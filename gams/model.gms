@@ -1,5 +1,21 @@
 $ontext
-title{Implementation of energyRt Reference Energy System model in GAMS}
+\documentclass{article}
+\usepackage[a4paper,landscape,margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{breqn}
+\usepackage{longtable}
+\usepackage{graphicx}
+\title{Implementation of energyRt Reference Energy System model in GAMS}
+\date{July 1, 2016}
+\author{Oleg Lugovoy \and Vladimir Potashnikov}
+\begin{document}
+\maketitle
+   \begin{abstract}
+         The model is a part of \textbf{energyRt} package for energy systems modeling in \textbf{R}
+         (\url{https://github.com/olugovoy/energyRt}), developed by Oleg Lugovoy and Vladimir Potashnikov,
+         and implemented in GAMS and GLPK/MathProg by Vladimir Potashnikov.
+   \end{abstract}
+\end{document}
 
 $offtext
 
@@ -42,10 +58,10 @@ Alias (slice, slicep), (group, groupp), (comm, commp), (comm, acomm), (comm, com
 * Mapping sets
 set
 *! technology:input
-mMilestoneLast(year)          Last period milestone
-mStartMilestone(year, year)
-mEndMilestone(year, year)
-mMidMilestone(year)
+mMilestoneLast(year)           Last period milestone
+mStartMilestone(year, year)    ???
+mEndMilestone(year, year)      ???
+mMidMilestone(year)            ???
 mTechRetirement(tech)          Early retirement option
 mTechUpgrade(tech, tech)       Upgrade by this technology possible for techp
 mTechInpComm(tech, comm)       Input main commodity
@@ -67,37 +83,37 @@ mTechCoutAOut(tech, comm, comm)  to Out aux out commodity (second commodity is m
 mTechNew(tech, region, year)     Technologies available for investment
 mTechSpan(tech, region, year)    Assisting set showing if the tech may exist in the time-span and region
 * Emissions
-mTechEmitedComm(tech, comm)
+mTechEmitedComm(tech, comm)      Mapping for emissions and technologies
 * Supply
-mSupComm(sup, comm)
+mSupComm(sup, comm)              Mapping for supply commodities
 * Demand
-mDemComm(dem, comm)
+mDemComm(dem, comm)              Mapping for demand commodities
 * Ballance
-mUpComm(comm)  PRODUCTION <= CONSUMPTION
-mLoComm(comm)  PRODUCTION >= CONSUMPTION
-mFxComm(comm)  PRODUCTION = CONSUMPTION
-defpTechAfaUp(tech, region, year, slice)
-defpTechAfacUp(tech, comm, region, year, slice)
-defpSupReserve(sup)
-defpSupAvaUp(sup, region, year, slice)
-defpDumCost(comm, region, year, slice)
-* Reserve set
-mResComm(stg, comm)
-* Reserve
-defpStorageCapUp(stg, region, year)
-mSlicePrevious(slice, slice)
-mSlicePreviousYear(slice)
+mUpComm(comm)  Commodity balance type PRODUCTION <= CONSUMPTION
+mLoComm(comm)  Commodity balance type PRODUCTION >= CONSUMPTION
+mFxComm(comm)  Commodity balance type PRODUCTION = CONSUMPTION
+defpTechAfaUp(tech, region, year, slice)         Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpTechAfacUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpSupReserve(sup)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpSupAvaUp(sup, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpDumCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+* Storage set
+mResComm(stg, comm)                              Mapping of storage technology and respective commodity
+* Storage
+defpStorageCapUp(stg, region, year)              Auxiliary mapping for Inf - used in GLPK-MathProg only
+mSlicePrevious(slice, slice)                     Mapping of slices for storage techs
+mSlicePreviousYear(slice)                        Mapping of slices for storage techs
 * Trade and ROW
-mTradeComm(trade, comm)
-mExpComm(expp, comm)
-mImpComm(imp, comm)
-defpTradeFlowUp(trade, region, region, year, slice)
-defpRowExportRes(expp)
-defpRowExportUp(expp, region, year, slice)
-defpRowImportRes(imp)
-defpRowImportUp(imp, region, year, slice)
+mTradeComm(trade, comm)                          Mapping of trade commodities
+mExpComm(expp, comm)                             Mapping of export commodities
+mImpComm(imp, comm)                              Mapping for import commodities
+defpTradeFlowUp(trade, region, region, year, slice)     Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpRowExportRes(expp)                                  Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpRowExportUp(expp, region, year, slice)              Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpRowImportRes(imp)                                   Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpRowImportUp(imp, region, year, slice)               Auxiliary mapping for Inf - used in GLPK-MathProg only
 * Zero discount
-mDiscountZero(region)
+mDiscountZero(region)                            Auxiliary mapping mapping for  regions with zero discount
 ;
 
 * Set priority
@@ -105,12 +121,12 @@ mDiscountZero(region)
 * tech, sup, group, comm, region, year, slice
 * Parameter
 parameter
-pMilestone1(year, year)
-pMilestone2(year, year)
+pMilestone1(year, year)                            ???
+pMilestone2(year, year)                            ???
 * Aggregate
-pAggregateFactor(comm, comm)
+pAggregateFactor(comm, comm)                       Aggragation factor of
 * Technology parameter
-pTechOlife(tech, region)
+pTechOlife(tech, region)                           Operational life of technologies
 
 pTechCinp2ginp(tech, comm, region, year, slice)    Multiplying factor for a commodity intput to obtain group input
 pTechGinp2use(tech, group, region, year, slice)    Multiplying factor for a group input commodity to obtain use
@@ -148,22 +164,22 @@ pDiscount(region, year)                             Discount rate (can be region
 *# RENAME  pDiscountFactor
 pDiscountMultiple(region, year)                     Discount factor (cumulative)
 * Supply
-pSupCost(sup, region, year, slice)
-pSupAvaUp(sup, region, year, slice)
-pSupAvaLo(sup, region, year, slice)
-pSupReserve(sup)
+pSupCost(sup, region, year, slice)                  Costs of supply
+pSupAvaUp(sup, region, year, slice)                 Upper bound for supply
+pSupAvaLo(sup, region, year, slice)                 Lower bound for supply
+pSupReserve(sup)                                    Total supply reserve
 * Demand
-pDemand(dem, region, year, slice)
+pDemand(dem, region, year, slice)                   Exogenous demand
 * Emissions
-pEmissionFactor(comm, comm)
+pEmissionFactor(comm, comm)                         Emission factor
 * Dummy import
-pDumCost(comm, region, year, slice)
+pDumCost(comm, region, year, slice)                 Dummy costs parameters
 * Tax
-pTaxCost(comm, region, year, slice)
-pSubsCost(comm, region, year, slice)
+pTaxCost(comm, region, year, slice)                 Taxes
+pSubsCost(comm, region, year, slice)                Subsidies
 ;
 
-* Reserve parameter
+* Storage technology parameters
 parameter
 pStorageInpLoss(stg, region, year, slice)
 pStorageOutLoss(stg, region, year, slice)
@@ -179,7 +195,7 @@ pStorageFixom(stg, region, year)
 pStorageInvcost(stg, region, year)
 pStorageStoreStock(stg, region, year, slice)
 ;
-* Trade parameter
+* Trade parameters
 parameter
 pTradeFlowUp(trade, region, region, year, slice)
 pTradeFlowLo(trade, region, region, year, slice)
@@ -194,7 +210,7 @@ pRowImportLo(imp, region, year, slice)
 pRowImportPrice(imp, region, year, slice)
 ;
 
-
+* Endigenous variables
 positive variable
 vTechUse(tech, region, year, slice)
 vTechNewCap(tech, region, year)
