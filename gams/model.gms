@@ -1,5 +1,8 @@
 $ontext
+<<<<<<< HEAD
 #!onLatex
+=======
+>>>>>>> 59858bf63953f28d2c24fd90456ced6d76912388
 \documentclass{article}
 \usepackage[a4paper,landscape,margin=1in]{geometry}
 \usepackage[utf8]{inputenc}
@@ -15,11 +18,16 @@ $ontext
          The model is a part of \textbf{energyRt} package for energy systems modeling in \textbf{R}
          (\url{https://github.com/olugovoy/energyRt}), developed by Oleg Lugovoy and Vladimir Potashnikov,
          and implemented in GAMS and GLPK/MathProg by Vladimir Potashnikov.
+<<<<<<< HEAD
          The package and the code of the model is dessiminated under GNU Affero General Public License (AGPL-3)
          free public license (see \url{https://www.gnu.org/licenses/agpl.html} for details).
    \end{abstract}
 \end{document}
 #!offLatex
+=======
+   \end{abstract}
+
+>>>>>>> 59858bf63953f28d2c24fd90456ced6d76912388
 $offtext
 
 OPTION RESLIM=50000, PROFILE=0, SOLVEOPT=REPLACE;
@@ -101,7 +109,10 @@ defpSupReserve(sup)                              Auxiliary mapping for Inf - use
 defpSupAvaUp(sup, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
 defpDumCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
 * Storage set
+<<<<<<< HEAD
 *# RENAME
+=======
+>>>>>>> 59858bf63953f28d2c24fd90456ced6d76912388
 mResComm(stg, comm)                              Mapping of storage technology and respective commodity
 * Storage
 defpStorageCapUp(stg, region, year)              Auxiliary mapping for Inf - used in GLPK-MathProg only
@@ -214,8 +225,12 @@ pRowImportLo(imp, region, year, slice)               Lower bound on import from 
 pRowImportPrice(imp, region, year, slice)            Import prices from ROW
 ;
 
+<<<<<<< HEAD
 * Endogenous variables
 ** Technology
+=======
+* Endigenous variables
+>>>>>>> 59858bf63953f28d2c24fd90456ced6d76912388
 positive variable
 vTechUse(tech, region, year, slice)                  Use level in technology
 vTechNewCap(tech, region, year)                      New capacity
@@ -1223,6 +1238,8 @@ eqSubsCost(comm, region, year)$mMidMilestone(year)..
          vOutTot(comm, region, year, slice));
 
 
+* End generation latex file
+*\end{document}
 * ------------------------------------------------------------------------------
 * Standart constrain: Begin
 * ------------------------------------------------------------------------------
