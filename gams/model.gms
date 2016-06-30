@@ -15,7 +15,6 @@ $ontext
          (\url{https://github.com/olugovoy/energyRt}), developed by Oleg Lugovoy and Vladimir Potashnikov,
          and implemented in GAMS and GLPK/MathProg by Vladimir Potashnikov.
    \end{abstract}
-\end{document}
 
 $offtext
 
@@ -1219,6 +1218,8 @@ eqSubsCost(comm, region, year)$mMidMilestone(year)..
          vOutTot(comm, region, year, slice));
 
 
+* End generation latex file
+*\end{document}
 * ------------------------------------------------------------------------------
 * Standart constrain: Begin
 * ------------------------------------------------------------------------------
