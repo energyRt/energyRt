@@ -1,0 +1,12 @@
+\name{approximation-rule}
+\alias{approximation-rule}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+  Main rule approximation
+}
+\description{
+  \describe{
+    \item{UP, LO, FX}{UP }
+    \item{}
+   }
+}
