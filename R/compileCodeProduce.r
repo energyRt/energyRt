@@ -294,7 +294,7 @@ sm_compile_model <- function(obj,
         dd$Freq <- cumprod(1 / (1 + dd$Freq))
         ll <- rbind(ll, dd)
       }
-      prec@maptable[['pDiscountMultiple']]@data <- ll
+      prec@maptable[['pDiscountFactor']]@data <- ll
        hh <- gg[gg$year == as.character(max(obj@sysInfo@year)), -2]
        hh <- hh[hh$Freq == 0, 'region', drop = FALSE]
       # Add mDiscountZero - zero discount rate in final period

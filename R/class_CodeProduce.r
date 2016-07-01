@@ -204,7 +204,7 @@ setMethod("initialize", "CodeProduce",
                 
   ## NEED SET ALIAS FOR SYS INFO
   # Reserve
-    .Object@maptable[['mResComm']] <- MapTable('mResComm', c('stg', 'comm'), 'map')    
+    .Object@maptable[['mStorageComm']] <- MapTable('mStorageComm', c('stg', 'comm'), 'map')    
     # Single & Double
         .Object@maptable[['pStorageOlife']] <- MapTable('pStorageOlife', 
               c('stg', 'region'), 'single', 
@@ -317,7 +317,7 @@ setMethod("initialize", "CodeProduce",
     .Object@maptable[['defpRowImportUp']] <- MapTable('defpRowImportUp', 
         c('imp', 'region', 'year', 'slice'), 'map')    
   .Object@maptable[['defpDumCost']] <- MapTable('defpDumCost', c('comm', 'region', 'year', 'slice'), 'map')    
-  .Object@maptable[['pDiscountMultiple']] <- MapTable('pDiscountMultiple', c('region', 'year'), 'single')    
+  .Object@maptable[['pDiscountFactor']] <- MapTable('pDiscountFactor', c('region', 'year'), 'single')    
   .Object@maptable[['mDiscountZero']] <- MapTable('mDiscountZero', 'region', 'map', default = 1) 
   ## Milestone set
   .Object@maptable[['mMidMilestone']] <- MapTable('mMidMilestone', 'year', 'map', default = 1) 

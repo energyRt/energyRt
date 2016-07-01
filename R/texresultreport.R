@@ -139,7 +139,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       }
       
       # Discount cost data
-      dsc <- obj@precompiled@maptable$pDiscountMultiple@data
+      dsc <- obj@precompiled@maptable$pDiscountFactor@data
       dsc <- tapply(dsc$Freq, dsc[, c('region', 'year'), drop = FALSE], sum)
       dsccost <- rbind(
         Subsidy = apply(apply(dat$vSubsCost, 2:3, sum) * dsc, 2, sum),

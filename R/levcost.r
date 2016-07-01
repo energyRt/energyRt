@@ -239,7 +239,7 @@ sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
             rr@result@solution_report$finish == 2 && 
             all(rr@result@data$vDumOut == 0))) stop('Error in solution')
 ##  # Additional table          
-##    dsc <- rr@precompiled@maptable[['pDiscountMultiple']]@data
+##    dsc <- rr@precompiled@maptable[['pDiscountFactor']]@data
 ##    dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]
 ##    colnames(dsc)[2] <- 'discount.factor'
 ##    yy <- rep(0, nrow(dsc))
@@ -286,7 +286,7 @@ sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
 ##    dsc[, 'total.cost'] <- apply(dsc[, ncol(dsc) - (0:3)], 1, sum)
 ##    dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
   # Additional table          
-    dsc <- rr@precompiled@maptable[['pDiscountMultiple']]@data
+    dsc <- rr@precompiled@maptable[['pDiscountFactor']]@data
     dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]
     colnames(dsc)[2] <- 'discount.factor'
     cst <- rep(0, nrow(dsc))
