@@ -364,10 +364,8 @@ sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
 #' @param tmp.dir a dirrectory for temporary files to run the model, by default
 #'                '/solwork' in the project directory.
 #' @param tmp.del a logical scalar indicating if solver temporary files should be deleted. 
-#' @return 
-#'  !!!
 #' @example 
-#'  !!!
+#'  
 #' 
 setMethod('levcost', signature(tech = 'technology'), sm_levcost)
 
