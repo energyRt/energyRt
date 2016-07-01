@@ -1,3 +1,4 @@
+
 universalInit <- function(class_name, name, ...) {
   obj <- new(class_name)
   slt <- getSlots(class_name)
@@ -76,26 +77,50 @@ universalInit <- function(class_name, name, ...) {
 #  units = data.frame(capacity = 'MV', fixom = 'j', stringsAsFactors = FALSE)))
 
 setGeneric("newTechnology", function(name, ...) standardGeneric("newTechnology"))
+#' Create new technology object
+#' 
+#' @name newTechnology
+#' 
 setMethod('newTechnology', signature(name = 'character'), function(name, ...) 
   universalInit('technology', name, ...))
 
 setGeneric("newCommodity", function(name, ...) standardGeneric("newCommodity"))
+#' Create new commodity object
+#' 
+#' @name newCommodity
+#' 
 setMethod('newCommodity', signature(name = 'character'), function(name, ...) 
   universalInit('commodity', name, ...))
 
 setGeneric("newDemand", function(name, ...) standardGeneric("newDemand"))
+#' Create new demand object
+#' 
+#' @name newDemand
+#' 
 setMethod('newDemand', signature(name = 'character'), function(name, ...) 
   universalInit('demand', name, ...))
 
 setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
+#' Create new supply object
+#' 
+#' @name newSupply
+#' 
 setMethod('newSupply', signature(name = 'character'), function(name, ...) 
   universalInit('supply', name, ...))
 
 setGeneric("newExport", function(name, ...) standardGeneric("newExport"))
+#' Create new export object
+#' 
+#' @name newExport
+#' 
 setMethod('newExport', signature(name = 'character'), function(name, ...) 
   universalInit('export', name, ...))
 
 setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
+#' Create new import object
+#' 
+#' @name newImport
+#' 
 setMethod('newImport', signature(name = 'character'), function(name, ...) 
   universalInit('import', name, ...))
 
@@ -104,10 +129,18 @@ setMethod('newImport', signature(name = 'character'), function(name, ...)
 #  universalInit('constrain', name, ...))
 
 setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
+#' Create new model object
+#' 
+#' @name newModel
+#' 
 setMethod('newModel', signature(name = 'character'), function(name, ...) 
   universalInit('model', name, ...))
 
 setGeneric("newRepository", function(name, ...) standardGeneric("newRepository"))
+#' Create new repository object
+#' 
+#' @name newRepository
+#' 
 setMethod('newRepository', signature(name = 'character'), function(name, ...) 
   universalInit('Repository', name, ...))
 

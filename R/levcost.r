@@ -1,3 +1,5 @@
+
+summary.levcost <- function(x) x$total
 sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
   tech <- upper_case(tech)
   arg <- list(...)
@@ -340,7 +342,32 @@ sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
     class = 'levcost')
 }
 
+#' Calculate levelized costs
+#' 
+#' \code{levcost} is a method for class \code{technology} to calculate 
+#' levelized costs of production of commodity
+#' @name levcost
+#' @docType methods
+#' @rdname show-methods
+#' 
+#' @param tech object of class \code{technology}
+#' @param start_year numeric, the year of investments
+#' @param discount numeric, the discount rate
+#' @param price data frame with input commodity prices, has three mandatory fields:
+#' 
+#'    \code{comm} character, names of commodities 
+#'        
+#'    \code{price} numeric, prices of the commodity
+#'    
+#'    \code{year} numeric, years
+#' @param solver character, name of solver software "GAMS" or "GLPK"
+#' @param tmp.dir a dirrectory for temporary files to run the model, by default
+#'                '/solwork' in the project directory.
+#' @param tmp.del a logical scalar indicating if solver temporary files should be deleted. 
+#' @return 
+#'  !!!
+#' @example 
+#'  !!!
+#' 
 setMethod('levcost', signature(tech = 'technology'), sm_levcost)
 
-
-summary.levcost <- function(x) x$total

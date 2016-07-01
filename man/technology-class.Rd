@@ -10,7 +10,7 @@ An S4 class to represent technology
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{A short name, character string}
+\item{\code{name}}{A short name of the technology, also used in GAMS and GLPK}
 
 \item{\code{description}}{Detailed description}
 
