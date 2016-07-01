@@ -1,3 +1,13 @@
+#' An S4 class to represent technology
+#' 
+#' @slot name A short name of the technology, also used in GAMS and GLPK
+#' @slot description Detailed description
+#' @slot type A character string to distinguish various types of technologies (optional)
+#' @slot sector A character string to assotiate the technology with a particular sector (optional)
+#' @slot enbal A reserved name to refer the technology to a certain part of energy balance (optional)
+#' @slot color A color to represent the technology with graphical functions (in development)
+#' @slot input 
+
 setClass("technology",
       representation(
       # General information
