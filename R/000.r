@@ -21,7 +21,7 @@ setGeneric('checkDuplicatedRow', function(obj) standardGeneric("checkDuplicatedR
 setGeneric('addSet', function(obj, set) standardGeneric("addSet"))
 setGeneric('addMultipleSet', function(obj, set) standardGeneric("addMultipleSet"))
 #setGeneric('solve', function(obj, ...) standardGeneric("solve"))
-setGeneric('levcost', function(tech, ...) standardGeneric("levcost"))
+setGeneric('levcost', function(obj, ...) standardGeneric("levcost"))
 setGeneric('interpolation', function(obj, parameter, default, ...) standardGeneric("interpolation"))
 setGeneric("add0", function(obj, app, approxim) standardGeneric("add0"))
 setGeneric("add_name", function(obj, app, approxim) standardGeneric("add_name"))

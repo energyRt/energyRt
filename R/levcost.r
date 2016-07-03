@@ -1,7 +1,7 @@
 
 summary.levcost <- function(x) x$total
-sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
-  tech <- upper_case(tech)
+sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
+  tech <- upper_case(obj)
   arg <- list(...)
   # prepare model
   reps <- new('repository')
@@ -366,5 +366,22 @@ sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
 #' @example 
 #'  
 #' 
-setMethod('levcost', signature(tech = 'technology'), sm_levcost)
+sm_levcost_scenario <- function(obj, commodity) {
+  if (is.null(commodity) || length(commodity) != 1) stop('levcost: wrong commodity')
+  if (any(obj@precompiled@maptable$mDemComm@data$comm != commodity) &&
+    any(obj@result@data$vDemInp[dimnames(obj@result@data$vDemInp)$comm != commodity,,,] != 0)) 
+      stop('levcost: demand commodity have to be only one')
+  if (all(obj@precompiled@maptable$mDemComm@data$comm != commodity) || 
+    all(obj@result@data$vDemInp[commodity,,,] == 0)) 
+      stop('levcost: there is not demand for commodity')
+  
+  gg <- obj@precompiled@maptable$pDiscountFactor@data
+  (obj@result@data$vObjective / sum(
+    tapply(gg$Freq, gg[, c('region', 'year')], sum)
+    * apply(obj@result@data$vDemInp[commodity,,,, drop  = FALSE], 2:3, sum)
+  ))
+}
+
+setMethod('levcost', signature(obj = 'technology'), sm_levcost)
+setMethod('levcost', signature(obj = 'scenario'), sm_levcost_scenario)
 
