@@ -7,6 +7,7 @@
 #' @slot enbal A reserved name to refer the technology to a certain part of energy balance (optional)
 #' @slot color A color to represent the technology with graphical functions (in development)
 #' @slot input 
+#' ...
 
 setClass("technology",
       representation(
@@ -166,4 +167,4 @@ setClass("technology",
       ),
       validity = check_technology_data_frame,
       S3methods = TRUE
-);
+)

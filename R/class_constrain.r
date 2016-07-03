@@ -28,7 +28,7 @@ setClass('constrain',
                                                 'sharein',
                                                 'shareout',
                                                 'tax',
-                                                'subs'
+                                                'subsidy'
                                                 )),
           rhs           = data.frame(),
           for.sum        = list(),
@@ -42,6 +42,10 @@ setClass('constrain',
 
 
 #----------------------------------------------------------------------------------
+#' Create new constrain object
+#' 
+#' @name newConstrain
+#' 
 newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(), 
    for.each = list(), default = 0, rule = 'default', comm = NULL) {
   obj <- new('constrain')
@@ -81,18 +85,18 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
       } else{
         obj@rhs[1, 'tax'] <- rhs
       }
-  } else if (type == 'subs') {
+  } else if (type == 'subsidy') {
       obj@comm     <- comm
       if (rule == 'default')  rule <- 'inter.forth'
       obj@rule     <- rule
       obj@rhs <- data.frame(region = character(), 
                               year = numeric(), 
                               slice = character(), 
-                              subs = numeric(), 
+                              subsidy = numeric(), 
                               stringsAsFactors = FALSE
                               )
       if (is.data.frame(rhs)) {
-        if (nrow(rhs) == 0) stop('Wrong rhs in subs constrain')
+        if (nrow(rhs) == 0) stop('Wrong rhs in subsidy constrain')
         nn <- 1:nrow(rhs)
         if (any(colnames(rhs) == 'region')) 
             obj@rhs[nn, 'region'] <- as.character(rhs$region)
@@ -100,11 +104,11 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
             obj@rhs[nn, 'year'] <- as.numeric(rhs$year)
         if (any(colnames(rhs) == 'slice')) 
             obj@rhs[nn, 'slice'] <- as.character(rhs$slice)
-        if (any(colnames(rhs) == 'subs')) {
-            obj@rhs[nn, 'subs'] <- as.numeric(rhs$subs)
-        } else stop('Wrong rhs in subs constrain')
+        if (any(colnames(rhs) == 'subsidy')) {
+            obj@rhs[nn, 'subsidy'] <- as.numeric(rhs$subsidy)
+        } else stop('Wrong rhs in subsidy constrain')
       } else{
-        obj@rhs[1, 'subs'] <- rhs
+        obj@rhs[1, 'subsidy'] <- rhs
       }
   } else {
       if (rule == 'default')  rule <- 'back.inter.forth'
@@ -198,7 +202,7 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
 #  add_code <- c()
 #  add_set <- c()
 #  eqDec <- c()
-#  if (all(obj@type != c('tax', 'subs'))) {
+#  if (all(obj@type != c('tax', 'subsidy'))) {
 #      # Add set
 #      specSet <- list()
 #      for(i in names(obj@for.each)[!sapply(obj@for.each, is.null)])
@@ -431,7 +435,7 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
 #  add_code <- c()
 #  add_set <- c()
 #  eqDec <- c()
-#  if (all(obj@type != c('tax', 'subs'))) {
+#  if (all(obj@type != c('tax', 'subsidy'))) {
 #      # Add set
 #      slc <- c('tech', 'sup', 'res', 'row', 'trade', 'group', 'comm', 'region', 'year', 'slice')
 #      al_slc <- c('t', 'sp', 'rs', 'rw', 'trd', 'g', 'c', 'r', 'y', 's')

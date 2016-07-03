@@ -348,7 +348,6 @@ sm_levcost <- function(tech, tmp.dir = NULL, tmp.del = TRUE, ...) {
 #' levelized costs of production of commodity
 #' @name levcost
 #' @docType methods
-#' @rdname show-methods
 #' 
 #' @param tech object of class \code{technology}
 #' @param start_year numeric, the year of investments

@@ -22,6 +22,6 @@ An S4 class to represent technology
 
 \item{\code{color}}{A color to represent the technology with graphical functions (in development)}
 
-\item{\code{input}}{}
+\item{\code{input}}{...}
 }}
 

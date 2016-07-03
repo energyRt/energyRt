@@ -142,7 +142,7 @@ setGeneric("newRepository", function(name, ...) standardGeneric("newRepository")
 #' @name newRepository
 #' 
 setMethod('newRepository', signature(name = 'character'), function(name, ...) 
-  universalInit('Repository', name, ...))
+  universalInit('repository', name, ...))
 
 
 

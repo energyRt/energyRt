@@ -97,7 +97,6 @@ class_to_text <- function(obj, alias = NULL) {
   txt
 }
 
-
 class_to_text2 <- function(obj, alias = NULL) {
   cls <- class(obj)
   slts <- getSlots(cls)
@@ -107,7 +106,7 @@ class_to_text2 <- function(obj, alias = NULL) {
   } else nm <- alias
   #txt <- paste(nm, ' <- new("', class(obj), '");', sep = '')
   txt <- paste(nm, ' <- new', toupper(substr(cls, 1, 1)), substr(cls, 2, nchar(cls)), '(', sep = '') 
-    #'(name = "', nm, '", \n'
+    # '(name = "', nm, '", \n'
   for(sl in names(slts)) {
    # if (sl == names(slts)[length(slts)]) isend <- '\n);\n' else isend <- ','
     a1 <- slot(obj, sl)

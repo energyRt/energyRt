@@ -1,3 +1,16 @@
+#' Graphical scetch of technology
+#' 
+#' \code{draw} is a method for class \code{technology} to graphically depict  
+#' input, output, and key parameters of technology
+#' @name draw
+#' @docType methods
+#' 
+#' @param tech object of class \code{technology}
+#' @param year numeric, the year of operation, optional, in case of some parameters vary by years;
+#' if missing, years are ingored, the first assigned parameter is considered. 
+#' @param slice character, the time slice, similar to year
+#' @param reg character, the region
+#' 
 draw <- function (...) UseMethod("draw")
 
 
