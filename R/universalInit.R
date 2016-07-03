@@ -1,8 +1,9 @@
 
-universalInit <- function(class_name, name, ...) {
+universalInit <- function(class_name, name, exclude = NULL, ...) {
   obj <- new(class_name)
   slt <- getSlots(class_name)
   arg <- list(...)
+  arg <- arg[names(arg) != exclude]
   obj@name <- name
   if (length(arg) != 0) {
     if (any(names(arg) == 'name')) stop('Duplicate parameter name')
@@ -133,8 +134,13 @@ setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #' 
 #' @name newModel
 #' 
-setMethod('newModel', signature(name = 'character'), function(name, ...) 
-  universalInit('model', name, ...))
+setMethod('newModel', signature(name = 'character'), function(name, ...) {
+    mdl <- universalInit('model', name, exclude = 'repository', ...)
+    if (any(names(list(...))== 'repository'))  {
+      mdl <- add(mdl, list(...)$repository)
+    }
+    mdl
+  })
 
 setGeneric("newRepository", function(name, ...) standardGeneric("newRepository"))
 #' Create new repository object
