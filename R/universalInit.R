@@ -150,7 +150,7 @@ setGeneric("newRepository", function(name, ...) standardGeneric("newRepository")
 setMethod('newRepository', signature(name = 'character'), function(name, ...) 
   universalInit('repository', name, ...))
 
-ssetGeneric("newModel", function(name, ...) standardGeneric("newModel"))
+setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #' Create new model object
 #' 
 #' @name newModel
