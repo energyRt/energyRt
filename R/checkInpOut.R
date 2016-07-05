@@ -57,16 +57,16 @@ checkInpOut <- function(tech) {
     }
     # Aux ?
     if (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2ainp', 'act2aout', 
-              'use2ainp', 'use2aout', 'cap2ainp', 'cap2aout')])) || 
+              'use2ainp', 'use2aout', 'cap2ainp', 'cap2aout', 'new2ainp', 'new2aout')])) || 
         any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2ainp', 
               'cinp2aout', 'cout2ainp', 'cout2aout')]))) {
       if (ctype[i, 'type'] != 'aux') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
   }
   for(i in acomm) {
-    aux[i, 'input'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2ainp', 'use2ainp', 'cap2ainp')])) || 
+    aux[i, 'input'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2ainp', 'use2ainp', 'cap2ainp', 'new2ainp')])) || 
         any(!is.na(tech@aeff[tech@aeff$comm == i, c('cinp2ainp', 'cout2ainp')]))) 
-    aux[i, 'output'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2aout', 'use2aout', 'cap2aout')])) || 
+    aux[i, 'output'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2aout', 'use2aout', 'cap2aout', 'new2aout')])) || 
         any(!is.na(tech@aeff[tech@aeff$comm == i, c('cinp2aout', 'cout2aout')]))) 
   }
   gtype <- data.frame(type      = factor(NULL, c('input', 'output')),

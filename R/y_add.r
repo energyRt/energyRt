@@ -442,8 +442,8 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   }
   dd <- data.frame(list = c('pTechUse2AOut', 'pTechAct2AOut', 'pTechCap2AOut', 
-       'pTechUse2AInp', 'pTechAct2AInp', 'pTechCap2AInp'),
-    table = c('use2aout', 'act2aout', 'cap2aout', 'use2ainp', 'act2ainp', 'cap2ainp'),
+       'pTechUse2AInp', 'pTechAct2AInp', 'pTechCap2AInp', 'pTechNew2AInp', 'pTechNew2AOut'),
+    table = c('use2aout', 'act2aout', 'cap2aout', 'use2ainp', 'act2ainp', 'cap2ainp', 'new2ainp', 'new2aout'),
     stringsAsFactors = FALSE)
   for(i in 1:nrow(dd)) {
     approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']

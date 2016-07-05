@@ -1,0 +1,4 @@
+*.log
+*.lst
+gams/model.lxi
+*.~gm

@@ -170,6 +170,13 @@ setMethod("initialize", "CodeProduce",
               c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
                 default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cap2aout')    
 
+        .Object@maptable[['pTechNew2AInp']] <- MapTable('pTechNew2AInp', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
+                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cap2aout')    
+        .Object@maptable[['pTechNew2AOut']] <- MapTable('pTechNew2AOut', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
+                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cap2aout')    
+
         .Object@maptable[['pTechCinp2AInp']] <- MapTable('pTechCinp2AInp', 
               c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'single', 
                 default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cinp2ainp')    
