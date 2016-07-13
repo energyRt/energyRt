@@ -7,7 +7,7 @@
 #' @slot enbal A reserved name to refer the technology to a certain part of energy balance (optional)
 #' @slot color A color to represent the technology with graphical functions (in development)
 #' @slot input 
-#' ...
+#' unfinished...
 
 setClass("technology",
       representation(

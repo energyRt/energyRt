@@ -6,8 +6,12 @@
 \title{Create new model object}
 \usage{
 \S4method{newModel}{character}(name, ...)
+
+\S4method{newModel}{character}(name, ...)
 }
 \description{
+Create new model object
+
 Create new model object
 }
 

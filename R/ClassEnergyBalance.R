@@ -1,3 +1,10 @@
+#ToDo:
+# Class technology, slot @enbal will have a name either a) a name of the sector
+# b) name of a function wich will assign the sector
+# Class energyBalance:
+# add slot @function which will have a list with functions to assign
+# technologies to a particular part of a balance.
+
 setClass("energyBalance",
           representation(
             # General information

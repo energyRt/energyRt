@@ -3,17 +3,13 @@
 \docType{methods}
 \name{levcost}
 \alias{levcost}
+\alias{sm_levcost_scenario}
 \title{Calculate levelized costs}
 \usage{
-\S4method{levcost}{technology}(tech, tmp.dir = NULL, tmp.del = TRUE, ...)
+sm_levcost_scenario(obj, commodity)
 }
 \arguments{
 \item{tech}{object of class \code{technology}}
-
-\item{tmp.dir}{a dirrectory for temporary files to run the model, by default
-'/solwork' in the project directory.}
-
-\item{tmp.del}{a logical scalar indicating if solver temporary files should be deleted.}
 
 \item{start_year}{numeric, the year of investments}
 
