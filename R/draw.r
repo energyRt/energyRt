@@ -73,7 +73,7 @@ draw.technology <- function(
     acomm <- tech@aux$acomm  
     if (length(acomm) != 0) {
       approxim <- list(region = region, year = year, slice = slice, comm = acomm)
-      aname <- c('act2ainp', 'act2aout', 'use2ainp', 'use2aout', 'cap2ainp', 'cap2aout')
+      aname <- c('act2ainp', 'act2aout', 'use2ainp', 'use2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 'ncap2aout')
       acname <- c('cinp2ainp', 'cout2ainp', 'cinp2aout', 'cout2aout')
       aparam <- lapply(acomm, function(y) {
         approxim$acomm <- y
@@ -98,9 +98,9 @@ draw.technology <- function(
         dbl <- dbl[sapply(dbl, nrow) != 0]
         
         list(single = sng, wcomm = dbl, input = any(names(sng) %in% c('act2ainp', 
-            'use2ainp', 'cap2ainp')) || any(names(dbl) %in% c('cinp2ainp', 'cout2ainp')), 
+            'use2ainp', 'cap2ainp', 'ncap2ainp')) || any(names(dbl) %in% c('cinp2ainp', 'cout2ainp')), 
             output = any(names(sng) %in% c('act2aout', 
-            'use2aout', 'cap2aout')) || any(names(dbl) %in% c('cinp2aout', 'cout2aout')))
+            'use2aout', 'cap2aout', 'ncap2aout')) || any(names(dbl) %in% c('cinp2aout', 'cout2aout')))
       })
       names(aparam) <- acomm
       ainp <- names(aparam)[sapply(aparam, function(x) x$input)]
@@ -208,7 +208,7 @@ draw.technology <- function(
         text(.01, y + .03, gg, adj = 0, cex = fnt)
         # Find 
         ll <- aparam[[cmm]]
-        ll$single <- ll$single[names(ll$single) %in% c('act2ainp', 'use2ainp', 'cap2ainp')]
+        ll$single <- ll$single[names(ll$single) %in% c('act2ainp', 'use2ainp', 'cap2ainp', 'ncap2ainp')]
         ll$wcomm <- ll$wcomm[names(ll$wcomm) %in% c('cinp2ainp', 'cout2ainp')]
         if (sum(c(sapply(ll$wcomm, nrow), recursive = TRUE)) + length(ll$single) > 3) {
             text(.26, y + .005, 'more than\nthree parameters', adj = 0, cex = .8)
@@ -325,7 +325,7 @@ draw.technology <- function(
         text(.80, y + .03, gg, adj = 0, cex = fnt)
         # Find
         ll <- aparam[[cmm]]
-        ll$single <- ll$single[names(ll$single) %in% c('act2aout', 'use2aout', 'cap2aout')]
+        ll$single <- ll$single[names(ll$single) %in% c('act2aout', 'use2aout', 'cap2aout', 'ncap2aout')]
         ll$wcomm <- ll$wcomm[names(ll$wcomm) %in% c('cinp2aout', 'cout2aout')]
         if (sum(c(sapply(ll$wcomm, nrow), recursive = TRUE)) + length(ll$single) > 3) {
             text(.56, y + .005, 'more than\nthree parameters', adj = 0, cex = .8)

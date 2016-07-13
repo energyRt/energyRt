@@ -155,12 +155,14 @@ pTechEmisComm(tech, comm)                          Combustion factor for input c
 pTechUse2AInp(tech, comm, region, year, slice)     Multiplying factor for use to obtain aux-commodity input
 pTechAct2AInp(tech, comm, region, year, slice)     Multiplying factor for activity to obtain aux-commodity input
 pTechCap2AInp(tech, comm, region, year, slice)     Multiplying factor for capacity to obtain aux-commodity input
+pTechNCap2AInp(tech, comm, region, year, slice)     Multiplying factor for new capacity to obtain aux-commodity input
 pTechCinp2AInp(tech, comm, comm, region, year, slice)    Multiplying factor for commodity-input to obtain aux-commodity input
 pTechCout2AInp(tech, comm, comm, region, year, slice)    Multiplying factor for commodity-output to obtain aux-commodity input
 * Aux output comm map
 pTechUse2AOut(tech, comm, region, year, slice)     Multiplying factor for use to obtain aux-commodity output
 pTechAct2AOut(tech, comm, region, year, slice)     Multiplying factor for activity to obtain aux-commodity output
 pTechCap2AOut(tech, comm, region, year, slice)     Multiplying factor for capacity to obtain aux-commodity output
+pTechNCap2AOut(tech, comm, region, year, slice)     Multiplying factor for new capacity to obtain aux-commodity output
 pTechCinp2AOut(tech, comm, comm, region, year, slice)     Multiplying factor for commodity to obtain aux-commodity output
 pTechCout2AOut(tech, comm, comm, region, year, slice)     Multiplying factor for commodity-output to obtain aux-commodity input
 *
@@ -529,6 +531,8 @@ eqTechAInp(tech, comm, region, year, slice)$(mMidMilestone(year) and mTechAInp(t
     pTechAct2AInp(tech, comm, region, year, slice)) +
   (vTechCap(tech, region, year) *
     pTechCap2AInp(tech, comm, region, year, slice)) +
+  (vTechNewCap(tech, region, year) *
+    pTechNCap2AInp(tech, comm, region, year, slice)) +
   sum(commp$mTechCinpAInp(tech, comm, commp),
       pTechCinp2AInp(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
@@ -544,6 +548,8 @@ eqTechAOut(tech, comm, region, year, slice)$(mMidMilestone(year) and mTechAOut(t
     pTechAct2AOut(tech, comm, region, year, slice)) +
   (vTechCap(tech, region, year) *
     pTechCap2AOut(tech, comm, region, year, slice)) +
+  (vTechNewCap(tech, region, year) *
+    pTechNCap2AOut(tech, comm, region, year, slice)) +
   sum(commp$mTechCinpAOut(tech, comm, commp),
       pTechCinp2AOut(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
@@ -8304,6 +8310,7 @@ put 2:0/;
 putclose;
 
 * 99089425-31110-4440-be57-2ca102e9cee1
+
 file vTechInv_csv / 'vTechInv.csv'/;
 vTechInv_csv.lp = 1;
 vTechInv_csv.nd = 1;

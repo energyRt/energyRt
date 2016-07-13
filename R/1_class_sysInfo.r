@@ -77,6 +77,8 @@ setClass("sysInfo",
                         cout2ainp   = as.numeric(0),
                         cinp2aout   = as.numeric(0),
                         cout2aout   = as.numeric(0),
+                        ncap2aout    = as.numeric(0),
+                        ncap2ainp    = as.numeric(0),
                         stringsAsFactors = FALSE),
           interpolation            = data.frame(
                         cinp2use   = as.character('back.inter.forth'),
@@ -114,6 +116,8 @@ setClass("sysInfo",
                         cout2ainp   = as.character('back.inter.forth'),
                         cinp2aout   = as.character('back.inter.forth'),
                         cout2aout   = as.character('back.inter.forth'),
+                        ncap2aout    = as.character('back.inter.forth'),
+                        ncap2ainp    = as.character('back.inter.forth'),
                         stringsAsFactors = FALSE)
       ),
       S3methods = TRUE
