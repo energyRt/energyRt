@@ -40,12 +40,12 @@
 [RP:MODEL_2]
 1=
 
+[RP:GLB1_SC]
+1=
+
 [RP:MODEL]
 1=
 2=eqTechShareOutUp
-
-[RP:GLB1_SC]
-1=
 
 [MRUFILES]
 1=C:\111\Dropbox\package\BottomUp\gams\for_out.gms
@@ -57,9 +57,9 @@
 7=C:\111\Dropbox\package\BottomUp\gams\estimate.lst
 
 [OPENWINDOW_1]
-FILE0=C:\Users\olugovoy\Desktop\Tsinghua training\temp\glb1_model\glb1_sc.gms
-FILE1=C:\Users\olugovoy\Documents\R\energyRt\gams\model.gms
-FILE2=C:\Users\olugovoy\Documents\R\energyRt\gams\model.gms
+FILE0=C:\111\GitHub\energyRt\gams\model.gms
+FILE1=C:\111\GitHub\energyRt\gams\model.lst
+FILE2=C:\111\GitHub\energyRt\gams\model.lst
 MAXIM=0
 TOP=0
 LEFT=0
