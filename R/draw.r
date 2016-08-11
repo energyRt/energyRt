@@ -96,7 +96,6 @@ draw.technology <- function(
         })
         names(dbl) <- acname
         dbl <- dbl[sapply(dbl, nrow) != 0]
-        
         list(single = sng, wcomm = dbl, input = any(names(sng) %in% c('act2ainp', 
             'use2ainp', 'cap2ainp', 'ncap2ainp')) || any(names(dbl) %in% c('cinp2ainp', 'cout2ainp')), 
             output = any(names(sng) %in% c('act2aout', 
@@ -217,8 +216,11 @@ draw.technology <- function(
             text(.26, y + .005 + .03 * c(1, -1, 0)[1:length(ll$single)], 
               paste(names(ll$single), '=', to_format(ll$single)), adj = 0, cex = .8)
           if (sum(c(sapply(ll$wcomm, nrow), recursive = TRUE)) != 0) {
-            ff <- sapply(names(ll$wcomm), function(x) paste(substr(x, 2, 4), '.', 
-              ll$wcomm[[x]]$comm, ' = ', to_format(ll$wcomm[[x]][, x]), sep = ''))
+            ff <- sapply(names(ll$wcomm), function(x) {
+              paste(c(sapply(seq(along = ll$wcomm[[x]]$comm), function(z) 
+                paste(substr(x, 2, 4), '.', ll$wcomm[[x]]$comm[z], 
+                  ' = ', to_format(ll$wcomm[[x]][z, x]), sep = ''))
+                , recursive = TRUE), collapse = ', ')})
             text(.26, y + .005 + .03 * c(1, -1, 0)[length(ll$single) + 1:length(ff)], 
               ff, adj = 0, cex = .8)
           }
@@ -320,7 +322,7 @@ draw.technology <- function(
         lines(c(.77, 1.02), rep(y, 2), lwd = llwd, col = cll)
         lines(c(.97, 1.02, .97), c(y - .02, y, y + .02), lwd = llwd, col = cll, lty = llty)
         gg <- cmm
-        if (!is.na(tech@aux[tech@aux$acomm == gg, 'unit'])) 
+       if (!is.na(tech@aux[tech@aux$acomm == gg, 'unit'])) 
             gg <- paste(gg, ' (', tech@aux[tech@aux$acomm == gg, 'unit'], ')', sep = '')
         text(.80, y + .03, gg, adj = 0, cex = fnt)
         # Find
@@ -334,8 +336,11 @@ draw.technology <- function(
             text(.757, y + .005 + .03 * c(1, -1, 0)[1:length(ll$single)],
               paste(names(ll$single), '=', to_format(ll$single)), adj = 1, cex = .8)
           if (sum(c(sapply(ll$wcomm, nrow), recursive = TRUE)) != 0) {
-            ff <- sapply(names(ll$wcomm), function(x) paste(substr(x, 2, 4), '.',
-              ll$wcomm[[x]]$comm, ' = ', to_format(ll$wcomm[[x]][, x]), sep = ''))
+            ff <- sapply(names(ll$wcomm), function(x) {
+              paste(c(sapply(seq(along = ll$wcomm[[x]]$comm), function(z) 
+                paste(substr(x, 2, 4), '.', ll$wcomm[[x]]$comm[z], 
+                  ' = ', to_format(ll$wcomm[[x]][z, x]), sep = ''))
+                , recursive = TRUE), collapse = ', ')})
             text(.757, y + .005 + .03 * c(1, -1, 0)[length(ll$single) + 1:length(ff)],
               ff, adj = 1, cex = .8)
           }

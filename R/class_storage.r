@@ -71,3 +71,53 @@ setClass("reserve",
       ),
       S3methods = TRUE
 );
+#
+#
+#commodity
+#introweek
+#introseasson
+#introday
+#seff = data.frame(
+#  region
+#  year
+#  season
+#  ava.up
+#  ava.lo
+#  ava.fx
+#  ava.fx
+#  chargeEff
+#  dischargeEff
+#  storageEff
+#)
+#weff = data.frame(
+#  region
+#  year
+#  week
+#  ava.up
+#  ava.lo
+#  ava.fx
+#  ava.fx
+#  chargeEff
+#  dischargeEff
+#  storageEff
+#)
+#deff = data.frame(
+#  region
+#  year
+#  day
+#  ava.up
+#  ava.lo
+#  ava.fx
+#  ava.fx
+#  chargeEff
+#  dischargeEff
+#  storageEff
+#)
+#
+#invcost
+#fixom
+#varom
+#
+#stock
+#
+#
