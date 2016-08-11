@@ -952,12 +952,11 @@ eqStorageSalv2(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(regio
       1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
-          ) / ((
-           1 - (1 + pDiscount(region, yeare)) ** (ORD(yeare)
-                 - pStorageOlife(stg, region) - ORD(year) + 1)
-           )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare))
+          ) / (sum(yearn$(ORD(yeare) = ORD(yearn)),
+           (pStorageOlife(stg, region) + ORD(year) - 1 - ORD(yeare)
+           )))
     ))   =e= 0;
-
+    
 eqStorageSalv3(stg, region, yeare)$(mMidMilestone(yeare) and not(mDiscountZero(region)))..
          vStorageSalv(stg, region)
          +

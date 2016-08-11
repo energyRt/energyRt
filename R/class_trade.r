@@ -3,7 +3,7 @@ setClass("trade",
       # General information
           name          = "character",       # Short name
           description   = "character",       # Details
-          commodity     = "character",       #
+          commodity     = "character",       # Vector if NULL that
           source        = "character",       # if NULL that in global region
           destination   = "character",       # if NULL that in global region
       # Performance parameters
@@ -17,7 +17,11 @@ setClass("trade",
          commodity      = NULL,       #
          source         = NULL,
          destination    = NULL,
-         trade          = data.frame(year       = numeric(),
+         trade          = data.frame(
+                                     source       = character(),
+                                     destination  = character(),
+                                     comm       = character(),
+                                     year       = numeric(),
                                      slice      = character(),
                                      ava.up     = numeric(),
                                      ava.fx     = numeric(),
