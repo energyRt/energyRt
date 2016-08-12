@@ -146,7 +146,6 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
         for(i in tps[!(tps %in% c(names(for.sum), names(for.each)))])
           for.each[i] <- list(NULL)
       }
-      #browser()
       ### HAVE TO FIX
       # Check additional set
     #  if (length(addset[[as.character(type)]]) != 0 && 
@@ -337,7 +336,6 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
 #            approxim[[i]] <- approxim[[i]][approxim[[i]] %in% obj@for.each[[i]]]
 #          }  
 #        }
-#        #browser()
 #        rhs <- interpolation(gg, 'rhs', approxim = approxim, year_range = year_range,
 #            rule = obj@rule, default = obj@default)  
 #        prm <- paste('rhsCns', obj@name, '(', paste(colnames(rhs)[-ncol(rhs)], 
@@ -359,7 +357,6 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
 #            } else {
 #              eqDecFull <- paste(eqDecFull, 'sum((', paste(qq, collapse = ', '), ')', sep = '')
 #            }
-#            #browser()
 #            q2 <- names(obj@for.sum[qq])[!sapply(obj@for.sum[qq], is.null)]
 #            if (length(q2) == 1) {
 #              eqDecFull <- paste(eqDecFull, '$', aliasSetFull[q2], '', sep = '')
@@ -397,7 +394,6 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
 #    hdd <- gsub('vInpTot[(]', 'vInpTot.l(', hdd)
 #    l2 <- gsub('[.][.].*', '', xx)
 #    use_set <- character()
-#    #browser()
 #    # There is loop
 #    if (any(grep('[(]', gsub('[$].*', '', l2)))) {
 #      use_set <- gsub('[$].*', '', gsub('^[[:alnum:]_]*', '', l2))
@@ -580,7 +576,6 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
 #            approxim[[i]] <- approxim[[i]][approxim[[i]] %in% obj@for.each[[i]]]
 #          }  
 #        }
-#        #browser()
 #        rhs <- interpolation(gg, 'rhs', approxim = approxim, year_range = year_range,
 #            rule = obj@rule, default = obj@default)
 #        prm <- paste('rhsCns', obj@name, '[', paste(al_slc[colnames(rhs)[-ncol(rhs)]], 
@@ -606,7 +601,6 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
 #              eqDecFull <- paste(eqDecFull, 'sum{', paste(paste(al_slc[qq], 'in', qq), 
 #                 collapse = ', '), '', sep = '')
 #            }
-#            #browser()
 #            q2 <- names(obj@for.sum[qq])[!sapply(obj@for.sum[qq], is.null)]
 #            if (length(q2) == 1) {
 #              eqDecFull <- paste(eqDecFull, ': ', aliasSetFull2[q2], '', sep = '')
