@@ -375,9 +375,11 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           tec <- dtt$technology[[tt]]
           tt <- tec@name
           #tt <- toupper(tt)
-          tec_input <- apply(dat$vTechInp[tt,,,,, drop = FALSE], c(2, 4), sum)
+          tec_input <- apply(dat$vTechInp[tt,,,,, drop = FALSE] +
+            dat$vTechAInp[tt,,,,, drop = FALSE], c(2, 4), sum)
           tec_input <- tec_input[apply(tec_input != 0, 1, any),, drop = FALSE]
-          tec_output <- apply(dat$vTechOut[tt,,,,, drop = FALSE], c(2, 4), sum)
+          tec_output <- apply(dat$vTechOut[tt,,,,, drop = FALSE] +
+            dat$vTechAOut[tt,,,,, drop = FALSE], c(2, 4), sum)
           tec_output <- tec_output[apply(tec_output != 0, 1, any),, drop = FALSE]
           tec_emission <- apply(dat$vTechEms[tt,,,,, drop = FALSE], c(2, 4), sum)
           tec_emission <- tec_emission[apply(tec_emission != 0, 1, any),, drop = FALSE]

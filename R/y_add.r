@@ -441,6 +441,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     obj@maptable[['mTechAInp']] <- addData(obj@maptable[['mTechAInp']],
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   }
+print(ctype$aux)
   dd <- data.frame(list = c('pTechUse2AOut', 'pTechAct2AOut', 'pTechCap2AOut', 
        'pTechUse2AInp', 'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp', 'pTechNCap2AOut'),
     table = c('use2aout', 'act2aout', 'cap2aout', 'use2ainp', 'act2ainp', 'cap2ainp', 'ncap2ainp', 'ncap2aout'),
@@ -468,11 +469,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
           dd[i, 'table'], obj@maptable[[dd[i, 'list']]], approxim, 'tech', tech@name))
     }
     if (nrow(tech@aeff) != 0) {
+#        mtechaout <- rep(FALSE, nrow(tech@aeff))
+#        names(mtechaout) <- tech@aeff$acomm
+#        mtechainp <- mtechaout
         for(i in 1:4) {
           tech@aeff <- tech@aeff[!is.na(tech@aeff$acomm),]
           ll <- c('cinp2ainp', 'cinp2aout', 'cout2ainp', 'cout2aout')[i]
           tbl <- c('pTechCinp2AInp', 'pTechCinp2AOut', 'pTechCout2AInp', 'pTechCout2AOut')[i]          
-          tbl2 <- c('mTechCinpAInp', 'mTechCinpAOut', 'mTechCoutAInp', 'mTechCoutAOut')[i]     
+          #tbl2 <- c('mTechCinpAInp', 'mTechCinpAOut', 'mTechCoutAInp', 'mTechCoutAOut')[i]     
           yy <- tech@aeff[!is.na(tech@aeff[, ll]), ]
           if (nrow(yy) != 0) {
             approxim_commp <- approxim
@@ -481,6 +485,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
             obj@maptable[[tbl]] <- addData(obj@maptable[[tbl]],
             simple_data_frame_approximation_chk(yy, ll, obj@maptable[[tbl]], 
                   approxim_commp, 'tech', tech@name))
+#            if (i %in% c(1, 3)) mtechainp[unique(yy$acomm)] <- TRUE else mtechaout[unique(yy$acomm)] <- TRUE 
           }
 #            tech@aeff <- tech@aeff[!is.na(tech@aeff$comm) & !is.na(tech@aeff$commp),]
 #            for(cmd in approxim_commp$comm) {
@@ -489,6 +494,13 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
 #                  data.frame(tech = rep(tech@name, length(cmm)), comm = rep(cmd, length(cmm)), commp = cmm))
 #           }
         }
+#        if (any(mtechainp)) {
+#          obj@maptable[['mTechAInp']] <- addData(obj@maptable[['mTechAInp']],
+#              data.frame(tech = rep(tech@name, sum(mtechainp)), comm = names(mtechainp)[mtechainp]))
+#          obj@maptable[['mTechAOut']] <- addData(obj@maptable[['mTechAOut']],
+#              data.frame(tech = rep(tech@name, sum(mtechaout)), comm = names(mtechaout)[mtechaout]))
+#        }
+  
     }
   
   # Start / End year

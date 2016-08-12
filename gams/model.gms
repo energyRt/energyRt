@@ -84,12 +84,8 @@ mTechOneComm(tech, comm)       Commodity without group
 mTechGroupComm(tech, group, comm)  Mapping between commodity-groups and commodities
 * Aux input comm map
 mTechAInp(tech, comm)            Auxiliary input commodity
-mTechCinpAInp(tech, comm, comm)  to Inp aux inp commodity (second commodity is main)
-mTechCoutAInp(tech, comm, comm)  to Out aux inp commodity (second commodity is main)
 * Aux output comm map
 mTechAOut(tech, comm)            Auxiliary output commodity
-mTechCinpAOut(tech, comm, comm)  to Inp aux out commodity (second commodity is main)
-mTechCoutAOut(tech, comm, comm)  to Out aux out commodity (second commodity is main)
 *
 mTechNew(tech, region, year)     Technologies available for investment
 mTechSpan(tech, region, year)    Assisting set showing if the tech may exist in the time-span and region
@@ -533,10 +529,10 @@ eqTechAInp(tech, comm, region, year, slice)$(mMidMilestone(year) and mTechAInp(t
     pTechCap2AInp(tech, comm, region, year, slice)) +
   (vTechNewCap(tech, region, year) *
     pTechNCap2AInp(tech, comm, region, year, slice)) +
-  sum(commp$mTechCinpAInp(tech, comm, commp),
+  sum(commp$pTechCinp2AInp(tech, comm, commp, region, year, slice),
       pTechCinp2AInp(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$mTechCoutAInp(tech, comm, commp),
+  sum(commp$pTechCout2AInp(tech, comm, commp, region, year, slice),
       pTechCout2AInp(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 
@@ -550,10 +546,10 @@ eqTechAOut(tech, comm, region, year, slice)$(mMidMilestone(year) and mTechAOut(t
     pTechCap2AOut(tech, comm, region, year, slice)) +
   (vTechNewCap(tech, region, year) *
     pTechNCap2AOut(tech, comm, region, year, slice)) +
-  sum(commp$mTechCinpAOut(tech, comm, commp),
+  sum(commp$pTechCinp2AOut(tech, comm, commp, region, year, slice),
       pTechCinp2AOut(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$mTechCoutAOut(tech, comm, commp),
+  sum(commp$pTechCout2AOut(tech, comm, commp, region, year, slice),
       pTechCout2AOut(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 

@@ -101,8 +101,8 @@ setMethod("initialize", "CodeProduce",
     for(i in c('mTechInpComm', 'mTechOutComm', 'mTechOneComm', 
       'mTechEmitedComm', 'mTechAInp', 'mTechAOut'))
         .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm'), 'map')    
-    for(i in c('mTechCinpAInp', 'mTechCoutAInp', 'mTechCinpAOut', 'mTechCoutAOut'))
-        .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm', 'commp'), 'map')    
+#    for(i in c('mTechCinpAInp', 'mTechCoutAInp', 'mTechCinpAOut', 'mTechCoutAOut'))
+#        .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm', 'commp'), 'map')    
     for(i in c('mTechInpGroup', 'mTechOutGroup'))
         .Object@maptable[[i]] <- MapTable(i, c('tech', 'group'), 'map')    
     .Object@maptable[['mTechGroupComm']] <- MapTable('mTechGroupComm', 
