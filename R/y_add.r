@@ -223,7 +223,6 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
       before <- paste(before, toupper(substr(ast, 1, 1)), substr(ast, 2, nchar(ast)), sep = '')
     }
  #   cat(app@name, '\n')
-#    if (app@name == 'GAS_UP') browser()
     FL <- TRUE
     for(cc in ccc) if (nrow(obj@maptable[[cc]]@data) == 0) FL <- FALSE
     if (length(ast) != 0 && nrow(obj@maptable[[ast]]@data) == 0) FL <- FALSE
@@ -314,6 +313,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
   tech <- upper_case(app)
   tech <- stayOnlyVariable(tech, approxim$region, 'region')
+  if (nrow(tech@output) == 0) stop('There is not output commodity for trchnology ', tech@name)
   # Temporary solution for immortality technology
   if (nrow(tech@olife) == 0) {
     tech@olife[1, ] <- NA;

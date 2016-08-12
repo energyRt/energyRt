@@ -115,30 +115,32 @@ draw.technology <- function(
          comm = rownames(ccomm), group = unique(ccomm$group))
       approxim$group <- approxim$group[!is.na(approxim$group)]
       if (length(approxim$group) == 0) approxim$group <- '1'
-      # Parameter approximation
-      gparam <- interpolation(tech@geff, 'ginp2use', 
-                                default = as.numeric(default['ginp2use']), 
-                                rule = rule['ginp2use'], 
-                                year_range = range(year),
-                                approxim = approxim)
-      gg <- c('cinp2ginp', 'cinp2use')
-      cparam <- lapply(gg, function(x) {
-                                interpolation(tech@ceff, x, 
-                                default = as.numeric(default[x]), 
-                                rule = rule[x], 
-                                year_range = range(year),
-                                approxim = approxim)})
-      names(cparam) <- gg
-      share <- interpolation_bound(tech@ceff, 'share', 
-                                default = as.numeric(default[c('share.lo', 'share.up')]), 
-                                rule = as.character(rule[c('share.lo', 'share.up')]), 
-                                year_range = range(year),
-                                approxim = approxim)
+      if (nrow(ccomm) != 0) {
+        # Parameter approximation
+        gparam <- interpolation(tech@geff, 'ginp2use', 
+                                  default = as.numeric(default['ginp2use']), 
+                                  rule = rule['ginp2use'], 
+                                  year_range = range(year),
+                                  approxim = approxim)
+        gg <- c('cinp2ginp', 'cinp2use')
+        cparam <- lapply(gg, function(x) {
+                                  interpolation(tech@ceff, x, 
+                                  default = as.numeric(default[x]), 
+                                  rule = rule[x], 
+                                  year_range = range(year),
+                                  approxim = approxim)})
+        names(cparam) <- gg
+        share <- interpolation_bound(tech@ceff, 'share', 
+                                  default = as.numeric(default[c('share.lo', 'share.up')]), 
+                                  rule = as.character(rule[c('share.lo', 'share.up')]), 
+                                  year_range = range(year),
+                                  approxim = approxim)
+      }
       # Figure
       lcount <- nrow(ccomm) + length(ainp)
       larrow <- rev(seq(lo_border + rn_border / (lcount + 1), 
          up_border - rn_border / (lcount + 1), length.out = lcount))
-      if (is.null(ARROW_FONT)) fnt <- min(sapply(rownames(ccomm), 
+      if (!is.null(ARROW_FONT)) fnt <- min(sapply(rownames(ccomm), 
           function(x) 9 / (6 + .7 * nchar(x[1])))) else fnt <- ARROW_FONT
       # Arrow
       for(i in seq(length.out = nrow(ccomm))) {
@@ -235,79 +237,82 @@ draw.technology <- function(
       approxim$group <- approxim$group[!is.na(approxim$group)]
       if (length(approxim$group) == 0) approxim$group <- '1'
       # Parameter approximation
-      gg <- c('use2cact', 'cact2cout')
-      cparam <- lapply(gg, function(x) {
-                                interpolation(tech@ceff, x, 
-                                default = as.numeric(default[x]), 
-                                rule = rule[x], 
-                                year_range = range(year),
-                                approxim = approxim)})
-      names(cparam) <- gg
-      share <- interpolation_bound(tech@ceff, 'share', 
-                                default = as.numeric(default[c('share.lo', 'share.up')]), 
-                                rule = as.character(rule[c('share.lo', 'share.up')]), 
-                                year_range = range(year),
-                                approxim = approxim)
-      afac <- interpolation_bound(tech@ceff, 'afac', 
-                                default = as.numeric(default[c('afac.lo', 'afac.up')]), 
-                                rule = as.character(rule[c('afac.lo', 'afac.up')]), 
-                                year_range = range(year),
-                                approxim = approxim)
-      # Figure
-      lcount <- nrow(ccomm) + length(aout)
-      larrow <- rev(seq(lo_border + rn_border / (lcount + 1), 
-          up_border - rn_border / (lcount + 1), length.out = lcount))
-      if (is.null(ARROW_FONT)) fnt <- min(sapply(rownames(ccomm), 
-          function(x) 9 / (6 + .7 * nchar(x[1])))) else fnt <- ARROW_FONT
-      # Arrow
-      for(i in seq(length.out = nrow(ccomm))) {
-        y <- larrow[i]
-        cll <- act_col
-        cmm <- rownames(ccomm)[i]
-        llty <- 1
-        llwd <- sng_lwd
-        lines(c(.77, 1.02), rep(y, 2), lwd = llwd, col = cll)
-        lines(c(.97, 1.02, .97), c(y - .02, y, y + .02), lwd = llwd, col = cll, lty = llty)
-        gg <- cmm
-        if (!is.na(tech@output[tech@output$comm == gg, 'unit'])) 
-            gg <- paste(gg, ' (', tech@output[tech@output$comm == gg, 'unit'], ')', sep = '')
-        text(.80, y + .03, gg, adj = 0, cex = fnt)
-        lo_legend <- paste('afac ',
-                to_format(as.numeric(afac[afac$comm == cmm & afac$type == 'lo', 'afac'])),
-                ' .. ',
-                to_format(as.numeric(afac[afac$comm == cmm & afac$type == 'up', 'afac'])),
-                '', sep = '')
-        #if (show_all ||lo_legend != 'afac 0 .. Inf') text(.757, y - .03, lo_legend, adj = 1, cex = .8)
-        s1 <- cparam$use2cact[cparam$use2cact$comm == cmm, 'use2cact']
-        if (show_all ||s1 != 1) text(.757, y + .03, paste('use2cact =', to_format(s1)), adj = 1, cex = .8)
-        s1 <- cparam$cact2cout[cparam$cact2cout$comm == cmm, 'cact2cout']
-        if (show_all ||s1 != 1) text(.757, y, paste('cact2cout =', to_format(s1)), adj = 1, cex = .8)
-        if (!is.na(ccomm[cmm, 'group'])) {
-          s1 <- share[share$comm == cmm & share$type == 'up', 'share']
-          s2 <- share[share$comm == cmm & share$type == 'lo', 'share']
-          if (show_all ||s1 != 1 || s2 != 0)
-              text(.757, y - .03, paste(to_format(100 * s2), '% .. ',
-                to_format(100 * s1), '%', sep = ''), adj = 1, cex = .8)
-        } 
+      if (nrow(ccomm) != 0) {
+        gg <- c('use2cact', 'cact2cout')
+        cparam <- lapply(gg, function(x) {
+                                  interpolation(tech@ceff, x, 
+                                  default = as.numeric(default[x]), 
+                                  rule = rule[x], 
+                                  year_range = range(year),
+                                  approxim = approxim)})
+        names(cparam) <- gg
+        share <- interpolation_bound(tech@ceff, 'share', 
+                                  default = as.numeric(default[c('share.lo', 'share.up')]), 
+                                  rule = as.character(rule[c('share.lo', 'share.up')]), 
+                                  year_range = range(year),
+                                  approxim = approxim)
+        afac <- interpolation_bound(tech@ceff, 'afac', 
+                                  default = as.numeric(default[c('afac.lo', 'afac.up')]), 
+                                  rule = as.character(rule[c('afac.lo', 'afac.up')]), 
+                                  year_range = range(year),
+                                  approxim = approxim)
       }
-      if (any(!is.na(ccomm$group))) {
-        for(gr in unique(ccomm$group[!is.na(ccomm$group)])) {
-          gmin <- seq(length.out = nrow(ccomm))[!is.na(ccomm$group) & ccomm$group == gr][1]
-          gmax <- rev(seq(length.out = nrow(ccomm))[!is.na(ccomm$group) & ccomm$group == gr])[1]
-          # arr <- c(larrow[gmin] - .025, larrow[gmax] + 0.05)
-          arr <- c(larrow[gmin] - (larrow[2] - larrow[1]) * .15, larrow[gmax] + (larrow[2] - larrow[1]) * .15)
-          if (length(larrow) == 1) arr <- rep(larrow, 2)
-          col2 <- act_col
-          if (gmin != gmax) {
-            lines(rep(.56, 2) + ar_shift, arr, lwd = 3, col = act_col)
-            lines(c(.56, .59) + ar_shift, rep(arr[1], 2), lwd = 3, col = act_col)
-            lines(c(.56, .59) + ar_shift,  rep(arr[2], 2), lwd = 3, col = act_col)
-            bg_col <- bbcol1
-            points(.56 + ar_shift, sum(arr) / 2, cex = 3.5, col = act_col, bg = bbcol2, pch = 21)
-            text(.56 + ar_shift, sum(arr) / 2, adj = .5, cex = .65, gr)
-          } else {
-            points(.77, sum(arr) / 2 - .01, cex = 3.5, col = act_col, bg = 'white', pch = 21)
-            text(.77, sum(arr) / 2 - .01, adj = .5, cex = .65, gr)
+       # Figure
+        lcount <- nrow(ccomm) + length(aout)
+        larrow <- rev(seq(lo_border + rn_border / (lcount + 1), 
+            up_border - rn_border / (lcount + 1), length.out = lcount))
+        if (!is.null(ARROW_FONT)) fnt <- min(sapply(rownames(ccomm), 
+            function(x) 9 / (6 + .7 * nchar(x[1])))) else fnt <- ARROW_FONT
+        # Arrow
+        for(i in seq(length.out = nrow(ccomm))) {
+          y <- larrow[i]
+          cll <- act_col
+          cmm <- rownames(ccomm)[i]
+          llty <- 1
+          llwd <- sng_lwd
+          lines(c(.77, 1.02), rep(y, 2), lwd = llwd, col = cll)
+          lines(c(.97, 1.02, .97), c(y - .02, y, y + .02), lwd = llwd, col = cll, lty = llty)
+          gg <- cmm
+          if (!is.na(tech@output[tech@output$comm == gg, 'unit'])) 
+              gg <- paste(gg, ' (', tech@output[tech@output$comm == gg, 'unit'], ')', sep = '')
+          text(.80, y + .03, gg, adj = 0, cex = fnt)
+          lo_legend <- paste('afac ',
+                  to_format(as.numeric(afac[afac$comm == cmm & afac$type == 'lo', 'afac'])),
+                  ' .. ',
+                  to_format(as.numeric(afac[afac$comm == cmm & afac$type == 'up', 'afac'])),
+                  '', sep = '')
+          #if (show_all ||lo_legend != 'afac 0 .. Inf') text(.757, y - .03, lo_legend, adj = 1, cex = .8)
+          s1 <- cparam$use2cact[cparam$use2cact$comm == cmm, 'use2cact']
+          if (show_all ||s1 != 1) text(.757, y + .03, paste('use2cact =', to_format(s1)), adj = 1, cex = .8)
+          s1 <- cparam$cact2cout[cparam$cact2cout$comm == cmm, 'cact2cout']
+          if (show_all ||s1 != 1) text(.757, y, paste('cact2cout =', to_format(s1)), adj = 1, cex = .8)
+          if (!is.na(ccomm[cmm, 'group'])) {
+            s1 <- share[share$comm == cmm & share$type == 'up', 'share']
+            s2 <- share[share$comm == cmm & share$type == 'lo', 'share']
+            if (show_all ||s1 != 1 || s2 != 0)
+                text(.757, y - .03, paste(to_format(100 * s2), '% .. ',
+                  to_format(100 * s1), '%', sep = ''), adj = 1, cex = .8)
+          } 
+        }
+       if (any(!is.na(ccomm$group))) {
+          for(gr in unique(ccomm$group[!is.na(ccomm$group)])) {
+            gmin <- seq(length.out = nrow(ccomm))[!is.na(ccomm$group) & ccomm$group == gr][1]
+            gmax <- rev(seq(length.out = nrow(ccomm))[!is.na(ccomm$group) & ccomm$group == gr])[1]
+            # arr <- c(larrow[gmin] - .025, larrow[gmax] + 0.05)
+            arr <- c(larrow[gmin] - (larrow[2] - larrow[1]) * .15, larrow[gmax] + (larrow[2] - larrow[1]) * .15)
+            if (length(larrow) == 1) arr <- rep(larrow, 2)
+            col2 <- act_col
+            if (gmin != gmax) {
+              lines(rep(.56, 2) + ar_shift, arr, lwd = 3, col = act_col)
+              lines(c(.56, .59) + ar_shift, rep(arr[1], 2), lwd = 3, col = act_col)
+              lines(c(.56, .59) + ar_shift,  rep(arr[2], 2), lwd = 3, col = act_col)
+              bg_col <- bbcol1
+              points(.56 + ar_shift, sum(arr) / 2, cex = 3.5, col = act_col, bg = bbcol2, pch = 21)
+              text(.56 + ar_shift, sum(arr) / 2, adj = .5, cex = .65, gr)
+            } else {
+              points(.77, sum(arr) / 2 - .01, cex = 3.5, col = act_col, bg = 'white', pch = 21)
+              text(.77, sum(arr) / 2 - .01, adj = .5, cex = .65, gr)
+            }
           }
         }
       }
@@ -345,7 +350,6 @@ draw.technology <- function(
               ff, adj = 1, cex = .8)
           }
         } 
-      }
     }
     par(mar = MAR)
     }, interrupt = function(x) {
