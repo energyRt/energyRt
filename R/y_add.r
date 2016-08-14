@@ -441,7 +441,6 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     obj@maptable[['mTechAInp']] <- addData(obj@maptable[['mTechAInp']],
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   }
-print(ctype$aux)
   dd <- data.frame(list = c('pTechUse2AOut', 'pTechAct2AOut', 'pTechCap2AOut', 
        'pTechUse2AInp', 'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp', 'pTechNCap2AOut'),
     table = c('use2aout', 'act2aout', 'cap2aout', 'use2ainp', 'act2ainp', 'cap2ainp', 'ncap2ainp', 'ncap2aout'),
