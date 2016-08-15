@@ -22,6 +22,7 @@ setClass('constrain',
           eq            = factor('FX', levels = c('>=', '<=', '=')),
           type          = factor(NA, levels = c('capacity', 
                                                 'newcapacity', 
+                                                'investment', 
                                                 'activity', 
                                                 'input', 
                                                 'output',
@@ -31,8 +32,8 @@ setClass('constrain',
                                                 'subsidy'
                                                 )),
           rhs           = data.frame(),
-          for.sum        = list(),
-          for.each       = list(),
+          for.sum       = list(),
+          for.each      = list(),
           default       = 0, 
           rule          = as.character('back.inter.forth'),
           comm          = NULL
@@ -116,6 +117,7 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
       minset <- list()
       minset$capacity <- c('region', 'year')
       minset$newcapacity <- c('region', 'year')
+      minset$investment <- c('region', 'year')
       minset$activity <- c('region', 'year', 'slice')
       minset$input <- c('comm', 'region', 'year', 'slice')
       minset$output <- c('comm', 'region', 'year', 'slice')
@@ -129,6 +131,7 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
       unqset <- list()
       unqset$capacity <- c('tech', 'sup', 'res', 'trade', 'row')
       unqset$newcapacity <- c('tech', 'sup', 'res', 'trade', 'row')
+      unqset$investment <- c('tech', 'sup', 'res', 'trade', 'row')
       unqset$activity <- c('tech', 'sup', 'res', 'trade', 'row')
       # Check duplicat set
       if (anyDuplicated(c(names(for.sum), names(for.each)))) {
