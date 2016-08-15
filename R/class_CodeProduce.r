@@ -278,6 +278,8 @@ setMethod("initialize", "CodeProduce",
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')
         .Object@maptable[[nn]] <- MapTable(nn, c('cns', i), 'map')    
     }
+    .Object@maptable[['mCnsTech']] <- MapTable('mCnsTech', c('cns', 'tech'), 'map') 
+    .Object@maptable[['mCnsSup']] <- MapTable('mCnsSup', c('cns', 'sup'), 'map') 
     for(i in c("pRhs(cns)", "pRhsS(cns, slice)", "pRhsY(cns, year)", "pRhsYS(cns, year, slice)", 
       "pRhsR(cns, region)", "pRhsRS(cns, region, slice)", "pRhsRY(cns, region, year)", 
       "pRhsRYS(cns, region, year, slice)", "pRhsC(cns, comm)", "pRhsCS(cns, comm, slice)", 

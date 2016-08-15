@@ -222,11 +222,10 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     if (length(ast) == 1) {
       before <- paste(before, toupper(substr(ast, 1, 1)), substr(ast, 2, nchar(ast)), sep = '')
     }
- #   cat(app@name, '\n')
     FL <- TRUE
     for(cc in ccc) if (nrow(obj@maptable[[cc]]@data) == 0) FL <- FALSE
     if (length(ast) != 0 && nrow(obj@maptable[[ast]]@data) == 0) FL <- FALSE
-    if (FL) {
+   if (FL) {
       obj@maptable[['cns']] <- addData(obj@maptable[['cns']], app@name)
       obj@maptable[[paste('mCns', before, sep = '')]] <- addData(obj@maptable[[paste('mCns', before, sep = '')]], 
            data.frame(cns = app@name, stringsAsFactors = FALSE))  
@@ -236,8 +235,16 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
         addData(obj@maptable[['mCnsRhsTypeShareOut']], data.frame(cns = app@name, stringsAsFactors = FALSE)) else 
       obj@maptable[['mCnsRhsTypeConst']] <- addData(obj@maptable[['mCnsRhsTypeConst']], 
           data.frame(cns = app@name, stringsAsFactors = FALSE))
-      for(cc in ccc) {
-        if (cc %in% names(app@for.sum)) {
+      for(cc in c(ccc, ast[length(ast) == 1])) {
+        if (length(ast) == 1 && cc == ast) {
+          if (cc %in% names(app@for.sum)) {
+            if (is.null(app@for.sum[[cc]])) ll <- obj@maptable[[cc]]@data[, cc] else
+              ll <- app@for.sum[[cc]]
+          } else {
+            if (is.null(app@for.each[[cc]])) ll <- obj@maptable[[cc]]@data[, cc] else
+              ll <- app@for.each[[cc]]
+            }
+        } else if (cc %in% names(app@for.sum)) {
           if (is.null(app@for.sum[[cc]])) ll <- obj@maptable[[cc]]@data[, cc] else
             ll <- app@for.sum[[cc]]
           nn <- paste('mCnsLhs', toupper(substr(cc, 1, 1)), substr(cc, 2, nchar(cc)), sep = '')
@@ -313,7 +320,6 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
   tech <- upper_case(app)
   tech <- stayOnlyVariable(tech, approxim$region, 'region')
-  if (nrow(tech@output) == 0) stop('There is not output commodity for trchnology ', tech@name)
   # Temporary solution for immortality technology
   if (nrow(tech@olife) == 0) {
     tech@olife[1, ] <- NA;
@@ -468,14 +474,11 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
           dd[i, 'table'], obj@maptable[[dd[i, 'list']]], approxim, 'tech', tech@name))
     }
     if (nrow(tech@aeff) != 0) {
-#        mtechaout <- rep(FALSE, nrow(tech@aeff))
-#        names(mtechaout) <- tech@aeff$acomm
-#        mtechainp <- mtechaout
         for(i in 1:4) {
           tech@aeff <- tech@aeff[!is.na(tech@aeff$acomm),]
           ll <- c('cinp2ainp', 'cinp2aout', 'cout2ainp', 'cout2aout')[i]
           tbl <- c('pTechCinp2AInp', 'pTechCinp2AOut', 'pTechCout2AInp', 'pTechCout2AOut')[i]          
-          #tbl2 <- c('mTechCinpAInp', 'mTechCinpAOut', 'mTechCoutAInp', 'mTechCoutAOut')[i]     
+          tbl2 <- c('mTechCinpAInp', 'mTechCinpAOut', 'mTechCoutAInp', 'mTechCoutAOut')[i]     
           yy <- tech@aeff[!is.na(tech@aeff[, ll]), ]
           if (nrow(yy) != 0) {
             approxim_commp <- approxim
@@ -484,7 +487,6 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
             obj@maptable[[tbl]] <- addData(obj@maptable[[tbl]],
             simple_data_frame_approximation_chk(yy, ll, obj@maptable[[tbl]], 
                   approxim_commp, 'tech', tech@name))
-#            if (i %in% c(1, 3)) mtechainp[unique(yy$acomm)] <- TRUE else mtechaout[unique(yy$acomm)] <- TRUE 
           }
 #            tech@aeff <- tech@aeff[!is.na(tech@aeff$comm) & !is.na(tech@aeff$commp),]
 #            for(cmd in approxim_commp$comm) {
@@ -493,13 +495,6 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
 #                  data.frame(tech = rep(tech@name, length(cmm)), comm = rep(cmd, length(cmm)), commp = cmm))
 #           }
         }
-#        if (any(mtechainp)) {
-#          obj@maptable[['mTechAInp']] <- addData(obj@maptable[['mTechAInp']],
-#              data.frame(tech = rep(tech@name, sum(mtechainp)), comm = names(mtechainp)[mtechainp]))
-#          obj@maptable[['mTechAOut']] <- addData(obj@maptable[['mTechAOut']],
-#              data.frame(tech = rep(tech@name, sum(mtechaout)), comm = names(mtechaout)[mtechaout]))
-#        }
-  
     }
   
   # Start / End year
