@@ -28,11 +28,11 @@ plot.result <- function(obj, type, commodity, region = NULL, year = NULL,
   'supply',  'tech_output',  'tech_input',  'demand',  'dummy', 'balance', 
   'export', 'import')
   if (type == 'output') {
-    gg <- apply(obj@data$vOutFull[commodity, region, year, slice, drop = FALSE], 3, sum)
+    gg <- apply(obj@data$vOutTot[commodity, region, year, slice, drop = FALSE], 3, sum)
   } else if (type == 'input') {
-    gg <- apply(obj@data$vInpFull[commodity, region, year, slice, drop = FALSE], 3, sum)
+    gg <- apply(obj@data$vInpTot[commodity, region, year, slice, drop = FALSE], 3, sum)
   } else if (type == 'emission') {
-    gg <- apply(obj@data$vEmsFull[commodity, region, year, slice, drop = FALSE], 3, sum)
+    gg <- apply(obj@data$vEmsTot[commodity, region, year, slice, drop = FALSE], 3, sum)
   } else if (type == 'aggregate') {
     gg <- apply(obj@data$vAggOut[commodity, region, year, slice, drop = FALSE], 3, sum)
   } else if (type == 'supply') {
