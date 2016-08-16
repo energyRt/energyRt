@@ -1,4 +1,12 @@
-getUniversalNames <- function(obj, cls, ...) {
+getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE, 
+  fixed = FALSE, useBytes = FALSE, invert = FALSE, ...) {
+  if (regex) {
+    grep2 <- function(x, y) grep(x, y, ignore.case = ignore.case, fixed = fixed, 
+      useBytes = useBytes, invert = invert)
+  } else {
+    grep2 <- function(x, y) grep(paste('^', x, '$', sep = ''), y, ignore.case = ignore.case, fixed = fixed, 
+      useBytes = useBytes, invert = invert)
+  }
   arg <- list(...)
   if (any(class(obj) == 'scenario')) obj <- obj@model
   if (any(class(obj) == 'repository')) {
@@ -30,8 +38,8 @@ getUniversalNames <- function(obj, cls, ...) {
     for(a in seq(along = arg)) {
       if (all(names(s1) != names(arg)[a])) {
           rst <- rst[0,, drop = FALSE]
-      } else {
-        if (nrow(rst) > 0) {
+      } else {     
+      if (nrow(rst) > 0) {
         error_msg <- paste('getUniversalName: undefined condition argument "', names(arg)[a], 
                 '" for class "', cls, '"', sep = '')
         nm <- names(arg)[a]
@@ -41,7 +49,7 @@ getUniversalNames <- function(obj, cls, ...) {
         # Character
          if (class(cnd) != 'character') stop(error_msg)
           for(i in seq(length.out = nrow(rst)))
-            rst[i, 'use']  <- any(grep(cnd, slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)))
+            rst[i, 'use']  <- any(grep2(cnd, slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)))
           rst <- rst[rst$use,, drop = FALSE]
         } else if (s1[nm] == "logical") {
         # Logical
@@ -49,7 +57,7 @@ getUniversalNames <- function(obj, cls, ...) {
           for(i in seq(length.out = nrow(rst)))
             rst[i, 'use']  <- any(cnd == slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
           rst <- rst[rst$use,, drop = FALSE]
-        } else if (s1[nm] == "numeric") {
+        } else if (s1[nm] == "numeric") {      
         # Numeric
           if (!(class(cnd) %in% c('integer', 'numeric'))) stop(error_msg)
             if (is.null(names(cnd)) && length(cnd) > 2) stop(error_msg)
@@ -58,27 +66,33 @@ getUniversalNames <- function(obj, cls, ...) {
             if (any(!(names(cnd) %in% c('l', 'le', 'e', 'ge', 'g', 'ne')))) stop(error_msg)
             if (any(names(cnd) == 'le')) {       
               for(i in seq(length.out = nrow(rst)))
-                rst[i, 'use']  <- any(cnd['le'] >= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst[i, 'use'] <- any(cnd['le'] >= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst <- rst[rst$use,, drop = FALSE]
             }
             if (any(names(cnd) == 'l')) {       
               for(i in seq(length.out = nrow(rst)))
                 rst[i, 'use']  <- any(cnd['l'] > slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst <- rst[rst$use,, drop = FALSE]
             }
             if (any(names(cnd) == 'e')) {       
               for(i in seq(length.out = nrow(rst)))
                 rst[i, 'use']  <- any(cnd['e'] == slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst <- rst[rst$use,, drop = FALSE]
             }
             if (any(names(cnd) == 'ge')) {       
               for(i in seq(length.out = nrow(rst)))
-                rst[i, 'use']  <- any(cnd['ge'] <= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst[i, 'use'] <- any(cnd['ge'] <= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst <- rst[rst$use,, drop = FALSE]
             }
             if (any(names(cnd) == 'g')) {       
               for(i in seq(length.out = nrow(rst)))
                 rst[i, 'use']  <- any(cnd['g'] < slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst <- rst[rst$use,, drop = FALSE]
             }
             if (any(names(cnd) == 'ne')) {       
               for(i in seq(length.out = nrow(rst)))
-                rst[i, 'use']  <- any(cnd['ne'] != slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst[i, 'use'] <- any(cnd['ne'] != slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
+                rst <- rst[rst$use,, drop = FALSE]
             }
         } else if (s1[nm] == "data.frame") {
         # data.frame
@@ -89,7 +103,7 @@ getUniversalNames <- function(obj, cls, ...) {
             if (class(cnd2) == "character") {
               if (class(cnd2) != 'character') stop(error_msg)
               for(i in seq(length.out = nrow(rst)))
-                rst[i, 'use']  <- any(grep(cnd2, 
+                rst[i, 'use']  <- any(grep2(cnd2, 
                        slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2]), na.rm = TRUE)
               rst <- rst[rst$use,, drop = FALSE]
             } else if (class(cnd2) == "logical") {
@@ -110,31 +124,37 @@ getUniversalNames <- function(obj, cls, ...) {
                 for(i in seq(length.out = nrow(rst)))
                   rst[i, 'use']  <- any(cnd2['le'] >= 
                     slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], na.rm = TRUE)
+                  rst <- rst[rst$use,, drop = FALSE]
               }
               if (any(names(cnd2) == 'l')) {       
                 for(i in seq(length.out = nrow(rst)))
                   rst[i, 'use']  <- any(cnd2['l'] > 
                     slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], na.rm = TRUE)
+                  rst <- rst[rst$use,, drop = FALSE]
               }
               if (any(names(cnd2) == 'e')) {       
                 for(i in seq(length.out = nrow(rst)))
                   rst[i, 'use']  <- any(cnd2['e'] == 
                     slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], na.rm = TRUE)
+                  rst <- rst[rst$use,, drop = FALSE]
               }
               if (any(names(cnd2) == 'ge')) {       
                 for(i in seq(length.out = nrow(rst)))
                   rst[i, 'use']  <- any(cnd2['ge'] <= 
                     slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], na.rm = TRUE)
+                  rst <- rst[rst$use,, drop = FALSE]
               }
               if (any(names(cnd2) == 'g')) {       
                 for(i in seq(length.out = nrow(rst)))
                   rst[i, 'use']  <- any(cnd2['g'] < 
                     slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], na.rm = TRUE)
+                  rst <- rst[rst$use,, drop = FALSE]
               }
               if (any(names(cnd2) == 'ne')) {       
                 for(i in seq(length.out = nrow(rst)))
                   rst[i, 'use']  <- any(cnd2['ne'] != 
                     slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], na.rm = TRUE)
+                  rst <- rst[rst$use,, drop = FALSE]
               }
             }   else stop(error_msg)
           }
