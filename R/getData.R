@@ -37,13 +37,20 @@ getData.scenario <- function(obj, tech = NULL, dem = NULL, sup = NULL,
           for(k in vv) if (any(dimnames(dtt[[j]])[[k]] %in% set[[i]])) {
             gg <- rep('', length(dim(dtt[[j]])))
             gg[k == names(dimnames(dtt[[j]]))] <- 'dimnames(dtt[[j]])[[k]] %in% set[[i]]'
-            ttt <- paste('dtt[[j]] <- dtt[[j]][', paste(gg, collapse = ','), ', drop = ', drop, ']', sep = '')
+            ttt <- paste('dtt[[j]] <- dtt[[j]][', paste(gg, collapse = ','), ', drop = ', FALSE, ']', sep = '')
             eval(parse(text = ttt))
             if (length(dtt[[j]]) == 0) rmv[j] <- FALSE
           }
-        } else rmv[j] <- FALSE
+        } else rmv[j] <- FALSE; 
       }
       dtt <- dtt[rmv]  
+    }
+  }
+  if (drop) {
+    for(j in names(dtt)) {
+      ttt <- paste('dtt[[j]] <- dtt[[j]][', paste(rep(',', length.out = length(dim(dtt[[j]])) - 1), 
+       collapse = ''), ', drop = ', drop, ']', sep = '')
+      eval(parse(text = ttt))
     }
   }
   if (remove_zero_dim) {
