@@ -211,13 +211,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
   } else {
     # Define lhs equation type
     ccc <- c("comm", "region", "year", "slice")
-    if (app@type %in% c('capacity', 'newcapacity', 'investment')) ccc <- c("region", "year")
+    if (app@type %in% c('capacity', 'newcapacity', 'invcost', 'eac')) ccc <- c("region", "year")
     # capacity newcapacity activity input output sharein shareout
     if (app@type %in% c('output', 'shareout')) before <- 'Out' else
     if (app@type %in% c('input', 'sharein'))   before <- 'Inp' else
     if (app@type == 'capacity') before <- 'Cap' else
     if (app@type == 'newcapacity') before <- 'NewCap' else 
-    if (app@type == 'investment') before <- 'Inv' else stop('Unlnown constrain type')
+    if (app@type == 'investment') before <- 'Inv' else
+    if (app@type == 'eac') before <- 'Eac' else stop('Unlnown constrain type')
     ast <- c(names(app@for.sum), names(app@for.each))[!(c(names(app@for.sum), names(app@for.each)) %in% ccc)] 
     if (length(ast) > 1) stop('Wrong constrain') else
     if (length(ast) == 1) {
