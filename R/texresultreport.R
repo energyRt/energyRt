@@ -571,21 +571,22 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             if (length(dim(gr)) == 1) {
              cat('RHS (sum from all set): ', gr['rhs'], ', value: ', gr['value'], '\n\n', sep = '', file = zz)
             } else {
-             cat('RHS (sum from all set): ', gr['rhs'], ', value: ', gr['value'], '\n\n', sep = '', file = zz)
-            png2(paste(cns@name, '_rhs.png', sep = ''), width = 640)
-            par(mar = c(5, 4, 4, 2) + .1)
-            plot(dimnames(gr)$year, gr[, 'rhs'], ylim = range(gr),
-                 main = 'Constrain (sum from all set, except year)', xlab = '', ylab = '', type = 'l', lwd = 2)
-            lines(dimnames(gr)$year, gr[, 'value'], lty = 2, col = 'red', lwd = 2)
-            dev.off2()
-            cat('\\begin{figure}[H]\n', sep = '', file = zz)
-            cat('  \\centering\n', sep = '', file = zz)
-            cat('  \\includegraphics[width = 7in]{', cns@name, '_rhs.png}\n', sep = '', file = zz)
-            cat('  \\caption{Constrain ', gsub('_', '\\\\_', cns@name), 
-                ', sum from all set, except year.}\n', sep = '', file = zz)
-            cat('\\end{figure}\n', sep = '', file = zz)
+               cat('RHS (sum from all set): ', gr['rhs'], ', value: ', gr['value'], '\n\n', sep = '', file = zz)
+              png2(paste(cns@name, '_rhs.png', sep = ''), width = 640)
+              par(mar = c(5, 4, 4, 2) + .1)
+              plot(dimnames(gr)$year, gr[, 'rhs'], ylim = range(gr),
+                   main = 'Constrain (sum from all set, except year)', xlab = '', ylab = '', type = 'l', lwd = 2)
+              lines(dimnames(gr)$year, gr[, 'value'], lty = 2, col = 'red', lwd = 2)
+              dev.off2()
+              cat('\\begin{figure}[H]\n', sep = '', file = zz)
+              cat('  \\centering\n', sep = '', file = zz)
+              cat('  \\includegraphics[width = 7in]{', cns@name, '_rhs.png}\n', sep = '', file = zz)
+              cat('  \\caption{Constrain ', gsub('_', '\\\\_', cns@name), 
+                  ', sum from all set, except year.}\n', sep = '', file = zz)
+              cat('\\end{figure}\n', sep = '', file = zz)
             }
           }
+          cat_bottomup_data_frame(getConstrainResults(obj, as.character(cns@name))[[1]], 'Constrain data', zz)
         }
       }
     ##########!!

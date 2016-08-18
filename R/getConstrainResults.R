@@ -8,16 +8,17 @@ getConstrainResults <- function(scenario, constrain) {
     prec <- scenario@precompiled@maptable
     tcns <- getObjects(scenario, 'constrain', name = constrain, regex = FALSE)[[1]]
     dtt <- scenario@result@data
-    fcase <- function(x) if (nchar(x) <= 1) toupper(x) else
+    fcase <- function(x) if (length(x) == 0 || nchar(x) <= 1) toupper(x) else
       paste(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)), sep = '')
     smpl_sl <- c(names(tcns@for.each), names(tcns@for.sum))
     std_smp <- c('comm', 'region', 'year', 'slice')
     ad_smpl <- smpl_sl[!(smpl_sl %in% std_smp)]
-    std_smp <- std_smp[std_smp != ad_smpl]
+    if (length(ad_smpl) == 1) std_smp <- std_smp[std_smp != ad_smpl]
     std_smp <- std_smp[std_smp %in% smpl_sl]
-    vary.set <- c(ad_smpl[length(ad_smpl) != 0 && any(ad_smpl == names(tcns@for.each))], std_smp)
+#    vary.set <- c(ad_smpl[length(ad_smpl) != 0 && any(ad_smpl == names(tcns@for.each))], std_smp)
     is.vary <- c(rep(TRUE, length(tcns@for.each)), rep(FALSE, length(tcns@for.sum)))
     names(is.vary) <- smpl_sl
+    vary.set <- std_smp[std_smp %in% names(is.vary)[is.vary]]
     cns.set <- list()
     for(st in c(ad_smpl, std_smp)) {
       gg <- prec[[paste('mCns', fcase(st), sep = '')]]@data
@@ -31,17 +32,16 @@ getConstrainResults <- function(scenario, constrain) {
     if (tcns@type == 'investment') before <- 'Inv' else
     if (tcns@type == 'eac') before <- 'Eac' else stop('Unlnown constrain type')
     vrb <- paste('v', fcase(ad_smpl), before, sep = '')
+    if (length(ad_smpl) == 0) vrb <- paste(vrb, 'Tot', sep = '')
     if (length(vary.set) == 0) {
-
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
-        is.vary[c(ad_smpl, std_smp)]
       lhs <- sum(gg)
       rhs <- prec[['pRhs']]@data
       rhs <- rhs[rhs == constrain, 2]
       ll <- list(data.frame(lhs = lhs, rhs = rhs, is.active = c(lhs == rhs)))
       names(ll) <- constrain
-      ll
+     ll
     } else {
       tbl <- data.frame(cns.set[[vary.set[1]]], stringsAsFactors = FALSE)
       colnames(tbl) <- vary.set[1]
@@ -51,8 +51,9 @@ getConstrainResults <- function(scenario, constrain) {
         tbl[, i] <- c(t(matrix(cns.set[[i]], length(cns.set[[i]]), nrow(tbl) / length(cns.set[[i]]))))
       }
       rhs <- prec[[paste('pRhs', fcase(ad_smpl)[length(ad_smpl) != 0 && any(ad_smpl == names(tcns@for.each))],
-        paste(toupper(substr(std_smp, 1, 1)), collapse = ''), sep = '')]]@data
-      rhs <- rhs[rhs == constrain, -1, drop = FALSE]
+        paste(toupper(substr(vary.set, 1, 1)), 
+          collapse = ''), sep = '')]]@data
+      rhs <- rhs[rhs$cns == constrain, -1, drop = FALSE]
       v1 <- apply(rhs[, -ncol(rhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
       v2 <- apply(tbl, 1, function(x) paste(x, collapse = '#'))
       tbl <- tbl[sort(v2, index.return = TRUE)$ix,, drop = FALSE]
@@ -73,7 +74,6 @@ getConstrainResults <- function(scenario, constrain) {
       }
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
-        is.vary[c(ad_smpl, std_smp)]
       gg <- apply(gg, seq(along = is.vary)[is.vary[c(ad_smpl, std_smp)]], sum)
       lhs <- as.data.frame.table(gg)
       v1 <- apply(lhs[, -ncol(lhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
@@ -84,6 +84,7 @@ getConstrainResults <- function(scenario, constrain) {
       tbl[, 'rhs'] <- rhs
       tbl[, 'is.active'] <- NA
       tbl[, 'is.active'] <- c(lhs == rhs)
+      rownames(tbl) <- NULL
       ll <- list(tbl)
       names(ll) <- constrain
       ll
