@@ -101,8 +101,8 @@ setMethod("initialize", "CodeProduce",
     for(i in c('mTechInpComm', 'mTechOutComm', 'mTechOneComm', 
       'mTechEmitedComm', 'mTechAInp', 'mTechAOut'))
         .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm'), 'map')    
-    for(i in c('mTechCinpAInp', 'mTechCoutAInp', 'mTechCinpAOut', 'mTechCoutAOut'))
-        .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm', 'commp'), 'map')    
+#    for(i in c('mTechCinpAInp', 'mTechCoutAInp', 'mTechCinpAOut', 'mTechCoutAOut'))
+#        .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm', 'commp'), 'map')    
     for(i in c('mTechInpGroup', 'mTechOutGroup'))
         .Object@maptable[[i]] <- MapTable(i, c('tech', 'group'), 'map')    
     .Object@maptable[['mTechGroupComm']] <- MapTable('mTechGroupComm', 
@@ -272,12 +272,15 @@ setMethod("initialize", "CodeProduce",
     # Map
     for(i in c("mCnsLType", "mCnsLhsComm", "mCnsLhsRegion", "mCnsLhsYear", "mCnsLhsSlice", 
       "mCnsLe", "mCnsGe", "mCnsRhsTypeShareIn", "mCnsRhsTypeShareOut", "mCnsRhsTypeConst", "mCnsInpTech", 
-      "mCnsOutTech", "mCnsCapTech", "mCnsNewCapTech", "mCnsOutSup", "mCnsInp", "mCnsOut"))
+      "mCnsOutTech", "mCnsCapTech", "mCnsNewCapTech", "mCnsOutSup", "mCnsInp", "mCnsOut", "mCnsInvTech",
+      "mCnsEacTech"))
         .Object@maptable[[i]] <- MapTable(i, 'cns', 'map')    
     for(i in c('tech', 'sup', 'comm', 'region', 'year', 'slice')) {
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')
         .Object@maptable[[nn]] <- MapTable(nn, c('cns', i), 'map')    
     }
+    .Object@maptable[['mCnsTech']] <- MapTable('mCnsTech', c('cns', 'tech'), 'map') 
+    .Object@maptable[['mCnsSup']] <- MapTable('mCnsSup', c('cns', 'sup'), 'map') 
     for(i in c("pRhs(cns)", "pRhsS(cns, slice)", "pRhsY(cns, year)", "pRhsYS(cns, year, slice)", 
       "pRhsR(cns, region)", "pRhsRS(cns, region, slice)", "pRhsRY(cns, region, year)", 
       "pRhsRYS(cns, region, year, slice)", "pRhsC(cns, comm)", "pRhsCS(cns, comm, slice)", 

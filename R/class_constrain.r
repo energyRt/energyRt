@@ -22,6 +22,8 @@ setClass('constrain',
           eq            = factor('FX', levels = c('>=', '<=', '=')),
           type          = factor(NA, levels = c('capacity', 
                                                 'newcapacity', 
+                                                'invcost', 
+                                                'eac', 
                                                 'activity', 
                                                 'input', 
                                                 'output',
@@ -31,8 +33,8 @@ setClass('constrain',
                                                 'subsidy'
                                                 )),
           rhs           = data.frame(),
-          for.sum        = list(),
-          for.each       = list(),
+          for.sum       = list(),
+          for.each      = list(),
           default       = 0, 
           rule          = as.character('back.inter.forth'),
           comm          = NULL
@@ -116,6 +118,8 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
       minset <- list()
       minset$capacity <- c('region', 'year')
       minset$newcapacity <- c('region', 'year')
+      minset$invcost <- c('region', 'year')
+      minset$eac <- c('region', 'year')
       minset$activity <- c('region', 'year', 'slice')
       minset$input <- c('comm', 'region', 'year', 'slice')
       minset$output <- c('comm', 'region', 'year', 'slice')
@@ -127,9 +131,11 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
       addset$sharein <- c('tech', 'sup', 'res', 'trade', 'row')
       addset$shareout <- c('tech', 'sup', 'res', 'trade', 'row')
       unqset <- list()
-      unqset$capacity <- c('tech', 'sup', 'res', 'trade', 'row')
-      unqset$newcapacity <- c('tech', 'sup', 'res', 'trade', 'row')
-      unqset$activity <- c('tech', 'sup', 'res', 'trade', 'row')
+      unqset$capacity <- c('tech', 'res')
+      unqset$newcapacity <- c('tech', 'res')
+      unqset$invcost <- c('tech', 'res')
+      unqset$eac <- c('tech', 'res')
+      unqset$activity <- c('tech', 'res')
       # Check duplicat set
       if (anyDuplicated(c(names(for.sum), names(for.each)))) {
         stop('There are duplicated set')

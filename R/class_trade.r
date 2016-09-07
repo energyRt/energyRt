@@ -15,8 +15,8 @@ setClass("trade",
          name           = "default_trade",       # Short name
          description    = "",
          commodity      = NULL,       #
-         source         = NULL,
-         destination    = NULL,
+         source         = character(),
+         destination    = character(),
          trade          = data.frame(
                                      source       = character(),
                                      destination  = character(),

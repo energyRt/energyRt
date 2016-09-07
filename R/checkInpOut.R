@@ -65,9 +65,9 @@ checkInpOut <- function(tech) {
   }
   for(i in acomm) {
     aux[i, 'input'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2ainp', 'use2ainp', 'cap2ainp', 'ncap2ainp')])) || 
-        any(!is.na(tech@aeff[tech@aeff$comm == i, c('cinp2ainp', 'cout2ainp')]))) 
+        any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2ainp', 'cout2ainp')]))) 
     aux[i, 'output'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2aout', 'use2aout', 'cap2aout', 'ncap2aout')])) || 
-        any(!is.na(tech@aeff[tech@aeff$comm == i, c('cinp2aout', 'cout2aout')]))) 
+        any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2aout', 'cout2aout')]))) 
   }
   gtype <- data.frame(type      = factor(NULL, c('input', 'output')),
                       stringsAsFactors = FALSE)

@@ -15,7 +15,7 @@ get_result_data_parameter <- function() {
         'vTecAct','vTecInp','vTecOut','vTecInv','vTecFix','vTecVar',
         'vTecVarY','vTecCost','vSupOut','vSupReserve','vSupCost',
         'vSupCostY','vDemInp','vEmsOut','vTecInpComb','vBalance',
-        'vOutFull','vInpFull','vSupOutFull','vTecInpFull','vTecOutFull',
+        'vOutTot','vInpTot','vSupOutTot','vTecInpTot','vTecOutTot',
         'vCost','vCostR','vObjective','vDumOut','vDumCost','vDumCostY', 'Modelstat','vTaxCost','vTaxCostY')
     data_parameter <- array(FALSE, dim = c(length(parameter), 7),
           dimnames = list(parameter, c('technology', 'supply', 'group', 'comm', 'region', 'year', 'slice')))
@@ -37,11 +37,11 @@ get_result_data_parameter <- function() {
     data_parameter['vEmsOut', c('comm', 'region', 'year', 'slice')] <- TRUE
     data_parameter['vTecInpComb', c('comm', 'region', 'year', 'slice')] <- TRUE
     data_parameter['vBalance', c('comm', 'region', 'year', 'slice')] <- TRUE
-    data_parameter['vOutFull', c('comm', 'region', 'year', 'slice')] <- TRUE
-    data_parameter['vInpFull', c('comm', 'region', 'year', 'slice')] <- TRUE
-    data_parameter['vSupOutFull', c('comm', 'region', 'year', 'slice')] <- TRUE
-    data_parameter['vTecInpFull', c('comm', 'region', 'year', 'slice')] <- TRUE
-    data_parameter['vTecOutFull', c('comm', 'region', 'year', 'slice')] <- TRUE
+    data_parameter['vOutTot', c('comm', 'region', 'year', 'slice')] <- TRUE
+    data_parameter['vInpTot', c('comm', 'region', 'year', 'slice')] <- TRUE
+    data_parameter['vSupOutTot', c('comm', 'region', 'year', 'slice')] <- TRUE
+    data_parameter['vTecInpTot', c('comm', 'region', 'year', 'slice')] <- TRUE
+    data_parameter['vTecOutTot', c('comm', 'region', 'year', 'slice')] <- TRUE
     data_parameter['vCost', c('region', 'year')] <- TRUE
     data_parameter['vCostR', 'region'] <- TRUE
     data_parameter['vDumOut', c('comm', 'region', 'year', 'slice')] <- TRUE
