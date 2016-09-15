@@ -283,18 +283,16 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
         if (any(colnames(approxim) == 'year')) {
           year_range <- c(max(c(min(approxim$year), year_range[1])), min(c(max(approxim$year), year_range[2]))) 
         }
+        for(i in names(app@for.each)[!(names(app@for.each) %in% names(approxim))]) approxim[[i]] <- app@for.each[[i]]
         rhs <- interpolation(app@rhs, 'rhs', approxim = approxim, year_range = year_range,
             rule = app@rule, default = app@default)
         colnames(rhs)[ncol(rhs)] <- 'Freq'
         rhs <- cbind(cns = rep(app@name, nrow(rhs)), rhs)
         if (any(colnames(rhs) == 'year')) rhs$year <- as.numeric(as.character(rhs$year))
-        nn <- paste('pRhs', paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), 
+        nn <- paste('pRhs', fcase(ast)[any(names(app@for.each) == ast)], 
+          paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), 
             collapse = ''), sep = '')
       obj@maptable[[nn]] <- addData(obj@maptable[[nn]], rhs)
-    #obj@maptable[[nn]] <- 
-#    paste(c('L'[any(!(names(app@for.each) %in% ccc))], 
-#      toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1))), collapse = '')
-    
     
     # Define sharein & shareout type
   
