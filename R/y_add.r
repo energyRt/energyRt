@@ -200,14 +200,22 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
 #  tt <- showEquation(app, approxim)
 #  obj@constrain[[app@name]] <- tt
   if (app@type == 'tax') {
+      approxim2 <- approxim
+      for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
+        approxim2[[cc]] <- app@for.each[[cc]]
+      }
      obj@maptable[['pTaxCost']] <- addData(obj@maptable[['pTaxCost']],
         simple_data_frame_approximation_chk(app@rhs, 'tax',
-         obj@maptable[['pTaxCost']], approxim, 'comm', app@comm))
+         obj@maptable[['pTaxCost']], approxim2, 'comm', app@comm))
   } else
   if (app@type == 'subs') {
+      approxim2 <- approxim
+      for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
+        approxim2[[cc]] <- app@for.each[[cc]]
+      }
      obj@maptable[['pSubsCost']] <- addData(obj@maptable[['pSubsCost']],
         simple_data_frame_approximation_chk(app@rhs, 'subs',
-         obj@maptable[['pSubsCost']], approxim, 'comm', app@comm))
+         obj@maptable[['pSubsCost']], approxim2, 'comm', app@comm))
   } else {
     # Define lhs equation type
     ccc <- c("comm", "region", "year", "slice")
