@@ -9,11 +9,16 @@ setClass('constrain',
           eq            = "factor",
           type          = "factor",
           rhs           = "data.frame",
-          for.sum        = "list",
-          for.each       = "list",
+          for.sum       = "list",
+          for.each      = "list",
           default       = "numeric", 
           rule          = "character",
-          comm          = "character"
+          comm          = "character",
+          cinp          = "logical",
+          cout          = "logical",
+          ainp          = "logical",
+          aout          = "logical",
+          emis          = "logical"
       ),
       prototype(
           name          = "",
@@ -37,7 +42,12 @@ setClass('constrain',
           for.each      = list(),
           default       = 0, 
           rule          = as.character('back.inter.forth'),
-          comm          = NULL
+          comm          = NULL,
+          cinp          = TRUE,
+          cout          = TRUE,
+          ainp          = TRUE,
+          aout          = TRUE,
+          emis          = TRUE
       ),
       S3methods = TRUE
 );
