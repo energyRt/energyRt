@@ -19,6 +19,7 @@ getConstrainResults <- function(scenario, constrain) {
     is.vary <- c(rep(TRUE, length(tcns@for.each)), rep(FALSE, length(tcns@for.sum)))
     names(is.vary) <- smpl_sl
     vary.set <- std_smp[std_smp %in% names(is.vary)[is.vary]]
+    vary.set2 <- c(ad_smpl, std_smp)
     cns.set <- list()
     for(st in c(ad_smpl, std_smp)) {
       gg <- prec[[paste('mCns', fcase(st), sep = '')]]@data
@@ -43,9 +44,9 @@ getConstrainResults <- function(scenario, constrain) {
       names(ll) <- constrain
      ll
     } else {
-      tbl <- data.frame(cns.set[[vary.set[1]]], stringsAsFactors = FALSE)
-      colnames(tbl) <- vary.set[1]
-      for(i in vary.set[-1]) {
+      tbl <- data.frame(cns.set[[vary.set2[1]]], stringsAsFactors = FALSE)
+      colnames(tbl) <- vary.set2[1]
+      for(i in vary.set2[-1]) {
         tbl <- tbl[rep(1:nrow(tbl), length(cns.set[[i]])),, drop = FALSE]
         tbl[, i] <- NA
         tbl[, i] <- c(t(matrix(cns.set[[i]], length(cns.set[[i]]), nrow(tbl) / length(cns.set[[i]]))))

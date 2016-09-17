@@ -9,11 +9,16 @@ setClass('constrain',
           eq            = "factor",
           type          = "factor",
           rhs           = "data.frame",
-          for.sum        = "list",
-          for.each       = "list",
+          for.sum       = "list",
+          for.each      = "list",
           default       = "numeric", 
           rule          = "character",
-          comm          = "character"
+          comm          = "character",
+          cinp          = "logical",
+          cout          = "logical",
+          ainp          = "logical",
+          aout          = "logical",
+          emis          = "logical"
       ),
       prototype(
           name          = "",
@@ -37,7 +42,12 @@ setClass('constrain',
           for.each      = list(),
           default       = 0, 
           rule          = as.character('back.inter.forth'),
-          comm          = NULL
+          comm          = NULL,
+          cinp          = TRUE,
+          cout          = TRUE,
+          ainp          = TRUE,
+          aout          = TRUE,
+          emis          = TRUE
       ),
       S3methods = TRUE
 );
@@ -87,6 +97,15 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
       } else{
         obj@rhs[1, 'tax'] <- rhs
       }
+      if (length(for.sum) != 0) warning('for.sum unacceptable for tax constrain')
+      if (length(for.each) != 0) {
+        uncpt <- names(for.each)[!(names(for.each) %in% c('comm', 'region', 'year', 'slice'))]
+        if (any(uncpt)) {
+          for.each <- for.each[!(names(for.each) %in% uncpt)]
+          warning('for.each unacceptable for tax constrain')
+        }
+        obj@for.each <- for.each
+      }
   } else if (type == 'subsidy') {
       obj@comm     <- comm
       if (rule == 'default')  rule <- 'inter.forth'
@@ -111,6 +130,15 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
         } else stop('Wrong rhs in subsidy constrain')
       } else{
         obj@rhs[1, 'subsidy'] <- rhs
+      }
+      if (length(for.sum) != 0) warning('for.sum unacceptable for subs constrain')
+      if (length(for.each) != 0) {
+        uncpt <- names(for.each)[!(names(for.each) %in% c('comm', 'region', 'year', 'slice'))]
+        if (any(uncpt)) {
+          for.each <- for.each[!(names(for.each) %in% uncpt)]
+          warning('for.each unacceptable for subs constrain')
+        }
+        obj@for.each <- for.each
       }
   } else {
       if (rule == 'default')  rule <- 'back.inter.forth'
