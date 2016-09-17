@@ -289,9 +289,9 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
         colnames(rhs)[ncol(rhs)] <- 'Freq'
         rhs <- cbind(cns = rep(app@name, nrow(rhs)), rhs)
         if (any(colnames(rhs) == 'year')) rhs$year <- as.numeric(as.character(rhs$year))
-        nn <- paste('pRhs', fcase(ast)[any(names(app@for.each) == ast)], 
-          paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), 
-            collapse = ''), sep = '')
+        if (all(names(app@for.each) != ast)) ii <- '' else ii <- paste(toupper(substr(ast, 1, 1)), 
+          substr(ast, 2, nchar(ast)), sep = '')
+        nn <- paste('pRhs', ii, paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), collapse = ''), sep = '')
       obj@maptable[[nn]] <- addData(obj@maptable[[nn]], rhs)
     
     # Define sharein & shareout type
