@@ -1,3 +1,25 @@
+#' Extraxts data from scenario object
+#' 
+#' @obj object of class scenario or model
+#' 
+#' filters:
+#' @param tech character vector with tachnology names
+#' @param dem 
+#' @param sup
+#' @param comm
+#' @param group
+#' @param region
+#' @param year
+#' @param slice
+#' @param stg
+#' @param expp
+#' @param imp
+#' @param trade
+#' @param variable
+#' @param remove_zero_dim
+#' @param drop
+
+
 getData.scenario <- function(obj, tech = NA, dem = NA, sup = NA,  
      comm = NA, group = NA, region = NA, year = NA, slice = NA, 
      stg = NA, expp = NA, imp = NA, trade = NA, variable = NULL, 
