@@ -13,7 +13,12 @@ setClass('constrain',
           for.each       = "list",
           default       = "numeric", 
           rule          = "character",
-          comm          = "character"
+          comm          = "character",
+          cout          = "logical",
+          cinp          = "logical",
+          aout          = "logical",
+          ainp          = "logical",
+          emis          = "logical"
       ),
       prototype(
           name          = "",
@@ -37,7 +42,12 @@ setClass('constrain',
           for.each      = list(),
           default       = 0, 
           rule          = as.character('back.inter.forth'),
-          comm          = NULL
+          comm          = NULL,
+          cout          = TRUE,
+          cinp          = TRUE,
+          aout          = TRUE,
+          ainp          = TRUE,
+          emis          = TRUE
       ),
       S3methods = TRUE
 );
@@ -49,7 +59,8 @@ setClass('constrain',
 #' @name newConstrain
 #' 
 newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(), 
-   for.each = list(), default = 0, rule = 'default', comm = NULL) {
+   for.each = list(), default = 0, rule = 'default', comm = NULL,
+    cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
   obj <- new('constrain')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq)))   {
@@ -62,6 +73,11 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
   obj@type[] <- type
   obj@default  <- default
   obj@name     <- name
+  obj@cout     <- TRUE
+  obj@cinp     <- TRUE
+  obj@aout     <- TRUE
+  obj@ainp     <- TRUE
+  obj@emis     <- TRUE
   if (type == 'tax') {
       obj@comm     <- comm
       if (rule == 'default')  rule <- 'inter.forth'
@@ -87,7 +103,16 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
       } else{
         obj@rhs[1, 'tax'] <- rhs
       }
-  } else if (type == 'subsidy') {
+      if (length(for.sum) != 0) warning('for.sum unacceptable for tax constrain')
+      if (length(for.each) != 0) {
+        uncpt <- names(for.each)[!(names(for.each) %in% c('comm', 'region', 'year', 'slice'))]
+        if (any(uncpt)) {
+          for.each <- for.each[!(names(for.each) %in% uncpt)]
+          warning('for.each unacceptable for tax constrain')
+        }
+        obj@for.each <- for.each
+      }
+   } else if (type == 'subsidy') {
       obj@comm     <- comm
       if (rule == 'default')  rule <- 'inter.forth'
       obj@rule     <- rule
@@ -111,6 +136,15 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
         } else stop('Wrong rhs in subsidy constrain')
       } else{
         obj@rhs[1, 'subsidy'] <- rhs
+      }
+      if (length(for.sum) != 0) warning('for.sum unacceptable for subs constrain')
+      if (length(for.each) != 0) {
+        uncpt <- names(for.each)[!(names(for.each) %in% c('comm', 'region', 'year', 'slice'))]
+        if (any(uncpt)) {
+          for.each <- for.each[!(names(for.each) %in% uncpt)]
+          warning('for.each unacceptable for subs constrain')
+        }
+        obj@for.each <- for.each
       }
   } else {
       if (rule == 'default')  rule <- 'back.inter.forth'

@@ -557,10 +557,11 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             '.\n\n', '\n', sep = '', file = zz)
         }
       }
+      ## Constrain
       if (length(dtt$constrain) != 0) {
         cat('\\section{Constrain analysis}\n\n', '\n', sep = '', file = zz)
         for(cc in seq(along = dtt$constrain)) {
-          cns <- dtt$constrain[[cc]]
+         cns <- dtt$constrain[[cc]]
           cat('\\subsection{', gsub('_', '\\\\_', 
              as.character(cns@name)), '}\n\n', '\n', sep = '', file = zz)
           cat_bottomup(cns, file = zz)
