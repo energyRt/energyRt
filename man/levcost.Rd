@@ -24,6 +24,11 @@ sm_levcost_scenario(obj, commodity)
    \code{year} numeric, years}
 
 \item{solver}{character, name of solver software "GAMS" or "GLPK"}
+
+\item{tmp.dir}{a dirrectory for temporary files to run the model, by default
+'/solwork' in the project directory.}
+
+\item{tmp.del}{a logical scalar indicating if solver temporary files should be deleted.}
 }
 \description{
 \code{levcost} is a method for class \code{technology} to calculate 
