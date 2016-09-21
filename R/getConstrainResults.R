@@ -52,8 +52,7 @@ getConstrainResults <- function(scenario, constrain) {
         tbl[, i] <- c(t(matrix(cns.set[[i]], length(cns.set[[i]]), nrow(tbl) / length(cns.set[[i]]))))
       }
       rhs <- prec[[paste('pRhs', fcase(ad_smpl)[length(ad_smpl) != 0 && any(ad_smpl == names(tcns@for.each))],
-        paste(toupper(substr(vary.set, 1, 1)), 
-          collapse = ''), sep = '')]]@data
+        paste(toupper(substr(vary.set, 1, 1)), collapse = ''), sep = '')]]@data
       rhs <- rhs[rhs$cns == constrain, -1, drop = FALSE]
       v1 <- apply(rhs[, -ncol(rhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
       v2 <- apply(tbl, 1, function(x) paste(x, collapse = '#'))

@@ -470,7 +470,7 @@ LL1 <- proc.time()[3]
 #        paste('put "', add_cns_data, '"/;\n', collapse = '', sep = ''), "putclose;\n\n\n"), sep = '\n', file = zz)
 #    }
     close(zz)
-    assign('prec', prec, globalenv()) 
+#    assign('prec', prec, globalenv()) 
     pp2 <- proc.time()[3]
     if(echo) cat('Preprocessing time: ', round(pp2 - pp1, 2), 's\n', sep = '')
     tryCatch({
@@ -528,6 +528,7 @@ LL1 <- proc.time()[3]
     for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'set') {
       cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)
     }
+    cat('set FORIF := FORIFSET;\n', sep = '\n', file = zz)
     for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'map') {
       cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)
     }

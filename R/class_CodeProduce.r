@@ -273,7 +273,7 @@ setMethod("initialize", "CodeProduce",
     for(i in c("mCnsLType", "mCnsLhsComm", "mCnsLhsRegion", "mCnsLhsYear", "mCnsLhsSlice", 
       "mCnsLe", "mCnsGe", "mCnsRhsTypeShareIn", "mCnsRhsTypeShareOut", "mCnsRhsTypeConst", "mCnsInpTech", 
       "mCnsOutTech", "mCnsCapTech", "mCnsNewCapTech", "mCnsOutSup", "mCnsInp", "mCnsOut", "mCnsInvTech",
-      "mCnsEacTech"))
+      "mCnsEacTech", "mCnsTechCInp", "mCnsTechCOut", "mCnsTechAInp", "mCnsTechAOut", "mCnsTechEmis"))
         .Object@maptable[[i]] <- MapTable(i, 'cns', 'map')    
     for(i in c('tech', 'sup', 'comm', 'region', 'year', 'slice')) {
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')

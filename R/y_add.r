@@ -271,6 +271,22 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
         colnames(dtt) <- c('cns', cc)
         obj@maptable[[nn]] <- addData(obj@maptable[[nn]], dtt)
       }
+      # Choose technology output
+      if (any(ast == 'tech')) {
+        if (app@type %in% c('output', 'shareout')) {
+          if (app@cout) obj@maptable[['mCnsTechCOut']] <- addData(obj@maptable[['mCnsTechCOut']], 
+            data.frame(cns = app@name, stringsAsFactors = FALSE))
+          if (app@aout) obj@maptable[['mCnsTechAOut']] <- addData(obj@maptable[['mCnsTechAOut']], 
+            data.frame(cns = app@name, stringsAsFactors = FALSE))
+          if (app@emis) obj@maptable[['mCnsTechEmis']] <- addData(obj@maptable[['mCnsTechEmis']], 
+            data.frame(cns = app@name, stringsAsFactors = FALSE))
+        } else if (app@type %in% c('input', 'sharein')) {
+          if (app@cinp) obj@maptable[['mCnsTechCInp']] <- addData(obj@maptable[['mCnsTechCInp']], 
+            data.frame(cns = app@name, stringsAsFactors = FALSE))
+          if (app@ainp) obj@maptable[['mCnsTechAInp']] <- addData(obj@maptable[['mCnsTechAInp']], 
+            data.frame(cns = app@name, stringsAsFactors = FALSE))
+        }
+      }
       # Define rhs type
       if (app@eq == '>=') obj@maptable[['mCnsGe']] <- addData(obj@maptable[['mCnsGe']], 
           data.frame(cns = app@name, stringsAsFactors = FALSE))
