@@ -12,6 +12,8 @@ setGeneric("removePreviousTechnology", function(obj, name) standardGeneric("remo
 setGeneric("isTechnology", function(obj, name) standardGeneric("isTechnology"))
 setGeneric("isConstrain", function(obj, name) standardGeneric("isConstrain"))
 setGeneric("removePreviousSysInfo", function(obj) standardGeneric("removePreviousSysInfo"))
+setGeneric("removePreviousTrade", function(obj, name) standardGeneric("removePreviousTrade"))
+setGeneric("isTrade", function(obj, name) standardGeneric("isTrade"))
 setGeneric('addData', function(obj, data) standardGeneric("addData"))
 setGeneric('clear', function(obj) standardGeneric("clear"))
 setGeneric('getSet', function(obj, set) standardGeneric("getSet"))

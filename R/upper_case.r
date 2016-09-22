@@ -17,6 +17,20 @@ upper_case.technology <- function(tec) {
 }
 
 # Upper case all set in 
+upper_case.trade <- function(trd) {
+#  trd@name <- toupper(trd@name)
+#  gg <- getClass('trade')
+#  for(i in names(gg@slots)[gg@slots == 'data.frame'])
+#  if (nrow(slot(trd, i)) > 0) {
+#    zz <- slot(trd, i)
+#    for(j in colnames(zz)[colnames(zz) %in% c('region', 'comm', 'slice')])
+#      zz[, j] <- toupper(zz[, j])
+#    slot(trd, i) <- zz
+#  }
+  trd
+}
+
+# Upper case all set in 
 upper_case.commodity <- function(cmd) {
 #  cmd@name <- toupper(cmd@name)
 #  gg <- getClass('commodity')

@@ -121,6 +121,23 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'technology',
   obj
 })
 
+################################################################################
+# Add trade
+################################################################################
+setMethod('add_name', signature(obj = 'CodeProduce', app = 'trade',
+  approxim = 'list'), function(obj, app, approxim) { 
+  trd <- upper_case(app)
+  if (!chec_correct_name(trd@name)) {
+    stop(paste('Incorrect trade name "', trd@name, '"', sep = ''))
+  }
+  if (isTrade(obj, trd@name)) {
+    warning(paste('There is trade name "', trd@name,
+        '" now, all previous information will be removed', sep = ''))
+    obj <- removePreviousTrade(obj, trd@name)
+  }
+  obj@maptable[['trade']] <- addData(obj@maptable[['trade']], trd@name)
+  obj
+})
 
 
 

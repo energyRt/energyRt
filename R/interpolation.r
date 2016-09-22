@@ -5,8 +5,8 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
   default = 'numeric'), function(obj, parameter, default, ...) {
   if (length(default) != 1) stop('Default value not define')
   # Get slice
-  prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'slice', 'year')
-  true_prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'year', 'slice')
+  prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'regionp', 'slice', 'year')
+  true_prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'regionp', 'year', 'slice')
   # Remove not used approxim
   arg <- list(...)
   rule <- arg$rule

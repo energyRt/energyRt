@@ -105,6 +105,22 @@ setMethod('removePreviousImport',
         obj
 })
 ################################################################################
+# Remove previous trade
+################################################################################
+setMethod('removePreviousTrade',
+    signature(obj = 'CodeProduce', name = 'character'),
+      function(obj, name) {
+      stop('should be done')
+        obj
+})
+################################################################################
+# Get trade 
+################################################################################
+setMethod('isTrade', signature(obj = 'CodeProduce', name = 'character'),
+      function(obj, name) {
+  any(obj@maptable$trade@data$trade == name, na.rm = TRUE)
+})
+################################################################################
 # Get commodity import
 ################################################################################
 setMethod('isImport', signature(obj = 'CodeProduce', name = 'character'),

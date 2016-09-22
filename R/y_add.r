@@ -299,7 +299,8 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
         if (any(colnames(approxim) == 'year')) {
           year_range <- c(max(c(min(approxim$year), year_range[1])), min(c(max(approxim$year), year_range[2]))) 
         }
-        for(i in names(app@for.each)[!(names(app@for.each) %in% names(approxim))]) approxim[[i]] <- app@for.each[[i]]
+        for(i in names(app@for.each)[!(names(app@for.each) %in% names(approxim))]) 
+            approxim[[i]] <- app@for.each[[i]]
         rhs <- interpolation(app@rhs, 'rhs', approxim = approxim, year_range = year_range,
             rule = app@rule, default = app@default)
         colnames(rhs)[ncol(rhs)] <- 'Freq'
@@ -641,36 +642,31 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
-
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
-
   obj@maptable[['mTradeComm']] <- addData(obj@maptable[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
-
-   #browser()
-#    .Object@maptable[['mTradeSrc']] <- 
-#        MapTable('mTradeSrc', c('trade', 'region'), 'map')    
-
-
-#    .Object@maptable[['mTradeSrc']] <- 
-#        MapTable('mTradeSrc', c('trade', 'region'), 'map')    
-#    .Object@maptable[['mTradeDst']] <- 
-#        MapTable('mTradeDst', c('trade', 'region'), 'map')    
-#    .Object@maptable[['pTradeFlowCost']] <- MapTable('pTradeFlowCost', 
-#    .Object@maptable[['pTradeFlow']] <- MapTable('pTradeFlow', 
-#          c('trade', 'region', 'region', 'year', 'slice'), 'double', 
-#            default = c(0, Inf), interpolation = 'back.inter.forth')
-
-#  obj@maptable[['mSupComm']] <- addData(obj@maptable[['mSupComm']],
-#      data.frame(sup = sup@name, comm = sup@commodity))
-#  obj@maptable[['pSupCost']] <- addData(obj@maptable[['pSupCost']],
-#      simple_data_frame_approximation_chk(sup@availability, 'cost',
-#          obj@maptable[['pSupCost']], approxim, 'sup', sup@name))
-#  obj@maptable[['pSupReserve']] <- addData(obj@maptable[['pSupReserve']],
-#      data.frame(sup = sup@name, Freq = sup@reserve))
-#  obj@maptable[['pSupAva']] <- addData(obj@maptable[['pSupAva']],
-#            data_frame_approximation_chk(sup@availability, 'ava',
-#            obj@maptable[['pSupAva']], approxim, 'sup', sup@name))
+  if (is.null(trd@source)) rg <- obj@maptable$region@data$region else rg <- trd@source
+  obj@maptable[['mTradeSrc']] <- addData(obj@maptable[['mTradeSrc']],
+      data.frame(trade = rep(trd@name, length(rg)), region = rg))
+  if (is.null(trd@destination)) rg <- obj@maptable$region@data$region else rg <- trd@destination
+  obj@maptable[['mTradeDst']] <- addData(obj@maptable[['mTradeDst']],
+      data.frame(trade = rep(trd@name, length(rg)), region = rg))
+  #
+  approxim <- approxim[names(approxim) != 'region']
+  approxim$region <- trd@source
+  approxim$regionp <- trd@destination
+  # pTradeFlowCost
+  obj@maptable[['pTradeFlowCost']] <- addData(obj@maptable[['pTradeFlowCost']],
+    simple_data_frame_approximation_chk(trd@trade, 'cost', obj@maptable[['pTradeFlowCost']], 
+      approxim, 'trade', trd@name))
+  # pTradeFlow
+    gg <- data_frame_approximation_chk(trd@trade, 'ava',
+            obj@maptable[['pTradeFlow']], approxim, 'trade', trd@name)
+    obj@maptable[['pTradeFlow']] <- addData(obj@maptable[['pTradeFlow']], gg)
+    gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
+    if (nrow(gg) != 0) 
+      obj@maptable[['defpTradeFlowUp']] <- addData(obj@maptable[['defpTradeFlowUp']],
+            gg[, obj@maptable[['defpTradeFlowUp']]@set])
   obj
 })
 

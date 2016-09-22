@@ -245,7 +245,7 @@ setMethod("initialize", "CodeProduce",
         MapTable('mTradeDst', c('trade', 'region'), 'map')    
     .Object@maptable[['mSlicePrevious']] <- MapTable('mSlicePrevious', c('slice', 'slice'), 'map')    
     .Object@maptable[['pTradeFlowCost']] <- MapTable('pTradeFlowCost', 
-          c('trade', 'region', 'region', 'year', 'slice'), 'single', 
+          c('trade', 'region', 'regionp', 'year', 'slice'), 'single', 
             default = 0, interpolation = 'back.inter.forth')    
     .Object@maptable[['pRowExportPrice']] <- MapTable('pRowExportPrice', 
           c('expp', 'region', 'year', 'slice'), 'single', 
@@ -254,7 +254,7 @@ setMethod("initialize", "CodeProduce",
           c('imp', 'region', 'year', 'slice'), 'single', 
             default = 0, interpolation = 'back.inter.forth')    
     .Object@maptable[['pTradeFlow']] <- MapTable('pTradeFlow', 
-          c('trade', 'region', 'region', 'year', 'slice'), 'double', 
+          c('trade', 'region', 'regionp', 'year', 'slice'), 'double', 
             default = c(0, Inf), interpolation = 'back.inter.forth')
     .Object@maptable[['pRowExport']] <- MapTable('pRowExport', 
           c('expp', 'region', 'year', 'slice'), 'double', 

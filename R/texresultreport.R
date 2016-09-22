@@ -18,7 +18,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     texdir <-  paste(getwd(), '/reports/', sep = '')
   }
   add_drr <- paste('Report_data', obj@name, paste(format(Sys.Date(), 
-                                                         format = '%Y-%m-%d'), format(Sys.time(), format = '%H-%M-%S')))
+    format = '%Y-%m-%d'), format(Sys.time(), format = '%H-%M-%S')))
   dir.create(paste(texdir, '/', add_drr, sep = ''), recursive = TRUE)
   tryCatch({
     setwd(paste(texdir, '/', add_drr, sep = ''))
@@ -30,6 +30,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     dtt$constrain <- list()
     dtt$import <- list()
     dtt$export <- list()
+    dtt$trade <- list()
     for(i in seq(along = obj@model@data)) {
       for(j in seq(along = obj@model@data[[i]]@data)) {
         obj@model@data[[i]]@data[[j]]@name <- obj@model@data[[i]]@data[[j]]@name
@@ -64,7 +65,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       cat('\\section{Summary}\n\n', '\n', sep = '', file = zz)
       
       if (obj@result@solution_report$finish != 2) {
-        cat('The model run is not completed. The results are not "optimal solution".\n\n', '\n', sep = '', file = zz)
+        cat('The model run is not completed. The results are not "optimal solution".\n\n', '\n', 
+          sep = '', file = zz)
       }
       if (obj@result@solution_report$status == 1) {
         cat('Optimal solution found, objective value ', obj@result@data$vObjective, 
@@ -137,7 +139,6 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         tbl <- tbl[apply(tbl != 0, 1, any), apply(tbl != 0, 2, any), drop = FALSE]
         cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
       }
-      
       # Discount cost data
       dsc <- obj@precompiled@maptable$pDiscountFactor@data
       dsc <- tapply(dsc$Freq, dsc[, c('region', 'year'), drop = FALSE], sum)
