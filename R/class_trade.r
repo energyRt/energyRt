@@ -4,8 +4,8 @@ setClass("trade",
           name          = "character",       # Short name
           description   = "character",       # Details
           commodity     = "character",       # Vector if NULL that
-          source        = "character",       # if NULL that in global region
-          destination   = "character",       # if NULL that in global region
+          source        = "character",       # if NULL that in all region
+          destination   = "character",       # if NULL that in all region
       # Performance parameters
           trade         = "data.frame"
       ),

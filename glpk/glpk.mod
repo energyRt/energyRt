@@ -48,6 +48,8 @@ param defpStorageCapUp{stg, region, year};
 param mSlicePrevious{slice, slice};
 param mSlicePreviousYear{slice};
 param mTradeComm{trade, comm};
+param mTradeSrc{trade, region};
+param mTradeDst{trade, region};
 param mExpComm{expp, comm};
 param mImpComm{imp, comm};
 param defpTradeFlowUp{trade, region, region, year, slice};
@@ -409,15 +411,15 @@ s.t.  eqStorageLo{ st1 in stg,r in region,y in year : (mMidMilestone[y] and pSto
 
 s.t.  eqStorageUp{ st1 in stg,r in region,y in year : (mMidMilestone[y] and defpStorageCapUp[st1,r,y])}: vStorageCap[st1,r,y] <=  pStorageCapUp[st1,r,y];
 
-s.t.  eqImport{ c in comm,r in region,y in year,s in slice : mMidMilestone[y]}: vImport[c,r,y,s]  =  sum{t1 in trade,rp in region:(mTradeComm[t1,c])}(vTradeFlow[t1,rp,r,y,s])+sum{i in imp:(mImpComm[i,c])}(vRowImport[i,r,y,s]);
+s.t.  eqImport{ c in comm,r in region,y in year,s in slice : mMidMilestone[y]}: vImport[c,r,y,s]  =  sum{t1 in trade,rp in region:((mTradeComm[t1,c] and mTradeSrc[t1,rp] and mTradeDst[t1,r]))}(vTradeFlow[t1,rp,r,y,s])+sum{i in imp:(mImpComm[i,c])}(vRowImport[i,r,y,s]);
 
-s.t.  eqExport{ c in comm,r in region,y in year,s in slice : mMidMilestone[y]}: vExport[c,r,y,s]  =  sum{t1 in trade,rp in region:(mTradeComm[t1,c])}(vTradeFlow[t1,r,rp,y,s])+sum{e in expp:(mExpComm[e,c])}(vRowExport[e,r,y,s]);
+s.t.  eqExport{ c in comm,r in region,y in year,s in slice : mMidMilestone[y]}: vExport[c,r,y,s]  =  sum{t1 in trade,rp in region:((mTradeComm[t1,c] and mTradeSrc[t1,r] and mTradeDst[t1,rp]))}(vTradeFlow[t1,r,rp,y,s])+sum{e in expp:(mExpComm[e,c])}(vRowExport[e,r,y,s]);
 
-s.t.  eqTradeFlowUp{ t1 in trade,r in region,rp in region,y in year,s in slice : (mMidMilestone[y] and defpTradeFlowUp[t1,r,rp,y,s])}: vTradeFlow[t1,r,rp,y,s] <=  pTradeFlowUp[t1,r,rp,y,s];
+s.t.  eqTradeFlowUp{ t1 in trade,r in region,rp in region,y in year,s in slice : (mMidMilestone[y] and defpTradeFlowUp[t1,r,rp,y,s] and mTradeSrc[t1,r] and mTradeDst[t1,rp])}: vTradeFlow[t1,r,rp,y,s] <=  pTradeFlowUp[t1,r,rp,y,s];
 
-s.t.  eqTradeFlowLo{ t1 in trade,r in region,rp in region,y in year,s in slice : (mMidMilestone[y] and pTradeFlowLo[t1,r,rp,y,s])}: vTradeFlow[t1,r,rp,y,s]  >=  pTradeFlowLo[t1,r,rp,y,s];
+s.t.  eqTradeFlowLo{ t1 in trade,r in region,rp in region,y in year,s in slice : (mMidMilestone[y] and pTradeFlowLo[t1,r,rp,y,s] and mTradeSrc[t1,r] and mTradeDst[t1,rp])}: vTradeFlow[t1,r,rp,y,s]  >=  pTradeFlowLo[t1,r,rp,y,s];
 
-s.t.  eqCostTrade{ r in region,y in year : mMidMilestone[y]}: vTradeCost[r,y]  =  sum{t1 in trade,rp in region,s in slice}(pTradeFlowCost[t1,rp,r,y,s]*vTradeFlow[t1,rp,r,y,s])+sum{i in imp,s in slice}(pRowImportPrice[i,r,y,s]*vRowImport[i,r,y,s])-sum{e in expp,s in slice}(pRowExportPrice[e,r,y,s]*vRowExport[e,r,y,s]);
+s.t.  eqCostTrade{ r in region,y in year : mMidMilestone[y]}: vTradeCost[r,y]  =  sum{t1 in trade,rp in region,s in slice:((mTradeSrc[t1,rp] and mTradeDst[t1,r]))}(pTradeFlowCost[t1,rp,r,y,s]*vTradeFlow[t1,rp,r,y,s])-sum{t1 in trade,rp in region,s in slice:((mTradeSrc[t1,rp] and mTradeDst[t1,r]))}(pTradeFlowCost[t1,r,rp,y,s]*vTradeFlow[t1,r,rp,y,s])+sum{i in imp,s in slice}(pRowImportPrice[i,r,y,s]*vRowImport[i,r,y,s])-sum{e in expp,s in slice}(pRowExportPrice[e,r,y,s]*vRowExport[e,r,y,s]);
 
 s.t.  eqRowExportUp{ e in expp,r in region,y in year,s in slice : (mMidMilestone[y] and defpRowExportUp[e,r,y,s])}: vRowExport[e,r,y,s] <=  pRowExportUp[e,r,y,s];
 

@@ -118,6 +118,8 @@ mSlicePrevious(slice, slice)                     Mapping of slices for storage t
 mSlicePreviousYear(slice)                        Mapping of slices for storage techs
 * Trade and ROW
 mTradeComm(trade, comm)                          Mapping of trade commodities
+mTradeSrc(trade, region)                         Mapping of trade source region
+mTradeDst(trade, region)                         Mapping of trade destination region
 mExpComm(expp, comm)                             Mapping of export commodities
 mImpComm(imp, comm)                              Mapping for import commodities
 defpTradeFlowUp(trade, region, region, year, slice)     Auxiliary mapping for Inf - used in GLPK-MathProg only
@@ -1052,26 +1054,31 @@ eqRowImportResUp(imp)
 
 eqImport(comm, region, year, slice)$mMidMilestone(year)..
   vImport(comm, region, year, slice) =e=
-  sum((trade, regionp)$mTradeComm(trade, comm), vTradeFlow(trade, regionp, region, year, slice)) +
-  sum(imp$mImpComm(imp, comm), vRowImport(imp, region, year, slice));
+  sum((trade, regionp)$(mTradeComm(trade, comm) and mTradeSrc(trade, regionp) and mTradeDst(trade, region)), 
+    vTradeFlow(trade, regionp, region, year, slice)) + sum(imp$mImpComm(imp, comm), vRowImport(imp, region, year, slice));
 
 eqExport(comm, region, year, slice)$mMidMilestone(year)..
   vExport(comm, region, year, slice) =e=
-  sum((trade, regionp)$mTradeComm(trade, comm), vTradeFlow(trade, region, regionp, year, slice)) +
-  sum(expp$mExpComm(expp, comm), vRowExport(expp, region, year, slice));
+  sum((trade, regionp)$(mTradeComm(trade, comm) and mTradeSrc(trade, region) and mTradeDst(trade, regionp)), 
+  vTradeFlow(trade, region, regionp, year, slice)) + sum(expp$mExpComm(expp, comm), vRowExport(expp, region, year, slice));
 
-eqTradeFlowUp(trade, region, regionp, year, slice)$(
-  mMidMilestone(year) and defpTradeFlowUp(trade, region, regionp, year, slice))..
-  vTradeFlow(trade, region, regionp, year, slice) =l= pTradeFlowUp(trade, region, regionp, year, slice);
+eqTradeFlowUp(trade, region, regionp, year, slice)$(mMidMilestone(year) and 
+    defpTradeFlowUp(trade, region, regionp, year, slice) and mTradeSrc(trade, region) and mTradeDst(trade, regionp))..
+      vTradeFlow(trade, region, regionp, year, slice) =l= pTradeFlowUp(trade, region, regionp, year, slice);
 
-eqTradeFlowLo(trade, region, regionp, year, slice)$(
-  mMidMilestone(year) and pTradeFlowLo(trade, region, regionp, year, slice))..
-  vTradeFlow(trade, region, regionp, year, slice) =g= pTradeFlowLo(trade, region, regionp, year, slice);
+eqTradeFlowLo(trade, region, regionp, year, slice)$(mMidMilestone(year) and 
+    pTradeFlowLo(trade, region, regionp, year, slice) and mTradeSrc(trade, region) and mTradeDst(trade, regionp))..
+      vTradeFlow(trade, region, regionp, year, slice) =g= pTradeFlowLo(trade, region, regionp, year, slice);
 
 
 eqCostTrade(region, year)$mMidMilestone(year).. vTradeCost(region, year) =e=
-  sum((trade, regionp, slice), pTradeFlowCost(trade, regionp, region, year, slice) *
-      vTradeFlow(trade, regionp, region, year, slice)) +
+* Import
+  sum((trade, regionp, slice)$(mTradeSrc(trade, regionp) and mTradeDst(trade, region)), 
+    pTradeFlowCost(trade, regionp, region, year, slice) * vTradeFlow(trade, regionp, region, year, slice)) -
+* Export
+  sum((trade, regionp, slice)$(mTradeSrc(trade, regionp) and mTradeDst(trade, region)), 
+    pTradeFlowCost(trade, region, regionp, year, slice) * vTradeFlow(trade, region, regionp, year, slice)) +
+* Row
   sum((imp, slice), pRowImportPrice(imp, region, year, slice) *
      vRowImport(imp, region, year, slice)) -
   sum((expp, slice), pRowExportPrice(expp, region, year, slice) *

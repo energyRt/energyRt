@@ -239,6 +239,10 @@ setMethod("initialize", "CodeProduce",
         MapTable('mImpComm', c('imp', 'comm'), 'map')    
     .Object@maptable[['mTradeComm']] <- 
         MapTable('mTradeComm', c('trade', 'comm'), 'map')    
+    .Object@maptable[['mTradeSrc']] <- 
+        MapTable('mTradeSrc', c('trade', 'region'), 'map')    
+    .Object@maptable[['mTradeDst']] <- 
+        MapTable('mTradeDst', c('trade', 'region'), 'map')    
     .Object@maptable[['mSlicePrevious']] <- MapTable('mSlicePrevious', c('slice', 'slice'), 'map')    
     .Object@maptable[['pTradeFlowCost']] <- MapTable('pTradeFlowCost', 
           c('trade', 'region', 'region', 'year', 'slice'), 'single', 

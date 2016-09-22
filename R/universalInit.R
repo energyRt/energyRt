@@ -163,3 +163,6 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
     mdl
   })
 
+setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
+setMethod('newTrade', signature(name = 'character'), function(name, ...) 
+  universalInit('trade', name, ...))
