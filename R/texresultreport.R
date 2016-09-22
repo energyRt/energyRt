@@ -587,7 +587,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               cat('\\end{figure}\n', sep = '', file = zz)
             }
           }
-          if (all(as.character(cns@type) != c('tax', 'subsidy')))
+          if (all(!(as.character(cns@type) %in% c('tax', 'subsidy'))))
             cat_bottomup_data_frame(getConstrainResults(obj, as.character(cns@name))[[1]], 'Constrain data', zz)
         }
       }
