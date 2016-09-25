@@ -652,9 +652,9 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'trade',
   obj@maptable[['mTradeDst']] <- addData(obj@maptable[['mTradeDst']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
   #
+  approxim$src <- trd@source; approxim$src <- approxim$src[approxim$src %in% approxim$region]
+  approxim$dst <- trd@destination; approxim$dst <- approxim$dst[approxim$dst %in% approxim$region]
   approxim <- approxim[names(approxim) != 'region']
-  approxim$region <- trd@source
-  approxim$regionp <- trd@destination
   # pTradeFlowCost
   obj@maptable[['pTradeFlowCost']] <- addData(obj@maptable[['pTradeFlowCost']],
     simple_data_frame_approximation_chk(trd@trade, 'cost', obj@maptable[['pTradeFlowCost']], 

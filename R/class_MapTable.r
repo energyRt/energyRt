@@ -36,7 +36,7 @@ setMethod("initialize", "MapTable", function(.Object, alias, set, type,
       for_sysInfo = ''
   ) {
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'acomm', 'comm', 'commp', 
-                'group', 'region', 'regionp', 
+                'group', 'region', 'regionp', 'src', 'dst', 
                  'year', 'yearp', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')
   if (!is.character(alias) || length(alias) != 1 || !chec_correct_name(alias)) 
     stop(paste('Wrong alias: "', alias, '"', sep = ''))
@@ -69,7 +69,8 @@ setMethod("initialize", "MapTable", function(.Object, alias, set, type,
   # Create data
   data <- data.frame(tech = character(), techp = character(), sup = character(), dem = character(), 
       acomm = character(), comm = character(), commp = character(), group = character(),  
-      region = character(), regionp = character(), year = numeric(), yearp = numeric(), 
+      region = character(), regionp = character(), src = character(), dst = character(), 
+      year = numeric(), yearp = numeric(), 
       slice = character(), stg = character(),
       expp = character(), imp = character(), trade = character(), cns = character(), 
       type = factor(levels = c('lo', 'up')),

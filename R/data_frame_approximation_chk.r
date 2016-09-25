@@ -36,7 +36,6 @@ simple_data_frame_approximation_chk <- function(frm, parameter, mtp, approxim,
                     default    = mtp@default,
                     year_range = range(approxim$year),
                     approxim   = approxim)
-  #cat(parameter, '\n')
   # Must fixed in the future
   colnames(dd)[[ncol(dd)]] <- 'Freq'
   for(i in colnames(dd)[-ncol(dd)]) {

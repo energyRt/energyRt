@@ -411,15 +411,15 @@ s.t.  eqStorageLo{ st1 in stg,r in region,y in year : (mMidMilestone[y] and pSto
 
 s.t.  eqStorageUp{ st1 in stg,r in region,y in year : (mMidMilestone[y] and defpStorageCapUp[st1,r,y])}: vStorageCap[st1,r,y] <=  pStorageCapUp[st1,r,y];
 
-s.t.  eqImport{ c in comm,r in region,y in year,s in slice : mMidMilestone[y]}: vImport[c,r,y,s]  =  sum{t1 in trade,rp in region:((mTradeComm[t1,c] and mTradeSrc[t1,rp] and mTradeDst[t1,r]))}(vTradeFlow[t1,rp,r,y,s])+sum{i in imp:(mImpComm[i,c])}(vRowImport[i,r,y,s]);
+s.t.  eqImport{ c in comm,dst in region,y in year,s in slice : mMidMilestone[y]}: vImport[c,dst,y,s]  =  sum{t1 in trade,src in region:((mTradeComm[t1,c] and mTradeSrc[t1,src] and mTradeDst[t1,dst]))}(vTradeFlow[t1,src,dst,y,s])+sum{i in imp:(mImpComm[i,c])}(vRowImport[i,dst,y,s]);
 
-s.t.  eqExport{ c in comm,r in region,y in year,s in slice : mMidMilestone[y]}: vExport[c,r,y,s]  =  sum{t1 in trade,rp in region:((mTradeComm[t1,c] and mTradeSrc[t1,r] and mTradeDst[t1,rp]))}(vTradeFlow[t1,r,rp,y,s])+sum{e in expp:(mExpComm[e,c])}(vRowExport[e,r,y,s]);
+s.t.  eqExport{ c in comm,src in region,y in year,s in slice : mMidMilestone[y]}: vExport[c,src,y,s]  =  sum{t1 in trade,dst in region:((mTradeComm[t1,c] and mTradeSrc[t1,src] and mTradeDst[t1,dst]))}(vTradeFlow[t1,src,dst,y,s])+sum{e in expp:(mExpComm[e,c])}(vRowExport[e,src,y,s]);
 
-s.t.  eqTradeFlowUp{ t1 in trade,r in region,rp in region,y in year,s in slice : (mMidMilestone[y] and defpTradeFlowUp[t1,r,rp,y,s] and mTradeSrc[t1,r] and mTradeDst[t1,rp])}: vTradeFlow[t1,r,rp,y,s] <=  pTradeFlowUp[t1,r,rp,y,s];
+s.t.  eqTradeFlowUp{ t1 in trade,src in region,dst in region,y in year,s in slice : (mMidMilestone[y] and defpTradeFlowUp[t1,src,dst,y,s] and mTradeSrc[t1,src] and mTradeDst[t1,dst])}: vTradeFlow[t1,src,dst,y,s] <=  pTradeFlowUp[t1,src,dst,y,s];
 
-s.t.  eqTradeFlowLo{ t1 in trade,r in region,rp in region,y in year,s in slice : (mMidMilestone[y] and pTradeFlowLo[t1,r,rp,y,s] and mTradeSrc[t1,r] and mTradeDst[t1,rp])}: vTradeFlow[t1,r,rp,y,s]  >=  pTradeFlowLo[t1,r,rp,y,s];
+s.t.  eqTradeFlowLo{ t1 in trade,src in region,dst in region,y in year,s in slice : (mMidMilestone[y] and pTradeFlowLo[t1,src,dst,y,s] and mTradeSrc[t1,src] and mTradeDst[t1,dst])}: vTradeFlow[t1,src,dst,y,s]  >=  pTradeFlowLo[t1,src,dst,y,s];
 
-s.t.  eqCostTrade{ r in region,y in year : mMidMilestone[y]}: vTradeCost[r,y]  =  sum{t1 in trade,rp in region,s in slice:((mTradeSrc[t1,rp] and mTradeDst[t1,r]))}(pTradeFlowCost[t1,rp,r,y,s]*vTradeFlow[t1,rp,r,y,s])-sum{t1 in trade,rp in region,s in slice:((mTradeSrc[t1,rp] and mTradeDst[t1,r]))}(pTradeFlowCost[t1,r,rp,y,s]*vTradeFlow[t1,r,rp,y,s])+sum{i in imp,s in slice}(pRowImportPrice[i,r,y,s]*vRowImport[i,r,y,s])-sum{e in expp,s in slice}(pRowExportPrice[e,r,y,s]*vRowExport[e,r,y,s]);
+s.t.  eqCostTrade{ r in region,y in year : mMidMilestone[y]}: vTradeCost[r,y]  =  sum{t1 in trade,src in region,s in slice:((mTradeSrc[t1,src] and mTradeDst[t1,r]))}(pTradeFlowCost[t1,src,r,y,s]*vTradeFlow[t1,src,r,y,s])-sum{t1 in trade,dst in region,s in slice:((mTradeSrc[t1,r] and mTradeDst[t1,dst]))}(pTradeFlowCost[t1,r,dst,y,s]*vTradeFlow[t1,r,dst,y,s])+sum{i in imp,s in slice}(pRowImportPrice[i,r,y,s]*vRowImport[i,r,y,s])-sum{e in expp,s in slice}(pRowExportPrice[e,r,y,s]*vRowExport[e,r,y,s]);
 
 s.t.  eqRowExportUp{ e in expp,r in region,y in year,s in slice : (mMidMilestone[y] and defpRowExportUp[e,r,y,s])}: vRowExport[e,r,y,s] <=  pRowExportUp[e,r,y,s];
 
@@ -2703,8 +2703,8 @@ for {t in tech,r in region,y in year : vTechNewCap[t,r,y] <> 0} {
     printf "%s,%s,%s,%f\n", t,r,y, vTechNewCap[t,r,y] >> "vTechNewCap.csv";
 } 
 printf "tech, region, year, year,value\n" > "vTechRetirementCap.csv";
-for {t in tech,r in region,y in year,yp in year : vTechRetirementCap[t,r,y,y] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", t,r,y,yp, vTechRetirementCap[t,r,y,y] >> "vTechRetirementCap.csv";
+for {t in tech,r in region,y in year,yp in year : vTechRetirementCap[t,r,y,yp] <> 0} { 
+    printf "%s,%s,%s,%s,%f\n", t,r,y,yp, vTechRetirementCap[t,r,y,yp] >> "vTechRetirementCap.csv";
 } 
 printf "tech, region, year,value\n" > "vTechCap.csv";
 for {t in tech,r in region,y in year : vTechCap[t,r,y] <> 0} { 
@@ -2823,8 +2823,8 @@ for {c in comm,r in region,y in year,s in slice : vExport[c,r,y,s] <> 0} {
     printf "%s,%s,%s,%s,%f\n", c,r,y,s, vExport[c,r,y,s] >> "vExport.csv";
 } 
 printf "trade, region, region, year, slice,value\n" > "vTradeFlow.csv";
-for {t1 in trade,r in region,rp in region,y in year,s in slice : vTradeFlow[t1,r,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t1,r,rp,y,s, vTradeFlow[t1,r,r,y,s] >> "vTradeFlow.csv";
+for {t1 in trade,r in region,rp in region,y in year,s in slice : vTradeFlow[t1,r,rp,y,s] <> 0} { 
+    printf "%s,%s,%s,%s,%s,%f\n", t1,r,rp,y,s, vTradeFlow[t1,r,rp,y,s] >> "vTradeFlow.csv";
 } 
 printf "expp,value\n" > "vRowExportRes.csv";
 for {e in expp : vRowExportRes[e] <> 0} { 
