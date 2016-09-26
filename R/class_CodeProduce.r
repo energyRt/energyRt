@@ -323,7 +323,7 @@ setMethod("initialize", "CodeProduce",
   .Object@maptable[['defpSupReserve']] <- MapTable('defpSupReserve', c('sup'), 'map')    
   .Object@maptable[['defpStorageCapUp']] <- MapTable('defpStorageCapUp', c('stg', 'region', 'year'), 'map')    
   .Object@maptable[['defpTradeFlowUp']] <- MapTable('defpTradeFlowUp', 
-                                        c('trade', 'region', 'region', 'year', 'slice'), 'map')    
+                                        c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
     .Object@maptable[['defpRowExportRes']] <- MapTable('defpRowExportRes', 'expp', 'map')    
     .Object@maptable[['defpRowImportRes']] <- MapTable('defpRowImportRes', 'imp', 'map')    
     .Object@maptable[['defpRowExportUp']] <- MapTable('defpRowExportUp', 

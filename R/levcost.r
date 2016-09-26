@@ -232,7 +232,7 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
   #if (!is.null(tax)) mdl@sysInfo@tax <- tax
   #if (!is.null(subs)) mdl@sysInfo@subs <- subs
   #, tmp.dir = tmp.dir
-  rr <- solve(mdl, name = 'LEC', solver = solver, tmp.del = FALSE, tmp.dir = 'c:/tmp/', 
+  rr <- solve(mdl, name = 'LEC', solver = solver, tmp.del = tmp.del, tmp.dir = tmp.dir, 
     glpkCompileParameter = glpkCompileParameter, gamsCompileParameter = gamsCompileParameter,
     cbcCompileParameter = cbcCompileParameter, echo = echo)
   if (!(rr@result@solution_report$status == 1 && 
