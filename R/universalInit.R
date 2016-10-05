@@ -9,7 +9,8 @@ universalInit <- function(class_name, name, exclude = NULL, ...) {
     if (any(names(arg) == 'name')) stop('Duplicate parameter name')
     if (is.null(names(arg)) || any(names(arg) == '') ||
        anyDuplicated(names(arg)) != 0) stop('Wrong arguments name')
-    if (any(sapply(arg, is.null))) stop('There is NULL argument')
+    #if (any(sapply(arg, is.null))) stop('There is NULL argument')
+    arg <- arg[!sapply(arg, is.null)]
     if (any(!(names(arg) %in% names(slt)))) stop('There is argument that not consist in class: "', 
        paste(names(arg)[!(names(arg) %in% names(slt))], collapse = '", "'), '"')
     # Add aditional argument
