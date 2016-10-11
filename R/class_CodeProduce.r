@@ -84,6 +84,8 @@ setMethod("initialize", "CodeProduce",
     # Map
     .Object@maptable[['mSupComm']] <- 
         MapTable('mSupComm', c('sup', 'comm'), 'map')    
+    .Object@maptable[['mSupSpan']] <- 
+        MapTable('mSupSpan', c('sup', 'region'), 'map')    
     # Single
     .Object@maptable[['pSupCost']] <- 
         MapTable('pSupCost', c('sup', 'region', 'year', 'slice'), 'single', 

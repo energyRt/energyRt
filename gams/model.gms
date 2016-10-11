@@ -94,6 +94,7 @@ mTechSpan(tech, region, year)    Assisting set showing if the tech may exist in 
 mTechEmitedComm(tech, comm)      Mapping for emissions and technologies
 * Supply
 mSupComm(sup, comm)              Mapping for supply commodities
+mSupSpan(sup, region)            Assisting set showing if the sup may exist in the region
 * Demand
 mDemComm(dem, comm)              Mapping for demand commodities
 * Ballance
@@ -818,12 +819,12 @@ eqSupCost(sup, region, year)
 ;
 
 eqSupAvaUp(sup, comm, region, year, slice)$(mMidMilestone(year) and mSupComm(sup, comm) and
-         defpSupAvaUp(sup, region, year, slice))..
+         defpSupAvaUp(sup, region, year, slice) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =l=
          pSupAvaUp(sup, region, year, slice);
 
-eqSupAvaLo(sup, comm, region, year, slice)$(mMidMilestone(year) and mSupComm(sup, comm))..
+eqSupAvaLo(sup, comm, region, year, slice)$(mMidMilestone(year) and mSupComm(sup, comm) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =g=
          pSupAvaLo(sup, region, year, slice);
@@ -832,7 +833,7 @@ eqSupReserve(sup, comm)$mSupComm(sup, comm)..
          vSupReserve(sup)
          =e=
          sum((region, year, slice, yeare, yearp)$(mMidMilestone(year) and
-                mStartMilestone(year, yeare) and mEndMilestone(year, yearp)),
+                mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mSupSpan(sup, region)),
              (ORD(yearp) - ORD(yeare) + 1) * vSupOut(sup, comm, region, year, slice)
          );
 
@@ -842,7 +843,7 @@ eqSupReserveCheck(sup, comm)$
          )..
          pSupReserve(sup) =g= vSupReserve(sup);
 
-eqSupCost(sup, region, year)$mMidMilestone(year)..
+eqSupCost(sup, region, year)$(mMidMilestone(year) and mSupSpan(sup, region))..
          vSupCost(sup, region, year)
          =e=
          sum((comm, slice)$mSupComm(sup, comm),
@@ -1173,7 +1174,7 @@ eqInpTot(comm, region, year, slice)$mMidMilestone(year)..
 eqSupOutTot(comm, region, year, slice)$mMidMilestone(year)..
          vSupOutTot(comm, region, year, slice)
          =e=
-         sum(sup$mSupComm(sup, comm),
+         sum(sup$(mSupComm(sup, comm) and mSupSpan(sup, region)),
                  vSupOut(sup, comm, region, year, slice)
          );
 
@@ -1239,7 +1240,7 @@ eqCost1(region, year)$(mMidMilestone(year) and not(mMilestoneLast(year)))..
          vCost(region, year)
          =e=
          sum(tech$mTechSpan(tech, region, year), vTechCost(tech, region, year))
-         + sum(sup, vSupCost(sup, region, year))
+         + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
          + sum(comm, vDumCost(comm, region, year))
          + sum(comm, vTaxCost(comm, region, year))
          - sum(comm, vSubsCost(comm, region, year))
@@ -1252,7 +1253,7 @@ eqCost2(region, year)$(mMidMilestone(year) and mMilestoneLast(year))..
          sum(tech$mTechSpan(tech, region, year), vTechCost(tech, region, year))
          + sum(tech, vTechSalv(tech, region))
          + sum(stg, vStorageSalv(stg, region))
-         + sum(sup, vSupCost(sup, region, year))
+         + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
          + sum(comm, vDumCost(comm, region, year))
          + sum(comm, vTaxCost(comm, region, year))
          - sum(comm, vSubsCost(comm, region, year))
@@ -2435,8 +2436,6 @@ eqCnsLETotOutCRYS(cns, comm, region, year, slice)
 eqCnsGETotOutCRYS(cns, comm, region, year, slice)
 eqCnsETotOutCRYS(cns, comm, region, year, slice)
 ;
-
-
 
 
 
@@ -5801,1441 +5800,1441 @@ eqCnsETechEacLRY(cns, tech, region, year)$(mCnsEacTech(cns) and mCnsLType(cns) a
        =e= 0;
 
 eqCnsLESupOutShareIn(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhs(cns) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutShareOut(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhs(cns) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOut(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhs(cns)
        =l= 0;
 
 eqCnsGESupOutShareIn(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhs(cns) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutShareOut(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhs(cns) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOut(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhs(cns)
        =g= 0;
 
 eqCnsESupOutShareIn(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhs(cns) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutShareOut(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhs(cns) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOut(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhs(cns)
        =e= 0;
 
 eqCnsLESupOutSShareIn(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsS(cns, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutSShareOut(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsS(cns, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutS(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsS(cns, slice)
        =l= 0;
 
 eqCnsGESupOutSShareIn(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsS(cns, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutSShareOut(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsS(cns, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutS(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsS(cns, slice)
        =g= 0;
 
 eqCnsESupOutSShareIn(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsS(cns, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutSShareOut(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsS(cns, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutS(cns, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsS(cns, slice)
        =e= 0;
 
 eqCnsLESupOutYShareIn(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsY(cns, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutYShareOut(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsY(cns, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutY(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsY(cns, year)
        =l= 0;
 
 eqCnsGESupOutYShareIn(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsY(cns, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutYShareOut(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsY(cns, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutY(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsY(cns, year)
        =g= 0;
 
 eqCnsESupOutYShareIn(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsY(cns, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutYShareOut(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsY(cns, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutY(cns, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsY(cns, year)
        =e= 0;
 
 eqCnsLESupOutYSShareIn(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsYS(cns, year, slice) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutYSShareOut(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsYS(cns, year, slice) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutYS(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsYS(cns, year, slice)
        =l= 0;
 
 eqCnsGESupOutYSShareIn(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsYS(cns, year, slice) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutYSShareOut(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsYS(cns, year, slice) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutYS(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsYS(cns, year, slice)
        =g= 0;
 
 eqCnsESupOutYSShareIn(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsYS(cns, year, slice) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutYSShareOut(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsYS(cns, year, slice) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutYS(cns, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, region)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsYS(cns, year, slice)
        =e= 0;
 
 eqCnsLESupOutRShareIn(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsR(cns, region) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutRShareOut(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsR(cns, region) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutR(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsR(cns, region)
        =l= 0;
 
 eqCnsGESupOutRShareIn(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsR(cns, region) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutRShareOut(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsR(cns, region) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutR(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsR(cns, region)
        =g= 0;
 
 eqCnsESupOutRShareIn(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsR(cns, region) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutRShareOut(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsR(cns, region) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutR(cns, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsR(cns, region)
        =e= 0;
 
 eqCnsLESupOutRSShareIn(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsRS(cns, region, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutRSShareOut(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsRS(cns, region, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutRS(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsRS(cns, region, slice)
        =l= 0;
 
 eqCnsGESupOutRSShareIn(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsRS(cns, region, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutRSShareOut(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsRS(cns, region, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutRS(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsRS(cns, region, slice)
        =g= 0;
 
 eqCnsESupOutRSShareIn(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsRS(cns, region, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutRSShareOut(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsRS(cns, region, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutRS(cns, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsRS(cns, region, slice)
        =e= 0;
 
 eqCnsLESupOutRYShareIn(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsRY(cns, region, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutRYShareOut(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsRY(cns, region, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutRY(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsRY(cns, region, year)
        =l= 0;
 
 eqCnsGESupOutRYShareIn(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsRY(cns, region, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutRYShareOut(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsRY(cns, region, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutRY(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsRY(cns, region, year)
        =g= 0;
 
 eqCnsESupOutRYShareIn(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsRY(cns, region, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutRYShareOut(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsRY(cns, region, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutRY(cns, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm, slice)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsRY(cns, region, year)
        =e= 0;
 
 eqCnsLESupOutRYSShareIn(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsRYS(cns, region, year, slice) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutRYSShareOut(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsRYS(cns, region, year, slice) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutRYS(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsRYS(cns, region, year, slice)
        =l= 0;
 
 eqCnsGESupOutRYSShareIn(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsRYS(cns, region, year, slice) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutRYSShareOut(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsRYS(cns, region, year, slice) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutRYS(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsRYS(cns, region, year, slice)
        =g= 0;
 
 eqCnsESupOutRYSShareIn(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsRYS(cns, region, year, slice) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutRYSShareOut(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsRYS(cns, region, year, slice) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutRYS(cns, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, comm)$(mCnsSup(cns, sup) and mCnsComm(cns, comm) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsRYS(cns, region, year, slice)
        =e= 0;
 
 eqCnsLESupOutCShareIn(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsC(cns, comm) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutCShareOut(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsC(cns, comm) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutC(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsC(cns, comm)
        =l= 0;
 
 eqCnsGESupOutCShareIn(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsC(cns, comm) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutCShareOut(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsC(cns, comm) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutC(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsC(cns, comm)
        =g= 0;
 
 eqCnsESupOutCShareIn(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsC(cns, comm) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutCShareOut(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsC(cns, comm) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutC(cns, comm)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsC(cns, comm)
        =e= 0;
 
 eqCnsLESupOutCSShareIn(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCS(cns, comm, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutCSShareOut(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCS(cns, comm, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutCS(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCS(cns, comm, slice)
        =l= 0;
 
 eqCnsGESupOutCSShareIn(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCS(cns, comm, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutCSShareOut(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCS(cns, comm, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutCS(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCS(cns, comm, slice)
        =g= 0;
 
 eqCnsESupOutCSShareIn(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCS(cns, comm, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutCSShareOut(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCS(cns, comm, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutCS(cns, comm, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCS(cns, comm, slice)
        =e= 0;
 
 eqCnsLESupOutCYShareIn(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsCY(cns, comm, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutCYShareOut(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsCY(cns, comm, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutCY(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCY(cns, comm, year)
        =l= 0;
 
 eqCnsGESupOutCYShareIn(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsCY(cns, comm, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutCYShareOut(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsCY(cns, comm, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutCY(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCY(cns, comm, year)
        =g= 0;
 
 eqCnsESupOutCYShareIn(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsCY(cns, comm, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutCYShareOut(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsCY(cns, comm, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutCY(cns, comm, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region, slice)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCY(cns, comm, year)
        =e= 0;
 
 eqCnsLESupOutCYSShareIn(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsCYS(cns, comm, year, slice) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutCYSShareOut(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsCYS(cns, comm, year, slice) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutCYS(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCYS(cns, comm, year, slice)
        =l= 0;
 
 eqCnsGESupOutCYSShareIn(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsCYS(cns, comm, year, slice) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutCYSShareOut(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsCYS(cns, comm, year, slice) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutCYS(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCYS(cns, comm, year, slice)
        =g= 0;
 
 eqCnsESupOutCYSShareIn(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsCYS(cns, comm, year, slice) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutCYSShareOut(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsCYS(cns, comm, year, slice) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutCYS(cns, comm, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, region)$(mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCYS(cns, comm, year, slice)
        =e= 0;
 
 eqCnsLESupOutCRShareIn(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCR(cns, comm, region) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutCRShareOut(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCR(cns, comm, region) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutCR(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCR(cns, comm, region)
        =l= 0;
 
 eqCnsGESupOutCRShareIn(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCR(cns, comm, region) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutCRShareOut(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCR(cns, comm, region) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutCR(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCR(cns, comm, region)
        =g= 0;
 
 eqCnsESupOutCRShareIn(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCR(cns, comm, region) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutCRShareOut(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCR(cns, comm, region) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutCR(cns, comm, region)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCR(cns, comm, region)
        =e= 0;
 
 eqCnsLESupOutCRSShareIn(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCRS(cns, comm, region, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutCRSShareOut(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCRS(cns, comm, region, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutCRS(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCRS(cns, comm, region, slice)
        =l= 0;
 
 eqCnsGESupOutCRSShareIn(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCRS(cns, comm, region, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutCRSShareOut(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCRS(cns, comm, region, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutCRS(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCRS(cns, comm, region, slice)
        =g= 0;
 
 eqCnsESupOutCRSShareIn(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCRS(cns, comm, region, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutCRSShareOut(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsCRS(cns, comm, region, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutCRS(cns, comm, region, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, sup, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSup(cns, sup) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsCRS(cns, comm, region, slice)
        =e= 0;
 
 eqCnsLESupOutCRYShareIn(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsCRY(cns, comm, region, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutCRYShareOut(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsCRY(cns, comm, region, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutCRY(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRY(cns, comm, region, year)
        =l= 0;
 
 eqCnsGESupOutCRYShareIn(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsCRY(cns, comm, region, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutCRYShareOut(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsCRY(cns, comm, region, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutCRY(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRY(cns, comm, region, year)
        =g= 0;
 
 eqCnsESupOutCRYShareIn(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsCRY(cns, comm, region, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutCRYShareOut(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsCRY(cns, comm, region, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutCRY(cns, comm, region, year)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup, slice)$(mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRY(cns, comm, region, year)
        =e= 0;
 
 eqCnsLESupOutCRYSShareIn(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice) * vInpTot(comm, region, year, slice)
        =l= 0;
 
 eqCnsLESupOutCRYSShareOut(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice) * vOutTot(comm, region, year, slice)
        =l= 0;
 
 eqCnsLESupOutCRYS(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice)
        =l= 0;
 
 eqCnsGESupOutCRYSShareIn(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice) * vInpTot(comm, region, year, slice)
        =g= 0;
 
 eqCnsGESupOutCRYSShareOut(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice) * vOutTot(comm, region, year, slice)
        =g= 0;
 
 eqCnsGESupOutCRYS(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice)
        =g= 0;
 
 eqCnsESupOutCRYSShareIn(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice) * vInpTot(comm, region, year, slice)
        =e= 0;
 
 eqCnsESupOutCRYSShareOut(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice) * vOutTot(comm, region, year, slice)
        =e= 0;
 
 eqCnsESupOutCRYS(cns, comm, region, year, slice)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((sup)$(mCnsSup(cns, sup)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((sup)$(mCnsSup(cns, sup) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsCRYS(cns, comm, region, year, slice)
        =e= 0;
 
 eqCnsLESupOutLShareIn(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSup(cns, sup) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutLShareOut(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSup(cns, sup) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutL(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSup(cns, sup)
        =l= 0;
 
 eqCnsGESupOutLShareIn(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSup(cns, sup) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutLShareOut(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSup(cns, sup) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutL(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSup(cns, sup)
        =g= 0;
 
 eqCnsESupOutLShareIn(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSup(cns, sup) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutLShareOut(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSup(cns, sup) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutL(cns, sup)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSup(cns, sup)
        =e= 0;
 
 eqCnsLESupOutLSShareIn(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupS(cns, sup, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutLSShareOut(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupS(cns, sup, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutLS(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupS(cns, sup, slice)
        =l= 0;
 
 eqCnsGESupOutLSShareIn(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupS(cns, sup, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutLSShareOut(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupS(cns, sup, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutLS(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupS(cns, sup, slice)
        =g= 0;
 
 eqCnsESupOutLSShareIn(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupS(cns, sup, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutLSShareOut(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupS(cns, sup, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutLS(cns, sup, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, comm, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupS(cns, sup, slice)
        =e= 0;
 
 eqCnsLESupOutLYShareIn(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupY(cns, sup, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLYShareOut(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupY(cns, sup, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLY(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupY(cns, sup, year)
        =l= 0;
 
 eqCnsGESupOutLYShareIn(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupY(cns, sup, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLYShareOut(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupY(cns, sup, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLY(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupY(cns, sup, year)
        =g= 0;
 
 eqCnsESupOutLYShareIn(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupY(cns, sup, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLYShareOut(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupY(cns, sup, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLY(cns, sup, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupY(cns, sup, year)
        =e= 0;
 
 eqCnsLESupOutLYSShareIn(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsSupYS(cns, sup, year, slice) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLYSShareOut(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsSupYS(cns, sup, year, slice) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLYS(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupYS(cns, sup, year, slice)
        =l= 0;
 
 eqCnsGESupOutLYSShareIn(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsSupYS(cns, sup, year, slice) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLYSShareOut(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsSupYS(cns, sup, year, slice) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLYS(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupYS(cns, sup, year, slice)
        =g= 0;
 
 eqCnsESupOutLYSShareIn(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsSupYS(cns, sup, year, slice) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLYSShareOut(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), pRhsSupYS(cns, sup, year, slice) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLYS(cns, sup, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupYS(cns, sup, year, slice)
        =e= 0;
 
-eqCnsLESupOutLRShareIn(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLRShareIn(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupR(cns, sup, region) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLRShareOut(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLRShareOut(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupR(cns, sup, region) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLR(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLR(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupR(cns, sup, region)
        =l= 0;
 
-eqCnsGESupOutLRShareIn(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLRShareIn(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupR(cns, sup, region) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLRShareOut(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLRShareOut(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupR(cns, sup, region) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLR(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLR(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupR(cns, sup, region)
        =g= 0;
 
-eqCnsESupOutLRShareIn(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLRShareIn(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupR(cns, sup, region) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLRShareOut(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLRShareOut(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupR(cns, sup, region) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLR(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLR(cns, sup, region)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, comm, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupR(cns, sup, region)
        =e= 0;
 
-eqCnsLESupOutLRSShareIn(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLRSShareIn(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupRS(cns, sup, region, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLRSShareOut(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLRSShareOut(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupRS(cns, sup, region, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLRS(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLRS(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupRS(cns, sup, region, slice)
        =l= 0;
 
-eqCnsGESupOutLRSShareIn(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLRSShareIn(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupRS(cns, sup, region, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLRSShareOut(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLRSShareOut(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupRS(cns, sup, region, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLRS(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLRS(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupRS(cns, sup, region, slice)
        =g= 0;
 
-eqCnsESupOutLRSShareIn(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLRSShareIn(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupRS(cns, sup, region, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLRSShareOut(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLRSShareOut(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupRS(cns, sup, region, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLRS(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLRS(cns, sup, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, comm, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsComm(cns, comm)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupRS(cns, sup, region, slice)
        =e= 0;
 
-eqCnsLESupOutLRYShareIn(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLRYShareIn(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsSupRY(cns, sup, region, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
-eqCnsLESupOutLRYShareOut(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLRYShareOut(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsSupRY(cns, sup, region, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
-eqCnsLESupOutLRY(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLRY(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupRY(cns, sup, region, year)
        =l= 0;
 
-eqCnsGESupOutLRYShareIn(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLRYShareIn(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsSupRY(cns, sup, region, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
-eqCnsGESupOutLRYShareOut(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLRYShareOut(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsSupRY(cns, sup, region, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
-eqCnsGESupOutLRY(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLRY(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupRY(cns, sup, region, year)
        =g= 0;
 
-eqCnsESupOutLRYShareIn(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLRYShareIn(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsSupRY(cns, sup, region, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
-eqCnsESupOutLRYShareOut(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLRYShareOut(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), pRhsSupRY(cns, sup, region, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
-eqCnsESupOutLRY(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLRY(cns, sup, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupRY(cns, sup, region, year)
        =e= 0;
 
-eqCnsLESupOutLRYSShareIn(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLRYSShareIn(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsSupRYS(cns, sup, region, year, slice) * vInpTot(comm, region, year, slice))
        =l= 0;
 
-eqCnsLESupOutLRYSShareOut(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLRYSShareOut(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsSupRYS(cns, sup, region, year, slice) * vOutTot(comm, region, year, slice))
        =l= 0;
 
-eqCnsLESupOutLRYS(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLRYS(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupRYS(cns, sup, region, year, slice)
        =l= 0;
 
-eqCnsGESupOutLRYSShareIn(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLRYSShareIn(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsSupRYS(cns, sup, region, year, slice) * vInpTot(comm, region, year, slice))
        =g= 0;
 
-eqCnsGESupOutLRYSShareOut(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLRYSShareOut(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsSupRYS(cns, sup, region, year, slice) * vOutTot(comm, region, year, slice))
        =g= 0;
 
-eqCnsGESupOutLRYS(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLRYS(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupRYS(cns, sup, region, year, slice)
        =g= 0;
 
-eqCnsESupOutLRYSShareIn(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLRYSShareIn(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsSupRYS(cns, sup, region, year, slice) * vInpTot(comm, region, year, slice))
        =e= 0;
 
-eqCnsESupOutLRYSShareOut(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLRYSShareOut(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((comm)$(mCnsComm(cns, comm)), pRhsSupRYS(cns, sup, region, year, slice) * vOutTot(comm, region, year, slice))
        =e= 0;
 
-eqCnsESupOutLRYS(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLRYS(cns, sup, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((comm)$(mCnsComm(cns, comm)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupRYS(cns, sup, region, year, slice)
        =e= 0;
 
 eqCnsLESupOutLCShareIn(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupC(cns, sup, comm) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutLCShareOut(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupC(cns, sup, comm) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutLC(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupC(cns, sup, comm)
        =l= 0;
 
 eqCnsGESupOutLCShareIn(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupC(cns, sup, comm) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutLCShareOut(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupC(cns, sup, comm) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutLC(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupC(cns, sup, comm)
        =g= 0;
 
 eqCnsESupOutLCShareIn(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupC(cns, sup, comm) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutLCShareOut(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupC(cns, sup, comm) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutLC(cns, sup, comm)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupC(cns, sup, comm)
        =e= 0;
 
 eqCnsLESupOutLCSShareIn(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCS(cns, sup, comm, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutLCSShareOut(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCS(cns, sup, comm, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
 eqCnsLESupOutLCS(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCS(cns, sup, comm, slice)
        =l= 0;
 
 eqCnsGESupOutLCSShareIn(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCS(cns, sup, comm, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutLCSShareOut(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCS(cns, sup, comm, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
 eqCnsGESupOutLCS(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCS(cns, sup, comm, slice)
        =g= 0;
 
 eqCnsESupOutLCSShareIn(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCS(cns, sup, comm, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutLCSShareOut(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCS(cns, sup, comm, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
 eqCnsESupOutLCS(cns, sup, comm, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
+      sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) and mSupSpan(sup, region)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCS(cns, sup, comm, slice)
        =e= 0;
 
 eqCnsLESupOutLCYShareIn(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupCY(cns, sup, comm, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLCYShareOut(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupCY(cns, sup, comm, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLCY(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCY(cns, sup, comm, year)
        =l= 0;
 
 eqCnsGESupOutLCYShareIn(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupCY(cns, sup, comm, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLCYShareOut(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupCY(cns, sup, comm, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLCY(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCY(cns, sup, comm, year)
        =g= 0;
 
 eqCnsESupOutLCYShareIn(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupCY(cns, sup, comm, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLCYShareOut(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), pRhsSupCY(cns, sup, comm, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLCY(cns, sup, comm, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
-      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCY(cns, sup, comm, year)
        =e= 0;
 
 eqCnsLESupOutLCYSShareIn(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsSupCYS(cns, sup, comm, year, slice) * vInpTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLCYSShareOut(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsSupCYS(cns, sup, comm, year, slice) * vOutTot(comm, region, year, slice))
        =l= 0;
 
 eqCnsLESupOutLCYS(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCYS(cns, sup, comm, year, slice)
        =l= 0;
 
 eqCnsGESupOutLCYSShareIn(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsSupCYS(cns, sup, comm, year, slice) * vInpTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLCYSShareOut(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsSupCYS(cns, sup, comm, year, slice) * vOutTot(comm, region, year, slice))
        =g= 0;
 
 eqCnsGESupOutLCYS(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCYS(cns, sup, comm, year, slice)
        =g= 0;
 
 eqCnsESupOutLCYSShareIn(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsSupCYS(cns, sup, comm, year, slice) * vInpTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLCYSShareOut(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((region)$(mCnsRegion(cns, region)), pRhsSupCYS(cns, sup, comm, year, slice) * vOutTot(comm, region, year, slice))
        =e= 0;
 
 eqCnsESupOutLCYS(cns, sup, comm, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
-      sum((region)$(mCnsRegion(cns, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
+      sum((region)$(mCnsRegion(cns, region) and mSupSpan(sup, region)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCYS(cns, sup, comm, year, slice)
        =e= 0;
 
-eqCnsLESupOutLCRShareIn(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLCRShareIn(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCR(cns, sup, comm, region) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLCRShareOut(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLCRShareOut(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCR(cns, sup, comm, region) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLCR(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLCR(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCR(cns, sup, comm, region)
        =l= 0;
 
-eqCnsGESupOutLCRShareIn(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLCRShareIn(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCR(cns, sup, comm, region) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLCRShareOut(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLCRShareOut(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCR(cns, sup, comm, region) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLCR(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLCR(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCR(cns, sup, comm, region)
        =g= 0;
 
-eqCnsESupOutLCRShareIn(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLCRShareIn(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCR(cns, sup, comm, region) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLCRShareOut(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLCRShareOut(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCR(cns, sup, comm, region) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLCR(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLCR(cns, sup, comm, region)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, year, slice)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCR(cns, sup, comm, region)
        =e= 0;
 
-eqCnsLESupOutLCRSShareIn(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLCRSShareIn(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCRS(cns, sup, comm, region, slice) * vInpTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLCRSShareOut(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLCRSShareOut(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCRS(cns, sup, comm, region, slice) * vOutTot(comm, region, year, slice)))
        =l= 0;
 
-eqCnsLESupOutLCRS(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLCRS(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCRS(cns, sup, comm, region, slice)
        =l= 0;
 
-eqCnsGESupOutLCRSShareIn(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLCRSShareIn(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCRS(cns, sup, comm, region, slice) * vInpTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLCRSShareOut(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLCRSShareOut(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCRS(cns, sup, comm, region, slice) * vOutTot(comm, region, year, slice)))
        =g= 0;
 
-eqCnsGESupOutLCRS(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLCRS(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCRS(cns, sup, comm, region, slice)
        =g= 0;
 
-eqCnsESupOutLCRSShareIn(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLCRSShareIn(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCRS(cns, sup, comm, region, slice) * vInpTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLCRSShareOut(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLCRSShareOut(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * (pRhsSupCRS(cns, sup, comm, region, slice) * vOutTot(comm, region, year, slice)))
        =e= 0;
 
-eqCnsESupOutLCRS(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLCRS(cns, sup, comm, region, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((yeare, yearp, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mCnsYear(cns, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)))
      - pRhsSupCRS(cns, sup, comm, region, slice)
        =e= 0;
 
-eqCnsLESupOutLCRYShareIn(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLCRYShareIn(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsSupCRY(cns, sup, comm, region, year) * vInpTot(comm, region, year, slice))
        =l= 0;
 
-eqCnsLESupOutLCRYShareOut(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLCRYShareOut(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsSupCRY(cns, sup, comm, region, year) * vOutTot(comm, region, year, slice))
        =l= 0;
 
-eqCnsLESupOutLCRY(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLCRY(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCRY(cns, sup, comm, region, year)
        =l= 0;
 
-eqCnsGESupOutLCRYShareIn(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLCRYShareIn(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsSupCRY(cns, sup, comm, region, year) * vInpTot(comm, region, year, slice))
        =g= 0;
 
-eqCnsGESupOutLCRYShareOut(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLCRYShareOut(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsSupCRY(cns, sup, comm, region, year) * vOutTot(comm, region, year, slice))
        =g= 0;
 
-eqCnsGESupOutLCRY(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLCRY(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCRY(cns, sup, comm, region, year)
        =g= 0;
 
-eqCnsESupOutLCRYShareIn(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLCRYShareIn(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsSupCRY(cns, sup, comm, region, year) * vInpTot(comm, region, year, slice))
        =e= 0;
 
-eqCnsESupOutLCRYShareOut(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLCRYShareOut(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - sum((slice)$(mCnsSlice(cns, slice)), pRhsSupCRY(cns, sup, comm, region, year) * vOutTot(comm, region, year, slice))
        =e= 0;
 
-eqCnsESupOutLCRY(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLCRY(cns, sup, comm, region, year)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
       sum((slice)$(mCnsSlice(cns, slice)),  vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm))
      - pRhsSupCRY(cns, sup, comm, region, year)
        =e= 0;
 
-eqCnsLESupOutLCRYSShareIn(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsLESupOutLCRYSShareIn(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice) * vInpTot(comm, region, year, slice)
        =l= 0;
 
-eqCnsLESupOutLCRYSShareOut(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsLESupOutLCRYSShareOut(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice) * vOutTot(comm, region, year, slice)
        =l= 0;
 
-eqCnsLESupOutLCRYS(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsLESupOutLCRYS(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice)
        =l= 0;
 
-eqCnsGESupOutLCRYSShareIn(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsGESupOutLCRYSShareIn(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice) * vInpTot(comm, region, year, slice)
        =g= 0;
 
-eqCnsGESupOutLCRYSShareOut(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsGESupOutLCRYSShareOut(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice) * vOutTot(comm, region, year, slice)
        =g= 0;
 
-eqCnsGESupOutLCRYS(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsGESupOutLCRYS(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice)
        =g= 0;
 
-eqCnsESupOutLCRYSShareIn(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareIn(cns))..
+eqCnsESupOutLCRYSShareIn(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareIn(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice) * vInpTot(comm, region, year, slice)
        =e= 0;
 
-eqCnsESupOutLCRYSShareOut(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeShareOut(cns))..
+eqCnsESupOutLCRYSShareOut(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeShareOut(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice) * vOutTot(comm, region, year, slice)
        =e= 0;
 
-eqCnsESupOutLCRYS(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
+eqCnsESupOutLCRYS(cns, sup, comm, region, year, slice)$(mCnsOutSup(cns) and mCnsLType(cns) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsSup(cns, sup) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mSupSpan(sup, region) and mCnsRhsTypeConst(cns))..
        vSupOut(sup, comm, region, year, slice)$mSupComm(sup, comm)
      - pRhsSupCRYS(cns, sup, comm, region, year, slice)
        =e= 0;
@@ -7719,6 +7718,7 @@ eqCnsETotOutCRYS(cns, comm, region, year, slice)$(mCnsOut(cns) and not(mCnsLType
        vOutTot(comm, region, year, slice)
      - pRhsCRYS(cns, comm, region, year, slice)
        =e= 0;
+
 
 
 

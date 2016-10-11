@@ -82,6 +82,24 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'demand',
 setMethod('add0', signature(obj = 'CodeProduce', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
   sup <- upper_case(app)
+  if (!is.null(sup@region)) {
+    approxim$region <- approxim$region[approxim$region %in% sup@region]
+    ss <- getSlots('supply')
+    ss <- names(ss)[ss == 'data.frame']
+    ss <- ss[sapply(ss, function(x) (any(colnames(slot(sup, x)) == 'region') 
+      && any(!is.na(slot(sup, x)$region))))]
+    for(sl in ss) if (any(!(slot(sup, sl)$region %in% sup@region), na.rm = TRUE)) {
+      rr <- !is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region)
+      warning(paste('There are data supply "', sup@name, '" for unsed region: "', 
+        paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
+      slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
+    }
+    obj@maptable[['mSupSpan']] <- addData(obj@maptable[['mSupSpan']],
+        data.frame(sup = rep(sup@name, length(sup@region)), region = sup@region))
+  } else {
+    obj@maptable[['mSupSpan']] <- addData(obj@maptable[['mSupSpan']],
+        data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region))
+  }
   sup <- stayOnlyVariable(sup, approxim$region, 'region')
 #  if (!chec_correct_name(sup@name)) {
 #    stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
@@ -346,14 +364,13 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
   tech <- upper_case(app)
   if (!is.null(tech@region)) {
     approxim$region <- approxim$region[approxim$region %in% tech@region]
-
     ss <- getSlots('technology')
     ss <- names(ss)[ss == 'data.frame']
     ss <- ss[sapply(ss, function(x) (any(colnames(slot(tech, x)) == 'region') 
       && any(!is.na(slot(tech, x)$region))))]
     for(sl in ss) if (any(!(slot(tech, sl)$region %in% tech@region), na.rm = TRUE)) {
       rr <- !is.na(slot(tech, sl)$region) & !(slot(tech, sl)$region %in% tech@region)
-      warning(paste('There data technology "', tech@name, '"for unsed region: "', 
+      warning(paste('There are data technology "', tech@name, '"for unsed region: "', 
         paste(unique(slot(tech, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
       slot(tech, sl) <- slot(tech, sl)[!rr,, drop = FALSE]
     }

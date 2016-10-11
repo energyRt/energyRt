@@ -9,7 +9,8 @@ setClass("supply",
           commodity     = "character",
           unit          = "character",
           reserve       = "numeric",         # Total available resource
-          availability  = "data.frame"      # Availability of the resource with prices
+          availability  = "data.frame",     # Availability of the resource with prices
+          region        = "characterOrNULL"
       ),
       prototype(
           name          = "",
@@ -27,7 +28,8 @@ setClass("supply",
                                      ava.up   = numeric(),
                                      ava.fx   = numeric(),
                                      cost     = numeric(),
-                                     stringsAsFactors = FALSE)
+                                     stringsAsFactors = FALSE),
+          region = NULL
       ),
       S3methods = TRUE
 );
