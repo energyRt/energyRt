@@ -1,3 +1,4 @@
+setClassUnion("characterOrNULL",members=c("character", "NULL"))
 setGeneric("isCommodity", function(obj, name) standardGeneric("isCommodity"))
 setGeneric("removePreviousCommodity", function(obj, name) standardGeneric("removePreviousCommodity"))
 setGeneric("removePreviousDemand", function(obj, name) standardGeneric("removePreviousDemand"))

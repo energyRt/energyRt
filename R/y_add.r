@@ -344,6 +344,20 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
 #  mLoComm(comm)  PRODUCTION >= CONSUMPTION
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
   tech <- upper_case(app)
+  if (!is.null(tech@region)) {
+    approxim$region <- approxim$region[approxim$region %in% tech@region]
+
+    ss <- getSlots('technology')
+    ss <- names(ss)[ss == 'data.frame']
+    ss <- ss[sapply(ss, function(x) (any(colnames(slot(tech, x)) == 'region') 
+      && any(!is.na(slot(tech, x)$region))))]
+    for(sl in ss) if (any(!(slot(tech, sl)$region %in% tech@region), na.rm = TRUE)) {
+      rr <- !is.na(slot(tech, sl)$region) & !(slot(tech, sl)$region %in% tech@region)
+      warning(paste('There data technology "', tech@name, '"for unsed region: "', 
+        paste(unique(slot(tech, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
+      slot(tech, sl) <- slot(tech, sl)[!rr,, drop = FALSE]
+    }
+  }
   tech <- stayOnlyVariable(tech, approxim$region, 'region')
   # Temporary solution for immortality technology
   if (nrow(tech@olife) == 0) {

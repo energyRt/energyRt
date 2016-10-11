@@ -41,8 +41,9 @@ setClass("technology",
           ucap          = "data.frame",    # Capacity of one unit (for integer programming)
           stock         = "data.frame", #
           early.retirement = "logical",
-          upgrade.technology = "character"
-          ), #
+          upgrade.technology = "character",
+          region        = "characterOrNULL"
+      ), #
       # Default values and structure of slots
       prototype(
           name          = "",
@@ -165,7 +166,8 @@ setClass("technology",
                                             stock = numeric(),
                                             stringsAsFactors = FALSE),
           early.retirement = TRUE,
-          upgrade.technology = character()
+          upgrade.technology = character(),
+          region        = NULL
       ),
       validity = check_technology_data_frame,
       S3methods = TRUE
