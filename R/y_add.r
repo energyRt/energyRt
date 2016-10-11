@@ -90,7 +90,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'supply',
       && any(!is.na(slot(sup, x)$region))))]
     for(sl in ss) if (any(!(slot(sup, sl)$region %in% sup@region), na.rm = TRUE)) {
       rr <- !is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region)
-      warning(paste('There are data supply "', sup@name, '" for unsed region: "', 
+      warning(paste('There are data supply "', sup@name, '" for unused region: "', 
         paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
       slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
     }
@@ -370,7 +370,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
       && any(!is.na(slot(tech, x)$region))))]
     for(sl in ss) if (any(!(slot(tech, sl)$region %in% tech@region), na.rm = TRUE)) {
       rr <- !is.na(slot(tech, sl)$region) & !(slot(tech, sl)$region %in% tech@region)
-      warning(paste('There are data technology "', tech@name, '"for unsed region: "', 
+      warning(paste('There are data technology "', tech@name, '"for unused region: "', 
         paste(unique(slot(tech, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
       slot(tech, sl) <- slot(tech, sl)[!rr,, drop = FALSE]
     }
