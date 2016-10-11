@@ -88,10 +88,11 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'supply',
     ss <- names(ss)[ss == 'data.frame']
     ss <- ss[sapply(ss, function(x) (any(colnames(slot(sup, x)) == 'region') 
       && any(!is.na(slot(sup, x)$region))))]
-    for(sl in ss) if (any(!(slot(sup, sl)$region %in% sup@region), na.rm = TRUE)) {
+    for(sl in ss) if (any(!is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region))) {
       rr <- !is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region)
       warning(paste('There are data supply "', sup@name, '" for unused region: "', 
         paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
+      browser()
       slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
     }
     obj@maptable[['mSupSpan']] <- addData(obj@maptable[['mSupSpan']],
@@ -368,7 +369,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     ss <- names(ss)[ss == 'data.frame']
     ss <- ss[sapply(ss, function(x) (any(colnames(slot(tech, x)) == 'region') 
       && any(!is.na(slot(tech, x)$region))))]
-    for(sl in ss) if (any(!(slot(tech, sl)$region %in% tech@region), na.rm = TRUE)) {
+    for(sl in ss) if (any(!is.na(slot(tech, sl)$region) & !(slot(tech, sl)$region %in% tech@region))) {
       rr <- !is.na(slot(tech, sl)$region) & !(slot(tech, sl)$region %in% tech@region)
       warning(paste('There are data technology "', tech@name, '"for unused region: "', 
         paste(unique(slot(tech, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
