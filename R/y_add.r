@@ -320,18 +320,25 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
         }
         for(i in names(app@for.each)[!(names(app@for.each) %in% names(approxim))]) 
             approxim[[i]] <- app@for.each[[i]]
-        rhs <- interpolation(app@rhs, 'rhs', approxim = approxim, year_range = year_range,
-            rule = app@rule, default = app@default)
-        colnames(rhs)[ncol(rhs)] <- 'Freq'
-        rhs <- cbind(cns = rep(app@name, nrow(rhs)), rhs)
+        if (length(approxim) != 0) {
+          rhs <- interpolation(app@rhs, 'rhs', approxim = approxim, year_range = year_range,
+              rule = app@rule, default = app@default)
+          colnames(rhs)[ncol(rhs)] <- 'Freq'
+          rhs <- cbind(cns = rep(app@name, nrow(rhs)), rhs)
+        } else {
+          if (nrow(app@rhs) == 0) 
+            rhs <- data.frame(cns = app@name, Freq = app@default, stringsAsFactors = FALSE) else
+          if (nrow(app@rhs) == 1) 
+            rhs <- data.frame(cns = app@name, Freq = app@rhs$rhs, stringsAsFactors = FALSE) else
+          stop('Wrong rhs constrain: "', app@name, '"')
+        }
         if (any(colnames(rhs) == 'year')) rhs$year <- as.numeric(as.character(rhs$year))
         if (all(names(app@for.each) != ast)) ii <- '' else ii <- paste(toupper(substr(ast, 1, 1)), 
           substr(ast, 2, nchar(ast)), sep = '')
-        nn <- paste('pRhs', ii, paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), collapse = ''), sep = '')
-      obj@maptable[[nn]] <- addData(obj@maptable[[nn]], rhs)
-    
+        nn <- paste('pRhs', ii, paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), 
+          collapse = ''), sep = '')
+      obj@maptable[[nn]] <- addData(obj@maptable[[nn]], rhs[, colnames(obj@maptable[[nn]]@data)])
     # Define sharein & shareout type
-  
   }
   obj
 })
