@@ -21,7 +21,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
   }
   add_drr <- paste('Report_data', obj@name, paste(format(Sys.Date(), 
                                                          format = '%Y-%m-%d'), format(Sys.time(), format = '%H-%M-%S')))
-  dir.create(paste(texdir, '/', add_drr, sep = ''), recursive = TRUE)
+   dir.create(paste(texdir, '/', add_drr, sep = ''), recursive = TRUE)
   tryCatch({
     
     setwd(paste(texdir, '/', add_drr, sep = ''))
@@ -34,6 +34,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
     dtt$constrain <- list()
     dtt$import <- list()
     dtt$export <- list()
+    dtt$trade <- list()
     for(i in seq(along = obj@data)) {
       for(j in seq(along = obj@data[[i]]@data)) {
         obj@data[[i]]@data[[j]]@name <- obj@data[[i]]@data[[j]]@name
