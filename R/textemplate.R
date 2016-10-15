@@ -6,7 +6,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
                          file.name = NULL) {
   obj.name <- deparse(substitute(obj))
   if (is.null(file.name)) {
-    file.name <- paste('BottomUpReport_Model_', 
+    file.name <- paste('energyRtReport_Model_', 
                        deparse(substitute(obj)), '_',
                        format(Sys.Date(), format = '%Y-%m-%d'), '_', 
                        format(Sys.time(), format = '%H-%M-%S'), 
@@ -44,7 +44,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
     }
    for(i in names(dtt)) if (length(dtt[[i]]) != 0) dtt[[i]] <- dtt[[i]][sort(names(dtt[[i]]))]
     tryCatch({
-      zz <- file('BottomUpReport.tex', 'w')
+      zz <- file('energyRtReport.tex', 'w')
       #cat('Auto-report for model ... \n\n', date(), '\n\n', sep = '', file = zz)
       #if (obj@name != '') cat('Name: "', obj@name, '"\n\n', sep = '', file = zz)
       cat('\\documentclass{article}\n', sep = '', file = zz)
@@ -290,14 +290,14 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
       stop(x)
     }) 
     if (.Platform$OS.type == "windows") {
-      shell('pdflatex BottomUpReport.tex')
-      shell('pdflatex BottomUpReport.tex')
-      file.copy('BottomUpReport.pdf', paste('../', file.name, sep = ''))
+      shell('pdflatex energyRtReport.tex')
+      shell('pdflatex energyRtReport.tex')
+      file.copy('energyRtReport.pdf', paste('../', file.name, sep = ''))
       shell.exec(paste('..\\', file.name, sep = ''))
     } else { 
-      system('pdflatex BottomUpReport.tex')
-      system('pdflatex BottomUpReport.tex')
-      file.copy('BottomUpReport.pdf', paste('../', file.name, sep = ''))
+      system('pdflatex energyRtReport.tex')
+      system('pdflatex energyRtReport.tex')
+      file.copy('energyRtReport.pdf', paste('../', file.name, sep = ''))
       system(paste('open ../', file.name, sep = ''))
     }
     setwd(WDD)

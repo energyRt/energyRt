@@ -4,7 +4,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                             file.name = NULL) {
   obj.name <- deparse(substitute(obj))
   if (is.null(file.name)) {
-    file.name <- paste('BottomUpReport_Scenario_', 
+    file.name <- paste('energyRtReport_Scenario_', 
                        deparse(substitute(obj)), '_',
                        format(Sys.Date(), format = '%Y-%m-%d'), '_', 
                        format(Sys.time(), format = '%H-%M-%S'), 
@@ -43,7 +43,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     dat <- obj@result@data
     
     tryCatch({
-      zz <- file('BottomUpScenarioReport.tex', 'w')
+      zz <- file('energyRtScenarioReport.tex', 'w')
       #cat('Auto-report for model ... \n\n', date(), '\n\n', sep = '', file = zz)
       #if (obj@name != '') cat('Name: "', obj@name, '"\n\n', sep = '', file = zz)
       cat('\\documentclass{article}\n', sep = '', file = zz)
@@ -640,14 +640,14 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     close(zz)
     
     if (.Platform$OS.type == "windows") {
-      shell('pdflatex BottomUpScenarioReport.tex')
-      shell('pdflatex BottomUpScenarioReport.tex')
-      file.copy('BottomUpScenarioReport.pdf', paste('../', file.name, sep = ''))
+      shell('pdflatex energyRtScenarioReport.tex')
+      shell('pdflatex energyRtScenarioReport.tex')
+      file.copy('energyRtScenarioReport.pdf', paste('../', file.name, sep = ''))
       shell.exec(paste('..\\', file.name, sep = ''))
     } else { 
-      system('pdflatex BottomUpScenarioReport.tex')
-      system('pdflatex BottomUpScenarioReport.tex')
-      file.copy('BottomUpScenarioReport.pdf', paste('../', file.name, sep = ''))
+      system('pdflatex energyRtScenarioReport.tex')
+      system('pdflatex energyRtScenarioReport.tex')
+      file.copy('energyRtScenarioReport.pdf', paste('../', file.name, sep = ''))
       system(paste('open ../', file.name, sep = ''))
     }
     setwd(WDD)

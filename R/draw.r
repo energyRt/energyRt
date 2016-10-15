@@ -70,7 +70,8 @@ draw.technology <- function(
        !is.na(ctype$comm$group)][sort(ctype$comm$group[!is.na(ctype$comm$group)], 
       index.return = TRUE)$ix], 
         seq(length.out = nrow(ctype$comm))[is.na(ctype$comm$group)])),, drop = FALSE]
-    acomm <- tech@aux$acomm  
+    acomm <- tech@aux$acomm 
+    acomm <- acomm[acomm %in% tech@aeff$acomm] 
     if (length(acomm) != 0) {
       approxim <- list(region = region, year = year, slice = slice, comm = acomm)
       aname <- c('act2ainp', 'act2aout', 'use2ainp', 'use2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 'ncap2aout')
