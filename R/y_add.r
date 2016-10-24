@@ -473,7 +473,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     obj@maptable[['pTechShare']] <- addData(obj@maptable[['pTechShare']],
           data_frame_approximation_chk(tech@ceff, 'share',
             obj@maptable[['pTechShare']], approxim_comm, 'tech', tech@name))
-  cmm <- rownames(ctype$comm)[ctype$comm$comb]
+  cmm <- rownames(ctype$comm)[ctype$comm$comb != 0]
   if (length(cmm) != 0) {
     obj@maptable[['pTechEmisComm']] <- addData(obj@maptable[['pTechEmisComm']],
       data.frame(tech = rep(tech@name, nrow(ctype$comm)), comm = rownames(ctype$comm),
