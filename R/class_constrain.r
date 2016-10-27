@@ -213,6 +213,12 @@ newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(),
                               stringsAsFactors = FALSE
                               )
       obj@rhs <- obj@rhs[colnames(obj@rhs) %in% c(names(for.each), 'rhs')]
+      if (is.list(rhs) && !is.data.frame(rhs)) {
+        rhs2 <- data.frame(stringsAsFactors = FALSE)
+        rhs2[1:max(sapply(rhs, length)), ] <- NA
+        for(i in names(rhs)) rhs2[, i] <- rhs[[i]]
+        rhs <- rhs2
+      }
       if (is.numeric(rhs)) {
         obj@default <- rhs
       } else if (is.data.frame(rhs)) {
