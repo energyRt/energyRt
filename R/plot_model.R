@@ -8,7 +8,7 @@
 plot_supply <- function(obj, commodity, region = NULL, supply = NULL, 
            year = NULL, slice = NULL, inf.col = 'red', ylim = NULL, xlab = '', 
            ylab = '', main = NULL, xlim = NULL, ylim2 = NULL,
-           col = 'gray', lwd = 2, density = 20, border = 'black', ...) {
+           col = 'gray', lwd = 2, density = 20, border = 'black', ylim_min = NULL, ...) {
     # Data calculation 
     if (is.null(region)) region <- obj@sysInfo@region
     if (is.null(year)) year <- obj@sysInfo@year
@@ -47,7 +47,7 @@ plot_supply <- function(obj, commodity, region = NULL, supply = NULL,
         }
     }
     # Plot
-    if (is.null(ylim)) ylim <- c(0, max(gg[gg != Inf])) else {
+    if (is.null(ylim)) ylim <- c(0, max(c(gg[gg != Inf], ylim_min))) else {
       if (min(gg) < ylim[1] || ylim[2] < max(gg[gg != Inf]))
         warning('Plot out of range')
     }

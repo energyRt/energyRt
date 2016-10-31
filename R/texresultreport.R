@@ -600,9 +600,10 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         for(cc in names(dtt$supply)) {
           sup <- dtt$supply[[cc]]
           png2(paste('supply_wrk_', sup@name, '.png', sep = ''))
-          SP <- plot(obj@model, type = 'supply', commodity = sup@commodity, main = '', supply = cc)
           sup_out <- apply(dat$vSupOut[cc, sup@commodity,,,, drop = FALSE], 4, sum)
           sup_cst <- apply(dat$vSupCost[cc,,, drop = FALSE], 3, sum)
+          SP <- plot(obj@model, type = 'supply', commodity = sup@commodity, 
+            main = '', supply = cc, ylim_min = max(sup_out))
           lines(dimnames(dat$vSupOut)$year, sup_out, col = 'cyan4', lwd = 2)
           dev.off2()
             bnd.on <- rep('free', nrow(SP)) 
