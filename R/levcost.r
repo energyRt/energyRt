@@ -83,6 +83,8 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
     region <- arg$region
     stopifnot(is.character(region) && length(region) == 1)
     arg <- arg[names(arg) != 'region', drop = FALSE]
+  } else if (length(obj@region) != 0) {
+    region <- obj@region[1]
   } else region <- 'DEF'
   if (any(names(arg) == 'slice')) {
     slice <- arg$slice
