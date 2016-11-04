@@ -64,7 +64,7 @@ getConstrainResults <- function(scenario, constrain) {
         if (tcns@type == 'sharein') gg <- dtt$vInpTot else gg <- dtt$vOutTot
         gg <- as.data.frame.table(gg)
         gg <- gg[gg$comm %in% cns.set$comm & gg$region %in% cns.set$region & gg$year %in% cns.set$year &
-          gg$slice %in% cns.set$slice, c(std_smp,
+          gg$slice %in% cns.set$slice, c(vary.set2,
             'Freq'), drop = FALSE]
         gg <- aggregate(gg$Freq, by = gg[, -ncol(gg), drop = FALSE], FUN = "sum")
         v1 <- apply(gg[, -ncol(gg), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
