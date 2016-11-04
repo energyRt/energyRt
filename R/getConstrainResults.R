@@ -75,7 +75,7 @@ getConstrainResults <- function(scenario, constrain) {
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
       gg <- apply(gg, seq(along = is.vary)[is.vary[c(ad_smpl, std_smp)]], sum)
-      lhs <- as.data.frame.table(gg)
+      lhs <- as.data.frame.table(as.array(gg))
       v1 <- apply(lhs[, -ncol(lhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
       lhs <- lhs[v1 %in% v2,, drop = FALSE]
       v1 <- v1[v1 %in% v2]
