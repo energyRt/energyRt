@@ -19,7 +19,7 @@ getConstrainResults <- function(scenario, constrain) {
     is.vary <- c(rep(TRUE, length(tcns@for.each)), rep(FALSE, length(tcns@for.sum)))
     names(is.vary) <- smpl_sl
     vary.set <- std_smp[std_smp %in% names(is.vary)[is.vary]]
-    vary.set2 <- c(ad_smpl, std_smp[std_smp %in% names(is.vary)[is.vary]])
+    vary.set2 <- c(ad_smpl[is.vary[ad_smpl]], std_smp[std_smp %in% names(is.vary)[is.vary]])
     cns.set <- list()
     for(st in c(ad_smpl, std_smp)) {
       gg <- prec[[paste('mCns', fcase(st), sep = '')]]@data
@@ -30,8 +30,8 @@ getConstrainResults <- function(scenario, constrain) {
     if (tcns@type %in% c('input', 'sharein'))   before <- 'Inp' else
     if (tcns@type == 'capacity') before <- 'Cap' else
     if (tcns@type == 'newcapacity') before <- 'NewCap' else
-    if (tcns@type == 'investment') before <- 'Inv' else
-    if (tcns@type == 'eac') before <- 'Eac' else stop('Unlnown constrain type')
+    if (tcns@type == 'invcost') before <- 'Inv' else
+    if (tcns@type == 'eac') before <- 'Eac' else stop('Unknown constrain type')
     vrb <- paste('v', fcase(ad_smpl), before, sep = '')
     if (length(ad_smpl) == 0) vrb <- paste(vrb, 'Tot', sep = '')
     if (length(vary.set) == 0) {
@@ -64,7 +64,7 @@ getConstrainResults <- function(scenario, constrain) {
         if (tcns@type == 'sharein') gg <- dtt$vInpTot else gg <- dtt$vOutTot
         gg <- as.data.frame.table(gg)
         gg <- gg[gg$comm %in% cns.set$comm & gg$region %in% cns.set$region & gg$year %in% cns.set$year &
-          gg$slice %in% cns.set$slice, c(std_smp,
+          gg$slice %in% cns.set$slice, c(vary.set2,
             'Freq'), drop = FALSE]
         gg <- aggregate(gg$Freq, by = gg[, -ncol(gg), drop = FALSE], FUN = "sum")
         v1 <- apply(gg[, -ncol(gg), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
@@ -75,7 +75,7 @@ getConstrainResults <- function(scenario, constrain) {
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
       gg <- apply(gg, seq(along = is.vary)[is.vary[c(ad_smpl, std_smp)]], sum)
-      lhs <- as.data.frame.table(gg)
+      lhs <- as.data.frame.table(as.array(gg))
       v1 <- apply(lhs[, -ncol(lhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
       lhs <- lhs[v1 %in% v2,, drop = FALSE]
       v1 <- v1[v1 %in% v2]
