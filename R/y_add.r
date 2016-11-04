@@ -244,8 +244,8 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     if (app@type %in% c('input', 'sharein'))   before <- 'Inp' else
     if (app@type == 'capacity') before <- 'Cap' else
     if (app@type == 'newcapacity') before <- 'NewCap' else 
-    if (app@type == 'investment') before <- 'Inv' else
-    if (app@type == 'eac') before <- 'Eac' else stop('Unlnown constrain type')
+    if (app@type == 'invcost') before <- 'Inv' else
+    if (app@type == 'eac') before <- 'Eac' else stop('Unknown constrain type')
     ast <- c(names(app@for.sum), names(app@for.each))[!(c(names(app@for.sum), names(app@for.each)) %in% ccc)] 
     if (length(ast) > 1) stop('Wrong constrain') else
     if (length(ast) == 1) {

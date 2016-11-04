@@ -30,8 +30,8 @@ getConstrainResults <- function(scenario, constrain) {
     if (tcns@type %in% c('input', 'sharein'))   before <- 'Inp' else
     if (tcns@type == 'capacity') before <- 'Cap' else
     if (tcns@type == 'newcapacity') before <- 'NewCap' else
-    if (tcns@type == 'investment') before <- 'Inv' else
-    if (tcns@type == 'eac') before <- 'Eac' else stop('Unlnown constrain type')
+    if (tcns@type == 'invcost') before <- 'Inv' else
+    if (tcns@type == 'eac') before <- 'Eac' else stop('Unknown constrain type')
     vrb <- paste('v', fcase(ad_smpl), before, sep = '')
     if (length(ad_smpl) == 0) vrb <- paste(vrb, 'Tot', sep = '')
     if (length(vary.set) == 0) {
