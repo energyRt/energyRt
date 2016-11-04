@@ -19,7 +19,7 @@ getConstrainResults <- function(scenario, constrain) {
     is.vary <- c(rep(TRUE, length(tcns@for.each)), rep(FALSE, length(tcns@for.sum)))
     names(is.vary) <- smpl_sl
     vary.set <- std_smp[std_smp %in% names(is.vary)[is.vary]]
-    vary.set2 <- c(ad_smpl, std_smp[std_smp %in% names(is.vary)[is.vary]])
+    vary.set2 <- c(ad_smpl[is.vary[ad_smpl]], std_smp[std_smp %in% names(is.vary)[is.vary]])
     cns.set <- list()
     for(st in c(ad_smpl, std_smp)) {
       gg <- prec[[paste('mCns', fcase(st), sep = '')]]@data
