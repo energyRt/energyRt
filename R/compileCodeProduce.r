@@ -483,8 +483,12 @@ LL1 <- proc.time()[3]
     if(echo) cat('Preprocessing time: ', round(pp2 - pp1, 2), 's\n', sep = '')
     tryCatch({
       setwd(tmpdir)
-      rs <- system(paste('gams mdl.gms', gamsCompileParameter), invisible = arg_invisible, 
-        show.output.on.console = show.output.on.console)
+      if (.Platform$OS.type == "windows") {
+        rs <- system(paste('gams mdl.gms', gamsCompileParameter), invisible = arg_invisible, 
+          show.output.on.console = show.output.on.console)
+      } else {
+        rs <- system(paste('gams mdl.gms', gamsCompileParameter))
+      }
       setwd(BEGINDR)  
       if (rs != 0) stop(paste('Solution error code', rs))
     }, interrupt = function(x) {
@@ -578,13 +582,13 @@ LL1 <- proc.time()[3]
           rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log log.csv', glpkCompileParameter), 
           invisible = arg_invisible, show.output.on.console = show.output.on.console)
         } else {
-          rs <- system(paste("cbc glpk.mod%glpk.dat -solve", cbcCompileParameter))
+          rs <- system(paste("cbc glpk.mod%glpk.dat -solve", cbcCompileParameter, 
+            show.output.on.console = show.output.on.console,  invisible = arg_invisible))
         }
       } else {
         if (solver  == 'GLPK') {
           rs <- system(paste('glpsol -m glpk.mod -d glpk.dat --log log.csv', 
-              glpkCompileParameter), invisible = arg_invisible, 
-        show.output.on.console = show.output.on.console) #, mustWork = TRUE)
+              glpkCompileParameter)) #, mustWork = TRUE)
 #>>>>>>> 00e795fd76161408e7b5782a3aaf58177d36e20e
         } else {
           rs <- system(paste("cbc glpk.mod%glpk.dat -solve", cbcCompileParameter))
