@@ -629,7 +629,7 @@ LL1 <- proc.time()[3]
     }
     rr$set_vec <- ss
     for(i in vrb_list) {
-      gg <- read.csv(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
+      gg <- as.data.frame(fread(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE))
       if (ncol(gg) == 1) {
         rr$par_arr[[i]] <- gg[1, 1]  
       } else {
