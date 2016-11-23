@@ -233,6 +233,8 @@ setMethod("initialize", "CodeProduce",
     .Object@maptable[['pStorageCap']] <- MapTable('pStorageCap', 
           c('stg', 'region', 'year'), 'double', 
             default = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@maptable[['mStorageNew']] <- MapTable('mStorageNew', c('stg', 'region', 'year'), 'map')    
+    .Object@maptable[['mStorageSpan']] <- MapTable('mStorageSpan', c('stg', 'region', 'year'), 'map')    
   # Trade
     # Map
     .Object@maptable[['mExpComm']] <- 

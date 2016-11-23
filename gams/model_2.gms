@@ -114,6 +114,8 @@ $ontext
 >>>>>>> 59858bf63953f28d2c24fd90456ced6d76912388
 $offtext
 mStorageComm(stg, comm)                              Mapping of storage technology and respective commodity
+mStorageNew(stg, region, year)     Storage available for investment
+mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the time-span and region
 * Storage
 defpStorageCapUp(stg, region, year)              Auxiliary mapping for Inf - used in GLPK-MathProg only
 mSlicePrevious(slice, slice)                     Mapping of slices for storage techs
@@ -857,7 +859,7 @@ eqDemInp(comm, region, year, slice)
 *eqDemInp2(comm, region, year, slice, year, year)
 ;
 
-eqDemInp(comm, region, year, slice)$mMidMilestone(year)..
+eqDemInp(comm, region, year, slice)$(mMidMilestone(year) and sum(dem$mDemComm(dem, comm), 1))..
          vDemInp(comm, region, year, slice)  =e=
          sum(dem$mDemComm(dem, comm), pDemand(dem, region, year, slice));
 
@@ -880,7 +882,7 @@ eqTechEms(tech, comm, region, year, slice)
 
 
 
-eqAggOut(comm, region, year, slice)$mMidMilestone(year)..
+eqAggOut(comm, region, year, slice)$(mMidMilestone(year) and sum(commp$pAggregateFactor(comm, commp), 1))..
          vAggOut(comm, region, year, slice)
          =e=
          sum(commp$pAggregateFactor(comm, commp),
@@ -901,7 +903,8 @@ eqTechEms(tech, comm, region, year, slice)$(
                    vTechInp(tech, commp, region, year, slice)
          );
 
-eqEmsTot(comm, region, year, slice)$mMidMilestone(year).. vEmsTot(comm, region, year, slice)
+eqEmsTot(comm, region, year, slice)$(mMidMilestone(year) and sum(tech$mTechEmitedComm(tech, comm), 1))..
+     vEmsTot(comm, region, year, slice)
          =e= sum(tech$(mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)),
             vTechEms(tech, comm, region, year, slice));
 
@@ -912,7 +915,7 @@ Equation
 eqStorageStore(stg, comm, region, year, slice)
 ;
 
-eqStorageStore(stg, comm, region, year, slice)$mMidMilestone(year)..
+eqStorageStore(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
   vStorageStore(stg, region, year, slice) =e=
   (1 - pStorageInpLoss(stg, region, year, slice)) * vStorageInp(stg, comm, region, year, slice) -
   (1 - pStorageOutLoss(stg, region, year, slice)) * vStorageOut(stg, comm, region, year, slice) +
@@ -938,35 +941,35 @@ eqStorageSalv3(stg, region, yeare)
 * Commodity Varom O & M aggregate by year eqaution
 eqStorageVar(stg, region, year)
 * Cost aggregate by year eqaution
-eqStorageCost1(stg, region, year)
-eqStorageCost2(stg, region, year)
+eqStorageCost(stg, region, year)
 * Constrain capacity
 eqStorageLo(stg, region, year)
 eqStorageUp(stg, region, year)
 ;
 
 * Capacity eqaution
-eqStorageCap(stg, region, year)$mMidMilestone(year)..
+eqStorageCap(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
          vStorageCap(stg, region, year)
          =e=
          pStorageStock(stg, region, year) +
          sum(yearp$
                  (
                          ORD(year) >= ORD(yearp) and
-                         ORD(year) < pStorageOlife(stg, region) + ORD(yearp)
+                         ORD(year) < pStorageOlife(stg, region) + ORD(yearp) and
+                         mStorageNew(stg, region, year)
                  ),
                  vStorageNewCap(stg, region, yearp)
          );
 
 * Investition eqaution
-eqStorageInv(stg, region, year)$mMidMilestone(year)..
+eqStorageInv(stg, region, year)$(mMidMilestone(year) and mStorageNew(stg, region, year))..
          vStorageInv(stg, region, year)
          =e=
          pStorageInvcost(stg, region, year) *
          vStorageNewCap(stg, region, year);
 
 * FIX O & M eqaution
-eqStorageFix(stg, region, year)$mMidMilestone(year)..
+eqStorageFix(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
          vStorageFixom(stg, region, year)
          =e=
          pStorageFixom(stg, region, year) *
@@ -976,9 +979,9 @@ eqStorageFix(stg, region, year)$mMidMilestone(year)..
 eqStorageSalv2(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(region))..
          vStorageSalv(stg, region)
          +
-        sum(year$(mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)), vStorageInv(stg, region, year) *
-   (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
-      1
+        sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)),
+        vStorageInv(stg, region, year) * (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
+        1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
           ) / (sum(yearn$(ORD(yeare) = ORD(yearn)),
@@ -989,9 +992,10 @@ eqStorageSalv2(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(regio
 eqStorageSalv3(stg, region, yeare)$(mMidMilestone(yeare) and not(mDiscountZero(region)))..
          vStorageSalv(stg, region)
          +
-         sum(year$(mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)), vStorageInv(stg, region, year) *
-      (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
-      1
+         sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)),
+         vStorageInv(stg, region, year) *
+         (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
+         1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
           ) / ((
@@ -1001,7 +1005,7 @@ eqStorageSalv3(stg, region, yeare)$(mMidMilestone(yeare) and not(mDiscountZero(r
     )  =e= 0;
 
 * Varom O & M aggregate by year eqaution
-eqStorageVar(stg, region, year)$mMidMilestone(year)..
+eqStorageVar(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
          vStorageVarom(stg, region, year)
          =e=
          sum((slice, comm)$mStorageComm(stg, comm),
@@ -1010,26 +1014,19 @@ eqStorageVar(stg, region, year)$mMidMilestone(year)..
                   pStorageCostStore(stg, region, year, slice) * vStorageStore(stg, region, year, slice));
 
 * Cost aggregate by year eqaution
-eqStorageCost1(stg, region, year)$(mMidMilestone(year) and not(mMilestoneLast(year)))..
+eqStorageCost(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
          vStorageCost(stg, region, year)
          =e=
-         vStorageInv(stg, region, year) +
+         vStorageInv(stg, region, year)$mStorageNew(stg, region, year) +
          vStorageFixom(stg, region, year) +
          vStorageVarom(stg, region, year);
 
-eqStorageCost2(stg, region, year)$(mMidMilestone(year) and mMilestoneLast(year))..
-         vStorageCost(stg, region, year)
-         =e=
-         vStorageInv(stg, region, year) +
-         vStorageFixom(stg, region, year) +
-         vStorageVarom(stg, region, year) +
-         vStorageSalv(stg, region);
 
 * Disable new capacity
-eqStorageLo(stg, region, year)$(mMidMilestone(year) and pStorageCapLo(stg, region, year))..
+eqStorageLo(stg, region, year)$(mMidMilestone(year) and pStorageCapLo(stg, region, year) and mStorageSpan(stg, region, year))..
          vStorageCap(stg, region, year) =g= pStorageCapLo(stg, region, year);
 
-eqStorageUp(stg, region, year)$(mMidMilestone(year) and defpStorageCapUp(stg, region, year))..
+eqStorageUp(stg, region, year)$(mMidMilestone(year) and defpStorageCapUp(stg, region, year) and mStorageSpan(stg, region, year))..
         vStorageCap(stg, region, year) =l= pStorageCapUp(stg, region, year);
 
 
@@ -1155,30 +1152,33 @@ eqBal(comm, region, year, slice)$mMidMilestone(year)..
 eqOutTot(comm, region, year, slice)$mMidMilestone(year)..
          vOutTot(comm, region, year, slice)
          =e=
-         vSupOutTot(comm, region, year, slice) +
-         vEmsTot(comm, region, year, slice) +
-         vAggOut(comm, region, year, slice) +
-         vTechOutTot(comm, region, year, slice) +
-         vDumOut(comm, region, year, slice) +
-         vStorageOutTot(comm, region, year, slice) +
+         vSupOutTot(comm, region, year, slice)$(sum(sup$(mSupComm(sup, comm) and mSupSpan(sup, region)), 1)) +
+         vEmsTot(comm, region, year, slice)$(sum(tech$mTechEmitedComm(tech, comm), 1)) +
+         vAggOut(comm, region, year, slice)$(sum(commp$pAggregateFactor(comm, commp), 1)) +
+         vTechOutTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and
+                  (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1)) +
+         vDumOut(comm, region, year, slice)$defpDumCost(comm, region, year, slice) +
+         vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
          vImport(comm, region, year, slice);
 
 eqInpTot(comm, region, year, slice)$mMidMilestone(year)..
          vInpTot(comm, region, year, slice)
          =e=
-         vTechInpTot(comm, region, year, slice) +
-         vDemInp(comm, region, year, slice) +
-         vStorageInpTot(comm, region, year, slice) +
+         vTechInpTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and
+             (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1)) +
+         vDemInp(comm, region, year, slice)$(sum(dem$mDemComm(dem, comm), 1)) +
+         vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
          vExport(comm, region, year, slice);
 
-eqSupOutTot(comm, region, year, slice)$mMidMilestone(year)..
+eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(sup$(mSupComm(sup, comm) and mSupSpan(sup, region)), 1))..
          vSupOutTot(comm, region, year, slice)
          =e=
          sum(sup$(mSupComm(sup, comm) and mSupSpan(sup, region)),
                  vSupOut(sup, comm, region, year, slice)
          );
 
-eqTechInpTot(comm, region, year, slice)$mMidMilestone(year)..
+eqTechInpTot(comm, region, year, slice)$(mMidMilestone(year) and sum(tech$(mTechSpan(tech, region, year) and
+         (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1))..
          vTechInpTot(comm, region, year, slice)
          =e=
          sum(tech$(mTechSpan(tech, region, year) and mTechInpComm(tech, comm)),
@@ -1186,7 +1186,9 @@ eqTechInpTot(comm, region, year, slice)$mMidMilestone(year)..
          sum(tech$(mTechSpan(tech, region, year) and mTechAInp(tech, comm)),
              vTechAInp(tech, comm, region, year, slice));
 
-eqTechOutTot(comm, region, year, slice)$mMidMilestone(year)..
+eqTechOutTot(comm, region, year, slice)$(mMidMilestone(year) and
+        sum(tech$(mTechSpan(tech, region, year) and
+                  (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1))..
          vTechOutTot(comm, region, year, slice)
          =e=
          sum(tech$(mTechSpan(tech, region, year) and mTechOutComm(tech, comm)),
@@ -1195,14 +1197,16 @@ eqTechOutTot(comm, region, year, slice)$mMidMilestone(year)..
              vTechAOut(tech, comm, region, year, slice));
 
 
-eqStorageInpTot(comm, region, year, slice)$mMidMilestone(year)..
+eqStorageInpTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mStorageComm(stg, comm)
+           and mStorageSpan(stg, region, year)), 1))..
          vStorageInpTot(comm, region, year, slice)
          =e=
          sum(stg$mStorageComm(stg, comm),
                  vStorageInp(stg, comm, region, year, slice)
          );
 
-eqStorageOutTot(comm, region, year, slice)$mMidMilestone(year)..
+eqStorageOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mStorageComm(stg, comm)
+           and mStorageSpan(stg, region, year)), 1))..
          vStorageOutTot(comm, region, year, slice)
          =e=
          sum(stg$mStorageComm(stg, comm),
@@ -1215,7 +1219,6 @@ eqStorageOutTot(comm, region, year, slice)$mMidMilestone(year)..
 * Cost equations
 **************************************
 Equation
-eqDumOut(comm, region, year, slice)
 eqDumCost(comm, region, year)
 eqCost1(region, year)
 eqCost2(region, year)
@@ -1226,14 +1229,11 @@ eqTaxCost(comm, region, year)
 eqSubsCost(comm, region, year)
 ;
 
-eqDumOut(comm, region, year, slice)$(mMidMilestone(year) and not(defpDumCost(comm, region, year, slice)))..
-         vDumOut(comm, region, year, slice) =e= 0;
-
-eqDumCost(comm, region, year)$mMidMilestone(year)..
+eqDumCost(comm, region, year)$(mMidMilestone(year) and sum(slice$defpDumCost(comm, region, year, slice), 1))..
          vDumCost(comm, region, year)
          =e=
-         sum(slice$(defpDumCost(comm, region, year, slice)),
-         pDumCost(comm, region, year, slice) * vDumOut(comm, region, year, slice));
+         sum(slice$defpDumCost(comm, region, year, slice),
+           pDumCost(comm, region, year, slice) * vDumOut(comm, region, year, slice));
 
 
 eqCost1(region, year)$(mMidMilestone(year) and not(mMilestoneLast(year)))..
@@ -1242,9 +1242,9 @@ eqCost1(region, year)$(mMidMilestone(year) and not(mMilestoneLast(year)))..
          sum(tech$mTechSpan(tech, region, year), vTechCost(tech, region, year))
          + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
          + sum(comm, vDumCost(comm, region, year))
-         + sum(comm, vTaxCost(comm, region, year))
-         - sum(comm, vSubsCost(comm, region, year))
-         + sum(stg, vStorageCost(stg, region, year))
+         + sum(comm$(sum(slice$pTaxCost(comm, region, year, slice), 1)), vTaxCost(comm, region, year))
+         - sum(comm$(sum(slice$pSubsCost(comm, region, year, slice), 1)), vSubsCost(comm, region, year))
+         + sum(stg$mStorageSpan(stg, region, year), vStorageCost(stg, region, year))
          + vTradeCost(region, year);
 
 eqCost2(region, year)$(mMidMilestone(year) and mMilestoneLast(year))..
@@ -1255,28 +1255,24 @@ eqCost2(region, year)$(mMidMilestone(year) and mMilestoneLast(year))..
          + sum(stg, vStorageSalv(stg, region))
          + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
          + sum(comm, vDumCost(comm, region, year))
-         + sum(comm, vTaxCost(comm, region, year))
-         - sum(comm, vSubsCost(comm, region, year))
-         + sum(stg, vStorageCost(stg, region, year))
+         + sum(comm$(sum(slice$pTaxCost(comm, region, year, slice), 1)), vTaxCost(comm, region, year))
+         - sum(comm$(sum(slice$pSubsCost(comm, region, year, slice), 1)), vSubsCost(comm, region, year))
+         + sum(stg$mStorageSpan(stg, region, year), vStorageCost(stg, region, year))
          + vTradeCost(region, year);
 
 eqObjective..
          vObjective =e= sum((region, year)$mMidMilestone(year), pDiscountFactor(region, year) *
                  vCost(region, year));
 * Tax
-eqTaxCost(comm, region, year)$mMidMilestone(year)..
+eqTaxCost(comm, region, year)$(mMidMilestone(year) and sum(slice$pTaxCost(comm, region, year, slice), 1))..
          vTaxCost(comm, region, year)
-         =e=
-         sum(slice, pTaxCost(comm, region, year, slice) *
-         vOutTot(comm, region, year, slice));
+         =e= sum(slice, pTaxCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
 
 
 * Subs
-eqSubsCost(comm, region, year)$mMidMilestone(year)..
+eqSubsCost(comm, region, year)$(mMidMilestone(year) and sum(slice$pSubsCost(comm, region, year, slice), 1))..
          vSubsCost(comm, region, year)
-         =e=
-         sum(slice, pSubsCost(comm, region, year, slice) *
-         vOutTot(comm, region, year, slice));
+         =e= sum(slice, pSubsCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
 
 
 * End generation latex file
@@ -7998,8 +7994,7 @@ eqStorageSalv3
 * Commodity Varom O & M aggregate by year eqaution
 eqStorageVar
 * Cost aggregate by year eqaution
-eqStorageCost1
-eqStorageCost2
+eqStorageCost
 * Constrain capacity
 eqStorageLo
 eqStorageUp
@@ -8036,7 +8031,6 @@ eqStorageOutTot
 **************************************
 * Cost equation
 **************************************
-eqDumOut
 eqDumCost
 eqCost1
 eqCost2
