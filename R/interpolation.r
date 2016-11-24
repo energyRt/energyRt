@@ -48,13 +48,14 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
     KK <- colSums(ii * t(is.na(obj[, true_prior[true_prior %in% prior], drop = FALSE])))
     dobj <- as.matrix(obj[, -ncol(obj), drop = FALSE])
     ddd <- t(as.matrix(dd[, -ncol(dd), drop = FALSE]))
-   for(i in rev(sort(unique(KK)))) {
-      ll <- dobj[KK == i,, drop = FALSE]
-      ee <- obj[KK == i, ncol(obj)]
+   for(i in sort(unique(KK))) {
+      fl <- KK == i
+      ll <- dobj[fl,, drop = FALSE]
+      ee <- obj[fl, ncol(obj)]
       zz <- !is.na(ll[1, ])    
       if (any(zz)) {
         for(u in 1:nrow(ll)) {
-          dd[is.na(dd[, ncol(dd)]) &
+          dd[
            apply(ll[u, zz] == ddd[zz, , drop = FALSE], 2, all), ncol(dd)] <- ee[u]
         }
       } else dd[, ncol(dd)] <- ee[1]
