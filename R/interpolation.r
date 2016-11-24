@@ -1,8 +1,7 @@
 
 ## undebug(interpolation)
-
 setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
-  default = 'numeric'), function(obj, parameter, default, ...) {
+  default = 'numeric'), function(obj, parameter, default, ...) { 
   if (length(default) != 1) stop('Default value not define')
   # Get slice
   prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'regionp', 'src', 'dst', 'slice', 'year')
@@ -38,46 +37,40 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
     apr <- approxim[c('year', true_prior[true_prior != 'year'])]
     if (any(sapply(apr, length) == 0)) return(NULL)
     dd <- as.data.frame.table(array(NA, dim = sapply(apr, length), 
-      dimnames = apr), responseName = parameter)
+      dimnames = apr), responseName = parameter, stringsAsFactors = FALSE)
     dd <- dd[, c(prior, parameter), drop = FALSE]
   } else {
     dd <- as.data.frame.table(array(NA, dim = sapply(approxim, length), 
-      dimnames = approxim), responseName = parameter)
+      dimnames = approxim), responseName = parameter, stringsAsFactors = FALSE)
   }
-  ddd  <- dd[, -ncol(dd), drop = FALSE]
   if (nrow(obj) != 0) {
     ii <- 2 ^ (seq(length.out = ncol(obj) - 1) - 1)
-    obj <- obj[sort(colSums(ii * t(is.na(obj[, true_prior[true_prior %in% prior], 
-        drop = FALSE]))), index.return = TRUE, decreasing = TRUE)$ix, , 
-            drop = FALSE]
-    dobj <- obj[, -ncol(obj), drop = FALSE]
-    # Insert data
-    for(i in seq(length.out = nrow(obj))) {
-      fl <- !is.na(dobj[i, ])
-      if (any(fl)) {
-        zz <- dobj[i, ]
-        tt <- rep(TRUE, nrow(dd))
-        for(j in seq(length.out = ncol(ddd))[fl])
-          if (is.na(dobj[i, j])) tt <- tt & is.na(ddd[, j]) else 
-            tt <- tt & (!is.na(ddd[, j]) & ddd[, j] == dobj[i, j])
-        dd[tt, parameter] <- obj[i, parameter]  
-      } else {
-        dd[, parameter] <- obj[i, parameter]  
-      }
+    KK <- colSums(ii * t(is.na(obj[, true_prior[true_prior %in% prior], drop = FALSE])))
+    dobj <- as.matrix(obj[, -ncol(obj), drop = FALSE])
+    ddd <- t(as.matrix(dd[, -ncol(dd), drop = FALSE]))
+   for(i in rev(sort(unique(KK)))) {
+      ll <- dobj[KK == i,, drop = FALSE]
+      ee <- obj[KK == i, ncol(obj)]
+      zz <- !is.na(ll[1, ])    
+      if (any(zz)) {
+        for(u in 1:nrow(ll)) {
+          dd[is.na(dd[, ncol(dd)]) &
+           apply(ll[u, zz] == ddd[zz, , drop = FALSE], 2, all), ncol(dd)] <- ee[u]
+        }
+      } else dd[, ncol(dd)] <- ee[1]
     }
   }  
   # Interpolation
   if (all(colnames(obj)[-ncol(obj)] != 'year')) {
     dd[is.na(dd[, parameter]), parameter] <- default
   } else {
-    if (nrow(obj) == 0) {
+    if (all(is.na(dd[, parameter]))) {
       dd[is.na(dd[, parameter]), parameter] <- default
-    } else {
+    } else if (any(is.na(dd[, parameter]))) {
       zz <- matrix(dd[, parameter], length(approxim$year))
       f1 <- apply(zz, 2, function(x) all(!is.na(x)))
       if (any(!f1)) {
-        gg <- (1:length(f1))[!f1][
-          colSums(is.na(zz[, !f1, drop = FALSE])) == nrow(zz)]
+        gg <- seq(along =f1)[!f1][apply(is.na(zz[, !f1, drop = FALSE]), 2, all)]
         zz[, gg] <- default
         f1[gg] <- TRUE
       }
@@ -88,22 +81,16 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
         forth <- any(grep('forth', rule))
         inter <- any(grep('inter', rule))
         while(any(!f1)) {
-          ee <- (1:length(f1))[!f1]
-          if (length(ee) == 1) ll <- ee[1] else {
-            yy <- FF[, ee[1]]
-            tt <- colSums(FF[yy, ee, drop = FALSE]) == sum(yy) & colSums(!FF[!yy, ee, drop = FALSE]) == sum(!yy)
-            ee <- ee[tt]; tt <- tt[tt]
-            if (length(ee) > 1) {
-              for(j in seq(along = yy)[!yy]) 
-                  tt <- tt & zz[j, ee] == zz[j, ee[1]]
-              ll <- ee[tt]
-            } else ll <- ee
+          ee <- seq(along = f1)[!f1]
+          if (length(ee) == 1) ll <- ee else {
+            ll <- ee[apply(is.na(zz[, ee[1]]) == is.na(zz[, ee]) & 
+              (is.na(zz[, ee[1]]) | zz[, ee[1]] == zz[, ee]), 2, all)]
           }
           # Approximate
           hh <- zz[, ee[1]]
           # Back
           if (is.na(hh[1])) {  
-            hm <- min((1:nr)[!is.na(hh)])   
+            hm <- (1:nr)[!is.na(hh)][1]   
             if (back) hh[1:(hm - 1)] <- hh[hm] else hh[1:(hm - 1)] <- default
           }
           # Forth
@@ -133,9 +120,9 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
     if (any(colnames(obj)[-ncol(obj)] == 'slice')) {
       dd <- dd[, c(true_prior, parameter), drop = FALSE]
     }
- if (length(approxim$year) != year_range[2] - year_range[1] + 1) {
-      dd <- dd[rep(year_range[1] <= approxim$year & approxim$year <= year_range[2], 
-            nrow(dd) / length(approxim$year)), , drop = FALSE]
+    if (length(approxim$year) != year_range[2] - year_range[1] + 1) {
+        dd <- dd[rep(year_range[1] <= approxim$year & approxim$year <= year_range[2], 
+              nrow(dd) / length(approxim$year)), , drop = FALSE]
     }
   }
   return(dd)
