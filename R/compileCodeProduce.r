@@ -6,22 +6,11 @@ sm_compile_model <- function(obj,
 #####################################################################################
   pp1 <- proc.time()[3]
   # Upper case
-#  for(i in seq(along = obj@data)) {
-#      for(j in seq(along =obj@data[[i]]@data)) {
-#        obj@data[[i]]@data[[j]] <- upper_case(obj@data[[i]]@data[[j]])
-#      }
-#  }
   arg <- list(...)
   if (any(names(arg) == 'solver')) {
     solver <- arg$solver
     arg <- arg[names(arg) != 'solver', drop = FALSE]
   } else solver <- 'GAMS'
-  
-#  if (all(names(arg) != 'echo')) echo <- TRUE
-  
-#  } else {
-#    echo <- arg$echo
-#  }
   
   if (is.null(tmp.dir)) {
     tmp.dir <- getwd()
@@ -39,7 +28,6 @@ sm_compile_model <- function(obj,
     dir.create(tmp.dir, recursive = TRUE)
   #}
   tmpdir <- tmp.dir
-  # tmpdir = getwd() #"SolverTMP"
   BEGINDR <- getwd()
   description <- ''
   if (is.null(names(arg)) || any(names(arg) == '')) stop('Undefined argument')
@@ -158,6 +146,12 @@ sm_compile_model <- function(obj,
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
         }
     }
+    prorgess_bar <- sum(sapply(obj@data, function(x) length(x@data)))
+    prorgess_bar_0 <- 0
+    prorgess_bar_dl <- (prorgess_bar + 70 - 1) %/% 70
+
+    cat('Load data ')
+    prorgess_bar_p <- proc.time()[3]
   # Fill DB main data
     for(i in seq(along = obj@data)) {
         ff <- rep(TRUE, length(obj@data[[i]]@data))
@@ -178,23 +172,26 @@ sm_compile_model <- function(obj,
             ff[j] <- fl
           } 
         obj@data[[i]]@data <- obj@data[[i]]@data[ff]  
-        for(j in seq(along = obj@data[[i]]@data)) { #if (class(obj@data[[i]]@data[[j]]) == 'technology') {
+        for(j in seq(along = obj@data[[i]]@data)) { 
           prec <- add0(prec, obj@data[[i]]@data[[j]], approxim = approxim)
+          prorgess_bar_0 <- prorgess_bar_0 + 1
+          if (prorgess_bar_0 %% prorgess_bar_dl == 0) {
+            cat('.')
+            flush.console() 
+          }
         }
     }
-    #cat('-----1\n')
+    cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
+   
+  prec <- add0(prec, obj@sysInfo, approxim = approxim) 
     for(i in seq(along = prec@maptable)) {
       if (prec@maptable[[i]]@true_length != 0) {
-           #   cat(i, '\n')
           prec@maptable[[i]]@data <- prec@maptable[[i]]@data[1:prec@maptable[[i]]@true_length,, drop = FALSE]
       }
-      prec@maptable[[i]]@true_length <- (-1)
     }
-#    cat('-----2\n')
 #####################################################################################
 # Handle data
 #####################################################################################
-  prec <- add0(prec, obj@sysInfo, approxim = approxim) 
   # Check slots
   check_set <- function(set, alias = NULL) {
     if (is.null(alias)) alias <- set
@@ -215,14 +212,6 @@ sm_compile_model <- function(obj,
   # Additional for compatibility with GLPK
   check_set('comm', c('comm', 'commp', 'acomm'))
   for(i in c('expp', 'imp', 'tech', 'trade', 'sup', 'group', 'region', 'year', 'slice')) check_set(i)
-  # Export to GAMS
-#  ddr <- getwd()
-#  #setwd(tmpdir)
-#  if (all(dir(tmpdir) != 'SolverTMP')) dir.create('SolverTMP')
-#  dirs <- paste(tmpdir, '/SolverTMP/', sep = '')
-  #setwd(dirs)
-  #zz <- file(paste(dirs, '/mdl.gms', sep = ''), 'w')
-  #cdd <- readLines('c:/111/dropbox/package/bottomup/gams/model.gms')
   if (length(obj@LECdata) != 0) {
      prec@maptable$mLECRegion <- addMultipleSet(prec@maptable$mLECRegion, obj@LECdata$region)
      if (length(obj@LECdata$pLECLoACT) == 1) {
@@ -230,7 +219,6 @@ sm_compile_model <- function(obj,
             data.frame(region = obj@LECdata$region, Freq = obj@LECdata$pLECLoACT))
      }
   }
-  #assign('approxim', approxim, globalenv())
   ## Constrain
   yy <- c('tech', 'sup', 'stg', 'expp', 'imp', 'trade', 'group', 'comm', 'region', 'year', 'slice')
   appr <- lapply(yy, function(x) prec@maptable[[x]]@data[[x]])
@@ -254,10 +242,7 @@ sm_compile_model <- function(obj,
       if (arg$fix_data != 'all') ll <- ll[ll %in% arg$fix_data]
       for(i in ll) {
         p1 <- proc.time()[3]
-        #addData(prec@maptable[[gsub('^.', 'preDef', i)]], approxim)
         gg <- as.data.frame.table(arg$fix_scenario@result@data[[i]], stringsAsFactors = FALSE)
-        #colnames(gg) <- gsub('[.].*', '', colnames(gg))
-#        cat('Old data', i, '\n')
         for(j in seq(length.out = ncol(gg) - 1)) {
           k <- gsub('[.].*', '', colnames(gg)[j])
           gg <- gg[gg[, j] %in% appr[[k]],, drop = FALSE]
@@ -272,26 +257,12 @@ sm_compile_model <- function(obj,
            addData(prec@maptable[[gsub('^.', 'mPreDef', i)]], gg[, -ncol(gg)])
         gg <- gg[gg[, 'Freq'] != 0,] 
         prec@maptable[[gsub('^.', 'preDef', i)]] <- addData(prec@maptable[[gsub('^.', 'preDef', i)]], gg)
-#        cat('Old data end', i, round(proc.time()[3] - p1, 2), '\n')
-   #     , 
-#          dim = dim(arg$fix_scenario@result@data[[i]]),
-#          dimnames = dimnames(arg$fix_scenario@result@data[[i]])
-#          )
-#          
-#        dimnames(arg$fix_scenario@result@data[[i]])
-#        
-#    obj@maptable[['pTechCinp2ginp']] <- addData(obj@maptable[['pTechCinp2ginp']],
-#      simple_data_frame_approximation_chk(tech@ceff, 'cinp2ginp',
-#       obj@maptable[['pTechCinp2ginp']], approxim_comm, 'tech', tech@name))
-#     
-#      arg$fix_scenario@result@data[[i]]
       
       }
       arg <- arg[names(arg) != 'fix_data', drop = FALSE]
       arg <- arg[names(arg) != 'fix_scenario', drop = FALSE]
       arg <- arg[names(arg) != 'fix_year', drop = FALSE]
   }
-   # cat('-----4\n')
   if (length(arg) != 0) warning('Unknown argument ', names(arg))
 # ---------------------------------------------------------------------------------------------------------  
       gg <- prec@maptable[['pDiscount']]@data
@@ -309,8 +280,6 @@ sm_compile_model <- function(obj,
       if (nrow(hh) != 0) {
         prec@maptable[['mDiscountZero']]@data <- hh      
       } 
-#    cat('-----40\n')
-                     #   browser()
 LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
       # Add defpSupReserve
@@ -322,7 +291,6 @@ LL1 <- proc.time()[3]
         prec@maptable[['defpSupReserve']]@default <- 0
       }  else prec@maptable[['defpSupReserve']]@default <- 1
       # Add defpSupAvaUp
-#  cat('--------\n')
       gg <- prec@maptable[['pSupAva']]@data
       gg <- gg[gg$Freq != Inf & gg$type == 'up', ]
       if (nrow(gg) != 0) {
@@ -330,8 +298,6 @@ LL1 <- proc.time()[3]
       } else if (nrow(gg) == 0 && prec@maptable[['pSupAva']]@default == Inf) {
         prec@maptable[['defpSupAvaUp']]@default <- 0
       }  else prec@maptable[['defpSupAvaUp']]@default <- 1
-  #cat('--------\n')
-#   cat('-----41\n')
       # Add pDumCost
       gg <- prec@maptable[['pDumCost']]@data
       gg <- gg[gg$Freq != Inf, ]
@@ -364,7 +330,6 @@ LL1 <- proc.time()[3]
       } else if (nrow(gg) == 0 && prec@maptable[['pRowExport']]@default[2] == Inf) {
         prec@maptable[['defpRowExportUp']]@default <- 0
       }  else prec@maptable[['defpRowExportUp']]@default <- 1
-    #cat('-----42\n')
       # defpRowImportUp
       gg <- prec@maptable[['pRowImport']]@data
       gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
@@ -373,7 +338,6 @@ LL1 <- proc.time()[3]
       } else if (nrow(gg) == 0 && prec@maptable[['pRowImport']]@default[2] == Inf) {
         prec@maptable[['defpRowImportUp']]@default <- 0
       }  else prec@maptable[['defpRowImportUp']]@default <- 1
-   # cat('-----43\n')
       # For remove emission equation
       g1 <- prec@maptable$pTechEmisComm@data
       g2 <- prec@maptable$pEmissionFactor@data
@@ -385,7 +349,6 @@ LL1 <- proc.time()[3]
           data.frame(tech = tec, comm = rep(g, length(tec))))
       }
       # Check user error
-#    cat('-----5\n')
       check_maptable(prec)
 ########
 #  Remove unused technology
@@ -413,7 +376,6 @@ LL1 <- proc.time()[3]
       prec@maptable$mTechRetirement@data <- prec@maptable$mTechRetirement@data[0,, drop = FALSE]
     }
 #!################
-#    assign('prec', prec, globalenv())
 ### FUNC GAMS 
   if (open.folder) shell.exec(tmpdir)
   if (solver == 'GAMS') {
@@ -423,13 +385,6 @@ LL1 <- proc.time()[3]
       gsub('[/][/]*', '\\\\', paste('FILE1=', tmp.dir, '/mdl.lst', sep = '')), '', 'MAXIM=1', 
       'TOP=50', 'LEFT=50', 'HEIGHT=400', 'WIDTH=400', ''), sep = '\n', file = zz)
     close(zz)
-#  CNS <- list()
-#    for(i in seq(along =obj@data)) {
-#        for(j in seq(along =obj@data[[i]]@data)) if (class(obj@data[[i]]@data[[j]]) == 'constrain') {
-#          CNS[[length(CNS) + 1]] <- sm_toGams_constrain(upper_case(obj@data[[i]]@data[[j]]), 
-#            approxim = appr, year_range = range(appr$year))
-#        }
-#    }
    cdd <- prec@model
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(cdd[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', cdd) - 1)], sep = '\n', file = zz)
@@ -446,13 +401,8 @@ LL1 <- proc.time()[3]
     for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'double') {
       cat(toGams(prec@maptable[[i]]), sep = '\n', file = zz)
     }
-#   for(i in seq(along = CNS)) {
-#     cat(CNS[[i]]$add_code, sep = '\n', file = zz)
-#     cat(CNS[[i]]$add_data, sep = '\n', file = zz)
-#   }                               
     cat(cdd[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', cdd) + 1):
         (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', cdd) - 1)], sep = '\n', file = zz)
-#    for(i in seq(along = CNS)) cat(CNS[[i]]$eq_decl, sep = '\n', file = zz)
     cat(cdd[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', cdd) + 1):
         (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', cdd) - 1)], sep = '\n', file = zz)
   
@@ -462,25 +412,14 @@ LL1 <- proc.time()[3]
     cat(cdd[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', cdd) + 1):(
         grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', cdd) - 1)], sep = '\n', file = zz)
     cat(obj@additionalCodeAfter, sep = '\n', file = zz)
-#    if (length(CNS) == 0) ccs <- character() else {
-#      ccs <- seq(along = CNS)[sapply(CNS, function(x) !is.null(x$debug_data))]
-#    }
-#    add_cns_data <- rep(NA, length(ccs))
-#    for(i in ccs) if (!is.null(CNS[[i]]$debug_data)) {
-#      cat(CNS[[i]]$debug_data, sep = '\n', file = zz)
-#      add_cns_data[i] <- names(CNS[[i]]$debug_data)
-#    } 
     cat(cdd[(min(c(grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', cdd) + 1, length(cdd)))):length(cdd)], sep = '\n', file = zz)
     # Add constrain file to read list
-#    if (length(add_cns_data) > 0) {
-#      cat(c("file variable_list_csv2 / 'variable_list2.csv'/;\nvariable_list_csv2.lp = 1;", 
-#        "put variable_list_csv2;\nput 'value'/;", 
-#        paste('put "', add_cns_data, '"/;\n', collapse = '', sep = ''), "putclose;\n\n\n"), sep = '\n', file = zz)
-#    }
     close(zz)
-#    assign('prec', prec, globalenv()) 
     pp2 <- proc.time()[3]
-    if(echo) cat('Preprocessing time: ', round(pp2 - pp1, 2), 's\n', sep = '')
+    if (echo) { 
+      cat('Total preprocessing time: ', round(pp2 - pp1, 2), 's\n', sep = '')
+      flush.console()
+    }
     tryCatch({
       setwd(tmpdir)
       if (.Platform$OS.type == "windows") {
@@ -504,13 +443,6 @@ LL1 <- proc.time()[3]
     if(echo) cat('Solver work time: ', round(pp3 - pp2, 2), 's\n', sep = '')
   } else if (solver == 'GLPK' || solver == 'CBC') {
 ### FUNC GLPK 
-#    CNS <- list()
-#    for(i in seq(along =obj@data)) {
-#        for(j in seq(along =obj@data[[i]]@data)) if (class(obj@data[[i]]@data[[j]]) == 'constrain') {
-#          CNS[[length(CNS) + 1]] <- sm_toGlpk_constrain(upper_case(obj@data[[i]]@data[[j]]),  
-#            approxim = appr, year_range = range(appr$year))
-#        }
-#    }
       zz <- file(paste(tmpdir, '/glpk.mod', sep = ''), 'w')
       if (length(grep('^minimize', prec@model_glpk)) != 1) stop('Wrong GLPK model')
       cat(prec@model_glpk[1:(grep('^minimize', prec@model_glpk) - 1)], sep = '\n', file = zz)
@@ -519,21 +451,6 @@ LL1 <- proc.time()[3]
 #      }
       cat(prec@model_glpk[grep('^minimize', prec@model_glpk):(grep('^end[;]', prec@model_glpk) - 1)], 
           sep = '\n', file = zz)
-#    if (length(CNS) == 0) ccs <- character() else {
-#      ccs <- seq(along = CNS)[sapply(CNS, function(x) !is.null(x$debug_data))]
-#    }
-#    add_cns_data <- rep(NA, length(ccs))
-#    for(i in ccs) {
-#      cat(CNS[[i]]$debug_data, sep = '\n', file = zz)
-#      add_cns_data[i] <- names(CNS[[i]]$debug_data)
-#    }
-#    add_cns_data <- add_cns_data[!is.na(add_cns_data)]
-    # Add constrain file to read list
-#    if (length(add_cns_data) > 0) {
-#      cat(c('printf "value\\n" > "variable_list2.csv";', 
-#        paste('printf "', add_cns_data, '\\n" >> "variable_list2.csv";', collapse = '', sep = '')), 
-#          sep = '\n', file = zz)
-#    }
       cat(prec@model_glpk[grep('^end[;]', prec@model_glpk):length(prec@model_glpk)], sep = '\n', file = zz)
       close(zz)
     cdd <- prec@model
@@ -563,7 +480,10 @@ LL1 <- proc.time()[3]
     ##!!!!!!!!!!!!!!!!!!!!!  
     close(zz)
     pp2 <- proc.time()[3]
-    if(echo) cat('Preprocessing time: ', round(pp2 - pp1, 2), 's\n', sep = '')
+    if(echo) {
+      cat('Total preprocessing time: ', round(pp2 - pp1, 2), 's\n', sep = '')
+      flush.console()
+    }
     tryCatch({
       setwd(tmpdir)
       if (.Platform$OS.type == "windows") {
@@ -691,6 +611,9 @@ solve.model <- function(obj, ...) {
 }
 
 sm_to_glpk <-  function(obj) {
+    if (obj@true_length > 0) {
+        obj@data <- obj@data[1:obj@true_length,, drop = FALSE]
+      }
     if (obj@type == 'set') {
       if (nrow(obj@data) == 0) {
         ret <- c(paste('set ', obj@alias, ' := 1;', sep = ''), '')

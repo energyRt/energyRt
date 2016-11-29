@@ -114,7 +114,7 @@ setMethod('addData', signature(obj = 'MapTable', data = 'data.frame'),
         if (nrow(data) != 0) {
           if (obj@true_length != -1) {
             if (obj@true_length + nrow(data) > nrow(obj@data)) {
-              obj@data[nrow(obj@data) + 1:(5 * nrow(data)), ] <- NA
+              obj@data[nrow(obj@data) + 1:(500 + .25 * nrow(obj@data)), ] <- NA
             }
             nn <- obj@true_length + 1:nrow(data)
             obj@true_length <- obj@true_length + nrow(data)
@@ -194,6 +194,9 @@ setMethod('removeBySet', signature(obj = 'MapTable', set = "character", value = 
 # Generate GAMS code, return character == GAMS code 
 setMethod('toGams', signature(obj = 'MapTable'),
   function(obj) {
+    if (obj@true_length > 0) {
+        obj@data <- obj@data[1:obj@true_length,, drop = FALSE]
+      }
     if (obj@type == 'set') {
       if (nrow(obj@data) == 0) {
         ret <- c('set', paste(obj@alias, ' /', sep = ''))
@@ -213,19 +216,25 @@ setMethod('toGams', signature(obj = 'MapTable'),
         ret <- c(ret, '/;', '')
       }
     } else if (obj@type == 'single') {
-       if (nrow(obj@data) == 0) {
+       if (nrow(obj@data) == 0 || all(obj@data$Freq == obj@default)) {
         ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@default, ';', sep = '')
+      } else  if (all(obj@data$Freq[1] == obj@data$Freq)) {
+        ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@data$Freq[1], ';', sep = '')
       } else {
+        obj@data <- obj@data[obj@data$Freq != 0,, drop = FALSE]
         ret <- c('parameter', paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') /', sep = ''))
-        ret <- c(ret, paste(apply(obj@data[, -ncol(obj@data), drop = FALSE], 1, 
-            function(x) paste(x, collapse = '.')), obj@data[, 'Freq']))
-        ret <- c(ret, '/;', '')
+        gg <- obj@data[, 1]
+        if (ncol(obj@data) > 2) for(i in 3:ncol(obj@data) - 1) gg <- paste(gg, '.', obj@data[, i], sep = '')
+        gg <- paste(gg, obj@data[, ncol(obj@data)])
+        ret <- c(ret, gg, '/;', '')
       }  
     } else if (obj@type == 'double') {     
        if (nrow(obj@data) == 0) {
         ret <- c()
-        ret <- c(ret, paste(obj@alias, 'Lo(', paste(obj@set, collapse = ', '), ') = ', obj@default[1], ';', sep = ''))
-        ret <- c(ret, paste(obj@alias, 'Up(', paste(obj@set, collapse = ', '), ') = ', obj@default[2], ';', sep = ''))
+        ret <- c(ret, paste(obj@alias, 'Lo(', paste(obj@set, collapse = ', '), ') = ', 
+            obj@default[1], ';', sep = ''))
+        ret <- c(ret, paste(obj@alias, 'Up(', paste(obj@set, collapse = ', '), ') = ', 
+            obj@default[2], ';', sep = ''))
       } else {
         ret <- c()
         for(i in levels(obj@data$type)) {
