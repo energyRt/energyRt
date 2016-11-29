@@ -179,7 +179,8 @@ setMethod('getSet', signature(obj = 'MapTable', set = "character"),
           stop('Internal error: Wrong set request')
     # zz <- unique(obj@data[, set])
     # zz[!is.na(zz)]
-    unique(obj@data[, set])
+    if (obj@true_length != -1) unique(obj@data[seq(length.out = obj@true_length), set]) else 
+        unique(obj@data[, set])
 })
 
 # Remove all data by all set

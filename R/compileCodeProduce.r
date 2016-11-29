@@ -184,11 +184,11 @@ sm_compile_model <- function(obj,
     cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
    
   prec <- add0(prec, obj@sysInfo, approxim = approxim) 
-    for(i in seq(along = prec@maptable)) {
-      if (prec@maptable[[i]]@true_length != 0) {
-          prec@maptable[[i]]@data <- prec@maptable[[i]]@data[1:prec@maptable[[i]]@true_length,, drop = FALSE]
-      }
-    }
+#    for(i in seq(along = prec@maptable)) {
+#      if (prec@maptable[[i]]@true_length != 0) {
+#          prec@maptable[[i]]@data <- prec@maptable[[i]]@data[1:prec@maptable[[i]]@true_length,, drop = FALSE]
+#      }
+#    }
 #####################################################################################
 # Handle data
 #####################################################################################
@@ -202,6 +202,7 @@ sm_compile_model <- function(obj,
             && !all(getSet(prec@maptable[[i]], al) %in% ss)) {
               dd <- getSet(prec@maptable[[i]], al)[!(getSet(prec@maptable[[i]], al) %in% ss)]
               dd <- prec@maptable[[i]]@data[prec@maptable[[i]]@data[, set] %in% dd, , drop = FALSE]
+              browser()
               stop(paste('Unknown ', set, ' in slot ', prec@maptable[[i]]@alias, '\n', 
                 paste(apply(dd, 1, function(x) paste(x, collapse = '.')), collapse = '\n'), 
                 '\n', sep = ''))               
@@ -284,6 +285,8 @@ LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
       # Add defpSupReserve
       gg <- prec@maptable[['pSupReserve']]@data
+      if (prec@maptable[['pSupReserve']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pSupReserve']]@true_length),, drop = FALSE]
       gg <- gg[gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
         prec@maptable[['defpSupReserve']]@data <- gg[, 1:(ncol(gg) - 1), drop = FALSE]      
@@ -292,6 +295,8 @@ LL1 <- proc.time()[3]
       }  else prec@maptable[['defpSupReserve']]@default <- 1
       # Add defpSupAvaUp
       gg <- prec@maptable[['pSupAva']]@data
+      if (prec@maptable[['pSupAva']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pSupAva']]@true_length),, drop = FALSE]
       gg <- gg[gg$Freq != Inf & gg$type == 'up', ]
       if (nrow(gg) != 0) {
         prec@maptable[['defpSupAvaUp']]@data <- gg[, 1:(ncol(gg) - 2), drop = FALSE]      
@@ -300,6 +305,8 @@ LL1 <- proc.time()[3]
       }  else prec@maptable[['defpSupAvaUp']]@default <- 1
       # Add pDumCost
       gg <- prec@maptable[['pDumCost']]@data
+      if (prec@maptable[['pDumCost']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pDumCost']]@true_length),, drop = FALSE]
       gg <- gg[gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
         prec@maptable[['defpDumCost']]@data <- gg[, 1:(ncol(gg) - 1), drop = FALSE]      
@@ -308,6 +315,10 @@ LL1 <- proc.time()[3]
       } else prec@maptable[['defpDumCost']]@default <- 1
       # defpRowExportRes   
       gg <- prec@maptable[['pRowExportRes']]@data
+      if (prec@maptable[['pRowExportRes']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pRowExportRes']]@true_length),, drop = FALSE]
+      if (prec@maptable[['pRowExportRes']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pRowExportRes']]@true_length),, drop = FALSE]
       gg <- gg[gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
         prec@maptable[['defpRowExportRes']]@data <- gg[, 1:(ncol(gg) - 1), drop = FALSE]      
@@ -316,6 +327,8 @@ LL1 <- proc.time()[3]
       }  else prec@maptable[['defpRowExportRes']]@default <- 1
       # defpRowImportRes
       gg <- prec@maptable[['pRowImportRes']]@data
+      if (prec@maptable[['pRowImportRes']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pRowImportRes']]@true_length),, drop = FALSE]
       gg <- gg[gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
         prec@maptable[['defpRowImportRes']]@data <- gg[, 1:(ncol(gg) - 1), drop = FALSE]      
@@ -324,6 +337,8 @@ LL1 <- proc.time()[3]
       }  else prec@maptable[['defpRowImportRes']]@default <- 1
       # defpRowExportUp 
       gg <- prec@maptable[['pRowExport']]@data
+      if (prec@maptable[['pRowExport']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pRowExport']]@true_length),, drop = FALSE]
       gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
         prec@maptable[['defpRowExportUp']]@data <- gg[, 1:(ncol(gg) - 2), drop = FALSE]      
@@ -332,6 +347,8 @@ LL1 <- proc.time()[3]
       }  else prec@maptable[['defpRowExportUp']]@default <- 1
       # defpRowImportUp
       gg <- prec@maptable[['pRowImport']]@data
+      if (prec@maptable[['pRowImport']]@true_length != -1)
+        gg <- gg[seq(along = prec@maptable[['pRowImport']]@true_length),, drop = FALSE]
       gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
         prec@maptable[['defpRowImportUp']]@data <- gg[, 1:(ncol(gg) - 2), drop = FALSE]      
@@ -340,7 +357,11 @@ LL1 <- proc.time()[3]
       }  else prec@maptable[['defpRowImportUp']]@default <- 1
       # For remove emission equation
       g1 <- prec@maptable$pTechEmisComm@data
+      if (prec@maptable[['pTechEmisComm']]@true_length != -1)
+        g1 <- g1[seq(along = prec@maptable[['pTechEmisComm']]@true_length),, drop = FALSE]
       g2 <- prec@maptable$pEmissionFactor@data
+      if (prec@maptable[['pEmissionFactor']]@true_length != -1)
+        g2 <- g2[seq(along = prec@maptable[['pEmissionFactor']]@true_length),, drop = FALSE]
       g1 <- g1[g1$Freq != 0, , drop = FALSE]
       for(g in unique(g2$comm)) {
         cmd <- g2[g2$comm == g, 'commp']
@@ -374,6 +395,8 @@ LL1 <- proc.time()[3]
     # Early reteirment
     if (!obj@early.retirement) {
       prec@maptable$mTechRetirement@data <- prec@maptable$mTechRetirement@data[0,, drop = FALSE]
+      if (prec@maptable$mTechRetirement@true_length != -1)
+        prec@maptable$mTechRetirement@true_length <- 0
     }
 #!################
 ### FUNC GAMS 

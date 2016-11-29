@@ -2,7 +2,11 @@ check_maptable <- function(prec) {
   error_type <- c()
   # Check that lo bound less or equal up bound
   for(pr in names(prec@maptable)[sapply(prec@maptable,
-    function(x) x@type == 'double')]) if (nrow(prec@maptable[[pr]]@data) > 0) {
+    function(x) x@type == 'double')]) 
+      if (nrow(prec@maptable[[pr]]@data) > 0 && prec@maptable[[pr]]@true_length != 0) {
+    if (prec@maptable[[pr]]@true_length != -1)  
+      prec@maptable[[pr]]@data <- prec@maptable[[pr]]@data[seq(length.out = 
+        prec@maptable[[pr]]@true_length),, drop = FALSE]
     gg <- prec@maptable[[pr]]@data
     fl <- gg[gg$type == 'lo', 'Freq'] > gg[gg$type == 'up', 'Freq']
     stopifnot(all(gg[gg$type == 'lo', 0:1 - ncol(gg)] ==
