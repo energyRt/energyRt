@@ -274,7 +274,7 @@ sm_compile_model <- function(obj,
         dd$Freq <- cumprod(1 / (1 + dd$Freq))
         ll <- rbind(ll, dd)
       }
-      prec@maptable[['pDiscountFactor']]@data <- ll
+      prec@maptable[['pDiscountFactor']] <- addData(prec@maptable[['pDiscountFactor']], ll)
        hh <- gg[gg$year == as.character(max(obj@sysInfo@year)), -2]
        hh <- hh[hh$Freq == 0, 'region', drop = FALSE]
       # Add mDiscountZero - zero discount rate in final period
@@ -634,8 +634,8 @@ solve.model <- function(obj, ...) {
 }
 
 sm_to_glpk <-  function(obj) {
-    if (obj@true_length > 0) {
-        obj@data <- obj@data[1:obj@true_length,, drop = FALSE]
+    if (obj@true_length != -1) {
+        obj@data <- obj@data[seq(length.out = obj@true_length),, drop = FALSE]
       }
     if (obj@type == 'set') {
       if (nrow(obj@data) == 0) {

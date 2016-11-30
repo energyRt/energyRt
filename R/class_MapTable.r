@@ -145,6 +145,7 @@ setMethod('addData', signature(obj = 'MapTable', data = 'character'),
     #    }
     nn <- nrow(obj@data) + 1:length(data)
     obj@data[nn, ] <- data
+    obj@true_length <- obj@true_length + length(data)
     obj
 })
 
@@ -162,6 +163,7 @@ setMethod('addData', signature(obj = 'MapTable', data = 'numeric'),
     #    }
     nn <- nrow(obj@data) + 1:length(data)
     obj@data[nn, ] <- data
+    obj@true_length <- obj@true_length + length(data)
     obj
 })
 
@@ -195,17 +197,17 @@ setMethod('removeBySet', signature(obj = 'MapTable', set = "character", value = 
 # Generate GAMS code, return character == GAMS code 
 setMethod('toGams', signature(obj = 'MapTable'),
   function(obj) {
-    if (obj@true_length > 0) {
-        obj@data <- obj@data[1:obj@true_length,, drop = FALSE]
+    if (obj@true_length != -1) {
+        obj@data <- obj@data[seq(length.out = obj@true_length),, drop = FALSE]
       }
-    if (obj@type == 'set') {
-      if (nrow(obj@data) == 0) {
+    if (obj@type == 'set') {                             
+      if (nrow(obj@data) == 0) {                         
         ret <- c('set', paste(obj@alias, ' /', sep = ''))
         ret <- c(ret, '1')
         ret <- c(ret, '/;', '')
       } else {
         ret <- c('set', paste(obj@alias, ' /', sep = ''))
-        ret <- c(ret, obj@data[, 1])
+        ret <- c(ret, obj@data[, 1]) 
         ret <- c(ret, '/;', '')
       }
     } else if (obj@type == 'map') {
