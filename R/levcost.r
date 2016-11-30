@@ -290,7 +290,7 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
    for(i in names(rr@precompiled@maptable))
      if (rr@precompiled@maptable[[i]]@true_length != -1) {
        rr@precompiled@maptable[[i]]@data <- rr@precompiled@maptable[[i]]@data[
-         seq(length.out = rr@precompiled@maptable[[i]]@true_length),, drop = FALSE]
+           seq(length.out = rr@precompiled@maptable[[i]]@true_length),, drop = FALSE]
      }
   # Additional table          
     dsc <- rr@precompiled@maptable[['pDiscountFactor']]@data
