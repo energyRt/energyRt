@@ -185,6 +185,11 @@ setMethod('getSet', signature(obj = 'MapTable', set = "character"),
         unique(obj@data[, set])
 })
 
+setMethod('getDataMapTable', signature(obj = 'MapTable'),
+  function(obj) {
+    if (obj@true_length != -1) obj@data[seq(length.out = obj@true_length),, drop = FALSE] else obj@data
+})
+
 # Remove all data by all set
 setMethod('removeBySet', signature(obj = 'MapTable', set = "character", value = "character"),
   function(obj, set, value) {

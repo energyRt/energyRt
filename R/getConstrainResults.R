@@ -22,7 +22,7 @@ getConstrainResults <- function(scenario, constrain) {
     vary.set2 <- c(ad_smpl[is.vary[ad_smpl]], std_smp[std_smp %in% names(is.vary)[is.vary]])
     cns.set <- list()
     for(st in c(ad_smpl, std_smp)) {
-      gg <- prec[[paste('mCns', fcase(st), sep = '')]]@data
+      gg <- getDataMapTable(prec[[paste('mCns', fcase(st), sep = '')]])
       cns.set[[st]] <- gg[gg$cns == constrain, st]
     }
     # Variable
@@ -38,7 +38,7 @@ getConstrainResults <- function(scenario, constrain) {
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
       lhs <- sum(gg)
-      rhs <- prec[['pRhs']]@data
+      rhs <- getDataMapTable(prec[['pRhs']])
       rhs <- rhs[rhs == constrain, 2]
       ll <- list(data.frame(lhs = lhs, rhs = rhs, is.active = c(lhs == rhs)))
       names(ll) <- constrain
@@ -51,8 +51,8 @@ getConstrainResults <- function(scenario, constrain) {
         tbl[, i] <- NA
         tbl[, i] <- c(t(matrix(cns.set[[i]], length(cns.set[[i]]), nrow(tbl) / length(cns.set[[i]]))))
       }
-      rhs <- prec[[paste('pRhs', fcase(ad_smpl)[length(ad_smpl) != 0 && any(ad_smpl == names(tcns@for.each))],
-        paste(toupper(substr(vary.set, 1, 1)), collapse = ''), sep = '')]]@data
+      rhs <- getDataMapTable(prec[[paste('pRhs', fcase(ad_smpl)[length(ad_smpl) != 0 && 
+        any(ad_smpl == names(tcns@for.each))], paste(toupper(substr(vary.set, 1, 1)), collapse = ''), sep = '')]])
       rhs <- rhs[rhs$cns == constrain, -1, drop = FALSE]
       v1 <- apply(rhs[, -ncol(rhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
       v2 <- apply(tbl, 1, function(x) paste(x, collapse = '#'))

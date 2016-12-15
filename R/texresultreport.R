@@ -176,7 +176,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         tbl <- tbl[apply(tbl != 0, 1, any), apply(tbl != 0, 2, any), drop = FALSE]
         cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
       }       
-      ## Commodity
+     ## Commodity
       if (length(dtt$commodity) != 0) {
         FL <- array(NA, dim = length(dtt$commodity), dimnames = list((names(dtt$commodity))))
         cat('\\section{Commodity analysis}\n\n', '\n', sep = '', file = zz)
@@ -310,7 +310,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                   cat('\\end{figure}\n', sep = '', file = zz)
                 }
               }
-              # Commodity demand
+             # Commodity demand
               cmd_dem <- cmd_use[c('technologyInput', 'demand', 'export'),, drop = FALSE]
               if (any(cmd_dem != 0)) {
                 # Demand
@@ -558,10 +558,12 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             '.\n\n', '\n', sep = '', file = zz)
         }
       }
+  cat('Constrain\n'); flush.console()
       ## Constrain
       if (length(dtt$constrain) != 0) {
         cat('\\section{Constrain analysis}\n\n', '\n', sep = '', file = zz)
         for(cc in seq(along = dtt$constrain)) {
+  cat(cc, 'Constrain\n'); flush.console()
          cns <- dtt$constrain[[cc]]
           cat('\\subsection{', gsub('_', '\\\\_', 
              as.character(cns@name)), '}\n\n', '\n', sep = '', file = zz)
@@ -592,6 +594,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             cat_bottomup_data_frame(getConstrainResults(obj, as.character(cns@name))[[1]], 'Constrain data', zz)
         }
       }
+  cat('Supply\n')
     ##########!!
       ## Supply
       if (length(dtt$supply) != 0) {
