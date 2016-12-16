@@ -10,7 +10,7 @@ write2xls <- function(scen,
                       ...) {
   # Convert arrays to data.frame.table
   lst.wide <- scen@result@data
-  for (i in names(rdt)) {
+  for (i in names(lst.wide)) {
     #message(i)
     if(is.array(lst.wide[[i]])) {
       #lst[[i]] <- array2df(rdt[[i]], label.x = i)
