@@ -2,7 +2,7 @@
 
 **energyRt** is a package for [R](https://www.r-project.org/) to develop Reference Energy System (RES) models and analyze energy-technologies.
 
-**energyRt** package includes a standard RES (or "Bottom-Up") linear, cost-minimizing model, which can be solved by [GAMS](http://www.gams.com/) or [GLPK](https://www.gnu.org/software/glpk/). The model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies. 
+**energyRt** package includes a typical RES (or "Bottom-Up") linear, cost-minimizing model, which can be solved by [GAMS](http://www.gams.com/) or [GLPK](https://www.gnu.org/software/glpk/). The model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies. 
 
 **energyRt** package is a set of _classes_, _methods_, and _functions_ in [R](https://www.r-project.org/) which are designed to:  
 - handle data, assist in defining RES models,  
