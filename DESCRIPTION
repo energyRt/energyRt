@@ -12,5 +12,5 @@ BugReports: https://github.com/olugovoy/energyRt/issues
 Description: Energy Technology Modeling Toolbox
 License: AGPL-3
 Depends:
-    methods, data.table, rpivotTable, WriteXLS
+    methods, rpivotTable, WriteXLS
 RoxygenNote: 5.0.1
