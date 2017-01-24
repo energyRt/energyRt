@@ -633,6 +633,67 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
 #        }
         FL[cc] <- !fl
       }      
+      ## Trade
+      if (length(dtt$trade) != 0) {
+        #stock <- obj@precompiled@maptable$pTechStock@data
+        #FL <- array(NA, dim = length(dtt$technology), dimnames = list(names(dtt$technology)))
+        cat('\\section{Trade analysis}\n\n', '\n', sep = '', file = zz)
+        grep('Trade', names(obj@precompiled@maptable), value = TRUE)
+        trd_src <- getDataMapTable(obj@precompiled@maptable$mTradeSrc)
+        trd_dst <- getDataMapTable(obj@precompiled@maptable$mTradeDst)
+        for(nm in names(dtt$trade)) {
+          trd <- dtt$trade[[nm]]
+          cat('\\subsection{', nm, '}\n\n', '\n', sep = '', file = zz)
+            cat('\n\n Commodity: "', trd@commodity, '"\n\n', sep = '', file = zz)
+            src <- trd_src[trd_src$trade == nm, 'region']
+            if (length(src) == 0) cat('\n\n Warning: There is not source region.\n\n', sep = '', file = zz) else
+              cat('Source regions: "',paste(src, collapse = '", "') , '"\n\n', sep = '', file = zz)
+            dst <- trd_dst[trd_dst$trade == nm, 'region']
+            if (length(trd) == 0) cat('\n\n Warning: There is not destination region.\n\n', sep = '', file = zz) else
+              cat('Destination regions: "',paste(dst, collapse = '", "') , '"\n\n', sep = '', file = zz)
+            if (any(dat$vTradeFlow[nm,,,,, drop = FALSE] != 0)) { 
+              # Source flow
+              sflow <- apply(dat$vTradeFlow[nm,,,,, drop = FALSE], c(2, 4), sum)
+              sflow <- sflow[apply(sflow != 0, 1, any),, drop = FALSE]
+              png2(paste('trade_src_', trd@name, '.png', sep = ''))
+              layout(matrix(1:2, 1), width = c(.75, .25))
+              par(mar = c(5, 4, 4, 0) + .1)
+              barplot(sflow, col = 1:nrow(sflow), main = '', xlab = '', ylab = '')
+              par(mar = c(5, 0, 4, 0) + .1)
+              plot.new()
+              legend('center', legend = rev(rownames(sflow)), fill = rev(nrow(sflow)), bty = 'n')
+              dev.off2()
+              sflow <- apply(dat$vTradeFlow[nm,,,,, drop = FALSE], c(3, 4), sum)
+              sflow <- sflow[apply(sflow != 0, 1, any),, drop = FALSE]
+              png2(paste('trade_dst_', trd@name, '.png', sep = ''))
+              layout(matrix(1:2, 1), width = c(.75, .25))
+              par(mar = c(5, 4, 4, 0) + .1)
+              barplot(sflow, col = 1:nrow(sflow), main = '', xlab = '', ylab = '')
+              par(mar = c(5, 0, 4, 0) + .1)
+              plot.new()
+              legend('center', legend = rev(rownames(sflow)), fill = rev(nrow(sflow)), bty = 'n')
+              dev.off2()
+              cat('\\begin{figure}[H]\n', sep = '', file = zz)
+              cat('  \\centering\n', sep = '', file = zz)
+              cat('  \\includegraphics[width = 5in]{trade_src_', 
+                  nm, '.png}\n', sep = '', file = zz)
+              cat('  \\caption{Trade by sources region ', gsub('_', '\\\\_', nm), 
+                  ', summary for all slice.}\n', sep = '', file = zz)
+              cat('\\end{figure}\n', sep = '', file = zz)
+              cat('\\begin{figure}[H]\n', sep = '', file = zz)
+              cat('  \\centering\n', sep = '', file = zz)
+              cat('  \\includegraphics[width = 5in]{trade_dst_', 
+                  nm, '.png}\n', sep = '', file = zz)
+              cat('  \\caption{Trade by destination region ', gsub('_', '\\\\_', nm), 
+                  ', summary for all slice.}\n', sep = '', file = zz)
+              cat('\\end{figure}\n', sep = '', file = zz)
+              vv <- as.data.frame.table(apply(dat$vTradeFlow[nm,,,,, drop = FALSE], 2:5, sum))
+              vv <- vv[vv$Freq != 0,, drop = FALSE]
+              colnames(vv)[5] <- 'value'
+              cat_bottomup_data_frame(vv, paste('Trade flow ', gsub('_', '\\\\_', nm), '.', sep = ''), zz)
+          }
+        }
+      }
       cat('\\end{document}\n', sep = '', file = zz)
     }, interrupt = function(x) stop('Was interrupt'), error = function(x) {
       close(zz)

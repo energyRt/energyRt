@@ -148,9 +148,9 @@ sm_compile_model <- function(obj,
     }
     prorgess_bar <- sum(sapply(obj@data, function(x) length(x@data)))
     prorgess_bar_0 <- 0
-    prorgess_bar_dl <- (prorgess_bar + 70 - 1) %/% 70
+    prorgess_bar_dl <- (prorgess_bar + 50 - 1) %/% 50
 
-    cat('Load data ')
+    cat('Generating model input files ')
     prorgess_bar_p <- proc.time()[3]
   # Fill DB main data
     for(i in seq(along = obj@data)) {
