@@ -92,7 +92,6 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'supply',
       rr <- !is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region)
       warning(paste('There are data supply "', sup@name, '" for unused region: "', 
         paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
-      browser()
       slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
     }
     obj@maptable[['mSupSpan']] <- addData(obj@maptable[['mSupSpan']],
@@ -575,7 +574,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     dstart[, 'year'] <- tech@start[fl, 'start']
   }
   if (any(!fl)) {
-    dstart[tech@start[!fl, 'region'], 'year'] <- tech@start[!fl, 'year']
+    dstart[tech@start[!fl, 'region'], 'year'] <- tech@start[!fl, 'start']
   }
   dstart <- dstart[!is.na(dstart$year),, drop = FALSE]
   for(rr in dstart$region) {
