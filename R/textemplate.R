@@ -240,7 +240,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
 #          png2(paste('trade_', trdd@name, '.png', sep = ''))
 #          SP <- plot(obj, type = 'trade', commodity = trdd@commodity, trade = trdd@name, main = '')
 #          dev.off2()
-          cat('\\subsection{', gsub('_', '\\\\_', trdd@name), '}\n\n', '\n', sep = '', file = zz) 
+          cat('\\subsection{', gsub('_', '\\\\_', trdd@name), '}\n\n', '\n', sep = '', file = zz)
           cat_bottomup(trdd, file = zz, includename = FALSE)#, print.all = TRUE)
 #          if (any(SP != 0)) {
 #            cat('\\begin{figure}[H]\n', sep = '', file = zz)

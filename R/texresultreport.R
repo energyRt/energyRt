@@ -689,6 +689,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               cat('\\end{figure}\n', sep = '', file = zz)
               vv <- as.data.frame.table(apply(dat$vTradeFlow[nm,,,,, drop = FALSE], 2:5, sum))
               vv <- vv[vv$Freq != 0,, drop = FALSE]
+              colnames(vv)[1] <- 'source'
+              colnames(vv)[2] <- 'destination'
               colnames(vv)[5] <- 'value'
               cat_bottomup_data_frame(vv, paste('Trade flow ', gsub('_', '\\\\_', nm), '.', sep = ''), zz)
           }
