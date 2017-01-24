@@ -11,18 +11,18 @@ print_bottomup <- function(obj, print.all = FALSE) {
     sl <- getSlots(class(obj))
     if (!print.all) {
       EX <- new(class(obj))                            
-      for(i in names(sl)[sl %in% 'character'])
+      for(i in names(sl)[sl %in% c('character', 'characterOrNULL')])
         if (is.null(slot(EX, i))) slot(EX, i) <- '-'
       RT <- compare(EX, obj, TRUE)
       sl <- sl[RT]
     }
     # Compare
     for(nm in names(sl)[sl %in% c('factor', 'numeric',
-      'logical', 'character')]) {
+      'logical', 'character', 'characterOrNULL')]) {
       if ('.S3Class' != nm) {
         s1 <- slot(obj, nm)
         if (length(s1) == 1) {
-            if (sl[nm] == 'character') {
+            if (sl[nm] %in% c('character', 'characterOrNULL')) {
               cat(nm, ': "', as.character(s1), '"\n', sep = '')
             } else {
               cat(nm, ': ', as.character(s1), '\n', sep = '')
@@ -105,25 +105,25 @@ cat_bottomup <- function(obj, print.all = FALSE, file = '', includename = TRUE) 
     sl <- getSlots(class(obj))
     if (!print.all) {
       EX <- new(class(obj))                            
-      for(i in names(sl)[sl %in% 'character'])
+      for(i in names(sl)[sl %in% c('character', 'characterOrNULL')])
         if (is.null(slot(EX, i))) slot(EX, i) <- '-'
       RT <- compare(EX, obj, TRUE)
       sl <- sl[RT]
     }
     # Compare
     for(nm in names(sl)[sl %in% c('factor', 'numeric',
-      'logical', 'character')]) {
+      'logical', 'character', 'characterOrNULL')]) {
       if ('.S3Class' != nm && (includename || nm != 'name')) {
         s1 <- slot(obj, nm)
         if (length(s1) == 1) {
-            if (sl[nm] %in% c('factor', 'character')) {
+            if (sl[nm] %in% c('factor', 'character', 'characterOrNULL')) {
               cat(nm, ': "', gsub('_', '\\\\_', as.character(s1)), '"\n\n', sep = '', file = zz)
             } else {
               cat(nm, ': ', as.character(s1), '\n\n', sep = '', file = zz)
             }
         } else {
               cat(nm, ': ', sep = '', file = zz)
-            if (sl[nm] %in% c('factor', 'character')) {
+            if (sl[nm] %in% c('factor', 'character', 'characterOrNULL')) {
               cat(paste(gsub('_', '\\\\_', as.character(s1)), collapse = ', '), '\n\n', sep = '', file = zz) 
             } else {
               cat('"', paste(s1, collapse = '", "'), '"\n\n', sep = '', file = zz) 

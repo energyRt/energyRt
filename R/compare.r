@@ -67,7 +67,7 @@ compare <- function(obj1, obj2, just_name = FALSE) {
         if (!all(chk(s1, s2))) {
           FL <- FALSE
           if (just_name) RT[nm] <- TRUE else {
-            if (sl[nm] == 'character') {
+            if (sl[nm] %in% c('character', 'characterOrNULL')) {
               cat('Differences slot "', nm, '": "', as.character(s1), '",\t"', 
                  as.character(s2), '"\n', sep = '')
             } else {
@@ -77,11 +77,14 @@ compare <- function(obj1, obj2, just_name = FALSE) {
           }
         }
       } else {
-        if (length(s1) != length(s2) || !chk(s1, s2))
-        cat('Differences slot "', nm, '":\n', sep = '')
-        if (length(s1) < length(s2)) s1[(length(s1) + 1):length(s2)] <- NA
-        if (length(s2) < length(s1)) s2[(length(s2) + 1):length(s1)] <- NA
-        print(cbind(obj1 = s1, obj2 = s2))
+        if (length(s1) != length(s2) || !chk(s1, s2)) {
+          if (just_name) RT[nm] <- TRUE else {
+            cat('Differences slot "', nm, '":\n', sep = '')
+            if (length(s1) < length(s2)) s1[(length(s1) + 1):length(s2)] <- NA
+            if (length(s2) < length(s1)) s2[(length(s2) + 1):length(s1)] <- NA
+            print(cbind(obj1 = s1, obj2 = s2))
+          }
+        }
       } #stop('Need realise')
     }
     for(nm in names(sl)[sl %in% 'data.frame']) {
