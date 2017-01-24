@@ -230,6 +230,31 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
         }
         FL[cc] <- !fl
       }
+
+      ## Trade
+      if (length(dtt$trade) != 0) {
+        FL <- array(NA, dim = length(dtt$trade), dimnames = list(names(dtt$trade)))
+        cat('\\section{Trade}\n\n', '\n', sep = '', file = zz)
+        for(cc in names(dtt$trade)) {
+          trdd <- dtt$trade[[cc]]
+#          png2(paste('trade_', trdd@name, '.png', sep = ''))
+#          SP <- plot(obj, type = 'trade', commodity = trdd@commodity, trade = trdd@name, main = '')
+#          dev.off2()
+          cat('\\subsection{', gsub('_', '\\\\_', trdd@name), '}\n\n', '\n', sep = '', file = zz) 
+          cat_bottomup(trdd, file = zz, includename = FALSE)#, print.all = TRUE)
+#          if (any(SP != 0)) {
+#            cat('\\begin{figure}[H]\n', sep = '', file = zz)
+#            cat('  \\centering\n', sep = '', file = zz)
+#            cat('  \\includegraphics[width = 5in]{trade_', 
+#                trdd@name, '.png}\n', sep = '', file = zz)
+#            cat('  \\caption{Trade commodity ', gsub('_', '\\\\_', trdd@commodity), 
+#                ', summary for all region and slice.}\n', sep = '', file = zz)
+#            cat('\\end{figure}\n', sep = '', file = zz)
+          #}  else cat('There is not trade commodity.\n\n', '\n', sep = '', file = zz) 
+          cat('\n\n', '\n', sep = '', file = zz) 
+        }
+        FL[cc] <- !fl
+      }
       
       ## Demand
       if (length(dtt$demand) != 0) {
@@ -255,6 +280,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
         }
         FL[cc] <- !fl
       }
+
       ## Technology
       if (length(dtt$technology) != 0) {
         FL <- array(NA, dim = length(dtt$technology), dimnames = list(names(dtt$technology)))
