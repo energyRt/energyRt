@@ -137,13 +137,6 @@ setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #' 
 #' @name newModel
 #' 
-setMethod('newModel', signature(name = 'character'), function(name, ...) {
-    mdl <- universalInit('model', name, exclude = 'repository', ...)
-    if (any(names(list(...))== 'repository'))  {
-      mdl <- add(mdl, list(...)$repository)
-    }
-    mdl
-  })
 
 setGeneric("newRepository", function(name, ...) standardGeneric("newRepository"))
 #' Create new repository object
@@ -154,17 +147,25 @@ setMethod('newRepository', signature(name = 'character'), function(name, ...)
   universalInit('repository', name, ...))
 
 setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
+
+setMethod('newModel', signature(name = 'character'), function(name, ...) {
+    sysInfVec <- c('region', 'year', 'slice')
+    args <- list(...)
+    mdl <- universalInit('model', name, exclude = c(sysInfVec, 'repository'), ...)
+    if (any(names(args) == 'repository'))  {
+      mdl <- add(mdl, args$repository)
+    }
+    sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
+    for(ii in sysInfVec) {
+      slot(mdl@sysInfo, ii) <- args[[ii]]
+    }
+    mdl
+  })
+
 #' Create new model object
 #' 
 #' @name newModel
 #' 
-setMethod('newModel', signature(name = 'character'), function(name, ...) {
-    mdl <- universalInit('model', name, exclude = 'repository', ...)
-    if (any(names(list(...))== 'repository'))  {
-      mdl <- add(mdl, list(...)$repository)
-    }
-    mdl
-  })
 
 setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
 setMethod('newTrade', signature(name = 'character'), function(name, ...) 
