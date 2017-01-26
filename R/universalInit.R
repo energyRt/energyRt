@@ -4,7 +4,7 @@ universalInit <- function(class_name, name, exclude = NULL, ...) {
   slt <- getSlots(class_name)
   arg <- list(...)
   if (!is.null(exclude)) arg <- arg[!(names(arg) %in% exclude)]
-  obj@name <- name
+  if (class_name != 'sysInfo') obj@name <- name
   if (length(arg) != 0) {
     if (any(names(arg) == 'name')) stop('Duplicate parameter name')
     if (is.null(names(arg)) || any(names(arg) == '') ||
@@ -157,9 +157,7 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
       mdl <- add(mdl, args$repository)
     }
     sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
-    for(ii in sysInfVec) {
-      slot(mdl@sysInfo, ii) <- args[[ii]]
-    }
+    mdl@sysInfo <- universalInit('sysInfo', '', exclude = names(args)[!(names(args) %in% sysInfVec)], ...)
     mdl
   })
 
@@ -171,3 +169,5 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
 setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
 setMethod('newTrade', signature(name = 'character'), function(name, ...) 
   universalInit('trade', name, ...))
+  
+  
