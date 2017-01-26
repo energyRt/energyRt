@@ -4,7 +4,7 @@
 add_to_model <- function(obj, ...) {
   if (class(obj) != "model") stop('Wrong argument')
   app <- list(...)
-  if (length(app) == 1) {
+  if (length(app) == 1 && class(app[[1]]) != "list") {
     app <- app[[1]]
     if (class(app) != "repository") {
       reps <- new('repository', name = app@name)
@@ -15,8 +15,16 @@ add_to_model <- function(obj, ...) {
     if (app@name == "" || any(sapply(obj@data, function(z) z@name) == app@name)) stop('Wrong repository name')
     obj@data[[app@name]] <- app
   } else {
-    for(i in seq(along = app)) {
-      obj <- add_to_model(obj, app[[i]])
+    if (sapply(app, class) == 'repository') {
+      for(i in seq(along = app)) {
+        obj <- add(obj, app[[i]])
+      }
+    } else {
+      rr <- new('repository')
+      for(i in seq(along = app)) {
+        rr <- add(rr, app[[i]])
+      }
+      obj <- add(obj, rr)
     }
   }
   obj

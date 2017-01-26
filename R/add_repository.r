@@ -13,6 +13,9 @@ add_to_repository <- function(obj, app, ..., overwrite = FALSE) {
   } else if (class(app) == 'repository') {
     for(i in seq(along = app@data))
       obj <- add(obj, app@data[[i]], overwrite = overwrite)
+  } else if (class(app) == 'list') {
+    for(i in seq(along = app))
+      obj <- add(obj, app[[i]], overwrite = overwrite)
   } else {
     #if (class(add) != tolower(sub('^.', '', class(x)))) stop('Error type to repository')
     if (all(class(app) != c('technology', 'commodity', 'region', 'commodity', 'constrain', 
