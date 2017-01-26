@@ -149,7 +149,8 @@ setMethod('newRepository', signature(name = 'character'), function(name, ...)
 setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 
 setMethod('newModel', signature(name = 'character'), function(name, ...) {
-    sysInfVec <- c('region', 'year', 'slice')
+    sysInfVec <- names(getSlots('sysInfo'))
+    sysInfVec <- sysInfVec[sysInfVec != ".S3Class"]
     args <- list(...)
     mdl <- universalInit('model', name, exclude = c(sysInfVec, 'repository'), ...)
     if (any(names(args) == 'repository'))  {
