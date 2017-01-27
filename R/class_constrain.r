@@ -24,7 +24,7 @@ setClass('constrain',
           name          = "",
           #variable      = "",
           #gamsVariable  = "",
-          eq            = factor('FX', levels = c('>=', '<=', '=')),
+          eq            = factor('==', levels = c('>=', '<=', '==')),
           type          = factor(NA, levels = c('capacity', 
                                                 'newcapacity', 
                                                 'invcost', 
@@ -58,7 +58,7 @@ setClass('constrain',
 #' 
 #' @name newConstrain
 #' 
-newConstrain <- function(name, type, eq = '=', rhs = 0, for.sum = list(), 
+newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
    for.each = list(), default = 0, rule = 'default', comm = NULL,
     cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
   obj <- new('constrain')
