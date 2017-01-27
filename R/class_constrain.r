@@ -4,6 +4,7 @@
 setClass('constrain', 
       representation(
           name          = "character",
+          description   = "character",
           #variable      = "character",
           #gamsVariable  = "character",
           eq            = "factor",
@@ -22,6 +23,7 @@ setClass('constrain',
       ),
       prototype(
           name          = "",
+          description   = "",
           #variable      = "",
           #gamsVariable  = "",
           eq            = factor('==', levels = c('>=', '<=', '==')),
