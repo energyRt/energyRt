@@ -37,7 +37,14 @@ setClass('constrain',
                                                 'sharein',
                                                 'shareout',
                                                 'tax',
-                                                'subsidy'
+                                                'subsidy',
+                                                'growthcap', 
+                                                'growthnewcap', 
+                                                'growthoutput', 
+                                                'growthinput', 
+                                                'growtheac', 
+                                                'growthinvcost', 
+                                                'growthactivity'
                                                 )),
           rhs           = data.frame(),
           for.sum       = list(),
@@ -161,17 +168,38 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       minset$output <- c('comm', 'region', 'year', 'slice')
       minset$sharein <- c('comm', 'region', 'year', 'slice')
       minset$shareout <- c('comm', 'region', 'year', 'slice')
+
+      minset$growthcapacity <- c('region', 'year')
+      minset$growthnewcapacity <- c('region', 'year')
+      minset$growthinvcost <- c('region', 'year')
+      minset$growtheac <- c('region', 'year')
+      minset$growthactivity <- c('region', 'year', 'slice')
+      minset$growthinput <- c('comm', 'region', 'year', 'slice')
+      minset$growthoutput <- c('comm', 'region', 'year', 'slice')
+
       addset <- list()
       addset$input <- c('tech', 'sup', 'res', 'trade', 'row')
       addset$output <- c('tech', 'sup', 'res', 'trade', 'row')
+
+      addset$growthinput <- c('tech', 'sup', 'res', 'trade', 'row')
+      addset$growthoutput <- c('tech', 'sup', 'res', 'trade', 'row')
+
       addset$sharein <- c('tech', 'sup', 'res', 'trade', 'row')
       addset$shareout <- c('tech', 'sup', 'res', 'trade', 'row')
+
       unqset <- list()
       unqset$capacity <- c('tech', 'res')
       unqset$newcapacity <- c('tech', 'res')
       unqset$invcost <- c('tech', 'res')
       unqset$eac <- c('tech', 'res')
       unqset$activity <- c('tech', 'res')
+
+      unqset$growthcapacity <- c('tech', 'res')
+      unqset$growthnewcapacity <- c('tech', 'res')
+      unqset$growthinvcost <- c('tech', 'res')
+      unqset$growtheac <- c('tech', 'res')
+      unqset$growthactivity <- c('tech', 'res')
+
       # Check duplicat set
       if (anyDuplicated(c(names(for.sum), names(for.each)))) {
         stop('There are duplicated set')

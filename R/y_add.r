@@ -237,14 +237,16 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
   } else {
     # Define lhs equation type
     ccc <- c("comm", "region", "year", "slice")
-    if (app@type %in% c('capacity', 'newcapacity', 'invcost', 'eac')) ccc <- c("region", "year")
+    if (app@type %in% c('capacity', 'newcapacity', 'invcost', 'eac',
+      'growthcapacity', 'growthnewcapacity', 'growthinvcost', 'growtheac')) ccc <- c("region", "year")
     # capacity newcapacity activity input output sharein shareout
-    if (app@type %in% c('output', 'shareout')) before <- 'Out' else
-    if (app@type %in% c('input', 'sharein'))   before <- 'Inp' else
-    if (app@type == 'capacity') before <- 'Cap' else
-    if (app@type == 'newcapacity') before <- 'NewCap' else 
-    if (app@type == 'invcost') before <- 'Inv' else
-    if (app@type == 'eac') before <- 'Eac' else stop('Unknown constrain type')
+    if (app@type %in% c('growthoutput', 'output', 'shareout')) before <- 'Out' else
+    if (app@type %in% c('growthinput', 'input', 'sharein'))   before <- 'Inp' else
+    if (app@type %in% c('growthcapacity', 'capacity')) before <- 'Cap' else
+    if (app@type %in% c('growthnewcapacity', 'newcapacity')) before <- 'NewCap' else 
+    if (app@type %in% c('growthinvcost', 'invcost')) before <- 'Inv' else
+    if (app@type %in% c('growthactivity', 'activity')) before <- 'Act' else
+    if (app@type %in% c('growtheac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
     ast <- c(names(app@for.sum), names(app@for.each))[!(c(names(app@for.sum), names(app@for.each)) %in% ccc)] 
     if (length(ast) > 1) stop('Wrong constrain') else
     if (length(ast) == 1) {
@@ -255,14 +257,18 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     if (length(ast) != 0 && nrow(obj@maptable[[ast]]@data) == 0) FL <- FALSE
    if (FL) {
       obj@maptable[['cns']] <- addData(obj@maptable[['cns']], app@name)
-      obj@maptable[[paste('mCns', before, sep = '')]] <- addData(obj@maptable[[paste('mCns', before, sep = '')]], 
+      obj@maptable[[paste('mCns', before, sep = '')]] <- 
+        addData(obj@maptable[[paste('mCns', before, sep = '')]], 
            data.frame(cns = app@name, stringsAsFactors = FALSE))  
-      if (app@type == 'sharein')  obj@maptable[['mCnsRhsTypeShareIn']] <- 
-         addData(obj@maptable[['mCnsRhsTypeShareIn']], data.frame(cns = app@name, stringsAsFactors = FALSE)) else
+      if (app@type == 'sharein')  
+        obj@maptable[['mCnsRhsTypeShareIn']] <- 
+           addData(obj@maptable[['mCnsRhsTypeShareIn']], 
+             data.frame(cns = app@name, stringsAsFactors = FALSE)) else
       if (app@type == 'shareout')  obj@maptable[['mCnsRhsTypeShareOut']] <- 
-        addData(obj@maptable[['mCnsRhsTypeShareOut']], data.frame(cns = app@name, stringsAsFactors = FALSE)) else 
-      obj@maptable[['mCnsRhsTypeConst']] <- addData(obj@maptable[['mCnsRhsTypeConst']], 
-          data.frame(cns = app@name, stringsAsFactors = FALSE))
+        addData(obj@maptable[['mCnsRhsTypeShareOut']], 
+          data.frame(cns = app@name, stringsAsFactors = FALSE)) else 
+              obj@maptable[['mCnsRhsTypeConst']] <- addData(obj@maptable[['mCnsRhsTypeConst']], 
+                  data.frame(cns = app@name, stringsAsFactors = FALSE))
       for(cc in c(ccc, ast[length(ast) == 1])) {
         if (length(ast) == 1 && cc == ast) {
           if (cc %in% names(app@for.sum)) {
@@ -291,14 +297,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
       }
       # Choose technology output
       if (any(ast == 'tech')) {
-        if (app@type %in% c('output', 'shareout')) {
+        if (app@type %in% c('growthoutput', 'output', 'shareout')) {
           if (app@cout) obj@maptable[['mCnsTechCOut']] <- addData(obj@maptable[['mCnsTechCOut']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
           if (app@aout) obj@maptable[['mCnsTechAOut']] <- addData(obj@maptable[['mCnsTechAOut']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
           if (app@emis) obj@maptable[['mCnsTechEmis']] <- addData(obj@maptable[['mCnsTechEmis']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
-        } else if (app@type %in% c('input', 'sharein')) {
+        } else if (app@type %in% c('growthinput', 'input', 'sharein')) {
           if (app@cinp) obj@maptable[['mCnsTechCInp']] <- addData(obj@maptable[['mCnsTechCInp']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
           if (app@ainp) obj@maptable[['mCnsTechAInp']] <- addData(obj@maptable[['mCnsTechAInp']], 

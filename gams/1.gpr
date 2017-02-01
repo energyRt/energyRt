@@ -58,8 +58,7 @@
 
 [OPENWINDOW_1]
 FILE0=C:\111\GitHub\energyRt\gams\model.gms
-FILE1=C:\111\GitHub\energyRt\gams\model.lst
-FILE2=C:\111\GitHub\energyRt\gams\model.lst
+FILE1=C:\111\GitHub\energyRt\gams\model.gms
 MAXIM=0
 TOP=0
 LEFT=0
