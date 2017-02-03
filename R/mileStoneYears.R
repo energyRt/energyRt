@@ -39,3 +39,12 @@ setMileStoneYears <- function(obj, start, ...) {
   } else stop('setMileStoneYears: undefined class')
 }
 
+setMethod('getMileStone', signature(obj = 'scenario'), function(obj) {
+    getMileStone(obj@model)
+})
+setMethod('getMileStone', signature(obj = 'model'), function(obj) {
+    getMileStone(obj@sysInfo)
+})
+setMethod('getMileStone', signature(obj = 'sysInfo'), function(obj) {
+    obj@milestone
+})
