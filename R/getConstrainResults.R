@@ -5,8 +5,6 @@ getConstrainResults <- function(scenario, constrain) {
       rst[[i]] <- getConstrainResults(scenario, i)[[1]]
       rst
   } else {
- scenario<<-scenario 
- constrain<<-constrain
     prec <- scenario@precompiled@maptable
     tcns <- getObjects(scenario, 'constrain', name = constrain, regex = FALSE)[[1]]
     dtt <- scenario@result@data
@@ -26,6 +24,15 @@ getConstrainResults <- function(scenario, constrain) {
     for(st in c(ad_smpl, std_smp)) {
       gg <- getDataMapTable(prec[[paste('mCns', fcase(st), sep = '')]])
       cns.set[[st]] <- gg[gg$cns == constrain, st]
+    }
+    mlst <- getMileStone(scenario)
+    if (any(names(cns.set) == 'year')) {
+      GROWTH_CNS <- any(grep('growth', as.character(tcns@type)))
+      mm <- cns.set$year[cns.set$year %in% mlst$mid]
+      if (GROWTH_CNS && mm[length(mm)] != mlst[nrow(mlst), 'mid']) {
+          mm <- c(mm, mlst[seq(length.out = nrow(mlst))[mm[length(mm)] == mlst$mid] + 1, 'mid'])
+      }
+      cns.set$year <- mm
     }
     # Variable
     if (tcns@type %in% c('growthoutput', 'output', 'shareout')) before <- 'Out' else
@@ -74,6 +81,32 @@ getConstrainResults <- function(scenario, constrain) {
         v1 <- v1[v1 %in% v2]
         gg <- gg[sort(v1, index.return = TRUE)$ix, ncol(gg), drop = FALSE]
         rhs <- rhs * gg
+      } else if (GROWTH_CNS) {
+        rhs <- getDataMapTable(prec[[paste('pRhs', fcase(ad_smpl)[length(ad_smpl) != 0 && 
+          any(ad_smpl == names(tcns@for.each))], paste(toupper(substr(vary.set, 1, 1)), 
+            collapse = ''), sep = '')]])
+        rhs <- rhs[rhs$cns == constrain, -1, drop = FALSE]
+        rhs[, 'mid'] <- NA
+        mlst2 <- mlst[mlst$mid %in% mm,, drop = FALSE]
+        for(i in seq(length.out = nrow(mlst2) - 1)) {
+          rhs[mlst2$mid[i] <= rhs$year & rhs$year < mlst2$mid[i + 1], 'mid'] <- mlst2$mid[i]
+        }
+        if (max(mlst$mid) == max(mlst2$mid)) {
+          rhs[mlst2$mid[nrow(mlst2)] <= rhs$year, 'mid'] <- mlst2$mid[nrow(mlst2)]
+        } else {
+          hh <- mlst[seq(length.out = nrow(mlst))[mlst$mid == max(mlst2$mid)] + 1, 'mid']
+          rhs[mlst2$mid[nrow(mlst2)] <= rhs$year & rhs$year < hh, 'mid'] <- mlst2$mid[nrow(mlst2)]
+        }
+        rhs$year <- rhs$mid
+        rhs <- rhs[, -ncol(rhs), drop = FALSE]
+        rhs <- aggregate(rhs$Freq, by = rhs[, -ncol(rhs), drop = FALSE], FUN = "prod")
+        colnames(rhs)[ncol(rhs)] <- 'Freq'
+        v1 <- apply(rhs[, -ncol(rhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
+        v2 <- apply(tbl, 1, function(x) paste(x, collapse = '#'))
+        tbl <- tbl[sort(v2, index.return = TRUE)$ix,, drop = FALSE]
+        rhs <- rhs[v1 %in% v2,, drop = FALSE]
+        v1 <- v1[v1 %in% v2]
+        rhs <- rhs[sort(v1, index.return = TRUE)$ix, 'Freq', drop = FALSE]
       }
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
@@ -85,8 +118,18 @@ getConstrainResults <- function(scenario, constrain) {
       lhs <- lhs[sort(v1, index.return = TRUE)$ix, 'Freq', drop = FALSE]
       tbl[, 'lhs'] <- lhs
       tbl[, 'rhs'] <- rhs
-      tbl[, 'is.active'] <- NA
-      tbl[, 'is.active'] <- c(lhs == rhs)
+      if (GROWTH_CNS) {
+        if (nrow(tbl) <= 1) tbl <- tbl[0,, drop = FALSE] else {
+          tbl[-nrow(tbl), 'lhs'] <- ((tbl[-1, 'lhs'] / tbl[-nrow(tbl), 'lhs']) #^ 
+            # (1 / (tbl[-1, 'year'] - tbl[-nrow(tbl), 'year']))
+             )
+          tbl <- tbl[-nrow(tbl),, drop = FALSE]
+        }
+      } 
+      if (nrow(tbl) > 0) {
+        tbl[, 'is.active'] <- NA
+        tbl[, 'is.active'] <- c(tbl$lhs == tbl$rhs)
+      }
       rownames(tbl) <- NULL
       ll <- list(tbl)
       names(ll) <- constrain
