@@ -5,6 +5,8 @@ getConstrainResults <- function(scenario, constrain) {
       rst[[i]] <- getConstrainResults(scenario, i)[[1]]
       rst
   } else {
+ scenario<<-scenario 
+ constrain<<-constrain
     prec <- scenario@precompiled@maptable
     tcns <- getObjects(scenario, 'constrain', name = constrain, regex = FALSE)[[1]]
     dtt <- scenario@result@data
@@ -26,12 +28,13 @@ getConstrainResults <- function(scenario, constrain) {
       cns.set[[st]] <- gg[gg$cns == constrain, st]
     }
     # Variable
-    if (tcns@type %in% c('output', 'shareout')) before <- 'Out' else
-    if (tcns@type %in% c('input', 'sharein'))   before <- 'Inp' else
-    if (tcns@type == 'capacity') before <- 'Cap' else
-    if (tcns@type == 'newcapacity') before <- 'NewCap' else
-    if (tcns@type == 'invcost') before <- 'Inv' else
-    if (tcns@type == 'eac') before <- 'Eac' else stop('Unknown constrain type')
+    if (tcns@type %in% c('growthoutput', 'output', 'shareout')) before <- 'Out' else
+    if (tcns@type %in% c('growthinput', 'input', 'sharein'))   before <- 'Inp' else
+    if (tcns@type %in% c('growthcapacity', 'capacity')) before <- 'Cap' else
+    if (tcns@type %in% c('growthnewcapacity', 'newcapacity')) before <- 'NewCap' else
+    if (tcns@type %in% c('growthinvcost', 'invcost')) before <- 'Inv' else
+    if (tcns@type %in% c('growthactivity', 'activity')) before <- 'Inv' else
+    if (tcns@type %in% c('growtheac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
     vrb <- paste('v', fcase(ad_smpl), before, sep = '')
     if (length(ad_smpl) == 0) vrb <- paste(vrb, 'Tot', sep = '')
     if (length(vary.set) == 0) {

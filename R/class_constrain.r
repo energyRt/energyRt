@@ -38,7 +38,7 @@ setClass('constrain',
                                                 'shareout',
                                                 'tax',
                                                 'subsidy',
-                                                'growthcap', 
+                                                'growthcap',  # >= meen minimum growth temp
                                                 'growthnewcap', 
                                                 'growthoutput', 
                                                 'growthinput', 
@@ -207,7 +207,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       # Check odd set
       if (any(!(c(names(for.sum), names(for.each)) %in% 
         c(minset[[as.character(type)]], addset[[as.character(type)]], 
-             unqset[[as.character(type)]])))) {
+             unqset[[as.character(type)]])))) {  
         stop('There are odd set')
       }
       # Check minimum set

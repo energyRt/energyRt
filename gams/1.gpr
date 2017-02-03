@@ -59,7 +59,7 @@
 [OPENWINDOW_1]
 FILE0=C:\111\GitHub\energyRt\gams\model.gms
 FILE1=C:\111\GitHub\energyRt\gams\model.gms
-MAXIM=0
+MAXIM=1
 TOP=0
 LEFT=0
 HEIGHT=947

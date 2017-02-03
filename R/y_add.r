@@ -266,7 +266,11 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
              data.frame(cns = app@name, stringsAsFactors = FALSE)) else
       if (app@type == 'shareout')  obj@maptable[['mCnsRhsTypeShareOut']] <- 
         addData(obj@maptable[['mCnsRhsTypeShareOut']], 
-          data.frame(cns = app@name, stringsAsFactors = FALSE)) else 
+          data.frame(cns = app@name, stringsAsFactors = FALSE)) 
+      if (any(grep('growth', as.character(app@type))))  
+        obj@maptable[['mCnsRhsTypeGrowth']] <- 
+           addData(obj@maptable[['mCnsRhsTypeGrowth']], 
+             data.frame(cns = app@name, stringsAsFactors = FALSE)) else
               obj@maptable[['mCnsRhsTypeConst']] <- addData(obj@maptable[['mCnsRhsTypeConst']], 
                   data.frame(cns = app@name, stringsAsFactors = FALSE))
       for(cc in c(ccc, ast[length(ast) == 1])) {
@@ -676,6 +680,9 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'sysInfo',
     data.frame(year = app@milestone$mid, yearp = app@milestone$end))
   obj@maptable[['mMilestoneLast']] <- addData(obj@maptable[['mMilestoneLast']], 
     data.frame(year = max(app@milestone$mid)))
+
+  obj@maptable[['mMilestoneNext']] <- addData(obj@maptable[['mMilestoneNext']], 
+    data.frame(year = app@milestone$mid[-nrow(app@milestone)], yearp = app@milestone$mid[-1])) 
   obj
 })
 

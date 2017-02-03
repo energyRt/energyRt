@@ -282,7 +282,7 @@ setMethod("initialize", "CodeProduce",
       "mCnsLe", "mCnsGe", "mCnsRhsTypeShareIn", "mCnsRhsTypeShareOut", "mCnsRhsTypeConst", "mCnsInpTech", 
       "mCnsOutTech", "mCnsCapTech", "mCnsNewCapTech", "mCnsOutSup", "mCnsInp", "mCnsOut", "mCnsInvTech",
       "mCnsEacTech", "mCnsTechCInp", "mCnsTechCOut", "mCnsTechAInp", "mCnsTechAOut", "mCnsTechEmis",
-      "mCnsActTech"))
+      "mCnsActTech", "mCnsRhsTypeGrowth"))
         .Object@maptable[[i]] <- MapTable(i, 'cns', 'map')    
     for(i in c('tech', 'sup', 'comm', 'region', 'year', 'slice')) {
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')
@@ -343,6 +343,7 @@ setMethod("initialize", "CodeProduce",
   .Object@maptable[['mMilestoneLast']] <- MapTable('mMilestoneLast', 'year', 'map', default = 1) 
   .Object@maptable[['mStartMilestone']] <- MapTable('mStartMilestone', c('year', 'yearp'), 'map', default = 1) 
   .Object@maptable[['mEndMilestone']] <- MapTable('mEndMilestone', c('year', 'yearp'), 'map', default = 1) 
+  .Object@maptable[['mMilestoneNext']] <- MapTable('mMilestoneNext', c('year', 'yearp'), 'map', default = 1) 
 
   ## Fix to previous value 
    .Object <- constrCodeProduce(.Object)  
