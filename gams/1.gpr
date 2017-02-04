@@ -37,15 +37,15 @@
 [RP:FOR_OUT]
 1=
 
-[RP:MODEL_2]
-1=
-
 [RP:GLB1_SC]
 1=
 
 [RP:MODEL]
 1=
 2=eqTechShareOutUp
+
+[RP:MODEL_2]
+1=
 
 [MRUFILES]
 1=C:\111\Dropbox\package\BottomUp\gams\for_out.gms
@@ -59,7 +59,7 @@
 [OPENWINDOW_1]
 FILE0=C:\111\GitHub\energyRt\gams\model.gms
 FILE1=C:\111\Github\energyRt\gams\model_2.gms
-FILE2=C:\111\Github\energyRt\gams\model_2.gms
+FILE2=C:\111\GitHub\energyRt\gams\model.gms
 MAXIM=1
 TOP=0
 LEFT=0

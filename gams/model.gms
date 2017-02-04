@@ -1718,50 +1718,74 @@ eqCnsLETechCap(cns)
 eqCnsGETechCap(cns)
 eqCnsETechCap(cns)
 eqCnsLETechCapY(cns, year)
+eqCnsLETechCapYGrowth(cns, year, yearp)
 eqCnsGETechCapY(cns, year)
+eqCnsGETechCapYGrowth(cns, year, yearp)
 eqCnsETechCapY(cns, year)
+eqCnsETechCapYGrowth(cns, year, yearp)
 eqCnsLETechCapR(cns, region)
 eqCnsGETechCapR(cns, region)
 eqCnsETechCapR(cns, region)
 eqCnsLETechCapRY(cns, region, year)
+eqCnsLETechCapRYGrowth(cns, region, year, yearp)
 eqCnsGETechCapRY(cns, region, year)
+eqCnsGETechCapRYGrowth(cns, region, year, yearp)
 eqCnsETechCapRY(cns, region, year)
+eqCnsETechCapRYGrowth(cns, region, year, yearp)
 eqCnsLETechNewCap(cns)
 eqCnsGETechNewCap(cns)
 eqCnsETechNewCap(cns)
 eqCnsLETechNewCapY(cns, year)
+eqCnsLETechNewCapYGrowth(cns, year, yearp)
 eqCnsGETechNewCapY(cns, year)
+eqCnsGETechNewCapYGrowth(cns, year, yearp)
 eqCnsETechNewCapY(cns, year)
+eqCnsETechNewCapYGrowth(cns, year, yearp)
 eqCnsLETechNewCapR(cns, region)
 eqCnsGETechNewCapR(cns, region)
 eqCnsETechNewCapR(cns, region)
 eqCnsLETechNewCapRY(cns, region, year)
+eqCnsLETechNewCapRYGrowth(cns, region, year, yearp)
 eqCnsGETechNewCapRY(cns, region, year)
+eqCnsGETechNewCapRYGrowth(cns, region, year, yearp)
 eqCnsETechNewCapRY(cns, region, year)
+eqCnsETechNewCapRYGrowth(cns, region, year, yearp)
 eqCnsLETechInv(cns)
 eqCnsGETechInv(cns)
 eqCnsETechInv(cns)
 eqCnsLETechInvY(cns, year)
+eqCnsLETechInvYGrowth(cns, year, yearp)
 eqCnsGETechInvY(cns, year)
+eqCnsGETechInvYGrowth(cns, year, yearp)
 eqCnsETechInvY(cns, year)
+eqCnsETechInvYGrowth(cns, year, yearp)
 eqCnsLETechInvR(cns, region)
 eqCnsGETechInvR(cns, region)
 eqCnsETechInvR(cns, region)
 eqCnsLETechInvRY(cns, region, year)
+eqCnsLETechInvRYGrowth(cns, region, year, yearp)
 eqCnsGETechInvRY(cns, region, year)
+eqCnsGETechInvRYGrowth(cns, region, year, yearp)
 eqCnsETechInvRY(cns, region, year)
+eqCnsETechInvRYGrowth(cns, region, year, yearp)
 eqCnsLETechEac(cns)
 eqCnsGETechEac(cns)
 eqCnsETechEac(cns)
 eqCnsLETechEacY(cns, year)
+eqCnsLETechEacYGrowth(cns, year, yearp)
 eqCnsGETechEacY(cns, year)
+eqCnsGETechEacYGrowth(cns, year, yearp)
 eqCnsETechEacY(cns, year)
+eqCnsETechEacYGrowth(cns, year, yearp)
 eqCnsLETechEacR(cns, region)
 eqCnsGETechEacR(cns, region)
 eqCnsETechEacR(cns, region)
 eqCnsLETechEacRY(cns, region, year)
+eqCnsLETechEacRYGrowth(cns, region, year, yearp)
 eqCnsGETechEacRY(cns, region, year)
+eqCnsGETechEacRYGrowth(cns, region, year, yearp)
 eqCnsETechEacRY(cns, region, year)
+eqCnsETechEacRYGrowth(cns, region, year, yearp)
 eqCnsLETechAct(cns)
 eqCnsGETechAct(cns)
 eqCnsETechAct(cns)
@@ -1769,11 +1793,17 @@ eqCnsLETechActS(cns, slice)
 eqCnsGETechActS(cns, slice)
 eqCnsETechActS(cns, slice)
 eqCnsLETechActY(cns, year)
+eqCnsLETechActYGrowth(cns, year, yearp)
 eqCnsGETechActY(cns, year)
+eqCnsGETechActYGrowth(cns, year, yearp)
 eqCnsETechActY(cns, year)
+eqCnsETechActYGrowth(cns, year, yearp)
 eqCnsLETechActYS(cns, year, slice)
+eqCnsLETechActYSGrowth(cns, year, slice, yearp)
 eqCnsGETechActYS(cns, year, slice)
+eqCnsGETechActYSGrowth(cns, year, slice, yearp)
 eqCnsETechActYS(cns, year, slice)
+eqCnsETechActYSGrowth(cns, year, slice, yearp)
 eqCnsLETechActR(cns, region)
 eqCnsGETechActR(cns, region)
 eqCnsETechActR(cns, region)
@@ -1781,11 +1811,17 @@ eqCnsLETechActRS(cns, region, slice)
 eqCnsGETechActRS(cns, region, slice)
 eqCnsETechActRS(cns, region, slice)
 eqCnsLETechActRY(cns, region, year)
+eqCnsLETechActRYGrowth(cns, region, year, yearp)
 eqCnsGETechActRY(cns, region, year)
+eqCnsGETechActRYGrowth(cns, region, year, yearp)
 eqCnsETechActRY(cns, region, year)
+eqCnsETechActRYGrowth(cns, region, year, yearp)
 eqCnsLETechActRYS(cns, region, year, slice)
+eqCnsLETechActRYSGrowth(cns, region, year, slice, yearp)
 eqCnsGETechActRYS(cns, region, year, slice)
+eqCnsGETechActRYSGrowth(cns, region, year, slice, yearp)
 eqCnsETechActRYS(cns, region, year, slice)
+eqCnsETechActRYSGrowth(cns, region, year, slice, yearp)
 eqCnsLETechInpLShareIn(cns, tech)
 eqCnsLETechInpLShareOut(cns, tech)
 eqCnsLETechInpL(cns, tech)
@@ -2126,50 +2162,74 @@ eqCnsLETechCapL(cns, tech)
 eqCnsGETechCapL(cns, tech)
 eqCnsETechCapL(cns, tech)
 eqCnsLETechCapLY(cns, tech, year)
+eqCnsLETechCapLYGrowth(cns, tech, year, yearp)
 eqCnsGETechCapLY(cns, tech, year)
+eqCnsGETechCapLYGrowth(cns, tech, year, yearp)
 eqCnsETechCapLY(cns, tech, year)
+eqCnsETechCapLYGrowth(cns, tech, year, yearp)
 eqCnsLETechCapLR(cns, tech, region)
 eqCnsGETechCapLR(cns, tech, region)
 eqCnsETechCapLR(cns, tech, region)
 eqCnsLETechCapLRY(cns, tech, region, year)
+eqCnsLETechCapLRYGrowth(cns, tech, region, year, yearp)
 eqCnsGETechCapLRY(cns, tech, region, year)
+eqCnsGETechCapLRYGrowth(cns, tech, region, year, yearp)
 eqCnsETechCapLRY(cns, tech, region, year)
+eqCnsETechCapLRYGrowth(cns, tech, region, year, yearp)
 eqCnsLETechNewCapL(cns, tech)
 eqCnsGETechNewCapL(cns, tech)
 eqCnsETechNewCapL(cns, tech)
 eqCnsLETechNewCapLY(cns, tech, year)
+eqCnsLETechNewCapLYGrowth(cns, tech, year, yearp)
 eqCnsGETechNewCapLY(cns, tech, year)
+eqCnsGETechNewCapLYGrowth(cns, tech, year, yearp)
 eqCnsETechNewCapLY(cns, tech, year)
+eqCnsETechNewCapLYGrowth(cns, tech, year, yearp)
 eqCnsLETechNewCapLR(cns, tech, region)
 eqCnsGETechNewCapLR(cns, tech, region)
 eqCnsETechNewCapLR(cns, tech, region)
 eqCnsLETechNewCapLRY(cns, tech, region, year)
+eqCnsLETechNewCapLRYGrowth(cns, tech, region, year, yearp)
 eqCnsGETechNewCapLRY(cns, tech, region, year)
+eqCnsGETechNewCapLRYGrowth(cns, tech, region, year, yearp)
 eqCnsETechNewCapLRY(cns, tech, region, year)
+eqCnsETechNewCapLRYGrowth(cns, tech, region, year, yearp)
 eqCnsLETechInvL(cns, tech)
 eqCnsGETechInvL(cns, tech)
 eqCnsETechInvL(cns, tech)
 eqCnsLETechInvLY(cns, tech, year)
+eqCnsLETechInvLYGrowth(cns, tech, year, yearp)
 eqCnsGETechInvLY(cns, tech, year)
+eqCnsGETechInvLYGrowth(cns, tech, year, yearp)
 eqCnsETechInvLY(cns, tech, year)
+eqCnsETechInvLYGrowth(cns, tech, year, yearp)
 eqCnsLETechInvLR(cns, tech, region)
 eqCnsGETechInvLR(cns, tech, region)
 eqCnsETechInvLR(cns, tech, region)
 eqCnsLETechInvLRY(cns, tech, region, year)
+eqCnsLETechInvLRYGrowth(cns, tech, region, year, yearp)
 eqCnsGETechInvLRY(cns, tech, region, year)
+eqCnsGETechInvLRYGrowth(cns, tech, region, year, yearp)
 eqCnsETechInvLRY(cns, tech, region, year)
+eqCnsETechInvLRYGrowth(cns, tech, region, year, yearp)
 eqCnsLETechEacL(cns, tech)
 eqCnsGETechEacL(cns, tech)
 eqCnsETechEacL(cns, tech)
 eqCnsLETechEacLY(cns, tech, year)
+eqCnsLETechEacLYGrowth(cns, tech, year, yearp)
 eqCnsGETechEacLY(cns, tech, year)
+eqCnsGETechEacLYGrowth(cns, tech, year, yearp)
 eqCnsETechEacLY(cns, tech, year)
+eqCnsETechEacLYGrowth(cns, tech, year, yearp)
 eqCnsLETechEacLR(cns, tech, region)
 eqCnsGETechEacLR(cns, tech, region)
 eqCnsETechEacLR(cns, tech, region)
 eqCnsLETechEacLRY(cns, tech, region, year)
+eqCnsLETechEacLRYGrowth(cns, tech, region, year, yearp)
 eqCnsGETechEacLRY(cns, tech, region, year)
+eqCnsGETechEacLRYGrowth(cns, tech, region, year, yearp)
 eqCnsETechEacLRY(cns, tech, region, year)
+eqCnsETechEacLRYGrowth(cns, tech, region, year, yearp)
 eqCnsLETechActL(cns, tech)
 eqCnsGETechActL(cns, tech)
 eqCnsETechActL(cns, tech)
@@ -2177,11 +2237,17 @@ eqCnsLETechActLS(cns, tech, slice)
 eqCnsGETechActLS(cns, tech, slice)
 eqCnsETechActLS(cns, tech, slice)
 eqCnsLETechActLY(cns, tech, year)
+eqCnsLETechActLYGrowth(cns, tech, year, yearp)
 eqCnsGETechActLY(cns, tech, year)
+eqCnsGETechActLYGrowth(cns, tech, year, yearp)
 eqCnsETechActLY(cns, tech, year)
+eqCnsETechActLYGrowth(cns, tech, year, yearp)
 eqCnsLETechActLYS(cns, tech, year, slice)
+eqCnsLETechActLYSGrowth(cns, tech, year, slice, yearp)
 eqCnsGETechActLYS(cns, tech, year, slice)
+eqCnsGETechActLYSGrowth(cns, tech, year, slice, yearp)
 eqCnsETechActLYS(cns, tech, year, slice)
+eqCnsETechActLYSGrowth(cns, tech, year, slice, yearp)
 eqCnsLETechActLR(cns, tech, region)
 eqCnsGETechActLR(cns, tech, region)
 eqCnsETechActLR(cns, tech, region)
@@ -2189,11 +2255,17 @@ eqCnsLETechActLRS(cns, tech, region, slice)
 eqCnsGETechActLRS(cns, tech, region, slice)
 eqCnsETechActLRS(cns, tech, region, slice)
 eqCnsLETechActLRY(cns, tech, region, year)
+eqCnsLETechActLRYGrowth(cns, tech, region, year, yearp)
 eqCnsGETechActLRY(cns, tech, region, year)
+eqCnsGETechActLRYGrowth(cns, tech, region, year, yearp)
 eqCnsETechActLRY(cns, tech, region, year)
+eqCnsETechActLRYGrowth(cns, tech, region, year, yearp)
 eqCnsLETechActLRYS(cns, tech, region, year, slice)
+eqCnsLETechActLRYSGrowth(cns, tech, region, year, slice, yearp)
 eqCnsGETechActLRYS(cns, tech, region, year, slice)
+eqCnsGETechActLRYSGrowth(cns, tech, region, year, slice, yearp)
 eqCnsETechActLRYS(cns, tech, region, year, slice)
+eqCnsETechActLRYSGrowth(cns, tech, region, year, slice, yearp)
 eqCnsLESupOutShareIn(cns)
 eqCnsLESupOutShareOut(cns)
 eqCnsLESupOut(cns)
@@ -2537,11 +2609,17 @@ eqCnsLETotInpS(cns, slice)
 eqCnsGETotInpS(cns, slice)
 eqCnsETotInpS(cns, slice)
 eqCnsLETotInpY(cns, year)
+eqCnsLETotInpYGrowth(cns, year, yearp)
 eqCnsGETotInpY(cns, year)
+eqCnsGETotInpYGrowth(cns, year, yearp)
 eqCnsETotInpY(cns, year)
+eqCnsETotInpYGrowth(cns, year, yearp)
 eqCnsLETotInpYS(cns, year, slice)
+eqCnsLETotInpYSGrowth(cns, year, slice, yearp)
 eqCnsGETotInpYS(cns, year, slice)
+eqCnsGETotInpYSGrowth(cns, year, slice, yearp)
 eqCnsETotInpYS(cns, year, slice)
+eqCnsETotInpYSGrowth(cns, year, slice, yearp)
 eqCnsLETotInpR(cns, region)
 eqCnsGETotInpR(cns, region)
 eqCnsETotInpR(cns, region)
@@ -2549,11 +2627,17 @@ eqCnsLETotInpRS(cns, region, slice)
 eqCnsGETotInpRS(cns, region, slice)
 eqCnsETotInpRS(cns, region, slice)
 eqCnsLETotInpRY(cns, region, year)
+eqCnsLETotInpRYGrowth(cns, region, year, yearp)
 eqCnsGETotInpRY(cns, region, year)
+eqCnsGETotInpRYGrowth(cns, region, year, yearp)
 eqCnsETotInpRY(cns, region, year)
+eqCnsETotInpRYGrowth(cns, region, year, yearp)
 eqCnsLETotInpRYS(cns, region, year, slice)
+eqCnsLETotInpRYSGrowth(cns, region, year, slice, yearp)
 eqCnsGETotInpRYS(cns, region, year, slice)
+eqCnsGETotInpRYSGrowth(cns, region, year, slice, yearp)
 eqCnsETotInpRYS(cns, region, year, slice)
+eqCnsETotInpRYSGrowth(cns, region, year, slice, yearp)
 eqCnsLETotInpC(cns, comm)
 eqCnsGETotInpC(cns, comm)
 eqCnsETotInpC(cns, comm)
@@ -2561,11 +2645,17 @@ eqCnsLETotInpCS(cns, comm, slice)
 eqCnsGETotInpCS(cns, comm, slice)
 eqCnsETotInpCS(cns, comm, slice)
 eqCnsLETotInpCY(cns, comm, year)
+eqCnsLETotInpCYGrowth(cns, comm, year, yearp)
 eqCnsGETotInpCY(cns, comm, year)
+eqCnsGETotInpCYGrowth(cns, comm, year, yearp)
 eqCnsETotInpCY(cns, comm, year)
+eqCnsETotInpCYGrowth(cns, comm, year, yearp)
 eqCnsLETotInpCYS(cns, comm, year, slice)
+eqCnsLETotInpCYSGrowth(cns, comm, year, slice, yearp)
 eqCnsGETotInpCYS(cns, comm, year, slice)
+eqCnsGETotInpCYSGrowth(cns, comm, year, slice, yearp)
 eqCnsETotInpCYS(cns, comm, year, slice)
+eqCnsETotInpCYSGrowth(cns, comm, year, slice, yearp)
 eqCnsLETotInpCR(cns, comm, region)
 eqCnsGETotInpCR(cns, comm, region)
 eqCnsETotInpCR(cns, comm, region)
@@ -2573,11 +2663,17 @@ eqCnsLETotInpCRS(cns, comm, region, slice)
 eqCnsGETotInpCRS(cns, comm, region, slice)
 eqCnsETotInpCRS(cns, comm, region, slice)
 eqCnsLETotInpCRY(cns, comm, region, year)
+eqCnsLETotInpCRYGrowth(cns, comm, region, year, yearp)
 eqCnsGETotInpCRY(cns, comm, region, year)
+eqCnsGETotInpCRYGrowth(cns, comm, region, year, yearp)
 eqCnsETotInpCRY(cns, comm, region, year)
+eqCnsETotInpCRYGrowth(cns, comm, region, year, yearp)
 eqCnsLETotInpCRYS(cns, comm, region, year, slice)
+eqCnsLETotInpCRYSGrowth(cns, comm, region, year, slice, yearp)
 eqCnsGETotInpCRYS(cns, comm, region, year, slice)
+eqCnsGETotInpCRYSGrowth(cns, comm, region, year, slice, yearp)
 eqCnsETotInpCRYS(cns, comm, region, year, slice)
+eqCnsETotInpCRYSGrowth(cns, comm, region, year, slice, yearp)
 eqCnsLETotOut(cns)
 eqCnsGETotOut(cns)
 eqCnsETotOut(cns)
@@ -2585,11 +2681,17 @@ eqCnsLETotOutS(cns, slice)
 eqCnsGETotOutS(cns, slice)
 eqCnsETotOutS(cns, slice)
 eqCnsLETotOutY(cns, year)
+eqCnsLETotOutYGrowth(cns, year, yearp)
 eqCnsGETotOutY(cns, year)
+eqCnsGETotOutYGrowth(cns, year, yearp)
 eqCnsETotOutY(cns, year)
+eqCnsETotOutYGrowth(cns, year, yearp)
 eqCnsLETotOutYS(cns, year, slice)
+eqCnsLETotOutYSGrowth(cns, year, slice, yearp)
 eqCnsGETotOutYS(cns, year, slice)
+eqCnsGETotOutYSGrowth(cns, year, slice, yearp)
 eqCnsETotOutYS(cns, year, slice)
+eqCnsETotOutYSGrowth(cns, year, slice, yearp)
 eqCnsLETotOutR(cns, region)
 eqCnsGETotOutR(cns, region)
 eqCnsETotOutR(cns, region)
@@ -2597,11 +2699,17 @@ eqCnsLETotOutRS(cns, region, slice)
 eqCnsGETotOutRS(cns, region, slice)
 eqCnsETotOutRS(cns, region, slice)
 eqCnsLETotOutRY(cns, region, year)
+eqCnsLETotOutRYGrowth(cns, region, year, yearp)
 eqCnsGETotOutRY(cns, region, year)
+eqCnsGETotOutRYGrowth(cns, region, year, yearp)
 eqCnsETotOutRY(cns, region, year)
+eqCnsETotOutRYGrowth(cns, region, year, yearp)
 eqCnsLETotOutRYS(cns, region, year, slice)
+eqCnsLETotOutRYSGrowth(cns, region, year, slice, yearp)
 eqCnsGETotOutRYS(cns, region, year, slice)
+eqCnsGETotOutRYSGrowth(cns, region, year, slice, yearp)
 eqCnsETotOutRYS(cns, region, year, slice)
+eqCnsETotOutRYSGrowth(cns, region, year, slice, yearp)
 eqCnsLETotOutC(cns, comm)
 eqCnsGETotOutC(cns, comm)
 eqCnsETotOutC(cns, comm)
@@ -2609,11 +2717,17 @@ eqCnsLETotOutCS(cns, comm, slice)
 eqCnsGETotOutCS(cns, comm, slice)
 eqCnsETotOutCS(cns, comm, slice)
 eqCnsLETotOutCY(cns, comm, year)
+eqCnsLETotOutCYGrowth(cns, comm, year, yearp)
 eqCnsGETotOutCY(cns, comm, year)
+eqCnsGETotOutCYGrowth(cns, comm, year, yearp)
 eqCnsETotOutCY(cns, comm, year)
+eqCnsETotOutCYGrowth(cns, comm, year, yearp)
 eqCnsLETotOutCYS(cns, comm, year, slice)
+eqCnsLETotOutCYSGrowth(cns, comm, year, slice, yearp)
 eqCnsGETotOutCYS(cns, comm, year, slice)
+eqCnsGETotOutCYSGrowth(cns, comm, year, slice, yearp)
 eqCnsETotOutCYS(cns, comm, year, slice)
+eqCnsETotOutCYSGrowth(cns, comm, year, slice, yearp)
 eqCnsLETotOutCR(cns, comm, region)
 eqCnsGETotOutCR(cns, comm, region)
 eqCnsETotOutCR(cns, comm, region)
@@ -2621,13 +2735,18 @@ eqCnsLETotOutCRS(cns, comm, region, slice)
 eqCnsGETotOutCRS(cns, comm, region, slice)
 eqCnsETotOutCRS(cns, comm, region, slice)
 eqCnsLETotOutCRY(cns, comm, region, year)
+eqCnsLETotOutCRYGrowth(cns, comm, region, year, yearp)
 eqCnsGETotOutCRY(cns, comm, region, year)
+eqCnsGETotOutCRYGrowth(cns, comm, region, year, yearp)
 eqCnsETotOutCRY(cns, comm, region, year)
+eqCnsETotOutCRYGrowth(cns, comm, region, year, yearp)
 eqCnsLETotOutCRYS(cns, comm, region, year, slice)
+eqCnsLETotOutCRYSGrowth(cns, comm, region, year, slice, yearp)
 eqCnsGETotOutCRYS(cns, comm, region, year, slice)
+eqCnsGETotOutCRYSGrowth(cns, comm, region, year, slice, yearp)
 eqCnsETotOutCRYS(cns, comm, region, year, slice)
+eqCnsETotOutCRYSGrowth(cns, comm, region, year, slice, yearp)
 ;
-
 
 
 
@@ -6979,6 +7098,15 @@ eqCnsLETechCapY(cns, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and mCnsLhs
           mTechSpan(tech, region, year)), vTechCap(tech, region, year)) - pRhsY(cns, year)
           =l= 0;
 
+eqCnsLETechCapYGrowth(cns, year, yearp)$(mCnsCapTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechCap(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech,
+          region, yearp)), vTechCap(tech, region, yearp)) =l= 0;
+
 eqCnsGETechCapY(cns, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
@@ -6986,12 +7114,31 @@ eqCnsGETechCapY(cns, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and mCnsLhs
           mTechSpan(tech, region, year)), vTechCap(tech, region, year)) - pRhsY(cns, year)
           =g= 0;
 
+eqCnsGETechCapYGrowth(cns, year, yearp)$(mCnsCapTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechCap(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech,
+          region, yearp)), vTechCap(tech, region, yearp)) =g= 0;
+
 eqCnsETechCapY(cns, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
           mTechSpan(tech, region, year)), vTechCap(tech, region, year)) - pRhsY(cns, year)
           =e= 0;
+
+eqCnsETechCapYGrowth(cns, year, yearp)$(mCnsCapTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechCap(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech,
+          region, yearp)), vTechCap(tech, region, yearp)) =e= 0;
 
 eqCnsLETechCapR(cns, region)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -7023,11 +7170,29 @@ eqCnsLETechCapRY(cns, region, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) an
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCap(tech, region, year))
           - pRhsRY(cns, region, year) =l= 0;
 
+eqCnsLETechCapRYGrowth(cns, region, year, yearp)$(mCnsCapTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCap(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech,
+          region, yearp)), vTechCap(tech, region, yearp)) =l= 0;
+
 eqCnsGETechCapRY(cns, region, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsRegion(cns, region)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCap(tech, region, year))
           - pRhsRY(cns, region, year) =g= 0;
+
+eqCnsGETechCapRYGrowth(cns, region, year, yearp)$(mCnsCapTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCap(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech,
+          region, yearp)), vTechCap(tech, region, yearp)) =g= 0;
 
 eqCnsETechCapRY(cns, region, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
@@ -7035,6 +7200,15 @@ eqCnsETechCapRY(cns, region, year)$(mCnsCapTech(cns) and not(mCnsLType(cns)) and
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCap(tech, region, year))
           - pRhsRY(cns, region, year) =e= 0;
+
+eqCnsETechCapRYGrowth(cns, region, year, yearp)$(mCnsCapTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCap(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech,
+          region, yearp)), vTechCap(tech, region, yearp)) =e= 0;
 
 eqCnsLETechNewCap(cns)$(mCnsNewCapTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
@@ -7065,6 +7239,15 @@ eqCnsLETechNewCapY(cns, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cns)) and m
           mTechNew(tech, region, year)), vTechNewCap(tech, region, year)) - pRhsY(cns, year)
           =l= 0;
 
+eqCnsLETechNewCapYGrowth(cns, year, yearp)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechNew(tech, region, year)), vTechNewCap(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechNew(tech,
+          region, yearp)), vTechNewCap(tech, region, yearp)) =l= 0;
+
 eqCnsGETechNewCapY(cns, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
@@ -7072,12 +7255,31 @@ eqCnsGETechNewCapY(cns, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cns)) and m
           mTechNew(tech, region, year)), vTechNewCap(tech, region, year)) - pRhsY(cns, year)
           =g= 0;
 
+eqCnsGETechNewCapYGrowth(cns, year, yearp)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechNew(tech, region, year)), vTechNewCap(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechNew(tech,
+          region, yearp)), vTechNewCap(tech, region, yearp)) =g= 0;
+
 eqCnsETechNewCapY(cns, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
           mTechNew(tech, region, year)), vTechNewCap(tech, region, year)) - pRhsY(cns, year)
           =e= 0;
+
+eqCnsETechNewCapYGrowth(cns, year, yearp)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechNew(tech, region, year)), vTechNewCap(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechNew(tech,
+          region, yearp)), vTechNewCap(tech, region, yearp)) =e= 0;
 
 eqCnsLETechNewCapR(cns, region)$(mCnsNewCapTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRegion(cns, region)
@@ -7110,6 +7312,15 @@ eqCnsLETechNewCapRY(cns, region, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cn
           sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechNewCap(tech, region, year))
           - pRhsRY(cns, region, year) =l= 0;
 
+eqCnsLETechNewCapRYGrowth(cns, region, year, yearp)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechNewCap(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech,
+          region, yearp)), vTechNewCap(tech, region, yearp)) =l= 0;
+
 eqCnsGETechNewCapRY(cns, region, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
       mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
@@ -7117,12 +7328,30 @@ eqCnsGETechNewCapRY(cns, region, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cn
           sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechNewCap(tech, region, year))
           - pRhsRY(cns, region, year) =g= 0;
 
+eqCnsGETechNewCapRYGrowth(cns, region, year, yearp)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechNewCap(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech,
+          region, yearp)), vTechNewCap(tech, region, yearp)) =g= 0;
+
 eqCnsETechNewCapRY(cns, region, year)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
       and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
       mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechNewCap(tech, region, year))
           - pRhsRY(cns, region, year) =e= 0;
+
+eqCnsETechNewCapRYGrowth(cns, region, year, yearp)$(mCnsNewCapTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechNewCap(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech,
+          region, yearp)), vTechNewCap(tech, region, yearp)) =e= 0;
 
 eqCnsLETechInv(cns)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
@@ -7152,17 +7381,45 @@ eqCnsLETechInvY(cns, year)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and mCnsLhs
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
           mTechNew(tech, region, year)), vTechInv(tech, region, year)) - pRhsY(cns, year) =l= 0;
 
+eqCnsLETechInvYGrowth(cns, year, yearp)$(mCnsInvTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechNew(tech, region, year)), vTechInv(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechNew(tech,
+          region, yearp)), vTechInv(tech, region, yearp)) =l= 0;
+
 eqCnsGETechInvY(cns, year)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
           mTechNew(tech, region, year)), vTechInv(tech, region, year)) - pRhsY(cns, year) =g= 0;
 
+eqCnsGETechInvYGrowth(cns, year, yearp)$(mCnsInvTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechNew(tech, region, year)), vTechInv(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechNew(tech,
+          region, yearp)), vTechInv(tech, region, yearp)) =g= 0;
+
 eqCnsETechInvY(cns, year)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
           mTechNew(tech, region, year)), vTechInv(tech, region, year)) - pRhsY(cns, year) =e= 0;
+
+eqCnsETechInvYGrowth(cns, year, yearp)$(mCnsInvTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechNew(tech, region, year)), vTechInv(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechNew(tech,
+          region, yearp)), vTechInv(tech, region, yearp)) =e= 0;
 
 eqCnsLETechInvR(cns, region)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -7194,11 +7451,29 @@ eqCnsLETechInvRY(cns, region, year)$(mCnsInvTech(cns) and not(mCnsLType(cns)) an
           sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechInv(tech, region, year))
           - pRhsRY(cns, region, year) =l= 0;
 
+eqCnsLETechInvRYGrowth(cns, region, year, yearp)$(mCnsInvTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechInv(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech,
+          region, yearp)), vTechInv(tech, region, yearp)) =l= 0;
+
 eqCnsGETechInvRY(cns, region, year)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsRegion(cns, region)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechInv(tech, region, year))
           - pRhsRY(cns, region, year) =g= 0;
+
+eqCnsGETechInvRYGrowth(cns, region, year, yearp)$(mCnsInvTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechInv(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech,
+          region, yearp)), vTechInv(tech, region, yearp)) =g= 0;
 
 eqCnsETechInvRY(cns, region, year)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
@@ -7206,6 +7481,15 @@ eqCnsETechInvRY(cns, region, year)$(mCnsInvTech(cns) and not(mCnsLType(cns)) and
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechInv(tech, region, year))
           - pRhsRY(cns, region, year) =e= 0;
+
+eqCnsETechInvRYGrowth(cns, region, year, yearp)$(mCnsInvTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech, region, year)), vTechInv(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechNew(tech,
+          region, yearp)), vTechInv(tech, region, yearp)) =e= 0;
 
 eqCnsLETechEac(cns)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
@@ -7236,6 +7520,15 @@ eqCnsLETechEacY(cns, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and mCnsLhs
           mTechSpan(tech, region, year)), vTechEac(tech, region, year)) - pRhsY(cns, year)
           =l= 0;
 
+eqCnsLETechEacYGrowth(cns, year, yearp)$(mCnsEacTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechEac(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech,
+          region, yearp)), vTechEac(tech, region, yearp)) =l= 0;
+
 eqCnsGETechEacY(cns, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
@@ -7243,12 +7536,31 @@ eqCnsGETechEacY(cns, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and mCnsLhs
           mTechSpan(tech, region, year)), vTechEac(tech, region, year)) - pRhsY(cns, year)
           =g= 0;
 
+eqCnsGETechEacYGrowth(cns, year, yearp)$(mCnsEacTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechEac(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech,
+          region, yearp)), vTechEac(tech, region, yearp)) =g= 0;
+
 eqCnsETechEacY(cns, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
           mTechSpan(tech, region, year)), vTechEac(tech, region, year)) - pRhsY(cns, year)
           =e= 0;
+
+eqCnsETechEacYGrowth(cns, year, yearp)$(mCnsEacTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechEac(tech, region, year)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((tech,
+          region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech,
+          region, yearp)), vTechEac(tech, region, yearp)) =e= 0;
 
 eqCnsLETechEacR(cns, region)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -7280,11 +7592,29 @@ eqCnsLETechEacRY(cns, region, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) an
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechEac(tech, region, year))
           - pRhsRY(cns, region, year) =l= 0;
 
+eqCnsLETechEacRYGrowth(cns, region, year, yearp)$(mCnsEacTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechEac(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech,
+          region, yearp)), vTechEac(tech, region, yearp)) =l= 0;
+
 eqCnsGETechEacRY(cns, region, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsRegion(cns, region)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechEac(tech, region, year))
           - pRhsRY(cns, region, year) =g= 0;
+
+eqCnsGETechEacRYGrowth(cns, region, year, yearp)$(mCnsEacTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
+      mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechEac(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech,
+          region, yearp)), vTechEac(tech, region, yearp)) =g= 0;
 
 eqCnsETechEacRY(cns, region, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
@@ -7292,6 +7622,15 @@ eqCnsETechEacRY(cns, region, year)$(mCnsEacTech(cns) and not(mCnsLType(cns)) and
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechEac(tech, region, year))
           - pRhsRY(cns, region, year) =e= 0;
+
+eqCnsETechEacRYGrowth(cns, region, year, yearp)$(mCnsEacTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechEac(tech, region, year))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech,
+          region, yearp)), vTechEac(tech, region, yearp)) =e= 0;
 
 eqCnsLETechAct(cns)$(mCnsActTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
@@ -7349,6 +7688,17 @@ eqCnsLETechActY(cns, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) and mCnsLhs
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsY(cns, year) =l= 0;
 
+eqCnsLETechActYGrowth(cns, year, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
+      mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsY(cns, year)) * sum((tech, region, slice)$(mCnsTech(cns, tech)
+          and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech,
+          region, yearp)), vTechAct(tech, region, yearp, slice)) =l= 0;
+
 eqCnsGETechActY(cns, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
@@ -7356,12 +7706,34 @@ eqCnsGETechActY(cns, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) and mCnsLhs
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsY(cns, year) =g= 0;
 
+eqCnsGETechActYGrowth(cns, year, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
+      mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsY(cns, year)) * sum((tech, region, slice)$(mCnsTech(cns, tech)
+          and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech,
+          region, yearp)), vTechAct(tech, region, yearp, slice)) =g= 0;
+
 eqCnsETechActY(cns, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns))
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region)
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsY(cns, year) =e= 0;
+
+eqCnsETechActYGrowth(cns, year, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
+      not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsY(cns, year)) * sum((tech, region, slice)$(mCnsTech(cns, tech)
+          and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech,
+          region, yearp)), vTechAct(tech, region, yearp, slice)) =e= 0;
 
 eqCnsLETechActYS(cns, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and
@@ -7371,6 +7743,17 @@ eqCnsLETechActYS(cns, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
           mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
           pRhsYS(cns, year, slice) =l= 0;
 
+eqCnsLETechActYSGrowth(cns, year, slice, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
+          prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 1
+          / pRhsYS(cns, year, slice)) * sum((tech, region)$(mCnsTech(cns, tech)
+          and mCnsRegion(cns, region) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =l= 0;
+
 eqCnsGETechActYS(cns, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and
       mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and
@@ -7379,6 +7762,17 @@ eqCnsGETechActYS(cns, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
           mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
           pRhsYS(cns, year, slice) =g= 0;
 
+eqCnsGETechActYSGrowth(cns, year, slice, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
+          prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 1
+          / pRhsYS(cns, year, slice)) * sum((tech, region)$(mCnsTech(cns, tech)
+          and mCnsRegion(cns, region) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =g= 0;
+
 eqCnsETechActYS(cns, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
@@ -7386,6 +7780,17 @@ eqCnsETechActYS(cns, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
           mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
           pRhsYS(cns, year, slice) =e= 0;
+
+eqCnsETechActYSGrowth(cns, year, slice, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+          mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
+          prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 1
+          / pRhsYS(cns, year, slice)) * sum((tech, region)$(mCnsTech(cns, tech)
+          and mCnsRegion(cns, region) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =e= 0;
 
 eqCnsLETechActR(cns, region)$(mCnsActTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region)
@@ -7449,6 +7854,17 @@ eqCnsLETechActRY(cns, region, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) an
           mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
           pRhsRY(cns, region, year) =l= 0;
 
+eqCnsLETechActRYGrowth(cns, region, year, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and
+          mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
+          prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 1
+          / pRhsRY(cns, region, year)) * sum((tech, slice)$(mCnsTech(cns, tech)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =l= 0;
+
 eqCnsGETechActRY(cns, region, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
       mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
@@ -7456,6 +7872,17 @@ eqCnsGETechActRY(cns, region, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) an
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and
           mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
           pRhsRY(cns, region, year) =g= 0;
+
+eqCnsGETechActRYGrowth(cns, region, year, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and
+          mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
+          prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 1
+          / pRhsRY(cns, region, year)) * sum((tech, slice)$(mCnsTech(cns, tech)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =g= 0;
 
 eqCnsETechActRY(cns, region, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
@@ -7465,12 +7892,33 @@ eqCnsETechActRY(cns, region, year)$(mCnsActTech(cns) and not(mCnsLType(cns)) and
           mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
           pRhsRY(cns, region, year) =e= 0;
 
+eqCnsETechActRYGrowth(cns, region, year, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year,
+      yearp))..
+          sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and
+          mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) -
+          prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 1
+          / pRhsRY(cns, region, year)) * sum((tech, slice)$(mCnsTech(cns, tech)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =e= 0;
+
 eqCnsLETechActRYS(cns, region, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns))
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =l= 0;
+
+eqCnsLETechActRYSGrowth(cns, region, year, slice, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((tech)$(mCnsTech(cns, tech)
+          and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice)) =l= 0;
 
 eqCnsGETechActRYS(cns, region, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns))
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
@@ -7479,6 +7927,15 @@ eqCnsGETechActRYS(cns, region, year, slice)$(mCnsActTech(cns) and not(mCnsLType(
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =g= 0;
 
+eqCnsGETechActRYSGrowth(cns, region, year, slice, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((tech)$(mCnsTech(cns, tech)
+          and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice)) =g= 0;
+
 eqCnsETechActRYS(cns, region, year, slice)$(mCnsActTech(cns) and not(mCnsLType(cns))
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and
@@ -7486,6 +7943,16 @@ eqCnsETechActRYS(cns, region, year, slice)$(mCnsActTech(cns) and not(mCnsLType(c
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =e= 0;
+
+eqCnsETechActRYSGrowth(cns, region, year, slice, yearp)$(mCnsActTech(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((tech)$(mCnsTech(cns, tech)
+          and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice)) =e= 0;
 
 eqCnsLETechInpLShareIn(cns, tech)$(mCnsInpTech(cns) and mCnsLType(cns) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns)
@@ -11852,17 +12319,44 @@ eqCnsLETechCapLY(cns, tech, year)$(mCnsCapTech(cns) and mCnsLType(cns) and mCnsL
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechCap(tech, region, year)) - pRhsTechY(cns, tech, year) =l= 0;
 
+eqCnsLETechCapLYGrowth(cns, tech, year, yearp)$(mCnsCapTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechCap(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechSpan(tech, region, yearp)), vTechCap(tech, region, yearp)) =l= 0;
+
 eqCnsGETechCapLY(cns, tech, year)$(mCnsCapTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechCap(tech, region, year)) - pRhsTechY(cns, tech, year) =g= 0;
 
+eqCnsGETechCapLYGrowth(cns, tech, year, yearp)$(mCnsCapTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechCap(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechSpan(tech, region, yearp)), vTechCap(tech, region, yearp)) =g= 0;
+
 eqCnsETechCapLY(cns, tech, year)$(mCnsCapTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechCap(tech, region, year)) - pRhsTechY(cns, tech, year) =e= 0;
+
+eqCnsETechCapLYGrowth(cns, tech, year, yearp)$(mCnsCapTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechCap(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechSpan(tech, region, yearp)), vTechCap(tech, region, yearp)) =e= 0;
 
 eqCnsLETechCapLR(cns, tech, region)$(mCnsCapTech(cns) and mCnsLType(cns) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region)
@@ -11894,17 +12388,44 @@ eqCnsLETechCapLRY(cns, tech, region, year)$(mCnsCapTech(cns) and mCnsLType(cns)
       mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechCap(tech, region, year) - pRhsTechRY(cns, tech, region, year) =l= 0;
 
+eqCnsLETechCapLRYGrowth(cns, tech, region, year, yearp)$(mCnsCapTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and
+      mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechCap(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechCap(tech, region, yearp) =l= 0;
+
 eqCnsGETechCapLRY(cns, tech, region, year)$(mCnsCapTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
       mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
       mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechCap(tech, region, year) - pRhsTechRY(cns, tech, region, year) =g= 0;
 
+eqCnsGETechCapLRYGrowth(cns, tech, region, year, yearp)$(mCnsCapTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
+      mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechCap(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechCap(tech, region, yearp) =g= 0;
+
 eqCnsETechCapLRY(cns, tech, region, year)$(mCnsCapTech(cns) and mCnsLType(cns) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
       not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechCap(tech, region, year) - pRhsTechRY(cns, tech, region, year) =e= 0;
+
+eqCnsETechCapLRYGrowth(cns, tech, region, year, yearp)$(mCnsCapTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vTechCap(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechCap(tech, region, yearp) =e= 0;
 
 eqCnsLETechNewCapL(cns, tech)$(mCnsNewCapTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
@@ -11934,11 +12455,29 @@ eqCnsLETechNewCapLY(cns, tech, year)$(mCnsNewCapTech(cns) and mCnsLType(cns) and
           sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
           vTechNewCap(tech, region, year)) - pRhsTechY(cns, tech, year) =l= 0;
 
+eqCnsLETechNewCapLYGrowth(cns, tech, year, yearp)$(mCnsNewCapTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
+          vTechNewCap(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechNew(tech, region, yearp)), vTechNewCap(tech, region, yearp)) =l= 0;
+
 eqCnsGETechNewCapLY(cns, tech, year)$(mCnsNewCapTech(cns) and mCnsLType(cns) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
           vTechNewCap(tech, region, year)) - pRhsTechY(cns, tech, year) =g= 0;
+
+eqCnsGETechNewCapLYGrowth(cns, tech, year, yearp)$(mCnsNewCapTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
+          vTechNewCap(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechNew(tech, region, yearp)), vTechNewCap(tech, region, yearp)) =g= 0;
 
 eqCnsETechNewCapLY(cns, tech, year)$(mCnsNewCapTech(cns) and mCnsLType(cns) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns))
@@ -11946,6 +12485,15 @@ eqCnsETechNewCapLY(cns, tech, year)$(mCnsNewCapTech(cns) and mCnsLType(cns) and
       mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
           vTechNewCap(tech, region, year)) - pRhsTechY(cns, tech, year) =e= 0;
+
+eqCnsETechNewCapLYGrowth(cns, tech, year, yearp)$(mCnsNewCapTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
+          vTechNewCap(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechNew(tech, region, yearp)), vTechNewCap(tech, region, yearp)) =e= 0;
 
 eqCnsLETechNewCapLR(cns, tech, region)$(mCnsNewCapTech(cns) and mCnsLType(cns) and
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech)
@@ -11977,11 +12525,29 @@ eqCnsLETechNewCapLRY(cns, tech, region, year)$(mCnsNewCapTech(cns) and mCnsLType
       mTechNew(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechNewCap(tech, region, year) - pRhsTechRY(cns, tech, region, year) =l= 0;
 
+eqCnsLETechNewCapLRYGrowth(cns, tech, region, year, yearp)$(mCnsNewCapTech(cns)
+      and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and
+      mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mTechNew(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechNewCap(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechNewCap(tech, region, yearp) =l= 0;
+
 eqCnsGETechNewCapLRY(cns, tech, region, year)$(mCnsNewCapTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
       mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
       mTechNew(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechNewCap(tech, region, year) - pRhsTechRY(cns, tech, region, year) =g= 0;
+
+eqCnsGETechNewCapLRYGrowth(cns, tech, region, year, yearp)$(mCnsNewCapTech(cns)
+      and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and
+      mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mTechNew(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechNewCap(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechNewCap(tech, region, yearp) =g= 0;
 
 eqCnsETechNewCapLRY(cns, tech, region, year)$(mCnsNewCapTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
@@ -11989,6 +12555,15 @@ eqCnsETechNewCapLRY(cns, tech, region, year)$(mCnsNewCapTech(cns) and mCnsLType(
       mCnsYear(cns, year) and mTechNew(tech, region, year) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           vTechNewCap(tech, region, year) - pRhsTechRY(cns, tech, region, year) =e= 0;
+
+eqCnsETechNewCapLRYGrowth(cns, tech, region, year, yearp)$(mCnsNewCapTech(cns) and
+      mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mTechNew(tech, region, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vTechNewCap(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechNewCap(tech, region, yearp) =e= 0;
 
 eqCnsLETechInvL(cns, tech)$(mCnsInvTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
@@ -12018,17 +12593,44 @@ eqCnsLETechInvLY(cns, tech, year)$(mCnsInvTech(cns) and mCnsLType(cns) and mCnsL
           sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
           vTechInv(tech, region, year)) - pRhsTechY(cns, tech, year) =l= 0;
 
+eqCnsLETechInvLYGrowth(cns, tech, year, yearp)$(mCnsInvTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
+          vTechInv(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechNew(tech, region, yearp)), vTechInv(tech, region, yearp)) =l= 0;
+
 eqCnsGETechInvLY(cns, tech, year)$(mCnsInvTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
           vTechInv(tech, region, year)) - pRhsTechY(cns, tech, year) =g= 0;
 
+eqCnsGETechInvLYGrowth(cns, tech, year, yearp)$(mCnsInvTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
+          vTechInv(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechNew(tech, region, yearp)), vTechInv(tech, region, yearp)) =g= 0;
+
 eqCnsETechInvLY(cns, tech, year)$(mCnsInvTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
           vTechInv(tech, region, year)) - pRhsTechY(cns, tech, year) =e= 0;
+
+eqCnsETechInvLYGrowth(cns, tech, year, yearp)$(mCnsInvTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechNew(tech, region, year)),
+          vTechInv(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechNew(tech, region, yearp)), vTechInv(tech, region, yearp)) =e= 0;
 
 eqCnsLETechInvLR(cns, tech, region)$(mCnsInvTech(cns) and mCnsLType(cns) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region)
@@ -12060,17 +12662,44 @@ eqCnsLETechInvLRY(cns, tech, region, year)$(mCnsInvTech(cns) and mCnsLType(cns)
       mTechNew(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechInv(tech, region, year) - pRhsTechRY(cns, tech, region, year) =l= 0;
 
+eqCnsLETechInvLRYGrowth(cns, tech, region, year, yearp)$(mCnsInvTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and
+      mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mTechNew(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechInv(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechInv(tech, region, yearp) =l= 0;
+
 eqCnsGETechInvLRY(cns, tech, region, year)$(mCnsInvTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
       mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
       mTechNew(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechInv(tech, region, year) - pRhsTechRY(cns, tech, region, year) =g= 0;
 
+eqCnsGETechInvLRYGrowth(cns, tech, region, year, yearp)$(mCnsInvTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
+      mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mTechNew(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechInv(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechInv(tech, region, yearp) =g= 0;
+
 eqCnsETechInvLRY(cns, tech, region, year)$(mCnsInvTech(cns) and mCnsLType(cns) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
       not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
       and mTechNew(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechInv(tech, region, year) - pRhsTechRY(cns, tech, region, year) =e= 0;
+
+eqCnsETechInvLRYGrowth(cns, tech, region, year, yearp)$(mCnsInvTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mTechNew(tech, region, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vTechInv(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechInv(tech, region, yearp) =e= 0;
 
 eqCnsLETechEacL(cns, tech)$(mCnsEacTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
@@ -12100,17 +12729,44 @@ eqCnsLETechEacLY(cns, tech, year)$(mCnsEacTech(cns) and mCnsLType(cns) and mCnsL
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechEac(tech, region, year)) - pRhsTechY(cns, tech, year) =l= 0;
 
+eqCnsLETechEacLYGrowth(cns, tech, year, yearp)$(mCnsEacTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechEac(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechSpan(tech, region, yearp)), vTechEac(tech, region, yearp)) =l= 0;
+
 eqCnsGETechEacLY(cns, tech, year)$(mCnsEacTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechEac(tech, region, year)) - pRhsTechY(cns, tech, year) =g= 0;
 
+eqCnsGETechEacLYGrowth(cns, tech, year, yearp)$(mCnsEacTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechEac(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechSpan(tech, region, yearp)), vTechEac(tech, region, yearp)) =g= 0;
+
 eqCnsETechEacLY(cns, tech, year)$(mCnsEacTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechEac(tech, region, year)) - pRhsTechY(cns, tech, year) =e= 0;
+
+eqCnsETechEacLYGrowth(cns, tech, year, yearp)$(mCnsEacTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
+      not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechEac(tech, region, year)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechY(cns, tech, year)) * sum((region)$(mCnsRegion(cns, region)
+          and mTechSpan(tech, region, yearp)), vTechEac(tech, region, yearp)) =e= 0;
 
 eqCnsLETechEacLR(cns, tech, region)$(mCnsEacTech(cns) and mCnsLType(cns) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region)
@@ -12142,17 +12798,44 @@ eqCnsLETechEacLRY(cns, tech, region, year)$(mCnsEacTech(cns) and mCnsLType(cns)
       mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechEac(tech, region, year) - pRhsTechRY(cns, tech, region, year) =l= 0;
 
+eqCnsLETechEacLRYGrowth(cns, tech, region, year, yearp)$(mCnsEacTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and
+      mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechEac(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechEac(tech, region, yearp) =l= 0;
+
 eqCnsGETechEacLRY(cns, tech, region, year)$(mCnsEacTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
       mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
       mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechEac(tech, region, year) - pRhsTechRY(cns, tech, region, year) =g= 0;
 
+eqCnsGETechEacLRYGrowth(cns, tech, region, year, yearp)$(mCnsEacTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and
+      mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and
+      mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechEac(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechEac(tech, region, yearp) =g= 0;
+
 eqCnsETechEacLRY(cns, tech, region, year)$(mCnsEacTech(cns) and mCnsLType(cns) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and
       not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechEac(tech, region, year) - pRhsTechRY(cns, tech, region, year) =e= 0;
+
+eqCnsETechEacLRYGrowth(cns, tech, region, year, yearp)$(mCnsEacTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vTechEac(tech, region, year) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRY(cns, tech, region, year))
+          * vTechEac(tech, region, yearp) =e= 0;
 
 eqCnsLETechActL(cns, tech)$(mCnsActTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech)
@@ -12212,12 +12895,34 @@ eqCnsLETechActLY(cns, tech, year)$(mCnsActTech(cns) and mCnsLType(cns) and mCnsL
           and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsTechY(cns, tech, year) =l= 0;
 
+eqCnsLETechActLYGrowth(cns, tech, year, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
+      mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)
+          and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsTechY(cns, tech, year)) * sum((region, slice)$(mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =l= 0;
+
 eqCnsGETechActLY(cns, tech, year)$(mCnsActTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)
           and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsTechY(cns, tech, year) =g= 0;
+
+eqCnsGETechActLYGrowth(cns, tech, year, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
+      mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)
+          and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsTechY(cns, tech, year)) * sum((region, slice)$(mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =g= 0;
 
 eqCnsETechActLY(cns, tech, year)$(mCnsActTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns)
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns))
@@ -12227,12 +12932,33 @@ eqCnsETechActLY(cns, tech, year)$(mCnsActTech(cns) and mCnsLType(cns) and mCnsLh
           and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
           - pRhsTechY(cns, tech, year) =e= 0;
 
+eqCnsETechActLYGrowth(cns, tech, year, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
+      not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)
+          and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsTechY(cns, tech, year)) * sum((region, slice)$(mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice) and mTechSpan(tech, region, yearp)), vTechAct(tech, region, yearp, slice))
+          =e= 0;
+
 eqCnsLETechActLYS(cns, tech, year, slice)$(mCnsActTech(cns) and mCnsLType(cns) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechAct(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =l= 0;
+
+eqCnsLETechActLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechAct(tech, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechYS(cns, tech, year, slice))
+          * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, yearp)),
+          vTechAct(tech, region, yearp, slice)) =l= 0;
 
 eqCnsGETechActLYS(cns, tech, year, slice)$(mCnsActTech(cns) and mCnsLType(cns) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and
@@ -12241,12 +12967,33 @@ eqCnsGETechActLYS(cns, tech, year, slice)$(mCnsActTech(cns) and mCnsLType(cns) a
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechAct(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =g= 0;
 
+eqCnsGETechActLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechAct(tech, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechYS(cns, tech, year, slice))
+          * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, yearp)),
+          vTechAct(tech, region, yearp, slice)) =g= 0;
+
 eqCnsETechActLYS(cns, tech, year, slice)$(mCnsActTech(cns) and mCnsLType(cns) and
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year)
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
           vTechAct(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =e= 0;
+
+eqCnsETechActLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
+      and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year)
+      and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)),
+          vTechAct(tech, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechYS(cns, tech, year, slice))
+          * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, yearp)),
+          vTechAct(tech, region, yearp, slice)) =e= 0;
 
 eqCnsLETechActLR(cns, tech, region)$(mCnsActTech(cns) and mCnsLType(cns) and not(mCnsLhsRegion(cns))
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech)
@@ -12306,12 +13053,32 @@ eqCnsLETechActLRY(cns, tech, region, year)$(mCnsActTech(cns) and mCnsLType(cns)
           sum((slice)$(mCnsSlice(cns, slice)), vTechAct(tech, region, year, slice))
           - pRhsTechRY(cns, tech, region, year) =l= 0;
 
+eqCnsLETechActLRYGrowth(cns, tech, region, year, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsTechRY(cns, tech, region, year)) * sum((slice)$(mCnsSlice(cns,
+          slice)), vTechAct(tech, region, yearp, slice)) =l= 0;
+
 eqCnsGETechActLRY(cns, tech, region, year)$(mCnsActTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechAct(tech, region, year, slice))
           - pRhsTechRY(cns, tech, region, year) =g= 0;
+
+eqCnsGETechActLRYGrowth(cns, tech, region, year, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsTechRY(cns, tech, region, year)) * sum((slice)$(mCnsSlice(cns,
+          slice)), vTechAct(tech, region, yearp, slice)) =g= 0;
 
 eqCnsETechActLRY(cns, tech, region, year)$(mCnsActTech(cns) and mCnsLType(cns) and
       not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
@@ -12321,6 +13088,16 @@ eqCnsETechActLRY(cns, tech, region, year)$(mCnsActTech(cns) and mCnsLType(cns) a
           sum((slice)$(mCnsSlice(cns, slice)), vTechAct(tech, region, year, slice))
           - pRhsTechRY(cns, tech, region, year) =e= 0;
 
+eqCnsETechActLRYGrowth(cns, tech, region, year, yearp)$(mCnsActTech(cns) and mCnsLType(cns)
+      and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vTechAct(tech, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsTechRY(cns, tech, region, year)) * sum((slice)$(mCnsSlice(cns,
+          slice)), vTechAct(tech, region, yearp, slice)) =e= 0;
+
 eqCnsLETechActLRYS(cns, tech, region, year, slice)$(mCnsActTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year)
@@ -12328,6 +13105,15 @@ eqCnsLETechActLRYS(cns, tech, region, year, slice)$(mCnsActTech(cns) and mCnsLTy
       mMidMilestone(year))..
           vTechAct(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice)
           =l= 0;
+
+eqCnsLETechActLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActTech(cns)
+      and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vTechAct(tech, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRYS(cns, tech, region, year, slice))
+          * vTechAct(tech, region, yearp, slice) =l= 0;
 
 eqCnsGETechActLRYS(cns, tech, region, year, slice)$(mCnsActTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
@@ -12337,6 +13123,15 @@ eqCnsGETechActLRYS(cns, tech, region, year, slice)$(mCnsActTech(cns) and mCnsLTy
           vTechAct(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice)
           =g= 0;
 
+eqCnsGETechActLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActTech(cns)
+      and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vTechAct(tech, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRYS(cns, tech, region, year, slice))
+          * vTechAct(tech, region, yearp, slice) =g= 0;
+
 eqCnsETechActLRYS(cns, tech, region, year, slice)$(mCnsActTech(cns) and mCnsLType(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region)
@@ -12344,6 +13139,16 @@ eqCnsETechActLRYS(cns, tech, region, year, slice)$(mCnsActTech(cns) and mCnsLTyp
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechAct(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice)
           =e= 0;
+
+eqCnsETechActLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActTech(cns)
+      and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech)
+      and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mTechSpan(tech, region, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          vTechAct(tech, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsTechRYS(cns, tech, region, year, slice))
+          * vTechAct(tech, region, yearp, slice) =e= 0;
 
 eqCnsLESupOutShareIn(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns)
@@ -15980,12 +16785,32 @@ eqCnsLETotInpY(cns, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(
           and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice)) - pRhsY(cns, year)
           =l= 0;
 
+eqCnsLETotInpYGrowth(cns, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns)) and
+      mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((comm,
+          region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns,
+          slice)), vInpTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotInpY(cns, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
       mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
           and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice)) - pRhsY(cns, year)
           =g= 0;
+
+eqCnsGETotInpYGrowth(cns, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns)) and
+      mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((comm,
+          region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns,
+          slice)), vInpTot(comm, region, yearp, slice)) =g= 0;
 
 eqCnsETotInpY(cns, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
@@ -15995,12 +16820,32 @@ eqCnsETotInpY(cns, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(c
           and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice)) - pRhsY(cns, year)
           =e= 0;
 
+eqCnsETotInpYGrowth(cns, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns)) and
+      mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((comm,
+          region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns,
+          slice)), vInpTot(comm, region, yearp, slice)) =e= 0;
+
 eqCnsLETotInpYS(cns, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
           vInpTot(comm, region, year, slice)) - pRhsYS(cns, year, slice) =l= 0;
+
+eqCnsLETotInpYSGrowth(cns, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
+          vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsYS(cns, year, slice)) * sum((comm,
+          region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), vInpTot(comm, region, yearp, slice))
+          =l= 0;
 
 eqCnsGETotInpYS(cns, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
@@ -16009,12 +16854,33 @@ eqCnsGETotInpYS(cns, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCns
           sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
           vInpTot(comm, region, year, slice)) - pRhsYS(cns, year, slice) =g= 0;
 
+eqCnsGETotInpYSGrowth(cns, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
+          vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsYS(cns, year, slice)) * sum((comm,
+          region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), vInpTot(comm, region, yearp, slice))
+          =g= 0;
+
 eqCnsETotInpYS(cns, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
           vInpTot(comm, region, year, slice)) - pRhsYS(cns, year, slice) =e= 0;
+
+eqCnsETotInpYSGrowth(cns, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year)
+      and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
+          vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsYS(cns, year, slice)) * sum((comm,
+          region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), vInpTot(comm, region, yearp, slice))
+          =e= 0;
 
 eqCnsLETotInpR(cns, region)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and
@@ -16075,6 +16941,15 @@ eqCnsLETotInpRY(cns, region, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCn
           sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
           - pRhsRY(cns, region, year) =l= 0;
 
+eqCnsLETotInpRYGrowth(cns, region, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((comm, slice)$(mCnsComm(cns, comm)
+          and mCnsSlice(cns, slice)), vInpTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotInpRY(cns, region, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
@@ -16082,12 +16957,31 @@ eqCnsGETotInpRY(cns, region, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCn
           sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
           - pRhsRY(cns, region, year) =g= 0;
 
+eqCnsGETotInpRYGrowth(cns, region, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((comm, slice)$(mCnsComm(cns, comm)
+          and mCnsSlice(cns, slice)), vInpTot(comm, region, yearp, slice)) =g= 0;
+
 eqCnsETotInpRY(cns, region, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and
       mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
           - pRhsRY(cns, region, year) =e= 0;
+
+eqCnsETotInpRYGrowth(cns, region, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((comm, slice)$(mCnsComm(cns, comm)
+          and mCnsSlice(cns, slice)), vInpTot(comm, region, yearp, slice)) =e= 0;
 
 eqCnsLETotInpRYS(cns, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
       and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
@@ -16097,6 +16991,16 @@ eqCnsLETotInpRYS(cns, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
           sum((comm)$(mCnsComm(cns, comm)), vInpTot(comm, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =l= 0;
 
+eqCnsLETotInpRYSGrowth(cns, region, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm)$(mCnsComm(cns, comm)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((comm)$(mCnsComm(cns, comm)),
+          vInpTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotInpRYS(cns, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
       and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and
@@ -16105,6 +17009,16 @@ eqCnsGETotInpRYS(cns, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
           sum((comm)$(mCnsComm(cns, comm)), vInpTot(comm, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =g= 0;
 
+eqCnsGETotInpRYSGrowth(cns, region, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm)$(mCnsComm(cns, comm)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((comm)$(mCnsComm(cns, comm)),
+          vInpTot(comm, region, yearp, slice)) =g= 0;
+
 eqCnsETotInpRYS(cns, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
       and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region)
@@ -16112,6 +17026,16 @@ eqCnsETotInpRYS(cns, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
       mMidMilestone(year))..
           sum((comm)$(mCnsComm(cns, comm)), vInpTot(comm, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =e= 0;
+
+eqCnsETotInpRYSGrowth(cns, region, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm)$(mCnsComm(cns, comm)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((comm)$(mCnsComm(cns, comm)),
+          vInpTot(comm, region, yearp, slice)) =e= 0;
 
 eqCnsLETotInpC(cns, comm)$(mCnsInp(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns)
@@ -16169,12 +17093,32 @@ eqCnsLETotInpCY(cns, comm, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and not(m
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
           vInpTot(comm, region, year, slice)) - pRhsCY(cns, comm, year) =l= 0;
 
+eqCnsLETotInpCYGrowth(cns, comm, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
+          vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCY(cns, comm, year)) * sum((region,
+          slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), vInpTot(comm, region, yearp, slice))
+          =l= 0;
+
 eqCnsGETotInpCY(cns, comm, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
       mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
           vInpTot(comm, region, year, slice)) - pRhsCY(cns, comm, year) =g= 0;
+
+eqCnsGETotInpCYGrowth(cns, comm, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
+          vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCY(cns, comm, year)) * sum((region,
+          slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), vInpTot(comm, region, yearp, slice))
+          =g= 0;
 
 eqCnsETotInpCY(cns, comm, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
@@ -16183,12 +17127,33 @@ eqCnsETotInpCY(cns, comm, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and not(mC
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
           vInpTot(comm, region, year, slice)) - pRhsCY(cns, comm, year) =e= 0;
 
+eqCnsETotInpCYGrowth(cns, comm, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
+          vInpTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCY(cns, comm, year)) * sum((region,
+          slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), vInpTot(comm, region, yearp, slice))
+          =e= 0;
+
 eqCnsLETotInpCYS(cns, comm, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
       not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region)), vInpTot(comm, region, year, slice))
           - pRhsCYS(cns, comm, year, slice) =l= 0;
+
+eqCnsLETotInpCYSGrowth(cns, comm, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCYS(cns, comm, year, slice)) * sum((region)$(mCnsRegion(cns, region)),
+          vInpTot(comm, region, yearp, slice)) =l= 0;
 
 eqCnsGETotInpCYS(cns, comm, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
@@ -16197,6 +17162,16 @@ eqCnsGETotInpCYS(cns, comm, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) a
           sum((region)$(mCnsRegion(cns, region)), vInpTot(comm, region, year, slice))
           - pRhsCYS(cns, comm, year, slice) =g= 0;
 
+eqCnsGETotInpCYSGrowth(cns, comm, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCYS(cns, comm, year, slice)) * sum((region)$(mCnsRegion(cns, region)),
+          vInpTot(comm, region, yearp, slice)) =g= 0;
+
 eqCnsETotInpCYS(cns, comm, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
       not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
@@ -16204,6 +17179,16 @@ eqCnsETotInpCYS(cns, comm, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns)) an
       mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region)), vInpTot(comm, region, year, slice))
           - pRhsCYS(cns, comm, year, slice) =e= 0;
+
+eqCnsETotInpCYSGrowth(cns, comm, year, slice, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
+      and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCYS(cns, comm, year, slice)) * sum((region)$(mCnsRegion(cns, region)),
+          vInpTot(comm, region, yearp, slice)) =e= 0;
 
 eqCnsLETotInpCR(cns, comm, region)$(mCnsInp(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and
@@ -16266,12 +17251,32 @@ eqCnsLETotInpCRY(cns, comm, region, year)$(mCnsInp(cns) and not(mCnsLType(cns))
           sum((slice)$(mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
           - pRhsCRY(cns, comm, region, year) =l= 0;
 
+eqCnsLETotInpCRYGrowth(cns, comm, region, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCRY(cns, comm, region, year)) * sum((slice)$(mCnsSlice(cns, slice)),
+          vInpTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotInpCRY(cns, comm, region, year)$(mCnsInp(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
           - pRhsCRY(cns, comm, region, year) =g= 0;
+
+eqCnsGETotInpCRYGrowth(cns, comm, region, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCRY(cns, comm, region, year)) * sum((slice)$(mCnsSlice(cns, slice)),
+          vInpTot(comm, region, yearp, slice)) =g= 0;
 
 eqCnsETotInpCRY(cns, comm, region, year)$(mCnsInp(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
@@ -16281,12 +17286,31 @@ eqCnsETotInpCRY(cns, comm, region, year)$(mCnsInp(cns) and not(mCnsLType(cns)) a
           sum((slice)$(mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
           - pRhsCRY(cns, comm, region, year) =e= 0;
 
+eqCnsETotInpCRYGrowth(cns, comm, region, year, yearp)$(mCnsInp(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
+      and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vInpTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCRY(cns, comm, region, year)) * sum((slice)$(mCnsSlice(cns, slice)),
+          vInpTot(comm, region, yearp, slice)) =e= 0;
+
 eqCnsLETotInpCRYS(cns, comm, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
       and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           vInpTot(comm, region, year, slice) - pRhsCRYS(cns, comm, region, year, slice) =l= 0;
+
+eqCnsLETotInpCRYSGrowth(cns, comm, region, year, slice, yearp)$(mCnsInp(cns) and
+      not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns))
+      and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm)
+      and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vInpTot(comm, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCRYS(cns, comm, region, year, slice))
+          * vInpTot(comm, region, yearp, slice) =l= 0;
 
 eqCnsGETotInpCRYS(cns, comm, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
@@ -16295,12 +17319,31 @@ eqCnsGETotInpCRYS(cns, comm, region, year, slice)$(mCnsInp(cns) and not(mCnsLTyp
       mMidMilestone(year))..
           vInpTot(comm, region, year, slice) - pRhsCRYS(cns, comm, region, year, slice) =g= 0;
 
+eqCnsGETotInpCRYSGrowth(cns, comm, region, year, slice, yearp)$(mCnsInp(cns) and
+      not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns))
+      and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm)
+      and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vInpTot(comm, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCRYS(cns, comm, region, year, slice))
+          * vInpTot(comm, region, yearp, slice) =g= 0;
+
 eqCnsETotInpCRYS(cns, comm, region, year, slice)$(mCnsInp(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
       and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vInpTot(comm, region, year, slice) - pRhsCRYS(cns, comm, region, year, slice) =e= 0;
+
+eqCnsETotInpCRYSGrowth(cns, comm, region, year, slice, yearp)$(mCnsInp(cns) and
+      not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns))
+      and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vInpTot(comm, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCRYS(cns, comm, region, year, slice))
+          * vInpTot(comm, region, yearp, slice) =e= 0;
 
 eqCnsLETotOut(cns)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) and
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns)
@@ -16361,12 +17404,32 @@ eqCnsLETotOutY(cns, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(
           and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice)) - pRhsY(cns, year)
           =l= 0;
 
+eqCnsLETotOutYGrowth(cns, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns)) and
+      mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((comm,
+          region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns,
+          slice)), vOutTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotOutY(cns, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
       mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
           and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice)) - pRhsY(cns, year)
           =g= 0;
+
+eqCnsGETotOutYGrowth(cns, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns)) and
+      mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((comm,
+          region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns,
+          slice)), vOutTot(comm, region, yearp, slice)) =g= 0;
 
 eqCnsETotOutY(cns, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
@@ -16376,12 +17439,32 @@ eqCnsETotOutY(cns, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(c
           and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice)) - pRhsY(cns, year)
           =e= 0;
 
+eqCnsETotOutYGrowth(cns, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns)) and
+      mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
+      and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)
+          and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare)
+          >= ORD(year) and ORD(yeare) < ORD(yearp)), 1 / pRhsY(cns, year)) * sum((comm,
+          region, slice)$(mCnsComm(cns, comm) and mCnsRegion(cns, region) and mCnsSlice(cns,
+          slice)), vOutTot(comm, region, yearp, slice)) =e= 0;
+
 eqCnsLETotOutYS(cns, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
           vOutTot(comm, region, year, slice)) - pRhsYS(cns, year, slice) =l= 0;
+
+eqCnsLETotOutYSGrowth(cns, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
+          vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsYS(cns, year, slice)) * sum((comm,
+          region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), vOutTot(comm, region, yearp, slice))
+          =l= 0;
 
 eqCnsGETotOutYS(cns, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
@@ -16390,12 +17473,33 @@ eqCnsGETotOutYS(cns, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCns
           sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
           vOutTot(comm, region, year, slice)) - pRhsYS(cns, year, slice) =g= 0;
 
+eqCnsGETotOutYSGrowth(cns, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
+          vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsYS(cns, year, slice)) * sum((comm,
+          region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), vOutTot(comm, region, yearp, slice))
+          =g= 0;
+
 eqCnsETotOutYS(cns, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns))
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
           vOutTot(comm, region, year, slice)) - pRhsYS(cns, year, slice) =e= 0;
+
+eqCnsETotOutYSGrowth(cns, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
+      not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year)
+      and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)),
+          vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsYS(cns, year, slice)) * sum((comm,
+          region)$(mCnsComm(cns, comm) and mCnsRegion(cns, region)), vOutTot(comm, region, yearp, slice))
+          =e= 0;
 
 eqCnsLETotOutR(cns, region)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and
@@ -16456,6 +17560,15 @@ eqCnsLETotOutRY(cns, region, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCn
           sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
           - pRhsRY(cns, region, year) =l= 0;
 
+eqCnsLETotOutRYGrowth(cns, region, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((comm, slice)$(mCnsComm(cns, comm)
+          and mCnsSlice(cns, slice)), vOutTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotOutRY(cns, region, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
@@ -16463,12 +17576,31 @@ eqCnsGETotOutRY(cns, region, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCn
           sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
           - pRhsRY(cns, region, year) =g= 0;
 
+eqCnsGETotOutRYGrowth(cns, region, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((comm, slice)$(mCnsComm(cns, comm)
+          and mCnsSlice(cns, slice)), vOutTot(comm, region, yearp, slice)) =g= 0;
+
 eqCnsETotOutRY(cns, region, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns)
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns)
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and
       mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
           - pRhsRY(cns, region, year) =e= 0;
+
+eqCnsETotOutRYGrowth(cns, region, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((comm, slice)$(mCnsComm(cns, comm) and mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRY(cns, region, year)) * sum((comm, slice)$(mCnsComm(cns, comm)
+          and mCnsSlice(cns, slice)), vOutTot(comm, region, yearp, slice)) =e= 0;
 
 eqCnsLETotOutRYS(cns, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
       and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
@@ -16478,6 +17610,16 @@ eqCnsLETotOutRYS(cns, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
           sum((comm)$(mCnsComm(cns, comm)), vOutTot(comm, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =l= 0;
 
+eqCnsLETotOutRYSGrowth(cns, region, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm)$(mCnsComm(cns, comm)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((comm)$(mCnsComm(cns, comm)),
+          vOutTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotOutRYS(cns, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
       and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and
@@ -16486,6 +17628,16 @@ eqCnsGETotOutRYS(cns, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
           sum((comm)$(mCnsComm(cns, comm)), vOutTot(comm, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =g= 0;
 
+eqCnsGETotOutRYSGrowth(cns, region, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm)$(mCnsComm(cns, comm)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((comm)$(mCnsComm(cns, comm)),
+          vOutTot(comm, region, yearp, slice)) =g= 0;
+
 eqCnsETotOutRYS(cns, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
       and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region)
@@ -16493,6 +17645,16 @@ eqCnsETotOutRYS(cns, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
       mMidMilestone(year))..
           sum((comm)$(mCnsComm(cns, comm)), vOutTot(comm, region, year, slice))
           - pRhsRYS(cns, region, year, slice) =e= 0;
+
+eqCnsETotOutRYSGrowth(cns, region, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and mCnsLhsComm(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((comm)$(mCnsComm(cns, comm)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsRYS(cns, region, year, slice)) * sum((comm)$(mCnsComm(cns, comm)),
+          vOutTot(comm, region, yearp, slice)) =e= 0;
 
 eqCnsLETotOutC(cns, comm)$(mCnsOut(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns)
@@ -16550,12 +17712,32 @@ eqCnsLETotOutCY(cns, comm, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and not(m
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
           vOutTot(comm, region, year, slice)) - pRhsCY(cns, comm, year) =l= 0;
 
+eqCnsLETotOutCYGrowth(cns, comm, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
+          vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCY(cns, comm, year)) * sum((region,
+          slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), vOutTot(comm, region, yearp, slice))
+          =l= 0;
+
 eqCnsGETotOutCY(cns, comm, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
       mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
           vOutTot(comm, region, year, slice)) - pRhsCY(cns, comm, year) =g= 0;
+
+eqCnsGETotOutCYGrowth(cns, comm, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
+          vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCY(cns, comm, year)) * sum((region,
+          slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), vOutTot(comm, region, yearp, slice))
+          =g= 0;
 
 eqCnsETotOutCY(cns, comm, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and
@@ -16564,12 +17746,33 @@ eqCnsETotOutCY(cns, comm, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and not(mC
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
           vOutTot(comm, region, year, slice)) - pRhsCY(cns, comm, year) =e= 0;
 
+eqCnsETotOutCYGrowth(cns, comm, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)),
+          vOutTot(comm, region, year, slice)) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCY(cns, comm, year)) * sum((region,
+          slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice)), vOutTot(comm, region, yearp, slice))
+          =e= 0;
+
 eqCnsLETotOutCYS(cns, comm, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
       not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region)), vOutTot(comm, region, year, slice))
           - pRhsCYS(cns, comm, year, slice) =l= 0;
+
+eqCnsLETotOutCYSGrowth(cns, comm, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCYS(cns, comm, year, slice)) * sum((region)$(mCnsRegion(cns, region)),
+          vOutTot(comm, region, yearp, slice)) =l= 0;
 
 eqCnsGETotOutCYS(cns, comm, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
@@ -16578,6 +17781,16 @@ eqCnsGETotOutCYS(cns, comm, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) a
           sum((region)$(mCnsRegion(cns, region)), vOutTot(comm, region, year, slice))
           - pRhsCYS(cns, comm, year, slice) =g= 0;
 
+eqCnsGETotOutCYSGrowth(cns, comm, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsYear(cns, year)
+      and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCYS(cns, comm, year, slice)) * sum((region)$(mCnsRegion(cns, region)),
+          vOutTot(comm, region, yearp, slice)) =g= 0;
+
 eqCnsETotOutCYS(cns, comm, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and
       not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
@@ -16585,6 +17798,16 @@ eqCnsETotOutCYS(cns, comm, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns)) an
       mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region)), vOutTot(comm, region, year, slice))
           - pRhsCYS(cns, comm, year, slice) =e= 0;
+
+eqCnsETotOutCYSGrowth(cns, comm, year, slice, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns))
+      and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
+      and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((region)$(mCnsRegion(cns, region)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCYS(cns, comm, year, slice)) * sum((region)$(mCnsRegion(cns, region)),
+          vOutTot(comm, region, yearp, slice)) =e= 0;
 
 eqCnsLETotOutCR(cns, comm, region)$(mCnsOut(cns) and not(mCnsLType(cns)) and not(mCnsLhsComm(cns))
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and
@@ -16647,12 +17870,32 @@ eqCnsLETotOutCRY(cns, comm, region, year)$(mCnsOut(cns) and not(mCnsLType(cns))
           sum((slice)$(mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
           - pRhsCRY(cns, comm, region, year) =l= 0;
 
+eqCnsLETotOutCRYGrowth(cns, comm, region, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCRY(cns, comm, region, year)) * sum((slice)$(mCnsSlice(cns, slice)),
+          vOutTot(comm, region, yearp, slice)) =l= 0;
+
 eqCnsGETotOutCRY(cns, comm, region, year)$(mCnsOut(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
           - pRhsCRY(cns, comm, region, year) =g= 0;
+
+eqCnsGETotOutCRYGrowth(cns, comm, region, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
+      and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and
+      mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCRY(cns, comm, region, year)) * sum((slice)$(mCnsSlice(cns, slice)),
+          vOutTot(comm, region, yearp, slice)) =g= 0;
 
 eqCnsETotOutCRY(cns, comm, region, year)$(mCnsOut(cns) and not(mCnsLType(cns)) and
       not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
@@ -16662,12 +17905,31 @@ eqCnsETotOutCRY(cns, comm, region, year)$(mCnsOut(cns) and not(mCnsLType(cns)) a
           sum((slice)$(mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
           - pRhsCRY(cns, comm, region, year) =e= 0;
 
+eqCnsETotOutCRYGrowth(cns, comm, region, year, yearp)$(mCnsOut(cns) and not(mCnsLType(cns))
+      and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
+      and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
+      and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          sum((slice)$(mCnsSlice(cns, slice)), vOutTot(comm, region, year, slice))
+          - prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)),
+          1 / pRhsCRY(cns, comm, region, year)) * sum((slice)$(mCnsSlice(cns, slice)),
+          vOutTot(comm, region, yearp, slice)) =e= 0;
+
 eqCnsLETotOutCRYS(cns, comm, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm) and mCnsRegion(cns, region)
       and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and
       mMidMilestone(year))..
           vOutTot(comm, region, year, slice) - pRhsCRYS(cns, comm, region, year, slice) =l= 0;
+
+eqCnsLETotOutCRYSGrowth(cns, comm, region, year, slice, yearp)$(mCnsOut(cns) and
+      not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns))
+      and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsComm(cns, comm)
+      and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vOutTot(comm, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCRYS(cns, comm, region, year, slice))
+          * vOutTot(comm, region, yearp, slice) =l= 0;
 
 eqCnsGETotOutCRYS(cns, comm, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
@@ -16676,12 +17938,31 @@ eqCnsGETotOutCRYS(cns, comm, region, year, slice)$(mCnsOut(cns) and not(mCnsLTyp
       mMidMilestone(year))..
           vOutTot(comm, region, year, slice) - pRhsCRYS(cns, comm, region, year, slice) =g= 0;
 
+eqCnsGETotOutCRYSGrowth(cns, comm, region, year, slice, yearp)$(mCnsOut(cns) and
+      not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns))
+      and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsComm(cns, comm)
+      and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
+      and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vOutTot(comm, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCRYS(cns, comm, region, year, slice))
+          * vOutTot(comm, region, yearp, slice) =g= 0;
+
 eqCnsETotOutCRYS(cns, comm, region, year, slice)$(mCnsOut(cns) and not(mCnsLType(cns))
       and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns))
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsComm(cns, comm)
       and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice)
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vOutTot(comm, region, year, slice) - pRhsCRYS(cns, comm, region, year, slice) =e= 0;
+
+eqCnsETotOutCRYSGrowth(cns, comm, region, year, slice, yearp)$(mCnsOut(cns) and
+      not(mCnsLType(cns)) and not(mCnsLhsComm(cns)) and not(mCnsLhsRegion(cns))
+      and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns))
+      and not(mCnsGe(cns)) and mCnsComm(cns, comm) and mCnsRegion(cns, region) and
+      mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and
+      mMidMilestone(year)and mMilestoneNext(year, yearp))..
+          vOutTot(comm, region, year, slice) - prod((yeare)$(ORD(yeare) >= ORD(year)
+          and ORD(yeare) < ORD(yearp)), 1 / pRhsCRYS(cns, comm, region, year, slice))
+          * vOutTot(comm, region, yearp, slice) =e= 0;
 
 
 * ------------------------------------------------------------------------------
@@ -17210,50 +18491,74 @@ eqCnsLETechCap
 eqCnsGETechCap
 eqCnsETechCap
 eqCnsLETechCapY
+eqCnsLETechCapYGrowth
 eqCnsGETechCapY
+eqCnsGETechCapYGrowth
 eqCnsETechCapY
+eqCnsETechCapYGrowth
 eqCnsLETechCapR
 eqCnsGETechCapR
 eqCnsETechCapR
 eqCnsLETechCapRY
+eqCnsLETechCapRYGrowth
 eqCnsGETechCapRY
+eqCnsGETechCapRYGrowth
 eqCnsETechCapRY
+eqCnsETechCapRYGrowth
 eqCnsLETechNewCap
 eqCnsGETechNewCap
 eqCnsETechNewCap
 eqCnsLETechNewCapY
+eqCnsLETechNewCapYGrowth
 eqCnsGETechNewCapY
+eqCnsGETechNewCapYGrowth
 eqCnsETechNewCapY
+eqCnsETechNewCapYGrowth
 eqCnsLETechNewCapR
 eqCnsGETechNewCapR
 eqCnsETechNewCapR
 eqCnsLETechNewCapRY
+eqCnsLETechNewCapRYGrowth
 eqCnsGETechNewCapRY
+eqCnsGETechNewCapRYGrowth
 eqCnsETechNewCapRY
+eqCnsETechNewCapRYGrowth
 eqCnsLETechInv
 eqCnsGETechInv
 eqCnsETechInv
 eqCnsLETechInvY
+eqCnsLETechInvYGrowth
 eqCnsGETechInvY
+eqCnsGETechInvYGrowth
 eqCnsETechInvY
+eqCnsETechInvYGrowth
 eqCnsLETechInvR
 eqCnsGETechInvR
 eqCnsETechInvR
 eqCnsLETechInvRY
+eqCnsLETechInvRYGrowth
 eqCnsGETechInvRY
+eqCnsGETechInvRYGrowth
 eqCnsETechInvRY
+eqCnsETechInvRYGrowth
 eqCnsLETechEac
 eqCnsGETechEac
 eqCnsETechEac
 eqCnsLETechEacY
+eqCnsLETechEacYGrowth
 eqCnsGETechEacY
+eqCnsGETechEacYGrowth
 eqCnsETechEacY
+eqCnsETechEacYGrowth
 eqCnsLETechEacR
 eqCnsGETechEacR
 eqCnsETechEacR
 eqCnsLETechEacRY
+eqCnsLETechEacRYGrowth
 eqCnsGETechEacRY
+eqCnsGETechEacRYGrowth
 eqCnsETechEacRY
+eqCnsETechEacRYGrowth
 eqCnsLETechAct
 eqCnsGETechAct
 eqCnsETechAct
@@ -17261,11 +18566,17 @@ eqCnsLETechActS
 eqCnsGETechActS
 eqCnsETechActS
 eqCnsLETechActY
+eqCnsLETechActYGrowth
 eqCnsGETechActY
+eqCnsGETechActYGrowth
 eqCnsETechActY
+eqCnsETechActYGrowth
 eqCnsLETechActYS
+eqCnsLETechActYSGrowth
 eqCnsGETechActYS
+eqCnsGETechActYSGrowth
 eqCnsETechActYS
+eqCnsETechActYSGrowth
 eqCnsLETechActR
 eqCnsGETechActR
 eqCnsETechActR
@@ -17273,11 +18584,17 @@ eqCnsLETechActRS
 eqCnsGETechActRS
 eqCnsETechActRS
 eqCnsLETechActRY
+eqCnsLETechActRYGrowth
 eqCnsGETechActRY
+eqCnsGETechActRYGrowth
 eqCnsETechActRY
+eqCnsETechActRYGrowth
 eqCnsLETechActRYS
+eqCnsLETechActRYSGrowth
 eqCnsGETechActRYS
+eqCnsGETechActRYSGrowth
 eqCnsETechActRYS
+eqCnsETechActRYSGrowth
 eqCnsLETechInpLShareIn
 eqCnsLETechInpLShareOut
 eqCnsLETechInpL
@@ -17618,50 +18935,74 @@ eqCnsLETechCapL
 eqCnsGETechCapL
 eqCnsETechCapL
 eqCnsLETechCapLY
+eqCnsLETechCapLYGrowth
 eqCnsGETechCapLY
+eqCnsGETechCapLYGrowth
 eqCnsETechCapLY
+eqCnsETechCapLYGrowth
 eqCnsLETechCapLR
 eqCnsGETechCapLR
 eqCnsETechCapLR
 eqCnsLETechCapLRY
+eqCnsLETechCapLRYGrowth
 eqCnsGETechCapLRY
+eqCnsGETechCapLRYGrowth
 eqCnsETechCapLRY
+eqCnsETechCapLRYGrowth
 eqCnsLETechNewCapL
 eqCnsGETechNewCapL
 eqCnsETechNewCapL
 eqCnsLETechNewCapLY
+eqCnsLETechNewCapLYGrowth
 eqCnsGETechNewCapLY
+eqCnsGETechNewCapLYGrowth
 eqCnsETechNewCapLY
+eqCnsETechNewCapLYGrowth
 eqCnsLETechNewCapLR
 eqCnsGETechNewCapLR
 eqCnsETechNewCapLR
 eqCnsLETechNewCapLRY
+eqCnsLETechNewCapLRYGrowth
 eqCnsGETechNewCapLRY
+eqCnsGETechNewCapLRYGrowth
 eqCnsETechNewCapLRY
+eqCnsETechNewCapLRYGrowth
 eqCnsLETechInvL
 eqCnsGETechInvL
 eqCnsETechInvL
 eqCnsLETechInvLY
+eqCnsLETechInvLYGrowth
 eqCnsGETechInvLY
+eqCnsGETechInvLYGrowth
 eqCnsETechInvLY
+eqCnsETechInvLYGrowth
 eqCnsLETechInvLR
 eqCnsGETechInvLR
 eqCnsETechInvLR
 eqCnsLETechInvLRY
+eqCnsLETechInvLRYGrowth
 eqCnsGETechInvLRY
+eqCnsGETechInvLRYGrowth
 eqCnsETechInvLRY
+eqCnsETechInvLRYGrowth
 eqCnsLETechEacL
 eqCnsGETechEacL
 eqCnsETechEacL
 eqCnsLETechEacLY
+eqCnsLETechEacLYGrowth
 eqCnsGETechEacLY
+eqCnsGETechEacLYGrowth
 eqCnsETechEacLY
+eqCnsETechEacLYGrowth
 eqCnsLETechEacLR
 eqCnsGETechEacLR
 eqCnsETechEacLR
 eqCnsLETechEacLRY
+eqCnsLETechEacLRYGrowth
 eqCnsGETechEacLRY
+eqCnsGETechEacLRYGrowth
 eqCnsETechEacLRY
+eqCnsETechEacLRYGrowth
 eqCnsLETechActL
 eqCnsGETechActL
 eqCnsETechActL
@@ -17669,11 +19010,17 @@ eqCnsLETechActLS
 eqCnsGETechActLS
 eqCnsETechActLS
 eqCnsLETechActLY
+eqCnsLETechActLYGrowth
 eqCnsGETechActLY
+eqCnsGETechActLYGrowth
 eqCnsETechActLY
+eqCnsETechActLYGrowth
 eqCnsLETechActLYS
+eqCnsLETechActLYSGrowth
 eqCnsGETechActLYS
+eqCnsGETechActLYSGrowth
 eqCnsETechActLYS
+eqCnsETechActLYSGrowth
 eqCnsLETechActLR
 eqCnsGETechActLR
 eqCnsETechActLR
@@ -17681,11 +19028,17 @@ eqCnsLETechActLRS
 eqCnsGETechActLRS
 eqCnsETechActLRS
 eqCnsLETechActLRY
+eqCnsLETechActLRYGrowth
 eqCnsGETechActLRY
+eqCnsGETechActLRYGrowth
 eqCnsETechActLRY
+eqCnsETechActLRYGrowth
 eqCnsLETechActLRYS
+eqCnsLETechActLRYSGrowth
 eqCnsGETechActLRYS
+eqCnsGETechActLRYSGrowth
 eqCnsETechActLRYS
+eqCnsETechActLRYSGrowth
 eqCnsLESupOutShareIn
 eqCnsLESupOutShareOut
 eqCnsLESupOut
@@ -18029,11 +19382,17 @@ eqCnsLETotInpS
 eqCnsGETotInpS
 eqCnsETotInpS
 eqCnsLETotInpY
+eqCnsLETotInpYGrowth
 eqCnsGETotInpY
+eqCnsGETotInpYGrowth
 eqCnsETotInpY
+eqCnsETotInpYGrowth
 eqCnsLETotInpYS
+eqCnsLETotInpYSGrowth
 eqCnsGETotInpYS
+eqCnsGETotInpYSGrowth
 eqCnsETotInpYS
+eqCnsETotInpYSGrowth
 eqCnsLETotInpR
 eqCnsGETotInpR
 eqCnsETotInpR
@@ -18041,11 +19400,17 @@ eqCnsLETotInpRS
 eqCnsGETotInpRS
 eqCnsETotInpRS
 eqCnsLETotInpRY
+eqCnsLETotInpRYGrowth
 eqCnsGETotInpRY
+eqCnsGETotInpRYGrowth
 eqCnsETotInpRY
+eqCnsETotInpRYGrowth
 eqCnsLETotInpRYS
+eqCnsLETotInpRYSGrowth
 eqCnsGETotInpRYS
+eqCnsGETotInpRYSGrowth
 eqCnsETotInpRYS
+eqCnsETotInpRYSGrowth
 eqCnsLETotInpC
 eqCnsGETotInpC
 eqCnsETotInpC
@@ -18053,11 +19418,17 @@ eqCnsLETotInpCS
 eqCnsGETotInpCS
 eqCnsETotInpCS
 eqCnsLETotInpCY
+eqCnsLETotInpCYGrowth
 eqCnsGETotInpCY
+eqCnsGETotInpCYGrowth
 eqCnsETotInpCY
+eqCnsETotInpCYGrowth
 eqCnsLETotInpCYS
+eqCnsLETotInpCYSGrowth
 eqCnsGETotInpCYS
+eqCnsGETotInpCYSGrowth
 eqCnsETotInpCYS
+eqCnsETotInpCYSGrowth
 eqCnsLETotInpCR
 eqCnsGETotInpCR
 eqCnsETotInpCR
@@ -18065,11 +19436,17 @@ eqCnsLETotInpCRS
 eqCnsGETotInpCRS
 eqCnsETotInpCRS
 eqCnsLETotInpCRY
+eqCnsLETotInpCRYGrowth
 eqCnsGETotInpCRY
+eqCnsGETotInpCRYGrowth
 eqCnsETotInpCRY
+eqCnsETotInpCRYGrowth
 eqCnsLETotInpCRYS
+eqCnsLETotInpCRYSGrowth
 eqCnsGETotInpCRYS
+eqCnsGETotInpCRYSGrowth
 eqCnsETotInpCRYS
+eqCnsETotInpCRYSGrowth
 eqCnsLETotOut
 eqCnsGETotOut
 eqCnsETotOut
@@ -18077,11 +19454,17 @@ eqCnsLETotOutS
 eqCnsGETotOutS
 eqCnsETotOutS
 eqCnsLETotOutY
+eqCnsLETotOutYGrowth
 eqCnsGETotOutY
+eqCnsGETotOutYGrowth
 eqCnsETotOutY
+eqCnsETotOutYGrowth
 eqCnsLETotOutYS
+eqCnsLETotOutYSGrowth
 eqCnsGETotOutYS
+eqCnsGETotOutYSGrowth
 eqCnsETotOutYS
+eqCnsETotOutYSGrowth
 eqCnsLETotOutR
 eqCnsGETotOutR
 eqCnsETotOutR
@@ -18089,11 +19472,17 @@ eqCnsLETotOutRS
 eqCnsGETotOutRS
 eqCnsETotOutRS
 eqCnsLETotOutRY
+eqCnsLETotOutRYGrowth
 eqCnsGETotOutRY
+eqCnsGETotOutRYGrowth
 eqCnsETotOutRY
+eqCnsETotOutRYGrowth
 eqCnsLETotOutRYS
+eqCnsLETotOutRYSGrowth
 eqCnsGETotOutRYS
+eqCnsGETotOutRYSGrowth
 eqCnsETotOutRYS
+eqCnsETotOutRYSGrowth
 eqCnsLETotOutC
 eqCnsGETotOutC
 eqCnsETotOutC
@@ -18101,11 +19490,17 @@ eqCnsLETotOutCS
 eqCnsGETotOutCS
 eqCnsETotOutCS
 eqCnsLETotOutCY
+eqCnsLETotOutCYGrowth
 eqCnsGETotOutCY
+eqCnsGETotOutCYGrowth
 eqCnsETotOutCY
+eqCnsETotOutCYGrowth
 eqCnsLETotOutCYS
+eqCnsLETotOutCYSGrowth
 eqCnsGETotOutCYS
+eqCnsGETotOutCYSGrowth
 eqCnsETotOutCYS
+eqCnsETotOutCYSGrowth
 eqCnsLETotOutCR
 eqCnsGETotOutCR
 eqCnsETotOutCR
@@ -18113,11 +19508,17 @@ eqCnsLETotOutCRS
 eqCnsGETotOutCRS
 eqCnsETotOutCRS
 eqCnsLETotOutCRY
+eqCnsLETotOutCRYGrowth
 eqCnsGETotOutCRY
+eqCnsGETotOutCRYGrowth
 eqCnsETotOutCRY
+eqCnsETotOutCRYGrowth
 eqCnsLETotOutCRYS
+eqCnsLETotOutCRYSGrowth
 eqCnsGETotOutCRYS
+eqCnsGETotOutCRYSGrowth
 eqCnsETotOutCRYS
+eqCnsETotOutCRYSGrowth
 **************************************
 * Fix to previous value
 **************************************

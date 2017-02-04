@@ -128,7 +128,8 @@ getConstrainResults <- function(scenario, constrain) {
       } 
       if (nrow(tbl) > 0) {
         tbl[, 'is.active'] <- NA
-        tbl[, 'is.active'] <- c(tbl$lhs == tbl$rhs)
+        tol <- 1e-10 * min(abs(c(tbl$rhs, tbl$rhs)[c(tbl$rhs, tbl$rhs) != 0]))
+        tbl[, 'is.active'] <- abs(tbl$lhs - tbl$rhs) < tol
       }
       rownames(tbl) <- NULL
       ll <- list(tbl)
