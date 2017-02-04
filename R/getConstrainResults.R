@@ -47,6 +47,15 @@ getConstrainResults <- function(scenario, constrain) {
     if (length(vary.set) == 0) {
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
+      # Adjust to different period length
+      if (any(names(cns.set) == 'year')) {
+          yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
+          gg <- as.data.frame.table(gg)
+          for(i in seq(along = cns.set$year)) {
+            gg[gg$year == cns.set$year[i], 'Freq'] <- yr[i] * gg[gg$year == cns.set$year[i], 'Freq']
+          }
+          gg <- sum(gg$Freq)
+      }
       lhs <- sum(gg)
       rhs <- getDataMapTable(prec[['pRhs']])
       rhs <- rhs[rhs == constrain, 2]
@@ -73,6 +82,13 @@ getConstrainResults <- function(scenario, constrain) {
       if (tcns@type %in% c('sharein', 'shareout')) {
         if (tcns@type == 'sharein') gg <- dtt$vInpTot else gg <- dtt$vOutTot
         gg <- as.data.frame.table(gg)
+        # Adjust to different period length
+        if (any(names(cns.set) == 'year')) {
+            yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
+            for(i in seq(along = cns.set$year)) {
+              gg[gg$year == cns.set$year[i], 'Freq'] <- yr[i] * gg[gg$year == cns.set$year[i], 'Freq']
+            }
+        }
         gg <- gg[gg$comm %in% cns.set$comm & gg$region %in% cns.set$region & gg$year %in% cns.set$year &
           gg$slice %in% cns.set$slice, c(vary.set2,
             'Freq'), drop = FALSE]
@@ -110,12 +126,19 @@ getConstrainResults <- function(scenario, constrain) {
       }
       eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
-      gg <- apply(gg, seq(along = is.vary)[is.vary[c(ad_smpl, std_smp)]], sum)
-      lhs <- as.data.frame.table(as.array(gg))
+      gg <- as.data.frame.table(gg)
+      # Adjust to different period length
+      if (any(names(cns.set) == 'year')) {
+          yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
+          for(i in seq(along = cns.set$year)) {
+            gg[gg$year == cns.set$year[i], 'Freq'] <- yr[i] * gg[gg$year == cns.set$year[i], 'Freq']
+          }
+      }
+      lhs <- aggregate(gg$Freq, gg[, names(cns.set)[is.vary[c(ad_smpl, std_smp)]]], sum)
       v1 <- apply(lhs[, -ncol(lhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
       lhs <- lhs[v1 %in% v2,, drop = FALSE]
       v1 <- v1[v1 %in% v2]
-      lhs <- lhs[sort(v1, index.return = TRUE)$ix, 'Freq', drop = FALSE]
+      lhs <- lhs[sort(v1, index.return = TRUE)$ix, 'x', drop = FALSE]
       tbl[, 'lhs'] <- lhs
       tbl[, 'rhs'] <- rhs
       if (GROWTH_CNS) {
