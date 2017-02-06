@@ -37,4 +37,3 @@ levelized costs of production of commodity
 \examples{
 
 }
-

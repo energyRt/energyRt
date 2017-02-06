@@ -21,4 +21,3 @@ if missing, years are ingored, the first assigned parameter is considered.}
 \code{draw} is a method for class \code{technology} to graphically depict  
 input, output, and key parameters of technology
 }
-

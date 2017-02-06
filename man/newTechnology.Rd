@@ -10,4 +10,3 @@
 \description{
 Create new technology object
 }
-
