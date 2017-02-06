@@ -105,7 +105,6 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       cat('\\tableofcontents\n\n', '\n', sep = '', file = zz)
       
       cat('\\section{Cost analysis}\n\n', '\n', sep = '', file = zz)
-      
       # Cost data
       cost <- rbind(
         Subsidy = apply(dat$vSubsCost, 3, sum),
@@ -140,8 +139,15 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
       }
       # Discount cost data
-      dsc <- obj@precompiled@maptable$pDiscountFactor@data
+      dsc <- getDataMapTable(obj@precompiled@maptable$pDiscountFactor)
+      dsc[, 'mid'] <- NA
+      mlst <- getMileStone(obj)
+      for(i in seq(length.out = nrow(mlst))) {
+        dsc[mlst$start[i] <= dsc$year & dsc$year <= mlst$end[i], 'mid'] <- mlst$mid[i]
+      }
+      dsc$year <- dsc$mid
       dsc <- tapply(dsc$Freq, dsc[, c('region', 'year'), drop = FALSE], sum)
+      # Discount for region
       dsccost <- rbind(
         Subsidy = apply(apply(dat$vSubsCost, 2:3, sum) * dsc, 2, sum),
         Trade = apply(dat$vTradeCost * dsc, 2, sum),
@@ -385,7 +391,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           tec_emission <- apply(dat$vTechEms[tt,,,,, drop = FALSE], c(2, 4), sum)
           tec_emission <- tec_emission[apply(tec_emission != 0, 1, any),, drop = FALSE]
           
-          gg <- stock[stock$tech == tt, ]
+          gg <- stock[!is.na(stock$tech) & stock$tech == tt & stock$year %in% mlst$mid, ]
           tec_cap <- rbind(
             'Total capacity' = apply(dat$vTechCap[tt,,, drop = FALSE], 3, sum),
             'New capacity' = apply(dat$vTechNewCap[tt,,, drop = FALSE], 3, sum),
@@ -606,7 +612,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           sup_out <- apply(dat$vSupOut[cc, sup@commodity,,,, drop = FALSE], 4, sum)
           sup_cst <- apply(dat$vSupCost[cc,,, drop = FALSE], 3, sum)
           SP <- plot(obj@model, type = 'supply', commodity = sup@commodity, 
-            main = '', supply = cc, ylim_min = max(sup_out))
+            main = '', supply = cc, ylim_min = max(sup_out), year = mlst$mid)
           lines(dimnames(dat$vSupOut)$year, sup_out, col = 'cyan4', lwd = 2)
           dev.off2()
             bnd.on <- rep('free', nrow(SP)) 

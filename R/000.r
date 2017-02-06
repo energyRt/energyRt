@@ -47,5 +47,6 @@ getData <- function (...) UseMethod("getData")
 
 setGeneric("mileStoneYears", function(obj) standardGeneric("mileStoneYears"))
 setGeneric("setMileStoneYears", function(obj, start, ...) standardGeneric("setMileStoneYears"))
+setGeneric("getMileStone", function(obj) standardGeneric("getMileStone"))
 
 
