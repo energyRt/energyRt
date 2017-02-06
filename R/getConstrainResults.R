@@ -83,7 +83,7 @@ getConstrainResults <- function(scenario, constrain) {
         if (tcns@type == 'sharein') gg <- dtt$vInpTot else gg <- dtt$vOutTot
         gg <- as.data.frame.table(gg)
         # Adjust to different period length
-        if (any(names(cns.set) == 'year')) {
+        if (any(names(cns.set) == 'year') && all(names(vary.set) != 'year')) {
             yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
             for(i in seq(along = cns.set$year)) {
               gg[gg$year == cns.set$year[i], 'Freq'] <- yr[i] * gg[gg$year == cns.set$year[i], 'Freq']
@@ -96,7 +96,7 @@ getConstrainResults <- function(scenario, constrain) {
         v1 <- apply(gg[, -ncol(gg), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
         v1 <- v1[v1 %in% v2]
         gg <- gg[sort(v1, index.return = TRUE)$ix, ncol(gg), drop = FALSE]
-        rhs <- rhs * gg
+        tolhs <- gg
       } else if (GROWTH_CNS) {
         rhs <- getDataMapTable(prec[[paste('pRhs', fcase(ad_smpl)[length(ad_smpl) != 0 && 
           any(ad_smpl == names(tcns@for.each))], paste(toupper(substr(vary.set, 1, 1)), 
@@ -128,7 +128,7 @@ getConstrainResults <- function(scenario, constrain) {
         sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
       gg <- as.data.frame.table(gg)
       # Adjust to different period length
-      if (any(names(cns.set) == 'year')) {
+      if (any(names(cns.set) == 'year') && all(names(vary.set) != 'year')) {
           yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
           for(i in seq(along = cns.set$year)) {
             gg[gg$year == cns.set$year[i], 'Freq'] <- yr[i] * gg[gg$year == cns.set$year[i], 'Freq']
@@ -138,7 +138,8 @@ getConstrainResults <- function(scenario, constrain) {
       v1 <- apply(lhs[, -ncol(lhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
       lhs <- lhs[v1 %in% v2,, drop = FALSE]
       v1 <- v1[v1 %in% v2]
-      lhs <- lhs[sort(v1, index.return = TRUE)$ix, 'x', drop = FALSE]
+      lhs <- lhs[sort(v1, index.return = TRUE)$ix, 'x', drop = FALSE] 
+      if (tcns@type %in% c('sharein', 'shareout')) lhs <- lhs / tolhs
       tbl[, 'lhs'] <- lhs
       tbl[, 'rhs'] <- rhs
       if (GROWTH_CNS) {

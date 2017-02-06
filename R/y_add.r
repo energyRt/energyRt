@@ -266,7 +266,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
              data.frame(cns = app@name, stringsAsFactors = FALSE)) else
       if (app@type == 'shareout')  obj@maptable[['mCnsRhsTypeShareOut']] <- 
         addData(obj@maptable[['mCnsRhsTypeShareOut']], 
-          data.frame(cns = app@name, stringsAsFactors = FALSE)) 
+          data.frame(cns = app@name, stringsAsFactors = FALSE)) else
       if (any(grep('growth', as.character(app@type))))  
         obj@maptable[['mCnsRhsTypeGrowth']] <- 
            addData(obj@maptable[['mCnsRhsTypeGrowth']], 
