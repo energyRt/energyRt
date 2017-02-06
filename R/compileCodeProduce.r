@@ -98,6 +98,11 @@ sm_compile_model <- function(obj,
 #####################################################################################
 # Fill data to Code produce
 #####################################################################################
+  if (nrow(obj@sysInfo@milestone) == 0) {
+    if (!all(min(obj@sysInfo@year) + seq(along = obj@sysInfo@year) - 1 == obj@sysInfo@year))
+      stop('wrong year, use setMileStoneYears function')
+    obj <- setMileStoneYears(obj, start = min(obj@sysInfo@year), interval = rep(1, length(obj@sysInfo@year)))
+  }
   # Create exemplar for code
   prec <- new('CodeProduce')
   # List for approximation
