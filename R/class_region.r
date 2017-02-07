@@ -5,13 +5,15 @@ setClass("region",
           name          = "character",      # Short name
           description   = "character",      # Details
           type	        = "character",      # energy, electricity, material, (fuel?)
-          color         = "character"       #
+          color         = "character",      #
+          sp            = "SpatialPolygonsDataFrame"              # Spatial 
       ),
       prototype(
           name          = "",
           description   = "",
           type	        = "",
-          color         = ""
+          color         = "",
+          sp            = NULL
       ),
       S3methods = TRUE
 )
