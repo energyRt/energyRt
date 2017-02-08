@@ -107,6 +107,7 @@ defpTechAfacUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - use
 defpSupReserve(sup)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
 defpSupAvaUp(sup, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
 defpDumCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpTechOlife(tech, region)                     Auxiliary mapping for not Inf - used in GLPK-MathProg only
 * Storage set
 $ontext
 <<<<<<< HEAD
@@ -706,7 +707,8 @@ eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
          sum((yearp)$
                  (       mTechNew(tech, region, yearp) and
                          ORD(year) >= ORD(yearp) and
-                         ORD(year) < pTechOlife(tech, region) + ORD(yearp)
+                         ORD(year) < pTechOlife(tech, region) + ORD(yearp) and
+                         not(ndefpTechOlife(tech, region))
                  ),
                   pTechInvcost(tech, region, yearp) * (
 *                   sum(yeare$(ORD(yeare) = ORD(year) and ORD(yearp) = ORD(year)), pTechStock(tech, region, yeare)) +
@@ -744,7 +746,7 @@ eqTechInv(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region, ye
 eqTechSalv2(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare))..
     vTechSalv(tech, region)
     +
-   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare)),
+   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
      - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetirementCap(tech, region, year, yearp)))  / (
@@ -760,7 +762,7 @@ eqTechSalv2(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare
 eqTechSalv3(tech, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(yeare))..
     vTechSalv(tech, region)
     +
-   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare)),
+   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
       - sum(yearp$(mMidMilestone(year) and mTechRetirement(tech)), vTechRetirementCap(tech, region, year, yearp))) / (

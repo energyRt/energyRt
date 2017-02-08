@@ -378,6 +378,22 @@ LL1 <- proc.time()[3]
         prec@maptable$mTechEmitedComm <- addData(prec@maptable$mTechEmitedComm,
           data.frame(tech = tec, comm = rep(g, length(tec))))
       }
+      # Tech oilfe
+      olf <- getDataMapTable(prec@maptable$pTechOlife)
+      inv <- getDataMapTable(prec@maptable$pTechInvcost)
+      olf <- olf[olf$Freq == Inf,, drop = FALSE]
+      if (nrow(olf) > 0) {
+        inv <- aggregate(inv$Freq, by = inv[, c('tech', 'region')], FUN = "max")
+        inv <- inv[inv$tech %in% unique(olf$tech) & inv$x != 0,, drop = FALSE]
+        oo <- paste(olf$tech, olf$region, sep = '#')
+        ii <- paste(inv$tech, inv$region, sep = '#')
+        if (any(oo %in%  ii)) {
+          print('There is technology with infinite olife and non zero invcost: ')
+          print(inv[ii %in% oo, -ncol(inv), drop = FALSE])
+          stop('See previous errors')
+        }
+        prec@maptable$ndefpTechOlife <- addData(prec@maptable$ndefpTechOlife, olf[, -ncol(olf), drop = FALSE])
+      }
       # Check user error
       check_maptable(prec)
 ########

@@ -320,6 +320,7 @@ setMethod("initialize", "CodeProduce",
         MapTable('pDiscount', c('region', 'year'), 'single', 
                 default = .1, interpolation = 'back.inter.forth', for_sysInfo = 'discount')    
   # Additional for compatibility with GLPK
+  .Object@maptable[['ndefpTechOlife']] <- MapTable('ndefpTechOlife', c('tech', 'region'), 'map')   
   .Object@maptable[['defpTechAfaUp']] <- MapTable('defpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
   .Object@maptable[['defpTechAfacUp']] <- 
       MapTable('defpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    

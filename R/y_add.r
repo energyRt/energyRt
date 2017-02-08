@@ -396,7 +396,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
   # Temporary solution for immortality technology
   if (nrow(tech@olife) == 0) {
     tech@olife[1, ] <- NA;
-    tech@olife[1, 'olife'] <- 1e3;
+    tech@olife[1, 'olife'] <- Inf;
   }
 #  if (!chec_correct_name(tech@name)) {
 #    stop(paste('Incorrect technology name "', tech@name, '"', sep = ''))
