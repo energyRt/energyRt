@@ -22,7 +22,7 @@ choropleth.scenario <- function(scen, # scenario object
   spdf <- sp::SpatialPolygonsDataFrame(scen@model@sysInfo@sp, dat)
   GISTools::choropleth(spdf, variable, shading)
   GISTools::choro.legend()
-    
+  
   # nyear <- 10
   # nreg <- length(adm1$OBJECTID)
   # animation::saveLatex(
