@@ -268,6 +268,17 @@ sm_compile_model <- function(obj,
       arg <- arg[names(arg) != 'fix_scenario', drop = FALSE]
       arg <- arg[names(arg) != 'fix_year', drop = FALSE]
   }
+# ---------------------------------------------------------------------------------------------------------  
+# Get only listing file
+# ---------------------------------------------------------------------------------------------------------  
+  if (any(names(arg) == 'only.listing')) {
+      only.listing <- arg$only.listing
+      if (only.listing && solver != 'GAMS') {
+         stop('only.listing file have to be only with GAMS "solver"')
+      }
+      arg <- arg[names(arg) != 'only.listing', drop = FALSE]
+  } else only.listing <- FALSE
+  
   if (length(arg) != 0) warning('Unknown argument ', names(arg))
 # ---------------------------------------------------------------------------------------------------------  
       gg <- prec@maptable[['pDiscount']]@data
@@ -456,6 +467,13 @@ LL1 <- proc.time()[3]
   
     cat(cdd[(grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', cdd) + 1):
         (grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', cdd) - 1)], sep = '\n', file = zz)
+    if (only.listing) {
+      cat('OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;\n',
+          'OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;\n',
+          'option iterlim = 0;\n', 
+          'Solve st_model minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
+    
+    }
     cat(obj@additionalCode, sep = '\n', file = zz)
     cat(cdd[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', cdd) + 1):(
         grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', cdd) - 1)], sep = '\n', file = zz)
@@ -487,6 +505,9 @@ LL1 <- proc.time()[3]
       setwd(BEGINDR)
       stop(x)
     })    
+    if (only.listing) {
+      return(readLines(paste(tmpdir, '/mdl.lst', sep = '')))
+    }
     pp3 <- proc.time()[3]
     if(echo) cat('Solver work time: ', round(pp3 - pp2, 2), 's\n', sep = '')
   } else if (solver == 'GLPK' || solver == 'CBC') {
