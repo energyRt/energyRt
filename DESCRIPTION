@@ -14,4 +14,4 @@ Depends: sp
 Imports: rpivotTable
 Suggests: WriteXLS
 License: AGLP-3
-RoxygenNote: 6.0.0
+RoxygenNote: 6.0.1
