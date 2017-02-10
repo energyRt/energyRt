@@ -23,7 +23,7 @@
 getData.scenario <- function(obj, tech = NA, dem = NA, sup = NA,  
      comm = NA, group = NA, region = NA, year = NA, slice = NA, 
      stg = NA, expp = NA, imp = NA, trade = NA, variable = NULL, 
-     remove_zero_dim = TRUE, drop = TRUE) {
+     remove_zero_dim = TRUE, drop = TRUE, DataFrame = FALSE) {
   if (is.null(tech) || is.null(dem) || is.null(sup) || is.null(comm)
     || is.null(group)|| is.null(region) || is.null(year) || is.null(slice)
     || is.null(stg) || is.null(expp) || is.null(imp) || is.null(trade)) return(NULL);
@@ -114,7 +114,11 @@ getData.scenario <- function(obj, tech = NA, dem = NA, sup = NA,
 #      }
 #    } else dtt <- data.frame()
 #  }
-  dtt
+  if(DataFrame) {
+    # as.data.frame.table
+    # dtt@variable <- 
+  } 
+  return(dtt)
 }
 getDataOut <- function(obj, comm) {
   gg <- getData(obj, comm = comm, variable = c("vTechOut", 'vImport', 'vSupOut'), 
@@ -129,3 +133,14 @@ getDataOut <- function(obj, comm) {
   tapply(gg$value, gg[, c('year', 'src')], sum)
 }
 
+getDataTable <- function(scen, ...) {
+  lmx <- getData(scen, ...)
+  ltb <- lapply(names(lmx), function(x) {
+    as.data.frame.table(lmx[[x]], responseName = x)
+  })
+  dft <- Reduce(function(x, y, ...) {merge(x, y, all = TRUE)}, ltb)
+  #dft <- Reduce(function(x, y, ...) {dplyr::full_join(x, y)}, ltb)
+  return(dft)
+} 
+
+  
