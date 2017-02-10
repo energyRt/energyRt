@@ -7,6 +7,7 @@ sm_compile_model <- function(obj,
   pp1 <- proc.time()[3]
   # Upper case
   arg <- list(...)
+  if (any(names(arg) == 'exclude')) arg <- arg[!(names(arg) %in% c('exclude', arg$exclude))]
   if (any(names(arg) == 'solver')) {
     solver <- arg$solver
     arg <- arg[names(arg) != 'solver', drop = FALSE]

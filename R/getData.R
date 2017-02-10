@@ -82,7 +82,7 @@ getData.scenario <- function(obj, tech = NA, dem = NA, sup = NA,
         
     }
   }
-  if (remove_zero_dim) {
+  if (remove_zero_dim && length(dtt) != 0) {
     dtt <- dtt[sapply(dtt, function(x) any(x != 0))]
     for(j in names(dtt)) {
       gg <- paste('apply(dtt[[j]] != 0, ', 1:length(dim(dtt[[j]])), ', any)', sep = '')
