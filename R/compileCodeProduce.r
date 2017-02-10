@@ -12,7 +12,10 @@ sm_compile_model <- function(obj,
     solver <- arg$solver
     arg <- arg[names(arg) != 'solver', drop = FALSE]
   } else solver <- 'GAMS'
-  
+  if (solver == 'GAMS') {
+    rs <- try(system('gams'))
+    if (rs != 0) stop('There is no gams')
+  }
   if (is.null(tmp.dir)) {
     tmp.dir <- getwd()
   }
@@ -496,7 +499,6 @@ LL1 <- proc.time()[3]
         rs <- system(paste('gams mdl.gms', gamsCompileParameter))
       }
       setwd(BEGINDR)  
-      if (rs != 0) stop(paste('Solution error code', rs))
     }, interrupt = function(x) {
       if (tmp.del) unlink(tmpdir, recursive = TRUE)
       setwd(BEGINDR)
@@ -506,6 +508,7 @@ LL1 <- proc.time()[3]
       setwd(BEGINDR)
       stop(x)
     })    
+    if (rs != 0) stop(paste('Solution error code', rs))
     if (only.listing) {
       return(readLines(paste(tmpdir, '/mdl.lst', sep = '')))
     }
