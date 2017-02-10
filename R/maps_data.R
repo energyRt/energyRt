@@ -4520,6 +4520,7 @@ getEquations <- function() {
     rs["eqPreDefRowExport", c("expp", "region", "year", "slice", "vRowExport")] <- TRUE;
     rs["eqPreDefRowImport", c("name", "description")] <- c("eqPreDefRowImport", "");
     rs["eqPreDefRowImport", c("imp", "region", "year", "slice", "vRowImport")] <- TRUE;
+    rs[, -(1:2)][is.na(rs[, -(1:2)])] <- FALSE;
 rs
 }
 getVariables <- function() {
@@ -6108,5 +6109,6 @@ getVariables <- function() {
     rs["vRowImportRes", c("imp", "eqRowImportRes", "eqRowImportResUp")] <- TRUE;
     rs["vRowImport", c("name", "description")] <- c("vRowImport", "???");
     rs["vRowImport", c("imp", "region", "year", "slice", "eqImport", "eqCostTrade", "eqRowImportUp", "eqRowImportLo", "eqRowImportRes", "eqPreDefRowImport")] <- TRUE;
+    rs[, -(1:2)][is.na(rs[, -(1:2)])] <- FALSE;
 rs
 }
