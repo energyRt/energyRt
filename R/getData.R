@@ -72,28 +72,34 @@ getData.scenario <- function(obj, tech = NA, dem = NA, sup = NA,
       dtt <- dtt[rmv]  
     }
   }
-  if (drop) {
-    for(j in names(dtt)) if (length(dim(dtt[[j]])) > 1) {
+if (drop) {
+    for(j in names(dtt)) if (length(dim(dtt[[j]])) > 0) {
       if (any(dim(dtt[[j]]) != 1)) {
+        kk <- names(dimnames(dtt[[j]]))[dim(dtt[[j]]) != 1]
         dtt[[j]] <- as.array(apply(dtt[[j]], seq(along = dim(dtt[[j]]))[dim(dtt[[j]]) != 1], sum))
+        names(dimnames(dtt[[j]])) <- kk
       } else {
-        dtt[[j]] <- as.array(apply(dtt[[j]], 1, sum))
+        dtt[[j]] <-c(dtt[[j]])
+        names(dtt[[j]]) <- NULL
       }
         
     }
   }
-  if (remove_zero_dim) {
+  if (remove_zero_dim && length(dtt) != 0) {
     dtt <- dtt[sapply(dtt, function(x) any(x != 0))]
     for(j in names(dtt)) {
       gg <- paste('apply(dtt[[j]] != 0, ', 1:length(dim(dtt[[j]])), ', any)', sep = '')
       eval(parse(text = paste('dtt[[j]] <- dtt[[j]][', paste(gg, collapse = ','), ', drop = FALSE]', sep = '')))
     }
     if (drop) {
-      for(j in names(dtt)) if (length(dim(dtt[[j]])) > 1) {
+      for(j in names(dtt)) if (length(dim(dtt[[j]])) > 0) {
         if (any(dim(dtt[[j]]) != 1)) {
+          kk <- names(dimnames(dtt[[j]]))[dim(dtt[[j]]) != 1]
           dtt[[j]] <- as.array(apply(dtt[[j]], seq(along = dim(dtt[[j]]))[dim(dtt[[j]]) != 1], sum))
+          names(dimnames(dtt[[j]])) <- kk
         } else {
-          dtt[[j]] <- as.array(apply(dtt[[j]], 1, sum))
+          dtt[[j]] <-c(dtt[[j]])
+          names(dtt[[j]]) <- NULL
         }
           
       }
