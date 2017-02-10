@@ -138,8 +138,8 @@ getDataOut <- function(obj, comm) {
   tapply(gg$value, gg[, c('year', 'src')], sum)
 }
 
-getDataTable <- function(scen, ...) {
-  lmx <- getData(scen, ...)
+getDataTable <- function(scen, drop = FALSE, ...) {
+  lmx <- getData(scen, drop = drop, ...)
   ltb <- lapply(names(lmx), function(x) {
     as.data.frame.table(lmx[[x]], responseName = x)
   })
