@@ -74,9 +74,7 @@ getData.scenario <- function(obj, tech = NA, dem = NA, sup = NA,
   }
   if (drop) {
     for(j in names(dtt)) if (length(dim(dtt[[j]])) > 1) {
-      ttt <- paste('dtt[[j]] <- dtt[[j]][', paste(rep(',', length.out = length(dim(dtt[[j]])) - 1), 
-       collapse = ''), ', drop = ', drop, ']', sep = '')
-      eval(parse(text = ttt))
+      dtt[[j]] <- as.array(apply(dtt[[j]], seq(along = dtt[[j]])[dim(dtt[[j]]) != 1], sum))
     }
   }
   if (remove_zero_dim) {
