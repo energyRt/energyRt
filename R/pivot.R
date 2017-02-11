@@ -3,7 +3,7 @@ pivot <- function(scen = NULL, variable = NULL, get_data = FALSE, ...) {
   stopifnot(is.logical(get_data))
   if (class(scen) == "scenario") {scen <- list(scen)}
   stopifnot(is.list(scen))
-  if (!is.list(variable == "scenario")) {variable <- as.list(variable)}
+  if (!is.list(variable)) {variable <- as.list(variable)}
   eg <- expand.grid(1:length(scen), 1:length(variable))
   lst <- mapply(function(x, y) {
     dft <- as.data.frame.table(scen[[x]]@result@data[[variable[[y]]]], 

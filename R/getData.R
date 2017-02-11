@@ -144,13 +144,23 @@ getDataOut <- function(obj, comm) {
   tapply(gg$value, gg[, c('year', 'src')], sum)
 }
 
-getDataTable <- function(scen, drop = FALSE, ...) {
-  lmx <- getData(scen, drop = drop, ...)
+getDataTable <- function(obj, use.dplyr = FALSE, ...) {
+  drop = FALSE
+  lmx <- getData(obj, drop = drop, ...)
   ltb <- lapply(names(lmx), function(x) {
-    as.data.frame.table(lmx[[x]], responseName = x)
+    if (is.null(dim(lmx[[x]]))) return(NULL)
+    y <- as.data.frame.table(lmx[[x]], responseName = "value0")
+    y$variable <- as.factor(x)
+    y$value <- y$value0
+    y$value0 <- NULL
+    return(y)
   })
-  dft <- Reduce(function(x, y, ...) {merge(x, y, all = TRUE)}, ltb)
-  #dft <- Reduce(function(x, y, ...) {dplyr::full_join(x, y)}, ltb)
+  if (use.dplyr) {
+    dft <- Reduce(function(x, y) {dplyr::full_join(x, y)}, ltb)
+    
+  } else {
+    dft <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, ltb)
+  }
   return(dft)
 } 
 
