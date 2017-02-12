@@ -202,6 +202,9 @@ setMethod("initialize", "CodeProduce",
         .Object@maptable[['pTechCvarom']] <- MapTable('pTechCvarom', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'single', 
                 default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cvarom')    
+        .Object@maptable[['pTechAvarom']] <- MapTable('pTechAvarom', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
+                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'avarom')    
         .Object@maptable[['pTechShare']] <- MapTable('pTechShare', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'double', 
                 default = c(0, 1), interpolation = 'back.inter.forth', 

@@ -156,6 +156,7 @@ param pTechAfacUp{tech, comm, region, year, slice};
 param pTechStock{tech, region, year};
 param pTechCap2act{tech};
 param pTechCvarom{tech, comm, region, year, slice};
+param pTechAvarom{tech, comm, region, year, slice};
 param pDiscount{region, year};
 param pDiscountFactor{region, year};
 param pSupCost{sup, region, year, slice};
@@ -374,9 +375,9 @@ s.t.  eqTechSalv2{ t in tech,r in region,ye in year : (mDiscountZero[r] and mMil
 
 s.t.  eqTechSalv3{ t in tech,r in region,ye in year : (not((mDiscountZero[r])) and mMilestoneLast[ye])}: vTechSalv[t,r]+sum{y in year:((mMidMilestone[y] and mTechNew[t,r,y] and ORD[y]+pTechOlife[t,r]-1>ORD[ye] and not((ndefpTechOlife[t,r]))))}((((pDiscountFactor[r,y]) / (pDiscountFactor[r,ye]))*pTechInvcost[t,r,y]*(vTechNewCap[t,r,y]-sum{yp in year:((mMidMilestone[y] and mTechRetirement[t]))}(vTechRetirementCap[t,r,y,yp]))) / ((1+((sum{yp in year:((mMidMilestone[yp] and ORD[yp] >= ORD[y]))}(pDiscountFactor[r,yp]))) / ((pDiscountFactor[r,ye])*(sum{yn in year:((ORD[ye]=ORD[yn]))}(((1-((1+pDiscount[r,yn]))^(ORD[ye]-pTechOlife[t,r]-ORD[y]+1))*(1+pDiscount[r,yn])) / (pDiscount[r,yn])))))))  =  0;
 
-s.t.  eqTechCost1{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y] and mTechNew[t,r,y])}: vTechCost[t,r,y]  =  (vTechInv[t,r,y]+pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:(mTechInpComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])));
+s.t.  eqTechCost1{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y] and mTechNew[t,r,y])}: vTechCost[t,r,y]  =  (vTechInv[t,r,y]+pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:(mTechInpComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:(mTechAOut[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAOut[t,c,r,y,s])+sum{c in comm:(mTechAInp[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s])));
 
-s.t.  eqTechCost2{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y] and not((mTechNew[t,r,y])))}: vTechCost[t,r,y]  =  (pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:(mTechInpComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])));
+s.t.  eqTechCost2{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y] and not((mTechNew[t,r,y])))}: vTechCost[t,r,y]  =  (pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:(mTechInpComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:(mTechAOut[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAOut[t,c,r,y,s])+sum{c in comm:(mTechAInp[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s])));
 
 s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mSupComm[s1,c] and defpSupAvaUp[s1,r,y,s] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,r,y,s];
 

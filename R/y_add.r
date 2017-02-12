@@ -412,10 +412,18 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
   # Need choose comm more accuracy
   approxim_comm <- approxim
   approxim_comm[['comm']] <- rownames(ctype$comm)
-  if (length(approxim_comm[['comm']]) != 0)
+  if (length(approxim_comm[['comm']]) != 0) {
     obj@maptable[['pTechCvarom']] <- addData(obj@maptable[['pTechCvarom']],
       simple_data_frame_approximation_chk(tech@varom, 'cvarom',
        obj@maptable[['pTechCvarom']], approxim_comm, 'tech', tech@name))
+  }
+  approxim_acomm <- approxim
+  approxim_acomm[['acomm']] <- rownames(ctype$aux)
+  if (length(approxim_acomm[['acomm']]) != 0) {
+    obj@maptable[['pTechAvarom']] <- addData(obj@maptable[['pTechAvarom']],
+      simple_data_frame_approximation_chk(tech@varom, 'avarom',
+       obj@maptable[['pTechAvarom']], approxim_acomm, 'tech', tech@name))
+  }
   approxim_comm[['comm']] <- rownames(ctype$comm)
   if (length(approxim_comm[['comm']]) != 0) {
     gg <- data_frame_approximation_chk(tech@ceff, 'afac',

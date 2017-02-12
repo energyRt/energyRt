@@ -182,6 +182,7 @@ pTechAfacUp(tech, comm, region, year, slice)        Upper bound for commodity ou
 pTechStock(tech, region, year)                      Technology capacity stock (accumulated in previous years production capacities)
 pTechCap2act(tech)                                  Technology capacity units to activity units conversion factor
 pTechCvarom(tech, comm, region, year, slice)        Commodity-specific variable costs (per unit of the commodity input or output)
+pTechAvarom(tech, comm, region, year, slice)        Auxilary Commodity-specific variable costs (per unit of the commodity input or output)
 * Exit stock and salvage
 pDiscount(region, year)                             Discount rate (can be region and year specific)
 *# RENAME  pDiscountFactor
@@ -787,10 +788,26 @@ eqTechCost1(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region,
                   sum(comm$mTechInpComm(tech, comm),
                           pTechCvarom(tech, comm, region, year, slice) *
                           vTechInp(tech, comm, region, year, slice)
-                  ) +
+                  )
+                  +
                   sum(comm$mTechOutComm(tech, comm),
                           pTechCvarom(tech, comm, region, year, slice) *
                           vTechOut(tech, comm, region, year, slice)
+                  )
+                  +
+                  sum(comm$mTechOutComm(tech, comm),
+                          pTechCvarom(tech, comm, region, year, slice) *
+                          vTechOut(tech, comm, region, year, slice)
+                  )
+                  +
+                  sum(comm$mTechAOut(tech, comm),
+                          pTechAvarom(tech, comm, region, year, slice) *
+                          vTechAOut(tech, comm, region, year, slice)
+                  )
+                  +
+                  sum(comm$mTechAInp(tech, comm),
+                          pTechAvarom(tech, comm, region, year, slice) *
+                          vTechAInp(tech, comm, region, year, slice)
                   )
          ));
 
@@ -808,6 +825,16 @@ eqTechCost2(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region,
                   sum(comm$mTechOutComm(tech, comm),
                           pTechCvarom(tech, comm, region, year, slice) *
                           vTechOut(tech, comm, region, year, slice)
+                  )
+                  +
+                  sum(comm$mTechAOut(tech, comm),
+                          pTechAvarom(tech, comm, region, year, slice) *
+                          vTechAOut(tech, comm, region, year, slice)
+                  )
+                  +
+                  sum(comm$mTechAInp(tech, comm),
+                          pTechAvarom(tech, comm, region, year, slice) *
+                          vTechAInp(tech, comm, region, year, slice)
                   )
          ));
 
