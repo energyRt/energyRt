@@ -56,6 +56,19 @@ sm_compile_model <- function(obj,
     description <- arg$description
     arg <- arg[names(arg) != 'description', drop = FALSE]    
   }
+  if (any(names(arg) == 'model.type')) {
+    model.type <- arg$model.type
+    arg <- arg[names(arg) != 'model.type', drop = FALSE]
+    if (all(model.type != c('reduce', 'large')))
+     stop('Unknown model.type argument, have to be "large" or "reduce"')
+  } else model.type <- 'reduce'
+  if (model.type == 'reduce') {
+    if (length(getNames(obj, class = 'constrain', type = '(fixom|varom)')) > 0) {
+      stop(paste('Unexeptable constrain for reduce model: "', 
+        paste(getNames(obj, class = 'constrain', type = '(fixom|varom)'), collapse = '", "'), 
+          '"', sep = ''))
+    }
+  }
   if (any(names(arg) == 'region')) {
     obj@sysInfo@region <- arg$region
     arg <- arg[names(arg) != 'region', drop = FALSE]
@@ -448,7 +461,11 @@ LL1 <- proc.time()[3]
       gsub('[/][/]*', '\\\\', paste('FILE1=', tmp.dir, '/mdl.lst', sep = '')), '', 'MAXIM=1', 
       'TOP=50', 'LEFT=50', 'HEIGHT=400', 'WIDTH=400', ''), sep = '\n', file = zz)
     close(zz)
-   cdd <- prec@model
+    if (model.type == 'reduce') {
+      cdd <- prec@model_reduce
+    } else {
+      cdd <- prec@model_large
+    }
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(cdd[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', cdd) - 1)], sep = '\n', file = zz)
    
@@ -514,17 +531,22 @@ LL1 <- proc.time()[3]
     }
     pp3 <- proc.time()[3]
     if(echo) cat('Solver work time: ', round(pp3 - pp2, 2), 's\n', sep = '')
-  } else if (solver == 'GLPK' || solver == 'CBC') {
+  } else if (solver == 'GLPK' || solver == 'CBC') {   
 ### FUNC GLPK 
+    if (model.type == 'reduce') {
+      glpk_model <- prec@model_reduce_glpk
+    } else {
+      glpk_model <- prec@model_large_glpk
+    }
       zz <- file(paste(tmpdir, '/glpk.mod', sep = ''), 'w')
-      if (length(grep('^minimize', prec@model_glpk)) != 1) stop('Wrong GLPK model')
-      cat(prec@model_glpk[1:(grep('^minimize', prec@model_glpk) - 1)], sep = '\n', file = zz)
+      if (length(grep('^minimize', glpk_model)) != 1) stop('Wrong GLPK model')
+      cat(glpk_model[1:(grep('^minimize', glpk_model) - 1)], sep = '\n', file = zz)
 #      for(i in seq(along = CNS)) {
 #        cat(CNS[[i]]$add_code, sep = '\n', file = zz)
 #      }
-      cat(prec@model_glpk[grep('^minimize', prec@model_glpk):(grep('^end[;]', prec@model_glpk) - 1)], 
+      cat(glpk_model[grep('^minimize', glpk_model):(grep('^end[;]', glpk_model) - 1)], 
           sep = '\n', file = zz)
-      cat(prec@model_glpk[grep('^end[;]', prec@model_glpk):length(prec@model_glpk)], sep = '\n', file = zz)
+      cat(glpk_model[grep('^end[;]', glpk_model):length(glpk_model)], sep = '\n', file = zz)
       close(zz)
     cdd <- prec@model
     zz <- file(paste(tmpdir, '/glpk.dat', sep = ''), 'w') 

@@ -1,11 +1,11 @@
 getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE, 
   fixed = FALSE, useBytes = FALSE, invert = FALSE, ...) {
   if (regex) {
-    grep2 <- function(x, y) grep(x, y, ignore.case = ignore.case, fixed = fixed, 
+    grep2 <- function(x, y) grep(x, as.character(y), ignore.case = ignore.case, fixed = fixed, 
       useBytes = useBytes, invert = invert)
   } else {
-    grep2 <- function(x, y) grep(paste('^', x, '$', sep = ''), y, ignore.case = ignore.case, fixed = fixed, 
-      useBytes = useBytes, invert = invert)
+    grep2 <- function(x, y) grep(paste('^', x, '$', sep = ''), as.character(y), 
+      ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
   }
   arg <- list(...)
   if (any(class(obj) == 'scenario')) obj <- obj@model
@@ -19,7 +19,7 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
       ll <- getUniversalNames(obj, cl, ...)
       for(i in seq(along = ll))
         lst[[names(ll)[i]]] <- ll[[i]]
-    }
+    }                                                         
     lst
   } else {
     rst <- data.frame(rp = numeric(), ob = numeric(), use = logical())
@@ -45,9 +45,9 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
         nm <- names(arg)[a]
         cnd <- arg[[a]]
         if (s1[nm] == 'list') stop(error_msg)
-        if (s1[nm] == "character") {
+        if (s1[nm] %in% c("character", 'factor', 'characterOrNULL')) {
         # Character
-         if (class(cnd) != 'character') stop(error_msg)
+         if (!(class(cnd)  %in% c("character", 'factor', 'characterOrNULL'))) stop(error_msg)
           for(i in seq(length.out = nrow(rst)))
             rst[i, 'use']  <- any(grep2(cnd, slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)))
           rst <- rst[rst$use,, drop = FALSE]
@@ -100,8 +100,8 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
             cnd2 <- arg[[a]][[nm2]]       
             if (all(colnames(slot(s2, nm)) != nm2)) stop(error_msg)
             # Character
-            if (class(cnd2) == "character") {
-              if (class(cnd2) != 'character') stop(error_msg)
+            if (class(cnd2)  %in% c("character", 'factor', 'characterOrNULL')) {
+              if (!(class(cnd2)  %in% c("character", 'factor', 'characterOrNULL'))) stop(error_msg)
               for(i in seq(length.out = nrow(rst)))
                 rst[i, 'use']  <- any(grep2(cnd2, 
                        slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2]), na.rm = TRUE)

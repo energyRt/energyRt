@@ -258,6 +258,10 @@ vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
 vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
 ;
 variable
+*! Large model : begin
+vTechFixom(tech, region, year)                       Fixom
+vTechVarom(tech, region, year, slice)                Varom
+*! Large model : end
 vTechInv(tech, region, year)                         Investment
 vTechEac(tech, region, year)                         Annualized investment cost
 vTechSalv(tech, region)                              Salvage costs
@@ -678,6 +682,10 @@ eqTechSalv3(tech, region, yeare)
 * Cost aggregate by year eqaution
 eqTechCost1(tech, region, year)
 eqTechCost2(tech, region, year)
+*! Large model : begin
+eqTechVarom(tech, region, year, slice)
+eqTechFixom(tech, region, year)
+*! Large model : end
 ;
 
 
@@ -728,6 +736,7 @@ eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
       pDiscountFactor(region, yeare) / pDiscountFactor(region, yearp) * (pTechOlife(tech, region) - 1 - ORD(yeare) + ORD(yearp)))
                  )
          );
+
 
 *eqTechRetirementCap(tech, region, year, yearp)$(not(mTechRetirement(tech)) or
 *  ORD(yearp) < ORD(year) or ORD(yearp) >= ORD(year) + pTechOlife(tech, region))..
@@ -838,6 +847,34 @@ eqTechCost2(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region,
                   )
          ));
 
+*! Large model : begin
+eqTechVarom(tech, region, year, slice)$(mMidMilestone(year) and mTechSpan(tech, region, year))..
+         vTechVarom(tech, region, year)
+         =e=
+                  pTechVarom(tech, region, year, slice) *
+                  vTechAct(tech, region, year, slice) +
+                  sum(comm$mTechInpComm(tech, comm),
+                          pTechCvarom(tech, comm, region, year, slice) *
+                          vTechInp(tech, comm, region, year, slice)
+                  ) +
+                  sum(comm$mTechOutComm(tech, comm),
+                          pTechCvarom(tech, comm, region, year, slice) *
+                          vTechOut(tech, comm, region, year, slice)
+                  )
+                  +
+                  sum(comm$mTechAOut(tech, comm),
+                          pTechAvarom(tech, comm, region, year, slice) *
+                          vTechAOut(tech, comm, region, year, slice)
+                  )
+                  +
+                  sum(comm$mTechAInp(tech, comm),
+                          pTechAvarom(tech, comm, region, year, slice) *
+                          vTechAInp(tech, comm, region, year, slice)
+                  );
+
+eqTechFixom(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region, year))..
+  vTechFixom(tech, region, year) =e= pTechFixom(tech, region, year) * vTechCap(tech, region, year);
+*! Large model : end
 
 **************************************
 * Supply equation
@@ -18069,6 +18106,10 @@ eqTechSalv3
 * Cost aggregate by year eqaution
 eqTechCost1
 eqTechCost2
+*! Large model : begin
+eqTechVarom
+eqTechFixom
+*! Large model : end
 * Disable new capacity
 *eqTechNewCapDisable
 **************************************

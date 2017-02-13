@@ -5,7 +5,7 @@ setClass("precompiled",
       representation(
           name          = "character",
           description   = "character",       # Details
-          defaultCode   = "character",
+          #defaultCode   = "character",
           #defaultInit   = "character",
           setInit       = "list",
           parameterInit = "list",
@@ -31,7 +31,7 @@ setClass("precompiled",
       prototype(
           name          = "",
           description   = "",       # Details
-          defaultCode   = readLines('gams/model.gms'),       # Get from gams model
+         # defaultCode   = readLines('gams/model.gms'),       # Get from gams model
           #defaultInit   = "",       # Calculate from interpolation & defaultValue
           setInit       = list(),   # Initializtion set (from precompiled)
           parameterInit = list(),   # Initializtion parameter (from precompiled)

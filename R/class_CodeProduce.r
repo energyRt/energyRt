@@ -8,8 +8,10 @@ setClass("CodeProduce",
     set = "list", # List with set : tech, sup, group, comm, region, year, slice
     maptable = "list", # List with techology parameter
     constrain = "list", 
-    model = "character", 
-    model_glpk = "character" 
+    model_reduce = "character", 
+    model_reduce_glpk = "character",
+    model_large = "character", 
+    model_large_glpk = "character"
   ),
   prototype(
     set = list(tech = c(), sup = c(), group = c(),
@@ -19,8 +21,10 @@ setClass("CodeProduce",
     constrain = list(), 
     #model = readLines(paste(Sys.getenv('dropbox'), '/package/bottomup/gams/model.gms', sep = '')),
     #model_glpk = readLines(paste(Sys.getenv('dropbox'), '/package/bottomup/glpk/glpk.mod', sep = ''))
-    model = readLines('gams/model_2.gms'),
-    model_glpk = readLines('glpk/glpk.mod')
+    model_reduce = readLines('gams/model_reduce.gms'),
+    model_reduce_glpk = readLines('glpk/glpk_reduce.mod'),
+    model_large = readLines('gams/model_large.gms'),
+    model_large_glpk = readLines('glpk/glpk_large.mod')
   )
 );
 
