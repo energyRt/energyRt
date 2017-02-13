@@ -237,18 +237,18 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
   } else {
     # Define lhs equation type
     ccc <- c("comm", "region", "year", "slice")
-    if (app@type %in% c('capacity', 'newcapacity', 'invcost', 'eac',
-      'growthcapacity', 'growthnewcapacity', 'growthinvcost', 'growtheac')) ccc <- c("region", "year")
+    if (app@type %in% c('capacity', 'newcapacity', 'invcost', 'eac', 'fixom', 'growth.capacity', 
+      'growth.newcapacity', 'growth.invcost', 'growth.eac', 'growth.fixom')) ccc <- c("region", "year")
     # capacity newcapacity activity input output sharein shareout
-    if (app@type %in% c('growthoutput', 'output', 'shareout')) before <- 'Out' else
-    if (app@type %in% c('growthinput', 'input', 'sharein'))   before <- 'Inp' else
-    if (app@type %in% c('growthcapacity', 'capacity')) before <- 'Cap' else
-    if (app@type %in% c('growthnewcapacity', 'newcapacity')) before <- 'NewCap' else 
-    if (app@type %in% c('growthinvcost', 'invcost')) before <- 'Inv' else
-    if (app@type %in% c('growthvarom', 'varom')) before <- 'Varom' else
-    if (app@type %in% c('growthfixom', 'fixom')) before <- 'Fixom' else
-    if (app@type %in% c('growthactivity', 'activity')) before <- 'Act' else
-    if (app@type %in% c('growtheac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
+    if (app@type %in% c('growth.output', 'output', 'shareout')) before <- 'Out' else
+    if (app@type %in% c('growth.input', 'input', 'sharein'))   before <- 'Inp' else
+    if (app@type %in% c('growth.capacity', 'capacity')) before <- 'Cap' else
+    if (app@type %in% c('growth.newcapacity', 'newcapacity')) before <- 'NewCap' else 
+    if (app@type %in% c('growth.invcost', 'invcost')) before <- 'Inv' else
+    if (app@type %in% c('growth.varom', 'varom')) before <- 'Varom' else
+    if (app@type %in% c('growth.fixom', 'fixom')) before <- 'Fixom' else
+    if (app@type %in% c('growth.activity', 'activity')) before <- 'Act' else
+    if (app@type %in% c('growth.eac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
     ast <- c(names(app@for.sum), names(app@for.each))[!(c(names(app@for.sum), names(app@for.each)) %in% ccc)] 
     if (length(ast) > 1) stop('Wrong constrain') else
     if (length(ast) == 1) {
@@ -303,14 +303,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
       }
       # Choose technology output
       if (any(ast == 'tech')) {
-        if (app@type %in% c('growthoutput', 'output', 'shareout')) {
+        if (app@type %in% c('growth.output', 'output', 'shareout')) {
           if (app@cout) obj@maptable[['mCnsTechCOut']] <- addData(obj@maptable[['mCnsTechCOut']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
           if (app@aout) obj@maptable[['mCnsTechAOut']] <- addData(obj@maptable[['mCnsTechAOut']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
           if (app@emis) obj@maptable[['mCnsTechEmis']] <- addData(obj@maptable[['mCnsTechEmis']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
-        } else if (app@type %in% c('growthinput', 'input', 'sharein')) {
+        } else if (app@type %in% c('growth.input', 'input', 'sharein')) {
           if (app@cinp) obj@maptable[['mCnsTechCInp']] <- addData(obj@maptable[['mCnsTechCInp']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
           if (app@ainp) obj@maptable[['mCnsTechAInp']] <- addData(obj@maptable[['mCnsTechAInp']], 

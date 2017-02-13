@@ -35,13 +35,15 @@ getConstrainResults <- function(scenario, constrain) {
       cns.set$year <- mm
     }
     # Variable
-    if (tcns@type %in% c('growthoutput', 'output', 'shareout')) before <- 'Out' else
-    if (tcns@type %in% c('growthinput', 'input', 'sharein'))   before <- 'Inp' else
-    if (tcns@type %in% c('growthcapacity', 'capacity')) before <- 'Cap' else
-    if (tcns@type %in% c('growthnewcapacity', 'newcapacity')) before <- 'NewCap' else
-    if (tcns@type %in% c('growthinvcost', 'invcost')) before <- 'Inv' else
-    if (tcns@type %in% c('growthactivity', 'activity')) before <- 'Inv' else
-    if (tcns@type %in% c('growtheac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
+    if (tcns@type %in% c('growth.output', 'output', 'shareout')) before <- 'Out' else
+    if (tcns@type %in% c('growth.input', 'input', 'sharein'))   before <- 'Inp' else
+    if (tcns@type %in% c('growth.capacity', 'capacity')) before <- 'Cap' else
+    if (tcns@type %in% c('growth.newcapacity', 'newcapacity')) before <- 'NewCap' else
+    if (tcns@type %in% c('growth.invcost', 'invcost')) before <- 'Inv' else
+    if (tcns@type %in% c('growth.fixom', 'fixom')) before <- 'Fixom' else
+    if (tcns@type %in% c('growth.varom', 'varom')) before <- 'Varom' else
+    if (tcns@type %in% c('growth.activity', 'activity')) before <- 'Inv' else
+    if (tcns@type %in% c('growth.eac', 'eac')) before <- 'Eac' else {browser(); stop('Unknown constrain type')}
     vrb <- paste('v', fcase(ad_smpl), before, sep = '')
     if (length(ad_smpl) == 0) vrb <- paste(vrb, 'Tot', sep = '')
     if (length(vary.set) == 0) {
