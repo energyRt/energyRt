@@ -76,6 +76,8 @@ param mCnsNewCapTech{cns};
 param mCnsInvTech{cns};
 param mCnsEacTech{cns};
 param mCnsActTech{cns};
+param mCnsVaromTech{cns};
+param mCnsFixomTech{cns};
 param mCnsOutSup{cns};
 param mCnsInp{cns};
 param mCnsOut{cns};

@@ -520,6 +520,60 @@ getEquationsMap <- function() {
     eqCnsGETechActRYSGrowth = c("cns", "region", "year", "slice", "year"), 
     eqCnsETechActRYS = c("cns", "region", "year", "slice"), 
     eqCnsETechActRYSGrowth = c("cns", "region", "year", "slice", "year"), 
+    eqCnsLETechVarom = c("cns"), 
+    eqCnsGETechVarom = c("cns"), 
+    eqCnsETechVarom = c("cns"), 
+    eqCnsLETechVaromS = c("cns", "slice"), 
+    eqCnsGETechVaromS = c("cns", "slice"), 
+    eqCnsETechVaromS = c("cns", "slice"), 
+    eqCnsLETechVaromY = c("cns", "year"), 
+    eqCnsLETechVaromYGrowth = c("cns", "year", "year"), 
+    eqCnsGETechVaromY = c("cns", "year"), 
+    eqCnsGETechVaromYGrowth = c("cns", "year", "year"), 
+    eqCnsETechVaromY = c("cns", "year"), 
+    eqCnsETechVaromYGrowth = c("cns", "year", "year"), 
+    eqCnsLETechVaromYS = c("cns", "year", "slice"), 
+    eqCnsLETechVaromYSGrowth = c("cns", "year", "slice", "year"), 
+    eqCnsGETechVaromYS = c("cns", "year", "slice"), 
+    eqCnsGETechVaromYSGrowth = c("cns", "year", "slice", "year"), 
+    eqCnsETechVaromYS = c("cns", "year", "slice"), 
+    eqCnsETechVaromYSGrowth = c("cns", "year", "slice", "year"), 
+    eqCnsLETechVaromR = c("cns", "region"), 
+    eqCnsGETechVaromR = c("cns", "region"), 
+    eqCnsETechVaromR = c("cns", "region"), 
+    eqCnsLETechVaromRS = c("cns", "region", "slice"), 
+    eqCnsGETechVaromRS = c("cns", "region", "slice"), 
+    eqCnsETechVaromRS = c("cns", "region", "slice"), 
+    eqCnsLETechVaromRY = c("cns", "region", "year"), 
+    eqCnsLETechVaromRYGrowth = c("cns", "region", "year", "year"), 
+    eqCnsGETechVaromRY = c("cns", "region", "year"), 
+    eqCnsGETechVaromRYGrowth = c("cns", "region", "year", "year"), 
+    eqCnsETechVaromRY = c("cns", "region", "year"), 
+    eqCnsETechVaromRYGrowth = c("cns", "region", "year", "year"), 
+    eqCnsLETechVaromRYS = c("cns", "region", "year", "slice"), 
+    eqCnsLETechVaromRYSGrowth = c("cns", "region", "year", "slice", "year"), 
+    eqCnsGETechVaromRYS = c("cns", "region", "year", "slice"), 
+    eqCnsGETechVaromRYSGrowth = c("cns", "region", "year", "slice", "year"), 
+    eqCnsETechVaromRYS = c("cns", "region", "year", "slice"), 
+    eqCnsETechVaromRYSGrowth = c("cns", "region", "year", "slice", "year"), 
+    eqCnsLETechFixom = c("cns"), 
+    eqCnsGETechFixom = c("cns"), 
+    eqCnsETechFixom = c("cns"), 
+    eqCnsLETechFixomY = c("cns", "year"), 
+    eqCnsLETechFixomYGrowth = c("cns", "year", "year"), 
+    eqCnsGETechFixomY = c("cns", "year"), 
+    eqCnsGETechFixomYGrowth = c("cns", "year", "year"), 
+    eqCnsETechFixomY = c("cns", "year"), 
+    eqCnsETechFixomYGrowth = c("cns", "year", "year"), 
+    eqCnsLETechFixomR = c("cns", "region"), 
+    eqCnsGETechFixomR = c("cns", "region"), 
+    eqCnsETechFixomR = c("cns", "region"), 
+    eqCnsLETechFixomRY = c("cns", "region", "year"), 
+    eqCnsLETechFixomRYGrowth = c("cns", "region", "year", "year"), 
+    eqCnsGETechFixomRY = c("cns", "region", "year"), 
+    eqCnsGETechFixomRYGrowth = c("cns", "region", "year", "year"), 
+    eqCnsETechFixomRY = c("cns", "region", "year"), 
+    eqCnsETechFixomRYGrowth = c("cns", "region", "year", "year"), 
     eqCnsLETechInpLShareIn = c("cns", "tech"), 
     eqCnsLETechInpLShareOut = c("cns", "tech"), 
     eqCnsLETechInpL = c("cns", "tech"), 
@@ -964,6 +1018,60 @@ getEquationsMap <- function() {
     eqCnsGETechActLRYSGrowth = c("cns", "tech", "region", "year", "slice", "year"), 
     eqCnsETechActLRYS = c("cns", "tech", "region", "year", "slice"), 
     eqCnsETechActLRYSGrowth = c("cns", "tech", "region", "year", "slice", "year"), 
+    eqCnsLETechVaromL = c("cns", "tech"), 
+    eqCnsGETechVaromL = c("cns", "tech"), 
+    eqCnsETechVaromL = c("cns", "tech"), 
+    eqCnsLETechVaromLS = c("cns", "tech", "slice"), 
+    eqCnsGETechVaromLS = c("cns", "tech", "slice"), 
+    eqCnsETechVaromLS = c("cns", "tech", "slice"), 
+    eqCnsLETechVaromLY = c("cns", "tech", "year"), 
+    eqCnsLETechVaromLYGrowth = c("cns", "tech", "year", "year"), 
+    eqCnsGETechVaromLY = c("cns", "tech", "year"), 
+    eqCnsGETechVaromLYGrowth = c("cns", "tech", "year", "year"), 
+    eqCnsETechVaromLY = c("cns", "tech", "year"), 
+    eqCnsETechVaromLYGrowth = c("cns", "tech", "year", "year"), 
+    eqCnsLETechVaromLYS = c("cns", "tech", "year", "slice"), 
+    eqCnsLETechVaromLYSGrowth = c("cns", "tech", "year", "slice", "year"), 
+    eqCnsGETechVaromLYS = c("cns", "tech", "year", "slice"), 
+    eqCnsGETechVaromLYSGrowth = c("cns", "tech", "year", "slice", "year"), 
+    eqCnsETechVaromLYS = c("cns", "tech", "year", "slice"), 
+    eqCnsETechVaromLYSGrowth = c("cns", "tech", "year", "slice", "year"), 
+    eqCnsLETechVaromLR = c("cns", "tech", "region"), 
+    eqCnsGETechVaromLR = c("cns", "tech", "region"), 
+    eqCnsETechVaromLR = c("cns", "tech", "region"), 
+    eqCnsLETechVaromLRS = c("cns", "tech", "region", "slice"), 
+    eqCnsGETechVaromLRS = c("cns", "tech", "region", "slice"), 
+    eqCnsETechVaromLRS = c("cns", "tech", "region", "slice"), 
+    eqCnsLETechVaromLRY = c("cns", "tech", "region", "year"), 
+    eqCnsLETechVaromLRYGrowth = c("cns", "tech", "region", "year", "year"), 
+    eqCnsGETechVaromLRY = c("cns", "tech", "region", "year"), 
+    eqCnsGETechVaromLRYGrowth = c("cns", "tech", "region", "year", "year"), 
+    eqCnsETechVaromLRY = c("cns", "tech", "region", "year"), 
+    eqCnsETechVaromLRYGrowth = c("cns", "tech", "region", "year", "year"), 
+    eqCnsLETechVaromLRYS = c("cns", "tech", "region", "year", "slice"), 
+    eqCnsLETechVaromLRYSGrowth = c("cns", "tech", "region", "year", "slice", "year"), 
+    eqCnsGETechVaromLRYS = c("cns", "tech", "region", "year", "slice"), 
+    eqCnsGETechVaromLRYSGrowth = c("cns", "tech", "region", "year", "slice", "year"), 
+    eqCnsETechVaromLRYS = c("cns", "tech", "region", "year", "slice"), 
+    eqCnsETechVaromLRYSGrowth = c("cns", "tech", "region", "year", "slice", "year"), 
+    eqCnsLETechFixomL = c("cns", "tech"), 
+    eqCnsGETechFixomL = c("cns", "tech"), 
+    eqCnsETechFixomL = c("cns", "tech"), 
+    eqCnsLETechFixomLY = c("cns", "tech", "year"), 
+    eqCnsLETechFixomLYGrowth = c("cns", "tech", "year", "year"), 
+    eqCnsGETechFixomLY = c("cns", "tech", "year"), 
+    eqCnsGETechFixomLYGrowth = c("cns", "tech", "year", "year"), 
+    eqCnsETechFixomLY = c("cns", "tech", "year"), 
+    eqCnsETechFixomLYGrowth = c("cns", "tech", "year", "year"), 
+    eqCnsLETechFixomLR = c("cns", "tech", "region"), 
+    eqCnsGETechFixomLR = c("cns", "tech", "region"), 
+    eqCnsETechFixomLR = c("cns", "tech", "region"), 
+    eqCnsLETechFixomLRY = c("cns", "tech", "region", "year"), 
+    eqCnsLETechFixomLRYGrowth = c("cns", "tech", "region", "year", "year"), 
+    eqCnsGETechFixomLRY = c("cns", "tech", "region", "year"), 
+    eqCnsGETechFixomLRYGrowth = c("cns", "tech", "region", "year", "year"), 
+    eqCnsETechFixomLRY = c("cns", "tech", "region", "year"), 
+    eqCnsETechFixomLRYGrowth = c("cns", "tech", "region", "year", "year"), 
     eqCnsLESupOutShareIn = c("cns"), 
     eqCnsLESupOutShareOut = c("cns"), 
     eqCnsLESupOut = c("cns"), 
@@ -1594,7 +1702,7 @@ getEquations <- function() {
    vRowImportRes  = logical(),
    vRowImport  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:1468,] <- NA;
+    rs[1:1576,] <- NA;
     rs["eqTechSng2Sng", c("name", "description")] <- c("eqTechSng2Sng", "Input to Output");
     rs["eqTechSng2Sng", c("tech", "comm", "region", "year", "slice", "vTechInp", "vTechOut")] <- TRUE;
     rs["eqTechGrp2Sng", c("name", "description")] <- c("eqTechGrp2Sng", "Group input to output");
@@ -2637,6 +2745,114 @@ getEquations <- function() {
     rs["eqCnsETechActRYS", c("tech", "region", "year", "slice", "cns", "vTechAct")] <- TRUE;
     rs["eqCnsETechActRYSGrowth", c("name", "description")] <- c("eqCnsETechActRYSGrowth", "");
     rs["eqCnsETechActRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechAct")] <- TRUE;
+    rs["eqCnsLETechVarom", c("name", "description")] <- c("eqCnsLETechVarom", "");
+    rs["eqCnsLETechVarom", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVarom", c("name", "description")] <- c("eqCnsGETechVarom", "");
+    rs["eqCnsGETechVarom", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVarom", c("name", "description")] <- c("eqCnsETechVarom", "");
+    rs["eqCnsETechVarom", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromS", c("name", "description")] <- c("eqCnsLETechVaromS", "");
+    rs["eqCnsLETechVaromS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromS", c("name", "description")] <- c("eqCnsGETechVaromS", "");
+    rs["eqCnsGETechVaromS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromS", c("name", "description")] <- c("eqCnsETechVaromS", "");
+    rs["eqCnsETechVaromS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromY", c("name", "description")] <- c("eqCnsLETechVaromY", "");
+    rs["eqCnsLETechVaromY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromYGrowth", c("name", "description")] <- c("eqCnsLETechVaromYGrowth", "");
+    rs["eqCnsLETechVaromYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromY", c("name", "description")] <- c("eqCnsGETechVaromY", "");
+    rs["eqCnsGETechVaromY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromYGrowth", c("name", "description")] <- c("eqCnsGETechVaromYGrowth", "");
+    rs["eqCnsGETechVaromYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromY", c("name", "description")] <- c("eqCnsETechVaromY", "");
+    rs["eqCnsETechVaromY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromYGrowth", c("name", "description")] <- c("eqCnsETechVaromYGrowth", "");
+    rs["eqCnsETechVaromYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromYS", c("name", "description")] <- c("eqCnsLETechVaromYS", "");
+    rs["eqCnsLETechVaromYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromYSGrowth", c("name", "description")] <- c("eqCnsLETechVaromYSGrowth", "");
+    rs["eqCnsLETechVaromYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromYS", c("name", "description")] <- c("eqCnsGETechVaromYS", "");
+    rs["eqCnsGETechVaromYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromYSGrowth", c("name", "description")] <- c("eqCnsGETechVaromYSGrowth", "");
+    rs["eqCnsGETechVaromYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromYS", c("name", "description")] <- c("eqCnsETechVaromYS", "");
+    rs["eqCnsETechVaromYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromYSGrowth", c("name", "description")] <- c("eqCnsETechVaromYSGrowth", "");
+    rs["eqCnsETechVaromYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromR", c("name", "description")] <- c("eqCnsLETechVaromR", "");
+    rs["eqCnsLETechVaromR", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromR", c("name", "description")] <- c("eqCnsGETechVaromR", "");
+    rs["eqCnsGETechVaromR", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromR", c("name", "description")] <- c("eqCnsETechVaromR", "");
+    rs["eqCnsETechVaromR", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromRS", c("name", "description")] <- c("eqCnsLETechVaromRS", "");
+    rs["eqCnsLETechVaromRS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromRS", c("name", "description")] <- c("eqCnsGETechVaromRS", "");
+    rs["eqCnsGETechVaromRS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromRS", c("name", "description")] <- c("eqCnsETechVaromRS", "");
+    rs["eqCnsETechVaromRS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromRY", c("name", "description")] <- c("eqCnsLETechVaromRY", "");
+    rs["eqCnsLETechVaromRY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromRYGrowth", c("name", "description")] <- c("eqCnsLETechVaromRYGrowth", "");
+    rs["eqCnsLETechVaromRYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromRY", c("name", "description")] <- c("eqCnsGETechVaromRY", "");
+    rs["eqCnsGETechVaromRY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromRYGrowth", c("name", "description")] <- c("eqCnsGETechVaromRYGrowth", "");
+    rs["eqCnsGETechVaromRYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromRY", c("name", "description")] <- c("eqCnsETechVaromRY", "");
+    rs["eqCnsETechVaromRY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromRYGrowth", c("name", "description")] <- c("eqCnsETechVaromRYGrowth", "");
+    rs["eqCnsETechVaromRYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromRYS", c("name", "description")] <- c("eqCnsLETechVaromRYS", "");
+    rs["eqCnsLETechVaromRYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromRYSGrowth", c("name", "description")] <- c("eqCnsLETechVaromRYSGrowth", "");
+    rs["eqCnsLETechVaromRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromRYS", c("name", "description")] <- c("eqCnsGETechVaromRYS", "");
+    rs["eqCnsGETechVaromRYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromRYSGrowth", c("name", "description")] <- c("eqCnsGETechVaromRYSGrowth", "");
+    rs["eqCnsGETechVaromRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromRYS", c("name", "description")] <- c("eqCnsETechVaromRYS", "");
+    rs["eqCnsETechVaromRYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromRYSGrowth", c("name", "description")] <- c("eqCnsETechVaromRYSGrowth", "");
+    rs["eqCnsETechVaromRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechFixom", c("name", "description")] <- c("eqCnsLETechFixom", "");
+    rs["eqCnsLETechFixom", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixom", c("name", "description")] <- c("eqCnsGETechFixom", "");
+    rs["eqCnsGETechFixom", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixom", c("name", "description")] <- c("eqCnsETechFixom", "");
+    rs["eqCnsETechFixom", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomY", c("name", "description")] <- c("eqCnsLETechFixomY", "");
+    rs["eqCnsLETechFixomY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomYGrowth", c("name", "description")] <- c("eqCnsLETechFixomYGrowth", "");
+    rs["eqCnsLETechFixomYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomY", c("name", "description")] <- c("eqCnsGETechFixomY", "");
+    rs["eqCnsGETechFixomY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomYGrowth", c("name", "description")] <- c("eqCnsGETechFixomYGrowth", "");
+    rs["eqCnsGETechFixomYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomY", c("name", "description")] <- c("eqCnsETechFixomY", "");
+    rs["eqCnsETechFixomY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomYGrowth", c("name", "description")] <- c("eqCnsETechFixomYGrowth", "");
+    rs["eqCnsETechFixomYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomR", c("name", "description")] <- c("eqCnsLETechFixomR", "");
+    rs["eqCnsLETechFixomR", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomR", c("name", "description")] <- c("eqCnsGETechFixomR", "");
+    rs["eqCnsGETechFixomR", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomR", c("name", "description")] <- c("eqCnsETechFixomR", "");
+    rs["eqCnsETechFixomR", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomRY", c("name", "description")] <- c("eqCnsLETechFixomRY", "");
+    rs["eqCnsLETechFixomRY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomRYGrowth", c("name", "description")] <- c("eqCnsLETechFixomRYGrowth", "");
+    rs["eqCnsLETechFixomRYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomRY", c("name", "description")] <- c("eqCnsGETechFixomRY", "");
+    rs["eqCnsGETechFixomRY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomRYGrowth", c("name", "description")] <- c("eqCnsGETechFixomRYGrowth", "");
+    rs["eqCnsGETechFixomRYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomRY", c("name", "description")] <- c("eqCnsETechFixomRY", "");
+    rs["eqCnsETechFixomRY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomRYGrowth", c("name", "description")] <- c("eqCnsETechFixomRYGrowth", "");
+    rs["eqCnsETechFixomRYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
     rs["eqCnsLETechInpLShareIn", c("name", "description")] <- c("eqCnsLETechInpLShareIn", "");
     rs["eqCnsLETechInpLShareIn", c("tech", "comm", "region", "year", "slice", "cns", "vTechInp", "vTechAInp", "vInpTot")] <- TRUE;
     rs["eqCnsLETechInpLShareOut", c("name", "description")] <- c("eqCnsLETechInpLShareOut", "");
@@ -3525,6 +3741,114 @@ getEquations <- function() {
     rs["eqCnsETechActLRYS", c("tech", "region", "year", "slice", "cns", "vTechAct")] <- TRUE;
     rs["eqCnsETechActLRYSGrowth", c("name", "description")] <- c("eqCnsETechActLRYSGrowth", "");
     rs["eqCnsETechActLRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechAct")] <- TRUE;
+    rs["eqCnsLETechVaromL", c("name", "description")] <- c("eqCnsLETechVaromL", "");
+    rs["eqCnsLETechVaromL", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromL", c("name", "description")] <- c("eqCnsGETechVaromL", "");
+    rs["eqCnsGETechVaromL", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromL", c("name", "description")] <- c("eqCnsETechVaromL", "");
+    rs["eqCnsETechVaromL", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLS", c("name", "description")] <- c("eqCnsLETechVaromLS", "");
+    rs["eqCnsLETechVaromLS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLS", c("name", "description")] <- c("eqCnsGETechVaromLS", "");
+    rs["eqCnsGETechVaromLS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLS", c("name", "description")] <- c("eqCnsETechVaromLS", "");
+    rs["eqCnsETechVaromLS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLY", c("name", "description")] <- c("eqCnsLETechVaromLY", "");
+    rs["eqCnsLETechVaromLY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLYGrowth", c("name", "description")] <- c("eqCnsLETechVaromLYGrowth", "");
+    rs["eqCnsLETechVaromLYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLY", c("name", "description")] <- c("eqCnsGETechVaromLY", "");
+    rs["eqCnsGETechVaromLY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLYGrowth", c("name", "description")] <- c("eqCnsGETechVaromLYGrowth", "");
+    rs["eqCnsGETechVaromLYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLY", c("name", "description")] <- c("eqCnsETechVaromLY", "");
+    rs["eqCnsETechVaromLY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLYGrowth", c("name", "description")] <- c("eqCnsETechVaromLYGrowth", "");
+    rs["eqCnsETechVaromLYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLYS", c("name", "description")] <- c("eqCnsLETechVaromLYS", "");
+    rs["eqCnsLETechVaromLYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLYSGrowth", c("name", "description")] <- c("eqCnsLETechVaromLYSGrowth", "");
+    rs["eqCnsLETechVaromLYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLYS", c("name", "description")] <- c("eqCnsGETechVaromLYS", "");
+    rs["eqCnsGETechVaromLYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLYSGrowth", c("name", "description")] <- c("eqCnsGETechVaromLYSGrowth", "");
+    rs["eqCnsGETechVaromLYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLYS", c("name", "description")] <- c("eqCnsETechVaromLYS", "");
+    rs["eqCnsETechVaromLYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLYSGrowth", c("name", "description")] <- c("eqCnsETechVaromLYSGrowth", "");
+    rs["eqCnsETechVaromLYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLR", c("name", "description")] <- c("eqCnsLETechVaromLR", "");
+    rs["eqCnsLETechVaromLR", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLR", c("name", "description")] <- c("eqCnsGETechVaromLR", "");
+    rs["eqCnsGETechVaromLR", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLR", c("name", "description")] <- c("eqCnsETechVaromLR", "");
+    rs["eqCnsETechVaromLR", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLRS", c("name", "description")] <- c("eqCnsLETechVaromLRS", "");
+    rs["eqCnsLETechVaromLRS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLRS", c("name", "description")] <- c("eqCnsGETechVaromLRS", "");
+    rs["eqCnsGETechVaromLRS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLRS", c("name", "description")] <- c("eqCnsETechVaromLRS", "");
+    rs["eqCnsETechVaromLRS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLRY", c("name", "description")] <- c("eqCnsLETechVaromLRY", "");
+    rs["eqCnsLETechVaromLRY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLRYGrowth", c("name", "description")] <- c("eqCnsLETechVaromLRYGrowth", "");
+    rs["eqCnsLETechVaromLRYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLRY", c("name", "description")] <- c("eqCnsGETechVaromLRY", "");
+    rs["eqCnsGETechVaromLRY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLRYGrowth", c("name", "description")] <- c("eqCnsGETechVaromLRYGrowth", "");
+    rs["eqCnsGETechVaromLRYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLRY", c("name", "description")] <- c("eqCnsETechVaromLRY", "");
+    rs["eqCnsETechVaromLRY", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLRYGrowth", c("name", "description")] <- c("eqCnsETechVaromLRYGrowth", "");
+    rs["eqCnsETechVaromLRYGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLRYS", c("name", "description")] <- c("eqCnsLETechVaromLRYS", "");
+    rs["eqCnsLETechVaromLRYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechVaromLRYSGrowth", c("name", "description")] <- c("eqCnsLETechVaromLRYSGrowth", "");
+    rs["eqCnsLETechVaromLRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLRYS", c("name", "description")] <- c("eqCnsGETechVaromLRYS", "");
+    rs["eqCnsGETechVaromLRYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsGETechVaromLRYSGrowth", c("name", "description")] <- c("eqCnsGETechVaromLRYSGrowth", "");
+    rs["eqCnsGETechVaromLRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLRYS", c("name", "description")] <- c("eqCnsETechVaromLRYS", "");
+    rs["eqCnsETechVaromLRYS", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsETechVaromLRYSGrowth", c("name", "description")] <- c("eqCnsETechVaromLRYSGrowth", "");
+    rs["eqCnsETechVaromLRYSGrowth", c("tech", "region", "year", "slice", "cns", "vTechVarom")] <- TRUE;
+    rs["eqCnsLETechFixomL", c("name", "description")] <- c("eqCnsLETechFixomL", "");
+    rs["eqCnsLETechFixomL", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomL", c("name", "description")] <- c("eqCnsGETechFixomL", "");
+    rs["eqCnsGETechFixomL", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomL", c("name", "description")] <- c("eqCnsETechFixomL", "");
+    rs["eqCnsETechFixomL", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomLY", c("name", "description")] <- c("eqCnsLETechFixomLY", "");
+    rs["eqCnsLETechFixomLY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomLYGrowth", c("name", "description")] <- c("eqCnsLETechFixomLYGrowth", "");
+    rs["eqCnsLETechFixomLYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomLY", c("name", "description")] <- c("eqCnsGETechFixomLY", "");
+    rs["eqCnsGETechFixomLY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomLYGrowth", c("name", "description")] <- c("eqCnsGETechFixomLYGrowth", "");
+    rs["eqCnsGETechFixomLYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomLY", c("name", "description")] <- c("eqCnsETechFixomLY", "");
+    rs["eqCnsETechFixomLY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomLYGrowth", c("name", "description")] <- c("eqCnsETechFixomLYGrowth", "");
+    rs["eqCnsETechFixomLYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomLR", c("name", "description")] <- c("eqCnsLETechFixomLR", "");
+    rs["eqCnsLETechFixomLR", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomLR", c("name", "description")] <- c("eqCnsGETechFixomLR", "");
+    rs["eqCnsGETechFixomLR", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomLR", c("name", "description")] <- c("eqCnsETechFixomLR", "");
+    rs["eqCnsETechFixomLR", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomLRY", c("name", "description")] <- c("eqCnsLETechFixomLRY", "");
+    rs["eqCnsLETechFixomLRY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsLETechFixomLRYGrowth", c("name", "description")] <- c("eqCnsLETechFixomLRYGrowth", "");
+    rs["eqCnsLETechFixomLRYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomLRY", c("name", "description")] <- c("eqCnsGETechFixomLRY", "");
+    rs["eqCnsGETechFixomLRY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsGETechFixomLRYGrowth", c("name", "description")] <- c("eqCnsGETechFixomLRYGrowth", "");
+    rs["eqCnsGETechFixomLRYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomLRY", c("name", "description")] <- c("eqCnsETechFixomLRY", "");
+    rs["eqCnsETechFixomLRY", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
+    rs["eqCnsETechFixomLRYGrowth", c("name", "description")] <- c("eqCnsETechFixomLRYGrowth", "");
+    rs["eqCnsETechFixomLRYGrowth", c("tech", "region", "year", "cns", "vTechFixom")] <- TRUE;
     rs["eqCnsLESupOutShareIn", c("name", "description")] <- c("eqCnsLESupOutShareIn", "");
     rs["eqCnsLESupOutShareIn", c("sup", "comm", "region", "year", "slice", "cns", "vSupOut", "vInpTot")] <- TRUE;
     rs["eqCnsLESupOutShareOut", c("name", "description")] <- c("eqCnsLESupOutShareOut", "");
@@ -5070,6 +5394,60 @@ getVariables <- function() {
    eqCnsGETechActRYSGrowth  = logical(),
    eqCnsETechActRYS  = logical(),
    eqCnsETechActRYSGrowth  = logical(),
+   eqCnsLETechVarom  = logical(),
+   eqCnsGETechVarom  = logical(),
+   eqCnsETechVarom  = logical(),
+   eqCnsLETechVaromS  = logical(),
+   eqCnsGETechVaromS  = logical(),
+   eqCnsETechVaromS  = logical(),
+   eqCnsLETechVaromY  = logical(),
+   eqCnsLETechVaromYGrowth  = logical(),
+   eqCnsGETechVaromY  = logical(),
+   eqCnsGETechVaromYGrowth  = logical(),
+   eqCnsETechVaromY  = logical(),
+   eqCnsETechVaromYGrowth  = logical(),
+   eqCnsLETechVaromYS  = logical(),
+   eqCnsLETechVaromYSGrowth  = logical(),
+   eqCnsGETechVaromYS  = logical(),
+   eqCnsGETechVaromYSGrowth  = logical(),
+   eqCnsETechVaromYS  = logical(),
+   eqCnsETechVaromYSGrowth  = logical(),
+   eqCnsLETechVaromR  = logical(),
+   eqCnsGETechVaromR  = logical(),
+   eqCnsETechVaromR  = logical(),
+   eqCnsLETechVaromRS  = logical(),
+   eqCnsGETechVaromRS  = logical(),
+   eqCnsETechVaromRS  = logical(),
+   eqCnsLETechVaromRY  = logical(),
+   eqCnsLETechVaromRYGrowth  = logical(),
+   eqCnsGETechVaromRY  = logical(),
+   eqCnsGETechVaromRYGrowth  = logical(),
+   eqCnsETechVaromRY  = logical(),
+   eqCnsETechVaromRYGrowth  = logical(),
+   eqCnsLETechVaromRYS  = logical(),
+   eqCnsLETechVaromRYSGrowth  = logical(),
+   eqCnsGETechVaromRYS  = logical(),
+   eqCnsGETechVaromRYSGrowth  = logical(),
+   eqCnsETechVaromRYS  = logical(),
+   eqCnsETechVaromRYSGrowth  = logical(),
+   eqCnsLETechFixom  = logical(),
+   eqCnsGETechFixom  = logical(),
+   eqCnsETechFixom  = logical(),
+   eqCnsLETechFixomY  = logical(),
+   eqCnsLETechFixomYGrowth  = logical(),
+   eqCnsGETechFixomY  = logical(),
+   eqCnsGETechFixomYGrowth  = logical(),
+   eqCnsETechFixomY  = logical(),
+   eqCnsETechFixomYGrowth  = logical(),
+   eqCnsLETechFixomR  = logical(),
+   eqCnsGETechFixomR  = logical(),
+   eqCnsETechFixomR  = logical(),
+   eqCnsLETechFixomRY  = logical(),
+   eqCnsLETechFixomRYGrowth  = logical(),
+   eqCnsGETechFixomRY  = logical(),
+   eqCnsGETechFixomRYGrowth  = logical(),
+   eqCnsETechFixomRY  = logical(),
+   eqCnsETechFixomRYGrowth  = logical(),
    eqCnsLETechInpLShareIn  = logical(),
    eqCnsLETechInpLShareOut  = logical(),
    eqCnsLETechInpL  = logical(),
@@ -5514,6 +5892,60 @@ getVariables <- function() {
    eqCnsGETechActLRYSGrowth  = logical(),
    eqCnsETechActLRYS  = logical(),
    eqCnsETechActLRYSGrowth  = logical(),
+   eqCnsLETechVaromL  = logical(),
+   eqCnsGETechVaromL  = logical(),
+   eqCnsETechVaromL  = logical(),
+   eqCnsLETechVaromLS  = logical(),
+   eqCnsGETechVaromLS  = logical(),
+   eqCnsETechVaromLS  = logical(),
+   eqCnsLETechVaromLY  = logical(),
+   eqCnsLETechVaromLYGrowth  = logical(),
+   eqCnsGETechVaromLY  = logical(),
+   eqCnsGETechVaromLYGrowth  = logical(),
+   eqCnsETechVaromLY  = logical(),
+   eqCnsETechVaromLYGrowth  = logical(),
+   eqCnsLETechVaromLYS  = logical(),
+   eqCnsLETechVaromLYSGrowth  = logical(),
+   eqCnsGETechVaromLYS  = logical(),
+   eqCnsGETechVaromLYSGrowth  = logical(),
+   eqCnsETechVaromLYS  = logical(),
+   eqCnsETechVaromLYSGrowth  = logical(),
+   eqCnsLETechVaromLR  = logical(),
+   eqCnsGETechVaromLR  = logical(),
+   eqCnsETechVaromLR  = logical(),
+   eqCnsLETechVaromLRS  = logical(),
+   eqCnsGETechVaromLRS  = logical(),
+   eqCnsETechVaromLRS  = logical(),
+   eqCnsLETechVaromLRY  = logical(),
+   eqCnsLETechVaromLRYGrowth  = logical(),
+   eqCnsGETechVaromLRY  = logical(),
+   eqCnsGETechVaromLRYGrowth  = logical(),
+   eqCnsETechVaromLRY  = logical(),
+   eqCnsETechVaromLRYGrowth  = logical(),
+   eqCnsLETechVaromLRYS  = logical(),
+   eqCnsLETechVaromLRYSGrowth  = logical(),
+   eqCnsGETechVaromLRYS  = logical(),
+   eqCnsGETechVaromLRYSGrowth  = logical(),
+   eqCnsETechVaromLRYS  = logical(),
+   eqCnsETechVaromLRYSGrowth  = logical(),
+   eqCnsLETechFixomL  = logical(),
+   eqCnsGETechFixomL  = logical(),
+   eqCnsETechFixomL  = logical(),
+   eqCnsLETechFixomLY  = logical(),
+   eqCnsLETechFixomLYGrowth  = logical(),
+   eqCnsGETechFixomLY  = logical(),
+   eqCnsGETechFixomLYGrowth  = logical(),
+   eqCnsETechFixomLY  = logical(),
+   eqCnsETechFixomLYGrowth  = logical(),
+   eqCnsLETechFixomLR  = logical(),
+   eqCnsGETechFixomLR  = logical(),
+   eqCnsETechFixomLR  = logical(),
+   eqCnsLETechFixomLRY  = logical(),
+   eqCnsLETechFixomLRYGrowth  = logical(),
+   eqCnsGETechFixomLRY  = logical(),
+   eqCnsGETechFixomLRYGrowth  = logical(),
+   eqCnsETechFixomLRY  = logical(),
+   eqCnsETechFixomLRYGrowth  = logical(),
    eqCnsLESupOutShareIn  = logical(),
    eqCnsLESupOutShareOut  = logical(),
    eqCnsLESupOut  = logical(),
@@ -6020,9 +6452,9 @@ getVariables <- function() {
       stringsAsFactors = FALSE);
     rs[1:54,] <- NA;
     rs["vTechFixom", c("name", "description")] <- c("vTechFixom", "Fixom");
-    rs["vTechFixom", c("tech", "region", "year", "eqTechFixom")] <- TRUE;
+    rs["vTechFixom", c("tech", "region", "year", "eqTechFixom", "eqCnsLETechFixom", "eqCnsGETechFixom", "eqCnsETechFixom", "eqCnsLETechFixomY", "eqCnsLETechFixomYGrowth", "eqCnsGETechFixomY", "eqCnsGETechFixomYGrowth", "eqCnsETechFixomY", "eqCnsETechFixomYGrowth", "eqCnsLETechFixomR", "eqCnsGETechFixomR", "eqCnsETechFixomR", "eqCnsLETechFixomRY", "eqCnsLETechFixomRYGrowth", "eqCnsGETechFixomRY", "eqCnsGETechFixomRYGrowth", "eqCnsETechFixomRY", "eqCnsETechFixomRYGrowth", "eqCnsLETechFixomL", "eqCnsGETechFixomL", "eqCnsETechFixomL", "eqCnsLETechFixomLY", "eqCnsLETechFixomLYGrowth", "eqCnsGETechFixomLY", "eqCnsGETechFixomLYGrowth", "eqCnsETechFixomLY", "eqCnsETechFixomLYGrowth", "eqCnsLETechFixomLR", "eqCnsGETechFixomLR", "eqCnsETechFixomLR", "eqCnsLETechFixomLRY", "eqCnsLETechFixomLRYGrowth", "eqCnsGETechFixomLRY", "eqCnsGETechFixomLRYGrowth", "eqCnsETechFixomLRY", "eqCnsETechFixomLRYGrowth")] <- TRUE;
     rs["vTechVarom", c("name", "description")] <- c("vTechVarom", "Varom");
-    rs["vTechVarom", c("tech", "region", "year", "slice", "eqTechVarom")] <- TRUE;
+    rs["vTechVarom", c("tech", "region", "year", "slice", "eqTechVarom", "eqCnsLETechVarom", "eqCnsGETechVarom", "eqCnsETechVarom", "eqCnsLETechVaromS", "eqCnsGETechVaromS", "eqCnsETechVaromS", "eqCnsLETechVaromY", "eqCnsLETechVaromYGrowth", "eqCnsGETechVaromY", "eqCnsGETechVaromYGrowth", "eqCnsETechVaromY", "eqCnsETechVaromYGrowth", "eqCnsLETechVaromYS", "eqCnsLETechVaromYSGrowth", "eqCnsGETechVaromYS", "eqCnsGETechVaromYSGrowth", "eqCnsETechVaromYS", "eqCnsETechVaromYSGrowth", "eqCnsLETechVaromR", "eqCnsGETechVaromR", "eqCnsETechVaromR", "eqCnsLETechVaromRS", "eqCnsGETechVaromRS", "eqCnsETechVaromRS", "eqCnsLETechVaromRY", "eqCnsLETechVaromRYGrowth", "eqCnsGETechVaromRY", "eqCnsGETechVaromRYGrowth", "eqCnsETechVaromRY", "eqCnsETechVaromRYGrowth", "eqCnsLETechVaromRYS", "eqCnsLETechVaromRYSGrowth", "eqCnsGETechVaromRYS", "eqCnsGETechVaromRYSGrowth", "eqCnsETechVaromRYS", "eqCnsETechVaromRYSGrowth", "eqCnsLETechVaromL", "eqCnsGETechVaromL", "eqCnsETechVaromL", "eqCnsLETechVaromLS", "eqCnsGETechVaromLS", "eqCnsETechVaromLS", "eqCnsLETechVaromLY", "eqCnsLETechVaromLYGrowth", "eqCnsGETechVaromLY", "eqCnsGETechVaromLYGrowth", "eqCnsETechVaromLY", "eqCnsETechVaromLYGrowth", "eqCnsLETechVaromLYS", "eqCnsLETechVaromLYSGrowth", "eqCnsGETechVaromLYS", "eqCnsGETechVaromLYSGrowth", "eqCnsETechVaromLYS", "eqCnsETechVaromLYSGrowth", "eqCnsLETechVaromLR", "eqCnsGETechVaromLR", "eqCnsETechVaromLR", "eqCnsLETechVaromLRS", "eqCnsGETechVaromLRS", "eqCnsETechVaromLRS", "eqCnsLETechVaromLRY", "eqCnsLETechVaromLRYGrowth", "eqCnsGETechVaromLRY", "eqCnsGETechVaromLRYGrowth", "eqCnsETechVaromLRY", "eqCnsETechVaromLRYGrowth", "eqCnsLETechVaromLRYS", "eqCnsLETechVaromLRYSGrowth", "eqCnsGETechVaromLRYS", "eqCnsGETechVaromLRYSGrowth", "eqCnsETechVaromLRYS", "eqCnsETechVaromLRYSGrowth")] <- TRUE;
     rs["vTechInv", c("name", "description")] <- c("vTechInv", "Investment");
     rs["vTechInv", c("tech", "region", "year", "eqTechInv", "eqTechCost1", "eqCnsLETechInv", "eqCnsGETechInv", "eqCnsETechInv", "eqCnsLETechInvY", "eqCnsLETechInvYGrowth", "eqCnsGETechInvY", "eqCnsGETechInvYGrowth", "eqCnsETechInvY", "eqCnsETechInvYGrowth", "eqCnsLETechInvR", "eqCnsGETechInvR", "eqCnsETechInvR", "eqCnsLETechInvRY", "eqCnsLETechInvRYGrowth", "eqCnsGETechInvRY", "eqCnsGETechInvRYGrowth", "eqCnsETechInvRY", "eqCnsETechInvRYGrowth", "eqCnsLETechInvL", "eqCnsGETechInvL", "eqCnsETechInvL", "eqCnsLETechInvLY", "eqCnsLETechInvLYGrowth", "eqCnsGETechInvLY", "eqCnsGETechInvLYGrowth", "eqCnsETechInvLY", "eqCnsETechInvLYGrowth", "eqCnsLETechInvLR", "eqCnsGETechInvLR", "eqCnsETechInvLR", "eqCnsLETechInvLRY", "eqCnsLETechInvLRYGrowth", "eqCnsGETechInvLRY", "eqCnsGETechInvLRYGrowth", "eqCnsETechInvLRY", "eqCnsETechInvLRYGrowth")] <- TRUE;
     rs["vTechEac", c("name", "description")] <- c("vTechEac", "Annualized investment cost");

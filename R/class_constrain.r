@@ -30,6 +30,8 @@ setClass('constrain',
           type          = factor(NA, levels = c('capacity', 
                                                 'newcapacity', 
                                                 'invcost', 
+                                                'varom', 
+                                                'fixom', 
                                                 'eac', 
                                                 'activity', 
                                                 'input', 
@@ -44,6 +46,8 @@ setClass('constrain',
                                                 'growthinput', 
                                                 'growtheac', 
                                                 'growthinvcost', 
+                                                'growthfixom', 
+                                                'growthvarom', 
                                                 'growthactivity'
                                                 )),
           rhs           = data.frame(),
@@ -162,6 +166,8 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       minset$capacity <- c('region', 'year')
       minset$newcapacity <- c('region', 'year')
       minset$invcost <- c('region', 'year')
+      minset$fixom <- c('region', 'year')
+      minset$varom <- c('region', 'year', 'slice')
       minset$eac <- c('region', 'year')
       minset$activity <- c('region', 'year', 'slice')
       minset$input <- c('comm', 'region', 'year', 'slice')
@@ -172,6 +178,8 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       minset$growthcapacity <- c('region', 'year')
       minset$growthnewcapacity <- c('region', 'year')
       minset$growthinvcost <- c('region', 'year')
+      minset$growthvarom <- c('region', 'year', 'slice')
+      minset$growthfixom <- c('region', 'year')
       minset$growtheac <- c('region', 'year')
       minset$growthactivity <- c('region', 'year', 'slice')
       minset$growthinput <- c('comm', 'region', 'year', 'slice')
@@ -191,12 +199,16 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       unqset$capacity <- c('tech', 'res')
       unqset$newcapacity <- c('tech', 'res')
       unqset$invcost <- c('tech', 'res')
+      unqset$fixom <- c('tech', 'res')
+      unqset$varom <- c('tech', 'res')
       unqset$eac <- c('tech', 'res')
       unqset$activity <- c('tech', 'res')
 
       unqset$growthcapacity <- c('tech', 'res')
       unqset$growthnewcapacity <- c('tech', 'res')
       unqset$growthinvcost <- c('tech', 'res')
+      unqset$growthfixom <- c('tech', 'res')
+      unqset$growthvarom <- c('tech', 'res')
       unqset$growtheac <- c('tech', 'res')
       unqset$growthactivity <- c('tech', 'res')
 

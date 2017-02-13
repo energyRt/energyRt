@@ -245,6 +245,8 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     if (app@type %in% c('growthcapacity', 'capacity')) before <- 'Cap' else
     if (app@type %in% c('growthnewcapacity', 'newcapacity')) before <- 'NewCap' else 
     if (app@type %in% c('growthinvcost', 'invcost')) before <- 'Inv' else
+    if (app@type %in% c('growthvarom', 'varom')) before <- 'Varom' else
+    if (app@type %in% c('growthfixom', 'fixom')) before <- 'Fixom' else
     if (app@type %in% c('growthactivity', 'activity')) before <- 'Act' else
     if (app@type %in% c('growtheac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
     ast <- c(names(app@for.sum), names(app@for.each))[!(c(names(app@for.sum), names(app@for.each)) %in% ccc)] 
