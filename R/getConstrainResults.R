@@ -43,7 +43,7 @@ getConstrainResults <- function(scenario, constrain) {
     if (tcns@type %in% c('growth.fixom', 'fixom')) before <- 'Fixom' else
     if (tcns@type %in% c('growth.varom', 'varom')) before <- 'Varom' else
     if (tcns@type %in% c('growth.activity', 'activity')) before <- 'Inv' else
-    if (tcns@type %in% c('growth.eac', 'eac')) before <- 'Eac' else {browser(); stop('Unknown constrain type')}
+    if (tcns@type %in% c('growth.eac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
     vrb <- paste('v', fcase(ad_smpl), before, sep = '')
     if (length(ad_smpl) == 0) vrb <- paste(vrb, 'Tot', sep = '')
     if (length(vary.set) == 0) {
