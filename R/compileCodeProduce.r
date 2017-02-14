@@ -548,8 +548,13 @@ LL1 <- proc.time()[3]
           sep = '\n', file = zz)
       cat(glpk_model[grep('^end[;]', glpk_model):length(glpk_model)], sep = '\n', file = zz)
       close(zz)
-    cdd <- prec@model
-    zz <- file(paste(tmpdir, '/glpk.dat', sep = ''), 'w') 
+#    cdd <- prec@model
+      if (model.type == 'reduce') {
+        cdd <- prec@model_reduce
+      } else {
+        cdd <- prec@model_large
+      }
+      zz <- file(paste(tmpdir, '/glpk.dat', sep = ''), 'w') 
     for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'set') {
       cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)
     }
