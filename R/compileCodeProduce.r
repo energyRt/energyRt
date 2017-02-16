@@ -168,7 +168,8 @@ sm_compile_model <- function(obj,
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
         }
     }
-    prorgess_bar <- sum(sapply(obj@data, function(x) length(x@data)))
+    prorgess_bar <- sapply(obj@data, function(x) length(x@data))
+    if (is.list(prorgess_bar)) prorgess_bar <- 0 else prorgess_bar <- sum(prorgess_bar)
     prorgess_bar_0 <- 0
     prorgess_bar_dl <- (prorgess_bar + 50 - 1) %/% 50
 
