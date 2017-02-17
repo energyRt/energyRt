@@ -61,7 +61,7 @@ setClass('constrain',
           for.sum       = list(),
           for.each      = list(),
           default       = 0, 
-          rule          = as.character('back.inter.forth'),
+          rule          = as.character('inter.forth'),
           comm          = NULL,
           cout          = TRUE,
           cinp          = TRUE,
@@ -100,8 +100,8 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   obj@emis     <- TRUE
   if (type == 'tax') {
       obj@comm     <- comm
-      if (rule == 'default')  rule <- 'inter.forth'
-      obj@rule     <- rule
+      # if (rule == 'default')  rule <- 'inter.forth'
+      # obj@rule     <- rule
       obj@rhs <- data.frame(region = character(), 
                               year = numeric(), 
                               slice = character(), 
@@ -134,8 +134,8 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       }
    } else if (type == 'subsidy') {
       obj@comm     <- comm
-      if (rule == 'default')  rule <- 'inter.forth'
-      obj@rule     <- rule
+      # if (rule == 'default')  rule <- 'inter.forth'
+      # obj@rule     <- rule
       obj@rhs <- data.frame(region = character(), 
                               year = numeric(), 
                               slice = character(), 
@@ -167,8 +167,9 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
         obj@for.each <- for.each
       }
   } else {
-      if (rule == 'default')  rule <- 'back.inter.forth'
-      obj@rule     <- rule
+#      if (rule == 'default')  rule <- 'back.inter.forth'
+#      if (rule == 'default')  rule <- new('constrain')@rule
+#      obj@rule     <- rule
       minset <- list()
       minset$capacity <- c('region', 'year')
       minset$newcapacity <- c('region', 'year')
