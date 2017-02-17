@@ -195,7 +195,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             output = apply(dat$vOutTot[cc,,,, drop = FALSE], 3, sum), 
             technologyInput = apply(dat$vTechInpTot[cc,,,, drop = FALSE], 3, sum), 
             technologyOutput = apply(dat$vTechOutTot[cc,,,, drop = FALSE], 3, sum),
-            emission = apply(dat$vEmsTot[cc,,,, drop = FALSE], 3, sum),
+            emission = apply(dat$vEmsFuelTot[cc,,,, drop = FALSE], 3, sum),
             aggregate = apply(dat$vAggOut[cc,,,, drop = FALSE], 3, sum),
             demand = apply(dat$vDemInp[cc,,,, drop = FALSE], 3, sum),
             dummy = apply(dat$vDumOut[cc,,,, drop = FALSE], 3, sum),
@@ -388,7 +388,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           tec_output <- apply(dat$vTechOut[tt,,,,, drop = FALSE] +
             dat$vTechAOut[tt,,,,, drop = FALSE], c(2, 4), sum)
           tec_output <- tec_output[apply(tec_output != 0, 1, any),, drop = FALSE]
-          tec_emission <- apply(dat$vTechEms[tt,,,,, drop = FALSE], c(2, 4), sum)
+          tec_emission <- apply(dat$vTechEmsFuel[tt,,,,, drop = FALSE], c(2, 4), sum)
           tec_emission <- tec_emission[apply(tec_emission != 0, 1, any),, drop = FALSE]
           
           gg <- stock[!is.na(stock$tech) & stock$tech == tt & stock$year %in% mlst$mid, ]
@@ -657,9 +657,9 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             dst <- trd_dst[trd_dst$trade == nm, 'region']
             if (length(trd) == 0) cat('\n\n Warning: There is not destination region.\n\n', sep = '', file = zz) else
               cat('Destination regions: "',paste(dst, collapse = '", "') , '"\n\n', sep = '', file = zz)
-            if (any(dat$vTradeFlow[nm,,,,, drop = FALSE] != 0)) { 
+            if (any(dat$vTradeIr[nm,,,,, drop = FALSE] != 0)) { 
               # Source flow
-              sflow <- apply(dat$vTradeFlow[nm,,,,, drop = FALSE], c(2, 4), sum)
+              sflow <- apply(dat$vTradeIr[nm,,,,, drop = FALSE], c(2, 4), sum)
               sflow <- sflow[apply(sflow != 0, 1, any),, drop = FALSE]
               png2(paste('trade_src_', trd@name, '.png', sep = ''))
               layout(matrix(1:2, 1), width = c(.75, .25))
@@ -669,7 +669,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               plot.new()
               legend('center', legend = rev(rownames(sflow)), fill = rev(nrow(sflow)), bty = 'n')
               dev.off2()
-              sflow <- apply(dat$vTradeFlow[nm,,,,, drop = FALSE], c(3, 4), sum)
+              sflow <- apply(dat$vTradeIr[nm,,,,, drop = FALSE], c(3, 4), sum)
               sflow <- sflow[apply(sflow != 0, 1, any),, drop = FALSE]
               png2(paste('trade_dst_', trd@name, '.png', sep = ''))
               layout(matrix(1:2, 1), width = c(.75, .25))
@@ -693,7 +693,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               cat('  \\caption{Trade by destination region ', gsub('_', '\\\\_', nm), 
                   ', summary for all slice.}\n', sep = '', file = zz)
               cat('\\end{figure}\n', sep = '', file = zz)
-              vv <- as.data.frame.table(apply(dat$vTradeFlow[nm,,,,, drop = FALSE], 2:5, sum))
+              vv <- as.data.frame.table(apply(dat$vTradeIr[nm,,,,, drop = FALSE], 2:5, sum))
               vv <- vv[vv$Freq != 0,, drop = FALSE]
               colnames(vv)[1] <- 'source'
               colnames(vv)[2] <- 'destination'

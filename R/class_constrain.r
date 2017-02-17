@@ -34,6 +34,10 @@ setClass('constrain',
                                                 'fixom', 
                                                 'eac', 
                                                 'activity', 
+                                                'actvarom', 
+                                                'varom', 
+                                                'cvarom', 
+                                                'avarom', 
                                                 'input', 
                                                 'output',
                                                 'sharein',
@@ -48,6 +52,9 @@ setClass('constrain',
                                                 'growth.invcost', 
                                                 'growth.fixom', 
                                                 'growth.varom', 
+                                                'growth.actvarom', 
+                                                'growth.cvarom', 
+                                                'growth.avarom', 
                                                 'growth.activity'
                                                 )),
           rhs           = data.frame(),
@@ -168,6 +175,9 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       minset$invcost <- c('region', 'year')
       minset$fixom <- c('region', 'year')
       minset$varom <- c('region', 'year', 'slice')
+      minset$actvarom <- c('region', 'year', 'slice')
+      minset$cvarom <- c('region', 'year', 'slice')
+      minset$avarom <- c('region', 'year', 'slice')
       minset$eac <- c('region', 'year')
       minset$activity <- c('region', 'year', 'slice')
       minset$input <- c('comm', 'region', 'year', 'slice')
@@ -179,6 +189,9 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       minset$growth.newcapacity <- c('region', 'year')
       minset$growth.invcost <- c('region', 'year')
       minset$growth.varom <- c('region', 'year', 'slice')
+      minset$growth.actvarom <- c('region', 'year', 'slice')
+      minset$growth.avarom <- c('region', 'year', 'slice')
+      minset$growth.cvarom <- c('region', 'year', 'slice')
       minset$growth.fixom <- c('region', 'year')
       minset$growth.eac <- c('region', 'year')
       minset$growth.activity <- c('region', 'year', 'slice')
@@ -201,6 +214,9 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       unqset$invcost <- c('tech', 'res')
       unqset$fixom <- c('tech', 'res')
       unqset$varom <- c('tech', 'res')
+      unqset$actvarom <- c('tech', 'res')
+      unqset$cvarom <- c('tech', 'res')
+      unqset$avarom <- c('tech', 'res')
       unqset$eac <- c('tech', 'res')
       unqset$activity <- c('tech', 'res')
 
@@ -209,6 +225,9 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       unqset$growth.invcost <- c('tech', 'res')
       unqset$growth.fixom <- c('tech', 'res')
       unqset$growth.varom <- c('tech', 'res')
+      unqset$growth.actvarom <- c('tech', 'res')
+      unqset$growth.cvarom <- c('tech', 'res')
+      unqset$growth.avarom <- c('tech', 'res')
       unqset$growth.eac <- c('tech', 'res')
       unqset$growth.activity <- c('tech', 'res')
 

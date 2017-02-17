@@ -255,7 +255,7 @@ sm_compile_model <- function(obj,
               "vTechCap", "vTechAct", 
               "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", 
               "vDemInp", "vDumOut", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageCap", 
-              "vStorageNewCap", "vImport", "vExport", "vTradeFlow", "vRowExport", "vRowImport")
+              "vStorageNewCap", "vImport", "vExport", "vTradeFlow", "vExportRow", "vImportRow")
       if (!is.character(arg$fix_data) || any(!(arg$fix_data %in% c('all', ll)))) {
         if (!is.character(arg$fix_data)) stop('Uncorrect fix_data') else
           stop('Unknown fix_data ', paste(arg$fix_data[!(arg$fix_data %in% c('all', ll))], collapse = ', '))
@@ -349,50 +349,50 @@ LL1 <- proc.time()[3]
       } else if (nrow(gg) == 0 && prec@maptable[['pDumCost']]@default == Inf) {
         prec@maptable[['defpDumCost']]@default <- 0
       } else prec@maptable[['defpDumCost']]@default <- 1
-      # defpRowExportRes   
-      gg <- getDataMapTable(prec@maptable[['pRowExportRes']])
-#      if (prec@maptable[['pRowExportRes']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pRowExportRes']]@true_length),, drop = FALSE]
+      # defpExportRowRes   
+      gg <- getDataMapTable(prec@maptable[['pExportRowRes']])
+#      if (prec@maptable[['pExportRowRes']]@true_length != -1)
+#        gg <- gg[seq(length.out = prec@maptable[['pExportRowRes']]@true_length),, drop = FALSE]
       gg <- gg[gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpRowExportRes']] <- addData(prec@maptable[['defpRowExportRes']], 
+        prec@maptable[['defpExportRowRes']] <- addData(prec@maptable[['defpExportRowRes']], 
           gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pRowExportRes']]@default == Inf) {
-        prec@maptable[['defpRowExportRes']]@default <- 0
-      }  else prec@maptable[['defpRowExportRes']]@default <- 1
-      # defpRowImportRes
-      gg <- getDataMapTable(prec@maptable[['pRowImportRes']])
-#      if (prec@maptable[['pRowImportRes']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pRowImportRes']]@true_length),, drop = FALSE]
+      } else if (nrow(gg) == 0 && prec@maptable[['pExportRowRes']]@default == Inf) {
+        prec@maptable[['defpExportRowRes']]@default <- 0
+      }  else prec@maptable[['defpExportRowRes']]@default <- 1
+      # defpImportRowRes
+      gg <- getDataMapTable(prec@maptable[['pImportRowRes']])
+#      if (prec@maptable[['pImportRowRes']]@true_length != -1)
+#        gg <- gg[seq(length.out = prec@maptable[['pImportRowRes']]@true_length),, drop = FALSE]
       gg <- gg[gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpRowImportRes']] <- addData(prec@maptable[['defpRowImportRes']], 
+        prec@maptable[['defpImportRowRes']] <- addData(prec@maptable[['defpImportRowRes']], 
           gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pRowImportRes']]@default == Inf) {
-        prec@maptable[['defpRowImportRes']]@default <- 0
-      }  else prec@maptable[['defpRowImportRes']]@default <- 1
-      # defpRowExportUp 
-      gg <- getDataMapTable(prec@maptable[['pRowExport']])
-#      if (prec@maptable[['pRowExport']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pRowExport']]@true_length),, drop = FALSE]
+      } else if (nrow(gg) == 0 && prec@maptable[['pImportRowRes']]@default == Inf) {
+        prec@maptable[['defpImportRowRes']]@default <- 0
+      }  else prec@maptable[['defpImportRowRes']]@default <- 1
+      # defpExportRowUp 
+      gg <- getDataMapTable(prec@maptable[['pExportRow']])
+#      if (prec@maptable[['pExportRow']]@true_length != -1)
+#        gg <- gg[seq(length.out = prec@maptable[['pExportRow']]@true_length),, drop = FALSE]
       gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpRowExportUp']] <- addData(prec@maptable[['defpRowExportUp']], 
+        prec@maptable[['defpExportRowUp']] <- addData(prec@maptable[['defpExportRowUp']], 
           gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pRowExport']]@default[2] == Inf) {
-        prec@maptable[['defpRowExportUp']]@default <- 0
-      }  else prec@maptable[['defpRowExportUp']]@default <- 1
-      # defpRowImportUp
-      gg <- getDataMapTable(prec@maptable[['pRowImport']])
-#      if (prec@maptable[['pRowImport']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pRowImport']]@true_length),, drop = FALSE]
+      } else if (nrow(gg) == 0 && prec@maptable[['pExportRow']]@default[2] == Inf) {
+        prec@maptable[['defpExportRowUp']]@default <- 0
+      }  else prec@maptable[['defpExportRowUp']]@default <- 1
+      # defpImportRowUp
+      gg <- getDataMapTable(prec@maptable[['pImportRow']])
+#      if (prec@maptable[['pImportRow']]@true_length != -1)
+#        gg <- gg[seq(length.out = prec@maptable[['pImportRow']]@true_length),, drop = FALSE]
       gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpRowImportUp']] <- addData(prec@maptable[['defpRowImportUp']], 
+        prec@maptable[['defpImportRowUp']] <- addData(prec@maptable[['defpImportRowUp']], 
           gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pRowImport']]@default[2] == Inf) {
-        prec@maptable[['defpRowImportUp']]@default <- 0
-      }  else prec@maptable[['defpRowImportUp']]@default <- 1
+      } else if (nrow(gg) == 0 && prec@maptable[['pImportRow']]@default[2] == Inf) {
+        prec@maptable[['defpImportRowUp']]@default <- 0
+      }  else prec@maptable[['defpImportRowUp']]@default <- 1
       # For remove emission equation
       g1 <- getDataMapTable(prec@maptable$pTechEmisComm)
 #      if (prec@maptable[['pTechEmisComm']]@true_length != -1)

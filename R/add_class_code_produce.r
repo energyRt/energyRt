@@ -37,11 +37,11 @@ constrCodeProduce <- function(.Object) {
   .Object@maptable[['preDefImport']] <- MapTable('preDefImport', c('comm', 'region', 'year', 'slice'), 'single', default = 0)
   .Object@maptable[['mPreDefExport']] <- MapTable('mPreDefExport', c('comm', 'region', 'year', 'slice'), 'map')
   .Object@maptable[['preDefExport']] <- MapTable('preDefExport', c('comm', 'region', 'year', 'slice'), 'single', default = 0)
-  .Object@maptable[['mPreDefTradeFlow']] <- MapTable('mPreDefTradeFlow', c('trade', 'region', 'regionp', 'year', 'slice'), 'map')
-  .Object@maptable[['preDefTradeFlow']] <- MapTable('preDefTradeFlow', c('trade', 'region', 'regionp', 'year', 'slice'), 'single', default = 0)
-  .Object@maptable[['mPreDefRowExport']] <- MapTable('mPreDefRowExport', c('expp', 'region', 'year', 'slice'), 'map')
-  .Object@maptable[['preDefRowExport']] <- MapTable('preDefRowExport', c('expp', 'region', 'year', 'slice'), 'single', default = 0)
-  .Object@maptable[['mPreDefRowImport']] <- MapTable('mPreDefRowImport', c('imp', 'region', 'year', 'slice'), 'map')
-  .Object@maptable[['preDefRowImport']] <- MapTable('preDefRowImport', c('imp', 'region', 'year', 'slice'), 'single', default = 0)
+  .Object@maptable[['mPreDefTradeIr']] <- MapTable('mPreDefTradeIr', c('trade', 'region', 'regionp', 'year', 'slice'), 'map')
+  .Object@maptable[['preDefTradeIr']] <- MapTable('preDefTradeIr', c('trade', 'region', 'regionp', 'year', 'slice'), 'single', default = 0)
+  .Object@maptable[['mPreDefExportRow']] <- MapTable('mPreDefExportRow', c('expp', 'region', 'year', 'slice'), 'map')
+  .Object@maptable[['preDefExportRow']] <- MapTable('preDefExportRow', c('expp', 'region', 'year', 'slice'), 'single', default = 0)
+  .Object@maptable[['mPreDefImportRow']] <- MapTable('mPreDefImportRow', c('imp', 'region', 'year', 'slice'), 'map')
+  .Object@maptable[['preDefImportRow']] <- MapTable('preDefImportRow', c('imp', 'region', 'year', 'slice'), 'single', default = 0)
 .Object
 }

@@ -26,6 +26,7 @@ setClass("trade",
                                      ava.fx     = numeric(),
                                      ava.lo     = numeric(),
                                      cost       = numeric(),
+                                     markup     = numeric(),
                                      stringsAsFactors = FALSE)
       ),
       S3methods = TRUE

@@ -86,8 +86,8 @@ setMethod('removePreviousExport',
 setMethod('isExport', signature(obj = 'CodeProduce', name = 'character'),
       function(obj, name) {
         fl <- FALSE
-        for(i in c('expp', 'mExpComm', 'pRowExportPrice', 'pRowExportRes', 
-           'pRowExport')) 
+        for(i in c('expp', 'mExpComm', 'pExportRowPrice', 'pExportRowRes', 
+           'pExportRow')) 
             fl <- fl || any(obj@maptable[[i]]@data$expp == name, na.rm = TRUE)
         fl
 })
@@ -99,8 +99,8 @@ setMethod('isExport', signature(obj = 'CodeProduce', name = 'character'),
 setMethod('removePreviousImport',
     signature(obj = 'CodeProduce', name = 'character'),
       function(obj, name) {
-        for(i in c('imp', 'mImpComm', 'pRowImportPrice', 'pRowImportRes', 
-           'pRowImport')) 
+        for(i in c('imp', 'mImpComm', 'pImportRowPrice', 'pImportRowRes', 
+           'pImportRow')) 
             obj@maptable[[i]] <- removeBySet(obj@maptable[[i]], 'imp', name)
         obj
 })
@@ -126,8 +126,8 @@ setMethod('isTrade', signature(obj = 'CodeProduce', name = 'character'),
 setMethod('isImport', signature(obj = 'CodeProduce', name = 'character'),
       function(obj, name) {
         fl <- FALSE
-        for(i in c('imp', 'mImpComm', 'pRowImportPrice', 'pRowImportRes', 
-           'pRowImport')) 
+        for(i in c('imp', 'mImpComm', 'pImportRowPrice', 'pImportRowRes', 
+           'pImportRow')) 
             fl <- fl || any(obj@maptable[[i]]@data$imp == name, na.rm = TRUE)
         fl
 })

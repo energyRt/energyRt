@@ -255,27 +255,30 @@ setMethod("initialize", "CodeProduce",
     .Object@maptable[['mTradeDst']] <- 
         MapTable('mTradeDst', c('trade', 'region'), 'map')    
     .Object@maptable[['mSlicePrevious']] <- MapTable('mSlicePrevious', c('slice', 'slice'), 'map')    
-    .Object@maptable[['pTradeFlowCost']] <- MapTable('pTradeFlowCost', 
+    .Object@maptable[['pTradeIrCost']] <- MapTable('pTradeIrCost', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'single', 
             default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pRowExportPrice']] <- MapTable('pRowExportPrice', 
+    .Object@maptable[['pTradeIrMarkup']] <- MapTable('pTradeIrMarkup', 
+          c('trade', 'src', 'dst', 'year', 'slice'), 'single', 
+            default = 0, interpolation = 'back.inter.forth')    
+    .Object@maptable[['pExportRowPrice']] <- MapTable('pExportRowPrice', 
           c('expp', 'region', 'year', 'slice'), 'single', 
             default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pRowImportPrice']] <- MapTable('pRowImportPrice', 
+    .Object@maptable[['pImportRowPrice']] <- MapTable('pImportRowPrice', 
           c('imp', 'region', 'year', 'slice'), 'single', 
             default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pTradeFlow']] <- MapTable('pTradeFlow', 
+    .Object@maptable[['pTradeIr']] <- MapTable('pTradeIr', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'double', 
             default = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@maptable[['pRowExport']] <- MapTable('pRowExport', 
+    .Object@maptable[['pExportRow']] <- MapTable('pExportRow', 
           c('expp', 'region', 'year', 'slice'), 'double', 
             default = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@maptable[['pRowImport']] <- MapTable('pRowImport', 
+    .Object@maptable[['pImportRow']] <- MapTable('pImportRow', 
           c('imp', 'region', 'year', 'slice'), 'double', 
             default = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@maptable[['pRowExportRes']] <- MapTable('pRowExportRes', 
+    .Object@maptable[['pExportRowRes']] <- MapTable('pExportRowRes', 
           'expp', 'single',  default = 0, interpolation = 'back.inter.forth')
-    .Object@maptable[['pRowImportRes']] <- MapTable('pRowImportRes', 
+    .Object@maptable[['pImportRowRes']] <- MapTable('pImportRowRes', 
           'imp', 'single',  default = 0, interpolation = 'back.inter.forth')
   # For LEC
   .Object@maptable[['mLECRegion']] <- MapTable('mLECRegion', 'region', 'map')    
@@ -289,7 +292,8 @@ setMethod("initialize", "CodeProduce",
       "mCnsLe", "mCnsGe", "mCnsRhsTypeShareIn", "mCnsRhsTypeShareOut", "mCnsRhsTypeConst", "mCnsInpTech", 
       "mCnsOutTech", "mCnsCapTech", "mCnsNewCapTech", "mCnsOutSup", "mCnsInp", "mCnsOut", "mCnsInvTech",
       "mCnsEacTech", "mCnsTechCInp", "mCnsTechCOut", "mCnsTechAInp", "mCnsTechAOut", "mCnsTechEmis",
-      "mCnsActTech", "mCnsRhsTypeGrowth", "mCnsVaromTech", "mCnsFixomTech"))
+      "mCnsActTech", "mCnsRhsTypeGrowth", "mCnsFixomTech", 
+      "mCnsVaromTech", "mCnsActVaromTech", "mCnsCVaromTech", "mCnsAVaromTech"))
         .Object@maptable[[i]] <- MapTable(i, 'cns', 'map')    
     for(i in c('tech', 'sup', 'comm', 'region', 'year', 'slice')) {
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')
@@ -335,13 +339,13 @@ setMethod("initialize", "CodeProduce",
       MapTable('defpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
   .Object@maptable[['defpSupReserve']] <- MapTable('defpSupReserve', c('sup'), 'map')    
   .Object@maptable[['defpStorageCapUp']] <- MapTable('defpStorageCapUp', c('stg', 'region', 'year'), 'map')    
-  .Object@maptable[['defpTradeFlowUp']] <- MapTable('defpTradeFlowUp', 
+  .Object@maptable[['defpTradeIrUp']] <- MapTable('defpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
-    .Object@maptable[['defpRowExportRes']] <- MapTable('defpRowExportRes', 'expp', 'map')    
-    .Object@maptable[['defpRowImportRes']] <- MapTable('defpRowImportRes', 'imp', 'map')    
-    .Object@maptable[['defpRowExportUp']] <- MapTable('defpRowExportUp', 
+    .Object@maptable[['defpExportRowRes']] <- MapTable('defpExportRowRes', 'expp', 'map')    
+    .Object@maptable[['defpImportRowRes']] <- MapTable('defpImportRowRes', 'imp', 'map')    
+    .Object@maptable[['defpExportRowUp']] <- MapTable('defpExportRowUp', 
         c('expp', 'region', 'year', 'slice'), 'map')    
-    .Object@maptable[['defpRowImportUp']] <- MapTable('defpRowImportUp', 
+    .Object@maptable[['defpImportRowUp']] <- MapTable('defpImportRowUp', 
         c('imp', 'region', 'year', 'slice'), 'map')    
   .Object@maptable[['defpDumCost']] <- MapTable('defpDumCost', c('comm', 'region', 'year', 'slice'), 'map')    
   .Object@maptable[['pDiscountFactor']] <- MapTable('pDiscountFactor', c('region', 'year'), 'single')    

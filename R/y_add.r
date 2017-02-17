@@ -141,14 +141,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'export',
 #  obj@maptable[['expp']] <- addData(obj@maptable[['expp']], exp@name)
   obj@maptable[['mExpComm']] <- addData(obj@maptable[['mExpComm']],
       data.frame(expp = exp@name, comm = exp@commodity))
-  obj@maptable[['pRowExportPrice']] <- addData(obj@maptable[['pRowExportPrice']],
+  obj@maptable[['pExportRowPrice']] <- addData(obj@maptable[['pExportRowPrice']],
       simple_data_frame_approximation_chk(exp@exp, 'price',
-          obj@maptable[['pRowExportPrice']], approxim, 'expp', exp@name))
-  obj@maptable[['pRowExportRes']] <- addData(obj@maptable[['pRowExportRes']],
+          obj@maptable[['pExportRowPrice']], approxim, 'expp', exp@name))
+  obj@maptable[['pExportRowRes']] <- addData(obj@maptable[['pExportRowRes']],
       data.frame(expp = exp@name, Freq = exp@reserve))
-  obj@maptable[['pRowExport']] <- addData(obj@maptable[['pRowExport']],
+  obj@maptable[['pExportRow']] <- addData(obj@maptable[['pExportRow']],
             data_frame_approximation_chk(exp@exp, 'exp',
-            obj@maptable[['pRowExport']], approxim, 'expp', exp@name))
+            obj@maptable[['pExportRow']], approxim, 'expp', exp@name))
   obj
 })
 
@@ -170,14 +170,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'import',
 #  obj@maptable[['imp']] <- addData(obj@maptable[['imp']], imp@name)
   obj@maptable[['mImpComm']] <- addData(obj@maptable[['mImpComm']],
       data.frame(imp = imp@name, comm = imp@commodity))
-  obj@maptable[['pRowImportPrice']] <- addData(obj@maptable[['pRowImportPrice']],
+  obj@maptable[['pImportRowPrice']] <- addData(obj@maptable[['pImportRowPrice']],
       simple_data_frame_approximation_chk(imp@imp, 'price',
-          obj@maptable[['pRowImportPrice']], approxim, 'imp', imp@name))
-  obj@maptable[['pRowImportRes']] <- addData(obj@maptable[['pRowImportRes']],
+          obj@maptable[['pImportRowPrice']], approxim, 'imp', imp@name))
+  obj@maptable[['pImportRowRes']] <- addData(obj@maptable[['pImportRowRes']],
       data.frame(imp = imp@name, Freq = imp@reserve))
-  obj@maptable[['pRowImport']] <- addData(obj@maptable[['pRowImport']],
+  obj@maptable[['pImportRow']] <- addData(obj@maptable[['pImportRow']],
             data_frame_approximation_chk(imp@imp, 'imp',
-            obj@maptable[['pRowImport']], approxim, 'imp', imp@name))
+            obj@maptable[['pImportRow']], approxim, 'imp', imp@name))
   obj
 })
 
@@ -246,6 +246,9 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     if (app@type %in% c('growth.newcapacity', 'newcapacity')) before <- 'NewCap' else 
     if (app@type %in% c('growth.invcost', 'invcost')) before <- 'Inv' else
     if (app@type %in% c('growth.varom', 'varom')) before <- 'Varom' else
+    if (app@type %in% c('growth.varom', 'actvarom')) before <- 'ActVarom' else
+    if (app@type %in% c('growth.varom', 'cvarom')) before <- 'CVarom' else
+    if (app@type %in% c('growth.varom', 'avarom')) before <- 'AVarom' else
     if (app@type %in% c('growth.fixom', 'fixom')) before <- 'Fixom' else
     if (app@type %in% c('growth.activity', 'activity')) before <- 'Act' else
     if (app@type %in% c('growth.eac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
@@ -716,18 +719,22 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'trade',
   approxim$src <- trd@source; approxim$src <- approxim$src[approxim$src %in% approxim$region]
   approxim$dst <- trd@destination; approxim$dst <- approxim$dst[approxim$dst %in% approxim$region]
   approxim <- approxim[names(approxim) != 'region']
-  # pTradeFlowCost
-  obj@maptable[['pTradeFlowCost']] <- addData(obj@maptable[['pTradeFlowCost']],
-    simple_data_frame_approximation_chk(trd@trade, 'cost', obj@maptable[['pTradeFlowCost']], 
+  # pTradeIrCost
+  obj@maptable[['pTradeIrCost']] <- addData(obj@maptable[['pTradeIrCost']],
+    simple_data_frame_approximation_chk(trd@trade, 'cost', obj@maptable[['pTradeIrCost']], 
       approxim, 'trade', trd@name))
-  # pTradeFlow
+  # pTradeIrMarkup
+  obj@maptable[['pTradeIrMarkup']] <- addData(obj@maptable[['pTradeIrMarkup']],
+    simple_data_frame_approximation_chk(trd@trade, 'markup', obj@maptable[['pTradeIrMarkup']], 
+      approxim, 'trade', trd@name))
+  # pTradeIr
     gg <- data_frame_approximation_chk(trd@trade, 'ava',
-            obj@maptable[['pTradeFlow']], approxim, 'trade', trd@name)
-    obj@maptable[['pTradeFlow']] <- addData(obj@maptable[['pTradeFlow']], gg)
+            obj@maptable[['pTradeIr']], approxim, 'trade', trd@name)
+    obj@maptable[['pTradeIr']] <- addData(obj@maptable[['pTradeIr']], gg)
     gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
     if (nrow(gg) != 0) 
-      obj@maptable[['defpTradeFlowUp']] <- addData(obj@maptable[['defpTradeFlowUp']],
-            gg[, obj@maptable[['defpTradeFlowUp']]@set])
+      obj@maptable[['defpTradeIrUp']] <- addData(obj@maptable[['defpTradeIrUp']],
+            gg[, obj@maptable[['defpTradeIrUp']]@set])
   obj
 })
 
