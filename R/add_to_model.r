@@ -38,9 +38,8 @@ add_to_model <- function(obj, ..., repos.name = NULL) {
     ff <- c(sapply(obj@data, function(z) z@name), recursive = TRUE)
     fl <- seq(alon = ff)[ff ==  repos.name]
     for(i in seq(along = app)) {
-      obj@data[[fl]] <- add(reps, app[[i]])
+      obj@data[[fl]] <- add(obj@data[[fl]], app[[i]])
     }
-    obj@data[[fl]] <- reps
   }
   ff <- c(lapply(obj@data, function(x) sapply(x@data, function(z) z@name)), recursive = TRUE)
   if (anyDuplicated(ff)) {
