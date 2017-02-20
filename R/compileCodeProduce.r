@@ -655,6 +655,13 @@ LL1 <- proc.time()[3]
     for(k in unique(rr$set$set)) {
       ss[[k]] <- rr$set$value[rr$set$set == k]
     }
+    # add alias
+    ss$src <- ss$region
+    ss$dst <- ss$region
+    ss$regionp <- ss$region
+    ss$yearp <- ss$year
+    ss$acomm <- ss$comm
+    ss$commp <- ss$comm
     rr$set_vec <- ss
     for(i in vrb_list) {
       gg <- read.csv(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
