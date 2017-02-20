@@ -78,7 +78,7 @@ setClass('constrain',
 #' @name newConstrain
 #' 
 newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
-   for.each = list(), default = 0, rule = 'inter.forth', comm = NULL,
+   for.each = list(), default = 0, rule = NULL, comm = NULL,
     cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
   obj <- new('constrain')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
@@ -89,7 +89,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   # TYPE vs SET   
   if (length(type) != 1 || !(type %in% levels(obj@type)))
     stop('Wrong type')
-  obj@rule     <- rule
+  if (!is.null(rule)) obj@rule[]     <- rule
   obj@type[] <- type
   obj@default  <- default
   obj@name     <- name
