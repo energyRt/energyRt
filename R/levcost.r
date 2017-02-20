@@ -239,7 +239,7 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
     cbcCompileParameter = cbcCompileParameter, echo = echo)
   if (!(rr@result@solution_report$status == 1 && 
             rr@result@solution_report$finish == 2 && 
-            all(rr@result@data$vDumOut == 0))) stop('Error in solution')
+            all(rr@result@data$vDummyOut == 0))) stop('Error in solution')
 ##  # Additional table          
 ##    dsc <- rr@precompiled@maptable[['pDiscountFactor']]@data
 ##    dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]

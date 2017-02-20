@@ -82,15 +82,35 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       }
       gg <- sub('[,][ ]$', '.\n\n', gg)
       cat(gg, sep = '', file = zz)
-      if (any(obj@result@data$vDumOut != 0)) {
-        dcmd <- dimnames(obj@result@data$vDumOut)[[1]][apply(obj@result@data$vDumOut != 0, 1, any)]
+      if (any(obj@result@data$vDummyOut != 0)) {
+        dcmd <- dimnames(obj@result@data$vDummyOut)[[1]][apply(obj@result@data$vDummyOut != 0, 1, any)]
         cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
         cat('There are dummy import for commodity "', 
             paste(dcmd, collapse = '", "'), '".\n\n', '\n', sep = '', file = zz)
         for(cc in dcmd) {
           cat('\\subsection{', cc, '}\n\n', '\n', sep = '', file = zz)
-          png2(paste(cc, '_dummy.png', sep = ''))
-          plot(dimnames(dat$vDumOut)$year, apply(dat$vDumOut[cc,,,, drop = FALSE], 3, sum), 
+          png2(paste(cc, '_dummy_out.png', sep = ''))
+          plot(dimnames(dat$vDummyOut)$year, apply(dat$vDummyOut[cc,,,, drop = FALSE], 3, sum), 
+               main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
+          dev.off2()
+          cat('\\begin{figure}[H]\n', sep = '', file = zz)
+          cat('  \\centering\n', sep = '', file = zz)
+          cat('  \\includegraphics[width = 7in]{', cc, 
+              '_dummy.png}\n', sep = '', file = zz)
+          cat('  \\caption{Dummy import commodity ', gsub('_', '\\\\_', cc), 
+              ', summary for all region and slice.}\n', sep = '', file = zz)
+          cat('\\end{figure}\n', sep = '', file = zz)
+        }
+      }
+      if (any(obj@result@data$vDummyInp != 0)) {
+        dcmd <- dimnames(obj@result@data$vDummyInp)[[1]][apply(obj@result@data$vDummyInp != 0, 1, any)]
+        cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
+        cat('There are dummy import for commodity "', 
+            paste(dcmd, collapse = '", "'), '".\n\n', '\n', sep = '', file = zz)
+        for(cc in dcmd) {
+          cat('\\subsection{', cc, '}\n\n', '\n', sep = '', file = zz)
+          png2(paste(cc, '_dummy_inp.png', sep = ''))
+          plot(dimnames(dat$vDummyInp)$year, apply(dat$vDummyInp[cc,,,, drop = FALSE], 3, sum), 
                main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
           dev.off2()
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
@@ -113,7 +133,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         Techology = apply(dat$vTechCost, 3, sum),
         Tax = apply(dat$vTaxCost, 3, sum),
         Storage = apply(dat$vStorageCost, 3, sum),
-        Dummy = apply(dat$vDumCost, 3, sum),
+        Dummy = apply(dat$vDummyCost, 3, sum),
         SalvageTechology = c(rep(0, dim(dat$vTechCost)[3] - 1), sum(dat$vTechSalv))
      )
       if (any(cost != 0)) {
@@ -155,7 +175,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         Techology = apply(apply(dat$vTechCost, 2:3, sum) * dsc, 2, sum),
         Tax = apply(apply(dat$vTaxCost, 2:3, sum) * dsc, 2, sum),
         Storage = apply(apply(dat$vStorageCost, 2:3, sum) * dsc, 2, sum),
-        Dummy = apply(apply(dat$vDumCost, 2:3, sum) * dsc, 2, sum),
+        Dummy = apply(apply(dat$vDummyCost, 2:3, sum) * dsc, 2, sum),
         SalvageTechology = c(rep(0, dim(dat$vTechCost)[3] - 1), sum(dat$vTechSalv)) * dsc
       )
       if (any(dsccost != 0)) {
@@ -198,7 +218,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             emission = apply(dat$vEmsFuelTot[cc,,,, drop = FALSE], 3, sum),
             aggregate = apply(dat$vAggOut[cc,,,, drop = FALSE], 3, sum),
             demand = apply(dat$vDemInp[cc,,,, drop = FALSE], 3, sum),
-            dummy = apply(dat$vDumOut[cc,,,, drop = FALSE], 3, sum),
+            dummyImport = apply(dat$vDummyOut[cc,,,, drop = FALSE], 3, sum),
+            dummyExport = apply(dat$vDummyInp[cc,,,, drop = FALSE], 3, sum),
             supply = apply(dat$vSupOutTot[cc,,,, drop = FALSE], 3, sum),
             import = apply(dat$vImport[cc,,,, drop = FALSE], 3, sum),
             export = apply(dat$vExport[cc,,,, drop = FALSE], 3, sum)
@@ -242,7 +263,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               }
               # Commodity source
               cmd_src <- cmd_use[c('technologyOutput', 'supply', 'emission', 'aggregate', 
-                                   'dummy', 'import'),, drop = FALSE]
+                                   'dummyImport', 'import'),, drop = FALSE]
               if (any(cmd_src != 0)) {
                 # Source
                 png2(paste(cmd@name, '_source.png', sep = ''), width = 640)
@@ -257,7 +278,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                 par(mar = c(5, 0, 4, 0) + .1)
                 plot.new()
                 legend('center', legend = c('Technology', 'Supply', 'Emission', 'Aggregate', 
-                                            'Dummy', 'Import')[yy], col = yy, lwd = 2, bty = 'n')
+                                            'Dummy Import', 'Import')[yy], col = yy, lwd = 2, bty = 'n')
                 dev.off2()
                 cat('\\begin{figure}[H]\n', sep = '', file = zz)
                 cat('  \\centering\n', sep = '', file = zz)
@@ -317,7 +338,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                 }
               }
              # Commodity demand
-              cmd_dem <- cmd_use[c('technologyInput', 'demand', 'export'),, drop = FALSE]
+              cmd_dem <- cmd_use[c('technologyInput', 'demand', 'export', 'dummyExport'),, drop = FALSE]
               if (any(cmd_dem != 0)) {
                 # Demand
                 png2(paste(cmd@name, '_demand.png', sep = ''), width = 640)
@@ -331,7 +352,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                 }
                 par(mar = c(5, 0, 4, 0) + .1)
                 plot.new()
-                legend('center', legend = c('Technology', 'Demand', 'Export')[yy], col = yy, lwd = 2, bty = 'n')
+                legend('center', legend = c('Technology', 'Demand', 'Export', 'Dummy Export')[yy], 
+                                 col = yy, lwd = 2, bty = 'n')
                 dev.off2()
                 cat('\\begin{figure}[H]\n', sep = '', file = zz)
                 cat('  \\centering\n', sep = '', file = zz)

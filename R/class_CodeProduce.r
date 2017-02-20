@@ -8,10 +8,10 @@ setClass("CodeProduce",
     set = "list", # List with set : tech, sup, group, comm, region, year, slice
     maptable = "list", # List with techology parameter
     constrain = "list", 
-    model_reduce = "character", 
-    model_reduce_glpk = "character",
-    model_large = "character", 
-    model_large_glpk = "character"
+    model_reduced      = "character", 
+    model_reduced_glpk = "character",
+    model_full         = "character", 
+    model_full_glpk    = "character"
   ),
   prototype(
     set = list(tech = c(), sup = c(), group = c(),
@@ -21,10 +21,10 @@ setClass("CodeProduce",
     constrain = list(), 
     #model = readLines(paste(Sys.getenv('dropbox'), '/package/bottomup/gams/model.gms', sep = '')),
     #model_glpk = readLines(paste(Sys.getenv('dropbox'), '/package/bottomup/glpk/glpk.mod', sep = ''))
-    model_reduce = readLines('gams/model_reduce.gms'),
-    model_reduce_glpk = readLines('glpk/glpk_reduce.mod'),
-    model_large = readLines('gams/model_large.gms'),
-    model_large_glpk = readLines('glpk/glpk_large.mod')
+    model_reduced = readLines('gams/model_reduced.gms'),
+    model_reduced_glpk = readLines('glpk/glpk_reduced.mod'),
+    model_full = readLines('gams/model_full.gms'),
+    model_full_glpk = readLines('glpk/glpk_full.mod')
   )
 );
 
@@ -73,9 +73,13 @@ setMethod("initialize", "CodeProduce",
         MapTable('pDemand', c('dem', 'region', 'year', 'slice'), 'single', 
         default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'dem')
     # Dummy import
-    .Object@maptable[['pDumCost']] <- 
-        MapTable('pDumCost', c('comm', 'region', 'year', 'slice'), 'single', 
-        default = Inf, interpolation = 'back.inter.forth', for_sysInfo = 'dummy')    
+    .Object@maptable[['pDummyImportCost']] <- 
+        MapTable('pDummyImportCost', c('comm', 'region', 'year', 'slice'), 'single', 
+        default = Inf, interpolation = 'back.inter.forth', for_sysInfo = 'dummyImport')    
+    # Dummy export
+    .Object@maptable[['pDummyExportCost']] <- 
+        MapTable('pDummyExportCost', c('comm', 'region', 'year', 'slice'), 'single', 
+        default = Inf, interpolation = 'back.inter.forth', for_sysInfo = 'dummyExport')    
     # Tax
     .Object@maptable[['pTaxCost']] <- 
         MapTable('pTaxCost', c('comm', 'region', 'year', 'slice'), 'single', 
@@ -347,7 +351,10 @@ setMethod("initialize", "CodeProduce",
         c('expp', 'region', 'year', 'slice'), 'map')    
     .Object@maptable[['defpImportRowUp']] <- MapTable('defpImportRowUp', 
         c('imp', 'region', 'year', 'slice'), 'map')    
-  .Object@maptable[['defpDumCost']] <- MapTable('defpDumCost', c('comm', 'region', 'year', 'slice'), 'map')    
+  .Object@maptable[['defpDummyImportCost']] <- MapTable('defpDummyImportCost', 
+      c('comm', 'region', 'year', 'slice'), 'map')    
+  .Object@maptable[['defpDummyExportCost']] <- MapTable('defpDummyExportCost', 
+      c('comm', 'region', 'year', 'slice'), 'map')    
   .Object@maptable[['pDiscountFactor']] <- MapTable('pDiscountFactor', c('region', 'year'), 'single')    
   .Object@maptable[['mDiscountZero']] <- MapTable('mDiscountZero', 'region', 'map', default = 1) 
   ## Milestone set

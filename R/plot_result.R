@@ -43,8 +43,10 @@ plot.result <- function(obj, type, commodity, region = NULL, year = NULL,
     gg <- apply(obj@data$vTechInp[technology, commodity, region, year, slice, drop = FALSE], 4, sum)
   } else if (type == 'demand') {
     gg <- apply(obj@data$vDemInp[commodity, region, year, slice, drop = FALSE], 3, sum)
-  } else if (type == 'dummy') {
-    gg <- apply(obj@data$vDumOut[commodity, region, year, slice, drop = FALSE], 3, sum)
+  } else if (type == 'dummy_output') {
+    gg <- apply(obj@data$vDummyOut[commodity, region, year, slice, drop = FALSE], 3, sum)
+  } else if (type == 'dummy_input') {
+    gg <- apply(obj@data$vDummyInp[commodity, region, year, slice, drop = FALSE], 3, sum)
   } else if (type == 'balance') {
     gg <- apply(obj@data$vBalance[commodity, region, year, slice, drop = FALSE], 3, sum)
   } else if (type == 'export') {      

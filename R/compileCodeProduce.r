@@ -59,14 +59,14 @@ sm_compile_model <- function(obj,
   if (any(names(arg) == 'model.type')) {
     model.type <- arg$model.type
     arg <- arg[names(arg) != 'model.type', drop = FALSE]
-    if (all(model.type != c('reduce', 'large')))
-     stop('Unknown model.type argument, have to be "large" or "reduce"')
-  } else model.type <- 'reduce'
-  if (model.type == 'reduce') {
-    if (length(getNames(obj, class = 'constrain', type = '(fixom|varom)')) > 0) {
-      stop(paste('Unexeptable constrain for reduce model: "', 
-        paste(getNames(obj, class = 'constrain', type = '(fixom|varom)'), collapse = '", "'), 
-          '"', sep = ''))
+    if (all(model.type != c('reduced', 'full')))
+     stop('Unknown model.type argument, have to be "full" or "reduced"')
+  } else model.type <- 'reduced'
+  if (model.type == 'reduced') {
+    if (length(getNames(obj, class = 'constrain', type = '(fixom|varom|actvarom|cvarom|avarom)')) > 0) {
+      stop(paste('Unexeptable constrain for reduced model: "', 
+        paste(getNames(obj, class = 'constrain', type = '(fixom|varom|actvarom|cvarom|avarom)'), 
+          collapse = '", "'), '"', sep = ''))
     }
   }
   if (any(names(arg) == 'region')) {
@@ -251,10 +251,10 @@ sm_compile_model <- function(obj,
 # Fix to previous data
 # ---------------------------------------------------------------------------------------------------------  
   if (any(names(arg) == 'fix_data')) {
-      ll <- c("vTechUse", "vTechNewCap", "vTechRetirementCap",# "vTechRetrofitCap", "vTechUpgradeCap", 
+      ll <- c("vTechUse", "vTechNewCap", "vTechRetiredCap",# "vTechRetrofitCap", "vTechUpgradeCap", 
               "vTechCap", "vTechAct", 
               "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", 
-              "vDemInp", "vDumOut", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageCap", 
+              "vDemInp", "vDummyOut", "vDummyInp", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageCap", 
               "vStorageNewCap", "vImport", "vExport", "vTradeFlow", "vExportRow", "vImportRow")
       if (!is.character(arg$fix_data) || any(!(arg$fix_data %in% c('all', ll)))) {
         if (!is.character(arg$fix_data)) stop('Uncorrect fix_data') else
@@ -338,17 +338,24 @@ LL1 <- proc.time()[3]
       } else if (nrow(gg) == 0 && prec@maptable[['pSupAva']]@default == Inf) {
         prec@maptable[['defpSupAvaUp']]@default <- 0
       }  else prec@maptable[['defpSupAvaUp']]@default <- 1
-      # Add pDumCost
-      gg <- getDataMapTable(prec@maptable[['pDumCost']])
-#      if (prec@maptable[['pDumCost']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pDumCost']]@true_length),, drop = FALSE]
+      # Add pDummyImportCost
+      gg <- getDataMapTable(prec@maptable[['pDummyImportCost']])
       gg <- gg[gg$Freq != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpDumCost']] <- 
-          addData(prec@maptable[['defpDumCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pDumCost']]@default == Inf) {
-        prec@maptable[['defpDumCost']]@default <- 0
-      } else prec@maptable[['defpDumCost']]@default <- 1
+        prec@maptable[['defpDummyImportCost']] <- 
+          addData(prec@maptable[['defpDummyImportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
+      } else if (nrow(gg) == 0 && prec@maptable[['pDummyImportCost']]@default == Inf) {
+        prec@maptable[['defpDummyImportCost']]@default <- 0
+      } else prec@maptable[['defpDummyImportCost']]@default <- 1
+      # Add pDummyExportCost
+      gg <- getDataMapTable(prec@maptable[['pDummyExportCost']])
+      gg <- gg[gg$Freq != Inf, ]
+      if (nrow(gg) != 0) {
+        prec@maptable[['defpDummyExportCost']] <- 
+          addData(prec@maptable[['defpDummyExportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
+      } else if (nrow(gg) == 0 && prec@maptable[['pDummyExportCost']]@default == Inf) {
+        prec@maptable[['defpDummyExportCost']]@default <- 0
+      } else prec@maptable[['defpDummyExportCost']]@default <- 1
       # defpExportRowRes   
       gg <- getDataMapTable(prec@maptable[['pExportRowRes']])
 #      if (prec@maptable[['pExportRowRes']]@true_length != -1)
@@ -462,10 +469,10 @@ LL1 <- proc.time()[3]
       gsub('[/][/]*', '\\\\', paste('FILE1=', tmp.dir, '/mdl.lst', sep = '')), '', 'MAXIM=1', 
       'TOP=50', 'LEFT=50', 'HEIGHT=400', 'WIDTH=400', ''), sep = '\n', file = zz)
     close(zz)
-    if (model.type == 'reduce') {
-      cdd <- prec@model_reduce
+    if (model.type == 'reduced') {
+      cdd <- prec@model_reduced
     } else {
-      cdd <- prec@model_large
+      cdd <- prec@model_full
     }
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(cdd[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', cdd) - 1)], sep = '\n', file = zz)
@@ -534,10 +541,10 @@ LL1 <- proc.time()[3]
     if(echo) cat('Solver work time: ', round(pp3 - pp2, 2), 's\n', sep = '')
   } else if (solver == 'GLPK' || solver == 'CBC') {   
 ### FUNC GLPK 
-    if (model.type == 'reduce') {
-      glpk_model <- prec@model_reduce_glpk
+    if (model.type == 'reduced') {
+      glpk_model <- prec@model_reduced_glpk
     } else {
-      glpk_model <- prec@model_large_glpk
+      glpk_model <- prec@model_full_glpk
     }
       zz <- file(paste(tmpdir, '/glpk.mod', sep = ''), 'w')
       if (length(grep('^minimize', glpk_model)) != 1) stop('Wrong GLPK model')
@@ -550,11 +557,11 @@ LL1 <- proc.time()[3]
       cat(glpk_model[grep('^end[;]', glpk_model):length(glpk_model)], sep = '\n', file = zz)
       close(zz)
 #    cdd <- prec@model
-      if (model.type == 'reduce') {
-        cdd <- prec@model_reduce
-      } else {
-        cdd <- prec@model_large
-      }
+    if (model.type == 'reduced') {
+      glpk_model <- prec@model_reduced_glpk
+    } else {
+      glpk_model <- prec@model_full_glpk
+    }
       zz <- file(paste(tmpdir, '/glpk.dat', sep = ''), 'w') 
     for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'set') {
       cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)

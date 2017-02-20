@@ -59,11 +59,11 @@ getEquationsMap <- function() {
     eqCostIrTrade = c("region", "year"), 
     eqExportRowUp = c("expp", "region", "year", "slice"), 
     eqExportRowLo = c("expp", "region", "year", "slice"), 
-    eqExportRowRes = c("expp"), 
+    eqExportRowCumulative = c("expp"), 
     eqExportRowResUp = c("expp"), 
     eqImportRowUp = c("imp", "region", "year", "slice"), 
     eqImportRowLo = c("imp", "region", "year", "slice"), 
-    eqImportRowRes = c("imp"), 
+    eqImportRowAccumulated = c("imp"), 
     eqImportRowResUp = c("imp"), 
     eqBalUp = c("comm", "region", "year", "slice"), 
     eqBalLo = c("comm", "region", "year", "slice"), 
@@ -76,7 +76,7 @@ getEquationsMap <- function() {
     eqTechOutTot = c("comm", "region", "year", "slice"), 
     eqStorageInpTot = c("comm", "region", "year", "slice"), 
     eqStorageOutTot = c("comm", "region", "year", "slice"), 
-    eqDumCost = c("comm", "region", "year"), 
+    eqDummyCost = c("comm", "region", "year"), 
     eqCost1 = c("region", "year"), 
     eqCost2 = c("region", "year"), 
     eqTaxCost = c("comm", "region", "year"), 
@@ -1776,7 +1776,7 @@ getEquationsMap <- function() {
     eqLECActivity = c("region", "year", "slice"), 
     eqPreDefTechUse = c("tech", "region", "year", "slice"), 
     eqPreDefTechNewCap = c("tech", "region", "year"), 
-    eqPreDefTechRetirementCap = c("tech", "region", "year", "year"), 
+    eqPreDefTechRetiredCap = c("tech", "region", "year", "year"), 
     eqPreDefTechCap = c("tech", "region", "year"), 
     eqPreDefTechAct = c("tech", "region", "year", "slice"), 
     eqPreDefTechInp = c("tech", "comm", "region", "year", "slice"), 
@@ -1785,7 +1785,8 @@ getEquationsMap <- function() {
     eqPreDefTechAOut = c("tech", "comm", "region", "year", "slice"), 
     eqPreDefSupOut = c("sup", "comm", "region", "year", "slice"), 
     eqPreDefDemInp = c("comm", "region", "year", "slice"), 
-    eqPreDefDumOut = c("comm", "region", "year", "slice"), 
+    eqPreDefDummyOut = c("comm", "region", "year", "slice"), 
+    eqPreDefDummyInp = c("comm", "region", "year", "slice"), 
     eqPreDefStorageInp = c("stg", "comm", "region", "year", "slice"), 
     eqPreDefStorageOut = c("stg", "comm", "region", "year", "slice"), 
     eqPreDefStorageStore = c("stg", "region", "year", "slice"), 
@@ -1822,7 +1823,7 @@ getVariablesMap <- function() {
     vTradeIrCost = c("region", "year"), 
     vTechUse = c("tech", "region", "year", "slice"), 
     vTechNewCap = c("tech", "region", "year"), 
-    vTechRetirementCap = c("tech", "region", "year", "year"), 
+    vTechRetiredCap = c("tech", "region", "year", "year"), 
     vTechCap = c("tech", "region", "year"), 
     vTechAct = c("tech", "region", "year", "slice"), 
     vTechInp = c("tech", "comm", "region", "year", "slice"), 
@@ -1839,8 +1840,9 @@ getVariablesMap <- function() {
     vTechOutTot = c("comm", "region", "year", "slice"), 
     vStorageInpTot = c("comm", "region", "year", "slice"), 
     vStorageOutTot = c("comm", "region", "year", "slice"), 
-    vDumOut = c("comm", "region", "year", "slice"), 
-    vDumCost = c("comm", "region", "year"), 
+    vDummyOut = c("comm", "region", "year", "slice"), 
+    vDummyInp = c("comm", "region", "year", "slice"), 
+    vDummyCost = c("comm", "region", "year"), 
     vStorageInp = c("stg", "comm", "region", "year", "slice"), 
     vStorageOut = c("stg", "comm", "region", "year", "slice"), 
     vStorageStore = c("stg", "region", "year", "slice"), 
@@ -1853,9 +1855,9 @@ getVariablesMap <- function() {
     vImport = c("comm", "region", "year", "slice"), 
     vExport = c("comm", "region", "year", "slice"), 
     vTradeIr = c("trade", "region", "region", "year", "slice"), 
-    vExportRowRes = c("expp"), 
+    vExportRowCumulative = c("expp"), 
     vExportRow = c("expp", "region", "year", "slice"), 
-    vImportRowRes = c("imp"), 
+    vImportRowAccumulated = c("imp"), 
     vImportRow = c("imp", "region", "year", "slice"))
 }
 getEquations <- function() {
@@ -1897,7 +1899,7 @@ getEquations <- function() {
    vTradeIrCost  = logical(),
    vTechUse  = logical(),
    vTechNewCap  = logical(),
-   vTechRetirementCap  = logical(),
+   vTechRetiredCap  = logical(),
    vTechCap  = logical(),
    vTechAct  = logical(),
    vTechInp  = logical(),
@@ -1914,8 +1916,9 @@ getEquations <- function() {
    vTechOutTot  = logical(),
    vStorageInpTot  = logical(),
    vStorageOutTot  = logical(),
-   vDumOut  = logical(),
-   vDumCost  = logical(),
+   vDummyOut  = logical(),
+   vDummyInp  = logical(),
+   vDummyCost  = logical(),
    vStorageInp  = logical(),
    vStorageOut  = logical(),
    vStorageStore  = logical(),
@@ -1928,12 +1931,12 @@ getEquations <- function() {
    vImport  = logical(),
    vExport  = logical(),
    vTradeIr  = logical(),
-   vExportRowRes  = logical(),
+   vExportRowCumulative  = logical(),
    vExportRow  = logical(),
-   vImportRowRes  = logical(),
+   vImportRowAccumulated  = logical(),
    vImportRow  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:1797,] <- NA;
+    rs[1:1798,] <- NA;
     rs["eqTechSng2Sng", c("name", "description")] <- c("eqTechSng2Sng", "Input to Output");
     rs["eqTechSng2Sng", c("tech", "comm", "region", "year", "slice", "vTechInp", "vTechOut")] <- TRUE;
     rs["eqTechGrp2Sng", c("name", "description")] <- c("eqTechGrp2Sng", "Group input to output");
@@ -1971,17 +1974,17 @@ getEquations <- function() {
     rs["eqTechAfacUp", c("name", "description")] <- c("eqTechAfacUp", "");
     rs["eqTechAfacUp", c("tech", "comm", "region", "year", "slice", "vTechCap", "vTechOut")] <- TRUE;
     rs["eqTechCap", c("name", "description")] <- c("eqTechCap", "");
-    rs["eqTechCap", c("tech", "region", "year", "vTechNewCap", "vTechRetirementCap", "vTechCap")] <- TRUE;
+    rs["eqTechCap", c("tech", "region", "year", "vTechNewCap", "vTechRetiredCap", "vTechCap")] <- TRUE;
     rs["eqTechNewCap", c("name", "description")] <- c("eqTechNewCap", "");
-    rs["eqTechNewCap", c("tech", "region", "year", "vTechNewCap", "vTechRetirementCap")] <- TRUE;
+    rs["eqTechNewCap", c("tech", "region", "year", "vTechNewCap", "vTechRetiredCap")] <- TRUE;
     rs["eqTechEac", c("name", "description")] <- c("eqTechEac", "");
-    rs["eqTechEac", c("tech", "region", "year", "vTechEac", "vTechNewCap", "vTechRetirementCap")] <- TRUE;
+    rs["eqTechEac", c("tech", "region", "year", "vTechEac", "vTechNewCap", "vTechRetiredCap")] <- TRUE;
     rs["eqTechInv", c("name", "description")] <- c("eqTechInv", "");
     rs["eqTechInv", c("tech", "region", "year", "vTechInv", "vTechNewCap")] <- TRUE;
     rs["eqTechSalv2", c("name", "description")] <- c("eqTechSalv2", "");
-    rs["eqTechSalv2", c("tech", "region", "year", "vTechSalv", "vTechNewCap", "vTechRetirementCap")] <- TRUE;
+    rs["eqTechSalv2", c("tech", "region", "year", "vTechSalv", "vTechNewCap", "vTechRetiredCap")] <- TRUE;
     rs["eqTechSalv3", c("name", "description")] <- c("eqTechSalv3", "");
-    rs["eqTechSalv3", c("tech", "region", "year", "vTechSalv", "vTechNewCap", "vTechRetirementCap")] <- TRUE;
+    rs["eqTechSalv3", c("tech", "region", "year", "vTechSalv", "vTechNewCap", "vTechRetiredCap")] <- TRUE;
     rs["eqTechCost1", c("name", "description")] <- c("eqTechCost1", "");
     rs["eqTechCost1", c("tech", "comm", "region", "year", "slice", "vTechInv", "vTechCost", "vTechCap", "vTechAct", "vTechInp", "vTechOut", "vTechAInp", "vTechAOut")] <- TRUE;
     rs["eqTechCost2", c("name", "description")] <- c("eqTechCost2", "");
@@ -2052,18 +2055,18 @@ getEquations <- function() {
     rs["eqExportRowUp", c("expp", "region", "year", "slice", "vExportRow")] <- TRUE;
     rs["eqExportRowLo", c("name", "description")] <- c("eqExportRowLo", "");
     rs["eqExportRowLo", c("expp", "region", "year", "slice", "vExportRow")] <- TRUE;
-    rs["eqExportRowRes", c("name", "description")] <- c("eqExportRowRes", "");
-    rs["eqExportRowRes", c("expp", "region", "year", "slice", "vExportRowRes", "vExportRow")] <- TRUE;
+    rs["eqExportRowCumulative", c("name", "description")] <- c("eqExportRowCumulative", "");
+    rs["eqExportRowCumulative", c("expp", "region", "year", "slice", "vExportRowCumulative", "vExportRow")] <- TRUE;
     rs["eqExportRowResUp", c("name", "description")] <- c("eqExportRowResUp", "");
-    rs["eqExportRowResUp", c("expp", "vExportRowRes")] <- TRUE;
+    rs["eqExportRowResUp", c("expp", "vExportRowCumulative")] <- TRUE;
     rs["eqImportRowUp", c("name", "description")] <- c("eqImportRowUp", "");
     rs["eqImportRowUp", c("imp", "region", "year", "slice", "vImportRow")] <- TRUE;
     rs["eqImportRowLo", c("name", "description")] <- c("eqImportRowLo", "");
     rs["eqImportRowLo", c("imp", "region", "year", "slice", "vImportRow")] <- TRUE;
-    rs["eqImportRowRes", c("name", "description")] <- c("eqImportRowRes", "");
-    rs["eqImportRowRes", c("imp", "region", "year", "slice", "vImportRowRes", "vImportRow")] <- TRUE;
+    rs["eqImportRowAccumulated", c("name", "description")] <- c("eqImportRowAccumulated", "");
+    rs["eqImportRowAccumulated", c("imp", "region", "year", "slice", "vImportRowAccumulated", "vImportRow")] <- TRUE;
     rs["eqImportRowResUp", c("name", "description")] <- c("eqImportRowResUp", "");
-    rs["eqImportRowResUp", c("imp", "vImportRowRes")] <- TRUE;
+    rs["eqImportRowResUp", c("imp", "vImportRowAccumulated")] <- TRUE;
     rs["eqBalUp", c("name", "description")] <- c("eqBalUp", "");
     rs["eqBalUp", c("comm", "region", "year", "slice", "vBalance")] <- TRUE;
     rs["eqBalLo", c("name", "description")] <- c("eqBalLo", "");
@@ -2073,9 +2076,9 @@ getEquations <- function() {
     rs["eqBal", c("name", "description")] <- c("eqBal", "");
     rs["eqBal", c("comm", "region", "year", "slice", "vBalance", "vOutTot", "vInpTot")] <- TRUE;
     rs["eqOutTot", c("name", "description")] <- c("eqOutTot", "");
-    rs["eqOutTot", c("comm", "region", "year", "slice", "vEmsFuelTot", "vAggOut", "vOutTot", "vSupOutTot", "vTechOutTot", "vStorageOutTot", "vDumOut", "vImport")] <- TRUE;
+    rs["eqOutTot", c("comm", "region", "year", "slice", "vEmsFuelTot", "vAggOut", "vOutTot", "vSupOutTot", "vTechOutTot", "vStorageOutTot", "vDummyOut", "vImport")] <- TRUE;
     rs["eqInpTot", c("name", "description")] <- c("eqInpTot", "");
-    rs["eqInpTot", c("comm", "region", "year", "slice", "vDemInp", "vInpTot", "vTechInpTot", "vStorageInpTot", "vExport")] <- TRUE;
+    rs["eqInpTot", c("comm", "region", "year", "slice", "vDemInp", "vInpTot", "vTechInpTot", "vStorageInpTot", "vDummyInp", "vExport")] <- TRUE;
     rs["eqSupOutTot", c("name", "description")] <- c("eqSupOutTot", "");
     rs["eqSupOutTot", c("sup", "comm", "region", "year", "slice", "vSupOut", "vSupOutTot")] <- TRUE;
     rs["eqTechInpTot", c("name", "description")] <- c("eqTechInpTot", "");
@@ -2086,12 +2089,12 @@ getEquations <- function() {
     rs["eqStorageInpTot", c("stg", "comm", "region", "year", "slice", "vStorageInpTot", "vStorageInp")] <- TRUE;
     rs["eqStorageOutTot", c("name", "description")] <- c("eqStorageOutTot", "");
     rs["eqStorageOutTot", c("stg", "comm", "region", "year", "slice", "vStorageOutTot", "vStorageOut")] <- TRUE;
-    rs["eqDumCost", c("name", "description")] <- c("eqDumCost", "");
-    rs["eqDumCost", c("comm", "region", "year", "slice", "vDumOut", "vDumCost")] <- TRUE;
+    rs["eqDummyCost", c("name", "description")] <- c("eqDummyCost", "");
+    rs["eqDummyCost", c("comm", "region", "year", "slice", "vDummyOut", "vDummyInp", "vDummyCost")] <- TRUE;
     rs["eqCost1", c("name", "description")] <- c("eqCost1", "");
-    rs["eqCost1", c("tech", "sup", "stg", "comm", "region", "year", "vTechCost", "vSupCost", "vCost", "vTaxCost", "vSubsCost", "vStorageCost", "vTradeCost", "vDumCost")] <- TRUE;
+    rs["eqCost1", c("tech", "sup", "stg", "comm", "region", "year", "vTechCost", "vSupCost", "vCost", "vTaxCost", "vSubsCost", "vStorageCost", "vTradeCost", "vDummyCost")] <- TRUE;
     rs["eqCost2", c("name", "description")] <- c("eqCost2", "");
-    rs["eqCost2", c("tech", "sup", "stg", "comm", "region", "year", "vTechSalv", "vTechCost", "vSupCost", "vCost", "vTaxCost", "vSubsCost", "vStorageCost", "vTradeCost", "vDumCost", "vStorageSalv")] <- TRUE;
+    rs["eqCost2", c("tech", "sup", "stg", "comm", "region", "year", "vTechSalv", "vTechCost", "vSupCost", "vCost", "vTaxCost", "vSubsCost", "vStorageCost", "vTradeCost", "vDummyCost", "vStorageSalv")] <- TRUE;
     rs["eqObjective", c("name", "description")] <- c("eqObjective", "");
     rs["eqObjective", c("region", "year", "vCost", "vObjective")] <- TRUE;
     rs["eqTaxCost", c("name", "description")] <- c("eqTaxCost", "");
@@ -5488,8 +5491,8 @@ getEquations <- function() {
     rs["eqPreDefTechUse", c("tech", "region", "year", "slice", "vTechUse")] <- TRUE;
     rs["eqPreDefTechNewCap", c("name", "description")] <- c("eqPreDefTechNewCap", "");
     rs["eqPreDefTechNewCap", c("tech", "region", "year", "vTechNewCap")] <- TRUE;
-    rs["eqPreDefTechRetirementCap", c("name", "description")] <- c("eqPreDefTechRetirementCap", "");
-    rs["eqPreDefTechRetirementCap", c("tech", "region", "year", "vTechRetirementCap")] <- TRUE;
+    rs["eqPreDefTechRetiredCap", c("name", "description")] <- c("eqPreDefTechRetiredCap", "");
+    rs["eqPreDefTechRetiredCap", c("tech", "region", "year", "vTechRetiredCap")] <- TRUE;
     rs["eqPreDefTechCap", c("name", "description")] <- c("eqPreDefTechCap", "");
     rs["eqPreDefTechCap", c("tech", "region", "year", "vTechCap")] <- TRUE;
     rs["eqPreDefTechAct", c("name", "description")] <- c("eqPreDefTechAct", "");
@@ -5506,8 +5509,10 @@ getEquations <- function() {
     rs["eqPreDefSupOut", c("sup", "comm", "region", "year", "slice", "vSupOut")] <- TRUE;
     rs["eqPreDefDemInp", c("name", "description")] <- c("eqPreDefDemInp", "");
     rs["eqPreDefDemInp", c("comm", "region", "year", "slice", "vDemInp")] <- TRUE;
-    rs["eqPreDefDumOut", c("name", "description")] <- c("eqPreDefDumOut", "");
-    rs["eqPreDefDumOut", c("comm", "region", "year", "slice", "vDumOut")] <- TRUE;
+    rs["eqPreDefDummyOut", c("name", "description")] <- c("eqPreDefDummyOut", "");
+    rs["eqPreDefDummyOut", c("comm", "region", "year", "slice", "vDummyOut")] <- TRUE;
+    rs["eqPreDefDummyInp", c("name", "description")] <- c("eqPreDefDummyInp", "");
+    rs["eqPreDefDummyInp", c("comm", "region", "year", "slice", "vDummyInp")] <- TRUE;
     rs["eqPreDefStorageInp", c("name", "description")] <- c("eqPreDefStorageInp", "");
     rs["eqPreDefStorageInp", c("stg", "comm", "region", "year", "slice", "vStorageInp")] <- TRUE;
     rs["eqPreDefStorageOut", c("name", "description")] <- c("eqPreDefStorageOut", "");
@@ -5605,11 +5610,11 @@ getVariables <- function() {
    eqCostIrTrade  = logical(),
    eqExportRowUp  = logical(),
    eqExportRowLo  = logical(),
-   eqExportRowRes  = logical(),
+   eqExportRowCumulative  = logical(),
    eqExportRowResUp  = logical(),
    eqImportRowUp  = logical(),
    eqImportRowLo  = logical(),
-   eqImportRowRes  = logical(),
+   eqImportRowAccumulated  = logical(),
    eqImportRowResUp  = logical(),
    eqBalUp  = logical(),
    eqBalLo  = logical(),
@@ -5622,7 +5627,7 @@ getVariables <- function() {
    eqTechOutTot  = logical(),
    eqStorageInpTot  = logical(),
    eqStorageOutTot  = logical(),
-   eqDumCost  = logical(),
+   eqDummyCost  = logical(),
    eqCost1  = logical(),
    eqCost2  = logical(),
    eqObjective  = logical(),
@@ -7323,7 +7328,7 @@ getVariables <- function() {
    eqLECActivity  = logical(),
    eqPreDefTechUse  = logical(),
    eqPreDefTechNewCap  = logical(),
-   eqPreDefTechRetirementCap  = logical(),
+   eqPreDefTechRetiredCap  = logical(),
    eqPreDefTechCap  = logical(),
    eqPreDefTechAct  = logical(),
    eqPreDefTechInp  = logical(),
@@ -7332,7 +7337,8 @@ getVariables <- function() {
    eqPreDefTechAOut  = logical(),
    eqPreDefSupOut  = logical(),
    eqPreDefDemInp  = logical(),
-   eqPreDefDumOut  = logical(),
+   eqPreDefDummyOut  = logical(),
+   eqPreDefDummyInp  = logical(),
    eqPreDefStorageInp  = logical(),
    eqPreDefStorageOut  = logical(),
    eqPreDefStorageStore  = logical(),
@@ -7344,7 +7350,7 @@ getVariables <- function() {
    eqPreDefExportRow  = logical(),
    eqPreDefImportRow  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:59,] <- NA;
+    rs[1:60,] <- NA;
     rs["vTechFixom", c("name", "description")] <- c("vTechFixom", "Fixom");
     rs["vTechFixom", c("tech", "region", "year", "eqTechFixom", "eqCnsLETechFixom", "eqCnsGETechFixom", "eqCnsETechFixom", "eqCnsLETechFixomY", "eqCnsLETechFixomYGrowth", "eqCnsGETechFixomY", "eqCnsGETechFixomYGrowth", "eqCnsETechFixomY", "eqCnsETechFixomYGrowth", "eqCnsLETechFixomR", "eqCnsGETechFixomR", "eqCnsETechFixomR", "eqCnsLETechFixomRY", "eqCnsLETechFixomRYGrowth", "eqCnsGETechFixomRY", "eqCnsGETechFixomRYGrowth", "eqCnsETechFixomRY", "eqCnsETechFixomRYGrowth", "eqCnsLETechFixomL", "eqCnsGETechFixomL", "eqCnsETechFixomL", "eqCnsLETechFixomLY", "eqCnsLETechFixomLYGrowth", "eqCnsGETechFixomLY", "eqCnsGETechFixomLYGrowth", "eqCnsETechFixomLY", "eqCnsETechFixomLYGrowth", "eqCnsLETechFixomLR", "eqCnsGETechFixomLR", "eqCnsETechFixomLR", "eqCnsLETechFixomLRY", "eqCnsLETechFixomLRYGrowth", "eqCnsGETechFixomLRY", "eqCnsGETechFixomLRYGrowth", "eqCnsETechFixomLRY", "eqCnsETechFixomLRYGrowth")] <- TRUE;
     rs["vTechVarom", c("name", "description")] <- c("vTechVarom", "Varom");
@@ -7361,13 +7367,13 @@ getVariables <- function() {
     rs["vTechEac", c("tech", "region", "year", "eqTechEac", "eqCnsLETechEac", "eqCnsGETechEac", "eqCnsETechEac", "eqCnsLETechEacY", "eqCnsLETechEacYGrowth", "eqCnsGETechEacY", "eqCnsGETechEacYGrowth", "eqCnsETechEacY", "eqCnsETechEacYGrowth", "eqCnsLETechEacR", "eqCnsGETechEacR", "eqCnsETechEacR", "eqCnsLETechEacRY", "eqCnsLETechEacRYGrowth", "eqCnsGETechEacRY", "eqCnsGETechEacRYGrowth", "eqCnsETechEacRY", "eqCnsETechEacRYGrowth", "eqCnsLETechEacL", "eqCnsGETechEacL", "eqCnsETechEacL", "eqCnsLETechEacLY", "eqCnsLETechEacLYGrowth", "eqCnsGETechEacLY", "eqCnsGETechEacLYGrowth", "eqCnsETechEacLY", "eqCnsETechEacLYGrowth", "eqCnsLETechEacLR", "eqCnsGETechEacLR", "eqCnsETechEacLR", "eqCnsLETechEacLRY", "eqCnsLETechEacLRYGrowth", "eqCnsGETechEacLRY", "eqCnsGETechEacLRYGrowth", "eqCnsETechEacLRY", "eqCnsETechEacLRYGrowth")] <- TRUE;
     rs["vTechSalv", c("name", "description")] <- c("vTechSalv", "Salvage costs");
     rs["vTechSalv", c("tech", "region", "eqTechSalv2", "eqTechSalv3", "eqCost2")] <- TRUE;
-    rs["vTechCost", c("name", "description")] <- c("vTechCost", "??? VAROM + FIXOM???");
+    rs["vTechCost", c("name", "description")] <- c("vTechCost", "Sum of all technology-related costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom) + vTechInv");
     rs["vTechCost", c("tech", "region", "year", "eqTechCost1", "eqTechCost2", "eqCost1", "eqCost2")] <- TRUE;
     rs["vSupCost", c("name", "description")] <- c("vSupCost", "Supply costs");
     rs["vSupCost", c("sup", "region", "year", "eqSupCost", "eqCost1", "eqCost2")] <- TRUE;
-    rs["vEmsFuelTot", c("name", "description")] <- c("vEmsFuelTot", "Total emissions");
+    rs["vEmsFuelTot", c("name", "description")] <- c("vEmsFuelTot", "Total fuel emissions");
     rs["vEmsFuelTot", c("comm", "region", "year", "slice", "eqEmsFuelTot", "eqOutTot")] <- TRUE;
-    rs["vTechEmsFuel", c("name", "description")] <- c("vTechEmsFuel", "Emissions on technology level");
+    rs["vTechEmsFuel", c("name", "description")] <- c("vTechEmsFuel", "Emissions on technology level by fuel");
     rs["vTechEmsFuel", c("tech", "comm", "region", "year", "slice", "eqEmsFuelTot", "eqTechEmsFuel", "eqCnsLETechOutShareIn", "eqCnsLETechOutShareOut", "eqCnsLETechOut", "eqCnsGETechOutShareIn", "eqCnsGETechOutShareOut", "eqCnsGETechOut", "eqCnsETechOutShareIn", "eqCnsETechOutShareOut", "eqCnsETechOut", "eqCnsLETechOutSShareIn", "eqCnsLETechOutSShareOut", "eqCnsLETechOutS", "eqCnsGETechOutSShareIn", "eqCnsGETechOutSShareOut", "eqCnsGETechOutS", "eqCnsETechOutSShareIn", "eqCnsETechOutSShareOut", "eqCnsETechOutS", "eqCnsLETechOutYShareIn", "eqCnsLETechOutYShareOut", "eqCnsLETechOutY", "eqCnsLETechOutYGrowth", "eqCnsGETechOutYShareIn", "eqCnsGETechOutYShareOut", "eqCnsGETechOutY", "eqCnsGETechOutYGrowth", "eqCnsETechOutYShareIn", "eqCnsETechOutYShareOut", "eqCnsETechOutY", "eqCnsETechOutYGrowth", "eqCnsLETechOutYSShareIn", "eqCnsLETechOutYSShareOut", "eqCnsLETechOutYS", "eqCnsLETechOutYSGrowth", "eqCnsGETechOutYSShareIn", "eqCnsGETechOutYSShareOut", "eqCnsGETechOutYS", "eqCnsGETechOutYSGrowth", "eqCnsETechOutYSShareIn", "eqCnsETechOutYSShareOut", "eqCnsETechOutYS", "eqCnsETechOutYSGrowth", "eqCnsLETechOutRShareIn", "eqCnsLETechOutRShareOut", "eqCnsLETechOutR", "eqCnsGETechOutRShareIn", "eqCnsGETechOutRShareOut", "eqCnsGETechOutR", "eqCnsETechOutRShareIn", "eqCnsETechOutRShareOut", "eqCnsETechOutR", "eqCnsLETechOutRSShareIn", "eqCnsLETechOutRSShareOut", "eqCnsLETechOutRS", "eqCnsGETechOutRSShareIn", "eqCnsGETechOutRSShareOut", "eqCnsGETechOutRS", "eqCnsETechOutRSShareIn", "eqCnsETechOutRSShareOut", "eqCnsETechOutRS", "eqCnsLETechOutRYShareIn", "eqCnsLETechOutRYShareOut", "eqCnsLETechOutRY", "eqCnsLETechOutRYGrowth", "eqCnsGETechOutRYShareIn", "eqCnsGETechOutRYShareOut", "eqCnsGETechOutRY", "eqCnsGETechOutRYGrowth", "eqCnsETechOutRYShareIn", "eqCnsETechOutRYShareOut", "eqCnsETechOutRY", "eqCnsETechOutRYGrowth", "eqCnsLETechOutRYSShareIn", "eqCnsLETechOutRYSShareOut", "eqCnsLETechOutRYS", "eqCnsLETechOutRYSGrowth", "eqCnsGETechOutRYSShareIn", "eqCnsGETechOutRYSShareOut", "eqCnsGETechOutRYS", "eqCnsGETechOutRYSGrowth", "eqCnsETechOutRYSShareIn", "eqCnsETechOutRYSShareOut", "eqCnsETechOutRYS", "eqCnsETechOutRYSGrowth", "eqCnsLETechOutCShareIn", "eqCnsLETechOutCShareOut", "eqCnsLETechOutC", "eqCnsGETechOutCShareIn", "eqCnsGETechOutCShareOut", "eqCnsGETechOutC", "eqCnsETechOutCShareIn", "eqCnsETechOutCShareOut", "eqCnsETechOutC", "eqCnsLETechOutCSShareIn", "eqCnsLETechOutCSShareOut", "eqCnsLETechOutCS", "eqCnsGETechOutCSShareIn", "eqCnsGETechOutCSShareOut", "eqCnsGETechOutCS", "eqCnsETechOutCSShareIn", "eqCnsETechOutCSShareOut", "eqCnsETechOutCS", "eqCnsLETechOutCYShareIn", "eqCnsLETechOutCYShareOut", "eqCnsLETechOutCY", "eqCnsLETechOutCYGrowth", "eqCnsGETechOutCYShareIn", "eqCnsGETechOutCYShareOut", "eqCnsGETechOutCY", "eqCnsGETechOutCYGrowth", "eqCnsETechOutCYShareIn", "eqCnsETechOutCYShareOut", "eqCnsETechOutCY", "eqCnsETechOutCYGrowth", "eqCnsLETechOutCYSShareIn", "eqCnsLETechOutCYSShareOut", "eqCnsLETechOutCYS", "eqCnsLETechOutCYSGrowth", "eqCnsGETechOutCYSShareIn", "eqCnsGETechOutCYSShareOut", "eqCnsGETechOutCYS", "eqCnsGETechOutCYSGrowth", "eqCnsETechOutCYSShareIn", "eqCnsETechOutCYSShareOut", "eqCnsETechOutCYS", "eqCnsETechOutCYSGrowth", "eqCnsLETechOutCRShareIn", "eqCnsLETechOutCRShareOut", "eqCnsLETechOutCR", "eqCnsGETechOutCRShareIn", "eqCnsGETechOutCRShareOut", "eqCnsGETechOutCR", "eqCnsETechOutCRShareIn", "eqCnsETechOutCRShareOut", "eqCnsETechOutCR", "eqCnsLETechOutCRSShareIn", "eqCnsLETechOutCRSShareOut", "eqCnsLETechOutCRS", "eqCnsGETechOutCRSShareIn", "eqCnsGETechOutCRSShareOut", "eqCnsGETechOutCRS", "eqCnsETechOutCRSShareIn", "eqCnsETechOutCRSShareOut", "eqCnsETechOutCRS", "eqCnsLETechOutCRYShareIn", "eqCnsLETechOutCRYShareOut", "eqCnsLETechOutCRY", "eqCnsLETechOutCRYGrowth", "eqCnsGETechOutCRYShareIn", "eqCnsGETechOutCRYShareOut", "eqCnsGETechOutCRY", "eqCnsGETechOutCRYGrowth", "eqCnsETechOutCRYShareIn", "eqCnsETechOutCRYShareOut", "eqCnsETechOutCRY", "eqCnsETechOutCRYGrowth", "eqCnsLETechOutCRYSShareIn", "eqCnsLETechOutCRYSShareOut", "eqCnsLETechOutCRYS", "eqCnsLETechOutCRYSGrowth", "eqCnsGETechOutCRYSShareIn", "eqCnsGETechOutCRYSShareOut", "eqCnsGETechOutCRYS", "eqCnsGETechOutCRYSGrowth", "eqCnsETechOutCRYSShareIn", "eqCnsETechOutCRYSShareOut", "eqCnsETechOutCRYS", "eqCnsETechOutCRYSGrowth", "eqCnsLETechOutLShareIn", "eqCnsLETechOutLShareOut", "eqCnsLETechOutL", "eqCnsGETechOutLShareIn", "eqCnsGETechOutLShareOut", "eqCnsGETechOutL", "eqCnsETechOutLShareIn", "eqCnsETechOutLShareOut", "eqCnsETechOutL", "eqCnsLETechOutLSShareIn", "eqCnsLETechOutLSShareOut", "eqCnsLETechOutLS", "eqCnsGETechOutLSShareIn", "eqCnsGETechOutLSShareOut", "eqCnsGETechOutLS", "eqCnsETechOutLSShareIn", "eqCnsETechOutLSShareOut", "eqCnsETechOutLS", "eqCnsLETechOutLYShareIn", "eqCnsLETechOutLYShareOut", "eqCnsLETechOutLY", "eqCnsLETechOutLYGrowth", "eqCnsGETechOutLYShareIn", "eqCnsGETechOutLYShareOut", "eqCnsGETechOutLY", "eqCnsGETechOutLYGrowth", "eqCnsETechOutLYShareIn", "eqCnsETechOutLYShareOut", "eqCnsETechOutLY", "eqCnsETechOutLYGrowth", "eqCnsLETechOutLYSShareIn", "eqCnsLETechOutLYSShareOut", "eqCnsLETechOutLYS", "eqCnsLETechOutLYSGrowth", "eqCnsGETechOutLYSShareIn", "eqCnsGETechOutLYSShareOut", "eqCnsGETechOutLYS", "eqCnsGETechOutLYSGrowth", "eqCnsETechOutLYSShareIn", "eqCnsETechOutLYSShareOut", "eqCnsETechOutLYS", "eqCnsETechOutLYSGrowth", "eqCnsLETechOutLRShareIn", "eqCnsLETechOutLRShareOut", "eqCnsLETechOutLR", "eqCnsGETechOutLRShareIn", "eqCnsGETechOutLRShareOut", "eqCnsGETechOutLR", "eqCnsETechOutLRShareIn", "eqCnsETechOutLRShareOut", "eqCnsETechOutLR", "eqCnsLETechOutLRSShareIn", "eqCnsLETechOutLRSShareOut", "eqCnsLETechOutLRS", "eqCnsGETechOutLRSShareIn", "eqCnsGETechOutLRSShareOut", "eqCnsGETechOutLRS", "eqCnsETechOutLRSShareIn", "eqCnsETechOutLRSShareOut", "eqCnsETechOutLRS", "eqCnsLETechOutLRYShareIn", "eqCnsLETechOutLRYShareOut", "eqCnsLETechOutLRY", "eqCnsLETechOutLRYGrowth", "eqCnsGETechOutLRYShareIn", "eqCnsGETechOutLRYShareOut", "eqCnsGETechOutLRY", "eqCnsGETechOutLRYGrowth", "eqCnsETechOutLRYShareIn", "eqCnsETechOutLRYShareOut", "eqCnsETechOutLRY", "eqCnsETechOutLRYGrowth", "eqCnsLETechOutLRYSShareIn", "eqCnsLETechOutLRYSShareOut", "eqCnsLETechOutLRYS", "eqCnsLETechOutLRYSGrowth", "eqCnsGETechOutLRYSShareIn", "eqCnsGETechOutLRYSShareOut", "eqCnsGETechOutLRYS", "eqCnsGETechOutLRYSGrowth", "eqCnsETechOutLRYSShareIn", "eqCnsETechOutLRYSShareOut", "eqCnsETechOutLRYS", "eqCnsETechOutLRYSGrowth", "eqCnsLETechOutLCShareIn", "eqCnsLETechOutLCShareOut", "eqCnsLETechOutLC", "eqCnsGETechOutLCShareIn", "eqCnsGETechOutLCShareOut", "eqCnsGETechOutLC", "eqCnsETechOutLCShareIn", "eqCnsETechOutLCShareOut", "eqCnsETechOutLC", "eqCnsLETechOutLCSShareIn", "eqCnsLETechOutLCSShareOut", "eqCnsLETechOutLCS", "eqCnsGETechOutLCSShareIn", "eqCnsGETechOutLCSShareOut", "eqCnsGETechOutLCS", "eqCnsETechOutLCSShareIn", "eqCnsETechOutLCSShareOut", "eqCnsETechOutLCS", "eqCnsLETechOutLCYShareIn", "eqCnsLETechOutLCYShareOut", "eqCnsLETechOutLCY", "eqCnsLETechOutLCYGrowth", "eqCnsGETechOutLCYShareIn", "eqCnsGETechOutLCYShareOut", "eqCnsGETechOutLCY", "eqCnsGETechOutLCYGrowth", "eqCnsETechOutLCYShareIn", "eqCnsETechOutLCYShareOut", "eqCnsETechOutLCY", "eqCnsETechOutLCYGrowth", "eqCnsLETechOutLCYSShareIn", "eqCnsLETechOutLCYSShareOut", "eqCnsLETechOutLCYS", "eqCnsLETechOutLCYSGrowth", "eqCnsGETechOutLCYSShareIn", "eqCnsGETechOutLCYSShareOut", "eqCnsGETechOutLCYS", "eqCnsGETechOutLCYSGrowth", "eqCnsETechOutLCYSShareIn", "eqCnsETechOutLCYSShareOut", "eqCnsETechOutLCYS", "eqCnsETechOutLCYSGrowth", "eqCnsLETechOutLCRShareIn", "eqCnsLETechOutLCRShareOut", "eqCnsLETechOutLCR", "eqCnsGETechOutLCRShareIn", "eqCnsGETechOutLCRShareOut", "eqCnsGETechOutLCR", "eqCnsETechOutLCRShareIn", "eqCnsETechOutLCRShareOut", "eqCnsETechOutLCR", "eqCnsLETechOutLCRSShareIn", "eqCnsLETechOutLCRSShareOut", "eqCnsLETechOutLCRS", "eqCnsGETechOutLCRSShareIn", "eqCnsGETechOutLCRSShareOut", "eqCnsGETechOutLCRS", "eqCnsETechOutLCRSShareIn", "eqCnsETechOutLCRSShareOut", "eqCnsETechOutLCRS", "eqCnsLETechOutLCRYShareIn", "eqCnsLETechOutLCRYShareOut", "eqCnsLETechOutLCRY", "eqCnsLETechOutLCRYGrowth", "eqCnsGETechOutLCRYShareIn", "eqCnsGETechOutLCRYShareOut", "eqCnsGETechOutLCRY", "eqCnsGETechOutLCRYGrowth", "eqCnsETechOutLCRYShareIn", "eqCnsETechOutLCRYShareOut", "eqCnsETechOutLCRY", "eqCnsETechOutLCRYGrowth", "eqCnsLETechOutLCRYSShareIn", "eqCnsLETechOutLCRYSShareOut", "eqCnsLETechOutLCRYS", "eqCnsLETechOutLCRYSGrowth", "eqCnsGETechOutLCRYSShareIn", "eqCnsGETechOutLCRYSShareOut", "eqCnsGETechOutLCRYS", "eqCnsGETechOutLCRYSGrowth", "eqCnsETechOutLCRYSShareIn", "eqCnsETechOutLCRYSShareOut", "eqCnsETechOutLCRYS", "eqCnsETechOutLCRYSGrowth")] <- TRUE;
     rs["vBalance", c("name", "description")] <- c("vBalance", "??? Net commodity balance");
     rs["vBalance", c("comm", "region", "year", "slice", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal")] <- TRUE;
@@ -7393,8 +7399,8 @@ getVariables <- function() {
     rs["vTechUse", c("tech", "region", "year", "slice", "eqTechUse2Sng", "eqTechUse2Grp", "eqTechAInp", "eqTechAOut", "eqPreDefTechUse")] <- TRUE;
     rs["vTechNewCap", c("name", "description")] <- c("vTechNewCap", "New capacity");
     rs["vTechNewCap", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechSalv2", "eqTechSalv3", "eqCnsLETechNewCap", "eqCnsGETechNewCap", "eqCnsETechNewCap", "eqCnsLETechNewCapY", "eqCnsLETechNewCapYGrowth", "eqCnsGETechNewCapY", "eqCnsGETechNewCapYGrowth", "eqCnsETechNewCapY", "eqCnsETechNewCapYGrowth", "eqCnsLETechNewCapR", "eqCnsGETechNewCapR", "eqCnsETechNewCapR", "eqCnsLETechNewCapRY", "eqCnsLETechNewCapRYGrowth", "eqCnsGETechNewCapRY", "eqCnsGETechNewCapRYGrowth", "eqCnsETechNewCapRY", "eqCnsETechNewCapRYGrowth", "eqCnsLETechNewCapL", "eqCnsGETechNewCapL", "eqCnsETechNewCapL", "eqCnsLETechNewCapLY", "eqCnsLETechNewCapLYGrowth", "eqCnsGETechNewCapLY", "eqCnsGETechNewCapLYGrowth", "eqCnsETechNewCapLY", "eqCnsETechNewCapLYGrowth", "eqCnsLETechNewCapLR", "eqCnsGETechNewCapLR", "eqCnsETechNewCapLR", "eqCnsLETechNewCapLRY", "eqCnsLETechNewCapLRYGrowth", "eqCnsGETechNewCapLRY", "eqCnsGETechNewCapLRYGrowth", "eqCnsETechNewCapLRY", "eqCnsETechNewCapLRYGrowth", "eqPreDefTechNewCap")] <- TRUE;
-    rs["vTechRetirementCap", c("name", "description")] <- c("vTechRetirementCap", "??? Early retired capacity");
-    rs["vTechRetirementCap", c("tech", "region", "year", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechSalv2", "eqTechSalv3", "eqPreDefTechRetirementCap")] <- TRUE;
+    rs["vTechRetiredCap", c("name", "description")] <- c("vTechRetiredCap", "Early retired capacity");
+    rs["vTechRetiredCap", c("tech", "region", "year", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechSalv2", "eqTechSalv3", "eqPreDefTechRetiredCap")] <- TRUE;
     rs["vTechCap", c("name", "description")] <- c("vTechCap", "Total capacity of the technology");
     rs["vTechCap", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechAfaLo", "eqTechAfaUp", "eqTechAfacLo", "eqTechAfacUp", "eqTechCap", "eqTechCost1", "eqTechCost2", "eqTechFixom", "eqCnsLETechCap", "eqCnsGETechCap", "eqCnsETechCap", "eqCnsLETechCapY", "eqCnsLETechCapYGrowth", "eqCnsGETechCapY", "eqCnsGETechCapYGrowth", "eqCnsETechCapY", "eqCnsETechCapYGrowth", "eqCnsLETechCapR", "eqCnsGETechCapR", "eqCnsETechCapR", "eqCnsLETechCapRY", "eqCnsLETechCapRYGrowth", "eqCnsGETechCapRY", "eqCnsGETechCapRYGrowth", "eqCnsETechCapRY", "eqCnsETechCapRYGrowth", "eqCnsLETechCapL", "eqCnsGETechCapL", "eqCnsETechCapL", "eqCnsLETechCapLY", "eqCnsLETechCapLYGrowth", "eqCnsGETechCapLY", "eqCnsGETechCapLYGrowth", "eqCnsETechCapLY", "eqCnsETechCapLYGrowth", "eqCnsLETechCapLR", "eqCnsGETechCapLR", "eqCnsETechCapLR", "eqCnsLETechCapLRY", "eqCnsLETechCapLRYGrowth", "eqCnsGETechCapLRY", "eqCnsGETechCapLRYGrowth", "eqCnsETechCapLRY", "eqCnsETechCapLRYGrowth", "eqPreDefTechCap")] <- TRUE;
     rs["vTechAct", c("name", "description")] <- c("vTechAct", "Activity level of technology");
@@ -7411,7 +7417,7 @@ getVariables <- function() {
     rs["vSupOut", c("sup", "comm", "region", "year", "slice", "eqSupAvaUp", "eqSupAvaLo", "eqSupReserve", "eqSupCost", "eqSupOutTot", "eqCnsLESupOutShareIn", "eqCnsLESupOutShareOut", "eqCnsLESupOut", "eqCnsGESupOutShareIn", "eqCnsGESupOutShareOut", "eqCnsGESupOut", "eqCnsESupOutShareIn", "eqCnsESupOutShareOut", "eqCnsESupOut", "eqCnsLESupOutSShareIn", "eqCnsLESupOutSShareOut", "eqCnsLESupOutS", "eqCnsGESupOutSShareIn", "eqCnsGESupOutSShareOut", "eqCnsGESupOutS", "eqCnsESupOutSShareIn", "eqCnsESupOutSShareOut", "eqCnsESupOutS", "eqCnsLESupOutYShareIn", "eqCnsLESupOutYShareOut", "eqCnsLESupOutY", "eqCnsLESupOutYGrowth", "eqCnsGESupOutYShareIn", "eqCnsGESupOutYShareOut", "eqCnsGESupOutY", "eqCnsGESupOutYGrowth", "eqCnsESupOutYShareIn", "eqCnsESupOutYShareOut", "eqCnsESupOutY", "eqCnsESupOutYGrowth", "eqCnsLESupOutYSShareIn", "eqCnsLESupOutYSShareOut", "eqCnsLESupOutYS", "eqCnsLESupOutYSGrowth", "eqCnsGESupOutYSShareIn", "eqCnsGESupOutYSShareOut", "eqCnsGESupOutYS", "eqCnsGESupOutYSGrowth", "eqCnsESupOutYSShareIn", "eqCnsESupOutYSShareOut", "eqCnsESupOutYS", "eqCnsESupOutYSGrowth", "eqCnsLESupOutRShareIn", "eqCnsLESupOutRShareOut", "eqCnsLESupOutR", "eqCnsGESupOutRShareIn", "eqCnsGESupOutRShareOut", "eqCnsGESupOutR", "eqCnsESupOutRShareIn", "eqCnsESupOutRShareOut", "eqCnsESupOutR", "eqCnsLESupOutRSShareIn", "eqCnsLESupOutRSShareOut", "eqCnsLESupOutRS", "eqCnsGESupOutRSShareIn", "eqCnsGESupOutRSShareOut", "eqCnsGESupOutRS", "eqCnsESupOutRSShareIn", "eqCnsESupOutRSShareOut", "eqCnsESupOutRS", "eqCnsLESupOutRYShareIn", "eqCnsLESupOutRYShareOut", "eqCnsLESupOutRY", "eqCnsLESupOutRYGrowth", "eqCnsGESupOutRYShareIn", "eqCnsGESupOutRYShareOut", "eqCnsGESupOutRY", "eqCnsGESupOutRYGrowth", "eqCnsESupOutRYShareIn", "eqCnsESupOutRYShareOut", "eqCnsESupOutRY", "eqCnsESupOutRYGrowth", "eqCnsLESupOutRYSShareIn", "eqCnsLESupOutRYSShareOut", "eqCnsLESupOutRYS", "eqCnsLESupOutRYSGrowth", "eqCnsGESupOutRYSShareIn", "eqCnsGESupOutRYSShareOut", "eqCnsGESupOutRYS", "eqCnsGESupOutRYSGrowth", "eqCnsESupOutRYSShareIn", "eqCnsESupOutRYSShareOut", "eqCnsESupOutRYS", "eqCnsESupOutRYSGrowth", "eqCnsLESupOutCShareIn", "eqCnsLESupOutCShareOut", "eqCnsLESupOutC", "eqCnsGESupOutCShareIn", "eqCnsGESupOutCShareOut", "eqCnsGESupOutC", "eqCnsESupOutCShareIn", "eqCnsESupOutCShareOut", "eqCnsESupOutC", "eqCnsLESupOutCSShareIn", "eqCnsLESupOutCSShareOut", "eqCnsLESupOutCS", "eqCnsGESupOutCSShareIn", "eqCnsGESupOutCSShareOut", "eqCnsGESupOutCS", "eqCnsESupOutCSShareIn", "eqCnsESupOutCSShareOut", "eqCnsESupOutCS", "eqCnsLESupOutCYShareIn", "eqCnsLESupOutCYShareOut", "eqCnsLESupOutCY", "eqCnsLESupOutCYGrowth", "eqCnsGESupOutCYShareIn", "eqCnsGESupOutCYShareOut", "eqCnsGESupOutCY", "eqCnsGESupOutCYGrowth", "eqCnsESupOutCYShareIn", "eqCnsESupOutCYShareOut", "eqCnsESupOutCY", "eqCnsESupOutCYGrowth", "eqCnsLESupOutCYSShareIn", "eqCnsLESupOutCYSShareOut", "eqCnsLESupOutCYS", "eqCnsLESupOutCYSGrowth", "eqCnsGESupOutCYSShareIn", "eqCnsGESupOutCYSShareOut", "eqCnsGESupOutCYS", "eqCnsGESupOutCYSGrowth", "eqCnsESupOutCYSShareIn", "eqCnsESupOutCYSShareOut", "eqCnsESupOutCYS", "eqCnsESupOutCYSGrowth", "eqCnsLESupOutCRShareIn", "eqCnsLESupOutCRShareOut", "eqCnsLESupOutCR", "eqCnsGESupOutCRShareIn", "eqCnsGESupOutCRShareOut", "eqCnsGESupOutCR", "eqCnsESupOutCRShareIn", "eqCnsESupOutCRShareOut", "eqCnsESupOutCR", "eqCnsLESupOutCRSShareIn", "eqCnsLESupOutCRSShareOut", "eqCnsLESupOutCRS", "eqCnsGESupOutCRSShareIn", "eqCnsGESupOutCRSShareOut", "eqCnsGESupOutCRS", "eqCnsESupOutCRSShareIn", "eqCnsESupOutCRSShareOut", "eqCnsESupOutCRS", "eqCnsLESupOutCRYShareIn", "eqCnsLESupOutCRYShareOut", "eqCnsLESupOutCRY", "eqCnsLESupOutCRYGrowth", "eqCnsGESupOutCRYShareIn", "eqCnsGESupOutCRYShareOut", "eqCnsGESupOutCRY", "eqCnsGESupOutCRYGrowth", "eqCnsESupOutCRYShareIn", "eqCnsESupOutCRYShareOut", "eqCnsESupOutCRY", "eqCnsESupOutCRYGrowth", "eqCnsLESupOutCRYSShareIn", "eqCnsLESupOutCRYSShareOut", "eqCnsLESupOutCRYS", "eqCnsLESupOutCRYSGrowth", "eqCnsGESupOutCRYSShareIn", "eqCnsGESupOutCRYSShareOut", "eqCnsGESupOutCRYS", "eqCnsGESupOutCRYSGrowth", "eqCnsESupOutCRYSShareIn", "eqCnsESupOutCRYSShareOut", "eqCnsESupOutCRYS", "eqCnsESupOutCRYSGrowth", "eqCnsLESupOutLShareIn", "eqCnsLESupOutLShareOut", "eqCnsLESupOutL", "eqCnsGESupOutLShareIn", "eqCnsGESupOutLShareOut", "eqCnsGESupOutL", "eqCnsESupOutLShareIn", "eqCnsESupOutLShareOut", "eqCnsESupOutL", "eqCnsLESupOutLSShareIn", "eqCnsLESupOutLSShareOut", "eqCnsLESupOutLS", "eqCnsGESupOutLSShareIn", "eqCnsGESupOutLSShareOut", "eqCnsGESupOutLS", "eqCnsESupOutLSShareIn", "eqCnsESupOutLSShareOut", "eqCnsESupOutLS", "eqCnsLESupOutLYShareIn", "eqCnsLESupOutLYShareOut", "eqCnsLESupOutLY", "eqCnsLESupOutLYGrowth", "eqCnsGESupOutLYShareIn", "eqCnsGESupOutLYShareOut", "eqCnsGESupOutLY", "eqCnsGESupOutLYGrowth", "eqCnsESupOutLYShareIn", "eqCnsESupOutLYShareOut", "eqCnsESupOutLY", "eqCnsESupOutLYGrowth", "eqCnsLESupOutLYSShareIn", "eqCnsLESupOutLYSShareOut", "eqCnsLESupOutLYS", "eqCnsLESupOutLYSGrowth", "eqCnsGESupOutLYSShareIn", "eqCnsGESupOutLYSShareOut", "eqCnsGESupOutLYS", "eqCnsGESupOutLYSGrowth", "eqCnsESupOutLYSShareIn", "eqCnsESupOutLYSShareOut", "eqCnsESupOutLYS", "eqCnsESupOutLYSGrowth", "eqCnsLESupOutLRShareIn", "eqCnsLESupOutLRShareOut", "eqCnsLESupOutLR", "eqCnsGESupOutLRShareIn", "eqCnsGESupOutLRShareOut", "eqCnsGESupOutLR", "eqCnsESupOutLRShareIn", "eqCnsESupOutLRShareOut", "eqCnsESupOutLR", "eqCnsLESupOutLRSShareIn", "eqCnsLESupOutLRSShareOut", "eqCnsLESupOutLRS", "eqCnsGESupOutLRSShareIn", "eqCnsGESupOutLRSShareOut", "eqCnsGESupOutLRS", "eqCnsESupOutLRSShareIn", "eqCnsESupOutLRSShareOut", "eqCnsESupOutLRS", "eqCnsLESupOutLRYShareIn", "eqCnsLESupOutLRYShareOut", "eqCnsLESupOutLRY", "eqCnsLESupOutLRYGrowth", "eqCnsGESupOutLRYShareIn", "eqCnsGESupOutLRYShareOut", "eqCnsGESupOutLRY", "eqCnsGESupOutLRYGrowth", "eqCnsESupOutLRYShareIn", "eqCnsESupOutLRYShareOut", "eqCnsESupOutLRY", "eqCnsESupOutLRYGrowth", "eqCnsLESupOutLRYSShareIn", "eqCnsLESupOutLRYSShareOut", "eqCnsLESupOutLRYS", "eqCnsLESupOutLRYSGrowth", "eqCnsGESupOutLRYSShareIn", "eqCnsGESupOutLRYSShareOut", "eqCnsGESupOutLRYS", "eqCnsGESupOutLRYSGrowth", "eqCnsESupOutLRYSShareIn", "eqCnsESupOutLRYSShareOut", "eqCnsESupOutLRYS", "eqCnsESupOutLRYSGrowth", "eqCnsLESupOutLCShareIn", "eqCnsLESupOutLCShareOut", "eqCnsLESupOutLC", "eqCnsGESupOutLCShareIn", "eqCnsGESupOutLCShareOut", "eqCnsGESupOutLC", "eqCnsESupOutLCShareIn", "eqCnsESupOutLCShareOut", "eqCnsESupOutLC", "eqCnsLESupOutLCSShareIn", "eqCnsLESupOutLCSShareOut", "eqCnsLESupOutLCS", "eqCnsGESupOutLCSShareIn", "eqCnsGESupOutLCSShareOut", "eqCnsGESupOutLCS", "eqCnsESupOutLCSShareIn", "eqCnsESupOutLCSShareOut", "eqCnsESupOutLCS", "eqCnsLESupOutLCYShareIn", "eqCnsLESupOutLCYShareOut", "eqCnsLESupOutLCY", "eqCnsLESupOutLCYGrowth", "eqCnsGESupOutLCYShareIn", "eqCnsGESupOutLCYShareOut", "eqCnsGESupOutLCY", "eqCnsGESupOutLCYGrowth", "eqCnsESupOutLCYShareIn", "eqCnsESupOutLCYShareOut", "eqCnsESupOutLCY", "eqCnsESupOutLCYGrowth", "eqCnsLESupOutLCYSShareIn", "eqCnsLESupOutLCYSShareOut", "eqCnsLESupOutLCYS", "eqCnsLESupOutLCYSGrowth", "eqCnsGESupOutLCYSShareIn", "eqCnsGESupOutLCYSShareOut", "eqCnsGESupOutLCYS", "eqCnsGESupOutLCYSGrowth", "eqCnsESupOutLCYSShareIn", "eqCnsESupOutLCYSShareOut", "eqCnsESupOutLCYS", "eqCnsESupOutLCYSGrowth", "eqCnsLESupOutLCRShareIn", "eqCnsLESupOutLCRShareOut", "eqCnsLESupOutLCR", "eqCnsGESupOutLCRShareIn", "eqCnsGESupOutLCRShareOut", "eqCnsGESupOutLCR", "eqCnsESupOutLCRShareIn", "eqCnsESupOutLCRShareOut", "eqCnsESupOutLCR", "eqCnsLESupOutLCRSShareIn", "eqCnsLESupOutLCRSShareOut", "eqCnsLESupOutLCRS", "eqCnsGESupOutLCRSShareIn", "eqCnsGESupOutLCRSShareOut", "eqCnsGESupOutLCRS", "eqCnsESupOutLCRSShareIn", "eqCnsESupOutLCRSShareOut", "eqCnsESupOutLCRS", "eqCnsLESupOutLCRYShareIn", "eqCnsLESupOutLCRYShareOut", "eqCnsLESupOutLCRY", "eqCnsLESupOutLCRYGrowth", "eqCnsGESupOutLCRYShareIn", "eqCnsGESupOutLCRYShareOut", "eqCnsGESupOutLCRY", "eqCnsGESupOutLCRYGrowth", "eqCnsESupOutLCRYShareIn", "eqCnsESupOutLCRYShareOut", "eqCnsESupOutLCRY", "eqCnsESupOutLCRYGrowth", "eqCnsLESupOutLCRYSShareIn", "eqCnsLESupOutLCRYSShareOut", "eqCnsLESupOutLCRYS", "eqCnsLESupOutLCRYSGrowth", "eqCnsGESupOutLCRYSShareIn", "eqCnsGESupOutLCRYSShareOut", "eqCnsGESupOutLCRYS", "eqCnsGESupOutLCRYSGrowth", "eqCnsESupOutLCRYSShareIn", "eqCnsESupOutLCRYSShareOut", "eqCnsESupOutLCRYS", "eqCnsESupOutLCRYSGrowth", "eqPreDefSupOut")] <- TRUE;
     rs["vSupReserve", c("name", "description")] <- c("vSupReserve", "Accumulated used reserve");
     rs["vSupReserve", c("sup", "eqSupReserve", "eqSupReserveCheck")] <- TRUE;
-    rs["vDemInp", c("name", "description")] <- c("vDemInp", "??? Input???");
+    rs["vDemInp", c("name", "description")] <- c("vDemInp", "Satisfierd level of demands");
     rs["vDemInp", c("comm", "region", "year", "slice", "eqDemInp", "eqInpTot", "eqPreDefDemInp")] <- TRUE;
     rs["vOutTot", c("name", "description")] <- c("vOutTot", "Total commodity output");
     rs["vOutTot", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqTaxCost", "eqSubsCost", "eqCnsLETechInpShareOut", "eqCnsGETechInpShareOut", "eqCnsETechInpShareOut", "eqCnsLETechInpSShareOut", "eqCnsGETechInpSShareOut", "eqCnsETechInpSShareOut", "eqCnsLETechInpYShareOut", "eqCnsGETechInpYShareOut", "eqCnsETechInpYShareOut", "eqCnsLETechInpYSShareOut", "eqCnsGETechInpYSShareOut", "eqCnsETechInpYSShareOut", "eqCnsLETechInpRShareOut", "eqCnsGETechInpRShareOut", "eqCnsETechInpRShareOut", "eqCnsLETechInpRSShareOut", "eqCnsGETechInpRSShareOut", "eqCnsETechInpRSShareOut", "eqCnsLETechInpRYShareOut", "eqCnsGETechInpRYShareOut", "eqCnsETechInpRYShareOut", "eqCnsLETechInpRYSShareOut", "eqCnsGETechInpRYSShareOut", "eqCnsETechInpRYSShareOut", "eqCnsLETechInpCShareOut", "eqCnsGETechInpCShareOut", "eqCnsETechInpCShareOut", "eqCnsLETechInpCSShareOut", "eqCnsGETechInpCSShareOut", "eqCnsETechInpCSShareOut", "eqCnsLETechInpCYShareOut", "eqCnsGETechInpCYShareOut", "eqCnsETechInpCYShareOut", "eqCnsLETechInpCYSShareOut", "eqCnsGETechInpCYSShareOut", "eqCnsETechInpCYSShareOut", "eqCnsLETechInpCRShareOut", "eqCnsGETechInpCRShareOut", "eqCnsETechInpCRShareOut", "eqCnsLETechInpCRSShareOut", "eqCnsGETechInpCRSShareOut", "eqCnsETechInpCRSShareOut", "eqCnsLETechInpCRYShareOut", "eqCnsGETechInpCRYShareOut", "eqCnsETechInpCRYShareOut", "eqCnsLETechInpCRYSShareOut", "eqCnsGETechInpCRYSShareOut", "eqCnsETechInpCRYSShareOut", "eqCnsLETechOutShareOut", "eqCnsGETechOutShareOut", "eqCnsETechOutShareOut", "eqCnsLETechOutSShareOut", "eqCnsGETechOutSShareOut", "eqCnsETechOutSShareOut", "eqCnsLETechOutYShareOut", "eqCnsGETechOutYShareOut", "eqCnsETechOutYShareOut", "eqCnsLETechOutYSShareOut", "eqCnsGETechOutYSShareOut", "eqCnsETechOutYSShareOut", "eqCnsLETechOutRShareOut", "eqCnsGETechOutRShareOut", "eqCnsETechOutRShareOut", "eqCnsLETechOutRSShareOut", "eqCnsGETechOutRSShareOut", "eqCnsETechOutRSShareOut", "eqCnsLETechOutRYShareOut", "eqCnsGETechOutRYShareOut", "eqCnsETechOutRYShareOut", "eqCnsLETechOutRYSShareOut", "eqCnsGETechOutRYSShareOut", "eqCnsETechOutRYSShareOut", "eqCnsLETechOutCShareOut", "eqCnsGETechOutCShareOut", "eqCnsETechOutCShareOut", "eqCnsLETechOutCSShareOut", "eqCnsGETechOutCSShareOut", "eqCnsETechOutCSShareOut", "eqCnsLETechOutCYShareOut", "eqCnsGETechOutCYShareOut", "eqCnsETechOutCYShareOut", "eqCnsLETechOutCYSShareOut", "eqCnsGETechOutCYSShareOut", "eqCnsETechOutCYSShareOut", "eqCnsLETechOutCRShareOut", "eqCnsGETechOutCRShareOut", "eqCnsETechOutCRShareOut", "eqCnsLETechOutCRSShareOut", "eqCnsGETechOutCRSShareOut", "eqCnsETechOutCRSShareOut", "eqCnsLETechOutCRYShareOut", "eqCnsGETechOutCRYShareOut", "eqCnsETechOutCRYShareOut", "eqCnsLETechOutCRYSShareOut", "eqCnsGETechOutCRYSShareOut", "eqCnsETechOutCRYSShareOut", "eqCnsLETechInpLShareOut", "eqCnsGETechInpLShareOut", "eqCnsETechInpLShareOut", "eqCnsLETechInpLSShareOut", "eqCnsGETechInpLSShareOut", "eqCnsETechInpLSShareOut", "eqCnsLETechInpLYShareOut", "eqCnsGETechInpLYShareOut", "eqCnsETechInpLYShareOut", "eqCnsLETechInpLYSShareOut", "eqCnsGETechInpLYSShareOut", "eqCnsETechInpLYSShareOut", "eqCnsLETechInpLRShareOut", "eqCnsGETechInpLRShareOut", "eqCnsETechInpLRShareOut", "eqCnsLETechInpLRSShareOut", "eqCnsGETechInpLRSShareOut", "eqCnsETechInpLRSShareOut", "eqCnsLETechInpLRYShareOut", "eqCnsGETechInpLRYShareOut", "eqCnsETechInpLRYShareOut", "eqCnsLETechInpLRYSShareOut", "eqCnsGETechInpLRYSShareOut", "eqCnsETechInpLRYSShareOut", "eqCnsLETechInpLCShareOut", "eqCnsGETechInpLCShareOut", "eqCnsETechInpLCShareOut", "eqCnsLETechInpLCSShareOut", "eqCnsGETechInpLCSShareOut", "eqCnsETechInpLCSShareOut", "eqCnsLETechInpLCYShareOut", "eqCnsGETechInpLCYShareOut", "eqCnsETechInpLCYShareOut", "eqCnsLETechInpLCYSShareOut", "eqCnsGETechInpLCYSShareOut", "eqCnsETechInpLCYSShareOut", "eqCnsLETechInpLCRShareOut", "eqCnsGETechInpLCRShareOut", "eqCnsETechInpLCRShareOut", "eqCnsLETechInpLCRSShareOut", "eqCnsGETechInpLCRSShareOut", "eqCnsETechInpLCRSShareOut", "eqCnsLETechInpLCRYShareOut", "eqCnsGETechInpLCRYShareOut", "eqCnsETechInpLCRYShareOut", "eqCnsLETechInpLCRYSShareOut", "eqCnsGETechInpLCRYSShareOut", "eqCnsETechInpLCRYSShareOut", "eqCnsLETechOutLShareOut", "eqCnsGETechOutLShareOut", "eqCnsETechOutLShareOut", "eqCnsLETechOutLSShareOut", "eqCnsGETechOutLSShareOut", "eqCnsETechOutLSShareOut", "eqCnsLETechOutLYShareOut", "eqCnsGETechOutLYShareOut", "eqCnsETechOutLYShareOut", "eqCnsLETechOutLYSShareOut", "eqCnsGETechOutLYSShareOut", "eqCnsETechOutLYSShareOut", "eqCnsLETechOutLRShareOut", "eqCnsGETechOutLRShareOut", "eqCnsETechOutLRShareOut", "eqCnsLETechOutLRSShareOut", "eqCnsGETechOutLRSShareOut", "eqCnsETechOutLRSShareOut", "eqCnsLETechOutLRYShareOut", "eqCnsGETechOutLRYShareOut", "eqCnsETechOutLRYShareOut", "eqCnsLETechOutLRYSShareOut", "eqCnsGETechOutLRYSShareOut", "eqCnsETechOutLRYSShareOut", "eqCnsLETechOutLCShareOut", "eqCnsGETechOutLCShareOut", "eqCnsETechOutLCShareOut", "eqCnsLETechOutLCSShareOut", "eqCnsGETechOutLCSShareOut", "eqCnsETechOutLCSShareOut", "eqCnsLETechOutLCYShareOut", "eqCnsGETechOutLCYShareOut", "eqCnsETechOutLCYShareOut", "eqCnsLETechOutLCYSShareOut", "eqCnsGETechOutLCYSShareOut", "eqCnsETechOutLCYSShareOut", "eqCnsLETechOutLCRShareOut", "eqCnsGETechOutLCRShareOut", "eqCnsETechOutLCRShareOut", "eqCnsLETechOutLCRSShareOut", "eqCnsGETechOutLCRSShareOut", "eqCnsETechOutLCRSShareOut", "eqCnsLETechOutLCRYShareOut", "eqCnsGETechOutLCRYShareOut", "eqCnsETechOutLCRYShareOut", "eqCnsLETechOutLCRYSShareOut", "eqCnsGETechOutLCRYSShareOut", "eqCnsETechOutLCRYSShareOut", "eqCnsLESupOutShareOut", "eqCnsGESupOutShareOut", "eqCnsESupOutShareOut", "eqCnsLESupOutSShareOut", "eqCnsGESupOutSShareOut", "eqCnsESupOutSShareOut", "eqCnsLESupOutYShareOut", "eqCnsGESupOutYShareOut", "eqCnsESupOutYShareOut", "eqCnsLESupOutYSShareOut", "eqCnsGESupOutYSShareOut", "eqCnsESupOutYSShareOut", "eqCnsLESupOutRShareOut", "eqCnsGESupOutRShareOut", "eqCnsESupOutRShareOut", "eqCnsLESupOutRSShareOut", "eqCnsGESupOutRSShareOut", "eqCnsESupOutRSShareOut", "eqCnsLESupOutRYShareOut", "eqCnsGESupOutRYShareOut", "eqCnsESupOutRYShareOut", "eqCnsLESupOutRYSShareOut", "eqCnsGESupOutRYSShareOut", "eqCnsESupOutRYSShareOut", "eqCnsLESupOutCShareOut", "eqCnsGESupOutCShareOut", "eqCnsESupOutCShareOut", "eqCnsLESupOutCSShareOut", "eqCnsGESupOutCSShareOut", "eqCnsESupOutCSShareOut", "eqCnsLESupOutCYShareOut", "eqCnsGESupOutCYShareOut", "eqCnsESupOutCYShareOut", "eqCnsLESupOutCYSShareOut", "eqCnsGESupOutCYSShareOut", "eqCnsESupOutCYSShareOut", "eqCnsLESupOutCRShareOut", "eqCnsGESupOutCRShareOut", "eqCnsESupOutCRShareOut", "eqCnsLESupOutCRSShareOut", "eqCnsGESupOutCRSShareOut", "eqCnsESupOutCRSShareOut", "eqCnsLESupOutCRYShareOut", "eqCnsGESupOutCRYShareOut", "eqCnsESupOutCRYShareOut", "eqCnsLESupOutCRYSShareOut", "eqCnsGESupOutCRYSShareOut", "eqCnsESupOutCRYSShareOut", "eqCnsLESupOutLShareOut", "eqCnsGESupOutLShareOut", "eqCnsESupOutLShareOut", "eqCnsLESupOutLSShareOut", "eqCnsGESupOutLSShareOut", "eqCnsESupOutLSShareOut", "eqCnsLESupOutLYShareOut", "eqCnsGESupOutLYShareOut", "eqCnsESupOutLYShareOut", "eqCnsLESupOutLYSShareOut", "eqCnsGESupOutLYSShareOut", "eqCnsESupOutLYSShareOut", "eqCnsLESupOutLRShareOut", "eqCnsGESupOutLRShareOut", "eqCnsESupOutLRShareOut", "eqCnsLESupOutLRSShareOut", "eqCnsGESupOutLRSShareOut", "eqCnsESupOutLRSShareOut", "eqCnsLESupOutLRYShareOut", "eqCnsGESupOutLRYShareOut", "eqCnsESupOutLRYShareOut", "eqCnsLESupOutLRYSShareOut", "eqCnsGESupOutLRYSShareOut", "eqCnsESupOutLRYSShareOut", "eqCnsLESupOutLCShareOut", "eqCnsGESupOutLCShareOut", "eqCnsESupOutLCShareOut", "eqCnsLESupOutLCSShareOut", "eqCnsGESupOutLCSShareOut", "eqCnsESupOutLCSShareOut", "eqCnsLESupOutLCYShareOut", "eqCnsGESupOutLCYShareOut", "eqCnsESupOutLCYShareOut", "eqCnsLESupOutLCYSShareOut", "eqCnsGESupOutLCYSShareOut", "eqCnsESupOutLCYSShareOut", "eqCnsLESupOutLCRShareOut", "eqCnsGESupOutLCRShareOut", "eqCnsESupOutLCRShareOut", "eqCnsLESupOutLCRSShareOut", "eqCnsGESupOutLCRSShareOut", "eqCnsESupOutLCRSShareOut", "eqCnsLESupOutLCRYShareOut", "eqCnsGESupOutLCRYShareOut", "eqCnsESupOutLCRYShareOut", "eqCnsLESupOutLCRYSShareOut", "eqCnsGESupOutLCRYSShareOut", "eqCnsESupOutLCRYSShareOut", "eqCnsLETotOut", "eqCnsGETotOut", "eqCnsETotOut", "eqCnsLETotOutS", "eqCnsGETotOutS", "eqCnsETotOutS", "eqCnsLETotOutY", "eqCnsLETotOutYGrowth", "eqCnsGETotOutY", "eqCnsGETotOutYGrowth", "eqCnsETotOutY", "eqCnsETotOutYGrowth", "eqCnsLETotOutYS", "eqCnsLETotOutYSGrowth", "eqCnsGETotOutYS", "eqCnsGETotOutYSGrowth", "eqCnsETotOutYS", "eqCnsETotOutYSGrowth", "eqCnsLETotOutR", "eqCnsGETotOutR", "eqCnsETotOutR", "eqCnsLETotOutRS", "eqCnsGETotOutRS", "eqCnsETotOutRS", "eqCnsLETotOutRY", "eqCnsLETotOutRYGrowth", "eqCnsGETotOutRY", "eqCnsGETotOutRYGrowth", "eqCnsETotOutRY", "eqCnsETotOutRYGrowth", "eqCnsLETotOutRYS", "eqCnsLETotOutRYSGrowth", "eqCnsGETotOutRYS", "eqCnsGETotOutRYSGrowth", "eqCnsETotOutRYS", "eqCnsETotOutRYSGrowth", "eqCnsLETotOutC", "eqCnsGETotOutC", "eqCnsETotOutC", "eqCnsLETotOutCS", "eqCnsGETotOutCS", "eqCnsETotOutCS", "eqCnsLETotOutCY", "eqCnsLETotOutCYGrowth", "eqCnsGETotOutCY", "eqCnsGETotOutCYGrowth", "eqCnsETotOutCY", "eqCnsETotOutCYGrowth", "eqCnsLETotOutCYS", "eqCnsLETotOutCYSGrowth", "eqCnsGETotOutCYS", "eqCnsGETotOutCYSGrowth", "eqCnsETotOutCYS", "eqCnsETotOutCYSGrowth", "eqCnsLETotOutCR", "eqCnsGETotOutCR", "eqCnsETotOutCR", "eqCnsLETotOutCRS", "eqCnsGETotOutCRS", "eqCnsETotOutCRS", "eqCnsLETotOutCRY", "eqCnsLETotOutCRYGrowth", "eqCnsGETotOutCRY", "eqCnsGETotOutCRYGrowth", "eqCnsETotOutCRY", "eqCnsETotOutCRYGrowth", "eqCnsLETotOutCRYS", "eqCnsLETotOutCRYSGrowth", "eqCnsGETotOutCRYS", "eqCnsGETotOutCRYSGrowth", "eqCnsETotOutCRYS", "eqCnsETotOutCRYSGrowth")] <- TRUE;
@@ -7427,10 +7433,12 @@ getVariables <- function() {
     rs["vStorageInpTot", c("comm", "region", "year", "slice", "eqInpTot", "eqStorageInpTot")] <- TRUE;
     rs["vStorageOutTot", c("name", "description")] <- c("vStorageOutTot", "Total storage output");
     rs["vStorageOutTot", c("comm", "region", "year", "slice", "eqOutTot", "eqStorageOutTot")] <- TRUE;
-    rs["vDumOut", c("name", "description")] <- c("vDumOut", "Dummy import");
-    rs["vDumOut", c("comm", "region", "year", "slice", "eqOutTot", "eqDumCost", "eqPreDefDumOut")] <- TRUE;
-    rs["vDumCost", c("name", "description")] <- c("vDumCost", "Dummy import costs");
-    rs["vDumCost", c("comm", "region", "year", "eqDumCost", "eqCost1", "eqCost2")] <- TRUE;
+    rs["vDummyOut", c("name", "description")] <- c("vDummyOut", "Dummy import");
+    rs["vDummyOut", c("comm", "region", "year", "slice", "eqOutTot", "eqDummyCost", "eqPreDefDummyOut")] <- TRUE;
+    rs["vDummyInp", c("name", "description")] <- c("vDummyInp", "Dummy export");
+    rs["vDummyInp", c("comm", "region", "year", "slice", "eqInpTot", "eqDummyCost", "eqPreDefDummyInp")] <- TRUE;
+    rs["vDummyCost", c("name", "description")] <- c("vDummyCost", "Dummy import & export costs");
+    rs["vDummyCost", c("comm", "region", "year", "eqDummyCost", "eqCost1", "eqCost2")] <- TRUE;
     rs["vStorageInp", c("name", "description")] <- c("vStorageInp", "Storage input");
     rs["vStorageInp", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageVar", "eqStorageInpTot", "eqPreDefStorageInp")] <- TRUE;
     rs["vStorageOut", c("name", "description")] <- c("vStorageOut", "Storage output");
@@ -7449,20 +7457,20 @@ getVariables <- function() {
     rs["vStorageCap", c("stg", "region", "year", "eqStorageCap", "eqStorageFix", "eqStorageLo", "eqStorageUp", "eqPreDefStorageCap")] <- TRUE;
     rs["vStorageNewCap", c("name", "description")] <- c("vStorageNewCap", "Storage new capacity");
     rs["vStorageNewCap", c("stg", "region", "year", "eqStorageCap", "eqStorageInv", "eqPreDefStorageNewCap")] <- TRUE;
-    rs["vImport", c("name", "description")] <- c("vImport", "Interregional import");
+    rs["vImport", c("name", "description")] <- c("vImport", "Total regional import");
     rs["vImport", c("comm", "region", "year", "slice", "eqImport", "eqOutTot", "eqPreDefImport")] <- TRUE;
-    rs["vExport", c("name", "description")] <- c("vExport", "Interregional export");
+    rs["vExport", c("name", "description")] <- c("vExport", "Total regional export");
     rs["vExport", c("comm", "region", "year", "slice", "eqExport", "eqInpTot", "eqPreDefExport")] <- TRUE;
-    rs["vTradeIr", c("name", "description")] <- c("vTradeIr", "Total physical trade flows");
+    rs["vTradeIr", c("name", "description")] <- c("vTradeIr", "Total physical trade flows between region");
     rs["vTradeIr", c("trade", "region", "year", "slice", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostIrTrade", "eqPreDefTradeIr")] <- TRUE;
-    rs["vExportRowRes", c("name", "description")] <- c("vExportRowRes", "??? Export to ROW");
-    rs["vExportRowRes", c("expp", "eqExportRowRes", "eqExportRowResUp")] <- TRUE;
-    rs["vExportRow", c("name", "description")] <- c("vExportRow", "???");
-    rs["vExportRow", c("expp", "region", "year", "slice", "eqExport", "eqCostRowTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowRes", "eqPreDefExportRow")] <- TRUE;
-    rs["vImportRowRes", c("name", "description")] <- c("vImportRowRes", "???");
-    rs["vImportRowRes", c("imp", "eqImportRowRes", "eqImportRowResUp")] <- TRUE;
-    rs["vImportRow", c("name", "description")] <- c("vImportRow", "???");
-    rs["vImportRow", c("imp", "region", "year", "slice", "eqImport", "eqCostRowTrade", "eqImportRowUp", "eqImportRowLo", "eqImportRowRes", "eqPreDefImportRow")] <- TRUE;
+    rs["vExportRowCumulative", c("name", "description")] <- c("vExportRowCumulative", "");
+    rs["vExportRowCumulative", c("expp", "eqExportRowCumulative", "eqExportRowResUp")] <- TRUE;
+    rs["vExportRow", c("name", "description")] <- c("vExportRow", "Export to dummy ROW region");
+    rs["vExportRow", c("expp", "region", "year", "slice", "eqExport", "eqCostRowTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqPreDefExportRow")] <- TRUE;
+    rs["vImportRowAccumulated", c("name", "description")] <- c("vImportRowAccumulated", "");
+    rs["vImportRowAccumulated", c("imp", "eqImportRowAccumulated", "eqImportRowResUp")] <- TRUE;
+    rs["vImportRow", c("name", "description")] <- c("vImportRow", "Import to dummy ROW region");
+    rs["vImportRow", c("imp", "region", "year", "slice", "eqImport", "eqCostRowTrade", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqPreDefImportRow")] <- TRUE;
     rs[, -(1:2)][is.na(rs[, -(1:2)])] <- FALSE;
 rs
 }

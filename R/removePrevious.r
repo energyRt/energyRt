@@ -165,7 +165,7 @@ setMethod('isConstrain', signature(obj = 'CodeProduce', name = 'character'),
 setMethod('removePreviousSysInfo',
     signature(obj = 'CodeProduce'),
       function(obj) {
-        for(i in c('pDiscount', 'pDumCost')) 
+        for(i in c('pDiscount', 'pDummyImportCost', 'pDummyExportCost')) 
             obj@maptable[[i]] <- clear(obj@maptable[[i]])
         obj
 })

@@ -106,7 +106,8 @@ defpTechAfaUp(tech, region, year, slice)         Auxiliary mapping for Inf - use
 defpTechAfacUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
 defpSupReserve(sup)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
 defpSupAvaUp(sup, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpDumCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpDummyImportCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+defpDummyExportCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpTechOlife(tech, region)                     Auxiliary mapping for not Inf - used in GLPK-MathProg only
 * Storage set
 $ontext
@@ -197,7 +198,8 @@ pDemand(dem, region, year, slice)                   Exogenous demand
 * Emissions
 pEmissionFactor(comm, comm)                         Emission factor
 * Dummy import
-pDumCost(comm, region, year, slice)                 Dummy costs parameters
+pDummyImportCost(comm, region, year, slice)                 Dummy costs parameters
+pDummyExportCost(comm, region, year, slice)                 Dummy costs parameters
 * Tax
 pTaxCost(comm, region, year, slice)                 Taxes
 pSubsCost(comm, region, year, slice)                Subsidies
@@ -246,7 +248,7 @@ $offtext
 positive variable
 vTechUse(tech, region, year, slice)                  Use level in technology
 vTechNewCap(tech, region, year)                      New capacity
-vTechRetirementCap(tech, region, year, year)         ??? Early retired capacity
+vTechRetiredCap(tech, region, year, year)         Early retired capacity
 *vTechRetrofitCap(tech, region, year, year)
 *vTechUpgradeCap(tech, region, year)
 * Activity and intput-output
@@ -259,17 +261,17 @@ vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
 vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
 ;
 variable
-*! Large model : begin
+*! Full model : begin
 vTechFixom(tech, region, year)                       Fixom
 vTechVarom(tech, region, year, slice)                Varom
 vTechActVarom(tech, region, year, slice)             Activity Varom
 vTechCVarom(tech, region, year, slice)               Commodity Varom
 vTechAVarom(tech, region, year, slice)               Auxilary commodity Varom
-*! Large model : end
+*! Full model : end
 vTechInv(tech, region, year)                         Investment
 vTechEac(tech, region, year)                         Annualized investment cost
 vTechSalv(tech, region)                              Salvage costs
-vTechCost(tech, region, year)                        ??? VAROM + FIXOM???
+vTechCost(tech, region, year)                        Sum of all technology-related costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom) + vTechInv
 ;
 positive variable
 * Supply
@@ -282,12 +284,12 @@ vSupCost(sup, region, year)                          Supply costs
 positive variable
 * Demand
 *#! RENAME?
-vDemInp(comm, region, year, slice)                   ??? Input???
+vDemInp(comm, region, year, slice)                   Satisfierd level of demands
 ;
 variable
 * Emission
-vEmsFuelTot(comm, region, year, slice)                   Total emissions
-vTechEmsFuel(tech, comm, region, year, slice)            Emissions on technology level
+vEmsFuelTot(comm, region, year, slice)                   Total fuel emissions
+vTechEmsFuel(tech, comm, region, year, slice)            Emissions on technology level by fuel
 ;
 variable
 * Ballance
@@ -309,8 +311,9 @@ vObjective                                           Objective costs
 ;
 positive variable
 * Dummy import
-vDumOut(comm, region, year, slice)                   Dummy import
-vDumCost(comm, region, year)                         Dummy import costs
+vDummyOut(comm, region, year, slice)                   Dummy import
+vDummyInp(comm, region, year, slice)                   Dummy export
+vDummyCost(comm, region, year)                         Dummy import & export costs
 ;
 variable
 * Tax
@@ -342,13 +345,13 @@ vStorageCost(stg, region, year)                      ???
 
 * Trade and Row variable
 positive variable
-vImport(comm, region, year, slice)                   Interregional import
-vExport(comm, region, year, slice)                   Interregional export
-vTradeIr(trade, region, region, year, slice)             Total physical trade flows
-vExportRowRes(expp)                                  ??? Export to ROW
-vExportRow(expp, region, year, slice)                ???
-vImportRowRes(imp)                                   ???
-vImportRow(imp, region, year, slice)                 ???
+vImport(comm, region, year, slice)                   Total regional import
+vExport(comm, region, year, slice)                   Total regional export
+vTradeIr(trade, region, region, year, slice)         Total physical trade flows between region
+vExportRowCumulative(expp)
+vExportRow(expp, region, year, slice)                Export to dummy ROW region
+vImportRowAccumulated(imp)
+vImportRow(imp, region, year, slice)                 Import to dummy ROW region
 ;
 variable
 vTradeCost(region, year)                             Trade costs
@@ -688,13 +691,13 @@ eqTechSalv3(tech, region, yeare)
 * Cost aggregate by year equation
 eqTechCost1(tech, region, year)
 eqTechCost2(tech, region, year)
-*! Large model : begin
+*! Full model : begin
 eqTechFixom(tech, region, year)
 eqTechVarom(tech, region, year, slice)
 eqTechActVarom(tech, region, year, slice)
 eqTechCVarom(tech, region, year, slice)
 eqTechAVarom(tech, region, year, slice)
-*! Large model : end
+*! Full model : end
 ;
 
 
@@ -710,12 +713,12 @@ eqTechCap(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
                  ),
                  vTechNewCap(tech, region, yearp) -
                    sum(yeare$(mTechRetirement(tech) and ORD(yeare) >= ORD(yearp) and ORD(yeare) <= ORD(year)),
-                       vTechRetirementCap(tech, region, yearp, yeare))
+                       vTechRetiredCap(tech, region, yearp, yeare))
          );
 
 eqTechNewCap(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region, year) and mTechRetirement(tech))..
     sum(yearp$(mMidMilestone(yearp) and ORD(yearp) >= ORD(year) and ORD(yearp) < ORD(year) + pTechOlife(tech, region)),
-                         vTechRetirementCap(tech, region, year, yearp)
+                         vTechRetiredCap(tech, region, year, yearp)
          ) =l= vTechNewCap(tech, region, year);
 
 * Capacity equation
@@ -732,7 +735,7 @@ eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
 *                   sum(yeare$(ORD(yeare) = ORD(year) and ORD(yearp) = ORD(year)), pTechStock(tech, region, yeare)) +
                    vTechNewCap(tech, region, yearp) -
                    sum((yeare)$(mTechRetirement(tech) and ORD(yeare) >= ORD(yearp) and ORD(yeare) <= ORD(year)),
-                       vTechRetirementCap(tech, region, yearp, yeare))) /
+                       vTechRetiredCap(tech, region, yearp, yeare))) /
                  (
 * Exceed before end year
    sum((yeare)$(ORD(yeare) >= ORD(yearp) and ORD(yeare) < ORD(yearp) + pTechOlife(tech, region)),
@@ -749,7 +752,7 @@ eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
 
 *eqTechRetirementCap(tech, region, year, yearp)$(not(mTechRetirement(tech)) or
 *  ORD(yearp) < ORD(year) or ORD(yearp) >= ORD(year) + pTechOlife(tech, region))..
-*    vTechRetirementCap(tech, region, year, yearp) =e= 0;
+*    vTechRetiredCap(tech, region, year, yearp) =e= 0;
 
 *eqTechRetrofitCap(tech, region, year, yearp)$(ORD(yearp) < ORD(year) or ORD(yearp) >= ORD(year) + pTechOlife(tech, region))..
 *    vTechRetrofitCap(tech, region, year, yearp) =e= 0;
@@ -768,7 +771,7 @@ eqTechSalv2(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare
    sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
-     - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetirementCap(tech, region, year, yearp)))  / (
+     - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp)))  / (
       1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
@@ -784,7 +787,7 @@ eqTechSalv3(tech, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(
    sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
-      - sum(yearp$(mMidMilestone(year) and mTechRetirement(tech)), vTechRetirementCap(tech, region, year, yearp))) / (
+      - sum(yearp$(mMidMilestone(year) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp))) / (
       1
         + (sum(yearp$(mMidMilestone(yearp) and ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
@@ -856,7 +859,7 @@ eqTechCost2(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region,
                   )
          ));
 
-*! Large model : begin
+*! Full model : begin
 eqTechFixom(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region, year))..
   vTechFixom(tech, region, year) =e= pTechFixom(tech, region, year) * vTechCap(tech, region, year);
 
@@ -903,7 +906,7 @@ eqTechAVarom(tech, region, year, slice)$(mMidMilestone(year) and mTechSpan(tech,
                           vTechAInp(tech, comm, region, year, slice)
                   );
 
-*! Large model : end
+*! Full model : end
 
 **************************************
 * Supply equation
@@ -1141,11 +1144,11 @@ eqCostRowTrade(region, year)
 eqCostIrTrade(region, year)
 eqExportRowUp(expp, region, year, slice)
 eqExportRowLo(expp, region, year, slice)
-eqExportRowRes(expp)
+eqExportRowCumulative(expp)
 eqExportRowResUp(expp)
 eqImportRowUp(imp, region, year, slice)
 eqImportRowLo(imp, region, year, slice)
-eqImportRowRes(imp)
+eqImportRowAccumulated(imp)
 eqImportRowResUp(imp)
 ;
 
@@ -1194,13 +1197,13 @@ eqExportRowUp(expp, region, year, slice)$(mMidMilestone(year) and defpExportRowU
 eqExportRowLo(expp, region, year, slice)$(mMidMilestone(year) and pExportRowLo(expp, region, year, slice) <> 0)..
   vExportRow(expp, region, year, slice)  =g= pExportRowLo(expp, region, year, slice);
 
-eqExportRowRes(expp).. vExportRowRes(expp) =e=
+eqExportRowCumulative(expp).. vExportRowCumulative(expp) =e=
     sum((region, year, slice, yeare, yearp)$(mMidMilestone(year) and
                 mStartMilestone(year, yeare) and mEndMilestone(year, yearp)),
        (ORD(yearp) - ORD(yeare) + 1) * vExportRow(expp, region, year, slice)
 );
 
-eqExportRowResUp(expp)$defpExportRowRes(expp).. vExportRowRes(expp) =l= pExportRowRes(expp);
+eqExportRowResUp(expp)$defpExportRowRes(expp).. vExportRowCumulative(expp) =l= pExportRowRes(expp);
 
 
 
@@ -1210,13 +1213,13 @@ eqImportRowUp(imp, region, year, slice)$(mMidMilestone(year) and defpImportRowUp
 eqImportRowLo(imp, region, year, slice)$(mMidMilestone(year) and pImportRowLo(imp, region, year, slice) <> 0)..
   vImportRow(imp, region, year, slice)  =g= pImportRowLo(imp, region, year, slice);
 
-eqImportRowRes(imp).. vImportRowRes(imp) =e=
+eqImportRowAccumulated(imp).. vImportRowAccumulated(imp) =e=
     sum((region, year, slice, yeare, yearp)$(mMidMilestone(year) and
                 mStartMilestone(year, yeare) and mEndMilestone(year, yearp)),
          (ORD(yearp) - ORD(yeare) + 1) * vImportRow(imp, region, year, slice)
 );
 
-eqImportRowResUp(imp)$defpImportRowRes(imp).. vImportRowRes(imp) =l= pImportRowRes(imp);
+eqImportRowResUp(imp)$defpImportRowRes(imp).. vImportRowAccumulated(imp) =l= pImportRowRes(imp);
 
 
 **************************************
@@ -1260,7 +1263,7 @@ eqOutTot(comm, region, year, slice)$mMidMilestone(year)..
          vAggOut(comm, region, year, slice)$(sum(commp$pAggregateFactor(comm, commp), 1)) +
          vTechOutTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and
                   (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1)) +
-         vDumOut(comm, region, year, slice)$defpDumCost(comm, region, year, slice) +
+         vDummyOut(comm, region, year, slice)$defpDummyImportCost(comm, region, year, slice) +
          vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
          vImport(comm, region, year, slice);
 
@@ -1271,6 +1274,7 @@ eqInpTot(comm, region, year, slice)$mMidMilestone(year)..
              (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1)) +
          vDemInp(comm, region, year, slice)$(sum(dem$mDemComm(dem, comm), 1)) +
          vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
+         vDummyInp(comm, region, year, slice)$defpDummyExportCost(comm, region, year, slice) +
          vExport(comm, region, year, slice);
 
 eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(sup$(mSupComm(sup, comm) and mSupSpan(sup, region)), 1))..
@@ -1322,7 +1326,7 @@ eqStorageOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mSt
 * Cost equations
 **************************************
 Equation
-eqDumCost(comm, region, year)
+eqDummyCost(comm, region, year)
 eqCost1(region, year)
 eqCost2(region, year)
 eqObjective
@@ -1332,11 +1336,14 @@ eqTaxCost(comm, region, year)
 eqSubsCost(comm, region, year)
 ;
 
-eqDumCost(comm, region, year)$(mMidMilestone(year) and sum(slice$defpDumCost(comm, region, year, slice), 1))..
-         vDumCost(comm, region, year)
+eqDummyCost(comm, region, year)$(mMidMilestone(year) and
+  (sum(slice$defpDummyImportCost(comm, region, year, slice), 1) or sum(slice$defpDummyExportCost(comm, region, year, slice), 1)))..
+         vDummyCost(comm, region, year)
          =e=
-         sum(slice$defpDumCost(comm, region, year, slice),
-           pDumCost(comm, region, year, slice) * vDumOut(comm, region, year, slice));
+         sum(slice$defpDummyImportCost(comm, region, year, slice),
+           pDummyImportCost(comm, region, year, slice) * vDummyOut(comm, region, year, slice)) +
+         sum(slice$defpDummyExportCost(comm, region, year, slice),
+           pDummyExportCost(comm, region, year, slice) * vDummyInp(comm, region, year, slice));
 
 
 eqCost1(region, year)$(mMidMilestone(year) and not(mMilestoneLast(year)))..
@@ -1344,7 +1351,7 @@ eqCost1(region, year)$(mMidMilestone(year) and not(mMilestoneLast(year)))..
          =e=
          sum(tech$mTechSpan(tech, region, year), vTechCost(tech, region, year))
          + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
-         + sum(comm, vDumCost(comm, region, year))
+         + sum(comm$(sum(slice$defpDummyImportCost(comm, region, year, slice), 1) or sum(slice$defpDummyExportCost(comm, region, year, slice), 1)), vDummyCost(comm, region, year))
          + sum(comm$(sum(slice$pTaxCost(comm, region, year, slice), 1)), vTaxCost(comm, region, year))
          - sum(comm$(sum(slice$pSubsCost(comm, region, year, slice), 1)), vSubsCost(comm, region, year))
          + sum(stg$mStorageSpan(stg, region, year), vStorageCost(stg, region, year))
@@ -1357,7 +1364,7 @@ eqCost2(region, year)$(mMidMilestone(year) and mMilestoneLast(year))..
          + sum(tech, vTechSalv(tech, region))
          + sum(stg, vStorageSalv(stg, region))
          + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
-         + sum(comm, vDumCost(comm, region, year))
+         + sum(comm$(sum(slice$defpDummyImportCost(comm, region, year, slice), 1) or sum(slice$defpDummyExportCost(comm, region, year, slice), 1)), vDummyCost(comm, region, year))
          + sum(comm$(sum(slice$pTaxCost(comm, region, year, slice), 1)), vTaxCost(comm, region, year))
          - sum(comm$(sum(slice$pSubsCost(comm, region, year, slice), 1)), vSubsCost(comm, region, year))
          + sum(stg$mStorageSpan(stg, region, year), vStorageCost(stg, region, year))
@@ -1930,7 +1937,7 @@ eqCnsGETechActRYS(cns, region, year, slice)
 eqCnsGETechActRYSGrowth(cns, region, year, slice, yearp)
 eqCnsETechActRYS(cns, region, year, slice)
 eqCnsETechActRYSGrowth(cns, region, year, slice, yearp)
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVarom(cns)
 eqCnsGETechVarom(cns)
 eqCnsETechVarom(cns)
@@ -2093,7 +2100,7 @@ eqCnsGETechAVaromRYS(cns, region, year, slice)
 eqCnsGETechAVaromRYSGrowth(cns, region, year, slice, yearp)
 eqCnsETechAVaromRYS(cns, region, year, slice)
 eqCnsETechAVaromRYSGrowth(cns, region, year, slice, yearp)
-*! Large model : end
+*! Full model : end
 eqCnsLETechInpLShareIn(cns, tech)
 eqCnsLETechInpLShareOut(cns, tech)
 eqCnsLETechInpL(cns, tech)
@@ -2538,7 +2545,7 @@ eqCnsGETechActLRYS(cns, tech, region, year, slice)
 eqCnsGETechActLRYSGrowth(cns, tech, region, year, slice, yearp)
 eqCnsETechActLRYS(cns, tech, region, year, slice)
 eqCnsETechActLRYSGrowth(cns, tech, region, year, slice, yearp)
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromL(cns, tech)
 eqCnsGETechVaromL(cns, tech)
 eqCnsETechVaromL(cns, tech)
@@ -2701,7 +2708,7 @@ eqCnsGETechAVaromLRYS(cns, tech, region, year, slice)
 eqCnsGETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)
 eqCnsETechAVaromLRYS(cns, tech, region, year, slice)
 eqCnsETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)
-*! Large model : end
+*! Full model : end
 eqCnsLESupOutShareIn(cns)
 eqCnsLESupOutShareOut(cns)
 eqCnsLESupOut(cns)
@@ -8375,7 +8382,7 @@ eqCnsETechActRYSGrowth(cns, region, year, slice, yearp)$(mCnsActTech(cns) and no
           and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) * sum((tech)$(mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), vTechAct(tech, region, year, slice)) =e= 0;
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVarom(cns)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -8383,10 +8390,10 @@ eqCnsLETechVarom(cns)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsReg
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhs(cns) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVarom(cns)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -8394,10 +8401,10 @@ eqCnsGETechVarom(cns)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsReg
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhs(cns) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVarom(cns)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsRhsTypeConst(cns))..
@@ -8406,10 +8413,10 @@ eqCnsETechVarom(cns)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegi
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhs(cns) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromS(cns, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns))..
@@ -8418,10 +8425,10 @@ eqCnsLETechVaromS(cns, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mC
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromS(cns, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns))..
@@ -8430,10 +8437,10 @@ eqCnsGETechVaromS(cns, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mC
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromS(cns, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -8442,20 +8449,20 @@ eqCnsETechVaromS(cns, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCn
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromY(cns, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromYGrowth(cns, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -8466,20 +8473,20 @@ eqCnsLETechVaromYGrowth(cns, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromY(cns, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromYGrowth(cns, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -8490,20 +8497,20 @@ eqCnsGETechVaromYGrowth(cns, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromY(cns, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromYGrowth(cns, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -8514,10 +8521,10 @@ eqCnsETechVaromYGrowth(cns, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(c
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromYS(cns, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -8525,10 +8532,10 @@ eqCnsLETechVaromYS(cns, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns))
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromYSGrowth(cns, year, slice, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -8539,10 +8546,10 @@ eqCnsLETechVaromYSGrowth(cns, year, slice, yearp)$(mCnsVaromTech(cns) and not(mC
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromYS(cns, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -8550,10 +8557,10 @@ eqCnsGETechVaromYS(cns, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns))
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromYSGrowth(cns, year, slice, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -8564,10 +8571,10 @@ eqCnsGETechVaromYSGrowth(cns, year, slice, yearp)$(mCnsVaromTech(cns) and not(mC
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromYS(cns, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -8575,10 +8582,10 @@ eqCnsETechVaromYS(cns, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns))
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromYSGrowth(cns, year, slice, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -8589,10 +8596,10 @@ eqCnsETechVaromYSGrowth(cns, year, slice, yearp)$(mCnsVaromTech(cns) and not(mCn
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromR(cns, region)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) 
       and mCnsRhsTypeConst(cns))..
@@ -8601,10 +8608,10 @@ eqCnsLETechVaromR(cns, region)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and n
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromR(cns, region)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) 
       and mCnsRhsTypeConst(cns))..
@@ -8613,10 +8620,10 @@ eqCnsGETechVaromR(cns, region)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and n
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromR(cns, region)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -8625,10 +8632,10 @@ eqCnsETechVaromR(cns, region)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) and no
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromRS(cns, region, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -8637,10 +8644,10 @@ eqCnsLETechVaromRS(cns, region, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromRS(cns, region, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -8649,10 +8656,10 @@ eqCnsGETechVaromRS(cns, region, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromRS(cns, region, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -8661,10 +8668,10 @@ eqCnsETechVaromRS(cns, region, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromRY(cns, region, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -8672,10 +8679,10 @@ eqCnsLETechVaromRY(cns, region, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromRYGrowth(cns, region, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -8686,10 +8693,10 @@ eqCnsLETechVaromRYGrowth(cns, region, year, yearp)$(mCnsVaromTech(cns) and not(m
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromRY(cns, region, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -8697,10 +8704,10 @@ eqCnsGETechVaromRY(cns, region, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromRYGrowth(cns, region, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -8711,10 +8718,10 @@ eqCnsGETechVaromRYGrowth(cns, region, year, yearp)$(mCnsVaromTech(cns) and not(m
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromRY(cns, region, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -8722,10 +8729,10 @@ eqCnsETechVaromRY(cns, region, year)$(mCnsVaromTech(cns) and not(mCnsLType(cns))
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromRYGrowth(cns, region, year, yearp)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -8737,20 +8744,20 @@ eqCnsETechVaromRYGrowth(cns, region, year, yearp)$(mCnsVaromTech(cns) and not(mC
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromRYS(cns, region, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsVaromTech(cns) and 
       not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and 
@@ -8761,20 +8768,20 @@ eqCnsLETechVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsVaromTech(cns) a
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromRYS(cns, region, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsVaromTech(cns) and 
       not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and 
@@ -8785,10 +8792,10 @@ eqCnsGETechVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsVaromTech(cns) a
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromRYS(cns, region, year, slice)$(mCnsVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -8796,10 +8803,10 @@ eqCnsETechVaromRYS(cns, region, year, slice)$(mCnsVaromTech(cns) and not(mCnsLTy
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsVaromTech(cns) and 
       not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) 
@@ -8810,30 +8817,30 @@ eqCnsETechVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsVaromTech(cns) an
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixom(cns)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) 
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechFixom(tech, region, year))) - pRhs(cns) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixom(cns)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsGe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) 
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechFixom(tech, region, year))) - pRhs(cns) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixom(cns)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRhsTypeConst(cns))..
       
@@ -8841,20 +8848,20 @@ eqCnsETechFixom(cns)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegi
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechFixom(tech, region, year))) - pRhs(cns) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomY(cns, year)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
       mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) - pRhsY(cns, year) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomYGrowth(cns, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
@@ -8863,20 +8870,20 @@ eqCnsLETechFixomYGrowth(cns, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsY(cns, year))) * sum((tech, 
           region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech, 
           region, year)), vTechFixom(tech, region, year)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomY(cns, year)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
       mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) - pRhsY(cns, year) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomYGrowth(cns, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and mMilestoneNext(year, yearp))..
@@ -8885,20 +8892,20 @@ eqCnsGETechFixomYGrowth(cns, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsY(cns, year))) * sum((tech, 
           region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech, 
           region, year)), vTechFixom(tech, region, year)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomY(cns, year)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) - pRhsY(cns, year) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomYGrowth(cns, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and 
       not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -8908,10 +8915,10 @@ eqCnsETechFixomYGrowth(cns, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(c
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsY(cns, year))) * sum((tech, 
           region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and mTechSpan(tech, 
           region, year)), vTechFixom(tech, region, year)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomR(cns, region)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) 
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
       
@@ -8919,10 +8926,10 @@ eqCnsLETechFixomR(cns, region)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and n
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechFixom(tech, region, year))) - pRhsR(cns, region) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomR(cns, region)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) 
       and mCnsLhsYear(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
       
@@ -8930,10 +8937,10 @@ eqCnsGETechFixomR(cns, region)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and n
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechFixom(tech, region, year))) - pRhsR(cns, region) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomR(cns, region)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) 
       and mCnsLhsYear(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) 
       and mCnsRhsTypeConst(cns))..
@@ -8941,20 +8948,20 @@ eqCnsETechFixomR(cns, region)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) and no
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechFixom(tech, region, year))) - pRhsR(cns, region) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomRY(cns, region, year)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and 
       mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) 
           - pRhsRY(cns, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomRYGrowth(cns, region, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and 
       mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -8963,20 +8970,20 @@ eqCnsLETechFixomRYGrowth(cns, region, year, yearp)$(mCnsFixomTech(cns) and not(m
           vTechFixom(tech, region, yearp)) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsRY(cns, region, year))) * sum((tech)$(mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomRY(cns, region, year)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and 
       mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) 
           - pRhsRY(cns, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomRYGrowth(cns, region, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and 
       mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -8985,20 +8992,20 @@ eqCnsGETechFixomRYGrowth(cns, region, year, yearp)$(mCnsFixomTech(cns) and not(m
           vTechFixom(tech, region, yearp)) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsRY(cns, region, year))) * sum((tech)$(mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomRY(cns, region, year)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and 
       mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) 
           - pRhsRY(cns, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomRYGrowth(cns, region, year, yearp)$(mCnsFixomTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsYear(cns, year) and 
@@ -9007,10 +9014,10 @@ eqCnsETechFixomRYGrowth(cns, region, year, yearp)$(mCnsFixomTech(cns) and not(mC
           vTechFixom(tech, region, yearp)) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsRY(cns, region, year))) * sum((tech)$(mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVarom(cns)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -9018,10 +9025,10 @@ eqCnsLETechActVarom(cns)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and mCns
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhs(cns) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVarom(cns)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -9029,10 +9036,10 @@ eqCnsGETechActVarom(cns)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and mCns
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhs(cns) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVarom(cns)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsRhsTypeConst(cns))..
@@ -9041,10 +9048,10 @@ eqCnsETechActVarom(cns)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and mCnsL
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhs(cns) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromS(cns, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and 
       mCnsLe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9053,10 +9060,10 @@ eqCnsLETechActVaromS(cns, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns))
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromS(cns, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and 
       mCnsGe(cns) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9065,10 +9072,10 @@ eqCnsGETechActVaromS(cns, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns))
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromS(cns, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9077,20 +9084,20 @@ eqCnsETechActVaromS(cns, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) a
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromY(cns, year)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromYGrowth(cns, year, yearp)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -9101,20 +9108,20 @@ eqCnsLETechActVaromYGrowth(cns, year, yearp)$(mCnsActVaromTech(cns) and not(mCns
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechActVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromY(cns, year)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromYGrowth(cns, year, yearp)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -9125,10 +9132,10 @@ eqCnsGETechActVaromYGrowth(cns, year, yearp)$(mCnsActVaromTech(cns) and not(mCns
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechActVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromY(cns, year)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -9136,10 +9143,10 @@ eqCnsETechActVaromY(cns, year)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) an
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromYGrowth(cns, year, yearp)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -9150,10 +9157,10 @@ eqCnsETechActVaromYGrowth(cns, year, yearp)$(mCnsActVaromTech(cns) and not(mCnsL
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechActVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromYS(cns, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -9161,10 +9168,10 @@ eqCnsLETechActVaromYS(cns, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromYSGrowth(cns, year, slice, yearp)$(mCnsActVaromTech(cns) and 
       not(mCnsLType(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -9175,10 +9182,10 @@ eqCnsLETechActVaromYSGrowth(cns, year, slice, yearp)$(mCnsActVaromTech(cns) and
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromYS(cns, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -9186,10 +9193,10 @@ eqCnsGETechActVaromYS(cns, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromYSGrowth(cns, year, slice, yearp)$(mCnsActVaromTech(cns) and 
       not(mCnsLType(cns)) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -9200,10 +9207,10 @@ eqCnsGETechActVaromYSGrowth(cns, year, slice, yearp)$(mCnsActVaromTech(cns) and
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromYS(cns, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -9211,10 +9218,10 @@ eqCnsETechActVaromYS(cns, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromYSGrowth(cns, year, slice, yearp)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -9225,10 +9232,10 @@ eqCnsETechActVaromYSGrowth(cns, year, slice, yearp)$(mCnsActVaromTech(cns) and n
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromR(cns, region)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -9237,10 +9244,10 @@ eqCnsLETechActVaromR(cns, region)$(mCnsActVaromTech(cns) and not(mCnsLType(cns))
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromR(cns, region)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -9249,10 +9256,10 @@ eqCnsGETechActVaromR(cns, region)$(mCnsActVaromTech(cns) and not(mCnsLType(cns))
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromR(cns, region)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -9262,10 +9269,10 @@ eqCnsETechActVaromR(cns, region)$(mCnsActVaromTech(cns) and not(mCnsLType(cns))
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromRS(cns, region, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -9274,10 +9281,10 @@ eqCnsLETechActVaromRS(cns, region, slice)$(mCnsActVaromTech(cns) and not(mCnsLTy
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromRS(cns, region, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -9286,10 +9293,10 @@ eqCnsGETechActVaromRS(cns, region, slice)$(mCnsActVaromTech(cns) and not(mCnsLTy
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromRS(cns, region, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -9298,10 +9305,10 @@ eqCnsETechActVaromRS(cns, region, slice)$(mCnsActVaromTech(cns) and not(mCnsLTyp
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromRY(cns, region, year)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -9309,10 +9316,10 @@ eqCnsLETechActVaromRY(cns, region, year)$(mCnsActVaromTech(cns) and not(mCnsLTyp
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromRYGrowth(cns, region, year, yearp)$(mCnsActVaromTech(cns) and 
       not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -9323,10 +9330,10 @@ eqCnsLETechActVaromRYGrowth(cns, region, year, yearp)$(mCnsActVaromTech(cns) and
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromRY(cns, region, year)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -9334,10 +9341,10 @@ eqCnsGETechActVaromRY(cns, region, year)$(mCnsActVaromTech(cns) and not(mCnsLTyp
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromRYGrowth(cns, region, year, yearp)$(mCnsActVaromTech(cns) and 
       not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -9348,10 +9355,10 @@ eqCnsGETechActVaromRYGrowth(cns, region, year, yearp)$(mCnsActVaromTech(cns) and
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromRY(cns, region, year)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -9359,10 +9366,10 @@ eqCnsETechActVaromRY(cns, region, year)$(mCnsActVaromTech(cns) and not(mCnsLType
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromRYGrowth(cns, region, year, yearp)$(mCnsActVaromTech(cns) and 
       not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) 
@@ -9374,20 +9381,20 @@ eqCnsETechActVaromRYGrowth(cns, region, year, yearp)$(mCnsActVaromTech(cns) and
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromRYS(cns, region, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and 
@@ -9398,20 +9405,20 @@ eqCnsLETechActVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsActVaromTech(
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromRYS(cns, region, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and 
@@ -9422,10 +9429,10 @@ eqCnsGETechActVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsActVaromTech(
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromRYS(cns, region, year, slice)$(mCnsActVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -9433,10 +9440,10 @@ eqCnsETechActVaromRYS(cns, region, year, slice)$(mCnsActVaromTech(cns) and not(m
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) 
@@ -9447,10 +9454,10 @@ eqCnsETechActVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsActVaromTech(c
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVarom(cns)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -9458,10 +9465,10 @@ eqCnsLETechCVarom(cns)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsR
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhs(cns) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVarom(cns)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -9469,10 +9476,10 @@ eqCnsGETechCVarom(cns)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsR
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhs(cns) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVarom(cns)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsRhsTypeConst(cns))..
@@ -9481,10 +9488,10 @@ eqCnsETechCVarom(cns)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRe
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhs(cns) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromS(cns, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9493,10 +9500,10 @@ eqCnsLETechCVaromS(cns, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromS(cns, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9505,10 +9512,10 @@ eqCnsGETechCVaromS(cns, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromS(cns, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9517,20 +9524,20 @@ eqCnsETechCVaromS(cns, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and m
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromY(cns, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromYGrowth(cns, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -9541,20 +9548,20 @@ eqCnsLETechCVaromYGrowth(cns, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLTyp
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechCVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromY(cns, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromYGrowth(cns, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -9565,20 +9572,20 @@ eqCnsGETechCVaromYGrowth(cns, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLTyp
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechCVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromY(cns, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromYGrowth(cns, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -9589,10 +9596,10 @@ eqCnsETechCVaromYGrowth(cns, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechCVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromYS(cns, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -9600,10 +9607,10 @@ eqCnsLETechCVaromYS(cns, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromYSGrowth(cns, year, slice, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -9614,10 +9621,10 @@ eqCnsLETechCVaromYSGrowth(cns, year, slice, yearp)$(mCnsCVaromTech(cns) and not(
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromYS(cns, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -9625,10 +9632,10 @@ eqCnsGETechCVaromYS(cns, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromYSGrowth(cns, year, slice, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -9639,10 +9646,10 @@ eqCnsGETechCVaromYSGrowth(cns, year, slice, yearp)$(mCnsCVaromTech(cns) and not(
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromYS(cns, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -9650,10 +9657,10 @@ eqCnsETechCVaromYS(cns, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromYSGrowth(cns, year, slice, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -9664,10 +9671,10 @@ eqCnsETechCVaromYSGrowth(cns, year, slice, yearp)$(mCnsCVaromTech(cns) and not(m
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromR(cns, region)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -9676,10 +9683,10 @@ eqCnsLETechCVaromR(cns, region)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromR(cns, region)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -9688,10 +9695,10 @@ eqCnsGETechCVaromR(cns, region)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromR(cns, region)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -9700,10 +9707,10 @@ eqCnsETechCVaromR(cns, region)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromRS(cns, region, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -9712,10 +9719,10 @@ eqCnsLETechCVaromRS(cns, region, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(c
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromRS(cns, region, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -9724,10 +9731,10 @@ eqCnsGETechCVaromRS(cns, region, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(c
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromRS(cns, region, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -9736,10 +9743,10 @@ eqCnsETechCVaromRS(cns, region, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cn
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromRY(cns, region, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -9747,10 +9754,10 @@ eqCnsLETechCVaromRY(cns, region, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cn
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromRYGrowth(cns, region, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -9761,10 +9768,10 @@ eqCnsLETechCVaromRYGrowth(cns, region, year, yearp)$(mCnsCVaromTech(cns) and not
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromRY(cns, region, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -9772,10 +9779,10 @@ eqCnsGETechCVaromRY(cns, region, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cn
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromRYGrowth(cns, region, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -9786,10 +9793,10 @@ eqCnsGETechCVaromRYGrowth(cns, region, year, yearp)$(mCnsCVaromTech(cns) and not
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromRY(cns, region, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -9797,10 +9804,10 @@ eqCnsETechCVaromRY(cns, region, year)$(mCnsCVaromTech(cns) and not(mCnsLType(cns
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromRYGrowth(cns, region, year, yearp)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -9812,20 +9819,20 @@ eqCnsETechCVaromRYGrowth(cns, region, year, yearp)$(mCnsCVaromTech(cns) and not(
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromRYS(cns, region, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsCVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and 
@@ -9836,20 +9843,20 @@ eqCnsLETechCVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsCVaromTech(cns)
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromRYS(cns, region, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsCVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and 
@@ -9860,10 +9867,10 @@ eqCnsGETechCVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsCVaromTech(cns)
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromRYS(cns, region, year, slice)$(mCnsCVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -9871,10 +9878,10 @@ eqCnsETechCVaromRYS(cns, region, year, slice)$(mCnsCVaromTech(cns) and not(mCnsL
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsCVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) 
@@ -9885,10 +9892,10 @@ eqCnsETechCVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsCVaromTech(cns)
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVarom(cns)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -9896,10 +9903,10 @@ eqCnsLETechAVarom(cns)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsR
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhs(cns) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVarom(cns)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, tech, region, year, slice)$(mMidMilestone(year) and 
@@ -9907,10 +9914,10 @@ eqCnsGETechAVarom(cns)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsR
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhs(cns) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVarom(cns)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsRhsTypeConst(cns))..
@@ -9919,10 +9926,10 @@ eqCnsETechAVarom(cns)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRe
           and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhs(cns) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromS(cns, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9931,10 +9938,10 @@ eqCnsLETechAVaromS(cns, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromS(cns, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9943,10 +9950,10 @@ eqCnsGETechAVaromS(cns, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromS(cns, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -9955,20 +9962,20 @@ eqCnsETechAVaromS(cns, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and m
           and mCnsRegion(cns, region) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsS(cns, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromY(cns, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromYGrowth(cns, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -9979,20 +9986,20 @@ eqCnsLETechAVaromYGrowth(cns, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLTyp
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechAVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromY(cns, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromYGrowth(cns, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -10003,20 +10010,20 @@ eqCnsGETechAVaromYGrowth(cns, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLTyp
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechAVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromY(cns, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech, region, slice)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsY(cns, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromYGrowth(cns, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -10027,10 +10034,10 @@ eqCnsETechAVaromYGrowth(cns, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType
           pRhsY(cns, year))) * sum((tech, region, slice)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mCnsSlice(cns, slice) and mTechSpan(tech, 
           region, year)), vTechAVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromYS(cns, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -10038,10 +10045,10 @@ eqCnsLETechAVaromYS(cns, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromYSGrowth(cns, year, slice, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -10052,10 +10059,10 @@ eqCnsLETechAVaromYSGrowth(cns, year, slice, yearp)$(mCnsAVaromTech(cns) and not(
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromYS(cns, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and 
@@ -10063,10 +10070,10 @@ eqCnsGETechAVaromYS(cns, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromYSGrowth(cns, year, slice, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsYear(cns, year) and mCnsSlice(cns, slice) and mCnsRhsTypeGrowth(cns)and 
@@ -10077,10 +10084,10 @@ eqCnsGETechAVaromYSGrowth(cns, year, slice, yearp)$(mCnsAVaromTech(cns) and not(
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromYS(cns, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -10088,10 +10095,10 @@ eqCnsETechAVaromYS(cns, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)
           sum((tech, region)$(mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
           mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsYS(cns, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromYSGrowth(cns, year, slice, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -10102,10 +10109,10 @@ eqCnsETechAVaromYSGrowth(cns, year, slice, yearp)$(mCnsAVaromTech(cns) and not(m
           pRhsYS(cns, year, slice))) * sum((tech, region)$(mCnsTech(cns, tech) and 
           mCnsRegion(cns, region) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromR(cns, region)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -10114,10 +10121,10 @@ eqCnsLETechAVaromR(cns, region)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromR(cns, region)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -10126,10 +10133,10 @@ eqCnsGETechAVaromR(cns, region)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromR(cns, region)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -10138,10 +10145,10 @@ eqCnsETechAVaromR(cns, region)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) and
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsR(cns, region) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromRS(cns, region, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -10150,10 +10157,10 @@ eqCnsLETechAVaromRS(cns, region, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(c
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromRS(cns, region, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) and 
@@ -10162,10 +10169,10 @@ eqCnsGETechAVaromRS(cns, region, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(c
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromRS(cns, region, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -10174,10 +10181,10 @@ eqCnsETechAVaromRS(cns, region, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cn
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsTech(cns, tech) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsRS(cns, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromRY(cns, region, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -10185,10 +10192,10 @@ eqCnsLETechAVaromRY(cns, region, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cn
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromRYGrowth(cns, region, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -10199,10 +10206,10 @@ eqCnsLETechAVaromRYGrowth(cns, region, year, yearp)$(mCnsAVaromTech(cns) and not
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromRY(cns, region, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -10210,10 +10217,10 @@ eqCnsGETechAVaromRY(cns, region, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cn
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromRYGrowth(cns, region, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -10224,10 +10231,10 @@ eqCnsGETechAVaromRYGrowth(cns, region, year, yearp)$(mCnsAVaromTech(cns) and not
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromRY(cns, region, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -10235,10 +10242,10 @@ eqCnsETechAVaromRY(cns, region, year)$(mCnsAVaromTech(cns) and not(mCnsLType(cns
           sum((tech, slice)$(mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
           mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsRY(cns, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromRYGrowth(cns, region, year, yearp)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -10250,20 +10257,20 @@ eqCnsETechAVaromRYGrowth(cns, region, year, yearp)$(mCnsAVaromTech(cns) and not(
           pRhsRY(cns, region, year))) * sum((tech, slice)$(mCnsTech(cns, tech) and 
           mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromRYS(cns, region, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsAVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsRegion(cns, region) and 
@@ -10274,20 +10281,20 @@ eqCnsLETechAVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsAVaromTech(cns)
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromRYS(cns, region, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsRegion(cns, region) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsAVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsRegion(cns, region) and 
@@ -10298,10 +10305,10 @@ eqCnsGETechAVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsAVaromTech(cns)
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromRYS(cns, region, year, slice)$(mCnsAVaromTech(cns) and not(mCnsLType(cns)) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) and 
@@ -10309,10 +10316,10 @@ eqCnsETechAVaromRYS(cns, region, year, slice)$(mCnsAVaromTech(cns) and not(mCnsL
       mMidMilestone(year))..
           sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsRYS(cns, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsAVaromTech(cns) 
       and not(mCnsLType(cns)) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) 
       and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsRegion(cns, region) 
@@ -10323,7 +10330,7 @@ eqCnsETechAVaromRYSGrowth(cns, region, year, slice, yearp)$(mCnsAVaromTech(cns)
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsRYS(cns, region, year, slice))) 
           * sum((tech)$(mCnsTech(cns, tech) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
 eqCnsLETechInpLShareIn(cns, tech)$(mCnsInpTech(cns) and mCnsLType(cns) and mCnsLhsComm(cns) 
@@ -15510,7 +15517,7 @@ eqCnsETechActLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActTech(cns)
           and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechAct(tech, region, year, slice) =e= 0;
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromL(cns, tech)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -15519,10 +15526,10 @@ eqCnsLETechVaromL(cns, tech)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsR
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromL(cns, tech)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -15531,10 +15538,10 @@ eqCnsGETechVaromL(cns, tech)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsR
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromL(cns, tech)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
@@ -15543,10 +15550,10 @@ eqCnsETechVaromL(cns, tech)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRe
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLS(cns, tech, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -15554,10 +15561,10 @@ eqCnsLETechVaromLS(cns, tech, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLS(cns, tech, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -15565,10 +15572,10 @@ eqCnsGETechVaromLS(cns, tech, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLS(cns, tech, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -15576,20 +15583,20 @@ eqCnsETechVaromLS(cns, tech, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) and m
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLY(cns, tech, year)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLYGrowth(cns, tech, year, yearp)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -15600,20 +15607,20 @@ eqCnsLETechVaromLYGrowth(cns, tech, year, yearp)$(mCnsVaromTech(cns) and mCnsLTy
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLY(cns, tech, year)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLYGrowth(cns, tech, year, yearp)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -15624,10 +15631,10 @@ eqCnsGETechVaromLYGrowth(cns, tech, year, yearp)$(mCnsVaromTech(cns) and mCnsLTy
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLY(cns, tech, year)$(mCnsVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -15635,10 +15642,10 @@ eqCnsETechVaromLY(cns, tech, year)$(mCnsVaromTech(cns) and mCnsLType(cns) and mC
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLYGrowth(cns, tech, year, yearp)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -15649,20 +15656,20 @@ eqCnsETechVaromLYGrowth(cns, tech, year, yearp)$(mCnsVaromTech(cns) and mCnsLTyp
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLYS(cns, tech, year, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -15672,20 +15679,20 @@ eqCnsLETechVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsVaromTech(cns) and
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLYS(cns, tech, year, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -15695,20 +15702,20 @@ eqCnsGETechVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsVaromTech(cns) and
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLYS(cns, tech, year, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -15719,10 +15726,10 @@ eqCnsETechVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsVaromTech(cns) and
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLR(cns, tech, region)$(mCnsVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -15730,10 +15737,10 @@ eqCnsLETechVaromLR(cns, tech, region)$(mCnsVaromTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLR(cns, tech, region)$(mCnsVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -15741,10 +15748,10 @@ eqCnsGETechVaromLR(cns, tech, region)$(mCnsVaromTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLR(cns, tech, region)$(mCnsVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
@@ -15753,10 +15760,10 @@ eqCnsETechVaromLR(cns, tech, region)$(mCnsVaromTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLRS(cns, tech, region, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -15765,10 +15772,10 @@ eqCnsLETechVaromLRS(cns, tech, region, slice)$(mCnsVaromTech(cns) and mCnsLType(
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLRS(cns, tech, region, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -15777,10 +15784,10 @@ eqCnsGETechVaromLRS(cns, tech, region, slice)$(mCnsVaromTech(cns) and mCnsLType(
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLRS(cns, tech, region, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -15789,20 +15796,20 @@ eqCnsETechVaromLRS(cns, tech, region, slice)$(mCnsVaromTech(cns) and mCnsLType(c
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLRY(cns, tech, region, year)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -15812,20 +15819,20 @@ eqCnsLETechVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsVaromTech(cns) an
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLRY(cns, tech, region, year)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -15835,10 +15842,10 @@ eqCnsGETechVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsVaromTech(cns) an
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLRY(cns, tech, region, year)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -15846,10 +15853,10 @@ eqCnsETechVaromLRY(cns, tech, region, year)$(mCnsVaromTech(cns) and mCnsLType(cn
       mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -15859,10 +15866,10 @@ eqCnsETechVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsVaromTech(cns) and
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLRYS(cns, tech, region, year, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -15870,10 +15877,10 @@ eqCnsLETechVaromLRYS(cns, tech, region, year, slice)$(mCnsVaromTech(cns) and mCn
       mMidMilestone(year))..
           vTechVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -15882,10 +15889,10 @@ eqCnsLETechVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsVaromTech
           vTechVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechVarom(tech, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLRYS(cns, tech, region, year, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -15893,10 +15900,10 @@ eqCnsGETechVaromLRYS(cns, tech, region, year, slice)$(mCnsVaromTech(cns) and mCn
       mMidMilestone(year))..
           vTechVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -15905,10 +15912,10 @@ eqCnsGETechVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsVaromTech
           vTechVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechVarom(tech, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLRYS(cns, tech, region, year, slice)$(mCnsVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -15916,10 +15923,10 @@ eqCnsETechVaromLRYS(cns, tech, region, year, slice)$(mCnsVaromTech(cns) and mCns
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) 
@@ -15929,30 +15936,30 @@ eqCnsETechVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsVaromTech(
           vTechVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechVarom(tech, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomL(cns, tech)$(mCnsFixomTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) 
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechFixom(tech, region, year))) - pRhsTech(cns, tech) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomL(cns, tech)$(mCnsFixomTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
           sum((yeare, yearp, region, year)$(mMidMilestone(year) and mStartMilestone(year, yeare) 
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechFixom(tech, region, year))) - pRhsTech(cns, tech) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomL(cns, tech)$(mCnsFixomTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -15960,19 +15967,19 @@ eqCnsETechFixomL(cns, tech)$(mCnsFixomTech(cns) and mCnsLType(cns) and mCnsLhsRe
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechFixom(tech, region, year))) - pRhsTech(cns, tech) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomLY(cns, tech, year)$(mCnsFixomTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechFixom(tech, region, year)) - pRhsTechY(cns, tech, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomLYGrowth(cns, tech, year, yearp)$(mCnsFixomTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and mCnsTech(cns, tech) 
       and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -15981,19 +15988,19 @@ eqCnsLETechFixomLYGrowth(cns, tech, year, yearp)$(mCnsFixomTech(cns) and mCnsLTy
           vTechFixom(tech, region, yearp)) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsTechY(cns, tech, year))) * sum((region)$(mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomLY(cns, tech, year)$(mCnsFixomTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechFixom(tech, region, year)) - pRhsTechY(cns, tech, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomLYGrowth(cns, tech, year, yearp)$(mCnsFixomTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) 
       and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and mMidMilestone(year)and 
@@ -16002,19 +16009,19 @@ eqCnsGETechFixomLYGrowth(cns, tech, year, yearp)$(mCnsFixomTech(cns) and mCnsLTy
           vTechFixom(tech, region, yearp)) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsTechY(cns, tech, year))) * sum((region)$(mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomLY(cns, tech, year)$(mCnsFixomTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) 
       and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechFixom(tech, region, year)) - pRhsTechY(cns, tech, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomLYGrowth(cns, tech, year, yearp)$(mCnsFixomTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) and 
       not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -16023,10 +16030,10 @@ eqCnsETechFixomLYGrowth(cns, tech, year, yearp)$(mCnsFixomTech(cns) and mCnsLTyp
           vTechFixom(tech, region, yearp)) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsTechY(cns, tech, year))) * sum((region)$(mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), vTechFixom(tech, region, year)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomLR(cns, tech, region)$(mCnsFixomTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLe(cns) and mCnsTech(cns, tech) 
       and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -16034,10 +16041,10 @@ eqCnsLETechFixomLR(cns, tech, region)$(mCnsFixomTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechFixom(tech, region, year))) 
           - pRhsTechR(cns, tech, region) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomLR(cns, tech, region)$(mCnsFixomTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsGe(cns) and mCnsTech(cns, tech) 
       and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -16045,10 +16052,10 @@ eqCnsGETechFixomLR(cns, tech, region)$(mCnsFixomTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechFixom(tech, region, year))) 
           - pRhsTechR(cns, tech, region) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomLR(cns, tech, region)$(mCnsFixomTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -16056,19 +16063,19 @@ eqCnsETechFixomLR(cns, tech, region)$(mCnsFixomTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechFixom(tech, region, year))) 
           - pRhsTechR(cns, tech, region) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomLRY(cns, tech, region, year)$(mCnsFixomTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) and 
       mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and 
       mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechFixom(tech, region, year) - pRhsTechRY(cns, tech, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechFixomLRYGrowth(cns, tech, region, year, yearp)$(mCnsFixomTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -16077,19 +16084,19 @@ eqCnsLETechFixomLRYGrowth(cns, tech, region, year, yearp)$(mCnsFixomTech(cns) an
           vTechFixom(tech, region, yearp) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsTechRY(cns, tech, region, year))) * 
           vTechFixom(tech, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomLRY(cns, tech, region, year)$(mCnsFixomTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) and 
       mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) and 
       mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechFixom(tech, region, year) - pRhsTechRY(cns, tech, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechFixomLRYGrowth(cns, tech, region, year, yearp)$(mCnsFixomTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -16098,20 +16105,20 @@ eqCnsGETechFixomLRYGrowth(cns, tech, region, year, yearp)$(mCnsFixomTech(cns) an
           vTechFixom(tech, region, yearp) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsTechRY(cns, tech, region, year))) * 
           vTechFixom(tech, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomLRY(cns, tech, region, year)$(mCnsFixomTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
       mCnsYear(cns, year) and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and 
       mMidMilestone(year))..
           vTechFixom(tech, region, year) - pRhsTechRY(cns, tech, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechFixomLRYGrowth(cns, tech, region, year, yearp)$(mCnsFixomTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
@@ -16120,10 +16127,10 @@ eqCnsETechFixomLRYGrowth(cns, tech, region, year, yearp)$(mCnsFixomTech(cns) and
           vTechFixom(tech, region, yearp) - (prod((yeare)$(ORD(yeare) >= ORD(year) 
           and ORD(yeare) < ORD(yearp)), pRhsTechRY(cns, tech, region, year))) * 
           vTechFixom(tech, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromL(cns, tech)$(mCnsActVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -16132,10 +16139,10 @@ eqCnsLETechActVaromL(cns, tech)$(mCnsActVaromTech(cns) and mCnsLType(cns) and mC
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromL(cns, tech)$(mCnsActVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -16144,10 +16151,10 @@ eqCnsGETechActVaromL(cns, tech)$(mCnsActVaromTech(cns) and mCnsLType(cns) and mC
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromL(cns, tech)$(mCnsActVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
@@ -16156,10 +16163,10 @@ eqCnsETechActVaromL(cns, tech)$(mCnsActVaromTech(cns) and mCnsLType(cns) and mCn
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLS(cns, tech, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and 
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -16167,10 +16174,10 @@ eqCnsLETechActVaromLS(cns, tech, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLS(cns, tech, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and 
       mCnsGe(cns) and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -16178,10 +16185,10 @@ eqCnsGETechActVaromLS(cns, tech, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLS(cns, tech, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsSlice(cns, slice) 
@@ -16190,10 +16197,10 @@ eqCnsETechActVaromLS(cns, tech, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns)
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLY(cns, tech, year)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -16201,10 +16208,10 @@ eqCnsLETechActVaromLY(cns, tech, year)$(mCnsActVaromTech(cns) and mCnsLType(cns)
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLYGrowth(cns, tech, year, yearp)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -16215,10 +16222,10 @@ eqCnsLETechActVaromLYGrowth(cns, tech, year, yearp)$(mCnsActVaromTech(cns) and m
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLY(cns, tech, year)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -16226,10 +16233,10 @@ eqCnsGETechActVaromLY(cns, tech, year)$(mCnsActVaromTech(cns) and mCnsLType(cns)
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLYGrowth(cns, tech, year, yearp)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -16240,10 +16247,10 @@ eqCnsGETechActVaromLYGrowth(cns, tech, year, yearp)$(mCnsActVaromTech(cns) and m
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLY(cns, tech, year)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -16251,10 +16258,10 @@ eqCnsETechActVaromLY(cns, tech, year)$(mCnsActVaromTech(cns) and mCnsLType(cns)
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLYGrowth(cns, tech, year, yearp)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -16265,20 +16272,20 @@ eqCnsETechActVaromLYGrowth(cns, tech, year, yearp)$(mCnsActVaromTech(cns) and mC
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechActVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLYS(cns, tech, year, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -16288,20 +16295,20 @@ eqCnsLETechActVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActVaromTech(cn
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLYS(cns, tech, year, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -16311,20 +16318,20 @@ eqCnsGETechActVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActVaromTech(cn
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLYS(cns, tech, year, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -16335,10 +16342,10 @@ eqCnsETechActVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsActVaromTech(cns
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechActVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLR(cns, tech, region)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -16347,10 +16354,10 @@ eqCnsLETechActVaromLR(cns, tech, region)$(mCnsActVaromTech(cns) and mCnsLType(cn
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLR(cns, tech, region)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -16359,10 +16366,10 @@ eqCnsGETechActVaromLR(cns, tech, region)$(mCnsActVaromTech(cns) and mCnsLType(cn
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLR(cns, tech, region)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16371,10 +16378,10 @@ eqCnsETechActVaromLR(cns, tech, region)$(mCnsActVaromTech(cns) and mCnsLType(cns
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechActVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLRS(cns, tech, region, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -16383,10 +16390,10 @@ eqCnsLETechActVaromLRS(cns, tech, region, slice)$(mCnsActVaromTech(cns) and mCns
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLRS(cns, tech, region, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -16395,10 +16402,10 @@ eqCnsGETechActVaromLRS(cns, tech, region, slice)$(mCnsActVaromTech(cns) and mCns
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLRS(cns, tech, region, slice)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16407,20 +16414,20 @@ eqCnsETechActVaromLRS(cns, tech, region, slice)$(mCnsActVaromTech(cns) and mCnsL
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechActVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLRY(cns, tech, region, year)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechActVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16430,20 +16437,20 @@ eqCnsLETechActVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsActVaromTech(c
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechActVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLRY(cns, tech, region, year)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechActVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16453,10 +16460,10 @@ eqCnsGETechActVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsActVaromTech(c
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechActVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLRY(cns, tech, region, year)$(mCnsActVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16464,10 +16471,10 @@ eqCnsETechActVaromLRY(cns, tech, region, year)$(mCnsActVaromTech(cns) and mCnsLT
       mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechActVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) 
@@ -16477,10 +16484,10 @@ eqCnsETechActVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsActVaromTech(cn
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechActVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLRYS(cns, tech, region, year, slice)$(mCnsActVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -16488,10 +16495,10 @@ eqCnsLETechActVaromLRYS(cns, tech, region, year, slice)$(mCnsActVaromTech(cns) a
       mMidMilestone(year))..
           vTechActVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechActVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16500,10 +16507,10 @@ eqCnsLETechActVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActVar
           vTechActVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) 
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechActVarom(tech, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLRYS(cns, tech, region, year, slice)$(mCnsActVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -16511,10 +16518,10 @@ eqCnsGETechActVaromLRYS(cns, tech, region, year, slice)$(mCnsActVaromTech(cns) a
       mMidMilestone(year))..
           vTechActVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechActVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16523,10 +16530,10 @@ eqCnsGETechActVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActVar
           vTechActVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) 
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechActVarom(tech, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLRYS(cns, tech, region, year, slice)$(mCnsActVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16534,10 +16541,10 @@ eqCnsETechActVaromLRYS(cns, tech, region, year, slice)$(mCnsActVaromTech(cns) an
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechActVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechActVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) 
@@ -16547,10 +16554,10 @@ eqCnsETechActVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsActVaro
           vTechActVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) 
           >= ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechActVarom(tech, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromL(cns, tech)$(mCnsCVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -16559,10 +16566,10 @@ eqCnsLETechCVaromL(cns, tech)$(mCnsCVaromTech(cns) and mCnsLType(cns) and mCnsLh
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromL(cns, tech)$(mCnsCVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -16571,10 +16578,10 @@ eqCnsGETechCVaromL(cns, tech)$(mCnsCVaromTech(cns) and mCnsLType(cns) and mCnsLh
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromL(cns, tech)$(mCnsCVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
@@ -16583,10 +16590,10 @@ eqCnsETechCVaromL(cns, tech)$(mCnsCVaromTech(cns) and mCnsLType(cns) and mCnsLhs
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLS(cns, tech, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -16594,10 +16601,10 @@ eqCnsLETechCVaromLS(cns, tech, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) an
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLS(cns, tech, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -16605,10 +16612,10 @@ eqCnsGETechCVaromLS(cns, tech, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) an
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLS(cns, tech, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
@@ -16617,10 +16624,10 @@ eqCnsETechCVaromLS(cns, tech, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLY(cns, tech, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -16628,10 +16635,10 @@ eqCnsLETechCVaromLY(cns, tech, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) and
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLYGrowth(cns, tech, year, yearp)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -16642,10 +16649,10 @@ eqCnsLETechCVaromLYGrowth(cns, tech, year, yearp)$(mCnsCVaromTech(cns) and mCnsL
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLY(cns, tech, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -16653,10 +16660,10 @@ eqCnsGETechCVaromLY(cns, tech, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) and
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLYGrowth(cns, tech, year, yearp)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -16667,10 +16674,10 @@ eqCnsGETechCVaromLYGrowth(cns, tech, year, yearp)$(mCnsCVaromTech(cns) and mCnsL
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLY(cns, tech, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -16678,10 +16685,10 @@ eqCnsETechCVaromLY(cns, tech, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) and
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLYGrowth(cns, tech, year, yearp)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -16692,20 +16699,20 @@ eqCnsETechCVaromLYGrowth(cns, tech, year, yearp)$(mCnsCVaromTech(cns) and mCnsLT
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechCVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLYS(cns, tech, year, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsCVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -16715,20 +16722,20 @@ eqCnsLETechCVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsCVaromTech(cns) a
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLYS(cns, tech, year, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsCVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -16738,20 +16745,20 @@ eqCnsGETechCVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsCVaromTech(cns) a
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLYS(cns, tech, year, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsCVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -16762,10 +16769,10 @@ eqCnsETechCVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsCVaromTech(cns) an
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechCVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLR(cns, tech, region)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -16773,10 +16780,10 @@ eqCnsLETechCVaromLR(cns, tech, region)$(mCnsCVaromTech(cns) and mCnsLType(cns) a
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLR(cns, tech, region)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -16784,10 +16791,10 @@ eqCnsGETechCVaromLR(cns, tech, region)$(mCnsCVaromTech(cns) and mCnsLType(cns) a
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLR(cns, tech, region)$(mCnsCVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
@@ -16796,10 +16803,10 @@ eqCnsETechCVaromLR(cns, tech, region)$(mCnsCVaromTech(cns) and mCnsLType(cns) an
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechCVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLRS(cns, tech, region, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -16808,10 +16815,10 @@ eqCnsLETechCVaromLRS(cns, tech, region, slice)$(mCnsCVaromTech(cns) and mCnsLTyp
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLRS(cns, tech, region, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -16820,10 +16827,10 @@ eqCnsGETechCVaromLRS(cns, tech, region, slice)$(mCnsCVaromTech(cns) and mCnsLTyp
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLRS(cns, tech, region, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16832,20 +16839,20 @@ eqCnsETechCVaromLRS(cns, tech, region, slice)$(mCnsCVaromTech(cns) and mCnsLType
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechCVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLRY(cns, tech, region, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechCVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsCVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16855,20 +16862,20 @@ eqCnsLETechCVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsCVaromTech(cns)
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechCVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLRY(cns, tech, region, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechCVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsCVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16878,10 +16885,10 @@ eqCnsGETechCVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsCVaromTech(cns)
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechCVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLRY(cns, tech, region, year)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16889,10 +16896,10 @@ eqCnsETechCVaromLRY(cns, tech, region, year)$(mCnsCVaromTech(cns) and mCnsLType(
       mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechCVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsCVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16902,10 +16909,10 @@ eqCnsETechCVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsCVaromTech(cns) a
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechCVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLRYS(cns, tech, region, year, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -16913,10 +16920,10 @@ eqCnsLETechCVaromLRYS(cns, tech, region, year, slice)$(mCnsCVaromTech(cns) and m
       mMidMilestone(year))..
           vTechCVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechCVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsCVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16925,10 +16932,10 @@ eqCnsLETechCVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsCVaromTe
           vTechCVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechCVarom(tech, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLRYS(cns, tech, region, year, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -16936,10 +16943,10 @@ eqCnsGETechCVaromLRYS(cns, tech, region, year, slice)$(mCnsCVaromTech(cns) and m
       mMidMilestone(year))..
           vTechCVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechCVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsCVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16948,10 +16955,10 @@ eqCnsGETechCVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsCVaromTe
           vTechCVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechCVarom(tech, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLRYS(cns, tech, region, year, slice)$(mCnsCVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -16959,10 +16966,10 @@ eqCnsETechCVaromLRYS(cns, tech, region, year, slice)$(mCnsCVaromTech(cns) and mC
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechCVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechCVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsCVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) 
@@ -16972,10 +16979,10 @@ eqCnsETechCVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsCVaromTec
           vTechCVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechCVarom(tech, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromL(cns, tech)$(mCnsAVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -16984,10 +16991,10 @@ eqCnsLETechAVaromL(cns, tech)$(mCnsAVaromTech(cns) and mCnsLType(cns) and mCnsLh
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromL(cns, tech)$(mCnsAVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) 
       and mCnsRhsTypeConst(cns))..
@@ -16996,10 +17003,10 @@ eqCnsGETechAVaromL(cns, tech)$(mCnsAVaromTech(cns) and mCnsLType(cns) and mCnsLh
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromL(cns, tech)$(mCnsAVaromTech(cns) and mCnsLType(cns) and mCnsLhsRegion(cns) 
       and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) and not(mCnsGe(cns)) 
       and mCnsTech(cns, tech) and mCnsRhsTypeConst(cns))..
@@ -17008,10 +17015,10 @@ eqCnsETechAVaromL(cns, tech)$(mCnsAVaromTech(cns) and mCnsLType(cns) and mCnsLhs
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), (ORD(yearp) 
           - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) - pRhsTech(cns, tech) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLS(cns, tech, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -17019,10 +17026,10 @@ eqCnsLETechAVaromLS(cns, tech, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) an
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLS(cns, tech, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns))..
@@ -17030,10 +17037,10 @@ eqCnsGETechAVaromLS(cns, tech, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) an
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLS(cns, tech, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsSlice(cns, slice) and 
@@ -17042,10 +17049,10 @@ eqCnsETechAVaromLS(cns, tech, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) and
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsRegion(cns, region) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsTechS(cns, tech, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLY(cns, tech, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -17053,10 +17060,10 @@ eqCnsLETechAVaromLY(cns, tech, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) and
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLYGrowth(cns, tech, year, yearp)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -17067,10 +17074,10 @@ eqCnsLETechAVaromLYGrowth(cns, tech, year, yearp)$(mCnsAVaromTech(cns) and mCnsL
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLY(cns, tech, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -17078,10 +17085,10 @@ eqCnsGETechAVaromLY(cns, tech, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) and
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLYGrowth(cns, tech, year, yearp)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeGrowth(cns)and 
@@ -17092,10 +17099,10 @@ eqCnsGETechAVaromLYGrowth(cns, tech, year, yearp)$(mCnsAVaromTech(cns) and mCnsL
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLY(cns, tech, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsRhsTypeConst(cns)and 
@@ -17103,10 +17110,10 @@ eqCnsETechAVaromLY(cns, tech, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) and
           sum((region, slice)$(mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           - pRhsTechY(cns, tech, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLYGrowth(cns, tech, year, yearp)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) and 
       not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -17117,20 +17124,20 @@ eqCnsETechAVaromLYGrowth(cns, tech, year, yearp)$(mCnsAVaromTech(cns) and mCnsLT
           pRhsTechY(cns, tech, year))) * sum((region, slice)$(mCnsRegion(cns, region) 
           and mCnsSlice(cns, slice) and mTechSpan(tech, region, year)), vTechAVarom(tech, region, year, slice)) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLYS(cns, tech, year, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsAVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -17140,20 +17147,20 @@ eqCnsLETechAVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsAVaromTech(cns) a
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLYS(cns, tech, year, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsAVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
@@ -17163,20 +17170,20 @@ eqCnsGETechAVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsAVaromTech(cns) a
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLYS(cns, tech, year, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
       and mCnsSlice(cns, slice) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) - pRhsTechYS(cns, tech, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsAVaromTech(cns) and 
       mCnsLType(cns) and mCnsLhsRegion(cns) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsYear(cns, year) 
@@ -17187,10 +17194,10 @@ eqCnsETechAVaromLYSGrowth(cns, tech, year, slice, yearp)$(mCnsAVaromTech(cns) an
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechYS(cns, tech, year, slice))) 
           * sum((region)$(mCnsRegion(cns, region) and mTechSpan(tech, region, year)), 
           vTechAVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLR(cns, tech, region)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsLe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -17198,10 +17205,10 @@ eqCnsLETechAVaromLR(cns, tech, region)$(mCnsAVaromTech(cns) and mCnsLType(cns) a
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLR(cns, tech, region)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and mCnsGe(cns) 
       and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsRhsTypeConst(cns))..
@@ -17209,10 +17216,10 @@ eqCnsGETechAVaromLR(cns, tech, region)$(mCnsAVaromTech(cns) and mCnsLType(cns) a
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLR(cns, tech, region)$(mCnsAVaromTech(cns) and mCnsLType(cns) and 
       not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and mCnsLhsSlice(cns) and not(mCnsLe(cns)) 
       and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and 
@@ -17221,10 +17228,10 @@ eqCnsETechAVaromLR(cns, tech, region)$(mCnsAVaromTech(cns) and mCnsLType(cns) an
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mCnsSlice(cns, slice) 
           and mTechSpan(tech, region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( 
           vTechAVarom(tech, region, year, slice))) - pRhsTechR(cns, tech, region) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLRS(cns, tech, region, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -17233,10 +17240,10 @@ eqCnsLETechAVaromLRS(cns, tech, region, slice)$(mCnsAVaromTech(cns) and mCnsLTyp
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLRS(cns, tech, region, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsSlice(cns, slice) 
@@ -17245,10 +17252,10 @@ eqCnsGETechAVaromLRS(cns, tech, region, slice)$(mCnsAVaromTech(cns) and mCnsLTyp
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLRS(cns, tech, region, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and mCnsLhsYear(cns) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17257,20 +17264,20 @@ eqCnsETechAVaromLRS(cns, tech, region, slice)$(mCnsAVaromTech(cns) and mCnsLType
           and mEndMilestone(year, yearp) and mCnsYear(cns, year) and mTechSpan(tech, 
           region, year)), (ORD(yearp) - ORD(yeare) + 1) * ( vTechAVarom(tech, region, year, slice))) 
           - pRhsTechRS(cns, tech, region, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLRY(cns, tech, region, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechAVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsAVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       mCnsLhsSlice(cns) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17280,20 +17287,20 @@ eqCnsLETechAVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsAVaromTech(cns)
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechAVarom(tech, region, year, slice)) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLRY(cns, tech, region, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
       and mTechSpan(tech, region, year) and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechAVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsAVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       mCnsLhsSlice(cns) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17303,10 +17310,10 @@ eqCnsGETechAVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsAVaromTech(cns)
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechAVarom(tech, region, year, slice)) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLRY(cns, tech, region, year)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17314,10 +17321,10 @@ eqCnsETechAVaromLRY(cns, tech, region, year)$(mCnsAVaromTech(cns) and mCnsLType(
       mMidMilestone(year))..
           sum((slice)$(mCnsSlice(cns, slice)), vTechAVarom(tech, region, year, slice)) 
           - pRhsTechRY(cns, tech, region, year) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsAVaromTech(cns) and 
       mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and mCnsLhsSlice(cns) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17327,10 +17334,10 @@ eqCnsETechAVaromLRYGrowth(cns, tech, region, year, yearp)$(mCnsAVaromTech(cns) a
           - (prod((yeare)$(ORD(yeare) >= ORD(year) and ORD(yeare) < ORD(yearp)), 
           pRhsTechRY(cns, tech, region, year))) * sum((slice)$(mCnsSlice(cns, slice)), 
           vTechAVarom(tech, region, year, slice)) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLRYS(cns, tech, region, year, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -17338,10 +17345,10 @@ eqCnsLETechAVaromLRYS(cns, tech, region, year, slice)$(mCnsAVaromTech(cns) and m
       mMidMilestone(year))..
           vTechAVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsLETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsAVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsLe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17350,10 +17357,10 @@ eqCnsLETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsAVaromTe
           vTechAVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechAVarom(tech, region, year, slice) =l= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLRYS(cns, tech, region, year, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) and mCnsYear(cns, year) 
@@ -17361,10 +17368,10 @@ eqCnsGETechAVaromLRYS(cns, tech, region, year, slice)$(mCnsAVaromTech(cns) and m
       mMidMilestone(year))..
           vTechAVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsGETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsAVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and mCnsGe(cns) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17373,10 +17380,10 @@ eqCnsGETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsAVaromTe
           vTechAVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechAVarom(tech, region, year, slice) =g= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLRYS(cns, tech, region, year, slice)$(mCnsAVaromTech(cns) and mCnsLType(cns) 
       and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and not(mCnsLhsSlice(cns)) 
       and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) and mCnsRegion(cns, region) 
@@ -17384,10 +17391,10 @@ eqCnsETechAVaromLRYS(cns, tech, region, year, slice)$(mCnsAVaromTech(cns) and mC
       and mCnsRhsTypeConst(cns)and mMidMilestone(year))..
           vTechAVarom(tech, region, year, slice) - pRhsTechRYS(cns, tech, region, year, slice) 
           =e= 0;
-*! Large model : end
+*! Full model : end
 
 
-*! Large model : begin
+*! Full model : begin
 eqCnsETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsAVaromTech(cns) 
       and mCnsLType(cns) and not(mCnsLhsRegion(cns)) and not(mCnsLhsYear(cns)) and 
       not(mCnsLhsSlice(cns)) and not(mCnsLe(cns)) and not(mCnsGe(cns)) and mCnsTech(cns, tech) 
@@ -17397,7 +17404,7 @@ eqCnsETechAVaromLRYSGrowth(cns, tech, region, year, slice, yearp)$(mCnsAVaromTec
           vTechAVarom(tech, region, yearp, slice) - (prod((yeare)$(ORD(yeare) >= 
           ORD(year) and ORD(yeare) < ORD(yearp)), pRhsTechRYS(cns, tech, region, year, slice))) 
           * vTechAVarom(tech, region, year, slice) =e= 0;
-*! Large model : end
+*! Full model : end
 
 
 eqCnsLESupOutShareIn(cns)$(mCnsOutSup(cns) and not(mCnsLType(cns)) and mCnsLhsComm(cns) 
@@ -22315,13 +22322,13 @@ eqTechSalv3
 * Cost aggregate by year equation
 eqTechCost1
 eqTechCost2
-*! Large model : begin
+*! Full model : begin
 eqTechFixom
 eqTechVarom
 eqTechActVarom
 eqTechCVarom
 eqTechAVarom
-*! Large model : end
+*! Full model : end
 * Disable new capacity
 *eqTechNewCapDisable
 **************************************
@@ -22377,11 +22384,11 @@ eqCostRowTrade
 eqCostIrTrade
 eqExportRowUp
 eqExportRowLo
-eqExportRowRes
+eqExportRowCumulative
 eqExportRowResUp
 eqImportRowUp
 eqImportRowLo
-eqImportRowRes
+eqImportRowAccumulated
 eqImportRowResUp
 **************************************
 * Ballance equation & dummy
@@ -22400,7 +22407,7 @@ eqStorageOutTot
 **************************************
 * Cost equation
 **************************************
-eqDumCost
+eqDummyCost
 eqCost1
 eqCost2
 eqObjective
@@ -22856,8 +22863,8 @@ eqCnsGETechActRYS
 eqCnsGETechActRYSGrowth
 eqCnsETechActRYS
 eqCnsETechActRYSGrowth
-*! Large model : begin
-*! Large model : begin
+*! Full model : begin
+*! Full model : begin
 eqCnsLETechVarom
 eqCnsGETechVarom
 eqCnsETechVarom
@@ -23020,7 +23027,7 @@ eqCnsGETechAVaromRYS
 eqCnsGETechAVaromRYSGrowth
 eqCnsETechAVaromRYS
 eqCnsETechAVaromRYSGrowth
-*! Large model : end
+*! Full model : end
 eqCnsLETechInpLShareIn
 eqCnsLETechInpLShareOut
 eqCnsLETechInpL
@@ -23465,8 +23472,8 @@ eqCnsGETechActLRYS
 eqCnsGETechActLRYSGrowth
 eqCnsETechActLRYS
 eqCnsETechActLRYSGrowth
-*! Large model : begin
-*! Large model : begin
+*! Full model : begin
+*! Full model : begin
 eqCnsLETechVaromL
 eqCnsGETechVaromL
 eqCnsETechVaromL
@@ -23629,7 +23636,7 @@ eqCnsGETechAVaromLRYS
 eqCnsGETechAVaromLRYSGrowth
 eqCnsETechAVaromLRYS
 eqCnsETechAVaromLRYSGrowth
-*! Large model : end
+*! Full model : end
 eqCnsLESupOutShareIn
 eqCnsLESupOutShareOut
 eqCnsLESupOut
@@ -24149,6 +24156,14 @@ put 2:0/;
 putclose;
 
 * 99089425-31110-4440-be57-2ca102e9cee1
+
+
+
+
+
+
+
+
 
 
 
