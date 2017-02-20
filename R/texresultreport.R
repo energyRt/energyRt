@@ -96,7 +96,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
           cat('  \\centering\n', sep = '', file = zz)
           cat('  \\includegraphics[width = 7in]{', cc, 
-              '_dummy.png}\n', sep = '', file = zz)
+              '_dummy_out.png}\n', sep = '', file = zz)
           cat('  \\caption{Dummy import commodity ', gsub('_', '\\\\_', cc), 
               ', summary for all region and slice.}\n', sep = '', file = zz)
           cat('\\end{figure}\n', sep = '', file = zz)
@@ -116,7 +116,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
           cat('  \\centering\n', sep = '', file = zz)
           cat('  \\includegraphics[width = 7in]{', cc, 
-              '_dummy.png}\n', sep = '', file = zz)
+              '_dummy_inp.png}\n', sep = '', file = zz)
           cat('  \\caption{Dummy import commodity ', gsub('_', '\\\\_', cc), 
               ', summary for all region and slice.}\n', sep = '', file = zz)
           cat('\\end{figure}\n', sep = '', file = zz)
