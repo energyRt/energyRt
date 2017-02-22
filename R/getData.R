@@ -114,7 +114,7 @@ getDataOut <- function(obj, comm) {
 }
 
 getDataParameter <- function(obj, ..., parameter = NULL, 
-  remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, merge.table = FALSE) {
+  remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, merge.table = FALSE, use.dplyr = FALSE) {
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
     'year', 'slice', 'stg', 'expp', 'imp', 'trade')
   set <- list(...)                      
