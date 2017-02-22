@@ -256,6 +256,10 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     if (length(ast) > 1) stop('Wrong constrain') else
     if (length(ast) == 1) {
       before <- paste(before, toupper(substr(ast, 1, 1)), substr(ast, 2, nchar(ast)), sep = '')
+      if (any(names(app@for.each) == ast)) {
+        obj@maptable[['mCnsLType']] <- addData(obj@maptable[['mCnsLType']], 
+             data.frame(cns = app@name, stringsAsFactors = FALSE))
+      }
     }
     FL <- TRUE
     for(cc in ccc) if (nrow(obj@maptable[[cc]]@data) == 0) FL <- FALSE
