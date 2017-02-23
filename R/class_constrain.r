@@ -95,11 +95,11 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   obj@type[] <- type
   obj@default  <- default
   obj@name     <- name
-  obj@cout     <- TRUE
-  obj@cinp     <- TRUE
-  obj@aout     <- TRUE
-  obj@ainp     <- TRUE
-  obj@emis     <- TRUE
+  obj@cout     <- cout
+  obj@cinp     <- cinp
+  obj@aout     <- aout
+  obj@ainp     <- ainp
+  obj@emis     <- emis
   if (type == 'tax') {
       obj@comm     <- comm
       # if (rule == 'default')  rule <- 'inter.forth'
