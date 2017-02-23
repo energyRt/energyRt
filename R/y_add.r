@@ -239,6 +239,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     ccc <- c("comm", "region", "year", "slice")
     if (app@type %in% c('capacity', 'newcapacity', 'invcost', 'eac', 'fixom', 'growth.capacity', 
       'growth.newcapacity', 'growth.invcost', 'growth.eac', 'growth.fixom')) ccc <- c("region", "year")
+    if (app@type %in% c('activity', 'growth.activity')) ccc <- c("region", "year", "slice")
     # capacity newcapacity activity input output sharein shareout
     if (app@type %in% c('growth.output', 'output', 'shareout')) before <- 'Out' else
     if (app@type %in% c('growth.input', 'input', 'sharein'))   before <- 'Inp' else
