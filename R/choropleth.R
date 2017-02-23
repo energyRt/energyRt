@@ -20,7 +20,7 @@ choropleth.scenario <- function(obj, # scenario object
                                 # for.each = list(), # parameter for animation
                                 # for.sum = list(), # parameter for animation
                                 ...) {
-  dat <- getDataTable(obj, ...)
+  dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE, get.parameter = FALSE)
   if (is.null(dat)) {
     message("No data for current set of filters")
     return()

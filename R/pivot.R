@@ -10,8 +10,13 @@ pivot <- function(scen = NULL, variable = NULL, get_data = FALSE, ...) {
                                responseName = "value") #[[y]])
     ii <- dft[, "value"] != 0
     dft <- dft[ii, ]
-    dft$variable <- variable[[y]]
-    dft$scen <- scen[[x]]@name
+    if (nrow(dft) > 0) {
+      dft$variable <- variable[[y]]
+      dft$scen <- scen[[x]]@name
+    } else {
+      dft$variable <- character()
+      dft$scen <- character()
+    }
     return(list(dft))
   },
   x = eg[, 1], y = eg[, 2])

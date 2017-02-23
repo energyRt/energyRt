@@ -1,19 +1,19 @@
 # Class for export to GAMS parameter or map
-setClass('MapTable',
+setClass('MapTable', # @parameter
   representation(
-    alias           = "character",   # Name for GAMS
-    set             = "character",   # Use set
-    type            = "factor",      # is it map (map),  single (single parameter),
+    alias           = "character",   # @name name Name for GAMS
+    set             = "character",   # @dimSets Dimension sets, comma separated, order is matter
+    type            = "factor",      # @type is it map (map),  single (single parameter),
                                      # double (Up / Lo parameter)
-    default         = "numeric",     # Default value : zero value  for map,
+    default         = "numeric",     # @defVal Default value : zero value  for map,
                                      # one for single, two for double
     interpolation   = "character",   # interpolation 'back.inter.forth'
-    data            = "data.frame",  # Data for expotrt
+    data            = "data.frame",  # @data Data for expotrt
     #use_now         = "numeric",     # For fast
     #use_all         = "numeric",     # For fast
-    check           = "function",     # function for checking map
-    for_sysInfo     = 'character',
-    true_length     = 'numeric'
+    check           = "function",     # ?delete? function for checking map
+    for_sysInfo     = 'character',   # @colName Column name in slot 
+    true_length     = 'numeric'      # @nValues Number of non-NA values in 'data' (to speed-up processing)
   ),
   prototype(
     alias           = NULL,

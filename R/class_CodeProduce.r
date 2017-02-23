@@ -3,12 +3,12 @@
 ################################################################################
 # ! User never use this class
 ################################################################################
-setClass("CodeProduce",
+setClass("CodeProduce", # parameters
   representation(
-    set = "list", # List with set : tech, sup, group, comm, region, year, slice
-    maptable = "list", # List with techology parameter
-    constrain = "list", 
-    model_reduced      = "character", 
+    set = "list", # @sets List with set : tech, sup, group, comm, region, year, slice
+    maptable = "list", # @parameters List with techology parameter
+    constrain = "list", # @...???
+    model_reduced      = "character", # @modelCodePath and @modelCode? 
     model_reduced_glpk = "character",
     model_full         = "character", 
     model_full_glpk    = "character"

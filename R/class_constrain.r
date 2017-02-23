@@ -10,6 +10,7 @@ setClass('constrain',
           eq            = "factor",
           type          = "factor",
           rhs           = "data.frame",
+          unit          = "character",
           for.sum        = "list",
           for.each       = "list",
           default       = "numeric", 
@@ -57,6 +58,7 @@ setClass('constrain',
                                                 'growth.activity'
                                                 )),
           rhs           = data.frame(),
+          unit          = "",
           for.sum       = list(),
           for.each      = list(),
           default       = 0, 
@@ -93,11 +95,11 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   obj@type[] <- type
   obj@default  <- default
   obj@name     <- name
-  obj@cout     <- TRUE
-  obj@cinp     <- TRUE
-  obj@aout     <- TRUE
-  obj@ainp     <- TRUE
-  obj@emis     <- TRUE
+  obj@cout     <- cout
+  obj@cinp     <- cinp
+  obj@aout     <- aout
+  obj@ainp     <- ainp
+  obj@emis     <- emis
   if (type == 'tax') {
       obj@comm     <- comm
       # if (rule == 'default')  rule <- 'inter.forth'
@@ -297,7 +299,28 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       obj@for.each  <- for.each
       obj@for.sum   <- for.sum
       if (!chec_correct_name(name)) stop('Uncorrect constrain name "', name, '"') 
+  } 
+  # Remove factor problem
+  for(i in colnames(obj@rhs)[sapply(obj@rhs, class) == 'factor']) {
+    obj@rhs[, i] <- as.character(obj@rhs[, i])
+    if (any(i == c('year', 'rhs'))) obj@rhs[, i] <- as.numeric(obj@rhs[, i])
   }
+  for(i in colnames(obj@rhs)[colnames(obj@rhs) %in% c('year', 'rhs') &
+    sapply(obj@rhs, class) == 'character']) {
+    obj@rhs[, i] <- as.numeric(obj@rhs[, i])
+  }
+  for(i in names(obj@for.each)[sapply(obj@for.each, class) == 'factor']) {
+    obj@for.each[[i]] <- as.character(obj@for.each[[i]])
+  }
+  for(i in names(obj@for.each)[names(obj@for.each) %in% c('year', 'rhs') &
+    sapply(obj@for.each, class) == 'character'])
+      obj@for.each[[i]] <- as.numeric(obj@for.each[[i]])
+  for(i in names(obj@for.sum)[sapply(obj@for.sum, class) == 'factor']) {
+    obj@for.sum[[i]] <- as.character(obj@for.sum[[i]])
+  }
+  for(i in names(obj@for.sum)[names(obj@for.sum) %in% c('year', 'rhs') &
+    sapply(obj@for.sum, class) == 'character'])
+      obj@for.sum[[i]] <- as.numeric(obj@for.sum[[i]])
   obj
 }
 
