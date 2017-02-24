@@ -2,7 +2,7 @@
 setClass('MapTable', # @parameter
   representation(
     alias           = "character",   # @name name Name for GAMS
-    set             = "character",   # @dimSets Dimension sets, comma separated, order is matter
+    set             = "character",   # @dimSetsNames Dimension sets, comma separated, order is matter
     type            = "factor",      # @type is it map (map),  single (single parameter),
                                      # double (Up / Lo parameter)
     default         = "numeric",     # @defVal Default value : zero value  for map,
@@ -13,6 +13,7 @@ setClass('MapTable', # @parameter
     #use_all         = "numeric",     # For fast
     check           = "function",     # ?delete? function for checking map
     for_sysInfo     = 'character',   # @colName Column name in slot 
+# misc$nval 
     true_length     = 'numeric'      # @nValues Number of non-NA values in 'data' (to speed-up processing)
   ),
   prototype(
@@ -185,7 +186,7 @@ setMethod('getSet', signature(obj = 'MapTable', set = "character"),
         unique(obj@data[, set])
 })
 
-setMethod('getDataMapTable', signature(obj = 'MapTable'),
+setMethod('getDataMapTable', signature(obj = 'MapTable'), # getParameterTable
   function(obj) {
     if (obj@true_length != -1) obj@data[seq(length.out = obj@true_length),, drop = FALSE] else obj@data
 })
