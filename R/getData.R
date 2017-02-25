@@ -79,9 +79,10 @@ getDataResult0 <- function(obj, ..., variable = NULL,
   }
   if (remove_zero_dim && length(dtt) != 0) {
     dtt <- dtt[sapply(dtt, function(x) any(x != 0))]
-    for(j in names(dtt)) {
+    for(j in names(dtt)) if (length(dtt[[j]]) > 1) {
       gg <- paste('apply(dtt[[j]] != 0, ', 1:length(dim(dtt[[j]])), ', any)', sep = '')
-      eval(parse(text = paste('dtt[[j]] <- dtt[[j]][', paste(gg, collapse = ','), ', drop = FALSE]', sep = '')))
+      eval(parse(text = paste('dtt[[j]] <- dtt[[j]][', paste(gg, collapse = ','), 
+          ', drop = FALSE]', sep = '')))
     }
     if (drop) {
       for(j in names(dtt)) if (length(dim(dtt[[j]])) > 0) {
@@ -225,8 +226,10 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
 
 
 getData <- function(obj, ..., parameter = NULL, variable = NULL, 
-  get.variable = TRUE, get.parameter = TRUE, merge.table = FALSE,
+  get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
   remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
+  if (is.null(get.variable)) get.variable <- is.null(parameter)
+  if (is.null(get.parameter)) get.parameter <- is.null(variable)
   if (merge.table && !astable) stop('merge is possible only for data.frame')
   if (get.parameter && get.variable) {
     if (!merge.table) {
