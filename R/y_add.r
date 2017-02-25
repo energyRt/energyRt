@@ -216,7 +216,15 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
 #        '" now, all previous information will be removed', sep = ''))
 #  }
 #  tt <- showEquation(app, approxim)
-#  obj@constrain[[app@name]] <- tt
+#  obj@constrain[[app@name]] <- tt 
+  if (any(names(app@for.each) == 'year') && !is.null(app@for.each$year) && 
+    (max(app@for.each$year) < min(approxim$year) || min(app@for.each$year) > max(approxim$year))) {
+     return(obj)
+  }
+  if (any(names(app@for.sum) == 'year') && !is.null(app@for.sum$year) && 
+    (max(app@for.sum$year) < min(approxim$year) || min(app@for.sum$year) > max(approxim$year))) {
+     return(obj)
+  }
   if (app@type == 'tax') {
       approxim2 <- approxim
       for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
@@ -335,6 +343,10 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
         year_range <- range(obj@maptable$year@data[, 'year'])
         approxim <- approxim[names(approxim) %in% names(app@for.each)] 
         if (any(colnames(approxim) == 'year')) {
+          year_range <- c(max(c(min(approxim$year), year_range[1])), min(c(max(approxim$year), year_range[2]))) 
+        }
+        if (any(names(app@for.each) == 'year') && !is.null(app@for.each$year)) {
+          approxim$year <- min(app@for.each$year):max(app@for.each$year)
           year_range <- c(max(c(min(approxim$year), year_range[1])), min(c(max(approxim$year), year_range[2]))) 
         }
         for(i in names(app@for.each)[!(names(app@for.each) %in% names(approxim))]) 
