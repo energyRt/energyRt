@@ -6,7 +6,7 @@ getConstrainResults <- function(scenario, constrain) {
       rst
   } else {
     prec <- scenario@precompiled@maptable
-    tcns <- getObjects(scenario, class = 'constrain', name = constrain, regex = FALSE)[[1]]
+    tcns <- getObjects(scenario, class = 'constrain', name = constrain)[[1]]
     dtt <- scenario@result@data
     fcase <- function(x) if (length(x) == 0 || nchar(x) <= 1) toupper(x) else
       paste(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)), sep = '')
