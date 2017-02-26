@@ -4,8 +4,7 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
     grep2 <- function(x, y) grep(x, as.character(y), ignore.case = ignore.case, fixed = fixed, 
       useBytes = useBytes, invert = invert)
   } else {
-    grep2 <- function(x, y) grep(paste('^', x, '$', sep = ''), as.character(y), 
-      ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
+    grep2 <- function(x, y) y %in% x
   }
   arg <- list(...)
   if (any(class(obj) == 'scenario')) obj <- obj@model
@@ -16,7 +15,8 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
     lst <- list()
     cls <- unique(c(lapply(obj@data, function(xx) unique(sapply(xx@data, class))), recursive = TRUE))
     for(cl in cls) {
-      ll <- getUniversalNames(obj, cl, ...)
+      ll <- getUniversalNames(obj, cl, regex = regex, ignore.case = ignore.case, fixed = fixed, 
+        useBytes = useBytes, invert = invert, ...)
       for(i in seq(along = ll))
         lst[[names(ll)[i]]] <- ll[[i]]
     }                                                         
@@ -171,13 +171,20 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
 
 
 getNames <- function(obj, class = c(), ...) {
-  names(getUniversalNames(obj, cls = class, ...))
+  names(getUniversalNames(obj, cls = class, regex = FALSE, ...))
 }
+getNames_ <- function(obj, class = c(), ...) {
+  names(getUniversalNames(obj, cls = class, regex = TRUE, ...))
+}
+
 
 getObjects <- function(obj, class = c(), ...) {   
-  getUniversalNames(obj, cls = class, ...)
+  getUniversalNames(obj, cls = class, regex = FALSE, ...)
 }
 
+getObjects_ <- function(obj, class = c(), ...) {   
+  getUniversalNames(obj, cls = class, regex = TRUE, ...)
+}
 
 
 
