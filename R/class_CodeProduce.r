@@ -359,6 +359,7 @@ setMethod("initialize", "CodeProduce",
   .Object@maptable[['mDiscountZero']] <- MapTable('mDiscountZero', 'region', 'map', default = 1) 
   ## Milestone set
   .Object@maptable[['mMidMilestone']] <- MapTable('mMidMilestone', 'year', 'map', default = 1) 
+  .Object@maptable[['mMilestoneHasNext']] <- MapTable('mMilestoneHasNext', 'year', 'map', default = 1) 
   .Object@maptable[['mMilestoneLast']] <- MapTable('mMilestoneLast', 'year', 'map', default = 1) 
   .Object@maptable[['mStartMilestone']] <- MapTable('mStartMilestone', c('year', 'yearp'), 'map', default = 1) 
   .Object@maptable[['mEndMilestone']] <- MapTable('mEndMilestone', c('year', 'yearp'), 'map', default = 1) 

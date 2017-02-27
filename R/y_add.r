@@ -717,6 +717,8 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'sysInfo',
 
   obj@maptable[['mMilestoneNext']] <- addData(obj@maptable[['mMilestoneNext']], 
     data.frame(year = app@milestone$mid[-nrow(app@milestone)], yearp = app@milestone$mid[-1])) 
+  obj@maptable[['mMilestoneHasNext']] <- addData(obj@maptable[['mMilestoneHasNext']], 
+    data.frame(year = app@milestone$mid[-nrow(app@milestone)])) 
   obj
 })
 
