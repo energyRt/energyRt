@@ -10,25 +10,15 @@ print.sysInfo <- function(x) {
         cat('\n')
       }
     }
-    if (is.null(x@region)) {
-      cat('There is no region')
-    } else {
-      cat('region:\n')
-      print(x@region)
+    for(i in c('region', 'year', 'milestone', 'slice')) {
+      if (is.null(slot(x, i))) {
+        cat('There is no ', i, '\n', sep = '')
+      } else {
+        cat(i, ':\n', sep = '')
+        print(slot(x, i))
+      }
     }
-    if (is.null(x@year)) {
-      cat('There is no year')
-    } else {
-      cat('year:\n')
-      print(x@year)
-    }
-    if (is.null(x@region)) {
-      cat('There is no slice')
-    } else {
-      cat('slice:\n')
-      print(x@slice)
-    }
-    if_print_data_frame(x, 'DummyImport')
+    if_print_data_frame(x, 'debug')
     if_print_data_frame(x, 'discount')
     #if_print_data_frame(x, 'tax')   
     if_print_data_frame(x, 'default')

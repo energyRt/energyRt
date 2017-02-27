@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------------------------------------
 setClass("sysInfo",
       representation(
-          Dummy              = "data.frame",
+          debug              = "data.frame",
 #          tax                = "data.frame",
 #          subs               = "data.frame",
           discount           = "data.frame",
@@ -16,7 +16,7 @@ setClass("sysInfo",
           default            = "data.frame"
       ),
       prototype(
-          Dummy   = data.frame(comm       = character(),
+          debug   = data.frame(comm       = character(),
                                      region     = character(),
                                      sp         = NULL,
                                      year       = numeric(),
