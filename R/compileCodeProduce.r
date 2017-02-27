@@ -176,28 +176,37 @@ sm_compile_model <- function(obj,
   # Fill DB main data
   if (n.threads > 1) {
     prorgess_bar_p <- proc.time()[3]
-    cl <- makePSOCKcluster(rep('localhost', n.threads))
-    ll <- list()
-    cat('1 ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
-    for(i in seq(along = obj@data)) {
-      for(j in seq(along = obj@data[[i]]@data)) { 
-        ll[[length(ll) + 1]] <- obj@data[[i]]@data[[j]]
+    tryCatch({
+      cl <- makePSOCKcluster(rep('localhost', n.threads))
+      ll <- list()
+      cat('1 ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
+      for(i in seq(along = obj@data)) {
+        for(j in seq(along = obj@data[[i]]@data)) { 
+          ll[[length(ll) + 1]] <- obj@data[[i]]@data[[j]]
+        }
       }
-    }
-    gg <- lapply(1:n.threads - 1, function(x) ll[(seq(along = ll) - 1) %% n.threads == x])
-    prclst <- parLapply(cl, gg, 
-      function(ll, prec, approxim) {
-          require(energyRt)
-          for(i in seq(along = ll)) {
-            prec <- add0(prec, ll[[i]], approxim = approxim)
-          }
-        prec
-      }, prec, approxim)
-    stopCluster(cl)
+      gg <- lapply(1:n.threads - 1, function(x) ll[(seq(along = ll) - 1) %% n.threads == x])
+      prclst <- parLapply(cl, gg, 
+        function(ll, prec, approxim) {
+            require(energyRt)
+            for(i in seq(along = ll)) {
+              prec <- add0(prec, ll[[i]], approxim = approxim)
+            }
+          prec
+        }, prec, approxim)
+      stopCluster(cl)
+    }, interrupt = function(x) {
+      stopCluster(cl)
+      stop('Solver has been interrupted')
+    }, error = function(x) {
+      stopCluster(cl)
+      stop(x)
+    })    
     for(i in names(prec@maptable)) {
         hh <- sapply(prclst, function(x) if (x@maptable[[i]]@true_length == -1) 
           nrow(x@maptable[[i]]@data) else x@maptable[[i]]@true_length)
-        if (prec@maptable[[i]]@true_length == -1) nn <- nrow(prec@maptable[[i]]@data) else nn <- prec@maptable[[i]]@true_length
+        if (prec@maptable[[i]]@true_length == -1) nn <- nrow(prec@maptable[[i]]@data) else 
+          nn <- prec@maptable[[i]]@true_length
         hh <- hh - nn
         n0 <- nn
         fl <- seq(along = hh)[hh != 0]
