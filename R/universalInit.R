@@ -1,9 +1,10 @@
 
-universalInit <- function(class_name, name, exclude = NULL, ...) {
+universalInit <- function(class_name, name, exclude = NULL, exclude_class = NULL, ...) {
   obj <- new(class_name)
   slt <- getSlots(class_name)
   arg <- list(...)
   if (!is.null(exclude)) arg <- arg[!(names(arg) %in% exclude)]
+  if (!is.null(exclude_class)) arg <- arg[!(sapply(arg, class) %in% exclude_class)]
   if (class_name != 'sysInfo') obj@name <- name
   if (length(arg) != 0) {
     if (any(names(arg) == 'name')) stop('Duplicate parameter name')
@@ -150,14 +151,16 @@ setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 
 setMethod('newModel', signature(name = 'character'), function(name, ...) {
     sysInfVec <- names(getSlots('sysInfo'))
-    sysInfVec <- sysInfVec[sysInfVec != ".S3Class"]
+    sysInfVec <- sysInfVec[sysInfVec != ".S3Class"]        
     args <- list(...)
-    mdl <- universalInit('model', name, exclude = c(sysInfVec, 'repository'), ...)
-    if (any(names(args) == 'repository'))  {
-      mdl <- add(mdl, args$repository)
+    mdl <- universalInit('model', name, exclude = sysInfVec, exclude_class = 'repository', ...)
+    if (any(sapply(args, class) == 'repository'))  {
+      fl <- seq(along = args)[sapply(args, class) == 'repository']
+      for(j in fl) mdl <- add(mdl, args[[j]])
     }
     sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
-    mdl@sysInfo <- universalInit('sysInfo', '', exclude = names(args)[!(names(args) %in% sysInfVec)], ...)
+    mdl@sysInfo <- universalInit('sysInfo', '', exclude_class = 'repository',
+      exclude = names(args)[!(names(args) %in% sysInfVec)], ...)
     mdl
   })
 
