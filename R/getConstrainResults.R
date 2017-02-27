@@ -6,7 +6,7 @@ getConstrainResults <- function(scenario, constrain) {
       rst
   } else {
     prec <- scenario@precompiled@maptable
-    tcns <- getObjects(scenario, 'constrain', name = constrain, regex = FALSE)[[1]]
+    tcns <- getObjects(scenario, class = 'constrain', name = constrain)[[1]]
     dtt <- scenario@result@data
     fcase <- function(x) if (length(x) == 0 || nchar(x) <= 1) toupper(x) else
       paste(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)), sep = '')
@@ -126,8 +126,9 @@ getConstrainResults <- function(scenario, constrain) {
         v1 <- v1[v1 %in% v2]
         rhs <- rhs[sort(v1, index.return = TRUE)$ix, 'Freq', drop = FALSE]
       }
-      eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
-        sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
+      tt <- paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
+        sep = '', collapse = ', '), ', drop = FALSE]', sep = '')
+      eval(parse(text = tt))
       gg <- as.data.frame.table(gg)
       # Adjust to different period length
       if (any(names(cns.set) == 'year') && all(names(vary.set) != 'year')) {

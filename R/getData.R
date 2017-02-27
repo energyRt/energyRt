@@ -28,6 +28,7 @@ getDataResult0 <- function(obj, ..., variable = NULL,
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
     'year', 'slice', 'stg', 'expp', 'imp', 'trade')
   set <- list(...)
+  if (any(names(set) == 'args')) set <- set$args
   if (any(!(names(set) %in% psb_set)))
     stop(paste('Unknown set name "', paste(names(set)[!(names(set) %in% psb_set)], 
       collapse = '", "'), '"', sep = ''))
@@ -79,9 +80,10 @@ getDataResult0 <- function(obj, ..., variable = NULL,
   }
   if (remove_zero_dim && length(dtt) != 0) {
     dtt <- dtt[sapply(dtt, function(x) any(x != 0))]
-    for(j in names(dtt)) {
+    for(j in names(dtt)) if (length(dtt[[j]]) > 1) {
       gg <- paste('apply(dtt[[j]] != 0, ', 1:length(dim(dtt[[j]])), ', any)', sep = '')
-      eval(parse(text = paste('dtt[[j]] <- dtt[[j]][', paste(gg, collapse = ','), ', drop = FALSE]', sep = '')))
+      eval(parse(text = paste('dtt[[j]] <- dtt[[j]][', paste(gg, collapse = ','), 
+          ', drop = FALSE]', sep = '')))
     }
     if (drop) {
       for(j in names(dtt)) if (length(dim(dtt[[j]])) > 0) {
@@ -118,6 +120,7 @@ getDataParameter <- function(obj, ..., parameter = NULL,
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
     'year', 'slice', 'stg', 'expp', 'imp', 'trade')
   set <- list(...)                      
+  if (any(names(set) == 'args')) set <- set$args
   if (any(!(names(set) %in% psb_set)))
     stop(paste('Unknown set name "', paste(names(set)[!(names(set) %in% psb_set)], 
       collapse = '", "'), '"', sep = ''))
@@ -220,13 +223,15 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
       names(ltb) <- names(lmx)
       return(ltb)
     }
-  } else return(lmx)
+  } else return(lmx)                                                            
 } 
 
 
 getData <- function(obj, ..., parameter = NULL, variable = NULL, 
-  get.variable = TRUE, get.parameter = TRUE, merge.table = FALSE,
+  get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
   remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
+  if (is.null(get.variable)) get.variable <- is.null(parameter)
+  if (is.null(get.parameter)) get.parameter <- is.null(variable)
   if (merge.table && !astable) stop('merge is possible only for data.frame')
   if (get.parameter && get.variable) {
     if (!merge.table) {
@@ -266,4 +271,23 @@ getData <- function(obj, ..., parameter = NULL, variable = NULL,
       remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)) 
   }
 }
+  
+getData_ <- function(obj, ..., parameter = NULL, variable = NULL, 
+  get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
+  remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
+  psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
+    'year', 'slice', 'stg', 'expp', 'imp', 'trade')
+  set <- list(...)                      
+  if (any(!(names(set) %in% psb_set)))
+    stop(paste('Unknown set name "', paste(names(set)[!(names(set) %in% psb_set)], 
+      collapse = '", "'), '"', sep = ''))
+  for(i in names(set)) {
+    set[[i]] <-  grep(set[[i]], obj@result@set[[i]], value = TRUE)
+  }
+  getData(obj, args = set, 
+      parameter = parameter, variable = variable, get.variable = get.variable, get.parameter = get.parameter, 
+      merge.table = merge.table, remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)
+}
+
+  
   

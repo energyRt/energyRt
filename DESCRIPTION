@@ -10,7 +10,7 @@ Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com",
 URL: https://github.com/olugovoy/energyRt
 BugReports: https://github.com/olugovoy/energyRt/issues
 Description: Energy Technology Modeling Toolbox
-Depends: sp
+Depends: sp, parallel
 Imports: rpivotTable
 Suggests: WriteXLS, GISTools
 License: AGLP-3

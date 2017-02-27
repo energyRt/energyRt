@@ -19,6 +19,10 @@ sm_compile_model <- function(obj,
   if (is.null(tmp.dir)) {
     tmp.dir <- getwd()
   }
+  if (any(names(arg) == 'n.threads')) {
+    n.threads <- arg$n.threads
+    arg <- arg[names(arg) != 'n.threads', drop = FALSE]
+  } else n.threads <- detectCores()
 #    if (.Platform$OS.type == "unix") {
 #      tmpdir = Sys.getenv('TMPDIR')
 #    } else {
@@ -168,44 +172,80 @@ sm_compile_model <- function(obj,
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
         }
     }
+    cat('Generating model input files ')
+  # Fill DB main data
+  if (n.threads > 1) {
+    prorgess_bar_p <- proc.time()[3]
+    cl <- makePSOCKcluster(rep('localhost', n.threads))
+    ll <- list()
+    cat('1 ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
+    for(i in seq(along = obj@data)) {
+      for(j in seq(along = obj@data[[i]]@data)) { 
+        ll[[length(ll) + 1]] <- obj@data[[i]]@data[[j]]
+      }
+    }
+    gg <- lapply(1:n.threads - 1, function(x) ll[(seq(along = ll) - 1) %% n.threads == x])
+    prclst <- parLapply(cl, gg, 
+      function(ll, prec, approxim) {
+          require(energyRt)
+          for(i in seq(along = ll)) {
+            prec <- add0(prec, ll[[i]], approxim = approxim)
+          }
+        prec
+      }, prec, approxim)
+    stopCluster(cl)
+    for(i in names(prec@maptable)) {
+        hh <- sapply(prclst, function(x) if (x@maptable[[i]]@true_length == -1) 
+          nrow(x@maptable[[i]]@data) else x@maptable[[i]]@true_length)
+        if (prec@maptable[[i]]@true_length == -1) nn <- nrow(prec@maptable[[i]]@data) else nn <- prec@maptable[[i]]@true_length
+        hh <- hh - nn
+        n0 <- nn
+        fl <- seq(along = hh)[hh != 0]
+        if (length(fl) != 0) {
+          prec@maptable[[i]]@data[nn + 1:sum(hh), ] <- NA
+          for(j in fl) {
+            prec@maptable[[i]]@data[nn + 1:hh[j], ] <- prclst[[j]]@maptable[[i]]@data[n0 + 1:hh[j], ]
+            nn <- nn + hh[j]
+          }
+          if (prec@maptable[[i]]@true_length != -1) prec@maptable[[i]]@true_length <- nn
+          if (i == 'group' && nn != 0) {
+            if (prec@maptable[[i]]@true_length != -1) {
+              gr <- unique(prec@maptable[[i]]@data[seq(length.out = prec@maptable[[i]]@true_length), 1])
+              prec@maptable[[i]]@data[, 1] <- NA
+              prec@maptable[[i]]@data[1:length(gr), 1] <- gr
+              prec@maptable[[i]]@true_length <- length(gr)
+            } else {
+              gr <- unique(prec@maptable[[i]]@data[, 1])
+              prec@maptable[[i]]@data <- prec@maptable[[i]]@data[1:length(gr),, drop = FALSE]
+              prec@maptable[[i]]@data[, 1] <- gr
+            }
+          }
+        }
+    }
+  } else if (n.threads == 1) {
     prorgess_bar <- sapply(obj@data, function(x) length(x@data))
     if (is.list(prorgess_bar)) prorgess_bar <- 0 else prorgess_bar <- sum(prorgess_bar)
     prorgess_bar_0 <- 0
     prorgess_bar_dl <- (prorgess_bar + 50 - 1) %/% 50
-
-    cat('Generating model input files ')
-    prorgess_bar_p <- proc.time()[3]
-  # Fill DB main data
-    for(i in seq(along = obj@data)) {
-        ff <- rep(TRUE, length(obj@data[[i]]@data))
-        for(j in seq(along =obj@data[[i]]@data)) {
-    # Remove year constrain problem
-            fl <- TRUE
-            if (class(obj@data[[i]]@data[[j]]) == 'constrain') {      
-              if (!is.null(obj@data[[i]]@data[[j]]@for.each$year)) {
-                fl <- any(obj@data[[i]]@data[[j]]@for.each$year %in% obj@sysInfo@year)
-              }
-              if (fl && !is.null(obj@data[[i]]@data[[j]]@for.each$slice)) {
-                fl <- any(obj@data[[i]]@data[[j]]@for.each$slice %in% obj@sysInfo@slice)
-              }
-              if (fl && !is.null(obj@data[[i]]@data[[j]]@for.each$region)) {
-                fl <- any(obj@data[[i]]@data[[j]]@for.each$region %in% obj@sysInfo@region)
-              }
-            }  
-            ff[j] <- fl
-          } 
-        obj@data[[i]]@data <- obj@data[[i]]@data[ff]  
-        for(j in seq(along = obj@data[[i]]@data)) { 
-          prec <- add0(prec, obj@data[[i]]@data[[j]], approxim = approxim)
-          prorgess_bar_0 <- prorgess_bar_0 + 1
-          if (prorgess_bar_0 %% prorgess_bar_dl == 0) {
-            cat('.')
-            flush.console() 
+    hh <- sum(sapply(obj@data, function(x) length(x@data)))
+    k <- 0
+      prorgess_bar_p <- proc.time()[3]
+    # Fill DB main data
+      for(i in seq(along = obj@data)) {
+          for(j in seq(along = obj@data[[i]]@data)) { 
+            k <- k + 1
+            hh[k] <- proc.time()[3]
+            prec <- add0(prec, obj@data[[i]]@data[[j]], approxim = approxim)
+            hh[k] <- hh[k] - proc.time()[3]
+            prorgess_bar_0 <- prorgess_bar_0 + 1
+            if (prorgess_bar_0 %% prorgess_bar_dl == 0) {
+              cat('.')
+              flush.console() 
+            }
           }
-        }
-    }
-    cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
-   
+      }
+      cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
+  } else stop('Uneceptable threads number')
   prec <- add0(prec, obj@sysInfo, approxim = approxim) 
 #    for(i in seq(along = prec@maptable)) {
 #      if (prec@maptable[[i]]@true_length != 0) {
