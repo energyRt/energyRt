@@ -687,11 +687,11 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'sysInfo',
   if (length(approxim_comm[['comm']]) != 0) {
     # Dummy import
       obj@maptable[['pDummyImportCost']] <- addData(obj@maptable[['pDummyImportCost']],
-        simple_data_frame_approximation_chk(app@Dummy, 'dummyImport',
+        simple_data_frame_approximation_chk(app@debug, 'dummyImport',
           obj@maptable[['pDummyImportCost']], approxim_comm))
     # Dummy export
       obj@maptable[['pDummyExportCost']] <- addData(obj@maptable[['pDummyExportCost']],
-        simple_data_frame_approximation_chk(app@Dummy, 'dummyExport',
+        simple_data_frame_approximation_chk(app@debug, 'dummyExport',
           obj@maptable[['pDummyExportCost']], approxim_comm))
 #    # Tax
 #      obj@maptable[['pTaxCost']] <- addData(obj@maptable[['pTaxCost']],

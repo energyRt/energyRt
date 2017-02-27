@@ -18,7 +18,7 @@ print.sysInfo <- function(x) {
         print(slot(x, i))
       }
     }
-    if_print_data_frame(x, 'Dummy')
+    if_print_data_frame(x, 'debug')
     if_print_data_frame(x, 'discount')
     #if_print_data_frame(x, 'tax')   
     if_print_data_frame(x, 'default')
