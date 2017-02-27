@@ -83,8 +83,12 @@ ggplot_bar_by_gtech <- function(
   colours,
   ...) {
   
-  dat <- getData_(scen, variable = variable, comm = comm, 
-                  get.parameter = F, merge.table = T, drop = F, remove_zero_dim = T)
+  get_data <- "getData_"
+  if (length(comm) > 1) get_data <- "getData"
+  if (length(variable) > 1) get_data <- "getData"
+  
+  dat <- eval(call(get_data, scen, variable = variable, comm = comm, 
+                  get.parameter = F, merge.table = T, drop = F, remove_zero_dim = T))
   
   dat <- addGroups(dat, mapping, select, zero.rm = T, na.rm = T)
   
@@ -109,8 +113,12 @@ ggplot_bar_by_gcomm <- function(
   colours,
   ...) {
   
-  dat <- getData_(scen, variable = variable, comm = comm, 
-                  get.parameter = F, merge.table = T, drop = F, remove_zero_dim = T)
+  get_data <- "getData_"
+  if (length(comm) > 1) get_data <- "getData"
+  if (length(variable) > 1) get_data <- "getData"
+  
+  dat <- eval(call(get_data, scen, variable = variable, comm = comm, 
+                  get.parameter = F, merge.table = T, drop = F, remove_zero_dim = T))
   
   dat <- addGroups(dat, mapping, select, zero.rm = T, na.rm = T)
   
