@@ -45,8 +45,8 @@ add <- function (...) UseMethod("add")
 report <- function (...) UseMethod("report")
 getData <- function (...) UseMethod("getData")
 
-setGeneric("mileStoneYears", function(obj) standardGeneric("mileStoneYears"))
-setGeneric("setMileStoneYears", function(obj, start, ...) standardGeneric("setMileStoneYears"))
-setGeneric("getMileStone", function(obj) standardGeneric("getMileStone"))
+setGeneric("milestoneYears", function(start, interval) standardGeneric("milestoneYears"))
+setGeneric("setMilestoneYears", function(obj, start, interval) standardGeneric("setMilestoneYears"))
+setGeneric("getMilestone", function(obj) standardGeneric("getMilestone"))
 
 
