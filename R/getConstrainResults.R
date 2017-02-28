@@ -25,7 +25,7 @@ getConstrainResults <- function(scenario, constrain) {
       gg <- getDataMapTable(prec[[paste('mCns', fcase(st), sep = '')]])
       cns.set[[st]] <- gg[gg$cns == constrain, st]
     }
-    mlst <- getMileStone(scenario)
+    mlst <- getMilestone(scenario)
     if (any(names(cns.set) == 'year')) {
       GROWTH_CNS <- any(grep('growth', as.character(tcns@type)))
       mm <- cns.set$year[cns.set$year %in% mlst$mid]

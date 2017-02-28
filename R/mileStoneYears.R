@@ -61,10 +61,10 @@ setMethod('milestoneYears', signature(start = 'numeric', interval = 'numeric'), 
 
 
 setMethod('getMilestone', signature(obj = 'scenario'), function(obj) {
-    getMileStone(obj@model)
+    getMilestone(obj@model)
 })
 setMethod('getMilestone', signature(obj = 'model'), function(obj) {
-    getMileStone(obj@sysInfo)
+    getMilestone(obj@sysInfo)
 })
 setMethod('getMilestone', signature(obj = 'sysInfo'), function(obj) {
     obj@milestone
