@@ -79,7 +79,7 @@ draw.technology <- function(
       aparam <- lapply(acomm, function(y) {
         approxim$acomm <- y
         approxim$comm <- NULL
-        #tech@aeff[tech@aeff$acomm == y,, drop = FALSE]
+        tech@aeff <- tech@aeff[tech@aeff$acomm == y,, drop = FALSE]
         sng <- sapply(aname, function(x) interpolation(tech@aeff, x, 
                                 default = as.numeric(default[x]), 
                                 rule = rule[x], 
