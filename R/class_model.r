@@ -23,7 +23,7 @@ setClass("model",
           additionalCode = "",
           additionalCodeAfter = "",
           LECdata        = list(),
-          early.retirement = TRUE
+          early.retirement = FALSE
       ),                           
       S3methods = TRUE
 );
