@@ -166,7 +166,7 @@ getDataParameter <- function(obj, ..., parameter = NULL,
   if (remove_zero_dim && length(dtt) != 0) {
     dtt <- dtt[sapply(dtt, function(x) any(x[, ncol(x)] != 0))]
     for(j in names(dtt)) {
-      dtt[[j]] <- dtt[[j]][dtt[[j]][, ncol(dtt[[j]])] == 0,, drop = FALSE]
+      dtt[[j]] <- dtt[[j]][dtt[[j]][, ncol(dtt[[j]])] != 0,, drop = FALSE]
     }
     if (drop) {
       for(j in names(dtt)) if (ncol(dtt[[j]]) > 1) {
