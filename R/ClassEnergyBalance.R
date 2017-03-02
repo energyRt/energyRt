@@ -22,7 +22,8 @@ setClass("energyBalance",
 #            id.slice      = "character", 
 #            id.rownames   = "character",
 #            id.other      = "data.frame",
-            data          = "data.frame"
+            data          = "data.frame",
+            misc = "list"
           ),
           prototype(
             name          = "",
@@ -57,8 +58,11 @@ setClass("energyBalance",
                                  slice = character(),
                                  rows = character()),
                                  #, stringsAsFactors = FALSE),
-            data          = data.frame()
-            ),
+            data          = data.frame(),
+            #! Misc
+            misc = list(
+              GUID = "54c3233e-6931-4d9c-8fd2-e64e18dee506"
+            )),
             #validity = check_technology_data_frame,
             S3methods = TRUE
 );

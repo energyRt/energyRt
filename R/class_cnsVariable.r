@@ -9,7 +9,8 @@ setClass('cnsVariable',
           set           = "list",  # other set, creat by function create_set
           ext_set       = "list",  # External set, that know use in constrains
           default       = "numeric", 
-          value         = "data.frame"
+          value         = "data.frame",
+          misc = "list"
           # parameter= list() # For the future
       ),
       prototype(
@@ -19,9 +20,12 @@ setClass('cnsVariable',
           set           = list(), 
           ext_set       = list(),  # External set, that know use in constrains
           default       = 1, 
-          value         = NULL#data.frame(value = numeric(), stringsAsFactors = FALSE),
+          value         = NULL,#data.frame(value = numeric(), stringsAsFactors = FALSE),
           # parameter= list() # For the future
-      ),
+      #! Misc
+      misc = list(
+        GUID = "a7c5f404-7107-405e-9aec-8684118f23ba"
+      )),
       S3methods = TRUE
 );
 

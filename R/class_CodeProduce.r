@@ -11,7 +11,8 @@ setClass("CodeProduce", # parameters
     model_reduced      = "character", # @modelCodePath and @modelCode? 
     model_reduced_glpk = "character",
     model_full         = "character", 
-    model_full_glpk    = "character"
+    model_full_glpk    = "character",
+    misc = "list"
   ),
   prototype(
     set = list(tech = c(), sup = c(), group = c(),
@@ -24,7 +25,11 @@ setClass("CodeProduce", # parameters
     model_reduced = readLines('gams/model_reduced.gms'),
     model_reduced_glpk = readLines('glpk/glpk_reduced.mod'),
     model_full = readLines('gams/model_full.gms'),
-    model_full_glpk = readLines('glpk/glpk_full.mod')
+    model_full_glpk = readLines('glpk/glpk_full.mod'),
+    #! Misc
+    misc = list(
+      GUID = "dc8680b2-130d-4a40-86b8-3a33018e005e"
+    )
   )
 );
 

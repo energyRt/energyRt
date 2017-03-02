@@ -9,7 +9,8 @@ setClass("import",
           commodity     = "character",
           unit          = "character",
           reserve       = "numeric",
-          imp           = "data.frame"
+          imp           = "data.frame",
+          misc = "list"
       ),
       prototype(
           name          = "",
@@ -27,7 +28,10 @@ setClass("import",
                                      imp.up   = numeric(),
                                      imp.fx   = numeric(),
                                      price     = numeric(),
-                                     stringsAsFactors = FALSE)
-      ),
+                                     stringsAsFactors = FALSE),
+      #! Misc
+      misc = list(
+        GUID = "8954c52f-6514-49ae-9688-17d6c5e74f06"
+      )),
       S3methods = TRUE
 );

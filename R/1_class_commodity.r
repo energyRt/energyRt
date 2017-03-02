@@ -21,7 +21,8 @@ setClass("commodity",
           color         = "character",      #
           source        = "list",
           other         = "list",           #
-          limtype       = "factor"
+          limtype       = "factor",
+          misc = "list"
       ),
       prototype(
           name          = "",
@@ -85,8 +86,11 @@ setClass("commodity",
           color         = "",
           source        = list(),
           other         = list(),
-          limtype       = factor('LO', levels = c('FX', 'UP', 'LO'))
-      ),
+          limtype       = factor('LO', levels = c('FX', 'UP', 'LO')),
+      #! Misc
+      misc = list(
+        GUID = "f1a88a0f-9376-4c81-8725-57bb1f495a2b"
+      )),
       S3methods = TRUE
 )
 

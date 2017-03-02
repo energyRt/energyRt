@@ -13,7 +13,8 @@ setClass("sysInfo",
           milestone          = "data.frame",
           slice              = "character",
           interpolation      = "data.frame",
-          default            = "data.frame"
+          default            = "data.frame",
+          misc = "list"
       ),
       prototype(
           debug   = data.frame(comm       = character(),
@@ -125,7 +126,10 @@ setClass("sysInfo",
                         cout2aout   = as.character('back.inter.forth'),
                         ncap2aout    = as.character('back.inter.forth'),
                         ncap2ainp    = as.character('back.inter.forth'),
-                        stringsAsFactors = FALSE)
-      ),
+                        stringsAsFactors = FALSE),
+      #! Misc
+      misc = list(
+        GUID = "00ca6370-61ca-4c20-8b94-443f78331bb8"
+      )),
       S3methods = TRUE
 );

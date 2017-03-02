@@ -6,15 +6,19 @@ setClass("region",
           description   = "character",      # Details
           type	        = "character",      # energy, electricity, material, (fuel?)
           color         = "character",      #
-          sp            = "SpatialPolygonsDataFrame"              # Spatial 
+          sp            = "SpatialPolygonsDataFrame",              # Spatial 
+          misc = "list"
       ),
       prototype(
           name          = "",
           description   = "",
           type	        = "",
           color         = "",
-          sp            = NULL
-      ),
+          sp            = NULL,
+      #! Misc
+      misc = list(
+        GUID = "4922cf26-c2e9-40c8-84bf-9a2fac4243e8"
+      )),
       S3methods = TRUE
 )
 

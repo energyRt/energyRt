@@ -16,7 +16,8 @@ setClass("reserve",
       # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
-          invcost       = "data.frame"     #
+          invcost       = "data.frame",
+          misc = "list"     #
       ),
       prototype(
           name          = "",
@@ -67,8 +68,11 @@ setClass("reserve",
           invcost       = data.frame(region   = character(),
                                      year     = numeric(),
                                      invcost  = numeric(),
-                                     stringsAsFactors = FALSE)
-      ),
+                                     stringsAsFactors = FALSE),
+      #! Misc
+      misc = list(
+        GUID = "d25eda0d-ed46-4d00-b6d5-38a88d11a313"
+      )),
       S3methods = TRUE
 );
 #

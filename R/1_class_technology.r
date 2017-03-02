@@ -42,7 +42,8 @@ setClass("technology",
           stock         = "data.frame", #
           early.retirement = "logical",
           upgrade.technology = "character",
-          region        = "characterOrNULL"
+          region        = "characterOrNULL",
+          misc = "list"
       ), #
       # Default values and structure of slots
       prototype(
@@ -169,8 +170,11 @@ setClass("technology",
                                             stringsAsFactors = FALSE),
           early.retirement = TRUE,
           upgrade.technology = character(),
-          region        = NULL
-      ),
+          region        = NULL,
+        #! Misc
+        misc = list(
+          GUID = "fdaa0d09-9524-405d-b2d8-b6cc1d1ca032"
+        )),
       validity = check_technology_data_frame,
       S3methods = TRUE
 )

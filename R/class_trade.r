@@ -7,7 +7,8 @@ setClass("trade",
           source        = "characterOrNULL",       # if NULL that in all region
           destination   = "characterOrNULL",       # if NULL that in all region
       # Performance parameters
-          trade         = "data.frame"
+          trade         = "data.frame",
+          misc = "list"
       ),
       # Default values and structure of slots
       prototype(
@@ -27,7 +28,10 @@ setClass("trade",
                                      ava.lo     = numeric(),
                                      cost       = numeric(),
                                      markup     = numeric(),
-                                     stringsAsFactors = FALSE)
-      ),
+                                     stringsAsFactors = FALSE),
+        #! Misc
+        misc = list(
+          GUID = "97e0ed37-fc8a-4210-ad95-702cf75bed56"
+        )),
       S3methods = TRUE
 );

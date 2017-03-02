@@ -12,7 +12,8 @@ setClass("model",
           additionalCode = "character",
           additionalCodeAfter = "character",
           LECdata        = "list",
-          early.retirement = "logical"
+          early.retirement = "logical",
+          misc = "list"
       ),
       prototype(
           name           = "",
@@ -23,8 +24,11 @@ setClass("model",
           additionalCode = "",
           additionalCodeAfter = "",
           LECdata        = list(),
-          early.retirement = FALSE
-      ),                           
+          early.retirement = FALSE,
+      #! Misc
+      misc = list(
+        GUID = "e4be2c7e-8ddf-4952-8f27-8fd12ca79e78"
+      )),                           
       S3methods = TRUE
 );
 

@@ -10,7 +10,8 @@ setClass("supply",
           unit          = "character",
           reserve       = "numeric",         # Total available resource
           availability  = "data.frame",     # Availability of the resource with prices
-          region        = "characterOrNULL"
+          region        = "characterOrNULL",
+          misc = "list"
       ),
       prototype(
           name          = "",
@@ -29,7 +30,10 @@ setClass("supply",
                                      ava.fx   = numeric(),
                                      cost     = numeric(),
                                      stringsAsFactors = FALSE),
-          region = NULL
-      ),
+          region = NULL,
+        #! Misc
+        misc = list(
+          GUID = "75321e73-f425-4d45-a36c-72dc4a769a28"
+        )),
       S3methods = TRUE
 );

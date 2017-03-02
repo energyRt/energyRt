@@ -20,7 +20,8 @@ setClass('constrain',
           cinp          = "logical",
           aout          = "logical",
           ainp          = "logical",
-          emis          = "logical"
+          emis          = "logical",
+          misc = "list"
       ),
       prototype(
           name          = "",
@@ -68,8 +69,11 @@ setClass('constrain',
           cinp          = TRUE,
           aout          = TRUE,
           ainp          = TRUE,
-          emis          = TRUE
-      ),
+          emis          = TRUE,
+        #! Misc
+        misc = list(
+          GUID = "0c9e0d17-222c-481e-8796-bbed7b0c0cc8"
+        )),
       S3methods = TRUE
 );
 

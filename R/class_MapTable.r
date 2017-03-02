@@ -14,7 +14,8 @@ setClass('MapTable', # @parameter
     check           = "function",     # ?delete? function for checking map
     for_sysInfo     = 'character',   # @colName Column name in slot 
 # misc$nval 
-    true_length     = 'numeric'      # @nValues Number of non-NA values in 'data' (to speed-up processing)
+    true_length     = 'numeric',     # @nValues Number of non-NA values in 'data' (to speed-up processing) 
+    misc = "list"
   ),
   prototype(
     alias           = NULL,
@@ -27,8 +28,11 @@ setClass('MapTable', # @parameter
     #use_all         = 0,
     check           = function(obj) TRUE,
     for_sysInfo     = NULL,
-    true_length     = 0
-  ),
+    true_length     = 0,
+      #! Misc
+      misc = list(
+        GUID = "8732f62e-0f23-4853-878b-ec8a5cbd5224"
+      )),
   validity          = function(object) object@check(object)
 );
 
