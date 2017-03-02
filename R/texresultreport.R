@@ -130,11 +130,11 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         Subsidy = apply(dat$vSubsCost, 3, sum),
         Trade = apply(dat$vTradeCost, 2, sum),
         Supply = apply(dat$vSupCost, 3, sum),
-        Techology = apply(dat$vTechCost, 3, sum),
+        Techology = apply(dat$vTechOMCost, 3, sum) + apply(dat$vTechInv, 3, sum),
         Tax = apply(dat$vTaxCost, 3, sum),
-        Storage = apply(dat$vStorageCost, 3, sum),
+        Storage = apply(dat$vStorageOMCost, 3, sum),
         Dummy = apply(dat$vDummyCost, 3, sum),
-        SalvageTechology = c(rep(0, dim(dat$vTechCost)[3] - 1), sum(dat$vTechSalv))
+        SalvageTechology = c(rep(0, dim(dat$vTechOMCost)[3] - 1), sum(dat$vTechSalv))
      )
       if (any(cost != 0)) {
         png2(paste('undiscount_cost.png', sep = ''), width = 640)
@@ -172,11 +172,11 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         Subsidy = apply(apply(dat$vSubsCost, 2:3, sum) * dsc, 2, sum),
         Trade = apply(dat$vTradeCost * dsc, 2, sum),
         Supply = apply(apply(dat$vSupCost, 2:3, sum) * dsc, 2, sum),
-        Techology = apply(apply(dat$vTechCost, 2:3, sum) * dsc, 2, sum),
+        Techology = apply(apply(dat$vTechOMCost, 2:3, sum) + apply(dat$vTechInv, 2:3, sum) * dsc, 2, sum),
         Tax = apply(apply(dat$vTaxCost, 2:3, sum) * dsc, 2, sum),
-        Storage = apply(apply(dat$vStorageCost, 2:3, sum) * dsc, 2, sum),
+        Storage = apply(apply(dat$vStorageOMCost, 2:3, sum) * dsc, 2, sum),
         Dummy = apply(apply(dat$vDummyCost, 2:3, sum) * dsc, 2, sum),
-        SalvageTechology = c(rep(0, dim(dat$vTechCost)[3] - 1), sum(dat$vTechSalv)) * dsc
+        SalvageTechology = c(rep(0, dim(dat$vTechOMCost)[3] - 1), sum(dat$vTechSalv)) * dsc
       )
       if (any(dsccost != 0)) {
         png2(paste('discount_cost.png', sep = ''), width = 640)
@@ -424,9 +424,9 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           tec_cost <- rbind(
             salvage = c(rep(0, dim(dat$vTechInv)[3] - 1), sum(dat$vTechSalv[tt,])),
             investment = apply(dat$vTechInv[tt,,, drop = FALSE], 3, sum),
-            'OM cost' = apply(dat$vTechCost[tt,,, drop = FALSE], 3, sum)
+            'OM cost' = apply(dat$vTechOMCost[tt,,, drop = FALSE], 3, sum)
           )
-          tec_cost['OM cost', ] <- tec_cost['OM cost', ] - tec_cost['investment', ]
+         # tec_cost['OM cost', ] <- tec_cost['OM cost', ] - tec_cost['investment', ]
           barcap <- rbind(new = tec_cap['New capacity', ], 
                           rest = tec_cap['Total capacity', ] - tec_cap['Initial stock', ] 
                             - tec_cap['New capacity', ], 
