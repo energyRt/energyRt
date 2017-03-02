@@ -197,7 +197,7 @@ getDataParameter <- function(obj, ..., parameter = NULL,
 
 getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.table = TRUE,
   remove_zero_dim = TRUE, drop = TRUE) {
-  lmx <- getDataResult0(obj, ...)
+  lmx <- getDataResult0(obj, ..., remove_zero_dim = remove_zero_dim, drop = drop)
   if (astable) {
     if (merge.table) {
       ltb <- lapply(names(lmx), function(x) {
