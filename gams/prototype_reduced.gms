@@ -755,33 +755,32 @@ eqTechInv(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region, ye
 eqTechSalv2(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare))..
     vTechSalv(tech, region)
     +
-   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
+   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
+         and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
-    pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
+    pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
      - sum(yearp$(mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp)))  / (
       1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
-          ) / (sum(yearn$(ORD(yeare) = ORD(yearn)),
+          ) / (
            (pTechOlife(tech, region) + ORD(year) - 1 - ORD(yeare)
-           )))
+           ))
     ))  =e= 0;
 
 
 eqTechSalv3(tech, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(yeare))..
     vTechSalv(tech, region)
     +
-   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
+   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn) and ORD(yearn) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
-    pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
-      - sum(yearp$(mMidMilestone(year)  and mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp))) / (
+    pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
+      - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp))) / (
       1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
-        / (pDiscountFactor(region, yeare)
-          ) / (sum(yearn$(ORD(yeare) = ORD(yearn)), (
-           1 - (1 + pDiscount(region, yearn)) ** (ORD(yeare)
-                 - pTechOlife(tech, region) - ORD(year) + 1)
-           )  *  (1 + pDiscount(region, yearn)) / pDiscount(region, yearn)))
+        / pDiscountFactor(region, yeare) / ((
+           1 - (1 + pDiscount(region, yeare)) ** (ORD(yeare) - pTechOlife(tech, region) - ORD(year) + 1)
+           )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare))
     ))  =e= 0;
 
 * Cost aggregate by year equation
@@ -1270,11 +1269,13 @@ eqCost(region, year)$(mMidMilestone(year))..
          + vTradeCost(region, year);
 
 eqObjective..
-         vObjective =e= sum((region, year)$mMidMilestone(year),
-           pDiscountFactor(region, year) *  sum(tech$mTechNew(tech, region, year), vTechInv(tech, region, year)) +
+   vObjective =e= sum((region, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
+           pDiscountFactor(region, yearp) *  sum(tech$mTechNew(tech, region, year), vTechInv(tech, region, year))) +
+         sum((region, year)$mMidMilestone(year),
            vCost(region, year) * sum((yeare, yearp, yearn)$(mStartMilestone(year, yearp) and mEndMilestone(year, yeare)
                  and ORD(yearn) >= ORD(yearp) and ORD(yearn) <= ORD(yeare)), pDiscountFactor(region, yearn))) +
          sum((region, year, tech)$mMilestoneLast(year), pDiscountFactor(region, year) * vTechSalv(tech, region));
+
 * Tax
 eqTaxCost(comm, region, year)$(mMidMilestone(year) and sum(slice$pTaxCost(comm, region, year, slice), 1))..
          vTaxCost(comm, region, year)
