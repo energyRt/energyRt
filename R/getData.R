@@ -195,7 +195,8 @@ getDataParameter <- function(obj, ..., parameter = NULL,
   return(dtt)
 }
 
-getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.table = TRUE) {
+getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.table = TRUE,
+  remove_zero_dim = TRUE, drop = TRUE) {
   lmx <- getDataResult0(obj, ...)
   if (astable) {
     if (merge.table) {
@@ -214,6 +215,13 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
         dft <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, ltb)
       }
       dft <- dft[, c(colnames(dft)[colnames(dft) != 'value'], 'value'), drop = FALSE]
+      if (remove_zero_dim) {
+        dft <- dft[dft$value != 0,, drop = FALSE]
+      }
+      if (drop) {
+        dft <- dft[, c(sapply(dft[, -ncol(dft), drop = FALSE], 
+          function(x) any(x[1] != x)), TRUE), drop = FALSE]
+      }
       return(dft)
     } else {
       ltb <- lapply(names(lmx), function(x) {
@@ -221,6 +229,15 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
         as.data.frame.table(lmx[[x]], responseName = "value")
       })
       names(ltb) <- names(lmx)
+      for(i in names(lmx)) {
+        if (remove_zero_dim) {
+          ltb[[i]] <- ltb[[i]][ltb[[i]]$value != 0,, drop = FALSE]
+        }
+        if (drop) {
+          ltb[[i]] <- ltb[[i]][, c(sapply(ltb[[i]][, -ncol(ltb[[i]]), drop = FALSE], 
+            function(x) any(x[1] != x)), TRUE), drop = FALSE]
+        }
+      }
       return(ltb)
     }
   } else return(lmx)                                                            
