@@ -180,17 +180,17 @@ getDataParameter <- function(obj, ..., parameter = NULL,
     gg <- names(dtt)
     dtt <- lapply(dtt, function(x) tapply(x[, ncol(x)], x[, -ncol(x), drop = FALSE], sum))
     names(dtt) <- gg
-    if (merge.table) {
-      if (use.dplyr) {
-        dtt <- Reduce(function(x, y) {dplyr::full_join(x, y)}, dtt)
-      } else {
-        dtt <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, dtt)
-      }
-    }  
   } else {
     for(j in names(dtt)) {
       colnames(dtt[[j]])[ncol(dtt[[j]])] <- "value"
     }
+    if (merge.table) {
+        if (use.dplyr) {
+          dtt <- Reduce(function(x, y) {dplyr::full_join(x, y)}, dtt)
+        } else {
+          dtt <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, dtt)
+        }
+    }  
   }
   return(dtt)
 }
@@ -248,8 +248,8 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
 getData <- function(obj, ..., parameter = NULL, variable = NULL, 
   get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
   remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
-  if (is.null(get.variable)) get.variable <- is.null(parameter)
-  if (is.null(get.parameter)) get.parameter <- is.null(variable)
+  if (is.null(get.variable)) get.variable <- is.null(parameter) || !is.null(variable)
+  if (is.null(get.parameter)) get.parameter <- is.null(variable) || !is.null(parameter)
   if (merge.table && !astable) stop('merge is possible only for data.frame')
   if (get.parameter && get.variable) {
     if (!merge.table) {
