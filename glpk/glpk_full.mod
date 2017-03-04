@@ -4161,8 +4161,7 @@ printf "comm, region, year, slice,value\n" > "vExport.csv";
 for {c in comm,r in region,y in year,s in slice : vExport[c,r,y,s] <> 0} { 
     printf "%s,%s,%s,%s,%f\n", c,r,y,s, vExport[c,r,y,s] >> "vExport.csv";
 } 
-printf "trade, src, dst, year, slice,value
-" > "vTradeIr.csv";
+printf "trade, src, dst, year, slice,value\n" > "vTradeIr.csv";
 for {t1 in trade,r in region,rp in region,y in year,s in slice : vTradeIr[t1,r,rp,y,s] <> 0} { 
     printf "%s,%s,%s,%s,%s,%f\n", t1,r,rp,y,s, vTradeIr[t1,r,rp,y,s] >> "vTradeIr.csv";
 } 
