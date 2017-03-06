@@ -1,6 +1,5 @@
 # Function to create choropleth maps
 choropleth.scenario <- function(obj, # scenario object
-                                
                                 #name = NULL, # search over names of all objects
                                 # variable = NULL, # character vector with variable names
                                 # year = NULL, # numerical vector with slices
@@ -19,8 +18,13 @@ choropleth.scenario <- function(obj, # scenario object
                                 # animation.file = NULL, # auto 
                                 # for.each = list(), # parameter for animation
                                 # for.sum = list(), # parameter for animation
-                                ...) {
-  dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE, get.parameter = FALSE)
+                                ...,
+                                src.reg = TRUE,   # logical, if TRUE, map trade for source region
+                                dst.reg = !src.reg, # if TRUE, map trade for destination region
+                                shading = NULL,
+                                main = NULL
+) {
+  dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE)
   if (is.null(dat)) {
     message("No data for current set of filters")
     return()
@@ -28,13 +32,27 @@ choropleth.scenario <- function(obj, # scenario object
   ff <- sapply(dat, is.factor)
   nm <- names(dat)
   rg <- nm == "region"
-  lv <- sapply(dat, function(x) {length(levels(x)) > 1})
-  #nm[ff & !rg & lv]
-  if (sum(ff & !rg & lv) > 0) {
-    dt <- aggregate(dat$value, by = list(dat$region), FUN = "sum")
-    names(dt) <- c("region", "value")
-    dat <- dt
+  src.rg <- nm == "src"
+  dst.rg <- nm == "dst"
+  if (!any(rg) & any(src.rg) & any(dst.rg)) { # trade
+    if (src.reg) {
+      #      dat$region = dat$src
+      dat <- dplyr::rename(dat, region = src)
+    } else if(dst.reg) {
+      # dat$region = dat$dst
+      dat <- dplyr::rename(dat, region = dst)
+    } else {
+      stop(" Check src.reg or dst.reg, one of them should be TRUE")
+    }
+    # } else {
+    # stop("The data has no region dimention")
+    ff <- sapply(dat, is.factor)
+    nm <- names(dat)
+    rg <- nm == "region"
+    src.rg <- nm == "src"
+    dst.rg <- nm == "dst"
   }
+  
   ltx <- sapply(dat[, ff & !rg], function(x) {
     levs <- levels(x)
     n <- 2
@@ -46,12 +64,29 @@ choropleth.scenario <- function(obj, # scenario object
     levs
   })
   #ltx
-  ttl <- paste(names(ltx), "=", ltx, collapse = ", ")
-  #ttl
+  if (!is.null(main)) {
+    ttl <- main
+  } else {
+    ttl <- paste(names(ltx), "=", ltx, collapse = ", ")
+    
+    lv <- sapply(dat, function(x) {length(levels(x)) > 1})
+    #nm[ff & !rg & lv]
+    if (sum(ff & !rg & lv) > 0) {
+      dt <- aggregate(dat$value, by = list(dat$region), FUN = "sum")
+      names(dt) <- c("region", "value")
+      dat <- dt
+    }
+    # message(paste(nm, collapse = " "))
+    # message(paste(names(dat), collapse = " "))
+    #ttl
+  }
   spdf <- sp::merge(scen.BAU@model@sysInfo@sp, dat)
   #head(spdf@data)
-
-  sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], n = 9)
+  if(is.null(shading)) {
+    sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], n = 7)
+  } else {
+    sh <- shading
+  }
   GISTools::choropleth(spdf, spdf@data[, "value"], main = ttl, cex.main = 0.75,
                        shading = sh)
   GISTools::choro.legend(124, 38, sh = sh, 

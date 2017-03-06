@@ -2,25 +2,87 @@
 #' 
 #' @obj object of class scenario or model
 #' 
-#' filters:
-#' @param tech character vector with tachnology names
-#' @param dem 
-#' @param sup
-#' @param comm
-#' @param group
-#' @param region
-#' @param year
-#' @param slice
-#' @param stg
-#' @param expp
-#' @param imp
-#' @param trade
-#' @param variable
-#' @param remove_zero_dim
-#' @param drop
+#' @... data search filters and parameters, which include:
+#' @param parameter character vector with names of paremeters
+#' @param variable character vector with names of variables
+#' @param tech character vector with names of tachnology objects
+#' @param dem character vector with names of demand objects
+#' @param sup character vector with names of sypply objects
+#' @param comm character vector with names of commodity objects
+#' @param group character vector group names in technology objects
+#' @param region character vector with names of regions
+#' @param year character or integer vector with years
+#' @param slice character vector with names of slices
+#' @param stg qqq
+#' @param expp character vector with names of export processes
+#' @param imp character vector with names of import processes
+#' @param trade character vector with names of trade objects
+#' @param get.parameter logical, if TRUE then search in interpolated parameters, and return if available  
+#' @param get.variable logical, if TRUE then search in variables, and return if available  
+#' @param remove_zero_dim rename to 'drop.zeros' 
+#' @param drop # add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'
 
+getData <- function(obj, ..., parameter = NULL, variable = NULL, 
+                    get.parameter = NULL, get.variable = NULL, merge.table = FALSE,
+                    remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
+  if (is.null(get.variable)) get.variable <- is.null(parameter) || !is.null(variable)
+  if (is.null(get.parameter)) get.parameter <- is.null(variable) || !is.null(parameter)
+  if (merge.table && !astable) stop('merge is possible only for data.frame')
+  if (get.parameter && get.variable) {
+    if (!merge.table) {
+      l1 <- getDataParameter(obj, ..., parameter = parameter, merge.table = FALSE,
+                             remove_zero_dim = remove_zero_dim, drop = drop, astable = astable)
+      l2 <- getDataResult(obj, ..., variable = variable, merge.table = FALSE,
+                          remove_zero_dim = remove_zero_dim, drop = drop, astable = astable)
+      for(i in names(l2)) l1[[i]] <- l2[[i]]
+      return(l1)
+    } else {
+      l1 <- getDataParameter(obj, ..., parameter = parameter, merge.table = FALSE,
+                             remove_zero_dim = FALSE, drop = FALSE, astable = astable)
+      l2 <- getDataResult(obj, ..., variable = variable, merge.table = FALSE,
+                          remove_zero_dim = FALSE, drop = FALSE, astable = astable)
+      for(i in names(l2)) l1[[i]] <- l2[[i]]
+      for(i in names(l1)) l1[[i]]$variable <- i
+      if (use.dplyr) {
+        l1 <- Reduce(function(x, y) {dplyr::full_join(x, y)}, l1)
+      } else {
+        l1 <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, l1)
+      }
+      l1 <- l1[, c(colnames(l1)[colnames(l1) != 'value'], 'value'), drop = FALSE]
+      if (remove_zero_dim) {
+        l1 <- l1[l1[, 'value'] != 0,, drop = FALSE]
+      }
+      if (drop && ncol(l1) > 1) {
+        l1 <- l1[, c(apply(l1[, -ncol(l1), drop = FALSE], 
+                           2, function(x) length(unique(x)) > 1), TRUE), drop = FALSE]
+      }
+      return(l1)
+    }
+  } else if (get.parameter) {
+    return(getDataParameter(obj, ..., parameter = parameter, merge.table = merge.table,
+                            remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)) 
+  } else {
+    return(getDataResult(obj, ..., variable = variable, merge.table = merge.table,
+                         remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)) 
+  }
+}
 
-#
+getData_ <- function(obj, ..., parameter = NULL, variable = NULL, 
+                     get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
+                     remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
+  psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
+               'year', 'slice', 'stg', 'expp', 'imp', 'trade')
+  set <- list(...)                      
+  if (any(!(names(set) %in% psb_set)))
+    stop(paste('Unknown set name "', paste(names(set)[!(names(set) %in% psb_set)], 
+                                           collapse = '", "'), '"', sep = ''))
+  for(i in names(set)) {
+    set[[i]] <-  grep(set[[i]], obj@result@set[[i]], value = TRUE)
+  }
+  getData(obj, args = set, 
+          parameter = parameter, variable = variable, get.variable = get.variable, get.parameter = get.parameter, 
+          merge.table = merge.table, remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)
+}
 
 
 getDataResult0 <- function(obj, ..., variable = NULL, 
@@ -244,68 +306,3 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
   } else return(lmx)                                                            
 } 
 
-
-getData <- function(obj, ..., parameter = NULL, variable = NULL, 
-  get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
-  remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
-  if (is.null(get.variable)) get.variable <- is.null(parameter) || !is.null(variable)
-  if (is.null(get.parameter)) get.parameter <- is.null(variable) || !is.null(parameter)
-  if (merge.table && !astable) stop('merge is possible only for data.frame')
-  if (get.parameter && get.variable) {
-    if (!merge.table) {
-      l1 <- getDataParameter(obj, ..., parameter = parameter, merge.table = FALSE,
-        remove_zero_dim = remove_zero_dim, drop = drop, astable = astable)
-      l2 <- getDataResult(obj, ..., variable = variable, merge.table = FALSE,
-        remove_zero_dim = remove_zero_dim, drop = drop, astable = astable)
-      for(i in names(l2)) l1[[i]] <- l2[[i]]
-      return(l1)
-    } else {
-      l1 <- getDataParameter(obj, ..., parameter = parameter, merge.table = FALSE,
-        remove_zero_dim = FALSE, drop = FALSE, astable = astable)
-      l2 <- getDataResult(obj, ..., variable = variable, merge.table = FALSE,
-        remove_zero_dim = FALSE, drop = FALSE, astable = astable)
-      for(i in names(l2)) l1[[i]] <- l2[[i]]
-      for(i in names(l1)) l1[[i]]$variable <- i
-      if (use.dplyr) {
-        l1 <- Reduce(function(x, y) {dplyr::full_join(x, y)}, l1)
-      } else {
-        l1 <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, l1)
-      }
-      l1 <- l1[, c(colnames(l1)[colnames(l1) != 'value'], 'value'), drop = FALSE]
-      if (remove_zero_dim) {
-        l1 <- l1[l1[, 'value'] != 0,, drop = FALSE]
-      }
-      if (drop && ncol(l1) > 1) {
-          l1 <- l1[, c(apply(l1[, -ncol(l1), drop = FALSE], 
-            2, function(x) length(unique(x)) > 1), TRUE), drop = FALSE]
-      }
-      return(l1)
-    }
-  } else if (get.parameter) {
-    return(getDataParameter(obj, ..., parameter = parameter, merge.table = merge.table,
-      remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)) 
-  } else {
-    return(getDataResult(obj, ..., variable = variable, merge.table = merge.table,
-      remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)) 
-  }
-}
-  
-getData_ <- function(obj, ..., parameter = NULL, variable = NULL, 
-  get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
-  remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
-  psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-    'year', 'slice', 'stg', 'expp', 'imp', 'trade')
-  set <- list(...)                      
-  if (any(!(names(set) %in% psb_set)))
-    stop(paste('Unknown set name "', paste(names(set)[!(names(set) %in% psb_set)], 
-      collapse = '", "'), '"', sep = ''))
-  for(i in names(set)) {
-    set[[i]] <-  grep(set[[i]], obj@result@set[[i]], value = TRUE)
-  }
-  getData(obj, args = set, 
-      parameter = parameter, variable = variable, get.variable = get.variable, get.parameter = get.parameter, 
-      merge.table = merge.table, remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)
-}
-
-  
-  
