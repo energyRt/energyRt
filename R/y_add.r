@@ -739,8 +739,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'trade',
   obj@maptable[['mTradeDst']] <- addData(obj@maptable[['mTradeDst']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
   #
-  approxim$src <- trd@source; approxim$src <- approxim$src[approxim$src %in% approxim$region]
-  approxim$dst <- trd@destination; approxim$dst <- approxim$dst[approxim$dst %in% approxim$region]
+  if (length(trd@source) != 0) {
+    approxim$src <- trd@source; 
+    approxim$src <- approxim$src[approxim$src %in% approxim$region]
+  } else approxim$src <- approxim$region 
+  if (length(trd@destination) != 0) {
+    approxim$dst <- trd@destination; 
+    approxim$dst <- approxim$dst[approxim$dst %in% approxim$region]
+  } else approxim$dst <- approxim$region
   approxim <- approxim[names(approxim) != 'region']
   # pTradeIrCost
   obj@maptable[['pTradeIrCost']] <- addData(obj@maptable[['pTradeIrCost']],
