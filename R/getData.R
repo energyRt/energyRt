@@ -24,16 +24,19 @@
 
 getData <- function(obj, ..., parameter = NULL, variable = NULL, 
                     get.parameter = NULL, get.variable = NULL, merge.table = FALSE,
-                    remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
+                    remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
+                    stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   if (is.null(get.variable)) get.variable <- is.null(parameter) || !is.null(variable)
   if (is.null(get.parameter)) get.parameter <- is.null(variable) || !is.null(parameter)
   if (merge.table && !astable) stop('merge is possible only for data.frame')
   if (get.parameter && get.variable) {
     if (!merge.table) {
       l1 <- getDataParameter(obj, ..., parameter = parameter, merge.table = FALSE,
-                             remove_zero_dim = remove_zero_dim, drop = drop, astable = astable)
+                             remove_zero_dim = remove_zero_dim, drop = drop, astable = astable,
+                             stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)
       l2 <- getDataResult(obj, ..., variable = variable, merge.table = FALSE,
-                          remove_zero_dim = remove_zero_dim, drop = drop, astable = astable)
+                          remove_zero_dim = remove_zero_dim, drop = drop, astable = astable,
+                             stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)
       for(i in names(l2)) l1[[i]] <- l2[[i]]
       return(l1)
     } else {
@@ -60,16 +63,21 @@ getData <- function(obj, ..., parameter = NULL, variable = NULL,
     }
   } else if (get.parameter) {
     return(getDataParameter(obj, ..., parameter = parameter, merge.table = merge.table,
-                            remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)) 
+                            remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, 
+                            use.dplyr = use.dplyr,
+                             stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)) 
   } else {
     return(getDataResult(obj, ..., variable = variable, merge.table = merge.table,
-                         remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)) 
+                         remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, 
+                         use.dplyr = use.dplyr,
+                             stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)) 
   }
 }
 
 getData_ <- function(obj, ..., parameter = NULL, variable = NULL, 
                      get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
-                     remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE) {
+                     remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
+                    stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
                'year', 'slice', 'stg', 'expp', 'imp', 'trade')
   set <- list(...)                      
@@ -81,7 +89,8 @@ getData_ <- function(obj, ..., parameter = NULL, variable = NULL,
   }
   getData(obj, args = set, 
           parameter = parameter, variable = variable, get.variable = get.variable, get.parameter = get.parameter, 
-          merge.table = merge.table, remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, use.dplyr = use.dplyr)
+          merge.table = merge.table, remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, 
+          use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)
 }
 
 
@@ -178,7 +187,8 @@ getDataOut <- function(obj, comm) {
 }
 
 getDataParameter <- function(obj, ..., parameter = NULL, 
-  remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, merge.table = FALSE, use.dplyr = FALSE) {
+  remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, merge.table = FALSE, use.dplyr = FALSE,
+                             stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
     'year', 'slice', 'stg', 'expp', 'imp', 'trade')
   set <- list(...)                      
@@ -254,16 +264,45 @@ getDataParameter <- function(obj, ..., parameter = NULL,
         }
     }  
   }
+  set <- obj@result@set
+  set$year <- obj@model@sysInfo@year
+  set$yearp <- set$year
+  if (merge.table) {
+    if (ncol(dtt) > 1) {
+      cc <- NULL
+      if (stringsAsFactors) 
+        cc <- colnames(dtt)[!(colnames(dtt) %in% c('year', 'yearp', 'value', 'variable'))]
+      if (yearsAsFactors) 
+        cc <- c(cc, colnames(dtt)[colnames(dtt) %in% c('year', 'yearp')])
+      for(i in cc) {
+        dtt[, i] <- factor(dtt[, i], levels = set[[i]])
+      } 
+    }
+  } else if (astable) {
+    for(j in names(dtt)) if (ncol(dtt[[j]]) > 1) {
+      cc <- NULL
+      if (stringsAsFactors) 
+        cc <- colnames(dtt[[j]])[!(colnames(dtt[[j]]) %in% c('year', 'yearp', 'value', 'variable'))]
+      if (yearsAsFactors) 
+        cc <- c(cc, colnames(dtt[[j]])[colnames(dtt[[j]]) %in% c('year', 'yearp')])
+      for(i in cc) {
+        dtt[[j]][, i] <- factor(dtt[[j]][, i], levels = set[[i]])
+      } 
+    }
+  }
   return(dtt)
 }
 
 getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.table = TRUE,
-  remove_zero_dim = TRUE, drop = TRUE) {
+  remove_zero_dim = TRUE, drop = TRUE, stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   lmx <- getDataResult0(obj, ..., remove_zero_dim = FALSE, drop = FALSE)
   if (astable) {
+    set <- obj@result@set
+    set$year <- obj@model@sysInfo@year
+    set$yearp <- set$year
     if (merge.table) {
       ltb <- lapply(names(lmx), function(x) {
-        if (is.null(dim(lmx[[x]]))) return(NULL)
+        if (is.null(dim(lmx[[x]]))) return(data.frame(variable = as.factor(x), value = lmx[[x]]))
         y <- as.data.frame.table(lmx[[x]], responseName = "value0")
         y$variable <- as.factor(x)
         y$value <- y$value0
@@ -285,10 +324,23 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
         if (ncol(dft) > 1) dft <- dft[, c(sapply(dft[, -ncol(dft), drop = FALSE], 
           function(x) any(x[1] != x)), TRUE), drop = FALSE]
       }
+      if (ncol(dft) > 1) {
+        for(i in 2:ncol(dft) - 1) dft[, i] <- as.character(dft[, i])
+        for(i in colnames(dft)[colnames(dft) %in% c('year', 'yearp')]) 
+          dft[, i] <- as.numeric(dft[, i])
+        cc <- NULL
+        if (stringsAsFactors) 
+          cc <- colnames(dft)[!(colnames(dft) %in% c('year', 'yearp', 'value', 'variable'))]
+        if (yearsAsFactors) 
+          cc <- c(cc, colnames(dft)[colnames(dft) %in% c('year', 'yearp')])
+        for(i in cc) {
+          dft[, i] <- factor(dft[, i], levels = set[[i]])
+        } 
+      }
       return(dft)
     } else {
       ltb <- lapply(names(lmx), function(x) {
-        if (is.null(dim(lmx[[x]]))) return(NULL)
+        if (is.null(dim(lmx[[x]]))) return(data.frame(variable = as.factor(x), value = lmx[[x]]))
         as.data.frame.table(lmx[[x]], responseName = "value")
       })
       names(ltb) <- names(lmx)
@@ -300,6 +352,19 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
           if (ncol(ltb[[i]]) > 1) ltb[[i]] <- ltb[[i]][, c(sapply(ltb[[i]][, -ncol(ltb[[i]]), drop = FALSE], 
             function(x) any(x[1] != x)), TRUE), drop = FALSE]
         }
+      }
+      for(j in names(ltb)) if (ncol(ltb[[j]]) > 1) {
+          for(i in 2:ncol(ltb[[j]]) - 1) ltb[[j]][, i] <- as.character(ltb[[j]][, i])
+          for(i in colnames(ltb[[j]])[colnames(ltb[[j]]) %in% c('year', 'yearp')]) 
+            ltb[[j]][, i] <- as.numeric(ltb[[j]][, i])
+          cc <- NULL
+          if (stringsAsFactors) 
+            cc <- colnames(ltb[[j]])[!(colnames(ltb[[j]]) %in% c('year', 'yearp', 'value', 'variable'))]
+          if (yearsAsFactors) 
+            cc <- c(cc, colnames(ltb[[j]])[colnames(ltb[[j]]) %in% c('year', 'yearp')])
+          for(i in cc) {
+            ltb[[j]][, i] <- factor(ltb[[j]][, i], levels = set[[i]])
+          } 
       }
       return(ltb)
     }
