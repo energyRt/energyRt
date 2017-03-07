@@ -24,13 +24,19 @@ choropleth.scenario <- function(obj, # scenario object
                                 shading = NULL,
                                 main = NULL
 ) {
-  dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE)
+  dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
+                 yearsAsFactors = TRUE, stringsAsFactors = TRUE)
   if (is.null(dat)) {
     message("No data for current set of filters")
     return()
   }
-  ff <- sapply(dat, is.factor)
   nm <- names(dat)
+  cc <- sapply(dat, is.character)
+  for (i in nm[cc]) {
+    dat[,i] <- as.factor(dat[,i])
+  }
+  
+  ff <- sapply(dat, is.factor)
   rg <- nm == "region"
   src.rg <- nm == "src"
   dst.rg <- nm == "dst"
@@ -54,7 +60,7 @@ choropleth.scenario <- function(obj, # scenario object
   }
   
   ltx <- sapply(dat[, ff & !rg], function(x) {
-    levs <- levels(x)
+    levs <- levels(as.factor(as.character(x)))
     n <- 2
     if(length(levs) > n) {
       levs <- paste0("sum(", levs[1], ",..., ", levs[length(levs)], ")")
@@ -83,7 +89,7 @@ choropleth.scenario <- function(obj, # scenario object
   spdf <- sp::merge(scen.BAU@model@sysInfo@sp, dat)
   #head(spdf@data)
   if(is.null(shading)) {
-    sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], n = 7)
+    sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], n = 9)
   } else {
     sh <- shading
   }
