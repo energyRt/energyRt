@@ -6,7 +6,8 @@
 \usage{
 getData(obj, ..., parameter = NULL, variable = NULL, get.parameter = NULL,
   get.variable = NULL, merge.table = FALSE, remove_zero_dim = TRUE,
-  drop = TRUE, astable = TRUE, use.dplyr = FALSE)
+  drop = TRUE, astable = TRUE, use.dplyr = FALSE,
+  stringsAsFactors = TRUE, yearsAsFactors = FALSE)
 }
 \arguments{
 \item{parameter}{character vector with names of paremeters}

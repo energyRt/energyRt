@@ -22,12 +22,21 @@ choropleth.scenario <- function(obj, # scenario object
                                 src.reg = TRUE,   # logical, if TRUE, map trade for source region
                                 dst.reg = !src.reg, # if TRUE, map trade for destination region
                                 shading = NULL,
-                                main = NULL
+                                main = NULL, 
+                                regex = FALSE
 ) {
-  dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
-                 yearsAsFactors = TRUE, stringsAsFactors = TRUE)
-  if (is.null(dat)) {
-    message("No data for current set of filters")
+  # if(regex) {get_data <- "getData_"} else {get_data <- "getData"}
+  # dat <- eval(call(get_data, obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
+  #                yearsAsFactors = TRUE, stringsAsFactors = TRUE))
+  if(regex) {
+    dat <- getData_(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
+                   yearsAsFactors = TRUE, stringsAsFactors = TRUE)
+  } else {
+    dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
+                     yearsAsFactors = TRUE, stringsAsFactors = TRUE)
+  }
+    if (is.null(dat) | nrow(dat) == 0) {
+    message("No data for the set of filters")
     return()
   }
   nm <- names(dat)
@@ -113,3 +122,103 @@ choropleth.scenario <- function(obj, # scenario object
   # )
   # 
 }
+
+arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
+                         col = "blue", col.Inf = "red",
+                         length = .12, angle = 12, FUN = "sum", 
+                         add = FALSE,
+                         ...) {
+  dat <- getData(scen, ..., # parameter = "pTradeIr", 
+                 astable = TRUE, drop = FALSE, merge.table = TRUE)
+  nm <- names(dat)
+  if (!("src" %in% nm) | !("dst" %in% nm)) {
+    message("No data for source and/or destination region, 'src' or 'dst' columns is missing.")
+    message(paste("Names:", nm))
+  }
+  cc <- sapply(dat, is.character)
+  for (i in nm[cc]) {
+    dat[,i] <- as.factor(dat[,i])
+  }
+  # Aggregate data
+  dat <- agg_srcdst(dat, FUN = FUN)
+  # Coerce to character for merging
+  nm2 <- names(dat)
+  ff <- sapply(dat, is.factor)
+  for (i in nm2[ff]) {
+    dat[,i] <- as.character(dat[,i])
+  }
+  
+  # Add coordinates
+  src <- get_labpt(scen)
+  nm2 <- names(src)
+  ff <- sapply(src, is.factor)
+  for (i in nm2[ff]) {
+    src[,i] <- as.character(src[,i])
+  }
+  
+  names(src) <- c("src", "x.src", "y.src")
+  dst <- src
+  names(dst) <- c("dst", "x.dst", "y.dst")
+  # dat <- dplyr::inner_join(dat, src)
+  # dat <- dplyr::inner_join(dat, dst)
+  dat <- merge(dat, src, by = "src")
+  dat <- merge(dat, dst, by = "dst")
+  
+  #
+  pos <- dat$value > 0
+  ii <- is.infinite(dat$value)
+  if (all(ii & pos)) {
+    dat$lwd <- NA
+    dat$lwd[ii & pos] <- lwd.Inf
+    #message("All Inf")
+  } else {
+    amax <- max(dat$value[pos])
+    if(is.infinite(amax)) amax <- max(dat$value[pos & !ii])
+    # if(is.infinite(amax)) amax <- mx
+    amin <- min(dat$value[pos])
+    mn <- lwd.min
+    mx <- lwd.max
+    dat$lwd <- NA
+    if (amax > amin) {
+      dat$lwd[pos] <- (dat$value[pos] - amin) * (mx - mn) / (amax - amin)  + mn
+    } else {
+      dat$lwd[pos] <- 0.5 * (lwd.min + lwd.max)
+    }
+    dat$lwd[ii] <- lwd.Inf
+    #message("Not Inf")
+  }
+  dat$col <- col
+  dat$col[ii] <- col.Inf
+  if (!add) plot(scen@model@sysInfo@sp)
+  arrows(dat$x.src, dat$y.src, dat$x.dst, dat$y.dst, 
+         col = dat$col, length = length, 
+         lwd = dat$lwd, angle = angle)
+}
+
+agg_region <- function(dat, by = list(dat$region), FUN = "sum",
+                       names = c("region", "value")) {
+  dat <- aggregate(dat$value, by = by, FUN = FUN)
+  names(dat) <- names
+  return(dat)
+}
+
+agg_srcdst <- function(dat, by = list(dat$src, dat$dst), FUN = "sum",
+                       names = c("src", "dst", "value")) {
+  dat <- aggregate(dat$value, by = by, FUN = FUN)
+  names(dat) <- names
+  return(dat)
+}
+
+get_labpt <- function(scen) {
+  labpt <- sapply(scen@model@sysInfo@sp$OBJECTID, function(x) {
+    scen.BAU@model@sysInfo@sp@polygons[[x]]@labpt
+  })
+  labpt <- cbind(
+    scen@model@sysInfo@sp@data$region,
+    as.data.frame(t(labpt))
+  )
+  names(labpt) <- c("region", "x", "y")
+  return(labpt)
+}
+
+
