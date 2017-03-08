@@ -186,6 +186,12 @@ getDataOut <- function(obj, comm) {
   tapply(gg$value, gg[, c('year', 'src')], sum)
 }
 
+getVariableParameterName <- function(obj) {
+  fl <- names(obj@precompiled@maptable)[sapply(obj@precompiled@maptable, function(x) 
+    x@type %in% c('single', 'double'))]
+  c(fl, names(obj@result@data))
+}
+
 getDataParameter <- function(obj, ..., parameter = NULL, 
   remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, merge.table = FALSE, use.dplyr = FALSE,
                              stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
@@ -229,10 +235,13 @@ getDataParameter <- function(obj, ..., parameter = NULL,
       dtt <- dtt[rmv]  
     }
   }
+  for(j in names(dtt)) {
+    colnames(dtt[[j]])[ncol(dtt[[j]])] <- "value"
+  }  
   if (drop) {
     for(j in names(dtt)) if (ncol(dtt[[j]]) > 1) {
-      dtt[[j]] <- dtt[[j]][, c(apply(dtt[[j]][, -ncol(dtt[[j]]), drop = FALSE], 
-        2, function(x) length(unique(x)) > 1), TRUE), drop = FALSE]
+      dtt[[j]] <- dtt[[j]][, c(apply(dtt[[j]][, -c(1, ncol(dtt[[j]])), drop = FALSE], 2, 
+        function(x) any(x != x[1])), TRUE), drop = FALSE]
     }
   }
   if (remove_zero_dim && length(dtt) != 0) {
@@ -242,8 +251,8 @@ getDataParameter <- function(obj, ..., parameter = NULL,
     }
     if (drop) {
       for(j in names(dtt)) if (ncol(dtt[[j]]) > 1) {
-        dtt[[j]] <- dtt[[j]][, c(apply(dtt[[j]][, -ncol(dtt[[j]]), drop = FALSE], 
-          2, function(x) length(unique(x)) > 1), TRUE), drop = FALSE]
+        dtt[[j]] <- dtt[[j]][, c(apply(dtt[[j]][, -c(1, ncol(dtt[[j]])), drop = FALSE], 2, 
+        function(x) any(x != x[1])), TRUE), drop = FALSE]
       }
     }
   }
@@ -253,9 +262,6 @@ getDataParameter <- function(obj, ..., parameter = NULL,
     dtt <- lapply(dtt, function(x) tapply(x[, ncol(x)], x[, -ncol(x), drop = FALSE], sum))
     names(dtt) <- gg
   } else {
-    for(j in names(dtt)) {
-      colnames(dtt[[j]])[ncol(dtt[[j]])] <- "value"
-    }
     if (merge.table) {
         if (use.dplyr) {
           dtt <- Reduce(function(x, y) {dplyr::full_join(x, y)}, dtt)
@@ -267,11 +273,12 @@ getDataParameter <- function(obj, ..., parameter = NULL,
   set <- obj@result@set
   set$year <- obj@model@sysInfo@year
   set$yearp <- set$year
+  set$variable <- getVariableParameterName(obj)
   if (merge.table) {
     if (ncol(dtt) > 1) {
       cc <- NULL
       if (stringsAsFactors) 
-        cc <- colnames(dtt)[!(colnames(dtt) %in% c('year', 'yearp', 'value', 'variable'))]
+        cc <- colnames(dtt)[!(colnames(dtt) %in% c('year', 'yearp', 'value'))]
       if (yearsAsFactors) 
         cc <- c(cc, colnames(dtt)[colnames(dtt) %in% c('year', 'yearp')])
       for(i in cc) {
@@ -282,7 +289,7 @@ getDataParameter <- function(obj, ..., parameter = NULL,
     for(j in names(dtt)) if (ncol(dtt[[j]]) > 1) {
       cc <- NULL
       if (stringsAsFactors) 
-        cc <- colnames(dtt[[j]])[!(colnames(dtt[[j]]) %in% c('year', 'yearp', 'value', 'variable'))]
+        cc <- colnames(dtt[[j]])[!(colnames(dtt[[j]]) %in% c('year', 'yearp', 'value'))]
       if (yearsAsFactors) 
         cc <- c(cc, colnames(dtt[[j]])[colnames(dtt[[j]]) %in% c('year', 'yearp')])
       for(i in cc) {
@@ -300,6 +307,7 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
     set <- obj@result@set
     set$year <- obj@model@sysInfo@year
     set$yearp <- set$year
+    set$variable <- getVariableParameterName(obj)
     if (merge.table) {
       ltb <- lapply(names(lmx), function(x) {
         if (is.null(dim(lmx[[x]]))) return(data.frame(variable = as.factor(x), value = lmx[[x]]))
@@ -320,8 +328,10 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
       if (remove_zero_dim) {
         dft <- dft[dft$value != 0,, drop = FALSE]
       }
+      dft <- dft[,c('variable', colnames(dft)[!(colnames(dft) %in% c('value', 'variable'))], 'value'), 
+        drop = FALSE]
       if (drop) {
-        if (ncol(dft) > 1) dft <- dft[, c(sapply(dft[, -ncol(dft), drop = FALSE], 
+        if (ncol(dft) > 2) dft <- dft[, c(TRUE, sapply(dft[, -c(1, ncol(dft)), drop = FALSE], 
           function(x) any(x[1] != x)), TRUE), drop = FALSE]
       }
       if (ncol(dft) > 1) {
@@ -330,7 +340,7 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
           dft[, i] <- as.numeric(dft[, i])
         cc <- NULL
         if (stringsAsFactors) 
-          cc <- colnames(dft)[!(colnames(dft) %in% c('year', 'yearp', 'value', 'variable'))]
+          cc <- colnames(dft)[!(colnames(dft) %in% c('year', 'yearp', 'value'))]
         if (yearsAsFactors) 
           cc <- c(cc, colnames(dft)[colnames(dft) %in% c('year', 'yearp')])
         for(i in cc) {
@@ -359,7 +369,7 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
             ltb[[j]][, i] <- as.numeric(ltb[[j]][, i])
           cc <- NULL
           if (stringsAsFactors) 
-            cc <- colnames(ltb[[j]])[!(colnames(ltb[[j]]) %in% c('year', 'yearp', 'value', 'variable'))]
+            cc <- colnames(ltb[[j]])[!(colnames(ltb[[j]]) %in% c('year', 'yearp', 'value'))]
           if (yearsAsFactors) 
             cc <- c(cc, colnames(ltb[[j]])[colnames(ltb[[j]]) %in% c('year', 'yearp')])
           for(i in cc) {
