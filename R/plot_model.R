@@ -73,9 +73,10 @@ plot_supply <- function(obj, commodity, region = NULL, supply = NULL,
     if (any(gg == Inf)) {
       yr <- year[gg[, 'up'] == Inf]
       mm <- par()$usr[4]
+      #if (length(yr) != 21) browser()
       while(length(yr) != 0) {  
-        rng <- sum(yr[1] + seq(along = yr) - 1 == yr)
-        rr <- yr[1:rng]; 
+        rng <- sum(year[yr[1] <= year] == yr) #sum(yr[1] + seq(along = yr) - 1 == yr)
+        rr <- yr[1:rng];
         lo <- gg[as.character(rr), 'lo']
         if (rr[1] != year[1]) {
           lo <- c(mean(gg[as.character(rr[1] - 0:1), 'lo']), lo)
