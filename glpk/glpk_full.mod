@@ -4277,7 +4277,7 @@ for {c in comm} {
 for {r in region} {
     printf "region,%s\n", r >> "raw_data_set.csv";
 }
-for {y in year} {
+for {y in year : mMidMilestone[y] <> 0} {
     printf "year,%s\n", y >> "raw_data_set.csv";
 }
 for {s in slice} {
