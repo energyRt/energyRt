@@ -50,7 +50,7 @@ getData0 <- function(obj, ..., parameter = NULL, variable = NULL,
       if (length(l1) == 0 && length(l2) == 0) return(NULL) else
       if (length(l1) != 0 && length(l2) != 0) {
         for(i in names(l2)) l1[[i]] <- l2[[i]]
-      } else if (length(l2) != 0) l2 <- l1
+      } else if (length(l2) != 0) l1 <- l2
       for(i in names(l1)) l1[[i]]$variable <- i
       if (use.dplyr) {
         l1 <- Reduce(function(x, y) {dplyr::full_join(x, y)}, l1)
@@ -233,6 +233,10 @@ getDataParameter <- function(obj, ..., parameter = NULL,
   names(alias_set) <- alias_set
   alias_set$comm = c('comm', 'acomm', 'comme')
   alias_set$region = c('region', 'regionp', 'src', 'dst')
+  if (any(names(set) %in% c('src', 'dst'))) {
+    dtt <- dtt[sapply(dtt, function(x) any(colnames(x) == 'src'))]  
+    alias_set$region <- c('region', 'regionp')
+  } 
   alias_set$year = c('year', 'yearp', 'yeare')
   alias_set <- alias_set[names(set)]
   if (length(set) != 0) {
@@ -283,19 +287,22 @@ getDataParameter <- function(obj, ..., parameter = NULL,
     names(dtt) <- gg
   } else {
     if (merge.table) {
-        if (use.dplyr) {
+       for(i in names(dtt)) {
+         dtt[[i]]$variable <- i
+         dtt[[i]] <- dtt[[i]][, c(ncol(dtt[[i]]), 2:ncol(dtt[[i]]) - 1), drop = FALSE]
+       }
+       if (use.dplyr) {
           dtt <- Reduce(function(x, y) {dplyr::full_join(x, y)}, dtt)
         } else {
           dtt <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, dtt)
         }
         dtt <- dtt[, c('variable', colnames(dtt)[!(colnames(dtt) %in% c('variable', 'value'))], 'value')]
         #
-        if (drop && ncol(dtt) > 1) {
+       if (drop && ncol(dtt) > 2) {
             dtt <- dtt[, c(TRUE, apply(dtt[, -c(1, ncol(dtt)), drop = FALSE], 2, 
                                            function(x) length(unique(x)) != 1), TRUE), drop = FALSE]
         }
         if (remove_zero_dim && length(dtt) != 0) {
-          dtt <- dtt[sapply(dtt, function(x) any(x[, ncol(x)] != 0))]
           dtt <- dtt[dtt[, ncol(dtt)] != 0,, drop = FALSE]
           if (drop && ncol(dtt) > 1) {
             dtt <- dtt[, c(TRUE, apply(dtt[, -c(1, ncol(dtt)), drop = FALSE], 2, 
