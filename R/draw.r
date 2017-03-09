@@ -195,7 +195,7 @@ draw.technology <- function(
         }
         if (gparam[gparam$group == gr, 'ginp2use'] != 1)  
           text(.39 + ar_shift, sum(arr) / 2 + .025, paste('ginp2use(', gr, ') =', 
-            to_format(gparam[gr, 'ginp2use']), sep = ''), 
+            to_format(gparam[gparam$group == gr, 'ginp2use']), sep = ''), 
                 adj = 0, cex = CEX_GREFF)
       }
       # acomm
