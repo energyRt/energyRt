@@ -662,7 +662,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         FL[cc] <- !fl
       }      
       ## Trade
-      if (length(dtt$trade) != 0) {
+  cat('Trade\n')
+  if (length(dtt$trade) != 0) {
         #stock <- obj@precompiled@maptable$pTechStock@data
         #FL <- array(NA, dim = length(dtt$technology), dimnames = list(names(dtt$technology)))
         cat('\\section{Trade analysis}\n\n', '\n', sep = '', file = zz)

@@ -9,7 +9,7 @@ plot_supply <- function(obj, commodity, region = NULL, supply = NULL,
            year = NULL, slice = NULL, inf.col = 'red', ylim = NULL, xlab = '', 
            ylab = '', main = NULL, xlim = NULL, ylim2 = NULL,
            col = 'gray', lwd = 2, density = 20, border = 'black', ylim_min = NULL, ...) {
-    # Data calculation 
+  # Data calculation 
     if (is.null(region)) region <- obj@sysInfo@region
     if (is.null(year)) year <- obj@sysInfo@year
     if (is.null(slice)) slice <- obj@sysInfo@slice
@@ -73,9 +73,8 @@ plot_supply <- function(obj, commodity, region = NULL, supply = NULL,
     if (any(gg == Inf)) {
       yr <- year[gg[, 'up'] == Inf]
       mm <- par()$usr[4]
-      #if (length(yr) != 21) browser()
       while(length(yr) != 0) {  
-        rng <- sum(year[yr[1] <= year] == yr) #sum(yr[1] + seq(along = yr) - 1 == yr)
+        rng <- sum(year[yr[1] <= year] == yr)
         rr <- yr[1:rng];
         lo <- gg[as.character(rr), 'lo']
         if (rr[1] != year[1]) {
@@ -168,7 +167,7 @@ plot_export <- function(obj, commodity, region = NULL, export = NULL,
       yr <- year[gg[, 'up'] == Inf]
       mm <- par()$usr[4]
       while(length(yr) != 0) {  
-        rng <- sum(yr[1] + seq(along = yr) - 1 == yr)
+        rng <- sum(year[yr[1] <= year] == yr)
         rr <- yr[1:rng]; 
         lo <- gg[as.character(rr), 'lo']
         if (rr[1] != year[1]) {
@@ -261,7 +260,7 @@ plot_import <- function(obj, commodity, region = NULL, import = NULL,
       yr <- year[gg[, 'up'] == Inf]
       mm <- par()$usr[4]
       while(length(yr) != 0) {  
-        rng <- sum(yr[1] + seq(along = yr) - 1 == yr)
+        rng <- sum(year[yr[1] <= year] == yr)
         rr <- yr[1:rng]; 
         lo <- gg[as.character(rr), 'lo']
         if (rr[1] != year[1]) {
