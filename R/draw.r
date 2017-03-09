@@ -109,6 +109,10 @@ draw.technology <- function(
       ainp <- NULL
       aout <- NULL
     }
+    if (any(!(tech@geff$group %in% tech@input$group))) {
+      stop(paste('There are undifend "group": ', paste(unique(tech@geff$group[
+        !(tech@geff$group %in% tech@input$group)]), collapse = '", "'), sep = ''))
+    }
     # LHS
     ccomm <- ctype$comm[ctype$comm$type == 'input',, drop = FALSE]
     if (nrow(ccomm) != 0 || length(ainp) != 0) {
