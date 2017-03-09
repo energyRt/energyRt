@@ -29,8 +29,8 @@ sm_compile_model <- function(obj,
 #       tmpdir = Sys.getenv('TMP')
 #    }
     tmp.dir <-  paste(tmp.dir, '/solwork/', sep = '')
-    add_drr <- paste(solver, obj@name, paste(format(Sys.Date(),
-       format = '%Y-%m-%d'), format(Sys.time(), format = '%H-%M-%S')))
+    add_drr <- paste(solver, obj@name, format(Sys.Date(),
+       format = '%Y-%m-%d'), format(Sys.time(), format = '%H-%M-%S'), sep = '_')
     #dir.create(paste(tmpdir, '/', add_drr, '/', sep = ''), recursive = TRUE)
     tmp.dir <- paste(tmp.dir, '/', add_drr, sep = '')
     dir.create(tmp.dir, recursive = TRUE)
