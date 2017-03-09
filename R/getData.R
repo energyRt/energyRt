@@ -22,7 +22,7 @@
 #' @param remove_zero_dim rename to 'drop.zeros' 
 #' @param drop # add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'
  
-getData <- function(obj, ..., parameter = NULL, variable = NULL, 
+getData0 <- function(obj, ..., parameter = NULL, variable = NULL, 
                     get.parameter = NULL, get.variable = NULL, merge.table = FALSE,
                     remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
                     stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
@@ -80,20 +80,28 @@ getData <- function(obj, ..., parameter = NULL, variable = NULL,
   }
 }
 
+
+getData <- function(obj, ..., regex = FALSE) {
+  if (regex) getData_(obj, ...) else getData0(obj, ...)  
+}
+
 getData_ <- function(obj, ..., parameter = NULL, variable = NULL, 
                      get.variable = NULL, get.parameter = NULL, merge.table = FALSE,
                      remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
                     stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-               'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')
+               'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
   set <- list(...)                      
   if (any(!(names(set) %in% psb_set)))
     stop(paste('Unknown set name "', paste(names(set)[!(names(set) %in% psb_set)], 
                                            collapse = '", "'), '"', sep = ''))
-  for(i in names(set)) {
+  for(i in names(set)[names(set) %in% c('src', 'dst')]) {
+    set[[i]] <-  grep(set[[i]], obj@result@set$region, value = TRUE)
+  }
+  for(i in names(set)[!(names(set) %in% c('src', 'dst'))]) {
     set[[i]] <-  grep(set[[i]], obj@result@set[[i]], value = TRUE)
   }
-  getData(obj, args = set, 
+  getData0(obj, args = set, 
           parameter = parameter, variable = variable, get.variable = get.variable, get.parameter = get.parameter, 
           merge.table = merge.table, remove_zero_dim = remove_zero_dim, drop = drop, astable = astable, 
           use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)
@@ -103,7 +111,7 @@ getData_ <- function(obj, ..., parameter = NULL, variable = NULL,
 getDataResult0 <- function(obj, ..., variable = NULL, 
   remove_zero_dim = TRUE, drop = TRUE) {
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-    'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')
+    'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
   set <- list(...)
   if (any(names(set) == 'args')) set <- set$args
   if (any(!(names(set) %in% psb_set)))
@@ -120,6 +128,10 @@ getDataResult0 <- function(obj, ..., variable = NULL,
   names(alias_set) <- alias_set
   alias_set$comm = c('comm', 'acomm', 'comme')
   alias_set$region = c('region', 'regionp', 'src', 'dst')
+  if (any(names(set) %in% c('src', 'dst'))) {
+    dtt <- dtt[sapply(dtt, function(x) any(names(dimnames(x)) == 'src'))]  
+    alias_set$region <- c('region', 'regionp')
+  } 
   alias_set$year = c('year', 'yearp', 'yeare')
   alias_set <- alias_set[names(set)]
   if (length(set) != 0) {
@@ -202,7 +214,7 @@ getDataParameter <- function(obj, ..., parameter = NULL,
   remove_zero_dim = TRUE, drop = TRUE, astable = TRUE, merge.table = FALSE, use.dplyr = FALSE,
                              stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-    'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')
+    'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
   set <- list(...)                      
   if (any(names(set) == 'args')) set <- set$args
   if (any(!(names(set) %in% psb_set)))
