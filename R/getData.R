@@ -389,7 +389,7 @@ getDataResult <- function(obj, ..., astable = TRUE, use.dplyr = FALSE, merge.tab
           dft[, i] <- factor(dft[, i], levels = set[[i]])
         } 
       }
-      if (length(dft) == 0) return(NULL) else return(dft)
+      if (nrow(dft) == 0) return(NULL) else return(dft)
     } else {
       ltb <- lapply(names(lmx), function(x) {
         if (is.null(dim(lmx[[x]]))) return(data.frame(variable = as.factor(x), value = lmx[[x]]))
