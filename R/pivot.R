@@ -20,7 +20,7 @@ pivot <- function(scen = NULL, variable = NULL, get_data = FALSE, ...) {
     return(list(dft))
   },
   x = eg[, 1], y = eg[, 2])
-
+  
   dft <- Reduce(function(x, y, ...) {merge(x, y, all = TRUE)}, lst)
   #dft <- Reduce(function(x, y, ...) {dplyr::full_join(x, y)}, lst)
   
@@ -29,7 +29,7 @@ pivot <- function(scen = NULL, variable = NULL, get_data = FALSE, ...) {
                              aggregatorName = "Sum",
                              rendererName = "Stacked Bar Chart",
                              cols = "year",
-                             rows = c("variable", "tech", "comm", "sup", "scen"),
+                             rows = c("tech", "comm", "sup", "dem"),
                              vals = "value", ...)
     
   } else {
