@@ -15,8 +15,8 @@ get.listing.file <- function(mdl, ...) {
   feqt <- data.frame(bg = grep('[.][.]', kk), en = grep('[;]', kk))
   feqt <- apply(feqt, 1, function(x) gsub('[[:space:]]*', '', gsub('[;].*', '', 
     paste(kk[x[1]:x[2]], collapse = ''))))
-  vb_map <- getVariablesMap()
-  eq_map <- getEquationsMap()
+  vb_map <- getVariablesDim()
+  eq_map <- getEquationsDim()
   splt.by.variable <- function(eq)  {
     arg <- gsub('[.][.].*', '', eq)
     if (any(grep('[(]', arg))) {
