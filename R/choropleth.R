@@ -221,4 +221,21 @@ get_labpt <- function(scen) {
   return(labpt)
 }
 
+add_labpt <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = NULL) {
+  # Adding coordnates of regions' centers
+  names(labpt) <- c(ID, paste0(pref, names(labpt) [2:3], sfx))
+  dat <- merge(dat, labpt, by = ID)
+  
+}
 
+getSPDF <- function(scen, ...) {
+  SPDF <- scen@model@sysInfo@sp
+  if (is.null(SPDF)) {
+    stop("The scenario has no spatial information. Check 'scen@model@sysInfo@sp'")
+  }
+  
+  dat <- getData(scen, ..., astable = TRUE, merge.table = TRUE, drop = FALSE)
+  dat <- agg_region(dat)
+  SPDF <- sp::merge(SPDF, dat)
+  return(SPDF)
+}
