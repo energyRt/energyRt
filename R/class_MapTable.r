@@ -231,8 +231,8 @@ setMethod('toGams', signature(obj = 'MapTable'),
     } else if (obj@type == 'single') {
        if (nrow(obj@data) == 0 || all(obj@data$Freq == obj@default)) {
         ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@default, ';', sep = '')
-      } else  if (all(obj@data$Freq[1] == obj@data$Freq)) {
-        ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@data$Freq[1], ';', sep = '')
+      #} else  if (all(obj@data$Freq[1] == obj@data$Freq)) {
+      #  ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@data$Freq[1], ';', sep = '')
       } else {
         obj@data <- obj@data[obj@data$Freq != 0,, drop = FALSE]
         ret <- c('parameter', paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') /', sep = ''))
