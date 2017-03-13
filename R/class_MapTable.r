@@ -216,30 +216,27 @@ setMethod('toGams', signature(obj = 'MapTable'),
         ret <- c(ret, '1')
         ret <- c(ret, '/;', '')
       } else {
-        ret <- c('set', paste(obj@alias, ' /', sep = ''))
-        ret <- c(ret, obj@data[, 1]) 
-        ret <- c(ret, '/;', '')
+        return(c('set', paste(obj@alias, ' /', sep = ''), obj@data[, 1], '/;', ''))
       }
     } else if (obj@type == 'map') {
       if (nrow(obj@data) == 0) {
         ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = NO;', sep = '')
       } else {
         ret <- c('set', paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') /', sep = ''))
-        ret <- c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')))
-        ret <- c(ret, '/;', '')
+        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', ''))
       }
     } else if (obj@type == 'single') {
        if (nrow(obj@data) == 0 || all(obj@data$Freq == obj@default)) {
-        ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@default, ';', sep = '')
+        return(paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@default, ';', sep = ''))
       #} else  if (all(obj@data$Freq[1] == obj@data$Freq)) {
       #  ret <- paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') = ', obj@data$Freq[1], ';', sep = '')
       } else {
-        obj@data <- obj@data[obj@data$Freq != 0,, drop = FALSE]
+        if (any(obj@data$Freq != 0)) obj@data <- obj@data[obj@data$Freq != 0,, drop = FALSE] else
+          obj@data <- obj@data[1,, drop = FALSE]  
         ret <- c('parameter', paste(obj@alias, '(', paste(obj@set, collapse = ', '), ') /', sep = ''))
-        gg <- obj@data[, 1]
-        if (ncol(obj@data) > 2) for(i in 3:ncol(obj@data) - 1) gg <- paste(gg, '.', obj@data[, i], sep = '')
-        gg <- paste(gg, obj@data[, ncol(obj@data)])
-        ret <- c(ret, gg, '/;', '')
+        gg <- paste(obj@data[, ncol(obj@data) - 1], obj@data[, ncol(obj@data)])
+        if (ncol(obj@data) > 2) for(i in seq(ncol(obj@data) - 2, 1)) gg <- paste(obj@data[, i], '.', gg, sep = '')
+        return(c(ret, gg, '/;', ''))
       }  
     } else if (obj@type == 'double') {     
        if (nrow(obj@data) == 0) {
@@ -249,21 +246,23 @@ setMethod('toGams', signature(obj = 'MapTable'),
         ret <- c(ret, paste(obj@alias, 'Up(', paste(obj@set, collapse = ', '), ') = ', 
             obj@default[2], ';', sep = ''))
       } else {
-        ret <- c()
-        for(i in levels(obj@data$type)) {
-          if (i == 'lo') {
-            ret <- c(ret, 'parameter', paste(obj@alias, 'Lo(', paste(obj@set, collapse = ', '), ') /', sep = ''))
-            dta <- obj@data[obj@data$type == 'lo', , drop = FALSE]
+        ret_lo <- c('parameter', paste(obj@alias, 'Lo(', paste(obj@set, collapse = ', '), ') /', sep = ''))
+        ret_up <- c('parameter', paste(obj@alias, 'Up(', paste(obj@set, collapse = ', '), ') /', sep = ''))
+        fl <- (obj@data$type == 'lo')
+        dta_lo <- obj@data[ fl, colnames(obj@data) != 'type', drop = FALSE]
+        dta_up <- obj@data[!fl, colnames(obj@data) != 'type', drop = FALSE]
+        nn <- ncol(dta_lo)
+        if (any(dta_up$Freq != 0)) dta_up <- dta_up[dta_up$Freq != 0,, drop = FALSE] else dta_up <- dta_up[1,, drop = FALSE]  
+        if (any(dta_lo$Freq != 0)) dta_lo <- dta_lo[dta_lo$Freq != 0,, drop = FALSE] else dta_lo <- dta_lo[1,, drop = FALSE]  
+        gg_lo <- paste(dta_lo[, nn - 1], dta_lo[, nn])
+        gg_up <- paste(dta_up[, nn - 1], dta_up[, nn])
+        if (nn > 2) { 
+          for(i in seq(nn - 2, 1)) {
+            gg_lo <- paste(dta_lo[, i], '.', gg_lo, sep = '')
+            gg_up <- paste(dta_up[, i], '.', gg_up, sep = '')
           }
-          if (i == 'up') {
-            ret <- c(ret, 'parameter', paste(obj@alias, 'Up(', paste(obj@set, collapse = ', '), ') /', sep = ''))
-            dta <- obj@data[obj@data$type == 'up', , drop = FALSE]
-          }
-          dta <- dta[, colnames(dta) != 'type', drop = FALSE]
-          ret <- c(ret, paste(apply(dta[, -ncol(dta), drop = FALSE], 1, 
-              function(x) paste(x, collapse = '.')), dta[, 'Freq']))
-          ret <- c(ret, '/;', '')
         }
+        return(c(ret_lo, gg_lo, '/;', '', ret_up, gg_up, '/;', ''))
       }
     } else stop('Must realise')
     ret

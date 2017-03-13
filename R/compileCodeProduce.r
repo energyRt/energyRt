@@ -172,14 +172,13 @@ sm_compile_model <- function(obj,
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
         }
     }
-    cat('Generating model input files ')
+  cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {
     prorgess_bar_p <- proc.time()[3]
     tryCatch({
       cl <- makePSOCKcluster(rep('localhost', n.threads))
       ll <- list()
-      cat('1 ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
       for(i in seq(along = obj@data)) {
         for(j in seq(along = obj@data[[i]]@data)) { 
           ll[[length(ll) + 1]] <- obj@data[[i]]@data[[j]]
@@ -231,6 +230,7 @@ sm_compile_model <- function(obj,
           }
         }
     }
+    cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
   } else if (n.threads == 1) {
     prorgess_bar <- sapply(obj@data, function(x) length(x@data))
     if (is.list(prorgess_bar)) prorgess_bar <- 0 else prorgess_bar <- sum(prorgess_bar)
@@ -296,7 +296,7 @@ sm_compile_model <- function(obj,
   appr <- lapply(yy, function(x) prec@maptable[[x]]@data[[x]])
   names(appr) <- yy
   appr$group <- appr$group[!is.na(appr$group)]
-# ---------------------------------------------------------------------------------------------------------  
+  # ---------------------------------------------------------------------------------------------------------  
 # Fix to previous data
 # ---------------------------------------------------------------------------------------------------------  
   if (any(names(arg) == 'fix_data')) {
@@ -510,9 +510,9 @@ LL1 <- proc.time()[3]
     }
 #!################
 ### FUNC GAMS 
-  if (open.folder) shell.exec(tmpdir)
+      if (open.folder) shell.exec(tmpdir)
   if (solver == 'GAMS') {
-    zz <- file(paste(tmpdir, '/mdl.gpr', sep = ''), 'w')
+        zz <- file(paste(tmpdir, '/mdl.gpr', sep = ''), 'w')
     cat(c('[RP:MDL]', '1=', '', '[OPENWINDOW_1]', 
       gsub('[/][/]*', '\\\\', paste('FILE0=', tmp.dir, '/mdl.gms', sep = '')),
       gsub('[/][/]*', '\\\\', paste('FILE1=', tmp.dir, '/mdl.lst', sep = '')), '', 'MAXIM=1', 
