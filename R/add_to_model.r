@@ -9,24 +9,13 @@ add_to_model <- function(obj, ..., repos.name = NULL) {
     stop(paste('Unknown class "', paste(unique(sapply(app, class)[
       !(sapply(app, class) %in% c(cls, 'repository'))]), collapse = '", "'), '"', sep = ''))
   }
-  if (any(sapply(app, class) == 'repository')) {
-#    if (any(sapply(app, class) != 'repository'))
-#      stop('You can not mix class repository and other for command add')
-    app <- app[sapply(app, class) == 'repository']
-    ff <- c(sapply(obj@data, function(z) z@name), recursive = TRUE)
-    for(i in seq(along = app)) {
-      if (app[[i]]@name == "" || any(ff == app[[i]]@name)) stop('Wrong repository name')
-      obj@data[[app[[i]]@name]] <- app[[i]]
-    }
-  }
-  app <- list(...)
   if (any(sapply(app, class) %in% cls)) {
     app <- app[sapply(app, class) != 'repository']
     # Generate name
     if (is.null(repos.name)) {
       if (length(obj@data) > 1) {
         repos.name <- obj@data[[length(obj@data)]]@name
-        warning('Repository name not defiane and there more than one repository, use "', repos.name, '"')
+        warning('"repos.name" is not specified. Adding to "', repos.name, '" repository')
       } else {
         if (length(obj@data) == 0) obj@data[['Default_repository']] <- new('repository', name = 'Default_repository')
         repos.name <- obj@data[[1]]@name
@@ -41,12 +30,24 @@ add_to_model <- function(obj, ..., repos.name = NULL) {
       obj@data[[fl]] <- add(obj@data[[fl]], app[[i]])
     }
   }
+  app <- list(...)
+  if (any(sapply(app, class) == 'repository')) {
+    #    if (any(sapply(app, class) != 'repository'))
+    #      stop('You can not mix class repository and other for command add')
+    app <- app[sapply(app, class) == 'repository']
+    ff <- c(sapply(obj@data, function(z) z@name), recursive = TRUE)
+    for(i in seq(along = app)) {
+      if (app[[i]]@name == "" || any(ff == app[[i]]@name)) stop('Wrong repository name')
+      obj@data[[app[[i]]@name]] <- app[[i]]
+    }
+  }
   ff <- c(lapply(obj@data, function(x) sapply(x@data, function(z) z@name)), recursive = TRUE)
   if (anyDuplicated(ff)) {
     stop(paste('There are duplicated objects "', 
       paste(unique(ff[duplicated(ff)]), collapse = '", "'), '"', sep = ''))
   }
-  hh <- c(sapply(obj@data, function(x) sapply(x@data, function(y) paste(class(y), ' - ', y@name, sep = ''))), recursive = TRUE)
+  hh <- c(sapply(obj@data, function(x) sapply(x@data, function(y) paste(class(y), ' - ', y@name, sep = ''))), 
+          recursive = TRUE)
   if (anyDuplicated(hh)) {
     hh <- unique(hh[duplicated(hh)])
     cat('There are duplicated pair "class - name"\n')
