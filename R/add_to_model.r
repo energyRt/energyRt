@@ -15,7 +15,7 @@ add_to_model <- function(obj, ..., repos.name = NULL) {
     if (is.null(repos.name)) {
       if (length(obj@data) > 1) {
         repos.name <- obj@data[[length(obj@data)]]@name
-        warning('"repos.name" is not specified. Adding to "', repos.name, '" repository')
+        warning('"repos.name" is not specified, adding objects to "', repos.name, '" repository')
       } else {
         if (length(obj@data) == 0) obj@data[['Default_repository']] <- new('repository', name = 'Default_repository')
         repos.name <- obj@data[[1]]@name
