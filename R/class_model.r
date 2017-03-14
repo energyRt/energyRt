@@ -9,8 +9,8 @@ setClass("model",
           data           = "list",
           sysInfo        = "sysInfo",
           codeProduce    = "CodeProduce", 
-          additionalCode = "character",
-          additionalCodeAfter = "character",
+          additionalCode = "character",        # move 2 misc
+          additionalCodeAfter = "character",   # move 2 misc
           LECdata        = "list",
           early.retirement = "logical",
           misc = "list"
