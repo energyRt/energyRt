@@ -1,5 +1,6 @@
 
 universalInit <- function(class_name, name, exclude = NULL, exclude_class = NULL, ...) {
+  # !!! newObject
   obj <- new(class_name)
   slt <- getSlots(class_name)
   arg <- list(...)

@@ -6,8 +6,8 @@ setClass("scenario",
           name          = "character",
           description   = "character",      
           model         = "model",
-          precompiled   = "CodeProduce",      
-          result        = "result",
+          precompiled   = "CodeProduce",     # @modInp // @parameters 
+          result        = "result",          # @modOut // @variables
           misc = "list"
       ),
       prototype(

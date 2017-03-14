@@ -2,16 +2,16 @@
 setClass('MapTable', # @parameter
   representation(
     alias           = "character",   # @name name Name for GAMS
-    set             = "character",   # @dimSetsNames Dimension sets, comma separated, order is matter
-    type            = "factor",      # @type is it map (map),  single (single parameter),
-                                     # double (Up / Lo parameter)
+    set             = "character",   # @dimSetNames Dimension sets, comma separated, order is matter
+    type            = "factor",      # @type is it map (map),  simple (simple parameter),
+                                     # multi (Up / Lo /Fx parameter)
     default         = "numeric",     # @defVal Default value : zero value  for map,
                                      # one for single, two for double
     interpolation   = "character",   # interpolation 'back.inter.forth'
-    data            = "data.frame",  # @data Data for expotrt
+    data            = "data.frame",  # @data Data for export
     #use_now         = "numeric",     # For fast
     #use_all         = "numeric",     # For fast
-    check           = "function",     # ?delete? function for checking map
+    # check           = "function",     # ?delete? function for checking map
     for_sysInfo     = 'character',   # @colName Column name in slot 
 # misc$nval 
     true_length     = 'numeric',     # @nValues Number of non-NA values in 'data' (to speed-up processing) 
@@ -26,7 +26,7 @@ setClass('MapTable', # @parameter
     data            = data.frame(),
     #use_now         = 0,     
     #use_all         = 0,
-    check           = function(obj) TRUE,
+    #check           = function(obj) TRUE,
     for_sysInfo     = NULL,
     true_length     = 0,
       #! Misc

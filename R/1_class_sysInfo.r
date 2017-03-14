@@ -8,7 +8,8 @@ setClass("sysInfo",
 #          subs               = "data.frame",
           discount           = "data.frame",
           region             = "character",
-          sp                 = "SpatialPolygonsDataFrame",
+          sp                 = "SpatialPolygonsDataFrame", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+
           year               = "numeric",
           milestone          = "data.frame",
           slice              = "character",
@@ -45,7 +46,7 @@ setClass("sysInfo",
           year               = as.numeric(2005:2050),
           milestone          = data.frame(start = numeric(), mid = numeric(), end = numeric()),
           slice              = "ANNUAL",
-          default      = data.frame(
+          default      = data.frame( # !!! distinguish interpolation for different objects and slots
                         cinp2use   = as.numeric(1),
                         ginp2use   = as.numeric(1),
                         cinp2ginp  = as.numeric(1),
