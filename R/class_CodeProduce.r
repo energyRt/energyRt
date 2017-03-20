@@ -303,7 +303,7 @@ setMethod("initialize", "modInp",
       "mCnsOutTech", "mCnsCapTech", "mCnsNewCapTech", "mCnsOutSup", "mCnsInp", "mCnsOut", "mCnsInvTech",
       "mCnsEacTech", "mCnsTechCInp", "mCnsTechCOut", "mCnsTechAInp", "mCnsTechAOut", "mCnsTechEmis",
       "mCnsActTech", "mCnsRhsTypeGrowth", "mCnsFixomTech", 
-      "mCnsVaromTech", "mCnsActVaromTech", "mCnsCVaromTech", "mCnsAVaromTech"))
+      "mCnsVaromTech", "mCnsActVaromTech", "mCnsCVaromTech", "mCnsAVaromTech", "mCnsBalance"))
         .Object@parameters[[i]] <- createParameter(i, 'cns', 'map')    
     for(i in c('tech', 'sup', 'comm', 'region', 'year', 'slice')) {
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')

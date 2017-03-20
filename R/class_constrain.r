@@ -37,6 +37,7 @@ setClass('constrain',
                                                 'eac', 
                                                 'activity', 
                                                 'actvarom', 
+                                                'balance', 
                                                 'cvarom', 
                                                 'avarom', 
                                                 'input', 
@@ -56,6 +57,7 @@ setClass('constrain',
                                                 'growth.actvarom', 
                                                 'growth.cvarom', 
                                                 'growth.avarom', 
+                                                'growth.balance', 
                                                 'growth.activity'
                                                 )),
           rhs           = data.frame(),
@@ -191,7 +193,8 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       minset$output <- c('comm', 'region', 'year', 'slice')
       minset$sharein <- c('comm', 'region', 'year', 'slice')
       minset$shareout <- c('comm', 'region', 'year', 'slice')
-
+      minset$balance <- c('comm', 'region', 'year', 'slice')
+      
       minset$growth.capacity <- c('region', 'year')
       minset$growth.newcapacity <- c('region', 'year')
       minset$growth.invcost <- c('region', 'year')
@@ -204,7 +207,8 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       minset$growth.activity <- c('region', 'year', 'slice')
       minset$growth.input <- c('comm', 'region', 'year', 'slice')
       minset$growth.output <- c('comm', 'region', 'year', 'slice')
-
+      minset$growth.balance <- c('region', 'year', 'slice')
+      
       addset <- list()
       addset$input <- c('tech', 'sup', 'res', 'trade', 'row')
       addset$output <- c('tech', 'sup', 'res', 'trade', 'row')
