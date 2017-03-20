@@ -3,7 +3,7 @@
 ################################################################################
 # Add commodity
 ################################################################################
-sm_add_CodeProduce_commodity_list <- function(obj, app, approxim) {
+sm_add_modInp_commodity_list <- function(obj, app, approxim) {
   cmd <- upper_case(app)
   cmd <- stayOnlyVariable(cmd, approxim$region, 'region')
 #  if (!chec_correct_name(cmd@name)) {
@@ -17,45 +17,45 @@ sm_add_CodeProduce_commodity_list <- function(obj, app, approxim) {
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousCommodity(obj, cmd@name)
 #  }
-#  obj@maptable[['comm']] <- addData(obj@maptable[['comm']], cmd@name)
+#  obj@parameters[['comm']] <- addData(obj@parameters[['comm']], cmd@name)
   # Add ems_from & pEmissionFactor
   dd <- cmd@emis[, c('comm', 'comm', 'mean'), drop = FALSE]
   if (nrow(dd) > 0) {
-    colnames(dd) <- c('comm', 'commp', 'Freq')
+    colnames(dd) <- c('comm', 'commp', 'value')
     dd[, 'commp'] <- cmd@name
-    dd[, 'Freq'] <- as.numeric(dd$Freq) # Must be remove later
-    #obj@maptable[['ems_from']] <- addData(obj@maptable[['ems_from']], dd[, c('comm', 'commp'), drop = FALSE])
-    obj@maptable[['pEmissionFactor']] <- addData(obj@maptable[['pEmissionFactor']], dd)
+    dd[, 'value'] <- as.numeric(dd$value) # Must be remove later
+    #obj@parameters[['ems_from']] <- addData(obj@parameters[['ems_from']], dd[, c('comm', 'commp'), drop = FALSE])
+    obj@parameters[['pEmissionFactor']] <- addData(obj@parameters[['pEmissionFactor']], dd)
   }
 
   dd <- cmd@agg[, c('comm', 'comm', 'agg'), drop = FALSE]
   if (nrow(dd) > 0) {
-    colnames(dd) <- c('comm', 'commp', 'Freq')
+    colnames(dd) <- c('comm', 'commp', 'value')
     dd[, 'comm'] <- cmd@name
-    dd[, 'Freq'] <- as.numeric(dd$Freq) # Must be remove later
-    #obj@maptable[['ems_from']] <- addData(obj@maptable[['ems_from']], dd[, c('comm', 'commp'), drop = FALSE])
-    obj@maptable[['pAggregateFactor']] <- addData(obj@maptable[['pAggregateFactor']], dd)
+    dd[, 'value'] <- as.numeric(dd$value) # Must be remove later
+    #obj@parameters[['ems_from']] <- addData(obj@parameters[['ems_from']], dd[, c('comm', 'commp'), drop = FALSE])
+    obj@parameters[['pAggregateFactor']] <- addData(obj@parameters[['pAggregateFactor']], dd)
   }
 
   # Define mUpComm | mLoComm | mFxComm
   if (cmd@limtype == 'UP')
-    obj@maptable[['mUpComm']] <- addData(obj@maptable[['mUpComm']], data.frame(comm = cmd@name))
+    obj@parameters[['mUpComm']] <- addData(obj@parameters[['mUpComm']], data.frame(comm = cmd@name))
   if (cmd@limtype == 'LO')
-    obj@maptable[['mLoComm']] <- addData(obj@maptable[['mLoComm']], data.frame(comm = cmd@name))
+    obj@parameters[['mLoComm']] <- addData(obj@parameters[['mLoComm']], data.frame(comm = cmd@name))
   if (cmd@limtype == 'FX')
-    obj@maptable[['mFxComm']] <- addData(obj@maptable[['mFxComm']], data.frame(comm = cmd@name))
+    obj@parameters[['mFxComm']] <- addData(obj@parameters[['mFxComm']], data.frame(comm = cmd@name))
   obj
 }
 
-setMethod('add0', signature(obj = 'CodeProduce', app = 'commodity',
-  approxim = 'list'), sm_add_CodeProduce_commodity_list)
+setMethod('add0', signature(obj = 'modInp', app = 'commodity',
+  approxim = 'list'), sm_add_modInp_commodity_list)
 
 
 
 ################################################################################
 # Add demand
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'demand',
+setMethod('add0', signature(obj = 'modInp', app = 'demand',
   approxim = 'list'), function(obj, app, approxim) {     
   dem <- upper_case(app)
   dem <- stayOnlyVariable(dem, approxim$region, 'region')
@@ -67,19 +67,19 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'demand',
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousDemand(obj, dem@name)
 #  }
-#  obj@maptable[['dem']] <- addData(obj@maptable[['dem']], dem@name)
-  obj@maptable[['mDemComm']] <- addData(obj@maptable[['mDemComm']],
+#  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
+  obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
       data.frame(dem = dem@name, comm = dem@commodity)) 
-  obj@maptable[['pDemand']] <- addData(obj@maptable[['pDemand']],
+  obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
       simple_data_frame_approximation_chk(dem@dem, 'dem',
-      obj@maptable[['pDemand']], approxim, 'dem', dem@name))
+      obj@parameters[['pDemand']], approxim, 'dem', dem@name))
   obj
 })
 
 ################################################################################
 # Add supply
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'supply',
+setMethod('add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
   sup <- upper_case(app)
   if (!is.null(sup@region)) {
@@ -94,10 +94,10 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'supply',
         paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
       slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
     }
-    obj@maptable[['mSupSpan']] <- addData(obj@maptable[['mSupSpan']],
+    obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
         data.frame(sup = rep(sup@name, length(sup@region)), region = sup@region))
   } else {
-    obj@maptable[['mSupSpan']] <- addData(obj@maptable[['mSupSpan']],
+    obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
         data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region))
   }
   sup <- stayOnlyVariable(sup, approxim$region, 'region')
@@ -109,24 +109,24 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'supply',
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousSupply(obj, sup@name)
 #  }    
-#  obj@maptable[['sup']] <- addData(obj@maptable[['sup']], sup@name)
-  obj@maptable[['mSupComm']] <- addData(obj@maptable[['mSupComm']],
+#  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
+  obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
       data.frame(sup = sup@name, comm = sup@commodity))
-  obj@maptable[['pSupCost']] <- addData(obj@maptable[['pSupCost']],
+  obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
       simple_data_frame_approximation_chk(sup@availability, 'cost',
-          obj@maptable[['pSupCost']], approxim, 'sup', sup@name))
-  obj@maptable[['pSupReserve']] <- addData(obj@maptable[['pSupReserve']],
-      data.frame(sup = sup@name, Freq = sup@reserve))
-  obj@maptable[['pSupAva']] <- addData(obj@maptable[['pSupAva']],
+          obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
+  obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
+      data.frame(sup = sup@name, value = sup@reserve))
+  obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
             data_frame_approximation_chk(sup@availability, 'ava',
-            obj@maptable[['pSupAva']], approxim, 'sup', sup@name))
+            obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
   obj
 })
 
 ################################################################################
 # Add export
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'export',
+setMethod('add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
   exp <- upper_case(app)
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
@@ -138,24 +138,24 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'export',
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousExport(obj, exp@name)
 #  }    
-#  obj@maptable[['expp']] <- addData(obj@maptable[['expp']], exp@name)
-  obj@maptable[['mExpComm']] <- addData(obj@maptable[['mExpComm']],
+#  obj@parameters[['expp']] <- addData(obj@parameters[['expp']], exp@name)
+  obj@parameters[['mExpComm']] <- addData(obj@parameters[['mExpComm']],
       data.frame(expp = exp@name, comm = exp@commodity))
-  obj@maptable[['pExportRowPrice']] <- addData(obj@maptable[['pExportRowPrice']],
+  obj@parameters[['pExportRowPrice']] <- addData(obj@parameters[['pExportRowPrice']],
       simple_data_frame_approximation_chk(exp@exp, 'price',
-          obj@maptable[['pExportRowPrice']], approxim, 'expp', exp@name))
-  obj@maptable[['pExportRowRes']] <- addData(obj@maptable[['pExportRowRes']],
-      data.frame(expp = exp@name, Freq = exp@reserve))
-  obj@maptable[['pExportRow']] <- addData(obj@maptable[['pExportRow']],
+          obj@parameters[['pExportRowPrice']], approxim, 'expp', exp@name))
+  obj@parameters[['pExportRowRes']] <- addData(obj@parameters[['pExportRowRes']],
+      data.frame(expp = exp@name, value = exp@reserve))
+  obj@parameters[['pExportRow']] <- addData(obj@parameters[['pExportRow']],
             data_frame_approximation_chk(exp@exp, 'exp',
-            obj@maptable[['pExportRow']], approxim, 'expp', exp@name))
+            obj@parameters[['pExportRow']], approxim, 'expp', exp@name))
   obj
 })
 
 ################################################################################
 # Add import
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'import',
+setMethod('add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
   imp <- upper_case(app)
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
@@ -167,24 +167,24 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'import',
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousImport(obj, imp@name)
 #  }    
-#  obj@maptable[['imp']] <- addData(obj@maptable[['imp']], imp@name)
-  obj@maptable[['mImpComm']] <- addData(obj@maptable[['mImpComm']],
+#  obj@parameters[['imp']] <- addData(obj@parameters[['imp']], imp@name)
+  obj@parameters[['mImpComm']] <- addData(obj@parameters[['mImpComm']],
       data.frame(imp = imp@name, comm = imp@commodity))
-  obj@maptable[['pImportRowPrice']] <- addData(obj@maptable[['pImportRowPrice']],
+  obj@parameters[['pImportRowPrice']] <- addData(obj@parameters[['pImportRowPrice']],
       simple_data_frame_approximation_chk(imp@imp, 'price',
-          obj@maptable[['pImportRowPrice']], approxim, 'imp', imp@name))
-  obj@maptable[['pImportRowRes']] <- addData(obj@maptable[['pImportRowRes']],
-      data.frame(imp = imp@name, Freq = imp@reserve))
-  obj@maptable[['pImportRow']] <- addData(obj@maptable[['pImportRow']],
+          obj@parameters[['pImportRowPrice']], approxim, 'imp', imp@name))
+  obj@parameters[['pImportRowRes']] <- addData(obj@parameters[['pImportRowRes']],
+      data.frame(imp = imp@name, value = imp@reserve))
+  obj@parameters[['pImportRow']] <- addData(obj@parameters[['pImportRow']],
             data_frame_approximation_chk(imp@imp, 'imp',
-            obj@maptable[['pImportRow']], approxim, 'imp', imp@name))
+            obj@parameters[['pImportRow']], approxim, 'imp', imp@name))
   obj
 })
 
 ################################################################################
 # Add constrain
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
+setMethod('add0', signature(obj = 'modInp', app = 'constrain',
   approxim = 'list'), function(obj, app, approxim) {
   app <- upper_case(app)
   if (!chec_correct_name(app@name)) {
@@ -197,17 +197,17 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousConstrain(obj, app@name)
   }
-##  obj@maptable[['sup']] <- addData(obj@maptable[['sup']], sup@name)
-##  obj@maptable[['mSupComm']] <- addData(obj@maptable[['mSupComm']],
+##  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
+##  obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
 ##      data.frame(sup = sup@name, comm = sup@commodity))
-##  obj@maptable[['pSupCost']] <- addData(obj@maptable[['pSupCost']],
+##  obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
 ##      simple_data_frame_approximation_chk(sup@availability, 'cost',
-##          obj@maptable[['pSupCost']], approxim, 'sup', sup@name))
-##  obj@maptable[['pSupReserve']] <- addData(obj@maptable[['pSupReserve']],
-##      data.frame(sup = sup@name, Freq = sup@reserve))
-##  obj@maptable[['pSupAva']] <- addData(obj@maptable[['pSupAva']],
+##          obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
+##  obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
+##      data.frame(sup = sup@name, value = sup@reserve))
+##  obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
 ##            data_frame_approximation_chk(sup@availability, 'ava',
-##            obj@maptable[['pSupAva']], approxim, 'sup', sup@name))
+##            obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
 #  if (!chec_correct_name(app@name)) {
 #    stop(paste('Incorrect technology name "', app@name, '"', sep = ''))
 #  }
@@ -230,18 +230,18 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
       for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
         approxim2[[cc]] <- app@for.each[[cc]]
       }
-     obj@maptable[['pTaxCost']] <- addData(obj@maptable[['pTaxCost']],
+     obj@parameters[['pTaxCost']] <- addData(obj@parameters[['pTaxCost']],
         simple_data_frame_approximation_chk(app@rhs, 'tax',
-         obj@maptable[['pTaxCost']], approxim2, 'comm', app@comm))
+         obj@parameters[['pTaxCost']], approxim2, 'comm', app@comm))
   } else
   if (app@type == 'subs') {
       approxim2 <- approxim
       for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
         approxim2[[cc]] <- app@for.each[[cc]]
       }
-     obj@maptable[['pSubsCost']] <- addData(obj@maptable[['pSubsCost']],
+     obj@parameters[['pSubsCost']] <- addData(obj@parameters[['pSubsCost']],
         simple_data_frame_approximation_chk(app@rhs, 'subs',
-         obj@maptable[['pSubsCost']], approxim2, 'comm', app@comm))
+         obj@parameters[['pSubsCost']], approxim2, 'comm', app@comm))
   } else {
     # Define lhs equation type
     ccc <- c("comm", "region", "year", "slice")
@@ -266,81 +266,81 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
     if (length(ast) == 1) {
       before <- paste(before, toupper(substr(ast, 1, 1)), substr(ast, 2, nchar(ast)), sep = '')
       if (any(names(app@for.each) == ast)) {
-        obj@maptable[['mCnsLType']] <- addData(obj@maptable[['mCnsLType']], 
+        obj@parameters[['mCnsLType']] <- addData(obj@parameters[['mCnsLType']], 
              data.frame(cns = app@name, stringsAsFactors = FALSE))
       }
     }
     FL <- TRUE
-    for(cc in ccc) if (nrow(obj@maptable[[cc]]@data) == 0) FL <- FALSE
-    if (length(ast) != 0 && nrow(obj@maptable[[ast]]@data) == 0) FL <- FALSE
+    for(cc in ccc) if (nrow(obj@parameters[[cc]]@data) == 0) FL <- FALSE
+    if (length(ast) != 0 && nrow(obj@parameters[[ast]]@data) == 0) FL <- FALSE
    if (FL) {
-      obj@maptable[['cns']] <- addData(obj@maptable[['cns']], app@name)
-      obj@maptable[[paste('mCns', before, sep = '')]] <- 
-        addData(obj@maptable[[paste('mCns', before, sep = '')]], 
+      obj@parameters[['cns']] <- addData(obj@parameters[['cns']], app@name)
+      obj@parameters[[paste('mCns', before, sep = '')]] <- 
+        addData(obj@parameters[[paste('mCns', before, sep = '')]], 
            data.frame(cns = app@name, stringsAsFactors = FALSE))  
       if (app@type == 'sharein')  
-        obj@maptable[['mCnsRhsTypeShareIn']] <- 
-           addData(obj@maptable[['mCnsRhsTypeShareIn']], 
+        obj@parameters[['mCnsRhsTypeShareIn']] <- 
+           addData(obj@parameters[['mCnsRhsTypeShareIn']], 
              data.frame(cns = app@name, stringsAsFactors = FALSE)) else
-      if (app@type == 'shareout')  obj@maptable[['mCnsRhsTypeShareOut']] <- 
-        addData(obj@maptable[['mCnsRhsTypeShareOut']], 
+      if (app@type == 'shareout')  obj@parameters[['mCnsRhsTypeShareOut']] <- 
+        addData(obj@parameters[['mCnsRhsTypeShareOut']], 
           data.frame(cns = app@name, stringsAsFactors = FALSE)) else
       if (any(grep('growth', as.character(app@type))))  
-        obj@maptable[['mCnsRhsTypeGrowth']] <- 
-           addData(obj@maptable[['mCnsRhsTypeGrowth']], 
+        obj@parameters[['mCnsRhsTypeGrowth']] <- 
+           addData(obj@parameters[['mCnsRhsTypeGrowth']], 
              data.frame(cns = app@name, stringsAsFactors = FALSE)) else
-              obj@maptable[['mCnsRhsTypeConst']] <- addData(obj@maptable[['mCnsRhsTypeConst']], 
+              obj@parameters[['mCnsRhsTypeConst']] <- addData(obj@parameters[['mCnsRhsTypeConst']], 
                   data.frame(cns = app@name, stringsAsFactors = FALSE))
       for(cc in c(ccc, ast[length(ast) == 1])) {
         if (length(ast) == 1 && cc == ast) {
           if (cc %in% names(app@for.sum)) {
-            if (is.null(app@for.sum[[cc]])) ll <- obj@maptable[[cc]]@data[, cc] else
+            if (is.null(app@for.sum[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
               ll <- app@for.sum[[cc]]
           } else {
-            if (is.null(app@for.each[[cc]])) ll <- obj@maptable[[cc]]@data[, cc] else
+            if (is.null(app@for.each[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
               ll <- app@for.each[[cc]]
             }
         } else if (cc %in% names(app@for.sum)) {
-          if (is.null(app@for.sum[[cc]])) ll <- obj@maptable[[cc]]@data[, cc] else
+          if (is.null(app@for.sum[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
             ll <- app@for.sum[[cc]]
           nn <- paste('mCnsLhs', toupper(substr(cc, 1, 1)), substr(cc, 2, nchar(cc)), sep = '')
-          obj@maptable[[nn]] <- addData(obj@maptable[[nn]], data.frame(cns = app@name,
+          obj@parameters[[nn]] <- addData(obj@parameters[[nn]], data.frame(cns = app@name,
             stringsAsFactors = FALSE))
         } else if (cc %in% names(app@for.each)) {
-          if (is.null(app@for.each[[cc]])) ll <- obj@maptable[[cc]]@data[, cc] else
+          if (is.null(app@for.each[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
             ll <- app@for.each[[cc]]
           approxim[[cc]] <- ll
         } else stop('Wrong constrain')
-        if (cc == 'year') ll <- ll[ll %in% obj@maptable$year@data[, 'year']] 
+        if (cc == 'year') ll <- ll[ll %in% obj@parameters$year@data[, 'year']] 
         nn <- paste('mCns', toupper(substr(cc, 1, 1)), substr(cc, 2, nchar(cc)), sep = '')
         dtt <- data.frame(cns = rep(app@name, length(ll)), ll, stringsAsFactors = FALSE)
         colnames(dtt) <- c('cns', cc)
-        obj@maptable[[nn]] <- addData(obj@maptable[[nn]], dtt)
+        obj@parameters[[nn]] <- addData(obj@parameters[[nn]], dtt)
       }
       # Choose technology output
       if (any(ast == 'tech')) {
         if (app@type %in% c('growth.output', 'output', 'shareout')) {
-          if (app@cout) obj@maptable[['mCnsTechCOut']] <- addData(obj@maptable[['mCnsTechCOut']], 
+          if (app@cout) obj@parameters[['mCnsTechCOut']] <- addData(obj@parameters[['mCnsTechCOut']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
-          if (app@aout) obj@maptable[['mCnsTechAOut']] <- addData(obj@maptable[['mCnsTechAOut']], 
+          if (app@aout) obj@parameters[['mCnsTechAOut']] <- addData(obj@parameters[['mCnsTechAOut']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
-          if (app@emis) obj@maptable[['mCnsTechEmis']] <- addData(obj@maptable[['mCnsTechEmis']], 
+          if (app@emis) obj@parameters[['mCnsTechEmis']] <- addData(obj@parameters[['mCnsTechEmis']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
         } else if (app@type %in% c('growth.input', 'input', 'sharein')) {
-          if (app@cinp) obj@maptable[['mCnsTechCInp']] <- addData(obj@maptable[['mCnsTechCInp']], 
+          if (app@cinp) obj@parameters[['mCnsTechCInp']] <- addData(obj@parameters[['mCnsTechCInp']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
-          if (app@ainp) obj@maptable[['mCnsTechAInp']] <- addData(obj@maptable[['mCnsTechAInp']], 
+          if (app@ainp) obj@parameters[['mCnsTechAInp']] <- addData(obj@parameters[['mCnsTechAInp']], 
             data.frame(cns = app@name, stringsAsFactors = FALSE))
         }
       }
       # Define rhs type
-      if (app@eq == '>=') obj@maptable[['mCnsGe']] <- addData(obj@maptable[['mCnsGe']], 
+      if (app@eq == '>=') obj@parameters[['mCnsGe']] <- addData(obj@parameters[['mCnsGe']], 
           data.frame(cns = app@name, stringsAsFactors = FALSE))
-      if (app@eq == '<=') obj@maptable[['mCnsLe']] <- addData(obj@maptable[['mCnsLe']], 
+      if (app@eq == '<=') obj@parameters[['mCnsLe']] <- addData(obj@parameters[['mCnsLe']], 
           data.frame(cns = app@name, stringsAsFactors = FALSE))
     }
     # Define rhs
-        year_range <- range(obj@maptable$year@data[, 'year'])
+        year_range <- range(obj@parameters$year@data[, 'year'])
         approxim <- approxim[names(approxim) %in% names(app@for.each)] 
         if (any(colnames(approxim) == 'year')) {
           year_range <- c(max(c(min(approxim$year), year_range[1])), min(c(max(approxim$year), year_range[2]))) 
@@ -353,14 +353,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
             approxim[[i]] <- app@for.each[[i]]
         if (length(approxim) != 0) {
           rhs <- interpolation(app@rhs, 'rhs', approxim = approxim, year_range = year_range,
-              rule = app@rule, default = app@default)
-          colnames(rhs)[ncol(rhs)] <- 'Freq'
+              rule = app@rule, defVal = app@defVal)
+          colnames(rhs)[ncol(rhs)] <- 'value'
           rhs <- cbind(cns = rep(app@name, nrow(rhs)), rhs)
         } else {
           if (nrow(app@rhs) == 0) 
-            rhs <- data.frame(cns = app@name, Freq = app@default, stringsAsFactors = FALSE) else
+            rhs <- data.frame(cns = app@name, value = app@defVal, stringsAsFactors = FALSE) else
           if (nrow(app@rhs) == 1) 
-            rhs <- data.frame(cns = app@name, Freq = app@rhs$rhs, stringsAsFactors = FALSE) else
+            rhs <- data.frame(cns = app@name, value = app@rhs$rhs, stringsAsFactors = FALSE) else
           stop('Wrong rhs constrain: "', app@name, '"')
         }
         if (any(colnames(rhs) == 'year')) rhs$year <- as.numeric(as.character(rhs$year))
@@ -368,7 +368,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
           substr(ast, 2, nchar(ast)), sep = '')
         nn <- paste('pRhs', ii, paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), 
           collapse = ''), sep = '')
-      obj@maptable[[nn]] <- addData(obj@maptable[[nn]], rhs[, colnames(obj@maptable[[nn]]@data)])
+      obj@parameters[[nn]] <- addData(obj@parameters[[nn]], rhs[, colnames(obj@parameters[[nn]]@data)])
     # Define sharein & shareout type
   }
   obj
@@ -377,7 +377,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'constrain',
 ################################################################################
 # Add technology
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
+setMethod('add0', signature(obj = 'modInp', app = 'technology',
   approxim = 'list'), function(obj, app, approxim) {
 #  mTechInpComm(tech, comm)       Input commodity
 #  mTechOutComm(tech, comm)       Output commodity
@@ -428,57 +428,57 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousTechnology(obj, tech@name)
 #  }
-#  obj@maptable[['tech']] <- addData(obj@maptable[['tech']], tech@name)
+#  obj@parameters[['tech']] <- addData(obj@parameters[['tech']], tech@name)
   # Map
   ctype <- checkInpOut(tech)
   # Need choose comm more accuracy
   approxim_comm <- approxim
   approxim_comm[['comm']] <- rownames(ctype$comm)
   if (length(approxim_comm[['comm']]) != 0) {
-    obj@maptable[['pTechCvarom']] <- addData(obj@maptable[['pTechCvarom']],
+    obj@parameters[['pTechCvarom']] <- addData(obj@parameters[['pTechCvarom']],
       simple_data_frame_approximation_chk(tech@varom, 'cvarom',
-       obj@maptable[['pTechCvarom']], approxim_comm, 'tech', tech@name))
+       obj@parameters[['pTechCvarom']], approxim_comm, 'tech', tech@name))
   }
   approxim_acomm <- approxim
   approxim_acomm[['acomm']] <- rownames(ctype$aux)
   if (length(approxim_acomm[['acomm']]) != 0) {
-    obj@maptable[['pTechAvarom']] <- addData(obj@maptable[['pTechAvarom']],
+    obj@parameters[['pTechAvarom']] <- addData(obj@parameters[['pTechAvarom']],
       simple_data_frame_approximation_chk(tech@varom, 'avarom',
-       obj@maptable[['pTechAvarom']], approxim_acomm, 'tech', tech@name))
+       obj@parameters[['pTechAvarom']], approxim_acomm, 'tech', tech@name))
   }
   approxim_comm[['comm']] <- rownames(ctype$comm)
   if (length(approxim_comm[['comm']]) != 0) {
     gg <- data_frame_approximation_chk(tech@ceff, 'afac',
-            obj@maptable[['pTechAfac']], approxim_comm, 'tech', tech@name)
-    obj@maptable[['pTechAfac']] <- addData(obj@maptable[['pTechAfac']], gg)
-    gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
+            obj@parameters[['pTechAfac']], approxim_comm, 'tech', tech@name)
+    obj@parameters[['pTechAfac']] <- addData(obj@parameters[['pTechAfac']], gg)
+    gg <- gg[gg$type == 'up' & gg$value != Inf, ]
     if (nrow(gg) != 0) 
-      obj@maptable[['defpTechAfacUp']] <- addData(obj@maptable[['defpTechAfacUp']],
-            gg[, obj@maptable[['defpTechAfacUp']]@set])
+      obj@parameters[['defpTechAfacUp']] <- addData(obj@parameters[['defpTechAfacUp']],
+            gg[, obj@parameters[['defpTechAfacUp']]@dimSetNames])
 
   }
   gg <- data_frame_approximation_chk(tech@afa, 'afa',
-            obj@maptable[['pTechAfa']], approxim, 'tech', tech@name)
-  obj@maptable[['pTechAfa']] <- addData(obj@maptable[['pTechAfa']], gg)
-  gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
+            obj@parameters[['pTechAfa']], approxim, 'tech', tech@name)
+  obj@parameters[['pTechAfa']] <- addData(obj@parameters[['pTechAfa']], gg)
+  gg <- gg[gg$type == 'up' & gg$value != Inf, ]
   if (nrow(gg) != 0) 
-      obj@maptable[['defpTechAfaUp']] <- addData(obj@maptable[['defpTechAfaUp']],
-            gg[, obj@maptable[['defpTechAfaUp']]@set])
+      obj@parameters[['defpTechAfaUp']] <- addData(obj@parameters[['defpTechAfaUp']],
+            gg[, obj@parameters[['defpTechAfaUp']]@dimSetNames])
 
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input']
   if (length(approxim_comm[['comm']]) != 0) {
-    obj@maptable[['pTechCinp2use']] <- addData(obj@maptable[['pTechCinp2use']],
+    obj@parameters[['pTechCinp2use']] <- addData(obj@parameters[['pTechCinp2use']],
       simple_data_frame_approximation_chk(tech@ceff, 'cinp2use',
-       obj@maptable[['pTechCinp2use']], approxim_comm, 'tech', tech@name))
+       obj@parameters[['pTechCinp2use']], approxim_comm, 'tech', tech@name))
   }
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'output']
   if (length(approxim_comm[['comm']]) != 0) {
-    obj@maptable[['pTechUse2cact']] <- addData(obj@maptable[['pTechUse2cact']],  
+    obj@parameters[['pTechUse2cact']] <- addData(obj@parameters[['pTechUse2cact']],  
        simple_data_frame_approximation_chk(tech@ceff, 'use2cact',
-       obj@maptable[['pTechUse2cact']], approxim_comm, 'tech', tech@name))
-    obj@maptable[['pTechCact2cout']] <- addData(obj@maptable[['pTechCact2cout']],
+       obj@parameters[['pTechUse2cact']], approxim_comm, 'tech', tech@name))
+    obj@parameters[['pTechCact2cout']] <- addData(obj@parameters[['pTechCact2cout']],
       simple_data_frame_approximation_chk(tech@ceff, 'cact2cout',
-       obj@maptable[['pTechCact2cout']], approxim_comm, 'tech', tech@name))
+       obj@parameters[['pTechCact2cout']], approxim_comm, 'tech', tech@name))
     if (any(!is.na(tech@ceff$cact2cout) & (tech@ceff$cact2cout == 0 | tech@ceff$cact2cout == Inf)))
       stop('cact2cout is not correct ', tech@name)
     if (any(!is.na(tech@ceff$use2cact) & (tech@ceff$use2cact == 0 | tech@ceff$use2cact == Inf)))
@@ -486,68 +486,68 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
   }
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input' & !is.na(ctype$comm[, 'group'])]
   if (length(approxim_comm[['comm']]) != 0) {
-    obj@maptable[['pTechCinp2ginp']] <- addData(obj@maptable[['pTechCinp2ginp']],
+    obj@parameters[['pTechCinp2ginp']] <- addData(obj@parameters[['pTechCinp2ginp']],
       simple_data_frame_approximation_chk(tech@ceff, 'cinp2ginp',
-       obj@maptable[['pTechCinp2ginp']], approxim_comm, 'tech', tech@name))
+       obj@parameters[['pTechCinp2ginp']], approxim_comm, 'tech', tech@name))
   }
   if (tech@early.retirement) 
-     obj@maptable[['mTechRetirement']] <- addData(obj@maptable[['mTechRetirement']], data.frame(tech = tech@name))
+     obj@parameters[['mTechRetirement']] <- addData(obj@parameters[['mTechRetirement']], data.frame(tech = tech@name))
   if (length(tech@upgrade.technology) != 0)
-     obj@maptable[['mTechUpgrade']] <- addData(obj@maptable[['mTechUpgrade']], 
+     obj@parameters[['mTechUpgrade']] <- addData(obj@parameters[['mTechUpgrade']], 
         data.frame(tech = rep(tech@name, length(tech@upgrade.technology)), techp = tech@upgrade.technology))
   cmm <- rownames(ctype$comm)[ctype$comm$type == 'input'] 
   if (length(cmm) != 0)
-    obj@maptable[['mTechInpComm']] <- addData(obj@maptable[['mTechInpComm']],
+    obj@parameters[['mTechInpComm']] <- addData(obj@parameters[['mTechInpComm']],
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   cmm <- rownames(ctype$comm)[ctype$comm$type == 'output']
   if (length(cmm) != 0)
-    obj@maptable[['mTechOutComm']] <- addData(obj@maptable[['mTechOutComm']],
+    obj@parameters[['mTechOutComm']] <- addData(obj@parameters[['mTechOutComm']],
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   cmm <- rownames(ctype$comm)[is.na(ctype$comm$group)] 
   if (length(cmm) != 0)
-    obj@maptable[['mTechOneComm']] <- addData(obj@maptable[['mTechOneComm']],
+    obj@parameters[['mTechOneComm']] <- addData(obj@parameters[['mTechOneComm']],
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   approxim_comm[['comm']] <- rownames(ctype$comm)[!is.na(ctype$comm$group)]
   if (length(approxim_comm[['comm']]) != 0)
-    obj@maptable[['pTechShare']] <- addData(obj@maptable[['pTechShare']],
+    obj@parameters[['pTechShare']] <- addData(obj@parameters[['pTechShare']],
           data_frame_approximation_chk(tech@ceff, 'share',
-            obj@maptable[['pTechShare']], approxim_comm, 'tech', tech@name))
+            obj@parameters[['pTechShare']], approxim_comm, 'tech', tech@name))
   cmm <- rownames(ctype$comm)[ctype$comm$comb != 0]
   if (length(cmm) != 0) {
-    obj@maptable[['pTechEmisComm']] <- addData(obj@maptable[['pTechEmisComm']],
+    obj@parameters[['pTechEmisComm']] <- addData(obj@parameters[['pTechEmisComm']],
       data.frame(tech = rep(tech@name, nrow(ctype$comm)), comm = rownames(ctype$comm),
-        Freq = ctype$comm$comb))
+        value = ctype$comm$comb))
   }
   gpp <- rownames(ctype$group)[ctype$group$type == 'input']
   if (length(gpp) != 0)
-    obj@maptable[['mTechInpGroup']] <- addData(obj@maptable[['mTechInpGroup']],
+    obj@parameters[['mTechInpGroup']] <- addData(obj@parameters[['mTechInpGroup']],
       data.frame(tech = rep(tech@name, length(gpp)), group = gpp))
   gpp <- rownames(ctype$group)[ctype$group$type == 'output']
   if (length(gpp) != 0)
-    obj@maptable[['mTechOutGroup']] <- addData(obj@maptable[['mTechOutGroup']],
+    obj@parameters[['mTechOutGroup']] <- addData(obj@parameters[['mTechOutGroup']],
       data.frame(tech = rep(tech@name, length(gpp)), group = gpp))
   approxim_group <- approxim
   approxim_group[['group']] <- rownames(ctype$group)[ctype$group$type == 'input']
   if (length(approxim_group[['group']]) != 0)
-      obj@maptable[['pTechGinp2use']] <- addData(obj@maptable[['pTechGinp2use']],
+      obj@parameters[['pTechGinp2use']] <- addData(obj@parameters[['pTechGinp2use']],
         simple_data_frame_approximation_chk(tech@geff, 'ginp2use',
-          obj@maptable[['pTechGinp2use']], approxim_group, 'tech', tech@name))
+          obj@parameters[['pTechGinp2use']], approxim_group, 'tech', tech@name))
   if (nrow(ctype$group) > 0)
-    obj@maptable[['group']] <- addMultipleSet(obj@maptable[['group']], rownames(ctype$group))
+    obj@parameters[['group']] <- addMultipleSet(obj@parameters[['group']], rownames(ctype$group))
  fl <- !is.na(ctype$comm$group)
   if (any(fl)) {
     gcomm <- data.frame(tech = rep(tech@name, sum(fl)), group = ctype$comm$group[fl], 
         comm = rownames(ctype$comm)[fl], stringsAsFactors = FALSE)
-    obj@maptable[['mTechGroupComm']] <- addData(obj@maptable[['mTechGroupComm']], gcomm)
+    obj@parameters[['mTechGroupComm']] <- addData(obj@parameters[['mTechGroupComm']], gcomm)
   }
   if (any(ctype$aux$output)) {    
     cmm <- rownames(ctype$aux)[ctype$aux$output]
-    obj@maptable[['mTechAOut']] <- addData(obj@maptable[['mTechAOut']],
+    obj@parameters[['mTechAOut']] <- addData(obj@parameters[['mTechAOut']],
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   }
   if (any(ctype$aux$input)) {    
     cmm <- rownames(ctype$aux)[ctype$aux$input]
-    obj@maptable[['mTechAInp']] <- addData(obj@maptable[['mTechAInp']],
+    obj@parameters[['mTechAInp']] <- addData(obj@parameters[['mTechAInp']],
       data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
   }
   dd <- data.frame(list = c('pTechUse2AOut', 'pTechAct2AOut', 'pTechCap2AOut', 
@@ -558,23 +558,23 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
     approxim_comm[['acomm']] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, 'table']]), 'acomm'])
     if (length(approxim_comm[['acomm']]) != 0) {
-       obj@maptable[[dd[i, 'list']]] <- addData(obj@maptable[[dd[i, 'list']]],
+       obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
               simple_data_frame_approximation_chk(tech@aeff, dd[i, 'table'], 
-                obj@maptable[[dd[i, 'list']]], approxim_comm, 'tech', tech@name))
+                obj@parameters[[dd[i, 'list']]], approxim_comm, 'tech', tech@name))
     }
   }                
                 
-    # Single & Double
-    obj@maptable[['pTechCap2act']] <- addData(obj@maptable[['pTechCap2act']],
-      data.frame(tech = tech@name, Freq = tech@cap2act))
+    # simple & multi
+    obj@parameters[['pTechCap2act']] <- addData(obj@parameters[['pTechCap2act']],
+      data.frame(tech = tech@name, value = tech@cap2act))
     dd <- data.frame(list = c('pTechOlife', 'pTechFixom', 'pTechInvcost', 'pTechStock',
       'pTechVarom'),
       table = c('olife', 'fixom', 'invcost', 'stock', 'varom'),
       stringsAsFactors = FALSE)
     for(i in 1:nrow(dd)) {
-      obj@maptable[[dd[i, 'list']]] <- addData(obj@maptable[[dd[i, 'list']]],
+      obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
         simple_data_frame_approximation_chk(slot(tech, dd[i, 'table']),
-          dd[i, 'table'], obj@maptable[[dd[i, 'list']]], approxim, 'tech', tech@name))
+          dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim, 'tech', tech@name))
     }
     if (nrow(tech@aeff) != 0) {
         for(i in 1:4) {
@@ -587,14 +587,14 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
             approxim_commp <- approxim
             approxim_commp$acomm <- unique(yy$acomm); 
             approxim_commp$comm <- unique(yy$comm)
-            obj@maptable[[tbl]] <- addData(obj@maptable[[tbl]],
-            simple_data_frame_approximation_chk(yy, ll, obj@maptable[[tbl]], 
+            obj@parameters[[tbl]] <- addData(obj@parameters[[tbl]],
+            simple_data_frame_approximation_chk(yy, ll, obj@parameters[[tbl]], 
                   approxim_commp, 'tech', tech@name))
           }
 #            tech@aeff <- tech@aeff[!is.na(tech@aeff$comm) & !is.na(tech@aeff$commp),]
 #            for(cmd in approxim_commp$comm) {
 #              cmm <- tech@aeff[tech@aeff$comm == cmd & !is.na(tech@aeff[, ll]), 'commp']
-#              obj@maptable[[tbl2]] <- addData(obj@maptable[[tbl2]], 
+#              obj@parameters[[tbl2]] <- addData(obj@parameters[[tbl2]], 
 #                  data.frame(tech = rep(tech@name, length(cmm)), comm = rep(cmd, length(cmm)), commp = cmm))
 #           }
         }
@@ -637,7 +637,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     if (any(dd$year >= dend[rr, 'year'])) dd[dd$region == rr & dd$year >= dend[rr, 'year'], 'enable'] <- FALSE
   }  
   dd <- dd[dd$enable, -1, drop = FALSE]
-  obj@maptable[['mTechNew']] <- addData(obj@maptable[['mTechNew']], dd)
+  obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd)
   ## life 
   dlife <- data.frame(row.names = approxim$region, region = approxim$region, 
     year = rep(NA, length(approxim$region)), stringsAsFactors = FALSE)
@@ -654,9 +654,9 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
     if (any(dd_able$year >= dend[rr, 'year'] + dlife[rr, 'year'])) 
       dd_able[dd_able$region == rr & dd_able$year >= dend[rr, 'year'] + dlife[rr, 'year'], 'enable'] <- FALSE
   }  
-  gg <- obj@maptable[["pTechStock"]]@data[!is.na(obj@maptable[["pTechStock"]]@data$tech) & 
-     obj@maptable[['pTechStock']]@data$tech == tech@name & 
-     obj@maptable[['pTechStock']]@data$Freq != 0,, drop = FALSE] 
+  gg <- obj@parameters[["pTechStock"]]@data[!is.na(obj@parameters[["pTechStock"]]@data$tech) & 
+     obj@parameters[['pTechStock']]@data$tech == tech@name & 
+     obj@parameters[['pTechStock']]@data$value != 0,, drop = FALSE] 
   
   if (nrow(gg) != 0 && any(!dd_able$enable)) {
     for(rr in unique(gg$region)) {
@@ -665,7 +665,7 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
   }   
   dd_able <- dd_able[dd_able$enable, -1, drop = FALSE]
 #  cat(tech@name, '\n')
-  obj@maptable[['mTechSpan']] <- addData(obj@maptable[['mTechSpan']], dd_able)
+  obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd_able)
   if (all(ctype$comm$type != 'output')) 
     stop('Techology "', tech@name, '", there is not activity commodity')   
   obj
@@ -674,50 +674,50 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'technology',
 ################################################################################
 # Add sysInfo
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'sysInfo',
+setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   approxim = 'list'), function(obj, app, approxim) {
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
   # Discount
-      obj@maptable[['pDiscount']] <- addData(obj@maptable[['pDiscount']],
+      obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
         simple_data_frame_approximation_chk(app@discount, 'discount',
-          obj@maptable[['pDiscount']], approxim))
+          obj@parameters[['pDiscount']], approxim))
   approxim_comm <- approxim
-  approxim_comm[['comm']] <- obj@maptable$comm@data$comm
+  approxim_comm[['comm']] <- obj@parameters$comm@data$comm
   if (length(approxim_comm[['comm']]) != 0) {
     # Dummy import
-      obj@maptable[['pDummyImportCost']] <- addData(obj@maptable[['pDummyImportCost']],
+      obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],
         simple_data_frame_approximation_chk(app@debug, 'dummyImport',
-          obj@maptable[['pDummyImportCost']], approxim_comm))
+          obj@parameters[['pDummyImportCost']], approxim_comm))
     # Dummy export
-      obj@maptable[['pDummyExportCost']] <- addData(obj@maptable[['pDummyExportCost']],
+      obj@parameters[['pDummyExportCost']] <- addData(obj@parameters[['pDummyExportCost']],
         simple_data_frame_approximation_chk(app@debug, 'dummyExport',
-          obj@maptable[['pDummyExportCost']], approxim_comm))
+          obj@parameters[['pDummyExportCost']], approxim_comm))
 #    # Tax
-#      obj@maptable[['pTaxCost']] <- addData(obj@maptable[['pTaxCost']],
+#      obj@parameters[['pTaxCost']] <- addData(obj@parameters[['pTaxCost']],
 #        simple_data_frame_approximation_chk(app@tax, 'tax',
-#          obj@maptable[['pTaxCost']], approxim_comm))
+#          obj@parameters[['pTaxCost']], approxim_comm))
 #    # Subs
-#      obj@maptable[['pSubsCost']] <- addData(obj@maptable[['pSubsCost']],
+#      obj@parameters[['pSubsCost']] <- addData(obj@parameters[['pSubsCost']],
 #        simple_data_frame_approximation_chk(app@subs, 'subs',
-#          obj@maptable[['pSubsCost']], approxim_comm))
+#          obj@parameters[['pSubsCost']], approxim_comm))
   }
   if (nrow(app@milestone) == 0) {
     app <- setMileStoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
   }
 
-  obj@maptable[['mMidMilestone']] <- addData(obj@maptable[['mMidMilestone']], 
+  obj@parameters[['mMidMilestone']] <- addData(obj@parameters[['mMidMilestone']], 
     data.frame(year = app@milestone$mid))
-  obj@maptable[['mStartMilestone']] <- addData(obj@maptable[['mStartMilestone']], 
+  obj@parameters[['mStartMilestone']] <- addData(obj@parameters[['mStartMilestone']], 
     data.frame(year = app@milestone$mid, yearp = app@milestone$start))
-  obj@maptable[['mEndMilestone']] <- addData(obj@maptable[['mEndMilestone']], 
+  obj@parameters[['mEndMilestone']] <- addData(obj@parameters[['mEndMilestone']], 
     data.frame(year = app@milestone$mid, yearp = app@milestone$end))
-  obj@maptable[['mMilestoneLast']] <- addData(obj@maptable[['mMilestoneLast']], 
+  obj@parameters[['mMilestoneLast']] <- addData(obj@parameters[['mMilestoneLast']], 
     data.frame(year = max(app@milestone$mid)))
 
-  obj@maptable[['mMilestoneNext']] <- addData(obj@maptable[['mMilestoneNext']], 
+  obj@parameters[['mMilestoneNext']] <- addData(obj@parameters[['mMilestoneNext']], 
     data.frame(year = app@milestone$mid[-nrow(app@milestone)], yearp = app@milestone$mid[-1])) 
-  obj@maptable[['mMilestoneHasNext']] <- addData(obj@maptable[['mMilestoneHasNext']], 
+  obj@parameters[['mMilestoneHasNext']] <- addData(obj@parameters[['mMilestoneHasNext']], 
     data.frame(year = app@milestone$mid[-nrow(app@milestone)])) 
   obj
 })
@@ -725,18 +725,18 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'sysInfo',
 ################################################################################
 # Add trade
 ################################################################################
-setMethod('add0', signature(obj = 'CodeProduce', app = 'trade',
+setMethod('add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
-  obj@maptable[['mTradeComm']] <- addData(obj@maptable[['mTradeComm']],
+  obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
-  if (is.null(trd@source)) rg <- obj@maptable$region@data$region else rg <- trd@source
-  obj@maptable[['mTradeSrc']] <- addData(obj@maptable[['mTradeSrc']],
+  if (is.null(trd@source)) rg <- obj@parameters$region@data$region else rg <- trd@source
+  obj@parameters[['mTradeSrc']] <- addData(obj@parameters[['mTradeSrc']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
-  if (is.null(trd@destination)) rg <- obj@maptable$region@data$region else rg <- trd@destination
-  obj@maptable[['mTradeDst']] <- addData(obj@maptable[['mTradeDst']],
+  if (is.null(trd@destination)) rg <- obj@parameters$region@data$region else rg <- trd@destination
+  obj@parameters[['mTradeDst']] <- addData(obj@parameters[['mTradeDst']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
   #
   if (length(trd@source) != 0) {
@@ -749,21 +749,21 @@ setMethod('add0', signature(obj = 'CodeProduce', app = 'trade',
   } else approxim$dst <- approxim$region
   approxim <- approxim[names(approxim) != 'region']
   # pTradeIrCost
-  obj@maptable[['pTradeIrCost']] <- addData(obj@maptable[['pTradeIrCost']],
-    simple_data_frame_approximation_chk(trd@trade, 'cost', obj@maptable[['pTradeIrCost']], 
+  obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
+    simple_data_frame_approximation_chk(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
       approxim, 'trade', trd@name))
   # pTradeIrMarkup
-  obj@maptable[['pTradeIrMarkup']] <- addData(obj@maptable[['pTradeIrMarkup']],
-    simple_data_frame_approximation_chk(trd@trade, 'markup', obj@maptable[['pTradeIrMarkup']], 
+  obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
+    simple_data_frame_approximation_chk(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
       approxim, 'trade', trd@name))
   # pTradeIr
     gg <- data_frame_approximation_chk(trd@trade, 'ava',
-            obj@maptable[['pTradeIr']], approxim, 'trade', trd@name)
-    obj@maptable[['pTradeIr']] <- addData(obj@maptable[['pTradeIr']], gg)
-    gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
+            obj@parameters[['pTradeIr']], approxim, 'trade', trd@name)
+    obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
+    gg <- gg[gg$type == 'up' & gg$value != Inf, ]
     if (nrow(gg) != 0) 
-      obj@maptable[['defpTradeIrUp']] <- addData(obj@maptable[['defpTradeIrUp']],
-            gg[, obj@maptable[['defpTradeIrUp']]@set])
+      obj@parameters[['defpTradeIrUp']] <- addData(obj@parameters[['defpTradeIrUp']],
+            gg[, obj@parameters[['defpTradeIrUp']]@dimSetNames])
   obj
 })
 

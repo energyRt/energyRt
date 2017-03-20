@@ -8,9 +8,7 @@ setClass("model",
           description    = "character",       # Details
           data           = "list",
           sysInfo        = "sysInfo",
-          codeProduce    = "CodeProduce", 
-          additionalCode = "character",        # move 2 misc
-          additionalCodeAfter = "character",   # move 2 misc
+          modInp    = "modInp", 
           LECdata        = "list",
           early.retirement = "logical",
           misc = "list"
@@ -20,14 +18,14 @@ setClass("model",
           description    = "",       # Details
           data           = list(),
           sysInfo        = new('sysInfo'),
-          codeProduce    = NULL,
-          additionalCode = "",
-          additionalCodeAfter = "",
+          modInp         = NULL,
           LECdata        = list(),
           early.retirement = FALSE,
       #! Misc
       misc = list(
-        GUID = "e4be2c7e-8ddf-4952-8f27-8fd12ca79e78"
+        GUID = "e4be2c7e-8ddf-4952-8f27-8fd12ca79e78",
+        additionalCode = "",        # move 2 misc
+        additionalCodeAfter = ""   # move 2 misc
       )),                           
       S3methods = TRUE
 )

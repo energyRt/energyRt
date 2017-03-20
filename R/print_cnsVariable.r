@@ -1,5 +1,5 @@
 print.cnsVariable <- function(x) {
-  cat('Parameter: "', x@parameter, '", default value: "', x@default, '"\n', sep = '')
+  cat('Parameter: "', x@parameter, '", default value: "', x@defVal, '"\n', sep = '')
   if (!is.null(x@value)) {
     cat('Value:\n')
     print(x@value)

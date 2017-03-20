@@ -1,5 +1,5 @@
 
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'commodity',
+setMethod('add_name', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
   cmd <- upper_case(app)
   if (!chec_correct_name(cmd@name)) {
@@ -10,7 +10,7 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'commodity',
         '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousCommodity(obj, cmd@name)
   }
-  obj@maptable[['comm']] <- addData(obj@maptable[['comm']], cmd@name)
+  obj@parameters[['comm']] <- addData(obj@parameters[['comm']], cmd@name)
   obj
 })
 
@@ -19,7 +19,7 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'commodity',
 ################################################################################
 # Add demand
 ################################################################################
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'demand',
+setMethod('add_name', signature(obj = 'modInp', app = 'demand',
   approxim = 'list'), function(obj, app, approxim) { 
   dem <- upper_case(app)
   if (!chec_correct_name(dem@name)) {
@@ -30,14 +30,14 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'demand',
         '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousDemand(obj, dem@name)
   }
-  obj@maptable[['dem']] <- addData(obj@maptable[['dem']], dem@name)
+  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
   obj
 })
 
 ################################################################################
 # Add constrain
 ################################################################################
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'constrain',
+setMethod('add_name', signature(obj = 'modInp', app = 'constrain',
   approxim = 'list'), function(obj, app, approxim) { 
   obj
 })
@@ -45,7 +45,7 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'constrain',
 ################################################################################
 # Add supply
 ################################################################################
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'supply',
+setMethod('add_name', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
   sup <- upper_case(app)
   if (!chec_correct_name(sup@name)) {
@@ -56,14 +56,14 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'supply',
         '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousSupply(obj, sup@name)
   }    
-  obj@maptable[['sup']] <- addData(obj@maptable[['sup']], sup@name)
+  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
   obj
 })
 
 ################################################################################
 # Add export
 ################################################################################
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'export',
+setMethod('add_name', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
   exp <- upper_case(app)
   if (!chec_correct_name(exp@name)) {
@@ -74,14 +74,14 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'export',
         '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousExport(obj, exp@name)
   }    
-  obj@maptable[['expp']] <- addData(obj@maptable[['expp']], exp@name)
+  obj@parameters[['expp']] <- addData(obj@parameters[['expp']], exp@name)
   obj
 })
 
 ################################################################################
 # Add import
 ################################################################################
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'import',
+setMethod('add_name', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
   imp <- upper_case(app)
   if (!chec_correct_name(imp@name)) {
@@ -92,7 +92,7 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'import',
         '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousImport(obj, imp@name)
   }    
-  obj@maptable[['imp']] <- addData(obj@maptable[['imp']], imp@name)
+  obj@parameters[['imp']] <- addData(obj@parameters[['imp']], imp@name)
   obj
 })
 
@@ -101,7 +101,7 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'import',
 ################################################################################
 # Add technology
 ################################################################################
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'technology',
+setMethod('add_name', signature(obj = 'modInp', app = 'technology',
   approxim = 'list'), function(obj, app, approxim) {
   tech <- upper_case(app)
   # Temporary solution for immortality technology
@@ -117,14 +117,14 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'technology',
         '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousTechnology(obj, tech@name)
   }
-  obj@maptable[['tech']] <- addData(obj@maptable[['tech']], tech@name)
+  obj@parameters[['tech']] <- addData(obj@parameters[['tech']], tech@name)
   obj
 })
 
 ################################################################################
 # Add trade
 ################################################################################
-setMethod('add_name', signature(obj = 'CodeProduce', app = 'trade',
+setMethod('add_name', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) { 
   trd <- upper_case(app)
   if (!chec_correct_name(trd@name)) {
@@ -135,7 +135,7 @@ setMethod('add_name', signature(obj = 'CodeProduce', app = 'trade',
         '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousTrade(obj, trd@name)
   }
-  obj@maptable[['trade']] <- addData(obj@maptable[['trade']], trd@name)
+  obj@parameters[['trade']] <- addData(obj@parameters[['trade']], trd@name)
   obj
 })
 

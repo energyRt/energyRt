@@ -1,9 +1,9 @@
 
 setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
-  default = 'numeric'), function(obj, parameter, default, ...) { 
+  defVal = 'numeric'), function(obj, parameter, defVal, ...) { 
   # Remove not used approxim
   arg <- list(...)
-  if (length(default) != 1) stop('Default value not define')
+  if (length(defVal) != 1) stop('defVal value not define')
   # Get slice
   prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'regionp', 'src', 'dst', 'slice', 'year')
   true_prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'regionp', 'src', 'dst', 
@@ -36,11 +36,11 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
     apr <- approxim[c('year', true_prior[true_prior != 'year'])]
     if (any(sapply(apr, length) == 0)) return(NULL)
     dd <- as.data.frame.table(array(NA, dim = sapply(apr, length), 
-      dimnames = apr), responseName = parameter, stringsAsFactors = FALSE)
+      dimnames = apr), stringsAsFactors = FALSE, responseName = parameter)
     dd <- dd[, c(prior, parameter), drop = FALSE]
   } else {
     dd <- as.data.frame.table(array(NA, dim = sapply(approxim, length), 
-      dimnames = approxim), responseName = parameter, stringsAsFactors = FALSE)
+      dimnames = approxim), stringsAsFactors = FALSE, responseName = parameter)
   }
   if (nrow(obj) != 0) {  
     ii <- 2 ^ (seq(length.out = ncol(obj) - 1) - 1)
@@ -77,16 +77,16 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
   }  
   # Interpolation
   if (all(colnames(obj)[-ncol(obj)] != 'year')) {
-    dd[is.na(dd[, parameter]), parameter] <- default
+    dd[is.na(dd[, parameter]), parameter] <- defVal
   } else {
     if (all(is.na(dd[, parameter]))) {
-      dd[is.na(dd[, parameter]), parameter] <- default
+      dd[is.na(dd[, parameter]), parameter] <- defVal
     } else if (any(is.na(dd[, parameter]))) {
       zz <- matrix(dd[, parameter], length(approxim$year))
       f1 <- apply(zz, 2, function(x) all(!is.na(x)))
       if (any(!f1)) {
         gg <- seq(along =f1)[!f1][apply(is.na(zz[, !f1, drop = FALSE]), 2, all)]
-        zz[, gg] <- default
+        zz[, gg] <- defVal
         f1[gg] <- TRUE
       }
       if (any(!f1)) {
@@ -106,16 +106,16 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
           # Back
           if (is.na(hh[1])) {  
             hm <- (1:nr)[!is.na(hh)][1]   
-            if (back) hh[1:(hm - 1)] <- hh[hm] else hh[1:(hm - 1)] <- default
+            if (back) hh[1:(hm - 1)] <- hh[hm] else hh[1:(hm - 1)] <- defVal
           }
           # Forth
           if (is.na(hh[nr])) {
             hm <- max((1:nr)[!is.na(hh)])  
-            if (forth) hh[(hm + 1):nr] <- hh[hm] else hh[(hm + 1):nr] <- default
+            if (forth) hh[(hm + 1):nr] <- hh[hm] else hh[(hm + 1):nr] <- defVal
           }
           # Inter
           if (any(is.na(hh))) {
-            if (!inter) hh[is.na(hh)] <- default else {
+            if (!inter) hh[is.na(hh)] <- defVal else {
               hm <- is.na(hh)
               bg <- (1:(nr - 1))[hm[-1] & !hm[-nr]]
               en <- (2:nr)[!hm[-1] & hm[-nr]]
@@ -139,28 +139,29 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
         dd <- dd[rep(year_range[1] <= approxim$year & approxim$year <= year_range[2], 
               nrow(dd) / length(approxim$year)), , drop = FALSE]
     }
+    
   }
-  return(dd)
+    return(dd)
 })
 
 # 
 
 
 setMethod("interpolation_bound", signature(obj = 'data.frame', 
-  parameter = 'character', default = 'numeric', rule = 'character'), 
-      function(obj, parameter, default, rule, ...) {
+  parameter = 'character', defVal = 'numeric', rule = 'character'), 
+      function(obj, parameter, defVal, rule, ...) {
   gg <- paste(parameter, c('.lo', '.fx', '.up'), sep = '')
   aa <- obj[, !(colnames(obj) %in% gg), drop = FALSE]; aa[, parameter] <- rep(NA, nrow(aa))
   a1 <- aa; a1[, parameter] <- obj[, gg[1]]
   a2 <- aa; a2[, parameter] <- obj[, gg[2]]
   a3 <- aa; a3[, parameter] <- obj[, gg[3]]
   d1 <- interpolation(rbind(a1, a2), parameter, 
-      default = default[1], rule = rule[1], ...)
+      defVal = defVal[1], rule = rule[1], ...)
   dd <- d1[, -ncol(d1), drop = FALSE]
   dd[, 'type'] <- 'lo'
   dd[, parameter] <- d1[, parameter]
   d2 <- interpolation(rbind(a3, a2), parameter, 
-    default = default[2], rule = rule[2], ...)
+    defVal = defVal[2], rule = rule[2], ...)
   zz <- d2[, -ncol(d2), drop = FALSE]
   zz[, 'type'] <- 'up'
   zz[, parameter] <- d2[, parameter]

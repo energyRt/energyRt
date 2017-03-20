@@ -39,8 +39,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       }
     }
     for(i in names(dtt)) if (length(dtt[[i]]) != 0) dtt[[i]] <- dtt[[i]][sort(names(dtt[[i]]))]
-    set <- obj@result@set
-    dat <- obj@result@data
+    set <- obj@modOut@sets
+    dat <- obj@modOut@data
     
     tryCatch({
       zz <- file('energyRtScenarioReport.tex', 'w')
@@ -64,15 +64,15 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       
       cat('\\section{Summary}\n\n', '\n', sep = '', file = zz)
       
-      if (obj@result@solution_report$finish != 2) {
+      if (obj@modOut@compilationStatus != 2) {
         cat('The model run is not completed. The results are not "optimal solution".\n\n', '\n', 
           sep = '', file = zz)
       }
-      if (obj@result@solution_report$status == 1) {
-        cat('Optimal solution found, objective value ', obj@result@data$vObjective, 
+      if (obj@modOut@solutionStatus == 1) {
+        cat('Optimal solution found, objective value ', obj@modOut@data$vObjective, 
             '.\n\n', '\n', sep = '', file = zz)
       } else {
-        cat('The model run is not completed. Exit code ', obj@result@solution_report$status, 
+        cat('The model run is not completed. Exit code ', obj@modOut@solutionStatus, 
             '.\n\n', '\n', sep = '', file = zz)
       }
       gg <- paste('There is ', length(obj@model@data), ' repositary, ', sep = '')
@@ -82,8 +82,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       }
       gg <- sub('[,][ ]$', '.\n\n', gg)
       cat(gg, sep = '', file = zz)
-      if (any(obj@result@data$vDummyOut != 0)) {
-        dcmd <- dimnames(obj@result@data$vDummyOut)[[1]][apply(obj@result@data$vDummyOut != 0, 1, any)]
+      if (any(obj@modOut@data$vDummyOut != 0)) {
+        dcmd <- dimnames(obj@modOut@data$vDummyOut)[[1]][apply(obj@modOut@data$vDummyOut != 0, 1, any)]
         cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
         cat('There are dummy import for commodity "', 
             paste(dcmd, collapse = '", "'), '".\n\n', '\n', sep = '', file = zz)
@@ -102,8 +102,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           cat('\\end{figure}\n', sep = '', file = zz)
         }
       }
-      if (any(obj@result@data$vDummyInp != 0)) {
-        dcmd <- dimnames(obj@result@data$vDummyInp)[[1]][apply(obj@result@data$vDummyInp != 0, 1, any)]
+      if (any(obj@modOut@data$vDummyInp != 0)) {
+        dcmd <- dimnames(obj@modOut@data$vDummyInp)[[1]][apply(obj@modOut@data$vDummyInp != 0, 1, any)]
         cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
         cat('There are dummy import for commodity "', 
             paste(dcmd, collapse = '", "'), '".\n\n', '\n', sep = '', file = zz)
@@ -159,14 +159,14 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
       }
       # Discount cost data
-      dsc <- getDataMapTable(obj@precompiled@maptable$pDiscountFactor)
+      dsc <- getParameterData(obj@modInp@parameters$pDiscountFactor)
       dsc[, 'mid'] <- NA
       mlst <- getMilestone(obj)
       for(i in seq(length.out = nrow(mlst))) {
         dsc[mlst$start[i] <= dsc$year & dsc$year <= mlst$end[i], 'mid'] <- mlst$mid[i]
       }
       dsc$year <- dsc$mid
-      dsc <- tapply(dsc$Freq, dsc[, c('region', 'year'), drop = FALSE], sum)
+      dsc <- tapply(dsc$value, dsc[, c('region', 'year'), drop = FALSE], sum)
       # Discount for region
       dsccost <- rbind(
         Subsidy = apply(apply(dat$vSubsCost, 2:3, sum) * dsc, 2, sum),
@@ -397,7 +397,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       }    
       ## Technology
       if (length(dtt$technology) != 0) {
-        stock <- obj@precompiled@maptable$pTechStock@data
+        stock <- obj@modInp@parameters$pTechStock@data
         FL <- array(NA, dim = length(dtt$technology), dimnames = list(names(dtt$technology)))
         cat('\\section{Technology analysis}\n\n', '\n', sep = '', file = zz)
         for(tt in names(dtt$technology)) {
@@ -417,7 +417,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           tec_cap <- rbind(
             'Total capacity' = apply(dat$vTechCap[tt,,, drop = FALSE], 3, sum),
             'New capacity' = apply(dat$vTechNewCap[tt,,, drop = FALSE], 3, sum),
-            'Initial stock' = tapply(gg$Freq, gg$year, sum),
+            'Initial stock' = tapply(gg$value, gg$year, sum),
             'Activity' = apply(dat$vTechAct[tt,,,, drop = FALSE], 3, sum)
           )
           
@@ -596,7 +596,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           cat('\\subsection{', gsub('_', '\\\\_', 
              as.character(cns@name)), '}\n\n', '\n', sep = '', file = zz)
           cat_bottomup(cns, file = zz)
-          rd <- obj@result@data[[paste('eqCns', cns@name, sep = '')]]
+          rd <- obj@modOut@data[[paste('eqCns', cns@name, sep = '')]]
           if (!is.null(rd)) {
             gr <- apply(rd, seq(length.out = length(dim(rd)))[(names(dimnames(rd)) 
               %in% c('year', 'type'))], sum)
@@ -664,12 +664,12 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       ## Trade
   cat('Trade\n')
   if (length(dtt$trade) != 0) {
-        #stock <- obj@precompiled@maptable$pTechStock@data
+        #stock <- obj@modInp@parameters$pTechStock@data
         #FL <- array(NA, dim = length(dtt$technology), dimnames = list(names(dtt$technology)))
         cat('\\section{Trade analysis}\n\n', '\n', sep = '', file = zz)
-        grep('Trade', names(obj@precompiled@maptable), value = TRUE)
-        trd_src <- getDataMapTable(obj@precompiled@maptable$mTradeSrc)
-        trd_dst <- getDataMapTable(obj@precompiled@maptable$mTradeDst)
+        grep('Trade', names(obj@modInp@parameters), value = TRUE)
+        trd_src <- getParameterData(obj@modInp@parameters$mTradeSrc)
+        trd_dst <- getParameterData(obj@modInp@parameters$mTradeDst)
         for(nm in names(dtt$trade)) {
           trd <- dtt$trade[[nm]]
           cat('\\subsection{', nm, '}\n\n', '\n', sep = '', file = zz)
@@ -717,7 +717,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                   ', summary for all slice.}\n', sep = '', file = zz)
               cat('\\end{figure}\n', sep = '', file = zz)
               vv <- as.data.frame.table(apply(dat$vTradeIr[nm,,,,, drop = FALSE], 2:5, sum))
-              vv <- vv[vv$Freq != 0,, drop = FALSE]
+              vv <- vv[vv$value != 0,, drop = FALSE]
               colnames(vv)[1] <- 'source'
               colnames(vv)[2] <- 'destination'
               colnames(vv)[5] <- 'value'

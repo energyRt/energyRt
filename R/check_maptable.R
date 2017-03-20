@@ -1,14 +1,14 @@
-check_maptable <- function(prec) {
+check_parameters <- function(prec) {
   error_type <- c()
   # Check that lo bound less or equal up bound
-  for(pr in names(prec@maptable)[sapply(prec@maptable,
+  for(pr in names(prec@parameters)[sapply(prec@parameters,
     function(x) x@type == 'double')]) 
-      if (nrow(prec@maptable[[pr]]@data) > 0 && prec@maptable[[pr]]@true_length != 0) {
-    if (prec@maptable[[pr]]@true_length != -1)  
-      prec@maptable[[pr]]@data <- prec@maptable[[pr]]@data[seq(length.out = 
-        prec@maptable[[pr]]@true_length),, drop = FALSE]
-    gg <- prec@maptable[[pr]]@data
-    fl <- gg[gg$type == 'lo', 'Freq'] > gg[gg$type == 'up', 'Freq']
+      if (nrow(prec@parameters[[pr]]@data) > 0 && prec@parameters[[pr]]@nValues != 0) {
+    if (prec@parameters[[pr]]@nValues != -1)  
+      prec@parameters[[pr]]@data <- prec@parameters[[pr]]@data[seq(length.out = 
+        prec@parameters[[pr]]@nValues),, drop = FALSE]
+    gg <- prec@parameters[[pr]]@data
+    fl <- gg[gg$type == 'lo', 'value'] > gg[gg$type == 'up', 'value']
     stopifnot(all(gg[gg$type == 'lo', 0:1 - ncol(gg)] ==
         gg[gg$type == 'up', 0:1 - ncol(gg)]))
     if (any(fl)) {
@@ -21,20 +21,20 @@ check_maptable <- function(prec) {
   }
   if (length(error_type)) stop('Unexcaptable bound value (up bound less lo bound) "',
     paste(error_type, collapse = '", "'), '"')
-  shr <- prec@maptable$pTechShare@data
+  shr <- prec@parameters$pTechShare@data
 #  # Check sum share.lo <= 1 and sum share.up >= 1
   if (nrow(shr) > 0) {
   FL <- FALSE
   p1 <- proc.time()[3]
     # Devide commodity by technology/group/inp&out
-    inp_comm <- prec@maptable$mTechInpComm@data
-    out_comm <- prec@maptable$mTechOutComm@data
-    group_comm <- prec@maptable$mTechGroupComm@data
+    inp_comm <- prec@parameters$mTechInpComm@data
+    out_comm <- prec@parameters$mTechOutComm@data
+    group_comm <- prec@parameters$mTechGroupComm@data
     inp_comm[, 'als'] <- 'input'
     out_comm[, 'als'] <- 'output'
     shr <- merge(merge(shr, group_comm), rbind(inp_comm, out_comm))
     # Check and out
-    hh <- tapply(shr$Freq, shr[, c('type', 'tech', 'als', 'group', 'region', 'year', 'slice')], sum)
+    hh <- tapply(shr$value, shr[, c('type', 'tech', 'als', 'group', 'region', 'year', 'slice')], sum)
     if (max(hh['lo',,,,,,], na.rm = TRUE) > 1) {
       FL <- TRUE
       ll <- apply(hh['lo',,,,,,, drop = FALSE], 2:7, sum); ll[is.na(ll)] <- 0

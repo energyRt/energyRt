@@ -103,29 +103,6 @@ param mCnsTechAInp{cns};
 param mCnsTechAOut{cns};
 param mCnsTechEmis{cns};
 param mLECRegion{region};
-param mPreDefTechUse{tech, region, year, slice};
-param mPreDefTechNewCap{tech, region, year};
-param mPreDefTechRetiredCap{tech, region, year, year};
-param mPreDefTechCap{tech, region, year};
-param mPreDefTechAct{tech, region, year, slice};
-param mPreDefTechInp{tech, comm, region, year, slice};
-param mPreDefTechOut{tech, comm, region, year, slice};
-param mPreDefTechAInp{tech, comm, region, year, slice};
-param mPreDefTechAOut{tech, comm, region, year, slice};
-param mPreDefSupOut{sup, comm, region, year, slice};
-param mPreDefDemInp{comm, region, year, slice};
-param mPreDefDummyOut{comm, region, year, slice};
-param mPreDefDummyInp{comm, region, year, slice};
-param mPreDefStorageInp{stg, comm, region, year, slice};
-param mPreDefStorageOut{stg, comm, region, year, slice};
-param mPreDefStorageStore{stg, region, year, slice};
-param mPreDefStorageCap{stg, region, year};
-param mPreDefStorageNewCap{stg, region, year};
-param mPreDefImport{comm, region, year, slice};
-param mPreDefExport{comm, region, year, slice};
-param mPreDefTradeIr{trade, region, region, year, slice};
-param mPreDefExportRow{expp, region, year, slice};
-param mPreDefImportRow{imp, region, year, slice};
 
 
 
@@ -251,29 +228,6 @@ param pRhsSupCRS{cns, sup, comm, region, slice};
 param pRhsSupCRY{cns, sup, comm, region, year};
 param pRhsSupCRYS{cns, sup, comm, region, year, slice};
 param pLECLoACT{region};
-param preDefTechUse{tech, region, year, slice};
-param preDefTechNewCap{tech, region, year};
-param preDefTechRetiredCap{tech, region, year, year};
-param preDefTechCap{tech, region, year};
-param preDefTechAct{tech, region, year, slice};
-param preDefTechInp{tech, comm, region, year, slice};
-param preDefTechOut{tech, comm, region, year, slice};
-param preDefTechAInp{tech, comm, region, year, slice};
-param preDefTechAOut{tech, comm, region, year, slice};
-param preDefSupOut{sup, comm, region, year, slice};
-param preDefDemInp{comm, region, year, slice};
-param preDefDummyOut{comm, region, year, slice};
-param preDefDummyInp{comm, region, year, slice};
-param preDefStorageInp{stg, comm, region, year, slice};
-param preDefStorageOut{stg, comm, region, year, slice};
-param preDefStorageStore{stg, region, year, slice};
-param preDefStorageCap{stg, region, year};
-param preDefStorageNewCap{stg, region, year};
-param preDefImport{comm, region, year, slice};
-param preDefExport{comm, region, year, slice};
-param preDefTradeIr{trade, region, region, year, slice};
-param preDefExportRow{expp, region, year, slice};
-param preDefImportRow{imp, region, year, slice};
 param ORD{year};
 
 
@@ -3228,52 +3182,6 @@ s.t.  eqCnsETotOutCRYS{ cn1 in cns,c in comm,r in region,y in year,s in slice : 
 s.t.  eqCnsETotOutCRYSGrowth{ cn1 in cns,c in comm,r in region,y in year,s in slice : (mCnsOut[cn1] and not((mCnsLType[cn1])) and not((mCnsLhsComm[cn1])) and not((mCnsLhsRegion[cn1])) and not((mCnsLhsYear[cn1])) and not((mCnsLhsSlice[cn1])) and not((mCnsLe[cn1])) and not((mCnsGe[cn1])) and mCnsComm[cn1,c] and mCnsRegion[cn1,r] and mCnsYear[cn1,y] and mCnsSlice[cn1,s] and mCnsRhsTypeGrowth[cn1] and mMidMilestone[y] and mMilestoneHasNext[y])}: sum{yp in year:(mMilestoneNext[y,yp])}(vOutTot[c,r,yp,s])-vOutTot[c,r,y,s]*(prod{ye in year,yp in year:((mMilestoneNext[y,yp] and ORD[ye] >= ORD[y] and ORD[ye]<ORD[yp]))}(pRhsCRYS[cn1,c,r,ye,s]))  =  0;
 
 s.t.  eqLECActivity{ r in region,y in year,s in slice : mLECRegion[r]}: sum{t in tech:(mTechSpan[t,r,y])}(vTechAct[t,r,y,s])  >=  pLECLoACT[r];
-
-s.t.  eqPreDefTechUse{ t in tech,r in region,y in year,s in slice : mPreDefTechUse[t,r,y,s]}: vTechUse[t,r,y,s]  =  preDefTechUse[t,r,y,s];
-
-s.t.  eqPreDefTechNewCap{ t in tech,r in region,y in year : mPreDefTechNewCap[t,r,y]}: vTechNewCap[t,r,y]  =  preDefTechNewCap[t,r,y];
-
-s.t.  eqPreDefTechRetiredCap{ t in tech,r in region,y in year,yp in year : mPreDefTechRetiredCap[t,r,y,yp]}: vTechRetiredCap[t,r,y,yp]  =  preDefTechRetiredCap[t,r,y,yp];
-
-s.t.  eqPreDefTechCap{ t in tech,r in region,y in year : mPreDefTechCap[t,r,y]}: vTechCap[t,r,y]  =  preDefTechCap[t,r,y];
-
-s.t.  eqPreDefTechAct{ t in tech,r in region,y in year,s in slice : mPreDefTechAct[t,r,y,s]}: vTechAct[t,r,y,s]  =  preDefTechAct[t,r,y,s];
-
-s.t.  eqPreDefTechInp{ t in tech,c in comm,r in region,y in year,s in slice : mPreDefTechInp[t,c,r,y,s]}: vTechInp[t,c,r,y,s]  =  preDefTechInp[t,c,r,y,s];
-
-s.t.  eqPreDefTechOut{ t in tech,c in comm,r in region,y in year,s in slice : mPreDefTechOut[t,c,r,y,s]}: vTechOut[t,c,r,y,s]  =  preDefTechOut[t,c,r,y,s];
-
-s.t.  eqPreDefTechAInp{ t in tech,c in comm,r in region,y in year,s in slice : mPreDefTechAInp[t,c,r,y,s]}: vTechAInp[t,c,r,y,s]  =  preDefTechAInp[t,c,r,y,s];
-
-s.t.  eqPreDefTechAOut{ t in tech,c in comm,r in region,y in year,s in slice : mPreDefTechAOut[t,c,r,y,s]}: vTechAOut[t,c,r,y,s]  =  preDefTechAOut[t,c,r,y,s];
-
-s.t.  eqPreDefSupOut{ s1 in sup,c in comm,r in region,y in year,s in slice : mPreDefSupOut[s1,c,r,y,s]}: vSupOut[s1,c,r,y,s]  =  preDefSupOut[s1,c,r,y,s];
-
-s.t.  eqPreDefDemInp{ c in comm,r in region,y in year,s in slice : mPreDefDemInp[c,r,y,s]}: vDemInp[c,r,y,s]  =  preDefDemInp[c,r,y,s];
-
-s.t.  eqPreDefDummyOut{ c in comm,r in region,y in year,s in slice : mPreDefDummyOut[c,r,y,s]}: vDummyOut[c,r,y,s]  =  preDefDummyOut[c,r,y,s];
-
-s.t.  eqPreDefDummyInp{ c in comm,r in region,y in year,s in slice : mPreDefDummyInp[c,r,y,s]}: vDummyInp[c,r,y,s]  =  preDefDummyInp[c,r,y,s];
-
-s.t.  eqPreDefStorageInp{ st1 in stg,c in comm,r in region,y in year,s in slice : mPreDefStorageInp[st1,c,r,y,s]}: vStorageInp[st1,c,r,y,s]  =  preDefStorageInp[st1,c,r,y,s];
-
-s.t.  eqPreDefStorageOut{ st1 in stg,c in comm,r in region,y in year,s in slice : mPreDefStorageOut[st1,c,r,y,s]}: vStorageOut[st1,c,r,y,s]  =  preDefStorageOut[st1,c,r,y,s];
-
-s.t.  eqPreDefStorageStore{ st1 in stg,r in region,y in year,s in slice : mPreDefStorageStore[st1,r,y,s]}: vStorageStore[st1,r,y,s]  =  preDefStorageStore[st1,r,y,s];
-
-s.t.  eqPreDefStorageCap{ st1 in stg,r in region,y in year : mPreDefStorageCap[st1,r,y]}: vStorageCap[st1,r,y]  =  preDefStorageCap[st1,r,y];
-
-s.t.  eqPreDefStorageNewCap{ st1 in stg,r in region,y in year : mPreDefStorageNewCap[st1,r,y]}: vStorageNewCap[st1,r,y]  =  preDefStorageNewCap[st1,r,y];
-
-s.t.  eqPreDefImport{ c in comm,r in region,y in year,s in slice : mPreDefImport[c,r,y,s]}: vImport[c,r,y,s]  =  preDefImport[c,r,y,s];
-
-s.t.  eqPreDefExport{ c in comm,r in region,y in year,s in slice : mPreDefExport[c,r,y,s]}: vExport[c,r,y,s]  =  preDefExport[c,r,y,s];
-
-s.t.  eqPreDefTradeIr{ t1 in trade,r in region,rp in region,y in year,s in slice : mPreDefTradeIr[t1,r,rp,y,s]}: vTradeIr[t1,r,rp,y,s]  =  preDefTradeIr[t1,r,rp,y,s];
-
-s.t.  eqPreDefExportRow{ e in expp,r in region,y in year,s in slice : mPreDefExportRow[e,r,y,s]}: vExportRow[e,r,y,s]  =  preDefExportRow[e,r,y,s];
-
-s.t.  eqPreDefImportRow{ i in imp,r in region,y in year,s in slice : mPreDefImportRow[i,r,y,s]}: vImportRow[i,r,y,s]  =  preDefImportRow[i,r,y,s];
 
 minimize vObjective2 : vObjective;
 

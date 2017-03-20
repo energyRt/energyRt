@@ -3,10 +3,10 @@
 #   if is_simple with dim = c(add_col, year)
 #   if !is_simple with dim = (add_col, year, c('LO', 'UP'))
 #data_frame_approximation <- function(frm, parameter, add_col,
-#          rule = 'back.intra.force', default, is_simple = TRUE) {
+#          rule = 'back.intra.force', defVal, is_simple = TRUE) {
 #  if (!is_simple) {
 #    stop('Need finish')
-#  } else simple_data_frame_approximation(frm, parameter, add_col, rule, default)
+#  } else simple_data_frame_approximation(frm, parameter, add_col, rule, defVal)
 #}
 
 #########################################################################################################

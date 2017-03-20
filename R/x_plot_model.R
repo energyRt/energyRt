@@ -1,5 +1,5 @@
 #interpolation_bound(MIN_BIO01@availability, 'ava',
-#   default = dfl, rule = rl, year_range = c(2005, 2100),
+#   defVal = dfl, rule = rl, year_range = c(2005, 2100),
 #   approxim = list(region = 'R1', slice = 'ANNUAL')
 #)
 #--------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ plot_supply <- function(obj, commodity, region = NULL, supply = NULL,
     }
     approxim = list(region = region, slice = slice)
     rl  <- as.character(obj@sysInfo@interpolation[c('ava.lo', 'ava.up')])
-    dfl <- as.numeric(obj@sysInfo@default[c('ava.lo', 'ava.up')])
+    dfl <- as.numeric(obj@sysInfo@defVal[c('ava.lo', 'ava.up')])
     year_range <- range(year)
     cyear <- as.character(year)
     gg <- array(0, dim = c(length(year), 2), dimnames = list(year, c('lo', 'up')))
@@ -40,7 +40,7 @@ plot_supply <- function(obj, commodity, region = NULL, supply = NULL,
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(supply) || obj@data[[i]]@data[[j]]@name %in% supply)) {
             bnd <- interpolation_bound(obj@data[[i]]@data[[j]]@availability,
-               'ava', default = dfl, rule = rl, year_range = year_range,
+               'ava', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim)
             gg <- gg + tapply(bnd$ava, bnd[, c('year', 'type')], sum)[cyear, , drop = FALSE]
           }
@@ -123,7 +123,7 @@ plot_export <- function(obj, commodity, region = NULL, export = NULL,
     }
     approxim = list(region = region, slice = slice)
     rl  <- as.character(obj@sysInfo@interpolation[c('ava.lo', 'ava.up')])
-    dfl <- as.numeric(obj@sysInfo@default[c('ava.lo', 'ava.up')])
+    dfl <- as.numeric(obj@sysInfo@defVal[c('ava.lo', 'ava.up')])
     year_range <- range(year)
     cyear <- as.character(year)
     gg <- array(0, dim = c(length(year), 2), dimnames = list(year, c('lo', 'up')))
@@ -133,7 +133,7 @@ plot_export <- function(obj, commodity, region = NULL, export = NULL,
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(export) || obj@data[[i]]@data[[j]]@name %in% export)) {
             bnd <- interpolation_bound(obj@data[[i]]@data[[j]]@exp,
-               'exp', default = dfl, rule = rl, year_range = year_range,
+               'exp', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim)
             gg <- gg + tapply(bnd$exp, bnd[, c('year', 'type')], sum)[cyear, , drop = FALSE]
           }
@@ -216,7 +216,7 @@ plot_import <- function(obj, commodity, region = NULL, import = NULL,
     }
     approxim = list(region = region, slice = slice)
     rl  <- as.character(obj@sysInfo@interpolation[c('ava.lo', 'ava.up')])
-    dfl <- as.numeric(obj@sysInfo@default[c('ava.lo', 'ava.up')])
+    dfl <- as.numeric(obj@sysInfo@defVal[c('ava.lo', 'ava.up')])
     year_range <- range(year)
     cyear <- as.character(year)
     gg <- array(0, dim = c(length(year), 2), dimnames = list(year, c('lo', 'up')))
@@ -226,7 +226,7 @@ plot_import <- function(obj, commodity, region = NULL, import = NULL,
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(import) || obj@data[[i]]@data[[j]]@name %in% import)) {
             bnd <- interpolation_bound(obj@data[[i]]@data[[j]]@imp,
-               'imp', default = dfl, rule = rl, year_range = year_range,
+               'imp', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim)
             gg <- gg + tapply(bnd$imp, bnd[, c('year', 'type')], sum)[cyear, , drop = FALSE]
           }
@@ -309,7 +309,7 @@ plot_demand <- function(obj, commodity, region = NULL, demand = NULL,
     }
     approxim = list(region = region, slice = slice)
     rl  <- as.character(obj@sysInfo@interpolation['dem'])
-    dfl <- as.numeric(obj@sysInfo@default['dem'])
+    dfl <- as.numeric(obj@sysInfo@defVal['dem'])
     year_range <- range(year)
     cyear <- as.character(year)
     gg <- array(0, dim = length(year), dimnames = list(year))
@@ -319,7 +319,7 @@ plot_demand <- function(obj, commodity, region = NULL, demand = NULL,
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(demand) || obj@data[[i]]@data[[j]]@name %in% demand)) {
             bnd <- interpolation(obj@data[[i]]@data[[j]]@dem,
-               'dem', default = dfl, rule = rl, year_range = year_range,
+               'dem', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim)
             gg <- gg + tapply(bnd$dem, bnd$year, sum)[cyear, drop = FALSE]
           }

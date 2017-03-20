@@ -13,7 +13,7 @@ setClass('constrain',
           unit          = "character",
           for.sum        = "list",
           for.each       = "list",
-          default       = "numeric", 
+          defVal       = "numeric", 
           rule          = "character",
           comm          = "character",
           cout          = "logical",
@@ -62,7 +62,7 @@ setClass('constrain',
           unit          = "",
           for.sum       = list(),
           for.each      = list(),
-          default       = 0, 
+          defVal       = 0, 
           rule          = as.character('inter.forth'),
           comm          = NULL,
           cout          = TRUE,
@@ -84,7 +84,7 @@ setClass('constrain',
 #' @name newConstrain
 #' 
 newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
-   for.each = list(), default = 0, rule = NULL, comm = NULL,
+   for.each = list(), defVal = 0, rule = NULL, comm = NULL,
     cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
   obj <- new('constrain')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
@@ -97,7 +97,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
     stop('Wrong type')
   if (!is.null(rule)) obj@rule[]     <- rule
   obj@type[] <- type
-  obj@default  <- default
+  obj@defVal  <- defVal
   obj@name     <- name
   obj@cout     <- cout
   obj@cinp     <- cinp
@@ -106,7 +106,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   obj@emis     <- emis
   if (type == 'tax') {
       obj@comm     <- comm
-      # if (rule == 'default')  rule <- 'inter.forth'
+      # if (rule == 'defVal')  rule <- 'inter.forth'
       # obj@rule     <- rule
       obj@rhs <- data.frame(region = character(), 
                               year = numeric(), 
@@ -140,7 +140,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       }
    } else if (type == 'subsidy') {
       obj@comm     <- comm
-      # if (rule == 'default')  rule <- 'inter.forth'
+      # if (rule == 'defVal')  rule <- 'inter.forth'
       # obj@rule     <- rule
       obj@rhs <- data.frame(region = character(), 
                               year = numeric(), 
@@ -173,8 +173,8 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
         obj@for.each <- for.each
       }
   } else {
-#      if (rule == 'default')  rule <- 'back.inter.forth'
-#      if (rule == 'default')  rule <- new('constrain')@rule
+#      if (rule == 'defVal')  rule <- 'back.inter.forth'
+#      if (rule == 'defVal')  rule <- new('constrain')@rule
 #      obj@rule     <- rule
       minset <- list()
       minset$capacity <- c('region', 'year')
@@ -288,7 +288,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
         rhs <- rhs2
       }
       if (is.numeric(rhs)) {
-        obj@default <- rhs
+        obj@defVal <- rhs
       } else if (is.data.frame(rhs)) {
         if (any(!(colnames(rhs) %in% colnames(obj@rhs)))) 
           stop('Uncorrect rhs column name')
@@ -450,9 +450,9 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
 #          } else {
 #            vv <- 'vOutTot(comm, region, year, slice)'
 #          }          
-#          eqDecFull <- paste(eqDecFull, obj@default, ' * ', vv, ';', sep = '')
+#          eqDecFull <- paste(eqDecFull, obj@defVal, ' * ', vv, ';', sep = '')
 #        } else {
-#          eqDecFull <- paste(eqDecFull, obj@default, ';', sep = '')
+#          eqDecFull <- paste(eqDecFull, obj@defVal, ';', sep = '')
 #        }
 #      } else {                                                               
 #        gg <- obj@rhs
@@ -472,7 +472,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
 #          }  
 #        }
 #        rhs <- interpolation(gg, 'rhs', approxim = approxim, year_range = year_range,
-#            rule = obj@rule, default = obj@default)  
+#            rule = obj@rule, defVal = obj@defVal)  
 #        prm <- paste('rhsCns', obj@name, '(', paste(colnames(rhs)[-ncol(rhs)], 
 #           collapse = ', '), ')', sep = '')
 #        if (tp == 'sharein' || tp == 'shareout') {
@@ -590,7 +590,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
 #      #
 #      for(i in names(specSet)) {
 #       add_code <- c(add_code, paste('param ', aliasSetFull[[i]], ';', sep = ''))
-#       add_set <- c(add_set, paste('param ', aliasSet[[i]], ' default 0 := ', sep = ''), 
+#       add_set <- c(add_set, paste('param ', aliasSet[[i]], ' defVal 0 := ', sep = ''), 
 #         paste('[', specSet[[i]], '] 1', sep = ''), ';')
 #      }
 #      #
@@ -690,9 +690,9 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
 #          } else {
 #            vv <- 'vOutTot(comm, region, year, slice)'
 #          }          
-#          eqDecFull <- paste(eqDecFull, obj@default, ' * ', vv, ';', sep = '')
+#          eqDecFull <- paste(eqDecFull, obj@defVal, ' * ', vv, ';', sep = '')
 #        } else {
-#          eqDecFull <- paste(eqDecFull, obj@default, ';', sep = '')
+#          eqDecFull <- paste(eqDecFull, obj@defVal, ';', sep = '')
 #        }
 #      } else {                                                               
 #        gg <- obj@rhs
@@ -712,7 +712,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
 #          }  
 #        }
 #        rhs <- interpolation(gg, 'rhs', approxim = approxim, year_range = year_range,
-#            rule = obj@rule, default = obj@default)
+#            rule = obj@rule, defVal = obj@defVal)
 #        prm <- paste('rhsCns', obj@name, '[', paste(al_slc[colnames(rhs)[-ncol(rhs)]], 
 #           collapse = ', '), ']', sep = '')
 #        prm2 <- paste('rhsCns', obj@name, '{', paste(colnames(rhs)[-ncol(rhs)], 
@@ -748,7 +748,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
 #            eqDecFull <- paste(eqDecFull, prm, ';', sep = '')
 #        }
 #        add_code <- c(add_code, paste('param ', prm2, ';', sep = ''))
-#        add_set <- c(add_set, paste('param ', prm3, ' default 0 := ', sep = ''), 
+#        add_set <- c(add_set, paste('param ', prm3, ' defVal 0 := ', sep = ''), 
 #          paste('[', apply(rhs[, -ncol(rhs), drop = FALSE], 1, function(x) paste(x, collapse = ',')),
 #            '] ', rhs[, ncol(rhs)], sep = ''), ';')
 #      }  

@@ -95,7 +95,7 @@ choropleth.scenario <- function(obj, # scenario object
     # message(paste(names(dat), collapse = " "))
     #ttl
   }
-  spdf <- sp::merge(scen.BAU@model@sysInfo@sp, dat)
+  spdf <- sp::merge(scen.BAU@model@sysInfo@GIS, dat)
   #head(spdf@data)
   if(is.null(shading)) {
     sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], n = 9)
@@ -107,7 +107,7 @@ choropleth.scenario <- function(obj, # scenario object
   GISTools::choro.legend(124, 38, sh = sh, 
                          cex = 0.75, bty = "o")
   
-  #spdf <- sp::merge(scen@model@sysInfo@sp, dat)
+  #spdf <- sp::merge(scen@model@sysInfo@GIS, dat)
   #GISTools::choropleth(spdf, variable, shading)
   #GISTools::choro.legend()
   
@@ -170,7 +170,7 @@ arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
   if (all(ii & pos)) {
     dat$lwd <- NA
     dat$lwd[ii & pos] <- lwd.Inf
-    #message("All Inf")
+    #message("All Inf") 
   } else {
     amax <- max(dat$value[pos])
     if(is.infinite(amax)) amax <- max(dat$value[pos & !ii])
@@ -189,7 +189,7 @@ arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
   }
   dat$col <- col
   dat$col[ii] <- col.Inf
-  if (!add) plot(scen@model@sysInfo@sp)
+  if (!add) plot(scen@model@sysInfo@GIS)
   arrows(dat$x.src, dat$y.src, dat$x.dst, dat$y.dst, 
          col = dat$col, length = length, 
          lwd = dat$lwd, angle = angle)
@@ -210,11 +210,11 @@ agg_srcdst <- function(dat, by = list(dat$src, dat$dst), FUN = "sum",
 }
 
 get_labpt <- function(scen) {
-  labpt <- sapply(scen@model@sysInfo@sp$OBJECTID, function(x) {
-    scen.BAU@model@sysInfo@sp@polygons[[x]]@labpt
+  labpt <- sapply(scen@model@sysInfo@GIS$OBJECTID, function(x) {
+    scen.BAU@model@sysInfo@GIS@polygons[[x]]@labpt
   })
   labpt <- cbind(
-    scen@model@sysInfo@sp@data$region,
+    scen@model@sysInfo@GIS@data$region,
     as.data.frame(t(labpt))
   )
   names(labpt) <- c("region", "x", "y")
@@ -229,9 +229,9 @@ add_labpt <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = N
 }
 
 getSPDF <- function(scen, ...) {
-  SPDF <- scen@model@sysInfo@sp
+  SPDF <- scen@model@sysInfo@GIS
   if (is.null(SPDF)) {
-    stop("The scenario has no spatial information. Check 'scen@model@sysInfo@sp'")
+    stop("The scenario has no spatial information. Check 'scen@model@sysInfo@GIS'")
   }
   
   dat <- getData(scen, ..., astable = TRUE, merge.table = TRUE, drop = FALSE)

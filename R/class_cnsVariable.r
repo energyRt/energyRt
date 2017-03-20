@@ -8,7 +8,7 @@ setClass('cnsVariable',
           #use_set       = "list", # set that initialize by parent class
           set           = "list",  # other set, creat by function create_set
           ext_set       = "list",  # External set, that know use in constrains
-          default       = "numeric", 
+          defVal       = "numeric", 
           value         = "data.frame",
           misc = "list"
           # parameter= list() # For the future
@@ -19,7 +19,7 @@ setClass('cnsVariable',
           #use_set       = list(), 
           set           = list(), 
           ext_set       = list(),  # External set, that know use in constrains
-          default       = 1, 
+          defVal       = 1, 
           value         = NULL,#data.frame(value = numeric(), stringsAsFactors = FALSE),
           # parameter= list() # For the future
       #! Misc
@@ -47,12 +47,12 @@ add_set.cnsVariable <- function(vrb, ...) {
 ##level <- list(comm = comm, technology = technology)
 ##print(create_cnsVariable('vTecInp', set = list(create_set('technology', c('TEC1', 'TEC2')))))
 ##print(create_cnsVariable('vTecInp', set = list(create_set('technology', c('TEC1', 'TEC2')),
-##        create_set('comm', c('COA', 'GAS'))), default = 5))
+##        create_set('comm', c('COA', 'GAS'))), defVal = 5))
 ##print(create_cnsVariable('vTecInp', ext_set = list(create_set('technology', c('TEC1', 'TEC2')),
-##        create_set('comm', c('COA', 'GAS'))), default = 5))
+##        create_set('comm', c('COA', 'GAS'))), defVal = 5))
 ##
 ##vrb <- create_cnsVariable('vTecInp', set = list(create_set('technology', c('TEC1', 'TEC2')),
-##        create_set('comm', c('COA', 'GAS'))), default = 5)
+##        create_set('comm', c('COA', 'GAS'))), defVal = 5)
 ##        
 ##
 ##prepare(vrb, level)

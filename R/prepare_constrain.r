@@ -40,7 +40,7 @@ prepare.constrain <- function(cns, level) {
     cln <- c(rename_col[cln], 'value')
     colnames(cns@value) <- cln
   }
-  zz <- data_frame_to_gams_parameter(cns@value, cns@default, paste('alPr', cns@name, sep = ''))
+  zz <- data_frame_to_gams_parameter(cns@value, cns@defVal, paste('alPr', cns@name, sep = ''))
   clearCode[[length(clearCode) + 1]] <- zz$clearCode
   eq_code <- paste(eq_declare, '..\n', zz$ext_code, eq_code, sep = '')
   limtype <- c('=e=', '=l=', '=b=')[as.numeric(cns@type)]

@@ -30,7 +30,7 @@ prepare.cnsVariable <- function(vrb, level = NULL, prefix = '') {
     cln <- c(rename_col[cln], 'value')
     colnames(vrb@value) <- cln
   }
-  zz <- data_frame_to_gams_parameter(vrb@value, vrb@default, paste(prefix, 'pr', sep = ''))
+  zz <- data_frame_to_gams_parameter(vrb@value, vrb@defVal, paste(prefix, 'pr', sep = ''))
   clearCode[[length(clearCode) + 1]] <- zz$clearCode
   ext_code <- paste(ext_code, '*', zz$ext_code)
   if (length(vrb@set) != 0) ext_code <- paste(ext_code, ')', sep = '')

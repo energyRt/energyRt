@@ -3,29 +3,23 @@
 ################################################################################
 # ! User never use this class
 ################################################################################
-setClass("CodeProduce", # modInp
+setClass("modInp", # modInp
   representation(
     set = "list", # @sets List with set : tech, sup, group, comm, region, year, slice
-    maptable = "list", # @parameters List with techology parameter
-    constrain = "list", # @customConstrains
-    model_reduced      = "character", # @modelVersion and @solver 
-    model_reduced_glpk = "character",
-    model_full         = "character", 
-    model_full_glpk    = "character",
+    parameters = "list", # @parameters List with techology parameter
+    customConstrains = "list", # @customConstrains
+    modelVersion        = "character",
+    solver              = "character",
     misc = "list"
   ),
   prototype(
     set = list(tech = c(), sup = c(), group = c(),
                 comm = c(), region = c(), year = c(), slice = c()
     ),
-    maptable = list(), # List with techology parameter
-    constrain = list(), 
-    #model = readLines(paste(Sys.getenv('dropbox'), '/package/bottomup/gams/model.gms', sep = '')),
-    #model_glpk = readLines(paste(Sys.getenv('dropbox'), '/package/bottomup/glpk/glpk.mod', sep = ''))
-    model_reduced = readLines('gams/model_reduced.gms'),
-    model_reduced_glpk = readLines('glpk/glpk_reduced.mod'),
-    model_full = readLines('gams/model_full.gms'),
-    model_full_glpk = readLines('glpk/glpk_full.mod'),
+    parameters = list(), # List with techology parameter
+    customConstrains = list(), 
+    modelVersion        = "",
+    solver              = "",
     #! Misc
     misc = list(
       GUID = "dc8680b2-130d-4a40-86b8-3a33018e005e"
@@ -33,267 +27,274 @@ setClass("CodeProduce", # modInp
   )
 );
 
-# Constructor
-setMethod("initialize", "CodeProduce",
-  function(.Object) {
-  # Create MapTable
-    # Base set
-    .Object@maptable[['region']] <- createSet('region')    
-    .Object@maptable[['year']]   <- createSet('year')    
-    .Object@maptable[['slice']]  <- createSet('slice')    
-    .Object@maptable[['comm']]   <- createSet('comm')    
-    .Object@maptable[['sup']]    <- createSet('sup')    
-    .Object@maptable[['dem']]    <- createSet('dem')    
-    .Object@maptable[['tech']]   <- createSet('tech')    
-    .Object@maptable[['group']]  <- createSet('group')    
-    .Object@maptable[['stg']]    <- createSet('stg')    
-    .Object@maptable[['expp']]    <- createSet('expp')    
-    .Object@maptable[['imp']]    <- createSet('imp')    
-    .Object@maptable[['trade']]    <- createSet('trade')    
-    .Object@maptable[['cns']] <- createSet('cns')    
 
-    .Object@maptable[['mSlicePrevious']] <- MapTable('mSlicePrevious', c('slice', 'slice'), 'map')    
-    .Object@maptable[['mSlicePreviousYear']] <- MapTable('mSlicePreviousYear', 'slice', 'map')    
+modelCode <- list(GAMS = list(reduced = readLines('gams/model_reduced.gms'),
+                              full = readLines('gams/model_full.gms')),
+                  GLPK = list(reduced = readLines('glpk/glpk_reduced.mod'),
+                              full = readLines('glpk/glpk_full.mod')))
+save(file = 'data/modelCode.RData', list = 'modelCode')
+
+# Constructor
+setMethod("initialize", "modInp",
+  function(.Object) {
+  # Create parameters
+    # Base set
+    .Object@parameters[['region']] <- createSet('region')    
+    .Object@parameters[['year']]   <- createSet('year')    
+    .Object@parameters[['slice']]  <- createSet('slice')    
+    .Object@parameters[['comm']]   <- createSet('comm')    
+    .Object@parameters[['sup']]    <- createSet('sup')    
+    .Object@parameters[['dem']]    <- createSet('dem')    
+    .Object@parameters[['tech']]   <- createSet('tech')    
+    .Object@parameters[['group']]  <- createSet('group')    
+    .Object@parameters[['stg']]    <- createSet('stg')    
+    .Object@parameters[['expp']]    <- createSet('expp')    
+    .Object@parameters[['imp']]    <- createSet('imp')    
+    .Object@parameters[['trade']]    <- createSet('trade')    
+    .Object@parameters[['cns']] <- createSet('cns')    
+
+        .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map')    
+    .Object@parameters[['mSlicePreviousYear']] <- createParameter('mSlicePreviousYear', 'slice', 'map')    
 
   # Commodity
     # Map
-    #.Object@maptable[['ems_from']] <- 
-    #    MapTable('ems_from', c('comm', 'commp'), 'map')    
-    .Object@maptable[['mUpComm']] <- MapTable('mUpComm', 'comm', 'map')    
-    .Object@maptable[['mLoComm']] <- MapTable('mLoComm', 'comm', 'map')    
-    .Object@maptable[['mFxComm']] <- MapTable('mFxComm', 'comm', 'map')    
-    # Single
-    .Object@maptable[['pEmissionFactor']] <- 
-        MapTable('pEmissionFactor', c('comm', 'commp'), 'single',  #PPP
-        default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pAggregateFactor']] <- 
-        MapTable('pAggregateFactor', c('comm', 'commp'), 'single', #PPP
-        default = 0, interpolation = 'back.inter.forth')    
+    #.Object@parameters[['ems_from']] <- 
+    #    createParameter('ems_from', c('comm', 'commp'), 'map')    
+    .Object@parameters[['mUpComm']] <- createParameter('mUpComm', 'comm', 'map')    
+    .Object@parameters[['mLoComm']] <- createParameter('mLoComm', 'comm', 'map')    
+    .Object@parameters[['mFxComm']] <- createParameter('mFxComm', 'comm', 'map')    
+    # simple
+    .Object@parameters[['pEmissionFactor']] <- 
+        createParameter('pEmissionFactor', c('comm', 'commp'), 'simple',  #PPP
+        defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pAggregateFactor']] <- 
+        createParameter('pAggregateFactor', c('comm', 'commp'), 'simple', #PPP
+        defVal = 0, interpolation = 'back.inter.forth')    
   # Other commodity attribute
     # Demand
     # Map
-    .Object@maptable[['mDemComm']] <- 
-        MapTable('mDemComm', c('dem', 'comm'), 'map')    
-    .Object@maptable[['pDemand']] <- 
-        MapTable('pDemand', c('dem', 'region', 'year', 'slice'), 'single', 
-        default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'dem')
+    .Object@parameters[['mDemComm']] <- 
+        createParameter('mDemComm', c('dem', 'comm'), 'map')    
+    .Object@parameters[['pDemand']] <- 
+        createParameter('pDemand', c('dem', 'region', 'year', 'slice'), 'simple', 
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'dem')
     # Dummy import
-    .Object@maptable[['pDummyImportCost']] <- 
-        MapTable('pDummyImportCost', c('comm', 'region', 'year', 'slice'), 'single', 
-        default = Inf, interpolation = 'back.inter.forth', for_sysInfo = 'dummyImport')    
+    .Object@parameters[['pDummyImportCost']] <- 
+        createParameter('pDummyImportCost', c('comm', 'region', 'year', 'slice'), 'simple', 
+        defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyImport')    
     # Dummy export
-    .Object@maptable[['pDummyExportCost']] <- 
-        MapTable('pDummyExportCost', c('comm', 'region', 'year', 'slice'), 'single', 
-        default = Inf, interpolation = 'back.inter.forth', for_sysInfo = 'dummyExport')    
+    .Object@parameters[['pDummyExportCost']] <- 
+        createParameter('pDummyExportCost', c('comm', 'region', 'year', 'slice'), 'simple', 
+        defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyExport')    
     # Tax
-    .Object@maptable[['pTaxCost']] <- 
-        MapTable('pTaxCost', c('comm', 'region', 'year', 'slice'), 'single', 
-        default = 0, interpolation = 'inter.forth', for_sysInfo = 'tax')    
+    .Object@parameters[['pTaxCost']] <- 
+        createParameter('pTaxCost', c('comm', 'region', 'year', 'slice'), 'simple', 
+        defVal = 0, interpolation = 'inter.forth', colName = 'tax')    
     # Subs
-    .Object@maptable[['pSubsCost']] <- 
-        MapTable('pSubsCost', c('comm', 'region', 'year', 'slice'), 'single', 
-        default = 0, interpolation = 'inter.forth', for_sysInfo = 'subs')    
+    .Object@parameters[['pSubsCost']] <- 
+        createParameter('pSubsCost', c('comm', 'region', 'year', 'slice'), 'simple', 
+        defVal = 0, interpolation = 'inter.forth', colName = 'subs')    
   # Supply
     # Map
-    .Object@maptable[['mSupComm']] <- 
-        MapTable('mSupComm', c('sup', 'comm'), 'map')    
-    .Object@maptable[['mSupSpan']] <- 
-        MapTable('mSupSpan', c('sup', 'region'), 'map')    
-    # Single
-    .Object@maptable[['pSupCost']] <- 
-        MapTable('pSupCost', c('sup', 'region', 'year', 'slice'), 'single', 
-        default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cost')    
-    .Object@maptable[['pSupReserve']] <- 
-        MapTable('pSupReserve', c('sup'), 'single', 
-        default = Inf, interpolation = 'back.inter.forth')    
-    # Double
-    .Object@maptable[['pSupAva']] <- 
-        MapTable('pSupAva', c('sup', 'region', 'year', 'slice'), 'double', 
-        default = c(0, Inf), interpolation = 'back.inter.forth', 
-          for_sysInfo = c('ava.lo', 'ava.up'))    
+    .Object@parameters[['mSupComm']] <- 
+        createParameter('mSupComm', c('sup', 'comm'), 'map')    
+    .Object@parameters[['mSupSpan']] <- 
+        createParameter('mSupSpan', c('sup', 'region'), 'map')    
+    # simple
+    .Object@parameters[['pSupCost']] <- 
+        createParameter('pSupCost', c('sup', 'region', 'year', 'slice'), 'simple', 
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'cost')    
+    .Object@parameters[['pSupReserve']] <- 
+        createParameter('pSupReserve', c('sup'), 'simple', 
+        defVal = Inf, interpolation = 'back.inter.forth')    
+    # multi
+    .Object@parameters[['pSupAva']] <- 
+        createParameter('pSupAva', c('sup', 'region', 'year', 'slice'), 'multi', 
+        defVal = c(0, Inf), interpolation = 'back.inter.forth', 
+          colName = c('ava.lo', 'ava.up'))    
   # Technology
     # Map
     for(i in c('mTechInpComm', 'mTechOutComm', 'mTechOneComm', 
       'mTechEmitedComm', 'mTechAInp', 'mTechAOut'))
-        .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm'), 'map')    
+        .Object@parameters[[i]] <- createParameter(i, c('tech', 'comm'), 'map')    
 #    for(i in c('mTechCinpAInp', 'mTechCoutAInp', 'mTechCinpAOut', 'mTechCoutAOut'))
-#        .Object@maptable[[i]] <- MapTable(i, c('tech', 'comm', 'commp'), 'map')    
+#        .Object@parameters[[i]] <- createParameter(i, c('tech', 'comm', 'commp'), 'map')    
     for(i in c('mTechInpGroup', 'mTechOutGroup'))
-        .Object@maptable[[i]] <- MapTable(i, c('tech', 'group'), 'map')    
-    .Object@maptable[['mTechGroupComm']] <- MapTable('mTechGroupComm', 
+        .Object@parameters[[i]] <- createParameter(i, c('tech', 'group'), 'map')    
+    .Object@parameters[['mTechGroupComm']] <- createParameter('mTechGroupComm', 
         c('tech', 'group', 'comm'), 'map')    
-#    .Object@maptable[['mTechStartYear']] <- MapTable('mTechStartYear', 
+#    .Object@parameters[['mTechStartYear']] <- createParameter('mTechStartYear', 
 #        c('tech', 'region', 'year'), 'map')    
-#    .Object@maptable[['mTechEndYear']] <- MapTable('mTechEndYear', 
+#    .Object@parameters[['mTechEndYear']] <- createParameter('mTechEndYear', 
 #        c('tech', 'region', 'year'), 'map')    
-    .Object@maptable[['mTechUpgrade']] <- MapTable('mTechUpgrade', 
+    .Object@parameters[['mTechUpgrade']] <- createParameter('mTechUpgrade', 
         c('tech', 'techp'), 'map')    
-    .Object@maptable[['mTechRetirement']] <- MapTable('mTechRetirement', c('tech'), 'map')    
+    .Object@parameters[['mTechRetirement']] <- createParameter('mTechRetirement', c('tech'), 'map')    
     # For disable technology with unexceptable start year
-    .Object@maptable[['mTechNew']] <- MapTable('mTechNew', c('tech', 'region', 'year'), 'map')    
-    .Object@maptable[['mTechSpan']] <- MapTable('mTechSpan', c('tech', 'region', 'year'), 'map')    
-    # Single & Double
-    .Object@maptable[['pTechCap2act']] <- 
-        MapTable('pTechCap2act', 'tech', 'single', 
-        default = 1, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pTechEmisComm']] <- MapTable('pTechEmisComm', c('tech', 'comm'), 'single', default = 1)    
-    .Object@maptable[['pTechOlife']] <- 
-        MapTable('pTechOlife', c('tech', 'region'), 'single', 
-        default = 1, interpolation = 'back.inter.forth', for_sysInfo = 'olife')          
-        .Object@maptable[['pTechFixom']] <- MapTable('pTechFixom', 
-              c('tech', 'region', 'year'), 'single', 
-        default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'fixom')    
-        .Object@maptable[['pTechInvcost']] <- MapTable('pTechInvcost', 
-              c('tech', 'region', 'year'), 'single', 
-        default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'invcost')    
-        .Object@maptable[['pTechStock']] <- MapTable('pTechStock', 
-              c('tech', 'region', 'year'), 'single', 
-        default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'stock')    
-        .Object@maptable[['pTechVarom']] <- MapTable('pTechVarom', 
-              c('tech', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'varom')    
-        .Object@maptable[['pTechAfa']] <- MapTable('pTechAfa', 
-              c('tech', 'region', 'year', 'slice'), 'double', 
-                default = c(0, 1), interpolation = 'back.inter.forth', 
-                for_sysInfo = c('afa.lo', 'afa.up'))    
-        .Object@maptable[['pTechGinp2use']] <- MapTable('pTechGinp2use', 
-              c('tech', 'group', 'region', 'year', 'slice'), 'single', 
-                default = 1, interpolation = 'back.inter.forth', for_sysInfo = 'ginp2use')    
-        .Object@maptable[['pTechCinp2ginp']] <- MapTable('pTechCinp2ginp', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 1, interpolation = 'back.inter.forth', for_sysInfo = 'cinp2ginp')    
-        .Object@maptable[['pTechUse2cact']] <- MapTable('pTechUse2cact', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 1, interpolation = 'back.inter.forth', for_sysInfo = 'use2cact')    
+    .Object@parameters[['mTechNew']] <- createParameter('mTechNew', c('tech', 'region', 'year'), 'map')    
+    .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map')    
+    # simple & multi
+    .Object@parameters[['pTechCap2act']] <- 
+        createParameter('pTechCap2act', 'tech', 'simple', 
+        defVal = 1, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pTechEmisComm']] <- createParameter('pTechEmisComm', c('tech', 'comm'), 'simple', defVal = 1)    
+    .Object@parameters[['pTechOlife']] <- 
+        createParameter('pTechOlife', c('tech', 'region'), 'simple', 
+        defVal = 1, interpolation = 'back.inter.forth', colName = 'olife')          
+        .Object@parameters[['pTechFixom']] <- createParameter('pTechFixom', 
+              c('tech', 'region', 'year'), 'simple', 
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'fixom')    
+        .Object@parameters[['pTechInvcost']] <- createParameter('pTechInvcost', 
+              c('tech', 'region', 'year'), 'simple', 
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost')    
+        .Object@parameters[['pTechStock']] <- createParameter('pTechStock', 
+              c('tech', 'region', 'year'), 'simple', 
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'stock')    
+        .Object@parameters[['pTechVarom']] <- createParameter('pTechVarom', 
+              c('tech', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'varom')    
+        .Object@parameters[['pTechAfa']] <- createParameter('pTechAfa', 
+              c('tech', 'region', 'year', 'slice'), 'multi', 
+                defVal = c(0, 1), interpolation = 'back.inter.forth', 
+                colName = c('afa.lo', 'afa.up'))    
+        .Object@parameters[['pTechGinp2use']] <- createParameter('pTechGinp2use', 
+              c('tech', 'group', 'region', 'year', 'slice'), 'simple', 
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'ginp2use')    
+        .Object@parameters[['pTechCinp2ginp']] <- createParameter('pTechCinp2ginp', 
+              c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'cinp2ginp')    
+        .Object@parameters[['pTechUse2cact']] <- createParameter('pTechUse2cact', 
+              c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'use2cact')    
         # Aux
-        .Object@maptable[['pTechUse2AInp']] <- MapTable('pTechUse2AInp', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'use2ainp')    
-        .Object@maptable[['pTechAct2AInp']] <- MapTable('pTechAct2AInp', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'act2ainp')    
-        .Object@maptable[['pTechCap2AInp']] <- MapTable('pTechCap2AInp', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cap2ainp')    
-        .Object@maptable[['pTechUse2AOut']] <- MapTable('pTechUse2AOut', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'use2aout')    
-        .Object@maptable[['pTechAct2AOut']] <- MapTable('pTechAct2AOut', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'act2aout')    
-        .Object@maptable[['pTechCap2AOut']] <- MapTable('pTechCap2AOut', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cap2aout')    
+        .Object@parameters[['pTechUse2AInp']] <- createParameter('pTechUse2AInp', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'use2ainp')    
+        .Object@parameters[['pTechAct2AInp']] <- createParameter('pTechAct2AInp', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'act2ainp')    
+        .Object@parameters[['pTechCap2AInp']] <- createParameter('pTechCap2AInp', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2ainp')    
+        .Object@parameters[['pTechUse2AOut']] <- createParameter('pTechUse2AOut', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'use2aout')    
+        .Object@parameters[['pTechAct2AOut']] <- createParameter('pTechAct2AOut', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'act2aout')    
+        .Object@parameters[['pTechCap2AOut']] <- createParameter('pTechCap2AOut', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout')    
 
-        .Object@maptable[['pTechNCap2AInp']] <- MapTable('pTechNCap2AInp', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cap2aout')    
-        .Object@maptable[['pTechNCap2AOut']] <- MapTable('pTechNCap2AOut', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cap2aout')    
+        .Object@parameters[['pTechNCap2AInp']] <- createParameter('pTechNCap2AInp', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout')    
+        .Object@parameters[['pTechNCap2AOut']] <- createParameter('pTechNCap2AOut', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout')    
 
-        .Object@maptable[['pTechCinp2AInp']] <- MapTable('pTechCinp2AInp', 
-              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cinp2ainp')    
-        .Object@maptable[['pTechCout2AInp']] <- MapTable('pTechCout2AInp', 
-              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cout2ainp')    
-        .Object@maptable[['pTechCinp2AOut']] <- MapTable('pTechCinp2AOut', 
-              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cinp2aout')    
-        .Object@maptable[['pTechCout2AOut']] <- MapTable('pTechCout2AOut', 
-              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cout2aout')    
+        .Object@parameters[['pTechCinp2AInp']] <- createParameter('pTechCinp2AInp', 
+              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cinp2ainp')    
+        .Object@parameters[['pTechCout2AInp']] <- createParameter('pTechCout2AInp', 
+              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cout2ainp')    
+        .Object@parameters[['pTechCinp2AOut']] <- createParameter('pTechCinp2AOut', 
+              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cinp2aout')    
+        .Object@parameters[['pTechCout2AOut']] <- createParameter('pTechCout2AOut', 
+              c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cout2aout')    
 
         # Aux stop
-        .Object@maptable[['pTechCact2cout']] <- MapTable('pTechCact2cout', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 1, interpolation = 'back.inter.forth', for_sysInfo = 'cact2cout')    
-        .Object@maptable[['pTechCinp2use']] <- MapTable('pTechCinp2use', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 1, interpolation = 'back.inter.forth', for_sysInfo = 'cinp2use')  
-        .Object@maptable[['pTechCvarom']] <- MapTable('pTechCvarom', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'cvarom')    
-        .Object@maptable[['pTechAvarom']] <- MapTable('pTechAvarom', 
-              c('tech', 'acomm', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth', for_sysInfo = 'avarom')    
-        .Object@maptable[['pTechShare']] <- MapTable('pTechShare', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'double', 
-                default = c(0, 1), interpolation = 'back.inter.forth', 
-                for_sysInfo = c('share.lo', 'share.up'))    
-        .Object@maptable[['pTechAfac']] <- MapTable('pTechAfac', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'double', 
-                default = c(0, Inf), interpolation = 'back.inter.forth', 
-                for_sysInfo = c('afac.lo', 'afac.up'))
+        .Object@parameters[['pTechCact2cout']] <- createParameter('pTechCact2cout', 
+              c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'cact2cout')    
+        .Object@parameters[['pTechCinp2use']] <- createParameter('pTechCinp2use', 
+              c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'cinp2use')  
+        .Object@parameters[['pTechCvarom']] <- createParameter('pTechCvarom', 
+              c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cvarom')    
+        .Object@parameters[['pTechAvarom']] <- createParameter('pTechAvarom', 
+              c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'avarom')    
+        .Object@parameters[['pTechShare']] <- createParameter('pTechShare', 
+              c('tech', 'comm', 'region', 'year', 'slice'), 'multi', 
+                defVal = c(0, 1), interpolation = 'back.inter.forth', 
+                colName = c('share.lo', 'share.up'))    
+        .Object@parameters[['pTechAfac']] <- createParameter('pTechAfac', 
+              c('tech', 'comm', 'region', 'year', 'slice'), 'multi', 
+                defVal = c(0, Inf), interpolation = 'back.inter.forth', 
+                colName = c('afac.lo', 'afac.up'))
                 
   ## NEED SET ALIAS FOR SYS INFO
   # Reserve
-    .Object@maptable[['mStorageComm']] <- MapTable('mStorageComm', c('stg', 'comm'), 'map')    
-    # Single & Double
-        .Object@maptable[['pStorageOlife']] <- MapTable('pStorageOlife', 
-              c('stg', 'region'), 'single', 
-                default = 1, interpolation = 'back.inter.forth')    
+    .Object@parameters[['mStorageComm']] <- createParameter('mStorageComm', c('stg', 'comm'), 'map')    
+    # simple & multi
+        .Object@parameters[['pStorageOlife']] <- createParameter('pStorageOlife', 
+              c('stg', 'region'), 'simple', 
+                defVal = 1, interpolation = 'back.inter.forth')    
     for(i in c('pStorageStock', 'pStorageFixom', 'pStorageInvcost'))
-        .Object@maptable[[i]] <- MapTable(i, 
-              c('stg', 'region', 'year'), 'single', 
-                default = 0, interpolation = 'back.inter.forth')    
+        .Object@parameters[[i]] <- createParameter(i, 
+              c('stg', 'region', 'year'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth')    
     for(i in c('pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreStock',
                'pStorageCostStore', 'pStorageCostInp', 'pStorageCostOut'))
-        .Object@maptable[[i]] <- MapTable(i, 
-              c('stg', 'region', 'year', 'slice'), 'single', 
-                default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pStorageStoreLoss']] <- MapTable('pStorageStoreLoss', 
-          c('stg', 'region', 'year', 'slice'), 'single', 
-            default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pStorageCap']] <- MapTable('pStorageCap', 
-          c('stg', 'region', 'year'), 'double', 
-            default = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@maptable[['mStorageNew']] <- MapTable('mStorageNew', c('stg', 'region', 'year'), 'map')    
-    .Object@maptable[['mStorageSpan']] <- MapTable('mStorageSpan', c('stg', 'region', 'year'), 'map')    
+        .Object@parameters[[i]] <- createParameter(i, 
+              c('stg', 'region', 'year', 'slice'), 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pStorageStoreLoss']] <- createParameter('pStorageStoreLoss', 
+          c('stg', 'region', 'year', 'slice'), 'simple', 
+            defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pStorageCap']] <- createParameter('pStorageCap', 
+          c('stg', 'region', 'year'), 'multi', 
+            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
+    .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
   # Trade
     # Map
-    .Object@maptable[['mExpComm']] <- 
-        MapTable('mExpComm', c('expp', 'comm'), 'map')    
-    .Object@maptable[['mImpComm']] <- 
-        MapTable('mImpComm', c('imp', 'comm'), 'map')    
-    .Object@maptable[['mTradeComm']] <- 
-        MapTable('mTradeComm', c('trade', 'comm'), 'map')    
-    .Object@maptable[['mTradeSrc']] <- 
-        MapTable('mTradeSrc', c('trade', 'region'), 'map')    
-    .Object@maptable[['mTradeDst']] <- 
-        MapTable('mTradeDst', c('trade', 'region'), 'map')    
-    .Object@maptable[['mSlicePrevious']] <- MapTable('mSlicePrevious', c('slice', 'slice'), 'map')    
-    .Object@maptable[['pTradeIrCost']] <- MapTable('pTradeIrCost', 
-          c('trade', 'src', 'dst', 'year', 'slice'), 'single', 
-            default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pTradeIrMarkup']] <- MapTable('pTradeIrMarkup', 
-          c('trade', 'src', 'dst', 'year', 'slice'), 'single', 
-            default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pExportRowPrice']] <- MapTable('pExportRowPrice', 
-          c('expp', 'region', 'year', 'slice'), 'single', 
-            default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pImportRowPrice']] <- MapTable('pImportRowPrice', 
-          c('imp', 'region', 'year', 'slice'), 'single', 
-            default = 0, interpolation = 'back.inter.forth')    
-    .Object@maptable[['pTradeIr']] <- MapTable('pTradeIr', 
-          c('trade', 'src', 'dst', 'year', 'slice'), 'double', 
-            default = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@maptable[['pExportRow']] <- MapTable('pExportRow', 
-          c('expp', 'region', 'year', 'slice'), 'double', 
-            default = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@maptable[['pImportRow']] <- MapTable('pImportRow', 
-          c('imp', 'region', 'year', 'slice'), 'double', 
-            default = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@maptable[['pExportRowRes']] <- MapTable('pExportRowRes', 
-          'expp', 'single',  default = 0, interpolation = 'back.inter.forth')
-    .Object@maptable[['pImportRowRes']] <- MapTable('pImportRowRes', 
-          'imp', 'single',  default = 0, interpolation = 'back.inter.forth')
+    .Object@parameters[['mExpComm']] <- 
+        createParameter('mExpComm', c('expp', 'comm'), 'map')    
+    .Object@parameters[['mImpComm']] <- 
+        createParameter('mImpComm', c('imp', 'comm'), 'map')    
+    .Object@parameters[['mTradeComm']] <- 
+        createParameter('mTradeComm', c('trade', 'comm'), 'map')    
+    .Object@parameters[['mTradeSrc']] <- 
+        createParameter('mTradeSrc', c('trade', 'region'), 'map')    
+    .Object@parameters[['mTradeDst']] <- 
+        createParameter('mTradeDst', c('trade', 'region'), 'map')    
+    .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map')    
+    .Object@parameters[['pTradeIrCost']] <- createParameter('pTradeIrCost', 
+          c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
+            defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pTradeIrMarkup']] <- createParameter('pTradeIrMarkup', 
+          c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
+            defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pExportRowPrice']] <- createParameter('pExportRowPrice', 
+          c('expp', 'region', 'year', 'slice'), 'simple', 
+            defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pImportRowPrice']] <- createParameter('pImportRowPrice', 
+          c('imp', 'region', 'year', 'slice'), 'simple', 
+            defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pTradeIr']] <- createParameter('pTradeIr', 
+          c('trade', 'src', 'dst', 'year', 'slice'), 'multi', 
+            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@parameters[['pExportRow']] <- createParameter('pExportRow', 
+          c('expp', 'region', 'year', 'slice'), 'multi', 
+            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@parameters[['pImportRow']] <- createParameter('pImportRow', 
+          c('imp', 'region', 'year', 'slice'), 'multi', 
+            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@parameters[['pExportRowRes']] <- createParameter('pExportRowRes', 
+          'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth')
+    .Object@parameters[['pImportRowRes']] <- createParameter('pImportRowRes', 
+          'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth')
   # For LEC
-  .Object@maptable[['mLECRegion']] <- MapTable('mLECRegion', 'region', 'map')    
-  .Object@maptable[['pLECLoACT']] <- 
-        MapTable('pLECLoACT', 'region', 'single', 
-                default = 0, interpolation = 'back.inter.forth')    
+  .Object@parameters[['mLECRegion']] <- createParameter('mLECRegion', 'region', 'map')    
+  .Object@parameters[['pLECLoACT']] <- 
+        createParameter('pLECLoACT', 'region', 'simple', 
+                defVal = 0, interpolation = 'back.inter.forth')    
 
   # Standard constraint
     # Map
@@ -303,13 +304,13 @@ setMethod("initialize", "CodeProduce",
       "mCnsEacTech", "mCnsTechCInp", "mCnsTechCOut", "mCnsTechAInp", "mCnsTechAOut", "mCnsTechEmis",
       "mCnsActTech", "mCnsRhsTypeGrowth", "mCnsFixomTech", 
       "mCnsVaromTech", "mCnsActVaromTech", "mCnsCVaromTech", "mCnsAVaromTech"))
-        .Object@maptable[[i]] <- MapTable(i, 'cns', 'map')    
+        .Object@parameters[[i]] <- createParameter(i, 'cns', 'map')    
     for(i in c('tech', 'sup', 'comm', 'region', 'year', 'slice')) {
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')
-        .Object@maptable[[nn]] <- MapTable(nn, c('cns', i), 'map')    
+        .Object@parameters[[nn]] <- createParameter(nn, c('cns', i), 'map')    
     }
-    .Object@maptable[['mCnsTech']] <- MapTable('mCnsTech', c('cns', 'tech'), 'map') 
-    .Object@maptable[['mCnsSup']] <- MapTable('mCnsSup', c('cns', 'sup'), 'map') 
+    .Object@parameters[['mCnsTech']] <- createParameter('mCnsTech', c('cns', 'tech'), 'map') 
+    .Object@parameters[['mCnsSup']] <- createParameter('mCnsSup', c('cns', 'sup'), 'map') 
     for(i in c("pRhs(cns)", "pRhsS(cns, slice)", "pRhsY(cns, year)", "pRhsYS(cns, year, slice)", 
       "pRhsR(cns, region)", "pRhsRS(cns, region, slice)", "pRhsRY(cns, region, year)", 
       "pRhsRYS(cns, region, year, slice)", "pRhsC(cns, comm)", "pRhsCS(cns, comm, slice)", 
@@ -329,59 +330,56 @@ setMethod("initialize", "CodeProduce",
       "pRhsSupCY(cns, sup, comm, year)", "pRhsSupCYS(cns, sup, comm, year, slice)", 
       "pRhsSupCR(cns, sup, comm, region)", "pRhsSupCRS(cns, sup, comm, region, slice)", 
       "pRhsSupCRY(cns, sup, comm, region, year)", "pRhsSupCRYS(cns, sup, comm, region, year, slice)")) {
-      .Object@maptable[[gsub('[(].*', '', i)]] <- MapTable(gsub('[(].*', '', i), 
-            strsplit(gsub('[)]', '', gsub('.*[(]', '', i)), ', ')[[1]], 'single', 
-              default = 0, interpolation = 'back.inter.forth')      
+      .Object@parameters[[gsub('[(].*', '', i)]] <- createParameter(gsub('[(].*', '', i), 
+            strsplit(gsub('[)]', '', gsub('.*[(]', '', i)), ', ')[[1]], 'simple', 
+              defVal = 0, interpolation = 'back.inter.forth')      
     }
 
   # Other
     # Discount
-    .Object@maptable[['pDiscount']] <- 
-        MapTable('pDiscount', c('region', 'year'), 'single', 
-                default = .1, interpolation = 'back.inter.forth', for_sysInfo = 'discount')    
+    .Object@parameters[['pDiscount']] <- 
+        createParameter('pDiscount', c('region', 'year'), 'simple', 
+                defVal = .1, interpolation = 'back.inter.forth', colName = 'discount')    
   # Additional for compatibility with GLPK
-  .Object@maptable[['ndefpTechOlife']] <- MapTable('ndefpTechOlife', c('tech', 'region'), 'map')   
-  .Object@maptable[['defpTechAfaUp']] <- MapTable('defpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
-  .Object@maptable[['defpTechAfacUp']] <- 
-      MapTable('defpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
-  .Object@maptable[['defpSupAvaUp']] <- 
-      MapTable('defpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
-  .Object@maptable[['defpSupReserve']] <- MapTable('defpSupReserve', c('sup'), 'map')    
-  .Object@maptable[['defpStorageCapUp']] <- MapTable('defpStorageCapUp', c('stg', 'region', 'year'), 'map')    
-  .Object@maptable[['defpTradeIrUp']] <- MapTable('defpTradeIrUp', 
+  .Object@parameters[['ndefpTechOlife']] <- createParameter('ndefpTechOlife', c('tech', 'region'), 'map')   
+  .Object@parameters[['defpTechAfaUp']] <- createParameter('defpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
+  .Object@parameters[['defpTechAfacUp']] <- 
+      createParameter('defpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['defpSupAvaUp']] <- 
+      createParameter('defpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['defpSupReserve']] <- createParameter('defpSupReserve', c('sup'), 'map')    
+  .Object@parameters[['defpStorageCapUp']] <- createParameter('defpStorageCapUp', c('stg', 'region', 'year'), 'map')    
+  .Object@parameters[['defpTradeIrUp']] <- createParameter('defpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
-    .Object@maptable[['defpExportRowRes']] <- MapTable('defpExportRowRes', 'expp', 'map')    
-    .Object@maptable[['defpImportRowRes']] <- MapTable('defpImportRowRes', 'imp', 'map')    
-    .Object@maptable[['defpExportRowUp']] <- MapTable('defpExportRowUp', 
+    .Object@parameters[['defpExportRowRes']] <- createParameter('defpExportRowRes', 'expp', 'map')    
+    .Object@parameters[['defpImportRowRes']] <- createParameter('defpImportRowRes', 'imp', 'map')    
+    .Object@parameters[['defpExportRowUp']] <- createParameter('defpExportRowUp', 
         c('expp', 'region', 'year', 'slice'), 'map')    
-    .Object@maptable[['defpImportRowUp']] <- MapTable('defpImportRowUp', 
+    .Object@parameters[['defpImportRowUp']] <- createParameter('defpImportRowUp', 
         c('imp', 'region', 'year', 'slice'), 'map')    
-  .Object@maptable[['defpDummyImportCost']] <- MapTable('defpDummyImportCost', 
+  .Object@parameters[['defpDummyImportCost']] <- createParameter('defpDummyImportCost', 
       c('comm', 'region', 'year', 'slice'), 'map')    
-  .Object@maptable[['defpDummyExportCost']] <- MapTable('defpDummyExportCost', 
+  .Object@parameters[['defpDummyExportCost']] <- createParameter('defpDummyExportCost', 
       c('comm', 'region', 'year', 'slice'), 'map')    
-  .Object@maptable[['pDiscountFactor']] <- MapTable('pDiscountFactor', c('region', 'year'), 'single')    
-  .Object@maptable[['mDiscountZero']] <- MapTable('mDiscountZero', 'region', 'map', default = 1) 
+  .Object@parameters[['pDiscountFactor']] <- createParameter('pDiscountFactor', c('region', 'year'), 'simple')    
+  .Object@parameters[['mDiscountZero']] <- createParameter('mDiscountZero', 'region', 'map', defVal = 1) 
   ## Milestone set
-  .Object@maptable[['mMidMilestone']] <- MapTable('mMidMilestone', 'year', 'map', default = 1) 
-  .Object@maptable[['mMilestoneHasNext']] <- MapTable('mMilestoneHasNext', 'year', 'map', default = 1) 
-  .Object@maptable[['mMilestoneLast']] <- MapTable('mMilestoneLast', 'year', 'map', default = 1) 
-  .Object@maptable[['mStartMilestone']] <- MapTable('mStartMilestone', c('year', 'yearp'), 'map', default = 1) 
-  .Object@maptable[['mEndMilestone']] <- MapTable('mEndMilestone', c('year', 'yearp'), 'map', default = 1) 
-  .Object@maptable[['mMilestoneNext']] <- MapTable('mMilestoneNext', c('year', 'yearp'), 'map', default = 1) 
-
-  ## Fix to previous value 
-   .Object <- constrCodeProduce(.Object)  
+  .Object@parameters[['mMidMilestone']] <- createParameter('mMidMilestone', 'year', 'map', defVal = 1) 
+  .Object@parameters[['mMilestoneHasNext']] <- createParameter('mMilestoneHasNext', 'year', 'map', defVal = 1) 
+  .Object@parameters[['mMilestoneLast']] <- createParameter('mMilestoneLast', 'year', 'map', defVal = 1) 
+  .Object@parameters[['mStartMilestone']] <- createParameter('mStartMilestone', c('year', 'yearp'), 'map', defVal = 1) 
+  .Object@parameters[['mEndMilestone']] <- createParameter('mEndMilestone', c('year', 'yearp'), 'map', defVal = 1) 
+  .Object@parameters[['mMilestoneNext']] <- createParameter('mMilestoneNext', c('year', 'yearp'), 'map', defVal = 1) 
   .Object
 })
 
 # Print
-setMethod('print', 'CodeProduce', function(x, ...) {
-  if (length(x@maptable) == 0) {
+setMethod('print', 'modInp', function(x, ...) {
+  if (length(x@parameters) == 0) {
     cat('There is no data\n')
   } else {
-    for(i in 1:length(x@maptable)) {
-      print(x@maptable[[i]])
+    for(i in 1:length(x@parameters)) {
+      print(x@parameters[[i]])
     }
   }
 })

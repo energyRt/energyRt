@@ -21,7 +21,7 @@ print.sysInfo <- function(x) {
     if_print_data_frame(x, 'debug')
     if_print_data_frame(x, 'discount')
     #if_print_data_frame(x, 'tax')   
-    if_print_data_frame(x, 'default')
+    if_print_data_frame(x, 'defVal')
     if_print_data_frame(x, 'interpolation')
 }
 

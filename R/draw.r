@@ -29,7 +29,7 @@ draw.technology <- function(
               sng_lwd = 4,
               grp_lwd = 2,
               rule = new('sysInfo')@interpolation,
-              default = new('sysInfo')@default,
+              defVal = new('sysInfo')@defVal,
               show_all = TRUE
   ) {
   MAR <- par()$mar
@@ -81,7 +81,7 @@ draw.technology <- function(
         approxim$comm <- NULL
         tech@aeff <- tech@aeff[tech@aeff$acomm == y,, drop = FALSE]
         sng <- sapply(aname, function(x) interpolation(tech@aeff, x, 
-                                default = as.numeric(default[x]), 
+                                defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),
                                 approxim = approxim)[, x])
@@ -89,7 +89,7 @@ draw.technology <- function(
         ll <- tech@aeff[tech@aeff$acomm == y, , drop = FALSE]
         approxim$comm <- unique(ll[, 'comm'])
         dbl <- lapply(acname, function(x) {
-          hh <- interpolation(ll, x, default = as.numeric(default[x]), 
+          hh <- interpolation(ll, x, defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),
                                 approxim = approxim)
@@ -123,20 +123,20 @@ draw.technology <- function(
       if (nrow(ccomm) != 0) {
         # Parameter approximation
         gparam <- interpolation(tech@geff, 'ginp2use', 
-                                  default = as.numeric(default['ginp2use']), 
+                                  defVal = as.numeric(defVal['ginp2use']), 
                                   rule = rule['ginp2use'], 
                                   year_range = range(year),
                                   approxim = approxim)
         gg <- c('cinp2ginp', 'cinp2use')
         cparam <- lapply(gg, function(x) {
                                   interpolation(tech@ceff, x, 
-                                  default = as.numeric(default[x]), 
+                                  defVal = as.numeric(defVal[x]), 
                                   rule = rule[x], 
                                   year_range = range(year),
                                   approxim = approxim)})
         names(cparam) <- gg
         share <- interpolation_bound(tech@ceff, 'share', 
-                                  default = as.numeric(default[c('share.lo', 'share.up')]), 
+                                  defVal = as.numeric(defVal[c('share.lo', 'share.up')]), 
                                   rule = as.character(rule[c('share.lo', 'share.up')]), 
                                   year_range = range(year),
                                   approxim = approxim)
@@ -246,18 +246,18 @@ draw.technology <- function(
         gg <- c('use2cact', 'cact2cout')
         cparam <- lapply(gg, function(x) {
                                   interpolation(tech@ceff, x, 
-                                  default = as.numeric(default[x]), 
+                                  defVal = as.numeric(defVal[x]), 
                                   rule = rule[x], 
                                   year_range = range(year),
                                   approxim = approxim)})
         names(cparam) <- gg
         share <- interpolation_bound(tech@ceff, 'share', 
-                                  default = as.numeric(default[c('share.lo', 'share.up')]), 
+                                  defVal = as.numeric(defVal[c('share.lo', 'share.up')]), 
                                   rule = as.character(rule[c('share.lo', 'share.up')]), 
                                   year_range = range(year),
                                   approxim = approxim)
         afac <- interpolation_bound(tech@ceff, 'afac', 
-                                  default = as.numeric(default[c('afac.lo', 'afac.up')]), 
+                                  defVal = as.numeric(defVal[c('afac.lo', 'afac.up')]), 
                                   rule = as.character(rule[c('afac.lo', 'afac.up')]), 
                                   year_range = range(year),
                                   approxim = approxim)

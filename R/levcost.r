@@ -241,7 +241,7 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
             rr@result@solution_report$finish == 2 && 
             all(rr@result@data$vDummyOut == 0))) stop('Error in solution')
 ##  # Additional table          
-##    dsc <- rr@precompiled@maptable[['pDiscountFactor']]@data
+##    dsc <- rr@modInp@parameters[['pDiscountFactor']]@data
 ##    dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]
 ##    colnames(dsc)[2] <- 'discount.factor'
 ##    yy <- rep(0, nrow(dsc))
@@ -287,13 +287,13 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
 ##    dsc[, 'varom'] <- rr@result@data$vTechVaromY[1, region, ]
 ##    dsc[, 'total.cost'] <- apply(dsc[, ncol(dsc) - (0:3)], 1, sum)
 ##    dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
-   for(i in names(rr@precompiled@maptable))
-     if (rr@precompiled@maptable[[i]]@true_length != -1) {
-       rr@precompiled@maptable[[i]]@data <- rr@precompiled@maptable[[i]]@data[
-           seq(length.out = rr@precompiled@maptable[[i]]@true_length),, drop = FALSE]
+   for(i in names(rr@modInp@parameters))
+     if (rr@modInp@parameters[[i]]@colName != -1) {
+       rr@modInp@parameters[[i]]@data <- rr@modInp@parameters[[i]]@data[
+           seq(length.out = rr@modInp@parameters[[i]]@colName),, drop = FALSE]
      }
   # Additional table          
-    dsc <- rr@precompiled@maptable[['pDiscountFactor']]@data
+    dsc <- rr@modInp@parameters[['pDiscountFactor']]@data
     dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]
     colnames(dsc)[2] <- 'discount.factor'
     cst <- rep(0, nrow(dsc))
@@ -326,12 +326,12 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
     dsc[, 'fuel.subs'] <- sbs
     dsc[, 'fuel.total'] <- cst + tx - sbs
     dsc[, 'invcost'] <- rr@result@data$vTechInv[1, region, ]
-    g2 <- rr@precompiled@maptable[['pTechFixom']]@data
-    dsc[, 'fixom'] <- (tapply(g2$Freq, g2[, 1:3], sum) * rr@result@data$vTechCap)[1, region,]
-    g1 <- rr@precompiled@maptable[['pTechVarom']]@data
-    g3 <- rr@precompiled@maptable[['pTechCvarom']]@data
-    g4 <- tapply(g3$Freq, g3[, 1:5], sum)
-    dsc[, 'varom'] <- apply(tapply(g1$Freq, g1[, 1:4], sum) * 
+    g2 <- rr@modInp@parameters[['pTechFixom']]@data
+    dsc[, 'fixom'] <- (tapply(g2$value, g2[, 1:3], sum) * rr@result@data$vTechCap)[1, region,]
+    g1 <- rr@modInp@parameters[['pTechVarom']]@data
+    g3 <- rr@modInp@parameters[['pTechCvarom']]@data
+    g4 <- tapply(g3$value, g3[, 1:5], sum)
+    dsc[, 'varom'] <- apply(tapply(g1$value, g1[, 1:4], sum) * 
       rr@result@data$vTechAct, 1:3, sum)[1, region, ] +
       apply(g4 *(rr@result@data$vTechInp[, dimnames(g4)$comm,,,, drop = FALSE] +
       rr@result@data$vTechOut[, dimnames(g4)$comm,,,, drop = FALSE]), c(1, 3:4), sum)[1, region, ]
@@ -375,16 +375,16 @@ sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
 #' 
 sm_levcost_scenario <- function(obj, commodity) {
   if (is.null(commodity) || length(commodity) != 1) stop('levcost: wrong commodity')
-  if (any(obj@precompiled@maptable$mDemComm@data$comm != commodity) &&
+  if (any(obj@modInp@parameters$mDemComm@data$comm != commodity) &&
     any(obj@result@data$vDemInp[dimnames(obj@result@data$vDemInp)$comm != commodity,,,] != 0)) 
       stop('levcost: demand commodity have to be only one')
-  if (all(obj@precompiled@maptable$mDemComm@data$comm != commodity) || 
+  if (all(obj@modInp@parameters$mDemComm@data$comm != commodity) || 
     all(obj@result@data$vDemInp[commodity,,,] == 0)) 
       stop('levcost: there is not demand for commodity')
   
-  gg <- obj@precompiled@maptable$pDiscountFactor@data
+  gg <- obj@modInp@parameters$pDiscountFactor@data
   (obj@result@data$vObjective / sum(
-    tapply(gg$Freq, gg[, c('region', 'year')], sum)
+    tapply(gg$value, gg[, c('region', 'year')], sum)
     * apply(obj@result@data$vDemInp[commodity,,,, drop  = FALSE], 2:3, sum)
   ))
 }

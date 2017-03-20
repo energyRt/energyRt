@@ -1,5 +1,5 @@
 print.constrain <- function(x) {
-  cat('Name: "', x@name, '", equation type: "', as.character(x@type), '", default value: ', x@default, 
+  cat('Name: "', x@name, '", equation type: "', as.character(x@type), '", default value: ', x@defVal, 
     ', bound by: ', as.character(x@eq), ', rule: ', x@rule, '"\n', sep = '')
   if (nrow(x@rhs) != 0) {
     cat('rhs:\n')

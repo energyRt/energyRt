@@ -125,7 +125,7 @@ sm_compile_model <- function(obj,
     obj <- setMilestoneYears(obj, start = min(obj@sysInfo@year), interval = rep(1, length(obj@sysInfo@year)))
   }
   # Create exemplar for code
-  prec <- new('CodeProduce')
+  prec <- new('modInp')
   # List for approximation
   approxim <- list(
       region = obj@sysInfo@region,
@@ -161,10 +161,10 @@ sm_compile_model <- function(obj,
   } else open.folder <- FALSE
   # Fill DB by region & slice
   for(i in c('region', 'slice')) {
-    prec@maptable[[i]] <- addData(prec@maptable[[i]], approxim[[i]])
+    prec@parameters[[i]] <- addData(prec@parameters[[i]], approxim[[i]])
   }
   # Fill DB by year
-  prec@maptable[['year']] <- addData(prec@maptable[['year']], as.numeric(approxim[['year']]))
+  prec@parameters[['year']] <- addData(prec@parameters[['year']], as.numeric(approxim[['year']]))
   prec <- read_default_data(prec, obj@sysInfo)
   # add set 
   for(i in seq(along = obj@data)) {
@@ -201,31 +201,31 @@ sm_compile_model <- function(obj,
       stopCluster(cl)
       stop(x)
     })    
-    for(i in names(prec@maptable)) {
-        hh <- sapply(prclst, function(x) if (x@maptable[[i]]@true_length == -1) 
-          nrow(x@maptable[[i]]@data) else x@maptable[[i]]@true_length)
-        if (prec@maptable[[i]]@true_length == -1) nn <- nrow(prec@maptable[[i]]@data) else 
-          nn <- prec@maptable[[i]]@true_length
+    for(i in names(prec@parameters)) {
+        hh <- sapply(prclst, function(x) if (x@parameters[[i]]@nValues == -1) 
+          nrow(x@parameters[[i]]@data) else x@parameters[[i]]@nValues)
+        if (prec@parameters[[i]]@nValues == -1) nn <- nrow(prec@parameters[[i]]@data) else 
+          nn <- prec@parameters[[i]]@nValues
         hh <- hh - nn
         n0 <- nn
         fl <- seq(along = hh)[hh != 0]
         if (length(fl) != 0) {
-          prec@maptable[[i]]@data[nn + 1:sum(hh), ] <- NA
+          prec@parameters[[i]]@data[nn + 1:sum(hh), ] <- NA
           for(j in fl) {
-            prec@maptable[[i]]@data[nn + 1:hh[j], ] <- prclst[[j]]@maptable[[i]]@data[n0 + 1:hh[j], ]
+            prec@parameters[[i]]@data[nn + 1:hh[j], ] <- prclst[[j]]@parameters[[i]]@data[n0 + 1:hh[j], ]
             nn <- nn + hh[j]
           }
-          if (prec@maptable[[i]]@true_length != -1) prec@maptable[[i]]@true_length <- nn
+          if (prec@parameters[[i]]@nValues != -1) prec@parameters[[i]]@nValues <- nn
           if (i == 'group' && nn != 0) {
-            if (prec@maptable[[i]]@true_length != -1) {
-              gr <- unique(prec@maptable[[i]]@data[seq(length.out = prec@maptable[[i]]@true_length), 1])
-              prec@maptable[[i]]@data[, 1] <- NA
-              prec@maptable[[i]]@data[1:length(gr), 1] <- gr
-              prec@maptable[[i]]@true_length <- length(gr)
+            if (prec@parameters[[i]]@nValues != -1) {
+              gr <- unique(prec@parameters[[i]]@data[seq(length.out = prec@parameters[[i]]@nValues), 1])
+              prec@parameters[[i]]@data[, 1] <- NA
+              prec@parameters[[i]]@data[1:length(gr), 1] <- gr
+              prec@parameters[[i]]@nValues <- length(gr)
             } else {
-              gr <- unique(prec@maptable[[i]]@data[, 1])
-              prec@maptable[[i]]@data <- prec@maptable[[i]]@data[1:length(gr),, drop = FALSE]
-              prec@maptable[[i]]@data[, 1] <- gr
+              gr <- unique(prec@parameters[[i]]@data[, 1])
+              prec@parameters[[i]]@data <- prec@parameters[[i]]@data[1:length(gr),, drop = FALSE]
+              prec@parameters[[i]]@data[, 1] <- gr
             }
           }
         }
@@ -256,9 +256,9 @@ sm_compile_model <- function(obj,
       cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
   } else stop('Uneceptable threads number')
   prec <- add0(prec, obj@sysInfo, approxim = approxim) 
-#    for(i in seq(along = prec@maptable)) {
-#      if (prec@maptable[[i]]@true_length != 0) {
-#          prec@maptable[[i]]@data <- prec@maptable[[i]]@data[1:prec@maptable[[i]]@true_length,, drop = FALSE]
+#    for(i in seq(along = prec@parameters)) {
+#      if (prec@parameters[[i]]@nValues != 0) {
+#          prec@parameters[[i]]@data <- prec@parameters[[i]]@data[1:prec@parameters[[i]]@nValues,, drop = FALSE]
 #      }
 #    }
 #####################################################################################
@@ -267,14 +267,14 @@ sm_compile_model <- function(obj,
   # Check slots
   check_set <- function(set, alias = NULL) {
     if (is.null(alias)) alias <- set
-    ss <- prec@maptable[[set]]@data[, set]
+    ss <- prec@parameters[[set]]@data[, set]
     for(al in alias) {
-      for(i in 1:length(prec@maptable)) {
-        if (any(prec@maptable[[i]]@set == al) 
-            && !all(getSet(prec@maptable[[i]], al) %in% ss)) {
-              dd <- getSet(prec@maptable[[i]], al)[!(getSet(prec@maptable[[i]], al) %in% ss)]
-              dd <- prec@maptable[[i]]@data[prec@maptable[[i]]@data[, set] %in% dd, , drop = FALSE]
-              stop(paste('Unknown ', set, ' in slot ', prec@maptable[[i]]@alias, '\n', 
+      for(i in 1:length(prec@parameters)) {
+        if (any(prec@parameters[[i]]@dimSetNames == al) 
+            && !all(getSet(prec@parameters[[i]], al) %in% ss)) {
+              dd <- getSet(prec@parameters[[i]], al)[!(getSet(prec@parameters[[i]], al) %in% ss)]
+              dd <- prec@parameters[[i]]@data[prec@parameters[[i]]@data[, set] %in% dd, , drop = FALSE]
+              stop(paste('Unknown ', set, ' in slot ', prec@parameters[[i]]@name, '\n', 
                 paste(apply(dd, 1, function(x) paste(x, collapse = '.')), collapse = '\n'), 
                 '\n', sep = ''))               
         }
@@ -285,15 +285,15 @@ sm_compile_model <- function(obj,
   check_set('comm', c('comm', 'commp', 'acomm'))
   for(i in c('expp', 'imp', 'tech', 'trade', 'sup', 'group', 'region', 'year', 'slice')) check_set(i)
   if (length(obj@LECdata) != 0) {
-     prec@maptable$mLECRegion <- addMultipleSet(prec@maptable$mLECRegion, obj@LECdata$region)
+     prec@parameters$mLECRegion <- addMultipleSet(prec@parameters$mLECRegion, obj@LECdata$region)
      if (length(obj@LECdata$pLECLoACT) == 1) {
-        prec@maptable$pLECLoACT <- addData(prec@maptable$pLECLoACT, 
-            data.frame(region = obj@LECdata$region, Freq = obj@LECdata$pLECLoACT))
+        prec@parameters$pLECLoACT <- addData(prec@parameters$pLECLoACT, 
+            data.frame(region = obj@LECdata$region, value = obj@LECdata$pLECLoACT))
      }
   }
   ## Constrain
   yy <- c('tech', 'sup', 'stg', 'expp', 'imp', 'trade', 'group', 'comm', 'region', 'year', 'slice')
-  appr <- lapply(yy, function(x) prec@maptable[[x]]@data[[x]])
+  appr <- lapply(yy, function(x) prec@parameters[[x]]@data[[x]])
   names(appr) <- yy
   appr$group <- appr$group[!is.na(appr$group)]
   # ---------------------------------------------------------------------------------------------------------  
@@ -325,10 +325,10 @@ sm_compile_model <- function(obj,
         }
         colnames(gg) <- gsub('[.]1', 'p', colnames(gg))
         colnames(gg) <- gsub('[.]2', 'e', colnames(gg))
-        prec@maptable[[gsub('^.', 'mPreDef', i)]] <- 
-           addData(prec@maptable[[gsub('^.', 'mPreDef', i)]], gg[, -ncol(gg)])
-        gg <- gg[gg[, 'Freq'] != 0,] 
-        prec@maptable[[gsub('^.', 'preDef', i)]] <- addData(prec@maptable[[gsub('^.', 'preDef', i)]], gg)
+        prec@parameters[[gsub('^.', 'mPreDef', i)]] <- 
+           addData(prec@parameters[[gsub('^.', 'mPreDef', i)]], gg[, -ncol(gg)])
+        gg <- gg[gg[, 'value'] != 0,] 
+        prec@parameters[[gsub('^.', 'preDef', i)]] <- addData(prec@parameters[[gsub('^.', 'preDef', i)]], gg)
       
       }
       arg <- arg[names(arg) != 'fix_data', drop = FALSE]
@@ -348,127 +348,127 @@ sm_compile_model <- function(obj,
   
   if (length(arg) != 0) warning('Unknown argument ', names(arg))
 # ---------------------------------------------------------------------------------------------------------  
-      gg <- prec@maptable[['pDiscount']]@data
+      gg <- prec@parameters[['pDiscount']]@data
       gg <- gg[sort(gg$year, index.return = TRUE)$ix,, drop = FALSE]
       ll <- gg[0,, drop = FALSE]
       for(l in unique(gg$region)) {
         dd <- gg[gg$region == l,, drop = FALSE]
-        dd$Freq <- cumprod(1 / (1 + dd$Freq))
+        dd$value <- cumprod(1 / (1 + dd$value))
         ll <- rbind(ll, dd)
       }
-      prec@maptable[['pDiscountFactor']] <- addData(prec@maptable[['pDiscountFactor']], ll)
+      prec@parameters[['pDiscountFactor']] <- addData(prec@parameters[['pDiscountFactor']], ll)
        hh <- gg[gg$year == as.character(max(obj@sysInfo@year)), -2]
-       hh <- hh[hh$Freq == 0, 'region', drop = FALSE]
+       hh <- hh[hh$value == 0, 'region', drop = FALSE]
       # Add mDiscountZero - zero discount rate in final period
       if (nrow(hh) != 0) {
-        prec@maptable[['mDiscountZero']] <- addData(prec@maptable[['mDiscountZero']], hh)
+        prec@parameters[['mDiscountZero']] <- addData(prec@parameters[['mDiscountZero']], hh)
       } 
 LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
       # Add defpSupReserve
-      gg <- getDataMapTable(prec@maptable[['pSupReserve']])
-#      if (prec@maptable[['pSupReserve']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pSupReserve']]@true_length),, drop = FALSE]
-      gg <- gg[gg$Freq != Inf, ]
+      gg <- getParameterData(prec@parameters[['pSupReserve']])
+#      if (prec@parameters[['pSupReserve']]@nValues != -1)
+#        gg <- gg[seq(length.out = prec@parameters[['pSupReserve']]@nValues),, drop = FALSE]
+      gg <- gg[gg$value != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpSupReserve']] <- 
-          addData(prec@maptable[['defpSupReserve']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pSupReserve']]@default == Inf) {
-        prec@maptable[['defpSupReserve']]@default <- 0
-      }  else prec@maptable[['defpSupReserve']]@default <- 1
+        prec@parameters[['defpSupReserve']] <- 
+          addData(prec@parameters[['defpSupReserve']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
+      } else if (nrow(gg) == 0 && prec@parameters[['pSupReserve']]@defVal == Inf) {
+        prec@parameters[['defpSupReserve']]@defVal <- 0
+      }  else prec@parameters[['defpSupReserve']]@defVal <- 1
       # Add defpSupAvaUp
-      gg <- getDataMapTable(prec@maptable[['pSupAva']])
-#      if (prec@maptable[['pSupAva']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pSupAva']]@true_length),, drop = FALSE]
-      gg <- gg[gg$Freq != Inf & gg$type == 'up', ]
+      gg <- getParameterData(prec@parameters[['pSupAva']])
+#      if (prec@parameters[['pSupAva']]@nValues != -1)
+#        gg <- gg[seq(length.out = prec@parameters[['pSupAva']]@nValues),, drop = FALSE]
+      gg <- gg[gg$value != Inf & gg$type == 'up', ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpSupAvaUp']] <- addData(prec@maptable[['defpSupAvaUp']], 
+        prec@parameters[['defpSupAvaUp']] <- addData(prec@parameters[['defpSupAvaUp']], 
            gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pSupAva']]@default == Inf) {
-        prec@maptable[['defpSupAvaUp']]@default <- 0
-      }  else prec@maptable[['defpSupAvaUp']]@default <- 1
+      } else if (nrow(gg) == 0 && prec@parameters[['pSupAva']]@defVal == Inf) {
+        prec@parameters[['defpSupAvaUp']]@defVal <- 0
+      }  else prec@parameters[['defpSupAvaUp']]@defVal <- 1
       # Add pDummyImportCost
-      gg <- getDataMapTable(prec@maptable[['pDummyImportCost']])
-      gg <- gg[gg$Freq != Inf, ]
+      gg <- getParameterData(prec@parameters[['pDummyImportCost']])
+      gg <- gg[gg$value != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpDummyImportCost']] <- 
-          addData(prec@maptable[['defpDummyImportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pDummyImportCost']]@default == Inf) {
-        prec@maptable[['defpDummyImportCost']]@default <- 0
-      } else prec@maptable[['defpDummyImportCost']]@default <- 1
+        prec@parameters[['defpDummyImportCost']] <- 
+          addData(prec@parameters[['defpDummyImportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
+      } else if (nrow(gg) == 0 && prec@parameters[['pDummyImportCost']]@defVal == Inf) {
+        prec@parameters[['defpDummyImportCost']]@defVal <- 0
+      } else prec@parameters[['defpDummyImportCost']]@defVal <- 1
       # Add pDummyExportCost
-      gg <- getDataMapTable(prec@maptable[['pDummyExportCost']])
-      gg <- gg[gg$Freq != Inf, ]
+      gg <- getParameterData(prec@parameters[['pDummyExportCost']])
+      gg <- gg[gg$value != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpDummyExportCost']] <- 
-          addData(prec@maptable[['defpDummyExportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pDummyExportCost']]@default == Inf) {
-        prec@maptable[['defpDummyExportCost']]@default <- 0
-      } else prec@maptable[['defpDummyExportCost']]@default <- 1
+        prec@parameters[['defpDummyExportCost']] <- 
+          addData(prec@parameters[['defpDummyExportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
+      } else if (nrow(gg) == 0 && prec@parameters[['pDummyExportCost']]@defVal == Inf) {
+        prec@parameters[['defpDummyExportCost']]@defVal <- 0
+      } else prec@parameters[['defpDummyExportCost']]@defVal <- 1
       # defpExportRowRes   
-      gg <- getDataMapTable(prec@maptable[['pExportRowRes']])
-#      if (prec@maptable[['pExportRowRes']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pExportRowRes']]@true_length),, drop = FALSE]
-      gg <- gg[gg$Freq != Inf, ]
+      gg <- getParameterData(prec@parameters[['pExportRowRes']])
+#      if (prec@parameters[['pExportRowRes']]@nValues != -1)
+#        gg <- gg[seq(length.out = prec@parameters[['pExportRowRes']]@nValues),, drop = FALSE]
+      gg <- gg[gg$value != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpExportRowRes']] <- addData(prec@maptable[['defpExportRowRes']], 
+        prec@parameters[['defpExportRowRes']] <- addData(prec@parameters[['defpExportRowRes']], 
           gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pExportRowRes']]@default == Inf) {
-        prec@maptable[['defpExportRowRes']]@default <- 0
-      }  else prec@maptable[['defpExportRowRes']]@default <- 1
+      } else if (nrow(gg) == 0 && prec@parameters[['pExportRowRes']]@defVal == Inf) {
+        prec@parameters[['defpExportRowRes']]@defVal <- 0
+      }  else prec@parameters[['defpExportRowRes']]@defVal <- 1
       # defpImportRowRes
-      gg <- getDataMapTable(prec@maptable[['pImportRowRes']])
-#      if (prec@maptable[['pImportRowRes']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pImportRowRes']]@true_length),, drop = FALSE]
-      gg <- gg[gg$Freq != Inf, ]
+      gg <- getParameterData(prec@parameters[['pImportRowRes']])
+#      if (prec@parameters[['pImportRowRes']]@nValues != -1)
+#        gg <- gg[seq(length.out = prec@parameters[['pImportRowRes']]@nValues),, drop = FALSE]
+      gg <- gg[gg$value != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpImportRowRes']] <- addData(prec@maptable[['defpImportRowRes']], 
+        prec@parameters[['defpImportRowRes']] <- addData(prec@parameters[['defpImportRowRes']], 
           gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pImportRowRes']]@default == Inf) {
-        prec@maptable[['defpImportRowRes']]@default <- 0
-      }  else prec@maptable[['defpImportRowRes']]@default <- 1
+      } else if (nrow(gg) == 0 && prec@parameters[['pImportRowRes']]@defVal == Inf) {
+        prec@parameters[['defpImportRowRes']]@defVal <- 0
+      }  else prec@parameters[['defpImportRowRes']]@defVal <- 1
       # defpExportRowUp 
-      gg <- getDataMapTable(prec@maptable[['pExportRow']])
-#      if (prec@maptable[['pExportRow']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pExportRow']]@true_length),, drop = FALSE]
-      gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
+      gg <- getParameterData(prec@parameters[['pExportRow']])
+#      if (prec@parameters[['pExportRow']]@nValues != -1)
+#        gg <- gg[seq(length.out = prec@parameters[['pExportRow']]@nValues),, drop = FALSE]
+      gg <- gg[gg$type == 'up' & gg$value != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpExportRowUp']] <- addData(prec@maptable[['defpExportRowUp']], 
+        prec@parameters[['defpExportRowUp']] <- addData(prec@parameters[['defpExportRowUp']], 
           gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pExportRow']]@default[2] == Inf) {
-        prec@maptable[['defpExportRowUp']]@default <- 0
-      }  else prec@maptable[['defpExportRowUp']]@default <- 1
+      } else if (nrow(gg) == 0 && prec@parameters[['pExportRow']]@defVal[2] == Inf) {
+        prec@parameters[['defpExportRowUp']]@defVal <- 0
+      }  else prec@parameters[['defpExportRowUp']]@defVal <- 1
       # defpImportRowUp
-      gg <- getDataMapTable(prec@maptable[['pImportRow']])
-#      if (prec@maptable[['pImportRow']]@true_length != -1)
-#        gg <- gg[seq(length.out = prec@maptable[['pImportRow']]@true_length),, drop = FALSE]
-      gg <- gg[gg$type == 'up' & gg$Freq != Inf, ]
+      gg <- getParameterData(prec@parameters[['pImportRow']])
+#      if (prec@parameters[['pImportRow']]@nValues != -1)
+#        gg <- gg[seq(length.out = prec@parameters[['pImportRow']]@nValues),, drop = FALSE]
+      gg <- gg[gg$type == 'up' & gg$value != Inf, ]
       if (nrow(gg) != 0) {
-        prec@maptable[['defpImportRowUp']] <- addData(prec@maptable[['defpImportRowUp']], 
+        prec@parameters[['defpImportRowUp']] <- addData(prec@parameters[['defpImportRowUp']], 
           gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@maptable[['pImportRow']]@default[2] == Inf) {
-        prec@maptable[['defpImportRowUp']]@default <- 0
-      }  else prec@maptable[['defpImportRowUp']]@default <- 1
+      } else if (nrow(gg) == 0 && prec@parameters[['pImportRow']]@defVal[2] == Inf) {
+        prec@parameters[['defpImportRowUp']]@defVal <- 0
+      }  else prec@parameters[['defpImportRowUp']]@defVal <- 1
       # For remove emission equation
-      g1 <- getDataMapTable(prec@maptable$pTechEmisComm)
-#      if (prec@maptable[['pTechEmisComm']]@true_length != -1)
-#        g1 <- g1[seq(length.out = prec@maptable[['pTechEmisComm']]@true_length),, drop = FALSE]
-      g2 <- getDataMapTable(prec@maptable$pEmissionFactor)
-#      if (prec@maptable[['pEmissionFactor']]@true_length != -1)
-#        g2 <- g2[seq(length.out = prec@maptable[['pEmissionFactor']]@true_length),, drop = FALSE]
-      g1 <- g1[g1$Freq != 0, , drop = FALSE]
+      g1 <- getParameterData(prec@parameters$pTechEmisComm)
+#      if (prec@parameters[['pTechEmisComm']]@nValues != -1)
+#        g1 <- g1[seq(length.out = prec@parameters[['pTechEmisComm']]@nValues),, drop = FALSE]
+      g2 <- getParameterData(prec@parameters$pEmissionFactor)
+#      if (prec@parameters[['pEmissionFactor']]@nValues != -1)
+#        g2 <- g2[seq(length.out = prec@parameters[['pEmissionFactor']]@nValues),, drop = FALSE]
+      g1 <- g1[g1$value != 0, , drop = FALSE]
       for(g in unique(g2$comm)) {
         cmd <- g2[g2$comm == g, 'commp']
         tec <- unique(g1[g1$comm %in% cmd, 'tech'])
-        prec@maptable$mTechEmitedComm <- addData(prec@maptable$mTechEmitedComm,
+        prec@parameters$mTechEmitedComm <- addData(prec@parameters$mTechEmitedComm,
           data.frame(tech = tec, comm = rep(g, length(tec))))
       }
       # Tech oilfe
-      olf <- getDataMapTable(prec@maptable$pTechOlife)
-      inv <- getDataMapTable(prec@maptable$pTechInvcost)
-      olf <- olf[olf$Freq == Inf,, drop = FALSE]
+      olf <- getParameterData(prec@parameters$pTechOlife)
+      inv <- getParameterData(prec@parameters$pTechInvcost)
+      olf <- olf[olf$value == Inf,, drop = FALSE]
       if (nrow(olf) > 0) {
-        inv <- aggregate(inv$Freq, by = inv[, c('tech', 'region')], FUN = "max")
+        inv <- aggregate(inv$value, by = inv[, c('tech', 'region')], FUN = "max")
         inv <- inv[inv$tech %in% unique(olf$tech) & inv$x != 0,, drop = FALSE]
         oo <- paste(olf$tech, olf$region, sep = '#')
         ii <- paste(inv$tech, inv$region, sep = '#')
@@ -477,10 +477,10 @@ LL1 <- proc.time()[3]
           print(inv[ii %in% oo, -ncol(inv), drop = FALSE])
           stop('See previous errors')
         }
-        prec@maptable$ndefpTechOlife <- addData(prec@maptable$ndefpTechOlife, olf[, -ncol(olf), drop = FALSE])
+        prec@parameters$ndefpTechOlife <- addData(prec@parameters$ndefpTechOlife, olf[, -ncol(olf), drop = FALSE])
       }
       # Check user error
-      check_maptable(prec)
+      check_parameters(prec)
 ########
 #  Remove unused technology
 ########
@@ -490,13 +490,13 @@ LL1 <- proc.time()[3]
           if (any(names(obj@data[[i]]@data[[j]]@for.each) == 'tech') && 
             !is.null(obj@data[[i]]@data[[j]]@for.each$tech)) {
             obj@data[[i]]@data[[j]]@for.each$tech <- obj@data[[i]]@data[[j]]@for.each$tech[
-              obj@data[[i]]@data[[j]]@for.each$tech %in% prec@maptable$tech@data$tech]
+              obj@data[[i]]@data[[j]]@for.each$tech %in% prec@parameters$tech@data$tech]
               if (length(obj@data[[i]]@data[[j]]@for.each$tech) == 0) FF[j] <- FALSE
           }
           if (any(names(obj@data[[i]]@data[[j]]@for.sum) == 'tech') && 
             !is.null(obj@data[[i]]@data[[j]]@for.sum$tech)) {
             obj@data[[i]]@data[[j]]@for.sum$tech <- obj@data[[i]]@data[[j]]@for.sum$tech[
-              obj@data[[i]]@data[[j]]@for.sum$tech %in% prec@maptable$tech@data$tech]
+              obj@data[[i]]@data[[j]]@for.sum$tech %in% prec@parameters$tech@data$tech]
               if (length(obj@data[[i]]@data[[j]]@for.sum$tech) == 0) FF[j] <- FALSE
           }
         }
@@ -504,13 +504,15 @@ LL1 <- proc.time()[3]
     }
     # Early reteirment
     if (!obj@early.retirement) {
-      prec@maptable$mTechRetirement@data <- prec@maptable$mTechRetirement@data[0,, drop = FALSE]
-      if (prec@maptable$mTechRetirement@true_length != -1)
-        prec@maptable$mTechRetirement@true_length <- 0
+      prec@parameters$mTechRetirement@data <- prec@parameters$mTechRetirement@data[0,, drop = FALSE]
+      if (prec@parameters$mTechRetirement@nValues != -1)
+        prec@parameters$mTechRetirement@nValues <- 0
     }
 #!################
 ### FUNC GAMS 
-      if (open.folder) shell.exec(tmpdir)
+  #### Code load
+  run_code <- energyRt::modelCode[[solver]][[model.type]]
+  if (open.folder) shell.exec(tmpdir)
   if (solver == 'GAMS') {
         zz <- file(paste(tmpdir, '/mdl.gpr', sep = ''), 'w')
     cat(c('[RP:MDL]', '1=', '', '[OPENWINDOW_1]', 
@@ -518,33 +520,28 @@ LL1 <- proc.time()[3]
       gsub('[/][/]*', '\\\\', paste('FILE1=', tmp.dir, '/mdl.lst', sep = '')), '', 'MAXIM=1', 
       'TOP=50', 'LEFT=50', 'HEIGHT=400', 'WIDTH=400', ''), sep = '\n', file = zz)
     close(zz)
-    if (model.type == 'reduced') {
-      cdd <- prec@model_reduced
-    } else {
-      cdd <- prec@model_full
-    }
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
-   cat(cdd[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', cdd) - 1)], sep = '\n', file = zz)
-   
-   for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'set') {
-      cat(toGams(prec@maptable[[i]]), sep = '\n', file = zz)
+   cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
+   prec <<- prec 
+   for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
+      cat(toGams(prec@parameters[[i]]), sep = '\n', file = zz)
     }
-    for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'map') {
-      cat(toGams(prec@maptable[[i]]), sep = '\n', file = zz)
+    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
+      cat(toGams(prec@parameters[[i]]), sep = '\n', file = zz)
     }
-    for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'single') {
-      cat(toGams(prec@maptable[[i]]), sep = '\n', file = zz)
+    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
+      cat(toGams(prec@parameters[[i]]), sep = '\n', file = zz)
     }
-    for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'double') {
-      cat(toGams(prec@maptable[[i]]), sep = '\n', file = zz)
+    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
+      cat(toGams(prec@parameters[[i]]), sep = '\n', file = zz)
     }
-    cat(cdd[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', cdd) + 1):
-        (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', cdd) - 1)], sep = '\n', file = zz)
-    cat(cdd[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', cdd) + 1):
-        (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', cdd) - 1)], sep = '\n', file = zz)
+    cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
+        (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+    cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
+        (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) - 1)], sep = '\n', file = zz)
   
-    cat(cdd[(grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', cdd) + 1):
-        (grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', cdd) - 1)], sep = '\n', file = zz)
+    cat(run_code[(grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) + 1):
+        (grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) - 1)], sep = '\n', file = zz)
     if (only.listing) {
       cat('OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;\n',
           'OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;\n',
@@ -552,11 +549,11 @@ LL1 <- proc.time()[3]
           'Solve st_model minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
     
     }
-    cat(obj@additionalCode, sep = '\n', file = zz)
-    cat(cdd[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', cdd) + 1):(
-        grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', cdd) - 1)], sep = '\n', file = zz)
-    cat(obj@additionalCodeAfter, sep = '\n', file = zz)
-    cat(cdd[(min(c(grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', cdd) + 1, length(cdd)))):length(cdd)], sep = '\n', file = zz)
+    cat(obj@misc$additionalCode, sep = '\n', file = zz)
+    cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
+        grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', run_code) - 1)], sep = '\n', file = zz)
+    cat(obj@misc$additionalCodeAfter, sep = '\n', file = zz)
+    cat(run_code[(min(c(grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
     # Add constrain file to read list
     close(zz)
     pp2 <- proc.time()[3]
@@ -590,40 +587,29 @@ LL1 <- proc.time()[3]
     if(echo) cat('Solver work time: ', round(pp3 - pp2, 2), 's\n', sep = '')
   } else if (solver == 'GLPK' || solver == 'CBC') {   
 ### FUNC GLPK 
-    if (model.type == 'reduced') {
-      glpk_model <- prec@model_reduced_glpk
-    } else {
-      glpk_model <- prec@model_full_glpk
-    }
       zz <- file(paste(tmpdir, '/glpk.mod', sep = ''), 'w')
-      if (length(grep('^minimize', glpk_model)) != 1) stop('Wrong GLPK model')
-      cat(glpk_model[1:(grep('^minimize', glpk_model) - 1)], sep = '\n', file = zz)
+      if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
+      cat(run_code[1:(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
 #      for(i in seq(along = CNS)) {
 #        cat(CNS[[i]]$add_code, sep = '\n', file = zz)
 #      }
-      cat(glpk_model[grep('^minimize', glpk_model):(grep('^end[;]', glpk_model) - 1)], 
+      cat(run_code[grep('^minimize', run_code):(grep('^end[;]', run_code) - 1)], 
           sep = '\n', file = zz)
-      cat(glpk_model[grep('^end[;]', glpk_model):length(glpk_model)], sep = '\n', file = zz)
+      cat(run_code[grep('^end[;]', run_code):length(run_code)], sep = '\n', file = zz)
       close(zz)
-#    cdd <- prec@model
-    if (model.type == 'reduced') {
-      glpk_model <- prec@model_reduced_glpk
-    } else {
-      glpk_model <- prec@model_full_glpk
-    }
       zz <- file(paste(tmpdir, '/glpk.dat', sep = ''), 'w') 
-    for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'set') {
-      cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)
+    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
+      cat(sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
     }
     cat('set FORIF := FORIFSET;\n', sep = '\n', file = zz)
-    for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'map') {
-      cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)
+    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
+      cat(sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
     }
-    for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'single') {
-      cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)
+    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
+      cat(sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
     }
-    for(i in names(prec@maptable)) if (prec@maptable[[i]]@type == 'double') {
-      cat(sm_to_glpk(prec@maptable[[i]]), sep = '\n', file = zz)
+    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
+      cat(sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
     }                            
 #    for(i in seq(along = CNS)) {
 #      cat(CNS[[i]]$add_data, sep = '\n', file = zz)
@@ -631,7 +617,7 @@ LL1 <- proc.time()[3]
     ##!!!!!!!!!!!!!!!!!!!!!
     ## ORD function
     cat('param ORD :=', sep = '\n', file = zz)  
-    cat(paste(prec@maptable$year@data$year, seq(along = prec@maptable$year@data$year)), sep = '\n', file = zz)  
+    cat(paste(prec@parameters$year@data$year, seq(along = prec@parameters$year@data$year)), sep = '\n', file = zz)
     cat(';', '', sep = '\n', file = zz) 
     cat('end;', '', sep = '\n', file = zz) 
     ##!!!!!!!!!!!!!!!!!!!!!  
@@ -698,7 +684,7 @@ LL1 <- proc.time()[3]
     if (file.exists(paste(tmpdir, '/variable_list2.csv', sep = ''))) {
       vrb_list2 <- read.csv(paste(tmpdir, '/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
     } else vrb_list2 <- character()
-    rr <- list(par_arr = list(), set = read.csv(paste(tmpdir, 
+    rr <- list(variables = list(), par_arr = list(), set = read.csv(paste(tmpdir, 
       '/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
     ss <- list()
     for(k in unique(rr$set$set)) {
@@ -716,7 +702,9 @@ LL1 <- proc.time()[3]
       gg <- read.csv(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
       if (ncol(gg) == 1) {
         rr$par_arr[[i]] <- gg[1, 1]  
+        rr$variables[[i]] <- data.frame(value = gg[1, 1])
       } else {
+        rr$variables[[i]] <- gg
         jj <- gg[, -ncol(gg), drop = FALSE]
         for(j in seq(length.out = ncol(jj))) {
           if (all(colnames(jj)[j] != names(rr$set_vec))) colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
@@ -755,12 +743,20 @@ LL1 <- proc.time()[3]
    scn <- new('scenario')
    scn@name <- name
    scn@description <- description
-   scn@precompiled <- prec
+   scn@modInp <- prec
    scn@model <- obj
-   scn@result <- new('result')
-   scn@result@data <- rr$par_arr
-   scn@result@set <- rr$set_vec
-   scn@result@solution_report <- rr$solution_report
+   scn@modOut <- new('modOut')
+   scn@modOut@data <- rr$par_arr
+   scn@modOut@sets <- rr$set_vec
+   scn@modOut@variables <- rr$variables
+   scn@modOut@compilationStatus <- as.character(rr$solution_report$finish)
+   scn@modOut@solutionStatus <- as.character(rr$solution_report$status)
+   for(i in names(scn@modInp@parameters)) {
+     if (scn@modInp@parameters[[i]]@nValues != -1) {
+       scn@modInp@parameters[[i]]@data <- scn@modInp@parameters[[i]]@data[
+         seq(length.out = scn@modInp@parameters[[i]]@nValues),, drop = FALSE]
+     }
+   }
    if (rr$solution_report$finish != 2 || rr$solution_report$status != 1)
      warning('Unsuccessful finish')
    scn
@@ -774,72 +770,4 @@ solve.model <- function(obj, ...) {
   } else sm_compile_model(obj, ...)
 }
 
-sm_to_glpk <-  function(obj) {
-    if (obj@true_length != -1) {
-        obj@data <- obj@data[seq(length.out = obj@true_length),, drop = FALSE]
-      }
-    if (obj@type == 'set') {
-      if (nrow(obj@data) == 0) {
-        ret <- c(paste('set ', obj@alias, ' := 1;', sep = ''), '')
-      } else {
-        ret <- c(paste('set ', obj@alias, ' := ', paste(obj@data[, 1], collapse = ' '), ';', sep = ''), '')
-      }
-    } else if (obj@type == 'map') {
-      if (nrow(obj@data) == 0) {
-        ret <- paste('param ', obj@alias, ' default 0 := ;', sep = '')
-      } else {
-        ret <- paste('param ', obj@alias, ' default 0 := ', sep = '')
-        ret <- c(ret, apply(obj@data, 1, function(x) paste('[', paste(x, collapse = ','), '] 1', sep = '')))
-        ret <- c(ret, ';', '')
-      }
-    } else if (obj@type == 'single') {
-       if (nrow(obj@data) == 0) {
-        dd <- obj@default
-        if (dd == Inf) dd <- 0
-        ret <- paste('param ', obj@alias, ' default ', dd, ' := ;', sep = '')
-      } else {
-        ret <- paste('param ', obj@alias, ' default 0 := ', sep = '')
-        fl <- obj@data[, 'Freq'] != Inf
-        if (any(fl)) {
-          ret <- c(ret, paste('[', apply(obj@data[fl, -ncol(obj@data), drop = FALSE], 1, 
-            function(x) paste(x, collapse = ',')), '] ', obj@data[fl, 'Freq'], sep = ''))
-        }
-        ret <- c(ret, ';', '')
-      }
-    } else if (obj@type == 'double') {
-      gg <- obj@data
-      gg <- gg[gg$type == 'lo', , drop = FALSE]
-      gg <- gg[, colnames(gg) != 'type'] 
-       if (nrow(gg) == 0 || all(gg$Freq[1] == gg$Freq)) {
-        if (nrow(gg) == 0) dd <- obj@default[1] else dd <- gg$Freq[1]
-        if (dd == Inf) dd <- 0
-        ret <- paste('param ', obj@alias, 'Lo default ', dd, ' := ;', sep = '')
-      } else {
-        ret <- paste('param ', obj@alias, 'Lo default 0 := ', sep = '')
-        fl <- gg[, 'Freq'] != Inf
-        if (any(fl)) {
-          ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
-            function(x) paste(x, collapse = ',')), '] ', gg[fl, 'Freq'], sep = ''))
-        }
-        ret <- c(ret, ';', '')
-       }
-      gg <- obj@data
-      gg <- gg[gg$type == 'up', , drop = FALSE]
-      gg <- gg[, colnames(gg) != 'type'] 
-       if (nrow(gg) == 0 || all(gg$Freq[1] == gg$Freq)) {
-        if (nrow(gg) == 0) dd <- obj@default[2] else dd <- gg$Freq[1]
-        if (dd == Inf) dd <- 0
-        ret <- c(ret, paste('param ', obj@alias, 'Up default ', dd, ' := ;', sep = ''))
-      } else {
-        ret <- c(ret, paste('param ', obj@alias, 'Up default 0 := ', sep = ''))
-        fl <- gg[, 'Freq'] != Inf
-        if (any(fl)) {
-          ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
-            function(x) paste(x, collapse = ',')), '] ', gg[fl, 'Freq'], sep = ''))
-        }
-        ret <- c(ret, ';', '')
-       }
-    } else stop('Must realise')
-    ret
-}
 
