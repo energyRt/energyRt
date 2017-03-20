@@ -19,13 +19,13 @@
 #' @param trade character vector with names of trade objects
 #' @param get.parameter logical, if TRUE then search in interpolated parameters, and return if available  
 #' @param get.variable logical, if TRUE then search in variables, and return if available  
-#' @param remove_zero_dim rename to 'drop.zeros' 
+#' @param remove_zero_dim rename to 'zero.rm' 
 #' @param drop # add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'
  
 
 getData0 <- function(obj, set, parameters = NULL, variables = NULL, 
-                     get.parameters = NULL, get.variables = NULL, merge.table = FALSE,
-                     drop.zeros = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
+                     get.parameters = NULL, get.variables = NULL, merge = FALSE,
+                     zero.rm = TRUE, drop = TRUE, asTables = TRUE, use.dplyr = FALSE, 
                      stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL) {
   # Find set
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
@@ -117,26 +117,26 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
     }
   }
   res <- res[!sapply(res, is.null)]
-  if (drop.zeros) {
+  if (zero.rm) {
     for(i in names(res)) {
       res[[i]] <- res[[i]][res[[i]]$value != 0,, drop = FALSE]
     }
     res <- res[!sapply(res, is.null) & sapply(res, nrow) != 0]
   }
   # To table
-  if (!astable) {
+  if (!asTables) {
     if (drop) {
       for(i in names(res)) {
-        res[[i]] <- res[[i]][, c(apply(res[[i]][, -ncol(res[[i]]), drop = FALSE], 2, 
-                                     function(x) any(x[1] != x)), TRUE), drop = FALSE]
+        res[[i]] <- res[[i]][, c(colnames(res[[i]][, -ncol(res[[i]]), drop = FALSE]) == 'scen' |
+            apply(res[[i]][, -ncol(res[[i]]), drop = FALSE], 2, function(x) any(x[1] != x)), TRUE), drop = FALSE]
       }
     }
     for(i in names(res)) {
       res[[i]] <- tapply(res[[i]]$value, res[[i]][, -ncol(res[[i]]), drop = FALSE], sum)
     }
   } else {
-    # astable
-    if (merge.table) {
+    # asTables
+    if (merge) {
       for(i in names(res)) {
         res[[i]] <- cbind(parameter = rep(i, nrow(res[[i]])), res[[i]], stringsAsFactors = FALSE)
       }
@@ -147,9 +147,10 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
           res <- Reduce(function(x, y) {merge(x, y, all = TRUE)}, res)
         }
         res <- cbind(res[, colnames(res) != 'value', drop = FALSE], value = res$value, stringsAsFactors = FALSE)
-      }
+      } else res <- res[[1]]
       if (drop) {
-          res <- res[, c(TRUE, apply(res[, -c(1, ncol(res)), drop = FALSE], 2, 
+          res <- res[, c(TRUE, TRUE[any(colnames(res) == 'scen')], 
+                         apply(res[, -c(1, 2[any(colnames(res) == 'scen')], ncol(res)), drop = FALSE], 2, 
                                          function(x) length(unique(x)) != 1), TRUE), drop = FALSE]
       }
       if (stringsAsFactors) {
@@ -169,11 +170,11 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
         }
       }
     } else {
-      # astable & !merge.table
+      # asTables & !merge
       for(i in names(res)) {
         if (drop) {
-            res[[i]] <- res[[i]][, c(apply(res[[i]][, -ncol(res[[i]]), drop = FALSE], 2, 
-                                           function(x) length(unique(x)) != 1), TRUE), drop = FALSE]
+            res[[i]] <- res[[i]][, c(colnames(res[[i]][, -ncol(res[[i]]), drop = FALSE]) == 'scen' |
+                apply(res[[i]][, -ncol(res[[i]]), drop = FALSE], 2, function(x) length(unique(x)) != 1), TRUE), drop = FALSE]
         }
         if (stringsAsFactors) {
           cc <- colnames(res[[i]])[sapply(res[[i]], class) == 'character' & !(colnames(res[[i]]) %in% 'scen')]
@@ -197,8 +198,8 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
 }
  
 getData1 <- function(arg, set, parameters = NULL, variables = NULL, 
-                     get.parameters = NULL, get.variables = NULL, merge.table = FALSE,
-                     drop.zeros = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
+                     get.parameters = NULL, get.variables = NULL, merge = FALSE,
+                     zero.rm = TRUE, drop = TRUE, asTables = TRUE, use.dplyr = FALSE, 
                      stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL) {
   if (any(sapply(arg, class) != 'scenario')) {
     ss <- names(arg)[sapply(arg, class) != 'scenario']
@@ -241,20 +242,25 @@ getData1 <- function(arg, set, parameters = NULL, variables = NULL,
     if (class(obj) != 'scenario') stop('Wrong argument obj')
   }
   getData0(obj, set = set, parameters = parameters, variables = variables, get.parameters = get.parameters, 
-           get.variables = get.variables, merge.table = merge.table, drop.zeros = drop.zeros, drop = drop, 
-           astable = astable, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
+           get.variables = get.variables, merge = merge, zero.rm = zero.rm, drop = drop, 
+           asTables = asTables, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
            yearsAsFactors = yearsAsFactors, scenario.name = scenario.name)
     
 }
 
 getData <- function(..., parameters = NULL, variables = NULL, 
-                     get.parameters = NULL, get.variables = NULL, merge.table = FALSE,
-                     drop.zeros = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
+                     get.parameters = NULL, get.variables = NULL, merge = FALSE,
+                     zero.rm = TRUE, drop = TRUE, asTables = TRUE, use.dplyr = FALSE, 
                      stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   #, regex = FALSE
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
   arg <- list(...) #, set
+  if (any(names(arg) == 'parameter')) parameters <- arg$parameter
+  if (any(names(arg) == 'variable')) variables <- arg$variable
+  if (any(names(arg) == 'get.variable')) get.variables <- arg$get.variable
+  if (any(names(arg) == 'get.parameter')) get.parameters <- arg$get.parameter
+  arg <- arg[!(names(arg) %in% c('get.parameter', 'parameter', 'variable', 'get.variable'))]
   if (any(names(arg) == 'scenario' && is.list(arg$scenario))) {
     fl <- seq(along = arg)[names(arg) == 'scenario']
     for(i in seq(length.out = arg$scenario))
@@ -275,18 +281,18 @@ getData <- function(..., parameters = NULL, variables = NULL,
     arg <- arg[!(names(arg) %in% psb_set)]
   }
   getData1(arg = arg, set = set, parameters = parameters, variables = variables, get.parameters = get.parameters, 
-           get.variables = get.variables, merge.table = merge.table, drop.zeros = drop.zeros, drop = drop, 
-           astable = astable, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
+           get.variables = get.variables, merge = merge, zero.rm = zero.rm, drop = drop, 
+           asTables = asTables, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
            yearsAsFactors = yearsAsFactors)
 }
 
 getData_ <- function(..., parameters = NULL, variables = NULL, 
-                    get.parameters = NULL, get.variables = NULL, merge.table = FALSE,
-                    drop.zeros = TRUE, drop = TRUE, astable = TRUE, use.dplyr = FALSE, 
+                    get.parameters = NULL, get.variables = NULL, merge = FALSE,
+                    zero.rm = TRUE, drop = TRUE, asTables = TRUE, use.dplyr = FALSE, 
                     stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
   getData(..., parameters = parameters, variables = variables, 
-                       get.parameters = get.parameters, get.variables = get.variables, merge.table = merge.table,
-                       drop.zeros = drop.zeros, drop = drop, astable = astable, use.dplyr = use.dplyr, 
+                       get.parameters = get.parameters, get.variables = get.variables, merge = merge,
+                       zero.rm = zero.rm, drop = drop, asTables = asTables, use.dplyr = use.dplyr, 
                        stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)
 }
   
