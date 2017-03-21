@@ -29,10 +29,10 @@ choropleth.scenario <- function(obj, # scenario object
   # dat <- eval(call(get_data, obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
   #                yearsAsFactors = TRUE, stringsAsFactors = TRUE))
   if(regex) {
-    dat <- getData_(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
+    dat <- getData_(obj, ..., merge = TRUE, asTable = TRUE,  drop = FALSE, 
                    yearsAsFactors = TRUE, stringsAsFactors = TRUE)
   } else {
-    dat <- getData(obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
+    dat <- getData(obj, ..., merge = TRUE, asTable = TRUE,  drop = FALSE, 
                      yearsAsFactors = TRUE, stringsAsFactors = TRUE)
   }
     if (is.null(dat) | nrow(dat) == 0) {

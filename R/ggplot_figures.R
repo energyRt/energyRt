@@ -88,7 +88,7 @@ ggplot_bar_by_gtech <- function(
   if (length(variable) > 1) get_data <- "getData"
   
   dat <- eval(call(get_data, scen, variable = variable, comm = comm, 
-                  get.parameter = F, merge.table = T, drop = F, remove_zero_dim = T))
+                  get.parameter = F, merge = T, drop = F, zero.rm = T))
   
   dat <- addGroups(dat, mapping, select, zero.rm = T, na.rm = T)
   
@@ -118,7 +118,7 @@ ggplot_bar_by_gcomm <- function(
   if (length(variable) > 1) get_data <- "getData"
   
   dat <- eval(call(get_data, scen, variable = variable, comm = comm, 
-                  get.parameter = F, merge.table = T, drop = F, remove_zero_dim = T))
+                  get.parameter = F, merge = T, drop = F, zero.rm = T))
   
   dat <- addGroups(dat, mapping, select, zero.rm = T, na.rm = T)
   
