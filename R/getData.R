@@ -133,13 +133,17 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
     }
     for(i in names(res)) {
       res[[i]] <- tapply(res[[i]]$value, res[[i]][, -ncol(res[[i]]), drop = FALSE], sum)
+      res[[i]][is.na(res[[i]])] <- 0 
     }
+    res <- res[sapply(res, length) != 0]
+    if (length(res) == 0) return(NULL)
   } else {
     # table
     if (merge) {
       for(i in names(res)) {
-        res[[i]] <- cbind(parameter = rep(i, nrow(res[[i]])), res[[i]], stringsAsFactors = FALSE)
+        res[[i]] <- cbind(name = rep(i, nrow(res[[i]])), res[[i]], stringsAsFactors = FALSE)
       }
+      if (length(res) == 0) return(NULL)
       if (length(res) > 1) {
         if (use.dplyr) {
           res <- Reduce(function(x, y) {dplyr::full_join(x, y)}, res)
@@ -154,14 +158,14 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
                                          function(x) length(unique(x)) != 1), TRUE), drop = FALSE]
       }
       if (stringsAsFactors) {
-        cc <- colnames(res)[sapply(res, class) == 'character' & !(colnames(res) %in% c('scen', 'parameter'))]
+        cc <- colnames(res)[sapply(res, class) == 'character' & !(colnames(res) %in% c('scen', 'name'))]
         for(i in cc) {
           res[, i] <- factor(res[, i], levels = obj@modOut@sets[[i]])
         }
         if (!is.null(scenario.name)) {
           res$scen <- factor(res[, 'scen'], levels = scenario.name)
         }
-        res$parameter <- as.factor(res$parameter)
+        res$name <- as.factor(res$name)
       }
       if (yearsAsFactors) {
         cc <- colnames(res)[sapply(res, class) == 'numeric' & !(colnames(res) %in% c('value'))]
@@ -192,6 +196,7 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
           }
         }    
       }
+      if (length(res) == 0) return(NULL)
     }
   }
   res
