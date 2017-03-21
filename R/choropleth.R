@@ -26,15 +26,15 @@ choropleth.scenario <- function(obj, # scenario object
                                 regex = FALSE
 ) {
   # if(regex) {get_data <- "getData_"} else {get_data <- "getData"}
-  # dat <- eval(call(get_data, obj, ..., merge.table = TRUE, astable = TRUE,  drop = FALSE, 
+  # dat <- eval(call(get_data, obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
   #                yearsAsFactors = TRUE, stringsAsFactors = TRUE))
-  if(regex) {
-    dat <- getData_(obj, ..., merge = TRUE, asTable = TRUE,  drop = FALSE, 
-                   yearsAsFactors = TRUE, stringsAsFactors = TRUE)
-  } else {
-    dat <- getData(obj, ..., merge = TRUE, asTable = TRUE,  drop = FALSE, 
-                     yearsAsFactors = TRUE, stringsAsFactors = TRUE)
-  }
+  # if(regex) {
+  #   dat <- getData_(obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
+  #                  yearsAsFactors = TRUE, stringsAsFactors = TRUE)
+  # } else {
+    dat <- getData(obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
+                     yearsAsFactors = TRUE, stringsAsFactors = TRUE, regex = regex)
+#  }
     if (is.null(dat) | nrow(dat) == 0) {
     message("No data for the set of filters")
     return()
@@ -129,10 +129,10 @@ arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
                          add = FALSE,
                          ...) {
   dat <- getData(scen, ..., # parameter = "pTradeIr", 
-                 astable = TRUE, drop = FALSE, merge.table = TRUE)
+                 table = TRUE, drop = FALSE, merge = TRUE)
   nm <- names(dat)
   if (!("src" %in% nm) | !("dst" %in% nm)) {
-    message("No data for source and/or destination region, 'src' or 'dst' columns is missing.")
+    message("No data for source and/or destination region, 'src' and/or 'dst' columns are missing.")
     message(paste("Names:", nm))
   }
   cc <- sapply(dat, is.character)
@@ -234,7 +234,7 @@ getSPDF <- function(scen, ...) {
     stop("The scenario has no spatial information. Check 'scen@model@sysInfo@GIS'")
   }
   
-  dat <- getData(scen, ..., astable = TRUE, merge.table = TRUE, drop = FALSE)
+  dat <- getData(scen, ..., table = TRUE, merge = TRUE, drop = FALSE)
   dat <- agg_region(dat)
   SPDF <- sp::merge(SPDF, dat)
   return(SPDF)
