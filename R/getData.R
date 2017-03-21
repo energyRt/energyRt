@@ -48,7 +48,7 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
   for(i in names(set)) {
     if (any(!(set[[i]] %in% src_set[[i]]))) 
       stop(paste('Unknown set "', i, '" value(s) : "', 
-                  paste(names(set)[!(names(set) %in% psb_set3)], collapse = '", "'),  '"', sep = ''))
+                  paste(set[[i]][!(set[[i]] %in% src_set[[i]])], collapse = '", "'),  '"', sep = ''))
     set[[i]] <- unique(set[[i]])
     if (length(set[[i]]) == length(src_set[[i]])) set[[i]] <- NULL
   }
@@ -273,19 +273,24 @@ getData <- function(..., parameters = NULL, variables = NULL,
       arg[[length(arg) + 1]] <- arg$scenario[[i]]
     arg <- arg[-fl]
   }
+  set <- arg[names(arg) %in% c(psb_set, paste(psb_set, '_', sep = ''))]      
+  arg <- arg[!(names(arg) %in% names(set))]
   if (any(names(arg) == 'regex')) {
     regex <- arg$regex
     arg <- arg[names(arg) != 'regex']
-    set <- arg[names(arg) %in% psb_set]      
-    arg <- arg[!(names(arg) %in% psb_set)]
+    if (any(grep('_$', names(set)))) {
+      ff <- grep('_$', names(set), value = TRUE)
+      f2 <- gsub('_$', '', ff); names(f2) <- ff
+      warning(paste('There are unapropriayte set with define "regex" argument: "', paste(ff, collapse = '", "'), 
+                    '", that merge with : "',f2, '"', sep = ''))
+        for(i in ff) {
+          set[[f2[i]]] <- c(set[[f2[i]]] , set[[i]])
+          }
+    }
     if (regex) {
       names(set) <- paste(names(set), '_', sep = '')
     }
-  } else {
-    psb_set <- c(psb_set, paste(psb_set, '_', sep = ''))
-    set <- arg[names(arg) %in% psb_set]      
-    arg <- arg[!(names(arg) %in% psb_set)]
-  }
+  } 
   getData1(arg = arg, set = set, parameters = parameters, variables = variables, get.parameters = get.parameters, 
            get.variables = get.variables, merge = merge, zero.rm = zero.rm, drop = drop, 
            table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
