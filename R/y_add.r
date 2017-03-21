@@ -71,7 +71,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
   obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
       data.frame(dem = dem@name, comm = dem@commodity)) 
   obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
-      simple_data_frame_approximation_chk(dem@dem, 'dem',
+      simpleInterpolation(dem@dem, 'dem',
       obj@parameters[['pDemand']], approxim, 'dem', dem@name))
   obj
 })
@@ -113,12 +113,12 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
   obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
       data.frame(sup = sup@name, comm = sup@commodity))
   obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
-      simple_data_frame_approximation_chk(sup@availability, 'cost',
+      simpleInterpolation(sup@availability, 'cost',
           obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
   obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
       data.frame(sup = sup@name, value = sup@reserve))
   obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
-            data_frame_approximation_chk(sup@availability, 'ava',
+            multiInterpolation(sup@availability, 'ava',
             obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
   obj
 })
@@ -142,12 +142,12 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
   obj@parameters[['mExpComm']] <- addData(obj@parameters[['mExpComm']],
       data.frame(expp = exp@name, comm = exp@commodity))
   obj@parameters[['pExportRowPrice']] <- addData(obj@parameters[['pExportRowPrice']],
-      simple_data_frame_approximation_chk(exp@exp, 'price',
+      simpleInterpolation(exp@exp, 'price',
           obj@parameters[['pExportRowPrice']], approxim, 'expp', exp@name))
   obj@parameters[['pExportRowRes']] <- addData(obj@parameters[['pExportRowRes']],
       data.frame(expp = exp@name, value = exp@reserve))
   obj@parameters[['pExportRow']] <- addData(obj@parameters[['pExportRow']],
-            data_frame_approximation_chk(exp@exp, 'exp',
+            multiInterpolation(exp@exp, 'exp',
             obj@parameters[['pExportRow']], approxim, 'expp', exp@name))
   obj
 })
@@ -171,12 +171,12 @@ setMethod('add0', signature(obj = 'modInp', app = 'import',
   obj@parameters[['mImpComm']] <- addData(obj@parameters[['mImpComm']],
       data.frame(imp = imp@name, comm = imp@commodity))
   obj@parameters[['pImportRowPrice']] <- addData(obj@parameters[['pImportRowPrice']],
-      simple_data_frame_approximation_chk(imp@imp, 'price',
+      simpleInterpolation(imp@imp, 'price',
           obj@parameters[['pImportRowPrice']], approxim, 'imp', imp@name))
   obj@parameters[['pImportRowRes']] <- addData(obj@parameters[['pImportRowRes']],
       data.frame(imp = imp@name, value = imp@reserve))
   obj@parameters[['pImportRow']] <- addData(obj@parameters[['pImportRow']],
-            data_frame_approximation_chk(imp@imp, 'imp',
+            multiInterpolation(imp@imp, 'imp',
             obj@parameters[['pImportRow']], approxim, 'imp', imp@name))
   obj
 })
@@ -201,12 +201,12 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
 ##  obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
 ##      data.frame(sup = sup@name, comm = sup@commodity))
 ##  obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
-##      simple_data_frame_approximation_chk(sup@availability, 'cost',
+##      simpleInterpolation(sup@availability, 'cost',
 ##          obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
 ##  obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
 ##      data.frame(sup = sup@name, value = sup@reserve))
 ##  obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
-##            data_frame_approximation_chk(sup@availability, 'ava',
+##            multiInterpolation(sup@availability, 'ava',
 ##            obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
 #  if (!chec_correct_name(app@name)) {
 #    stop(paste('Incorrect technology name "', app@name, '"', sep = ''))
@@ -231,7 +231,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
         approxim2[[cc]] <- app@for.each[[cc]]
       }
      obj@parameters[['pTaxCost']] <- addData(obj@parameters[['pTaxCost']],
-        simple_data_frame_approximation_chk(app@rhs, 'tax',
+        simpleInterpolation(app@rhs, 'tax',
          obj@parameters[['pTaxCost']], approxim2, 'comm', app@comm))
   } else
   if (app@type == 'subs') {
@@ -240,7 +240,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
         approxim2[[cc]] <- app@for.each[[cc]]
       }
      obj@parameters[['pSubsCost']] <- addData(obj@parameters[['pSubsCost']],
-        simple_data_frame_approximation_chk(app@rhs, 'subs',
+        simpleInterpolation(app@rhs, 'subs',
          obj@parameters[['pSubsCost']], approxim2, 'comm', app@comm))
   } else {
     # Define lhs equation type
@@ -437,19 +437,19 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   approxim_comm[['comm']] <- rownames(ctype$comm)
   if (length(approxim_comm[['comm']]) != 0) {
     obj@parameters[['pTechCvarom']] <- addData(obj@parameters[['pTechCvarom']],
-      simple_data_frame_approximation_chk(tech@varom, 'cvarom',
+      simpleInterpolation(tech@varom, 'cvarom',
        obj@parameters[['pTechCvarom']], approxim_comm, 'tech', tech@name))
   }
   approxim_acomm <- approxim
   approxim_acomm[['acomm']] <- rownames(ctype$aux)
   if (length(approxim_acomm[['acomm']]) != 0) {
     obj@parameters[['pTechAvarom']] <- addData(obj@parameters[['pTechAvarom']],
-      simple_data_frame_approximation_chk(tech@varom, 'avarom',
+      simpleInterpolation(tech@varom, 'avarom',
        obj@parameters[['pTechAvarom']], approxim_acomm, 'tech', tech@name))
   }
   approxim_comm[['comm']] <- rownames(ctype$comm)
   if (length(approxim_comm[['comm']]) != 0) {
-    gg <- data_frame_approximation_chk(tech@ceff, 'afac',
+    gg <- multiInterpolation(tech@ceff, 'afac',
             obj@parameters[['pTechAfac']], approxim_comm, 'tech', tech@name)
     obj@parameters[['pTechAfac']] <- addData(obj@parameters[['pTechAfac']], gg)
     gg <- gg[gg$type == 'up' & gg$value != Inf, ]
@@ -458,7 +458,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
             gg[, obj@parameters[['defpTechAfacUp']]@dimSetNames])
 
   }
-  gg <- data_frame_approximation_chk(tech@afa, 'afa',
+  gg <- multiInterpolation(tech@afa, 'afa',
             obj@parameters[['pTechAfa']], approxim, 'tech', tech@name)
   obj@parameters[['pTechAfa']] <- addData(obj@parameters[['pTechAfa']], gg)
   gg <- gg[gg$type == 'up' & gg$value != Inf, ]
@@ -469,16 +469,16 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input']
   if (length(approxim_comm[['comm']]) != 0) {
     obj@parameters[['pTechCinp2use']] <- addData(obj@parameters[['pTechCinp2use']],
-      simple_data_frame_approximation_chk(tech@ceff, 'cinp2use',
+      simpleInterpolation(tech@ceff, 'cinp2use',
        obj@parameters[['pTechCinp2use']], approxim_comm, 'tech', tech@name))
   }
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'output']
   if (length(approxim_comm[['comm']]) != 0) {
     obj@parameters[['pTechUse2cact']] <- addData(obj@parameters[['pTechUse2cact']],  
-       simple_data_frame_approximation_chk(tech@ceff, 'use2cact',
+       simpleInterpolation(tech@ceff, 'use2cact',
        obj@parameters[['pTechUse2cact']], approxim_comm, 'tech', tech@name))
     obj@parameters[['pTechCact2cout']] <- addData(obj@parameters[['pTechCact2cout']],
-      simple_data_frame_approximation_chk(tech@ceff, 'cact2cout',
+      simpleInterpolation(tech@ceff, 'cact2cout',
        obj@parameters[['pTechCact2cout']], approxim_comm, 'tech', tech@name))
     if (any(!is.na(tech@ceff$cact2cout) & (tech@ceff$cact2cout == 0 | tech@ceff$cact2cout == Inf)))
       stop('cact2cout is not correct ', tech@name)
@@ -488,7 +488,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input' & !is.na(ctype$comm[, 'group'])]
   if (length(approxim_comm[['comm']]) != 0) {
     obj@parameters[['pTechCinp2ginp']] <- addData(obj@parameters[['pTechCinp2ginp']],
-      simple_data_frame_approximation_chk(tech@ceff, 'cinp2ginp',
+      simpleInterpolation(tech@ceff, 'cinp2ginp',
        obj@parameters[['pTechCinp2ginp']], approxim_comm, 'tech', tech@name))
   }
   if (tech@early.retirement) 
@@ -511,7 +511,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   approxim_comm[['comm']] <- rownames(ctype$comm)[!is.na(ctype$comm$group)]
   if (length(approxim_comm[['comm']]) != 0)
     obj@parameters[['pTechShare']] <- addData(obj@parameters[['pTechShare']],
-          data_frame_approximation_chk(tech@ceff, 'share',
+          multiInterpolation(tech@ceff, 'share',
             obj@parameters[['pTechShare']], approxim_comm, 'tech', tech@name))
   cmm <- rownames(ctype$comm)[ctype$comm$comb != 0]
   if (length(cmm) != 0) {
@@ -531,7 +531,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   approxim_group[['group']] <- rownames(ctype$group)[ctype$group$type == 'input']
   if (length(approxim_group[['group']]) != 0)
       obj@parameters[['pTechGinp2use']] <- addData(obj@parameters[['pTechGinp2use']],
-        simple_data_frame_approximation_chk(tech@geff, 'ginp2use',
+        simpleInterpolation(tech@geff, 'ginp2use',
           obj@parameters[['pTechGinp2use']], approxim_group, 'tech', tech@name))
   if (nrow(ctype$group) > 0)
     obj@parameters[['group']] <- addMultipleSet(obj@parameters[['group']], rownames(ctype$group))
@@ -560,7 +560,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
     approxim_comm[['acomm']] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, 'table']]), 'acomm'])
     if (length(approxim_comm[['acomm']]) != 0) {
        obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
-              simple_data_frame_approximation_chk(tech@aeff, dd[i, 'table'], 
+              simpleInterpolation(tech@aeff, dd[i, 'table'], 
                 obj@parameters[[dd[i, 'list']]], approxim_comm, 'tech', tech@name))
     }
   }                
@@ -574,7 +574,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
       stringsAsFactors = FALSE)
     for(i in 1:nrow(dd)) {
       obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
-        simple_data_frame_approximation_chk(slot(tech, dd[i, 'table']),
+        simpleInterpolation(slot(tech, dd[i, 'table']),
           dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim, 'tech', tech@name))
     }
     if (nrow(tech@aeff) != 0) {
@@ -589,7 +589,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
             approxim_commp$acomm <- unique(yy$acomm); 
             approxim_commp$comm <- unique(yy$comm)
             obj@parameters[[tbl]] <- addData(obj@parameters[[tbl]],
-            simple_data_frame_approximation_chk(yy, ll, obj@parameters[[tbl]], 
+            simpleInterpolation(yy, ll, obj@parameters[[tbl]], 
                   approxim_commp, 'tech', tech@name))
           }
 #            tech@aeff <- tech@aeff[!is.na(tech@aeff$comm) & !is.na(tech@aeff$commp),]
@@ -681,26 +681,26 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   app <- stayOnlyVariable(app, approxim$region, 'region')
   # Discount
       obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
-        simple_data_frame_approximation_chk(app@discount, 'discount',
+        simpleInterpolation(app@discount, 'discount',
           obj@parameters[['pDiscount']], approxim))
   approxim_comm <- approxim
   approxim_comm[['comm']] <- obj@parameters$comm@data$comm
   if (length(approxim_comm[['comm']]) != 0) {
     # Dummy import
       obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],
-        simple_data_frame_approximation_chk(app@debug, 'dummyImport',
+        simpleInterpolation(app@debug, 'dummyImport',
           obj@parameters[['pDummyImportCost']], approxim_comm))
     # Dummy export
       obj@parameters[['pDummyExportCost']] <- addData(obj@parameters[['pDummyExportCost']],
-        simple_data_frame_approximation_chk(app@debug, 'dummyExport',
+        simpleInterpolation(app@debug, 'dummyExport',
           obj@parameters[['pDummyExportCost']], approxim_comm))
 #    # Tax
 #      obj@parameters[['pTaxCost']] <- addData(obj@parameters[['pTaxCost']],
-#        simple_data_frame_approximation_chk(app@tax, 'tax',
+#        simpleInterpolation(app@tax, 'tax',
 #          obj@parameters[['pTaxCost']], approxim_comm))
 #    # Subs
 #      obj@parameters[['pSubsCost']] <- addData(obj@parameters[['pSubsCost']],
-#        simple_data_frame_approximation_chk(app@subs, 'subs',
+#        simpleInterpolation(app@subs, 'subs',
 #          obj@parameters[['pSubsCost']], approxim_comm))
   }
   if (nrow(app@milestone) == 0) {
@@ -751,14 +751,14 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   approxim <- approxim[names(approxim) != 'region']
   # pTradeIrCost
   obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
-    simple_data_frame_approximation_chk(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
+    simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
       approxim, 'trade', trd@name))
   # pTradeIrMarkup
   obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
-    simple_data_frame_approximation_chk(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
+    simpleInterpolation(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
       approxim, 'trade', trd@name))
   # pTradeIr
-    gg <- data_frame_approximation_chk(trd@trade, 'ava',
+    gg <- multiInterpolation(trd@trade, 'ava',
             obj@parameters[['pTradeIr']], approxim, 'trade', trd@name)
     obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
     gg <- gg[gg$type == 'up' & gg$value != Inf, ]
