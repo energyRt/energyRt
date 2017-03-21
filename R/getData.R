@@ -23,8 +23,8 @@
 #' @param drop # add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'
  
 
-getData0 <- function(obj, set, parameters = NULL, variables = NULL, 
-                     get.parameters = NULL, get.variables = NULL, merge = FALSE,
+getData0 <- function(obj, set, parameter = NULL, variable = NULL, 
+                     get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
                      stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL) {
   # Find set
@@ -86,30 +86,30 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
     }
   }
   # Variable
-  if (is.null(get.variables)) get.variables <- is.null(parameters) || !is.null(variables)
-  if (is.null(get.parameters)) get.parameters <- is.null(variables) || !is.null(parameters)
+  if (is.null(get.variable)) get.variable <- is.null(parameter) || !is.null(variable)
+  if (is.null(get.parameter)) get.parameter <- is.null(variable) || !is.null(parameter)
   res <- list()
-  if (get.variables) {
+  if (get.variable) {
     dtt <- obj@modOut@variables
-    if (!is.null(variables)) {
-      if (any(!(variables %in% names(dtt)))) 
-        stop(paste('getData: unknown argument: "', paste(variables[!(variables %in% names(dtt))], 
+    if (!is.null(variable)) {
+      if (any(!(variable %in% names(dtt)))) 
+        stop(paste('getData: unknown argument: "', paste(variable[!(variable %in% names(dtt))], 
                                                          collapse = '", "'), '"', sep = ''))
-      dtt <- dtt[variables]
+      dtt <- dtt[variable]
     }
     for(i in names(dtt)) {
       res[[i]] <- check_function(dtt[[i]])
     }
   }
   # Parameter
-  if (get.parameters) {
+  if (get.parameter) {
     fl <- names(obj@modInp@parameters)[sapply(obj@modInp@parameters, function(x) 
-      x@type %in% c('simple', 'multiple'))]
-    if (!is.null(parameters)) {
-      if (any(!(parameters %in% fl))) 
-        stop(paste('getData: unknown argument: "', paste(parameters[!(parameters %in% fl)], 
+      x@type %in% c('simple', 'multi'))]
+    if (!is.null(parameter)) {
+      if (any(!(parameter %in% fl))) 
+        stop(paste('getData: unknown argument: "', paste(parameter[!(parameter %in% fl)], 
                                                          collapse = '", "'), '"', sep = ''))
-      fl <- fl[fl %in% parameters]
+      fl <- fl[fl %in% parameter]
     }
     dtt <- obj@modInp@parameters[fl]
     for(i in names(dtt)) {
@@ -202,10 +202,10 @@ getData0 <- function(obj, set, parameters = NULL, variables = NULL,
   res
 }
  
-getData1 <- function(arg, set, parameters = NULL, variables = NULL, 
-                     get.parameters = NULL, get.variables = NULL, merge = FALSE,
+getData1 <- function(arg, set, parameter = NULL, variable = NULL, 
+                     get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL) {
+                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL, name = NULL) {
   if (any(sapply(arg, class) != 'scenario')) {
     ss <- names(arg)[sapply(arg, class) != 'scenario']
     stop(paste('getData: unknown argument: "', paste(ss, collapse = '", "'), '"', sep = ''))
@@ -222,7 +222,7 @@ getData1 <- function(arg, set, parameters = NULL, variables = NULL,
           if (arg[[1]]@modInp@parameters[[j]]@nValues != -1)
             arg[[1]]@modInp@parameters[[j]]@nValues <- length(hh)
         }
-      } else if (arg[[1]]@modInp@parameters[[j]]@type %in% c('simple', 'multiple')) {
+      } else if (arg[[1]]@modInp@parameters[[j]]@type %in% c('simple', 'multi')) {
         for(i in seq(length.out = length(arg))) {
           arg[[i]]@modInp@parameters[[j]]@data <- cbind(
               scen = rep(arg[[i]]@name, nrow(arg[[i]]@modInp@parameters[[j]]@data)),
@@ -246,27 +246,35 @@ getData1 <- function(arg, set, parameters = NULL, variables = NULL,
     obj <- arg[[1]]
     if (class(obj) != 'scenario') stop('Wrong argument obj')
   }
-  getData0(obj, set = set, parameters = parameters, variables = variables, get.parameters = get.parameters, 
-           get.variables = get.variables, merge = merge, zero.rm = zero.rm, drop = drop, 
+  if (!is.null(name)) {
+    parameter <- c(parameter, name[name %in% names(obj@modInp@parameters)])
+    variable <- c(variable, name[name %in% names(obj@modOut@variables)])
+    ff <- name[!(name %in% c(names(obj@modInp@parameters), names(obj@modOut@variables)))]
+    if (length(ff) != 0) {
+      stop(paste('There is unknown name: "', paste(ff, collapse = '", "'), '"', sep = ''))
+    }
+  }
+  getData0(obj, set = set, parameter = parameter, variable = variable, get.parameter = get.parameter, 
+           get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
            table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
            yearsAsFactors = yearsAsFactors, scenario.name = scenario.name)
     
 }
 
-getData <- function(..., parameters = NULL, variables = NULL, 
-                     get.parameters = NULL, get.variables = NULL, merge = FALSE,
+getData <- function(..., parameter = NULL, variable = NULL, 
+                     get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                     stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
+                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL) {
   #, regex = FALSE
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
   arg <- list(...) #, set
   if (is.null(names(arg))) names(arg) <- rep('', length(arg))
-  if (any(names(arg) == 'parameter')) parameters <- arg$parameter
-  if (any(names(arg) == 'variable')) variables <- arg$variable
-  if (any(names(arg) == 'get.variable')) get.variables <- arg$get.variable
-  if (any(names(arg) == 'get.parameter')) get.parameters <- arg$get.parameter
-  arg <- arg[!(names(arg) %in% c('get.parameter', 'parameter', 'variable', 'get.variable'))]
+  if (any(names(arg) == 'parameters')) parameter <- arg$parameters
+  if (any(names(arg) == 'variables')) variable <- arg$variables
+  if (any(names(arg) == 'get.variables')) get.variable <- arg$get.variables
+  if (any(names(arg) == 'get.parameters')) get.parameter <- arg$get.parameters
+  arg <- arg[!(names(arg) %in% c('get.parameters', 'parameters', 'variables', 'get.variables'))]
   if (any(names(arg) == 'scenario' && is.list(arg$scenario))) {
     fl <- seq(along = arg)[names(arg) == 'scenario']
     for(i in seq(length.out = arg$scenario))
@@ -291,20 +299,20 @@ getData <- function(..., parameters = NULL, variables = NULL,
       names(set) <- paste(names(set), '_', sep = '')
     }
   } 
-  getData1(arg = arg, set = set, parameters = parameters, variables = variables, get.parameters = get.parameters, 
-           get.variables = get.variables, merge = merge, zero.rm = zero.rm, drop = drop, 
+  getData1(arg = arg, set = set, name = name, parameter = parameter, variable = variable, get.parameter = get.parameter, 
+           get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
            table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
            yearsAsFactors = yearsAsFactors)
 }
 
-getData_ <- function(..., parameters = NULL, variables = NULL, 
-                    get.parameters = NULL, get.variables = NULL, merge = FALSE,
+getData_ <- function(..., parameter = NULL, variable = NULL, 
+                    get.parameter = NULL, get.variable = NULL, merge = FALSE,
                     zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                    stringsAsFactors = TRUE, yearsAsFactors = FALSE) {
-  getData(..., parameters = parameters, variables = variables, 
-                       get.parameters = get.parameters, get.variables = get.variables, merge = merge,
+                    stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL) {
+  getData(..., parameter = parameter, variable = variable, 
+                       get.parameter = get.parameter, get.variable = get.variable, merge = merge,
                        zero.rm = zero.rm, drop = drop, table = table, use.dplyr = use.dplyr, 
-                       stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors)
+                       stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors, name = name)
 }
   
 
