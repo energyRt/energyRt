@@ -26,7 +26,8 @@
 getData0 <- function(obj, set, parameter = NULL, variable = NULL, 
                      get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL) {
+                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL, 
+                     ignore.case = FALSE, fixed = FALSE, useBytes = FALSE, invert = FALSE) {
   # Find set
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
@@ -40,7 +41,8 @@ getData0 <- function(obj, set, parameter = NULL, variable = NULL,
   if (any(names(set) %in% psb_set2)) {
     ii <- names(set)[names(set) %in% psb_set2]; i2 <- gsub('[_]$', '', ii); names(i2) <- ii;
     for(i in ii) {
-      xx <- unique(c(lapply(set[[i]], function(x) grep(x, src_set[[i2[i]]], value = TRUE)), recursive = TRUE))
+      xx <- unique(c(lapply(set[[i]], function(x) grep(x, src_set[[i2[i]]], value = TRUE, 
+       ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)), recursive = TRUE))
       if (length(xx) > 0) set[[i2[i]]] <- c(set[[i2[i]]], xx)
     }
     set <- set[!(names(set) %in% ii)]
@@ -205,7 +207,8 @@ getData0 <- function(obj, set, parameter = NULL, variable = NULL,
 getData1 <- function(arg, set, parameter = NULL, variable = NULL, 
                      get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL, name = NULL) {
+                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL, name = NULL, 
+                     ignore.case = FALSE, fixed = FALSE, useBytes = FALSE, invert = FALSE) {
   if (any(sapply(arg, class) != 'scenario')) {
     ss <- names(arg)[sapply(arg, class) != 'scenario']
     stop(paste('getData: unknown argument: "', paste(ss, collapse = '", "'), '"', sep = ''))
@@ -257,14 +260,16 @@ getData1 <- function(arg, set, parameter = NULL, variable = NULL,
   getData0(obj, set = set, parameter = parameter, variable = variable, get.parameter = get.parameter, 
            get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
            table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
-           yearsAsFactors = yearsAsFactors, scenario.name = scenario.name)
+           yearsAsFactors = yearsAsFactors, scenario.name = scenario.name, 
+           ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
     
 }
 
 getData <- function(..., parameter = NULL, variable = NULL, 
                      get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL) {
+                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE, 
+                    fixed = FALSE, useBytes = FALSE, invert = FALSE) {
   #, regex = FALSE
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
@@ -299,20 +304,24 @@ getData <- function(..., parameter = NULL, variable = NULL,
       names(set) <- paste(names(set), '_', sep = '')
     }
   } 
-  getData1(arg = arg, set = set, name = name, parameter = parameter, variable = variable, get.parameter = get.parameter, 
+  getData1(arg = arg, set = set, name = name, parameter = parameter, variable = variable, 
+           get.parameter = get.parameter, 
            get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
            table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
-           yearsAsFactors = yearsAsFactors)
+           yearsAsFactors = yearsAsFactors, 
+           ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
 }
 
 getData_ <- function(..., parameter = NULL, variable = NULL, 
                     get.parameter = NULL, get.variable = NULL, merge = FALSE,
                     zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                    stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL) {
+                    stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE, 
+                    fixed = FALSE, useBytes = FALSE, invert = FALSE) {
   getData(..., parameter = parameter, variable = variable, 
                        get.parameter = get.parameter, get.variable = get.variable, merge = merge,
                        zero.rm = zero.rm, drop = drop, table = table, use.dplyr = use.dplyr, 
-                       stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors, name = name)
+                       stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors, name = name, 
+                       ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
 }
   
 

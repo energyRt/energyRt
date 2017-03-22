@@ -1,10 +1,19 @@
-getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE, 
+getUniversalNames <- function(obj, cls, regex = NULL, ignore.case = FALSE, 
   fixed = FALSE, useBytes = FALSE, invert = FALSE, ...) {
-  if (regex) {
-    grep2 <- function(x, y) grep(x, as.character(y), ignore.case = ignore.case, fixed = fixed, 
-      useBytes = useBytes, invert = invert)
+  if (is.null(regex)) {
+    grep2 <- function(x, y, FL) {
+      if (FL) {
+        grep(x, as.character(y), ignore.case = ignore.case, fixed = fixed, 
+                                     useBytes = useBytes, invert = invert)
+      } else {
+        y %in% x
+      }
+    }
+  } else if (regex) {
+    grep2 <- function(x, y, FL) grep(x, as.character(y), ignore.case = ignore.case, fixed = fixed, 
+                      useBytes = useBytes, invert = invert)
   } else {
-    grep2 <- function(x, y) y %in% x
+    grep2 <- function(x, y, FL) y %in% x
   }
   arg <- list(...)
   if (any(class(obj) == 'scenario')) obj <- obj@model
@@ -35,10 +44,14 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
     }
     s1 <- getSlots(cls)
     s2 <- new(cls)
+    FL <- rep(FALSE, length(arg))
+    FL[grep('[_]$', names(arg))] <- TRUE
+    names(arg) <- gsub('[_]$', '', names(arg))
+    names(FL) <- names(arg)
     for(a in seq(along = arg)) {
       if (all(names(s1) != names(arg)[a])) {
           rst <- rst[0,, drop = FALSE]
-      } else {     
+      } else {  
       if (nrow(rst) > 0) {
         error_msg <- paste('getUniversalName: undefined condition argument "', names(arg)[a], 
                 '" for class "', cls, '"', sep = '')
@@ -48,8 +61,8 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
         if (s1[nm] %in% c("character", 'factor', 'characterOrNULL')) {
         # Character
          if (!(class(cnd)  %in% c("character", 'factor', 'characterOrNULL'))) stop(error_msg)
-          for(i in seq(length.out = nrow(rst)))
-            rst[i, 'use']  <- any(grep2(cnd, slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)))
+          for(i in seq(length.out = nrow(rst))) 
+            rst[i, 'use']  <- any(grep2(cnd, slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), FL[nm]))
           rst <- rst[rst$use,, drop = FALSE]
         } else if (s1[nm] == "logical") {
         # Logical
@@ -96,15 +109,19 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
             }
         } else if (s1[nm] == "data.frame") {
         # data.frame
+          FL2 <- rep(FALSE, length(cnd))
+          FL2[grep('[_]$', names(cnd))] <- TRUE
+          names(cnd) <- gsub('[_]$', '', names(cnd))
+          names(FL2) <- names(cnd)
           for(nm2 in names(cnd)) {
-            cnd2 <- arg[[a]][[nm2]]       
+            cnd2 <- cnd[[nm2]]       
             if (all(colnames(slot(s2, nm)) != nm2)) stop(error_msg)
             # Character
             if (class(cnd2)  %in% c("character", 'factor', 'characterOrNULL')) {
               if (!(class(cnd2)  %in% c("character", 'factor', 'characterOrNULL'))) stop(error_msg)
-              for(i in seq(length.out = nrow(rst)))
+              for(i in seq(length.out = nrow(rst))) 
                 rst[i, 'use']  <- any(grep2(cnd2, 
-                       slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2]), na.rm = TRUE)
+                       slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], FL2[nm2]), na.rm = TRUE)
               rst <- rst[rst$use,, drop = FALSE]
             } else if (class(cnd2) == "logical") {
             # Logical
@@ -170,16 +187,16 @@ getUniversalNames <- function(obj, cls, regex = TRUE, ignore.case = FALSE,
 }
 
 
-getNames <- function(obj, class = c(), ...) {
-  names(getUniversalNames(obj, cls = class, regex = FALSE, ...))
+getNames <- function(obj, class = c(), regex = NULL, ...) {
+  names(getUniversalNames(obj, cls = class, regex = regex, ...))
 }
 getNames_ <- function(obj, class = c(), ...) {
   names(getUniversalNames(obj, cls = class, regex = TRUE, ...))
 }
 
 
-getObjects <- function(obj, class = c(), ...) {   
-  getUniversalNames(obj, cls = class, regex = FALSE, ...)
+getObjects <- function(obj, class = c(), regex = NULL, ...) {   
+  getUniversalNames(obj, cls = class, regex = regex, ...)
 }
 
 getObjects_ <- function(obj, class = c(), ...) {   
