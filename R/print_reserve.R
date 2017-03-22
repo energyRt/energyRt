@@ -1,13 +1,13 @@
-reserve_data_frame <- function ()  {
-    g <- getClass("reserve")
-    names(g@slots)[sapply(names(g@slots), function(z) g@slots[[z]] == 
-        "data.frame")]
-}
 #---------------------------------------------------------------------------------------------------------
 #! print.reserve < -function(x,...) : print reserve
 #---------------------------------------------------------------------------------------------------------
 print.reserve <- function(x,...) {
-# print reserve
+  reserve_data_frame <- function ()  {
+      g <- getClass("reserve")
+      names(g@slots)[sapply(names(g@slots), function(z) g@slots[[z]] == 
+          "data.frame")]
+  }
+  # print reserve
     if_print_data_frame <- function(x, sl) {
       if(nrow(slot(x,sl)) != 0) {
         cat('\n', sl, '\n')

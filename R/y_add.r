@@ -3,10 +3,11 @@
 ################################################################################
 # Add commodity
 ################################################################################
-sm_add_modInp_commodity_list <- function(obj, app, approxim) {
-  cmd <- upper_case(app)
+setMethod('add0', signature(obj = 'modInp', app = 'commodity',
+  approxim = 'list'), function(obj, app, approxim) {
+  cmd <- energyRt:::.upper_case(app)
   cmd <- stayOnlyVariable(cmd, approxim$region, 'region')
-#  if (!chec_correct_name(cmd@name)) {
+#  if (!energyRt:::.chec_correct_name(cmd@name)) {
 #    stop(paste('Incorrect commodity name "', cmd@name, '"', sep = ''))
 #  }
 ##    cat(cmd@name, '\n')
@@ -17,14 +18,12 @@ sm_add_modInp_commodity_list <- function(obj, app, approxim) {
 #        '" now, all previous information will be removed', sep = ''))
 #    obj <- removePreviousCommodity(obj, cmd@name)
 #  }
-#  obj@parameters[['comm']] <- addData(obj@parameters[['comm']], cmd@name)
   # Add ems_from & pEmissionFactor
   dd <- cmd@emis[, c('comm', 'comm', 'mean'), drop = FALSE]
   if (nrow(dd) > 0) {
     colnames(dd) <- c('comm', 'commp', 'value')
     dd[, 'commp'] <- cmd@name
     dd[, 'value'] <- as.numeric(dd$value) # Must be remove later
-    #obj@parameters[['ems_from']] <- addData(obj@parameters[['ems_from']], dd[, c('comm', 'commp'), drop = FALSE])
     obj@parameters[['pEmissionFactor']] <- addData(obj@parameters[['pEmissionFactor']], dd)
   }
 
@@ -33,7 +32,6 @@ sm_add_modInp_commodity_list <- function(obj, app, approxim) {
     colnames(dd) <- c('comm', 'commp', 'value')
     dd[, 'comm'] <- cmd@name
     dd[, 'value'] <- as.numeric(dd$value) # Must be remove later
-    #obj@parameters[['ems_from']] <- addData(obj@parameters[['ems_from']], dd[, c('comm', 'commp'), drop = FALSE])
     obj@parameters[['pAggregateFactor']] <- addData(obj@parameters[['pAggregateFactor']], dd)
   }
 
@@ -45,10 +43,7 @@ sm_add_modInp_commodity_list <- function(obj, app, approxim) {
   if (cmd@limtype == 'FX')
     obj@parameters[['mFxComm']] <- addData(obj@parameters[['mFxComm']], data.frame(comm = cmd@name))
   obj
-}
-
-setMethod('add0', signature(obj = 'modInp', app = 'commodity',
-  approxim = 'list'), sm_add_modInp_commodity_list)
+})
 
 
 
@@ -57,9 +52,9 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'demand',
   approxim = 'list'), function(obj, app, approxim) {     
-  dem <- upper_case(app)
+  dem <- energyRt:::.upper_case(app)
   dem <- stayOnlyVariable(dem, approxim$region, 'region')
-#  if (!chec_correct_name(dem@name)) {
+#  if (!energyRt:::.chec_correct_name(dem@name)) {
 #    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
 #  }
 #  if (isDemand(obj, dem@name)) {
@@ -81,7 +76,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
-  sup <- upper_case(app)
+  sup <- energyRt:::.upper_case(app)
   if (!is.null(sup@region)) {
     approxim$region <- approxim$region[approxim$region %in% sup@region]
     ss <- getSlots('supply')
@@ -101,7 +96,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
         data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region))
   }
   sup <- stayOnlyVariable(sup, approxim$region, 'region')
-#  if (!chec_correct_name(sup@name)) {
+#  if (!energyRt:::.chec_correct_name(sup@name)) {
 #    stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
 #  }
 #  if (isSupply(obj, sup@name)) {
@@ -128,9 +123,9 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
-  exp <- upper_case(app)
+  exp <- energyRt:::.upper_case(app)
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
-#  if (!chec_correct_name(exp@name)) {
+#  if (!energyRt:::.chec_correct_name(exp@name)) {
 #    stop(paste('Incorrect export name "', exp@name, '"', sep = ''))
 #  }
 #  if (isExport(obj, exp@name)) {
@@ -157,9 +152,9 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
-  imp <- upper_case(app)
+  imp <- energyRt:::.upper_case(app)
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
-#  if (!chec_correct_name(imp@name)) {
+#  if (!energyRt:::.chec_correct_name(imp@name)) {
 #    stop(paste('Incorrect import name "', imp@name, '"', sep = ''))
 #  }
 #  if (isImport(obj, imp@name)) {
@@ -186,8 +181,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'import',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'constrain',
   approxim = 'list'), function(obj, app, approxim) {
-  app <- upper_case(app)
-  if (!chec_correct_name(app@name)) {
+  app <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(app@name)) {
     stop(paste('Incorrect constrain name "', app@name, '"', sep = ''))
   }
   if (isConstrain(obj, app@name)) {
@@ -208,7 +203,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
 ##  obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
 ##            multiInterpolation(sup@availability, 'ava',
 ##            obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
-#  if (!chec_correct_name(app@name)) {
+#  if (!energyRt:::.chec_correct_name(app@name)) {
 #    stop(paste('Incorrect technology name "', app@name, '"', sep = ''))
 #  }
 #  if (isConstrain(obj, app@name)) {
@@ -401,7 +396,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 #  mUpComm(comm)  PRODUCTION <= CONSUMPTION
 #  mLoComm(comm)  PRODUCTION >= CONSUMPTION
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
-  tech <- upper_case(app)
+  tech <- energyRt:::.upper_case(app)
   if (!is.null(tech@region)) {
     approxim$region <- approxim$region[approxim$region %in% tech@region]
     ss <- getSlots('technology')
@@ -421,7 +416,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
     tech@olife[1, ] <- NA;
     tech@olife[1, 'olife'] <- Inf;
   }
-#  if (!chec_correct_name(tech@name)) {
+#  if (!energyRt:::.chec_correct_name(tech@name)) {
 #    stop(paste('Incorrect technology name "', tech@name, '"', sep = ''))
 #  }
 #  if (isTechnology(obj, tech@name)) {
@@ -728,7 +723,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
-  trd <- upper_case(app)
+  trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],

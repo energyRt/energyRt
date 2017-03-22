@@ -306,7 +306,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       #obj@gamsVariable <- paste(variable, '(', paste(ss, collapse = ', '), ')', sep = '')
       obj@for.each  <- for.each
       obj@for.sum   <- for.sum
-      if (!chec_correct_name(name)) stop('Uncorrect constrain name "', name, '"') 
+      if (!energyRt:::.chec_correct_name(name)) stop('Uncorrect constrain name "', name, '"') 
   } 
   # Remove factor problem
   for(i in colnames(obj@rhs)[sapply(obj@rhs, class) == 'factor']) {

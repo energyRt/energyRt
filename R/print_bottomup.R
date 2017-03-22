@@ -1,4 +1,4 @@
-is_additional_information <- function(obj) {
+.is_additional_information <- function(obj) {
     sl <- getSlots(class(obj))
     EX <- new(class(obj))                            
     for(i in names(sl)[sl %in% 'character'])
@@ -7,7 +7,7 @@ is_additional_information <- function(obj) {
     length(RT) > 1
 }
 
-print_bottomup <- function(obj, print.all = FALSE) {
+.print_bottomup <- function(obj, print.all = FALSE) {
     sl <- getSlots(class(obj))
     if (!print.all) {
       EX <- new(class(obj))                            
@@ -40,26 +40,26 @@ print_bottomup <- function(obj, print.all = FALSE) {
     }
 }
 
-print.demand <- print_bottomup
-print.technology <- print_bottomup
-print.supply <- print_bottomup
-print.commodity <- print_bottomup
-print.region <- print_bottomup
-print.constrain <- print_bottomup
-print.sysInfo <- print_bottomup
-print.reserve <- print_bottomup
-print.export <- print_bottomup
-print.import <- print_bottomup
+print.demand <- energyRt:::.print_bottomup
+print.technology <- energyRt:::.print_bottomup
+print.supply <- energyRt:::.print_bottomup
+print.commodity <- energyRt:::.print_bottomup
+print.region <- energyRt:::.print_bottomup
+print.constrain <- energyRt:::.print_bottomup
+print.sysInfo <- energyRt:::.print_bottomup
+print.reserve <- energyRt:::.print_bottomup
+print.export <- energyRt:::.print_bottomup
+print.import <- energyRt:::.print_bottomup
 
-cat_bottomup_data_frame <- function(s1, nm, zz, maxcol = 10) {
+.cat_bottomup_data_frame <- function(s1, nm, zz, maxcol = 10) {
   if (ncol(s1) < maxcol) {
-    cat_bottomup_data_frame2(s1, nm, zz)
+    energyRt:::.cat_bottomup_data_frame2(s1, nm, zz)
   } else {
   fl <- !sapply(s1, function(x) all(is.na(x)))
   if (any(fl)) {
     s1 <- s1[,fl, drop = FALSE]
     if (ncol(s1) <= maxcol) {
-      cat_bottomup_data_frame2(s1, nm, zz)
+      energyRt:::.cat_bottomup_data_frame2(s1, nm, zz)
     } else {
       #hh <- round(seq(1, ncol(s1), length.out = ncol(s1) %/% maxcol + 2))
       #hh <- hh[-length(hh)]
@@ -68,14 +68,14 @@ cat_bottomup_data_frame <- function(s1, nm, zz, maxcol = 10) {
       hh[hh == ncol(s1)] <- ncol(s1) - 1
       uu <- c(hh[-1] - 1, ncol(s1))
       for(i in 1:length(hh)) {
-        cat_bottomup_data_frame2(s1[, hh[i]:uu[i]], 
+        energyRt:::.cat_bottomup_data_frame2(s1[, hh[i]:uu[i]], 
            paste(nm, ', part ', i, sep = ''), zz)
         }
       }
     }
   }
 }
-cat_bottomup_data_frame2 <- function(s1, nm, zz) {
+.cat_bottomup_data_frame2 <- function(s1, nm, zz) {
       cat('\\captionof{table}{', nm, '.}\n', sep = '', file = zz)
       cat('\\begin{longtable}{ | ', 
          paste(rep('c', ncol(s1) + 1), collapse = ' | '), ' |}\n', sep = '', file = zz)
@@ -100,7 +100,7 @@ cat_bottomup_data_frame2 <- function(s1, nm, zz) {
       cat('\\end{longtable}\n\n', sep = '', file = zz)
 }
 
-cat_bottomup <- function(obj, print.all = FALSE, file = '', includename = TRUE) {
+.cat_bottomup <- function(obj, print.all = FALSE, file = '', includename = TRUE) {
     zz <- file
     sl <- getSlots(class(obj))
     if (!print.all) {
@@ -133,7 +133,7 @@ cat_bottomup <- function(obj, print.all = FALSE, file = '', includename = TRUE) 
     }
     for(nm in names(sl)[sl %in% 'data.frame']) {
       s1 <- slot(obj, nm)
-      cat_bottomup_data_frame(s1, nm, zz)
+      energyRt:::.cat_bottomup_data_frame(s1, nm, zz)
 #      cat('\\captionof{table}{', nm, '.}\n', sep = '', file = zz)
 #      cat('\\begin{tabularx}{\\textwidth}{ | ', 
 #         paste(rep('X', ncol(s1) + 1), collapse = ' | '), ' |}\n', sep = '', file = zz)

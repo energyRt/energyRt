@@ -156,7 +156,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         cat('\\end{figure}\n', sep = '', file = zz)
         tbl <- as.data.frame(t(cost))
         tbl <- tbl[apply(tbl != 0, 1, any), apply(tbl != 0, 2, any), drop = FALSE]
-        cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
+        energyRt:::.cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
       }
       # Discount cost data
       dsc <- getParameterData(obj@modInp@parameters$pDiscountFactor)
@@ -200,7 +200,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       if (any(dsccost != 0)) {
         tbl <- as.data.frame(t(dsccost))
         tbl <- tbl[apply(tbl != 0, 1, any), apply(tbl != 0, 2, any), drop = FALSE]
-        cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
+        energyRt:::.cat_bottomup_data_frame(tbl, 'Raw cost data', zz)
       }       
      ## Commodity
       if (length(dtt$commodity) != 0) {
@@ -382,7 +382,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               gg <- as.data.frame(t(gg[,apply(gg != 0, 2, any), drop = FALSE]))
               gg$surplus <- gg$output - gg$input
               gg <- gg[, sapply(gg, function(x) any(x != 0)), drop = FALSE]
-              cat_bottomup_data_frame(gg, 'Raw data', zz)
+              energyRt:::.cat_bottomup_data_frame(gg, 'Raw data', zz)
             }
           }
           
@@ -565,17 +565,17 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             tbl <- cbind(t1, t2, t3)
             tbl <- tbl[apply(tbl != 0, 1, any),,drop = FALSE]
             # Table
-            cat_bottomup_data_frame(tbl, 'Raw data input/output', zz, 5)
+            energyRt:::.cat_bottomup_data_frame(tbl, 'Raw data input/output', zz, 5)
           }
           # Raw capacity data
           if (f2) {
             tbl <- as.data.frame(t(tec_cap))
             tbl <- tbl[apply(tbl != 0, 1, any), apply(tbl != 0, 2, any), drop = FALSE]
-            cat_bottomup_data_frame(tbl, 'Raw capacity data', zz)
+            energyRt:::.cat_bottomup_data_frame(tbl, 'Raw capacity data', zz)
             if (any(tec_cost != 0)) {
               tbl <- as.data.frame(t(tec_cost))
               tbl <- tbl[apply(tbl != 0, 1, any), apply(tbl != 0, 2, any), drop = FALSE]
-              cat_bottomup_data_frame(tbl, 'Raw capacity data', zz)
+              energyRt:::.cat_bottomup_data_frame(tbl, 'Raw capacity data', zz)
             }
           }
         }  
@@ -595,7 +595,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
          cns <- dtt$constrain[[cc]]
           cat('\\subsection{', gsub('_', '\\\\_', 
              as.character(cns@name)), '}\n\n', '\n', sep = '', file = zz)
-          cat_bottomup(cns, file = zz)
+          energyRt:::.cat_bottomup(cns, file = zz)
           rd <- obj@modOut@data[[paste('eqCns', cns@name, sep = '')]]
           if (!is.null(rd)) {
             gr <- apply(rd, seq(length.out = length(dim(rd)))[(names(dimnames(rd)) 
@@ -619,7 +619,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             }
           }
           if (all(!(as.character(cns@type) %in% c('tax', 'subsidy'))))
-            cat_bottomup_data_frame(getConstrainResults(obj, as.character(cns@name))[[1]], 'Constrain data', zz)
+            energyRt:::.cat_bottomup_data_frame(getConstrainResults(obj, as.character(cns@name))[[1]], 'Constrain data', zz)
         }
       }
   cat('Supply\n')
@@ -652,7 +652,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                 gsub('_', '\\\\_', sup@commodity), 
                 ', summary for all region and slice.}\n', sep = '', file = zz)
             cat('\\end{figure}\n', sep = '', file = zz)
-            cat_bottomup_data_frame(sup_dt, paste('Supply ', gsub('_', '\\\\_', cc), 
+            energyRt:::.cat_bottomup_data_frame(sup_dt, paste('Supply ', gsub('_', '\\\\_', cc), 
             ', for commodity ', gsub('_', '\\\\_', sup@commodity), '.', sep = ''), zz)
             cat('\n\n Total reserve: ', format(sup@reserve, digits = 4), 
               ', total extract: ', sum(sup_out), '.\n\n', sep = '', file = zz)
@@ -721,7 +721,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               colnames(vv)[1] <- 'source'
               colnames(vv)[2] <- 'destination'
               colnames(vv)[5] <- 'value'
-              cat_bottomup_data_frame(vv, paste('Trade flow ', gsub('_', '\\\\_', nm), '.', sep = ''), zz)
+              energyRt:::.cat_bottomup_data_frame(vv, paste('Trade flow ', 
+                gsub('_', '\\\\_', nm), '.', sep = ''), zz)
           }
         }
       }

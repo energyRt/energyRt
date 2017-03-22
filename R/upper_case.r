@@ -1,9 +1,9 @@
-upper_case <- function(x) {
-  UseMethod("upper_case")
+.upper_case <- function(x) {
+  UseMethod(".upper_case")
 }
 
 # Upper case all set in 
-upper_case.technology <- function(tec) {
+.upper_case.technology <- function(tec) {
 #  tec@name <- toupper(tec@name)
 #  gg <- getClass('technology')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
@@ -17,7 +17,7 @@ upper_case.technology <- function(tec) {
 }
 
 # Upper case all set in 
-upper_case.trade <- function(trd) {
+.upper_case.trade <- function(trd) {
 #  trd@name <- toupper(trd@name)
 #  gg <- getClass('trade')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
@@ -31,7 +31,7 @@ upper_case.trade <- function(trd) {
 }
 
 # Upper case all set in 
-upper_case.commodity <- function(cmd) {
+.upper_case.commodity <- function(cmd) {
 #  cmd@name <- toupper(cmd@name)
 #  gg <- getClass('commodity')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
@@ -45,7 +45,7 @@ upper_case.commodity <- function(cmd) {
 }
 
 # Upper case all set in 
-upper_case.constrain <- function(cns) {
+.upper_case.constrain <- function(cns) {
 #  slc <- c('tech', 'sup', 'res', 'row', 'trade', 'region', 'comm', 'slice')
 #  cns@name <- toupper(cns@name)
 #  gg <- getClass('constrain')
@@ -64,7 +64,7 @@ upper_case.constrain <- function(cns) {
 }
 
 # Upper case all set in 
-upper_case.supply <- function(sup) {
+.upper_case.supply <- function(sup) {
 #  sup@name <- toupper(sup@name)
 #  gg <- getClass('supply')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
@@ -78,7 +78,7 @@ upper_case.supply <- function(sup) {
 }
 
 # Upper case all set in 
-upper_case.export <- function(exp) {
+.upper_case.export <- function(exp) {
 #  exp@name <- toupper(exp@name)
 #  gg <- getClass('export')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
@@ -92,7 +92,7 @@ upper_case.export <- function(exp) {
 }
 
 # Upper case all set in 
-upper_case.import <- function(imp) {
+.upper_case.import <- function(imp) {
 #  imp@name <- toupper(imp@name)
 #  gg <- getClass('import')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
@@ -105,7 +105,7 @@ upper_case.import <- function(imp) {
   imp
 }
 
-upper_case.demand <- function(dem) {
+.upper_case.demand <- function(dem) {
 #  dem@name <- toupper(dem@name)
 #  gg <- getClass('demand')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
@@ -118,16 +118,13 @@ upper_case.demand <- function(dem) {
   dem
 }
 
-upper_case.region <- function(reg) {
+.upper_case.region <- function(reg) {
 #  reg@name <- toupper(reg@name)
   reg
 }
 
-get_type <- function(x) {
-  tolower(sub('^.', '', class(x)))
-}
 
-chec_correct_name <- function(x) {
+.chec_correct_name <- function(x) {
   (
     length(x) != 1 || !is.character(x) || 
       sub('^[[:alpha:]][[:alnum:]_]*$', '', x) == ''

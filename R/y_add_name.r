@@ -1,8 +1,8 @@
 
 setMethod('add_name', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
-  cmd <- upper_case(app)
-  if (!chec_correct_name(cmd@name)) {
+  cmd <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(cmd@name)) {
     stop(paste('Incorrect commodity name "', cmd@name, '"', sep = ''))
   }
   if (isCommodity(obj, cmd@name)) {
@@ -21,8 +21,8 @@ setMethod('add_name', signature(obj = 'modInp', app = 'commodity',
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'demand',
   approxim = 'list'), function(obj, app, approxim) { 
-  dem <- upper_case(app)
-  if (!chec_correct_name(dem@name)) {
+  dem <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(dem@name)) {
     stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
   }
   if (isDemand(obj, dem@name)) {
@@ -47,8 +47,8 @@ setMethod('add_name', signature(obj = 'modInp', app = 'constrain',
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
-  sup <- upper_case(app)
-  if (!chec_correct_name(sup@name)) {
+  sup <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(sup@name)) {
     stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
   }
   if (isSupply(obj, sup@name)) {
@@ -65,8 +65,8 @@ setMethod('add_name', signature(obj = 'modInp', app = 'supply',
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
-  exp <- upper_case(app)
-  if (!chec_correct_name(exp@name)) {
+  exp <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(exp@name)) {
     stop(paste('Incorrect export name "', exp@name, '"', sep = ''))
   }
   if (isExport(obj, exp@name)) {
@@ -83,8 +83,8 @@ setMethod('add_name', signature(obj = 'modInp', app = 'export',
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
-  imp <- upper_case(app)
-  if (!chec_correct_name(imp@name)) {
+  imp <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(imp@name)) {
     stop(paste('Incorrect import name "', imp@name, '"', sep = ''))
   }
   if (isImport(obj, imp@name)) {
@@ -103,13 +103,13 @@ setMethod('add_name', signature(obj = 'modInp', app = 'import',
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'technology',
   approxim = 'list'), function(obj, app, approxim) {
-  tech <- upper_case(app)
+  tech <- energyRt:::.upper_case(app)
   # Temporary solution for immortality technology
   if (nrow(tech@olife) == 0) {
     tech@olife[1, ] <- NA;
     tech@olife[1, 'olife'] <- 1e3;
   }
-  if (!chec_correct_name(tech@name)) {
+  if (!energyRt:::.chec_correct_name(tech@name)) {
     stop(paste('Incorrect technology name "', tech@name, '"', sep = ''))
   }
   if (isTechnology(obj, tech@name)) {
@@ -126,8 +126,8 @@ setMethod('add_name', signature(obj = 'modInp', app = 'technology',
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) { 
-  trd <- upper_case(app)
-  if (!chec_correct_name(trd@name)) {
+  trd <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(trd@name)) {
     stop(paste('Incorrect trade name "', trd@name, '"', sep = ''))
   }
   if (isTrade(obj, trd@name)) {

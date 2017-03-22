@@ -18,12 +18,6 @@ setClass("repository",
       )),
       S3methods = TRUE
 );
-print.rTechnology <- function(x) print_repository(x, 'technology')
 
 
-
-# Get repository names
-get_repository_name <- function(x) {
-  sapply(x@data, function(z) z@name)
-}
 

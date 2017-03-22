@@ -1,6 +1,3 @@
-gams_set_alias <- array(c('t', 'c', 'g', 'r', 'y', 's'), dim = 6,
-      dimnames = list(c('technology', 'comm', 'group', 'region', 'year', 'slice')))
-
 # For fill constrain set
 create_set <- function(name, set = NULL, alias = NULL) {
   if (all(name != c('technology', 'supply', 'group', 'comm', 'region', 'year', 'slice')))
@@ -18,6 +15,8 @@ create_set <- function(name, set = NULL, alias = NULL) {
 }
 
 prepare.set <- function(x, level = NULL, prefix = '') {
+  gams_set_alias <- array(c('t', 'c', 'g', 'r', 'y', 's'), dim = 6,
+        dimnames = list(c('technology', 'comm', 'group', 'region', 'year', 'slice')))
   x$gams_alias <- tolower(paste(prefix, x$alias, sep = ''))
   if (gsub('[[:alpha:]][[:alnum:]_]*', '', x$gams_alias) != '' || x$gams_alias == '')
       stop('Incorrect gams alias names: "', x$gams_alias, '"')

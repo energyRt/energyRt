@@ -1,7 +1,7 @@
 
 summary.levcost <- function(x) x$total
 .sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
-  tech <- upper_case(obj)
+  tech <- energyRt:::.upper_case(obj)
   arg <- list(...)
   # prepare model
   reps <- new('repository')
@@ -53,7 +53,7 @@ summary.levcost <- function(x) x$total
     for(i in unique(tax$comm)) {
       txx <- newConstrain(paste('TAX', i, sep = ''), 'tax', comm = i, 
          rhs = tax[tax$comm == i, colnames(tax) != 'comm'])
-      reps <- add_to_repository(reps, txx);
+      reps <- add(reps, txx);
     }
   } 
   if (any(names(arg) == 'subs') && !is.null(arg$subs)) {
@@ -75,7 +75,7 @@ summary.levcost <- function(x) x$total
     for(i in unique(subs$comm)) {
       sbs <- newConstrain(paste('SUBS', i, sep = ''), 'subs', comm = i, 
          rhs = subs[subs$comm == i, colnames(subs) != 'comm'])
-      reps <- add_to_repository(reps, sbs);
+      reps <- add(reps, sbs);
     }
     arg <- arg[names(arg) != 'subs', drop = FALSE]
   }
@@ -165,13 +165,13 @@ summary.levcost <- function(x) x$total
   }
 
 
-  reps <- add_to_repository(reps, tech)
+  reps <- add(reps, tech)
   colnames(price)[colnames(price) == 'price'] <- 'cost'
   for(i in tech@input$comm) {
     tmpc <- new('commodity')
     tmpc@name <- i
     tmpc@limtype[] <- 'FX'
-    reps <- add_to_repository(reps, tmpc)
+    reps <- add(reps, tmpc)
     tmpm <- new('supply')
     tmpm@name <- paste('MIN', i, sep = '')
     tmpm@commodity <- i
@@ -179,7 +179,7 @@ summary.levcost <- function(x) x$total
        tmpm@availability[1:sum(price$comm == i), colnames(price)[colnames(price) != 'comm']] <-
            price[price$comm == i, colnames(price)[colnames(price) != 'comm']]
     }
-    reps <- add_to_repository(reps, tmpm)
+    reps <- add(reps, tmpm)
   }
   for(i in tech@output$comm) {
     tmpc <- new('commodity')
@@ -189,14 +189,14 @@ summary.levcost <- function(x) x$total
     } else {
       tmpc@limtype[] <- 'LO'
     }
-    reps <- add_to_repository(reps, tmpc)
+    reps <- add(reps, tmpc)
   }
   acommin_sup <- tech@aeff[apply(!is.na(tech@aeff[, grep('ainp', colnames(tech@aeff))]), 1, any), 'acomm']
   for(i in tech@aux$acomm) {
     tmpc <- new('commodity')
     tmpc@name <- i
     tmpc@limtype[] <- 'LO'
-    reps <- add_to_repository(reps, tmpc)
+    reps <- add(reps, tmpc)
      #if (any(names(arg) == 'subs') && !is.null(arg$subs) && any(subs$comm == i)) 
      if (any(acommin_sup == i)) { 
         tmpm <- new('supply')
@@ -206,7 +206,7 @@ summary.levcost <- function(x) x$total
            tmpm@availability[1:sum(price$comm == i), colnames(price)[colnames(price) != 'comm']] <-
                price[price$comm == i, colnames(price)[colnames(price) != 'comm']]
         }
-        reps <- add_to_repository(reps, tmpm)
+        reps <- add(reps, tmpm)
       }
   }  
  # browser()
@@ -217,12 +217,12 @@ summary.levcost <- function(x) x$total
     tmpd@commodity <- comm
     tmpd@dem[1, 'dem'] <- 1
     tmpd@dem[1, 'region'] <- region
-    reps <- add_to_repository(reps, tmpd)
+    reps <- add(reps, tmpd)
   }
   mdl <- new('model')
   mdl@name <- paste('Levelized cost technology', tech@name) 
   mdl@LECdata$region <- region
-  mdl <- add_to_model(mdl, reps)
+  mdl <-add(mdl, reps)
   mdl@sysInfo@region <- region
   mdl@sysInfo@year   <- year
   mdl@sysInfo@slice  <- slice
@@ -368,7 +368,13 @@ summary.levcost <- function(x) x$total
 #' @example 
 #'  
 #' 
-sm_levcost_scenario <- function(obj, commodity) {
+
+setMethod('levcost', signature(obj = 'repository'), function(obj, ...) {
+  if (all(names(list(...)) != 'comm')) stop('Undefined comm for levcost with signature "model", "commodity"')
+  lapply(getObjects(obj, class = 'technology', output = list(comm = list(...)$comm)), 
+      function(x) energyRt:::.sm_levcost(x, ...))})
+setMethod('levcost', signature(obj = 'technology'), energyRt:::.sm_levcost)
+setMethod('levcost', signature(obj = 'scenario'), function(obj, commodity) {
   if (is.null(commodity) || length(commodity) != 1) stop('levcost: wrong commodity')
   if (any(obj@modInp@parameters$mDemComm@data$comm != commodity) &&
     any(obj@modOut@data$vDemInp[dimnames(obj@modOut@data$vDemInp)$comm != commodity,,,] != 0)) 
@@ -382,12 +388,5 @@ sm_levcost_scenario <- function(obj, commodity) {
     tapply(gg$value, gg[, c('region', 'year')], sum)
     * apply(obj@modOut@data$vDemInp[commodity,,,, drop  = FALSE], 2:3, sum)
   ))
-}
-
-setMethod('levcost', signature(obj = 'repository'), function(obj, ...) {
-  if (all(names(list(...)) != 'comm')) stop('Undefined comm for levcost with signature "model", "commodity"')
-  lapply(getObjects(obj, class = 'technology', output = list(comm = list(...)$comm)), 
-      function(x) energyRt:::.sm_levcost(x, ...))})
-setMethod('levcost', signature(obj = 'technology'), energyRt:::.sm_levcost)
-setMethod('levcost', signature(obj = 'scenario'), sm_levcost_scenario)
+})
 

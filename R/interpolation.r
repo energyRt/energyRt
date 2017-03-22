@@ -168,12 +168,3 @@ setMethod("interpolation_bound", signature(obj = 'data.frame',
   rbind(dd, zz)
 })
 
-
-setMethod("comb_interpolation", signature(obj = 'data.frame', 
-  parameter = 'character'), function(obj, parameter, ...) {
-  f1 <- any(colnames(obj) == parameter)
-  f2 <- all(paste(parameter, c('.lo', '.fx', '.up'), sep = '') %in% colnames(obj))
-  stopifnot(f1 != f2 && (f1 || f2))
-  if (f1) interpolation(obj, parameter, ...) else 
-    interpolation_bound(obj, parameter, ...)
-})

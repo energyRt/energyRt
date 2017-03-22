@@ -43,7 +43,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
                  'year', 'yearp', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')
-  if (!is.character(name) || length(name) != 1 || !chec_correct_name(name)) 
+  if (!is.character(name) || length(name) != 1 || !energyRt:::.chec_correct_name(name)) 
     stop(paste('Wrong name: "', name, '"', sep = ''))
   if (length(dimSetNames) == 0 || any(!is.character(dimSetNames)) || 
     any(!(dimSetNames %in% acceptable_set))) {
@@ -205,8 +205,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 })
 
 # Generate GAMS code, return character == GAMS code 
-setMethod('toGams', signature(obj = 'parameter'),
-  function(obj) {
+.toGams <- function(obj) {
     if (obj@nValues != -1) {
         obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
       }
@@ -266,7 +265,7 @@ setMethod('toGams', signature(obj = 'parameter'),
       }
     } else stop('Must realise')
     ret
-})
+}
 
 # Check duplicated row in data
 setMethod('checkDuplicatedRow', signature(obj = 'parameter'),
@@ -323,7 +322,7 @@ setMethod('print', 'parameter', function(x, ...) {
   }
 })
 
-sm_to_glpk <-  function(obj) {
+.sm_to_glpk <-  function(obj) {
   if (obj@nValues != -1) {
     obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
   }

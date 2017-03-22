@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------------------------------------------
 #! check_technology_data_frame <- function(x) : Check structure technology class (only data.frame)
 #---------------------------------------------------------------------------------------------------------
-check_technology_data_frame <- function(object) {
+.check_technology_data_frame <- function(object) {
 # check technology data.frame
   g <- getClass('technology')
   tec <- new('technology')

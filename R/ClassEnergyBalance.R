@@ -63,7 +63,6 @@ setClass("energyBalance",
             misc = list(
               GUID = "54c3233e-6931-4d9c-8fd2-e64e18dee506"
             )),
-            #validity = check_technology_data_frame,
             S3methods = TRUE
 );
 

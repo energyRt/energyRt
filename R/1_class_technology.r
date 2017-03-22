@@ -175,6 +175,6 @@ setClass("technology",
         misc = list(
           GUID = "fdaa0d09-9524-405d-b2d8-b6cc1d1ca032"
         )),
-      validity = check_technology_data_frame,
+      validity = .check_technology_data_frame,
       S3methods = TRUE
 )

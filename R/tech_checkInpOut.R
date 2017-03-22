@@ -1,6 +1,4 @@
 #---------------------------------------------------------------------------------------------------------
-#! set_commodity_type <- function(tech) : Fill table commodity_type and check for conflict type definition
-#---------------------------------------------------------------------------------------------------------
 # Fill table commodity_type and check for conflict type definition
 checkInpOut <- function(tech) {
   ctype <- data.frame(type      = factor(NULL, c('input', 'output', 'aux')),
@@ -304,40 +302,4 @@ checkInpOut <- function(tech) {
 #  commodity_type
 #}
 #
-#get_input_group <- function(tech) {
-#  #tech@group$group[!is.na(tech@group$ginp2use) | !is.na(tech@group$ginpcap)]
-#  zz <- unique(tech@input$group, na.rm = TRUE)
-#  if (all(is.na(zz))) NULL else zz
-#}
-#
-#capacity_group <- function(tech) {
-#  tech@geff$group[!is.na(tech@geff$ginpcap) | !is.na(tech@geff$goutcap)]
-#}
-#
-#get_output_group <- function(tech) {
-#  #tech@group$group[!is.na(tech@group$use2gout) | !is.na(tech@group$goutcap)]
-#  zz <- unique(tech@output$group, na.rm = TRUE)
-#  if (all(is.na(zz))) NULL else zz
-#}
-#
-#set_group_type <- function(tech) {
-#    g_type      = data.frame(#region     = character(),
-#                              group     = character(),
-#                              input     = logical(),
-#                              output    = logical(),
-#                              type      = factor(NULL, c('cap', 'act')),
-#                              stringsAsFactors = FALSE)
-#    grp <- unique(get_input_group(tech), get_output_group(tech))
-#    if (length(grp) == 0) {
-#      g_type
-#    } else {
-#      g_type[1:length(grp), 'group'] <- grp
-#      g_type[, c('input', 'output')] <- FALSE
-#      g_type[grp %in% get_input_group(tech), 'input'] <- TRUE
-#      g_type[grp %in% get_output_group(tech), 'output'] <- TRUE
-#      g_type[, 'type'] <- 'act'
-#      g_type[grp %in% capacity_group(tech), 'type'] <- 'cap'
-#      g_type
-#    }
-#}
 

@@ -4,7 +4,8 @@
 # if (!isClassUnion('repository')) setClassUnion("repository")
 # Add in repository
 
-add_to_repository <- function(obj, app, ..., overwrite = FALSE) {
+
+add.repository <- function(obj, app, ..., overwrite = FALSE) {
   if (length(list(...)) != 0)  {
     obj <- add(obj, app, overwrite = overwrite)
     arg <- list(...)
@@ -31,5 +32,3 @@ add_to_repository <- function(obj, app, ..., overwrite = FALSE) {
   }
   obj
 }
-
-add.repository <- add_to_repository

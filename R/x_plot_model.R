@@ -5,7 +5,7 @@
 #--------------------------------------------------------------------------------------------
 # plot supply
 #--------------------------------------------------------------------------------------------
-plot_supply <- function(obj, commodity, region = NULL, supply = NULL, 
+.plot_supply <- function(obj, commodity, region = NULL, supply = NULL, 
            year = NULL, slice = NULL, inf.col = 'red', ylim = NULL, xlab = '', 
            ylab = '', main = NULL, xlim = NULL, ylim2 = NULL,
            col = 'gray', lwd = 2, density = 20, border = 'black', ylim_min = NULL, ...) {
@@ -98,7 +98,7 @@ plot_supply <- function(obj, commodity, region = NULL, supply = NULL,
 #--------------------------------------------------------------------------------------------
 # plot export
 #--------------------------------------------------------------------------------------------
-plot_export <- function(obj, commodity, region = NULL, export = NULL, 
+.plot_export <- function(obj, commodity, region = NULL, export = NULL, 
            year = NULL, slice = NULL, inf.col = 'red', ylim = NULL, xlab = '', 
            ylab = '', main = NULL, xlim = NULL, ylim2 = NULL,
            col = 'gray', lwd = 2, density = 20, border = 'black', ...) {
@@ -191,7 +191,7 @@ plot_export <- function(obj, commodity, region = NULL, export = NULL,
 #--------------------------------------------------------------------------------------------
 # plot import
 #--------------------------------------------------------------------------------------------
-plot_import <- function(obj, commodity, region = NULL, import = NULL, 
+.plot_import <- function(obj, commodity, region = NULL, import = NULL, 
            year = NULL, slice = NULL, inf.col = 'red', ylim = NULL, xlab = '', 
            ylab = '', main = NULL, xlim = NULL, ylim2 = NULL,
            col = 'gray', lwd = 2, density = 20, border = 'black', ...) {
@@ -284,7 +284,7 @@ plot_import <- function(obj, commodity, region = NULL, import = NULL,
 #--------------------------------------------------------------------------------------------
 # plot demand
 #--------------------------------------------------------------------------------------------
-plot_demand <- function(obj, commodity, region = NULL, demand = NULL,
+.plot_demand <- function(obj, commodity, region = NULL, demand = NULL,
            year = NULL, slice = NULL, ylim = NULL, xlab = '', 
            ylab = '', main = NULL, xlim = NULL,
            col = 'gray', lwd = 2, ...) {
@@ -344,17 +344,17 @@ plot_demand <- function(obj, commodity, region = NULL, demand = NULL,
 # plot model
 #--------------------------------------------------------------------------------------------
 plot.model <- function(obj, type, ...) {
-  if (type == 'supply')  plot_supply(obj, ...) else
-  if (type == 'demand')  plot_demand(obj, ...) else
-  if (type == 'export')  plot_export(obj, ...) else
-  if (type == 'import')  plot_import(obj, ...) else
+  if (type == 'supply')  energyRt:::.plot_supply(obj, ...) else
+  if (type == 'demand')  energyRt:::.plot_demand(obj, ...) else
+  if (type == 'export')  energyRt:::.plot_export(obj, ...) else
+  if (type == 'import')  energyRt:::.plot_import(obj, ...) else
   stop('Unknown plot type ', type)
 }
 
 #--------------------------------------------------------------------------------------------
 # plot universal
 #--------------------------------------------------------------------------------------------
-plot_universal <- function(obj, discount = .1, region = NULL, year = 2000:2050, 
+.plot_universal <- function(obj, discount = .1, region = NULL, year = 2000:2050, 
   slice = 'ANNUAL', ...) {
   mdl <- new('model')
   reps <- new('repository')      
@@ -392,10 +392,10 @@ plot_universal <- function(obj, discount = .1, region = NULL, year = 2000:2050,
   plot(mdl, type = class(obj), commodity = obj@commodity, ...)
 }
 
-plot.demand <- plot_universal
-plot.supply <- plot_universal
-plot.export <- plot_universal
-plot.import <- plot_universal
+plot.demand <- energyRt:::.plot_universal
+plot.supply <- energyRt:::.plot_universal
+plot.export <- energyRt:::.plot_universal
+plot.import <- energyRt:::.plot_universal
 
 #plot.supply <- function(obj, discount = .1, region = NULL, year = 2000:2050, 
 #  slice = 'ANNUAL', ...) {

@@ -81,7 +81,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
         cat('\\section{Commodity}\n\n', '\n', sep = '', file = zz)
         for(cc in names(dtt$commodity)) {
           cmd <- dtt$commodity[[cc]]
-          fl <- is_additional_information(cmd)
+          fl <- energyRt:::.is_additional_information(cmd)
           png2(paste(cmd@name, '_supply.png', sep = ''))
           SP <- plot(obj, type = 'supply', commodity = cmd@name, main = '')
           fl <- fl || any(SP != 0)
@@ -102,7 +102,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           fl <- fl || any(emm)
           if (fl) {
             cat('\\subsection{', gsub('_', '\\\\_', cmd@name), '}\n\n', '\n', sep = '', file = zz) 
-            cat_bottomup(cmd, file = zz, includename = FALSE)#, print.all = TRUE)
+            energyRt:::.cat_bottomup(cmd, file = zz, includename = FALSE)#, print.all = TRUE)
             if (any(SP != 0)) {
               cat('\\begin{figure}[H]\n', sep = '', file = zz)
               cat('  \\centering\n', sep = '', file = zz)
@@ -143,7 +143,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
               s1 <- data.frame(Commodity = names(dtt$commodity)[emm])
               s1$Emission <- sapply(dtt$commodity[emm], function(x) 
                 x@emis[!is.na(x@emis$comm) & x@emis$comm == cmd@name, 'mean'])
-              cat_bottomup_data_frame(s1, paste('Commodity ', cmd@name, 
+              energyRt:::.cat_bottomup_data_frame(s1, paste('Commodity ', cmd@name, 
                                                 ' emmited by', sep = ''), zz)
             }
             cat('\n\n', '\n', sep = '', file = zz) 
@@ -166,7 +166,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           SP <- plot(obj, type = 'supply', commodity = sup@commodity, supply = sup@name, main = '')
           dev.off2()
           cat('\\subsection{', gsub('_', '\\\\_', sup@name), '}\n\n', '\n', sep = '', file = zz) 
-          cat_bottomup(sup, file = zz, includename = FALSE)#, print.all = TRUE)
+          energyRt:::.cat_bottomup(sup, file = zz, includename = FALSE)#, print.all = TRUE)
           if (any(SP != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
@@ -191,7 +191,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           SP <- plot(obj, type = 'export', commodity = expp@commodity, export = expp@name, main = '')
           dev.off2()
           cat('\\subsection{', gsub('_', '\\\\_', expp@name), '}\n\n', '\n', sep = '', file = zz) 
-          cat_bottomup(expp, file = zz, includename = FALSE)#, print.all = TRUE)
+          energyRt:::.cat_bottomup(expp, file = zz, includename = FALSE)#, print.all = TRUE)
           if (any(SP != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
@@ -216,7 +216,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           SP <- plot(obj, type = 'import', commodity = imp@commodity, import = imp@name, main = '')
           dev.off2()
           cat('\\subsection{', gsub('_', '\\\\_', imp@name), '}\n\n', '\n', sep = '', file = zz) 
-          cat_bottomup(imp, file = zz, includename = FALSE)#, print.all = TRUE)
+          energyRt:::.cat_bottomup(imp, file = zz, includename = FALSE)#, print.all = TRUE)
           if (any(SP != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
@@ -241,7 +241,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
 #          SP <- plot(obj, type = 'trade', commodity = trdd@commodity, trade = trdd@name, main = '')
 #          dev.off2()
           cat('\\subsection{', gsub('_', '\\\\_', trdd@name), '}\n\n', '\n', sep = '', file = zz)
-          cat_bottomup(trdd, file = zz, includename = FALSE)#, print.all = TRUE)
+          energyRt:::.cat_bottomup(trdd, file = zz, includename = FALSE)#, print.all = TRUE)
 #          if (any(SP != 0)) {
 #            cat('\\begin{figure}[H]\n', sep = '', file = zz)
 #            cat('  \\centering\n', sep = '', file = zz)
@@ -266,7 +266,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           DM <- plot(obj, type = 'demand', commodity = dem@commodity, demand = dem@name, main = '')
           dev.off2()
           cat('\\subsection{', gsub('_', '\\\\_', dem@name), '}\n\n', '\n', sep = '', file = zz) 
-          cat_bottomup(dem, file = zz, includename = FALSE)#, print.all = TRUE)
+          energyRt:::.cat_bottomup(dem, file = zz, includename = FALSE)#, print.all = TRUE)
           if (any(DM != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
@@ -292,7 +292,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           draw(tec, year = obj@sysInfo@year[1], slice = obj@sysInfo@slice[1])
           dev.off2()
           cat('\\subsection{', gsub('_', '\\\\_', tec@name), '}\n\n', '\n', sep = '', file = zz) 
-          cat_bottomup(tec, file = zz, includename = FALSE)#, print.all = TRUE)
+          energyRt:::.cat_bottomup(tec, file = zz, includename = FALSE)#, print.all = TRUE)
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
           cat('  \\centering\n', sep = '', file = zz)
           cat('  \\includegraphics[width = 8in]{technology_', 

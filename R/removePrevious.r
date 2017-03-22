@@ -14,17 +14,15 @@ setMethod('removePreviousCommodity',
 # Get commodity name
 ################################################################################
 
-sm_isCommodity_modInp_character <- function(obj, name) {
+setMethod('isCommodity', signature(obj = 'modInp', name = 'character'), 
+  function(obj, name) {
   fl <- FALSE
   for(i in c('comm', 'mUpComm', 'mLoComm', 'mFxComm'))
       fl <- fl || any(obj@parameters[[i]]@data$comm == name, na.rm = TRUE)
   for(i in c('pEmissionFactor')) # 'ems_from', 
       fl <- fl || any(obj@parameters[[i]]@data$commp == name, na.rm = TRUE)
   fl
-}
-
-setMethod('isCommodity', signature(obj = 'modInp', name = 'character'), 
-  sm_isCommodity_modInp_character)
+})
 
 ################################################################################
 # Remove previous demand

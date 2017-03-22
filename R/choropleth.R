@@ -140,7 +140,7 @@ arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
     dat[,i] <- as.factor(dat[,i])
   }
   # Aggregate data
-  dat <- agg_srcdst(dat, FUN = FUN)
+  dat <- energyRt:::.agg_srcdst(dat, FUN = FUN)
   # Coerce to character for merging
   nm2 <- names(dat)
   ff <- sapply(dat, is.factor)
@@ -202,7 +202,7 @@ agg_region <- function(dat, by = list(dat$region), FUN = "sum",
   return(dat)
 }
 
-agg_srcdst <- function(dat, by = list(dat$src, dat$dst), FUN = "sum",
+.agg_srcdst <- function(dat, by = list(dat$src, dat$dst), FUN = "sum",
                        names = c("src", "dst", "value")) {
   dat <- aggregate(dat$value, by = by, FUN = FUN)
   names(dat) <- names

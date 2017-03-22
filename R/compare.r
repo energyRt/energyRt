@@ -157,6 +157,5 @@ compare <- function(obj1, obj2, just_name = FALSE) {
 #    #if_print_one(a,b,'description')
 #    if_print_one(a,b,'cap2act')
 #    #if_print_vector(a,b,'region')
-#    for(i in technology_data_frame()) if_print_data_frame(a,b,i)
 #}
 #
