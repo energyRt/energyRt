@@ -40,7 +40,7 @@ getData0 <- function(obj, set, parameter = NULL, variable = NULL,
   if (any(names(set) %in% psb_set2)) {
     ii <- names(set)[names(set) %in% psb_set2]; i2 <- gsub('[_]$', '', ii); names(i2) <- ii;
     for(i in ii) {
-      xx <- grep(set[[i]], src_set[[i2[i]]], value = TRUE)
+      xx <- unique(c(lapply(set[[i]], function(x) grep(x, src_set[[i2[i]]], value = TRUE)), recursive = TRUE))
       if (length(xx) > 0) set[[i2[i]]] <- c(set[[i2[i]]], xx)
     }
     set <- set[!(names(set) %in% ii)]
