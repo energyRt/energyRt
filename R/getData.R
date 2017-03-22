@@ -23,7 +23,7 @@
 #' @param drop # add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'
  
 
-getData0 <- function(obj, set, parameter = NULL, variable = NULL, 
+energyRt.getData0 <- function(obj, set, parameter = NULL, variable = NULL, 
                      get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
                      stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL, 
@@ -204,7 +204,7 @@ getData0 <- function(obj, set, parameter = NULL, variable = NULL,
   res
 }
  
-getData1 <- function(arg, set, parameter = NULL, variable = NULL, 
+energyRt.getData1 <- function(arg, set, parameter = NULL, variable = NULL, 
                      get.parameter = NULL, get.variable = NULL, merge = FALSE,
                      zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
                      stringsAsFactors = TRUE, yearsAsFactors = FALSE, scenario.name = NULL, name = NULL, 
@@ -257,7 +257,7 @@ getData1 <- function(arg, set, parameter = NULL, variable = NULL,
       stop(paste('There is unknown name: "', paste(ff, collapse = '", "'), '"', sep = ''))
     }
   }
-  getData0(obj, set = set, parameter = parameter, variable = variable, get.parameter = get.parameter, 
+  energyRt.getData0(obj, set = set, parameter = parameter, variable = variable, get.parameter = get.parameter, 
            get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
            table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
            yearsAsFactors = yearsAsFactors, scenario.name = scenario.name, 
@@ -304,7 +304,7 @@ getData <- function(..., parameter = NULL, variable = NULL,
       names(set) <- paste(names(set), '_', sep = '')
     }
   } 
-  getData1(arg = arg, set = set, name = name, parameter = parameter, variable = variable, 
+  energyRt.getData1(arg = arg, set = set, name = name, parameter = parameter, variable = variable, 
            get.parameter = get.parameter, 
            get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
            table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
