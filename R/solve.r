@@ -1,5 +1,5 @@
 
-sm_compile_model <- function(obj, 
+.sm_compile_model <- function(obj, 
    tmp.dir = NULL, tmp.del = FALSE, ...) {
 #####################################################################################
 # Argument data prepare
@@ -762,12 +762,12 @@ LL1 <- proc.time()[3]
    scn
 }
 
-#setMethod('solve', signature(obj = 'model'), sm_compile_model)
+#setMethod('solve', signature(obj = 'model'), energyRt:::.sm_compile_model)
 solve.model <- function(obj, ...) {
   if (all(names(list(...)) != 'name')) {
     warning('Scenario name is not specified, using "DEFAULT" name')
-    sm_compile_model(obj, name = 'DEFAULT', ...)
-  } else sm_compile_model(obj, ...)
+    energyRt:::.sm_compile_model(obj, name = 'DEFAULT', ...)
+  } else energyRt:::.sm_compile_model(obj, ...)
 }
 
 

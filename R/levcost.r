@@ -1,6 +1,6 @@
 
 summary.levcost <- function(x) x$total
-sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
+.sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
   tech <- upper_case(obj)
   arg <- list(...)
   # prepare model
@@ -384,6 +384,10 @@ sm_levcost_scenario <- function(obj, commodity) {
   ))
 }
 
-setMethod('levcost', signature(obj = 'technology'), sm_levcost)
+setMethod('levcost', signature(obj = 'repository'), function(obj, ...) {
+  if (all(names(list(...)) != 'comm')) stop('Undefined comm for levcost with signature "model", "commodity"')
+  lapply(getObjects(obj, class = 'technology', output = list(comm = list(...)$comm)), 
+      function(x) energyRt:::.sm_levcost(x, ...))})
+setMethod('levcost', signature(obj = 'technology'), energyRt:::.sm_levcost)
 setMethod('levcost', signature(obj = 'scenario'), sm_levcost_scenario)
 
