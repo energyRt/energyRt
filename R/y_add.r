@@ -635,7 +635,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   }
   dend <- dend[!is.na(dend$year),, drop = FALSE]
   for(rr in dend$region) {
-    if (any(dd$year >= dend[rr, 'year'])) dd[dd$region == rr & dd$year >= dend[rr, 'year'], 'enable'] <- FALSE
+    if (any(dd$year > dend[rr, 'year'])) dd[dd$region == rr & dd$year > dend[rr, 'year'], 'enable'] <- FALSE
   }  
   dd <- dd[dd$enable, -1, drop = FALSE]
   obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd)
