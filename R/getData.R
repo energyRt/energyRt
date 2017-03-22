@@ -275,11 +275,11 @@ getData <- function(..., parameter = NULL, variable = NULL,
   if (any(names(arg) == 'get.variables')) get.variable <- arg$get.variables
   if (any(names(arg) == 'get.parameters')) get.parameter <- arg$get.parameters
   arg <- arg[!(names(arg) %in% c('get.parameters', 'parameters', 'variables', 'get.variables'))]
-  if (any(names(arg) == 'scenario' && is.list(arg$scenario))) {
-    fl <- seq(along = arg)[names(arg) == 'scenario']
-    for(i in seq(length.out = arg$scenario))
-      arg[[length(arg) + 1]] <- arg$scenario[[i]]
-    arg <- arg[-fl]
+  if (any(names(arg) == 'scen' && is.list(arg$scen))) {
+    scen <- arg$scen
+    arg <- arg[names(arg) != 'scen']
+    for(i in seq(along = scen))
+      arg[[length(arg) + 1]] <- scen[[i]]
   }
   set <- arg[names(arg) %in% c(psb_set, paste(psb_set, '_', sep = ''))]      
   arg <- arg[!(names(arg) %in% names(set))]
