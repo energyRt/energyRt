@@ -1,4 +1,4 @@
-energyRt.getUniversalNames <- function(obj, cls, regex = NULL, ignore.case = FALSE, 
+.getUniversalNames <- function(obj, cls, regex = NULL, ignore.case = FALSE, 
   fixed = FALSE, useBytes = FALSE, invert = FALSE, ...) {
   if (is.null(regex)) {
     grep2 <- function(x, y, FL) {
@@ -188,19 +188,19 @@ energyRt.getUniversalNames <- function(obj, cls, regex = NULL, ignore.case = FAL
 
 
 getNames <- function(obj, class = c(), regex = NULL, ...) {
-  names(energyRt.getUniversalNames(obj, cls = class, regex = regex, ...))
+  names(energyRt:::.getUniversalNames(obj, cls = class, regex = regex, ...))
 }
 getNames_ <- function(obj, class = c(), ...) {
-  names(energyRt.getUniversalNames(obj, cls = class, regex = TRUE, ...))
+  names(energyRt:::.getUniversalNames(obj, cls = class, regex = TRUE, ...))
 }
 
 
 getObjects <- function(obj, class = c(), regex = NULL, ...) {   
-  energyRt.getUniversalNames(obj, cls = class, regex = regex, ...)
+  energyRt:::.getUniversalNames(obj, cls = class, regex = regex, ...)
 }
 
 getObjects_ <- function(obj, class = c(), ...) {   
-  energyRt.getUniversalNames(obj, cls = class, regex = TRUE, ...)
+  energyRt:::.getUniversalNames(obj, cls = class, regex = TRUE, ...)
 }
 
 
