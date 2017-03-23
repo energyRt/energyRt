@@ -31,14 +31,15 @@ setClass('parameter', # @parameter
     nValues     = 0,
       #! Misc
       misc = list(
-        GUID = "8732f62e-0f23-4853-878b-ec8a5cbd5224"
+        GUID = "8732f62e-0f23-4853-878b-ec8a5cbd5224",
+        class = NULL
       ))#,
 #  validity          = function(object) object@check(object)
 );
 
 setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type, 
       check = NULL, defVal = 0, interpolation = 'back.inter.forth', 
-      colName = ''
+      colName = '', cls = NULL
   ) {
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
@@ -71,6 +72,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   if (!is.null(check)) .Object@check <- check
   .Object@defVal       <- defVal
   .Object@interpolation <- interpolation
+  .Object@misc$class <- cls
   # Create data
   data <- data.frame(tech = character(), techp = character(), sup = character(), dem = character(), 
       acomm = character(), comm = character(), commp = character(), group = character(),  
