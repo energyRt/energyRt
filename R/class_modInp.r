@@ -84,11 +84,11 @@ setMethod("initialize", "modInp",
     # Tax
     .Object@parameters[['pTaxCost']] <- 
         createParameter('pTaxCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'inter.forth', colName = 'tax', cls = 'sysInfo')    
+        defVal = 0, interpolation = 'inter.forth', colName = 'tax', cls = 'constrain')    
     # Subs
     .Object@parameters[['pSubsCost']] <- 
         createParameter('pSubsCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'inter.forth', colName = 'subs', cls = 'sysInfo')    
+        defVal = 0, interpolation = 'inter.forth', colName = 'subs', cls = 'constrain')    
   # Supply
     # Map
     .Object@parameters[['mSupComm']] <- 
@@ -125,7 +125,7 @@ setMethod("initialize", "modInp",
     # simple & multi
     .Object@parameters[['pTechCap2act']] <- 
         createParameter('pTechCap2act', 'tech', 'simple', 
-        defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2cat')    
+        defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2cat', slot = 'cap2act')    
     .Object@parameters[['pTechEmisComm']] <- createParameter('pTechEmisComm', c('tech', 'comm'), 'simple', 
                                                              defVal = 1, cls = 'technology', colName = 'combustion')    
     .Object@parameters[['pTechOlife']] <- 
@@ -274,9 +274,9 @@ setMethod("initialize", "modInp",
           c('imp', 'region', 'year', 'slice'), 'multi', 
             defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'import', colName = c('imp.lo', 'imp.up'))
     .Object@parameters[['pExportRowRes']] <- createParameter('pExportRowRes', 
-          'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'export', colName = 'reserve')
+          'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'export', slot = 'reserve', colName = 'reserve')
     .Object@parameters[['pImportRowRes']] <- createParameter('pImportRowRes', 
-          'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'import', colName = 'reserve')
+          'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'import', slot = 'reserve', colName = 'reserve')
   # For LEC
   .Object@parameters[['mLECRegion']] <- createParameter('mLECRegion', 'region', 'map')    
   .Object@parameters[['pLECLoACT']] <- 
