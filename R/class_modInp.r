@@ -61,167 +61,159 @@ setMethod("initialize", "modInp",
     # simple
     .Object@parameters[['pEmissionFactor']] <- 
         createParameter('pEmissionFactor', c('comm', 'commp'), 'simple',  #PPP
-        defVal = 0, interpolation = 'back.inter.forth')    
+        defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', colName = 'mean', slot = 'emis')    
     .Object@parameters[['pAggregateFactor']] <- 
         createParameter('pAggregateFactor', c('comm', 'commp'), 'simple', #PPP
-        defVal = 0, interpolation = 'back.inter.forth')    
+        defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', colName = 'mean', slot = 'agg')    
   # Other commodity attribute
     # Demand
     # Map
     .Object@parameters[['mDemComm']] <- 
-        createParameter('mDemComm', c('dem', 'comm'), 'map')    
+        createParameter('mDemComm', c('dem', 'comm'), 'map', cls = 'demand')    
     .Object@parameters[['pDemand']] <- 
         createParameter('pDemand', c('dem', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'back.inter.forth', colName = 'dem')
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'dem', cls = 'demand')
     # Dummy import
     .Object@parameters[['pDummyImportCost']] <- 
         createParameter('pDummyImportCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyImport')    
+        defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyImport', cls = 'sysInfo')    
     # Dummy export
     .Object@parameters[['pDummyExportCost']] <- 
         createParameter('pDummyExportCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyExport')    
+        defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyExport', cls = 'sysInfo')    
     # Tax
     .Object@parameters[['pTaxCost']] <- 
         createParameter('pTaxCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'inter.forth', colName = 'tax')    
+        defVal = 0, interpolation = 'inter.forth', colName = 'tax', cls = 'sysInfo')    
     # Subs
     .Object@parameters[['pSubsCost']] <- 
         createParameter('pSubsCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'inter.forth', colName = 'subs')    
+        defVal = 0, interpolation = 'inter.forth', colName = 'subs', cls = 'sysInfo')    
   # Supply
     # Map
     .Object@parameters[['mSupComm']] <- 
-        createParameter('mSupComm', c('sup', 'comm'), 'map')    
+        createParameter('mSupComm', c('sup', 'comm'), 'map', cls = 'supply')    
     .Object@parameters[['mSupSpan']] <- 
         createParameter('mSupSpan', c('sup', 'region'), 'map')    
     # simple
     .Object@parameters[['pSupCost']] <- 
         createParameter('pSupCost', c('sup', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'back.inter.forth', colName = 'cost')    
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'cost', cls = 'supply')    
     .Object@parameters[['pSupReserve']] <- 
         createParameter('pSupReserve', c('sup'), 'simple', 
-        defVal = Inf, interpolation = 'back.inter.forth')    
+        defVal = Inf, interpolation = 'back.inter.forth', cls = 'supply', slot = 'reserve', colName = 'reserve')    
     # multi
     .Object@parameters[['pSupAva']] <- 
         createParameter('pSupAva', c('sup', 'region', 'year', 'slice'), 'multi', 
         defVal = c(0, Inf), interpolation = 'back.inter.forth', 
-          colName = c('ava.lo', 'ava.up'))    
+          colName = c('ava.lo', 'ava.up'), cls = 'supply')    
   # Technology
     # Map
     for(i in c('mTechInpComm', 'mTechOutComm', 'mTechOneComm', 
       'mTechEmitedComm', 'mTechAInp', 'mTechAOut'))
-        .Object@parameters[[i]] <- createParameter(i, c('tech', 'comm'), 'map')    
-#    for(i in c('mTechCinpAInp', 'mTechCoutAInp', 'mTechCinpAOut', 'mTechCoutAOut'))
-#        .Object@parameters[[i]] <- createParameter(i, c('tech', 'comm', 'commp'), 'map')    
+        .Object@parameters[[i]] <- createParameter(i, c('tech', 'comm'), 'map', cls = 'technology')    
     for(i in c('mTechInpGroup', 'mTechOutGroup'))
-        .Object@parameters[[i]] <- createParameter(i, c('tech', 'group'), 'map')    
+        .Object@parameters[[i]] <- createParameter(i, c('tech', 'group'), 'map', cls = 'technology')    
     .Object@parameters[['mTechGroupComm']] <- createParameter('mTechGroupComm', 
-        c('tech', 'group', 'comm'), 'map')    
-#    .Object@parameters[['mTechStartYear']] <- createParameter('mTechStartYear', 
-#        c('tech', 'region', 'year'), 'map')    
-#    .Object@parameters[['mTechEndYear']] <- createParameter('mTechEndYear', 
-#        c('tech', 'region', 'year'), 'map')    
+        c('tech', 'group', 'comm'), 'map', cls = 'technology')    
     .Object@parameters[['mTechUpgrade']] <- createParameter('mTechUpgrade', 
-        c('tech', 'techp'), 'map')    
-    .Object@parameters[['mTechRetirement']] <- createParameter('mTechRetirement', c('tech'), 'map')    
+        c('tech', 'techp'), 'map', cls = 'technology')    
+    .Object@parameters[['mTechRetirement']] <- createParameter('mTechRetirement', c('tech'), 'map', cls = 'technology')    
     # For disable technology with unexceptable start year
-    .Object@parameters[['mTechNew']] <- createParameter('mTechNew', c('tech', 'region', 'year'), 'map')    
-    .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map')    
+    .Object@parameters[['mTechNew']] <- createParameter('mTechNew', c('tech', 'region', 'year'), 'map', cls = 'technology')    
+    .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     # simple & multi
     .Object@parameters[['pTechCap2act']] <- 
         createParameter('pTechCap2act', 'tech', 'simple', 
-        defVal = 1, interpolation = 'back.inter.forth')    
-    .Object@parameters[['pTechEmisComm']] <- createParameter('pTechEmisComm', c('tech', 'comm'), 'simple', defVal = 1)    
+        defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2cat')    
+    .Object@parameters[['pTechEmisComm']] <- createParameter('pTechEmisComm', c('tech', 'comm'), 'simple', 
+                                                             defVal = 1, cls = 'technology', colName = 'combustion')    
     .Object@parameters[['pTechOlife']] <- 
         createParameter('pTechOlife', c('tech', 'region'), 'simple', 
-        defVal = 1, interpolation = 'back.inter.forth', colName = 'olife')          
+        defVal = 1, interpolation = 'back.inter.forth', colName = 'olife', cls = 'technology')          
         .Object@parameters[['pTechFixom']] <- createParameter('pTechFixom', 
               c('tech', 'region', 'year'), 'simple', 
-        defVal = 0, interpolation = 'back.inter.forth', colName = 'fixom')    
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'fixom', cls = 'technology')    
         .Object@parameters[['pTechInvcost']] <- createParameter('pTechInvcost', 
               c('tech', 'region', 'year'), 'simple', 
-        defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost')    
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'technology')    
         .Object@parameters[['pTechStock']] <- createParameter('pTechStock', 
               c('tech', 'region', 'year'), 'simple', 
-        defVal = 0, interpolation = 'back.inter.forth', colName = 'stock')    
+        defVal = 0, interpolation = 'back.inter.forth', colName = 'stock', cls = 'technology')    
         .Object@parameters[['pTechVarom']] <- createParameter('pTechVarom', 
               c('tech', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'varom')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'varom', cls = 'technology')    
         .Object@parameters[['pTechAfa']] <- createParameter('pTechAfa', 
               c('tech', 'region', 'year', 'slice'), 'multi', 
                 defVal = c(0, 1), interpolation = 'back.inter.forth', 
-                colName = c('afa.lo', 'afa.up'))    
+                colName = c('afa.lo', 'afa.up'), cls = 'technology')    
         .Object@parameters[['pTechGinp2use']] <- createParameter('pTechGinp2use', 
               c('tech', 'group', 'region', 'year', 'slice'), 'simple', 
-                defVal = 1, interpolation = 'back.inter.forth', colName = 'ginp2use')    
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'ginp2use', cls = 'technology')    
         .Object@parameters[['pTechCinp2ginp']] <- createParameter('pTechCinp2ginp', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 1, interpolation = 'back.inter.forth', colName = 'cinp2ginp')    
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'cinp2ginp', cls = 'technology')    
         .Object@parameters[['pTechUse2cact']] <- createParameter('pTechUse2cact', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 1, interpolation = 'back.inter.forth', colName = 'use2cact')    
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'use2cact', cls = 'technology')    
         # Aux
         .Object@parameters[['pTechUse2AInp']] <- createParameter('pTechUse2AInp', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'use2ainp')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'use2ainp', cls = 'technology')    
         .Object@parameters[['pTechAct2AInp']] <- createParameter('pTechAct2AInp', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'act2ainp')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'act2ainp', cls = 'technology')    
         .Object@parameters[['pTechCap2AInp']] <- createParameter('pTechCap2AInp', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2ainp')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2ainp', cls = 'technology')    
         .Object@parameters[['pTechUse2AOut']] <- createParameter('pTechUse2AOut', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'use2aout')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'use2aout', cls = 'technology')    
         .Object@parameters[['pTechAct2AOut']] <- createParameter('pTechAct2AOut', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'act2aout')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'act2aout', cls = 'technology')    
         .Object@parameters[['pTechCap2AOut']] <- createParameter('pTechCap2AOut', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout', cls = 'technology')    
 
         .Object@parameters[['pTechNCap2AInp']] <- createParameter('pTechNCap2AInp', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout', cls = 'technology')    
         .Object@parameters[['pTechNCap2AOut']] <- createParameter('pTechNCap2AOut', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2aout', cls = 'technology')    
 
         .Object@parameters[['pTechCinp2AInp']] <- createParameter('pTechCinp2AInp', 
               c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cinp2ainp')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cinp2ainp', cls = 'technology')    
         .Object@parameters[['pTechCout2AInp']] <- createParameter('pTechCout2AInp', 
               c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cout2ainp')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cout2ainp', cls = 'technology')    
         .Object@parameters[['pTechCinp2AOut']] <- createParameter('pTechCinp2AOut', 
               c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cinp2aout')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cinp2aout', cls = 'technology')    
         .Object@parameters[['pTechCout2AOut']] <- createParameter('pTechCout2AOut', 
               c('tech', 'acomm', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cout2aout')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cout2aout', cls = 'technology')    
 
         # Aux stop
         .Object@parameters[['pTechCact2cout']] <- createParameter('pTechCact2cout', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 1, interpolation = 'back.inter.forth', colName = 'cact2cout')    
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'cact2cout', cls = 'technology')    
         .Object@parameters[['pTechCinp2use']] <- createParameter('pTechCinp2use', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 1, interpolation = 'back.inter.forth', colName = 'cinp2use')  
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'cinp2use', cls = 'technology')  
         .Object@parameters[['pTechCvarom']] <- createParameter('pTechCvarom', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'cvarom')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'cvarom', cls = 'technology')    
         .Object@parameters[['pTechAvarom']] <- createParameter('pTechAvarom', 
               c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth', colName = 'avarom')    
+                defVal = 0, interpolation = 'back.inter.forth', colName = 'avarom', cls = 'technology')    
         .Object@parameters[['pTechShare']] <- createParameter('pTechShare', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'multi', 
-                defVal = c(0, 1), interpolation = 'back.inter.forth', 
-                colName = c('share.lo', 'share.up'))    
-        .Object@parameters[['pTechAfac']] <- createParameter('pTechAfac', 
-              c('tech', 'comm', 'region', 'year', 'slice'), 'multi', 
-                defVal = c(0, Inf), interpolation = 'back.inter.forth', 
-                colName = c('afac.lo', 'afac.up'))
+              c('tech', 'comm', 'region', 'year', 'slice'), 'multi', defVal = c(0, 1), interpolation = 'back.inter.forth', 
+                colName = c('share.lo', 'share.up'), cls = 'technology')    
+        .Object@parameters[['pTechAfac']] <- createParameter('pTechAfac', c('tech', 'comm', 'region', 'year', 'slice'), 'multi', 
+                defVal = c(0, Inf), interpolation = 'back.inter.forth', colName = c('afac.lo', 'afac.up'), cls = 'technology')
                 
   ## NEED SET ALIAS FOR SYS INFO
   # Reserve
@@ -229,7 +221,7 @@ setMethod("initialize", "modInp",
     # simple & multi
         .Object@parameters[['pStorageOlife']] <- createParameter('pStorageOlife', 
               c('stg', 'region'), 'simple', 
-                defVal = 1, interpolation = 'back.inter.forth')    
+                defVal = 1, interpolation = 'back.inter.forth', colName = 'olife')    
     for(i in c('pStorageStock', 'pStorageFixom', 'pStorageInvcost'))
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year'), 'simple', 
@@ -250,41 +242,41 @@ setMethod("initialize", "modInp",
   # Trade
     # Map
     .Object@parameters[['mExpComm']] <- 
-        createParameter('mExpComm', c('expp', 'comm'), 'map')    
+        createParameter('mExpComm', c('expp', 'comm'), 'map', cls = 'trade')    
     .Object@parameters[['mImpComm']] <- 
-        createParameter('mImpComm', c('imp', 'comm'), 'map')    
+        createParameter('mImpComm', c('imp', 'comm'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeComm']] <- 
-        createParameter('mTradeComm', c('trade', 'comm'), 'map')    
+        createParameter('mTradeComm', c('trade', 'comm'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeSrc']] <- 
-        createParameter('mTradeSrc', c('trade', 'region'), 'map')    
+        createParameter('mTradeSrc', c('trade', 'region'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeDst']] <- 
-        createParameter('mTradeDst', c('trade', 'region'), 'map')    
-    .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map')    
+        createParameter('mTradeDst', c('trade', 'region'), 'map', cls = 'trade')    
+    .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map', cls = 'trade')    
     .Object@parameters[['pTradeIrCost']] <- createParameter('pTradeIrCost', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
-            defVal = 0, interpolation = 'back.inter.forth')    
+            defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cost')    
     .Object@parameters[['pTradeIrMarkup']] <- createParameter('pTradeIrMarkup', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
-            defVal = 0, interpolation = 'back.inter.forth')    
+            defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'markup')    
     .Object@parameters[['pExportRowPrice']] <- createParameter('pExportRowPrice', 
           c('expp', 'region', 'year', 'slice'), 'simple', 
-            defVal = 0, interpolation = 'back.inter.forth')    
+            defVal = 0, interpolation = 'back.inter.forth', cls = 'export', colName = 'price')    
     .Object@parameters[['pImportRowPrice']] <- createParameter('pImportRowPrice', 
           c('imp', 'region', 'year', 'slice'), 'simple', 
-            defVal = 0, interpolation = 'back.inter.forth')    
+            defVal = 0, interpolation = 'back.inter.forth', cls = 'import', colName = 'price')    
     .Object@parameters[['pTradeIr']] <- createParameter('pTradeIr', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'multi', 
-            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+            defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'trade', colName = c('ava.up', 'ava.lo'))
     .Object@parameters[['pExportRow']] <- createParameter('pExportRow', 
           c('expp', 'region', 'year', 'slice'), 'multi', 
-            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+            defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'export', colName = c('exp.lo', 'exp.up'))
     .Object@parameters[['pImportRow']] <- createParameter('pImportRow', 
           c('imp', 'region', 'year', 'slice'), 'multi', 
-            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+            defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'import', colName = c('imp.lo', 'imp.up'))
     .Object@parameters[['pExportRowRes']] <- createParameter('pExportRowRes', 
-          'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth')
+          'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'export', colName = 'reserve')
     .Object@parameters[['pImportRowRes']] <- createParameter('pImportRowRes', 
-          'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth')
+          'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'import', colName = 'reserve')
   # For LEC
   .Object@parameters[['mLECRegion']] <- createParameter('mLECRegion', 'region', 'map')    
   .Object@parameters[['pLECLoACT']] <- 
@@ -299,13 +291,13 @@ setMethod("initialize", "modInp",
       "mCnsEacTech", "mCnsTechCInp", "mCnsTechCOut", "mCnsTechAInp", "mCnsTechAOut", "mCnsTechEmis",
       "mCnsActTech", "mCnsRhsTypeGrowth", "mCnsFixomTech", 
       "mCnsVaromTech", "mCnsActVaromTech", "mCnsCVaromTech", "mCnsAVaromTech", "mCnsBalance"))
-        .Object@parameters[[i]] <- createParameter(i, 'cns', 'map')    
+        .Object@parameters[[i]] <- createParameter(i, 'cns', 'map', cls = 'constrain')    
     for(i in c('tech', 'sup', 'comm', 'region', 'year', 'slice')) {
         nn <- paste('mCns', toupper(substr(i, 1, 1)), substr(i, 2, nchar(i)), sep = '')
-        .Object@parameters[[nn]] <- createParameter(nn, c('cns', i), 'map')    
+        .Object@parameters[[nn]] <- createParameter(nn, c('cns', i), 'map', cls = 'constrain')    
     }
-    .Object@parameters[['mCnsTech']] <- createParameter('mCnsTech', c('cns', 'tech'), 'map') 
-    .Object@parameters[['mCnsSup']] <- createParameter('mCnsSup', c('cns', 'sup'), 'map') 
+    .Object@parameters[['mCnsTech']] <- createParameter('mCnsTech', c('cns', 'tech'), 'map', cls = 'constrain') 
+    .Object@parameters[['mCnsSup']] <- createParameter('mCnsSup', c('cns', 'sup'), 'map', cls = 'constrain') 
     for(i in c("pRhs(cns)", "pRhsS(cns, slice)", "pRhsY(cns, year)", "pRhsYS(cns, year, slice)", 
       "pRhsR(cns, region)", "pRhsRS(cns, region, slice)", "pRhsRY(cns, region, year)", 
       "pRhsRYS(cns, region, year, slice)", "pRhsC(cns, comm)", "pRhsCS(cns, comm, slice)", 
@@ -327,14 +319,14 @@ setMethod("initialize", "modInp",
       "pRhsSupCRY(cns, sup, comm, region, year)", "pRhsSupCRYS(cns, sup, comm, region, year, slice)")) {
       .Object@parameters[[gsub('[(].*', '', i)]] <- createParameter(gsub('[(].*', '', i), 
             strsplit(gsub('[)]', '', gsub('.*[(]', '', i)), ', ')[[1]], 'simple', 
-              defVal = 0, interpolation = 'back.inter.forth')      
+              defVal = 0, interpolation = 'back.inter.forth', cls = 'constrain', colName = 'rhs')      
     }
 
   # Other
     # Discount
     .Object@parameters[['pDiscount']] <- 
         createParameter('pDiscount', c('region', 'year'), 'simple', 
-                defVal = .1, interpolation = 'back.inter.forth', colName = 'discount')    
+                defVal = .1, interpolation = 'back.inter.forth', colName = 'discount', cls = 'sysInfo')    
   # Additional for compatibility with GLPK
   .Object@parameters[['ndefpTechOlife']] <- createParameter('ndefpTechOlife', c('tech', 'region'), 'map')   
   .Object@parameters[['defpTechAfaUp']] <- createParameter('defpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   

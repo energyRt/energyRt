@@ -280,9 +280,10 @@ getData <- function(..., parameter = NULL, variable = NULL,
   if (any(names(arg) == 'get.variables')) get.variable <- arg$get.variables
   if (any(names(arg) == 'get.parameters')) get.parameter <- arg$get.parameters
   arg <- arg[!(names(arg) %in% c('get.parameters', 'parameters', 'variables', 'get.variables'))]
-  if (any(names(arg) == 'scen' && is.list(arg$scen))) {
-    scen <- arg$scen
-    arg <- arg[names(arg) != 'scen']
+  while (any(sapply(arg, function(x) is.list(x) && all(sapply(x, class) == 'scenario')))) {
+    fl <- seq(along = arg)[sapply(arg, function(x) is.list(x) && all(sapply(x, class) == 'scenario'))]
+    scen <- arg[[fl]]
+    arg <- arg[-fl]
     for(i in seq(along = scen))
       arg[[length(arg) + 1]] <- scen[[i]]
   }
