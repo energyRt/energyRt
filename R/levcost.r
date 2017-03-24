@@ -123,6 +123,8 @@ summary.levcost <- function(x) x$total
     }
     arg <- arg[names(arg) != 'ignore.years', drop = FALSE]
   }
+  tech@end <- tech@end[!is.na(tech@end$end),, drop = FALSE]
+  tech@start <- tech@end[!is.na(tech@start$start),, drop = FALSE]
   # Check start & end year possibility
   fl <- (!is.na(tech@start$region) & tech@start$region == region)
   if (!any(fl)) fl <- is.na(tech@start$region)
@@ -390,3 +392,23 @@ setMethod('levcost', signature(obj = 'scenario'), function(obj, commodity) {
   ))
 })
 
+setMethod('list', signature(obj = 'list'), function(obj, ...) {
+  #if (all(names(list(...)) != 'comm')) stop('Undefined comm for levcost with signature "model", "commodity"')
+  lapply(obj, function(x) energyRt:::.sm_levcost(x, ...))})
+
+setMethod('levcost', signature(obj = 'technology'), energyRt:::.sm_levcost)
+setMethod('levcost', signature(obj = 'scenario'), function(obj, commodity) {
+  if (is.null(commodity) || length(commodity) != 1) stop('levcost: wrong commodity')
+  if (any(obj@modInp@parameters$mDemComm@data$comm != commodity) &&
+      any(obj@modOut@data$vDemInp[dimnames(obj@modOut@data$vDemInp)$comm != commodity,,,] != 0)) 
+    stop('levcost: demand commodity have to be only one')
+  if (all(obj@modInp@parameters$mDemComm@data$comm != commodity) || 
+      all(obj@modOut@data$vDemInp[commodity,,,] == 0)) 
+    stop('levcost: there is not demand for commodity')
+  
+  gg <- obj@modInp@parameters$pDiscountFactor@data
+  (obj@modOut@data$vObjective / sum(
+    tapply(gg$value, gg[, c('region', 'year')], sum)
+    * apply(obj@modOut@data$vDemInp[commodity,,,, drop  = FALSE], 2:3, sum)
+  ))
+})
