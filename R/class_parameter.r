@@ -74,6 +74,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   .Object@defVal       <- defVal
   .Object@interpolation <- interpolation
   .Object@misc$class <- cls
+  .Object@misc$slot <- slot
   # Create data
   data <- data.frame(tech = character(), techp = character(), sup = character(), dem = character(), 
       acomm = character(), comm = character(), commp = character(), group = character(),  

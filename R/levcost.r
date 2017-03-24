@@ -392,7 +392,7 @@ setMethod('levcost', signature(obj = 'scenario'), function(obj, commodity) {
   ))
 })
 
-setMethod('list', signature(obj = 'list'), function(obj, ...) {
+setMethod('levcost', signature(obj = 'list'), function(obj, ...) {
   #if (all(names(list(...)) != 'comm')) stop('Undefined comm for levcost with signature "model", "commodity"')
   lapply(obj, function(x) energyRt:::.sm_levcost(x, ...))})
 

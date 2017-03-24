@@ -266,7 +266,7 @@ setMethod("initialize", "modInp",
             defVal = 0, interpolation = 'back.inter.forth', cls = 'import', colName = 'price')    
     .Object@parameters[['pTradeIr']] <- createParameter('pTradeIr', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'multi', 
-            defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'trade', colName = c('ava.up', 'ava.lo'))
+            defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'trade', colName = c('ava.lo', 'ava.up'))
     .Object@parameters[['pExportRow']] <- createParameter('pExportRow', 
           c('expp', 'region', 'year', 'slice'), 'multi', 
             defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'export', colName = c('exp.lo', 'exp.up'))
