@@ -254,7 +254,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
     if (app@type %in% c('growth.varom', 'cvarom')) before <- 'CVarom' else
     if (app@type %in% c('growth.varom', 'avarom')) before <- 'AVarom' else
     if (app@type %in% c('growth.fixom', 'fixom')) before <- 'Fixom' else
-    if (app@type %in% c('growth.balance', 'balance')) before <- 'balance' else
+    if (app@type %in% c('growth.balance', 'balance')) before <- 'Balance' else
     if (app@type %in% c('growth.activity', 'activity')) before <- 'Act' else
     if (app@type %in% c('growth.eac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
     ast <- c(names(app@for.sum), names(app@for.each))[!(c(names(app@for.sum), names(app@for.each)) %in% ccc)] 
