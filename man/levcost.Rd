@@ -3,10 +3,9 @@
 \docType{methods}
 \name{levcost}
 \alias{levcost}
-\alias{sm_levcost_scenario}
 \title{Calculate levelized costs}
 \usage{
-sm_levcost_scenario(obj, commodity)
+\S4method{levcost}{repository}(obj, ...)
 }
 \arguments{
 \item{tech}{object of class \code{technology}}

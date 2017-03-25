@@ -5,7 +5,7 @@
 \title{Create new constrain object}
 \usage{
 newConstrain(name, type, eq = "==", rhs = 0, for.sum = list(),
-  for.each = list(), default = 0, rule = NULL, comm = NULL,
+  for.each = list(), defVal = 0, rule = NULL, comm = NULL,
   cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE)
 }
 \description{

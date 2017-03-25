@@ -4,21 +4,20 @@
 \alias{getData}
 \title{Extraxts data from scenario object}
 \usage{
-getData(obj, ..., parameter = NULL, variable = NULL, get.parameter = NULL,
-  get.variable = NULL, merge.table = FALSE, remove_zero_dim = TRUE,
-  drop = TRUE, astable = TRUE, use.dplyr = FALSE,
-  stringsAsFactors = TRUE, yearsAsFactors = FALSE)
+getData(..., parameter = NULL, variable = NULL, get.parameter = NULL,
+  get.variable = NULL, merge = FALSE, zero.rm = TRUE, drop = TRUE,
+  table = TRUE, use.dplyr = FALSE, stringsAsFactors = TRUE,
+  yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE,
+  fixed = FALSE, useBytes = FALSE, invert = FALSE)
 }
 \arguments{
-\item{parameter}{character vector with names of paremeters}
+\item{parameter}{character vector with names of the model parameters}
 
-\item{variable}{character vector with names of variables}
+\item{variable}{character vector with names of the model variables}
 
 \item{get.parameter}{logical, if TRUE then search in interpolated parameters, and return if available}
 
 \item{get.variable}{logical, if TRUE then search in variables, and return if available}
-
-\item{remove_zero_dim}{rename to 'drop.zeros'}
 
 \item{drop}{# add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'}
 
@@ -45,7 +44,12 @@ getData(obj, ..., parameter = NULL, variable = NULL, get.parameter = NULL,
 \item{imp}{character vector with names of import processes}
 
 \item{trade}{character vector with names of trade objects}
+
+\item{remove_zero_dim}{rename to 'zero.rm'}
 }
 \description{
-Extraxts data from scenario object
+obj objects of class scenario, model, or list with object of the two classes
+}
+\details{
+\code{...} filters for searching data in the objects, which include:
 }

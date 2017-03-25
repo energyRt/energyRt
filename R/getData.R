@@ -1,10 +1,10 @@
 #' Extraxts data from scenario object
 #' 
-#' @obj object of class scenario or model
+#' obj objects of class scenario, model, or list with object of the two classes
 #' 
-#' @... data search filters and parameters, which include:
-#' @param parameter character vector with names of paremeters
-#' @param variable character vector with names of variables
+#' \code{...} filters for searching data in the objects, which include:
+#' @param parameter character vector with names of the model parameters
+#' @param variable character vector with names of the model variables
 #' @param tech character vector with names of tachnology objects
 #' @param dem character vector with names of demand objects
 #' @param sup character vector with names of sypply objects
@@ -21,7 +21,67 @@
 #' @param get.variable logical, if TRUE then search in variables, and return if available  
 #' @param remove_zero_dim rename to 'zero.rm' 
 #' @param drop # add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'
- 
+
+getData <- function(..., parameter = NULL, variable = NULL, 
+                    get.parameter = NULL, get.variable = NULL, merge = FALSE,
+                    zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
+                    stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE, 
+                    fixed = FALSE, useBytes = FALSE, invert = FALSE) {
+  #, regex = FALSE
+  psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
+               'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
+  arg <- list(...) #, set
+  if (is.null(names(arg))) names(arg) <- rep('', length(arg))
+  if (any(names(arg) == 'parameters')) parameter <- arg$parameters
+  if (any(names(arg) == 'variables')) variable <- arg$variables
+  if (any(names(arg) == 'get.variables')) get.variable <- arg$get.variables
+  if (any(names(arg) == 'get.parameters')) get.parameter <- arg$get.parameters
+  arg <- arg[!(names(arg) %in% c('get.parameters', 'parameters', 'variables', 'get.variables'))]
+  while (any(sapply(arg, function(x) is.list(x) && all(sapply(x, class) == 'scenario')))) {
+    fl <- seq(along = arg)[sapply(arg, function(x) is.list(x) && all(sapply(x, class) == 'scenario'))]
+    scen <- arg[[fl]]
+    arg <- arg[-fl]
+    for(i in seq(along = scen))
+      arg[[length(arg) + 1]] <- scen[[i]]
+  }
+  set <- arg[names(arg) %in% c(psb_set, paste(psb_set, '_', sep = ''))]      
+  arg <- arg[!(names(arg) %in% names(set))]
+  if (any(names(arg) == 'regex')) {
+    regex <- arg$regex
+    arg <- arg[names(arg) != 'regex']
+    if (any(grep('_$', names(set)))) {
+      ff <- grep('_$', names(set), value = TRUE)
+      f2 <- gsub('_$', '', ff); names(f2) <- ff
+      warning(paste('Duplicated arguments: "', paste(ff, collapse = '", "'), 
+                    '", and: "',f2, '"', sep = ''))
+      for(i in ff) {
+        set[[f2[i]]] <- c(set[[f2[i]]] , set[[i]])
+      }
+    }
+    if (regex) {
+      names(set) <- paste(names(set), '_', sep = '')
+    }
+  } 
+  energyRt:::.getData1(arg = arg, set = set, name = name, parameter = parameter, variable = variable, 
+                       get.parameter = get.parameter, 
+                       get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
+                       table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
+                       yearsAsFactors = yearsAsFactors, 
+                       ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
+}
+
+getData_ <- function(..., parameter = NULL, variable = NULL, 
+                     get.parameter = NULL, get.variable = NULL, merge = FALSE,
+                     zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
+                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE, 
+                     fixed = FALSE, useBytes = FALSE, invert = FALSE) {
+  getData(..., parameter = parameter, variable = variable, 
+          get.parameter = get.parameter, get.variable = get.variable, merge = merge,
+          zero.rm = zero.rm, drop = drop, table = table, use.dplyr = use.dplyr, 
+          stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors, name = name, 
+          ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
+}
+
 
 .getData0 <- function(obj, set, parameter = NULL, variable = NULL, 
                      get.parameter = NULL, get.variable = NULL, merge = FALSE,
@@ -264,65 +324,4 @@
            ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
     
 }
-
-getData <- function(..., parameter = NULL, variable = NULL, 
-                     get.parameter = NULL, get.variable = NULL, merge = FALSE,
-                     zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                     stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE, 
-                    fixed = FALSE, useBytes = FALSE, invert = FALSE) {
-  #, regex = FALSE
-  psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-               'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
-  arg <- list(...) #, set
-  if (is.null(names(arg))) names(arg) <- rep('', length(arg))
-  if (any(names(arg) == 'parameters')) parameter <- arg$parameters
-  if (any(names(arg) == 'variables')) variable <- arg$variables
-  if (any(names(arg) == 'get.variables')) get.variable <- arg$get.variables
-  if (any(names(arg) == 'get.parameters')) get.parameter <- arg$get.parameters
-  arg <- arg[!(names(arg) %in% c('get.parameters', 'parameters', 'variables', 'get.variables'))]
-  while (any(sapply(arg, function(x) is.list(x) && all(sapply(x, class) == 'scenario')))) {
-    fl <- seq(along = arg)[sapply(arg, function(x) is.list(x) && all(sapply(x, class) == 'scenario'))]
-    scen <- arg[[fl]]
-    arg <- arg[-fl]
-    for(i in seq(along = scen))
-      arg[[length(arg) + 1]] <- scen[[i]]
-  }
-  set <- arg[names(arg) %in% c(psb_set, paste(psb_set, '_', sep = ''))]      
-  arg <- arg[!(names(arg) %in% names(set))]
-  if (any(names(arg) == 'regex')) {
-    regex <- arg$regex
-    arg <- arg[names(arg) != 'regex']
-    if (any(grep('_$', names(set)))) {
-      ff <- grep('_$', names(set), value = TRUE)
-      f2 <- gsub('_$', '', ff); names(f2) <- ff
-      warning(paste('There are unapropriayte set with define "regex" argument: "', paste(ff, collapse = '", "'), 
-                    '", that merge with : "',f2, '"', sep = ''))
-        for(i in ff) {
-          set[[f2[i]]] <- c(set[[f2[i]]] , set[[i]])
-          }
-    }
-    if (regex) {
-      names(set) <- paste(names(set), '_', sep = '')
-    }
-  } 
-  energyRt:::.getData1(arg = arg, set = set, name = name, parameter = parameter, variable = variable, 
-           get.parameter = get.parameter, 
-           get.variable = get.variable, merge = merge, zero.rm = zero.rm, drop = drop, 
-           table = table, use.dplyr = use.dplyr, stringsAsFactors = stringsAsFactors, 
-           yearsAsFactors = yearsAsFactors, 
-           ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
-}
-
-getData_ <- function(..., parameter = NULL, variable = NULL, 
-                    get.parameter = NULL, get.variable = NULL, merge = FALSE,
-                    zero.rm = TRUE, drop = TRUE, table = TRUE, use.dplyr = FALSE, 
-                    stringsAsFactors = TRUE, yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE, 
-                    fixed = FALSE, useBytes = FALSE, invert = FALSE) {
-  getData(..., parameter = parameter, variable = variable, 
-                       get.parameter = get.parameter, get.variable = get.variable, merge = merge,
-                       zero.rm = zero.rm, drop = drop, table = table, use.dplyr = use.dplyr, 
-                       stringsAsFactors = stringsAsFactors, yearsAsFactors = yearsAsFactors, name = name, 
-                       ignore.case = ignore.case, fixed = fixed, useBytes = useBytes, invert = invert)
-}
-  
 
