@@ -84,6 +84,7 @@ setClass("sysInfo",
                         imp.lo      = as.numeric(0),
                         imp.up      = as.numeric(Inf),
                         rhs         = as.numeric(0),
+                        agg         = as.numeric(0),
                         stringsAsFactors = FALSE),
           interpolation            = data.frame(
                         cinp2use   = as.character('back.inter.forth'),
@@ -136,6 +137,7 @@ setClass("sysInfo",
                         imp.lo      = as.character('back.inter.forth'),
                         imp.up      = as.character('back.inter.forth'),
                         rhs         = as.character('back.inter.forth'),
+                        agg         = as.character('back.inter.forth'),
                         stringsAsFactors = FALSE),
       #! Misc
       misc = list(

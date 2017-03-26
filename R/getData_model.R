@@ -1,4 +1,4 @@
-getInpuData <- function(..., parameter = NULL, object.name = NULL, object.class = NULL, 
+getInpuData <- function(..., parameter = NULL, name = NULL, object.class = NULL, 
                         slots = NULL, column = NULL, use.dplyr = FALSE, merge = FALSE) {
   # Get condiotion of work
   arg <- list(...)
@@ -62,7 +62,7 @@ getInpuData <- function(..., parameter = NULL, object.name = NULL, object.class 
     } else stop('There argument with unknown class: ', class(arg[[i]]))
   }
   if (!is.null(object.class)) obj <- obj[sapply(obj, class) %in% object.class]
-  if (!is.null(object.name))  obj <- obj[sapply(obj, function(x) x@name) %in% object.name]
+  if (!is.null(name))  obj <- obj[sapply(obj, function(x) x@name) %in% name]
   if (anyDuplicated(sapply(obj, function(x) x@name))) {
     ff <- sapply(obj, function(x) x@name); ff <- unique(ff[duplicated(ff)])
     stop(paste('There are objects with duplicated name: "', 
@@ -167,7 +167,7 @@ getInpuData <- function(..., parameter = NULL, object.name = NULL, object.class 
             res[1:sum(sapply(rs, nrow)), ] <- NA
             k <- 0
             for(j in seq(along = rs)) {
-              res[k + 1:nrow(rs[[j]])] <- rs[[j]]
+              res[k + 1:nrow(rs[[j]]), ] <- rs[[j]]
               k <- k + nrow(rs[[j]])
             }
         } else if (length(rs) == 1) res <- rs[[1]] else res <- NULL
@@ -183,9 +183,9 @@ getInpuData <- function(..., parameter = NULL, object.name = NULL, object.class 
             for(l in ff) {
               fl <-  fl | is.na(res[, l])
               if (RT) {
-                for(y in set[[k]]) fl[grep(y, res[, ff])] <- TRUE
+                for(y in set[[k]]) fl[grep(y, res[, l])] <- TRUE
               } else {
-                fl[res[, ff] %in% set[[k]]] <- TRUE
+                fl[res[, l] %in% set[[k]]] <- TRUE
               }
             }
             res <- res[fl,, drop = FALSE]

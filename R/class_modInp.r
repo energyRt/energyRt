@@ -64,7 +64,7 @@ setMethod("initialize", "modInp",
         defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', colName = 'mean', slot = 'emis')    
     .Object@parameters[['pAggregateFactor']] <- 
         createParameter('pAggregateFactor', c('comm', 'commp'), 'simple', #PPP
-        defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', colName = 'mean', slot = 'agg')    
+        defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', colName = 'agg', slot = 'agg')    
   # Other commodity attribute
     # Demand
     # Map

@@ -24,7 +24,7 @@
     lst <- list()
     cls <- unique(c(lapply(obj@data, function(xx) unique(sapply(xx@data, class))), recursive = TRUE))
     for(cl in cls) {
-      ll <- getUniversalNames(obj, cl, regex = regex, ignore.case = ignore.case, fixed = fixed, 
+      ll <- energyRt:::.getUniversalNames(obj, cl, regex = regex, ignore.case = ignore.case, fixed = fixed, 
         useBytes = useBytes, invert = invert, ...)
       for(i in seq(along = ll))
         lst[[names(ll)[i]]] <- ll[[i]]
