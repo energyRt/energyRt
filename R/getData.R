@@ -117,7 +117,7 @@ getData_ <- function(..., parameter = NULL, variable = NULL,
   # Alias rule for remove set
   alias_set <- lapply(psb_set, function(x) x)
   names(alias_set) <- alias_set
-  alias_set$comm = c('comm', 'acomm', 'comme')
+  alias_set$comm = c('comm', 'acomm', 'comme', 'commp')
   alias_set$region = c('region', 'regionp', 'src', 'dst')
   if (any(names(set) %in% c('src', 'dst'))) {
     alias_set$region <- c('region', 'regionp')
