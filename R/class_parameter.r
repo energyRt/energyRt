@@ -31,7 +31,6 @@ setClass('parameter', # @parameter
     nValues     = 0,
       #! Misc
       misc = list(
-        GUID = "8732f62e-0f23-4853-878b-ec8a5cbd5224",
         class = NULL,
         slot = NULL
       ))#,
@@ -42,6 +41,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
       check = NULL, defVal = 0, interpolation = 'back.inter.forth', 
       colName = '', cls = NULL, slot = NULL
   ) {
+  attr(.Object, 'GUID') <- '8732f62e-0f23-4853-878b-ec8a5cbd5224'
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
                  'year', 'yearp', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')

@@ -8,6 +8,7 @@ setClass("trade",
           destination   = "characterOrNULL",       # if NULL that in all region
       # Performance parameters
           trade         = "data.frame",
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       # Default values and structure of slots
@@ -29,9 +30,13 @@ setClass("trade",
                                      cost       = numeric(),
                                      markup     = numeric(),
                                      stringsAsFactors = FALSE),
+        GIS           = NULL,
         #! Misc
         misc = list(
-          GUID = "97e0ed37-fc8a-4210-ad95-702cf75bed56"
         )),
       S3methods = TRUE
 );
+setMethod("initialize", "trade", function(.Object, ...) {
+  attr(.Object, 'GUID') <- '97e0ed37-fc8a-4210-ad95-702cf75bed56'
+  .Object
+})

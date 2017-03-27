@@ -24,11 +24,14 @@ setClass('cnsVariable',
           # parameter= list() # For the future
       #! Misc
       misc = list(
-        GUID = "a7c5f404-7107-405e-9aec-8684118f23ba"
       )),
       S3methods = TRUE
 );
-
+setMethod("initialize", "cnsVariable", function(.Object, ...) {
+  attr(.Object, 'GUID') <- 'a7c5f404-7107-405e-9aec-8684118f23ba'
+  .Object
+})
+             
 # add set to constrain
 add_set.cnsVariable <- function(vrb, ...) {
   vrb@set[[length(cns@set) + 1]] <- create_set(...)

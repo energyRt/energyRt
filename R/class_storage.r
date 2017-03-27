@@ -17,6 +17,7 @@ setClass("reserve",
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
           invcost       = "data.frame",
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"     #
       ),
       prototype(
@@ -69,12 +70,16 @@ setClass("reserve",
                                      year     = numeric(),
                                      invcost  = numeric(),
                                      stringsAsFactors = FALSE),
+      GIS           = NULL,
       #! Misc
       misc = list(
-        GUID = "d25eda0d-ed46-4d00-b6d5-38a88d11a313"
       )),
       S3methods = TRUE
 );
+setMethod("initialize", "reserve", function(.Object, ...) {
+  attr(.Object, 'GUID') <- 'd25eda0d-ed46-4d00-b6d5-38a88d11a313'
+  .Object
+})
 #
 #
 #commodity

@@ -8,7 +8,7 @@ setClass("model",
           description    = "character",       # Details
           data           = "list",
           sysInfo        = "sysInfo",
-          modInp    = "modInp", 
+          modInp         = "modInp", 
           LECdata        = "list",
           early.retirement = "logical",
           misc = "list"
@@ -23,10 +23,13 @@ setClass("model",
           early.retirement = FALSE,
       #! Misc
       misc = list(
-        GUID = "e4be2c7e-8ddf-4952-8f27-8fd12ca79e78",
         additionalCode = "",        # move 2 misc
         additionalCodeAfter = ""   # move 2 misc
       )),                           
       S3methods = TRUE
 )
-
+setMethod("initialize", "model", function(.Object, ...) {
+  attr(.Object, 'GUID') <- 'e4be2c7e-8ddf-4952-8f27-8fd12ca79e78'
+  .Object
+})
+             

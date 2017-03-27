@@ -12,6 +12,7 @@ compare <- function(obj1, obj2, just_name = FALSE) {
     FL <- FALSE
   } else { 
     sl <- getSlots(class(obj1))
+    sl <- sl[sl != 'GIS']
     obj <- new(class(obj1)) 
     if (just_name) {
       RT <- rep(FALSE, length(sl))

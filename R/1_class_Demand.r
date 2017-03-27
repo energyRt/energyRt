@@ -9,6 +9,7 @@ setClass("demand",
           commodity     = "character",
           unit          = "character",
           dem           = "data.frame",      # Availability of the resource with prices 
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
@@ -25,8 +26,13 @@ setClass("demand",
                                      dem      = numeric(),
                                      stringsAsFactors = FALSE),
       #! Misc
+      GIS           = NULL,
       misc = list(
-        GUID = "f4b613b2-1efc-4c51-983c-f776e85a0e9b"
       )),
       S3methods = TRUE
 );
+setMethod("initialize", "demand", function(.Object, ...) {
+  attr(.Object, 'GUID') <- 'f4b613b2-1efc-4c51-983c-f776e85a0e9b'
+  .Object
+})
+             

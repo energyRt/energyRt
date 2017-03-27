@@ -22,6 +22,7 @@ setClass("commodity",
           source        = "list",
           other         = "list",           #
           limtype       = "factor",
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
@@ -87,10 +88,15 @@ setClass("commodity",
           source        = list(),
           other         = list(),
           limtype       = factor('LO', levels = c('FX', 'UP', 'LO')),
+      GIS           = NULL,
       #! Misc
       misc = list(
-        GUID = "f1a88a0f-9376-4c81-8725-57bb1f495a2b"
       )),
       S3methods = TRUE
 )
+setMethod("initialize", "commodity", function(.Object, ...) {
+  attr(.Object, 'GUID') <- 'f1a88a0f-9376-4c81-8725-57bb1f495a2b'
+  .Object
+})
+
 

@@ -21,6 +21,7 @@ setClass('constrain',
           aout          = "logical",
           ainp          = "logical",
           emis          = "logical",
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
@@ -72,14 +73,18 @@ setClass('constrain',
           aout          = TRUE,
           ainp          = TRUE,
           emis          = TRUE,
+          GIS           = NULL,
         #! Misc
         misc = list(
-          GUID = "0c9e0d17-222c-481e-8796-bbed7b0c0cc8"
         )),
       S3methods = TRUE
 );
 
-
+setMethod("initialize", "constrain", function(.Object, ...) {
+  attr(.Object, 'GUID') <- '0c9e0d17-222c-481e-8796-bbed7b0c0cc8'
+  .Object
+})
+             
 #----------------------------------------------------------------------------------
 #' Create new constrain object
 #' 

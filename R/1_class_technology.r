@@ -43,6 +43,7 @@ setClass("technology",
           early.retirement = "logical",
           upgrade.technology = "character",
           region        = "characterOrNULL",
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ), #
       # Default values and structure of slots
@@ -171,10 +172,15 @@ setClass("technology",
           early.retirement = TRUE,
           upgrade.technology = character(),
           region        = NULL,
+        GIS           = NULL,
         #! Misc
         misc = list(
-          GUID = "fdaa0d09-9524-405d-b2d8-b6cc1d1ca032"
         )),
       validity = .check_technology_data_frame,
       S3methods = TRUE
 )
+setMethod("initialize", "technology", function(.Object, ...) {
+  attr(.Object, 'GUID') <- 'fdaa0d09-9524-405d-b2d8-b6cc1d1ca032'
+  .Object
+})
+                                              

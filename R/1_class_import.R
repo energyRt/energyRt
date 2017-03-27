@@ -10,6 +10,7 @@ setClass("import",
           unit          = "character",
           reserve       = "numeric",
           imp           = "data.frame",
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
@@ -29,9 +30,14 @@ setClass("import",
                                      imp.fx   = numeric(),
                                      price     = numeric(),
                                      stringsAsFactors = FALSE),
+      GIS           = NULL,
       #! Misc
       misc = list(
-        GUID = "8954c52f-6514-49ae-9688-17d6c5e74f06"
       )),
       S3methods = TRUE
 );
+setMethod("initialize", "import", function(.Object, ...) {
+  attr(.Object, 'GUID') <- '8954c52f-6514-49ae-9688-17d6c5e74f06'
+  .Object
+})
+                                              

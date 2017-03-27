@@ -22,7 +22,6 @@ setClass("modInp", # modInp
     solver              = "",
     #! Misc
     misc = list(
-      GUID = "dc8680b2-130d-4a40-86b8-3a33018e005e"
     )
   )
 );
@@ -33,6 +32,7 @@ setClass("modInp", # modInp
 setMethod("initialize", "modInp",
   function(.Object) {
   # Create parameters
+    attr(.Object, 'GUID') <- 'dc8680b2-130d-4a40-86b8-3a33018e005e'
     # Base set
     .Object@parameters[['region']] <- createSet('region')    
     .Object@parameters[['year']]   <- createSet('year')    

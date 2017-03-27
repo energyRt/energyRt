@@ -11,6 +11,7 @@ setClass("supply",
           reserve       = "numeric",         # Total available resource
           availability  = "data.frame",     # Availability of the resource with prices
           region        = "characterOrNULL",
+          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
@@ -30,10 +31,15 @@ setClass("supply",
                                      ava.fx   = numeric(),
                                      cost     = numeric(),
                                      stringsAsFactors = FALSE),
-          region = NULL,
+        region = NULL,
+        GIS           = NULL,
         #! Misc
         misc = list(
-          GUID = "75321e73-f425-4d45-a36c-72dc4a769a28"
         )),
       S3methods = TRUE
 );
+setMethod("initialize", "supply", function(.Object, ...) {
+  attr(.Object, 'GUID') <- '75321e73-f425-4d45-a36c-72dc4a769a28'
+  .Object
+})
+                                              
