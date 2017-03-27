@@ -312,8 +312,8 @@ vObjective                                           Objective costs
 ;
 positive variable
 * Dummy import
-vDummyOut(comm, region, year, slice)                   Dummy import (for debugging)
-vDummyInp(comm, region, year, slice)                   Dummy export (for debugging)
+vDummyImport(comm, region, year, slice)                   Dummy import (for debugging)
+vDummyExport(comm, region, year, slice)                   Dummy export (for debugging)
 vDummyCost(comm, region, year)                         Dummy import & export costs  (for debugging)
 ;
 variable
@@ -1236,7 +1236,7 @@ eqOutTot(comm, region, year, slice)$mMidMilestone(year)..
          vAggOut(comm, region, year, slice)$(sum(commp$pAggregateFactor(comm, commp), 1)) +
          vTechOutTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and
                   (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1)) +
-         vDummyOut(comm, region, year, slice)$defpDummyImportCost(comm, region, year, slice) +
+         vDummyImport(comm, region, year, slice)$defpDummyImportCost(comm, region, year, slice) +
          vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
          vImport(comm, region, year, slice);
 
@@ -1247,7 +1247,7 @@ eqInpTot(comm, region, year, slice)$mMidMilestone(year)..
              (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1)) +
          vDemInp(comm, region, year, slice)$(sum(dem$mDemComm(dem, comm), 1)) +
          vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
-         vDummyInp(comm, region, year, slice)$defpDummyExportCost(comm, region, year, slice) +
+         vDummyExport(comm, region, year, slice)$defpDummyExportCost(comm, region, year, slice) +
          vExport(comm, region, year, slice);
 
 eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(sup$(mSupComm(sup, comm) and mSupSpan(sup, region)), 1))..
@@ -1313,9 +1313,9 @@ eqDummyCost(comm, region, year)$(mMidMilestone(year) and
          vDummyCost(comm, region, year)
          =e=
          sum(slice$defpDummyImportCost(comm, region, year, slice),
-           pDummyImportCost(comm, region, year, slice) * vDummyOut(comm, region, year, slice)) +
+           pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice)) +
          sum(slice$defpDummyExportCost(comm, region, year, slice),
-           pDummyExportCost(comm, region, year, slice) * vDummyInp(comm, region, year, slice));
+           pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
 
 
 eqCost(region, year)$(mMidMilestone(year))..

@@ -410,7 +410,7 @@
       ll <- c("vTechUse", "vTechNewCap", "vTechRetiredCap",# "vTechRetrofitCap", "vTechUpgradeCap", 
               "vTechCap", "vTechAct", 
               "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", 
-              "vDemInp", "vDummyOut", "vDummyInp", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageCap", 
+              "vDemInp", "vDummyImport", "vDummyExport", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageCap", 
               "vStorageNewCap", "vImport", "vExport", "vTradeFlow", "vExportRow", "vImportRow")
       if (!is.character(arg$fix_data) || any(!(arg$fix_data %in% c('all', ll)))) {
         if (!is.character(arg$fix_data)) stop('Uncorrect fix_data') else

@@ -241,7 +241,7 @@ summary.levcost <- function(x) x$total
     cbcCompileParameter = cbcCompileParameter, echo = echo)
   if (!(rr@modOut@solutionStatus == 1 && 
             rr@modOut@compilationStatus == 2 && 
-            all(rr@modOut@data$vDummyOut == 0))) stop('Error in solution')
+            all(rr@modOut@data$vDummyImport == 0))) stop('Error in solution')
 ##  # Additional table          
 ##    dsc <- rr@modInp@parameters[['pDiscountFactor']]@data
 ##    dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]

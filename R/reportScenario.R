@@ -82,15 +82,15 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       }
       gg <- sub('[,][ ]$', '.\n\n', gg)
       cat(gg, sep = '', file = zz)
-      if (any(obj@modOut@data$vDummyOut != 0)) {
-        dcmd <- dimnames(obj@modOut@data$vDummyOut)[[1]][apply(obj@modOut@data$vDummyOut != 0, 1, any)]
+      if (any(obj@modOut@data$vDummyImport != 0)) {
+        dcmd <- dimnames(obj@modOut@data$vDummyImport)[[1]][apply(obj@modOut@data$vDummyImport != 0, 1, any)]
         cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
         cat('There are dummy import for commodity "', 
             paste(dcmd, collapse = '", "'), '".\n\n', '\n', sep = '', file = zz)
         for(cc in dcmd) {
           cat('\\subsection{', cc, '}\n\n', '\n', sep = '', file = zz)
           png2(paste(cc, '_dummy_out.png', sep = ''))
-          plot(dimnames(dat$vDummyOut)$year, apply(dat$vDummyOut[cc,,,, drop = FALSE], 3, sum), 
+          plot(dimnames(dat$vDummyImport)$year, apply(dat$vDummyImport[cc,,,, drop = FALSE], 3, sum), 
                main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
           dev.off2()
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
@@ -102,15 +102,15 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           cat('\\end{figure}\n', sep = '', file = zz)
         }
       }
-      if (any(obj@modOut@data$vDummyInp != 0)) {
-        dcmd <- dimnames(obj@modOut@data$vDummyInp)[[1]][apply(obj@modOut@data$vDummyInp != 0, 1, any)]
+      if (any(obj@modOut@data$vDummyExport != 0)) {
+        dcmd <- dimnames(obj@modOut@data$vDummyExport)[[1]][apply(obj@modOut@data$vDummyExport != 0, 1, any)]
         cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
         cat('There are dummy import for commodity "', 
             paste(dcmd, collapse = '", "'), '".\n\n', '\n', sep = '', file = zz)
         for(cc in dcmd) {
           cat('\\subsection{', cc, '}\n\n', '\n', sep = '', file = zz)
           png2(paste(cc, '_dummy_inp.png', sep = ''))
-          plot(dimnames(dat$vDummyInp)$year, apply(dat$vDummyInp[cc,,,, drop = FALSE], 3, sum), 
+          plot(dimnames(dat$vDummyExport)$year, apply(dat$vDummyExport[cc,,,, drop = FALSE], 3, sum), 
                main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
           dev.off2()
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
@@ -218,8 +218,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             emission = apply(dat$vEmsFuelTot[cc,,,, drop = FALSE], 3, sum),
             aggregate = apply(dat$vAggOut[cc,,,, drop = FALSE], 3, sum),
             demand = apply(dat$vDemInp[cc,,,, drop = FALSE], 3, sum),
-            dummyImport = apply(dat$vDummyOut[cc,,,, drop = FALSE], 3, sum),
-            dummyExport = apply(dat$vDummyInp[cc,,,, drop = FALSE], 3, sum),
+            dummyImport = apply(dat$vDummyImport[cc,,,, drop = FALSE], 3, sum),
+            dummyExport = apply(dat$vDummyExport[cc,,,, drop = FALSE], 3, sum),
             supply = apply(dat$vSupOutTot[cc,,,, drop = FALSE], 3, sum),
             import = apply(dat$vImport[cc,,,, drop = FALSE], 3, sum),
             export = apply(dat$vExport[cc,,,, drop = FALSE], 3, sum)
