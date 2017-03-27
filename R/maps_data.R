@@ -9987,12 +9987,15 @@ if (!is.null(all) && all) {parameter = TRUE; set = TRUE; map = TRUE;}
      gg
 }
     .getVariables <- ..getVariables()
-     getVariables <- function(equation = FALSE) {
-     if (equation) energyRt:::.getVariables else      energyRt:::.getVariables[,c("name", "description", "tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice", "cns"), drop = FALSE]}
+     getVariables <- function(equation = FALSE, row.names = TRUE) {
+     gg <- energyRt:::.getVariables
+     if (!row.names) rownames(gg) <- NULL
+     if (equation) gg else gg[,c("name", "description", "tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice", "cns"), drop = FALSE]}
     .getEquations <- ..getEquations()
      getEquations <- function() {energyRt:::.getEquations}
     .getVariablesDim <- ..getVariablesDim()
      getVariablesDim <- function() {energyRt:::.getVariablesDim}
     .getEquationsDim <- ..getEquationsDim()
      getEquationsDim <- function() {energyRt:::.getEquationsDim}
-    save(file = 'data/pev_map.RData', list = c('getVariables', 'getParameters', 'getEquations', 'getVariablesDim', 'getEquationsDim'))
+    save(file = 'data/pev_map.RData', list = c('.getVariables', '.getParameters', '.getEquations', '.getVariablesDim', 
+     '.getEquationsDim'))
