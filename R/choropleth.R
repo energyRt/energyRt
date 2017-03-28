@@ -25,17 +25,12 @@ choropleth.scenario <- function(obj, # scenario object
                                 main = NULL, 
                                 regex = FALSE
 ) {
-  # if(regex) {get_data <- "getData_"} else {get_data <- "getData"}
-  # dat <- eval(call(get_data, obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
-  #                yearsAsFactors = TRUE, stringsAsFactors = TRUE))
-  # if(regex) {
-  #   dat <- getData_(obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
-  #                  yearsAsFactors = TRUE, stringsAsFactors = TRUE)
-  # } else {
-    dat <- getData(obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
-                     yearsAsFactors = TRUE, stringsAsFactors = TRUE, regex = regex)
-#  }
-    if (is.null(dat) | nrow(dat) == 0) {
+  #dat <- getData(obj, variable = "vDemInp", comm_ = "ELC", merge = TRUE, table = TRUE,  drop = FALSE, yearsAsFactors = TRUE, stringsAsFactors = TRUE)
+  
+  dat <- getData(obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
+                 yearsAsFactors = TRUE, stringsAsFactors = TRUE)
+  #  }
+  if (is.null(dat) | nrow(dat) == 0) {
     message("No data for the set of filters")
     return()
   }
@@ -45,6 +40,7 @@ choropleth.scenario <- function(obj, # scenario object
     dat[,i] <- as.factor(dat[,i])
   }
   
+  if (!is.factor(dat$year)) dat$year <- as.factor(dat$year)
   ff <- sapply(dat, is.factor)
   rg <- nm == "region"
   src.rg <- nm == "src"
@@ -83,18 +79,18 @@ choropleth.scenario <- function(obj, # scenario object
     ttl <- main
   } else {
     ttl <- paste(names(ltx), "=", ltx, collapse = ", ")
-    
-    lv <- sapply(dat, function(x) {length(levels(x)) > 1})
-    #nm[ff & !rg & lv]
-    if (sum(ff & !rg & lv) > 0) {
-      dt <- aggregate(dat$value, by = list(dat$region), FUN = "sum")
-      names(dt) <- c("region", "value")
-      dat <- dt
-    }
-    # message(paste(nm, collapse = " "))
-    # message(paste(names(dat), collapse = " "))
-    #ttl
+  } 
+  lv <- sapply(dat, function(x) {length(levels(x)) > 1})
+  #nm[ff & !rg & lv]
+  if (sum(ff & !rg & lv) > 0) {
+    dt <- aggregate(dat$value, by = list(dat$region), FUN = "sum")
+    names(dt) <- c("region", "value")
+    dat <- dt
   }
+  # message(paste(nm, collapse = " "))
+  # message(paste(names(dat), collapse = " "))
+  #ttl
+  #}
   spdf <- sp::merge(scen.BAU@model@sysInfo@GIS, dat)
   #head(spdf@data)
   if(is.null(shading)) {
@@ -122,6 +118,8 @@ choropleth.scenario <- function(obj, # scenario object
   # )
   # 
 }
+
+choropleth <- function (...) UseMethod("choropleth")
 
 arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
                          col = "blue", col.Inf = "red",

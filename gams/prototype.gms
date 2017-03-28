@@ -151,7 +151,7 @@ pAggregateFactor(comm, comm)                       Aggragation factor of
 * Technology parameter
 pTechOlife(tech, region)                           Operational life of technologies
 
-pTechCinp2ginp(tech, comm, region, year, slice)    Multiplying factor for a commodity intput to obtain group input
+pTechCinp2ginp(tech, comm, region, year, slice)    Multiplying factor for a commodity input to obtain group input
 pTechGinp2use(tech, group, region, year, slice)    Multiplying factor for a group input commodity to obtain use
 pTechCinp2use(tech, comm, region, year, slice)     Multiplying factor for a commodity input commodity to obtain use
 pTechUse2cact(tech, comm, region, year, slice)     Multiplying factor for use to obtain commodity activity

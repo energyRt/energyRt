@@ -13,14 +13,15 @@
 #' @param region character vector with names of regions
 #' @param year character or integer vector with years
 #' @param slice character vector with names of slices
-#' @param stg qqq
+#' @param stg character vector with names of storage 
 #' @param expp character vector with names of export processes
 #' @param imp character vector with names of import processes
 #' @param trade character vector with names of trade objects
 #' @param get.parameter logical, if TRUE then search in interpolated parameters, and return if available  
 #' @param get.variable logical, if TRUE then search in variables, and return if available  
-#' @param remove_zero_dim rename to 'zero.rm' 
-#' @param drop # add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'
+#' @param zero.rm drop rows with zero values
+#' @param drop logical, if TRUE (default) the minimal number of columns (dimensions) will be returned
+#' @param regex logical, if FALSE or NULL (default), all of the parameters will be considered as character vectors, if TRUE all parameter inputs will be considered as regular expression strings (vectors are not allowed).
 
 getData <- function(..., parameter = NULL, variable = NULL, 
                     get.parameter = NULL, get.variable = NULL, merge = FALSE,
