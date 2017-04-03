@@ -614,7 +614,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   }
   dstart <- dstart[!is.na(dstart$year),, drop = FALSE]
   for(rr in dstart$region) {
-    if (any(dd$year < dstart[rr, 'year'])) dd[dd$region == rr & dd$year < dstart[rr, 'year'], 'enable'] <- FALSE
+    if (!is.na(dstart[rr, 'year']) && any(dd$year < dstart[rr, 'year'])) dd[dd$region == rr & dd$year < dstart[rr, 'year'], 'enable'] <- FALSE
   } 
   dd_able <- dd
   ## end 
