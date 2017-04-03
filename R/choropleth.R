@@ -209,7 +209,7 @@ agg_region <- function(dat, by = list(dat$region), FUN = "sum",
 
 get_labpt <- function(scen) {
   labpt <- sapply(scen@model@sysInfo@GIS$OBJECTID, function(x) {
-    scen.BAU@model@sysInfo@GIS@polygons[[x]]@labpt
+    scen@model@sysInfo@GIS@polygons[[x]]@labpt
   })
   labpt <- cbind(
     scen@model@sysInfo@GIS@data$region,
