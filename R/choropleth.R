@@ -22,6 +22,8 @@ choropleth.scenario <- function(obj, # scenario object
                                 src.reg = TRUE,   # logical, if TRUE, map trade for source region
                                 dst.reg = !src.reg, # if TRUE, map trade for destination region
                                 shading = NULL,
+                                px = NA, # x coordinate of legend locatio
+                                py = NA, # y coordinate of legend location
                                 main = NULL, 
                                 regex = FALSE
 ) {
@@ -100,8 +102,10 @@ choropleth.scenario <- function(obj, # scenario object
   }
   GISTools::choropleth(spdf, spdf@data[, "value"], main = ttl, cex.main = 0.75,
                        shading = sh)
-  GISTools::choro.legend(124, 38, sh = sh, 
-                         cex = 0.75, bty = "o")
+  if(!is.na(px) & !is.na(py)) {
+    GISTools::choro.legend(px, py, sh = sh, 
+                           cex = 0.75, bty = "o")
+  }
   
   #spdf <- sp::merge(scen@model@sysInfo@GIS, dat)
   #GISTools::choropleth(spdf, variable, shading)
