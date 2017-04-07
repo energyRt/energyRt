@@ -22,7 +22,7 @@ addGroups <- function(dt,
   }
   # Add groups
   dimNames <- names(dt)
-  gDimNames <- names(mapping)
+  gDimNames <- sub("^g", "", names(mapping))
   gDimNames <- gDimNames[sapply(mapping, length) > 0] # Non-empty
   dimNames <- dimNames[dimNames %in% gDimNames]
   for (dn in dimNames) {
@@ -31,15 +31,15 @@ addGroups <- function(dt,
     #      message(gdim)
     if (replace) {
       if (any(gdim %in% names(dt))) {
-        stop(paste(gdim, "already exists"))
+        stop(paste(gdim, "column already exists in the 'dt' data.frame"))
       }}
-    grNames <- names(mapping[[dn]])
+    grNames <- names(mapping[[gdim]])
     dt[, gdim] <- factor(NA, levels = c(grNames, NA), ordered = TRUE)
     for (gn in grNames) {
       #        message(mapping[[dn]][[gn]])
       #sapply(grNames, function(x) {
       for (x in grNames) {
-        ii <-  dt[, dn] %in% mapping[[dn]][[gn]]
+        ii <-  dt[, dn] %in% mapping[[gdim]][[gn]]
         #            message(sum(ii))
         dt[ii, gdim] <- gn
       }
@@ -60,11 +60,11 @@ addGroups <- function(dt,
   if (aggregate) {
     dimNames <- names(dt)
     dimNames <- dimNames[dimNames != "value"]
-    dt <- ungroup(dt)
+    dt <- dplyr::ungroup(dt)
     for (dn in dimNames) {
       dt <- dplyr::group_by_(dt, dn, add = TRUE)
     }
-    dt <- summarize(dt, value = sum(value))
+    dt <- dplyr::summarize(dt, value = sum(value))
   }
   # dt <- dplyr::group_by_(dt, "year", "gtech") %>% 
   #       dplyr::summarize(value = sum(value))
@@ -78,9 +78,9 @@ ggplot_bar_by_gtech <- function(
   scen,
   variable,
   comm,
-  mapping,
-  select, 
-  colours,
+  mapping = list(),
+  select = list(), 
+  colours = NULL,
   ...) {
   
   get_data <- "getData_"
@@ -108,9 +108,9 @@ ggplot_bar_by_gcomm <- function(
   scen,
   variable,
   comm,
-  mapping,
-  select,
-  colours,
+  mapping = list(),
+  select = list(),
+  colours = NULL,
   ...) {
   
   get_data <- "getData_"
