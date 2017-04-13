@@ -65,6 +65,7 @@ getUnits <- function(tech) {
     # ab - mapping vector from "a" to "b"
     # ua - vector with a-units
     # ub - vector with b-units
+    if(is.null(idx) || length(idx) == 0) return(NA)
     if(is.null(b) & !is.null(ab)) {
       if(dim(ab)[2] > 1) {
         aa <- ab[,2]
@@ -90,7 +91,7 @@ getUnits <- function(tech) {
                      ab = tech@input[, c("comm", "group")],
                      ua = u$input, 
                      ub = u$group)
-
+  
   com_group <- rbind(tech@input[, c("comm", "group")],
                      tech@output[, c("comm", "group")])
   com_group <- com_group[!is.na(com_group$group),]
@@ -121,12 +122,30 @@ getUnits <- function(tech) {
   u$afac.fx <- NA
   
   # aeff ========================================= ####
+  
+  # if(dim(tech@aeff)[1] > 0) {
+  
+  n2acomm <- function(dat, name, ua) {
+    #dat <- dat[, c("acomm", "comm", name)
+    ii <- !is.na(dat[, name])
+    dat <- dplyr::distinct(dat[ii, c("acomm", "comm", name)])
+    if(dim(dat)[1] > 0) {
+      b <- dat$acomm
+      ub <- u$acomm[b]
+      n2acom <- paste0(ub, "/", ua)
+      names(n2acom) <- dat$acomm
+    } else {
+      n2acom <- NULL
+    }
+    return(n2acom)
+  }
+  
   u$cinp2ainp <- a2b(idx = tech@aeff$cinp2ainp, 
                      a = tech@aeff$comm, 
                      b = tech@aeff$acomm,
                      ua = u$input, 
                      ub = u$acomm) 
-    
+  
   u$cinp2aout <- a2b(idx = tech@aeff$cinp2aout, 
                      a = tech@aeff$comm, 
                      b = tech@aeff$acomm,
@@ -145,21 +164,6 @@ getUnits <- function(tech) {
                      ua = u$output, 
                      ub = u$acomm)
   
-  n2acomm <- function(dat, name, ua) {
-    #dat <- dat[, c("acomm", "comm", name)
-    ii <- !is.na(dat[, name])
-    dat <- dplyr::distinct(dat[ii, c("acomm", "comm", name)])
-    if(dim(dat)[1] > 0) {
-      b <- dat$acomm
-      ub <- u$acomm[b]
-      n2acom <- paste0(ub, "/", ua)
-      names(n2acom) <- dat$acomm
-    } else {
-      n2acom <- NULL
-    }
-    return(n2acom)
-  }
-  
   u$act2ainp <- n2acomm(tech@aeff, "act2ainp", u$act)
   u$act2aout <- n2acomm(tech@aeff, "act2aout", u$act)
   u$use2ainp <- n2acomm(tech@aeff, "use2ainp", u$use)
@@ -168,6 +172,20 @@ getUnits <- function(tech) {
   u$cap2aout <- n2acomm(tech@aeff, "cap2aout", u$cap)
   u$ncap2ainp <- n2acomm(tech@aeff, "ncap2ainp", u$cap)
   u$ncap2aout <- n2acomm(tech@aeff, "ncap2aout", u$cap)
+  # } else {
+  #   u$cinp2ainp <- NA 
+  #   u$cinp2aout <- NA
+  #   u$cout2ainp <- NA
+  #   u$cout2aout <- NA
+  #   u$act2ainp <- NA
+  #   u$act2aout <- NA
+  #   u$use2ainp <- NA
+  #   u$use2aout <- NA
+  #   u$cap2ainp <- NA
+  #   u$cap2aout <- NA
+  #   u$ncap2ainp <- NA
+  #   u$ncap2aout <- NA
+  #   }
   
   u$afa <- NA # !!!
   
