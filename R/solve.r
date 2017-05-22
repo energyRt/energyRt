@@ -64,11 +64,11 @@
                    g, '.*.*.*', ' ', ll[tt, a, g, 1, 1, ], '\n', sep = '')
               }  else {
                 rg <- dimnames(ll)[[4]][apply(ll[tt, a, g,,,, drop = FALSE] > 1, 
-                  2, any)][1]
+                  4, any)][1]
                 yr <- dimnames(ll)[[5]][apply(ll[tt, a, g, rg,,, drop = FALSE] > 1, 
-                  2, any)][1]
+                  5, any)][1]
                 sl <- dimnames(ll)[[6]][apply(ll[tt, a, g, rg, yr,, drop = FALSE] > 1, 
-                  2, any)][1]
+                  6, any)][1]
                 cat('Share lo more than 1 for ', a, ' commodity, first row: ', tt, '.',
                    g, '.', rg, '.', yr, '.', sl, ' ', ll[tt, a, g, rg, yr, sl], 
                      '\n', sep = '')
@@ -92,11 +92,11 @@
                    g, '.*.*.*', ' ', ll[tt, a, g, 1, 1, ], '\n', sep = '')
               }  else {
                 rg <- dimnames(ll)[[4]][apply(ll[tt, a, g,,,, drop = FALSE] < 1, 
-                  2, any)][1]
+                  4, any)][1]
                 yr <- dimnames(ll)[[5]][apply(ll[tt, a, g, rg,,, drop = FALSE] < 1, 
-                  2, any)][1]
+                  5, any)][1]
                 sl <- dimnames(ll)[[6]][apply(ll[tt, a, g, rg, yr,, drop = FALSE] < 1, 
-                  2, any)][1]
+                  6, any)][1]
                 cat('Share up less than 1 for ', a, ' commodity, first row: ', tt, '.',
                    g, '.', rg, '.', yr, '.', sl, ' ', ll[tt, a, g, rg, yr, sl], 
                      '\n', sep = '')
