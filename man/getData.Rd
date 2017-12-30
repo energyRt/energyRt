@@ -19,7 +19,9 @@ getData(..., parameter = NULL, variable = NULL, get.parameter = NULL,
 
 \item{get.variable}{logical, if TRUE then search in variables, and return if available}
 
-\item{drop}{# add 'drop.zero.dim = drop' and 'remove_zero_dim = drop'}
+\item{zero.rm}{drop rows with zero values}
+
+\item{drop}{logical, if TRUE (default) the minimal number of columns (dimensions) will be returned}
 
 \item{tech}{character vector with names of tachnology objects}
 
@@ -37,7 +39,7 @@ getData(..., parameter = NULL, variable = NULL, get.parameter = NULL,
 
 \item{slice}{character vector with names of slices}
 
-\item{stg}{qqq}
+\item{stg}{character vector with names of storage}
 
 \item{expp}{character vector with names of export processes}
 
@@ -45,7 +47,7 @@ getData(..., parameter = NULL, variable = NULL, get.parameter = NULL,
 
 \item{trade}{character vector with names of trade objects}
 
-\item{remove_zero_dim}{rename to 'zero.rm'}
+\item{regex}{logical, if FALSE or NULL (default), all of the parameters will be considered as character vectors, if TRUE all parameter inputs will be considered as regular expression strings (vectors are not allowed).}
 }
 \description{
 obj objects of class scenario, model, or list with object of the two classes
