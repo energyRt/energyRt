@@ -16,22 +16,23 @@
     error_type <- c()
     # Check that lo bound less or equal up bound
     for(pr in names(prec@parameters)[sapply(prec@parameters,
-      function(x) x@type == 'double')]) 
-        if (nrow(prec@parameters[[pr]]@data) > 0 && prec@parameters[[pr]]@nValues != 0) {
-      if (prec@parameters[[pr]]@nValues != -1)  
-        prec@parameters[[pr]]@data <- prec@parameters[[pr]]@data[seq(length.out = 
-          prec@parameters[[pr]]@nValues),, drop = FALSE]
-      gg <- prec@parameters[[pr]]@data
-      fl <- gg[gg$type == 'lo', 'value'] > gg[gg$type == 'up', 'value']
-      stopifnot(all(gg[gg$type == 'lo', 0:1 - ncol(gg)] ==
-          gg[gg$type == 'up', 0:1 - ncol(gg)]))
-      if (any(fl)) {
-        error_type <- c(error_type, pr)
-        cat('Error: Unexcaptable bound value (up bound less lo bound) "',
-          pr, '":\n', sep = '')
-        invisible(apply(gg[gg$type == 'lo', 0:1 - ncol(gg)][fl, ], 1, function(x)
-          cat(paste(x, collapse = '.'), '\n')))
-      }
+      function(x) x@type == 'multi')]) { 
+          if (nrow(prec@parameters[[pr]]@data) > 0 && prec@parameters[[pr]]@nValues != 0) {
+        if (prec@parameters[[pr]]@nValues != -1)  
+          prec@parameters[[pr]]@data <- prec@parameters[[pr]]@data[seq(length.out = 
+            prec@parameters[[pr]]@nValues),, drop = FALSE]
+        gg <- prec@parameters[[pr]]@data
+        fl <- gg[gg$type == 'lo', 'value'] > gg[gg$type == 'up', 'value']
+        stopifnot(all(gg[gg$type == 'lo', 0:1 - ncol(gg)] ==
+            gg[gg$type == 'up', 0:1 - ncol(gg)]))
+        if (any(fl)) {
+          error_type <- c(error_type, pr)
+          cat('Error: Unexcaptable bound value (up bound less lo bound) "',
+            pr, '":\n', sep = '')
+          invisible(apply(gg[gg$type == 'lo', 0:1 - ncol(gg)][fl, ], 1, function(x)
+            cat(paste(x, collapse = '.'), '\n')))
+        }
+          }
     }
     if (length(error_type)) stop('Unexcaptable bound value (up bound less lo bound) "',
       paste(error_type, collapse = '", "'), '"')
@@ -46,7 +47,10 @@
       group_comm <- prec@parameters$mTechGroupComm@data
       inp_comm[, 'als'] <- 'input'
       out_comm[, 'als'] <- 'output'
-      shr <- merge(merge(shr, group_comm), rbind(inp_comm, out_comm))
+      shr <- merge(merge(shr[!is.na(shr[, 1]),, drop = FALSE], 
+                         group_comm[!is.na(group_comm[, 1]),, drop = FALSE]), 
+                   rbind(inp_comm[!is.na(inp_comm[, 1]),, drop = FALSE], 
+                         out_comm[!is.na(out_comm[, 1]),, drop = FALSE]))
       # Check and out
       hh <- tapply(shr$value, shr[, c('type', 'tech', 'als', 'group', 'region', 'year', 'slice')], sum)
       if (max(hh['lo',,,,,,], na.rm = TRUE) > 1) {
@@ -64,11 +68,11 @@
                    g, '.*.*.*', ' ', ll[tt, a, g, 1, 1, ], '\n', sep = '')
               }  else {
                 rg <- dimnames(ll)[[4]][apply(ll[tt, a, g,,,, drop = FALSE] > 1, 
-                  2, any)][1]
+                  4, any)][1]
                 yr <- dimnames(ll)[[5]][apply(ll[tt, a, g, rg,,, drop = FALSE] > 1, 
-                  2, any)][1]
+                  5, any)][1]
                 sl <- dimnames(ll)[[6]][apply(ll[tt, a, g, rg, yr,, drop = FALSE] > 1, 
-                  2, any)][1]
+                  6, any)][1]
                 cat('Share lo more than 1 for ', a, ' commodity, first row: ', tt, '.',
                    g, '.', rg, '.', yr, '.', sl, ' ', ll[tt, a, g, rg, yr, sl], 
                      '\n', sep = '')
@@ -92,11 +96,11 @@
                    g, '.*.*.*', ' ', ll[tt, a, g, 1, 1, ], '\n', sep = '')
               }  else {
                 rg <- dimnames(ll)[[4]][apply(ll[tt, a, g,,,, drop = FALSE] < 1, 
-                  2, any)][1]
+                  4, any)][1]
                 yr <- dimnames(ll)[[5]][apply(ll[tt, a, g, rg,,, drop = FALSE] < 1, 
-                  2, any)][1]
+                  5, any)][1]
                 sl <- dimnames(ll)[[6]][apply(ll[tt, a, g, rg, yr,, drop = FALSE] < 1, 
-                  2, any)][1]
+                  6, any)][1]
                 cat('Share up less than 1 for ', a, ' commodity, first row: ', tt, '.',
                    g, '.', rg, '.', yr, '.', sl, ' ', ll[tt, a, g, rg, yr, sl], 
                      '\n', sep = '')
@@ -588,7 +592,7 @@ LL1 <- proc.time()[3]
       }
       # Check user error
       check_parameters(prec)
-########
+      ########
 #  Remove unused technology
 ########
     for(i in seq(along =obj@data)) {
