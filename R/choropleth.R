@@ -19,6 +19,8 @@ choropleth.scenario <- function(obj, # scenario object
                                 # for.each = list(), # parameter for animation
                                 # for.sum = list(), # parameter for animation
                                 ...,
+                                cols = "Reds",
+                                n = 9,
                                 src.reg = TRUE,   # logical, if TRUE, map trade for source region
                                 dst.reg = !src.reg, # if TRUE, map trade for destination region
                                 shading = NULL,
@@ -95,8 +97,12 @@ choropleth.scenario <- function(obj, # scenario object
   #}
   spdf <- sp::merge(scen.BAU@model@sysInfo@GIS, dat)
   #head(spdf@data)
+  if(is.null(n)) n = 9
+  if(is.null(cols)) cols = "Reds"
   if(is.null(shading)) {
-    sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], n = 9)
+    sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], 
+                                 cols = brewer.pal(n, cols),
+                                 n = n)
   } else {
     sh <- shading
   }
