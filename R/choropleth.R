@@ -19,11 +19,11 @@ choropleth.scenario <- function(obj, # scenario object
                                 # for.each = list(), # parameter for animation
                                 # for.sum = list(), # parameter for animation
                                 ...,
-                                cols = "Reds",
-                                n = 9,
                                 src.reg = TRUE,   # logical, if TRUE, map trade for source region
                                 dst.reg = !src.reg, # if TRUE, map trade for destination region
-                                shading = NULL,
+                                shading = NULL, # colors for syncronization with other data
+                                cols = "Reds", # used only if shading is not provided
+                                n = 9, # used only if shading is not provided
                                 px = NA, # x coordinate of legend locatio
                                 py = NA, # y coordinate of legend location
                                 main = NULL, 
@@ -101,7 +101,7 @@ choropleth.scenario <- function(obj, # scenario object
   if(is.null(cols)) cols = "Reds"
   if(is.null(shading)) {
     sh <- GISTools::auto.shading(spdf@data[!is.na(spdf@data$value), "value"], 
-                                 cols = brewer.pal(n, cols),
+                                 cols = RColorBrewer::brewer.pal(n, cols),
                                  n = n)
   } else {
     sh <- shading
