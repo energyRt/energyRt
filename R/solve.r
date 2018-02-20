@@ -662,9 +662,9 @@ LL1 <- proc.time()[3]
     }
     cat(obj@misc$additionalCode, sep = '\n', file = zz)
     cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
-        grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', run_code) - 1)], sep = '\n', file = zz)
+        grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) - 1)], sep = '\n', file = zz)
     cat(obj@misc$additionalCodeAfter, sep = '\n', file = zz)
-    cat(run_code[(min(c(grep('47b574db-2b0b-4556-a2e1-b323430d6ae6', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
+    cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
     # Add constrain file to read list
     close(zz)
     pp2 <- proc.time()[3]
@@ -790,10 +790,13 @@ LL1 <- proc.time()[3]
         cat('value\n2.00\n', file = z3)
         close(z3)
       }
-  } else stop('Unknown solver ', solver)
+  } else stop('Unknown solver ', solver) 
     vrb_list <- read.csv(paste(tmpdir, '/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
     if (file.exists(paste(tmpdir, '/variable_list2.csv', sep = ''))) {
       vrb_list2 <- read.csv(paste(tmpdir, '/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
+    } else vrb_list2 <- character()
+    if (file.exists(paste(tmpdir, '/variable_list3.csv', sep = ''))) {
+      vrb_list <- c(vrb_list, read.csv(paste(tmpdir, '/variable_list3.csv', sep = ''), stringsAsFactors = FALSE)$value)
     } else vrb_list2 <- character()
     rr <- list(variables = list(), par_arr = list(), set = read.csv(paste(tmpdir, 
       '/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
