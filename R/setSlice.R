@@ -4,14 +4,29 @@
 require(energyRt)
 mdl <- new('model')
 # set Slice name vectors
-#setSlice_name_vector <- function(mdl, ...) {
-  arg <- list(...)
-  dtf <-data.frame(stringsAsFactors = FALSE)
-  for (i in seq(along = arg)) {
-    if (class(arg[[i]]) == 'list') {
-    } else {
-      
+#.setSlice <- function(mdl, arg, dtf = data.frame(stringsAsFactors = FALSE)) {
+ #  arg <- list(...)
+  check_colnames <- function(dtf, nm) {
+    if (any(colnames(dtf) == nm) || any(grep('^[!A-z]', nm)) || any(gsub('[[:alnum:]]*', nm)))
+      stop(paste('Wrong slice level names "', nm, '"', sep = ''))
+  }
+  check_slice <- function(nm) {
+    if (any(grep('^[!A-z]', nm)) || any(gsub('[[:alnum:]]*', nm)) || anyDuplicated(nm)) {
+      n1 <- unique(c(grep('^[!A-z]', nm, value = TRUE), grep('[[:alnum:]]*', nm, value = TRUE)))
+      ms1 <- NULL; ms2 <- NULL; 
+      if (length(n1) != 0) 
+        ms1 <- paste('Wrong slice names "', paste(n1, collapse = '", "'), '". ', sep = '')
+      n2 <- unique(nm[duplicated(nm)])
+      if (length(n2) != 0) 
+        ms2 <- paste('Wrong slice names "', paste(n1, collapse = '", "'), '"', sep = '')
+      ms <- paste(ms1, ms2, sep = '')
+      stop(ms)
     }
+  }
+  for (i in seq(along = arg)) {
+    check_colnames(dtf, arg[[1]])
+    if ()
+    dtf <- .setSlice
   }
   
 #}
