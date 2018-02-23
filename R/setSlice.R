@@ -11,22 +11,32 @@ mdl <- new('model')
       stop(paste('Wrong slice level names "', nm, '"', sep = ''))
   }
   check_slice <- function(nm) {
-    if (any(grep('^[!A-z]', nm)) || any(gsub('[[:alnum:]]*', nm)) || anyDuplicated(nm)) {
-      n1 <- unique(c(grep('^[!A-z]', nm, value = TRUE), grep('[[:alnum:]]*', nm, value = TRUE)))
+    if (any(grep('^[A-z]', nm, invert = TRUE)) || any(gsub('[[:alnum:]]*', '', nm) != '') || anyDuplicated(nm)) {
+      n1 <- unique(c(grep('^[A-z]', nm, invert = TRUE, value = TRUE), nm[(gsub('[[:alnum:]]*', '', nm) != '')]))
       ms1 <- NULL; ms2 <- NULL; 
       if (length(n1) != 0) 
         ms1 <- paste('Wrong slice names "', paste(n1, collapse = '", "'), '". ', sep = '')
       n2 <- unique(nm[duplicated(nm)])
       if (length(n2) != 0) 
-        ms2 <- paste('Wrong slice names "', paste(n1, collapse = '", "'), '"', sep = '')
+        ms2 <- paste('Wrong slice names "', paste(n2, collapse = '", "'), '"', sep = '')
       ms <- paste(ms1, ms2, sep = '')
       stop(ms)
     }
   }
-  for (i in seq(along = arg)) {
-    check_colnames(dtf, arg[[1]])
-    if ()
-    dtf <- .setSlice
+  # Check full of slice sample
+  check_full_slice <- function (dtf) {
+    stop('check_full_slice')
+  }
+  dtf <- data.frame(stringsAsFactors = FALSE)
+  slice_def <- function(dtf, arg) {
+    while (length(arg) != 0) {
+      if (is.list(arg[[1]]))
+    }
+      dtf <- check_colnames(dtf, arg[[1]])
+      if ()
+        dtf <- .setSlice
+    }
+    dtf
   }
   
 #}
