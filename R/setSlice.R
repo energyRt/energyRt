@@ -28,19 +28,10 @@ mdl <- new('model')
     stop('check_full_slice')
   }
   slice_def <- function(dtf, arg) {
+    if (is.null(names(arg)) || any(names(arg) == ""))
+      stop(paste('.setSlice: Un named arguments: ', paste(capture.output(print(arg)), collapse = '\n'), sep = '\n'))
     while (length(arg) != 0) {
-      if (!(is.character(arg[[1]]) || (!is.null(names(arg)) && !is.na(names(arg))[1]) && 
-            is.list(arg[[1]])))
-        stop(paste('.setSlice: Unknown argument: ', paste(capture.output(print(arg[[1]])), collapse = '\n'),
-                   sep = '\n'))
-      if (is.character(arg[[1]])) {
-        lv <- arg[[1]];
-        arg <- arg[-1]
-      } else {
         lv <- names(arg)[1]
-      }
-      if (length(arg) == 0) 
-        stop(paste('.setSlice: There are no slice for level "', lv, '"', sep = ''))
       dtf[, lv] <- rep(character(), nrow(dtf))
       if (is.character(arg[[1]]) || (!is.null(names(arg[[1]])) && is.numeric(arg[[1]]))) {
         if (is.character(arg[[1]])) {
@@ -55,8 +46,9 @@ mdl <- new('model')
           stop(paste(paste('.setSlice: There are wronf slice data for level "', lv, '"\n', 
                            sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
         arg <- arg[-1]
-        dtf0 <- dtf; dtf <- dtf[0,, drop = FALSE];
-        dtf[, lv] <- rep(character(), nrow(dtf))
+        dtf0 <- dtf; 
+        dtf <- dtf[0,, drop = FALSE];
+        dtf[, lv] <- character()
         if (nrow(dtf0) != 0) {
           dtf[1:(nrow(dtf0) * length(val_sh)), ] <- NA
           for (i in 2:ncol(dtf0)) dtf[, i] <- dtf0[, i]
@@ -68,10 +60,14 @@ mdl <- new('model')
           dtf[, 'share'] <- val_sh
         }
       } else if (is.list(arg[[1]])) {
-        dtf0 <- dtf
-        while (length(arg) != 0) 
-          dtf <- rbind(dtf, slice_def(dtf, arg[[1]]))
-        arg <- arg[-1]
+        #if (length(arg[[1]]) == 0)
+        #  stop(paste('.setSlice: There are no slice for level "', lv, '"', sep = ''))
+        dtf0 <- dtf;
+        dtf <- dtf[0,, drop = FALSE]
+        arg2 <- arg[[1]]; 
+        for (i in seq(length.out = length(arg2))) { 
+          dtf <- rbind(dtf, slice_def(dtf0, list(lv, arg2[[i]])))
+        }
       } else stop(paste('.setSlice: Unknown type of argument for slice level "', lv, '"', sep = ''))
     }
     dtf
@@ -81,10 +77,13 @@ mdl <- new('model')
   dtf[, c(2:ncol(dtf), 1), drop = FALSE]
 }
 
-arg <- list('lv', paste('x', 1:12, sep = ''))
+#! 1
+.setSlice("SEASON" = c("WINTER", "SUMMER"))
+.setSlice("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
+.setSlice("SEASON" = list("WINTER" = .6, "SUMMER" = list(.3, DAY = c('MORNING', 'EVENING'))))
+.setSlice("SEASON" = list("WINTER" = .6, "SUMMER" = list(.3, DAY = c(MORNING = .5, EVENING = .5))))
+.setSlice("SEASON" = list("WINTER" = .6, "SUMMER" = list(.3, DAY = list(MORNING = .5, EVENING = .5))))
 
-.setSlice(mdl, 'lv', paste('x', 1:12, sep = ''))
-
-.setSlice(mdl, lv1 = list(c('hh' = .5, 'gg' = .25, 'll' = .25)))
-
+#! 2
+.setSlice("SEASON" = c("WINTER", "SUMMER"), HOUR = paste('H', seq(0, 21, by = 3), sep = ''))
 
