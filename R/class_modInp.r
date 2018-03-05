@@ -58,6 +58,14 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mUpComm']] <- createParameter('mUpComm', 'comm', 'map')    
     .Object@parameters[['mLoComm']] <- createParameter('mLoComm', 'comm', 'map')    
     .Object@parameters[['mFxComm']] <- createParameter('mFxComm', 'comm', 'map')    
+    # slice data
+    .Object@parameters[['mExpSlice']] <- createParameter('mExpSlice', c('expp', 'slice'), 'map', cls = 'export')   
+    .Object@parameters[['mImpSlice']] <- createParameter('mImpSlice', c('imp', 'slice'), 'map', cls = 'import')   
+    .Object@parameters[['mTechSlice']] <- createParameter('mTechSlice', c('tech', 'slice'), 'map', cls = 'technology')   
+    .Object@parameters[['mSupSlice']] <- createParameter('mSupSlice', c('sup', 'slice'), 'map', cls = 'supply')   
+    .Object@parameters[['mStorageSlice']] <- createParameter('mStorageSlice', c('stg', 'slice'), 'map', cls = 'storage')   
+    .Object@parameters[['mTradeSlice']] <- createParameter('mTradeSlice', c('trade', 'slice'), 'map', cls = 'trade')   
+    .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
     # simple
     .Object@parameters[['pEmissionFactor']] <- 
         createParameter('pEmissionFactor', c('comm', 'commp'), 'simple',  #PPP

@@ -76,6 +76,7 @@ mMilestoneHasNext(year)        Is there next period milestone
 mStartMilestone(year, year)    ???
 mEndMilestone(year, year)      ???
 mMidMilestone(year)            ???
+mCommSlice(comm, slice)        Commodity balance slice
 mTechRetirement(tech)          Early retirement option
 mTechUpgrade(tech, tech)       Upgrade by this technology possible for techp
 mTechInpComm(tech, comm)       Input main commodity
@@ -937,7 +938,7 @@ eqDemInp(comm, region, year, slice)
 *eqDemInp2(comm, region, year, slice, year, year)
 ;
 
-eqDemInp(comm, region, year, slice)$(mMidMilestone(year) and sum(dem$mDemComm(dem, comm), 1))..
+eqDemInp(comm, region, year, slice)$(mMidMilestone(year) and sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))..
          vDemInp(comm, region, year, slice)  =e=
          sum(dem$mDemComm(dem, comm), pDemand(dem, region, year, slice));
 
@@ -1245,7 +1246,7 @@ eqOutTot(comm, region, year, slice)$mMidMilestone(year)..
          vAggOut(comm, region, year, slice)$(sum(commp$pAggregateFactor(comm, commp), 1)) +
          vTechOutTot(comm, region, year, slice)$(sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and
                   (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1)) +
-         vDummyImport(comm, region, year, slice)$defpDummyImportCost(comm, region, year, slice) +
+         vDummyImport(comm, region, year, slice)$(mCommSlice(comm, slice) and defpDummyImportCost(comm, region, year, slice)) +
          vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
          vImport(comm, region, year, slice)$(sum((dst, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeDst(trade, dst)), 1)
                     + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), 1));
@@ -1255,9 +1256,9 @@ eqInpTot(comm, region, year, slice)$mMidMilestone(year)..
          =e=
          vTechInpTot(comm, region, year, slice)$(sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and
              (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1)) +
-         vDemInp(comm, region, year, slice)$(sum(dem$mDemComm(dem, comm), 1)) +
+         vDemInp(comm, region, year, slice)$(mCommSlice(comm, slice) and sum(dem$mDemComm(dem, comm), 1)) +
          vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
-         vDummyExport(comm, region, year, slice)$defpDummyExportCost(comm, region, year, slice) +
+         vDummyExport(comm, region, year, slice)$(mCommSlice(comm, slice) and defpDummyExportCost(comm, region, year, slice)) +
          vExport(comm, region, year, slice)$(sum((src, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src)), 1)
                     + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1));
 
@@ -1323,9 +1324,9 @@ eqDummyCost(comm, region, year)$(mMidMilestone(year) and
   (sum(slice$defpDummyImportCost(comm, region, year, slice), 1) or sum(slice$defpDummyExportCost(comm, region, year, slice), 1)))..
          vDummyCost(comm, region, year)
          =e=
-         sum(slice$defpDummyImportCost(comm, region, year, slice),
+         sum(slice$(mCommSlice(comm, slice) and defpDummyImportCost(comm, region, year, slice)),
            pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice)) +
-         sum(slice$defpDummyExportCost(comm, region, year, slice),
+         sum(slice$(mCommSlice(comm, slice) and defpDummyExportCost(comm, region, year, slice)),
            pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
 
 
@@ -26236,7 +26237,7 @@ eqLECActivity
 option lp = cbc;
 
 * f374f3df-5fd6-44f1-b08a-1a09485cbe3d
-
+$exit
 Solve st_model minimizing vObjective using LP;
 
 

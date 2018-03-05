@@ -237,11 +237,12 @@
   }
   # Create exemplar for code
   prec <- new('modInp')
+  obj@sysInfo@slice <- .init_slice(obj@sysInfo@slice)
   # List for approximation
   approxim <- list(
       region = obj@sysInfo@region,
       year   = obj@sysInfo@year,
-      slice  = obj@sysInfo@slice
+      slice  = obj@sysInfo@slice@misc$all_slice
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
@@ -253,11 +254,11 @@
       obj@sysInfo@year <- arg$year
       arg <- arg[names(arg) != 'year', drop = FALSE]
   }
-  if (any(names(arg) == 'slice')) {
-      approxim$slice = arg$slice
-      obj@sysInfo@slice <- arg$slice
-      arg <- arg[names(arg) != 'slice', drop = FALSE]
-  }
+  #if (any(names(arg) == 'slice')) {
+  #    approxim$slice = arg$slice
+  #    obj@sysInfo@slice <- arg$slice
+  #    arg <- arg[names(arg) != 'slice', drop = FALSE]
+  #}
   if (any(names(arg) == 'discount')) {
       obj@sysInfo@discount <- arg$discount
       arg <- arg[names(arg) != 'discount', drop = FALSE]

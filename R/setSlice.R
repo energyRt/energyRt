@@ -118,6 +118,7 @@ mdl <- new('model')
   dtf
 }
 
+
 #! 1
 #.setSlice("SEASON" = c("WINTER", "SUMMER"))
 #.setSlice("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
