@@ -3,9 +3,47 @@
 
 require(energyRt)
 mdl <- new('model')
+
+
+.slice_check_data <- function(dtf) {
+  if (ncol(dtf) < 2) stop(".setSlice: slice data frame have to greate or equal two")
+  if (colnames(dtf)[ncol(dtf)] != "share") stop(".setSlice: last slice data frame have to name 'share'")
+  rcs <- colnames(dtf)[-ncol(dtf)]
+  if (anyDuplicated(rcs))
+    stop(paste('.setSlice: there are duplicated slice levels: "', 
+               paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
+  fl <- apply(dtf[, -c(1, ncol(dtf)), drop = FALSE], 2, function(x) length(unique(x)) == 1)
+  if (any(fl)) 
+    stop(paste('.setSlice: all slice except first, have to consist from more than one slice, incorrect levels: "', 
+               paste(colnames(dtf)[c(FALSE, fl, FALSE)], collapse = '", "'), '"', sep = ''))
+  if (length(unique(dtf[, 1])) != 1)
+    stop(".setSlice: first slice have to consist only one slice")
+  rcs <- c(apply(dtf[, -ncol(dtf), drop = FALSE], 2, function(x) unique(x)), recursive = TRUE)
+  if (anyDuplicated(rcs))
+    stop(paste('.setSlice: there are duplicated slice in different levels: "', 
+               paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
+  # Check
+  if (sum(dtf$share) != 1) stop('.setSlice: Sum of share have to be equal one, not: ', sum(dtf$share))
+  ll <- apply(dtf[, -ncol(dtf), drop = FALSE], 1, paste, collapse = '.')
+  if (anyDuplicated(ll))
+    stop(paste('.setSlice: There are duplicate set of slice. ("',  paste(ll[duplicated(ll)], collapse = '", "'), '").', sep = ''))
+  if (length(ll) != prod(sapply(dtf[, -ncol(dtf), drop = FALSE], function(x) length(unique(x))))) {
+    dtf2 <- unique(dtf[, 1])
+    for (i in seq(length = ncol(dtf) - 2) + 1) {
+      ln <- length(unique(dtf[, i]))
+      dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), '.', unique(dtf[, i]), sep = '')
+    }
+    stop(paste('.setSlice: There are uncovered set of slice. ("',  paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").', sep = ''))
+  }
+}
+
 # set Slice name vectors
 .setSlice <- function(mdl, ...) {
   arg <- list(...)
+  rcs <- names(arg)
+  if (anyDuplicated(rcs))
+    stop(paste('.setSlice: there are duplicated slice levels: "', 
+               paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
   check_colnames <- function(dtf, nm) {
     if (any(colnames(dtf) == nm) || any(grep('^[!A-z]', nm)) || any(gsub('[[:alnum:]]*', nm)))
       stop(paste('Wrong slice level names "', nm, '"', sep = ''))
@@ -102,19 +140,14 @@ mdl <- new('model')
   dtf <- data.frame(share = numeric(), stringsAsFactors = FALSE)
   dtf <- slice_def(dtf, arg)
   dtf <- dtf[, c(2:ncol(dtf), 1), drop = FALSE]
-  # Check
-  if (sum(dtf$share) != 1) stop('.setSlice: Sum of share have to be equal one, not: ', sum(dtf$share))
-  ll <- apply(dtf[, -ncol(dtf), drop = FALSE], 1, paste, collapse = '.')
-  if (anyDuplicated(ll))
-    stop(paste('.setSlice: There are duplicate set of slice. ("',  paste(ll[duplicated(ll)], collapse = '", "'), '").', sep = ''))
-  if (length(ll) != prod(sapply(dtf[, -ncol(dtf), drop = FALSE], function(x) length(unique(x))))) {
-    dtf2 <- unique(dtf[, 1])
-    for (i in seq(length = ncol(dtf) - 2) + 1) {
-      ln <- length(unique(dtf[, i]))
-      dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), '.', unique(dtf[, i]), sep = '')
-    }
-    stop(paste('.setSlice: There are uncovered set of slice. ("',  paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").', sep = ''))
+  if (length(unique(dtf[, 1])) != 1) {
+    warning('.setSlice: first slice have to consist only one slice, add "ANNUAL"')
+    if (any(colnames(dtf) == 'year') || any(c(dtf == "ANNUAL", recursive = TRUE)))
+      stop('.setSlice: cannot add level "year" slice, with level "ANNUAL"')
+    dtf$year  <- rep('ANNUAL', nrow(dtf))
+    dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
   }
+  .slice_check_data(dtf)
   dtf
 }
 
