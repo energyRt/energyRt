@@ -115,6 +115,7 @@
 #####################################################################################
 # Argument data prepare
 #####################################################################################
+  obj@sysInfo@slice <- .init_slice(obj@sysInfo@slice)
   pp1 <- proc.time()[3]
   # Upper case
   arg <- list(...)
@@ -193,8 +194,9 @@
     arg <- arg[names(arg) != 'year', drop = FALSE]
   } 
   if (any(names(arg) == 'slice')) {
-    obj@sysInfo@slice <- arg$slice
-    arg <- arg[names(arg) != 'slice', drop = FALSE]
+    warning('parameter "slice" was deprecated')
+    # obj@sysInfo@slice <- arg$slice
+    # arg <- arg[names(arg) != 'slice', drop = FALSE]
   } 
   if (any(names(arg) == 'repository')) {
     rpp <- sapply(obj@data, function(x) x@name)
@@ -242,7 +244,7 @@
   approxim <- list(
       region = obj@sysInfo@region,
       year   = obj@sysInfo@year,
-      slice  = obj@sysInfo@slice@misc$all_slice
+      slice  = obj@sysInfo@slice@misc 
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
@@ -278,12 +280,18 @@
   # Fill DB by year
   prec@parameters[['year']] <- addData(prec@parameters[['year']], as.numeric(approxim[['year']]))
   prec <- read_default_data(prec, obj@sysInfo)
+  commodity_slice_map <- list()
   # add set 
   for(i in seq(along = obj@data)) {
         for(j in seq(along = obj@data[[i]]@data)) { #if (class(obj@data[[i]]@data[[j]]) == 'technology') {
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
+          if (class(obj@data[[i]]@data[[j]]) == 'commodity') {
+            if (is.null(obj@data[[i]]@data[[j]]@slice)) obj@data[[i]]@data[[j]]@slice <- approxim$slice$default_slice_level
+            commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@slice
+          }
         }
-    }
+  }
+  approxim$commodity_slice_map <- commodity_slice_map
   cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {

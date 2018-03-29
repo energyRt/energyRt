@@ -1,8 +1,8 @@
 # setSlice(level1= 'MON', TH', ..., level2= '1H', 2H', ...)
 # setSlice(level1= list(name 'WEEKDAY', 'MON' = 1/12, 'TH' = 1/13), ..., level2= '1H', 2H', ...)setSlice(level1= list('MON' = list(1/12, c('1H' = 1/13)), ...)
 
-require(energyRt)
-mdl <- new('model')
+#require(energyRt)
+#mdl <- new('model')
 
 
 .slice_check_data <- function(dtf) {
@@ -38,7 +38,7 @@ mdl <- new('model')
 }
 
 # set Slice name vectors
-.setSlice <- function(mdl, ...) {
+.setSlice <- function(...) {
   arg <- list(...)
   rcs <- names(arg)
   if (anyDuplicated(rcs))
@@ -148,8 +148,26 @@ mdl <- new('model')
     dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
   }
   .slice_check_data(dtf)
-  dtf
+  sl <- new('slice')
+  sl@levels <- dtf
+  sl
 }
+
+setMethod('setSlice', signature(obj = 'model'), function(obj, ...) {
+  obj@sysInfo@slice <- .setSlice(...)
+  obj
+})
+                              
+setMethod('setSlice', signature(obj = 'scenario'), function(obj, ...) {
+  obj@model@sysInfo@slice <- .setSlice(...)
+  obj
+})
+
+setMethod('setSlice', signature(obj = 'sysInfo'), function(obj, ...) {
+  obj@slice <- .setSlice(...)
+  obj
+})
+
 
 
 #! 1

@@ -7,7 +7,9 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
   cmd <- energyRt:::.upper_case(app)
   cmd <- stayOnlyVariable(cmd, approxim$region, 'region')
-#  if (!energyRt:::.chec_correct_name(cmd@name)) {
+  browser()
+  #obj@parameters[['mCommSlice']] <- addData(obj@parameters[['mCommSlice']], data.frame(comm = rep(cmd@name))
+  #  if (!energyRt:::.chec_correct_name(cmd@name)) {
 #    stop(paste('Incorrect commodity name "', cmd@name, '"', sep = ''))
 #  }
 ##    cat(cmd@name, '\n')
@@ -46,6 +48,17 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 })
 
 
+################################################################################
+# Add apporoximation to standart view
+################################################################################
+fix_approximation_list <- function(approxim, lev = NULL, comm = NULL) {
+  if (!is.null(comm)) {
+    if (!is.null(comm)) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
+    lev <- approxim$commodity_slice_map[[comm]]
+  }
+  approxim$slice <- approxim$slice[[approxim$slice$slice_level[[lev]]]]
+  approxim
+}
 
 ################################################################################
 # Add demand
@@ -54,6 +67,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
   approxim = 'list'), function(obj, app, approxim) {     
   dem <- energyRt:::.upper_case(app)
   dem <- stayOnlyVariable(dem, approxim$region, 'region')
+  approxim <- fix_approximation_list(approxim, comm = dem@commodity)
 #  if (!energyRt:::.chec_correct_name(dem@name)) {
 #    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
 #  }
@@ -76,8 +90,9 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
-  sup <- energyRt:::.upper_case(app)
-  if (!is.null(sup@region)) {
+    sup <- energyRt:::.upper_case(app)
+    approxim <- fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
+    if (!is.null(sup@region)) {
     approxim$region <- approxim$region[approxim$region %in% sup@region]
     ss <- getSlots('supply')
     ss <- names(ss)[ss == 'data.frame']
@@ -125,7 +140,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
   exp <- energyRt:::.upper_case(app)
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
-#  if (!energyRt:::.chec_correct_name(exp@name)) {
+  approxim <- fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
+  #  if (!energyRt:::.chec_correct_name(exp@name)) {
 #    stop(paste('Incorrect export name "', exp@name, '"', sep = ''))
 #  }
 #  if (isExport(obj, exp@name)) {
@@ -154,7 +170,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
   imp <- energyRt:::.upper_case(app)
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
-#  if (!energyRt:::.chec_correct_name(imp@name)) {
+  approxim <- fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
+  #  if (!energyRt:::.chec_correct_name(imp@name)) {
 #    stop(paste('Incorrect import name "', imp@name, '"', sep = ''))
 #  }
 #  if (isImport(obj, imp@name)) {
@@ -397,6 +414,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 #  mLoComm(comm)  PRODUCTION >= CONSUMPTION
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
   tech <- energyRt:::.upper_case(app)
+  if (is.null(tech@slice)) {
+    tech@slice <- names(approxim$deep)[max(approxim$deep[unique(sapply(c(tech@output$comm, 
+       tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))])]
+  }
+  approxim <- fix_approximation_list(approxim, lev = tech@slice)
   if (!is.null(tech@region)) {
     approxim$region <- approxim$region[approxim$region %in% tech@region]
     ss <- getSlots('technology')
@@ -725,6 +747,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
+  approxim <- fix_approximation_list(approxim, comm = trd@commodity, lev = trd@slice)
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
