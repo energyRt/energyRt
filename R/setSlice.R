@@ -1,7 +1,7 @@
 # setSlice(level1= 'MON', TH', ..., level2= '1H', 2H', ...)
 # setSlice(level1= list(name 'WEEKDAY', 'MON' = 1/12, 'TH' = 1/13), ..., level2= '1H', 2H', ...)setSlice(level1= list('MON' = list(1/12, c('1H' = 1/13)), ...)
 
-#require(energyRt)
+# require(energyRt)
 #mdl <- new('model')
 
 
@@ -147,6 +147,7 @@
     dtf$year  <- rep('ANNUAL', nrow(dtf))
     dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
   }
+  if (abs(sum(dtf$share) - 1) < 1e-10) dtf$share <- (dtf$share / sum(dtf$share))
   .slice_check_data(dtf)
   sl <- new('slice')
   sl@levels <- dtf
@@ -171,11 +172,11 @@ setMethod('setSlice', signature(obj = 'sysInfo'), function(obj, ...) {
 
 
 #! 1
-#.setSlice("SEASON" = c("WINTER", "SUMMER"))
-#.setSlice("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
-#.setSlice("SEASON" = list("WINTER" = .6, "SUMMER" = .4))
-#.setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING'))))
-#.setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING')))) # have to error
+# .setSlice("SEASON" = c("WINTER", "SUMMER"))
+# .setSlice("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
+# .setSlice("SEASON" = list("WINTER" = .6, "SUMMER" = .4))
+# .setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING'))))
+# .setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING')))) # have to error
 
 #! 2
 #.setSlice("SEASON" = c("WINTER", "SUMMER"), HOUR = paste('H', seq(0, 21, by = 3), sep = ''))
