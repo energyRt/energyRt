@@ -70,147 +70,24 @@ setClass("slice",
         }
         i <- i + 1
       }
-      sl@all_parent_child <- sl@all_parent_child[0,, drop = FALSE]
-      # sl@all_parent_child[sum(sapply(seq(along = sl@misc$nlevel), function(x) prod(sl@misc$nlevel[1:x]) * (x - 1))), ] <- NA
-      
-      k <- 0
-      for (i in 1:(ncol(dtf) - 2)) {
-        l <- nrow(dtf) / prod(sl@misc$nlevel[i]); k <- 1;
-        while (k < nrow(dtf)) {
-          if (i == 1) s1 <- dtf[k, 1] else s1 <- paste(dtf[k, 2:i, drop = FALSE], collapse = '_')
-          for (z in (i + 1):(ncol(dtf) - 1)) {
-            uu <- prod(sl@misc$nlevel[2:z])
-            tmp <- data.frame(parent = rep(s1, uu), 
-                              child = apply(dtf[k - 1 + seq(1, nrow(dtf), by  = uu), 2:z, drop = FALSE], 1, paste, collapse = '_'), 
-                              stringsAsFactors = FALSE)
-            sl@all_parent_child <- rbind(sl@all_parent_child, tmp)
-          }
-          k <- k + l
-        }
-      }
+      # all parent child realtion fill
+      sl@all_parent_child[sum(sapply(seq(along = sl@misc$nlevel), function(x) prod(sl@misc$nlevel[1:x]) * (x - 1))), ] <- NA
+      l2 <- unique(c(sl@parent_child$parent, sl@parent_child$child))
+      l2 <- l2[l2 != sl@levels[1, 1]]      
+      sl@all_parent_child[1:length(l2), 'parent'] <- sl@levels[1, 1]
+      sl@all_parent_child[1:length(l2), 'child'] <- l2
+      tt <- sl@parent_child[sl@parent_child$parent != sl@levels[1, 1],, drop = FALSE]
+      k <- length(l2)
+      for (i in l2) {
+        kk <- grep(paste('^', i, '_', sep = ''), sl@parent_child$child)
+        sl@all_parent_child[k + seq(along = kk), 'parent'] <- i
+        sl@all_parent_child[k + seq(along = kk), 'child'] <- sl@parent_child[kk, 'child']
+        k <- (length(kk) + k)
         
-        jj <- seq(1, nrow(dtf), length.out = prod(sl@misc$nlevel[i]))
-        if (i == 1) s1 <- dtf[jj, 1] else s1 <- apply(dtf[jj, 2:i, drop = FALSE], 1, paste, collapse = '_')
-        for (j in seq(along = jj)) {
-          for (l in (i + 1):(ncol(dtf) - 1)) {
-            s2 <- apply(dtf[, 2:l, drop = FALSE], 1, paste, collapse = '_')
-            kk <- k + 1:length(s2)
-            sl@all_parent_child[kk, 'parent'] <- s1[j]
-            sl@all_parent_child[kk, 'child'] <- s2
-            k <- k + length(s2)
-          }
-        }
-        k <- k + l
-      }
-      
-      
-      rtt <-list()
-      for (i in 1:nrow(sl@slice_share)) {
-        
-      }
-      
-      hh <- sum(sapply(seq(along = sl@misc$nlevel), function(x) prod(sl@misc$nlevel[1:x]) * (x - 1)))
-      
-      
-      tt <- sl@all_parent_child
-      tt[, ncol(tt)][tt[, ncol(tt)] %in% tt[, ncol(tt) - 1]]
-      
-      for (i in ) tt <- 
-      
-      #sl@parent_child$lev <- NULL 
-      k <- 0
-      for (i in 1:(ncol(dtf) - 2)) {
-        jj <- seq(1, nrow(dtf), length.out = prod(sl@misc$nlevel[i]))
-        if (i == 1) s1 <- dtf[jj, 1] else s1 <- apply(dtf[jj, 2:i, drop = FALSE], 1, paste, collapse = '_')
-        for (j in seq(along = jj)) {
-          for (l in (i + 1):(ncol(dtf) - 1)) {
-            s2 <- apply(dtf[, 2:l, drop = FALSE], 1, paste, collapse = '_')
-            kk <- k + 1:length(s2)
-            sl@all_parent_child[kk, 'parent'] <- s1[j]
-            sl@all_parent_child[kk, 'child'] <- s2
-            k <- k + length(s2)
-          }
-        }
-      }
-      
-      
-        s2 <- apply(dtf[, 2:i, drop = FALSE], 1, paste, collapse = '_')
-        ff <- apply(dtf[seq(1, nrow(dtf), length.out = prod(sl@misc$nlevel[i - 1])), 1:(i -1), 
-                        drop = FALSE], 1, paste, collapse = '_')
-        
-        
-        
-        if (i == (ncol(dtf) - 1)) {
-          
-        }
-        # add matrix
-        fl <- seq(along = )(sl@all_parent_child$lev == i)      
-        nn <- sl@all_parent_child$parent[fl]
-        names(nn) <- sl@all_parent_child$child[fl]
-        f2 <- seq(along = sl@all_parent_child$parent)[sl@all_parent_child$parent %in% names(nn)]
-        kk <- nrow(sl@all_parent_child) + 1:length(f2)
-        sl@all_parent_child[kk, 'child'] <- sl@all_parent_child[f2, 'child']
-        sl@all_parent_child[kk, 'parent'] <-nn[sl@all_parent_child[f2, 'parent']]
-        sl@all_parent_child[kk, 'parent'] <-nn[sl@all_parent_child[f2, 'parent']]
-      }
-      
+      }  
     }
-
-    
-    
-      # Fill misc list for compilation 
-  dtf <- sl@levels
-  sl@misc$slice_map <- lapply(dtf[, -ncol(dtf), drop = FALSE], unique)
-  names(sl@misc$slice_map) <- colnames(dtf)[-ncol(dtf)]
-  sl@misc$slice_ln <-lapply(sl@misc$slice_map, length)
-  names(sl@misc$slice_ln) <- colnames(dtf)[-ncol(dtf)]
-  sl@misc$slice_level <- list()
-  # Calculate pair (parent, child) slice
-  sbs <- list()
-  dtf0 <- dtf[, 2:(ncol(dtf) - 1), drop = FALSE]
-  if (ncol(dtf) > 3) {
-    for (i in ncol(dtf0):2 - 1) {
-      tm2 <- unique(dtf0[, i + 1])
-      tmp <- unique(apply(dtf0[, 1:i, drop = FALSE], 1, paste, collapse = "_"))
-      sl@misc$slice_level[[colnames(dtf0)[i]]] <- tmp
-      for (xx in unique(tmp)) {
-        oo <- paste(xx, '_', tm2, sep = '')
-        sbs[[xx]] <- c(oo, sbs[oo], recursive = TRUE)
-        names(sbs[[xx]]) <- NULL
-      }
-    }
-  }
-  tm2 <- unique(dtf0[, 1])
-  sbs[[dtf[1, 1]]] <- c(tm2, sbs[tm2], recursive = TRUE)
-  names(sbs[[dtf[1, 1]]]) <- NULL
-  sl@misc$slice_level[[colnames(dtf)[1]]] <- dtf[1, 1]
-  # to data.frame
-  dtf_loup <- data.frame(par = character(), sub = character(), stringsAsFactors = FALSE)
-  dtf_loup[1:sum(sapply(sbs, length)), ] <- NA
-  k <- 0
-  for (i in names(sbs)) {
-    nn <- (k + 1:length(sbs[[i]]))
-    dtf_loup[nn, 'par'] <- i
-    dtf_loup[nn, 'sub'] <- sbs[[i]]
-    k <- k + length(sbs[[i]])
-  }
-  sl@misc$parent_child <- dtf_loup
-  # Default slice level
-  sl@misc$default_slice_level <- colnames(dtf0)[ncol(dtf0)]
-  # deep level slice 
-  sl@misc$deep <- (2:ncol(dtf) - 1)
-  names(sl@misc$deep) <- colnames(dtf)[-ncol(dtf)]
-  # Time share foe everi slice
-  unique_slice_n <- sapply(seq(along = sl@misc$deep), function(x) prod(sl@misc$deep[1:x]))
-  unique_slice <- lapply(seq(along = sl@misc$deep[-1]), function(x) unique(sl@misc$deep[2:x]))
-  slice_share <- data.frame(slice, 
-  
-  
   sl
 }
 
 
-#sl <- new('slice')
-#sl@levels <- .setSlice(year = 'ANNUAL', ll = c('l1', 'l2'), nn = c('n1', 'n2'), hh = c('h1', 'h2'))
-# .init_slice(sl)
 

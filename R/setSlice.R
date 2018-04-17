@@ -183,3 +183,4 @@ setMethod('setSlice', signature(obj = 'sysInfo'), function(obj, ...) {
 #.setSlice("SEASON" = list("WINTER" = list(.3, DAY = list('MORNING' = list(.5, tp = c('x1' = .1, 'x2' = .9)), 'EVENING' = list(.5, tp = c('x1', 'x2')))), 
 #                          "SUMMER" = list(.7, DAY = list('MORNING' = list(.5, tp = c('x1', 'x2')), 'EVENING' = list(.5, tp = c('x1', 'x2'))))))
 
+# sl = .setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING', 'PEAK')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING', 'PEAK'))))
