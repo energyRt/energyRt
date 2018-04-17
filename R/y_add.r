@@ -7,19 +7,6 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
   cmd <- energyRt:::.upper_case(app)
   cmd <- stayOnlyVariable(cmd, approxim$region, 'region')
-  browser()
-  #obj@parameters[['mCommSlice']] <- addData(obj@parameters[['mCommSlice']], data.frame(comm = rep(cmd@name))
-  #  if (!energyRt:::.chec_correct_name(cmd@name)) {
-#    stop(paste('Incorrect commodity name "', cmd@name, '"', sep = ''))
-#  }
-##    cat(cmd@name, '\n')
-#
-#  # Add commodity to set
-#  if (isCommodity(obj, cmd@name)) {
-#    warning(paste('There is commodity name "', cmd@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousCommodity(obj, cmd@name)
-#  }
   # Add ems_from & pEmissionFactor
   dd <- cmd@emis[, c('comm', 'comm', 'mean'), drop = FALSE]
   if (nrow(dd) > 0) {
@@ -44,6 +31,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
     obj@parameters[['mLoComm']] <- addData(obj@parameters[['mLoComm']], data.frame(comm = cmd@name))
   if (cmd@limtype == 'FX')
     obj@parameters[['mFxComm']] <- addData(obj@parameters[['mFxComm']], data.frame(comm = cmd@name))
+  # For slice
+  approxim <- fix_approximation_list(approxim, comm = cmd@name)
+  obj@parameters[['mCommSlice']] <- addData(obj@parameters[['mCommSlice']], 
+                                            data.frame(comm = rep(cmd@name, length(approxim$commodity_slice_map[[cmd@name]])), 
+                                                       slice = approxim$slice))
   obj
 })
 
@@ -52,11 +44,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 # Add apporoximation to standart view
 ################################################################################
 fix_approximation_list <- function(approxim, lev = NULL, comm = NULL) {
-  if (!is.null(comm)) {
-    if (!is.null(comm)) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
+  if (is.null(lev)) {
+    if (is.null(comm)) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
     lev <- approxim$commodity_slice_map[[comm]]
   }
-  approxim$slice <- approxim$slice[[approxim$slice$slice_level[[lev]]]]
+  approxim$slice <- approxim$slice@slice_map[[lev]]
   approxim
 }
 
@@ -111,6 +103,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
         data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region))
   }
   sup <- stayOnlyVariable(sup, approxim$region, 'region')
+  obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']],
+                                          data.frame(sup = rep(sup@name, length(approxim$slice)), slice = approxim$slice))
 #  if (!energyRt:::.chec_correct_name(sup@name)) {
 #    stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
 #  }
@@ -141,6 +135,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
   exp <- energyRt:::.upper_case(app)
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
   approxim <- fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
+  obj@parameters[['mExpSlice']] <- addData(obj@parameters[['mExpSlice']],
+                                             data.frame(exp = rep(exp@name, length(approxim$slice)), slice = approxim$slice))
   #  if (!energyRt:::.chec_correct_name(exp@name)) {
 #    stop(paste('Incorrect export name "', exp@name, '"', sep = ''))
 #  }
@@ -171,6 +167,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'import',
   imp <- energyRt:::.upper_case(app)
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
   approxim <- fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
+  obj@parameters[['mImpSlice']] <- addData(obj@parameters[['mImpSlice']],
+                                           data.frame(imp = rep(imp@name, length(approxim$slice)), slice = approxim$slice))
   #  if (!energyRt:::.chec_correct_name(imp@name)) {
 #    stop(paste('Incorrect import name "', imp@name, '"', sep = ''))
 #  }
@@ -415,10 +413,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
   tech <- energyRt:::.upper_case(app)
   if (is.null(tech@slice)) {
-    tech@slice <- names(approxim$deep)[max(approxim$deep[unique(sapply(c(tech@output$comm, 
-       tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))])]
+    use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
+    tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]
   }
   approxim <- fix_approximation_list(approxim, lev = tech@slice)
+  obj@parameters[['mTechSlice']] <- addData(obj@parameters[['mTechSlice']],
+                                           data.frame(tech = rep(tech@name, length(approxim$slice)), slice = approxim$slice, 
+                                                      stringsAsFactors = FALSE))
   if (!is.null(tech@region)) {
     approxim$region <- approxim$region[approxim$region %in% tech@region]
     ss <- getSlots('technology')
@@ -694,6 +695,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   approxim = 'list'), function(obj, app, approxim) {
+
+    assign('obj', obj, globalenv())
+    assign('app', app, globalenv())
+    assign('approxim', approxim, globalenv())
+    
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
   # Discount
@@ -702,6 +708,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
           obj@parameters[['pDiscount']], approxim))
   approxim_comm <- approxim
   approxim_comm[['comm']] <- obj@parameters$comm@data$comm
+  approxim_comm$slice <- c(approxim$slice@levels[, -ncol(approxim$slice@levels)], recursive = TRUE)
   if (length(approxim_comm[['comm']]) != 0) {
     # Dummy import
       obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],
@@ -748,6 +755,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
   approxim <- fix_approximation_list(approxim, comm = trd@commodity, lev = trd@slice)
+  obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
+                                            data.frame(trd = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))

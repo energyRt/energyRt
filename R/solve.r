@@ -10,7 +10,7 @@
           as.character(ss@interpolation[1, prec@parameters[[i]]@colName])
       }
     }
-    prec
+    prec;
   }
   check_parameters <- function(prec) {
     error_type <- c()
@@ -240,11 +240,12 @@
   # Create exemplar for code
   prec <- new('modInp')
   obj@sysInfo@slice <- .init_slice(obj@sysInfo@slice)
+  
   # List for approximation
   approxim <- list(
       region = obj@sysInfo@region,
       year   = obj@sysInfo@year,
-      slice  = obj@sysInfo@slice@misc 
+      slice  = obj@sysInfo@slice
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
@@ -273,10 +274,12 @@
       open.folder <- arg$open.folder
       arg <- arg[names(arg) != 'open.folder', drop = FALSE]
   } else open.folder <- FALSE
-  # Fill DB by region & slice
-  for(i in c('region', 'slice')) {
+  # Fill DB by region ## & slice
+  for(i in c('region')) {
     prec@parameters[[i]] <- addData(prec@parameters[[i]], approxim[[i]])
   }
+  prec@parameters[['slice']] <- addData(prec@parameters[['slice']], 
+                                        unique(c(approxim$slice@levels[, -ncol(approxim$slice@levels)], recursive = TRUE)))
   # Fill DB by year
   prec@parameters[['year']] <- addData(prec@parameters[['year']], as.numeric(approxim[['year']]))
   prec <- read_default_data(prec, obj@sysInfo)
@@ -286,7 +289,7 @@
         for(j in seq(along = obj@data[[i]]@data)) { #if (class(obj@data[[i]]@data[[j]]) == 'technology') {
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
           if (class(obj@data[[i]]@data[[j]]) == 'commodity') {
-            if (is.null(obj@data[[i]]@data[[j]]@slice)) obj@data[[i]]@data[[j]]@slice <- approxim$slice$default_slice_level
+            if (is.null(obj@data[[i]]@data[[j]]@slice)) obj@data[[i]]@data[[j]]@slice <- approxim$slice@default_slice_level
             commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@slice
           }
         }

@@ -138,7 +138,11 @@
     dtf
   }
   dtf <- data.frame(share = numeric(), stringsAsFactors = FALSE)
-  dtf <- slice_def(dtf, arg)
+  if (length(arg) == 1 && is.character(arg[[1]])) {
+    dtf <- data.frame(share = 1, year = arg[[1]], stringsAsFactors = FALSE)
+  } else {
+    dtf <- slice_def(dtf, arg)
+  }
   dtf <- dtf[, c(2:ncol(dtf), 1), drop = FALSE]
   if (length(unique(dtf[, 1])) != 1) {
     warning('.setSlice: first slice have to consist only one slice, add "ANNUAL"')

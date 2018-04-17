@@ -7,6 +7,8 @@ setClass("slice",
           slice_share      = "data.frame", # Slice that after all, e.g.: ANNUAL, WINTER, WINTER_DAY, and so on with share
           parent_child     = "data.frame", # Stright relation parent-child
           all_parent_child = "data.frame", # All relation parent-child
+          slice_map        = "list", # Slices set by level
+          default_slice_level = "characterOrNULL", # Default slice map
           misc             = "list"
       ),
       prototype(
@@ -14,6 +16,8 @@ setClass("slice",
         slice_share      = data.frame(slice = character(), share = numeric(), stringsAsFactors = FALSE),
         parent_child     = data.frame(parent = character(), child = character(), stringsAsFactors = FALSE),
         all_parent_child = data.frame(parent = character(), child = character(), stringsAsFactors = FALSE),
+        slice_map        = list(), # Slices set by level
+        default_slice_level      = NULL, # Default slice map
         misc = list()
       ),                           
       S3methods = TRUE
@@ -83,9 +87,11 @@ setClass("slice",
         sl@all_parent_child[k + seq(along = kk), 'parent'] <- i
         sl@all_parent_child[k + seq(along = kk), 'child'] <- sl@parent_child[kk, 'child']
         k <- (length(kk) + k)
-        
       }  
     }
+  sl@slice_map <- lapply(sl@levels[, -ncol(sl@levels), drop = FALSE], function(x) unique(x))
+  names(sl@slice_map) <- colnames(sl@levels)[-ncol(sl@levels)]
+  sl@default_slice_level <- colnames(sl@levels)[ncol(sl@levels) - 1]
   sl
 }
 
