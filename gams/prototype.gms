@@ -64,7 +64,7 @@ slice  time slice
 ;
 
 Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
-Alias (slice, slicep), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
+Alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
 alias (region, src), (region, dst);
 
 * Mapping sets
@@ -144,6 +144,7 @@ defpImportRowRes(imp)                                   Auxiliary mapping for In
 defpImportRowUp(imp, region, year, slice)               Auxiliary mapping for Inf - used in GLPK-MathProg only
 * Zero discount
 mDiscountZero(region)                            Auxiliary mapping mapping for  regions with zero discount
+mAllSliceParentChild(slice, slicep)
 ;
 
 * Set priority
@@ -306,6 +307,8 @@ vBalance(comm, region, year, slice)                  Net commodity balance
 positive variable
 vOutTot(comm, region, year, slice)                   Total commodity output (consumption is not counted)
 vInpTot(comm, region, year, slice)                   Total commodity input
+vInp2Up(comm, region, year, slice, slicep)           From coomodity slice to up level
+vOut2Up(comm, region, year, slice, slicep)           From coomodity slice to up level
 vSupOutTot(comm, region, year, slice)                Total commodity supply
 vTechInpTot(comm, region, year, slice)               Total commodity input
 vTechOutTot(comm, region, year, slice)               Total technology output
@@ -1209,6 +1212,8 @@ eqImportRowResUp(imp)$defpImportRowRes(imp).. vImportRowAccumulated(imp) =l= pIm
 * Balance equation & dummy
 **************************************
 Equation
+eqInp2Up(comm, region, year, slice) From coomodity slice to up level
+eqOut2Up(comm, region, year, slice) From coomodity slice to up level
 eqBalUp(comm, region, year, slice)
 eqBalLo(comm, region, year, slice)
 eqBalFx(comm, region, year, slice)
@@ -1220,23 +1225,36 @@ eqTechInpTot(comm, region, year, slice)
 eqTechOutTot(comm, region, year, slice)
 eqStorageInpTot(comm, region, year, slice)
 eqStorageOutTot(comm, region, year, slice)
+
 ;
 
+* vInp2Up(comm, region, year, slice, slicep) From coomodity slice to up level
+* vOut2Up(comm, region, year, slice, slicep) From coomodity slice to up level
 
-eqBalLo(comm, region, year, slice)$(mMidMilestone(year) and mLoComm(comm))..
+eqInp2Up(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(comm, slice))
+   and (sum(slicep$(mCommSlice(comm, slicep) and mAllSliceParentChild(slicep, slice)), 1) <> 0))..
+  vInpTot(comm, region, year, slice) =e= sum(slicep$mAllSliceParentChild(slice, slicep), vInp2Up(comm, region, year, slice, slicep));
+
+eqOut2Up(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(comm, slice))
+   and (sum(slicep$(mCommSlice(comm, slicep) and mAllSliceParentChild(slicep, slice)), 1) <> 0))..
+  vOutTot(comm, region, year, slice) =e= sum(slicep$mAllSliceParentChild(slice, slicep), vOut2Up(comm, region, year, slice, slicep));
+
+eqBalLo(comm, region, year, slice)$(mMidMilestone(year) and mLoComm(comm) and mCommSlice(comm, slice))..
          vBalance(comm, region, year, slice) =g= 0;
 
-eqBalUp(comm, region, year, slice)$(mMidMilestone(year) and mUpComm(comm))..
+eqBalUp(comm, region, year, slice)$(mMidMilestone(year) and mUpComm(comm) and mCommSlice(comm, slice))..
          vBalance(comm, region, year, slice) =l= 0;
 
-eqBalFx(comm, region, year, slice)$(mMidMilestone(year) and mFxComm(comm))..
+eqBalFx(comm, region, year, slice)$(mMidMilestone(year) and mFxComm(comm) and mCommSlice(comm, slice))..
          vBalance(comm, region, year, slice) =e= 0;
 
-eqBal(comm, region, year, slice)$mMidMilestone(year)..
+eqBal(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, slice))..
          vBalance(comm, region, year, slice)
          =e=
-         vOutTot(comm, region, year, slice) -
-         vInpTot(comm, region, year, slice);
+         vOutTot(comm, region, year, slice) + sum(slicep$mAllSliceParentChild(slice, slicep), vOutTot(comm, region, year, slicep))
+         + sum(slicep$mAllSliceParentChild(slicep, slice), vOut2Up(comm, region, year, slicep, slice))
+         - vInpTot(comm, region, year, slice) - sum(slicep$mAllSliceParentChild(slice, slicep), vInpTot(comm, region, year, slicep))
+         - sum(slicep$mAllSliceParentChild(slicep, slice), vInp2Up(comm, region, year, slicep, slice));
 
 eqOutTot(comm, region, year, slice)$mMidMilestone(year)..
          vOutTot(comm, region, year, slice)
@@ -26255,7 +26273,6 @@ put 2:0/;
 putclose;
 
 * 99089425-31110-4440-be57-2ca102e9cee1
-
 
 
 

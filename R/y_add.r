@@ -702,6 +702,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
     
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
+  obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
+      approxim$slice@all_parent_child)
   # Discount
       obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
         simpleInterpolation(app@discount, 'discount',

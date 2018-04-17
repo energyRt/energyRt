@@ -66,6 +66,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mStorageSlice']] <- createParameter('mStorageSlice', c('stg', 'slice'), 'map', cls = 'storage')   
     .Object@parameters[['mTradeSlice']] <- createParameter('mTradeSlice', c('trade', 'slice'), 'map', cls = 'trade')   
     .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
+    .Object@parameters[['mAllSliceParentChild']] <- createParameter('mAllSliceParentChild', c('slice', 'slicep'), 'map', cls = 'slice')   
     # simple
     .Object@parameters[['pEmissionFactor']] <- 
         createParameter('pEmissionFactor', c('comm', 'commp'), 'simple',  #PPP
