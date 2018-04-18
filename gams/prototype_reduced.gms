@@ -22264,9 +22264,9 @@ eqLECActivity
 *$EXIT
 
 option lp = cbc;
-*$exit
-* f374f3df-5fd6-44f1-b08a-1a09485cbe3d
 
+* f374f3df-5fd6-44f1-b08a-1a09485cbe3d
+*$exit
 Solve st_model minimizing vObjective using LP;
 
 
