@@ -44,7 +44,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   attr(.Object, 'GUID') <- '8732f62e-0f23-4853-878b-ec8a5cbd5224'
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
-                 'year', 'yearp', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')
+                 'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade', 'cns')
   if (!is.character(name) || length(name) != 1 || !energyRt:::.chec_correct_name(name)) 
     stop(paste('Wrong name: "', name, '"', sep = ''))
   if (length(dimSetNames) == 0 || any(!is.character(dimSetNames)) || 
@@ -79,7 +79,6 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   data <- data.frame(tech = character(), techp = character(), sup = character(), dem = character(), 
       acomm = character(), comm = character(), commp = character(), group = character(),  
       region = character(), regionp = character(), src = character(), dst = character(), 
-      year = numeric(), yearp = numeric(), 
       slice = character(), stg = character(),
       expp = character(), imp = character(), trade = character(), cns = character(), 
       type = factor(levels = c('lo', 'up')),

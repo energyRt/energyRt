@@ -23,7 +23,6 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
     dd[, 'value'] <- as.numeric(dd$value) # Must be remove later
     obj@parameters[['pAggregateFactor']] <- addData(obj@parameters[['pAggregateFactor']], dd)
   }
-
   # Define mUpComm | mLoComm | mFxComm
   if (cmd@limtype == 'UP')
     obj@parameters[['mUpComm']] <- addData(obj@parameters[['mUpComm']], data.frame(comm = cmd@name))
@@ -695,22 +694,21 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   approxim = 'list'), function(obj, app, approxim) {
-
-    assign('obj', obj, globalenv())
-    assign('app', app, globalenv())
-    assign('approxim', approxim, globalenv())
-    
+  #  assign('obj', obj, globalenv())
+  #  assign('app', app, globalenv())
+  #  assign('approxim', approxim, globalenv())
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
   obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
-      approxim$slice@all_parent_child)
+      data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
+                 slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
   # Discount
       obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
         simpleInterpolation(app@discount, 'discount',
           obj@parameters[['pDiscount']], approxim))
   approxim_comm <- approxim
   approxim_comm[['comm']] <- obj@parameters$comm@data$comm
-  approxim_comm$slice <- c(approxim$slice@levels[, -ncol(approxim$slice@levels)], recursive = TRUE)
+  approxim_comm$slice <- approxim$slice@all_slice
   if (length(approxim_comm[['comm']]) != 0) {
     # Dummy import
       obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],

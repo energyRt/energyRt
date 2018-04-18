@@ -820,6 +820,7 @@ LL1 <- proc.time()[3]
     ss$yearp <- ss$year
     ss$acomm <- ss$comm
     ss$commp <- ss$comm
+    ss$slicep <- ss$slice
     rr$set_vec <- ss
     for(i in vrb_list) {
       gg <- read.csv(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)

@@ -9,6 +9,7 @@ setClass("slice",
           all_parent_child = "data.frame", # All relation parent-child
           slice_map        = "list", # Slices set by level
           default_slice_level = "characterOrNULL", # Default slice map
+          all_slice        = "characterOrNULL", 
           misc             = "list"
       ),
       prototype(
@@ -18,6 +19,7 @@ setClass("slice",
         all_parent_child = data.frame(parent = character(), child = character(), stringsAsFactors = FALSE),
         slice_map        = list(), # Slices set by level
         default_slice_level      = NULL, # Default slice map
+        all_slice        = NULL,
         misc = list()
       ),                           
       S3methods = TRUE
@@ -30,6 +32,7 @@ setClass("slice",
   }
   # Check for correctness of data frame
   .slice_check_data(sl@levels)
+  sl@all_slice <- unique(c(sl@levels[, -ncol(sl@levels)], recursive = TRUE))
   sl@misc <- list()
   # Calculate other data
     dtf <- sl@levels

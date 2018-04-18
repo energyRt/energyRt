@@ -138,7 +138,7 @@
     dtf
   }
   dtf <- data.frame(share = numeric(), stringsAsFactors = FALSE)
-  if (length(arg) == 1 && is.character(arg[[1]])) {
+  if (length(arg) == 1 && is.character(arg[[1]]) && length(arg[[1]]) == 1) {
     dtf <- data.frame(share = 1, year = arg[[1]], stringsAsFactors = FALSE)
   } else {
     dtf <- slice_def(dtf, arg)

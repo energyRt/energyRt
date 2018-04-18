@@ -1232,12 +1232,12 @@ eqStorageOutTot(comm, region, year, slice)
 * vOut2Up(comm, region, year, slice, slicep) From coomodity slice to up level
 
 eqInp2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(comm, slice))
-   and (sum(slicep$(mCommSlice(comm, slicep) and mAllSliceParentChild(slice, slicep)), 1) <> 0))..
+   and (sum(slicep$(mCommSlice(comm, slicep) and mAllSliceParentChild(slicep, slice)), 1) <> 0))..
   vInpTot(comm, region, year, slice) =e= sum(slicep$mAllSliceParentChild(slice, slicep), vInp2Up(comm, region, year, slice, slicep));
 
 eqOut2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(comm, slice))
-   and (sum(slicep$(mCommSlice(comm, slicep) and mAllSliceParentChild(slice, slicep)), 1) <> 0))..
-  vOutTot(comm, region, year, slice) =e= sum(slicep$mAllSliceParentChild(slice, slicep), vOut2Up(comm, region, year, slice, slicep));
+   and (sum(slicep$(mCommSlice(comm, slicep) and mAllSliceParentChild(slicep, slice)), 1) <> 0))..
+  vOutTot(comm, region, year, slice) =e= sum(slicep$mAllSliceParentChild(slicep, slice), vOut2Up(comm, region, year, slice, slicep));
 
 eqBalLo(comm, region, year, slice)$(mMidMilestone(year) and mLoComm(comm) and mCommSlice(comm, slice))..
          vBalance(comm, region, year, slice) =g= 0;
