@@ -38,8 +38,13 @@
 }
 
 # set Slice name vectors
-.setSlice <- function(...) {
-  arg <- list(...)
+.setSlice <- function(slice = NULL, ...) {
+  if (!is.null(slice) && length(list(...))) stop('setSlice: only one argument could be define: "slice" or "..."')
+  if (!is.null(slice)) {
+    arg <- slice
+  } else {
+    arg <- list(...)
+  }
   rcs <- names(arg)
   if (anyDuplicated(rcs))
     stop(paste('.setSlice: there are duplicated slice levels: "', 

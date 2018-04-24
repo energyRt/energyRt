@@ -135,7 +135,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
   approxim <- fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
   obj@parameters[['mExpSlice']] <- addData(obj@parameters[['mExpSlice']],
-                                             data.frame(exp = rep(exp@name, length(approxim$slice)), slice = approxim$slice))
+                                             data.frame(expp = rep(exp@name, length(approxim$slice)), slice = approxim$slice))
   #  if (!energyRt:::.chec_correct_name(exp@name)) {
 #    stop(paste('Incorrect export name "', exp@name, '"', sep = ''))
 #  }
@@ -756,7 +756,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
   approxim <- fix_approximation_list(approxim, comm = trd@commodity, lev = trd@slice)
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
-                                            data.frame(trd = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
+                                            data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
