@@ -68,6 +68,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
     .Object@parameters[['mAllSliceParentChild']] <- createParameter('mAllSliceParentChild', c('slice', 'slicep'), 'map')   
     # simple
+    .Object@parameters[['pSliceShare']] <- createParameter('pSliceShare', 'slice', 'simple')   
     .Object@parameters[['pEmissionFactor']] <- 
         createParameter('pEmissionFactor', c('comm', 'commp'), 'simple',  #PPP
         defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', colName = 'mean', slot = 'emis')    

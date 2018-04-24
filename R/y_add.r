@@ -708,8 +708,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
           obj@parameters[['pDiscount']], approxim))
   approxim_comm <- approxim
   approxim_comm[['comm']] <- obj@parameters$comm@data$comm
+  obj@parameters[['pSliceShare']] <- addData(obj@parameters[['pSliceShare']], 
+                                             data.frame(slice = approxim$slice@slice_share$slice, 
+                                                        value = approxim$slice@slice_share$share))
   approxim_comm$slice <- approxim$slice@all_slice
-  if (length(approxim_comm[['comm']]) != 0) {
+    if (length(approxim_comm[['comm']]) != 0) {
     # Dummy import
       obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],
         simpleInterpolation(app@debug, 'dummyImport',

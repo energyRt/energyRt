@@ -152,6 +152,7 @@ mAllSliceParentChild(slice, slice)
 * tech, sup, group, comm, region, year, slice
 * Parameter
 parameter
+pSliceShare(slice)                                 Slice share
 pMilestone1(year, year)                            ???
 pMilestone2(year, year)                            ???
 * Aggregate
@@ -596,7 +597,8 @@ eqTechAfaLo(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMileston
   and mTechSpan(tech, region, year))..
          pTechAfaLo(tech, region, year, slice) *
          pTechCap2act(tech) *
-         vTechCap(tech, region, year)
+         vTechCap(tech, region, year) *
+         pSliceShare(slice)
          =l=
          vTechAct(tech, region, year, slice);
 
@@ -609,7 +611,8 @@ eqTechAfaUp(tech, region, year, slice)$(
          =l=
          pTechAfaUp(tech, region, year, slice) *
          pTechCap2act(tech) *
-         vTechCap(tech, region, year);
+         vTechCap(tech, region, year) *
+         pSliceShare(slice);
 
 
 ********************************************************************************
@@ -656,7 +659,8 @@ eqTechAfacLo(tech, region, comm, year, slice)$
          pTechAfaLo(tech, region, year, slice) *
          pTechAfacLo(tech, comm, region, year, slice) *
          pTechCap2act(tech) *
-         vTechCap(tech, region, year)
+         vTechCap(tech, region, year) *
+         pSliceShare(slice)
          =l=
          vTechOut(tech, comm, region, year, slice);
 
@@ -673,7 +677,8 @@ eqTechAfacUp(tech, region, comm, year, slice)$
          pTechAfaUp(tech, region, year, slice) *
          pTechAfacUp(tech, comm, region, year, slice) *
          pTechCap2act(tech) *
-         vTechCap(tech, region, year);
+         vTechCap(tech, region, year) *
+         pSliceShare(slice);
 
 ********************************************************************************
 * Capacity and costs equations
@@ -844,12 +849,12 @@ eqSupAvaUp(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilest
          defpSupAvaUp(sup, region, year, slice) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =l=
-         pSupAvaUp(sup, region, year, slice);
+         pSupAvaUp(sup, region, year, slice) * pSliceShare(slice);
 
 eqSupAvaLo(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilestone(year) and mSupComm(sup, comm) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =g=
-         pSupAvaLo(sup, region, year, slice);
+         pSupAvaLo(sup, region, year, slice) * pSliceShare(slice);
 
 eqSupReserve(sup, comm)$mSupComm(sup, comm)..
          vSupReserve(sup)
