@@ -32,7 +32,7 @@
     sup <- unique(c(slice@levels[, 1:(nl - 1)], recursive = TRUE))
     for (nn in nms) if (any(!is.na(slot(obj, nn)$slice) & slot(obj, nn)$slice %in% sup)) {
       dtf <- slot(obj, nn)
-      ft <- (!(sapply(dtf, class) %in% c('character', 'factor')) & substr(colnames(dtf), 1, 4) != 'year')
+      ft <- (!(sapply(dtf, class) %in% c('character', 'factor')) & !(substr(colnames(dtf), 1, 4) %in% c('pric', 'cost', 'year')))
       fl <- (!is.na(dtf$slice) & dtf$slice %in% sup)
       df1 <- dtf[ fl,, drop = FALSE]
       df2 <- dtf[!fl,, drop = FALSE]
