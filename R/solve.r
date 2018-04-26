@@ -278,8 +278,7 @@
   for(i in c('region')) {
     prec@parameters[[i]] <- addData(prec@parameters[[i]], approxim[[i]])
   }
-  prec@parameters[['slice']] <- addData(prec@parameters[['slice']], 
-                                        unique(c(approxim$slice@levels[, -ncol(approxim$slice@levels)], recursive = TRUE)))
+  prec@parameters[['slice']] <- addData(prec@parameters[['slice']], approxim$slice@all_slice)
   # Fill DB by year
   prec@parameters[['year']] <- addData(prec@parameters[['year']], as.numeric(approxim[['year']]))
   prec <- read_default_data(prec, obj@sysInfo)

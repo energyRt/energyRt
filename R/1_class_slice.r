@@ -32,7 +32,6 @@ setClass("slice",
   }
   # Check for correctness of data frame
   .slice_check_data(sl@levels)
-  sl@all_slice <- unique(c(sl@levels[, -ncol(sl@levels)], recursive = TRUE))
   sl@misc <- list()
   # Calculate other data
     dtf <- sl@levels
@@ -92,9 +91,14 @@ setClass("slice",
         k <- (length(kk) + k)
       }  
     }
-  sl@slice_map <- lapply(sl@levels[, -ncol(sl@levels), drop = FALSE], function(x) unique(x))
+  # slice_map  
+  tmp <- nchar(sl@slice_share$slice) - nchar(gsub('[_]', '', sl@slice_share$slice)) + 2
+  names(tmp) <- sl@slice_share$slice
+  tmp[sl@levels[1, 1]] <- 1
+  sl@slice_map <- lapply(1:(ncol(sl@levels) - 1), function(x) names(tmp)[tmp == x])
   names(sl@slice_map) <- colnames(sl@levels)[-ncol(sl@levels)]
   sl@default_slice_level <- colnames(sl@levels)[ncol(sl@levels) - 1]
+  sl@all_slice <- sl@slice_share$slice
   sl
 }
 

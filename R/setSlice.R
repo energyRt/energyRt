@@ -117,7 +117,6 @@
                              sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
           dtf <- add_val(dtf, c(arg2, recursive = TRUE), names(arg2))
           arg <- arg[-1]
-          return (dtf);
         } else {
           if (!all(sapply(arg2, is.list)))
             stop(paste(paste('.setSlice: There are wrong slice data for level "', lv, '"\n', 
@@ -126,7 +125,6 @@
           dtf <- NULL
           arg2 <- arg[[1]]; 
           for (i in seq(length.out = length(arg2))) { 
-            # browser()
             dtf1 <- slice_def(add_val(dtf0, arg2[[i]][[1]], names(arg2)[i]), arg2[[i]][-1])
             if (i == 1) {
               dtf <- dtf1

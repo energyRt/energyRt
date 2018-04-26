@@ -27,7 +27,7 @@
     }
   }
   # Split higher to lowwer
-  nl <- (2:ncol(slice@levels) - 1)[sapply(slice@levels[, -ncol(slice@levels), drop = FALSE], function(x) any(x %in% lev))]
+  nl <- seq(along = slice@slice_map)[sapply(slice@slice_map, function(x) all(x %in% lev))]
   if (nl > 1) {
     sup <- unique(c(slice@levels[, 1:(nl - 1)], recursive = TRUE))
     for (nn in nms) if (any(!is.na(slot(obj, nn)$slice) & slot(obj, nn)$slice %in% sup)) {
