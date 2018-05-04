@@ -9605,7 +9605,7 @@ rs
     rs["mTechAOut", c("name", "description", "type")] <- c("mTechAOut", "Auxiliary output commodity", "map");
     rs["mTechAOut", c("tech", "comm", "eqTechOMCost", "eqTechVarom")] <- TRUE;
     rs["mTechNew", c("name", "description", "type")] <- c("mTechNew", "Technologies available for investment", "map");
-    rs["mTechNew", c("tech", "region", "year", "eqTechCap", "eqTechEac", "eqObjective")] <- TRUE;
+    rs["mTechNew", c("tech", "region", "year", "eqTechCap", "eqTechEac", "eqTechSalv2", "eqTechSalv3", "eqObjective")] <- TRUE;
     rs["mTechSpan", c("name", "description", "type")] <- c("mTechSpan", "Assisting set showing if the tech may exist in the time-span and region", "map");
     rs["mTechSpan", c("tech", "region", "year", "eqEmsFuelTot", "eqTechInpTot", "eqCost", "eqLECActivity")] <- TRUE;
     rs["mTechSlice", c("name", "description", "type")] <- c("mTechSlice", "Technology work in slice", "map");

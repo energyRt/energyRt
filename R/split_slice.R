@@ -29,7 +29,7 @@
   # Split higher to lowwer
   nl <- seq(along = slice@slice_map)[sapply(slice@slice_map, function(x) all(x %in% lev))]
   if (nl > 1) {
-    sup <- unique(c(slice@levels[, 1:(nl - 1)], recursive = TRUE))
+    sup <- unique(c(slice@slice_map[1:(nl - 1)], recursive = TRUE))
     for (nn in nms) if (any(!is.na(slot(obj, nn)$slice) & slot(obj, nn)$slice %in% sup)) {
       dtf <- slot(obj, nn)
       ft <- (!(sapply(dtf, class) %in% c('character', 'factor')) & !(substr(colnames(dtf), 1, 4) %in% c('pric', 'cost', 'year')))
@@ -40,7 +40,7 @@
       hh <- slice@slice_share$share; names(hh) <- slice@slice_share$slice
       tt[, 'share'] <- hh[tt$child] / hh[tt$parent]
       gg <- NULL
-      for (ss in sup) {
+      for (ss in sup) if (any(df1$slice == ss)) {
         kk <- tt[tt$parent == ss, ]
         tmp <- df1[df1$slice == ss, ];
         for (uu in seq(length.out = nrow(kk))) {
@@ -59,7 +59,7 @@
   }
   # Split lower to higher
   if (nl < ncol(slice@levels) - 1) {
-    sup <- unique(c(slice@levels[, (nl + 1):(ncol(slice@levels) - 1)], recursive = TRUE))
+    sup <- unique(c(slice@slice_map[(nl + 1):(ncol(slice@levels) - 1)], recursive = TRUE))
     for (nn in nms) if (any(!is.na(slot(obj, nn)$slice) & slot(obj, nn)$slice %in% sup)) {
       dtf <- slot(obj, nn)
       ft <- (!(sapply(dtf, class) %in% c('character', 'factor')) & substr(colnames(dtf), 1, 4) != 'year')

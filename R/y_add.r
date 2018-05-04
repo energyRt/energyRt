@@ -81,48 +81,49 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
+    # if (!is.null(app@slice)) browser() else cat('-')
     sup <- energyRt:::.upper_case(app)
     approxim <- fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
     if (!is.null(sup@region)) {
-    approxim$region <- approxim$region[approxim$region %in% sup@region]
-    ss <- getSlots('supply')
-    ss <- names(ss)[ss == 'data.frame']
-    ss <- ss[sapply(ss, function(x) (any(colnames(slot(sup, x)) == 'region') 
-      && any(!is.na(slot(sup, x)$region))))]
-    for(sl in ss) if (any(!is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region))) {
-      rr <- !is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region)
-      warning(paste('There are data supply "', sup@name, '" for unused region: "', 
-        paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
-      slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
+      approxim$region <- approxim$region[approxim$region %in% sup@region]
+      ss <- getSlots('supply')
+      ss <- names(ss)[ss == 'data.frame']
+      ss <- ss[sapply(ss, function(x) (any(colnames(slot(sup, x)) == 'region') 
+        && any(!is.na(slot(sup, x)$region))))]
+      for(sl in ss) if (any(!is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region))) {
+        rr <- !is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region)
+        warning(paste('There are data supply "', sup@name, '" for unused region: "', 
+          paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
+        slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
+      }
+      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
+          data.frame(sup = rep(sup@name, length(sup@region)), region = sup@region))
+    } else {
+      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
+          data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region))
     }
-    obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
-        data.frame(sup = rep(sup@name, length(sup@region)), region = sup@region))
-  } else {
-    obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
-        data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region))
-  }
-  sup <- stayOnlyVariable(sup, approxim$region, 'region')
-  obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']],
-                                          data.frame(sup = rep(sup@name, length(approxim$slice)), slice = approxim$slice))
-#  if (!energyRt:::.chec_correct_name(sup@name)) {
-#    stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
-#  }
-#  if (isSupply(obj, sup@name)) {
-#    warning(paste('There is supply name "', sup@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousSupply(obj, sup@name)
-#  }    
-#  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
-  obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
-      data.frame(sup = sup@name, comm = sup@commodity))
-  obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
-      simpleInterpolation(sup@availability, 'cost',
-          obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
-  obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
-      data.frame(sup = sup@name, value = sup@reserve))
-  obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
-            multiInterpolation(sup@availability, 'ava',
-            obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
+    sup <- stayOnlyVariable(sup, approxim$region, 'region')
+    obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']],
+                                            data.frame(sup = rep(sup@name, length(approxim$slice)), slice = approxim$slice))
+  #  if (!energyRt:::.chec_correct_name(sup@name)) {
+  #    stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
+  #  }
+  #  if (isSupply(obj, sup@name)) {
+  #    warning(paste('There is supply name "', sup@name,
+  #        '" now, all previous information will be removed', sep = ''))
+  #    obj <- removePreviousSupply(obj, sup@name)
+  #  }    
+  #  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
+    obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
+        data.frame(sup = sup@name, comm = sup@commodity))
+    obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
+        simpleInterpolation(sup@availability, 'cost',
+            obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
+    obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
+        data.frame(sup = sup@name, value = sup@reserve))
+    obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
+              multiInterpolation(sup@availability, 'ava',
+              obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
   obj
 })
 
