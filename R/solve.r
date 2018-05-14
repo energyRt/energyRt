@@ -271,9 +271,13 @@
       arg <- arg[names(arg) != 'repository', drop = FALSE]
   }
   if (any(names(arg) == 'open.folder')) {
-      open.folder <- arg$open.folder
-      arg <- arg[names(arg) != 'open.folder', drop = FALSE]
+    open.folder <- arg$open.folder
+    arg <- arg[names(arg) != 'open.folder', drop = FALSE]
   } else open.folder <- FALSE
+  if (any(names(arg) == 'to_array_result')) {
+    to_array_result <- arg$to_array_result
+    arg <- arg[names(arg) != 'to_array_result', drop = FALSE]
+  } else to_array_result <- TRUE
   # Fill DB by region ## & slice
   for(i in c('region')) {
     prec@parameters[[i]] <- addData(prec@parameters[[i]], approxim[[i]])
@@ -418,7 +422,7 @@
   appr <- lapply(yy, function(x) prec@parameters[[x]]@data[[x]])
   names(appr) <- yy
   appr$group <- appr$group[!is.na(appr$group)]
-  # ---------------------------------------------------------------------------------------------------------  
+# ---------------------------------------------------------------------------------------------------------  
 # Fix to previous data
 # ---------------------------------------------------------------------------------------------------------  
   if (any(names(arg) == 'fix_data')) {
@@ -457,6 +461,7 @@
       arg <- arg[names(arg) != 'fix_scenario', drop = FALSE]
       arg <- arg[names(arg) != 'fix_year', drop = FALSE]
   }
+pzz <- proc.time()[3]
 # ---------------------------------------------------------------------------------------------------------  
 # Get only listing file
 # ---------------------------------------------------------------------------------------------------------  
@@ -604,7 +609,8 @@ LL1 <- proc.time()[3]
       # Check user error
       check_parameters(prec)
       ########
-#  Remove unused technology
+      cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
+      #  Remove unused technology
 ########
     for(i in seq(along =obj@data)) {
         FF <- rep(TRUE, length(obj@data[[i]]@data))
@@ -633,6 +639,7 @@ LL1 <- proc.time()[3]
 #!################
 ### FUNC GAMS 
   #### Code load
+      
   run_code <- energyRt::modelCode[[solver]][[model.type]]
   if (open.folder) shell.exec(tmpdir)
   if (solver == 'GAMS') {
@@ -644,19 +651,64 @@ LL1 <- proc.time()[3]
     close(zz)
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
-   prec <<- prec 
-   for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
+   # prec <<- prec 
+   pzz <- proc.time()[3]
+   file_w <- c()
+   if (n.threads > 1 && FALSE) {
+     tryCatch({
+       pp <- proc.time()[3]
+       cl <- makePSOCKcluster(rep('localhost', n.threads))
+       gg <- lapply(1:n.threads - 1, function(x) prec@parameters[(seq(along = prec@parameters) - 1) %% n.threads == x])
+       prclst <- parLapply(cl, gg, 
+                           function(ll) {
+                             pp <- proc.time()[3]
+                             require(energyRt)
+                             rs <- data.frame(val = character(), type = character(), stringsAsFactors = FALSE)
+                             rs[seq(along = ll), ] <- NA
+                             for(i in seq(along = ll)) {
+                               rs[i, 'val'] <- paste(energyRt:::.toGams(ll[[i]]), collapse = '\n')
+                               rs[i, 'type'] <- as.character(ll[[i]]@type)
+                             }
+                             rs
+                           })
+       stopCluster(cl)
+     }, interrupt = function(x) {
+       stopCluster(cl)
+       stop('Solver has been interrupted')
+     }, error = function(x) {
+       stopCluster(cl)
+       stop(x)
+     })
+     file_w <- c(
+       c(lapply(prclst, function(x) x[x$type == 'set', 'val']), recursive = TRUE),
+       c(lapply(prclst, function(x) x[x$type == 'map', 'val']), recursive = TRUE),
+       c(lapply(prclst, function(x) x[x$type == 'simple', 'val']), recursive = TRUE),
+       c(lapply(prclst, function(x) x[x$type == 'multi', 'val']), recursive = TRUE)
+     )
+   } else if (n.threads == 1|| TRUE) {
+     file_w <- c()
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       # cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+   } else stop('Uneceptable threads number')
+   cat('pzz5: ', round(proc.time()[3] - pzz, 2), '\n')
+   pzz <- proc.time()[3]
+   cat(file_w, sep = '\n', file = zz)
+    cat('pzz6: ', round(proc.time()[3] - pzz, 2), '\n')
+    
     cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
         (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
     cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
@@ -669,7 +721,6 @@ LL1 <- proc.time()[3]
           'OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;\n',
           'option iterlim = 0;\n', 
           'Solve st_model minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
-    
     }
     cat(obj@misc$additionalCode, sep = '\n', file = zz)
     cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
@@ -824,7 +875,7 @@ LL1 <- proc.time()[3]
     for(i in vrb_list) {
       gg <- read.csv(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
       if (ncol(gg) == 1) {
-        rr$par_arr[[i]] <- gg[1, 1]  
+        if (to_array_result) rr$par_arr[[i]] <- gg[1, 1]  
         rr$variables[[i]] <- data.frame(value = gg[1, 1])
       } else {
         rr$variables[[i]] <- gg
@@ -833,9 +884,11 @@ LL1 <- proc.time()[3]
           if (all(colnames(jj)[j] != names(rr$set_vec))) colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
           jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
         }
-        zz <- tapply(gg[,'value'], jj, sum)
-        zz[is.na(zz)] <- 0
-        rr$par_arr[[i]] <- zz
+        if (to_array_result) {
+          zz <- tapply(gg[,'value'], jj, sum)
+          zz[is.na(zz)] <- 0
+          rr$par_arr[[i]] <- zz
+        }
       }
     }
     # Read constrain data
@@ -844,15 +897,14 @@ LL1 <- proc.time()[3]
       if (nrow(gg) == 0) {
         rr$par_arr[[i]] <- NULL
       } else if (ncol(gg) == 2) {
-        rr$par_arr[[i]] <- array(c(gg[1, 3:4], recursive = TRUE), dim = 2, dimnames = list(c('value', 'rhs')))
+        if (to_array_result) rr$par_arr[[i]] <- array(c(gg[1, 3:4], recursive = TRUE), dim = 2, dimnames = list(c('value', 'rhs')))
       } else {
         l1 <- gg[, -ncol(gg)]; l1$type[seq(length.out = nrow(gg))] <- 'rhs'
         l2 <- gg[, 1 - ncol(gg)]; l2$type[seq(length.out = nrow(gg))] <- 'value'
         colnames(l1)[ncol(l1) - 1] <- 'type'
         colnames(l2)[ncol(l2) - 1] <- 'type'
         gg <- rbind(l1, l2)
-        rr$par_arr[[i]] <- tapply(gg[, ncol(gg) - 1], gg[, 1 - ncol(gg)], sum)
-        
+        if (to_array_result) rr$par_arr[[i]] <- tapply(gg[, ncol(gg) - 1], gg[, 1 - ncol(gg)], sum)
       }
     }
     rr[['solution_report']] <- list(finish = read.csv(paste(tmpdir, '/pFinish.csv', sep = ''))$value, 
@@ -869,7 +921,7 @@ LL1 <- proc.time()[3]
    scn@modInp <- prec
    scn@model <- obj
    scn@modOut <- new('modOut')
-   scn@modOut@data <- rr$par_arr
+   if (to_array_result) scn@modOut@data <- rr$par_arr
    scn@modOut@sets <- rr$set_vec
    scn@modOut@variables <- rr$variables
    scn@modOut@compilationStatus <- as.character(rr$solution_report$finish)
