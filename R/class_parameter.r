@@ -234,12 +234,24 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
       #} else  if (all(obj@data$value[1] == obj@data$value)) {
       #  ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = ', obj@data$value[1], ';', sep = '')
       } else {
-        if (any(obj@data$value != 0)) obj@data <- obj@data[obj@data$value != 0,, drop = FALSE] else
-          obj@data <- obj@data[1,, drop = FALSE]  
-        ret <- c('parameter', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        gg <- paste(obj@data[, ncol(obj@data) - 1], obj@data[, ncol(obj@data)])
-        if (ncol(obj@data) > 2) for(i in seq(ncol(obj@data) - 2, 1)) gg <- paste(obj@data[, i], '.', gg, sep = '')
-        return(c(ret, gg, '/;', ''))
+        gen_gg <- function(obj, dtt) {
+          ret <- c('parameter', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
+          gg <- paste(dtt[, ncol(dtt) - 1], dtt[, ncol(dtt)])
+          if (ncol(dtt) > 2) for(i in seq(ncol(dtt) - 2, 1)) gg <- paste(dtt[, i], '.', gg, sep = '')
+          c(ret, gg, '/;')
+        }
+        if (obj@defVal != 0) {
+          vnn <- max(obj@data$value[obj@data$value != Inf]) + 1;
+          ppl <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
+          zz <- c(
+            paste(ppl, '$( ', ppl, '= ', 0, ') = ', obj@defVal, ';', sep = ''),
+            paste(ppl, '$( ', ppl, '= ', vnn, ') = ', 0, ';', sep = '')
+          )
+          obj@data[obj@data$value == 0, 'value'] <- vnn;
+          return(c(gen_gg(obj, obj@data), zz))
+        } else {
+          return(gen_gg(obj, obj@data))
+        }
       }  
     } else if (obj@type == 'multi') {     
        if (nrow(obj@data) == 0) {

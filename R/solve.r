@@ -22,29 +22,58 @@
           prec@parameters[[pr]]@data <- prec@parameters[[pr]]@data[seq(length.out = 
             prec@parameters[[pr]]@nValues),, drop = FALSE]
         gg <- prec@parameters[[pr]]@data
-        fl <- gg[gg$type == 'lo', 'value'] > gg[gg$type == 'up', 'value']
-        stopifnot(all(gg[gg$type == 'lo', 0:1 - ncol(gg)] ==
-            gg[gg$type == 'up', 0:1 - ncol(gg)]))
-        if (any(fl)) {
-          error_type <- c(error_type, pr)
-          cat('Error: Unexcaptable bound value (up bound less lo bound) "',
-            pr, '":\n', sep = '')
-          invisible(apply(gg[gg$type == 'lo', 0:1 - ncol(gg)][fl, ], 1, function(x)
-            cat(paste(x, collapse = '.'), '\n')))
-        }
+        f1 <- apply(gg[gg$type == 'up', 0:1 - ncol(gg), drop = FALSE], 1, paste, collapse = '##')
+        f2 <- apply(gg[gg$type == 'lo', 0:1 - ncol(gg), drop = FALSE], 1, paste, collapse = '##')
+        # Merge
+        if (any(f1 %in% f2)) {
+          gup <- gg[gg$type == 'up',, drop = FALSE][f1 %in% f2,, drop = FALSE]
+          glo <- gg[gg$type == 'lo',, drop = FALSE][f2 %in% f1,, drop = FALSE]
+          ff <- 1:nrow(glo); names(ff) <- f2[f2 %in% f1]; 
+          glo <- glo[ff[f1[f1 %in% f2]],, drop = FALSE]
+          if (any(glo$value > gup$value)) {
+            error_type <- c(error_type, pr)
+            cat('Error: Unexcaptable bound value (up bound less lo bound) "',
+                pr, '":\n', sep = '')
+            invisible(apply(glo[glo$value > gup$value, 0:1 - ncol(glo)], 1, function(x)
+              cat(paste(x, collapse = '.'), '\n')))
           }
+        }
+        # Default up
+        if (any(!(f1 %in% f2))) {
+          gup <- gg[gg$type == 'up',, drop = FALSE][!(f1 %in% f2),, drop = FALSE]
+          if (any(prec@parameters[[pr]]@defVal[1] > gup$value)) {
+            error_type <- c(error_type, pr)
+            cat('Error: Unexcaptable bound value (up bound less lo bound) "',
+                pr, '":\n', sep = '')
+            invisible(apply(gup[prec@parameters[[pr]]@defVal[1] > gup$value, 0:1 - ncol(gup)], 1, function(x)
+              cat(paste(x, collapse = '.'), '\n')))
+          }
+        }
+        # Default lo
+        if (any(!(f2 %in% f1))) {
+          glo <- gg[gg$type == 'lo',, drop = FALSE][!(f2 %in% f1),, drop = FALSE]
+          if (any(glo$value > prec@parameters[[pr]]@defVal[2])) {
+            error_type <- c(error_type, pr)
+            cat('Error: Unexcaptable bound value (up bound less lo bound) "',
+                pr, '":\n', sep = '')
+            invisible(apply(glo[glo$value > prec@parameters[[pr]]@defVal[2], 0:1 - ncol(glo)], 1, function(x)
+              cat(paste(x, collapse = '.'), '\n')))
+          }
+        }
+      }
     }
     if (length(error_type)) stop('Unexcaptable bound value (up bound less lo bound) "',
       paste(error_type, collapse = '", "'), '"')
     shr <- prec@parameters$pTechShare@data
   #  # Check sum share.lo <= 1 and sum share.up >= 1
-    if (nrow(shr) > 0) {
+    #! Need realise
+    if (nrow(shr) > 0 && FALSE) {
     FL <- FALSE
     p1 <- proc.time()[3]
       # Devide commodity by technology/group/inp&out
-      inp_comm <- prec@parameters$mTechInpComm@data
-      out_comm <- prec@parameters$mTechOutComm@data
-      group_comm <- prec@parameters$mTechGroupComm@data
+      inp_comm <- getParameterData(prec@parameters$mTechInpComm)
+      out_comm <- getParameterData(prec@parameters$mTechOutComm)
+      group_comm <- getParameterData(prec@parameters$mTechGroupComm)
       inp_comm[, 'als'] <- 'input'
       out_comm[, 'als'] <- 'output'
       shr <- merge(merge(shr[!is.na(shr[, 1]),, drop = FALSE], 
@@ -245,7 +274,8 @@
   approxim <- list(
       region = obj@sysInfo@region,
       year   = obj@sysInfo@year,
-      slice  = obj@sysInfo@slice
+      slice  = obj@sysInfo@slice,
+      solver = solver
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
@@ -475,7 +505,7 @@ pzz <- proc.time()[3]
   
   if (length(arg) != 0) warning('Unknown argument ', names(arg))
 # ---------------------------------------------------------------------------------------------------------  
-      gg <- prec@parameters[['pDiscount']]@data
+      gg <- .getTotalParameterData(prec, 'pDiscount')
       gg <- gg[sort(gg$year, index.return = TRUE)$ix,, drop = FALSE]
       ll <- gg[0,, drop = FALSE]
       for(l in unique(gg$region)) {
@@ -607,7 +637,8 @@ LL1 <- proc.time()[3]
         prec@parameters$ndefpTechOlife <- addData(prec@parameters$ndefpTechOlife, olf[, -ncol(olf), drop = FALSE])
       }
       # Check user error
-      check_parameters(prec)
+       assign('prec', prec, globalenv())
+      # check_parameters(prec)
       ########
       cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
       #  Remove unused technology
