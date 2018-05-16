@@ -218,8 +218,10 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
   }
     as_simple <- function(dtt, name, def) {
       add_cond2 <- ''
-      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) 
+      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) {
         add_cond2 <- '(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))'
+        if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('(not(mTechOneComm(tech, comm)) and  ', add_cond2, ')', sep = '')
+      }
       if (nrow(dtt) == 0 || all(dtt$value == def)) {
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
@@ -231,6 +233,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
             paste(ppl, '$( ', add_cond2, ' and '[add_cond2 != ''], ppl, '= ', vnn, ') = ', 0, ';', sep = '')
           )
           dtt[dtt$value == 0, 'value'] <- vnn;
+          dtt <- dtt[dtt$value != def,, drop = FALSE];
           return(c(gen_gg(name, dtt), zz))
         } else {
           return(gen_gg(name, dtt))

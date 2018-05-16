@@ -683,25 +683,28 @@ LL1 <- proc.time()[3]
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
    # prec <<- prec 
+   # assign('prec', prec, globalenv())
    pzz <- proc.time()[3]
    file_w <- c()
-   if (n.threads > 1 && FALSE) {
+   if (n.threads > 1) { #  && FALSE
      tryCatch({
        pp <- proc.time()[3]
-       cl <- makePSOCKcluster(rep('localhost', n.threads))
-       gg <- lapply(1:n.threads - 1, function(x) prec@parameters[(seq(along = prec@parameters) - 1) %% n.threads == x])
+       nth <- min(c(2, n.threads))
+       cl <- makePSOCKcluster(rep('localhost', nth))
+       gg <- lapply(1:nth - 1, function(x) seq(along = prec@parameters)[(seq(along = prec@parameters) - 1) %% nth == x])
        prclst <- parLapply(cl, gg, 
-                           function(ll) {
-                             pp <- proc.time()[3]
+                           function(ll, zz) {
+                             ll <- zz[ll]
                              require(energyRt)
-                             rs <- data.frame(val = character(), type = character(), stringsAsFactors = FALSE)
-                             rs[seq(along = ll), ] <- NA
+                             rs <- rep(character(), length(ll))
+                             ss <- list()
+                             rs[seq(along = ll)] <- NA
                              for(i in seq(along = ll)) {
-                               rs[i, 'val'] <- paste(energyRt:::.toGams(ll[[i]]), collapse = '\n')
-                               rs[i, 'type'] <- as.character(ll[[i]]@type)
+                               ss[[i]] <- energyRt:::.toGams(ll[[i]])
+                               rs[i] <- as.character(ll[[i]]@type)
                              }
-                             rs
-                           })
+                             list(rs = rs, ss = ss)
+                           }, prec@parameters)
        stopCluster(cl)
      }, interrupt = function(x) {
        stopCluster(cl)
@@ -711,12 +714,12 @@ LL1 <- proc.time()[3]
        stop(x)
      })
      file_w <- c(
-       c(lapply(prclst, function(x) x[x$type == 'set', 'val']), recursive = TRUE),
-       c(lapply(prclst, function(x) x[x$type == 'map', 'val']), recursive = TRUE),
-       c(lapply(prclst, function(x) x[x$type == 'simple', 'val']), recursive = TRUE),
-       c(lapply(prclst, function(x) x[x$type == 'multi', 'val']), recursive = TRUE)
+       c(lapply(prclst, function(x) x$ss[x$rs == 'set']), recursive = TRUE),
+       c(lapply(prclst, function(x) x$ss[x$rs == 'map']), recursive = TRUE),
+       c(lapply(prclst, function(x) x$ss[x$rs == 'simple']), recursive = TRUE),
+       c(lapply(prclst, function(x) x$ss[x$rs == 'multi']), recursive = TRUE)
      )
-   } else if (n.threads == 1|| TRUE) {
+   } else if (n.threads == 1) { # || TRUE
      file_w <- c()
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
