@@ -44,18 +44,18 @@ param mDemComm{dem, comm};
 param mUpComm{comm};
 param mLoComm{comm};
 param mFxComm{comm};
-param defpTechAfaUp{tech, region, year, slice};
-param defpTechAfacUp{tech, comm, region, year, slice};
-param defpSupReserve{sup};
-param defpSupAvaUp{sup, region, year, slice};
-param defpDummyImportCost{comm, region, year, slice};
-param defpDummyExportCost{comm, region, year, slice};
+param ndefpTechAfaUp{tech, region, year, slice};
+param ndefpTechAfacUp{tech, comm, region, year, slice};
+param ndefpSupReserve{sup};
+param ndefpSupAvaUp{sup, region, year, slice};
+param ndefpDummyImportCost{comm, region, year, slice};
+param ndefpDummyExportCost{comm, region, year, slice};
 param ndefpTechOlife{tech, region};
 param mStorageSlice{stg, slice};
 param mStorageComm{stg, comm};
 param mStorageNew{stg, region, year};
 param mStorageSpan{stg, region, year};
-param defpStorageCapUp{stg, region, year};
+param ndefpStorageCapUp{stg, region, year};
 param mSlicePrevious{slice, slice};
 param mSlicePreviousYear{slice};
 param mTradeSlice{trade, slice};
@@ -66,11 +66,11 @@ param mExpComm{expp, comm};
 param mImpComm{imp, comm};
 param mExpSlice{expp, slice};
 param mImpSlice{imp, slice};
-param defpTradeIrUp{trade, region, region, year, slice};
-param defpExportRowRes{expp};
-param defpExportRowUp{expp, region, year, slice};
-param defpImportRowRes{imp};
-param defpImportRowUp{imp, region, year, slice};
+param ndefpTradeIrUp{trade, region, region, year, slice};
+param ndefpExportRowRes{expp};
+param ndefpExportRowUp{expp, region, year, slice};
+param ndefpImportRowRes{imp};
+param ndefpImportRowUp{imp, region, year, slice};
 param mDiscountZero{region};
 param mAllSliceParentChild{slice, slice};
 param mCnsLe{cns};
@@ -338,15 +338,15 @@ s.t.  eqTechAOut{ t in tech,c in comm,r in region,y in year,s in slice : (mTechS
 
 s.t.  eqTechAfaLo{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and pTechAfaLo[t,r,y,s] <> 0 and mTechSpan[t,r,y])}: pTechAfaLo[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechAct[t,r,y,s];
 
-s.t.  eqTechAfaUp{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and defpTechAfaUp[t,r,y,s])}: vTechAct[t,r,y,s] <=  pTechAfaUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+s.t.  eqTechAfaUp{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and not((ndefpTechAfaUp[t,r,y,s])))}: vTechAct[t,r,y,s] <=  pTechAfaUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
 
 s.t.  eqTechActSng{ t in tech,c in comm,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and mTechOneComm[t,c] and pTechCact2cout[t,c,r,y,s] <> 0)}: vTechAct[t,r,y,s]  =  (vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]);
 
 s.t.  eqTechActGrp{ t in tech,g in group,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechOutGroup[t,g] and mTechSpan[t,r,y])}: vTechAct[t,r,y,s]  =  sum{c in comm:((mTechGroupComm[t,g,c] and pTechCact2cout[t,c,r,y,s] <> 0))}((vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]));
 
-s.t.  eqTechAfacLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and defpTechAfaUp[t,r,y,s] and pTechAfacLo[t,c,r,y,s] <> 0)}: pTechCact2cout[t,c,r,y,s]*pTechAfaLo[t,r,y,s]*pTechAfacLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechOut[t,c,r,y,s];
+s.t.  eqTechAfacLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and pTechAfacLo[t,c,r,y,s] <> 0)}: pTechCact2cout[t,c,r,y,s]*pTechAfaLo[t,r,y,s]*pTechAfacLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechOut[t,c,r,y,s];
 
-s.t.  eqTechAfacUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and defpTechAfaUp[t,r,y,s] and defpTechAfacUp[t,c,r,y,s])}: vTechOut[t,c,r,y,s] <=  pTechCact2cout[t,c,r,y,s]*pTechAfaUp[t,r,y,s]*pTechAfacUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+s.t.  eqTechAfacUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and not((ndefpTechAfaUp[t,r,y,s])) and not((ndefpTechAfacUp[t,c,r,y,s])))}: vTechOut[t,c,r,y,s] <=  pTechCact2cout[t,c,r,y,s]*pTechAfaUp[t,r,y,s]*pTechAfacUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
 
 s.t.  eqTechCap{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y])}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:((mTechNew[t,r,yp] and mMidMilestone[yp] and ORD[y] >= ORD[yp] and ORD[y]<pTechOlife[t,r]+ORD[yp]))}(vTechNewCap[t,r,yp]-sum{ye in year:((mTechRetirement[t] and mMidMilestone[ye] and ORD[ye] >= ORD[yp] and ORD[ye] <= ORD[y]))}(vTechRetiredCap[t,r,yp,ye]));
 
@@ -372,13 +372,13 @@ s.t.  eqTechCVarom{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s
 
 s.t.  eqTechAVarom{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y])}: vTechAVarom[t,r,y,s]  =  sum{c in comm:(mTechAInp[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s]);
 
-s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and defpSupAvaUp[s1,r,y,s] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,r,y,s]*pSliceShare[s];
+s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and not((ndefpSupAvaUp[s1,r,y,s])) and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,r,y,s]*pSliceShare[s];
 
 s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,r,y,s]*pSliceShare[s];
 
 s.t.  eqSupReserve{ s1 in sup,c in comm : mSupComm[s1,c]}: vSupReserve[s1]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mSupSlice[s1,s] and mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp] and mSupSpan[s1,r]))}((ORD[yp]-ORD[ye]+1)*vSupOut[s1,c,r,y,s]);
 
-s.t.  eqSupReserveCheck{ s1 in sup,c in comm : (mSupComm[s1,c] and defpSupReserve[s1])}: pSupReserve[s1]  >=  vSupReserve[s1];
+s.t.  eqSupReserveCheck{ s1 in sup,c in comm : (mSupComm[s1,c] and not((ndefpSupReserve[s1])))}: pSupReserve[s1]  >=  vSupReserve[s1];
 
 s.t.  eqSupCost{ s1 in sup,r in region,y in year : (mMidMilestone[y] and mSupSpan[s1,r])}: vSupCost[s1,r,y]  =  sum{c in comm,s in slice:((mSupSlice[s1,s] and mSupComm[s1,c]))}(pSupCost[s1,r,y,s]*vSupOut[s1,c,r,y,s]);
 
@@ -408,13 +408,13 @@ s.t.  eqStorageOMCost{ st1 in stg,r in region,y in year : (mMidMilestone[y] and 
 
 s.t.  eqStorageLo{ st1 in stg,r in region,y in year : (mMidMilestone[y] and pStorageCapLo[st1,r,y] and mStorageSpan[st1,r,y])}: vStorageCap[st1,r,y]  >=  pStorageCapLo[st1,r,y];
 
-s.t.  eqStorageUp{ st1 in stg,r in region,y in year : (mMidMilestone[y] and defpStorageCapUp[st1,r,y] and mStorageSpan[st1,r,y])}: vStorageCap[st1,r,y] <=  pStorageCapUp[st1,r,y];
+s.t.  eqStorageUp{ st1 in stg,r in region,y in year : (mMidMilestone[y] and not((ndefpStorageCapUp[st1,r,y])) and mStorageSpan[st1,r,y])}: vStorageCap[st1,r,y] <=  pStorageCapUp[st1,r,y];
 
 s.t.  eqImport{ c in comm,dst in region,y in year,s in slice : (mMidMilestone[y] and sum{t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeDst[t1,dst]))}(1)+sum{i in imp:((mImpSlice[i,s] and mImpComm[i,c]))}(1))}: vImport[c,dst,y,s]  =  sum{t1 in trade,src in region:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeSrc[t1,src] and mTradeDst[t1,dst] and ORD[src] <> ORD[dst]))}(vTradeIr[t1,src,dst,y,s])+sum{i in imp:((mImpSlice[i,s] and mImpComm[i,c]))}(vImportRow[i,dst,y,s]);
 
 s.t.  eqExport{ c in comm,src in region,y in year,s in slice : (mMidMilestone[y] and sum{t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeSrc[t1,src]))}(1)+sum{e in expp:((mExpSlice[e,s] and mExpComm[e,c]))}(1))}: vExport[c,src,y,s]  =  sum{t1 in trade,dst in region:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeSrc[t1,src] and mTradeDst[t1,dst] and ORD[src] <> ORD[dst]))}(vTradeIr[t1,src,dst,y,s])+sum{e in expp:((mExpSlice[e,s] and mExpComm[e,c]))}(vExportRow[e,src,y,s]);
 
-s.t.  eqTradeFlowUp{ t1 in trade,src in region,dst in region,y in year,s in slice : (mTradeSlice[t1,s] and mMidMilestone[y] and defpTradeIrUp[t1,src,dst,y,s] and mTradeSrc[t1,src] and mTradeDst[t1,dst] and ORD[src] <> ORD[dst])}: vTradeIr[t1,src,dst,y,s] <=  pTradeIrUp[t1,src,dst,y,s];
+s.t.  eqTradeFlowUp{ t1 in trade,src in region,dst in region,y in year,s in slice : (mTradeSlice[t1,s] and mMidMilestone[y] and not((ndefpTradeIrUp[t1,src,dst,y,s])) and mTradeSrc[t1,src] and mTradeDst[t1,dst] and ORD[src] <> ORD[dst])}: vTradeIr[t1,src,dst,y,s] <=  pTradeIrUp[t1,src,dst,y,s];
 
 s.t.  eqTradeFlowLo{ t1 in trade,src in region,dst in region,y in year,s in slice : (mTradeSlice[t1,s] and mMidMilestone[y] and pTradeIrLo[t1,src,dst,y,s] and mTradeSrc[t1,src] and mTradeDst[t1,dst] and ORD[src] <> ORD[dst])}: vTradeIr[t1,src,dst,y,s]  >=  pTradeIrLo[t1,src,dst,y,s];
 
@@ -424,25 +424,25 @@ s.t.  eqCostRowTrade{ r in region,y in year : mMidMilestone[y]}: vTradeRowCost[r
 
 s.t.  eqCostIrTrade{ r in region,y in year : mMidMilestone[y]}: vTradeIrCost[r,y]  =  sum{t1 in trade,src in region,s in slice:((mTradeSlice[t1,s] and mTradeSrc[t1,src] and mTradeDst[t1,r] and ORD[src] <> ORD[r]))}((pTradeIrCost[t1,src,r,y,s]+pTradeIrMarkup[t1,src,r,y,s])*vTradeIr[t1,src,r,y,s])-sum{t1 in trade,dst in region,s in slice:((mTradeSlice[t1,s] and mTradeSrc[t1,r] and mTradeDst[t1,dst] and ORD[dst] <> ORD[r]))}(pTradeIrMarkup[t1,r,dst,y,s]*vTradeIr[t1,r,dst,y,s]);
 
-s.t.  eqExportRowUp{ e in expp,r in region,y in year,s in slice : (mExpSlice[e,s] and mMidMilestone[y] and defpExportRowUp[e,r,y,s])}: vExportRow[e,r,y,s] <=  pExportRowUp[e,r,y,s];
+s.t.  eqExportRowUp{ e in expp,r in region,y in year,s in slice : (mExpSlice[e,s] and mMidMilestone[y] and not((ndefpExportRowUp[e,r,y,s])))}: vExportRow[e,r,y,s] <=  pExportRowUp[e,r,y,s];
 
 s.t.  eqExportRowLo{ e in expp,r in region,y in year,s in slice : (mExpSlice[e,s] and mMidMilestone[y] and pExportRowLo[e,r,y,s] <> 0)}: vExportRow[e,r,y,s]  >=  pExportRowLo[e,r,y,s];
 
 s.t.  eqExportRowCumulative{ e in expp}: vExportRowCumulative[e]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mExpSlice[e,s] and mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ORD[yp]-ORD[ye]+1)*vExportRow[e,r,y,s]);
 
-s.t.  eqExportRowResUp{ e in expp : defpExportRowRes[e]}: vExportRowCumulative[e] <=  pExportRowRes[e];
+s.t.  eqExportRowResUp{ e in expp : (not((ndefpExportRowRes[e])))}: vExportRowCumulative[e] <=  pExportRowRes[e];
 
-s.t.  eqImportRowUp{ i in imp,r in region,y in year,s in slice : (mImpSlice[i,s] and mMidMilestone[y] and defpImportRowUp[i,r,y,s])}: vImportRow[i,r,y,s] <=  pImportRowUp[i,r,y,s];
+s.t.  eqImportRowUp{ i in imp,r in region,y in year,s in slice : (mImpSlice[i,s] and mMidMilestone[y] and not((ndefpImportRowUp[i,r,y,s])))}: vImportRow[i,r,y,s] <=  pImportRowUp[i,r,y,s];
 
 s.t.  eqImportRowLo{ i in imp,r in region,y in year,s in slice : (mImpSlice[i,s] and mMidMilestone[y] and pImportRowLo[i,r,y,s] <> 0)}: vImportRow[i,r,y,s]  >=  pImportRowLo[i,r,y,s];
 
 s.t.  eqImportRowAccumulated{ i in imp}: vImportRowAccumulated[i]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ORD[yp]-ORD[ye]+1)*vImportRow[i,r,y,s]);
 
-s.t.  eqImportRowResUp{ i in imp : defpImportRowRes[i]}: vImportRowAccumulated[i] <=  pImportRowRes[i];
+s.t.  eqImportRowResUp{ i in imp : (not((ndefpImportRowRes[i])))}: vImportRowAccumulated[i] <=  pImportRowRes[i];
 
-s.t.  eqInp2Bal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and not((mCommSlice[c,s])))}: sum{sp in slice:((mAllSliceParentChild[sp,s] and mCommSlice[c,sp]))}(vInp2Up[c,r,y,sp,s])+sum{sp in slice:((mAllSliceParentChild[s,sp] and mCommSlice[c,sp]))}(vInp2Up[c,r,y,s,sp])  =  sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechInpComm[t,c] or mTechAInp[t,c])))}(1)} (vTechInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and sum{d in dem:(mDemComm[d,c])}(1)} (vDemInp[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and defpDummyExportCost[c,r,y,s]} (vDummyExport[c,r,y,s])+sum{FORIF: sum{src in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeSrc[t1,src]))}(1)+sum{e in expp:((mExpSlice[e,s] and mExpComm[e,c]))}(1)} (vExport[c,r,y,s]);
+s.t.  eqInp2Bal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and not((mCommSlice[c,s])))}: sum{sp in slice:((mAllSliceParentChild[sp,s] and mCommSlice[c,sp]))}(vInp2Up[c,r,y,sp,s])+sum{sp in slice:((mAllSliceParentChild[s,sp] and mCommSlice[c,sp]))}(vInp2Up[c,r,y,s,sp])  =  sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechInpComm[t,c] or mTechAInp[t,c])))}(1)} (vTechInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and sum{d in dem:(mDemComm[d,c])}(1)} (vDemInp[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and not((ndefpDummyExportCost[c,r,y,s]))} (vDummyExport[c,r,y,s])+sum{FORIF: sum{src in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeSrc[t1,src]))}(1)+sum{e in expp:((mExpSlice[e,s] and mExpComm[e,c]))}(1)} (vExport[c,r,y,s]);
 
-s.t.  eqOut2Bal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and not((mCommSlice[c,s])))}: sum{sp in slice:((mAllSliceParentChild[s,sp] and mCommSlice[c,sp]))}(vOut2Up[c,r,y,s,sp])+sum{sp in slice:((mAllSliceParentChild[sp,s] and mCommSlice[c,sp]))}(vOut2Up[c,r,y,sp,s])  =  sum{FORIF: sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(1)} (vSupOutTot[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechEmitedComm[t,c]))}(1)} (vEmsFuelTot[c,r,y,s])+sum{FORIF: sum{cp in comm:(pAggregateFactor[c,cp])}(1)} (vAggOut[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechOutComm[t,c] or mTechAOut[t,c])))}(1)} (vTechOutTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and defpDummyImportCost[c,r,y,s]} (vDummyImport[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageOutTot[c,r,y,s])+sum{FORIF: sum{dst in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeDst[t1,dst]))}(1)+sum{i in imp:((mImpSlice[i,s] and mImpComm[i,c]))}(1)} (vImport[c,r,y,s]);
+s.t.  eqOut2Bal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and not((mCommSlice[c,s])))}: sum{sp in slice:((mAllSliceParentChild[s,sp] and mCommSlice[c,sp]))}(vOut2Up[c,r,y,s,sp])+sum{sp in slice:((mAllSliceParentChild[sp,s] and mCommSlice[c,sp]))}(vOut2Up[c,r,y,sp,s])  =  sum{FORIF: sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(1)} (vSupOutTot[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechEmitedComm[t,c]))}(1)} (vEmsFuelTot[c,r,y,s])+sum{FORIF: sum{cp in comm:(pAggregateFactor[c,cp])}(1)} (vAggOut[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechOutComm[t,c] or mTechAOut[t,c])))}(1)} (vTechOutTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and not((ndefpDummyImportCost[c,r,y,s]))} (vDummyImport[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageOutTot[c,r,y,s])+sum{FORIF: sum{dst in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeDst[t1,dst]))}(1)+sum{i in imp:((mImpSlice[i,s] and mImpComm[i,c]))}(1)} (vImport[c,r,y,s]);
 
 s.t.  eqBalLo{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mLoComm[c] and mCommSlice[c,s])}: vBalance[c,r,y,s]  >=  0;
 
@@ -452,9 +452,9 @@ s.t.  eqBalFx{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] an
 
 s.t.  eqBal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vBalance[c,r,y,s]  =  vOutTot[c,r,y,s]-vInpTot[c,r,y,s];
 
-s.t.  eqOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vOutTot[c,r,y,s]  =  sum{FORIF: sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(1)} (vSupOutTot[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechEmitedComm[t,c]))}(1)} (vEmsFuelTot[c,r,y,s])+sum{FORIF: sum{cp in comm:(pAggregateFactor[c,cp])}(1)} (vAggOut[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechOutComm[t,c] or mTechAOut[t,c])))}(1)} (vTechOutTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and defpDummyImportCost[c,r,y,s]} (vDummyImport[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageOutTot[c,r,y,s])+sum{FORIF: sum{dst in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeDst[t1,dst]))}(1)+sum{i in imp:((mImpSlice[i,s] and mImpComm[i,c]))}(1)} (vImport[c,r,y,s])+sum{sp in slice:(mAllSliceParentChild[sp,s])}(vOut2Up[c,r,y,sp,s])+sum{sp in slice:(mAllSliceParentChild[s,sp])}(vOut2Up[c,r,y,s,sp]);
+s.t.  eqOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vOutTot[c,r,y,s]  =  sum{FORIF: sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(1)} (vSupOutTot[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechEmitedComm[t,c]))}(1)} (vEmsFuelTot[c,r,y,s])+sum{FORIF: sum{cp in comm:(pAggregateFactor[c,cp])}(1)} (vAggOut[c,r,y,s])+sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechOutComm[t,c] or mTechAOut[t,c])))}(1)} (vTechOutTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and not((ndefpDummyImportCost[c,r,y,s]))} (vDummyImport[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageOutTot[c,r,y,s])+sum{FORIF: sum{dst in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeDst[t1,dst]))}(1)+sum{i in imp:((mImpSlice[i,s] and mImpComm[i,c]))}(1)} (vImport[c,r,y,s])+sum{sp in slice:(mAllSliceParentChild[sp,s])}(vOut2Up[c,r,y,sp,s])+sum{sp in slice:(mAllSliceParentChild[s,sp])}(vOut2Up[c,r,y,s,sp]);
 
-s.t.  eqInpTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vInpTot[c,r,y,s]  =  sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechInpComm[t,c] or mTechAInp[t,c])))}(1)} (vTechInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and sum{d in dem:(mDemComm[d,c])}(1)} (vDemInp[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and defpDummyExportCost[c,r,y,s]} (vDummyExport[c,r,y,s])+sum{FORIF: sum{src in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeSrc[t1,src]))}(1)+sum{e in expp:((mExpSlice[e,s] and mExpComm[e,c]))}(1)} (vExport[c,r,y,s])+sum{sp in slice:(mAllSliceParentChild[sp,s])}(vInp2Up[c,r,y,sp,s])+sum{sp in slice:(mAllSliceParentChild[s,sp])}(vInp2Up[c,r,y,s,sp]);
+s.t.  eqInpTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vInpTot[c,r,y,s]  =  sum{FORIF: sum{t in tech:((mTechSlice[t,s] and mTechSpan[t,r,y] and (mTechInpComm[t,c] or mTechAInp[t,c])))}(1)} (vTechInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and sum{d in dem:(mDemComm[d,c])}(1)} (vDemInp[c,r,y,s])+sum{FORIF: sum{st1 in stg:((mStorageSlice[st1,s] and mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1)} (vStorageInpTot[c,r,y,s])+sum{FORIF: mCommSlice[c,s] and not((ndefpDummyExportCost[c,r,y,s]))} (vDummyExport[c,r,y,s])+sum{FORIF: sum{src in region,t1 in trade:((mTradeSlice[t1,s] and mTradeComm[t1,c] and mTradeSrc[t1,src]))}(1)+sum{e in expp:((mExpSlice[e,s] and mExpComm[e,c]))}(1)} (vExport[c,r,y,s])+sum{sp in slice:(mAllSliceParentChild[sp,s])}(vInp2Up[c,r,y,sp,s])+sum{sp in slice:(mAllSliceParentChild[s,sp])}(vInp2Up[c,r,y,s,sp]);
 
 s.t.  eqSupOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(1))}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(vSupOut[s1,c,r,y,s]);
 
@@ -466,9 +466,9 @@ s.t.  eqStorageInpTot{ c in comm,r in region,y in year,s in slice : (mMidMilesto
 
 s.t.  eqStorageOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and sum{st1 in stg:((mStorageComm[st1,c] and mStorageSpan[st1,r,y]))}(1))}: vStorageOutTot[c,r,y,s]  =  sum{st1 in stg:(mStorageComm[st1,c])}(vStorageOut[st1,c,r,y,s]);
 
-s.t.  eqDummyCost{ c in comm,r in region,y in year : (mMidMilestone[y] and (sum{s in slice:(defpDummyImportCost[c,r,y,s])}(1) or sum{s in slice:(defpDummyExportCost[c,r,y,s])}(1)))}: vDummyCost[c,r,y]  =  sum{s in slice:((mCommSlice[c,s] and defpDummyImportCost[c,r,y,s]))}(pDummyImportCost[c,r,y,s]*vDummyImport[c,r,y,s])+sum{s in slice:((mCommSlice[c,s] and defpDummyExportCost[c,r,y,s]))}(pDummyExportCost[c,r,y,s]*vDummyExport[c,r,y,s]);
+s.t.  eqDummyCost{ c in comm,r in region,y in year : (mMidMilestone[y] and (sum{s in slice:((not((ndefpDummyImportCost[c,r,y,s]))))}(1) or sum{s in slice:((not((ndefpDummyExportCost[c,r,y,s]))))}(1)))}: vDummyCost[c,r,y]  =  sum{s in slice:((mCommSlice[c,s] and not((ndefpDummyImportCost[c,r,y,s]))))}(pDummyImportCost[c,r,y,s]*vDummyImport[c,r,y,s])+sum{s in slice:((mCommSlice[c,s] and not((ndefpDummyExportCost[c,r,y,s]))))}(pDummyExportCost[c,r,y,s]*vDummyExport[c,r,y,s]);
 
-s.t.  eqCost{ r in region,y in year : (mMidMilestone[y])}: vCost[r,y]  =  sum{t in tech:(mTechSpan[t,r,y])}(vTechOMCost[t,r,y])+sum{s1 in sup:(mSupSpan[s1,r])}(vSupCost[s1,r,y])+sum{c in comm:((sum{s in slice:(defpDummyImportCost[c,r,y,s])}(1) or sum{s in slice:(defpDummyExportCost[c,r,y,s])}(1)))}(vDummyCost[c,r,y])+sum{c in comm:((sum{s in slice:(pTaxCost[c,r,y,s])}(1)))}(vTaxCost[c,r,y])-sum{c in comm:((sum{s in slice:(pSubsCost[c,r,y,s])}(1)))}(vSubsCost[c,r,y])+sum{st1 in stg:(mStorageSpan[st1,r,y])}(vStorageOMCost[st1,r,y])+vTradeCost[r,y];
+s.t.  eqCost{ r in region,y in year : (mMidMilestone[y])}: vCost[r,y]  =  sum{t in tech:(mTechSpan[t,r,y])}(vTechOMCost[t,r,y])+sum{s1 in sup:(mSupSpan[s1,r])}(vSupCost[s1,r,y])+sum{c in comm:((sum{s in slice:((not((ndefpDummyImportCost[c,r,y,s]))))}(1) or sum{s in slice:((not((ndefpDummyExportCost[c,r,y,s]))))}(1)))}(vDummyCost[c,r,y])+sum{c in comm:((sum{s in slice:(pTaxCost[c,r,y,s])}(1)))}(vTaxCost[c,r,y])-sum{c in comm:((sum{s in slice:(pSubsCost[c,r,y,s])}(1)))}(vSubsCost[c,r,y])+sum{st1 in stg:(mStorageSpan[st1,r,y])}(vStorageOMCost[st1,r,y])+vTradeCost[r,y];
 
 s.t.  eqObjective: vObjective  =  sum{r in region,y in year,yp in year:((mMidMilestone[y] and mStartMilestone[y,yp]))}(pDiscountFactor[r,yp]*sum{t in tech:(mTechNew[t,r,y])}(vTechInv[t,r,y]))+sum{r in region,y in year:(mMidMilestone[y])}(vCost[r,y]*sum{ye in year,yp in year,yn in year:((mStartMilestone[y,yp] and mEndMilestone[y,ye] and ORD[yn] >= ORD[yp] and ORD[yn] <= ORD[ye]))}(pDiscountFactor[r,yn]))+sum{r in region,y in year,t in tech:((mMilestoneLast[y] and sum{yp in year:(mTechNew[t,r,yp])}(1) <> 0))}(pDiscountFactor[r,y]*vTechSalv[t,r]);
 

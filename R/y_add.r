@@ -470,19 +470,19 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
     gg <- multiInterpolation(tech@ceff, 'afac',
             obj@parameters[['pTechAfac']], approxim_comm, 'tech', tech@name)
     obj@parameters[['pTechAfac']] <- addData(obj@parameters[['pTechAfac']], gg)
-    gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-    if (nrow(gg) != 0) 
-      obj@parameters[['defpTechAfacUp']] <- addData(obj@parameters[['defpTechAfacUp']],
-            gg[, obj@parameters[['defpTechAfacUp']]@dimSetNames])
+    #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
+    #if (nrow(gg) != 0) 
+    #  obj@parameters[['ndefpTechAfacUp']] <- addData(obj@parameters[['dnefpTechAfacUp']],
+    #        gg[, obj@parameters[['ndefpTechAfacUp']]@dimSetNames])
 
   }
   gg <- multiInterpolation(tech@afa, 'afa',
             obj@parameters[['pTechAfa']], approxim, 'tech', tech@name)
   obj@parameters[['pTechAfa']] <- addData(obj@parameters[['pTechAfa']], gg)
-  gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-  if (nrow(gg) != 0) 
-      obj@parameters[['defpTechAfaUp']] <- addData(obj@parameters[['defpTechAfaUp']],
-            gg[, obj@parameters[['defpTechAfaUp']]@dimSetNames])
+  #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
+  #if (nrow(gg) != 0) 
+  #    obj@parameters[['ndefpTechAfaUp']] <- addData(obj@parameters[['ndefpTechAfaUp']],
+  #          gg[, obj@parameters[['ndefpTechAfaUp']]@dimSetNames])
 
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input']
   if (length(approxim_comm[['comm']]) != 0) {
@@ -792,10 +792,10 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
     gg <- multiInterpolation(trd@trade, 'ava',
             obj@parameters[['pTradeIr']], approxim, 'trade', trd@name)
     obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
-    gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-    if (nrow(gg) != 0) 
-      obj@parameters[['defpTradeIrUp']] <- addData(obj@parameters[['defpTradeIrUp']],
-            gg[, obj@parameters[['defpTradeIrUp']]@dimSetNames])
+    #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
+    #if (nrow(gg) != 0) 
+    #  obj@parameters[['ndefpTradeIrUp']] <- addData(obj@parameters[['ndefpTradeIrUp']],
+    #        gg[, obj@parameters[['ndefpTradeIrUp']]@dimSetNames])
   obj
 })
 

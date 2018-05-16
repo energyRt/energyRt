@@ -522,90 +522,35 @@ pzz <- proc.time()[3]
       } 
 LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
-      # Add defpSupReserve
-      gg <- getParameterData(prec@parameters[['pSupReserve']])
-#      if (prec@parameters[['pSupReserve']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pSupReserve']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpSupReserve']] <- 
-          addData(prec@parameters[['defpSupReserve']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pSupReserve']]@defVal == Inf) {
-        prec@parameters[['defpSupReserve']]@defVal <- 0
-      }  else prec@parameters[['defpSupReserve']]@defVal <- 1
-      # Add defpSupAvaUp
-      gg <- getParameterData(prec@parameters[['pSupAva']])
-#      if (prec@parameters[['pSupAva']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pSupAva']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf & gg$type == 'up', ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpSupAvaUp']] <- addData(prec@parameters[['defpSupAvaUp']], 
-           gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pSupAva']]@defVal == Inf) {
-        prec@parameters[['defpSupAvaUp']]@defVal <- 0
-      }  else prec@parameters[['defpSupAvaUp']]@defVal <- 1
-      # Add pDummyImportCost
-      gg <- getParameterData(prec@parameters[['pDummyImportCost']])
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpDummyImportCost']] <- 
-          addData(prec@parameters[['defpDummyImportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pDummyImportCost']]@defVal == Inf) {
-        prec@parameters[['defpDummyImportCost']]@defVal <- 0
-      } else prec@parameters[['defpDummyImportCost']]@defVal <- 1
-      # Add pDummyExportCost
-      gg <- getParameterData(prec@parameters[['pDummyExportCost']])
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpDummyExportCost']] <- 
-          addData(prec@parameters[['defpDummyExportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pDummyExportCost']]@defVal == Inf) {
-        prec@parameters[['defpDummyExportCost']]@defVal <- 0
-      } else prec@parameters[['defpDummyExportCost']]@defVal <- 1
-      # defpExportRowRes   
-      gg <- getParameterData(prec@parameters[['pExportRowRes']])
-#      if (prec@parameters[['pExportRowRes']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pExportRowRes']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpExportRowRes']] <- addData(prec@parameters[['defpExportRowRes']], 
-          gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pExportRowRes']]@defVal == Inf) {
-        prec@parameters[['defpExportRowRes']]@defVal <- 0
-      }  else prec@parameters[['defpExportRowRes']]@defVal <- 1
-      # defpImportRowRes
-      gg <- getParameterData(prec@parameters[['pImportRowRes']])
-#      if (prec@parameters[['pImportRowRes']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pImportRowRes']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpImportRowRes']] <- addData(prec@parameters[['defpImportRowRes']], 
-          gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pImportRowRes']]@defVal == Inf) {
-        prec@parameters[['defpImportRowRes']]@defVal <- 0
-      }  else prec@parameters[['defpImportRowRes']]@defVal <- 1
-      # defpExportRowUp 
-      gg <- getParameterData(prec@parameters[['pExportRow']])
-#      if (prec@parameters[['pExportRow']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pExportRow']]@nValues),, drop = FALSE]
-      gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpExportRowUp']] <- addData(prec@parameters[['defpExportRowUp']], 
-          gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pExportRow']]@defVal[2] == Inf) {
-        prec@parameters[['defpExportRowUp']]@defVal <- 0
-      }  else prec@parameters[['defpExportRowUp']]@defVal <- 1
-      # defpImportRowUp
-      gg <- getParameterData(prec@parameters[['pImportRow']])
-#      if (prec@parameters[['pImportRow']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pImportRow']]@nValues),, drop = FALSE]
-      gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpImportRowUp']] <- addData(prec@parameters[['defpImportRowUp']], 
-          gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pImportRow']]@defVal[2] == Inf) {
-        prec@parameters[['defpImportRowUp']]@defVal <- 0
-      }  else prec@parameters[['defpImportRowUp']]@defVal <- 1
+
+      assign('prec', prec, globalenv())
+      defin_ndef_par <- function(prec, name1, name2) {
+        gg <- getParameterData(prec@parameters[[name1]])
+        if (prec@parameters[[name1]]@defVal[2] == Inf) {
+          gg <- gg[gg$type == 'up' & gg$value != Inf, ]
+          prec@parameters[[name2]]@data <- gg[, 1:(ncol(gg) - 2), drop = FALSE]
+          if (prec@parameters[[name2]]@nValues != -1) {
+            prec@parameters[[name2]]@nValues <- nrow(gg)
+          }
+        } else {
+          gg <- gg[gg$type == 'up' & gg$value == Inf, ]
+          prec@parameters[[name2]]@not_data <- gg[, 1:(ncol(gg) - 2), drop = FALSE]
+        }
+        prec
+      }
+      prec <- defin_ndef_par(prec, 'pSupReserve', 'ndefpSupReserve')
+      prec <- defin_ndef_par(prec, 'pSupAva', 'ndefpSupAvaUp')
+      prec <- defin_ndef_par(prec, 'pDummyImportCost', 'ndefpDummyImportCost')
+      prec <- defin_ndef_par(prec, 'pDummyExportCost', 'ndefpDummyExportCost')
+      prec <- defin_ndef_par(prec, 'pExportRowRes', 'ndefpExportRowRes')
+      prec <- defin_ndef_par(prec, 'pImportRowRes', 'ndefpImportRowRes')
+      prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
+      prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
+      prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfac')
+      prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
+      prec <- defin_ndef_par(prec, 'pTradeIr', 'ndefpTradeIrUp')
+      
+      
       # For remove emission equation
       g1 <- getParameterData(prec@parameters$pTechEmisComm)
 #      if (prec@parameters[['pTechEmisComm']]@nValues != -1)

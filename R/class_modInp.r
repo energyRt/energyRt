@@ -339,24 +339,24 @@ setMethod("initialize", "modInp",
                 defVal = .1, interpolation = 'back.inter.forth', colName = 'discount', cls = 'sysInfo')    
   # Additional for compatibility with GLPK
   .Object@parameters[['ndefpTechOlife']] <- createParameter('ndefpTechOlife', c('tech', 'region'), 'map')   
-  .Object@parameters[['defpTechAfaUp']] <- createParameter('defpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
-  .Object@parameters[['defpTechAfacUp']] <- 
-      createParameter('defpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpSupAvaUp']] <- 
-      createParameter('defpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpSupReserve']] <- createParameter('defpSupReserve', c('sup'), 'map')    
-  .Object@parameters[['defpStorageCapUp']] <- createParameter('defpStorageCapUp', c('stg', 'region', 'year'), 'map')    
-  .Object@parameters[['defpTradeIrUp']] <- createParameter('defpTradeIrUp', 
+  .Object@parameters[['ndefpTechAfaUp']] <- createParameter('ndefpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
+  .Object@parameters[['ndefpTechAfacUp']] <- 
+      createParameter('ndefpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['ndefpSupAvaUp']] <- 
+      createParameter('ndefpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['ndefpSupReserve']] <- createParameter('ndefpSupReserve', c('sup'), 'map')    
+  .Object@parameters[['ndefpStorageCapUp']] <- createParameter('ndefpStorageCapUp', c('stg', 'region', 'year'), 'map')    
+  .Object@parameters[['ndefpTradeIrUp']] <- createParameter('ndefpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
-    .Object@parameters[['defpExportRowRes']] <- createParameter('defpExportRowRes', 'expp', 'map')    
-    .Object@parameters[['defpImportRowRes']] <- createParameter('defpImportRowRes', 'imp', 'map')    
-    .Object@parameters[['defpExportRowUp']] <- createParameter('defpExportRowUp', 
+    .Object@parameters[['ndefpExportRowRes']] <- createParameter('ndefpExportRowRes', 'expp', 'map')    
+    .Object@parameters[['ndefpImportRowRes']] <- createParameter('ndefpImportRowRes', 'imp', 'map')    
+    .Object@parameters[['ndefpExportRowUp']] <- createParameter('ndefpExportRowUp', 
         c('expp', 'region', 'year', 'slice'), 'map')    
-    .Object@parameters[['defpImportRowUp']] <- createParameter('defpImportRowUp', 
+    .Object@parameters[['ndefpImportRowUp']] <- createParameter('ndefpImportRowUp', 
         c('imp', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpDummyImportCost']] <- createParameter('defpDummyImportCost', 
+  .Object@parameters[['ndefpDummyImportCost']] <- createParameter('ndefpDummyImportCost', 
       c('comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpDummyExportCost']] <- createParameter('defpDummyExportCost', 
+  .Object@parameters[['ndefpDummyExportCost']] <- createParameter('ndefpDummyExportCost', 
       c('comm', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['pDiscountFactor']] <- createParameter('pDiscountFactor', c('region', 'year'), 'simple')    
   .Object@parameters[['mDiscountZero']] <- createParameter('mDiscountZero', 'region', 'map', defVal = 1) 

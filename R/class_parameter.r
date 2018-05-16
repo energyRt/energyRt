@@ -9,6 +9,7 @@ setClass('parameter', # @parameter
                                      # one for single, two for multi
     interpolation   = "character",   # interpolation 'back.inter.forth'
     data            = "data.frame",  # @data Data for export
+    not_data        = "data.frame",  # @data NO flag for map 
     #use_now         = "numeric",     # For fast
     #use_all         = "numeric",     # For fast
     # check           = "function",     # ?delete? function for checking map
@@ -24,6 +25,7 @@ setClass('parameter', # @parameter
     defVal         = NULL,
     interpolation   = NULL,
     data            = data.frame(),
+    not_data        = data.frame(),
     #use_now         = 0,     
     #use_all         = 0,
     #check           = function(obj) TRUE,

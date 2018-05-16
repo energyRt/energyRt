@@ -106,12 +106,12 @@ mDemComm(dem, comm)              Mapping for demand commodities
 mUpComm(comm)  Commodity balance type PRODUCTION <= CONSUMPTION
 mLoComm(comm)  Commodity balance type PRODUCTION >= CONSUMPTION
 mFxComm(comm)  Commodity balance type PRODUCTION = CONSUMPTION
-defpTechAfaUp(tech, region, year, slice)         Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpTechAfacUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpSupReserve(sup)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpSupAvaUp(sup, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpDummyImportCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpDummyExportCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpTechAfaUp(tech, region, year, slice)         Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpTechAfacUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpSupReserve(sup)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpSupAvaUp(sup, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpDummyImportCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpDummyExportCost(comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpTechOlife(tech, region)                     Auxiliary mapping for not Inf - used in GLPK-MathProg only
 * Storage set
 $ontext
@@ -125,7 +125,7 @@ mStorageComm(stg, comm)                              Mapping of storage technolo
 mStorageNew(stg, region, year)     Storage available for investment
 mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the time-span and region
 * Storage
-defpStorageCapUp(stg, region, year)              Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpStorageCapUp(stg, region, year)              Auxiliary mapping for Inf - used in GLPK-MathProg only
 mSlicePrevious(slice, slice)                     Mapping of slices for storage techs
 mSlicePreviousYear(slice)                        Mapping of slices for storage techs
 * Trade and ROW
@@ -137,11 +137,11 @@ mExpComm(expp, comm)                             Mapping of export commodities
 mImpComm(imp, comm)                              Mapping for import commodities
 mExpSlice(expp, slice)                           Exp work in slice
 mImpSlice(imp, slice)                            Imp work in slice
-defpTradeIrUp(trade, region, region, year, slice)     Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpExportRowRes(expp)                                  Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpExportRowUp(expp, region, year, slice)              Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpImportRowRes(imp)                                   Auxiliary mapping for Inf - used in GLPK-MathProg only
-defpImportRowUp(imp, region, year, slice)               Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpTradeIrUp(trade, region, region, year, slice)     Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpExportRowRes(expp)                                  Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpExportRowUp(expp, region, year, slice)              Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpImportRowRes(imp)                                   Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpImportRowUp(imp, region, year, slice)               Auxiliary mapping for Inf - used in GLPK-MathProg only
 * Zero discount
 mDiscountZero(region)                            Auxiliary mapping mapping for  regions with zero discount
 mAllSliceParentChild(slice, slice)
@@ -612,7 +612,7 @@ eqTechAfaLo(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMileston
 * Availability factor UP
 eqTechAfaUp(tech, region, year, slice)$(
                  mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
-                 defpTechAfaUp(tech, region, year, slice)
+                 not(ndefpTechAfaUp(tech, region, year, slice))
          )..
          vTechAct(tech, region, year, slice)
          =l=
@@ -659,7 +659,6 @@ eqTechAfacUp(tech, region, comm, year, slice)
 eqTechAfacLo(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechOutComm(tech, comm) and
-                 defpTechAfaUp(tech, region, year, slice) and
                  pTechAfacLo(tech, comm, region, year, slice) <> 0
          )..
          pTechCact2cout(tech, comm, region, year, slice) *
@@ -675,8 +674,8 @@ eqTechAfacLo(tech, region, comm, year, slice)$
 eqTechAfacUp(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechOutComm(tech, comm) and
-                 defpTechAfaUp(tech, region, year, slice) and
-                 defpTechAfacUp(tech, comm, region, year, slice)
+                 not(ndefpTechAfaUp(tech, region, year, slice)) and
+                 not(ndefpTechAfacUp(tech, comm, region, year, slice))
          )..
          vTechOut(tech, comm, region, year, slice)
          =l=
@@ -908,7 +907,7 @@ eqSupCost(sup, region, year)
 ;
 
 eqSupAvaUp(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilestone(year) and mSupComm(sup, comm) and
-         defpSupAvaUp(sup, region, year, slice) and mSupSpan(sup, region))..
+         not(ndefpSupAvaUp(sup, region, year, slice)) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =l=
          pSupAvaUp(sup, region, year, slice) * pSliceShare(slice);
@@ -928,7 +927,7 @@ eqSupReserve(sup, comm)$mSupComm(sup, comm)..
 
 eqSupReserveCheck(sup, comm)$
          (
-                 mSupComm(sup, comm) and defpSupReserve(sup)
+                 mSupComm(sup, comm) and not(ndefpSupReserve(sup))
          )..
          pSupReserve(sup) =g= vSupReserve(sup);
 
@@ -1113,7 +1112,7 @@ eqStorageOMCost(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, re
 eqStorageLo(stg, region, year)$(mMidMilestone(year) and pStorageCapLo(stg, region, year) and mStorageSpan(stg, region, year))..
          vStorageCap(stg, region, year) =g= pStorageCapLo(stg, region, year);
 
-eqStorageUp(stg, region, year)$(mMidMilestone(year) and defpStorageCapUp(stg, region, year) and mStorageSpan(stg, region, year))..
+eqStorageUp(stg, region, year)$(mMidMilestone(year) and not(ndefpStorageCapUp(stg, region, year)) and mStorageSpan(stg, region, year))..
         vStorageCap(stg, region, year) =l= pStorageCapUp(stg, region, year);
 
 
@@ -1155,7 +1154,7 @@ eqExport(comm, src, year, slice)$(mMidMilestone(year) and
   vTradeIr(trade, src, dst, year, slice)) + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), vExportRow(expp, src, year, slice));
 
 eqTradeFlowUp(trade, src, dst, year, slice)$(mTradeSlice(trade, slice) and mMidMilestone(year) and
-    defpTradeIrUp(trade, src, dst, year, slice) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and ord(src) <> ord(dst))..
+    not(ndefpTradeIrUp(trade, src, dst, year, slice)) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and ord(src) <> ord(dst))..
       vTradeIr(trade, src, dst, year, slice) =l= pTradeIrUp(trade, src, dst, year, slice);
 
 eqTradeFlowLo(trade, src, dst, year, slice)$(mTradeSlice(trade, slice) and mMidMilestone(year) and
@@ -1182,7 +1181,7 @@ eqCostIrTrade(region, year)$mMidMilestone(year).. vTradeIrCost(region, year) =e=
   - sum((trade, dst, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(dst) <> ord(region)),
     pTradeIrMarkup(trade, region, dst, year, slice) * vTradeIr(trade, region, dst, year, slice));
 
-eqExportRowUp(expp, region, year, slice)$(mExpSlice(expp, slice) and mMidMilestone(year) and defpExportRowUp(expp, region, year, slice))..
+eqExportRowUp(expp, region, year, slice)$(mExpSlice(expp, slice) and mMidMilestone(year) and not(ndefpExportRowUp(expp, region, year, slice)))..
   vExportRow(expp, region, year, slice)  =l= pExportRowUp(expp, region, year, slice);
 
 eqExportRowLo(expp, region, year, slice)$(mExpSlice(expp, slice) and mMidMilestone(year) and pExportRowLo(expp, region, year, slice) <> 0)..
@@ -1194,11 +1193,11 @@ eqExportRowCumulative(expp).. vExportRowCumulative(expp) =e=
        (ORD(yearp) - ORD(yeare) + 1) * vExportRow(expp, region, year, slice)
 );
 
-eqExportRowResUp(expp)$defpExportRowRes(expp).. vExportRowCumulative(expp) =l= pExportRowRes(expp);
+eqExportRowResUp(expp)$(not(ndefpExportRowRes(expp))).. vExportRowCumulative(expp) =l= pExportRowRes(expp);
 
 
 
-eqImportRowUp(imp, region, year, slice)$(mImpSlice(imp, slice) and mMidMilestone(year) and defpImportRowUp(imp, region, year, slice))..
+eqImportRowUp(imp, region, year, slice)$(mImpSlice(imp, slice) and mMidMilestone(year) and not(ndefpImportRowUp(imp, region, year, slice)))..
   vImportRow(imp, region, year, slice)  =l= pImportRowUp(imp, region, year, slice);
 
 eqImportRowLo(imp, region, year, slice)$(mImpSlice(imp, slice) and mMidMilestone(year) and pImportRowLo(imp, region, year, slice) <> 0)..
@@ -1210,7 +1209,7 @@ eqImportRowAccumulated(imp).. vImportRowAccumulated(imp) =e=
          (ORD(yearp) - ORD(yeare) + 1) * vImportRow(imp, region, year, slice)
 );
 
-eqImportRowResUp(imp)$defpImportRowRes(imp).. vImportRowAccumulated(imp) =l= pImportRowRes(imp);
+eqImportRowResUp(imp)$(not(ndefpImportRowRes(imp))).. vImportRowAccumulated(imp) =l= pImportRowRes(imp);
 
 
 **************************************
@@ -1244,7 +1243,7 @@ eqInp2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(com
              (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1)) +
          vDemInp(comm, region, year, slice)$(mCommSlice(comm, slice) and sum(dem$mDemComm(dem, comm), 1)) +
          vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
-         vDummyExport(comm, region, year, slice)$(mCommSlice(comm, slice) and defpDummyExportCost(comm, region, year, slice)) +
+         vDummyExport(comm, region, year, slice)$(mCommSlice(comm, slice) and not(ndefpDummyExportCost(comm, region, year, slice))) +
          vExport(comm, region, year, slice)$(sum((src, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src)), 1)
                     + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1));
 
@@ -1257,7 +1256,7 @@ eqOut2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(com
          vTechOutTot(comm, region, year, slice)$(sum(tech$(mTechSlice(tech, slice)  and mTechSlice(tech, slice)
                  and mTechSpan(tech, region, year) and
                   (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1)) +
-         vDummyImport(comm, region, year, slice)$(mCommSlice(comm, slice) and defpDummyImportCost(comm, region, year, slice)) +
+         vDummyImport(comm, region, year, slice)$(mCommSlice(comm, slice) and not(ndefpDummyImportCost(comm, region, year, slice))) +
          vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
          vImport(comm, region, year, slice)$(sum((dst, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeDst(trade, dst)), 1)
                     + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), 1));
@@ -1286,7 +1285,7 @@ eqOutTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
          vTechOutTot(comm, region, year, slice)$(sum(tech$(mTechSlice(tech, slice)
                  and mTechSpan(tech, region, year) and
                   (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1)) +
-         vDummyImport(comm, region, year, slice)$(mCommSlice(comm, slice) and defpDummyImportCost(comm, region, year, slice)) +
+         vDummyImport(comm, region, year, slice)$(mCommSlice(comm, slice) and not(ndefpDummyImportCost(comm, region, year, slice))) +
          vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
          vImport(comm, region, year, slice)$(sum((dst, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeDst(trade, dst)), 1)
                     + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), 1))
@@ -1302,7 +1301,7 @@ eqInpTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
              (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1)) +
          vDemInp(comm, region, year, slice)$(mCommSlice(comm, slice) and sum(dem$mDemComm(dem, comm), 1)) +
          vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
-         vDummyExport(comm, region, year, slice)$(mCommSlice(comm, slice) and defpDummyExportCost(comm, region, year, slice)) +
+         vDummyExport(comm, region, year, slice)$(mCommSlice(comm, slice) and not(ndefpDummyExportCost(comm, region, year, slice))) +
          vExport(comm, region, year, slice)$(sum((src, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src)), 1)
                     + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1))
   + sum(slicep$mAllSliceParentChild(slicep, slice), vInp2Up(comm, region, year, slicep, slice))
@@ -1369,12 +1368,12 @@ eqSubsCost(comm, region, year)
 ;
 
 eqDummyCost(comm, region, year)$(mMidMilestone(year) and
-  (sum(slice$defpDummyImportCost(comm, region, year, slice), 1) or sum(slice$defpDummyExportCost(comm, region, year, slice), 1)))..
+  (sum(slice$(not(ndefpDummyImportCost(comm, region, year, slice))), 1) or sum(slice$(not(ndefpDummyExportCost(comm, region, year, slice))), 1)))..
          vDummyCost(comm, region, year)
          =e=
-         sum(slice$(mCommSlice(comm, slice) and defpDummyImportCost(comm, region, year, slice)),
+         sum(slice$(mCommSlice(comm, slice) and not(ndefpDummyImportCost(comm, region, year, slice))),
            pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice)) +
-         sum(slice$(mCommSlice(comm, slice) and defpDummyExportCost(comm, region, year, slice)),
+         sum(slice$(mCommSlice(comm, slice) and not(ndefpDummyExportCost(comm, region, year, slice))),
            pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
 
 
@@ -1383,8 +1382,8 @@ eqCost(region, year)$(mMidMilestone(year))..
          =e=
          sum(tech$mTechSpan(tech, region, year), vTechOMCost(tech, region, year))
          + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
-         + sum(comm$(sum(slice$defpDummyImportCost(comm, region, year, slice), 1)
-                 or sum(slice$defpDummyExportCost(comm, region, year, slice), 1)), vDummyCost(comm, region, year))
+         + sum(comm$(sum(slice$(not(ndefpDummyImportCost(comm, region, year, slice))), 1)
+                 or sum(slice$(not(ndefpDummyExportCost(comm, region, year, slice))), 1)), vDummyCost(comm, region, year))
          + sum(comm$(sum(slice$pTaxCost(comm, region, year, slice), 1)), vTaxCost(comm, region, year))
          - sum(comm$(sum(slice$pSubsCost(comm, region, year, slice), 1)), vSubsCost(comm, region, year))
          + sum(stg$mStorageSpan(stg, region, year), vStorageOMCost(stg, region, year))
@@ -22560,7 +22559,7 @@ eqLECActivity
 * ddd355e0-0023-45e9-b0d3-1ad83ba74b3a
 *$EXIT
 
-option lp = cbc;
+*option lp = cbc;
 
 * f374f3df-5fd6-44f1-b08a-1a09485cbe3d
 *$exit
