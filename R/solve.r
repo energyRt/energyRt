@@ -528,33 +528,25 @@ LL1 <- proc.time()[3]
         gg <- getParameterData(prec@parameters[[name1]])
         if (prec@parameters[[name1]]@defVal[2] == Inf) {
           gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-          prec@parameters[[name2]]@not_data <- TRUE
+          prec@parameters[[name2]]@data <- gg[, 1:(ncol(gg) - 2), drop = FALSE]
+          if (prec@parameters[[name2]]@nValues != -1) {
+            prec@parameters[[name2]]@nValues <- nrow(gg)
+          }
         } else {
           gg <- gg[gg$type == 'up' & gg$value == Inf, ]
+          prec@parameters[[name2]]@not_data <- gg[, 1:(ncol(gg) - 2), drop = FALSE]
         }
-        prec@parameters[[name2]] <- addData(prec@parameters[[name2]], gg[, 1:(ncol(gg) - 2), drop = FALSE])
         prec
       }
-      defin_ndef_par_set <- function(prec, name1, name2) {
-        gg <- getParameterData(prec@parameters[[name1]])
-        if (prec@parameters[[name1]]@defVal[1] == Inf) {
-          gg <- gg[gg$value != Inf, ]
-          prec@parameters[[name2]]@not_data <- TRUE
-        } else {
-          gg <- gg[gg$value == Inf, ]
-        }
-        prec@parameters[[name2]] <- addData(prec@parameters[[name2]], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-        prec
-      }
-      prec <- defin_ndef_par_set(prec, 'pSupReserve', 'ndefpSupReserve')
-      prec <- defin_ndef_par_set(prec, 'pDummyImportCost', 'ndefpDummyImportCost')
-      prec <- defin_ndef_par_set(prec, 'pDummyExportCost', 'ndefpDummyExportCost')
-      prec <- defin_ndef_par_set(prec, 'pExportRowRes', 'ndefpExportRowRes')
-      prec <- defin_ndef_par_set(prec, 'pImportRowRes', 'ndefpImportRowRes')
+      prec <- defin_ndef_par(prec, 'pSupReserve', 'ndefpSupReserve')
       prec <- defin_ndef_par(prec, 'pSupAva', 'ndefpSupAvaUp')
+      prec <- defin_ndef_par(prec, 'pDummyImportCost', 'ndefpDummyImportCost')
+      prec <- defin_ndef_par(prec, 'pDummyExportCost', 'ndefpDummyExportCost')
+      prec <- defin_ndef_par(prec, 'pExportRowRes', 'ndefpExportRowRes')
+      prec <- defin_ndef_par(prec, 'pImportRowRes', 'ndefpImportRowRes')
       prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
       prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
-      prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfacUp')
+      prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfac')
       prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
       prec <- defin_ndef_par(prec, 'pTradeIr', 'ndefpTradeIrUp')
       

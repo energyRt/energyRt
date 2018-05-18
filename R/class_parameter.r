@@ -9,7 +9,7 @@ setClass('parameter', # @parameter
                                      # one for single, two for multi
     interpolation   = "character",   # interpolation 'back.inter.forth'
     data            = "data.frame",  # @data Data for export
-    not_data        = "logical",  # @data NO flag for map 
+    not_data        = "data.frame",  # @data NO flag for map 
     #use_now         = "numeric",     # For fast
     #use_all         = "numeric",     # For fast
     # check           = "function",     # ?delete? function for checking map
@@ -25,7 +25,7 @@ setClass('parameter', # @parameter
     defVal         = NULL,
     interpolation   = NULL,
     data            = data.frame(),
-    not_data        = FALSE,
+    not_data        = data.frame(),
     #use_now         = 0,     
     #use_all         = 0,
     #check           = function(obj) TRUE,
@@ -264,20 +264,11 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         return(c('set', paste(obj@name, ' /', sep = ''), obj@data[, 1], '/;', ''))
       }
     } else if (obj@type == 'map') {
-      add_nl <- ''
-      if (obj@not_data) {
-        add_nl <-  paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
-        add_nl <-  paste(add_nl, ' = not(', add_nl, ');', sep = '')
-      }
       if (nrow(obj@data) == 0) {
-        if (obj@not_data) {
-          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = YES;', sep = '')
-        } else {
-          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
-        }
+        ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
       } else {
         ret <- c('set', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', add_nl, ''))
+        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', ''))
       }
     } else if (obj@type == 'simple') {
       ret <- as_simple(obj@data, obj@name, obj@defVal)
