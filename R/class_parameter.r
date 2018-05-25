@@ -219,21 +219,11 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
     c(ret, gg, '/;')
   }
     as_simple <- function(dtt, name, def) {
-      add_cnd <- function(y, x) { 
-        if (x == '') return(x) else return(paste(x, 'and', y))
-      }
       add_cond2 <- ''
-      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) { 
+      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) {
         add_cond2 <- '(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))'
-        if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('not(mTechOneComm(tech, comm)) and  ', add_cond2, sep = '')
-    }
-    if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'slice')) 
-      add_cond2 <- add_cnd('mTechSlice(tech, slice)', add_cond2)
-    if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'acomm')) 
-      add_cond2 <- add_cnd('(mTechAInp(tech, acomm) or mTechAOut(tech, acomm))', add_cond2)
-    if (any(obj@dimSetNames == 'year')) 
-      add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
-    if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
+        if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('(not(mTechOneComm(tech, comm)) and  ', add_cond2, ')', sep = '')
+      }
       if (nrow(dtt) == 0 || all(dtt$value == def)) {
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
