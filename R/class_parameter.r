@@ -9,7 +9,7 @@ setClass('parameter', # @parameter
                                      # one for single, two for multi
     interpolation   = "character",   # interpolation 'back.inter.forth'
     data            = "data.frame",  # @data Data for export
-    not_data        = "data.frame",  # @data NO flag for map 
+    not_data        = "logical",  # @data NO flag for map 
     #use_now         = "numeric",     # For fast
     #use_all         = "numeric",     # For fast
     # check           = "function",     # ?delete? function for checking map
@@ -25,7 +25,7 @@ setClass('parameter', # @parameter
     defVal         = NULL,
     interpolation   = NULL,
     data            = data.frame(),
-    not_data        = data.frame(),
+    not_data        = FALSE,
     #use_now         = 0,     
     #use_all         = 0,
     #check           = function(obj) TRUE,
@@ -219,11 +219,22 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
     c(ret, gg, '/;')
   }
     as_simple <- function(dtt, name, def) {
+      add_cnd <- function(y, x) { 
+        if (x == '') return(x) else return(paste(x, 'and', y))
+      }
       add_cond2 <- ''
       if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) {
         add_cond2 <- '(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))'
-        if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('(not(mTechOneComm(tech, comm)) and  ', add_cond2, ')', sep = '')
+        if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('not(mTechOneComm(tech, comm)) and  ', add_cond2, sep = '')
       }
+      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'slice')) 
+        add_cond2 <- add_cnd('mTechSlice(tech, slice)', add_cond2)
+      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'acomm')) 
+        add_cond2 <- add_cnd('(mTechAInp(tech, acomm) or mTechAOut(tech, acomm))', add_cond2)
+      if (any(obj@dimSetNames == 'year')) 
+        add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
+      if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
+      
       if (nrow(dtt) == 0 || all(dtt$value == def)) {
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
@@ -254,11 +265,21 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         return(c('set', paste(obj@name, ' /', sep = ''), obj@data[, 1], '/;', ''))
       }
     } else if (obj@type == 'map') {
+      add_nl <- ''
+      if (obj@not_data) {
+        add_nl <-  paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
+        add_nl <-  paste(add_nl, ' = not(', add_nl, ');', sep = '')
+      }
       if (nrow(obj@data) == 0) {
-        ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
+        if (obj@not_data) {
+          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = YES;', sep = '')
+        } else {
+          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
+        }
+        return(ret)
       } else {
         ret <- c('set', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', ''))
+        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', add_nl, ''))
       }
     } else if (obj@type == 'simple') {
       ret <- as_simple(obj@data, obj@name, obj@defVal)
