@@ -894,7 +894,9 @@ LL1 <- proc.time()[3]
         colnames(l1)[ncol(l1) - 1] <- 'type'
         colnames(l2)[ncol(l2) - 1] <- 'type'
         gg <- rbind(l1, l2)
-        if (to_array_result) rr$par_arr[[i]] <- tapply(gg[, ncol(gg) - 1], gg[, 1 - ncol(gg)], sum)
+        if (to_array_result) {
+          # rr$par_arr[[i]] <- tapply(gg[, ncol(gg) - 1], gg[, 1 - ncol(gg)], sum)
+        }
       }
     }
     rr[['solution_report']] <- list(finish = read.csv(paste(tmpdir, '/pFinish.csv', sep = ''))$value, 
