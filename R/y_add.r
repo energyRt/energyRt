@@ -236,7 +236,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
      return(obj)
   }
   if (app@type == 'tax') {
-      approxim2 <- approxim
+      approxim2 <- fix_approximation_list(approxim, comm = app@comm)
       for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
         approxim2[[cc]] <- app@for.each[[cc]]
       }
@@ -244,13 +244,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
         simpleInterpolation(app@rhs, 'tax',
          obj@parameters[['pTaxCost']], approxim2, 'comm', app@comm))
   } else
-  if (app@type == 'subs') {
-      approxim2 <- approxim
+  if (app@type == 'subsidy') {
+      approxim2 <- fix_approximation_list(approxim, comm = app@comm)
       for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
         approxim2[[cc]] <- app@for.each[[cc]]
       }
      obj@parameters[['pSubsCost']] <- addData(obj@parameters[['pSubsCost']],
-        simpleInterpolation(app@rhs, 'subs',
+        simpleInterpolation(app@rhs, 'subsidy',
          obj@parameters[['pSubsCost']], approxim2, 'comm', app@comm))
   } else {
     # Define lhs equation type
