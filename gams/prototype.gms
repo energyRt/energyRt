@@ -360,9 +360,9 @@ positive variable
 vImport(comm, region, year, slice)                   Total regional import (Ir + ROW)
 vExport(comm, region, year, slice)                   Total regional export (Ir + ROW)
 vTradeIr(trade, region, region, year, slice)         Total physical trade flows between regions
-vExportRowCumulative(expp)
+vExportRowAccumulated(expp)							 Accumulated export to ROW
 vExportRow(expp, region, year, slice)                Export to ROW
-vImportRowAccumulated(imp)
+vImportRowAccumulated(imp)							 Accumulated import from ROW
 vImportRow(imp, region, year, slice)                 Import from ROW
 ;
 variable
@@ -941,7 +941,7 @@ eqSupCost(sup, region, year)$(mMidMilestone(year) and mSupSpan(sup, region))..
 * Demand equation
 **************************************
 Equation
-eqDemInp(comm, region, year, slice)
+eqDemInp(comm, region, year, slice)  Demand equation
 *eqDemInp2(comm, region, year, slice, year, year)
 ;
 
@@ -1062,7 +1062,7 @@ eqStorageFix(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regio
          vStorageCap(stg, region, year);
 
 * Salvage value
-eqStorageSalv2(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(region))..
+eqStorageSalv0(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(region))..
          vStorageSalv(stg, region)
          +
         sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)),
@@ -1075,7 +1075,7 @@ eqStorageSalv2(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(regio
            )))
     ))   =e= 0;
 
-eqStorageSalv3(stg, region, yeare)$(mMidMilestone(yeare) and not(mDiscountZero(region)))..
+eqStorageSalv(stg, region, yeare)$(mMidMilestone(yeare) and not(mDiscountZero(region)))..
          vStorageSalv(stg, region)
          +
          sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)),
@@ -1187,13 +1187,13 @@ eqExportRowUp(expp, region, year, slice)$(mExpSlice(expp, slice) and mMidMilesto
 eqExportRowLo(expp, region, year, slice)$(mExpSlice(expp, slice) and mMidMilestone(year) and pExportRowLo(expp, region, year, slice) <> 0)..
   vExportRow(expp, region, year, slice)  =g= pExportRowLo(expp, region, year, slice);
 
-eqExportRowCumulative(expp).. vExportRowCumulative(expp) =e=
+eqExportRowCumulative(expp).. vExportRowAccumulated(expp) =e=
     sum((region, year, slice, yeare, yearp)$(mExpSlice(expp, slice) and mMidMilestone(year) and
                 mStartMilestone(year, yeare) and mEndMilestone(year, yearp)),
        (ORD(yearp) - ORD(yeare) + 1) * vExportRow(expp, region, year, slice)
 );
 
-eqExportRowResUp(expp)$(not(ndefpExportRowRes(expp))).. vExportRowCumulative(expp) =l= pExportRowRes(expp);
+eqExportRowResUp(expp)$(not(ndefpExportRowRes(expp))).. vExportRowAccumulated(expp) =l= pExportRowRes(expp);
 
 
 
@@ -20663,8 +20663,8 @@ eqTechEac
 * FIX O & M equation
 * Salvage value
 *eqTechSalv1
-eqTechSalv2
-eqTechSalv3
+eqTechSalv0
+eqTechSalv
 * Commodity Varom O & M and Varom O & M aggregate by year equation
 * Aggregated annual costs
 eqTechOMCost
@@ -20683,7 +20683,7 @@ eqTechAVarom
 eqSupAvaUp
 eqSupAvaLo
 eqSupReserve
-eqSupReserveCheck
+eqSupTotal
 eqSupCost
 **************************************
 * Demand equation
@@ -20709,8 +20709,8 @@ eqStorageInv
 * FIX O & M equation
 eqStorageFix
 * Salvage value
-eqStorageSalv2
-eqStorageSalv3
+eqStorageSalv0
+eqStorageSalv
 * Commodity Varom O & M aggregate by year equation
 eqStorageVar
 * Aggregated annual costs
