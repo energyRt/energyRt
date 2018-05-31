@@ -4,7 +4,7 @@ plot.result <- function(obj, type, commodity, region = NULL, year = NULL,
   if (is.null(year)) year <- obj@set$year
   if (is.null(commodity)) commodity <- obj@set$comm
   if (is.null(region)) region <- obj@set$region
-  if (is.null(slice)) slice <- obj@set$slice
+  if (is.null(slice)) slice <- obj@model@sysInfo@slice@all_slice
   if (is.null(technology)) technology <- obj@set$tech
   if (is.null(supply)) supply <- obj@set$sup
   if (is.null(export)) export <- obj@set$expp

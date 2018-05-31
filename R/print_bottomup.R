@@ -76,6 +76,9 @@ print.import <- energyRt:::.print_bottomup
   }
 }
 .cat_bottomup_data_frame2 <- function(s1, nm, zz) {
+      for (qq in names(s1)[sapply(s1, is.numeric)]) {
+        s1[, qq] <- format(s1[, qq], digits = 2)
+      }
       cat('\\captionof{table}{', nm, '.}\n', sep = '', file = zz)
       cat('\\begin{longtable}{ | ', 
          paste(rep('c', ncol(s1) + 1), collapse = ' | '), ' |}\n', sep = '', file = zz)

@@ -12,7 +12,12 @@
   # Data calculation 
     if (is.null(region)) region <- obj@sysInfo@region
     if (is.null(year)) year <- obj@sysInfo@year
-    if (is.null(slice)) slice <- obj@sysInfo@slice
+    if (is.null(slice)) {
+      slice <- .init_slice(obj@sysInfo@slice)
+      nn <- getObjects(obj, name = commodity)[[1]]@slice
+      if (is.null(nn)) nn <- colnames(slice@levels)[ncol(slice@levels) - 1]
+      slice <- slice@slice_map[nn]
+    }
     if (is.null(region) || length(region) == 0) {
       region <- 'DEF'
       RFL <- TRUE
@@ -105,7 +110,12 @@
     # Data calculation 
     if (is.null(region)) region <- obj@sysInfo@region
     if (is.null(year)) year <- obj@sysInfo@year
-    if (is.null(slice)) slice <- obj@sysInfo@slice
+    if (is.null(slice)) {
+      slice <- .init_slice(obj@sysInfo@slice)
+      nn <- getObjects(obj, name = commodity)[[1]]@slice
+      if (is.null(nn)) nn <- colnames(slice@levels)[ncol(slice@levels) - 1]
+      slice <- slice@slice_map[nn]
+    }
     if (is.null(region) || length(region) == 0) {
       region <- 'DEF'
       RFL <- TRUE
@@ -198,7 +208,12 @@
     # Data calculation 
     if (is.null(region)) region <- obj@sysInfo@region
     if (is.null(year)) year <- obj@sysInfo@year
-    if (is.null(slice)) slice <- obj@sysInfo@slice
+    if (is.null(slice)) {
+      slice <- .init_slice(obj@sysInfo@slice)
+      nn <- getObjects(obj, name = commodity)[[1]]@slice
+      if (is.null(nn)) nn <- colnames(slice@levels)[ncol(slice@levels) - 1]
+      slice <- slice@slice_map[nn]
+    }
     if (is.null(region) || length(region) == 0) {
       region <- 'DEF'
       RFL <- TRUE
@@ -291,7 +306,12 @@
     # Data calculation 
     if (is.null(region)) region <- obj@sysInfo@region
     if (is.null(year)) year <- obj@sysInfo@year
-    if (is.null(slice)) slice <- obj@sysInfo@slice
+    if (is.null(slice)) {
+      slice <- .init_slice(obj@sysInfo@slice)
+      nn <- getObjects(obj, name = commodity)[[1]]@slice
+      if (is.null(nn)) nn <- colnames(slice@levels)[ncol(slice@levels) - 1]
+      slice <- slice@slice_map[nn]
+    }
     if (is.null(region) || length(region) == 0) {
       region <- 'DEF'
       RFL <- TRUE
@@ -349,6 +369,13 @@ plot.model <- function(obj, type, ...) {
   if (type == 'export')  energyRt:::.plot_export(obj, ...) else
   if (type == 'import')  energyRt:::.plot_import(obj, ...) else
   stop('Unknown plot type ', type)
+}
+plot.model <- function(obj, type, ...) {
+  if (type == 'supply')  .plot_supply(obj, ...) else
+    if (type == 'demand')  .plot_demand(obj, ...) else
+      if (type == 'export')  .plot_export(obj, ...) else
+        if (type == 'import')  .plot_import(obj, ...) else
+          stop('Unknown plot type ', type)
 }
 
 #--------------------------------------------------------------------------------------------
