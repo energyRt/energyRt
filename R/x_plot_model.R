@@ -44,9 +44,12 @@
           if (class(obj@data[[i]]@data[[j]]) == 'supply' 
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(supply) || obj@data[[i]]@data[[j]]@name %in% supply)) {
+            approxim2 <- approxim; 
+            if (!is.null(obj@data[[i]]@data[[j]])) 
+              approxim2$region <- obj@data[[i]]@data[[j]]@region
             bnd <- interpolation_bound(obj@data[[i]]@data[[j]]@availability,
                'ava', defVal = dfl, rule = rl, year_range = year_range,
-               approxim = approxim)
+               approxim = approxim2)
             gg <- gg + tapply(bnd$ava, bnd[, c('year', 'type')], sum)[cyear, , drop = FALSE]
           }
         }
