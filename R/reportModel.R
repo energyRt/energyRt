@@ -289,7 +289,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           tec <- dtt$technology[[cc]]
           png2(paste('technology_', tec@name, '.png', sep = ''), 
                width = 1.5 * 480, height = 1.5 * 480, pointsize = 16)
-          draw(tec, year = obj@sysInfo@year[1], slice = obj@sysInfo@slice[1])
+          draw(tec, year = obj@sysInfo@year[1], slice = 'ANNUAL')
           dev.off2()
           cat('\\subsection{', gsub('_', '\\\\_', tec@name), '}\n\n', '\n', sep = '', file = zz) 
           energyRt:::.cat_bottomup(tec, file = zz, includename = FALSE)#, print.all = TRUE)
@@ -298,7 +298,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           cat('  \\includegraphics[width = 8in]{technology_', 
               tec@name, '.png}\n', sep = '', file = zz)
           cat('  \\caption{Technology scheme ',gsub('_', '\\\\_', tec@name), 
-              ' in year ', obj@sysInfo@year[1], ', slice ', obj@sysInfo@slice[1], 
+              ' in year ', obj@sysInfo@year[1], ', slice ANNUAL', 
               '}\n', sep = '', file = zz)
           cat('\\end{figure}\n', sep = '', file = zz)
           cat('\n\n', '\n', sep = '', file = zz) 

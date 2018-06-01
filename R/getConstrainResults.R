@@ -36,7 +36,7 @@ getConstrainResults <- function(scenario, constrain) {
     }
     # Remove unused slice
     if (any(names(cns.set) == 'slice') && any(names(cns.set) == 'tech')) {
-      uu = obj@modInp@parameters$mTechSlice@data
+      uu = scenario@modInp@parameters$mTechSlice@data
       uu <- uu[uu$tech %in% cns.set$tech & uu$slice %in% cns.set$slice ,, drop = FALSE]    
       cns.set$slice <- cns.set$slice[cns.set$slice %in% unique(uu$slice)]   
       
