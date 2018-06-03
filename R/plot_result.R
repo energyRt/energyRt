@@ -1,4 +1,4 @@
-plot.result <- function(obj, type, commodity, region = NULL, year = NULL,
+plot.precompiled <- function(obj, type, commodity, region = NULL, year = NULL,
   slice = NULL, technology = NULL, supply = NULL, export = NULL, import = NULL,
   main = NULL, xlab = '', ylab = '', lwd = 2, ylim = NULL) {
   if (is.null(year)) year <- obj@set$year
@@ -61,4 +61,4 @@ plot.result <- function(obj, type, commodity, region = NULL, year = NULL,
   gg
 }
 
-plot.scenario <- function(obj, ...) plot(obj@result, ...)
+plot.scenario <- function(obj, ...) plot(obj@modInp, ...)

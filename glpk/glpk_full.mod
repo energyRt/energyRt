@@ -117,8 +117,6 @@ param mLECRegion{region};
 
 
 param pSliceShare{slice};
-param pMilestone1{year, year};
-param pMilestone2{year, year};
 param pAggregateFactor{comm, comm};
 param pTechOlife{tech, region};
 param pTechCinp2ginp{tech, comm, region, year, slice};
@@ -372,9 +370,9 @@ s.t.  eqTechCVarom{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s
 
 s.t.  eqTechAVarom{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y])}: vTechAVarom[t,r,y,s]  =  sum{c in comm:(mTechAInp[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s]);
 
-s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and not((ndefpSupAvaUp[s1,r,y,s])) and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,r,y,s]*pSliceShare[s];
+s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and not((ndefpSupAvaUp[s1,r,y,s])) and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,r,y,s];
 
-s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,r,y,s]*pSliceShare[s];
+s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,r,y,s];
 
 s.t.  eqSupTotal{ s1 in sup,c in comm : mSupComm[s1,c]}: vSupReserve[s1]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mSupSlice[s1,s] and mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp] and mSupSpan[s1,r]))}((ORD[yp]-ORD[ye]+1)*vSupOut[s1,c,r,y,s]);
 

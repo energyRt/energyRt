@@ -153,8 +153,6 @@ mAllSliceParentChild(slice, slice)
 * Parameter
 parameter
 pSliceShare(slice)                                 Slice share
-pMilestone1(year, year)                            ???
-pMilestone2(year, year)                            ???
 * Aggregate
 pAggregateFactor(comm, comm)                       Aggragation factor of
 * Technology parameter
@@ -910,12 +908,12 @@ eqSupAvaUp(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilest
          not(ndefpSupAvaUp(sup, region, year, slice)) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =l=
-         pSupAvaUp(sup, region, year, slice) * pSliceShare(slice);
+         pSupAvaUp(sup, region, year, slice);
 
 eqSupAvaLo(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilestone(year) and mSupComm(sup, comm) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =g=
-         pSupAvaLo(sup, region, year, slice) * pSliceShare(slice);
+         pSupAvaLo(sup, region, year, slice);
 
 eqSupTotal(sup, comm)$mSupComm(sup, comm)..
          vSupReserve(sup)
@@ -942,19 +940,12 @@ eqSupCost(sup, region, year)$(mMidMilestone(year) and mSupSpan(sup, region))..
 **************************************
 Equation
 eqDemInp(comm, region, year, slice)  Demand equation
-*eqDemInp2(comm, region, year, slice, year, year)
 ;
 
 eqDemInp(comm, region, year, slice)$(mMidMilestone(year) and sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))..
          vDemInp(comm, region, year, slice)  =e=
          sum(dem$mDemComm(dem, comm), pDemand(dem, region, year, slice));
 
-*eqDemInp2(comm, region, year, slice, yeare, yearp)$(
-*  not(mMidMilestone(year)) and mMilestone1(year, yeare) and mMilestone2(year, yearp))..
-*         pMilestone1(year, yeare) * vDemInp(comm, region, yeare, slice) +
-*         pMilestone2(year, yearp) * vDemInp(comm, region, yearp, slice)
-*         =g=
-*         sum(dem$mDemComm(dem, comm), pDemand(dem, region, year, slice));
 
 
 **************************************
