@@ -44,6 +44,7 @@ getData <- function (...) UseMethod("getData")
 setGeneric("milestoneYears", function(start, interval) standardGeneric("milestoneYears"))
 setGeneric("setMilestoneYears", function(obj, start, interval) standardGeneric("setMilestoneYears"))
 setGeneric("getMilestone", function(obj) standardGeneric("getMilestone"))
+setGeneric("setSlice", function(obj, ...) standardGeneric("setSlice"))
 
 setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
 

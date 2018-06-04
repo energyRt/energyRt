@@ -1,10 +1,10 @@
-plot.result <- function(obj, type, commodity, region = NULL, year = NULL,
+plot.precompiled <- function(obj, type, commodity, region = NULL, year = NULL,
   slice = NULL, technology = NULL, supply = NULL, export = NULL, import = NULL,
   main = NULL, xlab = '', ylab = '', lwd = 2, ylim = NULL) {
   if (is.null(year)) year <- obj@set$year
   if (is.null(commodity)) commodity <- obj@set$comm
   if (is.null(region)) region <- obj@set$region
-  if (is.null(slice)) slice <- obj@set$slice
+  if (is.null(slice)) slice <- obj@model@sysInfo@slice@all_slice
   if (is.null(technology)) technology <- obj@set$tech
   if (is.null(supply)) supply <- obj@set$sup
   if (is.null(export)) export <- obj@set$expp
@@ -61,4 +61,4 @@ plot.result <- function(obj, type, commodity, region = NULL, year = NULL,
   gg
 }
 
-plot.scenario <- function(obj, ...) plot(obj@result, ...)
+plot.scenario <- function(obj, ...) plot(obj@modInp, ...)

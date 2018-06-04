@@ -22,6 +22,7 @@ setClass("commodity",
           source        = "list",
           other         = "list",           #
           limtype       = "factor",
+          slice         = "characterOrNULL",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
@@ -88,7 +89,8 @@ setClass("commodity",
           source        = list(),
           other         = list(),
           limtype       = factor('LO', levels = c('FX', 'UP', 'LO')),
-      GIS           = NULL,
+          slice         = NULL,
+          GIS           = NULL,
       #! Misc
       misc = list(
       )),

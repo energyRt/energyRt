@@ -10,6 +10,7 @@ setClass("export",
           unit          = "character",
           reserve       = "numeric",
           exp           = "data.frame",
+          slice         = "characterOrNULL",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
@@ -31,6 +32,7 @@ setClass("export",
                                      price     = numeric(),
                                      stringsAsFactors = FALSE),
       GIS           = NULL,
+      slice         = NULL,
       #! Misc
       misc = list(
       )),

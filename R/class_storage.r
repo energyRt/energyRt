@@ -18,6 +18,7 @@ setClass("reserve",
           varom         = "data.frame",    #
           invcost       = "data.frame",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          slice         = "characterOrNULL",
           misc = "list"     #
       ),
       prototype(
@@ -71,6 +72,7 @@ setClass("reserve",
                                      invcost  = numeric(),
                                      stringsAsFactors = FALSE),
       GIS           = NULL,
+      slice         = NULL,
       #! Misc
       misc = list(
       )),

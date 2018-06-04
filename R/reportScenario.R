@@ -40,8 +40,15 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     }
     for(i in names(dtt)) if (length(dtt[[i]]) != 0) dtt[[i]] <- dtt[[i]][sort(names(dtt[[i]]))]
     set <- obj@modOut@sets
-    dat <- obj@modOut@data
-    
+    dat <- obj@modOut@variables
+    mid_year <- obj@modInp@parameters$mMidMilestone@data$year
+    region <- obj@modInp@parameters$region@data$region
+    for (i in seq(along = dat)) {
+      if (any(colnames(dat[[i]]) == 'region')) dat[[i]][, 'region'] <- factor(dat[[i]][, 'region'], levels = region)
+      if (any(colnames(dat[[i]]) == 'year')) dat[[i]][, 'year'] <- factor(dat[[i]][, 'year'], levels = mid_year)
+      if (any(colnames(dat[[i]]) == 'src')) dat[[i]][, 'src'] <- factor(dat[[i]][, 'src'], levels = region)
+      if (any(colnames(dat[[i]]) == 'dst')) dat[[i]][, 'dst'] <- factor(dat[[i]][, 'dst'], levels = region)
+    }
     tryCatch({
       zz <- file('energyRtScenarioReport.tex', 'w')
       #cat('Auto-report for model ... \n\n', date(), '\n\n', sep = '', file = zz)
@@ -69,7 +76,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           sep = '', file = zz)
       }
       if (obj@modOut@solutionStatus == 1) {
-        cat('Optimal solution found, objective value ', obj@modOut@data$vObjective, 
+        cat('Optimal solution found, objective value ', dat$vObjective$value, 
             '.\n\n', '\n', sep = '', file = zz)
       } else {
         cat('The model run is not completed. Exit code ', obj@modOut@solutionStatus, 
@@ -82,16 +89,20 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       }
       gg <- sub('[,][ ]$', '.\n\n', gg)
       cat(gg, sep = '', file = zz)
-      if (any(obj@modOut@data$vDummyImport != 0)) {
-        dcmd <- dimnames(obj@modOut@data$vDummyImport)[[1]][apply(obj@modOut@data$vDummyImport != 0, 1, any)]
+      if (any(dat$vDummyImport$value != 0)) {
+        dcmd <- unique(dat$vDummyImport[dat$vDummyImport$value != 0, 'comm']) 
         cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
         cat('There are dummy import for commodity "', 
             paste(dcmd, collapse = '", "'), '".\n\n', '\n', sep = '', file = zz)
         for(cc in dcmd) {
           cat('\\subsection{', cc, '}\n\n', '\n', sep = '', file = zz)
           png2(paste(cc, '_dummy_out.png', sep = ''))
-          plot(dimnames(dat$vDummyImport)$year, apply(dat$vDummyImport[cc,,,, drop = FALSE], 3, sum), 
-               main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
+          dd <- dat$vDummyImport[dat$vDummyImport$comm == cc,, drop = FALSE]
+          if (nrow(dd) == 1) {
+            plot(dd$year + c(-.5, .5), rep(dd$value, 2), main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
+          } else {
+            plot(dd$year, dd$value, main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
+          }
           dev.off2()
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
           cat('  \\centering\n', sep = '', file = zz)
@@ -102,7 +113,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           cat('\\end{figure}\n', sep = '', file = zz)
         }
       }
-      if (any(obj@modOut@data$vDummyExport != 0)) {
+      if (any(dat$vDummyExport$value != 0)) {
         dcmd <- dimnames(obj@modOut@data$vDummyExport)[[1]][apply(obj@modOut@data$vDummyExport != 0, 1, any)]
         cat('\\section{Dummy import}\n\n', '\n', sep = '', file = zz)
         cat('There are dummy import for commodity "', 
@@ -110,8 +121,12 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         for(cc in dcmd) {
           cat('\\subsection{', cc, '}\n\n', '\n', sep = '', file = zz)
           png2(paste(cc, '_dummy_inp.png', sep = ''))
-          plot(dimnames(dat$vDummyExport)$year, apply(dat$vDummyExport[cc,,,, drop = FALSE], 3, sum), 
-               main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
+          dd <- dat$vDummyExport[dat$vDummyExport$comm == cc,, drop = FALSE]
+          if (nrow(dd) == 1) {
+            plot(dd$year + c(-.5, .5), rep(dd$value, 2), main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
+          } else {
+            plot(dd$year, dd$value, main = '', xlab = '', ylab = '', type = 'l', lwd = 2)
+          }
           dev.off2()
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
           cat('  \\centering\n', sep = '', file = zz)
@@ -126,16 +141,19 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       
       cat('\\section{Cost analysis}\n\n', '\n', sep = '', file = zz)
       # Cost data
-      cost <- rbind(
-        Subsidy = apply(dat$vSubsCost, 3, sum),
-        Trade = apply(dat$vTradeCost, 2, sum),
-        Supply = apply(dat$vSupCost, 3, sum),
-        Techology = apply(dat$vTechOMCost, 3, sum) + apply(dat$vTechInv, 3, sum),
-        Tax = apply(dat$vTaxCost, 3, sum),
-        Storage = apply(dat$vStorageOMCost, 3, sum),
-        Dummy = apply(dat$vDummyCost, 3, sum),
-        SalvageTechology = c(rep(0, dim(dat$vTechOMCost)[3] - 1), sum(dat$vTechSalv))
-     )
+      cst_list <- c(Subsidy = 'vSubsCost', Trade = 'vTradeCost', Supply = 'vSupCost', Techology = c('vTechOMCost', 'vTechInv'), 
+                    Tax = 'vTaxCost', Storage = 'vStorageOMCost', Dummy = 'vDummyCost', SalvageTechology = 'vTechSalv')
+      cost <- array(0, dim = c(length(cst_list), length(mid_year)), dimnames = list(names(cst_list), mid_year))
+      for (i in names(cst_list)) {
+        for (j in cst_list[[i]]) {
+          if (any(colnames(dat[[j]]) == 'year')) dd <- tapply(dat[[j]]$value, dat[[j]]$year  , sum) else {
+            dd <- sum(dat[[j]]$value)
+            names(dd) <- mid_year[length(mid_year)]
+          }
+          dd[is.na(dd)] <- 0
+          if (length(dd) > 0) cost[i, names(dd)] <- cost[i, names(dd)] + dd
+        }
+      }
       if (any(cost != 0)) {
         png2(paste('undiscount_cost.png', sep = ''), width = 640)
         layout(matrix(1:2, 1), width = c(.75, .25))
@@ -166,18 +184,23 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
         dsc[mlst$start[i] <= dsc$year & dsc$year <= mlst$end[i], 'mid'] <- mlst$mid[i]
       }
       dsc$year <- dsc$mid
+      dsc[, 'region'] <- factor(dsc[, 'region'], levels = region)
+      dsc[, 'year'] <- factor(dsc[, 'year'], levels = mid_year)
       dsc <- tapply(dsc$value, dsc[, c('region', 'year'), drop = FALSE], sum)
       # Discount for region
-      dsccost <- rbind(
-        Subsidy = apply(apply(dat$vSubsCost, 2:3, sum) * dsc, 2, sum),
-        Trade = apply(dat$vTradeCost * dsc, 2, sum),
-        Supply = apply(apply(dat$vSupCost, 2:3, sum) * dsc, 2, sum),
-        Techology = apply(apply(dat$vTechOMCost, 2:3, sum) + apply(dat$vTechInv, 2:3, sum) * dsc, 2, sum),
-        Tax = apply(apply(dat$vTaxCost, 2:3, sum) * dsc, 2, sum),
-        Storage = apply(apply(dat$vStorageOMCost, 2:3, sum) * dsc, 2, sum),
-        Dummy = apply(apply(dat$vDummyCost, 2:3, sum) * dsc, 2, sum),
-        SalvageTechology = c(rep(0, dim(dat$vTechOMCost)[3] - 1), sum(dat$vTechSalv)) * dsc
-      )
+      dsccost <- array(0, dim = c(length(cst_list), length(mid_year)), dimnames = list(names(cst_list), mid_year))
+      for (i in names(cst_list)) {
+        for (j in cst_list[[i]]) {
+          if (any(colnames(dat[[j]]) == 'year')) {
+            dd <- tapply(dat[[j]]$value, dat[[j]][, c('region', 'year')], sum) * dsc
+            dd <- colSums(dd, na.rm = TRUE)
+          } else {
+            dd <- sum(tapply(dat[[j]]$value, dat[[j]]$region, sum) * dsc[, ncol(dsc)], na.rm = TRUE)
+            names(dd) <- mid_year[length(mid_year)]
+          }
+          if (length(dd) > 0) dsccost[i, names(dd)] <- dsccost[i, names(dd)] + dd
+        }
+      }
       if (any(dsccost != 0)) {
         png2(paste('discount_cost.png', sep = ''), width = 640)
         layout(matrix(1:2, 1), width = c(.75, .25))
@@ -210,20 +233,29 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           cmd <- dtt$commodity[[cc]]
           cc <- cmd@name
           cc <- (cc)
+          cmd_tmp_func <- function(x, y) {
+            fl <- (x$comm == y)
+            tapply(x$value[fl], x$year[fl], sum)
+          }
+          trd <- obj@modInp@parameters$mTradeComm@data[obj@modInp@parameters$mTradeComm@data$comm == cc, ]$trade
+          fl <- (dat$vTradeIr$trade %in% trd)
+          trd <- tapply(dat$vTradeIr$value[fl], dat$vTradeIr$year[fl], sum);
+          trd[is.na(trd)] <- 0
           cmd_use <- rbind(
-            input = apply(dat$vInpTot[cc,,,, drop = FALSE], 3, sum), 
-            output = apply(dat$vOutTot[cc,,,, drop = FALSE], 3, sum), 
-            technologyInput = apply(dat$vTechInpTot[cc,,,, drop = FALSE], 3, sum), 
-            technologyOutput = apply(dat$vTechOutTot[cc,,,, drop = FALSE], 3, sum),
-            emission = apply(dat$vEmsFuelTot[cc,,,, drop = FALSE], 3, sum),
-            aggregate = apply(dat$vAggOut[cc,,,, drop = FALSE], 3, sum),
-            demand = apply(dat$vDemInp[cc,,,, drop = FALSE], 3, sum),
-            dummyImport = apply(dat$vDummyImport[cc,,,, drop = FALSE], 3, sum),
-            dummyExport = apply(dat$vDummyExport[cc,,,, drop = FALSE], 3, sum),
-            supply = apply(dat$vSupOutTot[cc,,,, drop = FALSE], 3, sum),
-            import = apply(dat$vImport[cc,,,, drop = FALSE], 3, sum),
-            export = apply(dat$vExport[cc,,,, drop = FALSE], 3, sum)
+            input = cmd_tmp_func(dat$vInpTot, cc) - trd, 
+            output = cmd_tmp_func(dat$vOutTot, cc) - trd, 
+            technologyInput = cmd_tmp_func(dat$vTechInpTot, cc), 
+            technologyOutput = cmd_tmp_func(dat$vTechOutTot, cc),
+            emission = cmd_tmp_func(dat$vEmsFuelTot, cc),
+            aggregate = cmd_tmp_func(dat$vAggOut, cc),
+            demand = cmd_tmp_func(dat$vDemInp, cc),
+            dummyImport = cmd_tmp_func(dat$vDummyImport, cc),
+            dummyExport = cmd_tmp_func(dat$vDummyExport, cc),
+            supply = cmd_tmp_func(dat$vSupOutTot, cc),
+            import = cmd_tmp_func(dat$vImport, cc) - trd,
+            export = cmd_tmp_func(dat$vExport, cc) - trd
           )
+          cmd_use[is.na(cmd_use)] <- 0
           fl <- any(cmd_use != 0)
           png2(paste(cmd@name, '_supply.png', sep = ''), width = 640)       
           SP <- plot(obj@model, type = 'supply', commodity = cmd@name, main = '', 
@@ -309,7 +341,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                 }
                 # Aggregate commodity
                 if (nrow(cmd@agg) > 0) {
-                  ag <- apply(dat$vOutTot[cmd@agg$comm,,,, drop = FALSE], c(1, 3), sum)
+                  gtg <- (dat$vOutTot$comm %in% cmd@agg$comm)
+                  ag <- tapply(dat$vOutTot$value[gtg], dat$vOutTot[gtg, c('comm', 'year'), drop = FALSE], sum)
                   for(i in 1:nrow(ag)) {
                     ag[i, ] <- cmd@agg$agg[i] * ag[i, ]
                   }
@@ -385,7 +418,9 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               energyRt:::.cat_bottomup_data_frame(gg, 'Raw data', zz)
             }
           }
-          
+           
+          if (length(fl) != 1) stop()
+          if (length(cc) != 1) stop()
           FL[cc] <- !fl
         }
         if (any(FL)) {
@@ -404,27 +439,30 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           tec <- dtt$technology[[tt]]
           tt <- tec@name
           #tt <- toupper(tt)
-          tec_input <- apply(dat$vTechInp[tt,,,,, drop = FALSE] +
-            dat$vTechAInp[tt,,,,, drop = FALSE], c(2, 4), sum)
-          tec_input <- tec_input[apply(tec_input != 0, 1, any),, drop = FALSE]
-          tec_output <- apply(dat$vTechOut[tt,,,,, drop = FALSE] +
-            dat$vTechAOut[tt,,,,, drop = FALSE], c(2, 4), sum)
-          tec_output <- tec_output[apply(tec_output != 0, 1, any),, drop = FALSE]
-          tec_emission <- apply(dat$vTechEmsFuel[tt,,,,, drop = FALSE], c(2, 4), sum)
-          tec_emission <- tec_emission[apply(tec_emission != 0, 1, any),, drop = FALSE]
-          
+          tec_tmp_func <- function(x, y, z = c('comm', 'year')) {
+            fl <- (x$tech == y)
+            nn <- tapply(x$value[fl], x[fl, z], sum)
+            nn[is.na(nn)] <- 0
+            nn
+          }
+          tec_input <- tec_tmp_func(rbind(dat$vTechInp, dat$vTechAInp), tt)
+          tec_output <- tec_tmp_func(rbind(dat$vTechOut, dat$vTechAOut), tt)  
+          tec_emission <- tec_tmp_func(dat$vTechEmsFuel, tt)
           gg <- stock[!is.na(stock$tech) & stock$tech == tt & stock$year %in% mlst$mid, ]
+          gg$year <- factor(gg$year, levels = mid_year)
+          yyy <- tapply(gg$value, gg$year, sum)
+          yyy[is.na(yyy)] <- 0
           tec_cap <- rbind(
-            'Total capacity' = apply(dat$vTechCap[tt,,, drop = FALSE], 3, sum),
-            'New capacity' = apply(dat$vTechNewCap[tt,,, drop = FALSE], 3, sum),
-            'Initial stock' = tapply(gg$value, gg$year, sum),
-            'Activity' = apply(dat$vTechAct[tt,,,, drop = FALSE], 3, sum)
+            'Total capacity' = tec_tmp_func(dat$vTechCap, tt, 'year'),
+            'New capacity' = tec_tmp_func(dat$vTechNewCap, tt, 'year'),
+            'Initial stock' = yyy,
+            'Activity' = tec_tmp_func(dat$vTechAct, tt, 'year') 
           )
           
           tec_cost <- rbind(
-            salvage = c(rep(0, dim(dat$vTechInv)[3] - 1), sum(dat$vTechSalv[tt,])),
-            investment = apply(dat$vTechInv[tt,,, drop = FALSE], 3, sum),
-            'OM cost' = apply(dat$vTechOMCost[tt,,, drop = FALSE], 3, sum)
+            salvage = c(rep(0, length(mid_year) - 1), sum(dat$vTechSalv[dat$vTechSalv$tech == tt, 'value'])),
+            investment = tec_tmp_func(dat$vTechInv, tt, 'year'),
+            'OM cost' = tec_tmp_func(dat$vTechOMCost, tt, 'year')
           )
          # tec_cost['OM cost', ] <- tec_cost['OM cost', ] - tec_cost['investment', ]
           barcap <- rbind(new = tec_cap['New capacity', ], 
@@ -626,16 +664,23 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     ##########!!
       ## Supply
       if (length(dtt$supply) != 0) {
-        FL <- array(NA, dim = length(dtt$supply), dimnames = list(names(dtt$supply)))
         cat('\\section{Supply}\n\n', '\n', sep = '', file = zz)
         for(cc in names(dtt$supply)) {
+          cat('.')
           sup <- dtt$supply[[cc]]
           png2(paste('supply_wrk_', sup@name, '.png', sep = ''))
-          sup_out <- apply(dat$vSupOut[cc, sup@commodity,,,, drop = FALSE], 4, sum)
-          sup_cst <- apply(dat$vSupCost[cc,,, drop = FALSE], 3, sum)
+          sup_tmp_func <- function(x, y, z = NULL) {
+            if (!is.null(z)) fl <- (x$sup == y & x$comm == z) else fl <- (x$sup == y)
+            nn <- tapply(x$value[fl], x[fl, 'year', drop = FALSE], sum)
+            nn[is.na(nn)] <- 0
+            nn
+          }
+          sup_out <- sup_tmp_func(dat$vSupOut, cc, sup@commodity)
+          sup_cst <- sup_tmp_func(dat$vSupOut, cc)
+          
           SP <- plot(obj@model, type = 'supply', commodity = sup@commodity, 
             main = '', supply = cc, ylim_min = max(sup_out), year = mlst$mid)
-          lines(dimnames(dat$vSupOut)$year, sup_out, col = 'cyan4', lwd = 2)
+          lines(names(sup_out), sup_out, col = 'cyan4', lwd = 2)
           dev.off2()
             bnd.on <- rep('free', nrow(SP)) 
             bnd.on[sup_out == SP[, 'lo']] <- 'lo'
@@ -659,8 +704,8 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
           }  
           cat('\n\n', '\n', sep = '', file = zz) 
 #        }
-        FL[cc] <- !fl
-      }      
+      }   
+
       ## Trade
   cat('Trade\n')
   if (length(dtt$trade) != 0) {
@@ -680,9 +725,15 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             dst <- trd_dst[trd_dst$trade == nm, 'region']
             if (length(trd) == 0) cat('\n\n Warning: There is not destination region.\n\n', sep = '', file = zz) else
               cat('Destination regions: "',paste(dst, collapse = '", "') , '"\n\n', sep = '', file = zz)
-            if (any(dat$vTradeIr[nm,,,,, drop = FALSE] != 0)) { 
+            trd_tmp_func <- function(x, y, z) {
+              fl <- (x$trade == y)
+              nn <- tapply(x$value[fl], x[fl, z], sum)
+              nn[is.na(nn)] <- 0
+              nn
+            }
+            if (any(dat$vTradeIr$trade == nm)) { 
               # Source flow
-              sflow <- apply(dat$vTradeIr[nm,,,,, drop = FALSE], c(2, 4), sum)
+              sflow <- trd_tmp_func(dat$vTradeIr, nm, c("src", "year"))
               sflow <- sflow[apply(sflow != 0, 1, any),, drop = FALSE]
               png2(paste('trade_src_', trd@name, '.png', sep = ''))
               layout(matrix(1:2, 1), width = c(.75, .25))
@@ -692,7 +743,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               plot.new()
               legend('center', legend = rev(rownames(sflow)), fill = rev(nrow(sflow)), bty = 'n')
               dev.off2()
-              sflow <- apply(dat$vTradeIr[nm,,,,, drop = FALSE], c(3, 4), sum)
+              sflow <- sflow <- trd_tmp_func(dat$vTradeIr, nm, c("dst", "year")) 
               sflow <- sflow[apply(sflow != 0, 1, any),, drop = FALSE]
               png2(paste('trade_dst_', trd@name, '.png', sep = ''))
               layout(matrix(1:2, 1), width = c(.75, .25))
@@ -716,7 +767,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               cat('  \\caption{Trade by destination region ', gsub('_', '\\\\_', nm), 
                   ', summary for all slice.}\n', sep = '', file = zz)
               cat('\\end{figure}\n', sep = '', file = zz)
-              vv <- as.data.frame.table(apply(dat$vTradeIr[nm,,,,, drop = FALSE], 2:5, sum))
+              vv <- dat$vTradeIr[dat$vTradeIr$trade == nm, -1, drop = FALSE]
               vv <- vv[vv$value != 0,, drop = FALSE]
               colnames(vv)[1] <- 'source'
               colnames(vv)[2] <- 'destination'

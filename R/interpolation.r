@@ -1,6 +1,10 @@
 
 setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
   defVal = 'numeric'), function(obj, parameter, defVal, ...) { 
+   # assign('obj', obj, globalenv())
+  #  assign('parameter', parameter, globalenv())
+  #  assign('defVal', defVal, globalenv())
+  #  assign('arg', list(...), globalenv())
   # Remove not used approxim
   arg <- list(...)
   if (length(defVal) != 1) stop('defVal value not define')

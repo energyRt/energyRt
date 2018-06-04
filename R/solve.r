@@ -10,7 +10,7 @@
           as.character(ss@interpolation[1, prec@parameters[[i]]@colName])
       }
     }
-    prec
+    prec;
   }
   check_parameters <- function(prec) {
     error_type <- c()
@@ -22,29 +22,58 @@
           prec@parameters[[pr]]@data <- prec@parameters[[pr]]@data[seq(length.out = 
             prec@parameters[[pr]]@nValues),, drop = FALSE]
         gg <- prec@parameters[[pr]]@data
-        fl <- gg[gg$type == 'lo', 'value'] > gg[gg$type == 'up', 'value']
-        stopifnot(all(gg[gg$type == 'lo', 0:1 - ncol(gg)] ==
-            gg[gg$type == 'up', 0:1 - ncol(gg)]))
-        if (any(fl)) {
-          error_type <- c(error_type, pr)
-          cat('Error: Unexcaptable bound value (up bound less lo bound) "',
-            pr, '":\n', sep = '')
-          invisible(apply(gg[gg$type == 'lo', 0:1 - ncol(gg)][fl, ], 1, function(x)
-            cat(paste(x, collapse = '.'), '\n')))
-        }
+        f1 <- apply(gg[gg$type == 'up', 0:1 - ncol(gg), drop = FALSE], 1, paste, collapse = '##')
+        f2 <- apply(gg[gg$type == 'lo', 0:1 - ncol(gg), drop = FALSE], 1, paste, collapse = '##')
+        # Merge
+        if (any(f1 %in% f2)) {
+          gup <- gg[gg$type == 'up',, drop = FALSE][f1 %in% f2,, drop = FALSE]
+          glo <- gg[gg$type == 'lo',, drop = FALSE][f2 %in% f1,, drop = FALSE]
+          ff <- 1:nrow(glo); names(ff) <- f2[f2 %in% f1]; 
+          glo <- glo[ff[f1[f1 %in% f2]],, drop = FALSE]
+          if (any(glo$value > gup$value)) {
+            error_type <- c(error_type, pr)
+            cat('Error: Unexcaptable bound value (up bound less lo bound) "',
+                pr, '":\n', sep = '')
+            invisible(apply(glo[glo$value > gup$value, 0:1 - ncol(glo)], 1, function(x)
+              cat(paste(x, collapse = '.'), '\n')))
           }
+        }
+        # Default up
+        if (any(!(f1 %in% f2))) {
+          gup <- gg[gg$type == 'up',, drop = FALSE][!(f1 %in% f2),, drop = FALSE]
+          if (any(prec@parameters[[pr]]@defVal[1] > gup$value)) {
+            error_type <- c(error_type, pr)
+            cat('Error: Unexcaptable bound value (up bound less lo bound) "',
+                pr, '":\n', sep = '')
+            invisible(apply(gup[prec@parameters[[pr]]@defVal[1] > gup$value, 0:1 - ncol(gup)], 1, function(x)
+              cat(paste(x, collapse = '.'), '\n')))
+          }
+        }
+        # Default lo
+        if (any(!(f2 %in% f1))) {
+          glo <- gg[gg$type == 'lo',, drop = FALSE][!(f2 %in% f1),, drop = FALSE]
+          if (any(glo$value > prec@parameters[[pr]]@defVal[2])) {
+            error_type <- c(error_type, pr)
+            cat('Error: Unexcaptable bound value (up bound less lo bound) "',
+                pr, '":\n', sep = '')
+            invisible(apply(glo[glo$value > prec@parameters[[pr]]@defVal[2], 0:1 - ncol(glo)], 1, function(x)
+              cat(paste(x, collapse = '.'), '\n')))
+          }
+        }
+      }
     }
     if (length(error_type)) stop('Unexcaptable bound value (up bound less lo bound) "',
       paste(error_type, collapse = '", "'), '"')
     shr <- prec@parameters$pTechShare@data
   #  # Check sum share.lo <= 1 and sum share.up >= 1
-    if (nrow(shr) > 0) {
+    #! Need realise
+    if (nrow(shr) > 0 && FALSE) {
     FL <- FALSE
     p1 <- proc.time()[3]
       # Devide commodity by technology/group/inp&out
-      inp_comm <- prec@parameters$mTechInpComm@data
-      out_comm <- prec@parameters$mTechOutComm@data
-      group_comm <- prec@parameters$mTechGroupComm@data
+      inp_comm <- getParameterData(prec@parameters$mTechInpComm)
+      out_comm <- getParameterData(prec@parameters$mTechOutComm)
+      group_comm <- getParameterData(prec@parameters$mTechGroupComm)
       inp_comm[, 'als'] <- 'input'
       out_comm[, 'als'] <- 'output'
       shr <- merge(merge(shr[!is.na(shr[, 1]),, drop = FALSE], 
@@ -115,6 +144,7 @@
 #####################################################################################
 # Argument data prepare
 #####################################################################################
+  obj@sysInfo@slice <- .init_slice(obj@sysInfo@slice)
   pp1 <- proc.time()[3]
   # Upper case
   arg <- list(...)
@@ -193,8 +223,9 @@
     arg <- arg[names(arg) != 'year', drop = FALSE]
   } 
   if (any(names(arg) == 'slice')) {
-    obj@sysInfo@slice <- arg$slice
-    arg <- arg[names(arg) != 'slice', drop = FALSE]
+    warning('parameter "slice" was deprecated')
+    # obj@sysInfo@slice <- arg$slice
+    # arg <- arg[names(arg) != 'slice', drop = FALSE]
   } 
   if (any(names(arg) == 'repository')) {
     rpp <- sapply(obj@data, function(x) x@name)
@@ -237,11 +268,14 @@
   }
   # Create exemplar for code
   prec <- new('modInp')
+  obj@sysInfo@slice <- .init_slice(obj@sysInfo@slice)
+  
   # List for approximation
   approxim <- list(
       region = obj@sysInfo@region,
       year   = obj@sysInfo@year,
-      slice  = obj@sysInfo@slice
+      slice  = obj@sysInfo@slice,
+      solver = solver
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
@@ -253,11 +287,11 @@
       obj@sysInfo@year <- arg$year
       arg <- arg[names(arg) != 'year', drop = FALSE]
   }
-  if (any(names(arg) == 'slice')) {
-      approxim$slice = arg$slice
-      obj@sysInfo@slice <- arg$slice
-      arg <- arg[names(arg) != 'slice', drop = FALSE]
-  }
+  #if (any(names(arg) == 'slice')) {
+  #    approxim$slice = arg$slice
+  #    obj@sysInfo@slice <- arg$slice
+  #    arg <- arg[names(arg) != 'slice', drop = FALSE]
+  #}
   if (any(names(arg) == 'discount')) {
       obj@sysInfo@discount <- arg$discount
       arg <- arg[names(arg) != 'discount', drop = FALSE]
@@ -267,22 +301,33 @@
       arg <- arg[names(arg) != 'repository', drop = FALSE]
   }
   if (any(names(arg) == 'open.folder')) {
-      open.folder <- arg$open.folder
-      arg <- arg[names(arg) != 'open.folder', drop = FALSE]
+    open.folder <- arg$open.folder
+    arg <- arg[names(arg) != 'open.folder', drop = FALSE]
   } else open.folder <- FALSE
-  # Fill DB by region & slice
-  for(i in c('region', 'slice')) {
+  if (any(names(arg) == 'to_array_result')) {
+    to_array_result <- arg$to_array_result
+    arg <- arg[names(arg) != 'to_array_result', drop = FALSE]
+  } else to_array_result <- TRUE
+  # Fill DB by region ## & slice
+  for(i in c('region')) {
     prec@parameters[[i]] <- addData(prec@parameters[[i]], approxim[[i]])
   }
+  prec@parameters[['slice']] <- addData(prec@parameters[['slice']], approxim$slice@all_slice)
   # Fill DB by year
   prec@parameters[['year']] <- addData(prec@parameters[['year']], as.numeric(approxim[['year']]))
   prec <- read_default_data(prec, obj@sysInfo)
+  commodity_slice_map <- list()
   # add set 
   for(i in seq(along = obj@data)) {
         for(j in seq(along = obj@data[[i]]@data)) { #if (class(obj@data[[i]]@data[[j]]) == 'technology') {
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
+          if (class(obj@data[[i]]@data[[j]]) == 'commodity') {
+            if (is.null(obj@data[[i]]@data[[j]]@slice)) obj@data[[i]]@data[[j]]@slice <- approxim$slice@default_slice_level
+            commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@slice
+          }
         }
-    }
+  }
+  approxim$commodity_slice_map <- commodity_slice_map
   cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {
@@ -407,7 +452,7 @@
   appr <- lapply(yy, function(x) prec@parameters[[x]]@data[[x]])
   names(appr) <- yy
   appr$group <- appr$group[!is.na(appr$group)]
-  # ---------------------------------------------------------------------------------------------------------  
+# ---------------------------------------------------------------------------------------------------------  
 # Fix to previous data
 # ---------------------------------------------------------------------------------------------------------  
   if (any(names(arg) == 'fix_data')) {
@@ -446,6 +491,7 @@
       arg <- arg[names(arg) != 'fix_scenario', drop = FALSE]
       arg <- arg[names(arg) != 'fix_year', drop = FALSE]
   }
+pzz <- proc.time()[3]
 # ---------------------------------------------------------------------------------------------------------  
 # Get only listing file
 # ---------------------------------------------------------------------------------------------------------  
@@ -459,7 +505,7 @@
   
   if (length(arg) != 0) warning('Unknown argument ', names(arg))
 # ---------------------------------------------------------------------------------------------------------  
-      gg <- prec@parameters[['pDiscount']]@data
+      gg <- .getTotalParameterData(prec, 'pDiscount')
       gg <- gg[sort(gg$year, index.return = TRUE)$ix,, drop = FALSE]
       ll <- gg[0,, drop = FALSE]
       for(l in unique(gg$region)) {
@@ -476,90 +522,44 @@
       } 
 LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
-      # Add defpSupReserve
-      gg <- getParameterData(prec@parameters[['pSupReserve']])
-#      if (prec@parameters[['pSupReserve']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pSupReserve']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpSupReserve']] <- 
-          addData(prec@parameters[['defpSupReserve']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pSupReserve']]@defVal == Inf) {
-        prec@parameters[['defpSupReserve']]@defVal <- 0
-      }  else prec@parameters[['defpSupReserve']]@defVal <- 1
-      # Add defpSupAvaUp
-      gg <- getParameterData(prec@parameters[['pSupAva']])
-#      if (prec@parameters[['pSupAva']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pSupAva']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf & gg$type == 'up', ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpSupAvaUp']] <- addData(prec@parameters[['defpSupAvaUp']], 
-           gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pSupAva']]@defVal == Inf) {
-        prec@parameters[['defpSupAvaUp']]@defVal <- 0
-      }  else prec@parameters[['defpSupAvaUp']]@defVal <- 1
-      # Add pDummyImportCost
-      gg <- getParameterData(prec@parameters[['pDummyImportCost']])
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpDummyImportCost']] <- 
-          addData(prec@parameters[['defpDummyImportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pDummyImportCost']]@defVal == Inf) {
-        prec@parameters[['defpDummyImportCost']]@defVal <- 0
-      } else prec@parameters[['defpDummyImportCost']]@defVal <- 1
-      # Add pDummyExportCost
-      gg <- getParameterData(prec@parameters[['pDummyExportCost']])
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpDummyExportCost']] <- 
-          addData(prec@parameters[['defpDummyExportCost']], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pDummyExportCost']]@defVal == Inf) {
-        prec@parameters[['defpDummyExportCost']]@defVal <- 0
-      } else prec@parameters[['defpDummyExportCost']]@defVal <- 1
-      # defpExportRowRes   
-      gg <- getParameterData(prec@parameters[['pExportRowRes']])
-#      if (prec@parameters[['pExportRowRes']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pExportRowRes']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpExportRowRes']] <- addData(prec@parameters[['defpExportRowRes']], 
-          gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pExportRowRes']]@defVal == Inf) {
-        prec@parameters[['defpExportRowRes']]@defVal <- 0
-      }  else prec@parameters[['defpExportRowRes']]@defVal <- 1
-      # defpImportRowRes
-      gg <- getParameterData(prec@parameters[['pImportRowRes']])
-#      if (prec@parameters[['pImportRowRes']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pImportRowRes']]@nValues),, drop = FALSE]
-      gg <- gg[gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpImportRowRes']] <- addData(prec@parameters[['defpImportRowRes']], 
-          gg[, 1:(ncol(gg) - 1), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pImportRowRes']]@defVal == Inf) {
-        prec@parameters[['defpImportRowRes']]@defVal <- 0
-      }  else prec@parameters[['defpImportRowRes']]@defVal <- 1
-      # defpExportRowUp 
-      gg <- getParameterData(prec@parameters[['pExportRow']])
-#      if (prec@parameters[['pExportRow']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pExportRow']]@nValues),, drop = FALSE]
-      gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpExportRowUp']] <- addData(prec@parameters[['defpExportRowUp']], 
-          gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pExportRow']]@defVal[2] == Inf) {
-        prec@parameters[['defpExportRowUp']]@defVal <- 0
-      }  else prec@parameters[['defpExportRowUp']]@defVal <- 1
-      # defpImportRowUp
-      gg <- getParameterData(prec@parameters[['pImportRow']])
-#      if (prec@parameters[['pImportRow']]@nValues != -1)
-#        gg <- gg[seq(length.out = prec@parameters[['pImportRow']]@nValues),, drop = FALSE]
-      gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-      if (nrow(gg) != 0) {
-        prec@parameters[['defpImportRowUp']] <- addData(prec@parameters[['defpImportRowUp']], 
-          gg[, 1:(ncol(gg) - 2), drop = FALSE])
-      } else if (nrow(gg) == 0 && prec@parameters[['pImportRow']]@defVal[2] == Inf) {
-        prec@parameters[['defpImportRowUp']]@defVal <- 0
-      }  else prec@parameters[['defpImportRowUp']]@defVal <- 1
+
+      assign('prec', prec, globalenv())
+      defin_ndef_par <- function(prec, name1, name2) {
+        gg <- getParameterData(prec@parameters[[name1]])
+        if (prec@parameters[[name1]]@defVal[2] == Inf) {
+          gg <- gg[gg$type == 'up' & gg$value != Inf, ]
+          prec@parameters[[name2]]@not_data <- TRUE
+        } else {
+          gg <- gg[gg$type == 'up' & gg$value == Inf, ]
+        }
+        prec@parameters[[name2]] <- addData(prec@parameters[[name2]], gg[, 1:(ncol(gg) - 2), drop = FALSE])
+        prec
+      }
+      defin_ndef_par_set <- function(prec, name1, name2) {
+        gg <- getParameterData(prec@parameters[[name1]])
+        if (prec@parameters[[name1]]@defVal[1] == Inf) {
+          gg <- gg[gg$value != Inf, ]
+          prec@parameters[[name2]]@not_data <- TRUE
+        } else {
+          gg <- gg[gg$value == Inf, ]
+        }
+        prec@parameters[[name2]] <- addData(prec@parameters[[name2]], gg[, 1:(ncol(gg) - 1), drop = FALSE])
+        prec
+      }
+      
+      
+      prec <- defin_ndef_par_set(prec, 'pSupReserve', 'ndefpSupReserve')
+      prec <- defin_ndef_par_set(prec, 'pDummyImportCost', 'ndefpDummyImportCost')
+      prec <- defin_ndef_par_set(prec, 'pDummyExportCost', 'ndefpDummyExportCost')
+      prec <- defin_ndef_par_set(prec, 'pExportRowRes', 'ndefpExportRowRes')
+      prec <- defin_ndef_par_set(prec, 'pImportRowRes', 'ndefpImportRowRes')
+      prec <- defin_ndef_par(prec, 'pSupAva', 'ndefpSupAvaUp')
+      prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
+      prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
+      prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
+      prec <- defin_ndef_par(prec, 'pTradeIr', 'ndefpTradeIrUp')
+      prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfacUp')
+      
       # For remove emission equation
       g1 <- getParameterData(prec@parameters$pTechEmisComm)
 #      if (prec@parameters[['pTechEmisComm']]@nValues != -1)
@@ -591,9 +591,11 @@ LL1 <- proc.time()[3]
         prec@parameters$ndefpTechOlife <- addData(prec@parameters$ndefpTechOlife, olf[, -ncol(olf), drop = FALSE])
       }
       # Check user error
-      check_parameters(prec)
+       assign('prec', prec, globalenv())
+      # check_parameters(prec)
       ########
-#  Remove unused technology
+      cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
+      #  Remove unused technology
 ########
     for(i in seq(along =obj@data)) {
         FF <- rep(TRUE, length(obj@data[[i]]@data))
@@ -622,6 +624,7 @@ LL1 <- proc.time()[3]
 #!################
 ### FUNC GAMS 
   #### Code load
+      
   run_code <- energyRt::modelCode[[solver]][[model.type]]
   if (open.folder) shell.exec(tmpdir)
   if (solver == 'GAMS') {
@@ -633,21 +636,71 @@ LL1 <- proc.time()[3]
     close(zz)
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
-   prec <<- prec 
-   for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
-      cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
+   # prec <<- prec 
+   # assign('prec', prec, globalenv())
+   pzz <- proc.time()[3]
+   file_w <- c()
+   if (n.threads > 1) { #  && FALSE
+     tryCatch({
+       pp <- proc.time()[3]
+       nth <- min(c(2, n.threads))
+       cl <- makePSOCKcluster(rep('localhost', nth))
+       gg <- lapply(1:nth - 1, function(x) seq(along = prec@parameters)[(seq(along = prec@parameters) - 1) %% nth == x])
+       prclst <- parLapply(cl, gg, 
+                           function(ll, zz) {
+                             ll <- zz[ll]
+                             require(energyRt)
+                             rs <- rep(character(), length(ll))
+                             ss <- list()
+                             rs[seq(along = ll)] <- NA
+                             for(i in seq(along = ll)) {
+                               ss[[i]] <- energyRt:::.toGams(ll[[i]])
+                               rs[i] <- as.character(ll[[i]]@type)
+                             }
+                             list(rs = rs, ss = ss)
+                           }, prec@parameters)
+       stopCluster(cl)
+     }, interrupt = function(x) {
+       stopCluster(cl)
+       stop('Solver has been interrupted')
+     }, error = function(x) {
+       stopCluster(cl)
+       stop(x)
+     })
+     file_w <- c(
+       c(lapply(prclst, function(x) x$ss[x$rs == 'set']), recursive = TRUE),
+       c(lapply(prclst, function(x) x$ss[x$rs == 'map']), recursive = TRUE),
+       c(lapply(prclst, function(x) x$ss[x$rs == 'simple']), recursive = TRUE),
+       c(lapply(prclst, function(x) x$ss[x$rs == 'multi']), recursive = TRUE)
+     )
+   } else if (n.threads == 1) { # || TRUE
+     file_w <- c()
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
+       file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
+       # cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
+     }
+   } else stop('Uneceptable threads number')
+   cat('pzz5: ', round(proc.time()[3] - pzz, 2), '\n')
+   pzz <- proc.time()[3]
+   cat(file_w, sep = '\n', file = zz)
+    cat('pzz6: ', round(proc.time()[3] - pzz, 2), '\n')
+    if (any(names(obj@misc) == 'additionalEquationGAMS')) cat(obj@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
+    
     cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
-        (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+                   (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+    if (any(names(obj@misc) == 'additionalEquationGAMS')) cat(obj@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
     cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
         (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) - 1)], sep = '\n', file = zz)
   
@@ -658,7 +711,6 @@ LL1 <- proc.time()[3]
           'OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;\n',
           'option iterlim = 0;\n', 
           'Solve st_model minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
-    
     }
     cat(obj@misc$additionalCode, sep = '\n', file = zz)
     cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
@@ -811,11 +863,12 @@ LL1 <- proc.time()[3]
     ss$yearp <- ss$year
     ss$acomm <- ss$comm
     ss$commp <- ss$comm
+    ss$slicep <- ss$slice
     rr$set_vec <- ss
     for(i in vrb_list) {
       gg <- read.csv(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
       if (ncol(gg) == 1) {
-        rr$par_arr[[i]] <- gg[1, 1]  
+        if (to_array_result) rr$par_arr[[i]] <- gg[1, 1]  
         rr$variables[[i]] <- data.frame(value = gg[1, 1])
       } else {
         rr$variables[[i]] <- gg
@@ -824,9 +877,11 @@ LL1 <- proc.time()[3]
           if (all(colnames(jj)[j] != names(rr$set_vec))) colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
           jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
         }
-        zz <- tapply(gg[,'value'], jj, sum)
-        zz[is.na(zz)] <- 0
-        rr$par_arr[[i]] <- zz
+        if (to_array_result) {
+          zz <- tapply(gg[,'value'], jj, sum)
+          zz[is.na(zz)] <- 0
+          rr$par_arr[[i]] <- zz
+        }
       }
     }
     # Read constrain data
@@ -835,15 +890,16 @@ LL1 <- proc.time()[3]
       if (nrow(gg) == 0) {
         rr$par_arr[[i]] <- NULL
       } else if (ncol(gg) == 2) {
-        rr$par_arr[[i]] <- array(c(gg[1, 3:4], recursive = TRUE), dim = 2, dimnames = list(c('value', 'rhs')))
+        if (to_array_result) rr$par_arr[[i]] <- array(c(gg[1, 3:4], recursive = TRUE), dim = 2, dimnames = list(c('value', 'rhs')))
       } else {
         l1 <- gg[, -ncol(gg)]; l1$type[seq(length.out = nrow(gg))] <- 'rhs'
         l2 <- gg[, 1 - ncol(gg)]; l2$type[seq(length.out = nrow(gg))] <- 'value'
         colnames(l1)[ncol(l1) - 1] <- 'type'
         colnames(l2)[ncol(l2) - 1] <- 'type'
         gg <- rbind(l1, l2)
-        rr$par_arr[[i]] <- tapply(gg[, ncol(gg) - 1], gg[, 1 - ncol(gg)], sum)
-        
+        if (to_array_result) {
+          # rr$par_arr[[i]] <- tapply(gg[, ncol(gg) - 1], gg[, 1 - ncol(gg)], sum)
+        }
       }
     }
     rr[['solution_report']] <- list(finish = read.csv(paste(tmpdir, '/pFinish.csv', sep = ''))$value, 
@@ -860,7 +916,7 @@ LL1 <- proc.time()[3]
    scn@modInp <- prec
    scn@model <- obj
    scn@modOut <- new('modOut')
-   scn@modOut@data <- rr$par_arr
+   if (to_array_result) scn@modOut@data <- rr$par_arr
    scn@modOut@sets <- rr$set_vec
    scn@modOut@variables <- rr$variables
    scn@modOut@compilationStatus <- as.character(rr$solution_report$finish)
