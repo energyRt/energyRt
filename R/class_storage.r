@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------------------------------------------
-# reserve
+# storage
 #---------------------------------------------------------------------------------------------------------
-setClass("reserve",
+setClass("storage",
       representation(
           name          = "character",
           description   = "character",
@@ -10,10 +10,9 @@ setClass("reserve",
           end           = "data.frame",
           olife         = "data.frame",    #
           stock         = "data.frame",    #
-          storeStock    = "data.frame",    #
           loss          = "data.frame",    #
-          capLimit      = "data.frame",    #
-      # Costs
+          availability  = "data.frame",     # Availability of the resource with prices
+          # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
           invcost       = "data.frame",
@@ -38,12 +37,6 @@ setClass("reserve",
                                             year  = numeric(),
                                             stock = numeric(),
                                             stringsAsFactors = FALSE),
-          capLimit      = data.frame(region = character(),
-                                            year  = numeric(),
-                                            cap.lo = numeric(),
-                                            cap.fx = numeric(),
-                                            cap.up = numeric(),
-                                            stringsAsFactors = FALSE),
           loss         = data.frame(region     = character(),
                                      year       = numeric(),
                                      slice      = character(),
@@ -51,11 +44,14 @@ setClass("reserve",
                                      inpLoss    = numeric(),  
                                      outLoss    = numeric(),  
                                      stringsAsFactors = FALSE),
-          storeStock    = data.frame(region = character(),
-                                            year  = numeric(),
-                                            stock = numeric(),
-                                            stringsAsFactors = FALSE),
-      # Costs
+          availability  = data.frame(region   = character(),
+                                     year     = numeric(),
+                                     slice    = character(),
+                                     ava.lo   = numeric(),
+                                     ava.up   = numeric(),
+                                     ava.fx   = numeric(),
+                                     stringsAsFactors = FALSE),
+          # Costs
           fixom         = data.frame(region   = character(),
                                      year     = numeric(),
                                      fixom    = numeric(),
@@ -78,7 +74,7 @@ setClass("reserve",
       )),
       S3methods = TRUE
 );
-setMethod("initialize", "reserve", function(.Object, ...) {
+setMethod("initialize", "storage", function(.Object, ...) {
   attr(.Object, 'GUID') <- 'd25eda0d-ed46-4d00-b6d5-38a88d11a313'
   .Object
 })

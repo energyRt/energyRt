@@ -800,3 +800,55 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
 })
 
 
+
+
+
+################################################################################
+# Add supply
+################################################################################
+setMethod('add0', signature(obj = 'modInp', app = 'storage',
+  approxim = 'list'), function(obj, app, approxim) {
+    stg <- energyRt:::.upper_case(app)
+    approxim <- fix_approximation_list(approxim, comm = stg@commodity, lev = stg@slice)
+    if (!is.null(stg@region)) {
+      approxim$region <- approxim$region[approxim$region %in% stg@region]
+      ss <- getSlots('storage')
+      ss <- names(ss)[ss == 'data.frame']
+      ss <- ss[sapply(ss, function(x) (any(colnames(slot(stg, x)) == 'region') 
+                                       && any(!is.na(slot(stg, x)$region))))]
+      for(sl in ss) if (any(!is.na(slot(stg, sl)$region) & !(slot(stg, sl)$region %in% stg@region))) {
+        rr <- !is.na(slot(stg, sl)$region) & !(slot(stg, sl)$region %in% stg@region)
+        warning(paste('There are data storage "', stg@name, '" for unused region: "', 
+                      paste(unique(slot(stg, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
+        slot(stg, sl) <- slot(stg, sl)[!rr,, drop = FALSE]
+      }
+      obj@parameters[['mStgSpan']] <- addData(obj@parameters[['mStgSpan']],
+                                              data.frame(stg = rep(stg@name, length(stg@region)), region = stg@region))
+    } else {
+      obj@parameters[['mStgSpan']] <- addData(obj@parameters[['mStgSpan']],
+                                              data.frame(stg = rep(stg@name, length(approxim$region)), region = approxim$region))
+    }
+    stg <- stayOnlyVariable(stg, approxim$region, 'region')
+    obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']],
+                                             data.frame(stg = rep(stg@name, length(approxim$slice)), slice = approxim$slice))
+    #  if (!energyRt:::.chec_correct_name(stg@name)) {
+    #    stop(paste('Incorrect stgply name "', stg@name, '"', sep = ''))
+    #  }
+    #  if (isSupply(obj, stg@name)) {
+    #    warning(paste('There is stgply name "', stg@name,
+    #        '" now, all previous information will be removed', sep = ''))
+    #    obj <- removePreviousSupply(obj, stg@name)
+    #  }    
+    #  obj@parameters[['stg']] <- addData(obj@parameters[['stg']], stg@name)
+    obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
+                                            data.frame(stg = stg@name, comm = stg@commodity))
+    obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
+                                            simpleInterpolation(stg@availability, 'cost',
+                                                                obj@parameters[['pSupCost']], approxim, 'stg', stg@name))
+    obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
+                                               data.frame(stg = stg@name, value = stg@reserve))
+    obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
+                                           multiInterpolation(stg@availability, 'ava',
+                                                              obj@parameters[['pSupAva']], approxim, 'stg', stg@name))
+    obj
+  })
