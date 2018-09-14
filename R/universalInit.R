@@ -183,4 +183,13 @@ setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
 setMethod('newTrade', signature(name = 'character'), function(name, ...) 
   universalInit('trade', name, ...))
   
+
+setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
+#' Create new import object
+#' 
+#' @name newStorage
+#' 
+setMethod('newStorage', signature(name = 'character'), function(name, ...) 
+  universalInit('storage', name, ...))
+
   

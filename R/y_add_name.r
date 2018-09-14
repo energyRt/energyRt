@@ -46,17 +46,35 @@ setMethod('add_name', signature(obj = 'modInp', app = 'constrain',
 # Add supply
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'supply',
-  approxim = 'list'), function(obj, app, approxim) {
+approxim = 'list'), function(obj, app, approxim) {
   sup <- energyRt:::.upper_case(app)
   if (!energyRt:::.chec_correct_name(sup@name)) {
     stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
   }
   if (isSupply(obj, sup@name)) {
     warning(paste('There is supply name "', sup@name,
-        '" now, all previous information will be removed', sep = ''))
+                  '" now, all previous information will be removed', sep = ''))
     obj <- removePreviousSupply(obj, sup@name)
   }    
   obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
+  obj
+})
+
+################################################################################
+# Add storage
+################################################################################
+setMethod('add_name', signature(obj = 'modInp', app = 'storage',
+approxim = 'list'), function(obj, app, approxim) {
+  stg <- energyRt:::.upper_case(app)
+  if (!energyRt:::.chec_correct_name(stg@name)) {
+    stop(paste('Incorrect storage name "', stg@name, '"', sep = ''))
+  }
+  if (isSupply(obj, stg@name)) {
+    warning(paste('There is storage name "', stg@name,
+                  '" now, all previous information will be removed', sep = ''))
+    obj <- removePreviousStorage(obj, stg@name)
+  }    
+  obj@parameters[['stg']] <- addData(obj@parameters[['stg']], stg@name)
   obj
 })
 

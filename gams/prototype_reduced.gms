@@ -122,6 +122,7 @@ $ontext
 $offtext
 * Storage
 mStorageSlice(stg, slice)          Storage work in slice
+ndefpStorageOlife(stg, region)    Auxiliary mapping for not Inf - used in GLPK-MathProg only
 mStorageComm(stg, comm)            Mapping of storage technology and respective commodity
 mStorageNew(stg, region, year)     Storage available for investment
 mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the time-span and region
@@ -227,7 +228,6 @@ pStorageCostInp(stg, region, year, slice)           Storage input costs
 pStorageCostOut(stg, region, year, slice)           Storage output costs
 pStorageFixom(stg, region, year)                    Storage fixed O&M costs
 pStorageInvcost(stg, region, year)                  Storage investment costs
-pStorageStoreStock(stg, region, year, slice)        Storage capacity stock
 pStorageAvaLo(stg, region, year, slice)             Storage lower 'charge' bound
 pStorageAvaUp(stg, region, year, slice)             Storage upper 'charge' bound
 ;
@@ -1002,10 +1002,11 @@ eqStorageCost(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regi
          + vStorageInv(stg, region, year)$mStorageNew(stg, region, year);
 
 * Salvage value
-eqStorageSalv0(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(region))..
+eqStorageSalv0(stg, region, yeare)$(mMilestoneLast(yeare) and mDiscountZero(region))..
          vStorageSalv(stg, region)
          +
-        sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)),
+        sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and
+           ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare) and not(ndefpStorageOlife(stg, region))),
         vStorageInv(stg, region, year) * (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
         1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
@@ -1015,10 +1016,12 @@ eqStorageSalv0(stg, region, yeare)$(mMidMilestone(yeare) and mDiscountZero(regio
            )))
     ))   =e= 0;
 
-eqStorageSalv(stg, region, yeare)$(mMidMilestone(yeare) and not(mDiscountZero(region)))..
+
+eqStorageSalv(stg, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(region)))..
          vStorageSalv(stg, region)
          +
-         sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare)),
+         sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year)
+         and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare) and not(ndefpStorageOlife(stg, region))),
          vStorageInv(stg, region, year) *
          (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
          1

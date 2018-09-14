@@ -118,6 +118,11 @@
   dem
 }
 
+.upper_case.storage <- function(stg) {
+  stg
+}
+
+
 .upper_case.region <- function(reg) {
 #  reg@name <- toupper(reg@name)
   reg

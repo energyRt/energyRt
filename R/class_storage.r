@@ -10,6 +10,7 @@ setClass("storage",
           end           = "data.frame",
           olife         = "data.frame",    #
           stock         = "data.frame",    #
+          loss          = "data.frame",    #
           availability  = "data.frame",     # Availability of the resource with prices
           cap  = "data.frame",     # Constrain to capacity
           # Costs

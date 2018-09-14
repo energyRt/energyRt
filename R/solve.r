@@ -491,7 +491,7 @@
       arg <- arg[names(arg) != 'fix_scenario', drop = FALSE]
       arg <- arg[names(arg) != 'fix_year', drop = FALSE]
   }
-pzz <- proc.time()[3]
+# pzz <- proc.time()[3]
 # ---------------------------------------------------------------------------------------------------------  
 # Get only listing file
 # ---------------------------------------------------------------------------------------------------------  
@@ -559,6 +559,8 @@ LL1 <- proc.time()[3]
       prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
       prec <- defin_ndef_par(prec, 'pTradeIr', 'ndefpTradeIrUp')
       prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfacUp')
+      prec <- defin_ndef_par(prec, 'pStorageAva', 'ndefpStorageAvaUp')
+      prec <- defin_ndef_par(prec, 'pStorageCap', 'ndefpStorageCapUp')
       
       # For remove emission equation
       g1 <- getParameterData(prec@parameters$pTechEmisComm)
@@ -590,11 +592,27 @@ LL1 <- proc.time()[3]
         }
         prec@parameters$ndefpTechOlife <- addData(prec@parameters$ndefpTechOlife, olf[, -ncol(olf), drop = FALSE])
       }
+      # Storage oilfe
+      olf <- getParameterData(prec@parameters$pStorageOlife)
+      inv <- getParameterData(prec@parameters$pStorageInvcost)
+      olf <- olf[olf$value == Inf,, drop = FALSE]
+      if (nrow(olf) > 0) {
+        inv <- aggregate(inv$value, by = inv[, c('stg', 'region')], FUN = "max")
+        inv <- inv[inv$stg %in% unique(olf$stg) & inv$x != 0,, drop = FALSE]
+        oo <- paste(olf$stg, olf$region, sep = '#')
+        ii <- paste(inv$stg, inv$region, sep = '#')
+        if (any(oo %in%  ii)) {
+          print('There is storage with infinite olife and non zero invcost: ')
+          print(inv[ii %in% oo, -ncol(inv), drop = FALSE])
+          stop('See previous errors')
+        }
+        prec@parameters$ndefpStorageOlife <- addData(prec@parameters$ndefpStorageOlife, olf[, -ncol(olf), drop = FALSE])
+      }
       # Check user error
        assign('prec', prec, globalenv())
       # check_parameters(prec)
       ########
-      cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
+      #cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
       #  Remove unused technology
 ########
     for(i in seq(along =obj@data)) {
@@ -638,7 +656,7 @@ LL1 <- proc.time()[3]
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
    # prec <<- prec 
    # assign('prec', prec, globalenv())
-   pzz <- proc.time()[3]
+   # pzz <- proc.time()[3]
    file_w <- c()
    if (n.threads > 1) { #  && FALSE
      tryCatch({
@@ -692,10 +710,10 @@ LL1 <- proc.time()[3]
        # cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
    } else stop('Uneceptable threads number')
-   cat('pzz5: ', round(proc.time()[3] - pzz, 2), '\n')
-   pzz <- proc.time()[3]
+   #cat('pzz5: ', round(proc.time()[3] - pzz, 2), '\n')
+   #pzz <- proc.time()[3]
    cat(file_w, sep = '\n', file = zz)
-    cat('pzz6: ', round(proc.time()[3] - pzz, 2), '\n')
+   # cat('pzz6: ', round(proc.time()[3] - pzz, 2), '\n')
     if (any(names(obj@misc) == 'additionalEquationGAMS')) cat(obj@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
     
     cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):

@@ -48,8 +48,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['trade']]    <- createSet('trade')    
     .Object@parameters[['cns']] <- createSet('cns')    
 
-        .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map')    
-    .Object@parameters[['mSlicePreviousYear']] <- createParameter('mSlicePreviousYear', 'slice', 'map')    
+    .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slice'), 'map')    
 
   # Commodity
     # Map
@@ -236,17 +235,17 @@ setMethod("initialize", "modInp",
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year'), 'simple', 
                 defVal = 0, interpolation = 'back.inter.forth')    
-    for(i in c('pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreStock',
+    for(i in c('pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreLoss',
                'pStorageCostStore', 'pStorageCostInp', 'pStorageCostOut'))
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year', 'slice'), 'simple', 
-                defVal = 0, interpolation = 'back.inter.forth')    
-    .Object@parameters[['pStorageStoreLoss']] <- createParameter('pStorageStoreLoss', 
-          c('stg', 'region', 'year', 'slice'), 'simple', 
-            defVal = 0, interpolation = 'back.inter.forth')    
+                defVal = 1, interpolation = 'back.inter.forth')    
     .Object@parameters[['pStorageCap']] <- createParameter('pStorageCap', 
           c('stg', 'region', 'year'), 'multi', 
             defVal = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@parameters[['pStorageAva']] <- createParameter('pStorageAva', 
+                                                           c('stg', 'region', 'year', 'slice'), 'multi', 
+                                                           defVal = c(0, Inf), interpolation = 'back.inter.forth')
     .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
   # Trade
@@ -261,7 +260,6 @@ setMethod("initialize", "modInp",
         createParameter('mTradeSrc', c('trade', 'region'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeDst']] <- 
         createParameter('mTradeDst', c('trade', 'region'), 'map', cls = 'trade')    
-    .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map', cls = 'trade')    
     .Object@parameters[['pTradeIrCost']] <- createParameter('pTradeIrCost', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
             defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cost')    
@@ -346,6 +344,8 @@ setMethod("initialize", "modInp",
       createParameter('ndefpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['ndefpSupReserve']] <- createParameter('ndefpSupReserve', c('sup'), 'map')    
   .Object@parameters[['ndefpStorageCapUp']] <- createParameter('ndefpStorageCapUp', c('stg', 'region', 'year'), 'map')    
+  .Object@parameters[['ndefpStorageAvaUp']] <- createParameter('ndefpStorageAvaUp', c('stg', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['ndefpStorageOlife']] <- createParameter('ndefpStorageOlife', c('stg', 'region'), 'map')   
   .Object@parameters[['ndefpTradeIrUp']] <- createParameter('ndefpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
     .Object@parameters[['ndefpExportRowRes']] <- createParameter('ndefpExportRowRes', 'expp', 'map')    
