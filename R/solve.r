@@ -577,37 +577,9 @@ LL1 <- proc.time()[3]
           data.frame(tech = tec, comm = rep(g, length(tec))))
       }
       # Tech oilfe
-      olf <- getParameterData(prec@parameters$pTechOlife)
-      inv <- getParameterData(prec@parameters$pTechInvcost)
-      olf <- olf[olf$value == Inf,, drop = FALSE]
-      if (nrow(olf) > 0) {
-        inv <- aggregate(inv$value, by = inv[, c('tech', 'region')], FUN = "max")
-        inv <- inv[inv$tech %in% unique(olf$tech) & inv$x != 0,, drop = FALSE]
-        oo <- paste(olf$tech, olf$region, sep = '#')
-        ii <- paste(inv$tech, inv$region, sep = '#')
-        if (any(oo %in%  ii)) {
-          print('There is technology with infinite olife and non zero invcost: ')
-          print(inv[ii %in% oo, -ncol(inv), drop = FALSE])
-          stop('See previous errors')
-        }
-        prec@parameters$ndefpTechOlife <- addData(prec@parameters$ndefpTechOlife, olf[, -ncol(olf), drop = FALSE])
-      }
+      prec <- defin_ndef_par_set(prec, 'pTechOlife', 'ndefpTechOlife')
       # Storage oilfe
-      olf <- getParameterData(prec@parameters$pStorageOlife)
-      inv <- getParameterData(prec@parameters$pStorageInvcost)
-      olf <- olf[olf$value == Inf,, drop = FALSE]
-      if (nrow(olf) > 0) {
-        inv <- aggregate(inv$value, by = inv[, c('stg', 'region')], FUN = "max")
-        inv <- inv[inv$stg %in% unique(olf$stg) & inv$x != 0,, drop = FALSE]
-        oo <- paste(olf$stg, olf$region, sep = '#')
-        ii <- paste(inv$stg, inv$region, sep = '#')
-        if (any(oo %in%  ii)) {
-          print('There is storage with infinite olife and non zero invcost: ')
-          print(inv[ii %in% oo, -ncol(inv), drop = FALSE])
-          stop('See previous errors')
-        }
-        prec@parameters$ndefpStorageOlife <- addData(prec@parameters$ndefpStorageOlife, olf[, -ncol(olf), drop = FALSE])
-      }
+      prec <- defin_ndef_par_set(prec, 'pStorageOlife', 'ndefpStorageOlife')
       # Check user error
        assign('prec', prec, globalenv())
       # check_parameters(prec)

@@ -99,6 +99,27 @@ setClass("slice",
   names(sl@slice_map) <- colnames(sl@levels)[-ncol(sl@levels)]
   sl@default_slice_level <- colnames(sl@levels)[ncol(sl@levels) - 1]
   sl@all_slice <- sl@slice_share$slice
+  
+  # next_slice <- list()
+  sl@misc$next_slice <- NULL
+  if (nrow(sl@levels) != 1) {
+    tmp <- sl@parent_child; 
+    #tmp$lv <- NA; 
+    tmp$next_slice <- NA
+    #for (i in names(sl@slice_map))
+    #  tmp[tmp$parent %in% sl@slice_map[[i]], 'lv'] <- i
+    j <- 1
+    for (i in 1:(nrow(tmp) - 1)) {
+      if (tmp[i, 'parent'] == tmp[i + 1, 'parent']) {
+        tmp[i, 'next_slice'] <- tmp[i + 1, 'child']
+      } else {
+        tmp[i, 'next_slice'] <- tmp[j, 'child']
+        j <- i + 1
+      }
+    }
+    tmp[i + 1, 'next_slice'] <- tmp[j, 'child']
+    sl@misc$next_slice <- data.frame(slice = tmp$child, slicep = tmp$next_slice, stringsAsFactors = FALSE)
+  }
   sl
 }
 

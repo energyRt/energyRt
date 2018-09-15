@@ -386,7 +386,6 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
 })
 
 .start_end_fix <- function(approxim, app, als, stock_exist) {
-  
   # Start / End year
   dd <- data.frame(enable = rep(TRUE, length(approxim$region) * length(approxim$year)),
                    app = rep(app@name, length(approxim$region) * length(approxim$year)),
@@ -711,6 +710,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
       data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
                  slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
+  if (!is.null(approxim$slice@misc$next_slice))
+    obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
   # Discount
       obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
         simpleInterpolation(app@discount, 'discount',

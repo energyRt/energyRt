@@ -48,7 +48,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['trade']]    <- createSet('trade')    
     .Object@parameters[['cns']] <- createSet('cns')    
 
-    .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slice'), 'map')    
+    .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slicep'), 'map')    
 
   # Commodity
     # Map
@@ -239,7 +239,7 @@ setMethod("initialize", "modInp",
                'pStorageCostStore', 'pStorageCostInp', 'pStorageCostOut'))
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year', 'slice'), 'simple', 
-                defVal = 1, interpolation = 'back.inter.forth')    
+                defVal = 0, interpolation = 'back.inter.forth')    
     .Object@parameters[['pStorageCap']] <- createParameter('pStorageCap', 
           c('stg', 'region', 'year'), 'multi', 
             defVal = c(0, Inf), interpolation = 'back.inter.forth')

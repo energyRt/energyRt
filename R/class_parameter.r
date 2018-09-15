@@ -239,7 +239,11 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
         if (def != 0) {
-          vnn <- max(dtt$value[dtt$value != Inf]) + 1;
+          if (def == Inf) {
+            vnn <- max(dtt$value[dtt$value != Inf]) + 1;
+          } else {
+            vnn <- max(c(def, dtt$value[dtt$value != Inf])) + 1;
+          }
           ppl <- paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
           zz <- c(
             paste(ppl, '$( ', add_cond2, ' and '[add_cond2 != ''], ppl, '= ', 0, ') = ', def, ';', sep = ''),

@@ -742,7 +742,7 @@ eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
                  (       mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
                          ORD(year) >= ORD(yearp) and
                          ORD(year) < pTechOlife(tech, region) + ORD(yearp) and
-                         not(ndefpTechOlife(tech, region))
+                         not(ndefpTechOlife(tech, region)) and pTechInvcost(tech, region, yearp) <> 0
                  ),
                   pTechInvcost(tech, region, yearp) * (
 *                   sum(yeare$(ORD(yeare) = ORD(year) and ORD(yearp) = ORD(year)), pTechStock(tech, region, yeare)) +
@@ -782,7 +782,7 @@ eqTechSalv0(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare
     vTechSalv(tech, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
-         and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
+         and ORD(year) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
      - sum(yearp$(mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp)))  / (
@@ -798,7 +798,9 @@ eqTechSalv0(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare
 eqTechSalv(tech, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(yeare) and sum(year$mTechNew(tech, region, year), 1) <> 0)..
     vTechSalv(tech, region)
     +
-   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn) and ORD(yearn) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))),
+   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
+  and mTechNew(tech, region, yearn) and ORD(yearn) + pTechOlife(tech, region) - 1 > ORD(yeare) and not(ndefpTechOlife(tech, region))
+   and pTechInvcost(tech, region, yearn) <> 0),
     (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
       - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp))) / (
@@ -1068,7 +1070,8 @@ eqStorageSalv0(stg, region, yeare)$(mMilestoneLast(yeare) and mDiscountZero(regi
          vStorageSalv(stg, region)
          +
         sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and
-           ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare) and not(ndefpStorageOlife(stg, region))),
+           ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare) and not(ndefpStorageOlife(stg, region))
+                 and pStorageInvcost(stg, region, year) <> 0),
         vStorageInv(stg, region, year) * (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
         1
         + (sum(yearp$(ORD(yearp) >= ORD(year)), pDiscountFactor(region, yearp)))
@@ -1083,7 +1086,8 @@ eqStorageSalv(stg, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(r
          vStorageSalv(stg, region)
          +
          sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year)
-         and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare) and not(ndefpStorageOlife(stg, region))),
+         and ORD(year) + pStorageOlife(stg, region) - 1 > ORD(yeare) and not(ndefpStorageOlife(stg, region))
+                 and pStorageInvcost(stg, region, year) <> 0),
          vStorageInv(stg, region, year) *
          (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
          1
@@ -1322,12 +1326,11 @@ eqTechOutTot(comm, region, year, slice)$( mMidMilestone(year) and
          sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year)  and mTechSlice(tech, slice) and mTechAOut(tech, comm)),
              vTechAOut(tech, comm, region, year, slice));
 
-
 eqStorageInpTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mStorageComm(stg, comm)
            and mStorageSpan(stg, region, year)), 1))..
          vStorageInpTot(comm, region, year, slice)
          =e=
-         sum(stg$mStorageComm(stg, comm),
+         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1),
                  vStorageInp(stg, comm, region, year, slice)
          );
 
@@ -1335,7 +1338,7 @@ eqStorageOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mSt
            and mStorageSpan(stg, region, year)), 1))..
          vStorageOutTot(comm, region, year, slice)
          =e=
-         sum(stg$mStorageComm(stg, comm),
+         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1),
                  vStorageOut(stg, comm, region, year, slice)
          );
 
@@ -20701,6 +20704,9 @@ eqStorageSalv
 * Constrain capacity
 eqStorageLo
 eqStorageUp
+eqStorageCost
+eqStorageAvaLo
+eqStorageAvaUp
 **************************************
 * Trade and Row equation
 **************************************
