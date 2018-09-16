@@ -559,8 +559,6 @@ LL1 <- proc.time()[3]
       prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
       prec <- defin_ndef_par(prec, 'pTradeIr', 'ndefpTradeIrUp')
       prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfacUp')
-      prec <- defin_ndef_par(prec, 'pStorageAva', 'ndefpStorageAvaUp')
-      prec <- defin_ndef_par(prec, 'pStorageCap', 'ndefpStorageCapUp')
       
       # For remove emission equation
       g1 <- getParameterData(prec@parameters$pTechEmisComm)

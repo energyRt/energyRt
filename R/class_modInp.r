@@ -240,12 +240,6 @@ setMethod("initialize", "modInp",
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year', 'slice'), 'simple', 
                 defVal = 0, interpolation = 'back.inter.forth')    
-    .Object@parameters[['pStorageCap']] <- createParameter('pStorageCap', 
-          c('stg', 'region', 'year'), 'multi', 
-            defVal = c(0, Inf), interpolation = 'back.inter.forth')
-    .Object@parameters[['pStorageAva']] <- createParameter('pStorageAva', 
-                                                           c('stg', 'region', 'year', 'slice'), 'multi', 
-                                                           defVal = c(0, Inf), interpolation = 'back.inter.forth')
     .Object@parameters[['pStorageAfa']] <- createParameter('pStorageAfa', 
                                                            c('stg', 'region', 'year', 'slice'), 'multi', 
                                                            defVal = c(0, 1), interpolation = 'back.inter.forth')
@@ -348,8 +342,6 @@ setMethod("initialize", "modInp",
   .Object@parameters[['ndefpSupAvaUp']] <- 
       createParameter('ndefpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['ndefpSupReserve']] <- createParameter('ndefpSupReserve', c('sup'), 'map')    
-  .Object@parameters[['ndefpStorageCapUp']] <- createParameter('ndefpStorageCapUp', c('stg', 'region', 'year'), 'map')    
-  .Object@parameters[['ndefpStorageAvaUp']] <- createParameter('ndefpStorageAvaUp', c('stg', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['ndefpStorageOlife']] <- createParameter('ndefpStorageOlife', c('stg', 'region'), 'map')   
   .Object@parameters[['ndefpTradeIrUp']] <- createParameter('ndefpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    

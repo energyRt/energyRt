@@ -871,17 +871,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']],
                                                  simpleInterpolation(stg@stock, 'stock',
                                                                      obj@parameters[['pStorageStock']], approxim, 'stg', stg@name))
-    obj@parameters[['pStorageAva']] <- addData(obj@parameters[['pStorageAva']],
-                                               multiInterpolation(stg@availability, 'ava',
-                                                                  obj@parameters[['pStorageAva']], approxim, 'stg', stg@name))
     obj@parameters[['pStorageAfa']] <- addData(obj@parameters[['pStorageAfa']],
-                                               multiInterpolation(stg@availability, 'afa',
+                                               multiInterpolation(stg@afa, 'afa',
                                                                   obj@parameters[['pStorageAfa']], approxim, 'stg', stg@name))
     obj@parameters[['pStorageCap2act']] <- addData(obj@parameters[['pStorageCap2act']],
                                                 data.frame(stg = stg@name, value = stg@cap2act))
-    obj@parameters[['pStorageCap']] <- addData(obj@parameters[['pStorageCap']],
-                                               multiInterpolation(stg@cap, 'cap',
-                                                                  obj@parameters[['pStorageCap']], approxim, 'stg', stg@name))
     stock_exist <- obj@parameters[["pStorageStock"]]@data[!is.na(obj@parameters[["pStorageStock"]]@data$stg) & 
                                                          obj@parameters[['pStorageStock']]@data$stg == stg@name & 
                                                          obj@parameters[['pStorageStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 

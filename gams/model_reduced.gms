@@ -126,8 +126,6 @@ ndefpStorageOlife(stg, region)    Auxiliary mapping for not Inf - used in GLPK-M
 mStorageComm(stg, comm)            Mapping of storage technology and respective commodity
 mStorageNew(stg, region, year)     Storage available for investment
 mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the time-span and region
-ndefpStorageCapUp(stg, region, year)              Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpStorageAvaUp(stg, region, year, slice)
 mSliceNext(slice, slice)                          Next slice
 * Trade and ROW
 mTradeSlice(trade, slice)                        Trade work in slice
@@ -221,15 +219,11 @@ pStorageOutLoss(stg, region, year, slice)           Storage output losses
 pStorageStoreLoss(stg, region, year, slice)         Storage storing losses
 pStorageStock(stg, region, year)                    Storage stock
 pStorageOlife(stg, region)                          Storage operational life
-pStorageCapUp(stg, region, year)                    Storage upper bound on capacity
-pStorageCapLo(stg, region, year)                    Storage lower bound on capacity
 pStorageCostStore(stg, region, year, slice)         Storing costs
 pStorageCostInp(stg, region, year, slice)           Storage input costs
 pStorageCostOut(stg, region, year, slice)           Storage output costs
 pStorageFixom(stg, region, year)                    Storage fixed O&M costs
 pStorageInvcost(stg, region, year)                  Storage investment costs
-pStorageAvaLo(stg, region, year, slice)             Storage lower 'charge' bound
-pStorageAvaUp(stg, region, year, slice)             Storage upper 'charge' bound
 pStorageCap2act(stg)                                Storage capacity units to activity units conversion factor
 pStorageAfaLo(stg, region, year, slice)             Storage lower 'charge' bound (percent)
 pStorageAfaUp(stg, region, year, slice)             Storage upper 'charge' bound (percent)
@@ -933,8 +927,6 @@ eqEmsFuelTot(comm, region, year, slice)$(mMidMilestone(year) and sum(tech$(mTech
 ********************************************************************************
 Equation
 eqStorageStore(stg, comm, region, year, slice)      Storage equation
-eqStorageAvaLo(stg, comm, region, year, slice)             Storage lower 'charge' bound
-eqStorageAvaUp(stg, comm, region, year, slice)             Storage upper 'charge' bound
 eqStorageAfaLo(stg, comm, region, year, slice)             Storage availability factor lower
 eqStorageAfaUp(stg, comm, region, year, slice)             Storage availability factor upper
 ;
@@ -946,15 +938,6 @@ eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
   (1 - pStorageOutLoss(stg, region, year, slice)) * vStorageOut(stg, comm, region, year, slice) +
   sum(slicep$(mStorageSlice(stg, slicep) and mSliceNext(slicep, slice)),
   (1 - pStorageStoreLoss(stg, region, year, slice)) * vStorageStore(stg, comm, region, year, slicep));
-
-* Storage bounds on accumulated stock
-eqStorageAvaLo(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageComm(stg, comm)
-                 and pStorageAvaLo(stg, region, year, slice) and mStorageSpan(stg, region, year))..
-         vStorageStore(stg, comm, region, year, slice) =g= pStorageAvaLo(stg, region, year, slice);
-
-eqStorageAvaUp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageComm(stg, comm)
-                 and not(ndefpStorageAvaUp(stg, region, year, slice))  and mStorageSpan(stg, region, year))..
-        vStorageStore(stg, comm, region, year, slice) =l= pStorageAvaUp(stg, region, year, slice);
 
 eqStorageAfaLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageAfaLo(stg, region, year, slice))..
@@ -981,8 +964,6 @@ eqStorageCost(stg, region, year)  Storage total costs
 eqStorageSalv0(stg, region, yeare)  Storage salvage equation for zero discount
 eqStorageSalv(stg, region, yeare)   Storage salvage equation
 * Constrain capacity
-eqStorageLo(stg, region, year)      Storage lower 'charge' accumulated stock
-eqStorageUp(stg, region, year)      Storage upper 'charge' accumulated stock
 ;
 
 * Capacity equation
@@ -1051,13 +1032,6 @@ eqStorageSalv(stg, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(r
                  - pStorageOlife(stg, region) - ORD(year) + 1)
            )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare)))
     )  =e= 0;
-
-* Storage bounds on accumulated stock
-eqStorageLo(stg, region, year)$(mMidMilestone(year) and pStorageCapLo(stg, region, year) and mStorageSpan(stg, region, year))..
-         vStorageCap(stg, region, year) =g= pStorageCapLo(stg, region, year);
-
-eqStorageUp(stg, region, year)$(mMidMilestone(year) and not(ndefpStorageCapUp(stg, region, year)) and mStorageSpan(stg, region, year))..
-        vStorageCap(stg, region, year) =l= pStorageCapUp(stg, region, year);
 
 
 
@@ -17596,11 +17570,7 @@ eqStorageInv
 eqStorageSalv0
 eqStorageSalv
 * Constrain capacity
-eqStorageLo
-eqStorageUp
 eqStorageCost
-eqStorageAvaLo
-eqStorageAvaUp
 eqStorageAfaLo
 eqStorageAfaUp
 **************************************
