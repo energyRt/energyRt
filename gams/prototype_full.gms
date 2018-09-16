@@ -230,6 +230,9 @@ pStorageFixom(stg, region, year)                    Storage fixed O&M costs
 pStorageInvcost(stg, region, year)                  Storage investment costs
 pStorageAvaLo(stg, region, year, slice)             Storage lower 'charge' bound
 pStorageAvaUp(stg, region, year, slice)             Storage upper 'charge' bound
+pStorageCap2act(stg)                                Storage capacity units to activity units conversion factor
+pStorageAfaLo(stg, region, year, slice)             Storage lower 'charge' bound (percent)
+pStorageAfaUp(stg, region, year, slice)             Storage upper 'charge' bound (percent)
 ;
 * Trade parameters
 parameter
@@ -994,6 +997,8 @@ Equation
 eqStorageStore(stg, comm, region, year, slice)      Storage equation
 eqStorageAvaLo(stg, comm, region, year, slice)             Storage lower 'charge' bound
 eqStorageAvaUp(stg, comm, region, year, slice)             Storage upper 'charge' bound
+eqStorageAfaLo(stg, comm, region, year, slice)             Storage availability factor lower
+eqStorageAfaUp(stg, comm, region, year, slice)             Storage availability factor upper
 ;
 
 eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
@@ -1012,6 +1017,16 @@ eqStorageAvaLo(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorage
 eqStorageAvaUp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageComm(stg, comm)
                  and not(ndefpStorageAvaUp(stg, region, year, slice))  and mStorageSpan(stg, region, year))..
         vStorageStore(stg, comm, region, year, slice) =l= pStorageAvaUp(stg, region, year, slice);
+
+eqStorageAfaLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
+  and mStorageComm(stg, comm) and pStorageAfaLo(stg, region, year, slice))..
+  vStorageStore(stg, comm, region, year, slice) =g= pStorageAfaLo(stg, region, year, slice) *
+     pStorageCap2act(stg) * vStorageCap(stg, region, year);
+
+eqStorageAfaUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
+  and mStorageComm(stg, comm))..
+  vStorageStore(stg, comm, region, year, slice) =l= pStorageAfaUp(stg, region, year, slice) *
+     pStorageCap2act(stg) * vStorageCap(stg, region, year);
 
 
 ********************************************************************************
@@ -20707,6 +20722,8 @@ eqStorageUp
 eqStorageCost
 eqStorageAvaLo
 eqStorageAvaUp
+eqStorageAfaLo
+eqStorageAfaUp
 **************************************
 * Trade and Row equation
 **************************************

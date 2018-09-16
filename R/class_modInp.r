@@ -246,6 +246,11 @@ setMethod("initialize", "modInp",
     .Object@parameters[['pStorageAva']] <- createParameter('pStorageAva', 
                                                            c('stg', 'region', 'year', 'slice'), 'multi', 
                                                            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@parameters[['pStorageAfa']] <- createParameter('pStorageAfa', 
+                                                           c('stg', 'region', 'year', 'slice'), 'multi', 
+                                                           defVal = c(0, 1), interpolation = 'back.inter.forth')
+    .Object@parameters[['pStorageCap2act']] <- createParameter('pStorageCap2act', 'stg', 'simple', 
+                      defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2cat', slot = 'cap2act')    
     .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
   # Trade
