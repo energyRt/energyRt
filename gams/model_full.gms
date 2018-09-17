@@ -342,11 +342,11 @@ vStorageInp(stg, comm, region, year, slice)          Storage input
 vStorageOut(stg, comm, region, year, slice)          Storage output
 vStorageStore(stg, comm, region, year, slice)              Storage level
 vStorageInv(stg, region, year)                       Storage technology investments
-vStorageSalv(stg, region)                            Storage salvage costs
 vStorageCap(stg, region, year)                       Storage capacity
 vStorageNewCap(stg, region, year)                    Storage new capacity
 ;
 variable
+vStorageSalv(stg, region)                            Storage salvage costs
 vStorageCost(stg, region, year)                    Storage O&M costs
 ;
 
@@ -989,8 +989,9 @@ eqEmsFuelTot(comm, region, year, slice)$(mMidMilestone(year) and sum(tech$(mTech
 ********************************************************************************
 Equation
 eqStorageStore(stg, comm, region, year, slice)      Storage equation
-eqStorageAfaLo(stg, comm, region, year, slice)             Storage availability factor lower
-eqStorageAfaUp(stg, comm, region, year, slice)             Storage availability factor upper
+eqStorageAfaLo(stg, comm, region, year, slice)      Storage availability factor lower
+eqStorageAfaUp(stg, comm, region, year, slice)      Storage availability factor upper
+eqStorageClean(stg, comm, region, year, slice)      Storage input less Stote
 ;
 
 eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
@@ -1010,6 +1011,10 @@ eqStorageAfaUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
   and mStorageComm(stg, comm))..
   vStorageStore(stg, comm, region, year, slice) =l= pStorageAfaUp(stg, region, year, slice) *
      pStorageCap2act(stg) * vStorageCap(stg, region, year);
+
+eqStorageClean(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
+  and mStorageComm(stg, comm))..
+  vStorageInp(stg, comm, region, year, slice) =l= vStorageStore(stg, comm, region, year, slice);
 
 
 ********************************************************************************
@@ -1316,18 +1321,18 @@ eqTechOutTot(comm, region, year, slice)$( mMidMilestone(year) and
              vTechAOut(tech, comm, region, year, slice));
 
 eqStorageInpTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mStorageComm(stg, comm)
-           and mStorageSpan(stg, region, year)), 1))..
+           and mStorageSpan(stg, region, year) and mStorageSlice(stg, slice)), 1))..
          vStorageInpTot(comm, region, year, slice)
          =e=
-         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1),
+         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1 and mStorageSlice(stg, slice)),
                  vStorageInp(stg, comm, region, year, slice)
          );
 
 eqStorageOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mStorageComm(stg, comm)
-           and mStorageSpan(stg, region, year)), 1))..
+           and mStorageSpan(stg, region, year) and mStorageSlice(stg, slice)), 1))..
          vStorageOutTot(comm, region, year, slice)
          =e=
-         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1),
+         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1 and mStorageSlice(stg, slice)),
                  vStorageOut(stg, comm, region, year, slice)
          );
 
@@ -20694,6 +20699,7 @@ eqStorageSalv
 eqStorageCost
 eqStorageAfaLo
 eqStorageAfaUp
+eqStorageClean
 **************************************
 * Trade and Row equation
 **************************************
@@ -22873,6 +22879,15 @@ put vAggOut_csv;
 put "comm,region,year,slice,value"/;
 loop((comm,region,year,slice)$(vAggOut.l(comm,region,year,slice) and mMidMilestone(year)), put comm.tl:0",", region.tl:0",", year.tl:0",", slice.tl:0","vAggOut.l(comm,region,year,slice):0:15/;);
 putclose; 
+file vStorageSalv_csv / 'vStorageSalv.csv'/;
+vStorageSalv_csv.lp = 1;
+vStorageSalv_csv.nd = 1;
+vStorageSalv_csv.nz = 1e-25;
+vStorageSalv_csv.nr = 2;
+put vStorageSalv_csv;
+put "stg,region,value"/;
+loop((stg,region)$vStorageSalv.l(stg,region), put stg.tl:0",", region.tl:0","vStorageSalv.l(stg,region):0:15/;);
+putclose; 
 file vStorageCost_csv / 'vStorageCost.csv'/;
 vStorageCost_csv.lp = 1;
 vStorageCost_csv.nd = 1;
@@ -23161,15 +23176,6 @@ put vStorageInv_csv;
 put "stg,region,year,value"/;
 loop((stg,region,year)$(vStorageInv.l(stg,region,year) and mMidMilestone(year)), put stg.tl:0",", region.tl:0",", year.tl:0","vStorageInv.l(stg,region,year):0:15/;);
 putclose; 
-file vStorageSalv_csv / 'vStorageSalv.csv'/;
-vStorageSalv_csv.lp = 1;
-vStorageSalv_csv.nd = 1;
-vStorageSalv_csv.nz = 1e-25;
-vStorageSalv_csv.nr = 2;
-put vStorageSalv_csv;
-put "stg,region,value"/;
-loop((stg,region)$vStorageSalv.l(stg,region), put stg.tl:0",", region.tl:0","vStorageSalv.l(stg,region):0:15/;);
-putclose; 
 file vStorageCap_csv / 'vStorageCap.csv'/;
 vStorageCap_csv.lp = 1;
 vStorageCap_csv.nd = 1;
@@ -23273,6 +23279,7 @@ put variable_list_csv;
     put "vTaxCost"/;
     put "vSubsCost"/;
     put "vAggOut"/;
+    put "vStorageSalv"/;
     put "vStorageCost"/;
     put "vTradeCost"/;
     put "vTradeRowCost"/;
@@ -23305,7 +23312,6 @@ put variable_list_csv;
     put "vStorageOut"/;
     put "vStorageStore"/;
     put "vStorageInv"/;
-    put "vStorageSalv"/;
     put "vStorageCap"/;
     put "vStorageNewCap"/;
     put "vImport"/;
