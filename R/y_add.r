@@ -876,6 +876,41 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
                                                                   obj@parameters[['pStorageAfa']], approxim, 'stg', stg@name))
     obj@parameters[['pStorageCap2act']] <- addData(obj@parameters[['pStorageCap2act']],
                                                 data.frame(stg = stg@name, value = stg@cap2act))
+    # Aux input/output
+    if (nrow(stg@aux) != 0) {
+      if (any(!(stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]))) {
+        cmm <- stg@aeff$acomm[!is.na(stg@aeff$acomm)][stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]]
+        stop(paste0('Unknown aux commodity "', paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
+      }
+      stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),, drop = FALSE]
+      ainp_flag <- c('store2ainp', 'inp2ainp', 'out2ainp', 'cap2ainp', 'ncap2ainp')
+      aout_flag <- c('store2aout', 'inp2aout', 'out2aout', 'cap2aout', 'ncap2aout')
+      cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), 'acomm']
+      cmp_out <- stg@aeff[apply(!is.na(stg@aeff[, aout_flag]), 1, any), 'acomm']
+      obj@parameters[['mStorageAInp']] <- addData(obj@parameters[['mStorageAInp']],
+                                                  data.frame(stg = rep(stg@name, length(cmp_inp)), comm = cmp_inp))
+      obj@parameters[['mStorageAOut']] <- addData(obj@parameters[['mStorageAOut']],
+                                                  data.frame(stg = rep(stg@name, length(cmp_out)), comm = cmp_out))
+      dd <- data.frame(list = c('pStorageStore2AInp', 'pStorageStore2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 'pStorageOut2AInp', 
+                                'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 'pStorageNCap2AInp', 'pStorageNCap2AOut'),
+                       table = c('store2ainp', 'store2aout', 'inp2ainp', 'inp2aout', 'out2ainp', 'out2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 
+                                 'ncap2aout'),
+                       stringsAsFactors = FALSE)
+      approxim_comm <- approxim
+      for(i in 1:nrow(dd)) {
+        approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
+        approxim_comm[['acomm']] <- unique(stg@aeff[!is.na(stg@aeff[, dd[i, 'table']]), 'acomm'])
+        if (length(approxim_comm[['acomm']]) != 0) {
+          obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
+                                                     simpleInterpolation(stg@aeff, dd[i, 'table'], 
+                                                                         obj@parameters[[dd[i, 'list']]], approxim_comm, 'stg', stg@name))
+        }
+      }                
+    } else {
+      if (nrow(stg@aeff) != 0)
+        stop(paste0('Unknown aux commodity "', paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'), '", in storage "', stg@name, '"'))
+    }
+    # Some slice
     stock_exist <- obj@parameters[["pStorageStock"]]@data[!is.na(obj@parameters[["pStorageStock"]]@data$stg) & 
                                                          obj@parameters[['pStorageStock']]@data$stg == stg@name & 
                                                          obj@parameters[['pStorageStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 

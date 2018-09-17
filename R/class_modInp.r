@@ -247,7 +247,14 @@ setMethod("initialize", "modInp",
                       defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2cat', slot = 'cap2act')    
     .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
-  # Trade
+    .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
+    .Object@parameters[['mStorageAOut']] <- createParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    
+    for(i in c('pStorageStore2AInp', 'pStorageStore2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 
+               'pStorageOut2AInp', 'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
+               'pStorageNCap2AInp', 'pStorageNCap2AOut'))
+      .Object@parameters[[i]] <- createParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                                                 defVal = 0, interpolation = 'back.inter.forth')    
+    # Trade
     # Map
     .Object@parameters[['mExpComm']] <- 
         createParameter('mExpComm', c('expp', 'comm'), 'map', cls = 'trade')    

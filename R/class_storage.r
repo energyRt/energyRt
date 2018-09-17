@@ -8,10 +8,12 @@ setClass("storage",
           commodity     = "character",
           start         = "data.frame",
           end           = "data.frame",
+          aux           = "data.frame",      #
           olife         = "data.frame",    #
           stock         = "data.frame",    #
           loss          = "data.frame",    #
           afa           = "data.frame",     # Availability of the resource with prices
+          aeff         = "data.frame",    #  Commodity efficiency
           # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
@@ -46,6 +48,25 @@ setClass("storage",
                                      inpLoss    = numeric(),  
                                      outLoss    = numeric(),  
                                      stringsAsFactors = FALSE),
+          aux           = data.frame(acomm     = character(),
+                                     unit     = character(),
+                                     stringsAsFactors = FALSE),
+          aeff          = data.frame(
+                                      acomm      = character(),
+                                      region     = character(),
+                                      year       = numeric(),
+                                      slice      = character(),
+                                      store2ainp  = numeric(),
+                                      inp2ainp  = numeric(),
+                                      out2ainp  = numeric(),
+                                      store2aout  = numeric(),
+                                      inp2aout  = numeric(),
+                                      out2aout  = numeric(),
+                                      cap2ainp  = numeric(),
+                                      cap2aout  = numeric(),
+                                      ncap2ainp  = numeric(),
+                                      ncap2aout  = numeric(),
+                                      stringsAsFactors = FALSE),
           afa  = data.frame(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),

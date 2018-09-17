@@ -124,6 +124,8 @@ $offtext
 mStorageSlice(stg, slice)          Storage work in slice
 ndefpStorageOlife(stg, region)    Auxiliary mapping for not Inf - used in GLPK-MathProg only
 mStorageComm(stg, comm)            Mapping of storage technology and respective commodity
+mStorageAInp(stg, comm)
+mStorageAOut(stg, comm)
 mStorageNew(stg, region, year)     Storage available for investment
 mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the time-span and region
 mSliceNext(slice, slice)                          Next slice
@@ -227,6 +229,16 @@ pStorageInvcost(stg, region, year)                  Storage investment costs
 pStorageCap2act(stg)                                Storage capacity units to activity units conversion factor
 pStorageAfaLo(stg, region, year, slice)             Storage lower 'charge' bound (percent)
 pStorageAfaUp(stg, region, year, slice)             Storage upper 'charge' bound (percent)
+pStorageStore2AInp(stg, comm, region, year, slice)  Auxilary input
+pStorageStore2AOut(stg, comm, region, year, slice)  Auxilary output
+pStorageInp2AInp(stg, comm, region, year, slice)  Auxilary input
+pStorageInp2AOut(stg, comm, region, year, slice)  Auxilary output
+pStorageOut2AInp(stg, comm, region, year, slice)  Auxilary input
+pStorageOut2AOut(stg, comm, region, year, slice)  Auxilary output
+pStorageCap2AInp(stg, comm, region, year, slice)  Auxilary input
+pStorageCap2AOut(stg, comm, region, year, slice)  Auxilary output
+pStorageNCap2AInp(stg, comm, region, year, slice)  Auxilary input
+pStorageNCap2AOut(stg, comm, region, year, slice)  Auxilary output
 ;
 * Trade parameters
 parameter
@@ -312,6 +324,8 @@ vTechInpTot(comm, region, year, slice)               Total commodity input
 vTechOutTot(comm, region, year, slice)               Total technology output
 vStorageInpTot(comm, region, year, slice)            Total storage input
 vStorageOutTot(comm, region, year, slice)            Total storage output
+vStorageAInp(stg, comm, region, year, slice)
+vStorageAOut(stg, comm, region, year, slice)
 ;
 variable
 * Costs variable
@@ -992,7 +1006,31 @@ eqStorageStore(stg, comm, region, year, slice)      Storage equation
 eqStorageAfaLo(stg, comm, region, year, slice)      Storage availability factor lower
 eqStorageAfaUp(stg, comm, region, year, slice)      Storage availability factor upper
 eqStorageClean(stg, comm, region, year, slice)      Storage input less Stote
+eqStorageAInp(stg, comm, region, year, slice)
+eqStorageAOut(stg, comm, region, year, slice)
+
 ;
+
+eqStorageAInp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageAInp(stg, comm)
+  and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))..
+  vStorageAInp(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
+         pStorageStore2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
+         pStorageInp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
+         pStorageOut2AInp(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
+         pStorageCap2AInp(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
+         pStorageNCap2AInp(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year)
+);
+
+eqStorageAOut(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageAOut(stg, comm)
+  and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))..
+  vStorageAOut(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
+         pStorageStore2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
+         pStorageInp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
+         pStorageOut2AOut(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
+         pStorageCap2AOut(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
+         pStorageNCap2AOut(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year)
+);
+
 
 eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm))..
@@ -1271,7 +1309,8 @@ eqOutTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
                  and mTechSpan(tech, region, year) and
                   (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1)) +
          vDummyImport(comm, region, year, slice)$(mCommSlice(comm, slice) and not(ndefpDummyImportCost(comm, region, year, slice))) +
-         vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
+         vStorageOutTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice)
+      and (mStorageComm(stg, comm) or mStorageAOut(stg, comm)) and mStorageSpan(stg, region, year)), 1)) +
          vImport(comm, region, year, slice)$(sum((dst, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeDst(trade, dst)), 1)
                     + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), 1))
   + sum(slicep$mAllSliceParentChild(slicep, slice), vOut2Up(comm, region, year, slicep, slice))
@@ -1285,7 +1324,8 @@ eqInpTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
                  and mTechSpan(tech, region, year) and
              (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1)) +
          vDemInp(comm, region, year, slice)$(mCommSlice(comm, slice) and sum(dem$mDemComm(dem, comm), 1)) +
-         vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1)) +
+         vStorageInpTot(comm, region, year, slice)$(sum(stg$(mStorageSlice(stg, slice) and
+           (mStorageComm(stg, comm) or mStorageAInp(stg, comm)) and mStorageSpan(stg, region, year)), 1)) +
          vDummyExport(comm, region, year, slice)$(mCommSlice(comm, slice) and not(ndefpDummyExportCost(comm, region, year, slice))) +
          vExport(comm, region, year, slice)$(sum((src, trade)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src)), 1)
                     + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1))
@@ -1320,21 +1360,32 @@ eqTechOutTot(comm, region, year, slice)$( mMidMilestone(year) and
          sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year)  and mTechSlice(tech, slice) and mTechAOut(tech, comm)),
              vTechAOut(tech, comm, region, year, slice));
 
-eqStorageInpTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mStorageComm(stg, comm)
+eqStorageInpTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(
+          (mStorageComm(stg, comm) or mStorageAInp(stg, comm))
            and mStorageSpan(stg, region, year) and mStorageSlice(stg, slice)), 1))..
          vStorageInpTot(comm, region, year, slice)
          =e=
-         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1 and mStorageSlice(stg, slice)),
+         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1
+                 and mStorageSlice(stg, slice)and mStorageSpan(stg, region, year)),
                  vStorageInp(stg, comm, region, year, slice)
+         ) +
+         sum(stg$(mStorageAInp(stg, comm) and mStorageSlice(stg, slice) and mStorageSpan(stg, region, year)),
+                 vStorageAInp(stg, comm, region, year, slice)
          );
 
-eqStorageOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(mStorageComm(stg, comm)
+eqStorageOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$((mStorageComm(stg, comm) or mStorageAOut(stg, comm))
            and mStorageSpan(stg, region, year) and mStorageSlice(stg, slice)), 1))..
          vStorageOutTot(comm, region, year, slice)
          =e=
-         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, region, year, slice) < 1 and mStorageSlice(stg, slice)),
+         sum(stg$(mStorageComm(stg, comm) and pStorageOutLoss(stg, region, year, slice) < 1
+                 and mStorageSlice(stg, slice) and mStorageSpan(stg, region, year)),
                  vStorageOut(stg, comm, region, year, slice)
+         ) +
+         sum(stg$(mStorageAOut(stg, comm) and mStorageSlice(stg, slice) and mStorageSpan(stg, region, year)),
+                 vStorageAOut(stg, comm, region, year, slice)
          );
+
+
 
 
 **************************************
@@ -20700,6 +20751,8 @@ eqStorageCost
 eqStorageAfaLo
 eqStorageAfaUp
 eqStorageClean
+eqStorageAInp
+eqStorageAOut
 **************************************
 * Trade and Row equation
 **************************************
