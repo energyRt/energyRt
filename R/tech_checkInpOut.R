@@ -49,8 +49,8 @@ checkInpOut <- function(tech) {
       if (ctype[i, 'type'] != 'input') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Output ?
-    if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("use2cact", "cact2cout", 
-       "afac.lo", "afac.up", "afac.fx")]))) {
+    if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("use2cact", "cact2cout"# , "afac.lo", "afac.up", "afac.fx"
+       )]))) {
       if (ctype[i, 'type'] != 'output') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Aux ?

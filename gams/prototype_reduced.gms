@@ -651,14 +651,18 @@ eqTechActGrp(tech, group, region, year, slice)$(mTechSlice(tech, slice) and mMid
 * Availability commodity factor equations
 ********************************************************************************
 Equation
-* Availability commodity factor LO equations
-eqTechAfacLo(tech, region, comm, year, slice) Technology commodity availability factor lower bound
-* Availability commodity factor UP equations
-eqTechAfacUp(tech, region, comm, year, slice) Technology commodity availability factor upper bound
+* Availability commodity factor LO output equations
+eqTechAfacOutLo(tech, region, comm, year, slice) Technology commodity availability factor lower bound
+* Availability commodity factor UP output equations
+eqTechAfacOutUp(tech, region, comm, year, slice) Technology commodity availability factor upper bound
+* Availability commodity factor LO input equations
+eqTechAfacInpLo(tech, region, comm, year, slice) Technology commodity availability factor lower bound
+* Availability commodity factor UP input equations
+eqTechAfacInpUp(tech, region, comm, year, slice) Technology commodity availability factor upper bound
 ;
 
-* Availability commodity factor LO equations
-eqTechAfacLo(tech, region, comm, year, slice)$
+* Availability commodity factor LO output equations
+eqTechAfacOutLo(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechOutComm(tech, comm) and
                  pTechAfacLo(tech, comm, region, year, slice) <> 0
@@ -672,8 +676,8 @@ eqTechAfacLo(tech, region, comm, year, slice)$
          =l=
          vTechOut(tech, comm, region, year, slice);
 
-* Availability commodity factor LO equations
-eqTechAfacUp(tech, region, comm, year, slice)$
+* Availability commodity factor UP output equations
+eqTechAfacOutUp(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechOutComm(tech, comm) and
                  not(ndefpTechAfaUp(tech, region, year, slice)) and
@@ -682,6 +686,35 @@ eqTechAfacUp(tech, region, comm, year, slice)$
          vTechOut(tech, comm, region, year, slice)
          =l=
          pTechCact2cout(tech, comm, region, year, slice) *
+         pTechAfaUp(tech, region, year, slice) *
+         pTechAfacUp(tech, comm, region, year, slice) *
+         pTechCap2act(tech) *
+         vTechCap(tech, region, year) *
+         pSliceShare(slice);
+
+* Availability commodity factor LO input equations
+eqTechAfacInpLo(tech, region, comm, year, slice)$
+         (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
+                 mTechInpComm(tech, comm) and
+                 pTechAfacLo(tech, comm, region, year, slice) <> 0
+         )..
+         pTechAfaLo(tech, region, year, slice) *
+         pTechAfacLo(tech, comm, region, year, slice) *
+         pTechCap2act(tech) *
+         vTechCap(tech, region, year) *
+         pSliceShare(slice)
+         =l=
+         vTechInp(tech, comm, region, year, slice);
+
+* Availability commodity factor UP input equations
+eqTechAfacInpUp(tech, region, comm, year, slice)$
+         (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
+                 mTechInpComm(tech, comm) and
+                 not(ndefpTechAfaUp(tech, region, year, slice)) and
+                 not(ndefpTechAfacUp(tech, comm, region, year, slice))
+         )..
+         vTechInp(tech, comm, region, year, slice)
+         =l=
          pTechAfaUp(tech, region, year, slice) *
          pTechAfacUp(tech, comm, region, year, slice) *
          pTechCap2act(tech) *
@@ -17567,10 +17600,14 @@ eqTechActGrp
 ********************************************************************************
 * Availability commodity factor equations
 ********************************************************************************
-* Availability commodity factor LO equations
-eqTechAfacLo
-* Availability commodity factor UP equations
-eqTechAfacUp
+* Availability commodity factor LO output equations
+eqTechAfacOutLo
+* Availability commodity factor UP output equations
+eqTechAfacOutUp
+* Availability commodity factor LO input equations
+eqTechAfacInpLo
+* Availability commodity factor UP input equations
+eqTechAfacInpUp
 ********************************************************************************
 * Capacity and costs equations
 ********************************************************************************

@@ -353,9 +353,13 @@ s.t.  eqTechActSng{ t in tech,c in comm,r in region,y in year,s in slice : (mTec
 
 s.t.  eqTechActGrp{ t in tech,g in group,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechOutGroup[t,g] and mTechSpan[t,r,y])}: vTechAct[t,r,y,s]  =  sum{c in comm:((mTechGroupComm[t,g,c] and pTechCact2cout[t,c,r,y,s] <> 0))}((vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]));
 
-s.t.  eqTechAfacLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and pTechAfacLo[t,c,r,y,s] <> 0)}: pTechCact2cout[t,c,r,y,s]*pTechAfaLo[t,r,y,s]*pTechAfacLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechOut[t,c,r,y,s];
+s.t.  eqTechAfacOutLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and pTechAfacLo[t,c,r,y,s] <> 0)}: pTechCact2cout[t,c,r,y,s]*pTechAfaLo[t,r,y,s]*pTechAfacLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechOut[t,c,r,y,s];
 
-s.t.  eqTechAfacUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and not((ndefpTechAfaUp[t,r,y,s])) and not((ndefpTechAfacUp[t,c,r,y,s])))}: vTechOut[t,c,r,y,s] <=  pTechCact2cout[t,c,r,y,s]*pTechAfaUp[t,r,y,s]*pTechAfacUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+s.t.  eqTechAfacOutUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and not((ndefpTechAfaUp[t,r,y,s])) and not((ndefpTechAfacUp[t,c,r,y,s])))}: vTechOut[t,c,r,y,s] <=  pTechCact2cout[t,c,r,y,s]*pTechAfaUp[t,r,y,s]*pTechAfacUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+
+s.t.  eqTechAfacInpLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechInpComm[t,c] and pTechAfacLo[t,c,r,y,s] <> 0)}: pTechAfaLo[t,r,y,s]*pTechAfacLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechInp[t,c,r,y,s];
+
+s.t.  eqTechAfacInpUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechInpComm[t,c] and not((ndefpTechAfaUp[t,r,y,s])) and not((ndefpTechAfacUp[t,c,r,y,s])))}: vTechInp[t,c,r,y,s] <=  pTechAfaUp[t,r,y,s]*pTechAfacUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
 
 s.t.  eqTechCap{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y])}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:((mTechNew[t,r,yp] and mMidMilestone[yp] and ORD[y] >= ORD[yp] and ORD[y]<pTechOlife[t,r]+ORD[yp]))}(vTechNewCap[t,r,yp]-sum{ye in year:((mTechRetirement[t] and mMidMilestone[ye] and ORD[ye] >= ORD[yp] and ORD[ye] <= ORD[y]))}(vTechRetiredCap[t,r,yp,ye]));
 
