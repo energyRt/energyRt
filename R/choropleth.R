@@ -95,7 +95,10 @@ choropleth.scenario <- function(obj, # scenario object
   # message(paste(names(dat), collapse = " "))
   #ttl
   #}
-  spdf <- sp::merge(scen.BAU@model@sysInfo@GIS, dat)
+  if (is.null(obj@model@sysInfo@GIS)) {
+    message("No GIS information in the scenario. Check YourScenario@GIS")
+  }
+  spdf <- sp::merge(obj@model@sysInfo@GIS, dat)
   #head(spdf@data)
   if(is.null(n)) n = 9
   if(is.null(cols)) cols = "Reds"
