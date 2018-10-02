@@ -167,3 +167,35 @@ setMethod('removePreviousSysInfo',
             obj@parameters[[i]] <- clear(obj@parameters[[i]])
         obj
 })
+
+
+################################################################################
+# Remove previous storage
+################################################################################
+setMethod('removePreviousSupply',
+          signature(obj = 'modInp', name = 'character'),
+          function(obj, name) {
+            for(i in c('mStorageSlice', 'ndefpStorageOlife', 'mStorageComm', 'mStorageNew', 'mStorageSpan', 
+                       'ndefpStorageCapUp', 'ndefpStorageAvaUp', 'pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreLoss', 
+                       'pStorageStock', 'pStorageOlife', 'pStorageCapUp', 'pStorageCapLo', 'pStorageCostStore', 
+                       'pStorageCostInp', 'pStorageCostOut', 'pStorageFixom', 'pStorageInvcost', 'pStorageAvaLo', 'pStorageAvaUp')
+            ) 
+              obj@parameters[[i]] <- removeBySet(obj@parameters[[i]], 'stg', name)
+            obj
+          })
+################################################################################
+# Get commodity supply
+################################################################################
+setMethod('isStorage', signature(obj = 'modInp', name = 'character'),
+          function(obj, name) {
+            fl <- FALSE
+            for(i in c('mStorageSlice', 'ndefpStorageOlife', 'mStorageComm', 'mStorageNew', 'mStorageSpan', 
+                       'ndefpStorageCapUp', 'ndefpStorageAvaUp', 'pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreLoss', 
+                       'pStorageStock', 'pStorageOlife', 'pStorageCapUp', 'pStorageCapLo', 'pStorageCostStore', 
+                       'pStorageCostInp', 'pStorageCostOut', 'pStorageFixom', 'pStorageInvcost', 'pStorageAvaLo', 'pStorageAvaUp')
+            ) 
+              fl <- fl || any(obj@parameters[[i]]@data$stg == name, na.rm = TRUE)
+            fl
+          })
+
+

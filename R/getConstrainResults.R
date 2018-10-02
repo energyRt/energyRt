@@ -7,7 +7,7 @@ getConstrainResults <- function(scenario, constrain) {
   } else {
     prec <- scenario@modInp@parameters
     tcns <- getObjects(scenario, class = 'constrain', name = constrain)[[1]]
-    dtt <- scenario@modOut@data
+    dtt <- scenario@modOut@variables
     fcase <- function(x) if (length(x) == 0 || nchar(x) <= 1) toupper(x) else
       paste(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)), sep = '')
     smpl_sl <- c(names(tcns@for.each), names(tcns@for.sum))
@@ -34,6 +34,13 @@ getConstrainResults <- function(scenario, constrain) {
       }
       cns.set$year <- mm
     }
+    # Remove unused slice
+    if (any(names(cns.set) == 'slice') && any(names(cns.set) == 'tech')) {
+      uu = scenario@modInp@parameters$mTechSlice@data
+      uu <- uu[uu$tech %in% cns.set$tech & uu$slice %in% cns.set$slice ,, drop = FALSE]    
+      cns.set$slice <- cns.set$slice[cns.set$slice %in% unique(uu$slice)]   
+      
+    }
     # Variable
     if (tcns@type %in% c('growth.output', 'output', 'shareout')) before <- 'Out' else
     if (tcns@type %in% c('growth.input', 'input', 'sharein'))   before <- 'Inp' else
@@ -48,8 +55,10 @@ getConstrainResults <- function(scenario, constrain) {
     vrb <- paste('v', fcase(ad_smpl), before, sep = '')
     if (length(ad_smpl) == 0 && before != 'Balance') vrb <- paste(vrb, 'Tot', sep = '')
     if (length(vary.set) == 0) {
-      eval(parse(text = paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
-        sep = '', collapse = ', '), ', drop = FALSE]', sep = '')))
+      gg <- dtt[[vrb]]
+      for (jj in names(cns.set)) {
+        gg <- gg[gg[, jj] %in% cns.set[[jj]],, drop = FALSE]  
+      }
       # Adjust to different period length
       if (any(names(cns.set) == 'year')) {
           yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
@@ -84,7 +93,11 @@ getConstrainResults <- function(scenario, constrain) {
       rhs <- rhs[sort(v1, index.return = TRUE)$ix, 'value', drop = FALSE]
       if (tcns@type %in% c('sharein', 'shareout')) {
         if (tcns@type == 'sharein') gg <- dtt$vInpTot else gg <- dtt$vOutTot
-        gg <- as.data.frame.table(gg, responseName = 'value')
+        for (jj in vary.set2) {
+          gg <- gg[gg[, jj] %in% cns.set[[jj]],, drop = FALSE]  
+          gg[, jj] <- factor(gg[, jj], cns.set[[jj]])
+        } 
+        # gg <- as.data.frame.table(gg, responseName = 'value')
         # Adjust to different period length
         if (any(names(cns.set) == 'year') && all(names(vary.set) != 'year')) {
             yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
@@ -98,7 +111,7 @@ getConstrainResults <- function(scenario, constrain) {
         gg <- aggregate(gg$value, by = gg[, -ncol(gg), drop = FALSE], FUN = "sum")
         v1 <- apply(gg[, -ncol(gg), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
         v1 <- v1[v1 %in% v2]
-        gg <- gg[sort(v1, index.return = TRUE)$ix, ncol(gg), drop = FALSE]
+        gg <- gg[sort(v1, index.return = TRUE)$ix, , drop = FALSE]
         tolhs <- gg
       } else if (GROWTH_CNS) {
         rhs <- getParameterData(prec[[paste('pRhs', fcase(ad_smpl)[length(ad_smpl) != 0 && 
@@ -127,10 +140,11 @@ getConstrainResults <- function(scenario, constrain) {
         v1 <- v1[v1 %in% v2]
         rhs <- rhs[sort(v1, index.return = TRUE)$ix, 'value', drop = FALSE]
       }
-      tt <- paste('gg <- dtt[[vrb]][', paste('as.character(cns.set$', names(cns.set), ')',
-        sep = '', collapse = ', '), ', drop = FALSE]', sep = '')
-      eval(parse(text = tt))
-      gg <- as.data.frame.table(gg, responseName = 'value')
+      gg <- dtt[[vrb]]
+      for (jj in names(cns.set)) {
+        gg <- gg[gg[, jj] %in% cns.set[[jj]],, drop = FALSE]  
+        gg[, jj] <- factor(gg[, jj], cns.set[[jj]])
+      }
       # Adjust to different period length
       if (any(names(cns.set) == 'year') && all(names(vary.set) != 'year')) {
           yr <- sapply(cns.set$year, function(x) {fl <- mlst$mid == x; (mlst$end[fl] - mlst$start[fl] + 1)})
@@ -138,13 +152,21 @@ getConstrainResults <- function(scenario, constrain) {
             gg[gg$year == cns.set$year[i], 'value'] <- yr[i] * gg[gg$year == cns.set$year[i], 'value']
           }
       }
-      lhs <- aggregate(gg$value, gg[, names(cns.set)[is.vary[c(ad_smpl, std_smp)]]], sum)
-      v1 <- apply(lhs[, -ncol(lhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
-      lhs <- lhs[v1 %in% v2,, drop = FALSE]
-      v1 <- v1[v1 %in% v2]
-      lhs <- lhs[sort(v1, index.return = TRUE)$ix, 'x', drop = FALSE] 
-      if (tcns@type %in% c('sharein', 'shareout')) lhs <- lhs / tolhs
-      tbl[, 'lhs'] <- lhs
+      if (nrow(gg) == 0) {
+        lhs <- data.frame(x = rep(0, prod(sapply(gg[, names(cns.set)[is.vary[c(ad_smpl, std_smp)]], drop = FALSE], nlevels))))
+      } else {
+        lhs <- as.data.frame.table(tapply(gg$value, gg[, names(cns.set)[is.vary[c(ad_smpl, std_smp)]], drop = FALSE], sum), responseName = 'x')
+        v1 <- apply(lhs[, -ncol(lhs), drop = FALSE], 1, function(x) paste(x, collapse = '#'))
+        lhs <- lhs[v1 %in% v2,, drop = FALSE]
+        v1 <- v1[v1 %in% v2]
+        lhs <- lhs[sort(v1, index.return = TRUE)$ix, , drop = FALSE] 
+      }
+      if (tcns@type %in% c('sharein', 'shareout')) {
+        kk <- merge(lhs, tolhs, names(cns.set)[is.vary[c(ad_smpl, std_smp)]], all = TRUE)
+        kk[is.na(kk[, 'x.x']), 'x.x'] <- 0
+        lhs$x <- kk[, 'x.x'] / kk[, 'x.y']
+      }
+      tbl[, 'lhs'] <- lhs[, 'x']
       tbl[, 'rhs'] <- rhs
       if (GROWTH_CNS) {
         if (nrow(tbl) <= 1) tbl <- tbl[0,, drop = FALSE] else {

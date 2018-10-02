@@ -47,10 +47,10 @@
 [RP:MODEL_2]
 1=
 
-[RP:PROTOTYPE]
+[RP:PROTOTYPE_LARGE]
 1=
 
-[RP:PROTOTYPE_LARGE]
+[RP:PROTOTYPE]
 1=
 
 [MRUFILES]
@@ -65,9 +65,10 @@
 
 [OPENWINDOW_1]
 FILE0=C:\111\Github\energyRt\gams\prototype.gms
-FILE1=C:\111\Github\energyRt\gams\prototype.gms
-MAXIM=1
+FILE1=C:\111\Github\energyRt\gams\prototype.lst
+FILE2=C:\111\Github\energyRt\gams\prototype.gms
+MAXIM=0
 TOP=0
 LEFT=0
-HEIGHT=947
-WIDTH=1384
+HEIGHT=740
+WIDTH=1300

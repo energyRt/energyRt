@@ -9,7 +9,7 @@ setClass("sysInfo",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           year               = "numeric",
           milestone          = "data.frame",
-          slice              = "character",
+          slice              = "slice",
           interpolation      = "data.frame",
           defVal            = "data.frame",
           misc = "list"
@@ -32,7 +32,7 @@ setClass("sysInfo",
           region             = NULL,
           year               = as.numeric(2005:2050),
           milestone          = data.frame(start = numeric(), mid = numeric(), end = numeric()),
-          slice              = "ANNUAL",
+          slice              = new('slice'),
           defVal      = data.frame( # !!! distinguish interpolation for different objects and slots
                         cinp2use   = as.numeric(1),
                         ginp2use   = as.numeric(1),

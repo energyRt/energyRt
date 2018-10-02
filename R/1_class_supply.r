@@ -12,6 +12,7 @@ setClass("supply",
           availability  = "data.frame",     # Availability of the resource with prices
           region        = "characterOrNULL",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          slice         = "characterOrNULL",
           misc = "list"
       ),
       prototype(
@@ -33,6 +34,7 @@ setClass("supply",
                                      stringsAsFactors = FALSE),
         region = NULL,
         GIS           = NULL,
+        slice         = NULL,
         #! Misc
         misc = list(
         )),

@@ -9,6 +9,7 @@ setClass('parameter', # @parameter
                                      # one for single, two for multi
     interpolation   = "character",   # interpolation 'back.inter.forth'
     data            = "data.frame",  # @data Data for export
+    not_data        = "logical",  # @data NO flag for map 
     #use_now         = "numeric",     # For fast
     #use_all         = "numeric",     # For fast
     # check           = "function",     # ?delete? function for checking map
@@ -24,6 +25,7 @@ setClass('parameter', # @parameter
     defVal         = NULL,
     interpolation   = NULL,
     data            = data.frame(),
+    not_data        = FALSE,
     #use_now         = 0,     
     #use_all         = 0,
     #check           = function(obj) TRUE,
@@ -44,7 +46,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   attr(.Object, 'GUID') <- '8732f62e-0f23-4853-878b-ec8a5cbd5224'
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
-                 'year', 'yearp', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns')
+                 'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade', 'cns')
   if (!is.character(name) || length(name) != 1 || !energyRt:::.chec_correct_name(name)) 
     stop(paste('Wrong name: "', name, '"', sep = ''))
   if (length(dimSetNames) == 0 || any(!is.character(dimSetNames)) || 
@@ -79,7 +81,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   data <- data.frame(tech = character(), techp = character(), sup = character(), dem = character(), 
       acomm = character(), comm = character(), commp = character(), group = character(),  
       region = character(), regionp = character(), src = character(), dst = character(), 
-      year = numeric(), yearp = numeric(), 
+      year = numeric(), yearp = numeric(), slicep = character(), 
       slice = character(), stg = character(),
       expp = character(), imp = character(), trade = character(), cns = character(), 
       type = factor(levels = c('lo', 'up')),
@@ -210,7 +212,52 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 
 # Generate GAMS code, return character == GAMS code 
 .toGams <- function(obj) {
-    if (obj@nValues != -1) {
+  gen_gg <- function(name, dtt) {
+    ret <- c('parameter', paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
+    gg <- paste(dtt[, ncol(dtt) - 1], dtt[, ncol(dtt)])
+    if (ncol(dtt) > 2) for(i in seq(ncol(dtt) - 2, 1)) gg <- paste(dtt[, i], '.', gg, sep = '')
+    c(ret, gg, '/;')
+  }
+    as_simple <- function(dtt, name, def) {
+      add_cnd <- function(y, x) { 
+        if (x == '') return(x) else return(paste(x, 'and', y))
+      }
+      add_cond2 <- ''
+      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) {
+        add_cond2 <- '(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))'
+        if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('not(mTechOneComm(tech, comm)) and  ', add_cond2, sep = '')
+      }
+      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'slice')) 
+        add_cond2 <- add_cnd('mTechSlice(tech, slice)', add_cond2)
+      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'acomm')) 
+        add_cond2 <- add_cnd('(mTechAInp(tech, acomm) or mTechAOut(tech, acomm))', add_cond2)
+      if (any(obj@dimSetNames == 'year')) 
+        add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
+      if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
+      
+      if (nrow(dtt) == 0 || all(dtt$value == def)) {
+        return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
+      } else {
+        if (def != 0) {
+          if (def == Inf) {
+            vnn <- max(dtt$value[dtt$value != Inf]) + 1;
+          } else {
+            vnn <- max(c(def, dtt$value[dtt$value != Inf])) + 1;
+          }
+          ppl <- paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
+          zz <- c(
+            paste(ppl, '$( ', add_cond2, ' and '[add_cond2 != ''], ppl, '= ', 0, ') = ', def, ';', sep = ''),
+            paste(ppl, '$( ', add_cond2, ' and '[add_cond2 != ''], ppl, '= ', vnn, ') = ', 0, ';', sep = '')
+          )
+          dtt[dtt$value == 0, 'value'] <- vnn;
+          dtt <- dtt[dtt$value != def,, drop = FALSE];
+          return(c(gen_gg(name, dtt), zz))
+        } else {
+          return(gen_gg(name, dtt))
+        }
+      }  
+    }
+  if (obj@nValues != -1) {
         obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
       }
     if (obj@type == 'set') {                             
@@ -222,25 +269,24 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         return(c('set', paste(obj@name, ' /', sep = ''), obj@data[, 1], '/;', ''))
       }
     } else if (obj@type == 'map') {
+      add_nl <- ''
+      if (obj@not_data) {
+        add_nl <-  paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
+        add_nl <-  paste(add_nl, ' = not(', add_nl, ');', sep = '')
+      }
       if (nrow(obj@data) == 0) {
-        ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
+        if (obj@not_data) {
+          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = YES;', sep = '')
+        } else {
+          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
+        }
+        return(ret)
       } else {
         ret <- c('set', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', ''))
+        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', add_nl, ''))
       }
     } else if (obj@type == 'simple') {
-       if (nrow(obj@data) == 0 || all(obj@data$value == obj@defVal)) {
-        return(paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = ', obj@defVal, ';', sep = ''))
-      #} else  if (all(obj@data$value[1] == obj@data$value)) {
-      #  ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = ', obj@data$value[1], ';', sep = '')
-      } else {
-        if (any(obj@data$value != 0)) obj@data <- obj@data[obj@data$value != 0,, drop = FALSE] else
-          obj@data <- obj@data[1,, drop = FALSE]  
-        ret <- c('parameter', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        gg <- paste(obj@data[, ncol(obj@data) - 1], obj@data[, ncol(obj@data)])
-        if (ncol(obj@data) > 2) for(i in seq(ncol(obj@data) - 2, 1)) gg <- paste(obj@data[, i], '.', gg, sep = '')
-        return(c(ret, gg, '/;', ''))
-      }  
+      ret <- as_simple(obj@data, obj@name, obj@defVal)
     } else if (obj@type == 'multi') {     
        if (nrow(obj@data) == 0) {
         ret <- c()
@@ -249,23 +295,10 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         ret <- c(ret, paste(obj@name, 'Up(', paste(obj@dimSetNames, collapse = ', '), ') = ', 
             obj@defVal[2], ';', sep = ''))
       } else {
-        ret_lo <- c('parameter', paste(obj@name, 'Lo(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        ret_up <- c('parameter', paste(obj@name, 'Up(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        fl <- (obj@data$type == 'lo')
-        dta_lo <- obj@data[ fl, colnames(obj@data) != 'type', drop = FALSE]
-        dta_up <- obj@data[!fl, colnames(obj@data) != 'type', drop = FALSE]
-        nn <- ncol(dta_lo)
-        if (any(dta_up$value != 0)) dta_up <- dta_up[dta_up$value != 0,, drop = FALSE] else dta_up <- dta_up[1,, drop = FALSE]  
-        if (any(dta_lo$value != 0)) dta_lo <- dta_lo[dta_lo$value != 0,, drop = FALSE] else dta_lo <- dta_lo[1,, drop = FALSE]  
-        gg_lo <- paste(dta_lo[, nn - 1], dta_lo[, nn])
-        gg_up <- paste(dta_up[, nn - 1], dta_up[, nn])
-        if (nn > 2) { 
-          for(i in seq(nn - 2, 1)) {
-            gg_lo <- paste(dta_lo[, i], '.', gg_lo, sep = '')
-            gg_up <- paste(dta_up[, i], '.', gg_up, sep = '')
-          }
-        }
-        return(c(ret_lo, gg_lo, '/;', '', ret_up, gg_up, '/;', ''))
+        ret <- c(
+          as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Lo', sep = ''), obj@defVal[1]),
+          as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Up', sep = ''), obj@defVal[2])
+        )
       }
     } else stop('Must realise')
     ret

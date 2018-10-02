@@ -1,23 +1,27 @@
 #---------------------------------------------------------------------------------------------------------
-# reserve
+# storage
 #---------------------------------------------------------------------------------------------------------
-setClass("reserve",
+setClass("storage",
       representation(
           name          = "character",
           description   = "character",
           commodity     = "character",
           start         = "data.frame",
           end           = "data.frame",
+          aux           = "data.frame",      #
           olife         = "data.frame",    #
           stock         = "data.frame",    #
-          storeStock    = "data.frame",    #
           loss          = "data.frame",    #
-          capLimit      = "data.frame",    #
-      # Costs
+          afa           = "data.frame",     # Availability of the resource with prices
+          aeff         = "data.frame",    #  Commodity efficiency
+          # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
           invcost       = "data.frame",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          slice         = "characterOrNULL",
+          region        = "characterOrNULL",
+          cap2act       = "numeric",
           misc = "list"     #
       ),
       prototype(
@@ -34,15 +38,9 @@ setClass("reserve",
                                             olife = numeric(),
                                             stringsAsFactors = FALSE),
           stock         = data.frame(region = character(),
-                                            year  = numeric(),
-                                            stock = numeric(),
-                                            stringsAsFactors = FALSE),
-          capLimit      = data.frame(region = character(),
-                                            year  = numeric(),
-                                            cap.lo = numeric(),
-                                            cap.fx = numeric(),
-                                            cap.up = numeric(),
-                                            stringsAsFactors = FALSE),
+                                     year  = numeric(),
+                                     stock = numeric(),
+                                     stringsAsFactors = FALSE),
           loss         = data.frame(region     = character(),
                                      year       = numeric(),
                                      slice      = character(),
@@ -50,11 +48,33 @@ setClass("reserve",
                                      inpLoss    = numeric(),  
                                      outLoss    = numeric(),  
                                      stringsAsFactors = FALSE),
-          storeStock    = data.frame(region = character(),
-                                            year  = numeric(),
-                                            stock = numeric(),
-                                            stringsAsFactors = FALSE),
-      # Costs
+          aux           = data.frame(acomm     = character(),
+                                     unit     = character(),
+                                     stringsAsFactors = FALSE),
+          aeff          = data.frame(
+                                      acomm      = character(),
+                                      region     = character(),
+                                      year       = numeric(),
+                                      slice      = character(),
+                                      store2ainp  = numeric(),
+                                      inp2ainp  = numeric(),
+                                      out2ainp  = numeric(),
+                                      store2aout  = numeric(),
+                                      inp2aout  = numeric(),
+                                      out2aout  = numeric(),
+                                      cap2ainp  = numeric(),
+                                      cap2aout  = numeric(),
+                                      ncap2ainp  = numeric(),
+                                      ncap2aout  = numeric(),
+                                      stringsAsFactors = FALSE),
+          afa  = data.frame(region   = character(),
+                                     year     = numeric(),
+                                     slice    = character(),
+                                     afa.lo   = numeric(),
+                                     afa.up   = numeric(),
+                                     afa.fx   = numeric(),
+                                     stringsAsFactors = FALSE),
+          # Costs
           fixom         = data.frame(region   = character(),
                                      year     = numeric(),
                                      fixom    = numeric(),
@@ -70,13 +90,16 @@ setClass("reserve",
                                      year     = numeric(),
                                      invcost  = numeric(),
                                      stringsAsFactors = FALSE),
+      cap2act       = 1,
       GIS           = NULL,
+      slice         = NULL,
+      region        = NULL,
       #! Misc
       misc = list(
       )),
       S3methods = TRUE
 );
-setMethod("initialize", "reserve", function(.Object, ...) {
+setMethod("initialize", "storage", function(.Object, ...) {
   attr(.Object, 'GUID') <- 'd25eda0d-ed46-4d00-b6d5-38a88d11a313'
   .Object
 })

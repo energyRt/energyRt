@@ -48,8 +48,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['trade']]    <- createSet('trade')    
     .Object@parameters[['cns']] <- createSet('cns')    
 
-        .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map')    
-    .Object@parameters[['mSlicePreviousYear']] <- createParameter('mSlicePreviousYear', 'slice', 'map')    
+    .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slicep'), 'map')    
 
   # Commodity
     # Map
@@ -58,7 +57,17 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mUpComm']] <- createParameter('mUpComm', 'comm', 'map')    
     .Object@parameters[['mLoComm']] <- createParameter('mLoComm', 'comm', 'map')    
     .Object@parameters[['mFxComm']] <- createParameter('mFxComm', 'comm', 'map')    
+    # slice data
+    .Object@parameters[['mExpSlice']] <- createParameter('mExpSlice', c('expp', 'slice'), 'map', cls = 'export')   
+    .Object@parameters[['mImpSlice']] <- createParameter('mImpSlice', c('imp', 'slice'), 'map', cls = 'import')   
+    .Object@parameters[['mTechSlice']] <- createParameter('mTechSlice', c('tech', 'slice'), 'map', cls = 'technology')   
+    .Object@parameters[['mSupSlice']] <- createParameter('mSupSlice', c('sup', 'slice'), 'map', cls = 'supply')   
+    .Object@parameters[['mStorageSlice']] <- createParameter('mStorageSlice', c('stg', 'slice'), 'map', cls = 'storage')   
+    .Object@parameters[['mTradeSlice']] <- createParameter('mTradeSlice', c('trade', 'slice'), 'map', cls = 'trade')   
+    .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
+    .Object@parameters[['mAllSliceParentChild']] <- createParameter('mAllSliceParentChild', c('slice', 'slicep'), 'map')   
     # simple
+    .Object@parameters[['pSliceShare']] <- createParameter('pSliceShare', 'slice', 'simple')   
     .Object@parameters[['pEmissionFactor']] <- 
         createParameter('pEmissionFactor', c('comm', 'commp'), 'simple',  #PPP
         defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', colName = 'mean', slot = 'emis')    
@@ -226,20 +235,26 @@ setMethod("initialize", "modInp",
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year'), 'simple', 
                 defVal = 0, interpolation = 'back.inter.forth')    
-    for(i in c('pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreStock',
+    for(i in c('pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreLoss',
                'pStorageCostStore', 'pStorageCostInp', 'pStorageCostOut'))
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year', 'slice'), 'simple', 
                 defVal = 0, interpolation = 'back.inter.forth')    
-    .Object@parameters[['pStorageStoreLoss']] <- createParameter('pStorageStoreLoss', 
-          c('stg', 'region', 'year', 'slice'), 'simple', 
-            defVal = 0, interpolation = 'back.inter.forth')    
-    .Object@parameters[['pStorageCap']] <- createParameter('pStorageCap', 
-          c('stg', 'region', 'year'), 'multi', 
-            defVal = c(0, Inf), interpolation = 'back.inter.forth')
+    .Object@parameters[['pStorageAfa']] <- createParameter('pStorageAfa', 
+                                                           c('stg', 'region', 'year', 'slice'), 'multi', 
+                                                           defVal = c(0, 1), interpolation = 'back.inter.forth')
+    .Object@parameters[['pStorageCap2act']] <- createParameter('pStorageCap2act', 'stg', 'simple', 
+                      defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2cat', slot = 'cap2act')    
     .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
-  # Trade
+    .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
+    .Object@parameters[['mStorageAOut']] <- createParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    
+    for(i in c('pStorageStore2AInp', 'pStorageStore2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 
+               'pStorageOut2AInp', 'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
+               'pStorageNCap2AInp', 'pStorageNCap2AOut'))
+      .Object@parameters[[i]] <- createParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                                                 defVal = 0, interpolation = 'back.inter.forth')    
+    # Trade
     # Map
     .Object@parameters[['mExpComm']] <- 
         createParameter('mExpComm', c('expp', 'comm'), 'map', cls = 'trade')    
@@ -251,7 +266,6 @@ setMethod("initialize", "modInp",
         createParameter('mTradeSrc', c('trade', 'region'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeDst']] <- 
         createParameter('mTradeDst', c('trade', 'region'), 'map', cls = 'trade')    
-    .Object@parameters[['mSlicePrevious']] <- createParameter('mSlicePrevious', c('slice', 'slice'), 'map', cls = 'trade')    
     .Object@parameters[['pTradeIrCost']] <- createParameter('pTradeIrCost', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
             defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cost')    
@@ -329,24 +343,24 @@ setMethod("initialize", "modInp",
                 defVal = .1, interpolation = 'back.inter.forth', colName = 'discount', cls = 'sysInfo')    
   # Additional for compatibility with GLPK
   .Object@parameters[['ndefpTechOlife']] <- createParameter('ndefpTechOlife', c('tech', 'region'), 'map')   
-  .Object@parameters[['defpTechAfaUp']] <- createParameter('defpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
-  .Object@parameters[['defpTechAfacUp']] <- 
-      createParameter('defpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpSupAvaUp']] <- 
-      createParameter('defpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpSupReserve']] <- createParameter('defpSupReserve', c('sup'), 'map')    
-  .Object@parameters[['defpStorageCapUp']] <- createParameter('defpStorageCapUp', c('stg', 'region', 'year'), 'map')    
-  .Object@parameters[['defpTradeIrUp']] <- createParameter('defpTradeIrUp', 
+  .Object@parameters[['ndefpTechAfaUp']] <- createParameter('ndefpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
+  .Object@parameters[['ndefpTechAfacUp']] <- 
+      createParameter('ndefpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['ndefpSupAvaUp']] <- 
+      createParameter('ndefpSupAvaUp', c('sup', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['ndefpSupReserve']] <- createParameter('ndefpSupReserve', c('sup'), 'map')    
+  .Object@parameters[['ndefpStorageOlife']] <- createParameter('ndefpStorageOlife', c('stg', 'region'), 'map')   
+  .Object@parameters[['ndefpTradeIrUp']] <- createParameter('ndefpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
-    .Object@parameters[['defpExportRowRes']] <- createParameter('defpExportRowRes', 'expp', 'map')    
-    .Object@parameters[['defpImportRowRes']] <- createParameter('defpImportRowRes', 'imp', 'map')    
-    .Object@parameters[['defpExportRowUp']] <- createParameter('defpExportRowUp', 
+    .Object@parameters[['ndefpExportRowRes']] <- createParameter('ndefpExportRowRes', 'expp', 'map')    
+    .Object@parameters[['ndefpImportRowRes']] <- createParameter('ndefpImportRowRes', 'imp', 'map')    
+    .Object@parameters[['ndefpExportRowUp']] <- createParameter('ndefpExportRowUp', 
         c('expp', 'region', 'year', 'slice'), 'map')    
-    .Object@parameters[['defpImportRowUp']] <- createParameter('defpImportRowUp', 
+    .Object@parameters[['ndefpImportRowUp']] <- createParameter('ndefpImportRowUp', 
         c('imp', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpDummyImportCost']] <- createParameter('defpDummyImportCost', 
+  .Object@parameters[['ndefpDummyImportCost']] <- createParameter('ndefpDummyImportCost', 
       c('comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['defpDummyExportCost']] <- createParameter('defpDummyExportCost', 
+  .Object@parameters[['ndefpDummyExportCost']] <- createParameter('ndefpDummyExportCost', 
       c('comm', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['pDiscountFactor']] <- createParameter('pDiscountFactor', c('region', 'year'), 'simple')    
   .Object@parameters[['mDiscountZero']] <- createParameter('mDiscountZero', 'region', 'map', defVal = 1) 

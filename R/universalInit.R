@@ -164,7 +164,8 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
     sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
     mdl@sysInfo <- universalInit('sysInfo', '', exclude_class = 'repository',
 #      exclude = c(names(args)[!(names(args) %in% sysInfVec)], mlst_vec), ...)
-      exclude = names(args)[!(names(args) %in% sysInfVec)], ...)
+      exclude = c('slice', names(args)[!(names(args) %in% sysInfVec)]), ...)
+    if (any(names(args) == 'slice')) mdl@sysInfo <- setSlice(mdl@sysInfo, slice = args$slice)
 #    args <- list(...)
 #    if (any(names(args) %in% mlst_vec)) {
 #      if (sum(names(args) %in% mlst_vec) != 2) stop('Undefined all need parameters for setMileStoneYears')
@@ -182,4 +183,13 @@ setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
 setMethod('newTrade', signature(name = 'character'), function(name, ...) 
   universalInit('trade', name, ...))
   
+
+setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
+#' Create new import object
+#' 
+#' @name newStorage
+#' 
+setMethod('newStorage', signature(name = 'character'), function(name, ...) 
+  universalInit('storage', name, ...))
+
   

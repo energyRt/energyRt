@@ -1,6 +1,8 @@
 setClassUnion("characterOrNULL", members=c("character", "NULL"))
 setGeneric("isCommodity", function(obj, name) standardGeneric("isCommodity"))
 setGeneric("removePreviousCommodity", function(obj, name) standardGeneric("removePreviousCommodity"))
+setGeneric("isStorage", function(obj, name) standardGeneric("isStorage"))
+setGeneric("removePreviousStorage", function(obj, name) standardGeneric("removePreviousStorage"))
 setGeneric("removePreviousDemand", function(obj, name) standardGeneric("removePreviousDemand"))
 setGeneric("isDemand", function(obj, name) standardGeneric("isDemand"))
 setGeneric("removePreviousSupply", function(obj, name) standardGeneric("removePreviousSupply"))
@@ -44,6 +46,7 @@ getData <- function (...) UseMethod("getData")
 setGeneric("milestoneYears", function(start, interval) standardGeneric("milestoneYears"))
 setGeneric("setMilestoneYears", function(obj, start, interval) standardGeneric("setMilestoneYears"))
 setGeneric("getMilestone", function(obj) standardGeneric("getMilestone"))
+setGeneric("setSlice", function(obj, ...) standardGeneric("setSlice"))
 
 setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
 
