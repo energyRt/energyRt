@@ -142,7 +142,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       cat('\\section{Cost analysis}\n\n', '\n', sep = '', file = zz)
       # Cost data
       cst_list <- c(Subsidy = 'vSubsCost', Trade = 'vTradeCost', Supply = 'vSupCost', Techology = c('vTechOMCost', 'vTechInv'), 
-                    Tax = 'vTaxCost', Storage = 'vStorageOMCost', Dummy = 'vDummyCost', SalvageTechology = 'vTechSalv')
+                    Tax = 'vTaxCost', Storage = 'vStorageCost', Dummy = 'vDummyCost', SalvageTechology = 'vTechSalv')
       cost <- array(0, dim = c(length(cst_list), length(mid_year)), dimnames = list(names(cst_list), mid_year))
       for (i in names(cst_list)) {
         for (j in cst_list[[i]]) {
