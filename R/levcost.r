@@ -86,11 +86,6 @@ summary.levcost <- function(x) x$total
   } else if (length(obj@region) != 0) {
     region <- obj@region[1]
   } else region <- 'DEF'
-  if (any(names(arg) == 'slice')) {
-    slice <- arg$slice
-    stopifnot(is.character(slice))
-    arg <- arg[names(arg) != 'slice', drop = FALSE]
-  } else slice <- 'ANNAUL'
   if (any(names(arg) == 'start_year')) {
     start_year <- arg$start_year
     stopifnot(is.numeric(start_year) && length(start_year) == 1)
@@ -222,12 +217,17 @@ summary.levcost <- function(x) x$total
     reps <- add(reps, tmpd)
   }
   mdl <- new('model')
+  if (any(names(arg) == 'slice')) {
+    slice <- arg$slice
+    mdl@sysInfo <- setSlice(mdl@sysInfo, slice = args$slice)
+    arg <- arg[names(arg) != 'slice', drop = FALSE]
+  } else mdl@sysInfo <- setSlice(mdl@sysInfo, year = 'ANNAUL')
   mdl@name <- paste('Levelized cost technology', tech@name) 
   mdl@LECdata$region <- region
   mdl <-add(mdl, reps)
   mdl@sysInfo@region <- region
   mdl@sysInfo@year   <- year
-  mdl@sysInfo@slice  <- slice
+ #  mdl@sysInfo@slice  <- slice
   mdl@sysInfo@discount <- discount
   mdl@LECdata$region <- region
   if (is.null(comm)) {
@@ -242,97 +242,82 @@ summary.levcost <- function(x) x$total
   if (!(rr@modOut@solutionStatus == 1 && 
             rr@modOut@compilationStatus == 2 && 
             all(rr@modOut@data$vDummyImport == 0))) stop('Error in solution')
-##  # Additional table          
-##    dsc <- rr@modInp@parameters[['pDiscountFactor']]@data
-##    dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]
-##    colnames(dsc)[2] <- 'discount.factor'
-##    yy <- rep(0, nrow(dsc))
-##    for(i in c(tech@input$comm, tech@output$comm)) {
-##      if (any(i == tech@input$comm)) {
-##        gg <-  apply(rr@modOut@data$vTechInp[1, i, region,,, drop = FALSE], 4, sum)
-##        dsc[, paste('input.', i, sep = '')] <- gg
-##        fl <- TRUE
-##      } else {
-##        gg <-  apply(rr@modOut@data$vTechOut[1, i, region,,, drop = FALSE], 4, sum)
-##        dsc[, paste('output.', i, sep = '')] <- gg
-##        fl <- FALSE
-##      }            
-##      if (fl) {
-##        dsc[, paste('avarage.cost.', i, sep = '')] <-
-##          rr@modOut@data$vSupCost[paste('MIN', i, sep = ''), region,] / gg
-##      }
-##      dsc[, paste('avarage.tax.', i, sep = '')] <- rr@modOut@data$vTaxCost[i,region, ] / gg
-##      dsc[, paste('avarage.subs.', i, sep = '')] <- rr@modOut@data$vSubsCost[i,region, ] / gg
-##      if (fl) {
-##        dsc[, paste('cost.', i, sep = '')] <-
-##          rr@modOut@data$vSupCost[paste('MIN', i, sep = ''), region,]
-##      }
-##      dsc[, paste('tax.', i, sep = '')] <- rr@modOut@data$vTaxCost[i,region, ]
-##      dsc[, paste('subs.', i, sep = '')] <- rr@modOut@data$vSubsCost[i,region, ]
-##      if (fl) {
-##        dsc[, paste('total.cost.', i, sep = '')] <- dsc[, paste('cost.', i, sep = '')] 
-##          + dsc[, paste('tax.', i, sep = '')] - dsc[, paste('subs.', i, sep = '')]
-##      } else {
-##        dsc[, paste('total.cost.', i, sep = '')] <- dsc[, paste('tax.', i, sep = '')] 
-##          - dsc[, paste('subs.', i, sep = '')]
-##      }
-##      xx <- dsc[, paste('total.cost.', i, sep = '')]
-##      xx[is.na(xx)] <- 0
-##      yy <- yy + xx
-##    }
-##    for(i in 1:ncol(dsc))
-##      dsc[is.nan(dsc[, i]) | dsc[, i] == Inf, i] <- NA
-##    dsc <- dsc[, c(TRUE, TRUE, apply(dsc[,-(1:2), drop = FALSE], 2, function(x) any(!is.na(x) & x !=0)))]
-##    dsc[, 'fuelcost'] <- yy
-##    dsc[, 'invcost'] <- rr@modOut@data$vTechInv[1, region, ]
-##    dsc[, 'fixom'] <- rr@modOut@data$vTechFixom[1, region, ]
-##    dsc[, 'varom'] <- rr@modOut@data$vTechVaromY[1, region, ]
-##    dsc[, 'total.cost'] <- apply(dsc[, ncol(dsc) - (0:3)], 1, sum)
-##    dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
-  # Additional table          
     dsc <- rr@modInp@parameters[['pDiscountFactor']]@data
-    dsc <- dsc[dsc$region == region, 2:3, drop = FALSE]
+    dsc <- dsc[, 2:3, drop = FALSE]
     colnames(dsc)[2] <- 'discount.factor'
-    cst <- rep(0, nrow(dsc))
-    sbs <- rep(0, nrow(dsc))
-    tx <- rep(0, nrow(dsc))
-    for(i in c(tech@input$comm, tech@output$comm, tech@aux$acomm)) {
-      if (any(i == tech@input$comm)) {
-        gg <-  apply(rr@modOut@data$vTechInp[1, i, region,,, drop = FALSE], 4, sum)
-        dsc[, paste('input.', i, sep = '')] <- gg
-        fl <- TRUE
-      } else if (any(i == tech@output$comm)) {
-        gg <-  apply(rr@modOut@data$vTechOut[1, i, region,,, drop = FALSE], 4, sum)
-        dsc[, paste('output.', i, sep = '')] <- gg
-        fl <- FALSE
-      } else {
-        gg <-  apply(rr@modOut@data$vTechAOut[1, i, region,,, drop = FALSE], 4, sum)
-        dsc[, paste('aux.output.', i, sep = '')] <- gg
-        gg <-  apply(rr@modOut@data$vTechAInp[1, i, region,,, drop = FALSE], 4, sum)
-        dsc[, paste('aux.input.', i, sep = '')] <- gg
-        fl <- FALSE
-      }            
-      if (fl) {
-        cst <- cst + rr@modOut@data$vSupCost[paste('MIN', i, sep = ''), region,]
-      }
-      tx <- tx + rr@modOut@data$vTaxCost[i, region, ]
-      sbs <- sbs + rr@modOut@data$vSubsCost[i, region, ]
+    rownames(dsc) <- dsc$year
+    ff <- c(
+      'vTechInp' = 'input',
+      'vTechOut' = 'output',
+      'vTechAInp' = 'ainput',
+      'vTechAOut' = 'aoutput',
+      'vTaxCost' = 'tax',
+      'vSubsCost' = 'subs'
+      )
+    for (i in names(ff)) {
+      ndd <- rr@modOut@variables[[i]]
+      if (nrow(ndd) > 0) {
+        ndd <- tapply(ndd$value, ndd[, c('comm', 'year')], sum)
+        ndd[is.na(ndd)] <- 0
+        for (j in rownames(ndd)) {
+          ii <- paste0(ff[i], '.', j)
+          dsc[, ii] <- 0
+          dsc[colnames(ndd), ii] <- ndd[j, ]
+        }
+      }    
     }
-    dsc[, 'fuel.cost'] <- cst
-    dsc[, 'fuel.tax'] <- tx 
-    dsc[, 'fuel.subs'] <- sbs
-    dsc[, 'fuel.total'] <- cst + tx - sbs
-    dsc[, 'invcost'] <- rr@modOut@data$vTechInv[1, region, ]
-    g2 <- rr@modInp@parameters[['pTechFixom']]@data
-    dsc[, 'fixom'] <- (tapply(g2$value, g2[, 1:3], sum) * rr@modOut@data$vTechCap)[1, region,]
-    g1 <- rr@modInp@parameters[['pTechVarom']]@data
-    g3 <- rr@modInp@parameters[['pTechCvarom']]@data
-    g4 <- tapply(g3$value, g3[, 1:5], sum)
-    dsc[, 'varom'] <- apply(tapply(g1$value, g1[, 1:4], sum) * 
-      rr@modOut@data$vTechAct, 1:3, sum)[1, region, ] +
-      apply(g4 *(rr@modOut@data$vTechInp[, dimnames(g4)$comm,,,, drop = FALSE] +
-      rr@modOut@data$vTechOut[, dimnames(g4)$comm,,,, drop = FALSE]), c(1, 3:4), sum)[1, region, ]
-    dsc[, 'total.cost'] <- apply(dsc[, c('fuel.total', 'invcost', 'fixom', 'varom')], 1, sum)
+    ndd <- rr@modOut@variables$vSupCost
+    if (nrow(ndd) > 0) {
+      spp <- rr@modInp@parameters$mSupComm@data$comm
+      names(spp) <- rr@modInp@parameters$mSupComm@data$sup
+      ndd$comm <- spp[ndd$sup]
+      ndd <- tapply(ndd$value, ndd[, c('comm', 'year')], sum)
+      ndd[is.na(ndd)] <- 0
+      for (i in rownames(ndd)) {
+        ii <- paste0('cost.', i)
+        dsc[, ii] <- 0
+        dsc[colnames(ndd), ii] <- ndd[i, ]
+      }
+    }
+    if (any(grep('^cost[.]', colnames(dsc)))) {
+      dsc[, 'fuel.cost'] <- dsc[, grep('^cost[.]', colnames(dsc))]
+    } else dsc$fuel.cost <- 0
+    if (any(grep('^tax[.]', colnames(dsc)))) {
+      dsc[, 'fuel.tax'] <- dsc[, grep('^tax[.]', colnames(dsc))]
+    } else dsc$fuel.tax <- 0
+    if (any(grep('^subs[.]', colnames(dsc)))) {
+      dsc[, 'fuel.subs'] <- dsc[, grep('^subs[.]', colnames(dsc))]
+    } else dsc$fuel.subs <- 0
+    dsc[, 'fuel.total'] <- rowSums(dsc[, c('fuel.subs', 'fuel.tax', 'fuel.cost'), drop = FALSE])
+    gfix <- merge(
+      rr@modInp@parameters[['pTechFixom']]@data,
+      rr@modOut@variables$vTechCap, by = c('tech', 'region', 'year'))
+    dsc[as.character(gfix$year), 'fixom'] <- gfix$value.x *  gfix$value.y
+    dsc[, 'varom'] <- 0
+    gvar <- merge(
+      rr@modInp@parameters[['pTechVarom']]@data,
+      rr@modOut@variables$vTechAct, by = c('tech', 'region', 'year', 'slice'))
+    if (nrow(gvar) > 0) {
+      gvar <- tapply(gvar$value.x * gvar$value.y, gvar$year, sum)
+      dsc[names(gvar), 'varom'] <- gvar
+    }
+    gvar <- merge(
+      rr@modInp@parameters$pTechCvarom@data,
+      rbind(
+        rr@modOut@variables$vTechInp, rr@modOut@variables$vTechAInp,
+        rr@modOut@variables$vTechOut, rr@modOut@variables$vTechAOut), 
+      by = c('tech', 'region', 'year', 'slice'))
+    if (nrow(gvar) > 0) {
+      gvar <- tapply(gvar$value.x * gvar$value.y, gvar$year, sum)
+      dsc[names(gvar), 'varom'] <- dsc[names(gvar), 'varom'] + gvar
+    }  
+    dsc$invcost <- 0
+    ndd <- rr@modOut@variables$vTechInv
+    if (nrow(ndd) > 0) {
+      ginv <- tapply(ndd$value, ndd$year, sum)
+      dsc[names(ginv), 'invcost'] <- ginv
+    }
+    dsc$total.cost <- apply(dsc[, c('fuel.total', 'invcost', 'fixom', 'varom')], 1, sum)
     dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
   dd <- sum(dsc[, 'discount.factor'])
   structure(list(total = rr@modOut@data$vObjective / dd, 
