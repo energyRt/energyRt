@@ -13,7 +13,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
                        '.pdf', sep = '')
   }
   assign('setPNGLAST', FALSE, globalenv());
-  png2 <- function(...) {assign('setPNGLAST', TRUE, globalenv()); png(...);}
+  png2 <- function(..., width = 640, height = 480) {assign('setPNGLAST', TRUE, globalenv()); png(..., width = width, height = height);}
   dev.off2 <- function() {assign('setPNGLAST', FALSE, globalenv()); dev.off();}
   WDD <- getwd()
   if (is.null(texdir)) {
@@ -106,7 +106,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
             if (any(SP != 0)) {
               cat('\\begin{figure}[H]\n', sep = '', file = zz)
               cat('  \\centering\n', sep = '', file = zz)
-              cat('  \\includegraphics[width = 5in]{', cmd@name, 
+              cat('  \\includegraphics[width = 6in]{', cmd@name, 
                   '_supply.png}\n', sep = '', file = zz)
               cat('  \\caption{Supply commodity ', gsub('_', '\\\\_', cmd@name), 
                   ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -115,7 +115,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
             if (any(DM != 0)) {
               cat('\\begin{figure}[H]\n', sep = '', file = zz)
               cat('  \\centering\n', sep = '', file = zz)
-              cat('  \\includegraphics[width = 5in]{', cmd@name, 
+              cat('  \\includegraphics[width = 6in]{', cmd@name, 
                   '_demand.png}\n', sep = '', file = zz)
               cat('  \\caption{Demand commodity ', gsub('_', '\\\\_', cmd@name), 
                   ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -124,7 +124,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
             if (any(EXP != 0)) {
               cat('\\begin{figure}[H]\n', sep = '', file = zz)
               cat('  \\centering\n', sep = '', file = zz)
-              cat('  \\includegraphics[width = 5in]{', cmd@name, 
+              cat('  \\includegraphics[width = 6in]{', cmd@name, 
                   '_export.png}\n', sep = '', file = zz)
               cat('  \\caption{Export commodity ', gsub('_', '\\\\_', cmd@name), 
                   ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -133,7 +133,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
             if (any(IMP != 0)) {
               cat('\\begin{figure}[H]\n', sep = '', file = zz)
               cat('  \\centering\n', sep = '', file = zz)
-              cat('  \\includegraphics[width = 5in]{', cmd@name, 
+              cat('  \\includegraphics[width = 6in]{', cmd@name, 
                   '_import.png}\n', sep = '', file = zz)
               cat('  \\caption{Import commodity ', gsub('_', '\\\\_', cmd@name), 
                   ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -170,7 +170,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           if (any(SP != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
-            cat('  \\includegraphics[width = 5in]{supply_', 
+            cat('  \\includegraphics[width = 6in]{supply_', 
                 sup@name, '.png}\n', sep = '', file = zz)
             cat('  \\caption{Supply commodity ', gsub('_', '\\\\_', sup@commodity), 
                 ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -195,7 +195,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           if (any(SP != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
-            cat('  \\includegraphics[width = 5in]{export_', 
+            cat('  \\includegraphics[width = 6in]{export_', 
                 expp@name, '.png}\n', sep = '', file = zz)
             cat('  \\caption{Export commodity ', gsub('_', '\\\\_', expp@commodity), 
                 ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -220,7 +220,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           if (any(SP != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
-            cat('  \\includegraphics[width = 5in]{import_', 
+            cat('  \\includegraphics[width = 6in]{import_', 
                 imp@name, '.png}\n', sep = '', file = zz)
             cat('  \\caption{Import commodity ', gsub('_', '\\\\_', imp@commodity), 
                 ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -245,7 +245,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
 #          if (any(SP != 0)) {
 #            cat('\\begin{figure}[H]\n', sep = '', file = zz)
 #            cat('  \\centering\n', sep = '', file = zz)
-#            cat('  \\includegraphics[width = 5in]{trade_', 
+#            cat('  \\includegraphics[width = 6in]{trade_', 
 #                trdd@name, '.png}\n', sep = '', file = zz)
 #            cat('  \\caption{Trade commodity ', gsub('_', '\\\\_', trdd@commodity), 
 #                ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -270,7 +270,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           if (any(DM != 0)) {
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
-            cat('  \\includegraphics[width = 5in]{demand_', 
+            cat('  \\includegraphics[width = 6in]{demand_', 
                 dem@name, '.png}\n', sep = '', file = zz)
             cat('  \\caption{Demand commodity ', gsub('_', '\\\\_', dem@commodity), 
                 ', summary for all region and slice.}\n', sep = '', file = zz)
@@ -295,7 +295,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
           energyRt:::.cat_bottomup(tec, file = zz, includename = FALSE)#, print.all = TRUE)
           cat('\\begin{figure}[H]\n', sep = '', file = zz)
           cat('  \\centering\n', sep = '', file = zz)
-          cat('  \\includegraphics[width = 8in]{technology_', 
+          cat('  \\includegraphics[width = 6in]{technology_', 
               tec@name, '.png}\n', sep = '', file = zz)
           cat('  \\caption{Technology scheme ',gsub('_', '\\\\_', tec@name), 
               ' in year ', obj@sysInfo@year[1], ', slice ANNUAL', 

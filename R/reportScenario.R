@@ -11,7 +11,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
                        '.pdf', sep = '')
   }
   assign('setPNGLAST', FALSE, globalenv());
-  png2 <- function(...) {assign('setPNGLAST', TRUE, globalenv()); png(...);}
+  png2 <- function(..., width = 640, height = 480) {assign('setPNGLAST', TRUE, globalenv()); png(..., width = width, height = height);}
   dev.off2 <- function() {assign('setPNGLAST', FALSE, globalenv()); dev.off();}
   WDD <- getwd()
   if (is.null(texdir)) {
@@ -691,7 +691,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             cost = sup_cst, row.names = dimnames(SP)[[1]], boun.on = bnd.on)
             cat('\\begin{figure}[H]\n', sep = '', file = zz)
             cat('  \\centering\n', sep = '', file = zz)
-            cat('  \\includegraphics[width = 5in]{supply_wrk_', 
+            cat('  \\includegraphics[width = 6in]{supply_wrk_', 
                 sup@name, '.png}\n', sep = '', file = zz)
             cat('  \\caption{Supply ', gsub('_', '\\\\_', cc), ', for commodity ', 
                 gsub('_', '\\\\_', sup@commodity), 
@@ -755,14 +755,14 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
               dev.off2()
               cat('\\begin{figure}[H]\n', sep = '', file = zz)
               cat('  \\centering\n', sep = '', file = zz)
-              cat('  \\includegraphics[width = 5in]{trade_src_', 
+              cat('  \\includegraphics[width = 6in]{trade_src_', 
                   nm, '.png}\n', sep = '', file = zz)
               cat('  \\caption{Trade by sources region ', gsub('_', '\\\\_', nm), 
                   ', summary for all slice.}\n', sep = '', file = zz)
               cat('\\end{figure}\n', sep = '', file = zz)
               cat('\\begin{figure}[H]\n', sep = '', file = zz)
               cat('  \\centering\n', sep = '', file = zz)
-              cat('  \\includegraphics[width = 5in]{trade_dst_', 
+              cat('  \\includegraphics[width = 6in]{trade_dst_', 
                   nm, '.png}\n', sep = '', file = zz)
               cat('  \\caption{Trade by destination region ', gsub('_', '\\\\_', nm), 
                   ', summary for all slice.}\n', sep = '', file = zz)
