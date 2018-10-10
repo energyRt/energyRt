@@ -1,5 +1,5 @@
 # Function to create choropleth maps
-choropleth.scenario <- function(obj, # scenario object
+choropleth.scenario <- function(scen, # scenario object
                                 #name = NULL, # search over names of all objects
                                 # variable = NULL, # character vector with variable names
                                 # year = NULL, # numerical vector with slices
@@ -29,9 +29,8 @@ choropleth.scenario <- function(obj, # scenario object
                                 main = NULL, 
                                 regex = FALSE
 ) {
-  #dat <- getData(obj, variable = "vDemInp", comm_ = "ELC", merge = TRUE, table = TRUE,  drop = FALSE, yearsAsFactors = TRUE, stringsAsFactors = TRUE)
-  
-  dat <- getData(obj, ..., merge = TRUE, table = TRUE,  drop = FALSE, 
+
+  dat <- getData(scen, ..., merge = TRUE, drop = FALSE, 
                  yearsAsFactors = TRUE, stringsAsFactors = TRUE)
   #  }
   if (is.null(dat) | nrow(dat) == 0) {
@@ -95,10 +94,10 @@ choropleth.scenario <- function(obj, # scenario object
   # message(paste(names(dat), collapse = " "))
   #ttl
   #}
-  if (is.null(obj@model@sysInfo@GIS)) {
+  if (is.null(scen@model@sysInfo@GIS)) {
     message("No GIS information in the scenario. Check YourScenario@GIS")
   }
-  spdf <- sp::merge(obj@model@sysInfo@GIS, dat)
+  spdf <- sp::merge(scen@model@sysInfo@GIS, dat)
   #head(spdf@data)
   if(is.null(n)) n = 9
   if(is.null(cols)) cols = "Reds"
@@ -121,7 +120,7 @@ choropleth.scenario <- function(obj, # scenario object
   #GISTools::choro.legend()
   
   # nyear <- 10
-  # nreg <- length(adm1$OBJECTID)
+  # nreg <- length(adm1$scenECTID)
   # animation::saveLatex(
   #   for(i in 1:nyear) {
   #     #choropleth(adm1, cl[,i], main = year + i, cex.main = 3)
@@ -140,7 +139,7 @@ arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
                          add = FALSE,
                          ...) {
   dat <- getData(scen, ..., # parameter = "pTradeIr", 
-                 table = TRUE, drop = FALSE, merge = TRUE)
+                 drop = FALSE, merge = TRUE)
   nm <- names(dat)
   if (!("src" %in% nm) | !("dst" %in% nm)) {
     message("No data for source and/or destination region, 'src' and/or 'dst' columns are missing.")
@@ -245,7 +244,7 @@ getSPDF <- function(scen, ...) {
     stop("The scenario has no spatial information. Check 'scen@model@sysInfo@GIS'")
   }
   
-  dat <- getData(scen, ..., table = TRUE, merge = TRUE, drop = FALSE)
+  dat <- getData(scen, ..., merge = TRUE, drop = FALSE)
   dat <- agg_region(dat)
   SPDF <- sp::merge(SPDF, dat)
   return(SPDF)
