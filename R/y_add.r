@@ -72,7 +72,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
       data.frame(dem = dem@name, comm = dem@commodity)) 
   obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
       simpleInterpolation(dem@dem, 'dem',
-      obj@parameters[['pDemand']], approxim, 'dem', dem@name))
+      obj@parameters[['pDemand']], approxim, c('dem', 'comm'), c(dem@name, dem@commodity)))
   obj
 })
 
@@ -118,12 +118,12 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
         data.frame(sup = sup@name, comm = sup@commodity))
     obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
         simpleInterpolation(sup@availability, 'cost',
-            obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
+            obj@parameters[['pSupCost']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
     obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
-        data.frame(sup = sup@name, value = sup@reserve))
+        data.frame(sup = sup@name, comm = sup@commodity, value = sup@reserve))
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
               multiInterpolation(sup@availability, 'ava',
-              obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
+              obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
   obj
 })
 
@@ -839,18 +839,18 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     obj@parameters[['mStorageComm']] <- addData(obj@parameters[['mStorageComm']],
                                             data.frame(stg = stg@name, comm = stg@commodity))
     obj@parameters[['pStorageOlife']] <- addData(obj@parameters[['pStorageOlife']],
-                                                   simpleInterpolation(stg@olife, 'olife',
-                                                                       obj@parameters[['pStorageOlife']], approxim, 'stg', stg@name))
+                                                   simpleInterpolation(stg@olife, 'olife', obj@parameters[['pStorageOlife']], 
+                                                                       approxim, 'stg', stg@name))
     # Loss
     obj@parameters[['pStorageInpLoss']] <- addData(obj@parameters[['pStorageInpLoss']],
-                                                   simpleInterpolation(stg@loss, 'inpLoss',
-                                                                       obj@parameters[['pStorageInpLoss']], approxim, 'stg', stg@name))
+                                                   simpleInterpolation(stg@loss, 'inpLoss', obj@parameters[['pStorageInpLoss']], 
+                                                                       approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
     obj@parameters[['pStorageOutLoss']] <- addData(obj@parameters[['pStorageOutLoss']],
-                                                   simpleInterpolation(stg@loss, 'outLoss',
-                                                                       obj@parameters[['pStorageOutLoss']], approxim, 'stg', stg@name))
-    obj@parameters[['pStorageStoreLoss']] <- addData(obj@parameters[['pStorageStoreLoss']],
-                                                   simpleInterpolation(stg@loss, 'storeLoss',
-                                                                       obj@parameters[['pStorageStoreLoss']], approxim, 'stg', stg@name))
+                                                   simpleInterpolation(stg@loss, 'outLoss', obj@parameters[['pStorageOutLoss']], 
+                                                                       approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+    obj@parameters[['pStorageStoreLoss']] <- addData(obj@parameters[['pStorageStoreLoss']], 
+                                                     simpleInterpolation(stg@loss, 'storeLoss',  obj@parameters[['pStorageStoreLoss']], 
+                                                                         approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
     # Cost
     obj@parameters[['pStorageCostInp']] <- addData(obj@parameters[['pStorageCostInp']],
                                                    simpleInterpolation(stg@varom, 'inpCost',

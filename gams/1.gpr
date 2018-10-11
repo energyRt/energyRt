@@ -53,19 +53,27 @@
 [RP:PROTOTYPE]
 1=
 
+[RP:0_EXECUTEBATCH]
+1=
+
+[RP:6_SCENARIOS_FIX_2010]
+1=
+
 [MRUFILES]
-1=C:\111\Github\energyRt\gams\prototype_large.gms
-2=C:\111\Dropbox\package\BottomUp\gams\for_out.gms
-3=C:\111\Dropbox\package\BottomUp\gams\mdl.lst
-4=C:\111\Dropbox\package\BottomUp\gams\model.gms
-5=C:\111\Dropbox\package\BottomUp\gams\model.lst
-6=C:\111\Dropbox\package\BottomUp\gams\Untitled_1.gms
-7=C:\111\Dropbox\package\BottomUp\gams\lec_model.gms
-8=C:\111\Dropbox\package\BottomUp\gams\estimate.lst
+1=C:\111\Github\energyRt\gams\prototype.gms
+2=C:\111\Github\energyRt\gams\prototype_large.gms
+3=C:\111\Dropbox\package\BottomUp\gams\for_out.gms
+4=C:\111\Dropbox\package\BottomUp\gams\mdl.lst
+5=C:\111\Dropbox\package\BottomUp\gams\model.gms
+6=C:\111\Dropbox\package\BottomUp\gams\model.lst
+7=C:\111\Dropbox\package\BottomUp\gams\Untitled_1.gms
+8=C:\111\Dropbox\package\BottomUp\gams\lec_model.gms
+9=C:\111\Dropbox\package\BottomUp\gams\estimate.lst
 
 [OPENWINDOW_1]
-FILE0=C:\111\Github\energyRt\gams\prototype.gms
-FILE1=C:\111\Github\energyRt\gams\prototype.gms
+FILE0=C:\111\Github\FABLE_RU\Model\0_executebatch.gms
+FILE1=C:\111\Github\FABLE_RU\Model\6_scenarios_fix_2010.gms
+FILE2=C:\111\Github\FABLE_RU\Model\0_executebatch.gms
 MAXIM=0
 TOP=0
 LEFT=0
