@@ -48,11 +48,19 @@ pivot <- function(scen = NULL,
   
   if (get_data == F) {
     rpivotTable::rpivotTable(dft,
-                             aggregatorName = "Sum",
-                             rendererName = "Stacked Bar Chart",
-                             cols = "year",
-                             rows = c("tech", "comm", "sup", "dem"),
-                             vals = "value")
+                             aggregatorName = aggregatorName,
+                             rendererName = rendererName,
+                             cols = cols,
+                             rows = rows,
+                             vals = vals,
+                             sorter = sorter, 
+                             exclusions = exclusions,
+                             inclusions = inclusions, 
+                             locale = locale, 
+                             subtotals = subtotals, 
+                             width = width, 
+                             height = height, 
+                             elementId = elementId)
     
   } else {
     return(dft)
