@@ -12,8 +12,10 @@
 #' @export
 #'
 #' @examples
-findData <- function(scen, dataType = c("parameters", "variables"), dropEmpty = TRUE, 
-                     valueColumn = TRUE, dfDim = TRUE, dfNames = TRUE, asMatrix = FALSE) {
+findData <- function(scen, dataType = c("parameters", "variables"), 
+                     setsNames_ = NULL, valueColumn = TRUE,
+                     allSets = TRUE, # anyOfTheSets = !allSets,
+                     dropEmpty = TRUE, dfDim = TRUE, dfNames = TRUE, asMatrix = FALSE) {
   
   ll <- list()
   lt <- list()
@@ -55,6 +57,18 @@ findData <- function(scen, dataType = c("parameters", "variables"), dropEmpty = 
     ll <- ll[ii]
   }
   
+  # browser()
+  if(length(setsNames_) > 0) {
+    ii <- sapply(ll, function(x) {
+      if (allSets) {
+        all(sapply(setsNames_, function(y) any(grepl(y, x$names))))
+      } else {
+        any(sapply(setsNames_, function(y) any(grepl(y, x$names))))
+      }
+    })
+    ll <- ll[ii]
+  }
+
   if(length(dataType) > 0) warning("Data type '", dataType, "' is not found.")
   
   if (dropEmpty) {
@@ -89,7 +103,7 @@ getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
   arg <- list(...)
   argnam <- names(arg)
   stopifnot(!any(duplicated(argnam)))
-  
+  # browser()
   # Select scenarios, check and add names if not provided
   if(!is.list(scen)) {
     scen <- list(scen)
@@ -142,7 +156,7 @@ getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
     if(is.null(scen[[sc]]@modInp@parameters$pDemand@data$comm)) {scen[[sc]] <- .addComm2pDemand(scen[[sc]])}
     for (datype in names(parvar)[parvar]) { # loop over data sources
       if (verbose) cat("Extracting data from", datype, "\n")
-      lt <- findData(scen[[sc]], dataType = datype)
+      lt <- findData(scen[[sc]], dataType = datype, setsNames_ = paste0("^", nflt1, "$"))
       pvNames <- names(lt)
       # filter for variable/parameter names
       if (!is.null(name)) {

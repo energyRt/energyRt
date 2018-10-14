@@ -139,7 +139,7 @@ arrows_trade <- function(scen, lwd.min = 1, lwd.max = 10, lwd.Inf = lwd.max,
                          add = FALSE,
                          ...) {
   dat <- getData(scen, ..., # parameter = "pTradeIr", 
-                 drop = FALSE, merge = TRUE)
+                 drop = FALSE, merge = TRUE, asTibble = FALSE)
   nm <- names(dat)
   if (!("src" %in% nm) | !("dst" %in% nm)) {
     message("No data for source and/or destination region, 'src' and/or 'dst' columns are missing.")
