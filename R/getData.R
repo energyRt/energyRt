@@ -179,7 +179,7 @@ getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
         clNames <- clNames[ii]
         # browser()
         if (length(clNames) == 0) {
-          warning("Inconsistent combinatino of filters.")
+          warning("Inconsistent combination of filters.")
           return(NULL)
         }
         # find pars/vars which have any of the col-names for filtration
