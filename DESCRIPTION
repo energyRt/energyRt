@@ -1,7 +1,7 @@
 Package: energyRt
 Type: Package
 Title: Energy technology modeling R-toolbox, alpha-version, for testing only
-Version: 0.00.00.9030
+Version: 0.00.00.9031
 Date: 2018-10-14
 Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com", 
                     role = c("aut", "cre"), comment = ""), 
@@ -11,7 +11,7 @@ URL: https://github.com/olugovoy/energyRt
 BugReports: https://github.com/olugovoy/energyRt/issues
 Description: Energy Technology Modeling Toolbox
 Depends: sp, parallel, ggplot2
-Imports: rpivotTable
+Imports: rpivotTable, data.table
 Suggests: WriteXLS, GISTools
 License: AGLP-3
 RoxygenNote: 6.1.0
