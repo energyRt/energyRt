@@ -2,7 +2,6 @@
 % Please edit documentation in R/universalInit.R
 \name{newModel}
 \alias{newModel}
-\alias{newModel}
 \title{Create new model object}
 \usage{
 newRepository(name, ...)

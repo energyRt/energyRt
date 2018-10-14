@@ -2,56 +2,36 @@
 % Please edit documentation in R/getData.R
 \name{getData}
 \alias{getData}
-\title{Extraxts data from scenario object}
+\title{Extracts information from _scenario_, based on filters.}
 \usage{
-getData(..., parameter = NULL, variable = NULL, get.parameter = NULL,
-  get.variable = NULL, merge = FALSE, zero.rm = TRUE, drop = TRUE,
-  table = TRUE, use.dplyr = FALSE, stringsAsFactors = TRUE,
-  yearsAsFactors = FALSE, name = NULL, ignore.case = FALSE,
-  fixed = FALSE, useBytes = FALSE, invert = FALSE)
+getData(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
+  merge = FALSE, na.rm = FALSE, drop = FALSE,
+  stringsAsFactors = FALSE, yearsAsFactors = FALSE, verbose = FALSE,
+  asTibble = TRUE, scenNameInList = as.logical(length(scen) - 1))
 }
 \arguments{
-\item{parameter}{character vector with names of the model parameters}
+\item{scen}{}
 
-\item{variable}{character vector with names of the model variables}
+\item{...}{}
 
-\item{get.parameter}{logical, if TRUE then search in interpolated parameters, and return if available}
+\item{name}{}
 
-\item{get.variable}{logical, if TRUE then search in variables, and return if available}
+\item{parameters}{}
 
-\item{zero.rm}{drop rows with zero values}
+\item{variables}{}
 
-\item{drop}{logical, if TRUE (default) the minimal number of columns (dimensions) will be returned}
+\item{merge}{}
 
-\item{tech}{character vector with names of tachnology objects}
+\item{na.rm}{}
 
-\item{dem}{character vector with names of demand objects}
+\item{drop}{}
 
-\item{sup}{character vector with names of sypply objects}
+\item{stringsAsFactors}{}
 
-\item{comm}{character vector with names of commodity objects}
+\item{verbose}{}
 
-\item{group}{character vector group names in technology objects}
-
-\item{region}{character vector with names of regions}
-
-\item{year}{character or integer vector with years}
-
-\item{slice}{character vector with names of slices}
-
-\item{stg}{character vector with names of storage}
-
-\item{expp}{character vector with names of export processes}
-
-\item{imp}{character vector with names of import processes}
-
-\item{trade}{character vector with names of trade objects}
-
-\item{regex}{logical, if FALSE or NULL (default), all of the parameters will be considered as character vectors, if TRUE all parameter inputs will be considered as regular expression strings (vectors are not allowed).}
+\item{asTibble}{}
 }
 \description{
-obj objects of class scenario, model, or list with object of the two classes
-}
-\details{
-\code{...} filters for searching data in the objects, which include:
+Extracts information from _scenario_, based on filters.
 }
