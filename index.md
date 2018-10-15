@@ -2,14 +2,14 @@
 
 **energyRt** is a package for [R](https://www.r-project.org/) to develop Reference Energy System (RES) models and analyze energy-technologies.
 
-**energyRt** package includes a typical RES (or "Bottom-Up") linear, cost-minimizing model, which can be solved by [GAMS](http://www.gams.com/) or [GLPK](https://www.gnu.org/software/glpk/). The model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies. 
+**energyRt** package provides tools to build RES ("Bottom-Up"), technological, linear cost-minimizing models, which can be solved using [GAMS](http://www.gams.com/) and [GLPK](https://www.gnu.org/software/glpk/). The RES model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies. 
 
 **energyRt** package is a set of _classes_, _methods_, and _functions_ in [R](https://www.r-project.org/) which are designed to:  
 - handle data, assist in defining RES models,  
 - helps to analyze data, check for errors and bugs before parsing it into solver,  
-- parses your dataset to GAMS or GLPK and run them to solve the model,  
-- reads solution and imports results back to R,  
-- assists in analysis of results and reporting. 
+- parses your dataset to GAMS or GLPK and runs them to solve the model,  
+- reads the solution and imports results back to R,  
+- assists with an analysis of results and reporting. 
 
 ### Motivation
 
@@ -22,7 +22,7 @@
 
 ### Development status
 
-The project is in an active development phase. Current functionality allows to develop basic RES models. Some features (incl. regions, storage technologies) and documentation are in development. Testing for bugs.
+The project is in an preparation of the first official release, which includes the documentation and a set of examples (**expected - Nov 2018**). Current functionality allows development of multi-regional RES models with trade, time-slices, and variety of technologies, an integration with GIS (via _sp_ and _choropleth_ packages), pivot tables (via _rPivotTable_), authomatic pdf-reports for models and scenarios, analysis of levelized costs of tehcnologies, and other features.
 
 ### Authors and Contributors
 The package is designed by Oleg Lugovoy (@olugovoy) and Vladimir Potashnikov (@vpotashnikov).
