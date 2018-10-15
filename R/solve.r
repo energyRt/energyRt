@@ -735,7 +735,7 @@ LL1 <- proc.time()[3]
       return(readLines(paste(tmpdir, '/mdl.lst', sep = '')))
     }
     pp3 <- proc.time()[3]
-    if(echo) cat('Solver time: ', round(pp3 - pp2, 2), 's\n', sep = '')
+    if(echo) cat('GAMS time: ', round(pp3 - pp2, 2), 's\n', sep = '')
   } else if (solver == 'GLPK' || solver == 'CBC') {   
 ### FUNC GLPK 
       zz <- file(paste(tmpdir, '/glpk.mod', sep = ''), 'w')
@@ -820,7 +820,7 @@ LL1 <- proc.time()[3]
       stop(x)
     })    
       pp3 <- proc.time()[3]
-      if(echo) cat('Solver time: ', round(pp3 - pp2, 2), 's\n', sep = '')
+      if(echo) cat('GLPK/MathProg time: ', round(pp3 - pp2, 2), 's\n', sep = '')
       if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(tmpdir, '/log.csv', sep = ''))))) {
         z3 <- file(paste(tmpdir, '/pStat.csv', sep = ''), 'w')
         cat('value\n1.00\n', file = z3)
