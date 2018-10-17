@@ -9,7 +9,7 @@ setClass("trade",
       # Performance parameters
           trade         = "data.frame",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-          slice = "characterOrNULL",
+          # slice = "characterOrNULL", # imported from commodity
           misc = "list"
       ),
       # Default values and structure of slots
@@ -32,7 +32,7 @@ setClass("trade",
                                      markup     = numeric(),
                                      stringsAsFactors = FALSE),
         GIS           = NULL,
-        slice = NULL,
+        # slice = NULL,
         #! Misc
         misc = list(
         )),
