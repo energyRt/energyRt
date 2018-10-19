@@ -201,11 +201,11 @@
     description <- arg$description
     arg <- arg[names(arg) != 'description', drop = FALSE]    
   }
-  if (any(names(arg) == 'useStandardDataFrame')) {
-    useStandardDataFrame <- arg$useStandardDataFrame
-    arg <- arg[names(arg) != 'useStandardDataFrame', drop = FALSE]    
-  } else useStandardDataFrame <- TRUE
-  if (useStandardDataFrame) {
+  if (any(names(arg) == 'useDataTable')) {
+    useDataTable <- arg$useDataTable
+    arg <- arg[names(arg) != 'useDataTable', drop = FALSE]    
+  } else useDataTable <- TRUE
+  if (useDataTable) {
     readOutputFunction <- read.csv
   } else readOutputFunction <- data.table::fread
   if (any(names(arg) == 'model.type')) {
