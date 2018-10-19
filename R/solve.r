@@ -201,6 +201,13 @@
     description <- arg$description
     arg <- arg[names(arg) != 'description', drop = FALSE]    
   }
+  if (any(names(arg) == 'useStandardDataFrame')) {
+    useStandardDataFrame <- arg$useStandardDataFrame
+    arg <- arg[names(arg) != 'useStandardDataFrame', drop = FALSE]    
+  } else useStandardDataFrame <- TRUE
+  if (useStandardDataFrame) {
+    readOutputFunction <- read.csv
+  } else readOutputFunction <- data.table::fread
   if (any(names(arg) == 'model.type')) {
     model.type <- arg$model.type
     arg <- arg[names(arg) != 'model.type', drop = FALSE]
@@ -831,14 +838,14 @@ LL1 <- proc.time()[3]
         close(z3)
       }
   } else stop('Unknown solver ', solver) 
-    vrb_list <- data.table::fread(paste(tmpdir, '/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
+    vrb_list <- readOutputFunction(paste(tmpdir, '/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
     if (file.exists(paste(tmpdir, '/variable_list2.csv', sep = ''))) {
-      vrb_list2 <- data.table::fread(paste(tmpdir, '/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
+      vrb_list2 <- readOutputFunction(paste(tmpdir, '/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
     } else vrb_list2 <- character()
     if (file.exists(paste(tmpdir, '/variable_list3.csv', sep = ''))) {
-      vrb_list <- c(vrb_list, data.table::fread(paste(tmpdir, '/variable_list3.csv', sep = ''), stringsAsFactors = FALSE)$value)
+      vrb_list <- c(vrb_list, readOutputFunction(paste(tmpdir, '/variable_list3.csv', sep = ''), stringsAsFactors = FALSE)$value)
     } else vrb_list2 <- character()
-    rr <- list(variables = list(), par_arr = list(), set = data.table::fread(paste(tmpdir, 
+    rr <- list(variables = list(), par_arr = list(), set = readOutputFunction(paste(tmpdir, 
       '/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
     ss <- list()
     for(k in unique(rr$set$set)) {
@@ -854,7 +861,7 @@ LL1 <- proc.time()[3]
     ss$slicep <- ss$slice
     rr$set_vec <- ss
     for(i in vrb_list) {
-      gg <- data.table::fread(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
+      gg <- readOutputFunction(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
       if (ncol(gg) == 1) {
         if (to_array_result) rr$par_arr[[i]] <- gg[1, 1]  
         rr$variables[[i]] <- data.frame(value = gg[1, 1])
@@ -874,7 +881,7 @@ LL1 <- proc.time()[3]
     }
     # Read constrain data
     for(i in vrb_list2) {
-      gg <- data.table::fread(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
+      gg <- readOutputFunction(paste(tmpdir, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
       if (nrow(gg) == 0) {
         rr$par_arr[[i]] <- NULL
       } else if (ncol(gg) == 2) {
@@ -890,8 +897,8 @@ LL1 <- proc.time()[3]
         }
       }
     }
-    rr[['solution_report']] <- list(finish = data.table::fread(paste(tmpdir, '/pFinish.csv', sep = ''))$value, 
-      status = data.table::fread(paste(tmpdir, '/pStat.csv', sep = ''))$value)
+    rr[['solution_report']] <- list(finish = readOutputFunction(paste(tmpdir, '/pFinish.csv', sep = ''))$value, 
+      status = readOutputFunction(paste(tmpdir, '/pStat.csv', sep = ''))$value)
     pp4 <- proc.time()[3]
      if (tmp.del) {
        #cat(tmpdir, 'yyyyyyyyyyyyyy\n')
