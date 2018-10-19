@@ -767,7 +767,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
-  approxim <- fix_approximation_list(approxim, comm = trd@commodity, lev = trd@slice)
+  approxim <- fix_approximation_list(approxim, comm = trd@commodity)
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
                                             data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
