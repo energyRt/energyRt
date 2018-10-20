@@ -314,7 +314,7 @@
   if (any(names(arg) == 'to_array_result')) {
     to_array_result <- arg$to_array_result
     arg <- arg[names(arg) != 'to_array_result', drop = FALSE]
-  } else to_array_result <- TRUE
+  } else to_array_result <- FALSE
   # Fill DB by region ## & slice
   for(i in c('region')) {
     prec@parameters[[i]] <- addData(prec@parameters[[i]], approxim[[i]])
@@ -394,6 +394,7 @@
         }
     }
     cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
+    prclst <- NULL
   } else if (n.threads == 1) {
     prorgess_bar <- sapply(obj@data, function(x) length(x@data))
     if (is.list(prorgess_bar)) prorgess_bar <- 0 else prorgess_bar <- sum(prorgess_bar)
@@ -668,6 +669,7 @@ LL1 <- proc.time()[3]
        c(lapply(prclst, function(x) x$ss[x$rs == 'simple']), recursive = TRUE),
        c(lapply(prclst, function(x) x$ss[x$rs == 'multi']), recursive = TRUE)
      )
+     prclst <- NULL
    } else if (n.threads == 1) { # || TRUE
      file_w <- c()
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
@@ -690,6 +692,7 @@ LL1 <- proc.time()[3]
    #cat('pzz5: ', round(proc.time()[3] - pzz, 2), '\n')
    #pzz <- proc.time()[3]
    cat(file_w, sep = '\n', file = zz)
+   file_w <- NULL
    # cat('pzz6: ', round(proc.time()[3] - pzz, 2), '\n')
     if (any(names(obj@misc) == 'additionalEquationGAMS')) cat(obj@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
     

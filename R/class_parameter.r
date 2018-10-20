@@ -215,7 +215,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
   gen_gg <- function(name, dtt) {
     ret <- c('parameter', paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
     gg <- paste(dtt[, ncol(dtt) - 1], dtt[, ncol(dtt)])
-    if (ncol(dtt) > 2) for(i in seq(ncol(dtt) - 2, 1)) gg <- paste(dtt[, i], '.', gg, sep = '')
+    if (ncol(dtt) > 2) for(i in seq(ncol(dtt) - 2, 1)) gg <- paste0(dtt[, i], '.', gg)
     c(ret, gg, '/;')
   }
     as_simple <- function(dtt, name, def) {
