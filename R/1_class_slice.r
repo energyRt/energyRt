@@ -28,7 +28,7 @@ setClass("slice",
 .init_slice <- function(sl) {
   if (nrow(sl@levels) == 0) { 
     warning('There is not slice, add "ANNUAL"')
-    sl@levels <- .setSlice(year = 'ANNUAL')
+    sl@levels <- .setSlice(ANNUAL = 'ANNUAL')
   }
   # Check for correctness of data frame
   .slice_check_data(sl@levels)
