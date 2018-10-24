@@ -142,16 +142,17 @@
   }
   dtf <- data.frame(share = numeric(), stringsAsFactors = FALSE)
   if (length(arg) == 1 && is.character(arg[[1]]) && length(arg[[1]]) == 1) {
-    dtf <- data.frame(share = 1, year = arg[[1]], stringsAsFactors = FALSE)
+    dtf <- data.frame(share = 1, ANNUAL = arg[[1]], stringsAsFactors = FALSE)
+    if (!is.null(names(arg))) colnames(dtf)[2] <- names(arg)[1] 
   } else {
     dtf <- slice_def(dtf, arg)
   }
   dtf <- dtf[, c(2:ncol(dtf), 1), drop = FALSE]
   if (length(unique(dtf[, 1])) != 1) {
     warning('.setSlice: first slice have to consist only one slice, add "ANNUAL"')
-    if (any(colnames(dtf) == 'year') || any(c(dtf == "ANNUAL", recursive = TRUE)))
-      stop('.setSlice: cannot add level "year" slice, with level "ANNUAL"')
-    dtf$year  <- rep('ANNUAL', nrow(dtf))
+    if (any(colnames(dtf) == 'ANNUAL') || any(c(dtf == "ANNUAL", recursive = TRUE)))
+      stop('.setSlice: cannot add level "ANNUAL" slice, with level "ANNUAL"')
+    dtf$ANNUAL  <- rep('ANNUAL', nrow(dtf))
     dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
   }
   if (abs(sum(dtf$share) - 1) < 1e-10) dtf$share <- (dtf$share / sum(dtf$share))

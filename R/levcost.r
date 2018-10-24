@@ -221,7 +221,7 @@ summary.levcost <- function(x) x$total
     slice <- arg$slice
     mdl@sysInfo <- setSlice(mdl@sysInfo, slice = args$slice)
     arg <- arg[names(arg) != 'slice', drop = FALSE]
-  } else mdl@sysInfo <- setSlice(mdl@sysInfo, year = 'ANNAUL')
+  } else mdl@sysInfo <- setSlice(mdl@sysInfo, ANNAUL = 'ANNAUL')
   mdl@name <- paste('Levelized cost technology', tech@name) 
   mdl@LECdata$region <- region
   mdl <-add(mdl, reps)
