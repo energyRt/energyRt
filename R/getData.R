@@ -156,7 +156,8 @@ getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
     if(is.null(scen[[sc]]@modInp@parameters$pDemand@data$comm)) {scen[[sc]] <- .addComm2pDemand(scen[[sc]])}
     for (datype in names(parvar)[parvar]) { # loop over data sources
       if (verbose) cat("Extracting data from", datype, "\n")
-      lt <- findData(scen[[sc]], dataType = datype, setsNames_ = paste0("^", nflt1, "$"))
+      if (length(nflt1) > 0) {sets_names <- paste0("^", nflt1, "$")} else {sets_names <- NULL}
+      lt <- findData(scen[[sc]], dataType = datype, setsNames_ = sets_names)
       pvNames <- names(lt)
       # filter for variable/parameter names
       if (!is.null(name)) {
