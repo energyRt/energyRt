@@ -801,10 +801,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
     gg <- multiInterpolation(trd@trade, 'ava',
             obj@parameters[['pTradeIr']], approxim, 'trade', trd@name)
     obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
-    #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
-    #if (nrow(gg) != 0) 
-    #  obj@parameters[['ndefpTradeIrUp']] <- addData(obj@parameters[['ndefpTradeIrUp']],
-    #        gg[, obj@parameters[['ndefpTradeIrUp']]@dimSetNames])
+    # Trade ainp
+    if (nrow(trd@aux) != 0) {
+      browser()
+      #approxim
+      #obj@parameters[['mTradeIrAInp']] <- addData(obj@parameters[['mTradeIrAInp']],
+      #                                            data.frame(trade = rep(trd@name, trad_ainp), acomm = trad_ainp))
+    }
   obj
 })
 

@@ -259,6 +259,8 @@ setMethod("initialize", "modInp",
                                                  defVal = 0, interpolation = 'back.inter.forth')    
     # Trade
     # Map
+    .Object@parameters[['mTradeIrAInp']] <- createParameter('mTradeIrAInp', c('trade', 'comm'), 'map', cls = 'trade')   
+    .Object@parameters[['mTradeIrAOut']] <- createParameter('mTradeIrAOut', c('trade', 'comm'), 'map', cls = 'trade')   
     .Object@parameters[['mExpComm']] <- 
         createParameter('mExpComm', c('expp', 'comm'), 'map', cls = 'trade')    
     .Object@parameters[['mImpComm']] <- 
@@ -268,7 +270,13 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mTradeSrc']] <- 
         createParameter('mTradeSrc', c('trade', 'region'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeDst']] <- 
-        createParameter('mTradeDst', c('trade', 'region'), 'map', cls = 'trade')    
+        createParameter('mTradeDst', c('trade', 'region'), 'map', cls = 'trade')  
+    drt1 <- c('pTradeIrCsrc2Aout', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Aout', 'pTradeIrCdst2Ainp')
+    drt2 <- c(        'csrc2aout',         'csrc2ainp',         'cdst2aout',         'cdst2ainp')
+    for (i in seq_along(drt1))
+      .Object@parameters[[drt1[i]]] <- createParameter(drt1[i], c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
+                                                            defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = drt2[i])    
+    
     .Object@parameters[['pTradeIrCost']] <- createParameter('pTradeIrCost', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
             defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cost')    
