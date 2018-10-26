@@ -9834,9 +9834,9 @@ rs
     rs["pTechShareUp", c("name", "description", "type")] <- c("pTechShareUp", "Upper bound for share of the commodity in total group input or output", "parameter");
     rs["pTechShareUp", c("tech", "comm", "region", "year", "slice", "eqTechShareInpUp", "eqTechShareOutUp")] <- TRUE;
     rs["pTechAfaLo", c("name", "description", "type")] <- c("pTechAfaLo", "Lower bound for activity", "parameter");
-    rs["pTechAfaLo", c("tech", "region", "year", "slice", "eqTechAfaLo", "eqTechAfacOutLo", "eqTechAfacInpLo")] <- TRUE;
+    rs["pTechAfaLo", c("tech", "region", "year", "slice", "eqTechAfaLo")] <- TRUE;
     rs["pTechAfaUp", c("name", "description", "type")] <- c("pTechAfaUp", "Upper bound for activity", "parameter");
-    rs["pTechAfaUp", c("tech", "region", "year", "slice", "eqTechAfaUp", "eqTechAfacOutUp", "eqTechAfacInpUp")] <- TRUE;
+    rs["pTechAfaUp", c("tech", "region", "year", "slice", "eqTechAfaUp")] <- TRUE;
     rs["pTechAfacLo", c("name", "description", "type")] <- c("pTechAfacLo", "Lower bound for commodity output", "parameter");
     rs["pTechAfacLo", c("tech", "comm", "region", "year", "slice", "eqTechAfacOutLo", "eqTechAfacInpLo")] <- TRUE;
     rs["pTechAfacUp", c("name", "description", "type")] <- c("pTechAfacUp", "Upper bound for commodity output", "parameter");

@@ -8,6 +8,8 @@ setClass("trade",
           destination   = "characterOrNULL",       # if NULL that in all region
       # Performance parameters
           trade         = "data.frame",
+          aux           = "data.frame",      #
+          aeff         = "data.frame",    #  Commodity efficiency
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           # slice = "characterOrNULL", # imported from commodity
           misc = "list"
@@ -30,6 +32,20 @@ setClass("trade",
                                      ava.lo     = numeric(),
                                      cost       = numeric(),
                                      markup     = numeric(),
+                                     csrc2cdst  = numeric(),
+                                     stringsAsFactors = FALSE),
+         aux           = data.frame(acomm     = character(),
+                                    unit     = character(),
+                                    stringsAsFactors = FALSE),
+         # Auxilary parameter
+         aeff          = data.frame(
+                                     acomm      = character(),
+                                     src     = character(),
+                                     dst     = character(),
+                                     year       = numeric(),
+                                     slice      = character(),
+                                     ainp  = numeric(),
+                                     aout  = numeric(),
                                      stringsAsFactors = FALSE),
         GIS           = NULL,
         # slice = NULL,
