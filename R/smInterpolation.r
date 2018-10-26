@@ -1,6 +1,6 @@
 #### Deprecated version due to deprecetate simple_data_frame_approximation
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
   # cat('simple_data_frame_approximation_chk:', parameter, '\n')
   if (approxim$solver == 'GAMS' && nrow(frm) == 0) return(frm)
   dd <- interpolation(frm, parameter,
@@ -23,11 +23,19 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'value'), drop = FALSE])
   }
-  dd[dd$value != mtp@defVal,, drop = FALSE]
+  dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
+  if (!is.null(remove_duplicate) && nrow(dd) != 0) {
+    fl <- rep(TRUE, nrow(dd))
+    for (i in seq_along(remove_duplicate)) {
+      fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
+    }
+    dd <- dd[fl,, drop = FALSE]
+  }
+  dd
 }
 
 multiInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
   # if (approxim$solver == 'GAMS' && nrow(frm) == 0) return(frm)
   dd <- interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
@@ -48,5 +56,13 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'type', 'value'), drop = FALSE])
   }
-  dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+  dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+  if (!is.null(remove_duplicate) && nrow(dd) != 0) {
+    fl <- rep(TRUE, nrow(dd))
+    for (i in seq_along(remove_duplicate)) {
+      fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
+    }
+    dd <- dd[fl,, drop = FALSE]
+  }
+  dd
 }

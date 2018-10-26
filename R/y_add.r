@@ -767,6 +767,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
+  remove_duplicate <- list(c('src', 'dst'))
   approxim <- fix_approximation_list(approxim, comm = trd@commodity)
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
                                             data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
@@ -792,27 +793,49 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   # pTradeIrCost
   obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
     simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
-      approxim, 'trade', trd@name))
+      approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIrMarkup
   obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
     simpleInterpolation(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
-      approxim, 'trade', trd@name))
+      approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIr
     gg <- multiInterpolation(trd@trade, 'ava',
-            obj@parameters[['pTradeIr']], approxim, 'trade', trd@name)
+            obj@parameters[['pTradeIr']], approxim, 'trade', trd@name, remove_duplicate = remove_duplicate)
     obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
     # Trade ainp
     if (nrow(trd@aux) != 0) {
-      browser()
-      #approxim
-      #obj@parameters[['mTradeIrAInp']] <- addData(obj@parameters[['mTradeIrAInp']],
-      #                                            data.frame(trade = rep(trd@name, trad_ainp), acomm = trad_ainp))
+      if (any(is.na(trd@aux$acomm))) 
+        stop('Wrong aux commodity for trade "', trd@name, '"')
+      trd@aeff <- trd@aeff[!is.na(trd@aeff$acomm),, drop = FALSE]
+      if (!all(trd@aeff$acomm %in% trd@aux$acomm))
+        stop('Wrong aux commodity for trade "', trd@name, '"')
+      inp_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2ainp) | !is.na(trd@aeff$cdst2ainp), 'acomm'])
+      out_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2aout) | !is.na(trd@aeff$cdst2aout), 'acomm'])
+      if (length(inp_comm) != 0) obj@parameters[['mTradeIrAInp']] <- addData(obj@parameters[['mTradeIrAInp']], 
+                                                                             data.frame(trade = rep(trd@name, length(inp_comm)), comm = inp_comm))
+      if (length(out_comm) != 0) obj@parameters[['mTradeIrAOut']] <- addData(obj@parameters[['mTradeIrAOut']], 
+                                                                             data.frame(trade = rep(trd@name, length(out_comm)), comm = out_comm))
+      for (cc in inp_comm) {
+        approxim$acomm <- cc
+        obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(
+          obj@parameters[['pTradeIrCsrc2Ainp']], simpleInterpolation(trd@aeff, 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
+                                                                     approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+        obj@parameters[['pTradeIrCdst2Ainp']] <- addData(
+          obj@parameters[['pTradeIrCdst2Ainp']], simpleInterpolation(trd@aeff, 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
+                                                                     approxim, 'trade', trd@name, remove_duplicate = list('src', 'dst')))
+      }
+      for (cc in out_comm) {
+        approxim$acomm <- cc
+        obj@parameters[['pTradeIrCsrc2Aout']] <- addData(
+          obj@parameters[['pTradeIrCsrc2Aout']], simpleInterpolation(trd@aeff, 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
+                                                                     approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+        obj@parameters[['pTradeIrCdst2Aout']] <- addData(
+          obj@parameters[['pTradeIrCdst2Aout']], simpleInterpolation(trd@aeff, 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
+                                                                     approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+      }
     }
   obj
 })
-
-
-
 
 
 ################################################################################
