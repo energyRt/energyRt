@@ -1,6 +1,6 @@
 
 summary.levcost <- function(x) x$total
-.sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, ...) {
+.sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, n.threads = 1, ...) {
   tech <- energyRt:::.upper_case(obj)
   arg <- list(...)
   # prepare model
@@ -119,7 +119,7 @@ summary.levcost <- function(x) x$total
     arg <- arg[names(arg) != 'ignore.years', drop = FALSE]
   }
   tech@end <- tech@end[!is.na(tech@end$end),, drop = FALSE]
-  tech@start <- tech@end[!is.na(tech@start$start),, drop = FALSE]
+  tech@start <- tech@start[!is.na(tech@start$start),, drop = FALSE]
   # Check start & end year possibility
   fl <- (!is.na(tech@start$region) & tech@start$region == region)
   if (!any(fl)) fl <- is.na(tech@start$region)
@@ -238,7 +238,7 @@ summary.levcost <- function(x) x$total
   #, tmp.dir = tmp.dir
   rr <- solve(mdl, name = 'LEC', solver = solver, tmp.del = tmp.del, tmp.dir = tmp.dir, 
     glpkCompileParameter = glpkCompileParameter, gamsCompileParameter = gamsCompileParameter,
-    cbcCompileParameter = cbcCompileParameter, echo = echo)
+    cbcCompileParameter = cbcCompileParameter, echo = echo, n.threads = n.threads)
   if (!(rr@modOut@solutionStatus == 1 && 
             rr@modOut@compilationStatus == 2 && 
             all(rr@modOut@data$vDummyImport == 0))) stop('Error in solution')
