@@ -880,24 +880,24 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
                                                    simpleInterpolation(stg@olife, 'olife', obj@parameters[['pStorageOlife']], 
                                                                        approxim, 'stg', stg@name))
     # Loss
-    obj@parameters[['pStorageInpLoss']] <- addData(obj@parameters[['pStorageInpLoss']],
-                                                   simpleInterpolation(stg@loss, 'inpLoss', obj@parameters[['pStorageInpLoss']], 
+    obj@parameters[['pStorageInpEff']] <- addData(obj@parameters[['pStorageInpEff']],
+                                                   simpleInterpolation(stg@seff, 'inpeff', obj@parameters[['pStorageInpEff']], 
                                                                        approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
-    obj@parameters[['pStorageOutLoss']] <- addData(obj@parameters[['pStorageOutLoss']],
-                                                   simpleInterpolation(stg@loss, 'outLoss', obj@parameters[['pStorageOutLoss']], 
+    obj@parameters[['pStorageOutEff']] <- addData(obj@parameters[['pStorageOutEff']],
+                                                   simpleInterpolation(stg@seff, 'outeff', obj@parameters[['pStorageOutEff']], 
                                                                        approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
-    obj@parameters[['pStorageStoreLoss']] <- addData(obj@parameters[['pStorageStoreLoss']], 
-                                                     simpleInterpolation(stg@loss, 'storeLoss',  obj@parameters[['pStorageStoreLoss']], 
+    obj@parameters[['pStorageStgEff']] <- addData(obj@parameters[['pStorageStgEff']], 
+                                                     simpleInterpolation(stg@seff, 'stgeff',  obj@parameters[['pStorageStgEff']], 
                                                                          approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
     # Cost
     obj@parameters[['pStorageCostInp']] <- addData(obj@parameters[['pStorageCostInp']],
-                                                   simpleInterpolation(stg@varom, 'inpCost',
+                                                   simpleInterpolation(stg@varom, 'inpcost',
                                                                        obj@parameters[['pStorageCostInp']], approxim, 'stg', stg@name))
     obj@parameters[['pStorageCostOut']] <- addData(obj@parameters[['pStorageCostOut']],
-                                                   simpleInterpolation(stg@varom, 'outCost',
+                                                   simpleInterpolation(stg@varom, 'outcost',
                                                                        obj@parameters[['pStorageCostOut']], approxim, 'stg', stg@name))
     obj@parameters[['pStorageCostStore']] <- addData(obj@parameters[['pStorageCostStore']],
-                                                   simpleInterpolation(stg@varom, 'storeCost',
+                                                   simpleInterpolation(stg@varom, 'stgcost',
                                                                        obj@parameters[['pStorageCostStore']], approxim, 'stg', stg@name))
     obj@parameters[['pStorageInvcost']] <- addData(obj@parameters[['pStorageInvcost']],
                                                    simpleInterpolation(stg@invcost, 'invcost',
@@ -921,17 +921,17 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
         stop(paste0('Unknown aux commodity "', paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
       }
       stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),, drop = FALSE]
-      ainp_flag <- c('store2ainp', 'inp2ainp', 'out2ainp', 'cap2ainp', 'ncap2ainp')
-      aout_flag <- c('store2aout', 'inp2aout', 'out2aout', 'cap2aout', 'ncap2aout')
+      ainp_flag <- c('stg2ainp', 'inp2ainp', 'out2ainp', 'cap2ainp', 'ncap2ainp')
+      aout_flag <- c('stg2aout', 'inp2aout', 'out2aout', 'cap2aout', 'ncap2aout')
       cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), 'acomm']
       cmp_out <- stg@aeff[apply(!is.na(stg@aeff[, aout_flag]), 1, any), 'acomm']
       obj@parameters[['mStorageAInp']] <- addData(obj@parameters[['mStorageAInp']],
                                                   data.frame(stg = rep(stg@name, length(cmp_inp)), comm = cmp_inp))
       obj@parameters[['mStorageAOut']] <- addData(obj@parameters[['mStorageAOut']],
                                                   data.frame(stg = rep(stg@name, length(cmp_out)), comm = cmp_out))
-      dd <- data.frame(list = c('pStorageStore2AInp', 'pStorageStore2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 'pStorageOut2AInp', 
+      dd <- data.frame(list = c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 'pStorageOut2AInp', 
                                 'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 'pStorageNCap2AInp', 'pStorageNCap2AOut'),
-                       table = c('store2ainp', 'store2aout', 'inp2ainp', 'inp2aout', 'out2ainp', 'out2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 
+                       table = c('stg2ainp', 'stg2aout', 'inp2ainp', 'inp2aout', 'out2ainp', 'out2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 
                                  'ncap2aout'),
                        stringsAsFactors = FALSE)
       approxim_comm <- approxim

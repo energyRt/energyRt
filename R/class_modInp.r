@@ -235,7 +235,7 @@ setMethod("initialize", "modInp",
         .Object@parameters[[i]] <- createParameter(i, 
               c('stg', 'region', 'year'), 'simple', 
                 defVal = 0, interpolation = 'back.inter.forth')    
-        for(i in c('pStorageInpLoss', 'pStorageOutLoss', 'pStorageStoreLoss'))
+        for(i in c('pStorageInpEff', 'pStorageOutEff', 'pStorageStgEff'))
           .Object@parameters[[i]] <- createParameter(i, 
                                                      c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
                                                      defVal = 0, interpolation = 'back.inter.forth')    
@@ -252,7 +252,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
     .Object@parameters[['mStorageAOut']] <- createParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    
-    for(i in c('pStorageStore2AInp', 'pStorageStore2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 
+    for(i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 
                'pStorageOut2AInp', 'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
                'pStorageNCap2AInp', 'pStorageNCap2AOut'))
       .Object@parameters[[i]] <- createParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 

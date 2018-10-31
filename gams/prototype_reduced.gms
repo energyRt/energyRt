@@ -220,9 +220,9 @@ pSubsCost(comm, region, year, slice)                Commodity subsidies
 
 * Storage technology parameters
 parameter
-pStorageInpLoss(stg, comm, region, year, slice)           Storage input losses
-pStorageOutLoss(stg, comm, region, year, slice)           Storage output losses
-pStorageStoreLoss(stg, comm, region, year, slice)         Storage storing losses
+pStorageInpEff(stg, comm, region, year, slice)           Storage input losses
+pStorageOutEff(stg, comm, region, year, slice)           Storage output losses
+pStorageStgEff(stg, comm, region, year, slice)         Storage storing losses
 pStorageStock(stg, region, year)                    Storage stock
 pStorageOlife(stg, region)                          Storage operational life
 pStorageCostStore(stg, region, year, slice)         Storing costs
@@ -233,8 +233,8 @@ pStorageInvcost(stg, region, year)                  Storage investment costs
 pStorageCap2act(stg)                                Storage capacity units to activity units conversion factor
 pStorageAfaLo(stg, region, year, slice)             Storage lower 'charge' bound (percent)
 pStorageAfaUp(stg, region, year, slice)             Storage upper 'charge' bound (percent)
-pStorageStore2AInp(stg, comm, region, year, slice)  Auxilary input
-pStorageStore2AOut(stg, comm, region, year, slice)  Auxilary output
+pStorageStg2AInp(stg, comm, region, year, slice)  Auxilary input
+pStorageStg2AOut(stg, comm, region, year, slice)  Auxilary output
 pStorageInp2AInp(stg, comm, region, year, slice)  Auxilary input
 pStorageInp2AOut(stg, comm, region, year, slice)  Auxilary output
 pStorageOut2AInp(stg, comm, region, year, slice)  Auxilary input
@@ -992,7 +992,7 @@ eqStorageAOut(stg, comm, region, year, slice)
 eqStorageAInp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageAInp(stg, comm)
   and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))..
   vStorageAInp(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
-         pStorageStore2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
+         pStorageStg2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
          pStorageInp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
          pStorageOut2AInp(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
          pStorageCap2AInp(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
@@ -1002,7 +1002,7 @@ eqStorageAInp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageA
 eqStorageAOut(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageAOut(stg, comm)
   and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))..
   vStorageAOut(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
-         pStorageStore2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
+         pStorageStg2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
          pStorageInp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
          pStorageOut2AOut(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
          pStorageCap2AOut(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
@@ -1013,10 +1013,10 @@ eqStorageAOut(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageA
 eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm))..
   vStorageStore(stg, comm, region, year, slice) =e=
-  (1 - pStorageInpLoss(stg, comm, region, year, slice)) * vStorageInp(stg, comm, region, year, slice) -
-  (1 - pStorageOutLoss(stg, comm, region, year, slice)) * vStorageOut(stg, comm, region, year, slice) +
+  pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice) -
+  pStorageOutEff(stg, comm, region, year, slice) * vStorageOut(stg, comm, region, year, slice) +
   sum(slicep$(mStorageSlice(stg, slicep) and mSliceNext(slicep, slice)),
-  (1 - pStorageStoreLoss(stg, comm, region, year, slice)) * vStorageStore(stg, comm, region, year, slicep));
+  pStorageStgEff(stg, comm, region, year, slice) * vStorageStore(stg, comm, region, year, slicep));
 
 eqStorageAfaLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageAfaLo(stg, region, year, slice))..
@@ -1395,7 +1395,7 @@ eqStorageInpTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$(
            and mStorageSpan(stg, region, year) and mStorageSlice(stg, slice)), 1))..
          vStorageInpTot(comm, region, year, slice)
          =e=
-         sum(stg$(mStorageComm(stg, comm) and pStorageInpLoss(stg, comm, region, year, slice) < 1
+         sum(stg$(mStorageComm(stg, comm) and pStorageInpEff(stg, comm, region, year, slice)
                  and mStorageSlice(stg, slice)and mStorageSpan(stg, region, year)),
                  vStorageInp(stg, comm, region, year, slice)
          ) +
@@ -1407,7 +1407,7 @@ eqStorageOutTot(comm, region, year, slice)$(mMidMilestone(year) and sum(stg$((mS
            and mStorageSpan(stg, region, year) and mStorageSlice(stg, slice)), 1))..
          vStorageOutTot(comm, region, year, slice)
          =e=
-         sum(stg$(mStorageComm(stg, comm) and pStorageOutLoss(stg, comm, region, year, slice) < 1
+         sum(stg$(mStorageComm(stg, comm) and pStorageOutEff(stg, comm, region, year, slice)
                  and mStorageSlice(stg, slice) and mStorageSpan(stg, region, year)),
                  vStorageOut(stg, comm, region, year, slice)
          ) +
@@ -19257,163 +19257,5 @@ put 2:0/;
 putclose;
 
 * 99089425-31110-4440-be57-2ca102e9cee1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
