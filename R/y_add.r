@@ -1,10 +1,17 @@
-
+################################################################################
+# Check is slice level exist
+################################################################################
+.checkSliceLevel <- function(app, approxim) {
+  if (!is.null(app@slice) && all(app@slice != colnames(approxim$slice@levels)[-ncol(approxim$slice@levels)]))
+    stop(paste0('Unknown slice level "', app@slice, '" for ', class(app), ': "', app@name, '"'))
+}
 
 ################################################################################
 # Add commodity
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
+  .checkSliceLevel(app, approxim)
   cmd <- energyRt:::.upper_case(app)
   cmd <- stayOnlyVariable(cmd, approxim$region, 'region')
   # Add ems_from & pEmissionFactor
@@ -81,6 +88,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
+    .checkSliceLevel(app, approxim)
     # if (!is.null(app@slice)) browser() else cat('-')
     sup <- energyRt:::.upper_case(app)
     approxim <- fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
@@ -132,7 +140,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
-  exp <- energyRt:::.upper_case(app)
+    .checkSliceLevel(app, approxim)
+    exp <- energyRt:::.upper_case(app)
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
   approxim <- fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
   obj@parameters[['mExpSlice']] <- addData(obj@parameters[['mExpSlice']],
@@ -164,7 +173,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
-  imp <- energyRt:::.upper_case(app)
+    .checkSliceLevel(app, approxim)
+    imp <- energyRt:::.upper_case(app)
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
   approxim <- fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
   obj@parameters[['mImpSlice']] <- addData(obj@parameters[['mImpSlice']],
@@ -453,7 +463,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'technology',
   approxim = 'list'), function(obj, app, approxim) {
-#  mTechInpComm(tech, comm)       Input commodity
+    .checkSliceLevel(app, approxim)
+    #  mTechInpComm(tech, comm)       Input commodity
 #  mTechOutComm(tech, comm)       Output commodity
 #  mTechCapComm(tech, comm)       Capacity fix commodity
 #  mTechActComm(tech, comm)       Activity fix commodity
@@ -843,6 +854,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'storage',
   approxim = 'list'), function(obj, app, approxim) {
+    .checkSliceLevel(app, approxim)
     stg <- energyRt:::.upper_case(app)
     approxim <- fix_approximation_list(approxim, comm = stg@commodity, lev = stg@slice)
     # browser()

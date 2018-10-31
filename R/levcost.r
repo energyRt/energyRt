@@ -1,30 +1,23 @@
 
 summary.levcost <- function(x) x$total
-.sm_levcost <- function(obj, tmp.dir = NULL, tmp.del = TRUE, n.threads = 1, ...) {
+.sm_levcost <- function(obj, echo = TRUE, n.threads = 1, 
+                        subs = NULL, tax = NULL, discount = NULL, region = NULL, start_year = NULL, 
+                        comm = NULL, ignore.years = NULL, slice = NULL, price = NULL, ...) {
   tech <- energyRt:::.upper_case(obj)
+  price0 <- price
   arg <- list(...)
   # prepare model
   reps <- new('repository')
   # Initial parameter
  # tech <- tec
  # arg <- list(discount = .1) #, comm = 'ELC') # For test
-  if (all(names(arg) != 'echo')) {
-    echo <- TRUE
-  } else echo <- arg$echo
-  
-  if (any(names(arg) == 'solver')) {
-    solver <- arg$solver
-    arg <- arg[names(arg) != 'solver', drop = FALSE]
-  } else solver <- 'GAMS'
-  if (any(names(arg) == 'discount')) {
-    discount <- arg$discount
+  if (!is.null(discount)) {
     if (is.numeric(discount)) discount <- data.frame(discount = discount, stringsAsFactors = TRUE)
     if (all(colnames(discount) != 'region')) discount <- cbind(discount, region = rep(NA, nrow(discount)))
     if (all(colnames(discount) != 'year')) discount <- cbind(discount, year = rep(NA, nrow(discount)))
     discount <- discount[, c('region', 'year', 'discount'), drop = FALSE]
     discount$region <- as.character(discount$region)
     discount$year <- as.numeric(discount$year)
-    arg <- arg[names(arg) != 'discount', drop = FALSE]
   } else {
     discount <- data.frame(region     = character(),
                                      year       = numeric(),
@@ -33,8 +26,7 @@ summary.levcost <- function(x) x$total
     discount[1, 'discount'] <- .1
     warning('Discount is not specified, default value 10%')
   }
-  if (any(names(arg) == 'tax') && !is.null(arg$tax)) {
-    tax <- arg$tax
+  if (!is.null(tax)) {
     if (!is.data.frame(tax) && is.list(tax)) {
       gg <- sapply(tax, length)
       if (any(gg[1] != gg)) stop('Error subs argument')
@@ -49,15 +41,13 @@ summary.levcost <- function(x) x$total
     tax$region <- as.character(tax$region)
     tax$year <- as.numeric(tax$year)
     tax$slice <- as.character(tax$slice)
-    arg <- arg[names(arg) != 'tax', drop = FALSE]
     for(i in unique(tax$comm)) {
       txx <- newConstrain(paste('TAX', i, sep = ''), 'tax', comm = i, 
          rhs = tax[tax$comm == i, colnames(tax) != 'comm'])
       reps <- add(reps, txx);
     }
   } 
-  if (any(names(arg) == 'subs') && !is.null(arg$subs)) {
-    subs <- arg$subs
+  if (!is.null(subs)) {
     if (!is.data.frame(subs) && is.list(subs)) {
       gg <- sapply(sunbs, length)
       if (any(gg[1] != gg)) stop('Error subs argument')
@@ -77,46 +67,27 @@ summary.levcost <- function(x) x$total
          rhs = subs[subs$comm == i, colnames(subs) != 'comm'])
       reps <- add(reps, sbs);
     }
-    arg <- arg[names(arg) != 'subs', drop = FALSE]
   }
-  if (any(names(arg) == 'region')) {
-    region <- arg$region
+  if (!is.null(region)) {
     stopifnot(is.character(region) && length(region) == 1)
     arg <- arg[names(arg) != 'region', drop = FALSE]
   } else if (length(obj@region) != 0) {
     region <- obj@region[1]
   } else region <- 'DEF'
-  if (any(names(arg) == 'start_year')) {
-    start_year <- arg$start_year
+  if (!is.null(start_year)) {
     stopifnot(is.numeric(start_year) && length(start_year) == 1)
-    arg <- arg[names(arg) != 'start_year', drop = FALSE]
   } else {
     start_year <- max(c(tech@start$start, 2005, na.rm = TRUE))
     warning('Start year is not specified, default value ', start_year)
   }
-  if (any(names(arg) == 'comm')) {
-    comm <- toupper(arg$comm)
+  if (!is.null(comm)) {
     stopifnot(is.character(comm) && length(comm) == 1)
-    arg <- arg[names(arg) != 'comm', drop = FALSE]
   } else comm <- NULL
-  if (any(names(arg) == 'glpkCompileParameter')) {
-    glpkCompileParameter <- arg$glpkCompileParameter
-    arg <- arg[names(arg) != 'glpkCompileParameter', drop = FALSE]
-  } else glpkCompileParameter <- ''
-  if (any(names(arg) == 'gamsCompileParameter')) {
-    gamsCompileParameter <- arg$gamsCompileParameter
-    arg <- arg[names(arg) != 'gamsCompileParameter', drop = FALSE]
-  } else gamsCompileParameter <- ''
-  if (any(names(arg) == 'cbcCompileParameter')) {
-    cbcCompileParameter <- arg$cbcCompileParameter
-    arg <- arg[names(arg) != 'cbcCompileParameter', drop = FALSE]
-  } else cbcCompileParameter <- ''
-  if (any(names(arg) == 'ignore.years')) {
-    if (arg$ignore.years) {
+  if (!is.null(ignore.years)) {
+    if (ignore.years) {
       tech@start <- tech@start[0,, drop = FALSE]
       tech@end   <-   tech@end[0,, drop = FALSE]
     }
-    arg <- arg[names(arg) != 'ignore.years', drop = FALSE]
   }
   tech@end <- tech@end[!is.na(tech@end$end),, drop = FALSE]
   tech@start <- tech@start[!is.na(tech@start$start),, drop = FALSE]
@@ -129,21 +100,15 @@ summary.levcost <- function(x) x$total
   if (!any(fl)) fl <- is.na(tech@end$region)
   if (any(fl) && any(tech@end[fl, 'end'] <= start_year)) 
     stop('Start year belong to unacceptable time region (see end year)')
-#  if (any(names(arg) == 'use_out_price')) {
-#    use_out_price <- arg$use_out_price
-#    stopifnot(is.logical(use_out_price) && length(use_out_price) == 1)
-#    arg <- arg[names(arg) != 'use_out_price', drop = FALSE]
-#  } else use_out_price <- TRUE
   price <- data.frame(comm = character(), region = character(),
             year = numeric(), slice = character(), price = numeric(),
               stringsAsFactors = FALSE)
-  if (any(names(arg) == 'price')) {
-    stopifnot(is.data.frame(arg$price) && all(colnames(arg$price) %in% c('comm', 'region', 
+  if (!is.null(price0)) {
+    stopifnot(is.data.frame(price0) && all(colnames(price0) %in% c('comm', 'region', 
       'year', 'slice', 'price')))
-    price[1:nrow(arg$price), ] <- NA
-    for(i in colnames(arg$price)) price[, i] <- arg$price[,i]
+    price[1:nrow(price0), ] <- NA
+    for(i in colnames(price0)) price[, i] <- price0[,i]
     if (any(!is.na(price$year))) price$year[!is.na(price$year)] <- as.numeric(price$year[!is.na(price$year)])
-    arg <- arg[names(arg) != 'price', drop = FALSE]
   }
   if (nrow(tech@olife) == 0 && all(tech@olife$region != region, na.rm = TRUE)
   && all(!is.na(tech@olife$region))) {
@@ -216,13 +181,17 @@ summary.levcost <- function(x) x$total
     tmpd@dem[1, 'region'] <- region
     reps <- add(reps, tmpd)
   }
-  mdl <- new('model')
-  if (any(names(arg) == 'slice')) {
-    slice <- arg$slice
-    mdl@sysInfo <- setSlice(mdl@sysInfo, slice = args$slice)
-    arg <- arg[names(arg) != 'slice', drop = FALSE]
-  } else mdl@sysInfo <- setSlice(mdl@sysInfo, ANNAUL = 'ANNAUL')
-  mdl@name <- paste('Levelized cost technology', tech@name) 
+  if (!is.null(slice)) {
+    if (any(class(slice) == c('scenario', 'model', 'sysInfo', 'slice'))) {
+      mdl <- newModel(paste('Levelized cost technology', tech@name))
+      if (class(slice) == 'scenario') mdl@sysInfo@slice <- slice@model@sysInfo@slice
+      if (class(slice) == 'model') mdl@sysInfo@slice <- slice@sysInfo@slice
+      if (class(slice) == 'sysInfo') mdl@sysInfo@slice <- slice@slice
+      if (class(slice) == 'slice') mdl@sysInfo@slice <- slice
+    } else mdl <- newModel(paste('Levelized cost technology', tech@name), slice = slice)
+  } else {
+    mdl <- newModel(paste('Levelized cost technology', tech@name) , slice = 'ANNUAL')
+  }
   mdl@LECdata$region <- region
   mdl <-add(mdl, reps)
   mdl@sysInfo@region <- region
@@ -236,9 +205,7 @@ summary.levcost <- function(x) x$total
   #if (!is.null(tax)) mdl@sysInfo@tax <- tax
   #if (!is.null(subs)) mdl@sysInfo@subs <- subs
   #, tmp.dir = tmp.dir
-  rr <- solve(mdl, name = 'LEC', solver = solver, tmp.del = tmp.del, tmp.dir = tmp.dir, 
-    glpkCompileParameter = glpkCompileParameter, gamsCompileParameter = gamsCompileParameter,
-    cbcCompileParameter = cbcCompileParameter, echo = echo, n.threads = n.threads)
+  rr <- solve(mdl, name = 'LEC', echo = echo, n.threads = n.threads, ...)
   if (!(rr@modOut@solutionStatus == 1 && 
             rr@modOut@compilationStatus == 2 && 
             all(rr@modOut@data$vDummyImport == 0))) stop('Error in solution')
