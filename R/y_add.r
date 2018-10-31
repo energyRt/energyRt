@@ -5,6 +5,52 @@
   if (!is.null(app@slice) && all(app@slice != colnames(approxim$slice@levels)[-ncol(approxim$slice@levels)]))
     stop(paste0('Unknown slice level "', app@slice, '" for ', class(app), ': "', app@name, '"'))
 }
+################################################################################
+# Disaggregate slice, e.g. from WINTER to WINTER_DAY and WINTER_NIGHT
+################################################################################
+.disaggregateSliceLevel <- function(app, approxim) {
+  slt <- getSlots(class(app)) 
+  slt <- names(slt)[slt == 'data.frame']
+  for (ss in slt) if (any(colnames(slot(app, ss)) == 'slice')) {
+    tmp <- slot(app, ss)
+    fl <- (!is.na(tmp$slice) & !(tmp$slice %in% approxim$slice))
+    if (any(fl)) {
+      mark_col <- (sapply(tmp, is.character) | colnames(tmp) == 'year')
+      mark_coli <- colnames(tmp)[mark_col]
+      t1 <- tmp[fl,, drop = FALSE]
+      t2 <- tmp[!fl,, drop = FALSE]
+      # Sort from lowest level to largest
+      ff <- approxim$parent_child$parent[!duplicated(approxim$parent_child$parent)]
+      f1 <- seq_along(ff)
+      names(f1) <- ff
+      if (!all(t1$slice %in% ff))
+        stop(paste0('Unknown slice or slice is not parrent slice, for "', app@name, '" (class ', class(app), '), slot: "',
+                    ss, '", slice: "', paste0(t1$slice[!(t1$slice %in% ff)], collapse = '", "'), '"'))      
+      t1 <- t1[sort(f1[t1$slice], index.return = TRUE, decreasing = TRUE)$ix,, drop = FALSE]
+      # Add child desaggregation 
+      for (i in seq_len(nrow(t1))) {
+        ll <- approxim$parent_child[approxim$parent_child$parent == t1[i, 'slice'], 'child']
+        t0 <- t1[rep(i, length(ll)),, drop = FALSE]
+        t0$slice <- ll
+        tes <- t0[, mark_coli, drop = FALSE]; tes[is.na(tes)] <- '-'
+        z1 <- apply(tes, 1, paste0, collapse = '##')
+        tes <- t2[, mark_coli, drop = FALSE]; tes[is.na(tes)] <- '-'
+        z2 <- apply(tes, 1, paste0, collapse = '##')
+        # If there are the same row, after splititng
+        if (any(z1 %in% z2)) {
+          merge_col <- merge(t0, t2, by = mark_coli)
+          colnames(merge_col)[seq_len(ncol(t0))] <- colnames(t0)
+          for (j in colnames(tmp)[!mark_col])
+            merge_col[!is.na(merge_col[, paste0(j, '.y')]), j] <- NA
+          t0 <- rbind(t0[!((z1 %in% z2)), ], merge_col[, 1:ncol(t0)])
+        }
+        t2 <- rbind(t2, t0)
+      }
+      slot(app, ss) <- t2
+    }
+  }
+  app
+}
 
 ################################################################################
 # Add commodity
@@ -38,7 +84,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
   if (cmd@limtype == 'FX')
     obj@parameters[['mFxComm']] <- addData(obj@parameters[['mFxComm']], data.frame(comm = cmd@name))
   # For slice
-  approxim <- fix_approximation_list(approxim, comm = cmd@name)
+  approxim <- .fix_approximation_list(approxim, comm = cmd@name)
   obj@parameters[['mCommSlice']] <- addData(obj@parameters[['mCommSlice']], 
                                             data.frame(comm = rep(cmd@name, length(approxim$commodity_slice_map[[cmd@name]])), 
                                                        slice = approxim$slice))
@@ -47,14 +93,16 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 
 
 ################################################################################
-# Add apporoximation to standart view
+# Add apporoximation list (auxgilary list for approximation) to standart view
 ################################################################################
-fix_approximation_list <- function(approxim, lev = NULL, comm = NULL) {
+.fix_approximation_list <- function(approxim, lev = NULL, comm = NULL) {
   if (is.null(lev)) {
     if (is.null(comm)) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
     lev <- approxim$commodity_slice_map[[comm]]
   }
+  approxim$parent_child <- approxim$slice@all_parent_child
   approxim$slice <- approxim$slice@slice_map[[lev]]
+  approxim$parent_child <- approxim$parent_child[approxim$parent_child$child %in% approxim$slice,, drop = FALSE]
   approxim
 }
 
@@ -65,7 +113,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
   approxim = 'list'), function(obj, app, approxim) {     
   dem <- energyRt:::.upper_case(app)
   dem <- stayOnlyVariable(dem, approxim$region, 'region')
-  approxim <- fix_approximation_list(approxim, comm = dem@commodity)
+  approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
+  dem <- .disaggregateSliceLevel(dem, approxim)
 #  if (!energyRt:::.chec_correct_name(dem@name)) {
 #    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
 #  }
@@ -91,7 +140,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
     .checkSliceLevel(app, approxim)
     # if (!is.null(app@slice)) browser() else cat('-')
     sup <- energyRt:::.upper_case(app)
-    approxim <- fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
+    approxim <- .fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
+    sup <- .disaggregateSliceLevel(sup, approxim)
     if (!is.null(sup@region)) {
       approxim$region <- approxim$region[approxim$region %in% sup@region]
       ss <- getSlots('supply')
@@ -143,7 +193,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
     .checkSliceLevel(app, approxim)
     exp <- energyRt:::.upper_case(app)
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
-  approxim <- fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
+  approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
+  exp <- .disaggregateSliceLevel(exp, approxim)
   obj@parameters[['mExpSlice']] <- addData(obj@parameters[['mExpSlice']],
                                              data.frame(expp = rep(exp@name, length(approxim$slice)), slice = approxim$slice))
   #  if (!energyRt:::.chec_correct_name(exp@name)) {
@@ -176,7 +227,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'import',
     .checkSliceLevel(app, approxim)
     imp <- energyRt:::.upper_case(app)
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
-  approxim <- fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
+  approxim <- .fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
+  imp <- .disaggregateSliceLevel(imp, approxim)
   obj@parameters[['mImpSlice']] <- addData(obj@parameters[['mImpSlice']],
                                            data.frame(imp = rep(imp@name, length(approxim$slice)), slice = approxim$slice))
   #  if (!energyRt:::.chec_correct_name(imp@name)) {
@@ -246,7 +298,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
      return(obj)
   }
   if (app@type == 'tax') {
-      approxim2 <- fix_approximation_list(approxim, comm = app@comm)
+      approxim2 <- .fix_approximation_list(approxim, comm = app@comm)
       for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
         approxim2[[cc]] <- app@for.each[[cc]]
       }
@@ -255,7 +307,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
          obj@parameters[['pTaxCost']], approxim2, 'comm', app@comm))
   } else
   if (app@type == 'subsidy') {
-      approxim2 <- fix_approximation_list(approxim, comm = app@comm)
+      approxim2 <- .fix_approximation_list(approxim, comm = app@comm)
       for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
         approxim2[[cc]] <- app@for.each[[cc]]
       }
@@ -490,7 +542,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
     use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
     tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]
   }
-  approxim <- fix_approximation_list(approxim, lev = tech@slice)
+  approxim <- .fix_approximation_list(approxim, lev = tech@slice)
+  tech <- .disaggregateSliceLevel(tech, approxim)
   obj@parameters[['mTechSlice']] <- addData(obj@parameters[['mTechSlice']],
                                            data.frame(tech = rep(tech@name, length(approxim$slice)), slice = approxim$slice, 
                                                       stringsAsFactors = FALSE))
@@ -779,7 +832,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
   remove_duplicate <- list(c('src', 'dst'))
-  approxim <- fix_approximation_list(approxim, comm = trd@commodity)
+  approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
+  trd <- .disaggregateSliceLevel(trd, approxim)
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
                                             data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
   if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
@@ -856,8 +910,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     stg <- energyRt:::.upper_case(app)
-    approxim <- fix_approximation_list(approxim, comm = stg@commodity, lev = stg@slice)
-    # browser()
+    approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = stg@slice)
+    stg <- .disaggregateSliceLevel(stg, approxim)
     if (!is.null(stg@region)) {
       approxim$region <- approxim$region[approxim$region %in% stg@region]
       ss <- getSlots('storage')
