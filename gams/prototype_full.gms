@@ -20716,10 +20716,11 @@ pLECLoACT(region)
 * LEC equation
 **************************************
 Equation
-eqLECActivity(region, year, slice)
+eqLECActivity(tech, region, year)
 ;
 
-eqLECActivity(region, year, slice)$mLECRegion(region).. sum(tech$mTechSpan(tech, region, year), vTechAct(tech, region, year, slice)) =g= pLECLoACT(region);
+eqLECActivity(tech, region, year)$(mLECRegion(region) and mTechSpan(tech, region, year))..
+         sum(slice$mTechSlice(tech, slice), vTechAct(tech, region, year, slice)) =g= pLECLoACT(region);
 
 
 

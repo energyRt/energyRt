@@ -4033,7 +4033,7 @@ s.t.  eqCnsEBalanceCRYS{ cn1 in cns,c in comm,r in region,y in year,s in slice :
 
 s.t.  eqCnsEBalanceCRYSGrowth{ cn1 in cns,c in comm,r in region,y in year,s in slice : (mCnsBalance[cn1] and not((mCnsLType[cn1])) and not((mCnsLhsComm[cn1])) and not((mCnsLhsRegion[cn1])) and not((mCnsLhsYear[cn1])) and not((mCnsLhsSlice[cn1])) and not((mCnsLe[cn1])) and not((mCnsGe[cn1])) and mCnsComm[cn1,c] and mCnsRegion[cn1,r] and mCnsYear[cn1,y] and mCnsSlice[cn1,s] and mCnsRhsTypeGrowth[cn1] and mMidMilestone[y] and mMilestoneHasNext[y])}: sum{yp in year:(mMilestoneNext[y,yp])}(sum{sp in slice:((mCommSlice[c,sp] and (ORD[s]=ORD[sp] or mAllSliceParentChild[s,sp])))}(vBalance[c,r,yp,sp]))-sum{sp in slice:((mCommSlice[c,sp] and (ORD[s]=ORD[sp] or mAllSliceParentChild[s,sp])))}(vBalance[c,r,y,sp])*(prod{ye in year,yp in year:((mMilestoneNext[y,yp] and ORD[ye] >= ORD[y] and ORD[ye]<ORD[yp]))}(pRhsCRYS[cn1,c,r,ye,s]))  =  0;
 
-s.t.  eqLECActivity{ r in region,y in year,s in slice : mLECRegion[r]}: sum{t in tech:(mTechSpan[t,r,y])}(vTechAct[t,r,y,s])  >=  pLECLoACT[r];
+s.t.  eqLECActivity{ t in tech,r in region,y in year : (mLECRegion[r] and mTechSpan[t,r,y])}: sum{s in slice:(mTechSlice[t,s])}(vTechAct[t,r,y,s])  >=  pLECLoACT[r];
 
 minimize vObjective2 : vObjective;
 

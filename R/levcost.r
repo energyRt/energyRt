@@ -174,12 +174,16 @@ summary.levcost <- function(x) x$total
  # browser()
   additionalCode <- ''
   if (!is.null(comm)) {
-    tmpd <- new('demand')
-    tmpd@name <- paste('DEM', comm, sep = '')
-    tmpd@commodity <- comm
-    tmpd@dem[1, 'dem'] <- 1
-    tmpd@dem[1, 'region'] <- region
+    comm2 <- comm
+    while (any(comm2 == c(tech@input$comm, tech@output$comm, tech@aux$comm))) comm2 <- paste0(comm2, 'dm')
+    tmpd <- newDemand(
+      name = paste0('DEM', comm2),
+      commodity = paste0(comm2),
+      dem = list(region = region, dem = 1)
+    )
     reps <- add(reps, tmpd)
+    reps <- add(reps, newCommodity(comm2, slice = 'ANNUAL', agg = list(comm = comm, agg = 1)))
+    
   }
   if (!is.null(slice)) {
     if (any(class(slice) == c('scenario', 'model', 'sysInfo', 'slice'))) {
