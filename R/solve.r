@@ -534,7 +534,7 @@ LL1 <- proc.time()[3]
       assign('prec', prec, globalenv())
       defin_ndef_par <- function(prec, name1, name2) {
         gg <- getParameterData(prec@parameters[[name1]])
-        if (prec@parameters[[name1]]@defVal[2] == Inf) {
+        if (solver == 'GAMS' && prec@parameters[[name1]]@defVal[2] == Inf) {
           gg <- gg[gg$type == 'up' & gg$value != Inf, ]
           prec@parameters[[name2]]@not_data <- TRUE
         } else {
@@ -545,7 +545,7 @@ LL1 <- proc.time()[3]
       }
       defin_ndef_par_set <- function(prec, name1, name2) {
         gg <- getParameterData(prec@parameters[[name1]])
-        if (prec@parameters[[name1]]@defVal[1] == Inf) {
+        if (solver == 'GAMS' && prec@parameters[[name1]]@defVal[1] == Inf) {
           gg <- gg[gg$value != Inf, ]
           prec@parameters[[name2]]@not_data <- TRUE
         } else {
@@ -565,7 +565,7 @@ LL1 <- proc.time()[3]
       prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
       prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
       prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
-      prec <- defin_ndef_par(prec, 'pTradeIr', 'ndefpTradeIrUp')
+      prec <- defin_ndef_par(prec, name1 = 'pTradeIr', name2 = 'ndefpTradeIrUp')
       prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfacUp')
       
       # For remove emission equation

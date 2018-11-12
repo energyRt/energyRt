@@ -23,13 +23,16 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'value'), drop = FALSE])
   }
-  dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
-  if (!is.null(remove_duplicate) && nrow(dd) != 0) {
-    fl <- rep(TRUE, nrow(dd))
-    for (i in seq_along(remove_duplicate)) {
-      fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
+  # For increase speed, not work for GLPK
+  if (approxim$solver == 'GAMS') {
+    dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
+    if (!is.null(remove_duplicate) && nrow(dd) != 0) {
+      fl <- rep(TRUE, nrow(dd))
+      for (i in seq_along(remove_duplicate)) {
+        fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
+      }
+      dd <- dd[fl,, drop = FALSE]
     }
-    dd <- dd[fl,, drop = FALSE]
   }
   dd
 }
@@ -56,13 +59,16 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'type', 'value'), drop = FALSE])
   }
-  dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
-  if (!is.null(remove_duplicate) && nrow(dd) != 0) {
-    fl <- rep(TRUE, nrow(dd))
-    for (i in seq_along(remove_duplicate)) {
-      fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
+  # For increase speed, not work for GLPK
+  if (approxim$solver == 'GAMS') {
+    dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+    if (!is.null(remove_duplicate) && nrow(dd) != 0) {
+      fl <- rep(TRUE, nrow(dd))
+      for (i in seq_along(remove_duplicate)) {
+        fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
+      }
+      dd <- dd[fl,, drop = FALSE]
     }
-    dd <- dd[fl,, drop = FALSE]
   }
   dd
 }

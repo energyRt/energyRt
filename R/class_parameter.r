@@ -125,7 +125,7 @@ setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
         if (nrow(data) != 0) {
           if (obj@nValues != -1) {
             if (obj@nValues + nrow(data) > nrow(obj@data)) {
-              obj@data[nrow(obj@data) + 1:(500 + .25 * nrow(obj@data)), ] <- NA
+              obj@data[nrow(obj@data) + 1:(nrow(data) + nrow(obj@data)), ] <- NA
             }
             nn <- obj@nValues + 1:nrow(data)
             obj@nValues <- obj@nValues + nrow(data)
