@@ -829,8 +829,6 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
-    #cat(app@name, '\n')
-    #if (app@name == 'trd_COA_1') browser()
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
   remove_duplicate <- list(c('src', 'dst'))
