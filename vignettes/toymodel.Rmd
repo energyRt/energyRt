@@ -1,0 +1,853 @@
+---
+title: "'Toy' 9-region model or US electric power sector"
+# author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# Information  
+
+The following example is a prototype model of multi-region model for US (curently 9 regions) for electricity generation from renewable and fossil energy sources, and interregional trade. The example is a demonstration of a functionality of **energyRt** package for energy systems modeling and set of methods, which provide connection with spatial (GIS) tools in R.  
+
+\newpage  
+  
+  
+```{r setup2, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(fig_width = 8, fig_height = 6)
+library(energyRt)
+library(lubridate)
+library(tibble)
+library(tidyverse)
+# Chose your default solver, comment another
+# solver <- "GLPK"
+solver <- "GAMS" 
+if(exists("../temp/_gams_link.R")) source("../temp/_gams_link.R")
+
+ ```
+
+# Map and nine census regions  
+```{r Regions}
+if (!file.exists("../data/usa9reg.RData")) {
+  stop("US map data is not found. Follow the steps in 'usa_maps.R'")
+} else {
+  load("../data/usa9reg.RData")
+}
+
+ggplot(usa9r, aes(long,lat, group = group)) + 
+  geom_polygon(aes(fill = id), colour = rgb(1,1,1,0.2)) +
+  # geom_polygon(aes(fill = id), colour = "white", size = 1) + 
+  theme(legend.position="none") +
+  labs(fill = "Region") +
+  #coord_quickmap() +
+  theme_void()
+b <- last_plot()
+
+(reg_names <- as.character(usa9reg@data$region))
+(nreg <- length(reg_names))
+
+# Neighbor regions
+if (!any((installed.packages())[, "Package"] == "spdep")) install.packages("spdep")
+nbr <- spdep::poly2nb(usa9reg)
+
+
+```
+
+```{r Commodities}
+COA <- newCommodity(
+  name = "COA",
+  description = "Generic coal",   
+  emis = list(
+    comm = "CO2", 
+    unit = "kt/PJ",
+    mean = 102
+  ),
+  color = "brown",
+  slice = "ANNUAL"
+)
+
+OIL <- newCommodity(
+  name = "OIL",
+  description = "Oil",    
+  emis = list(
+    comm = "CO2",
+    mean = 83
+  ),
+  slice = "ANNUAL"
+)
+
+BIO <- newCommodity(
+  name = "BIO",
+  description = "Generic biomass, all types",
+  type = "renewable, fuel",
+  color = "darkgreen",
+  slice = "ANNUAL"
+)
+
+HYD <- newCommodity(
+  name = "HYD",
+  slice = "HOUR"
+)
+
+WIN <- newCommodity(
+  name = "WIN",
+  slice = "HOUR"
+)
+
+ELC <- newCommodity(
+  name = "ELC",
+  slice = "HOUR"
+)
+
+CO2 <- newCommodity(
+  name = "CO2",
+  slice = "HOUR"
+)
+
+```
+
+# Definition of supply
+
+```{r Supply}
+set.seed(1000)
+
+MIN_COA <- newSupply(
+  name = "MIN_COA",
+  description = "All coals",
+  commodity = "COA",
+  #unit = "MRMB/PJ",
+  #reserve = 355555.5/nreg,
+  availability = list(
+    #year = c(2010),
+    region = reg_names,
+    ava.up = round(runif(nreg, 100, 1000) * round(runif(nreg, 0, 1), 0), 0), # Randomly assign availability of reserves
+    cost = rnorm(nreg, 20, 3) # convert("RMB/tce", "MRMB/PJ", 400/0.7)
+  ),
+  slice = "ANNUAL"
+)
+
+MIN_WIN <- newSupply(
+  name = "MIN_WIN",
+  description = "Wind potential",
+  commodity = "WIN",
+  #unit = "PJ",
+  availability = list(
+#    year = 2010,
+    region = reg_names,
+    ava.up = runif(nreg, 0, 1000)
+  ),
+  slice = "HOUR"
+)
+
+set.seed(1e3)
+SUP_ELC <- newSupply(
+  name = "SUP_ELC",
+  description = "Electricity supply in regions",
+  commodity = "ELC",
+  unit = "PJ",
+  availability = list(
+#    year = 2010,
+    region = reg_names,
+    ava.up = runif(nreg, 0, 1000),
+    cost = rep(1000/3.6, nreg)
+  ),
+  slice = "HOUR"
+)
+
+# Alternative formulation of SUP_ELC
+set.seed(1e3)
+sup_elc <- list()
+for (reg in reg_names) {
+    comm_name <-  paste0("ELC_", reg)
+    sup_name <- paste0("SUP_", comm_name)
+    sup_elc[[sup_name]] <- newSupply(
+    name = sup_name,
+    description = "",
+    region = reg,
+    commodity = comm_name,
+    availability = list(
+      region = reg,
+      ava.up = runif(1, 0, 1000),
+      cost = 100
+    ),
+  slice = "HOUR"
+  )
+}
+
+if (F) {
+  head(SUP_ELC@availability)
+  sup_elc$SUP_ELC_AL@availability
+  sup_elc$SUP_ELC_CT@availability
+}
+
+
+```
+
+# Definition of trade between regions
+
+```{r ELC_Trade}
+
+set.seed(100)
+
+# Creating neighbors-trade matrix
+trd_nbr <- matrix(rep(NA, nreg*nreg), nrow = nreg, dimnames = list(reg_names, reg_names))
+head(trd_nbr)
+
+for (i in 1:length(reg_names)) {
+  trd_nbr[i, nbr[[i]]] <- 1
+  trd_nbr[nbr[[i]], i] <- 1
+}
+head(trd_nbr)
+trd_dt <- as.data.frame.table(trd_nbr, stringsAsFactors = F)
+trd_dt <- trd_dt[!is.na(trd_dt$Freq),]
+head(trd_dt)
+dim(trd_dt)
+trd_dt <- dplyr::distinct(trd_dt)
+dim(trd_dt)
+names(trd_dt) <- c("src", "dst", "trd")
+head(trd_dt)
+#trd_dt$src <- as.character()
+
+#COAT <- newCommodity("COAT") # Coal for trade
+#ELCT <- newCommodity("ELCT") # Electricity for trade
+
+
+#Repository for trades, related technologies and commodities
+TRD_ELC_ALL <- newRepository(name = "TRD_ELC_ALL")
+# Select regions with non-zero number of neighbours
+nbr0 <- sapply(nbr, function(x) length(x) > 0 && x > 0)
+#reg_names0 <- reg_names
+reg_id <- 1:length(reg_names)
+for (i in reg_id) {
+# The loop creates trade-objects for every region with neighbors, 
+# as well as requires commodities, and technologies to model the trade
+  if (nbr0[i]) {
+    # Names 
+    src_nm <- reg_names[i]    # Source region name
+    dst_nms <- reg_names[nbr[[i]]]  # Destination region name
+    n_dst <- length(nbr[[i]]) # Number of destimation regions
+    n_src <- n_dst  # Assuming simmetric trade oppennes with neighbor regions
+    trd_nm <- paste0("TRD_ELC_", src_nm)  # Trade object name
+    cmd_nm <- paste0("ELC_", src_nm)  # Commodity name, exporting to other regions
+    cmd_nm_nbr <- paste0("ELC_", dst_nms) # Commodities name, importing from other regions
+    tch_src_nm <- paste0("TELC_", src_nm, "_SRC") # Technology name - transportation to sorce region border
+    tch_dst_nm <- paste0("TELC_", src_nm, "_DST") # Technology name - transportation from other region to this region
+    
+    trd <- newTrade(trd_nm, 
+                    commodity = cmd_nm,
+                    source = src_nm,
+                    destination = dst_nms,
+                    trade = list(
+                      src = rep(src_nm, n_dst),
+                      dst = dst_nms,
+                      cost = rep(0.5, n_dst)
+                    )#,
+                    # slice = "HOUR"
+                    )
+    
+    tch_src <- newTechnology(
+        name = tch_src_nm,
+        description = paste("Transportation of electricity to", src_nm, "region border"),
+        region = src_nm,
+        input = list(
+          comm = "ELC",
+          unit = "PJ"
+        ),
+        output = list(
+          comm = cmd_nm,
+          #group = rep("i", n_dst),
+          unit = rep("PJ", 1)
+        ),
+        cap2act = 1,
+        ceff = list(
+          comm = c("ELC"),
+          cinp2use = 0.97
+        ),
+        afa = list(
+          afa.up = 1
+        ),
+        fixom = list(
+          fixom = 0
+        ),
+        invcost = list(
+          invcost = 0
+        ),
+        start = list(
+          start = 2010
+        ),
+        olife = list(
+          olife = 100
+        ),
+        slice = "HOUR"
+      )
+    # draw(tch_src)
+    
+      tch_dst <- newTechnology(
+        name = tch_dst_nm,
+        description = paste("Transportation of electricity from", src_nm, "region border"),
+        region = src_nm,
+        input = list(
+          comm = cmd_nm_nbr,
+          group = rep("i", n_src),
+          unit = rep("PJ", n_src)
+        ),
+        output = list(
+          comm = "ELC",
+          unit = rep("PJ", 1)
+        ),
+        cap2act = 1,
+        geff = list(
+          # comm = c("ELC"),
+          region = src_nm,
+          group = "i",
+          ginp2use = 1
+        ),
+        ceff = list(
+          region = src_nm,
+          comm = "ELC",
+          use2cact = 0.97
+        ),
+        afa = list(
+          afa.up = 1
+        ),
+        fixom = list(
+          fixom = 0
+        ),
+        invcost = list(
+          invcost = 0
+        ),
+        start = list(
+          start = 2010
+        ),
+        olife = list(
+          olife = 100
+        ),
+        slice = "HOUR"
+      )
+     # draw(tch_dst)
+     
+     cmd <- newCommodity(cmd_nm) # , region = c(src_nm, dst_nms)
+    
+     #message(paste(i, src_nm))
+     TRD_ELC_ALL <- add(TRD_ELC_ALL, trd, cmd, tch_src, tch_dst)
+  }
+
+}
+
+if (F) {
+  TRD_ELC_ALL@data$TRD_ELC_AL
+  TRD_ELC_ALL@data$ELC_AL
+  draw(TRD_ELC_ALL@data$TELC_AL_SRC)
+  draw(TRD_ELC_ALL@data$TELC_AL_DST)
+}
+
+```
+
+# Demand
+### Time slices and load curve
+```{r time_slices}
+timeslices <- list(
+  MONTH = paste0("m", formatC(1:12, width = 2, flag = "0")),
+  HOUR = paste0("h", formatC(0:23, width = 2, flag = "0"))
+)
+
+# Intraday loadcurve
+loadcurve <- c(0.75, 0.72, 0.70, 0.71, # h00 - h03
+               0.80, 0.95, 1.05, 1.10, # h04 - h07
+               1.11, 1.10, 1.05, 1.01, # h08 - h11
+               1.00, 1.03, 1.07, 1.12, # h12 - h15
+               1.17, 1.19, 1.20, 1.18, # h16 - h19
+               1.12, 1.06, 0.96, 0.85  # h20 - h23
+               )
+sum(loadcurve)/length(loadcurve)
+names(loadcurve) <- timeslices$HOUR
+plot(loadcurve, ylim = c(0, max(loadcurve)), type = "l", col = "red", lwd = 3)
+abline(h = 1, col = "grey")
+
+# library(lubridate)
+TimeZone <- "EST"
+# TimeZone <- "Asia/Shanghai"
+y <- ymd_hms("2020-01-15 00:00:00", tz = TimeZone)
+repDays <- y + months(0:11)
+hrs <- hours(0:23)
+hSlices <- sapply(as.array(repDays), function(x) x + hours(0:23))
+hSlices <- c(as.POSIXct(hSlices, origin = "1970-01-01", tz = TimeZone)) #UTC
+allSlices <- format(hSlices, format = "m%m_h%H")
+
+slc <- tibble(daytime = hSlices,
+              slice = allSlices,
+              smonth = as.factor(substr(allSlices, 1, 3)),
+              shour = substr(allSlices, 5, 7),
+              hour = hour(hSlices),
+              yday = as.integer(yday(hSlices))
+              
+              )
+# slc
+
+
+```
+
+# Solar irradiance
+```{r solar_irradiance}
+
+get_labpt_gis <- function(gis) {
+  labpt <- sapply(1:length(gis@data[,1]), function(x) {
+    gis@polygons[[x]]@labpt
+  })
+  labpt <- cbind(
+    gis@data$region,
+    as.data.frame(t(labpt))
+  )
+  names(labpt) <- c("region", "x", "y")
+  return(labpt)
+}
+
+reg_centers <- get_labpt_gis(usa9reg)
+
+# sirad::extrat(100, lat = radians(48.2))
+
+# Time zones offset/shift to CST
+# <https://upload.wikimedia.org/wikipedia/commons/e/e8/Standard_World_Time_Zones.png>
+summary(reg_centers$x)
+tzs <- tibble(tz_mean = seq(-60, -120, -15),
+              tz_w = seq(-60, -120, -15) - 7.5,
+              tz_e = seq(-60, -120, -15) + 7.5)
+tzs
+
+reg_centers$tz_shift <- as.integer(0) # UTC+8 == CST
+for (i in 1:dim(tzs)[1]) {
+  ii <- reg_centers$x >= tzs$tz_w[i] & reg_centers$x < tzs$tz_e[i]
+  reg_centers$tz_shift[ii] <- 2 - i # US Eastern
+}
+summary(reg_centers$tz_shift)
+summary(as.factor(reg_centers$tz_shift))
+library(dplyr)
+
+frad <- function(i) { # calculate solar radiation for lat and tz_shift
+  # i <- 1
+  sol <- slc
+  sol$region <- reg_centers$region[i]
+  lat <- reg_centers$y[i]
+  sol$solrad <- c(sapply(unique(sol$yday), 
+    function(x) sirad::extrat(x, lat = sirad::radians(lat))$ExtraTerrestrialSolarRadiationHourly))
+  tz_shift <- reg_centers$tz_shift[i]
+  if (tz_shift < 0) {
+    sol$solrad <- dplyr::lead(sol$solrad, -tz_shift)
+  } else if (tz_shift > 0) {
+    sol$solrad <- lag(sol$solrad, tz_shift)
+  }
+  sol$solrad[is.na(sol$solrad)] <- 0
+  return(sol)
+}
+srad <- frad(1)
+for (i in 2:length(reg_centers$region)) {
+  srad <- bind_rows(srad, frad(i))
+}
+dim(srad)
+
+# plot(srad$hour, srad$solrad, type = "l", col = "orange2", lwd = 1)
+# srad
+
+ggplot(srad, aes(hour, solrad, color = region)) + geom_line(alpha = 1) + facet_wrap(~smonth) + theme_bw()
+# ggplot(srad, aes(hour, solrad, fill = region)) + geom_area(alpha = .75) + facet_wrap(~smonth) + theme_bw()
+ggplot(srad, aes(hour, solrad, color = smonth)) + geom_line(alpha = 1) + facet_wrap(~region) + theme_bw()
+# ggplot(srad, aes(hour, solrad, fill = solrad)) + geom_area(alpha = .5) + facet_wrap(~smonth) + theme_bw()
+
+hist(srad$solrad[srad$solrad > 0.5], n = 4, col = "lightblue")
+summary(srad$solrad)
+
+```
+
+
+```{r sup_solar}
+
+sol <- c("SOLW" = 0.5, "SOLM" = 1.5, "SOLR" = 2.5, "SOLV" = 3.5)
+# ii <- slc$solrad > 0
+for (i in names(sol)) {
+  srad[[i]] <- FALSE
+  srad[[i]] <- srad$solrad >= sol[i] # & ii
+  # ii[slc[[i]]] <- FALSE
+}
+# srad
+srad$region <- as.character(srad$region)
+
+SUP_SOLW <- newSupply(
+  name = "SUP_SOLW",
+  commodity = "SOLW",
+  availability = list(
+    slice = c(NA, srad$slice[srad$SOLW]),
+    ava.up = c(0, rep(1e8, sum(srad$SOLW))),
+    region = c(NA, srad$region[srad$SOLW])
+  ),
+  slice = "HOUR"
+)
+
+SUP_SOLM <- newSupply(
+  name = "SUP_SOLM",
+  commodity = "SOLM",
+  availability = list(
+    slice = c(NA, srad$slice[srad$SOLM]),
+    ava.up = c(0, rep(1e8, sum(srad$SOLM))),
+    region = c(NA, srad$region[srad$SOLM])
+  ),
+  slice = "HOUR"
+)
+
+SUP_SOLR <- newSupply(
+  name = "SUP_SOLR",
+  commodity = "SOLR",
+  availability = list(
+    slice = c(NA, srad$slice[srad$SOLR]),
+    ava.up = c(0, rep(1e8, sum(srad$SOLR))),
+    region = c(NA, srad$region[srad$SOLR])
+  ),
+  slice = "HOUR"
+)
+
+SUP_SOLV <- newSupply(
+  name = "SUP_SOLV",
+  commodity = "SOLV",
+  availability = list(
+    slice = c(NA, srad$slice[srad$SOLV]),
+    ava.up = c(0, rep(1e8, sum(srad$SOLV))),
+    region = c(NA, srad$region[srad$SOLV])
+  ),
+  slice = "HOUR"
+)
+
+SOLW <- newCommodity('SOLW', slice = "HOUR", limtype = "FX")
+SOLM <- newCommodity('SOLM', slice = "HOUR", limtype = "FX")
+SOLR <- newCommodity('SOLR', slice = "HOUR", limtype = "FX")
+SOLV <- newCommodity('SOLV', slice = "HOUR", limtype = "FX")
+
+
+```
+
+### Aggregated technologies by energy source
+```{r aggregated_techs}
+ESOL <- newTechnology(
+  name = "ESOL",
+  description = "Solar PV ",
+  input = list(
+    comm = c("SOLW", "SOLM", "SOLR", "SOLV"),
+    unit = rep("PJ", 4), 
+    group = rep("i", 4),
+    combustion = rep(0, 4)
+  ),
+  output = list(
+    comm = "ELC",
+    unit = "PJ"
+  ),
+  # region = "AZ",
+  cap2act = 31.536,
+  geff = list(
+    group = "i",
+    ginp2use = .2 # PV technical efficiency
+  ),
+  ceff = data.frame(
+    # region = "AZ",
+    # year = 2015,
+    comm = c("SOLW", "SOLM", "SOLR", "SOLV"),
+    cinp2ginp = c(1, 1, 1, 1), # negative == self consumption
+    afac.up = c(.25, .25, .25, 0.25), #/100,
+    # afac.lo = c(.25, .00, .00, 0.0) #/100,
+    share.up = c(1, 1/2, 1/3, 1/4)
+    # share.lo = c(1/4, 0, 0, 0)
+    # afac.lo = c(.05, .05, .05, 0.05, 0)
+  ),
+  # afa = list(
+  #   afa.lo = c(0.14),
+  #   afa.up = c(0.15)
+  # ),
+  fixom = list(
+    fixom = 1
+  ),
+  # start = list(
+  #   start = 2007
+  # ),
+  olife = list(
+    olife = 20
+  ),
+  # stock = list(
+  #   year = c(2010, 2015, 2020, 2030, 2040, 2050),
+  #   stock = c(.1,  0.2,  0.3,  0.3, 0.2, 0)
+  # ),
+  stock = list(
+    stock = 50
+  ),
+  invcost = list(
+    invcost = 1500
+  ),
+  slice = 'HOUR'
+)
+draw(ESOL)
+
+
+```
+
+```{r Storage}
+STGELC <- newStorage(
+  name = 'STGELC',
+  commodity = 'ELC',
+  description = "Battery",
+  slice = 'HOUR', 
+  olife = list(olife = 10), 
+  invcost = list(invcost = 10),
+  seff = data.frame(stgeff = .95, inpeff = .99, outeff = 0.99),
+  stock = list(year = 2015, stock = 100)
+)
+
+
+```
+
+```{r Demand}
+set.seed(50)
+dem_mon <- tibble(region = rep(reg_names, 12),
+                  smonth = c(sapply(timeslices$MONTH, function(x) rep(x, length(reg_names)))),
+                  mdem_PJ = rep(runif(length(reg_names), 100, 150), 12))
+
+ddem <- full_join(srad, dem_mon)
+
+lcuv <- tibble(shour = names(loadcurve), load = loadcurve)
+dd <- full_join(ddem, lcuv)
+dd$mhav_PJ <- dd$mdem_PJ/24 * dd$load
+summary(dd$mhav_PJ)
+dim(dd)[1]/49/12/24
+sum(dd$mdem_PJ)/24; sum(dd$mhav_PJ)
+
+
+DEM_ELC_MH <- newDemand(
+  name = "DEM_ELC_MH",
+  commodity = "ELC",
+  dem = list(
+    year = rep(2015, length(dd$daytime)), 
+    region = dd$region,
+    slice = dd$slice, 
+    dem = dd$mhav_PJ
+    # dem = convert("TWh", "PJ", dd$mhav_TWh)
+    # dem = rep(1, nslices)
+    # dem = runif(nslices, 50, 100)
+    # dem = 10 * (rep(loadcurve, length(timeslices$MONTH)) + 0 * (rbeta(nslices, 5, 5) - .5))
+    )
+)
+ggplot(DEM_ELC_MH@dem, aes(as.numeric(as.factor(slice)), dem, color = as.factor(year))) + 
+  geom_line() + facet_wrap(.~region) +
+  labs(title = "Electric demand by time slices and states",
+       x = "Time slice number", y = "TWh", color = "Year")
+
+
+```
+
+# Models definition  
+## Model without trade  
+```{r Model0_trade, eval=TRUE, include=TRUE}
+# Repository with all technologies, commodities, supply, demand, etc. objects
+rps0 <- add(newRepository('repository'), 
+           # Commodities
+           # COA, 
+           # WIN, 
+           ELC,
+           # ZERO, 
+           SOLW, SOLM, SOLR, SOLV,
+           # CO2,
+           # Supply
+           SUP_SOLW, SUP_SOLM, SUP_SOLR, SUP_SOLV,
+           SUP_ELC,
+           # Storage
+           STGELC,
+           # Technologies
+           ESOL,
+           # Demand
+            DEM_ELC_MH
+           )
+
+# Create 'model' object
+mdl0 <- newModel(name = 'TEST', 
+                debug = data.frame(dummyImport = 1e5,
+                                   dummyExport = 1e5), 
+                region = reg_names,
+                discount = 0.075,
+                slice = list(ANNUAL = "ANNUAL",
+                             MONTH = timeslices$MONTH, 
+                             HOUR = timeslices$HOUR),
+                year = 2015:2020,
+                #milestone = msYears,
+                repository = rps0,
+                GIS = usa9reg,
+                early.retirement = F)
+
+mdl0 <- setMilestoneYears(mdl0, start = 2015, interval = c(1, 2, rep(5, 0)))
+mdl0@sysInfo@milestone
+summary(mdl0)
+format(object.size(mdl0), units = "auto")
+#report(mdl0)
+```
+
+
+```{r solve_mod0, include=0}
+scen0 <- solve(mdl0, name = 'ELC_mh_NoTRD', solver = solver) #, n.threads = 1)
+# scen0 <- solve(mdl0, name = 'ELC_mh_NoTRD', solver = 'GLPK') #, n.threads = 1)
+```
+
+```{r scenario_0_results}
+format(object.size(scen0), units = "auto")
+dum0 <- scen0@modOut@variables$vDummyCost
+head(dum0)
+dim(dum0) 
+head(scen0@modOut@variables$vTechInp)
+
+stg <- getData(scen0, name_ = "^vStor")
+
+# Quich look at solar technologie
+pivot(scen0, tech = "ESOL", parameters = F, year = 2015, slice_ = "m06", 
+            cols = "slice", rows = "comm")
+
+check_sup_out <- getData(scen0, name = "vSupOut", year = 2015, merge = T, sup_ = "SUP_SOL")
+sapply(check_sup_out, unique)
+check_sup_out
+
+ggplot(check_sup_out, aes(slice, value, fill = comm)) + geom_bar(stat="identity") + theme_bw()
+unique(check_sup_out$region)
+ggplot(check_sup_out[check_sup_out$region == "PCF",], 
+       aes(slice, value, fill = comm)) + geom_bar(stat="identity") + theme_bw()
+
+check_tech_inp <- getData(scen0, name = "vTechInp", tech_ = "ESOL", comm_ = "^SOL", year = 2015, slice_ = "m06_", merge = T)
+
+ggplot(check_tech_inp, aes(slice, value, fill = comm)) + geom_bar(stat="identity") + theme_bw()
+ii <- check_tech_inp$region == "SAT" & check_tech_inp$slice == "m06_h11"
+check_tech_inp[ii,]
+ggplot(check_tech_inp[ii,], aes(slice, value, fill = comm)) + geom_bar(stat="identity") + theme_bw()
+
+ggplot(check_tech_inp, aes(as.factor(slice), value, fill = comm)) + geom_bar(stat="identity") + theme_bw() + facet_wrap(~region)
+
+pivot(scen0, tech = "ESOL", parameters = F, year = 2015, slice_ = "m06", # region = "AL", name = "vTechInp", # comm_ = "SOL", 
+            cols = "slice", rows = "comm")
+
+# report(mdl0)
+# report(scen0)
+
+```
+
+## Model with ELC supply and interregional trade  
+```{r Model1_trade, eval=TRUE, include=TRUE}
+
+rps1 <- add(newRepository('repository'), 
+           # Commodities
+           # COA, 
+           # WIN, 
+           ELC,
+           SOLW, SOLM, SOLR, SOLV,
+           # CO2,
+           # Supply
+           SUP_SOLW, SUP_SOLM, SUP_SOLR, SUP_SOLV,
+           SUP_ELC,
+           # Technologies
+           ESOL,
+           # ECOASC,
+           # EWIN,
+           # Trade
+           TRD_ELC_ALL,
+            # Demand
+           DEM_ELC_MH
+           )
+
+
+mdl1 <- newModel(name = 'USA_ELC_TRD1', 
+                debug = data.frame(dummyImport = 1e5,
+                                   dummyExport = 1e5), 
+                region = reg_names,
+                discount = 0.075,
+                slice = list(ANNUAL = "ANNUAL",
+                             SEASON = timeslices$MONTH, 
+                             HOUR = timeslices$HOUR),
+                year = 2015:2015,
+                #milestone = msYears,
+                repository = rps1,
+                GIS = usa9reg,
+                early.retirement = F)
+
+mdl1 <- setMilestoneYears(mdl1, start = 2015, interval = c(1, 2, rep(5, 3)))
+mdl1@sysInfo@milestone
+summary(mdl1)
+format(object.size(mdl1), units = "auto")
+# summary(mdl1)
+# report(mdl1)
+```
+
+```{r run_scen1, include=FALSE}
+scen1 <- NULL
+scen1 <- solve(mdl1, name = 'SOLTRD1', solver = solver, tmp.del = F)
+# scen1.glpk <- solve(mdl1, name = 'SOLTRD1', solver = "GLPK", tmp.del = F)
+# save(scen1, file = "scen1.RData")
+```
+
+```{r analysis_scen1}
+
+format(object.size(scen1), units = "auto")
+dum1 <- scen1@modOut@variables$vDummyCost
+head(dum1)
+dim(dum1)
+dim(scen1@modOut@variables$vDummyImport)
+head(scen1@modOut@variables$vDummyImport)
+# report(scen1)
+
+dd1 <- getData(scen1, name = c("pDemand", "vDummyImport", "vSupOut", "vImport"), year = 2015, merge = T)
+unique(dd1$name)
+dim(dd1)
+head(dd1)
+dd1$value[dd1$name == "pDemand"] <- -dd1$value[dd1$name == "pDemand"]
+ggplot(dd1, aes(region, value, fill = name)) + geom_col() + theme_bw()
+if (sum(dum1$value) > 0.001) {
+  pivot(scen1, name = "vDummyImport", year = 2015)
+  choropleth(scen1, name = "vDummyImport", year = 2015)
+  choropleth(scen1, name = "vDummyImport", year = 2015, slice = "m01_h00")
+  choropleth(scen1, name = "vDummyImport", year = 2015, slice = "m01_h02")
+  choropleth(scen1, name = "vDummyImport", year = 2015, slice = "m01_h04")
+}
+
+# All variables with the scenario result are stored in the scenario object:
+names(scen1@modOut@variables)
+getVariables() # returnes a data.frame with the variable description and dimension (sets)
+
+# All parameters are stored in the model object, interpolated parameters are stored in the scenario object:
+names(scen1@modInp@parameters)
+getParameters() # returnes a data.frame with the parameters description and dimension (sets)
+
+choropleth(scen1, name = "vSupOut", year = 2015)
+choropleth(scen1, name = "vSupOut", year = 2020)
+choropleth(scen1, name = "vImport", year = 2015)
+arrows_trade(scen1, name = "vTradeIr", year = 2015, add = TRUE)
+
+choropleth(scen1, name = "vTechCap", tech = "ESOL", year = 2015)
+
+choropleth(scen1, name = "vExport", year = 2015)
+arrows_trade(scen1, name = "vTradeIr", year = 2015, slice = "m01_h12", add = TRUE)
+arrows_trade(scen1, name = "vTradeIr", year = 2015, add = TRUE, col = "green")
+# Why import is higher than demand? and no supply?
+
+head(scen1@modOut@variables$vTechInp)
+unique(scen1@modOut@variables$vTechInp$tech)
+unique(scen1@modOut@variables$vTechOut$tech)
+
+pivot(scen1, tech = "ESOL", parameters = F, year = 2015, slice_ = "m06", # region = "AL", name = "vTechInp", # comm_ = "SOL", 
+            cols = "slice", rows = "comm")
+
+pivot(scen1, tech = "ESOL", parameters = F, #year = 2015, slice_ = "m06", # region = "AL", name = "vTechInp", # comm_ = "SOL", 
+            cols = "slice", rows = "comm")
+
+dd1[dd1$name == "vImport",]
+pivot(scen1, "vImport", comm_ = "ELC")
+
+```
+
+To be continued...
