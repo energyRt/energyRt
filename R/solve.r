@@ -777,11 +777,8 @@ LL1 <- proc.time()[3]
 #    }
     ##!!!!!!!!!!!!!!!!!!!!!
     ## ORD function
-    cat('param ORD :=', sep = '\n', file = zz)
+    cat('param ORD :=', sep = '\n', file = zz)  
     cat(paste(prec@parameters$year@data$year, seq(along = prec@parameters$year@data$year)), sep = '\n', file = zz)
-    cat(';', '', sep = '\n', file = zz) 
-    cat('param ORDr :=', sep = '\n', file = zz)
-    cat(paste(prec@parameters$region@data$region, seq(along = prec@parameters$region@data$region)), sep = '\n', file = zz)
     cat(';', '', sep = '\n', file = zz) 
     cat('end;', '', sep = '\n', file = zz) 
     ##!!!!!!!!!!!!!!!!!!!!!  
