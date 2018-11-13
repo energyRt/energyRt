@@ -786,7 +786,7 @@ format(object.size(mdl1), units = "auto")
 
 ```{r run_scen1, include=FALSE}
 scen1 <- NULL
-scen1 <- solve(mdl1, name = 'SOLTRD1', solver = solver, tmp.del = F)
+scen1 <- solve(mdl1, name = 'SOLTRD1', solver = solver, tmp.del = T)
 # scen1.glpk <- solve(mdl1, name = 'SOLTRD1', solver = "GLPK", tmp.del = F)
 # save(scen1, file = "scen1.RData")
 ```
