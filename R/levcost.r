@@ -171,6 +171,7 @@ summary.levcost <- function(x) x$total
         reps <- add(reps, tmpm)
       }
   }  
+ # browser()
   additionalCode <- ''
   if (!is.null(comm)) {
     comm2 <- comm
@@ -263,7 +264,6 @@ summary.levcost <- function(x) x$total
       rr@modInp@parameters[['pTechFixom']]@data,
       rr@modOut@variables$vTechCap, by = c('tech', 'region', 'year'))
     dsc[as.character(gfix$year), 'fixom'] <- gfix$value.x *  gfix$value.y
-    dsc[is.na(dsc[, 'fixom']), 'fixom'] <- 0
     dsc[, 'varom'] <- 0
     gvar <- merge(
       rr@modInp@parameters[['pTechVarom']]@data,
@@ -291,7 +291,7 @@ summary.levcost <- function(x) x$total
     dsc$total.cost <- apply(dsc[, c('fuel.total', 'invcost', 'fixom', 'varom')], 1, sum)
     dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
   dd <- sum(dsc[, 'discount.factor'])
-  structure(list(total = rr@modOut@variables$vObjective, 
+  structure(list(total = rr@modOut@data$vObjective / dd, 
     invcost = sum(dsc[, 'invcost'] * dsc[, 'discount.factor']) / dd,
     fixom = sum(dsc[, 'fixom'] * dsc[, 'discount.factor']) / dd, 
     varom = sum(dsc[, 'varom'] * dsc[, 'discount.factor']) / dd,
