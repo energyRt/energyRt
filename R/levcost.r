@@ -194,7 +194,7 @@ summary.levcost <- function(x) x$total
       if (class(slice) == 'slice') mdl@sysInfo@slice <- slice
     } else mdl <- newModel(paste('Levelized cost technology', tech@name), slice = slice)
   } else {
-    mdl <- newModel(paste('Levelized cost technology', tech@name) , slice = 'ANNUAL')
+    mdl <- newModel(paste('levcost_', tech@name) , slice = 'ANNUAL')
   }
   mdl@LECdata$region <- region
   mdl <-add(mdl, reps)
