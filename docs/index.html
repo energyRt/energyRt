@@ -54,10 +54,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/toymodel.html">Vignette Title</a>
-    </li>
-    <li>
-      <a href="articles/usmodel.html">Vignette Title</a>
+      <a href="articles/toymodel.html">'Toy' 9-region model or US electric power sector</a>
     </li>
   </ul>
 </li>
@@ -113,6 +110,65 @@
 <h3 class="hasAnchor">
 <a href="#development-status" class="anchor"></a>Development status</h3>
 <p>The project is in an preparation of the first official release, which includes the documentation and a set of examples (<strong>expected - Nov 2018</strong>). Current functionality allows development of multi-regional RES models with trade, time-slices, and variety of technologies, an integration with GIS (via <em>sp</em> and <em>choropleth</em> packages), pivot tables (via <em>rPivotTable</em>), authomatic <em>pdf-reports</em> for models and scenarios, analysis of levelized costs of tehcnologies, and other features.</p>
+</div>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<div id="prerequisites" class="section level3">
+<h3 class="hasAnchor">
+<a href="#prerequisites" class="anchor"></a>Prerequisites</h3>
+<div id="r-and-rstudio" class="section level4">
+<h4 class="hasAnchor">
+<a href="#r-and-rstudio" class="anchor"></a>R and RStudio</h4>
+<p>Assuming that R is already installed (if not, please download and install from <a href="https://www.r-project.org/" class="uri">https://www.r-project.org/</a>), we also recommend RStudio (<a href="https://www.rstudio.com/" class="uri">https://www.rstudio.com/</a>), a powerful IDE (Integrated Development Environment) for R. It simplifies usage of R, provides number of features such as reproducible research (integration with Markdown, Sweave), integration with version control (github, svn).</p>
+</div>
+<div id="gams-or-glpk-to-solve-the-model" class="section level4">
+<h4 class="hasAnchor">
+<a href="#gams-or-glpk-to-solve-the-model" class="anchor"></a>GAMS or GLPK to solve the model</h4>
+<p>The cost-minimising linear programming model (the set of equation for LP problem), emboddied into <em>energyRt</em> package requires additional software to solve it. Currently <em>energyRt</em> model code is written in <em>GAMS</em> and <em>GLPK</em>, <em>Julia</em> version is in progress, at least one of them is required to solve the model.</p>
+<p>The General Algebraic Modeling System (<em>GAMS</em>, <a href="http://gams.com/" class="uri">http://gams.com/</a>) is a powerful proprietary modeling system. Suitable LP solvers: CBC (included in the basic GAMS version, very powerful open source solver) or CPLEX. Others LP solvers have not been tested, but may work as well.</p>
+<p>GAMS path should be also added to the environmental variables in your operating system.</p>
+<p><em>GLPK</em> is an open source Linear Programming Kit which includes powerful LP and MIP solver, and basic language for creating mathematical programming models (Mathprog or GMPL – for details see <a href="https://en.wikibooks.org/wiki/GLPK/GMPL_%28MathProg%29" class="uri">https://en.wikibooks.org/wiki/GLPK/GMPL_%28MathProg%29</a>)</p>
+<p>GLPK/GMPL is an open source alternative to GAMS, but only for LP and MIP problems. GLPK/GMPL is a bit slower than GAMS for small models, and significantly slower for large models, partially because of the slower Mathprog (GMPL) language processor. Installing GLPK on PC/Windows systems</p>
+<div id="download-glpk-binaries-for-windows" class="section level5">
+<h5 class="hasAnchor">
+<a href="#download-glpk-binaries-for-windows" class="anchor"></a>Download GLPK binaries for Windows:</h5>
+<p><a href="https://sourceforge.net/projects/winglpk/" class="uri">https://sourceforge.net/projects/winglpk/</a></p>
+</div>
+<div id="installing-glpk-on-mac-systems" class="section level5">
+<h5 class="hasAnchor">
+<a href="#installing-glpk-on-mac-systems" class="anchor"></a>Installing GLPK on Mac systems</h5>
+<p>We are not familiar if there are any GLPK-binaries/installers for Mac OSx. Therefore the following example is for installed from source with a standard procedure: gzip -d glpk-4.57.tar.gz<br>
+tar -x &lt; glpk-4.57.tar<br>
+cd glpk-4.57<br>
+./configure<br>
+make<br>
+make check<br>
+make install<br>
+make distclean</p>
+<p>After installation check:<br>
+which glpsol<br>
+glpsol<br>
+or glpsol -v</p>
+<p>Response from glpsol will be an indicator of successful installation.</p>
+<p>Alternatively, GLPK is included in homebrew-science installer library.<br>
+See: <a href="http://brew.sh/" class="uri">http://brew.sh/</a> and <a href="https://github.com/Homebrew/homebrew-science" class="uri">https://github.com/Homebrew/homebrew-science</a> for details.</p>
+</div>
+</div>
+<div id="tex" class="section level4">
+<h4 class="hasAnchor">
+<a href="#tex" class="anchor"></a>TeX</h4>
+<p>Required to generate authomatic reports.<br>
+For Windows: <a href="http://miktex.org/" class="uri">http://miktex.org/</a> (other options are possible but not tested)<br>
+For Mac: <a href="http://tug.org/mactex/" class="uri">http://tug.org/mactex/</a> (other options are possible but not tested)</p>
+</div>
+</div>
+<div id="energyrt" class="section level3">
+<h3 class="hasAnchor">
+<a href="#energyrt" class="anchor"></a>energyRt</h3>
+<p>Currently the package is hosted only on GitHub. To install the package:<br>
+devtools::install_github(“olugovoy/energyRt”)</p>
+</div>
 </div>
 </div>
   </div>
