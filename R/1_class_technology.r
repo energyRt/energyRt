@@ -25,7 +25,9 @@ setClass("technology",
           units         = "data.frame",      #
           group         = "data.frame",      # groups units
           cap2act       = "numeric",         #
-      # Performance parameters
+          cap2stg       = "numeric",         # Technology capacity to storage 
+          seff          = "data.frame",      # storage efficiency          
+          # Performance parameters
           geff          = "data.frame",    #  Group efficiency
           ceff          = "data.frame",    #  Commodity efficiency
           aeff         = "data.frame",    #  Commodity efficiency
@@ -85,7 +87,14 @@ setClass("technology",
 #                                    inout     = factor(NULL, c('input', 'output')),
                                     stringsAsFactors = FALSE),
           cap2act       = 1,
-                                    # group efficiency 
+          seff         = data.frame(region    = character(),
+                                    year      = numeric(),
+                                    slice     = character(),
+                                    stgeff    = numeric(),  
+                                    stg2use   = numeric(),  
+                                    use2stg   = numeric(),  
+                                    stringsAsFactors = FALSE),
+          # group efficiency 
           geff         = data.frame(region     = character(),
                                      year       = numeric(),
                                      slice      = character(),
@@ -130,6 +139,13 @@ setClass("technology",
                                      cap2aout  = numeric(),
                                      ncap2ainp  = numeric(),
                                      ncap2aout  = numeric(),
+                                     # storage part
+                                     stg2ainp  = numeric(),
+                                     sinp2ainp  = numeric(),
+                                     sout2ainp  = numeric(),
+                                     stg2aout  = numeric(),
+                                     sinp2aout  = numeric(),
+                                     sout2aout  = numeric(),
                                      stringsAsFactors = FALSE),
           afa           = data.frame(region   = character(),
                                      year     = numeric(),
