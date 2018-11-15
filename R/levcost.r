@@ -194,7 +194,7 @@ summary.levcost <- function(x) x$total
       if (class(slice) == 'slice') mdl@sysInfo@slice <- slice
     } else mdl <- newModel(paste('Levelized cost technology', tech@name), slice = slice)
   } else {
-    mdl <- newModel(paste('Levelized cost technology', tech@name) , slice = 'ANNUAL')
+    mdl <- newModel(paste('levcost_', tech@name) , slice = 'ANNUAL')
   }
   mdl@LECdata$region <- region
   mdl <-add(mdl, reps)
@@ -292,7 +292,7 @@ summary.levcost <- function(x) x$total
     dsc$total.cost <- apply(dsc[, c('fuel.total', 'invcost', 'fixom', 'varom')], 1, sum)
     dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
   dd <- sum(dsc[, 'discount.factor'])
-  structure(list(total = rr@modOut@variables$vObjective, 
+  structure(list(total = rr@modOut@variables$vObjective / sum(dd), 
     invcost = sum(dsc[, 'invcost'] * dsc[, 'discount.factor']) / dd,
     fixom = sum(dsc[, 'fixom'] * dsc[, 'discount.factor']) / dd, 
     varom = sum(dsc[, 'varom'] * dsc[, 'discount.factor']) / dd,

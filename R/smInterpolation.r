@@ -2,6 +2,7 @@
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
   # cat('simple_data_frame_approximation_chk:', parameter, '\n')
+  there.is.year <- any(colnames(frm) == 'year')
   if (approxim$solver == 'GAMS' && nrow(frm) == 0) return(frm)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
@@ -13,7 +14,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   for(i in colnames(dd)[-ncol(dd)]) {
       dd[[i]] <- as.character(dd[[i]])
   }
-  if (any(colnames(dd) == 'year')) dd[['year']] <- as.numeric(dd[['year']])
+  if (there.is.year) dd[['year']] <- as.numeric(dd[['year']])
   if (is.null(add_set_name)) {
     dd <- dd[, c(mtp@dimSetNames, 'value'), drop = FALSE]
   } else {
@@ -34,12 +35,16 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
       dd <- dd[fl,, drop = FALSE]
     }
   }
+  if (there.is.year && !is.null(approxim$mileStoneYears)) {
+    dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
+  }
   dd
 }
 
 multiInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
   # if (approxim$solver == 'GAMS' && nrow(frm) == 0) return(frm)
+  there.is.year <- any(colnames(frm) == 'year')
   dd <- interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
                     rule       = mtp@interpolation,
@@ -49,7 +54,7 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
   for(i in colnames(dd)[-ncol(dd)]) {
       dd[[i]] <- as.character(dd[[i]])
   }
-  if (any(colnames(dd) == 'year')) dd[['year']] <- as.numeric(dd[['year']])
+  if (there.is.year) dd[['year']] <- as.numeric(dd[['year']])
   if (is.null(add_set_name)) {
     dd <- dd[, c(mtp@dimSetNames, 'type', 'value'), drop = FALSE]
   } else {
@@ -69,6 +74,9 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
       }
       dd <- dd[fl,, drop = FALSE]
     }
+  }
+  if (there.is.year && !is.null(approxim$mileStoneYears)) {
+    dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
   }
   dd
 }

@@ -31,6 +31,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     dtt$import <- list()
     dtt$export <- list()
     dtt$trade <- list()
+    dtt$storage <- list()
     for(i in seq(along = obj@model@data)) {
       for(j in seq(along = obj@model@data[[i]]@data)) {
         obj@model@data[[i]]@data[[j]]@name <- obj@model@data[[i]]@data[[j]]@name
