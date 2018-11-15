@@ -777,9 +777,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   if (!is.null(approxim$slice@misc$next_slice))
     obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
   # Discount
+  approxim.no.mileStone.Year <- approxim
+  approxim.no.mileStone.Year$mileStoneYears <- NULL
       obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
         simpleInterpolation(app@discount, 'discount',
-          obj@parameters[['pDiscount']], approxim))
+          obj@parameters[['pDiscount']], approxim.no.mileStone.Year))
   approxim_comm <- approxim
   approxim_comm[['comm']] <- obj@parameters$comm@data$comm
   obj@parameters[['pSliceShare']] <- addData(obj@parameters[['pSliceShare']], 

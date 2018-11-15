@@ -282,7 +282,8 @@
       region = obj@sysInfo@region,
       year   = obj@sysInfo@year,
       slice  = obj@sysInfo@slice,
-      solver = solver
+      solver = solver,
+      mileStoneYears = obj@sysInfo@milestone$mid
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
