@@ -164,7 +164,11 @@
     n.threads <- arg$n.threads
     arg <- arg[names(arg) != 'n.threads', drop = FALSE]
   } else n.threads <- detectCores()
-#    if (.Platform$OS.type == "unix") {
+  if (any(names(arg) == 'update.scen')) {
+    update.scen <- arg$update.scen
+    arg <- arg[names(arg) != 'update.scen', drop = FALSE]
+  } else update.scen <- NULL
+  #    if (.Platform$OS.type == "unix") {
 #      tmpdir = Sys.getenv('TMPDIR')
 #    } else {
 #       tmpdir = Sys.getenv('TMP')
@@ -336,6 +340,12 @@
         }
   }
   approxim$commodity_slice_map <- commodity_slice_map
+  if (!is.null(update.scen)) {
+    for (tglb in c('update.scen', 'obj', 'prec'))
+      assign(tglb, get(tglb), globalenv())
+    browser()
+   # compare(update.scen@model, )
+  }
   cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {
