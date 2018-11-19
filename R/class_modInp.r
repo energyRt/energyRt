@@ -109,8 +109,9 @@ setMethod("initialize", "modInp",
         createParameter('pSupCost', c('sup', 'comm', 'region', 'year', 'slice'), 'simple', 
         defVal = 0, interpolation = 'back.inter.forth', colName = 'cost', cls = 'supply')    
     .Object@parameters[['pSupReserve']] <- 
-        createParameter('pSupReserve', c('sup', 'comm'), 'simple', 
-        defVal = Inf, interpolation = 'back.inter.forth', cls = 'supply', slot = 'reserve', colName = 'reserve')    
+        createParameter('pSupReserve', c('sup', 'comm', 'region'), 'multi', 
+        defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'supply', slot = 'reserve', 
+        colName = c('res.lo', 'res.up'))
     # multi
     .Object@parameters[['pSupAva']] <- 
         createParameter('pSupAva', c('sup', 'comm', 'region', 'year', 'slice'), 'multi', 
@@ -359,7 +360,7 @@ setMethod("initialize", "modInp",
       createParameter('ndefpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['ndefpSupAvaUp']] <- 
       createParameter('ndefpSupAvaUp', c('sup', 'comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['ndefpSupReserve']] <- createParameter('ndefpSupReserve', c('sup', 'comm'), 'map')    
+  .Object@parameters[['ndefpSupReserve']] <- createParameter('ndefpSupReserve', c('sup', 'comm', 'region'), 'map')    
   .Object@parameters[['ndefpStorageOlife']] <- createParameter('ndefpStorageOlife', c('stg', 'region'), 'map')   
   .Object@parameters[['ndefpTradeIrUp']] <- createParameter('ndefpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    

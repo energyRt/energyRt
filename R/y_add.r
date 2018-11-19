@@ -178,7 +178,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
         simpleInterpolation(sup@availability, 'cost',
             obj@parameters[['pSupCost']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
     obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
-        data.frame(sup = sup@name, comm = sup@commodity, value = sup@reserve))
+      multiInterpolation(sup@reserve, 'res', obj@parameters[['pSupReserve']], 
+      approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
               multiInterpolation(sup@availability, 'ava',
               obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))

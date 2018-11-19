@@ -340,12 +340,6 @@
         }
   }
   approxim$commodity_slice_map <- commodity_slice_map
-  if (!is.null(update.scen)) {
-    for (tglb in c('update.scen', 'obj', 'prec'))
-      assign(tglb, get(tglb), globalenv())
-    browser()
-   # compare(update.scen@model, )
-  }
   cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {
@@ -543,6 +537,12 @@ LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
 
       assign('prec', prec, globalenv())
+      if (!is.null(update.scen)) {
+        for (tglb in c('update.scen', 'obj', 'prec'))
+          assign(tglb, get(tglb), globalenv())
+        browser()
+        # compare(update.scen@model, )
+      }
       defin_ndef_par <- function(prec, name1, name2) {
         gg <- getParameterData(prec@parameters[[name1]])
         if (solver == 'GAMS' && prec@parameters[[name1]]@defVal[2] == Inf) {
@@ -567,12 +567,12 @@ LL1 <- proc.time()[3]
       }
       
       
-      prec <- defin_ndef_par_set(prec, 'pSupReserve', 'ndefpSupReserve')
       prec <- defin_ndef_par_set(prec, 'pDummyImportCost', 'ndefpDummyImportCost')
       prec <- defin_ndef_par_set(prec, 'pDummyExportCost', 'ndefpDummyExportCost')
       prec <- defin_ndef_par_set(prec, 'pExportRowRes', 'ndefpExportRowRes')
       prec <- defin_ndef_par_set(prec, 'pImportRowRes', 'ndefpImportRowRes')
       prec <- defin_ndef_par(prec, 'pSupAva', 'ndefpSupAvaUp')
+      prec <- defin_ndef_par(prec, 'pSupReserve', 'ndefpSupReserveUp')
       prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
       prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
       prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')

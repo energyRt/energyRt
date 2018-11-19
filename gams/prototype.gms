@@ -69,6 +69,7 @@ alias (region, src), (region, dst);
 
 * Mapping sets
 set
+mSameRegion(region, region) The same region
 *! technology:input
 mMilestoneLast(year)           Last period milestone
 mMilestoneNext(year, year)     Next period milestone
@@ -108,7 +109,7 @@ mLoComm(comm)  Commodity balance type PRODUCTION >= CONSUMPTION
 mFxComm(comm)  Commodity balance type PRODUCTION = CONSUMPTION
 ndefpTechAfaUp(tech, region, year, slice)         Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpTechAfacUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpSupReserve(sup, comm)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpSupReserveUp(sup, comm, region)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpSupAvaUp(sup, comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpDummyImportCost(comm, region, year, slice)   Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpDummyExportCost(comm, region, year, slice)   Auxiliary mapping for Inf - used in GLPK-MathProg only
@@ -205,7 +206,8 @@ pDiscountFactor(region, year)                       Discount factor (cumulative)
 pSupCost(sup, comm, region, year, slice)                  Costs of supply
 pSupAvaUp(sup, comm, region, year, slice)                 Upper bound for supply
 pSupAvaLo(sup, comm, region, year, slice)                 Lower bound for supply
-pSupReserve(sup, comm)                                    Total supply reserve
+pSupReserveUp(sup, comm, region)                            Total supply reserve by region Up
+pSupReserveLo(sup, comm, region)                            Total supply reserve by region Lo
 * Demand
 pDemand(dem, comm, region, year, slice)                   Exogenous demand
 * Emissions
@@ -304,7 +306,7 @@ vTechOMCost(tech, region, year)                      Sum of all technology-relat
 positive variable
 * Supply
 vSupOut(sup, comm, region, year, slice)              Output of supply processes
-vSupReserve(sup, comm)                                     Cumulative used supply reserve
+vSupReserve(sup, comm, region)                       Cumulative used supply reserve
 ;
 variable
 vSupCost(sup, region, year)                          Supply costs
@@ -952,8 +954,9 @@ eqTechAVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilesto
 Equation
 eqSupAvaUp(sup, comm, region, year, slice)  Supply availability upper bound
 eqSupAvaLo(sup, comm, region, year, slice)  Supply availability lower bound
-eqSupTotal(sup, comm)                       Total supply of each commodity
-eqSupReserve(sup, comm)                     Total supply vs reserve check
+eqSupTotal(sup, comm, region)                       Total supply of each commodity
+eqSupReserveUp(sup, comm, region)                     Total supply vs reserve check
+eqSupReserveLo(sup, comm, region)                     Total supply vs reserve check
 eqSupCost(sup, region, year)                Total supply costs
 ;
 
@@ -968,19 +971,26 @@ eqSupAvaLo(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilest
          =g=
          pSupAvaLo(sup, comm, region, year, slice);
 
-eqSupTotal(sup, comm)$mSupComm(sup, comm)..
-         vSupReserve(sup, comm)
+eqSupTotal(sup, comm, region)$(mSupComm(sup, comm) and mSupSpan(sup, region))..
+         vSupReserve(sup, comm, region)
          =e=
-         sum((region, year, slice, yeare, yearp)$(mSupSlice(sup, slice) and mMidMilestone(year) and
-                mStartMilestone(year, yeare) and mEndMilestone(year, yearp) and mSupSpan(sup, region)),
+         sum((year, slice, yeare, yearp)$(mSupSlice(sup, slice) and mMidMilestone(year) and
+                mStartMilestone(year, yeare) and mEndMilestone(year, yearp)),
              (ORD(yearp) - ORD(yeare) + 1) * vSupOut(sup, comm, region, year, slice)
          );
 
-eqSupReserve(sup, comm)$
+eqSupReserveUp(sup, comm, region)$
          (
-                 mSupComm(sup, comm) and not(ndefpSupReserve(sup, comm))
+                 mSupComm(sup, comm) and not(ndefpSupReserveUp(sup, comm, region)) and mSupSpan(sup, region)
          )..
-         pSupReserve(sup, comm) =g= vSupReserve(sup, comm);
+         pSupReserveUp(sup, comm, region) =g= vSupReserve(sup, comm, region);
+
+eqSupReserveLo(sup, comm, region)$
+         (
+                 mSupComm(sup, comm) and  pSupReserveLo(sup, comm, region) <> 0 and mSupSpan(sup, region)
+         )..
+         vSupReserve(sup, comm, region) =g= pSupReserveLo(sup, comm, region);
+
 
 eqSupCost(sup, region, year)$(mMidMilestone(year) and mSupSpan(sup, region))..
          vSupCost(sup, region, year)
@@ -1205,7 +1215,7 @@ eqImportRowResUp(imp)                       Accumulated import from ROW upper bo
 eqImport(comm, dst, year, slice)$(mMidMilestone(year) and
   sum(trade$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeDst(trade, dst)), 1) + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), 1))..
   vImport(comm, dst, year, slice) =e=
-  sum((trade, src)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and ord(src) <> ord(dst)),
+  sum((trade, src)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and mSameRegion(src, dst)),
    vTradeIr(trade, src, dst, year, slice)) + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), vImportRow(imp, dst, year, slice));
 
 
@@ -1213,15 +1223,15 @@ eqExport(comm, src, year, slice)$(mMidMilestone(year) and
    sum(trade$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src)), 1) + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1)
   )..
   vExport(comm, src, year, slice) =e=
-  sum((trade, dst)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and ord(src) <> ord(dst)),
+  sum((trade, dst)$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and mSameRegion(src, dst)),
   vTradeIr(trade, src, dst, year, slice)) + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), vExportRow(expp, src, year, slice));
 
 eqTradeFlowUp(trade, src, dst, year, slice)$(mTradeSlice(trade, slice) and mMidMilestone(year) and
-    not(ndefpTradeIrUp(trade, src, dst, year, slice)) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and ord(src) <> ord(dst))..
+    not(ndefpTradeIrUp(trade, src, dst, year, slice)) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and mSameRegion(src, dst))..
       vTradeIr(trade, src, dst, year, slice) =l= pTradeIrUp(trade, src, dst, year, slice);
 
 eqTradeFlowLo(trade, src, dst, year, slice)$(mTradeSlice(trade, slice) and mMidMilestone(year) and
-    pTradeIrLo(trade, src, dst, year, slice) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and ord(src) <> ord(dst))..
+    pTradeIrLo(trade, src, dst, year, slice) and mTradeSrc(trade, src) and mTradeDst(trade, dst) and mSameRegion(src, dst))..
       vTradeIr(trade, src, dst, year, slice) =g= pTradeIrLo(trade, src, dst, year, slice);
 
 
@@ -1237,11 +1247,11 @@ eqCostRowTrade(region, year)$mMidMilestone(year).. vTradeRowCost(region, year) =
 
 eqCostIrTrade(region, year)$mMidMilestone(year).. vTradeIrCost(region, year) =e=
 * Import
-  sum((trade, src, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(src) <> ord(region)),
+  sum((trade, src, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(src, region)),
     (pTradeIrCost(trade, src, region, year, slice) + pTradeIrMarkup(trade, src, region, year, slice)) *
         vTradeIr(trade, src, region, year, slice))
 * Plus markup from export
-  - sum((trade, dst, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(dst) <> ord(region)),
+  - sum((trade, dst, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(dst, region)),
     pTradeIrMarkup(trade, region, dst, year, slice) * vTradeIr(trade, region, dst, year, slice));
 
 eqExportRowUp(expp, region, year, slice)$(mExpSlice(expp, slice) and mMidMilestone(year) and not(ndefpExportRowUp(expp, region, year, slice)))..
@@ -1284,26 +1294,26 @@ eqTradeIrAOut(trade, comm, region, year, slice) Trade auxiliary commodity output
 
 eqTradeIrAInp(trade, comm, region, year, slice)$(mTradeIrAInp(trade, comm) and
     mTradeSlice(trade, slice) and mMidMilestone(year) and (mTradeSrc(trade, region) or mTradeDst(trade, region)) and
-                     (sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst) and
+                     (sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst) and
                         pTradeIrCsrc2Ainp(trade, region, dst, year, slice) <> 0), 1)
-                  + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src) and
+                  + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src) and
                         pTradeIrCdst2Ainp(trade, src, region, year, slice) <> 0), 1) <> 0))..
   vTradeIrAInp(trade, comm, region, year, slice) =e=
-    sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst)),
+    sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst)),
       pTradeIrCsrc2Ainp(trade, region, dst, year, slice) * vTradeIr(trade, region, dst, year, slice))
-    + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src)),
+    + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src)),
       pTradeIrCdst2Ainp(trade, src, region, year, slice) * vTradeIr(trade, src, region, year, slice));
 
 eqTradeIrAOut(trade, comm, region, year, slice)$(mTradeIrAOut(trade, comm) and
     mTradeSlice(trade, slice) and mMidMilestone(year) and (mTradeSrc(trade, region) or mTradeDst(trade, region))  and
-           sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst) and
+           sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst) and
       pTradeIrCsrc2Aout(trade, region, dst, year, slice) <> 0), 1)
-         + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src) and
+         + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src) and
       pTradeIrCdst2Aout(trade, src, region, year, slice) <> 0), 1) <> 0)..
   vTradeIrAOut(trade, comm, region, year, slice) =e=
-    sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst)),
+    sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst)),
       pTradeIrCsrc2Aout(trade, region, dst, year, slice) * vTradeIr(trade, region, dst, year, slice))
-    + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src)),
+    + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src)),
       pTradeIrCdst2Aout(trade, src, region, year, slice) * vTradeIr(trade, src, region, year, slice));
 
 
@@ -1342,9 +1352,9 @@ eqInp2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(com
          vExport(comm, region, year, slice)$(sum(trade$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, region)), 1)
                     + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1))
          + sum(trade$(mTradeSlice(trade, slice) and mTradeIrAInp(trade, comm) and
-                     (sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst) and
+                     (sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst) and
                         pTradeIrCsrc2Ainp(trade, region, dst, year, slice) <> 0), 1)
-                  + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src) and
+                  + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src) and
                         pTradeIrCdst2Ainp(trade, src, region, year, slice) <> 0), 1) <> 0)), vTradeIrAInp(trade, comm, region, year, slice));
 
 eqOut2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(comm, slice)))..
@@ -1361,9 +1371,9 @@ eqOut2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(com
          vImport(comm, region, year, slice)$(sum(trade$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeDst(trade, region)), 1)
                     + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), 1))
      + sum(trade$(mTradeSlice(trade, slice) and mTradeIrAOut(trade, comm) and
-           sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst) and
+           sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst) and
                pTradeIrCsrc2Aout(trade, region, dst, year, slice) <> 0), 1)
-         + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src) and
+         + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src) and
                pTradeIrCdst2Aout(trade, src, region, year, slice) <> 0), 1) <> 0), vTradeIrAOut(trade, comm, region, year, slice))
 ;
 
@@ -1397,9 +1407,9 @@ eqOutTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
          vImport(comm, region, year, slice)$(sum(trade$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeDst(trade, region)), 1)
                     + sum(imp$(mImpSlice(imp, slice) and mImpComm(imp, comm)), 1))
      + sum(trade$(mTradeSlice(trade, slice) and mTradeIrAInp(trade, comm) and
-           sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst) and
+           sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst) and
                pTradeIrCsrc2Aout(trade, region, dst, year, slice) <> 0), 1)
-         + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src) and
+         + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src) and
                pTradeIrCdst2Aout(trade, src, region, year, slice) <> 0), 1) <> 0), vTradeIrAOut(trade, comm, region, year, slice))
   + sum(slicep$mAllSliceParentChild(slicep, slice), vOut2Up(comm, region, year, slicep, slice))
   + sum(slicep$mAllSliceParentChild(slice, slicep), vOut2Up(comm, region, year, slice, slicep))
@@ -1418,9 +1428,9 @@ eqInpTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
          vExport(comm, region, year, slice)$(sum(trade$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, region)), 1)
                     + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1))
          + sum(trade$(mTradeSlice(trade, slice) and mTradeIrAOut(trade, comm) and
-                     (sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and ord(region) <> ord(dst) and
+                     (sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and mSameRegion(region, dst) and
                         pTradeIrCsrc2Ainp(trade, region, dst, year, slice) <> 0), 1)
-                  + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and ord(region) <> ord(src) and
+                  + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and mSameRegion(region, src) and
                         pTradeIrCdst2Ainp(trade, src, region, year, slice) <> 0), 1) <> 0)), vTradeIrAInp(trade, comm, region, year, slice))
   + sum(slicep$mAllSliceParentChild(slicep, slice), vInp2Up(comm, region, year, slicep, slice))
   + sum(slicep$mAllSliceParentChild(slice, slicep), vInp2Up(comm, region, year, slice, slicep))
@@ -20816,7 +20826,8 @@ eqTechAVarom
 **************************************
 eqSupAvaUp
 eqSupAvaLo
-eqSupReserve
+eqSupReserveUp
+eqSupReserveLo
 eqSupTotal
 eqSupCost
 **************************************
