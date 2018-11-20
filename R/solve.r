@@ -684,18 +684,22 @@ LL1 <- proc.time()[3]
    } else if (n.threads == 1) { # || TRUE
      file_w <- c()
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
+       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
+       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
+       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
+       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        # cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
@@ -788,14 +792,14 @@ LL1 <- proc.time()[3]
 #    }
     ##!!!!!!!!!!!!!!!!!!!!!
     ## ORD function
-    cat('param ORD :=', sep = '\n', file = zz)
-    cat(paste(prec@parameters$year@data$year, seq(along = prec@parameters$year@data$year)), sep = '\n', file = zz)
-    cat(';', '', sep = '\n', file = zz) 
-    cat('param ORDr :=', sep = '\n', file = zz)
-    cat(paste(prec@parameters$region@data$region, seq(along = prec@parameters$region@data$region)), sep = '\n', file = zz)
-    cat(';', '', sep = '\n', file = zz) 
-    cat('end;', '', sep = '\n', file = zz) 
+    #cat('param ORD :=', sep = '\n', file = zz)
+    #cat(paste(prec@parameters$year@data$year, seq(along = prec@parameters$year@data$year)), sep = '\n', file = zz)
+    #cat(';', '', sep = '\n', file = zz) 
+    #cat('param ORDr :=', sep = '\n', file = zz)
+    #cat(paste(prec@parameters$region@data$region, seq(along = prec@parameters$region@data$region)), sep = '\n', file = zz)
+    #cat(';', '', sep = '\n', file = zz) 
     ##!!!!!!!!!!!!!!!!!!!!!  
+    cat('end;', '', sep = '\n', file = zz) 
     close(zz)
     pp2 <- proc.time()[3]
     if(echo) {

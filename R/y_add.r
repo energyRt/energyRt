@@ -824,6 +824,15 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
     data.frame(year = app@milestone$mid[-nrow(app@milestone)], yearp = app@milestone$mid[-1])) 
   obj@parameters[['mMilestoneHasNext']] <- addData(obj@parameters[['mMilestoneHasNext']], 
     data.frame(year = app@milestone$mid[-nrow(app@milestone)])) 
+
+  obj@parameters[['mSameSlice']] <- addData(obj@parameters[['mSameSlice']], 
+    data.frame(slice = app@slice@all_slice, slicep = app@slice@all_slice))
+  obj@parameters[['mSameRegion']] <- addData(obj@parameters[['mSameRegion']], 
+    data.frame(region = app@region, regionp = app@region))
+  tmp <- data.frame(year = app@milestone$mid, value = seq_along(app@milestone$mid))
+  obj@parameters[['ordYear']] <- addData(obj@parameters[['ordYear']], tmp)
+  obj@parameters[['cardYear']] <- addData(obj@parameters[['cardYear']], tmp[nrow(tmp),, drop = FALSE])
+  
   obj
 })
 
