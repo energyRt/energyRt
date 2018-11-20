@@ -3,6 +3,7 @@
    tmp.dir = NULL, tmp.del = FALSE, ...) {
   read_default_data <- function(prec, ss) {
     for(i in seq(along = prec@parameters)) {
+      # assign('test', prec@parameters[[i]], globalenv())
       if (any(prec@parameters[[i]]@colName != '')) {
         prec@parameters[[i]]@defVal <-
           as.numeric(ss@defVal[1, prec@parameters[[i]]@colName])
@@ -684,22 +685,18 @@ LL1 <- proc.time()[3]
    } else if (n.threads == 1) { # || TRUE
      file_w <- c()
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
-       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
-       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
-       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        #cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
      for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
-       assign('test', prec@parameters[[i]], globalenv())
        file_w <- c(file_w, energyRt:::.toGams(prec@parameters[[i]]))
        # cat(energyRt:::.toGams(prec@parameters[[i]]), sep = '\n', file = zz)
      }
