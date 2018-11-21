@@ -648,6 +648,10 @@ LL1 <- proc.time()[3]
        prec@parameters$mStartMilestone@data$year %in% mile.stone.after, 'yearp'], na.rm = TRUE)
      stay.year.end <- max(prec@parameters$mEndMilestone@data[
        prec@parameters$mEndMilestone@data$year %in% mile.stone.after, 'yearp'], na.rm = TRUE)
+
+     mile.stone.length <- (prec@parameters$mEndMilestone@data$yearp - prec@parameters$mStartMilestone@data$yearp + 1)
+     names(mile.stone.length) <- prec@parameters$mEndMilestone@data$year
+
      # Move new capacity before up to to stock (technology)
      tech.new.cap <- up.to.scen@modOut@variables$vTechNewCap
      tech.stock <- energyRt:::.getTotalParameterData(prec, 'pTechStock')
@@ -666,25 +670,27 @@ LL1 <- proc.time()[3]
        } 
      }
      tech.stock2 <- aggregate(tech.stock$value, by = list(tech = tech.stock$tech, region = tech.stock$region, 
-                                                          year = tech.stock$year), sum, simplify = FALSE, drop = FALSE)
+                                                          year = tech.stock$year), sum, simplify = !FALSE, drop = FALSE)
      colnames(tech.stock2)[ncol(tech.stock2)] <- 'value'
      # have to replace tech.stock2 -> pTechStock
-     prec <- .setParameterData(prec, 'pTechStock', tech.stock2)
+     prec <- energyRt:::.setParameterData(prec, 'pTechStock', tech.stock2)
      # Move new capacity before up to to stock (supply)
      # Chage supply reserve
-     sup.res.par <-energyRt:::.getTotalParameterData(prec, 'pSupReserve')
-     sup.res.use0 <-up.to.scen@modOut@variables$vSupReserve
+     sup.res.par <- energyRt:::.getTotalParameterData(prec, 'pSupReserve')
+     sup.res.use0 <-up.to.scen@modOut@variables$vSupOut
      sup.res.use0$type <- 'lo'
-     sup.res.use0 <- sup.res.use0[, c(colnames(sup.res.use0)[!(colnames(sup.res.use0) %in% c('type', 'value'))], 'type', 'value')]
-     sup.res.use0$value <- (-sup.res.use0$value)
+     sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", "year", 'type', 'value')]
+     sup.res.use0 <- sup.res.use0[sup.res.use0$year < up.to,, drop = FALSE]
+     sup.res.use0$value <- (-sup.res.use0$value * mile.stone.length[as.character(sup.res.use0$year)])
+     sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", 'type', 'value')]
      sup.res.use <- sup.res.use0
      sup.res.use0$type <- 'up'
      sup.res.use <- rbind(sup.res.use0, sup.res.use, sup.res.par)
      sup.res.use2 <- aggregate(sup.res.use$value, by = list(sup = sup.res.use$sup, comm = sup.res.use$comm, region = sup.res.use$region, 
-                                                            type = sup.res.use$type), sum, simplify = FALSE, drop = FALSE)
+                                                            type = sup.res.use$type), sum, simplify = TRUE, drop = FALSE)
      colnames(sup.res.use2)[ncol(sup.res.use2)] <- 'value'
      sup.res.use2$value[sup.res.use2$value < 0] <- 0
-     prec <- .setParameterData(prec, 'pSupReserve', sup.res.use2)
+     prec <- energyRt:::.setParameterData(prec, 'pSupReserve', sup.res.use2)
 
      als_year <- c('year', 'yearn', 'yearp', 'yeare')
      for (nn in names(prec@parameters)) {
