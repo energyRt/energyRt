@@ -824,15 +824,15 @@ eqTechSalv0(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare
     vTechSalv(tech, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
-         and ordYear(year) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(ndefpTechOlife(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
-    (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
+         and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(ndefpTechOlife(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
+    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
      - sum(yearp$(mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp)))  / (
       1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(year)), pDiscountFactor(region, yearp)))
+        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
           ) / (
-           (pTechOlife(tech, region) + ordYear(year) - 1 - ordYear(yeare)
+           (pTechOlife(tech, region) + ordYear(yearn) - 1 - ordYear(yeare)
            ))
     ))  =e= 0;
 
@@ -843,13 +843,13 @@ eqTechSalv(tech, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(y
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
   and mTechNew(tech, region, yearn) and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(ndefpTechOlife(tech, region))
    and pTechInvcost(tech, region, yearn) <> 0),
-    (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) *
+    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
       - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp))) / (
       1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(year)), pDiscountFactor(region, yearp)))
+        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
         / pDiscountFactor(region, yeare) / ((
-           1 - (1 + pDiscount(region, yeare)) ** (ordYear(yeare) - pTechOlife(tech, region) - ordYear(year) + 1)
+           1 - (1 + pDiscount(region, yeare)) ** (ordYear(yeare) - pTechOlife(tech, region) - ordYear(yearn) + 1)
            )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare))
     ))  =e= 0;
 
@@ -1096,39 +1096,36 @@ eqStorageCost(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regi
          + vStorageInv(stg, region, year)$mStorageNew(stg, region, year);
 
 * Salvage value
-eqStorageSalv0(stg, region, yeare)$(mMilestoneLast(yeare) and mDiscountZero(region))..
-         vStorageSalv(stg, region)
-         +
-        sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year) and
-           ordYear(year) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(ndefpStorageOlife(stg, region))
-                 and pStorageInvcost(stg, region, year) <> 0),
-        vStorageInv(stg, region, year) * (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
-        1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(year)), pDiscountFactor(region, yearp)))
+eqStorageSalv0(stg, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare) and sum(year$mStorageNew(stg, region, year), 1) <> 0)..
+    vStorageSalv(stg, region)
+    +
+   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mStorageNew(stg, region, yearn)
+         and ordYear(yearn) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(ndefpStorageOlife(stg, region))  and pStorageInvcost(stg, region, yearn) <> 0),
+    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
+    pStorageInvcost(stg, region, yearn) * vStorageNewCap(stg, region, yearn)  / (
+      1
+        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
         / (pDiscountFactor(region, yeare)
-          ) / (sum(yearn$(ordYear(yeare) = ordYear(yearn)),
-           (pStorageOlife(stg, region) + ordYear(year) - 1 - ordYear(yeare)
-           )))
-    ))   =e= 0;
+          ) / (
+           (pStorageOlife(stg, region) + ordYear(yearn) - 1 - ordYear(yeare)
+           ))
+    ))  =e= 0;
 
 
-eqStorageSalv(stg, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(region)))..
-         vStorageSalv(stg, region)
-         +
-         sum(year$(mStorageNew(stg, region, year) and mMidMilestone(year)
-         and ordYear(year) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(ndefpStorageOlife(stg, region))
-                 and pStorageInvcost(stg, region, year) <> 0),
-         vStorageInv(stg, region, year) *
-         (pDiscountFactor(region, year) /  pDiscountFactor(region, yeare)) / (
-         1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(year)), pDiscountFactor(region, yearp)))
-        / (pDiscountFactor(region, yeare)
-          ) / ((
-           1 - (1 + pDiscount(region, yeare)) ** (ordYear(yeare)
-                 - pStorageOlife(stg, region) - ordYear(year) + 1)
-           )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare)))
-    )  =e= 0;
-
+eqStorageSalv(stg, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(yeare) and sum(year$mStorageNew(stg, region, year), 1) <> 0)..
+    vStorageSalv(stg, region)
+    +
+   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
+  and mStorageNew(stg, region, yearn) and ordYear(yearn) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(ndefpStorageOlife(stg, region))
+   and pStorageInvcost(stg, region, yearn) <> 0),
+    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
+    pStorageInvcost(stg, region, yearn) * vStorageNewCap(stg, region, yearn) / (
+      1
+        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
+        / pDiscountFactor(region, yeare) / ((
+           1 - (1 + pDiscount(region, yeare)) ** (ordYear(yeare) - pStorageOlife(stg, region) - ordYear(yearn) + 1)
+           )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare))
+    ))  =e= 0;
 
 
 **************************************

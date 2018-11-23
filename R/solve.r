@@ -230,15 +230,15 @@
     useDataTable <- arg$useDataTable
     arg <- arg[names(arg) != 'useDataTable', drop = FALSE]    
   } else useDataTable <- TRUE
-  if (any(names(arg) == 'up.to')) {
-    up.to <- arg$up.to
-    arg <- arg[names(arg) != 'up.to', drop = FALSE]
-    if (!is.null(up.to)) {
-      up.to.scen <- arg$up.to.scen
-      if (class(up.to.scen) != 'scenario') stop('up.to.scen must be defined for up.to')
-      arg <- arg[names(arg) != 'up.to.scen', drop = FALSE]
+  if (any(names(arg) == 'startYear')) {
+    startYear <- arg$startYear
+    arg <- arg[names(arg) != 'startYear', drop = FALSE]
+    if (!is.null(startYear)) {
+      fixTo <- arg$fixTo
+      if (class(fixTo) != 'scenario') stop('fixTo must be defined for startYear')
+      arg <- arg[names(arg) != 'fixTo', drop = FALSE]
     }
-  } else up.to <- NULL
+  } else startYear <- NULL
   if (any(names(arg) == 'year')) {
     obj@sysInfo@year <- arg$year
     arg <- arg[names(arg) != 'year', drop = FALSE]
@@ -639,11 +639,11 @@ LL1 <- proc.time()[3]
     }
   
    # up to year
-   if (!is.null(up.to)) {
+   if (!is.null(startYear)) {
      prec0 <- prec
      # begin
      mile.stone <- prec@parameters$mMidMilestone@data$year
-     mile.stone.after <- mile.stone[mile.stone >= up.to] 
+     mile.stone.after <- mile.stone[mile.stone >= startYear] 
      stay.year.begin <- min(prec@parameters$mStartMilestone@data[
        prec@parameters$mStartMilestone@data$year %in% mile.stone.after, 'yearp'], na.rm = TRUE)
      stay.year.end <- max(prec@parameters$mEndMilestone@data[
@@ -653,9 +653,9 @@ LL1 <- proc.time()[3]
      names(mile.stone.length) <- prec@parameters$mEndMilestone@data$year
 
      # Move new capacity before up to to stock (technology)
-     tech.new.cap <- up.to.scen@modOut@variables$vTechNewCap
+     tech.new.cap <- fixTo@modOut@variables$vTechNewCap
      tech.stock <- energyRt:::.getTotalParameterData(prec, 'pTechStock')
-     tech.new.cap <- tech.new.cap[tech.new.cap$year <= up.to,, drop = FALSE]
+     tech.new.cap <- tech.new.cap[tech.new.cap$year <= startYear,, drop = FALSE]
      tech.life <- energyRt:::.getTotalParameterData(prec, 'pTechOlife')
      olife.tmp <- tech.life$value
      names(olife.tmp) <- paste0(tech.life$tech, '#', tech.life$region)
@@ -677,10 +677,10 @@ LL1 <- proc.time()[3]
      # Move new capacity before up to to stock (supply)
      # Chage supply reserve
      sup.res.par <- energyRt:::.getTotalParameterData(prec, 'pSupReserve')
-     sup.res.use0 <-up.to.scen@modOut@variables$vSupOut
+     sup.res.use0 <-fixTo@modOut@variables$vSupOut
      sup.res.use0$type <- 'lo'
      sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", "year", 'type', 'value')]
-     sup.res.use0 <- sup.res.use0[sup.res.use0$year < up.to,, drop = FALSE]
+     sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear,, drop = FALSE]
      sup.res.use0$value <- (-sup.res.use0$value * mile.stone.length[as.character(sup.res.use0$year)])
      sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", 'type', 'value')]
      sup.res.use <- sup.res.use0
