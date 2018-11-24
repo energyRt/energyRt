@@ -3,6 +3,7 @@
    tmp.dir = NULL, tmp.del = FALSE, ...) {
   read_default_data <- function(prec, ss) {
     for(i in seq(along = prec@parameters)) {
+      # assign('test', prec@parameters[[i]], globalenv())
       if (any(prec@parameters[[i]]@colName != '')) {
         prec@parameters[[i]]@defVal <-
           as.numeric(ss@defVal[1, prec@parameters[[i]]@colName])
@@ -225,10 +226,19 @@
           collapse = '", "'), '"', sep = ''))
     }
   }
-  if (any(names(arg) == 'region')) {
-    obj@sysInfo@region <- arg$region
-    arg <- arg[names(arg) != 'region', drop = FALSE]
-  } 
+  if (any(names(arg) == 'useDataTable')) {
+    useDataTable <- arg$useDataTable
+    arg <- arg[names(arg) != 'useDataTable', drop = FALSE]    
+  } else useDataTable <- TRUE
+  if (any(names(arg) == 'startYear')) {
+    startYear <- arg$startYear
+    arg <- arg[names(arg) != 'startYear', drop = FALSE]
+    if (!is.null(startYear)) {
+      fixTo <- arg$fixTo
+      if (class(fixTo) != 'scenario') stop('fixTo must be defined for startYear')
+      arg <- arg[names(arg) != 'fixTo', drop = FALSE]
+    }
+  } else startYear <- NULL
   if (any(names(arg) == 'year')) {
     obj@sysInfo@year <- arg$year
     arg <- arg[names(arg) != 'year', drop = FALSE]
@@ -340,12 +350,6 @@
         }
   }
   approxim$commodity_slice_map <- commodity_slice_map
-  if (!is.null(update.scen)) {
-    for (tglb in c('update.scen', 'obj', 'prec'))
-      assign(tglb, get(tglb), globalenv())
-    browser()
-   # compare(update.scen@model, )
-  }
   cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {
@@ -542,7 +546,12 @@
 LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
 
-      assign('prec', prec, globalenv())
+      #if (!is.null(update.scen)) {
+      #  for (tglb in c('update.scen', 'obj', 'prec'))
+      #    assign(tglb, get(tglb), globalenv())
+      #  browser()
+      #  # compare(update.scen@model, )
+      #}
       defin_ndef_par <- function(prec, name1, name2) {
         gg <- getParameterData(prec@parameters[[name1]])
         if (solver == 'GAMS' && prec@parameters[[name1]]@defVal[2] == Inf) {
@@ -567,12 +576,12 @@ LL1 <- proc.time()[3]
       }
       
       
-      prec <- defin_ndef_par_set(prec, 'pSupReserve', 'ndefpSupReserve')
       prec <- defin_ndef_par_set(prec, 'pDummyImportCost', 'ndefpDummyImportCost')
       prec <- defin_ndef_par_set(prec, 'pDummyExportCost', 'ndefpDummyExportCost')
       prec <- defin_ndef_par_set(prec, 'pExportRowRes', 'ndefpExportRowRes')
       prec <- defin_ndef_par_set(prec, 'pImportRowRes', 'ndefpImportRowRes')
       prec <- defin_ndef_par(prec, 'pSupAva', 'ndefpSupAvaUp')
+      prec <- defin_ndef_par(prec, 'pSupReserve', 'ndefpSupReserveUp')
       prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
       prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
       prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
@@ -628,10 +637,80 @@ LL1 <- proc.time()[3]
       if (prec@parameters$mTechRetirement@nValues != -1)
         prec@parameters$mTechRetirement@nValues <- 0
     }
+  
+   # up to year
+   if (!is.null(startYear)) {
+     prec0 <- prec
+     # begin
+     mile.stone <- prec@parameters$mMidMilestone@data$year
+     mile.stone.after <- mile.stone[mile.stone >= startYear] 
+     stay.year.begin <- min(prec@parameters$mStartMilestone@data[
+       prec@parameters$mStartMilestone@data$year %in% mile.stone.after, 'yearp'], na.rm = TRUE)
+     stay.year.end <- max(prec@parameters$mEndMilestone@data[
+       prec@parameters$mEndMilestone@data$year %in% mile.stone.after, 'yearp'], na.rm = TRUE)
+
+     mile.stone.length <- (prec@parameters$mEndMilestone@data$yearp - prec@parameters$mStartMilestone@data$yearp + 1)
+     names(mile.stone.length) <- prec@parameters$mEndMilestone@data$year
+
+     # Move new capacity before up to to stock (technology)
+     tech.new.cap <- fixTo@modOut@variables$vTechNewCap
+     tech.stock <- energyRt:::.getTotalParameterData(prec, 'pTechStock')
+     tech.new.cap <- tech.new.cap[tech.new.cap$year <= startYear,, drop = FALSE]
+     tech.life <- energyRt:::.getTotalParameterData(prec, 'pTechOlife')
+     olife.tmp <- tech.life$value
+     names(olife.tmp) <- paste0(tech.life$tech, '#', tech.life$region)
+     tech.new.cap$olife <- olife.tmp[paste0(tech.new.cap$tech, '#', tech.new.cap$region)]
+     # add 
+     for (yr in mile.stone.after) {
+       fl_use <- (yr <= tech.new.cap$olife + tech.new.cap$year)
+       if (any(fl_use)) {
+         tmp <- tech.new.cap[fl_use, c('tech', 'region', 'year', 'value')]
+         tmp$year <- yr
+         tech.stock <- rbind(tech.stock, tmp)
+       } 
+     }
+     tech.stock2 <- aggregate(tech.stock$value, by = list(tech = tech.stock$tech, region = tech.stock$region, 
+                                                          year = tech.stock$year), sum, simplify = !FALSE, drop = FALSE)
+     colnames(tech.stock2)[ncol(tech.stock2)] <- 'value'
+     # have to replace tech.stock2 -> pTechStock
+     prec <- energyRt:::.setParameterData(prec, 'pTechStock', tech.stock2)
+     # Move new capacity before up to to stock (supply)
+     # Chage supply reserve
+     sup.res.par <- energyRt:::.getTotalParameterData(prec, 'pSupReserve')
+     sup.res.use0 <-fixTo@modOut@variables$vSupOut
+     sup.res.use0$type <- 'lo'
+     sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", "year", 'type', 'value')]
+     sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear,, drop = FALSE]
+     sup.res.use0$value <- (-sup.res.use0$value * mile.stone.length[as.character(sup.res.use0$year)])
+     sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", 'type', 'value')]
+     sup.res.use <- sup.res.use0
+     sup.res.use0$type <- 'up'
+     sup.res.use <- rbind(sup.res.use0, sup.res.use, sup.res.par)
+     sup.res.use2 <- aggregate(sup.res.use$value, by = list(sup = sup.res.use$sup, comm = sup.res.use$comm, region = sup.res.use$region, 
+                                                            type = sup.res.use$type), sum, simplify = TRUE, drop = FALSE)
+     colnames(sup.res.use2)[ncol(sup.res.use2)] <- 'value'
+     sup.res.use2$value[sup.res.use2$value < 0] <- 0
+     prec <- energyRt:::.setParameterData(prec, 'pSupReserve', sup.res.use2)
+
+     als_year <- c('year', 'yearn', 'yearp', 'yeare')
+     for (nn in names(prec@parameters)) {
+       if (any(prec@parameters[[nn]]@dimSetNames %in% als_year)) {
+         clmn <- als_year[als_year %in% prec@parameters[[nn]]@dimSetNames]
+         if (prec@parameters[[nn]]@nValues != -1) {
+           prec@parameters[[nn]]@data <- prec@parameters[[nn]]@data[seq_len(prec@parameters[[nn]]@nValues),, drop = FALSE]
+         }
+         for (cc in clmn)
+          prec@parameters[[nn]]@data <- prec@parameters[[nn]]@data[prec@parameters[[nn]]@data[, cc] >= stay.year.begin,, drop = FALSE]
+         if (prec@parameters[[nn]]@nValues != -1) {
+           prec@parameters[[nn]]@nValues <- nrow(prec@parameters[[nn]]@data)
+         }
+       }
+     }
+   }
+       
 #!################
 ### FUNC GAMS 
   #### Code load
-      
   run_code <- energyRt::modelCode[[solver]][[model.type]]
   if (open.folder) shell.exec(tmpdir)
   if (solver == 'GAMS') {
@@ -644,7 +723,8 @@ LL1 <- proc.time()[3]
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
    # prec <<- prec 
-   # assign('prec', prec, globalenv())
+   assign('prec', prec, globalenv())
+   # cat('.....---------........\n')
    # pzz <- proc.time()[3]
    file_w <- c()
    if (n.threads > 1) { #  && FALSE
@@ -788,14 +868,14 @@ LL1 <- proc.time()[3]
 #    }
     ##!!!!!!!!!!!!!!!!!!!!!
     ## ORD function
-    cat('param ORD :=', sep = '\n', file = zz)
-    cat(paste(prec@parameters$year@data$year, seq(along = prec@parameters$year@data$year)), sep = '\n', file = zz)
-    cat(';', '', sep = '\n', file = zz) 
-    cat('param ORDr :=', sep = '\n', file = zz)
-    cat(paste(prec@parameters$region@data$region, seq(along = prec@parameters$region@data$region)), sep = '\n', file = zz)
-    cat(';', '', sep = '\n', file = zz) 
-    cat('end;', '', sep = '\n', file = zz) 
+    #cat('param ORD :=', sep = '\n', file = zz)
+    #cat(paste(prec@parameters$year@data$year, seq(along = prec@parameters$year@data$year)), sep = '\n', file = zz)
+    #cat(';', '', sep = '\n', file = zz) 
+    #cat('param ORDr :=', sep = '\n', file = zz)
+    #cat(paste(prec@parameters$region@data$region, seq(along = prec@parameters$region@data$region)), sep = '\n', file = zz)
+    #cat(';', '', sep = '\n', file = zz) 
     ##!!!!!!!!!!!!!!!!!!!!!  
+    cat('end;', '', sep = '\n', file = zz) 
     close(zz)
     pp2 <- proc.time()[3]
     if(echo) {

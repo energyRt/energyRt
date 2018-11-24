@@ -8,7 +8,7 @@ setClass("supply",
           color         = "data.frame",      #
           commodity     = "character",
           unit          = "character",
-          reserve       = "numeric",         # Total available resource
+          reserve       = "data.frame",         # Total available resource
           availability  = "data.frame",     # Availability of the resource with prices
           region        = "characterOrNULL",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
@@ -23,7 +23,11 @@ setClass("supply",
                                      stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
-          reserve       = Inf,         # Total available resource
+          reserve       = data.frame(region   = character(), # Total available resource by region
+                                     res.lo   = numeric(),
+                                     res.up   = numeric(),
+                                     res.fx   = numeric(),
+                                     stringsAsFactors = FALSE),
           availability  = data.frame(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
