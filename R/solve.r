@@ -662,7 +662,7 @@ LL1 <- proc.time()[3]
      tech.new.cap$olife <- olife.tmp[paste0(tech.new.cap$tech, '#', tech.new.cap$region)]
      # add 
      for (yr in mile.stone.after) {
-       fl_use <- (yr <= tech.new.cap$olife + tech.new.cap$year)
+       fl_use <- (yr < tech.new.cap$olife + tech.new.cap$year)
        if (any(fl_use)) {
          tmp <- tech.new.cap[fl_use, c('tech', 'region', 'year', 'value')]
          tmp$year <- yr
