@@ -108,8 +108,8 @@ mDemComm(dem, comm)              Demand commodities
 mUpComm(comm)  Commodity balance type PRODUCTION <= CONSUMPTION
 mLoComm(comm)  Commodity balance type PRODUCTION >= CONSUMPTION
 mFxComm(comm)  Commodity balance type PRODUCTION = CONSUMPTION
-ndefpTechAfaUp(tech, region, year, slice)         Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpTechAfacUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpTechAfUp(tech, region, year, slice)         Auxiliary mapping for Inf - used in GLPK-MathProg only
+ndefpTechAfcUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpSupReserveUp(sup, comm, region)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpSupAvaUp(sup, comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
 ndefpDummyImportCost(comm, region, year, slice)   Auxiliary mapping for Inf - used in GLPK-MathProg only
@@ -193,10 +193,10 @@ pTechVarom(tech, region, year, slice)               Variable  O&M costs (per uni
 pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
 pTechShareLo(tech, comm, region, year, slice)       Lower bound for share of the commodity in total group input or output
 pTechShareUp(tech, comm, region, year, slice)       Upper bound for share of the commodity in total group input or output
-pTechAfaLo(tech, region, year, slice)               Lower bound for activity
-pTechAfaUp(tech, region, year, slice)               Upper bound for activity
-pTechAfacLo(tech, comm, region, year, slice)        Lower bound for commodity output
-pTechAfacUp(tech, comm, region, year, slice)        Upper bound for commodity output
+pTechAfLo(tech, region, year, slice)               Lower bound for activity
+pTechAfUp(tech, region, year, slice)               Upper bound for activity
+pTechAfcLo(tech, comm, region, year, slice)        Lower bound for commodity output
+pTechAfcUp(tech, comm, region, year, slice)        Upper bound for commodity output
 pTechStock(tech, region, year)                      Technology capacity stock (accumulated in previous years production capacities)
 pTechCap2act(tech)                                  Technology capacity units to activity units conversion factor
 pTechCvarom(tech, comm, region, year, slice)        Commodity-specific variable costs (per unit of the commodity input or output)
@@ -236,8 +236,8 @@ pStorageCostOut(stg, region, year, slice)           Storage output costs
 pStorageFixom(stg, region, year)                    Storage fixed O&M costs
 pStorageInvcost(stg, region, year)                  Storage investment costs
 pStorageCap2act(stg)                                Storage capacity units to activity units conversion factor
-pStorageAfaLo(stg, region, year, slice)             Storage lower 'charge' bound (percent)
-pStorageAfaUp(stg, region, year, slice)             Storage upper 'charge' bound (percent)
+pStorageAfLo(stg, region, year, slice)             Storage lower 'charge' bound (percent)
+pStorageAfUp(stg, region, year, slice)             Storage upper 'charge' bound (percent)
 pStorageStg2AInp(stg, comm, region, year, slice)  Auxilary input
 pStorageStg2AOut(stg, comm, region, year, slice)  Auxilary output
 pStorageInp2AInp(stg, comm, region, year, slice)  Auxilary input
@@ -619,15 +619,15 @@ eqTechAOut(tech, comm, region, year, slice)$(mTechSlice(tech, slice) and mMidMil
 ********************************************************************************
 Equation
 * Availability factor LO
-eqTechAfaLo(tech, region, year, slice) Technology availability factor lower bound
+eqTechAfLo(tech, region, year, slice) Technology availability factor lower bound
 * Availability factor UP
-eqTechAfaUp(tech, region, year, slice) Technology availability factor upper bound
+eqTechAfUp(tech, region, year, slice) Technology availability factor upper bound
 ;
 
 * Availability factor LO
-eqTechAfaLo(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and pTechAfaLo(tech, region, year, slice) <> 0
+eqTechAfLo(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and pTechAfLo(tech, region, year, slice) <> 0
   and mTechSpan(tech, region, year))..
-         pTechAfaLo(tech, region, year, slice) *
+         pTechAfLo(tech, region, year, slice) *
          pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice)
@@ -635,13 +635,13 @@ eqTechAfaLo(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMileston
          vTechAct(tech, region, year, slice);
 
 * Availability factor UP
-eqTechAfaUp(tech, region, year, slice)$(
+eqTechAfUp(tech, region, year, slice)$(
                  mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
-                 not(ndefpTechAfaUp(tech, region, year, slice))
+                 not(ndefpTechAfUp(tech, region, year, slice))
          )..
          vTechAct(tech, region, year, slice)
          =l=
-         pTechAfaUp(tech, region, year, slice) *
+         pTechAfUp(tech, region, year, slice) *
          pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice);
@@ -675,23 +675,23 @@ eqTechActGrp(tech, group, region, year, slice)$(mTechSlice(tech, slice) and mMid
 ********************************************************************************
 Equation
 * Availability commodity factor LO output equations
-eqTechAfacOutLo(tech, region, comm, year, slice) Technology commodity availability factor lower bound
+eqTechAfcOutLo(tech, region, comm, year, slice) Technology commodity availability factor lower bound
 * Availability commodity factor UP output equations
-eqTechAfacOutUp(tech, region, comm, year, slice) Technology commodity availability factor upper bound
+eqTechAfcOutUp(tech, region, comm, year, slice) Technology commodity availability factor upper bound
 * Availability commodity factor LO input equations
-eqTechAfacInpLo(tech, region, comm, year, slice) Technology commodity availability factor lower bound
+eqTechAfcInpLo(tech, region, comm, year, slice) Technology commodity availability factor lower bound
 * Availability commodity factor UP input equations
-eqTechAfacInpUp(tech, region, comm, year, slice) Technology commodity availability factor upper bound
+eqTechAfcInpUp(tech, region, comm, year, slice) Technology commodity availability factor upper bound
 ;
 
 * Availability commodity factor LO output equations
-eqTechAfacOutLo(tech, region, comm, year, slice)$
+eqTechAfcOutLo(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechOutComm(tech, comm) and
-                 pTechAfacLo(tech, comm, region, year, slice) <> 0
+                 pTechAfcLo(tech, comm, region, year, slice) <> 0
          )..
          pTechCact2cout(tech, comm, region, year, slice) *
-         pTechAfacLo(tech, comm, region, year, slice) *
+         pTechAfcLo(tech, comm, region, year, slice) *
          pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice)
@@ -699,27 +699,27 @@ eqTechAfacOutLo(tech, region, comm, year, slice)$
          vTechOut(tech, comm, region, year, slice);
 
 * Availability commodity factor UP output equations
-eqTechAfacOutUp(tech, region, comm, year, slice)$
+eqTechAfcOutUp(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechOutComm(tech, comm) and
-                 not(ndefpTechAfaUp(tech, region, year, slice)) and
-                 not(ndefpTechAfacUp(tech, comm, region, year, slice))
+                 not(ndefpTechAfUp(tech, region, year, slice)) and
+                 not(ndefpTechAfcUp(tech, comm, region, year, slice))
          )..
          vTechOut(tech, comm, region, year, slice)
          =l=
          pTechCact2cout(tech, comm, region, year, slice) *
-         pTechAfacUp(tech, comm, region, year, slice) *
+         pTechAfcUp(tech, comm, region, year, slice) *
          pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice);
 
 * Availability commodity factor LO input equations
-eqTechAfacInpLo(tech, region, comm, year, slice)$
+eqTechAfcInpLo(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechInpComm(tech, comm) and
-                 pTechAfacLo(tech, comm, region, year, slice) <> 0
+                 pTechAfcLo(tech, comm, region, year, slice) <> 0
          )..
-         pTechAfacLo(tech, comm, region, year, slice) *
+         pTechAfcLo(tech, comm, region, year, slice) *
          pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice)
@@ -727,15 +727,15 @@ eqTechAfacInpLo(tech, region, comm, year, slice)$
          vTechInp(tech, comm, region, year, slice);
 
 * Availability commodity factor UP input equations
-eqTechAfacInpUp(tech, region, comm, year, slice)$
+eqTechAfcInpUp(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechInpComm(tech, comm) and
-                 not(ndefpTechAfaUp(tech, region, year, slice)) and
-                 not(ndefpTechAfacUp(tech, comm, region, year, slice))
+                 not(ndefpTechAfUp(tech, region, year, slice)) and
+                 not(ndefpTechAfcUp(tech, comm, region, year, slice))
          )..
          vTechInp(tech, comm, region, year, slice)
          =l=
-         pTechAfacUp(tech, comm, region, year, slice) *
+         pTechAfcUp(tech, comm, region, year, slice) *
          pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice);
@@ -1056,8 +1056,8 @@ eqEmsFuelTot(comm, region, year, slice)$(mMidMilestone(year) and sum(tech$(mTech
 ********************************************************************************
 Equation
 eqStorageStore(stg, comm, region, year, slice)      Storage equation
-eqStorageAfaLo(stg, comm, region, year, slice)      Storage availability factor lower
-eqStorageAfaUp(stg, comm, region, year, slice)      Storage availability factor upper
+eqStorageAfLo(stg, comm, region, year, slice)      Storage availability factor lower
+eqStorageAfUp(stg, comm, region, year, slice)      Storage availability factor upper
 eqStorageClean(stg, comm, region, year, slice)      Storage input less Stote
 eqStorageAInp(stg, comm, region, year, slice)
 eqStorageAOut(stg, comm, region, year, slice)
@@ -1093,14 +1093,14 @@ eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
   sum(slicep$(mStorageSlice(stg, slicep) and mSliceNext(slicep, slice)),
   pStorageStgEff(stg, comm, region, year, slice) * vStorageStore(stg, comm, region, year, slicep));
 
-eqStorageAfaLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm) and pStorageAfaLo(stg, region, year, slice))..
-  vStorageStore(stg, comm, region, year, slice) =g= pStorageAfaLo(stg, region, year, slice) *
+eqStorageAfLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
+  and mStorageComm(stg, comm) and pStorageAfLo(stg, region, year, slice))..
+  vStorageStore(stg, comm, region, year, slice) =g= pStorageAfLo(stg, region, year, slice) *
      pStorageCap2act(stg) * vStorageCap(stg, region, year);
 
-eqStorageAfaUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
+eqStorageAfUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm))..
-  vStorageStore(stg, comm, region, year, slice) =l= pStorageAfaUp(stg, region, year, slice) *
+  vStorageStore(stg, comm, region, year, slice) =l= pStorageAfUp(stg, region, year, slice) *
      pStorageCap2act(stg) * vStorageCap(stg, region, year);
 
 eqStorageClean(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
@@ -20805,9 +20805,9 @@ eqTechAOut
 * Availability factor equations
 ********************************************************************************
 * Availability factor LO
-eqTechAfaLo
+eqTechAfLo
 * Availability factor UP
-eqTechAfaUp
+eqTechAfUp
 ********************************************************************************
 * Connect activity with output equations
 ********************************************************************************
@@ -20818,13 +20818,13 @@ eqTechActGrp
 * Availability commodity factor equations
 ********************************************************************************
 * Availability commodity factor LO output equations
-eqTechAfacOutLo
+eqTechAfcOutLo
 * Availability commodity factor UP output equations
-eqTechAfacOutUp
+eqTechAfcOutUp
 * Availability commodity factor LO input equations
-eqTechAfacInpLo
+eqTechAfcInpLo
 * Availability commodity factor UP input equations
-eqTechAfacInpUp
+eqTechAfcInpUp
 ********************************************************************************
 * Capacity and costs equations
 ********************************************************************************
@@ -20889,8 +20889,8 @@ eqStorageSalv0
 eqStorageSalv
 * Constrain capacity
 eqStorageCost
-eqStorageAfaLo
-eqStorageAfaUp
+eqStorageAfLo
+eqStorageAfUp
 eqStorageClean
 eqStorageAInp
 eqStorageAOut

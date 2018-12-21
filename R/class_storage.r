@@ -12,7 +12,7 @@ setClass("storage",
           olife         = "data.frame",    #
           stock         = "data.frame",    #
           seff          = "data.frame",    #
-          afa           = "data.frame",     # Availability of the resource with prices
+          af           = "data.frame",     # Availability of the resource with prices
           aeff         = "data.frame",    #  Commodity efficiency
           # Costs
           fixom         = "data.frame",    #
@@ -67,12 +67,12 @@ setClass("storage",
                                       ncap2ainp  = numeric(),
                                       ncap2aout  = numeric(),
                                       stringsAsFactors = FALSE),
-          afa  = data.frame(region   = character(),
+          af  = data.frame(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
-                                     afa.lo   = numeric(),
-                                     afa.up   = numeric(),
-                                     afa.fx   = numeric(),
+                                     af.lo   = numeric(),
+                                     af.up   = numeric(),
+                                     af.fx   = numeric(),
                                      stringsAsFactors = FALSE),
           # Costs
           fixom         = data.frame(region   = character(),

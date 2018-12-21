@@ -31,7 +31,7 @@ setClass("technology",
           geff          = "data.frame",    #  Group efficiency
           ceff          = "data.frame",    #  Commodity efficiency
           aeff         = "data.frame",    #  Commodity efficiency
-          afa           = "data.frame",    #
+          af           = "data.frame",    #
       # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
@@ -115,10 +115,10 @@ setClass("technology",
                                      share.lo   = numeric(),
                                      share.up   = numeric(),
                                      share.fx   = numeric(),
-                                     # afac
-                                     afac.lo    = numeric(),
-                                     afac.up    = numeric(),
-                                     afac.fx    = numeric(),
+                                     # afc
+                                     afc.lo    = numeric(),
+                                     afc.up    = numeric(),
+                                     afc.fx    = numeric(),
                                       stringsAsFactors = FALSE),
 # Auxilary parameter
           aeff          = data.frame(
@@ -147,12 +147,12 @@ setClass("technology",
                                      sinp2aout  = numeric(),
                                      sout2aout  = numeric(),
                                      stringsAsFactors = FALSE),
-          afa           = data.frame(region   = character(),
+          af           = data.frame(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
-                                     afa.lo   = numeric(),
-                                     afa.up   = numeric(),
-                                     afa.fx   = numeric(),
+                                     af.lo   = numeric(),
+                                     af.up   = numeric(),
+                                     af.fx   = numeric(),
                                      stringsAsFactors = FALSE),
           fixom         = data.frame(region   = character(),
                                      year     = numeric(),

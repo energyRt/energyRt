@@ -161,10 +161,10 @@ setMethod("initialize", "modInp",
         .Object@parameters[['pTechVarom']] <- createParameter('pTechVarom', 
               c('tech', 'region', 'year', 'slice'), 'simple', 
                 defVal = 0, interpolation = 'back.inter.forth', colName = 'varom', cls = 'technology')    
-        .Object@parameters[['pTechAfa']] <- createParameter('pTechAfa', 
+        .Object@parameters[['pTechAf']] <- createParameter('pTechAf', 
               c('tech', 'region', 'year', 'slice'), 'multi', 
                 defVal = c(0, 1), interpolation = 'back.inter.forth', 
-                colName = c('afa.lo', 'afa.up'), cls = 'technology')    
+                colName = c('af.lo', 'af.up'), cls = 'technology')    
         .Object@parameters[['pTechGinp2use']] <- createParameter('pTechGinp2use', 
               c('tech', 'group', 'region', 'year', 'slice'), 'simple', 
                 defVal = 1, interpolation = 'back.inter.forth', colName = 'ginp2use', cls = 'technology')    
@@ -230,8 +230,8 @@ setMethod("initialize", "modInp",
         .Object@parameters[['pTechShare']] <- createParameter('pTechShare', 
               c('tech', 'comm', 'region', 'year', 'slice'), 'multi', defVal = c(0, 1), interpolation = 'back.inter.forth', 
                 colName = c('share.lo', 'share.up'), cls = 'technology')    
-        .Object@parameters[['pTechAfac']] <- createParameter('pTechAfac', c('tech', 'comm', 'region', 'year', 'slice'), 'multi', 
-                defVal = c(0, Inf), interpolation = 'back.inter.forth', colName = c('afac.lo', 'afac.up'), cls = 'technology')
+        .Object@parameters[['pTechAfc']] <- createParameter('pTechAfc', c('tech', 'comm', 'region', 'year', 'slice'), 'multi', 
+                defVal = c(0, Inf), interpolation = 'back.inter.forth', colName = c('afc.lo', 'afc.up'), cls = 'technology')
                 
   ## NEED SET ALIAS FOR SYS INFO
   # Reserve
@@ -252,7 +252,7 @@ setMethod("initialize", "modInp",
           .Object@parameters[[i]] <- createParameter(i, 
                                                      c('stg', 'region', 'year', 'slice'), 'simple', 
                                                      defVal = 0, interpolation = 'back.inter.forth')    
-        .Object@parameters[['pStorageAfa']] <- createParameter('pStorageAfa', 
+        .Object@parameters[['pStorageAf']] <- createParameter('pStorageAf', 
                                                            c('stg', 'region', 'year', 'slice'), 'multi', 
                                                            defVal = c(0, 1), interpolation = 'back.inter.forth')
     .Object@parameters[['pStorageCap2act']] <- createParameter('pStorageCap2act', 'stg', 'simple', 
@@ -364,9 +364,9 @@ setMethod("initialize", "modInp",
                 defVal = .1, interpolation = 'back.inter.forth', colName = 'discount', cls = 'sysInfo')    
   # Additional for compatibility with GLPK
   .Object@parameters[['ndefpTechOlife']] <- createParameter('ndefpTechOlife', c('tech', 'region'), 'map')   
-  .Object@parameters[['ndefpTechAfaUp']] <- createParameter('ndefpTechAfaUp', c('tech', 'region', 'year', 'slice'), 'map')   
-  .Object@parameters[['ndefpTechAfacUp']] <- 
-      createParameter('ndefpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
+  .Object@parameters[['ndefpTechAfUp']] <- createParameter('ndefpTechAfUp', c('tech', 'region', 'year', 'slice'), 'map')   
+  .Object@parameters[['ndefpTechAfcUp']] <- 
+      createParameter('ndefpTechAfcUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['ndefpSupAvaUp']] <- 
       createParameter('ndefpSupAvaUp', c('sup', 'comm', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['ndefpSupReserveUp']] <- createParameter('ndefpSupReserveUp', c('sup', 'comm', 'region'), 'map')    

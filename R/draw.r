@@ -270,9 +270,9 @@ draw.technology <- function(
                                   rule = as.character(rule[c('share.lo', 'share.up')]), 
                                   year_range = range(year),
                                   approxim = approxim)
-        afac <- interpolation_bound(tft, 'afac', 
-                                  defVal = as.numeric(defVal[c('afac.lo', 'afac.up')]), 
-                                  rule = as.character(rule[c('afac.lo', 'afac.up')]), 
+        afc <- interpolation_bound(tft, 'afc', 
+                                  defVal = as.numeric(defVal[c('afc.lo', 'afc.up')]), 
+                                  rule = as.character(rule[c('afc.lo', 'afc.up')]), 
                                   year_range = range(year),
                                   approxim = approxim)
       }
@@ -296,12 +296,12 @@ draw.technology <- function(
           if (!is.na(tech@output[tech@output$comm == gg, 'unit'])) 
               gg <- paste(gg, ' (', tech@output[tech@output$comm == gg, 'unit'], ')', sep = '')
           text(.80, y + .03, gg, adj = 0, cex = fnt)
-          lo_legend <- paste('afac ',
-                  to_format(as.numeric(afac[afac$comm == cmm & afac$type == 'lo', 'afac'])),
+          lo_legend <- paste('afc ',
+                  to_format(as.numeric(afc[afc$comm == cmm & afc$type == 'lo', 'afc'])),
                   ' .. ',
-                  to_format(as.numeric(afac[afac$comm == cmm & afac$type == 'up', 'afac'])),
+                  to_format(as.numeric(afc[afc$comm == cmm & afc$type == 'up', 'afc'])),
                   '', sep = '')
-          #if (show_all ||lo_legend != 'afac 0 .. Inf') text(.757, y - .03, lo_legend, adj = 1, cex = .8)
+          #if (show_all ||lo_legend != 'afc 0 .. Inf') text(.757, y - .03, lo_legend, adj = 1, cex = .8)
           s1 <- cparam$use2cact[cparam$use2cact$comm == cmm, 'use2cact']
           if (show_all ||s1 != 1) text(.757, y + .03, paste('use2cact =', to_format(s1)), adj = 1, cex = .8)
           s1 <- cparam$cact2cout[cparam$cact2cout$comm == cmm, 'cact2cout']

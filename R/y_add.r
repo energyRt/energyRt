@@ -595,22 +595,22 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   }
   approxim_comm[['comm']] <- rownames(ctype$comm)
   if (length(approxim_comm[['comm']]) != 0) {
-    gg <- multiInterpolation(tech@ceff, 'afac',
-            obj@parameters[['pTechAfac']], approxim_comm, 'tech', tech@name)
-    obj@parameters[['pTechAfac']] <- addData(obj@parameters[['pTechAfac']], gg)
+    gg <- multiInterpolation(tech@ceff, 'afc',
+            obj@parameters[['pTechAfc']], approxim_comm, 'tech', tech@name)
+    obj@parameters[['pTechAfc']] <- addData(obj@parameters[['pTechAfc']], gg)
     #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
     #if (nrow(gg) != 0) 
-    #  obj@parameters[['ndefpTechAfacUp']] <- addData(obj@parameters[['dnefpTechAfacUp']],
-    #        gg[, obj@parameters[['ndefpTechAfacUp']]@dimSetNames])
+    #  obj@parameters[['ndefpTechAfcUp']] <- addData(obj@parameters[['dnefpTechAfcUp']],
+    #        gg[, obj@parameters[['ndefpTechAfcUp']]@dimSetNames])
 
   }
-  gg <- multiInterpolation(tech@afa, 'afa',
-            obj@parameters[['pTechAfa']], approxim, 'tech', tech@name)
-  obj@parameters[['pTechAfa']] <- addData(obj@parameters[['pTechAfa']], gg)
+  gg <- multiInterpolation(tech@af, 'af',
+            obj@parameters[['pTechAf']], approxim, 'tech', tech@name)
+  obj@parameters[['pTechAf']] <- addData(obj@parameters[['pTechAf']], gg)
   #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
   #if (nrow(gg) != 0) 
-  #    obj@parameters[['ndefpTechAfaUp']] <- addData(obj@parameters[['ndefpTechAfaUp']],
-  #          gg[, obj@parameters[['ndefpTechAfaUp']]@dimSetNames])
+  #    obj@parameters[['ndefpTechAfUp']] <- addData(obj@parameters[['ndefpTechAfUp']],
+  #          gg[, obj@parameters[['ndefpTechAfUp']]@dimSetNames])
 
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input']
   if (length(approxim_comm[['comm']]) != 0) {
@@ -976,9 +976,9 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']],
                                                  simpleInterpolation(stg@stock, 'stock',
                                                                      obj@parameters[['pStorageStock']], approxim, 'stg', stg@name))
-    obj@parameters[['pStorageAfa']] <- addData(obj@parameters[['pStorageAfa']],
-                                               multiInterpolation(stg@afa, 'afa',
-                                                                  obj@parameters[['pStorageAfa']], approxim, 'stg', stg@name))
+    obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']],
+                                               multiInterpolation(stg@af, 'af',
+                                                                  obj@parameters[['pStorageAf']], approxim, 'stg', stg@name))
     obj@parameters[['pStorageCap2act']] <- addData(obj@parameters[['pStorageCap2act']],
                                                 data.frame(stg = stg@name, value = stg@cap2act))
     # Aux input/output
