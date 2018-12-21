@@ -30,9 +30,10 @@ setClass("technology",
           # Performance parameters
           geff          = "data.frame",    #  Group efficiency
           ceff          = "data.frame",    #  Commodity efficiency
-          aeff         = "data.frame",    #  Commodity efficiency
-          af           = "data.frame",    #
-      # Costs
+          aeff          = "data.frame",    #  Commodity efficiency
+          af            = "data.frame",    #
+          afs           = "data.frame",    #
+          # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
           invcost       = "data.frame",    #
@@ -150,10 +151,17 @@ setClass("technology",
           af           = data.frame(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
-                                     af.lo   = numeric(),
-                                     af.up   = numeric(),
-                                     af.fx   = numeric(),
+                                     af.lo    = numeric(),
+                                     af.up    = numeric(),
+                                     af.fx    = numeric(),
                                      stringsAsFactors = FALSE),
+          afs          = data.frame(region   = character(),
+                                    year     = numeric(),
+                                    slice    = character(),
+                                    afs.lo   = numeric(),
+                                    afs.up   = numeric(),
+                                    afs.fx   = numeric(),
+                                    stringsAsFactors = FALSE),
           fixom         = data.frame(region   = character(),
                                      year     = numeric(),
                                      fixom    = numeric(),

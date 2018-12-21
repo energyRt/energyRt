@@ -161,10 +161,14 @@ setMethod("initialize", "modInp",
         .Object@parameters[['pTechVarom']] <- createParameter('pTechVarom', 
               c('tech', 'region', 'year', 'slice'), 'simple', 
                 defVal = 0, interpolation = 'back.inter.forth', colName = 'varom', cls = 'technology')    
-        .Object@parameters[['pTechAf']] <- createParameter('pTechAf', 
-              c('tech', 'region', 'year', 'slice'), 'multi', 
-                defVal = c(0, 1), interpolation = 'back.inter.forth', 
-                colName = c('af.lo', 'af.up'), cls = 'technology')    
+        #
+        .Object@parameters[['pTechAf']] <- 
+          createParameter('pTechAf', c('tech', 'region', 'year', 'slice'), 'multi', defVal = c(0, 1), 
+                          interpolation = 'back.inter.forth', colName = c('af.lo', 'af.up'), cls = 'technology')    
+        #
+        .Object@parameters[['pTechAfs']] <- 
+          createParameter('pTechAfs', c('tech', 'region', 'year', 'slice'), 'multi', defVal = c(0, 0), 
+                          interpolation = 'back.inter.forth', colName = c('afs.lo', 'afs.up'), cls = 'technology')    
         .Object@parameters[['pTechGinp2use']] <- createParameter('pTechGinp2use', 
               c('tech', 'group', 'region', 'year', 'slice'), 'simple', 
                 defVal = 1, interpolation = 'back.inter.forth', colName = 'ginp2use', cls = 'technology')    

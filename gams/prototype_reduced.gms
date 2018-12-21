@@ -193,10 +193,12 @@ pTechVarom(tech, region, year, slice)               Variable  O&M costs (per uni
 pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
 pTechShareLo(tech, comm, region, year, slice)       Lower bound for share of the commodity in total group input or output
 pTechShareUp(tech, comm, region, year, slice)       Upper bound for share of the commodity in total group input or output
-pTechAfLo(tech, region, year, slice)               Lower bound for activity
-pTechAfUp(tech, region, year, slice)               Upper bound for activity
-pTechAfcLo(tech, comm, region, year, slice)        Lower bound for commodity output
-pTechAfcUp(tech, comm, region, year, slice)        Upper bound for commodity output
+pTechAfLo(tech, region, year, slice)                Lower bound for activity
+pTechAfUp(tech, region, year, slice)                Upper bound for activity
+pTechAfsLo(tech, region, year, slice)               Lower bound for activity by sum
+pTechAfsUp(tech, region, year, slice)               Upper bound for activity by sum
+pTechAfcLo(tech, comm, region, year, slice)         Lower bound for commodity output
+pTechAfcUp(tech, comm, region, year, slice)         Upper bound for commodity output
 pTechStock(tech, region, year)                      Technology capacity stock (accumulated in previous years production capacities)
 pTechCap2act(tech)                                  Technology capacity units to activity units conversion factor
 pTechCvarom(tech, comm, region, year, slice)        Commodity-specific variable costs (per unit of the commodity input or output)
@@ -615,6 +617,10 @@ Equation
 eqTechAfLo(tech, region, year, slice) Technology availability factor lower bound
 * Availability factor UP
 eqTechAfUp(tech, region, year, slice) Technology availability factor upper bound
+* Availability sum factor LO
+eqTechAfsLo(tech, region, year, slice) Technology availability factor for sum lower bound
+* Availability sum factor UP
+eqTechAfsUp(tech, region, year, slice) Technology availability factor for sum upper bound
 ;
 
 * Availability factor LO
@@ -639,6 +645,25 @@ eqTechAfUp(tech, region, year, slice)$(
          vTechCap(tech, region, year) *
          pSliceShare(slice);
 
+* Availability factor for sum LO
+eqTechAfsLo(tech, region, year, slice)$(mMidMilestone(year) and pTechAfsLo(tech, region, year, slice) > 0
+  and mTechSpan(tech, region, year))..
+         pTechAfsLo(tech, region, year, slice) *
+         pTechCap2act(tech) *
+         vTechCap(tech, region, year) *
+         pSliceShare(slice)
+         =l=
+         sum(slicep$(mTechSlice(tech, slicep) and mAllSliceParentChild(slice, slicep)), vTechAct(tech, region, year, slicep));
+
+* Availability factor for sum UP
+eqTechAfsUp(tech, region, year, slice)$(mMidMilestone(year) and pTechAfsUp(tech, region, year, slice) >= 0
+  and mTechSpan(tech, region, year))..
+         sum(slicep$(mTechSlice(tech, slicep) and mAllSliceParentChild(slice, slicep)), vTechAct(tech, region, year, slicep))
+         =l=
+         pTechAfsUp(tech, region, year, slice) *
+         pTechCap2act(tech) *
+         vTechCap(tech, region, year) *
+         pSliceShare(slice);
 
 ********************************************************************************
 * Connect activity with output equations
@@ -17703,6 +17728,10 @@ eqTechAOut
 eqTechAfLo
 * Availability factor UP
 eqTechAfUp
+* Availability factor for sum Lo
+eqTechAfsLo
+* Availability factor for sum UP
+eqTechAfsUp
 ********************************************************************************
 * Connect activity with output equations
 ********************************************************************************

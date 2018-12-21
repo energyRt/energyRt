@@ -11,6 +11,7 @@
 .disaggregateSliceLevel <- function(app, approxim) {
   slt <- getSlots(class(app)) 
   slt <- names(slt)[slt == 'data.frame']
+  if (class(app) == 'technology') slt <- slt[slt != 'afs']
   for (ss in slt) if (any(colnames(slot(app, ss)) == 'slice')) {
     tmp <- slot(app, ss)
     fl <- (!is.na(tmp$slice) & !(tmp$slice %in% approxim$slice))
@@ -607,6 +608,14 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   gg <- multiInterpolation(tech@af, 'af',
             obj@parameters[['pTechAf']], approxim, 'tech', tech@name)
   obj@parameters[['pTechAf']] <- addData(obj@parameters[['pTechAf']], gg)
+  if (nrow(tech@afs) > 0) {
+    afs_slice <- unique(tech@afs$slice)
+    afs_slice <- afs_slice[!is.na(afs_slice)]
+    approxim.afs <- approxim
+    approxim.afs$slice <- afs_slice
+    gg <- multiInterpolation(tech@afs, 'afs', obj@parameters[['pTechAfs']], approxim.afs, 'tech', tech@name)
+    obj@parameters[['pTechAfs']] <- addData(obj@parameters[['pTechAfs']], gg)
+  }
   #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
   #if (nrow(gg) != 0) 
   #    obj@parameters[['ndefpTechAfUp']] <- addData(obj@parameters[['ndefpTechAfUp']],
