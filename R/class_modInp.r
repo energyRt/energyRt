@@ -50,7 +50,15 @@ setMethod("initialize", "modInp",
 
     .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slicep'), 'map')    
 
-  # Commodity
+    .Object@parameters[['mSameRegion']] <- createParameter('mSameRegion', c('region', 'regionp'), 'map') # for glpk    
+    .Object@parameters[['mSameSlice']] <- createParameter('mSameSlice', c('slice', 'slicep'), 'map') # for glpk    
+    
+    .Object@parameters[['ordYear']] <- createParameter('ordYear', 'year', 'simple', 
+        defVal = 0, interpolation = 'inter.forth', colName = '') # for glpk    
+    .Object@parameters[['cardYear']] <- createParameter('cardYear', 'year', 'simple', 
+        defVal = 0, interpolation = 'inter.forth', colName = '') # for glpk    
+    
+    # Commodity
     # Map
     #.Object@parameters[['ems_from']] <- 
     #    createParameter('ems_from', c('comm', 'commp'), 'map')    
@@ -109,8 +117,9 @@ setMethod("initialize", "modInp",
         createParameter('pSupCost', c('sup', 'comm', 'region', 'year', 'slice'), 'simple', 
         defVal = 0, interpolation = 'back.inter.forth', colName = 'cost', cls = 'supply')    
     .Object@parameters[['pSupReserve']] <- 
-        createParameter('pSupReserve', c('sup', 'comm'), 'simple', 
-        defVal = Inf, interpolation = 'back.inter.forth', cls = 'supply', slot = 'reserve', colName = 'reserve')    
+        createParameter('pSupReserve', c('sup', 'comm', 'region'), 'multi', 
+        defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'supply', slot = 'reserve', 
+        colName = c('res.lo', 'res.up'))
     # multi
     .Object@parameters[['pSupAva']] <- 
         createParameter('pSupAva', c('sup', 'comm', 'region', 'year', 'slice'), 'multi', 
@@ -134,7 +143,7 @@ setMethod("initialize", "modInp",
     # simple & multi
     .Object@parameters[['pTechCap2act']] <- 
         createParameter('pTechCap2act', 'tech', 'simple', 
-        defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2cat', slot = 'cap2act')    
+        defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2act', slot = 'cap2act')    
     .Object@parameters[['pTechEmisComm']] <- createParameter('pTechEmisComm', c('tech', 'comm'), 'simple', 
                                                              defVal = 1, cls = 'technology', colName = 'combustion')    
     .Object@parameters[['pTechOlife']] <- 
@@ -247,7 +256,7 @@ setMethod("initialize", "modInp",
                                                            c('stg', 'region', 'year', 'slice'), 'multi', 
                                                            defVal = c(0, 1), interpolation = 'back.inter.forth')
     .Object@parameters[['pStorageCap2act']] <- createParameter('pStorageCap2act', 'stg', 'simple', 
-                      defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2cat', slot = 'cap2act')    
+                      defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2act', slot = 'cap2act')    
     .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
@@ -299,7 +308,8 @@ setMethod("initialize", "modInp",
           c('imp', 'region', 'year', 'slice'), 'multi', 
             defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'import', colName = c('imp.lo', 'imp.up'))
     .Object@parameters[['pExportRowRes']] <- createParameter('pExportRowRes', 
-          'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'export', slot = 'reserve', colName = 'reserve')
+          'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'export', 
+          slot = 'reserve', colName = 'reserve')
     .Object@parameters[['pImportRowRes']] <- createParameter('pImportRowRes', 
           'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'import', slot = 'reserve', colName = 'reserve')
   # For LEC
@@ -359,7 +369,7 @@ setMethod("initialize", "modInp",
       createParameter('ndefpTechAfacUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['ndefpSupAvaUp']] <- 
       createParameter('ndefpSupAvaUp', c('sup', 'comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['ndefpSupReserve']] <- createParameter('ndefpSupReserve', c('sup', 'comm'), 'map')    
+  .Object@parameters[['ndefpSupReserveUp']] <- createParameter('ndefpSupReserveUp', c('sup', 'comm', 'region'), 'map')    
   .Object@parameters[['ndefpStorageOlife']] <- createParameter('ndefpStorageOlife', c('stg', 'region'), 'map')   
   .Object@parameters[['ndefpTradeIrUp']] <- createParameter('ndefpTradeIrUp', 
                                         c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
