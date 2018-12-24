@@ -33,6 +33,7 @@ setClass("technology",
           aeff          = "data.frame",    #  Commodity efficiency
           af            = "data.frame",    #
           afs           = "data.frame",    #
+          weather       = "data.frame",    # weather condisions multiplier
           # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
@@ -158,6 +159,17 @@ setClass("technology",
           afs          = data.frame(region   = character(),
                                     year     = numeric(),
                                     slice    = character(),
+                                    afs.lo   = numeric(),
+                                    afs.up   = numeric(),
+                                    afs.fx   = numeric(),
+                                    stringsAsFactors = FALSE),
+          weather      = data.frame(weather  = character(),
+                                    afc.lo   = numeric(),
+                                    afc.up   = numeric(),
+                                    afc.fx   = numeric(),
+                                    af.lo    = numeric(),
+                                    af.up    = numeric(),
+                                    af.fx    = numeric(),
                                     afs.lo   = numeric(),
                                     afs.up   = numeric(),
                                     afs.fx   = numeric(),
