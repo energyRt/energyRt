@@ -61,6 +61,7 @@ comm   commodity
 region region
 year   year
 slice  time slice
+weather  weather
 ;
 
 Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
@@ -102,6 +103,10 @@ mTechEmitedComm(tech, comm)      Technologies with emissions
 mSupSlice(sup, slice)            Supply by time slices
 mSupComm(sup, comm)              Supplied commodities
 mSupSpan(sup, region)            Supply techs by regions
+mSupWeatherLo(sup, weather) Use weather to supply ava.lo
+mSupWeatherUp(sup, weather) Use weather to supply ava.up
+mWeatherSlice(weather, slice) Weather slice
+mWeatherRegion(weather, region) weather region 
 * Demand
 mDemComm(dem, comm)              Demand commodities
 * Ballance
@@ -223,6 +228,10 @@ pDummyExportCost(comm, region, year, slice)         Dummy costs parameters (for 
 * Tax
 pTaxCost(comm, region, year, slice)                 Commodity taxes
 pSubsCost(comm, region, year, slice)                Commodity subsidies
+*
+pWeather(weather, region, year, slice) Weather
+pSupWeatherLo(sup, weather)  Weather multiplier
+pSupWeatherUp(sup, weather)  Weather multiplier
 ;
 
 * Storage technology parameters
@@ -930,12 +939,14 @@ eqSupAvaUp(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilest
          not(ndefpSupAvaUp(sup, comm, region, year, slice)) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =l=
-         pSupAvaUp(sup, comm, region, year, slice);
+         pSupAvaUp(sup, comm, region, year, slice) * prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mSupWeatherUp(sup, weather)
+           and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))), pWeather(weather, region, year, slice) * pSupWeatherUp(sup, weather));
 
 eqSupAvaLo(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilestone(year) and mSupComm(sup, comm) and mSupSpan(sup, region))..
          vSupOut(sup, comm, region, year, slice)
          =g=
-         pSupAvaLo(sup, comm, region, year, slice);
+         pSupAvaLo(sup, comm, region, year, slice) * prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mSupWeatherLo(sup, weather)
+           and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))), pWeather(weather, region, year, slice) * pSupWeatherLo(sup, weather));
 
 eqSupTotal(sup, comm, region)$(mSupComm(sup, comm) and mSupSpan(sup, region))..
          vSupReserve(sup, comm, region)
@@ -19956,6 +19967,7 @@ loop(comm, put "comm,"comm.tl:0/;);
 loop(region, put "region,"region.tl:0/;);
 loop(year$mMidMilestone(year), put "year,"year.tl:0/;);
 loop(slice, put "slice,"slice.tl:0/;);
+loop(weather, put "weather,"weather.tl:0/;);
 loop(cns, put "cns,"cns.tl:0/;);
 putclose;
 

@@ -195,3 +195,12 @@ setMethod('newStorage', signature(name = 'character'), function(name, ...)
   universalInit('storage', name, ...))
 
   
+setGeneric("newWeather", function(name, ...) standardGeneric("newWeather"))
+#' Create new weather object
+#' 
+#' @name newWeather
+#' 
+setMethod('newWeather', signature(name = 'character'), function(name, ...) 
+  universalInit('weather', name, ...))
+
+

@@ -44,7 +44,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
       colName = '', cls = NULL, slot = NULL
   ) {
   attr(.Object, 'GUID') <- '8732f62e-0f23-4853-878b-ec8a5cbd5224'
-  acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'acomm', 'comm', 'commp', 
+  acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'weather', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
                  'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade', 'cns')
   if (!is.character(name) || length(name) != 1 || !energyRt:::.chec_correct_name(name)) 
@@ -78,7 +78,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   .Object@misc$class <- cls
   .Object@misc$slot <- slot
   # Create data
-  data <- data.frame(tech = character(), techp = character(), sup = character(), dem = character(), 
+  data <- data.frame(tech = character(), techp = character(), sup = character(), weather = character(), dem = character(), 
       acomm = character(), comm = character(), commp = character(), group = character(),  
       region = character(), regionp = character(), src = character(), dst = character(), 
       year = numeric(), yearp = numeric(), slicep = character(), 

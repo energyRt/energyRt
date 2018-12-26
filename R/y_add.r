@@ -111,28 +111,51 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 # Add demand
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'demand',
-  approxim = 'list'), function(obj, app, approxim) {     
-  dem <- energyRt:::.upper_case(app)
-  dem <- stayOnlyVariable(dem, approxim$region, 'region')
-  approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
-  dem <- .disaggregateSliceLevel(dem, approxim)
-#  if (!energyRt:::.chec_correct_name(dem@name)) {
-#    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
-#  }
-#  if (isDemand(obj, dem@name)) {
-#    warning(paste('There is demand name "', dem@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousDemand(obj, dem@name)
-#  }
-#  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
-  obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
-      data.frame(dem = dem@name, comm = dem@commodity)) 
-  obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
-      simpleInterpolation(dem@dem, 'dem',
-      obj@parameters[['pDemand']], approxim, c('dem', 'comm'), c(dem@name, dem@commodity)))
-  obj
-})
+                            approxim = 'list'), function(obj, app, approxim) {     
+                              dem <- energyRt:::.upper_case(app)
+                              dem <- stayOnlyVariable(dem, approxim$region, 'region')
+                              approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
+                              dem <- .disaggregateSliceLevel(dem, approxim)
+                              #  if (!energyRt:::.chec_correct_name(dem@name)) {
+                              #    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
+                              #  }
+                              #  if (isDemand(obj, dem@name)) {
+                              #    warning(paste('There is demand name "', dem@name,
+                              #        '" now, all previous information will be removed', sep = ''))
+                              #    obj <- removePreviousDemand(obj, dem@name)
+                              #  }
+                              #  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
+                              obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
+                                                                      data.frame(dem = dem@name, comm = dem@commodity)) 
+                              obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
+                                                                     simpleInterpolation(dem@dem, 'dem',
+                                                                                         obj@parameters[['pDemand']], approxim, c('dem', 'comm'), c(dem@name, dem@commodity)))
+                              obj
+                            })
 
+
+################################################################################
+# Add weather
+################################################################################
+setMethod('add0', signature(obj = 'modInp', app = 'weather',
+                            approxim = 'list'), function(obj, app, approxim) {    
+                              wth <- energyRt:::.upper_case(app)
+                              if (is.null(wth@slice) && length(approxim$slice@misc$nlevel) > 1) {
+                                stop('For weather slice level have to be define, if more than one slice level')
+                              }
+                              if (is.null(wth@slice)) wth@slice <- names(approxim$slice@misc$nlevel)[1]
+                              approxim <- .fix_approximation_list(approxim, lev = wth@slice)
+                              wth <- stayOnlyVariable(wth, approxim$region, 'region')
+                              wth <- .disaggregateSliceLevel(wth, approxim)
+    obj@parameters[['pWeather']] <- addData(obj@parameters[['pWeather']], simpleInterpolation(wth@weather, 'wval',
+       obj@parameters[['pWeather']], approxim, 'weather', wth@name))
+    obj@parameters[['mWeatherSlice']] <- addData(obj@parameters[['mWeatherSlice']],
+                                                 data.frame(weather = rep(weather@name, length(approxim$slice)), slice = approxim$slice))
+    obj@parameters[['mWeatherRegion']] <- addData(obj@parameters[['mWeatherRegion']],
+                                            data.frame(weather = rep(wth@name, length(wth@region)), region = wth@region))
+    obj
+})
+ 
 ################################################################################
 # Add supply
 ################################################################################
@@ -184,6 +207,31 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
               multiInterpolation(sup@availability, 'ava',
               obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
+    # For weather
+    # mSupWeatherLo(sup, weather)
+    wth.lo <- sup@weather[!is.na(sup@weather$wava.lo) | !is.na(sup@weather$wava.fx), 'weather']
+    obj@parameters[['mSupWeatherLo']] <- addData(obj@parameters[['mSupWeatherLo']],
+                                            data.frame(sup = rep(sup@name, length(wth.lo)), weather = wth.lo))
+    # mSupWeatherUp(sup, weather)
+    wth.up <- sup@weather[!is.na(sup@weather$wava.up) | !is.na(sup@weather$wava.fx), 'weather']
+    obj@parameters[['mSupWeatherUp']] <- addData(obj@parameters[['mSupWeatherUp']],
+                                                 data.frame(sup = rep(sup@name, length(wth.up)), weather = wth.up))
+    gg <- sup@weather
+    gg$sup <- sup@name
+    gg$type <- 'lo'
+    a1 <- gg[, c('sup', 'weather', 'type', 'wava.lo'), drop = FALSE]; 
+    colnames(a1)[ncol(a1)] <- 'value'
+    a2 <- gg[, c('sup', 'weather', 'type', 'wava.fx'), drop = FALSE]; 
+    colnames(a2)[ncol(a2)] <- 'value'
+    a3 <- gg[, c('sup', 'weather', 'type', 'wava.up'), drop = FALSE]; 
+    colnames(a3)[ncol(a3)] <- 'value'
+    g1 <- rbind(a1, a2); g1$type <- 'lo'
+    g2 <- rbind(a3, a2); g1$type <- 'up'
+    gg <- rbind(g1, g2)
+    gg <- gg[!is.na(gg$value),, drop = FALSE]
+    # sup     weather type    value
+      obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], gg)
+    
   obj
 })
 

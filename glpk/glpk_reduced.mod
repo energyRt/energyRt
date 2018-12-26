@@ -11,6 +11,7 @@ set comm;
 set region;
 set year;
 set slice;
+set weather;
 set cns;
 set FORIF;
 
@@ -42,6 +43,10 @@ param mTechEmitedComm{tech, comm};
 param mSupSlice{sup, slice};
 param mSupComm{sup, comm};
 param mSupSpan{sup, region};
+param mSupWeatherLo{sup, weather};
+param mSupWeatherUp{sup, weather};
+param mWeatherSlice{weather, slice};
+param mWeatherRegion{weather, region};
 param mDemComm{dem, comm};
 param mUpComm{comm};
 param mLoComm{comm};
@@ -174,6 +179,9 @@ param pDummyImportCost{comm, region, year, slice};
 param pDummyExportCost{comm, region, year, slice};
 param pTaxCost{comm, region, year, slice};
 param pSubsCost{comm, region, year, slice};
+param pWeather{weather, region, year, slice};
+param pSupWeatherLo{sup, weather};
+param pSupWeatherUp{sup, weather};
 param pStorageInpEff{stg, comm, region, year, slice};
 param pStorageOutEff{stg, comm, region, year, slice};
 param pStorageStgEff{stg, comm, region, year, slice};
@@ -391,9 +399,9 @@ s.t.  eqTechSalv{ t in tech,r in region,ye in year : (not((mDiscountZero[r])) an
 
 s.t.  eqTechOMCost{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y])}: vTechOMCost[t,r,y]  =  pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice:(mTechSlice[t,s])}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:(mTechInpComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:(mTechAOut[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAOut[t,c,r,y,s])+sum{c in comm:(mTechAInp[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s]));
 
-s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and not((ndefpSupAvaUp[s1,c,r,y,s])) and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,c,r,y,s];
+s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and not((ndefpSupAvaUp[s1,c,r,y,s])) and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mSupWeatherUp[s1,wth1] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pSupWeatherUp[s1,wth1]);
 
-s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,c,r,y,s];
+s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mSupWeatherLo[s1,wth1] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pSupWeatherLo[s1,wth1]);
 
 s.t.  eqSupTotal{ s1 in sup,c in comm,r in region : (mSupComm[s1,c] and mSupSpan[s1,r])}: vSupReserve[s1,c,r]  =  sum{y in year,s in slice,ye in year,yp in year:((mSupSlice[s1,s] and mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ordYear[yp]-ordYear[ye]+1)*vSupOut[s1,c,r,y,s]);
 
@@ -3724,6 +3732,9 @@ for {y in year : mMidMilestone[y] <> 0} {
 }
 for {s in slice} {
     printf "slice,%s\n", s >> "raw_data_set.csv";
+}
+for {wth1 in weather} {
+    printf "weather,%s\n", wth1 >> "raw_data_set.csv";
 }
 for {cn1 in cns} {
     printf "cns,%s\n", cn1 >> "raw_data_set.csv";

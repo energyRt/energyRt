@@ -47,7 +47,23 @@ setMethod("initialize", "modInp",
     .Object@parameters[['imp']]    <- createSet('imp')    
     .Object@parameters[['trade']]    <- createSet('trade')    
     .Object@parameters[['cns']] <- createSet('cns')    
+    .Object@parameters[['weather']] <- createSet('weather')    
 
+    # weather
+    .Object@parameters[['mSupWeatherLo']] <- createParameter('mSupWeatherLo', c('sup', 'weather'), 'map')    
+    .Object@parameters[['mSupWeatherUp']] <- createParameter('mSupWeatherUp', c('sup', 'weather'), 'map')    
+    .Object@parameters[['mWeatherSlice']] <- createParameter('mWeatherSlice', c('weather', 'slice'), 'map')
+    .Object@parameters[['mWeatherRegion']] <- createParameter('mWeatherRegion', c('weather', 'region'), 'map')
+    .Object@parameters[['pWeather']] <- 
+      createParameter('pWeather', c('weather', 'region', 'year', 'slice'), 'simple', 
+                      defVal = 1, interpolation = 'back.inter.forth', colName = 'wval', cls = 'weather')    
+    .Object@parameters[['pSupWeather']] <- 
+      createParameter('pSupWeather', c('sup', 'weather'), 'multi', 
+                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wava.lo', 'wava.up'), cls = 'weather')    
+    
+    
+    #
+        
     .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slicep'), 'map')    
 
     .Object@parameters[['mSameRegion']] <- createParameter('mSameRegion', c('region', 'regionp'), 'map') # for glpk    

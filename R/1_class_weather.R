@@ -19,6 +19,7 @@ setClass("weather",
            region = NULL,
            slice         = NULL,
            weather       = data.frame(region   = character(), # 
+                                      year     = numeric(),
                                       slice    = character(),
                                       wval     = numeric(),
                                       stringsAsFactors = FALSE),
@@ -32,6 +33,6 @@ setClass("weather",
          S3methods = TRUE
 );
 setMethod("initialize", "weather", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '75321e73-f425-4d45-a36c-72dc4a769a28'
+  attr(.Object, 'GUID') <- '98271d3b-9704-42c2-8748-9fd1b3760eba'
   .Object
 })
