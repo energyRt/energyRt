@@ -21,7 +21,7 @@ setClass("storage",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           slice         = "characterOrNULL",
           region        = "characterOrNULL",
-          cap2act       = "numeric",
+          cap2act       = "numeric", # cap2stg cinp
           misc = "list"     #
       ),
       prototype(
@@ -46,7 +46,7 @@ setClass("storage",
                                      slice      = character(),
                                      stgeff    = numeric(),  
                                      inpeff    = numeric(),  
-                                     outeff    = numeric(),  
+                                     outeff    = numeric(),  # cinp.up...,  cout.up...
                                      stringsAsFactors = FALSE),
           aux           = data.frame(acomm     = character(),
                                      unit     = character(),

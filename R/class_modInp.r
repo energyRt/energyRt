@@ -251,7 +251,7 @@ setMethod("initialize", "modInp",
         for(i in c('pStorageInpEff', 'pStorageOutEff', 'pStorageStgEff'))
           .Object@parameters[[i]] <- createParameter(i, 
                                                      c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
-                                                     defVal = 0, interpolation = 'back.inter.forth')    
+                                                     defVal = 1, interpolation = 'back.inter.forth')    
         for(i in c('pStorageCostStore', 'pStorageCostInp', 'pStorageCostOut'))
           .Object@parameters[[i]] <- createParameter(i, 
                                                      c('stg', 'region', 'year', 'slice'), 'simple', 
