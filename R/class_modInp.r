@@ -275,9 +275,13 @@ setMethod("initialize", "modInp",
         .Object@parameters[['pStorageAf']] <- createParameter('pStorageAf', 
                                                            c('stg', 'region', 'year', 'slice'), 'multi', 
                                                            defVal = c(0, 1), interpolation = 'back.inter.forth')
-    .Object@parameters[['pStorageCap2act']] <- createParameter('pStorageCap2act', 'stg', 'simple', 
-                      defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2act', slot = 'cap2act')    
-    .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
+        .Object@parameters[['pStorageCap2stg']] <- createParameter('pStorageCap2stg', 'stg', 'simple', 
+             defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2stg', slot = 'cap2stg')    
+        .Object@parameters[['pStorageCinp']] <- createParameter('pStorageCinp', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
+             defVal = c(0, -1), interpolation = rep('back.inter.forth', 2), cls = 'storage', colName = c('cinp.lo', 'cinp.up'), slot = 'seff')
+        .Object@parameters[['pStorageCout']] <- createParameter('pStorageCout', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
+             defVal = c(0, -1), interpolation = rep('back.inter.forth', 2), cls = 'storage', colName = c('cinp.lo', 'cinp.up'), slot = 'seff')
+        .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
     .Object@parameters[['mStorageAOut']] <- createParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    

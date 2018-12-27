@@ -1038,8 +1038,12 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']],
                                                multiInterpolation(stg@af, 'af',
                                                                   obj@parameters[['pStorageAf']], approxim, 'stg', stg@name))
-    obj@parameters[['pStorageCap2act']] <- addData(obj@parameters[['pStorageCap2act']],
-                                                data.frame(stg = stg@name, value = stg@cap2act))
+    obj@parameters[['pStorageCap2stg']] <- addData(obj@parameters[['pStorageCap2stg']],
+                                                data.frame(stg = stg@name, value = stg@cap2stg))
+    obj@parameters[['pStorageCinp']] <- addData(obj@parameters[['pStorageCinp']], multiInterpolation(stg@seff, 'cinp',
+      obj@parameters[['pStorageCinp']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+    obj@parameters[['pStorageCout']] <- addData(obj@parameters[['pStorageCout']], multiInterpolation(stg@seff, 'cout',
+      obj@parameters[['pStorageCout']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
     # Aux input/output
     if (nrow(stg@aux) != 0) {
       if (any(!(stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]))) {

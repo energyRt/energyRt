@@ -192,9 +192,13 @@ param pStorageCostInp{stg, region, year, slice};
 param pStorageCostOut{stg, region, year, slice};
 param pStorageFixom{stg, region, year};
 param pStorageInvcost{stg, region, year};
-param pStorageCap2act{stg};
+param pStorageCap2stg{stg};
 param pStorageAfLo{stg, region, year, slice};
 param pStorageAfUp{stg, region, year, slice};
+param pStorageCinpUp{stg, comm, region, year, slice};
+param pStorageCinpLo{stg, comm, region, year, slice};
+param pStorageCoutUp{stg, comm, region, year, slice};
+param pStorageCoutLo{stg, comm, region, year, slice};
 param pStorageStg2AInp{stg, comm, region, year, slice};
 param pStorageStg2AOut{stg, comm, region, year, slice};
 param pStorageInp2AInp{stg, comm, region, year, slice};
@@ -369,9 +373,9 @@ s.t.  eqTechAfLo{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] 
 
 s.t.  eqTechAfUp{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and not((ndefpTechAfUp[t,r,y,s])))}: vTechAct[t,r,y,s] <=  pTechAfUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
 
-s.t.  eqTechAfsLo{ t in tech,r in region,y in year,s in slice : (mMidMilestone[y] and pTechAfsLo[t,r,y,s]>0 and mTechSpan[t,r,y])}: pTechAfsLo[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  sum{sp in slice:((mTechSlice[t,sp] and mAllSliceParentChild[s,sp]))}(vTechAct[t,r,y,sp]);
+s.t.  eqTechAfsLo{ t in tech,r in region,y in year,s in slice : (mMidMilestone[y] and pTechAfsLo[t,r,y,s]>0 and mTechSpan[t,r,y])}: pTechAfsLo[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  sum{sp in slice:((mTechSlice[t,sp] and (mSameSlice[s,sp] or mAllSliceParentChild[s,sp])))}(vTechAct[t,r,y,sp]);
 
-s.t.  eqTechAfsUp{ t in tech,r in region,y in year,s in slice : (mMidMilestone[y] and pTechAfsUp[t,r,y,s] >= 0 and mTechSpan[t,r,y])}: sum{sp in slice:((mTechSlice[t,sp] and mAllSliceParentChild[s,sp]))}(vTechAct[t,r,y,sp]) <=  pTechAfsUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+s.t.  eqTechAfsUp{ t in tech,r in region,y in year,s in slice : (mMidMilestone[y] and pTechAfsUp[t,r,y,s] >= 0 and mTechSpan[t,r,y])}: sum{sp in slice:((mTechSlice[t,sp] and (mSameSlice[s,sp] or mAllSliceParentChild[s,sp])))}(vTechAct[t,r,y,sp]) <=  pTechAfsUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
 
 s.t.  eqTechActSng{ t in tech,c in comm,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and mTechOneComm[t,c] and pTechCact2cout[t,c,r,y,s] <> 0)}: vTechAct[t,r,y,s]  =  (vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]);
 
@@ -425,11 +429,19 @@ s.t.  eqStorageAOut{ st1 in stg,c in comm,r in region,y in year,s in slice : (mM
 
 s.t.  eqStorageStore{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageStore[st1,c,r,y,s]  =  pStorageInpEff[st1,c,r,y,s]*vStorageInp[st1,c,r,y,s]-pStorageOutEff[st1,c,r,y,s]*vStorageOut[st1,c,r,y,s]+sum{sp in slice:((mStorageSlice[st1,sp] and mSliceNext[sp,s]))}(pStorageStgEff[st1,c,r,y,s]*vStorageStore[st1,c,r,y,sp]);
 
-s.t.  eqStorageAfLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageAfLo[st1,r,y,s])}: vStorageStore[st1,c,r,y,s]  >=  pStorageAfLo[st1,r,y,s]*pStorageCap2act[st1]*vStorageCap[st1,r,y];
+s.t.  eqStorageAfLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageAfLo[st1,r,y,s])}: vStorageStore[st1,c,r,y,s]  >=  pStorageAfLo[st1,r,y,s]*pStorageCap2stg[st1]*vStorageCap[st1,r,y];
 
-s.t.  eqStorageAfUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageStore[st1,c,r,y,s] <=  pStorageAfUp[st1,r,y,s]*pStorageCap2act[st1]*vStorageCap[st1,r,y];
+s.t.  eqStorageAfUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageStore[st1,c,r,y,s] <=  pStorageAfUp[st1,r,y,s]*pStorageCap2stg[st1]*vStorageCap[st1,r,y];
 
 s.t.  eqStorageClean{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageInp[st1,c,r,y,s] <=  vStorageStore[st1,c,r,y,s];
+
+s.t.  eqStorageInpUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCinpUp[st1,c,r,y,s] >= 0)}: pStorageInpEff[st1,c,r,y,s]*vStorageInp[st1,c,r,y,s] <=  pStorageCinpUp[st1,c,r,y,s]*pSliceShare[s];
+
+s.t.  eqStorageInpLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCinpLo[st1,c,r,y,s]>0)}: pStorageInpEff[st1,c,r,y,s]*vStorageInp[st1,c,r,y,s]  >=  pStorageCinpLo[st1,c,r,y,s]*pSliceShare[s];
+
+s.t.  eqStorageOutUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCoutUp[st1,c,r,y,s] >= 0)}: pStorageOutEff[st1,c,r,y,s]*vStorageOut[st1,c,r,y,s] <=  pStorageCoutUp[st1,c,r,y,s]*pSliceShare[s];
+
+s.t.  eqStorageOutLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCoutLo[st1,c,r,y,s]>0)}: pStorageOutEff[st1,c,r,y,s]*vStorageOut[st1,c,r,y,s]  >=  pStorageCoutLo[st1,c,r,y,s]*pSliceShare[s];
 
 s.t.  eqStorageCap{ st1 in stg,r in region,y in year : (mMidMilestone[y] and mStorageSpan[st1,r,y])}: vStorageCap[st1,r,y]  =  pStorageStock[st1,r,y]+sum{yp in year:((ordYear[y] >= ordYear[yp] and ordYear[y]<pStorageOlife[st1,r]+ordYear[yp] and mStorageNew[st1,r,y]))}(vStorageNewCap[st1,r,yp]);
 
