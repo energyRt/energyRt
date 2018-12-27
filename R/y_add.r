@@ -216,21 +216,23 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
     wth.up <- sup@weather[!is.na(sup@weather$wava.up) | !is.na(sup@weather$wava.fx), 'weather']
     obj@parameters[['mSupWeatherUp']] <- addData(obj@parameters[['mSupWeatherUp']],
                                                  data.frame(sup = rep(sup@name, length(wth.up)), weather = wth.up))
-    gg <- sup@weather
-    gg$sup <- sup@name
-    gg$type <- 'lo'
-    a1 <- gg[, c('sup', 'weather', 'type', 'wava.lo'), drop = FALSE]; 
-    colnames(a1)[ncol(a1)] <- 'value'
-    a2 <- gg[, c('sup', 'weather', 'type', 'wava.fx'), drop = FALSE]; 
-    colnames(a2)[ncol(a2)] <- 'value'
-    a3 <- gg[, c('sup', 'weather', 'type', 'wava.up'), drop = FALSE]; 
-    colnames(a3)[ncol(a3)] <- 'value'
-    g1 <- rbind(a1, a2); g1$type <- 'lo'
-    g2 <- rbind(a3, a2); g1$type <- 'up'
-    gg <- rbind(g1, g2)
-    gg <- gg[!is.na(gg$value),, drop = FALSE]
-    # sup     weather type    value
-      obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], gg)
+    if (nrow(sup@weather) > 0) {
+      gg <- sup@weather
+      gg$sup <- sup@name
+      gg$type <- 'lo'
+      a1 <- gg[, c('sup', 'weather', 'type', 'wava.lo'), drop = FALSE]; 
+      colnames(a1)[ncol(a1)] <- 'value'
+      a2 <- gg[, c('sup', 'weather', 'type', 'wava.fx'), drop = FALSE]; 
+      colnames(a2)[ncol(a2)] <- 'value'
+      a3 <- gg[, c('sup', 'weather', 'type', 'wava.up'), drop = FALSE]; 
+      colnames(a3)[ncol(a3)] <- 'value'
+      g1 <- rbind(a1, a2); g1$type <- 'lo'
+      g2 <- rbind(a3, a2); g1$type <- 'up'
+      gg <- rbind(g1, g2)
+      gg <- gg[!is.na(gg$value),, drop = FALSE]
+      # sup     weather type    value
+        obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], gg)
+    }
     
   obj
 })
