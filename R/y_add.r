@@ -150,7 +150,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'weather',
     obj@parameters[['pWeather']] <- addData(obj@parameters[['pWeather']], simpleInterpolation(wth@weather, 'wval',
        obj@parameters[['pWeather']], approxim, 'weather', wth@name))
     obj@parameters[['mWeatherSlice']] <- addData(obj@parameters[['mWeatherSlice']],
-                                                 data.frame(weather = rep(weather@name, length(approxim$slice)), slice = approxim$slice))
+                                                 data.frame(weather = rep(wth@name, length(approxim$slice)), slice = approxim$slice))
     obj@parameters[['mWeatherRegion']] <- addData(obj@parameters[['mWeatherRegion']],
                                             data.frame(weather = rep(wth@name, length(wth@region)), region = wth@region))
     obj
