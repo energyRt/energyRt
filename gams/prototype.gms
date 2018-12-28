@@ -860,7 +860,7 @@ eqTechCap(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
          sum((yearp)$
                  (       mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
                          ordYear(year) >= ordYear(yearp) and
-                         ordYear(year) < pTechOlife(tech, region) + ordYear(yearp)
+                         (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or ndefpTechOlife(tech, region))
                  ),
                  vTechNewCap(tech, region, yearp) -
                    sum(yeare$(mTechRetirement(tech) and mMidMilestone(yeare) and
@@ -1260,7 +1260,7 @@ eqStorageCap(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regio
          sum(yearp$
                  (
                          ordYear(year) >= ordYear(yearp) and
-                         ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp) and
+                         (ndefpStorageOlife(stg, region) or ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp)) and
                          mStorageNew(stg, region, year)
                  ),
                  vStorageNewCap(stg, region, yearp)
