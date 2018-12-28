@@ -61,7 +61,19 @@ setMethod("initialize", "modInp",
       createParameter('pSupWeather', c('sup', 'weather'), 'multi', 
                       defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wava.lo', 'wava.up'), cls = 'weather')    
     
+    .Object@parameters[['mTechWeatherAf']] <- createParameter('mTechWeatherAf', c('tech', 'weather'), 'map')    
+    .Object@parameters[['mTechWeatherAfs']] <- createParameter('mTechWeatherAfs', c('tech', 'weather'), 'map')    
+    .Object@parameters[['mTechWeatherAfc']] <- createParameter('mTechWeatherAfc', c('tech', 'weather', 'comm'), 'map')    
     
+    .Object@parameters[['pTechWeatherAf']] <- 
+      createParameter('pTechWeatherAf', c('tech', 'weather'), 'multi', 
+                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('waf.lo', 'waf.up'), cls = 'weather')    
+    .Object@parameters[['pTechWeatherAfs']] <- 
+      createParameter('pTechWeatherAfs', c('tech', 'weather'), 'multi', 
+                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wafs.lo', 'wafs.up'), cls = 'weather')    
+    .Object@parameters[['pTechWeatherAfc']] <- 
+      createParameter('pTechWeatherAfc', c('tech', 'weather', 'comm'), 'multi', 
+                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wafc.lo', 'wafc.up'), cls = 'weather')    
     #
         
     .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slicep'), 'map')    

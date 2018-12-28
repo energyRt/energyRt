@@ -812,6 +812,43 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   dd0 <- .start_end_fix(approxim, tech, 'tech', stock_exist)
   obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
   obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
+  # Weather part
+  merge.weather <- function(tech, nm, add = NULL) {
+    waf <- tech@weather[, c('weather', add, nm)]
+    waf <- waf[rowSums(!is.na(waf)) > length(ad) + 2,, drop = FALSE]
+    if (nrow(waf) == 0) return(NULL)
+    # Map parts
+    m <- uniqur(waf$weather)
+    m <- data.frame(tech = rep(tech@name, length(m)), weather = m)
+    waf20 <- data.frame(
+      tech = rep(tech@name, 4 * nrow(waf)),
+      stringsAsFactors = FALSE)
+    for (i in add) {
+      waf20[, i] <- rep(waf[, i], 4)
+    }
+    waf20$type <- c(rep('lo', 2 * nrow(waf)), rep('up', 2 * nrow(waf)))
+    waf20$value <- c(waf[, paste0(nm, '.lo')], waf[, paste0(nm, '.fx')], 
+                     waf[, paste0(nm, '.up')], waf[, paste0(nm, '.fx')])
+    waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
+    list(m = m, p = waf20)
+  }
+  browser()
+  tmp <- merge.weather(tech, 'waf')
+  if (!is.null(tmp)) {
+    obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$p)
+    obj@parameters[['pTechWeatherAf']] <- addData(obj@parameters[['pTechWeatherAf']], tmp$p)
+  }
+  tmp <- merge.weather(tech, 'wafs')
+  if (!is.null(tmp)) {
+    obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$p)
+    obj@parameters[['pTechWeatherAfs']] <- addData(obj@parameters[['pTechWeatherAfs']], tmp$p)
+  }
+  tmp <- merge.weather(tech, 'wafc', 'comm')
+  if (!is.null(tmp)) {
+    obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$p)
+    obj@parameters[['pTechWeatherAfc']] <- addData(obj@parameters[['pTechWeatherAfc']], tmp$p)
+  }
+
 #  cat(tech@name, '\n')
   if (all(ctype$comm$type != 'output')) 
     stop('Techology "', tech@name, '", there is not activity commodity')   
