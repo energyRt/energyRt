@@ -1115,7 +1115,7 @@ eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
   and mStorageComm(stg, comm))..
   vStorageStore(stg, comm, region, year, slice) =e=
   pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice) -
-  pStorageOutEff(stg, comm, region, year, slice) * vStorageOut(stg, comm, region, year, slice) +
+  vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice) +
   sum(slicep$(mStorageSlice(stg, slicep) and mSliceNext(slicep, slice)),
   pStorageStgEff(stg, comm, region, year, slice) * vStorageStore(stg, comm, region, year, slicep));
 
@@ -1159,7 +1159,7 @@ eqStorageInpLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
 *
 eqStorageOutUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageCoutUp(stg, comm, region, year, slice) >= 0)..
-  pStorageOutEff(stg, comm, region, year, slice) * vStorageOut(stg, comm, region, year, slice) =l=
+  vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice) =l=
     pStorageCoutUp(stg, comm, region, year, slice) * pSliceShare(slice) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCout(stg, weather)
                  and pStorageWeatherCoutUp(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),
@@ -1167,7 +1167,7 @@ eqStorageOutUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
 
 eqStorageOutLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageCoutLo(stg, comm, region, year, slice) > 0)..
-  pStorageOutEff(stg, comm, region, year, slice) * vStorageOut(stg, comm, region, year, slice) =g=
+  vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice)  =g=
     pStorageCoutLo(stg, comm, region, year, slice) * pSliceShare(slice) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCout(stg, weather)
                  and pStorageWeatherCoutLo(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),

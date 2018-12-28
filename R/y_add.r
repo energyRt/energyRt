@@ -145,6 +145,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'weather',
                               }
                               if (is.null(wth@slice)) wth@slice <- names(approxim$slice@misc$nlevel)[1]
                               approxim <- .fix_approximation_list(approxim, lev = wth@slice)
+                              # region fix
+                              if (!is.null(wth@region)) {
+                                approxim$region <- approxim$region[approxim$region %in% wth@region]
+                              }
+                              wth@region <- approxim$region
                               wth <- stayOnlyVariable(wth, approxim$region, 'region')
                               wth <- .disaggregateSliceLevel(wth, approxim)
     obj@parameters[['pWeather']] <- addData(obj@parameters[['pWeather']], simpleInterpolation(wth@weather, 'wval',
