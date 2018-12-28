@@ -19392,7 +19392,7 @@ eqLECActivity
 
 * Place to insert your data
 * ddd355e0-0023-45e9-b0d3-1ad83ba74b3a
-$EXIT
+*$EXIT
 
 *option lp = cbc;
 

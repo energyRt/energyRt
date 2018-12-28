@@ -814,14 +814,22 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
   # Weather part
   merge.weather <- function(tech, nm, add = NULL) {
-    waf <- tech@weather[, c('weather', add, nm)]
-    waf <- waf[rowSums(!is.na(waf)) > length(ad) + 2,, drop = FALSE]
+    waf <- tech@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
+    waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
     if (nrow(waf) == 0) return(NULL)
     # Map parts
-    m <- uniqur(waf$weather)
-    m <- data.frame(tech = rep(tech@name, length(m)), weather = m)
+    if (length(add) == 0) {
+      m <- unique(waf$weather)
+      m <- data.frame(tech = rep(tech@name, length(m)), weather = m)
+    } else {
+      m <- waf[, c('weather', add), drop = FALSE]
+      m <- m[(!duplicated(apply(m, 1, paste0, collapse = '#'))),, drop = FALSE]
+      m$tech <- tech@name
+      m <- m[, c(ncol(m), 1:(ncol(m) - 1)), drop = FALSE]
+    }
     waf20 <- data.frame(
       tech = rep(tech@name, 4 * nrow(waf)),
+      weather = rep(waf$weather, 4),
       stringsAsFactors = FALSE)
     for (i in add) {
       waf20[, i] <- rep(waf[, i], 4)
@@ -832,23 +840,21 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
     waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
     list(m = m, p = waf20)
   }
-  browser()
   tmp <- merge.weather(tech, 'waf')
   if (!is.null(tmp)) {
-    obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$p)
+    obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$m)
     obj@parameters[['pTechWeatherAf']] <- addData(obj@parameters[['pTechWeatherAf']], tmp$p)
   }
   tmp <- merge.weather(tech, 'wafs')
   if (!is.null(tmp)) {
-    obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$p)
+    obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$m)
     obj@parameters[['pTechWeatherAfs']] <- addData(obj@parameters[['pTechWeatherAfs']], tmp$p)
   }
   tmp <- merge.weather(tech, 'wafc', 'comm')
   if (!is.null(tmp)) {
-    obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$p)
+    obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$m)
     obj@parameters[['pTechWeatherAfc']] <- addData(obj@parameters[['pTechWeatherAfc']], tmp$p)
   }
-
 #  cat(tech@name, '\n')
   if (all(ctype$comm$type != 'output')) 
     stop('Techology "', tech@name, '", there is not activity commodity')   
