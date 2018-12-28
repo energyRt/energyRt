@@ -161,6 +161,12 @@ mAllSliceParentChild(slice, slice)
 mTechWeatherAf(tech, weather)
 mTechWeatherAfs(tech, weather)
 mTechWeatherAfc(tech, weather, comm)
+
+
+mStorageWeatherAf(stg, weather)
+mStorageWeatherCinp(stg, weather)
+mStorageWeatherCout(stg, weather)
+
 ;
 
 * Set priority
@@ -245,6 +251,14 @@ pTechWeatherAfsUp(tech, weather)  Weather multiplier
 
 pTechWeatherAfcLo(tech, weather, comm)  Weather multiplier
 pTechWeatherAfcUp(tech, weather, comm)  Weather multiplier
+
+pStorageWeatherAfUp(stg, weather)
+pStorageWeatherAfLo(stg, weather)
+pStorageWeatherCinpUp(stg, weather)
+pStorageWeatherCinpLo(stg, weather)
+pStorageWeatherCoutUp(stg, weather)
+pStorageWeatherCoutLo(stg, weather)
+
 ;
 
 * Storage technology parameters
@@ -1108,12 +1122,18 @@ eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
 eqStorageAfLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageAfLo(stg, region, year, slice))..
   vStorageStore(stg, comm, region, year, slice) =g= pStorageAfLo(stg, region, year, slice) *
-     pStorageCap2stg(stg) * vStorageCap(stg, region, year);
+     pStorageCap2stg(stg) * vStorageCap(stg, region, year) *
+         prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherAf(stg, weather)
+                 and pStorageWeatherAfLo(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),
+                    pWeather(weather, region, year, slice) * pStorageWeatherAfLo(stg, weather));
 
 eqStorageAfUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm))..
   vStorageStore(stg, comm, region, year, slice) =l= pStorageAfUp(stg, region, year, slice) *
-     pStorageCap2stg(stg) * vStorageCap(stg, region, year);
+     pStorageCap2stg(stg) * vStorageCap(stg, region, year) *
+         prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherAf(stg, weather)
+                 and pStorageWeatherAfUp(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),
+                    pWeather(weather, region, year, slice) * pStorageWeatherAfUp(stg, weather));
 
 eqStorageClean(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm))..
@@ -1123,23 +1143,35 @@ eqStorageClean(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
 eqStorageInpUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageCinpUp(stg, comm, region, year, slice) >= 0)..
   pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice) =l=
-    pStorageCinpUp(stg, comm, region, year, slice) * pSliceShare(slice);
+    pStorageCinpUp(stg, comm, region, year, slice) * pSliceShare(slice) *
+         prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCinp(stg, weather)
+                 and pStorageWeatherCinpUp(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),
+                    pWeather(weather, region, year, slice) * pStorageWeatherCinpUp(stg, weather));
 
 eqStorageInpLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageCinpLo(stg, comm, region, year, slice) > 0)..
   pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice) =g=
-    pStorageCinpLo(stg, comm, region, year, slice) * pSliceShare(slice);
+    pStorageCinpLo(stg, comm, region, year, slice) * pSliceShare(slice) *
+         prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCinp(stg, weather)
+                 and pStorageWeatherCinpLo(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),
+                    pWeather(weather, region, year, slice) * pStorageWeatherCinpLo(stg, weather));
 
 *
 eqStorageOutUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageCoutUp(stg, comm, region, year, slice) >= 0)..
   pStorageOutEff(stg, comm, region, year, slice) * vStorageOut(stg, comm, region, year, slice) =l=
-    pStorageCoutUp(stg, comm, region, year, slice) * pSliceShare(slice);
+    pStorageCoutUp(stg, comm, region, year, slice) * pSliceShare(slice) *
+         prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCout(stg, weather)
+                 and pStorageWeatherCoutUp(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),
+                    pWeather(weather, region, year, slice) * pStorageWeatherCoutUp(stg, weather));
 
 eqStorageOutLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
   and mStorageComm(stg, comm) and pStorageCoutLo(stg, comm, region, year, slice) > 0)..
   pStorageOutEff(stg, comm, region, year, slice) * vStorageOut(stg, comm, region, year, slice) =g=
-    pStorageCoutLo(stg, comm, region, year, slice) * pSliceShare(slice);
+    pStorageCoutLo(stg, comm, region, year, slice) * pSliceShare(slice) *
+         prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCout(stg, weather)
+                 and pStorageWeatherCoutLo(stg, weather) >= 0 and (mAllSliceParentChild(slice, slicep) or mSameSlice(slice, slicep))),
+                    pWeather(weather, region, year, slice) * pStorageWeatherCoutLo(stg, weather));
 
 
 ********************************************************************************

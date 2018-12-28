@@ -74,6 +74,22 @@ setMethod("initialize", "modInp",
     .Object@parameters[['pTechWeatherAfc']] <- 
       createParameter('pTechWeatherAfc', c('tech', 'weather', 'comm'), 'multi', 
                       defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wafc.lo', 'wafc.up'), cls = 'weather')    
+    
+    .Object@parameters[['mStorageWeatherAf']] <- createParameter('mStorageWeatherAf', c('stg', 'weather'), 'map')    
+    .Object@parameters[['pStorageWeatherAf']] <- 
+      createParameter('pStorageWeatherAf', c('stg', 'weather'), 'multi', 
+                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('waf.lo', 'waf.up'), cls = 'weather')    
+    
+    .Object@parameters[['mStorageWeatherCinp']] <- createParameter('mStorageWeatherCinp', c('stg', 'weather'), 'map')    
+    .Object@parameters[['pStorageWeatherCinp']] <- 
+      createParameter('pStorageWeatherCinp', c('stg', 'weather'), 'multi', 
+                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wcinp.lo', 'wcinp.up'), cls = 'weather')    
+    
+    .Object@parameters[['mStorageWeatherCout']] <- createParameter('mStorageWeatherCout', c('stg', 'weather'), 'map')    
+    .Object@parameters[['pStorageWeatherCout']] <- 
+      createParameter('pStorageWeatherCout', c('stg', 'weather'), 'multi', 
+                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wcout.lo', 'wcout.up'), cls = 'weather')    
+    
     #
         
     .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slicep'), 'map')    

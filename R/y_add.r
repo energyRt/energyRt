@@ -1128,5 +1128,50 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     dd0 <- .start_end_fix(approxim, stg, 'stg', stock_exist)
     obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
     obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
+    # Weather part
+    # Weather part
+    merge.weather <- function(stg, nm, add = NULL) {
+      waf <- stg@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
+      waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
+      if (nrow(waf) == 0) return(NULL)
+      # Map parts
+      if (length(add) == 0) {
+        m <- unique(waf$weather)
+        m <- data.frame(stg = rep(stg@name, length(m)), weather = m)
+      } else {
+        m <- waf[, c('weather', add), drop = FALSE]
+        m <- m[(!duplicated(apply(m, 1, paste0, collapse = '#'))),, drop = FALSE]
+        m$stg <- stg@name
+        m <- m[, c(ncol(m), 1:(ncol(m) - 1)), drop = FALSE]
+      }
+      waf20 <- data.frame(
+        stg = rep(stg@name, 4 * nrow(waf)),
+        weather = rep(waf$weather, 4),
+        stringsAsFactors = FALSE)
+      for (i in add) {
+        waf20[, i] <- rep(waf[, i], 4)
+      }
+      waf20$type <- c(rep('lo', 2 * nrow(waf)), rep('up', 2 * nrow(waf)))
+      waf20$value <- c(waf[, paste0(nm, '.lo')], waf[, paste0(nm, '.fx')], 
+                       waf[, paste0(nm, '.up')], waf[, paste0(nm, '.fx')])
+      waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
+      list(m = m, p = waf20)
+    }
+    tmp <- merge.weather(stg, 'waf')
+    if (!is.null(tmp)) {
+      obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$m)
+      obj@parameters[['pStorageWeatherAf']] <- addData(obj@parameters[['pStorageWeatherAf']], tmp$p)
+    }
+    tmp <- merge.weather(stg, 'wcinp')
+    if (!is.null(tmp)) {
+      obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$m)
+      obj@parameters[['pStorageWeatherCinp']] <- addData(obj@parameters[['pStorageWeatherCinp']], tmp$p)
+    }
+    tmp <- merge.weather(stg, 'wcout')
+    if (!is.null(tmp)) {
+      obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$m)
+      obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
+    }
+    
     obj
   })

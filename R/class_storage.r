@@ -22,6 +22,7 @@ setClass("storage",
           slice         = "characterOrNULL",
           region        = "characterOrNULL",
           cap2stg       = "numeric", # cap2stg cinp
+          weather       = "data.frame",    # weather condisions multiplier
           misc = "list"     #
       ),
       prototype(
@@ -100,6 +101,17 @@ setClass("storage",
       GIS           = NULL,
       slice         = NULL,
       region        = NULL,
+      weather      = data.frame(weather  = character(),
+                                waf.lo    = numeric(),
+                                waf.up    = numeric(),
+                                waf.fx    = numeric(),
+                                wcinp.lo   = numeric(),
+                                wcinp.fx   = numeric(),
+                                wcinp.up   = numeric(),
+                                wcout.lo   = numeric(),
+                                wcout.fx   = numeric(),
+                                wcout.up   = numeric(),
+                                stringsAsFactors = FALSE),
       #! Misc
       misc = list(
       )),
