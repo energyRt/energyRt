@@ -11,6 +11,7 @@ set comm;
 set region;
 set year;
 set slice;
+set weather;
 set cns;
 set FORIF;
 
@@ -42,12 +43,16 @@ param mTechEmitedComm{tech, comm};
 param mSupSlice{sup, slice};
 param mSupComm{sup, comm};
 param mSupSpan{sup, region};
+param mSupWeatherLo{sup, weather};
+param mSupWeatherUp{sup, weather};
+param mWeatherSlice{weather, slice};
+param mWeatherRegion{weather, region};
 param mDemComm{dem, comm};
 param mUpComm{comm};
 param mLoComm{comm};
 param mFxComm{comm};
-param ndefpTechAfaUp{tech, region, year, slice};
-param ndefpTechAfacUp{tech, comm, region, year, slice};
+param ndefpTechAfUp{tech, region, year, slice};
+param ndefpTechAfcUp{tech, comm, region, year, slice};
 param ndefpSupReserveUp{sup, comm, region};
 param ndefpSupAvaUp{sup, comm, region, year, slice};
 param ndefpDummyImportCost{comm, region, year, slice};
@@ -80,6 +85,12 @@ param ndefpImportRowRes{imp};
 param ndefpImportRowUp{imp, region, year, slice};
 param mDiscountZero{region};
 param mAllSliceParentChild{slice, slice};
+param mTechWeatherAf{tech, weather};
+param mTechWeatherAfs{tech, weather};
+param mTechWeatherAfc{tech, weather, comm};
+param mStorageWeatherAf{stg, weather};
+param mStorageWeatherCinp{stg, weather};
+param mStorageWeatherCout{stg, weather};
 param mCnsLe{cns};
 param mCnsGe{cns};
 param mCnsRhsTypeConst{cns};
@@ -151,10 +162,12 @@ param pTechVarom{tech, region, year, slice};
 param pTechInvcost{tech, region, year};
 param pTechShareLo{tech, comm, region, year, slice};
 param pTechShareUp{tech, comm, region, year, slice};
-param pTechAfaLo{tech, region, year, slice};
-param pTechAfaUp{tech, region, year, slice};
-param pTechAfacLo{tech, comm, region, year, slice};
-param pTechAfacUp{tech, comm, region, year, slice};
+param pTechAfLo{tech, region, year, slice};
+param pTechAfUp{tech, region, year, slice};
+param pTechAfsLo{tech, region, year, slice};
+param pTechAfsUp{tech, region, year, slice};
+param pTechAfcLo{tech, comm, region, year, slice};
+param pTechAfcUp{tech, comm, region, year, slice};
 param pTechStock{tech, region, year};
 param pTechCap2act{tech};
 param pTechCvarom{tech, comm, region, year, slice};
@@ -172,6 +185,21 @@ param pDummyImportCost{comm, region, year, slice};
 param pDummyExportCost{comm, region, year, slice};
 param pTaxCost{comm, region, year, slice};
 param pSubsCost{comm, region, year, slice};
+param pWeather{weather, region, year, slice};
+param pSupWeatherLo{sup, weather};
+param pSupWeatherUp{sup, weather};
+param pTechWeatherAfLo{tech, weather};
+param pTechWeatherAfUp{tech, weather};
+param pTechWeatherAfsLo{tech, weather};
+param pTechWeatherAfsUp{tech, weather};
+param pTechWeatherAfcLo{tech, weather, comm};
+param pTechWeatherAfcUp{tech, weather, comm};
+param pStorageWeatherAfUp{stg, weather};
+param pStorageWeatherAfLo{stg, weather};
+param pStorageWeatherCinpUp{stg, weather};
+param pStorageWeatherCinpLo{stg, weather};
+param pStorageWeatherCoutUp{stg, weather};
+param pStorageWeatherCoutLo{stg, weather};
 param pStorageInpEff{stg, comm, region, year, slice};
 param pStorageOutEff{stg, comm, region, year, slice};
 param pStorageStgEff{stg, comm, region, year, slice};
@@ -182,9 +210,13 @@ param pStorageCostInp{stg, region, year, slice};
 param pStorageCostOut{stg, region, year, slice};
 param pStorageFixom{stg, region, year};
 param pStorageInvcost{stg, region, year};
-param pStorageCap2act{stg};
-param pStorageAfaLo{stg, region, year, slice};
-param pStorageAfaUp{stg, region, year, slice};
+param pStorageCap2stg{stg};
+param pStorageAfLo{stg, region, year, slice};
+param pStorageAfUp{stg, region, year, slice};
+param pStorageCinpUp{stg, comm, region, year, slice};
+param pStorageCinpLo{stg, comm, region, year, slice};
+param pStorageCoutUp{stg, comm, region, year, slice};
+param pStorageCoutLo{stg, comm, region, year, slice};
 param pStorageStg2AInp{stg, comm, region, year, slice};
 param pStorageStg2AOut{stg, comm, region, year, slice};
 param pStorageInp2AInp{stg, comm, region, year, slice};
@@ -355,23 +387,27 @@ s.t.  eqTechAInp{ t in tech,c in comm,r in region,y in year,s in slice : (mTechS
 
 s.t.  eqTechAOut{ t in tech,c in comm,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechAOut[t,c] and mTechSpan[t,r,y])}: vTechAOut[t,c,r,y,s]  =  (vTechUse[t,r,y,s]*pTechUse2AOut[t,c,r,y,s])+(vTechAct[t,r,y,s]*pTechAct2AOut[t,c,r,y,s])+(vTechCap[t,r,y]*pTechCap2AOut[t,c,r,y,s])+(vTechNewCap[t,r,y]*pTechNCap2AOut[t,c,r,y,s])+sum{cp in comm:(pTechCinp2AOut[t,c,cp,r,y,s])}(pTechCinp2AOut[t,c,cp,r,y,s]*vTechInp[t,cp,r,y,s])+sum{cp in comm:(pTechCout2AOut[t,c,cp,r,y,s])}(pTechCout2AOut[t,c,cp,r,y,s]*vTechOut[t,cp,r,y,s]);
 
-s.t.  eqTechAfaLo{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and pTechAfaLo[t,r,y,s] <> 0 and mTechSpan[t,r,y])}: pTechAfaLo[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechAct[t,r,y,s];
+s.t.  eqTechAfLo{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and pTechAfLo[t,r,y,s] <> 0 and mTechSpan[t,r,y])}: pTechAfLo[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mTechWeatherAf[t,wth1] and pTechWeatherAfLo[t,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfLo[t,wth1]) <=  vTechAct[t,r,y,s];
 
-s.t.  eqTechAfaUp{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and not((ndefpTechAfaUp[t,r,y,s])))}: vTechAct[t,r,y,s] <=  pTechAfaUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+s.t.  eqTechAfUp{ t in tech,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and not((ndefpTechAfUp[t,r,y,s])))}: vTechAct[t,r,y,s] <=  pTechAfUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mTechWeatherAf[t,wth1] and pTechWeatherAfUp[t,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfUp[t,wth1]);
+
+s.t.  eqTechAfsLo{ t in tech,r in region,y in year,s in slice : (mMidMilestone[y] and pTechAfsLo[t,r,y,s]>0 and mTechSpan[t,r,y])}: pTechAfsLo[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mTechWeatherAfs[t,wth1] and pTechWeatherAfsLo[t,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfsLo[t,wth1]) <=  sum{sp in slice:((mTechSlice[t,sp] and (mSameSlice[s,sp] or mAllSliceParentChild[s,sp])))}(vTechAct[t,r,y,sp]);
+
+s.t.  eqTechAfsUp{ t in tech,r in region,y in year,s in slice : (mMidMilestone[y] and pTechAfsUp[t,r,y,s] >= 0 and mTechSpan[t,r,y])}: sum{sp in slice:((mTechSlice[t,sp] and (mSameSlice[s,sp] or mAllSliceParentChild[s,sp])))}(vTechAct[t,r,y,sp]) <=  pTechAfsUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mTechWeatherAfs[t,wth1] and pTechWeatherAfsUp[t,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfsUp[t,wth1]);
 
 s.t.  eqTechActSng{ t in tech,c in comm,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and mTechOneComm[t,c] and pTechCact2cout[t,c,r,y,s] <> 0)}: vTechAct[t,r,y,s]  =  (vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]);
 
 s.t.  eqTechActGrp{ t in tech,g in group,r in region,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechOutGroup[t,g] and mTechSpan[t,r,y])}: vTechAct[t,r,y,s]  =  sum{c in comm:((mTechGroupComm[t,g,c] and pTechCact2cout[t,c,r,y,s] <> 0))}((vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]));
 
-s.t.  eqTechAfacOutLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and pTechAfacLo[t,c,r,y,s] <> 0)}: pTechCact2cout[t,c,r,y,s]*pTechAfacLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechOut[t,c,r,y,s];
+s.t.  eqTechAfcOutLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and pTechAfcLo[t,c,r,y,s] <> 0)}: pTechCact2cout[t,c,r,y,s]*pTechAfcLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and pTechWeatherAfcLo[t,wth1,c] >= 0 and mTechWeatherAfc[t,wth1,c] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfcLo[t,wth1,c]) <=  vTechOut[t,c,r,y,s];
 
-s.t.  eqTechAfacOutUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and not((ndefpTechAfaUp[t,r,y,s])) and not((ndefpTechAfacUp[t,c,r,y,s])))}: vTechOut[t,c,r,y,s] <=  pTechCact2cout[t,c,r,y,s]*pTechAfacUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+s.t.  eqTechAfcOutUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechOutComm[t,c] and not((ndefpTechAfUp[t,r,y,s])) and not((ndefpTechAfcUp[t,c,r,y,s])))}: vTechOut[t,c,r,y,s] <=  pTechCact2cout[t,c,r,y,s]*pTechAfcUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and pTechWeatherAfcUp[t,wth1,c] >= 0 and mTechWeatherAfc[t,wth1,c] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfcUp[t,wth1,c]);
 
-s.t.  eqTechAfacInpLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechInpComm[t,c] and pTechAfacLo[t,c,r,y,s] <> 0)}: pTechAfacLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s] <=  vTechInp[t,c,r,y,s];
+s.t.  eqTechAfcInpLo{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechInpComm[t,c] and pTechAfcLo[t,c,r,y,s] <> 0)}: pTechAfcLo[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and pTechWeatherAfcLo[t,wth1,c] >= 0 and mTechWeatherAfc[t,wth1,c] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfcLo[t,wth1,c]) <=  vTechInp[t,c,r,y,s];
 
-s.t.  eqTechAfacInpUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechInpComm[t,c] and not((ndefpTechAfaUp[t,r,y,s])) and not((ndefpTechAfacUp[t,c,r,y,s])))}: vTechInp[t,c,r,y,s] <=  pTechAfacUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s];
+s.t.  eqTechAfcInpUp{ t in tech,r in region,c in comm,y in year,s in slice : (mTechSlice[t,s] and mMidMilestone[y] and mTechSpan[t,r,y] and mTechInpComm[t,c] and not((ndefpTechAfUp[t,r,y,s])) and not((ndefpTechAfcUp[t,c,r,y,s])))}: vTechInp[t,c,r,y,s] <=  pTechAfcUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and pTechWeatherAfcUp[t,wth1,c] >= 0 and mTechWeatherAfc[t,wth1,c] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pTechWeatherAfcUp[t,wth1,c]);
 
-s.t.  eqTechCap{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y])}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:((mTechNew[t,r,yp] and mMidMilestone[yp] and ordYear[y] >= ordYear[yp] and ordYear[y]<pTechOlife[t,r]+ordYear[yp]))}(vTechNewCap[t,r,yp]-sum{ye in year:((mTechRetirement[t] and mMidMilestone[ye] and ordYear[ye] >= ordYear[yp] and ordYear[ye] <= ordYear[y]))}(vTechRetiredCap[t,r,yp,ye]));
+s.t.  eqTechCap{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y])}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:((mTechNew[t,r,yp] and mMidMilestone[yp] and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or ndefpTechOlife[t,r])))}(vTechNewCap[t,r,yp]-sum{ye in year:((mTechRetirement[t] and mMidMilestone[ye] and ordYear[ye] >= ordYear[yp] and ordYear[ye] <= ordYear[y]))}(vTechRetiredCap[t,r,yp,ye]));
 
 s.t.  eqTechNewCap{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechNew[t,r,y] and mTechRetirement[t])}: sum{yp in year:((mMidMilestone[yp] and ordYear[yp] >= ordYear[y] and ordYear[yp]<ordYear[y]+pTechOlife[t,r]))}(vTechRetiredCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
 
@@ -385,9 +421,9 @@ s.t.  eqTechSalv{ t in tech,r in region,ye in year : (not((mDiscountZero[r])) an
 
 s.t.  eqTechOMCost{ t in tech,r in region,y in year : (mMidMilestone[y] and mTechSpan[t,r,y])}: vTechOMCost[t,r,y]  =  pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice:(mTechSlice[t,s])}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:(mTechInpComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:(mTechOutComm[t,c])}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:(mTechAOut[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAOut[t,c,r,y,s])+sum{c in comm:(mTechAInp[t,c])}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s]));
 
-s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and not((ndefpSupAvaUp[s1,c,r,y,s])) and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,c,r,y,s];
+s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and not((ndefpSupAvaUp[s1,c,r,y,s])) and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mSupWeatherUp[s1,wth1] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pSupWeatherUp[s1,wth1]);
 
-s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,c,r,y,s];
+s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mSupWeatherLo[s1,wth1] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pSupWeatherLo[s1,wth1]);
 
 s.t.  eqSupTotal{ s1 in sup,c in comm,r in region : (mSupComm[s1,c] and mSupSpan[s1,r])}: vSupReserve[s1,c,r]  =  sum{y in year,s in slice,ye in year,yp in year:((mSupSlice[s1,s] and mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ordYear[yp]-ordYear[ye]+1)*vSupOut[s1,c,r,y,s]);
 
@@ -409,15 +445,23 @@ s.t.  eqStorageAInp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mM
 
 s.t.  eqStorageAOut{ st1 in stg,c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mStorageAOut[st1,c] and mStorageSlice[st1,s] and mStorageSpan[st1,r,y])}: vStorageAOut[st1,c,r,y,s]  =  sum{cp in comm:(mStorageComm[st1,cp])}(pStorageStg2AOut[st1,c,r,y,s]*vStorageStore[st1,cp,r,y,s]+pStorageInp2AOut[st1,c,r,y,s]*vStorageInp[st1,cp,r,y,s]+pStorageOut2AOut[st1,c,r,y,s]*vStorageOut[st1,cp,r,y,s]+pStorageCap2AOut[st1,c,r,y,s]*vStorageCap[st1,r,y]+pStorageNCap2AOut[st1,c,r,y,s]*vStorageNewCap[st1,r,y]);
 
-s.t.  eqStorageStore{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageStore[st1,c,r,y,s]  =  pStorageInpEff[st1,c,r,y,s]*vStorageInp[st1,c,r,y,s]-pStorageOutEff[st1,c,r,y,s]*vStorageOut[st1,c,r,y,s]+sum{sp in slice:((mStorageSlice[st1,sp] and mSliceNext[sp,s]))}(pStorageStgEff[st1,c,r,y,s]*vStorageStore[st1,c,r,y,sp]);
+s.t.  eqStorageStore{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageStore[st1,c,r,y,s]  =  pStorageInpEff[st1,c,r,y,s]*vStorageInp[st1,c,r,y,s]-(vStorageOut[st1,c,r,y,s]) / (pStorageOutEff[st1,c,r,y,s])+sum{sp in slice:((mStorageSlice[st1,sp] and mSliceNext[sp,s]))}(pStorageStgEff[st1,c,r,y,s]*vStorageStore[st1,c,r,y,sp]);
 
-s.t.  eqStorageAfaLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageAfaLo[st1,r,y,s])}: vStorageStore[st1,c,r,y,s]  >=  pStorageAfaLo[st1,r,y,s]*pStorageCap2act[st1]*vStorageCap[st1,r,y];
+s.t.  eqStorageAfLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageAfLo[st1,r,y,s])}: vStorageStore[st1,c,r,y,s]  >=  pStorageAfLo[st1,r,y,s]*pStorageCap2stg[st1]*vStorageCap[st1,r,y]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mStorageWeatherAf[st1,wth1] and pStorageWeatherAfLo[st1,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pStorageWeatherAfLo[st1,wth1]);
 
-s.t.  eqStorageAfaUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageStore[st1,c,r,y,s] <=  pStorageAfaUp[st1,r,y,s]*pStorageCap2act[st1]*vStorageCap[st1,r,y];
+s.t.  eqStorageAfUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageStore[st1,c,r,y,s] <=  pStorageAfUp[st1,r,y,s]*pStorageCap2stg[st1]*vStorageCap[st1,r,y]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mStorageWeatherAf[st1,wth1] and pStorageWeatherAfUp[st1,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pStorageWeatherAfUp[st1,wth1]);
 
 s.t.  eqStorageClean{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c])}: vStorageInp[st1,c,r,y,s] <=  vStorageStore[st1,c,r,y,s];
 
-s.t.  eqStorageCap{ st1 in stg,r in region,y in year : (mMidMilestone[y] and mStorageSpan[st1,r,y])}: vStorageCap[st1,r,y]  =  pStorageStock[st1,r,y]+sum{yp in year:((ordYear[y] >= ordYear[yp] and ordYear[y]<pStorageOlife[st1,r]+ordYear[yp] and mStorageNew[st1,r,y]))}(vStorageNewCap[st1,r,yp]);
+s.t.  eqStorageInpUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCinpUp[st1,c,r,y,s] >= 0)}: pStorageInpEff[st1,c,r,y,s]*vStorageInp[st1,c,r,y,s] <=  pStorageCinpUp[st1,c,r,y,s]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mStorageWeatherCinp[st1,wth1] and pStorageWeatherCinpUp[st1,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pStorageWeatherCinpUp[st1,wth1]);
+
+s.t.  eqStorageInpLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCinpLo[st1,c,r,y,s]>0)}: pStorageInpEff[st1,c,r,y,s]*vStorageInp[st1,c,r,y,s]  >=  pStorageCinpLo[st1,c,r,y,s]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mStorageWeatherCinp[st1,wth1] and pStorageWeatherCinpLo[st1,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pStorageWeatherCinpLo[st1,wth1]);
+
+s.t.  eqStorageOutUp{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCoutUp[st1,c,r,y,s] >= 0)}: (vStorageOut[st1,c,r,y,s]) / (pStorageOutEff[st1,c,r,y,s]) <=  pStorageCoutUp[st1,c,r,y,s]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mStorageWeatherCout[st1,wth1] and pStorageWeatherCoutUp[st1,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pStorageWeatherCoutUp[st1,wth1]);
+
+s.t.  eqStorageOutLo{ st1 in stg,c in comm,r in region,y in year,s in slice : (mStorageSlice[st1,s] and mMidMilestone[y] and mStorageSpan[st1,r,y] and mStorageComm[st1,c] and pStorageCoutLo[st1,c,r,y,s]>0)}: (vStorageOut[st1,c,r,y,s]) / (pStorageOutEff[st1,c,r,y,s])  >=  pStorageCoutLo[st1,c,r,y,s]*pSliceShare[s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mStorageWeatherCout[st1,wth1] and pStorageWeatherCoutLo[st1,wth1] >= 0 and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pStorageWeatherCoutLo[st1,wth1]);
+
+s.t.  eqStorageCap{ st1 in stg,r in region,y in year : (mMidMilestone[y] and mStorageSpan[st1,r,y])}: vStorageCap[st1,r,y]  =  pStorageStock[st1,r,y]+sum{yp in year:((ordYear[y] >= ordYear[yp] and (ndefpStorageOlife[st1,r] or ordYear[y]<pStorageOlife[st1,r]+ordYear[yp]) and mStorageNew[st1,r,y]))}(vStorageNewCap[st1,r,yp]);
 
 s.t.  eqStorageInv{ st1 in stg,r in region,y in year : (mMidMilestone[y] and mStorageNew[st1,r,y])}: vStorageInv[st1,r,y]  =  pStorageInvcost[st1,r,y]*vStorageNewCap[st1,r,y];
 
@@ -3718,6 +3762,9 @@ for {y in year : mMidMilestone[y] <> 0} {
 }
 for {s in slice} {
     printf "slice,%s\n", s >> "raw_data_set.csv";
+}
+for {wth1 in weather} {
+    printf "weather,%s\n", wth1 >> "raw_data_set.csv";
 }
 for {cn1 in cns} {
     printf "cns,%s\n", cn1 >> "raw_data_set.csv";

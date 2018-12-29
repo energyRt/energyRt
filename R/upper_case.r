@@ -106,16 +106,19 @@
 }
 
 .upper_case.demand <- function(dem) {
-#  dem@name <- toupper(dem@name)
-#  gg <- getClass('demand')
-#  for(i in names(gg@slots)[gg@slots == 'data.frame'])
-#  if (nrow(slot(dem, i)) > 0) {
-#    zz <- slot(dem, i)
-#    for(j in colnames(zz)[colnames(zz) %in% c('region', 'comm', 'slice')])
-#      zz[, j] <- toupper(zz[, j])
-#    slot(dem, i) <- zz
-#  }
+  #  dem@name <- toupper(dem@name)
+  #  gg <- getClass('demand')
+  #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
+  #  if (nrow(slot(dem, i)) > 0) {
+  #    zz <- slot(dem, i)
+  #    for(j in colnames(zz)[colnames(zz) %in% c('region', 'comm', 'slice')])
+  #      zz[, j] <- toupper(zz[, j])
+  #    slot(dem, i) <- zz
+  #  }
   dem
+}
+.upper_case.weather <- function(wth) {
+  wth
 }
 
 .upper_case.storage <- function(stg) {

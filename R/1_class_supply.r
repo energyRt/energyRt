@@ -8,6 +8,7 @@ setClass("supply",
           color         = "data.frame",      #
           commodity     = "character",
           unit          = "character",
+          weather       = "data.frame", # weather factor (availability multiplier)
           reserve       = "data.frame",         # Total available resource
           availability  = "data.frame",     # Availability of the resource with prices
           region        = "characterOrNULL",
@@ -23,6 +24,11 @@ setClass("supply",
                                      stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
+          weather       = data.frame(weather = character(), # name of the weather object
+                                     wava.lo   = numeric(), # multipliers for ava.*, 1 by default
+                                     wava.up   = numeric(),
+                                     wava.fx   = numeric(),
+                                     stringsAsFactors = FALSE),
           reserve       = data.frame(region   = character(), # Total available resource by region
                                      res.lo   = numeric(),
                                      res.up   = numeric(),

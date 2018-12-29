@@ -30,9 +30,11 @@ setClass("technology",
           # Performance parameters
           geff          = "data.frame",    #  Group efficiency
           ceff          = "data.frame",    #  Commodity efficiency
-          aeff         = "data.frame",    #  Commodity efficiency
-          afa           = "data.frame",    #
-      # Costs
+          aeff          = "data.frame",    #  Commodity efficiency
+          af            = "data.frame",    #
+          afs           = "data.frame",    #
+          weather       = "data.frame",    # weather condisions multiplier
+          # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
           invcost       = "data.frame",    #
@@ -115,10 +117,10 @@ setClass("technology",
                                      share.lo   = numeric(),
                                      share.up   = numeric(),
                                      share.fx   = numeric(),
-                                     # afac
-                                     afac.lo    = numeric(),
-                                     afac.up    = numeric(),
-                                     afac.fx    = numeric(),
+                                     # afc
+                                     afc.lo    = numeric(),
+                                     afc.up    = numeric(),
+                                     afc.fx    = numeric(),
                                       stringsAsFactors = FALSE),
 # Auxilary parameter
           aeff          = data.frame(
@@ -147,13 +149,32 @@ setClass("technology",
                                      sinp2aout  = numeric(),
                                      sout2aout  = numeric(),
                                      stringsAsFactors = FALSE),
-          afa           = data.frame(region   = character(),
+          af           = data.frame(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
-                                     afa.lo   = numeric(),
-                                     afa.up   = numeric(),
-                                     afa.fx   = numeric(),
+                                     af.lo    = numeric(),
+                                     af.up    = numeric(),
+                                     af.fx    = numeric(),
                                      stringsAsFactors = FALSE),
+          afs          = data.frame(region   = character(),
+                                    year     = numeric(),
+                                    slice    = character(),
+                                    afs.lo   = numeric(),
+                                    afs.up   = numeric(),
+                                    afs.fx   = numeric(),
+                                    stringsAsFactors = FALSE),
+          weather      = data.frame(weather  = character(),
+                                    comm     = character(),
+                                    wafc.lo   = numeric(),
+                                    wafc.up   = numeric(),
+                                    wafc.fx   = numeric(),
+                                    waf.lo    = numeric(),
+                                    waf.up    = numeric(),
+                                    waf.fx    = numeric(),
+                                    wafs.lo   = numeric(),
+                                    wafs.up   = numeric(),
+                                    wafs.fx   = numeric(),
+                                    stringsAsFactors = FALSE),
           fixom         = data.frame(region   = character(),
                                      year     = numeric(),
                                      fixom    = numeric(),

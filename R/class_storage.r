@@ -12,7 +12,7 @@ setClass("storage",
           olife         = "data.frame",    #
           stock         = "data.frame",    #
           seff          = "data.frame",    #
-          afa           = "data.frame",     # Availability of the resource with prices
+          af           = "data.frame",     # Availability of the resource with prices
           aeff         = "data.frame",    #  Commodity efficiency
           # Costs
           fixom         = "data.frame",    #
@@ -21,7 +21,8 @@ setClass("storage",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           slice         = "characterOrNULL",
           region        = "characterOrNULL",
-          cap2act       = "numeric",
+          cap2stg       = "numeric", # cap2stg cinp
+          weather       = "data.frame",    # weather condisions multiplier
           misc = "list"     #
       ),
       prototype(
@@ -46,8 +47,14 @@ setClass("storage",
                                      slice      = character(),
                                      stgeff    = numeric(),  
                                      inpeff    = numeric(),  
-                                     outeff    = numeric(),  
-                                     stringsAsFactors = FALSE),
+                                     outeff    = numeric(),  # cinp.up...,  cout.up...
+                                    cinp.up    = numeric(),  
+                                    cinp.fx    = numeric(),  
+                                    cinp.lo    = numeric(),  
+                                    cout.up    = numeric(),  
+                                    cout.fx    = numeric(),  
+                                    cout.lo    = numeric(),  
+                                    stringsAsFactors = FALSE),
           aux           = data.frame(acomm     = character(),
                                      unit     = character(),
                                      stringsAsFactors = FALSE),
@@ -67,12 +74,12 @@ setClass("storage",
                                       ncap2ainp  = numeric(),
                                       ncap2aout  = numeric(),
                                       stringsAsFactors = FALSE),
-          afa  = data.frame(region   = character(),
+          af  = data.frame(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
-                                     afa.lo   = numeric(),
-                                     afa.up   = numeric(),
-                                     afa.fx   = numeric(),
+                                     af.lo   = numeric(),
+                                     af.up   = numeric(),
+                                     af.fx   = numeric(),
                                      stringsAsFactors = FALSE),
           # Costs
           fixom         = data.frame(region   = character(),
@@ -90,10 +97,21 @@ setClass("storage",
                                      year     = numeric(),
                                      invcost  = numeric(),
                                      stringsAsFactors = FALSE),
-      cap2act       = 1,
+      cap2stg       = 1,
       GIS           = NULL,
       slice         = NULL,
       region        = NULL,
+      weather      = data.frame(weather  = character(),
+                                waf.lo    = numeric(),
+                                waf.up    = numeric(),
+                                waf.fx    = numeric(),
+                                wcinp.lo   = numeric(),
+                                wcinp.fx   = numeric(),
+                                wcinp.up   = numeric(),
+                                wcout.lo   = numeric(),
+                                wcout.fx   = numeric(),
+                                wcout.up   = numeric(),
+                                stringsAsFactors = FALSE),
       #! Misc
       misc = list(
       )),

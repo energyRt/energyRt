@@ -49,7 +49,7 @@ checkInpOut <- function(tech) {
       if (ctype[i, 'type'] != 'input') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Output ?
-    if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("use2cact", "cact2cout"# , "afac.lo", "afac.up", "afac.fx"
+    if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("use2cact", "cact2cout"# , "afc.lo", "afc.up", "afc.fx"
        )]))) {
       if (ctype[i, 'type'] != 'output') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
@@ -175,7 +175,7 @@ checkInpOut <- function(tech) {
 #    c('cinp2use', 'cinpcap', 'cinp2ginp')])))
 #      stop('There are input atribute for output commodity in technology "', tech@name, '"')
 #  if (any(!is.na(tech@ceff[tech@ceff$comm %in% icomm, c('use2aout', 'use2cact', 
-#    'cact2cout', 'coutcap', 'afac.lo', 'afac.up', 'afac.fx')])))
+#    'cact2cout', 'coutcap', 'afc.lo', 'afc.up', 'afc.fx')])))
 #      stop('There are output atribute for input commodity in technology "', tech@name, '"')
 #  # Check group atribute for single commodity & vice versa
 #  if (any(!is.na(tech@ceff[tech@ceff$comm %in% comm[!is.na(ctype$group)], 
@@ -192,11 +192,11 @@ checkInpOut <- function(tech) {
 #
 #  ceff_param <- c('cinp2use', 'use2aout', 'use2cact', 'cact2cout', 'cinpcap',
 #                 'coutcap', 'cinp2ginp', 'share.lo', 'share.up',
-#                 'share.fx', 'afac.lo', 'afac.up', 'afac.fx')
+#                 'share.fx', 'afc.lo', 'afc.up', 'afc.fx')
 #
 #  ceff_group <- c('cinp2use', 'use2aout', 'use2cact', 'cact2cout', 'cinpcap',
 #                 'coutcap', 'cinp2ginp', 'share.lo', 'share.up',
-#                 'share.fx', 'afac.lo', 'afac.up', 'afac.fx')
+#                 'share.fx', 'afc.lo', 'afc.up', 'afc.fx')
 #
 #  tpp <- array(FALSE, dim = c(length(comm), length(ceff_param)), dimnames = list(comm, ceff_param))
 #  for(i in comm)

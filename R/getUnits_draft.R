@@ -117,9 +117,9 @@ getUnits <- function(tech) {
                     ua = u$comm, 
                     ub = u$group)
   
-  u$afac.lo <- NA
-  u$afac.up <- NA
-  u$afac.fx <- NA
+  u$afc.lo <- NA
+  u$afc.up <- NA
+  u$afc.fx <- NA
   
   # aeff ========================================= ####
   
@@ -187,7 +187,7 @@ getUnits <- function(tech) {
   #   u$ncap2aout <- NA
   #   }
   
-  u$afa <- NA # !!!
+  u$af <- NA # !!!
   
   #costs ========================================= ####
   u$cost <- tech@units$cost

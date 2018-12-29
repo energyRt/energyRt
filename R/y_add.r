@@ -11,6 +11,7 @@
 .disaggregateSliceLevel <- function(app, approxim) {
   slt <- getSlots(class(app)) 
   slt <- names(slt)[slt == 'data.frame']
+  if (class(app) == 'technology') slt <- slt[slt != 'afs']
   for (ss in slt) if (any(colnames(slot(app, ss)) == 'slice')) {
     tmp <- slot(app, ss)
     fl <- (!is.na(tmp$slice) & !(tmp$slice %in% approxim$slice))
@@ -110,28 +111,56 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 # Add demand
 ################################################################################
 setMethod('add0', signature(obj = 'modInp', app = 'demand',
-  approxim = 'list'), function(obj, app, approxim) {     
-  dem <- energyRt:::.upper_case(app)
-  dem <- stayOnlyVariable(dem, approxim$region, 'region')
-  approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
-  dem <- .disaggregateSliceLevel(dem, approxim)
-#  if (!energyRt:::.chec_correct_name(dem@name)) {
-#    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
-#  }
-#  if (isDemand(obj, dem@name)) {
-#    warning(paste('There is demand name "', dem@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousDemand(obj, dem@name)
-#  }
-#  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
-  obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
-      data.frame(dem = dem@name, comm = dem@commodity)) 
-  obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
-      simpleInterpolation(dem@dem, 'dem',
-      obj@parameters[['pDemand']], approxim, c('dem', 'comm'), c(dem@name, dem@commodity)))
-  obj
-})
+                            approxim = 'list'), function(obj, app, approxim) {     
+                              dem <- energyRt:::.upper_case(app)
+                              dem <- stayOnlyVariable(dem, approxim$region, 'region')
+                              approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
+                              dem <- .disaggregateSliceLevel(dem, approxim)
+                              #  if (!energyRt:::.chec_correct_name(dem@name)) {
+                              #    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
+                              #  }
+                              #  if (isDemand(obj, dem@name)) {
+                              #    warning(paste('There is demand name "', dem@name,
+                              #        '" now, all previous information will be removed', sep = ''))
+                              #    obj <- removePreviousDemand(obj, dem@name)
+                              #  }
+                              #  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
+                              obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
+                                                                      data.frame(dem = dem@name, comm = dem@commodity)) 
+                              obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
+                                                                     simpleInterpolation(dem@dem, 'dem',
+                                                                                         obj@parameters[['pDemand']], approxim, c('dem', 'comm'), c(dem@name, dem@commodity)))
+                              obj
+                            })
 
+
+################################################################################
+# Add weather
+################################################################################
+setMethod('add0', signature(obj = 'modInp', app = 'weather',
+                            approxim = 'list'), function(obj, app, approxim) {    
+                              wth <- energyRt:::.upper_case(app)
+                              if (is.null(wth@slice) && length(approxim$slice@misc$nlevel) > 1) {
+                                stop('For weather slice level have to be define, if more than one slice level')
+                              }
+                              if (is.null(wth@slice)) wth@slice <- names(approxim$slice@misc$nlevel)[1]
+                              approxim <- .fix_approximation_list(approxim, lev = wth@slice)
+                              # region fix
+                              if (!is.null(wth@region)) {
+                                approxim$region <- approxim$region[approxim$region %in% wth@region]
+                              }
+                              wth@region <- approxim$region
+                              wth <- stayOnlyVariable(wth, approxim$region, 'region')
+                              wth <- .disaggregateSliceLevel(wth, approxim)
+    obj@parameters[['pWeather']] <- addData(obj@parameters[['pWeather']], simpleInterpolation(wth@weather, 'wval',
+       obj@parameters[['pWeather']], approxim, 'weather', wth@name))
+    obj@parameters[['mWeatherSlice']] <- addData(obj@parameters[['mWeatherSlice']],
+                                                 data.frame(weather = rep(wth@name, length(approxim$slice)), slice = approxim$slice))
+    obj@parameters[['mWeatherRegion']] <- addData(obj@parameters[['mWeatherRegion']],
+                                            data.frame(weather = rep(wth@name, length(wth@region)), region = wth@region))
+    obj
+})
+ 
 ################################################################################
 # Add supply
 ################################################################################
@@ -183,6 +212,33 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
               multiInterpolation(sup@availability, 'ava',
               obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
+    # For weather
+    # mSupWeatherLo(sup, weather)
+    wth.lo <- sup@weather[!is.na(sup@weather$wava.lo) | !is.na(sup@weather$wava.fx), 'weather']
+    obj@parameters[['mSupWeatherLo']] <- addData(obj@parameters[['mSupWeatherLo']],
+                                            data.frame(sup = rep(sup@name, length(wth.lo)), weather = wth.lo))
+    # mSupWeatherUp(sup, weather)
+    wth.up <- sup@weather[!is.na(sup@weather$wava.up) | !is.na(sup@weather$wava.fx), 'weather']
+    obj@parameters[['mSupWeatherUp']] <- addData(obj@parameters[['mSupWeatherUp']],
+                                                 data.frame(sup = rep(sup@name, length(wth.up)), weather = wth.up))
+    if (nrow(sup@weather) > 0) {
+      gg <- sup@weather
+      gg$sup <- sup@name
+      gg$type <- 'lo'
+      a1 <- gg[, c('sup', 'weather', 'type', 'wava.lo'), drop = FALSE]; 
+      colnames(a1)[ncol(a1)] <- 'value'
+      a2 <- gg[, c('sup', 'weather', 'type', 'wava.fx'), drop = FALSE]; 
+      colnames(a2)[ncol(a2)] <- 'value'
+      a3 <- gg[, c('sup', 'weather', 'type', 'wava.up'), drop = FALSE]; 
+      colnames(a3)[ncol(a3)] <- 'value'
+      g1 <- rbind(a1, a2); g1$type <- 'lo'
+      g2 <- rbind(a3, a2); g1$type <- 'up'
+      gg <- rbind(g1, g2)
+      gg <- gg[!is.na(gg$value),, drop = FALSE]
+      # sup     weather type    value
+        obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], gg)
+    }
+    
   obj
 })
 
@@ -595,22 +651,30 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   }
   approxim_comm[['comm']] <- rownames(ctype$comm)
   if (length(approxim_comm[['comm']]) != 0) {
-    gg <- multiInterpolation(tech@ceff, 'afac',
-            obj@parameters[['pTechAfac']], approxim_comm, 'tech', tech@name)
-    obj@parameters[['pTechAfac']] <- addData(obj@parameters[['pTechAfac']], gg)
+    gg <- multiInterpolation(tech@ceff, 'afc',
+            obj@parameters[['pTechAfc']], approxim_comm, 'tech', tech@name)
+    obj@parameters[['pTechAfc']] <- addData(obj@parameters[['pTechAfc']], gg)
     #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
     #if (nrow(gg) != 0) 
-    #  obj@parameters[['ndefpTechAfacUp']] <- addData(obj@parameters[['dnefpTechAfacUp']],
-    #        gg[, obj@parameters[['ndefpTechAfacUp']]@dimSetNames])
+    #  obj@parameters[['ndefpTechAfcUp']] <- addData(obj@parameters[['dnefpTechAfcUp']],
+    #        gg[, obj@parameters[['ndefpTechAfcUp']]@dimSetNames])
 
   }
-  gg <- multiInterpolation(tech@afa, 'afa',
-            obj@parameters[['pTechAfa']], approxim, 'tech', tech@name)
-  obj@parameters[['pTechAfa']] <- addData(obj@parameters[['pTechAfa']], gg)
+  gg <- multiInterpolation(tech@af, 'af',
+            obj@parameters[['pTechAf']], approxim, 'tech', tech@name)
+  obj@parameters[['pTechAf']] <- addData(obj@parameters[['pTechAf']], gg)
+  if (nrow(tech@afs) > 0) {
+    afs_slice <- unique(tech@afs$slice)
+    afs_slice <- afs_slice[!is.na(afs_slice)]
+    approxim.afs <- approxim
+    approxim.afs$slice <- afs_slice
+    gg <- multiInterpolation(tech@afs, 'afs', obj@parameters[['pTechAfs']], approxim.afs, 'tech', tech@name)
+    obj@parameters[['pTechAfs']] <- addData(obj@parameters[['pTechAfs']], gg)
+  }
   #gg <- gg[gg$type == 'up' & gg$value == Inf, ]
   #if (nrow(gg) != 0) 
-  #    obj@parameters[['ndefpTechAfaUp']] <- addData(obj@parameters[['ndefpTechAfaUp']],
-  #          gg[, obj@parameters[['ndefpTechAfaUp']]@dimSetNames])
+  #    obj@parameters[['ndefpTechAfUp']] <- addData(obj@parameters[['ndefpTechAfUp']],
+  #          gg[, obj@parameters[['ndefpTechAfUp']]@dimSetNames])
 
   approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input']
   if (length(approxim_comm[['comm']]) != 0) {
@@ -753,6 +817,49 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   dd0 <- .start_end_fix(approxim, tech, 'tech', stock_exist)
   obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
   obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
+  # Weather part
+  merge.weather <- function(tech, nm, add = NULL) {
+    waf <- tech@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
+    waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
+    if (nrow(waf) == 0) return(NULL)
+    # Map parts
+    if (length(add) == 0) {
+      m <- unique(waf$weather)
+      m <- data.frame(tech = rep(tech@name, length(m)), weather = m)
+    } else {
+      m <- waf[, c('weather', add), drop = FALSE]
+      m <- m[(!duplicated(apply(m, 1, paste0, collapse = '#'))),, drop = FALSE]
+      m$tech <- tech@name
+      m <- m[, c(ncol(m), 1:(ncol(m) - 1)), drop = FALSE]
+    }
+    waf20 <- data.frame(
+      tech = rep(tech@name, 4 * nrow(waf)),
+      weather = rep(waf$weather, 4),
+      stringsAsFactors = FALSE)
+    for (i in add) {
+      waf20[, i] <- rep(waf[, i], 4)
+    }
+    waf20$type <- c(rep('lo', 2 * nrow(waf)), rep('up', 2 * nrow(waf)))
+    waf20$value <- c(waf[, paste0(nm, '.lo')], waf[, paste0(nm, '.fx')], 
+                     waf[, paste0(nm, '.up')], waf[, paste0(nm, '.fx')])
+    waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
+    list(m = m, p = waf20)
+  }
+  tmp <- merge.weather(tech, 'waf')
+  if (!is.null(tmp)) {
+    obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$m)
+    obj@parameters[['pTechWeatherAf']] <- addData(obj@parameters[['pTechWeatherAf']], tmp$p)
+  }
+  tmp <- merge.weather(tech, 'wafs')
+  if (!is.null(tmp)) {
+    obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$m)
+    obj@parameters[['pTechWeatherAfs']] <- addData(obj@parameters[['pTechWeatherAfs']], tmp$p)
+  }
+  tmp <- merge.weather(tech, 'wafc', 'comm')
+  if (!is.null(tmp)) {
+    obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$m)
+    obj@parameters[['pTechWeatherAfc']] <- addData(obj@parameters[['pTechWeatherAfc']], tmp$p)
+  }
 #  cat(tech@name, '\n')
   if (all(ctype$comm$type != 'output')) 
     stop('Techology "', tech@name, '", there is not activity commodity')   
@@ -976,11 +1083,15 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']],
                                                  simpleInterpolation(stg@stock, 'stock',
                                                                      obj@parameters[['pStorageStock']], approxim, 'stg', stg@name))
-    obj@parameters[['pStorageAfa']] <- addData(obj@parameters[['pStorageAfa']],
-                                               multiInterpolation(stg@afa, 'afa',
-                                                                  obj@parameters[['pStorageAfa']], approxim, 'stg', stg@name))
-    obj@parameters[['pStorageCap2act']] <- addData(obj@parameters[['pStorageCap2act']],
-                                                data.frame(stg = stg@name, value = stg@cap2act))
+    obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']],
+                                               multiInterpolation(stg@af, 'af',
+                                                                  obj@parameters[['pStorageAf']], approxim, 'stg', stg@name))
+    obj@parameters[['pStorageCap2stg']] <- addData(obj@parameters[['pStorageCap2stg']],
+                                                data.frame(stg = stg@name, value = stg@cap2stg))
+    obj@parameters[['pStorageCinp']] <- addData(obj@parameters[['pStorageCinp']], multiInterpolation(stg@seff, 'cinp',
+      obj@parameters[['pStorageCinp']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+    obj@parameters[['pStorageCout']] <- addData(obj@parameters[['pStorageCout']], multiInterpolation(stg@seff, 'cout',
+      obj@parameters[['pStorageCout']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
     # Aux input/output
     if (nrow(stg@aux) != 0) {
       if (any(!(stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]))) {
@@ -1022,5 +1133,50 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     dd0 <- .start_end_fix(approxim, stg, 'stg', stock_exist)
     obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
     obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
+    # Weather part
+    # Weather part
+    merge.weather <- function(stg, nm, add = NULL) {
+      waf <- stg@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
+      waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
+      if (nrow(waf) == 0) return(NULL)
+      # Map parts
+      if (length(add) == 0) {
+        m <- unique(waf$weather)
+        m <- data.frame(stg = rep(stg@name, length(m)), weather = m)
+      } else {
+        m <- waf[, c('weather', add), drop = FALSE]
+        m <- m[(!duplicated(apply(m, 1, paste0, collapse = '#'))),, drop = FALSE]
+        m$stg <- stg@name
+        m <- m[, c(ncol(m), 1:(ncol(m) - 1)), drop = FALSE]
+      }
+      waf20 <- data.frame(
+        stg = rep(stg@name, 4 * nrow(waf)),
+        weather = rep(waf$weather, 4),
+        stringsAsFactors = FALSE)
+      for (i in add) {
+        waf20[, i] <- rep(waf[, i], 4)
+      }
+      waf20$type <- c(rep('lo', 2 * nrow(waf)), rep('up', 2 * nrow(waf)))
+      waf20$value <- c(waf[, paste0(nm, '.lo')], waf[, paste0(nm, '.fx')], 
+                       waf[, paste0(nm, '.up')], waf[, paste0(nm, '.fx')])
+      waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
+      list(m = m, p = waf20)
+    }
+    tmp <- merge.weather(stg, 'waf')
+    if (!is.null(tmp)) {
+      obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$m)
+      obj@parameters[['pStorageWeatherAf']] <- addData(obj@parameters[['pStorageWeatherAf']], tmp$p)
+    }
+    tmp <- merge.weather(stg, 'wcinp')
+    if (!is.null(tmp)) {
+      obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$m)
+      obj@parameters[['pStorageWeatherCinp']] <- addData(obj@parameters[['pStorageWeatherCinp']], tmp$p)
+    }
+    tmp <- merge.weather(stg, 'wcout')
+    if (!is.null(tmp)) {
+      obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$m)
+      obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
+    }
+    
     obj
   })
