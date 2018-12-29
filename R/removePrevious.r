@@ -38,12 +38,23 @@ setMethod('removePreviousDemand',
 # Get commodity demand
 ################################################################################
 setMethod('isDemand', signature(obj = 'modInp', name = 'character'),
-      function(obj, name) {
-        fl <- FALSE
-        for(i in c('pDemand')) 
-            fl <- fl || any(obj@parameters[[i]]@data$comm == name, na.rm = TRUE)
-        fl
-})
+          function(obj, name) {
+            fl <- FALSE
+            for(i in c('pDemand')) 
+              fl <- fl || any(obj@parameters[[i]]@data$comm == name, na.rm = TRUE)
+            fl
+          })
+
+################################################################################
+# Get commodity weather
+################################################################################
+setMethod('isWeather', signature(obj = 'modInp', name = 'character'),
+          function(obj, name) {
+            fl <- FALSE
+            for(i in c('pWeather')) 
+              fl <- fl || any(obj@parameters[[i]]@data$comm == name, na.rm = TRUE)
+            fl
+          })
 
 ################################################################################
 # Remove previous supply
@@ -135,11 +146,20 @@ setMethod('isImport', signature(obj = 'modInp', name = 'character'),
 # Remove previous technology
 ################################################################################
 setMethod('removePreviousTechnology',
-    signature(obj = 'modInp', name = 'character'),
-      function(obj, name) {
-      stop('should be done')
-        obj
-})
+          signature(obj = 'modInp', name = 'character'),
+          function(obj, name) {
+            stop('should be done')
+            obj
+          })
+################################################################################
+# Remove previous weather
+################################################################################
+setMethod('removePreviousWeather',
+          signature(obj = 'modInp', name = 'character'),
+          function(obj, name) {
+            stop('should be done')
+            obj
+          })
 ################################################################################
 # Get technology
 ################################################################################

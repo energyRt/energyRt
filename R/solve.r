@@ -462,7 +462,7 @@
   }
   # Additional for compatibility with GLPK
   check_set('comm', c('comm', 'commp', 'acomm'))
-  for(i in c('expp', 'imp', 'tech', 'trade', 'sup', 'group', 'region', 'year', 'slice')) check_set(i)
+  for(i in c('expp', 'imp', 'tech', 'trade', 'sup', 'weather', 'group', 'region', 'year', 'slice')) check_set(i)
   if (length(obj@LECdata) != 0) {
      prec@parameters$mLECRegion <- addMultipleSet(prec@parameters$mLECRegion, obj@LECdata$region)
      if (length(obj@LECdata$pLECLoACT) == 1) {
@@ -471,7 +471,7 @@
      }
   }
   ## Constrain
-  yy <- c('tech', 'sup', 'stg', 'expp', 'imp', 'trade', 'group', 'comm', 'region', 'year', 'slice')
+  yy <- c('tech', 'sup', 'weather', 'stg', 'expp', 'imp', 'trade', 'group', 'comm', 'region', 'year', 'slice')
   appr <- lapply(yy, function(x) prec@parameters[[x]]@data[[x]])
   names(appr) <- yy
   appr$group <- appr$group[!is.na(appr$group)]
@@ -584,9 +584,9 @@ LL1 <- proc.time()[3]
       prec <- defin_ndef_par(prec, 'pSupReserve', 'ndefpSupReserveUp')
       prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
       prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
-      prec <- defin_ndef_par(prec, 'pTechAfa', 'ndefpTechAfaUp')
+      prec <- defin_ndef_par(prec, 'pTechAf', 'ndefpTechAfUp')
       prec <- defin_ndef_par(prec, name1 = 'pTradeIr', name2 = 'ndefpTradeIrUp')
-      prec <- defin_ndef_par(prec, 'pTechAfac', 'ndefpTechAfacUp')
+      prec <- defin_ndef_par(prec, 'pTechAfc', 'ndefpTechAfcUp')
       
       # For remove emission equation
       g1 <- getParameterData(prec@parameters$pTechEmisComm)

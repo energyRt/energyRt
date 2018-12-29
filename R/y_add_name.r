@@ -20,19 +20,37 @@ setMethod('add_name', signature(obj = 'modInp', app = 'commodity',
 # Add demand
 ################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'demand',
-  approxim = 'list'), function(obj, app, approxim) { 
-  dem <- energyRt:::.upper_case(app)
-  if (!energyRt:::.chec_correct_name(dem@name)) {
-    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
-  }
-  if (isDemand(obj, dem@name)) {
-    warning(paste('There is demand name "', dem@name,
-        '" now, all previous information will be removed', sep = ''))
-    obj <- removePreviousDemand(obj, dem@name)
-  }
-  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
-  obj
-})
+                                approxim = 'list'), function(obj, app, approxim) { 
+                                  dem <- energyRt:::.upper_case(app)
+                                  if (!energyRt:::.chec_correct_name(dem@name)) {
+                                    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
+                                  }
+                                  if (isDemand(obj, dem@name)) {
+                                    warning(paste('There is demand name "', dem@name,
+                                                  '" now, all previous information will be removed', sep = ''))
+                                    obj <- removePreviousDemand(obj, dem@name)
+                                  }
+                                  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
+                                  obj
+                                })
+
+################################################################################
+# Add weather
+################################################################################
+setMethod('add_name', signature(obj = 'modInp', app = 'weather',
+                                approxim = 'list'), function(obj, app, approxim) { 
+                                  wth <- energyRt:::.upper_case(app)
+                                  if (!energyRt:::.chec_correct_name(wth@name)) {
+                                    stop(paste('Incorrect weather name "', wth@name, '"', sep = ''))
+                                  }
+                                  if (isWeather(obj, wth@name)) {
+                                    warning(paste('There is weather name "', wth@name,
+                                                  '" now, all previous information will be removed', sep = ''))
+                                    obj <- removePreviousWeather(obj, wth@name)
+                                  }
+                                  obj@parameters[['weather']] <- addData(obj@parameters[['weather']], wth@name)
+                                  obj
+                                })
 
 ################################################################################
 # Add constrain

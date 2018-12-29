@@ -32,6 +32,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
     dtt$export <- list()
     dtt$trade <- list()
     dtt$storage <- list()
+    dtt$weather <- list()
     for(i in seq(along = obj@model@data)) {
       for(j in seq(along = obj@model@data[[i]]@data)) {
         obj@model@data[[i]]@data[[j]]@name <- obj@model@data[[i]]@data[[j]]@name
@@ -142,7 +143,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       
       cat('\\section{Cost analysis}\n\n', '\n', sep = '', file = zz)
       # Cost data
-      cst_list <- c(Subsidy = 'vSubsCost', Trade = 'vTradeCost', Supply = 'vSupCost', Techology = c('vTechOMCost', 'vTechInv'), 
+      cst_list <- list(Subsidy = 'vSubsCost', Trade = 'vTradeCost', Supply = 'vSupCost', Techology = c('vTechOMCost', 'vTechInv'), 
                     Tax = 'vTaxCost', Storage = 'vStorageCost', Dummy = 'vDummyCost', SalvageTechology = 'vTechSalv')
       cost <- array(0, dim = c(length(cst_list), length(mid_year)), dimnames = list(names(cst_list), mid_year))
       for (i in names(cst_list)) {
@@ -700,8 +701,28 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             cat('\\end{figure}\n', sep = '', file = zz)
             energyRt:::.cat_bottomup_data_frame(sup_dt, paste('Supply ', gsub('_', '\\\\_', cc), 
             ', for commodity ', gsub('_', '\\\\_', sup@commodity), '.', sep = ''), zz)
-            cat('\n\n Total reserve: ', format(sup@reserve, digits = 4), 
-              ', total extract: ', sum(sup_out), '.\n\n', sep = '', file = zz)
+            # Calculate resrerve for sum of regions
+            get.all.sup.reserve <- function(obj, sup) {
+              res_sup <- obj@modInp@parameters$pSupReserve@data[obj@modInp@parameters$pSupReserve@data$sup == sup@name, ]
+              def <- obj@modInp@parameters$pSupReserve@defVal
+              if (is.null(sup@region)) {
+                reg_sup <- obj@model@sysInfo@region
+              } else {
+                reg_sup <-sup@region
+              }
+              res_sup.lo <- res_sup[res_sup$type == 'lo', ]
+              if (nrow(res_sup.lo) != length(reg_sup)) {
+                lo <- sum(c(rep(def[1], length(reg_sup) - nrow(res_sup.lo)), res_sup.lo$value))
+              } else lo <- sum(res_sup.lo$value)
+              res_sup.up <- res_sup[res_sup$type == 'up', ]
+              if (nrow(res_sup.up) != length(reg_sup)) {
+                up <- sum(c(rep(def[2], length(reg_sup) - nrow(res_sup.up)), res_sup.up$value))
+              } else up <- sum(res_sup.up$value)
+              c(lo = lo, up = up)
+            }
+            sup.lim <- get.all.sup.reserve(obj, sup)
+            cat('\n\n Total reserve: (', format(sup.lim['lo'], digits = 4), ', ', format(sup.lim['up'], digits = 4), 
+              '), total extract: ', sum(sup_out), '.\n\n', sep = '', file = zz)
           }  
           cat('\n\n', '\n', sep = '', file = zz) 
 #        }
