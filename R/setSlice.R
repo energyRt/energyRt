@@ -23,7 +23,7 @@
     stop(paste('.setSlice: there are duplicated slice in different levels: "', 
                paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
   # Check
-  if (sum(dtf$share) != 1) stop('.setSlice: Sum of share have to be equal one, not: ', sum(dtf$share))
+  if (round(sum(dtf$share), 5) != 1) stop('.setSlice: Sum of share have to be equal one, not: ', sum(dtf$share))
   ll <- apply(dtf[, -ncol(dtf), drop = FALSE], 1, paste, collapse = '.')
   if (anyDuplicated(ll))
     stop(paste('.setSlice: There are duplicate set of slice. ("',  paste(ll[duplicated(ll)], collapse = '", "'), '").', sep = ''))
