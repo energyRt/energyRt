@@ -383,7 +383,9 @@ setMethod('print', 'parameter', function(x, ...) {
       if (dd == Inf) dd <- 0
       ret <- paste('param ', obj@name, ' default ', dd, ' := ;', sep = '')
     } else {
-      ret <- paste('param ', obj@name, ' default 0 := ', sep = '')
+      dd <- obj@defVal
+      if (dd == Inf) dd <- 0
+      ret <- paste('param ', obj@name, ' default ', dd, ' := ', sep = '')
       fl <- obj@data[, 'value'] != Inf
       if (any(fl)) {
         ret <- c(ret, paste('[', apply(obj@data[fl, -ncol(obj@data), drop = FALSE], 1, 
@@ -400,7 +402,9 @@ setMethod('print', 'parameter', function(x, ...) {
       if (dd == Inf) dd <- 0
       ret <- paste('param ', obj@name, 'Lo default ', dd, ' := ;', sep = '')
     } else {
-      ret <- paste('param ', obj@name, 'Lo default 0 := ', sep = '')
+      dd <- obj@defVal[1]
+      if (dd == Inf) dd <- 0
+      ret <- paste('param ', obj@name, 'Lo default ', dd, ' := ', sep = '')
       fl <- gg[, 'value'] != Inf
       if (any(fl)) {
         ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
@@ -416,7 +420,9 @@ setMethod('print', 'parameter', function(x, ...) {
       if (dd == Inf) dd <- 0
       ret <- c(ret, paste('param ', obj@name, 'Up default ', dd, ' := ;', sep = ''))
     } else {
-      ret <- c(ret, paste('param ', obj@name, 'Up default 0 := ', sep = ''))
+      dd <- obj@defVal[2]
+      if (dd == Inf) dd <- 0
+      ret <- c(ret, paste('param ', obj@name, 'Up default ', dd, ' := ', sep = ''))
       fl <- gg[, 'value'] != Inf
       if (any(fl)) {
         ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
