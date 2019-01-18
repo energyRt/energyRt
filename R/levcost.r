@@ -178,7 +178,7 @@ summary.levcost <- function(x) x$total
     while (any(comm2 == c(tech@input$comm, tech@output$comm, tech@aux$comm))) comm2 <- paste0(comm2, 'dm')
     tmpd <- newDemand(
       name = paste0('DEM', comm2),
-      commodity = paste0(comm2),
+      commodity = paste0(comm),
       dem = list(region = region, dem = 1)
     )
     reps <- add(reps, tmpd)
