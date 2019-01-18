@@ -179,7 +179,8 @@ summary.levcost <- function(x) x$total
     tmpd <- newDemand(
       name = paste0('DEM', comm2),
       commodity = paste0(comm),
-      dem = list(region = region, dem = 1)
+      dem = list(region = region, dem = 1),
+      slice = 'ANNUAL'
     )
     reps <- add(reps, tmpd)
     reps <- add(reps, newCommodity(comm2, slice = 'ANNUAL', agg = list(comm = comm, agg = 1)))
