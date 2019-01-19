@@ -173,19 +173,6 @@ summary.levcost <- function(x) x$total
   }  
  # browser()
   additionalCode <- ''
-  if (!is.null(comm)) {
-    comm2 <- comm
-    while (any(comm2 == c(tech@input$comm, tech@output$comm, tech@aux$comm))) comm2 <- paste0(comm2, 'dm')
-    tmpd <- newDemand(
-      name = paste0('DEM', comm2),
-      commodity = paste0(comm),
-      dem = list(region = region, dem = 1),
-      slice = 'ANNUAL'
-    )
-    reps <- add(reps, tmpd)
-    reps <- add(reps, newCommodity(comm2, slice = 'ANNUAL', agg = list(comm = comm, agg = 1)))
-    
-  }
   if (!is.null(slice)) {
     if (any(class(slice) == c('scenario', 'model', 'sysInfo', 'slice'))) {
       mdl <- newModel(paste('Levelized cost technology', tech@name))
@@ -194,8 +181,22 @@ summary.levcost <- function(x) x$total
       if (class(slice) == 'sysInfo') mdl@sysInfo@slice <- slice@slice
       if (class(slice) == 'slice') mdl@sysInfo@slice <- slice
     } else mdl <- newModel(paste('Levelized cost technology', tech@name), slice = slice)
+    num.slice <- nrow(mdl@sysInfo@slice@levels)
   } else {
     mdl <- newModel(paste('levcost_', tech@name) , slice = 'ANNUAL')
+    num.slice <- 1
+  }
+  if (!is.null(comm)) {
+    comm2 <- comm
+    while (any(comm2 == c(tech@input$comm, tech@output$comm, tech@aux$comm))) comm2 <- paste0(comm2, 'dm')
+    tmpd <- newDemand(
+      name = paste0('DEM', comm2),
+      commodity = comm,
+      dem = list(region = region, dem = 1 / num.slice)
+    )
+    reps <- add(reps, tmpd)
+    reps <- add(reps, newCommodity(comm2, agg = list(comm = comm, agg = 1)))
+      
   }
   mdl@LECdata$region <- region
   mdl <-add(mdl, reps)
