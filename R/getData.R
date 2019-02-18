@@ -97,6 +97,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'
 #' @examples
 getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE, merge = FALSE, 
+                    addGroups = list(), summarizeGroups = list(),
                     na.rm = FALSE, drop = FALSE, stringsAsFactors = FALSE, yearsAsFactors = FALSE, verbose = FALSE,
                     asTibble = TRUE, scenNameInList = as.logical(length(scen)-1)) {
   

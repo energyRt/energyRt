@@ -29,22 +29,28 @@ choropleth.scenario <- function(scen, # scenario object
                                 main = NULL, 
                                 regex = FALSE
 ) {
-
+  # browser()
+  
   dat <- getData(scen, ..., merge = TRUE, drop = FALSE, 
-                 yearsAsFactors = TRUE, stringsAsFactors = TRUE)
+                 yearsAsFactors = TRUE, stringsAsFactors = FALSE)
   #  }
-  if (is.null(dat) | nrow(dat) == 0) {
-    message("No data for the set of filters")
+  # browser()
+  if (is.null(dat)) {
+    message("No data to display - check the set of filters")
+    return()
+  } else if (nrow(dat) == 0) {
+    message("No data to display - check the set of filters")
     return()
   }
   nm <- names(dat)
-  cc <- sapply(dat, is.character)
-  for (i in nm[cc]) {
-    dat[,i] <- as.factor(dat[,i])
-  }
+  # cc <- sapply(dat, is.character)
+  # for (i in nm[cc]) {
+  #   dat[,i] <- as.factor(dat[,i])
+  # }
+  # browser()
   
   if (!is.factor(dat$year)) dat$year <- as.factor(dat$year)
-  ff <- sapply(dat, is.factor)
+  ff <- !sapply(dat, is.numeric)
   rg <- nm == "region"
   src.rg <- nm == "src"
   dst.rg <- nm == "dst"
@@ -60,7 +66,7 @@ choropleth.scenario <- function(scen, # scenario object
     }
     # } else {
     # stop("The data has no region dimention")
-    ff <- sapply(dat, is.factor)
+    ff <- !sapply(dat, is.numeric)
     nm <- names(dat)
     rg <- nm == "region"
     src.rg <- nm == "src"
@@ -78,12 +84,13 @@ choropleth.scenario <- function(scen, # scenario object
     levs
   })
   #ltx
+  # browser()
   if (!is.null(main)) {
     ttl <- main
   } else {
     ttl <- paste(names(ltx), "=", ltx, collapse = ", ")
   } 
-  lv <- sapply(dat, function(x) {length(levels(x)) > 1})
+  lv <- sapply(dat, function(x) {length(unique(x)) > 1 & (!is.numeric(x))})
   #nm[ff & !rg & lv]
   if (sum(ff & !rg & lv) > 0) {
     dt <- aggregate(dat$value, by = list(dat$region), FUN = "sum")
@@ -98,6 +105,7 @@ choropleth.scenario <- function(scen, # scenario object
     message("No GIS information in the scenario. Check YourScenario@GIS")
   }
   spdf <- sp::merge(scen@model@sysInfo@GIS, dat)
+  # browser()
   #head(spdf@data)
   if(is.null(n)) n = 9
   if(is.null(cols)) cols = "Reds"
