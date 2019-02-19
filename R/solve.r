@@ -351,6 +351,8 @@
         }
   }
   approxim$commodity_slice_map <- commodity_slice_map
+  prec@set <- lapply(prec@parameters[sapply(prec@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
+  assign('approxim', approxim, globalenv())
   cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {
@@ -614,7 +616,7 @@ LL1 <- proc.time()[3]
       #cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
       #  Remove unused technology
 ########
-    for(i in seq(along =obj@data)) {
+    for(i in seq(along = obj@data)) {
         FF <- rep(TRUE, length(obj@data[[i]]@data))
         for(j in seq(along = obj@data[[i]]@data)) if (class(obj@data[[i]]@data[[j]]) == 'constrain') {
           if (any(names(obj@data[[i]]@data[[j]]@for.each) == 'tech') && 
