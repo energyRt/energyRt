@@ -353,6 +353,7 @@
   approxim$commodity_slice_map <- commodity_slice_map
   prec@set <- lapply(prec@parameters[sapply(prec@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
   assign('approxim', approxim, globalenv())
+  prec@gams.equation <- list()
   cat('Generating model input files ')
   # Fill DB main data
   if (n.threads > 1) {
@@ -725,6 +726,12 @@ LL1 <- proc.time()[3]
     close(zz)
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
+   # Add Statment equation 
+   if (length(prec@gams.equation) > 0) {
+     cat('equation', sapply(prec@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
+     cat(sapply(prec@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
+   }
+   # cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
    # prec <<- prec 
    assign('prec', prec, globalenv())
    # cat('.....---------........\n')
@@ -792,6 +799,12 @@ LL1 <- proc.time()[3]
     
     cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
                    (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+    #####
+    # Add Statment equation 
+    if (length(prec@gams.equation) > 0) {
+      cat('**************************************\n* Statment equation\n**************************************', 
+          sapply(prec@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
+    }
     if (any(names(obj@misc) == 'additionalEquationGAMS')) cat(obj@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
     cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
         (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) - 1)], sep = '\n', file = zz)

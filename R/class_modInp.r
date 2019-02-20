@@ -10,6 +10,7 @@ setClass("modInp", # modInp
     customConstrains = "list", # @customConstrains
     modelVersion        = "character",
     solver              = "character",
+    gams.equation  = 'list',
     misc = "list"
   ),
   prototype(
@@ -20,6 +21,7 @@ setClass("modInp", # modInp
     customConstrains = list(), 
     modelVersion        = "",
     solver              = "",
+    gams.equation  = list(),
     #! Misc
     misc = list(
     )

@@ -1180,3 +1180,15 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     
     obj
   })
+
+
+################################################################################
+# Add statement
+################################################################################
+setMethod('add0', signature(obj = 'modInp', app = 'statement',
+  approxim = 'list'), function(obj, app, approxim) {
+    .getSetEquation(obj, app, approxim)
+})
+
+
+

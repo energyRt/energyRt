@@ -201,7 +201,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 
 # Calculate do equation need additional set, and add it
-.getSetEquation <- function(prec, stm) {
+.getSetEquation <- function(prec, stm, approxim) {
   # Need estimate all additional sets
   adf <- data.frame(
     name = character(),
@@ -361,12 +361,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     res$equation <- paste0(res$equation, stm@rhs)
   }
   res$equation <- paste0(res$equation, ';')
-  
-  list(prec = prec, adf = adf)
+  prec@gams.equation[[length(prec@gams.equation) + 1]] <- res
+  prec
 }
-
-
-
-#.toGams <- function(prec, ) {
-#}
 
