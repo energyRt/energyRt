@@ -67,6 +67,9 @@ weather  weather
 Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
 Alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
 alias (region, src), (region, dst);
+* Alias for statment
+Alias (year, year_cns), (tech, tech_cns), (dem, dem_cns), (sup, sup_cns), (stg, stg_cns);
+Alias (slice_cns, slice), (trade, trade_cns), (imp, imp_cns), (expp, expp_cns);
 
 * Mapping sets
 set

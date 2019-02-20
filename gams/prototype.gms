@@ -67,6 +67,9 @@ weather  weather
 Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
 Alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
 alias (region, src), (region, dst);
+* Alias for statment
+Alias (year, year_cns), (tech, tech_cns), (dem, dem_cns), (sup, sup_cns), (stg, stg_cns);
+Alias (slice_cns, slice), (trade, trade_cns), (imp, imp_cns), (expp, expp_cns);
 
 * Mapping sets
 set
@@ -1022,6 +1025,10 @@ eqTechCVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilesto
                   sum(comm$mTechInpComm(tech, comm),
                           pTechCvarom(tech, comm, region, year, slice) *
                           vTechInp(tech, comm, region, year, slice)
+                  )+
+                 sum(comm$mTechOutComm(tech, comm),
+                          pTechCvarom(tech, comm, region, year, slice) *
+                          vTechOut(tech, comm, region, year, slice)
                   );
 
 eqTechAVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year))..
@@ -1030,6 +1037,10 @@ eqTechAVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilesto
                   sum(comm$mTechAInp(tech, comm),
                           pTechAvarom(tech, comm, region, year, slice) *
                           vTechAInp(tech, comm, region, year, slice)
+                  ) +
+                  sum(comm$mTechAOut(tech, comm),
+                          pTechAvarom(tech, comm, region, year, slice) *
+                          vTechAOut(tech, comm, region, year, slice)
                   );
 
 *! Full model : end
