@@ -65,6 +65,22 @@ newStatement <- function(name, eq = '==', rhs = data.frame(), for.each = list(),
     stop('Wrong condition type')
   }
   obj@eq[] <- eq
+  if (is.numeric(rhs)) {
+    defVal <- rhs
+    rhs <- data.frame()
+  }
+  if (!is.data.frame(rhs) && is.list(rhs) && length(rhs) == 1 && length(rhs[[1]]) == 1) {
+    defVal <- rhs[[1]]
+    rhs <- data.frame()
+  }
+  if (is.data.frame(rhs) && ncol(rhs) == 1 && nrow(rhs) == 1) {
+    defVal <- rhs[1, 1]
+    rhs <- data.frame()
+  }
+  if (is.numeric(rhs)) {
+    defVal <- rhs
+    rhs <- data.frame()
+  }
   if (!is.data.frame(rhs) && is.list(rhs)) {
     xx <- sapply(rhs, length)
     if (any(xx[1] != xx))
@@ -141,6 +157,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
+  assign('prec', prec,  globalenv())
+  assign('stm', stm,  globalenv())
+  assign('approxim', approxim,  globalenv())
   # Add for.sum for lhs if set not declarate before
   for (i in seq_along(stm@lhs)) {
     need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
@@ -163,13 +182,15 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   # for.each
   nn <- length(stm@for.each) + sapply(stm@lhs, function(x) sum(names(x@for.sum) != 'value'))
   if (nn > 0) {
+    add.set <- lapply(1:nn, function(x) NULL)
     adf[1:nn, ] <- NA
     k <- 0
     for (i in seq_along(stm@for.each)) {
       k <- k + 1
       adf[k, 'set'] <- names(stm@for.each)[i]
       adf[k, 'type'] <- 'for.each'
-      add.set[[k]] <- stm@for.each[[k]]
+      if (!is.null(stm@for.each[[k]]))
+        add.set[[k]] <- stm@for.each[[k]]
     }
     for (j in seq_along(stm@lhs)) {
       for (i in names(stm@lhs[[j]]@for.sum)[names(stm@lhs[[j]]@for.sum) != 'value']) {
@@ -177,15 +198,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         adf[k, 'set'] <- i
         adf[k, 'type'] <- 'lhs'
         adf[k, 'num'] <- j
-        add.set[[k]] <- unique(stm@lhs[[j]]@for.sum[[i]])
+        if (!is.null(stm@lhs[[j]]@for.sum[[i]]))
+          add.set[[k]] <- unique(stm@lhs[[j]]@for.sum[[i]])
       }
     }
     adf$name <- adf$set
     # 
     adf$need.new <- TRUE
     # if set contain all
-    for (i in seq_len(nrow(adf))) {
-      if (is.null(add.set[[i]]) || all(add.set[[i]] %in% prec@set[[adf[i, 'set']]]))
+    for (i in seq_along(add.set)) {
+      if (!(is.null(add.set[[i]]) || all(add.set[[i]] %in% prec@set[[adf[i, 'set']]])))
         adf[i, 'need.new'] <- FALSE
     }
     # if set in lhs the same as for.each
@@ -196,18 +218,23 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     }
     add.set <- add.set[adf$need.new]
     adf <- adf[adf$need.new,, drop = FALSE]
-    adf$new.name <- paste0('mCns', stm@name, '_', adf$set)
-    if (anyDuplicated(adf$new.name) != 0) {
-      tmp <- rep(0, nrow(adf))
-      while (anyDuplicated(paste0(adf$new.name, tmp)) != 0) {
-        fl <- duplicate(paste0(adf$new.name, tmp))
-        tmp[fl] <- tmp[fl] + 1
+    if (nrow(adf) > 0) {
+      adf$new.name <- paste0('mCns', stm@name, '_', adf$set)
+      for (i in seq_len(nrow(adf))) {
+        add.set[[i]] <- prec@set[[adf[i,  'set']]]
       }
-      tmp[tmp == 0] <- ''
-      adf$new.name <- paste0(adf$new.name, tmp)
-    }
-    for (i in seq_len(nrow(adf))) {
-      prec@parameters[[adf[i, 'new.name']]] <- addMultipleSet(createParameter(adf[i, 'new.name'], adf[i, 'set'], 'map'), add.set[[i]])
+      if (anyDuplicated(adf$new.name) != 0) {
+        tmp <- rep(0, nrow(adf))
+        while (anyDuplicated(paste0(adf$new.name, tmp)) != 0) {
+          fl <- duplicated(paste0(adf$new.name, tmp))
+          tmp[fl] <- tmp[fl] + 1
+        }
+        tmp[tmp == 0] <- ''
+        adf$new.name <- paste0(adf$new.name, tmp)
+      }
+      for (i in seq_len(nrow(adf))) {
+        prec@parameters[[adf[i, 'new.name']]] <- addMultipleSet(createParameter(adf[i, 'new.name'], adf[i, 'set'], 'map'), add.set[[i]])
+      }
     }
   }
   
@@ -223,9 +250,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   }
   # Equationbefore ..
   res$equation <- res$equationDeclaration
-  if (any(adf$type == 'for.each')) {
+  if (any(adf$type == 'for.each') || any(names(stm@for.each) == 'year')) {
     fl <- (adf$type == 'for.each')
-    res$equation <- paste0(res$equation, '$(', paste0(paste0(adf[fl, 'new.name'], '(', adf[fl, 'name'], ')'), collapse = ', '), ')')
+    res$equation <- paste0(res$equation, '$(', paste0(c(paste0(adf[fl, 'new.name'], '(', adf[fl, 'name'], ')'), 
+                                                        'mMidMilestone(year)'[any(names(stm@for.each) == 'year')]), collapse = ' and '), ')')
   }
   res$equation <- paste0(res$equation, '.. ')
   # Add lhs
@@ -304,12 +332,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     for (j in names(need.set2)) {
       approxim2[[j]] <- unique(c(stm@rhs[, j], add.set[adf$set == j], recursive = TRUE))
     }
-    xx <- createParameter('pCnsRhs', need.set2, 'simple', defVal = stm@defVal, interpolation = 'back.inter.forth')
-    prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@rhs, 'value', xx, approxim2))
+    xx <- createParameter(paste0('pCnsRhs', stm@name), need.set2, 'simple', defVal = stm@defVal, 
+                          interpolation = 'back.inter.forth', colName = 'rhs')
+    prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@rhs, 'rhs', xx, approxim2))
     # Add mult
     res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set2, collapse = ', '), ')')
-  } else if (stm@lhs[[i]]@defVal != 1) {
-    res$equation <- paste0(res$equation, stm@rhs)
+  } else {
+    res$equation <- paste0(res$equation, stm@defVal)
   }
   res$equation <- paste0(res$equation, ';')
   prec@gams.equation[[stm@name]] <- res
