@@ -348,6 +348,18 @@ setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'characte
       addData(obj, gg)
     }
 })
+# Add Set
+setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'numeric'),
+          function(obj, dimSetNames) {
+            dimSetNames <- dimSetNames[!(dimSetNames %in% obj@data[,1])]
+            if (length(dimSetNames) == 0) {
+              obj
+            } else {
+              gg <- data.frame(dimSetNames)
+              colnames(gg) <- obj@dimSetNames
+              addData(obj, gg)
+            }
+          })
 
 # Add data to Map Table with check new data
 setMethod('print', 'parameter', function(x, ...) {

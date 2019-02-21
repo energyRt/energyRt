@@ -1,18 +1,38 @@
 
+################################################################################
+# Add statement
+################################################################################
+setMethod('add_name', signature(obj = 'modInp', app = 'statement',
+                                approxim = 'list'), function(obj, app, approxim) {
+                                  if (!energyRt:::.chec_correct_name(app@name)) {
+                                    stop(paste('Incorrect statement name "', app@name, '"', sep = ''))
+                                  }
+                                  if (isStatement(obj, app@name)) {
+                                    warning(paste('There is statement name "', app@name,
+                                                  '" now, all previous information will be removed', sep = ''))
+                                    obj <- removePreviousStatement(obj, cmd@name)
+                                  }
+                                  obj
+                                })
+
+
+################################################################################
+# Add commodity
+################################################################################
 setMethod('add_name', signature(obj = 'modInp', app = 'commodity',
-  approxim = 'list'), function(obj, app, approxim) {
-  cmd <- energyRt:::.upper_case(app)
-  if (!energyRt:::.chec_correct_name(cmd@name)) {
-    stop(paste('Incorrect commodity name "', cmd@name, '"', sep = ''))
-  }
-  if (isCommodity(obj, cmd@name)) {
-    warning(paste('There is commodity name "', cmd@name,
-        '" now, all previous information will be removed', sep = ''))
-    obj <- removePreviousCommodity(obj, cmd@name)
-  }
-  obj@parameters[['comm']] <- addData(obj@parameters[['comm']], cmd@name)
-  obj
-})
+                                approxim = 'list'), function(obj, app, approxim) {
+                                  cmd <- energyRt:::.upper_case(app)
+                                  if (!energyRt:::.chec_correct_name(cmd@name)) {
+                                    stop(paste('Incorrect commodity name "', cmd@name, '"', sep = ''))
+                                  }
+                                  if (isCommodity(obj, cmd@name)) {
+                                    warning(paste('There is commodity name "', cmd@name,
+                                                  '" now, all previous information will be removed', sep = ''))
+                                    obj <- removePreviousCommodity(obj, cmd@name)
+                                  }
+                                  obj@parameters[['comm']] <- addData(obj@parameters[['comm']], cmd@name)
+                                  obj
+                                })
 
 
 

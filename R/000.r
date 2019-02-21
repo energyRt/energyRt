@@ -18,6 +18,10 @@ setGeneric("removePreviousSysInfo", function(obj) standardGeneric("removePreviou
 setGeneric("removePreviousTrade", function(obj, name) standardGeneric("removePreviousTrade"))
 setGeneric("isTrade", function(obj, name) standardGeneric("isTrade"))
 setGeneric('addData', function(obj, data) standardGeneric("addData"))
+
+setGeneric("removePreviousStatement", function(obj, name) standardGeneric("removePreviousStatement"))
+setGeneric("isStatement", function(obj, name) standardGeneric("isStatement"))
+
 setGeneric('clear', function(obj) standardGeneric("clear"))
 setGeneric('getSet', function(obj, dimSetNames) standardGeneric("getSet"))
 setGeneric('getParameterData', function(obj, set) standardGeneric("getParameterData"))

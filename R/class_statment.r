@@ -57,68 +57,6 @@ setClass('summand',
          S3methods = TRUE
 );
 
-# need run read.var.name.equation.r for update var list
-.vrb_map = list(
-  vTechInv = c("tech", "region", "year"),
-  vTechEac = c("tech", "region", "year"),
-  vTechSalv = c("tech", "region"),
-  vTechOMCost = c("tech", "region", "year"),
-  vSupCost = c("sup", "region", "year"),
-  vEmsFuelTot = c("comm", "region", "year", "slice"),
-  vTechEmsFuel = c("tech", "comm", "region", "year", "slice"),
-  vBalance = c("comm", "region", "year", "slice"),
-  vCost = c("region", "year"),
-  vObjective = c(""),
-  vTaxCost = c("comm", "region", "year"),
-  vSubsCost = c("comm", "region", "year"),
-  vAggOut = c("comm", "region", "year", "slice"),
-  vStorageSalv = c("stg", "region"),
-  vStorageCost = c("stg", "region", "year"),
-  vTradeCost = c("region", "year"),
-  vTradeRowCost = c("region", "year"),
-  vTradeIrCost = c("region", "year"),
-  vTechUse = c("tech", "region", "year", "slice"),
-  vTechNewCap = c("tech", "region", "year"),
-  vTechRetiredCap = c("tech", "region", "year", "yearp"),
-  vTechCap = c("tech", "region", "year"),
-  vTechAct = c("tech", "region", "year", "slice"),
-  vTechInp = c("tech", "comm", "region", "year", "slice"),
-  vTechOut = c("tech", "comm", "region", "year", "slice"),
-  vTechAInp = c("tech", "comm", "region", "year", "slice"),
-  vTechAOut = c("tech", "comm", "region", "year", "slice"),
-  vSupOut = c("sup", "comm", "region", "year", "slice"),
-  vSupReserve = c("sup", "comm", "region"),
-  vDemInp = c("comm", "region", "year", "slice"),
-  vOutTot = c("comm", "region", "year", "slice"),
-  vInpTot = c("comm", "region", "year", "slice"),
-  vInp2Up = c("comm", "region", "year", "slice", "slicep"),
-  vOut2Up = c("comm", "region", "year", "slice", "slicep"),
-  vSupOutTot = c("comm", "region", "year", "slice"),
-  vTechInpTot = c("comm", "region", "year", "slice"),
-  vTechOutTot = c("comm", "region", "year", "slice"),
-  vStorageInpTot = c("comm", "region", "year", "slice"),
-  vStorageOutTot = c("comm", "region", "year", "slice"),
-  vStorageAInp = c("stg", "comm", "region", "year", "slice"),
-  vStorageAOut = c("stg", "comm", "region", "year", "slice"),
-  vDummyImport = c("comm", "region", "year", "slice"),
-  vDummyExport = c("comm", "region", "year", "slice"),
-  vDummyCost = c("comm", "region", "year"),
-  vStorageInp = c("stg", "comm", "region", "year", "slice"),
-  vStorageOut = c("stg", "comm", "region", "year", "slice"),
-  vStorageStore = c("stg", "comm", "region", "year", "slice"),
-  vStorageInv = c("stg", "region", "year"),
-  vStorageCap = c("stg", "region", "year"),
-  vStorageNewCap = c("stg", "region", "year"),
-  vImport = c("comm", "region", "year", "slice"),
-  vExport = c("comm", "region", "year", "slice"),
-  vTradeIr = c("trade", "src", "dst", "year", "slice"),
-  vTradeIrAInp = c("trade", "comm", "region", "year", "slice"),
-  vTradeIrAOut = c("trade", "comm", "region", "year", "slice"),
-  vExportRowAccumulated = c("expp"),
-  vExportRow = c("expp", "region", "year", "slice"),
-  vImportRowAccumulated = c("imp"),
-  vImportRow = c("imp", "region", "year", "slice")
-);
 
 newStatement <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ...) {
   obj <- new('statement')
@@ -192,7 +130,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 
 #stm <- newStatement('testEx', for.each = list(year = 2012), rhs = data.frame(year = 2012, value = 5),
-#                    summand1 = list(variable = 'vTechOut', for.sum = list(tech = c('ELC_COA', 'ELC_GAS')), mult = list(tech = 'ELC_COA', value = 2)))
+#                    summand1 = list(variable = 'vTechOut', for.sum = list(year = 2012, tech = c('ELC_COA', 'ELC_GAS')), 
+#                                    mult = list(tech = 'ELC_COA', value = 2)))
 
 
 # Get set values
@@ -202,6 +141,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
+  # Add for.sum for lhs if set not declarate before
+  for (i in seq_along(stm@lhs)) {
+    need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
+    need.set <- need.set[!(need.set %in% c(names(stm@for.each), names(stm@lhs[[i]]@for.sum)))]
+    if (length(need.set) != 0) {
+      need.set <- c(need.set, names(stm@lhs[[i]]@for.sum))
+      stm@lhs[[i]]@for.sum <- lapply(need.set, function(j) stm@lhs[[i]]@for.sum[[j]])
+      names(stm@lhs[[i]]@for.sum) <- need.set
+    }
+  }
   # Need estimate all additional sets
   adf <- data.frame(
     name = character(),
@@ -289,7 +238,6 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       need.set[adf3$set] <- adf3$name
       names(stm@lhs[[i]]@for.sum) <- need.set[names(stm@lhs[[i]]@for.sum)]
     }
-    
     lft <- ''; rgt <- '';
     if (length(stm@lhs[[i]]@for.sum) != 0) {
       if (length(stm@lhs[[i]]@for.sum) == 1) {
@@ -303,10 +251,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       lft <- paste0(lft, ', ')
       rgt <- ')'
     }
-    vrm <- stm@lhs[[i]]@variable
+    vrm <- .vrb_mapping[[stm@lhs[[i]]@variable]]
     if (length(need.set) != 0) {
-      vrm <- paste0(vrm, '(', paste0(need.set, collapse = ', '), ')')
+      for (k in names(need.set)) {
+        vrm <- gsub(paste0(' ', k, ' '), paste0(' ', need.set[k], ' '), vrm)
+      }
     }
+    vrm <- gsub('[ ]*$', '', gsub('[(] ', '(', gsub(' [)]', ')', gsub(' [$] ', '$', gsub(' , ', ', ', vrm)))))
     # Add multiplier
     if (nrow(stm@lhs[[i]]@mult) != 0) {
       # Complicated parameter
@@ -361,7 +312,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     res$equation <- paste0(res$equation, stm@rhs)
   }
   res$equation <- paste0(res$equation, ';')
-  prec@gams.equation[[length(prec@gams.equation) + 1]] <- res
+  prec@gams.equation[[stm@name]] <- res
   prec
 }
 

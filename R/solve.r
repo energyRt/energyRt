@@ -412,6 +412,22 @@
           }
         }
     }
+    # add statement set/parameter
+    for(i in seq_along(prclst)) {
+      for(j in names(prclst[[i]]@parameters)[!(names(prclst[[i]]@parameters) %in% names(prec@parameters))]) {
+        prec@parameters[[j]] <- prclst[[i]]@parameters[[j]]
+      }
+    }    
+    # add statement equation
+    for(i in seq_along(prclst)) {
+      if (any(names(prclst[[i]]@gams.equation) %in% names(prec@gams.equation))) {
+        stop(paste0('There are duplicat statements "', paste0(names(prec@gams.equation)[!(
+          names(prec@gams.equation) %in% names(prclst[[i]]@gams.equation))], collapse = '", "'), '"'))
+      }
+      for(j in names(prclst[[i]]@gams.equation)) {
+        prec@gams.equation[[j]] <- prclst[[i]]@gams.equation[[j]]  
+      }
+    }
     cat(' ', round(proc.time()[3] - prorgess_bar_p, 2), 's\n')
     prclst <- NULL
   } else if (n.threads == 1) {
@@ -444,6 +460,7 @@
 #          prec@parameters[[i]]@data <- prec@parameters[[i]]@data[1:prec@parameters[[i]]@nValues,, drop = FALSE]
 #      }
 #    }
+  assign('prec', prec, globalenv())
 #####################################################################################
 # Handle data
 #####################################################################################
@@ -726,11 +743,6 @@ LL1 <- proc.time()[3]
     close(zz)
    zz <- file(paste(tmpdir, '/mdl.gms', sep = ''), 'w')
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
-   # Add Statment equation 
-   if (length(prec@gams.equation) > 0) {
-     cat('equation', sapply(prec@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
-     cat(sapply(prec@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
-   }
    # cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
    # prec <<- prec 
    assign('prec', prec, globalenv())
@@ -794,6 +806,11 @@ LL1 <- proc.time()[3]
    #pzz <- proc.time()[3]
    cat(file_w, sep = '\n', file = zz)
    file_w <- NULL
+   # Add Statment equation 
+   if (length(prec@gams.equation) > 0) {
+     cat('equation', sapply(prec@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
+     cat(sapply(prec@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
+   }
    # cat('pzz6: ', round(proc.time()[3] - pzz, 2), '\n')
     if (any(names(obj@misc) == 'additionalEquationGAMS')) cat(obj@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
     
@@ -802,8 +819,7 @@ LL1 <- proc.time()[3]
     #####
     # Add Statment equation 
     if (length(prec@gams.equation) > 0) {
-      cat('**************************************\n* Statment equation\n**************************************', 
-          sapply(prec@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
+          cat(sapply(prec@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
     }
     if (any(names(obj@misc) == 'additionalEquationGAMS')) cat(obj@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
     cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):

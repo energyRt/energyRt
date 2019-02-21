@@ -20,7 +20,7 @@ add.repository <- function(obj, app, ..., overwrite = FALSE) {
   } else {
     #if (class(add) != tolower(sub('^.', '', class(x)))) stop('Error type to repository')
     if (all(class(app) != c('technology', 'commodity', 'region', 'commodity', 'constrain', 
-    'stock', 'supply', 'weather', 'demand', 'reserve', 'trade', 'export', 'import', 'storage'))) 
+    'stock', 'supply', 'weather', 'demand', 'reserve', 'trade', 'export', 'import', 'storage', 'statement'))) 
       stop('Error type to repository ', class(app))
     if (app@name == '' || any(sapply(obj@data, function(z) app@name == z@name & class(app) == class(z)))) { 
       if (app@name == '' || !overwrite) stop('Wrong name')
