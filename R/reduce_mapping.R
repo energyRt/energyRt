@@ -8,7 +8,8 @@
 #prec <- .Object
 
 .reduce_mapping <- function(prec) {
-  browser()
+  assign('prec', prec, globalenv())
+  #! need add tech reductions
   generate_haveval <- function(nam, val, invert = FALSE, type = 'l') {
     gg <- getParameterData(prec@parameters[[nam]])
     if (type == 'lo') {

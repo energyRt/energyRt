@@ -417,26 +417,6 @@ setMethod("initialize", "modInp",
         createParameter('pDiscount', c('region', 'year'), 'simple', 
                 defVal = .1, interpolation = 'back.inter.forth', colName = 'discount', cls = 'sysInfo')    
   # Additional for compatibility with GLPK
-  .Object@parameters[['ndefpTechOlife']] <- createParameter('ndefpTechOlife', c('tech', 'region'), 'map')   
-  .Object@parameters[['ndefpTechAfUp']] <- createParameter('ndefpTechAfUp', c('tech', 'region', 'year', 'slice'), 'map')   
-  .Object@parameters[['ndefpTechAfcUp']] <- 
-      createParameter('ndefpTechAfcUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['ndefpSupAvaUp']] <- 
-      createParameter('ndefpSupAvaUp', c('sup', 'comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['ndefpSupReserveUp']] <- createParameter('ndefpSupReserveUp', c('sup', 'comm', 'region'), 'map')    
-  .Object@parameters[['ndefpStorageOlife']] <- createParameter('ndefpStorageOlife', c('stg', 'region'), 'map')   
-  .Object@parameters[['ndefpTradeIrUp']] <- createParameter('ndefpTradeIrUp', 
-                                        c('trade', 'src', 'dst', 'year', 'slice'), 'map')    
-    .Object@parameters[['ndefpExportRowRes']] <- createParameter('ndefpExportRowRes', 'expp', 'map')    
-    .Object@parameters[['ndefpImportRowRes']] <- createParameter('ndefpImportRowRes', 'imp', 'map')    
-    .Object@parameters[['ndefpExportRowUp']] <- createParameter('ndefpExportRowUp', 
-        c('expp', 'region', 'year', 'slice'), 'map')    
-    .Object@parameters[['ndefpImportRowUp']] <- createParameter('ndefpImportRowUp', 
-        c('imp', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['ndefpDummyImportCost']] <- createParameter('ndefpDummyImportCost', 
-      c('comm', 'region', 'year', 'slice'), 'map')    
-  .Object@parameters[['ndefpDummyExportCost']] <- createParameter('ndefpDummyExportCost', 
-      c('comm', 'region', 'year', 'slice'), 'map')    
   .Object@parameters[['pDiscountFactor']] <- createParameter('pDiscountFactor', c('region', 'year'), 'simple')    
   .Object@parameters[['mDiscountZero']] <- createParameter('mDiscountZero', 'region', 'map', defVal = 1) 
   ## Milestone set
