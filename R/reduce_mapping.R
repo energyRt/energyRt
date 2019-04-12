@@ -2,51 +2,13 @@
 
 #  prec0 = prec
 # .Object <- prec0;
-if (FALSE) {
+#if (FALSE) {
 # Add reduce mapping
-.Object@parameters[['mTechInpTot']] <- createParameter('mTechInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mTechOutTot']] <- createParameter('mTechOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mSupOutTot']] <- createParameter('mSupOutTot', c('comm', 'region', 'slice'), 'map') 
-.Object@parameters[['mDemInp']] <- createParameter('mDemInp', c('comm', 'slice'), 'map') 
-.Object@parameters[['mEmsFuelTot']] <- createParameter('mEmsFuelTot', c('comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mTechEmsFuel']] <- createParameter('mTechEmsFuel', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mDummyImport']] <- createParameter('mDummyImport', c('comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mDummyExport']] <- createParameter('mDummyExport', c('comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mDummyCost']] <- createParameter('mDummyCost', c('comm', 'region', 'year'), 'map') 
-.Object@parameters[['mTradeIr']] <- createParameter('mTradeIr', c('trade', 'region', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mTradeIrUp']] <- createParameter('mTradeIrUp', c('trade', 'region', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mTradeIrAInp2']] <- createParameter('mTradeIrAInp2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mTradeIrAOut2']] <- createParameter('mTradeIrAOut2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mTradeIrAInpTot']] <- createParameter('mTradeIrAInpTot', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mTradeIrAOutTot']] <- createParameter('mTradeIrAOutTot', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
 
-.Object@parameters[['mImportRow']] <- createParameter('mImportRow', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mImportRowUp']] <- createParameter('mImportRowUp', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mExportRowUp']] <- createParameter('mExportRowUp', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mImportAccumulatedRowUp']] <- createParameter('mImportAccumulatedRowUp', c('imp', 'comm'), 'map') 
-.Object@parameters[['mExportRowAccumulatedUp']] <- createParameter('mExportRowAccumulatedUp', c('expp', 'comm'), 'map') 
+#prec <- .Object
 
-.Object@parameters[['mExport']] <- createParameter('mExport', c('comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mImport']] <- createParameter('mImport', c('comm', 'region', 'year', 'slice'), 'map') 
-
-.Object@parameters[['mStorageInpTot']] <- createParameter('mStorageInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mStorageOutTot']] <- createParameter('mStorageOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
-
-.Object@parameters[['mTaxCost']] <- createParameter('mTaxCost', c('comm', 'region', 'year'), 'map') 
-.Object@parameters[['mSubsCost']] <- createParameter('mSubsCost', c('comm', 'region', 'year'), 'map') 
-.Object@parameters[['mAggOut']] <- createParameter('mAggOut', c('comm', 'region', 'year', 'slice'), 'map') 
-
-
-prec <- .Object
-
-eqTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice)..
-vTradeIrAInpTot(comm, region, year, slice) =e= sum(trade$mTradeIrAInp2(trade, comm, region, year, slice), vTradeIrAInp(trade, comm, region, year, slice));
-
-eqTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice)..
-vTradeIrAOutTot(comm, region, year, slice) =e= sum(trade$mTradeIrAOut2(trade, comm, region, year, slice), vTradeIrAOut(trade, comm, region, year, slice));
-
-# .reduce_mapping <- function(prec) {
+.reduce_mapping <- function(prec) {
+  browser()
   generate_haveval <- function(nam, val, invert = FALSE, type = 'l') {
     gg <- getParameterData(prec@parameters[[nam]])
     if (type == 'lo') {
@@ -104,10 +66,10 @@ vTradeIrAOutTot(comm, region, year, slice) =e= sum(trade$mTradeIrAOut2(trade, co
   for (i in c('pTradeIr', 'pExportRow', 'pImportRow')) 
     tmp_noinf[[i]] <- generate_haveval(i, Inf, TRUE, 'up')
   tmp_nozero <- list()
-  for (i in c('pTradeIr', 'pExportRow', 'pImportRow')) 
+  for (i in c('pTradeIr', 'pExportRow', 'pImportRow', 'pSupAva', 'pTechAf', 'pTechAfc')) 
     tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'up')
   for (i in c('pDummyImportCost', 'pDummyExportCost', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Ainp', 
-              'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor')) 
+              'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor', 'pSupReserve')) 
     tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'l')
   
   
@@ -247,5 +209,5 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], 
       merge(merge(merge(reduce.sect(tmp_nozero$pAggregateFactor, 'comm'), tmp$region), tmp$year), tmp$slice))
                                             
-    
+    # mSupAvaUp mSupReserveUp mTechAfUp mTechAfcUp mTechOlifeInf mStorageOlifeInf 
 }

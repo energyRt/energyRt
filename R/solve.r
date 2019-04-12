@@ -566,49 +566,6 @@
       } 
 LL1 <- proc.time()[3]
       ##!!!!!!!!!!!!!!!!!!!!!
-
-      #if (!is.null(update.scen)) {
-      #  for (tglb in c('update.scen', 'obj', 'prec'))
-      #    assign(tglb, get(tglb), globalenv())
-      #  browser()
-      #  # compare(update.scen@model, )
-      #}
-      defin_ndef_par <- function(prec, name1, name2) {
-        gg <- getParameterData(prec@parameters[[name1]])
-        if (solver == 'GAMS' && prec@parameters[[name1]]@defVal[2] == Inf) {
-          gg <- gg[gg$type == 'up' & gg$value != Inf, ]
-          prec@parameters[[name2]]@not_data <- TRUE
-        } else {
-          gg <- gg[gg$type == 'up' & gg$value == Inf, ]
-        }
-        prec@parameters[[name2]] <- addData(prec@parameters[[name2]], gg[, 1:(ncol(gg) - 2), drop = FALSE])
-        prec
-      }
-      defin_ndef_par_set <- function(prec, name1, name2) {
-        gg <- getParameterData(prec@parameters[[name1]])
-        if (solver == 'GAMS' && prec@parameters[[name1]]@defVal[1] == Inf) {
-          gg <- gg[gg$value != Inf, ]
-          prec@parameters[[name2]]@not_data <- TRUE
-        } else {
-          gg <- gg[gg$value == Inf, ]
-        }
-        prec@parameters[[name2]] <- addData(prec@parameters[[name2]], gg[, 1:(ncol(gg) - 1), drop = FALSE])
-        prec
-      }
-      
-      
-      prec <- defin_ndef_par_set(prec, 'pDummyImportCost', 'ndefpDummyImportCost')
-      prec <- defin_ndef_par_set(prec, 'pDummyExportCost', 'ndefpDummyExportCost')
-      prec <- defin_ndef_par_set(prec, 'pExportRowRes', 'ndefpExportRowRes')
-      prec <- defin_ndef_par_set(prec, 'pImportRowRes', 'ndefpImportRowRes')
-      prec <- defin_ndef_par(prec, 'pSupAva', 'ndefpSupAvaUp')
-      prec <- defin_ndef_par(prec, 'pSupReserve', 'ndefpSupReserveUp')
-      prec <- defin_ndef_par(prec, 'pExportRow', 'ndefpExportRowUp')
-      prec <- defin_ndef_par(prec, 'pImportRow', 'ndefpImportRowUp')
-      prec <- defin_ndef_par(prec, 'pTechAf', 'ndefpTechAfUp')
-      prec <- defin_ndef_par(prec, name1 = 'pTradeIr', name2 = 'ndefpTradeIrUp')
-      prec <- defin_ndef_par(prec, 'pTechAfc', 'ndefpTechAfcUp')
-      
       # For remove emission equation
       g1 <- getParameterData(prec@parameters$pTechEmisComm)
 #      if (prec@parameters[['pTechEmisComm']]@nValues != -1)
@@ -623,10 +580,6 @@ LL1 <- proc.time()[3]
         prec@parameters$mTechEmitedComm <- addData(prec@parameters$mTechEmitedComm,
           data.frame(tech = tec, comm = rep(g, length(tec))))
       }
-      # Tech oilfe
-      prec <- defin_ndef_par_set(prec, 'pTechOlife', 'ndefpTechOlife')
-      # Storage oilfe
-      prec <- defin_ndef_par_set(prec, 'pStorageOlife', 'ndefpStorageOlife')
       # Check user error
        assign('prec', prec, globalenv())
       # check_parameters(prec)
@@ -728,7 +681,8 @@ LL1 <- proc.time()[3]
        }
      }
    }
-       
+   # Reduce mapping
+   prec <- .reduce_mapping(prec)
 #!################
 ### FUNC GAMS 
   #### Code load

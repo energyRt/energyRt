@@ -116,13 +116,6 @@ mDemComm(dem, comm)              Demand commodities
 mUpComm(comm)  Commodity balance type PRODUCTION <= CONSUMPTION
 mLoComm(comm)  Commodity balance type PRODUCTION >= CONSUMPTION
 mFxComm(comm)  Commodity balance type PRODUCTION = CONSUMPTION
-ndefpTechAfUp(tech, region, year, slice)         Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpTechAfcUp(tech, comm, region, year, slice)  Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpSupReserveUp(sup, comm, region)                              Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpSupAvaUp(sup, comm, region, year, slice)           Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpDummyImportCost(comm, region, year, slice)   Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpDummyExportCost(comm, region, year, slice)   Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpTechOlife(tech, region)                      Auxiliary mapping for not Inf - used in GLPK-MathProg only
 * Storage set
 $ontext
 <<<<<<< HEAD
@@ -132,7 +125,6 @@ $ontext
 $offtext
 * Storage
 mStorageSlice(stg, slice)          Storage work in slice
-ndefpStorageOlife(stg, region)    Auxiliary mapping for not Inf - used in GLPK-MathProg only
 mStorageComm(stg, comm)            Mapping of storage technology and respective commodity
 mStorageAInp(stg, comm)
 mStorageAOut(stg, comm)
@@ -152,11 +144,6 @@ mExpComm(expp, comm)                             Mapping of export commodities
 mImpComm(imp, comm)                              Mapping for import commodities
 mExpSlice(expp, slice)                           Exp work in slice
 mImpSlice(imp, slice)                            Imp work in slice
-ndefpTradeIrUp(trade, region, region, year, slice)     Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpExportRowRes(expp)                                  Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpExportRowUp(expp, region, year, slice)              Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpImportRowRes(imp)                                   Auxiliary mapping for Inf - used in GLPK-MathProg only
-ndefpImportRowUp(imp, region, year, slice)               Auxiliary mapping for Inf - used in GLPK-MathProg only
 * Zero discount
 mDiscountZero(region)                            Auxiliary mapping mapping for  regions with zero discount
 mAllSliceParentChild(slice, slice)
@@ -504,7 +491,13 @@ mTaxCost(comm, region, year)
 mSubsCost(comm, region, year)
 * (sum(commp$pAggregateFactor(comm, commp), 1))
 mAggOut(comm, region, year, slice)
-
+mTechAfUp(tech, region, year, slice)
+mTechAfUp(tech, region, year, slice)
+mTechOlifeInf(tech, region)
+mStorageOlifeInf(stg, region)
+mTechAfcUp(tech, comm, region, year, slice)
+mSupAvaUp(sup, comm, region, year, slice)
+mSupReserveUp(sup, comm, region)
 ;
 
 
@@ -757,7 +750,7 @@ eqTechAfLo(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone
 * Availability factor UP
 eqTechAfUp(tech, region, year, slice)$(
                  mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
-                 not(ndefpTechAfUp(tech, region, year, slice))
+                 mTechAfUp(tech, region, year, slice)
          )..
          vTechAct(tech, region, year, slice)
          =l=
@@ -849,8 +842,8 @@ eqTechAfcOutLo(tech, region, comm, year, slice)$
 eqTechAfcOutUp(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechOutComm(tech, comm) and
-                 not(ndefpTechAfUp(tech, region, year, slice)) and
-                 not(ndefpTechAfcUp(tech, comm, region, year, slice))
+                 mTechAfUp(tech, region, year, slice) and
+                 mTechAfcUp(tech, comm, region, year, slice)
          )..
          vTechOut(tech, comm, region, year, slice)
          =l=
@@ -881,8 +874,8 @@ eqTechAfcInpLo(tech, region, comm, year, slice)$
 eqTechAfcInpUp(tech, region, comm, year, slice)$
          (       mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year) and
                  mTechInpComm(tech, comm) and
-                 not(ndefpTechAfUp(tech, region, year, slice)) and
-                 not(ndefpTechAfcUp(tech, comm, region, year, slice))
+                 mTechAfUp(tech, region, year, slice) and
+                 mTechAfcUp(tech, comm, region, year, slice)
          )..
          vTechInp(tech, comm, region, year, slice)
          =l=
@@ -930,7 +923,7 @@ eqTechCap(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
          sum((yearp)$
                  (       mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
                          ordYear(year) >= ordYear(yearp) and
-                         (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or ndefpTechOlife(tech, region))
+                         (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))
                  ),
                  vTechNewCap(tech, region, yearp) -
                    sum(yeare$(mTechRetirement(tech) and mMidMilestone(yeare) and
@@ -951,7 +944,7 @@ eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
                  (       mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
                          ordYear(year) >= ordYear(yearp) and
                          ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) and
-                         not(ndefpTechOlife(tech, region)) and pTechInvcost(tech, region, yearp) <> 0
+                         not(mTechOlifeInf(tech, region)) and pTechInvcost(tech, region, yearp) <> 0
                  ),
                   pTechInvcost(tech, region, yearp) * (
 *                   sum(yeare$(ordYear(yeare) = ordYear(year) and ordYear(yearp) = ordYear(year)), pTechStock(tech, region, yeare)) +
@@ -991,7 +984,7 @@ eqTechSalv0(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare
     vTechSalv(tech, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
-         and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(ndefpTechOlife(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
+         and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
     (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
      - sum(yearp$(mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp)))  / (
@@ -1008,7 +1001,7 @@ eqTechSalv(tech, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(y
     vTechSalv(tech, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
-  and mTechNew(tech, region, yearn) and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(ndefpTechOlife(tech, region))
+  and mTechNew(tech, region, yearn) and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))
    and pTechInvcost(tech, region, yearn) <> 0),
     (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
     pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
@@ -1124,8 +1117,7 @@ eqSupReserveLo(sup, comm, region)                     Total supply vs reserve ch
 eqSupCost(sup, region, year)                Total supply costs
 ;
 
-eqSupAvaUp(sup, comm, region, year, slice)$(mSupSlice(sup, slice) and mMidMilestone(year) and mSupComm(sup, comm) and
-         not(ndefpSupAvaUp(sup, comm, region, year, slice)) and mSupSpan(sup, region))..
+eqSupAvaUp(sup, comm, region, year, slice)$mSupAvaUp(sup, comm, region, year, slice)..
          vSupOut(sup, comm, region, year, slice)
          =l=
          pSupAvaUp(sup, comm, region, year, slice) * prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mSupWeatherUp(sup, weather)
@@ -1145,10 +1137,7 @@ eqSupTotal(sup, comm, region)$(mSupComm(sup, comm) and mSupSpan(sup, region))..
              (ordYear(yearp) - ordYear(yeare) + 1) * vSupOut(sup, comm, region, year, slice)
          );
 
-eqSupReserveUp(sup, comm, region)$
-         (
-                 mSupComm(sup, comm) and not(ndefpSupReserveUp(sup, comm, region)) and mSupSpan(sup, region)
-         )..
+eqSupReserveUp(sup, comm, region)$mSupReserveUp(sup, comm, region)..
          pSupReserveUp(sup, comm, region) =g= vSupReserve(sup, comm, region);
 
 eqSupReserveLo(sup, comm, region)$
@@ -1335,7 +1324,7 @@ eqStorageCap(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regio
          sum(yearp$
                  (
                          ordYear(year) >= ordYear(yearp) and
-                         (ndefpStorageOlife(stg, region) or ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp)) and
+                         (mStorageOlifeInf(stg, region) or ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp)) and
                          mStorageNew(stg, region, year)
                  ),
                  vStorageNewCap(stg, region, yearp)
@@ -1365,7 +1354,7 @@ eqStorageSalv0(stg, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yea
     vStorageSalv(stg, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mStorageNew(stg, region, yearn)
-         and ordYear(yearn) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(ndefpStorageOlife(stg, region))  and pStorageInvcost(stg, region, yearn) <> 0),
+         and ordYear(yearn) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(mStorageOlifeInf(stg, region))  and pStorageInvcost(stg, region, yearn) <> 0),
     (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
     pStorageInvcost(stg, region, yearn) * vStorageNewCap(stg, region, yearn)  / (
       1
@@ -1381,7 +1370,7 @@ eqStorageSalv(stg, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast
     vStorageSalv(stg, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
-  and mStorageNew(stg, region, yearn) and ordYear(yearn) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(ndefpStorageOlife(stg, region))
+  and mStorageNew(stg, region, yearn) and ordYear(yearn) + pStorageOlife(stg, region) - 1 > ordYear(yeare) and not(mStorageOlifeInf(stg, region))
    and pStorageInvcost(stg, region, yearn) <> 0),
     (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
     pStorageInvcost(stg, region, yearn) * vStorageNewCap(stg, region, yearn) / (
@@ -22897,7 +22886,7 @@ eqLECActivity
 
 * Place to insert your data
 * ddd355e0-0023-45e9-b0d3-1ad83ba74b3a
-$EXIT
+*$EXIT
 
 *option lp = cbc;
 

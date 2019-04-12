@@ -446,6 +446,47 @@ setMethod("initialize", "modInp",
   .Object@parameters[['mStartMilestone']] <- createParameter('mStartMilestone', c('year', 'yearp'), 'map', defVal = 1) 
   .Object@parameters[['mEndMilestone']] <- createParameter('mEndMilestone', c('year', 'yearp'), 'map', defVal = 1) 
   .Object@parameters[['mMilestoneNext']] <- createParameter('mMilestoneNext', c('year', 'yearp'), 'map', defVal = 1) 
+  ## Reduce mapping
+  .Object@parameters[['mTechInpTot']] <- createParameter('mTechInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTechOutTot']] <- createParameter('mTechOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mDemInp']] <- createParameter('mDemInp', c('comm', 'slice'), 'map') 
+  .Object@parameters[['mEmsFuelTot']] <- createParameter('mEmsFuelTot', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTechEmsFuel']] <- createParameter('mTechEmsFuel', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mDummyImport']] <- createParameter('mDummyImport', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mDummyExport']] <- createParameter('mDummyExport', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mDummyCost']] <- createParameter('mDummyCost', c('comm', 'region', 'year'), 'map') 
+  .Object@parameters[['mTradeIr']] <- createParameter('mTradeIr', c('trade', 'region', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTradeIrUp']] <- createParameter('mTradeIrUp', c('trade', 'region', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTradeIrAInp2']] <- createParameter('mTradeIrAInp2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTradeIrAOut2']] <- createParameter('mTradeIrAOut2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTradeIrAInpTot']] <- createParameter('mTradeIrAInpTot', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTradeIrAOutTot']] <- createParameter('mTradeIrAOutTot', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+  
+  .Object@parameters[['mImportRow']] <- createParameter('mImportRow', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mImportRowUp']] <- createParameter('mImportRowUp', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mExportRowUp']] <- createParameter('mExportRowUp', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mImportAccumulatedRowUp']] <- createParameter('mImportAccumulatedRowUp', c('imp', 'comm'), 'map') 
+  .Object@parameters[['mExportRowAccumulatedUp']] <- createParameter('mExportRowAccumulatedUp', c('expp', 'comm'), 'map') 
+  
+  .Object@parameters[['mExport']] <- createParameter('mExport', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mImport']] <- createParameter('mImport', c('comm', 'region', 'year', 'slice'), 'map') 
+  
+  .Object@parameters[['mStorageInpTot']] <- createParameter('mStorageInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mStorageOutTot']] <- createParameter('mStorageOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
+  
+  .Object@parameters[['mTaxCost']] <- createParameter('mTaxCost', c('comm', 'region', 'year'), 'map') 
+  .Object@parameters[['mSubsCost']] <- createParameter('mSubsCost', c('comm', 'region', 'year'), 'map') 
+  .Object@parameters[['mAggOut']] <- createParameter('mAggOut', c('comm', 'region', 'year', 'slice'), 'map') 
+  
+  .Object@parameters[['mSupOutTot']] <- createParameter('mSupOutTot', c('comm', 'region', 'slice'), 'map') 
+  .Object@parameters[['mSupAvaUp']] <- createParameter('mSupAvaUp', c('sup', 'comm', 'region', 'slice'), 'map') 
+  .Object@parameters[['mSupReserveUp']] <- createParameter('mSupReserveUp', c('sup', 'comm', 'region'), 'map') 
+  
+  .Object@parameters[['mTechAfUp']] <- createParameter('mTechAfUp', c('tech', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTechAfcUp']] <- createParameter('mTechAfcUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mTechOlifeInf']] <- createParameter('mTechAfcUp', c('tech', 'region'), 'map') 
+  .Object@parameters[['mStorageOlifeInf']] <- createParameter('mStorageOlifeInf', c('stg', 'region'), 'map') 
   .Object
 })
 
