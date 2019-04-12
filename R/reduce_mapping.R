@@ -17,6 +17,8 @@ if (FALSE) {
 .Object@parameters[['mTradeIrUp']] <- createParameter('mTradeIrUp', c('trade', 'region', 'region', 'year', 'slice'), 'map') 
 .Object@parameters[['mTradeIrAInp2']] <- createParameter('mTradeIrAInp2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
 .Object@parameters[['mTradeIrAOut2']] <- createParameter('mTradeIrAOut2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+.Object@parameters[['mTradeIrAInpTot']] <- createParameter('mTradeIrAInpTot', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+.Object@parameters[['mTradeIrAOutTot']] <- createParameter('mTradeIrAOutTot', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
 
 .Object@parameters[['mImportRow']] <- createParameter('mImportRow', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
 .Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
@@ -38,6 +40,11 @@ if (FALSE) {
 
 prec <- .Object
 
+eqTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice)..
+vTradeIrAInpTot(comm, region, year, slice) =e= sum(trade$mTradeIrAInp2(trade, comm, region, year, slice), vTradeIrAInp(trade, comm, region, year, slice));
+
+eqTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice)..
+vTradeIrAOutTot(comm, region, year, slice) =e= sum(trade$mTradeIrAOut2(trade, comm, region, year, slice), vTradeIrAOut(trade, comm, region, year, slice));
 
 # .reduce_mapping <- function(prec) {
   generate_haveval <- function(nam, val, invert = FALSE, type = 'l') {
@@ -181,16 +188,23 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     # mTradeIrAInp2(trade, comm, region, year, slice)
     a0 <- tmp$mTradeIrAInp; colnames(a0)[2] <- 'acomm' 
     a1 <- merge(a0, rbind(tmp_nozero$pTradeIrCsrc2Ainp, tmp_nozero$pTradeIrCdst2Ainp))
-    colnames(a1)[3:4] <- c('region', 'region.1')
+    colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
     prec@parameters[['mTradeIrAInp2']] <- addData(prec@parameters[['mTradeIrAInp2']], 
-                                                  merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'acomm', 'region', 'year', 'slice')])
+          merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
+    # mTradeIrAInpTot
+    prec@parameters[['mTradeIrAInpTot']] <- addData(prec@parameters[['mTradeIrAInpTot']], 
+        reduce.sect(getParameterData(prec@parameters$mTradeIrAInp2), c('comm', 'region', 'year', 'slice')))
+    
     # mTradeIrAOut2(trade, comm, region, year, slice)
     a0 <- tmp$mTradeIrAOut; colnames(a0)[2] <- 'acomm' 
     a1 <- merge(a0, rbind(tmp_nozero$pTradeIrCsrc2Aout, tmp_nozero$pTradeIrCdst2Aout))
-    colnames(a1)[3:4] <- c('region', 'region.1')
+    colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
     prec@parameters[['mTradeIrAOut2']] <- addData(prec@parameters[['mTradeIrAOut2']], 
-                                                  merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'acomm', 'region', 'year', 'slice')])
-
+        merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
+    # mTradeIrAOutTot
+    prec@parameters[['mTradeIrAOutTot']] <- addData(prec@parameters[['mTradeIrAOutTot']], 
+      reduce.sect(getParameterData(prec@parameters$mTradeIrAOut2), c('comm', 'region', 'year', 'slice')))
+    
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
     aa <- merge(tmp$mImpComm, merge(tmp$mImpSlice, tmp_nozero$pImportRow))[, c("imp", "comm", "region", "year", "slice")]
     prec@parameters[['mImportRow']] <- addData(prec@parameters[['mImportRow']], aa)
