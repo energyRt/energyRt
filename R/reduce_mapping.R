@@ -18,11 +18,11 @@ if (FALSE) {
 .Object@parameters[['mTradeIrAOut2']] <- createParameter('mTradeIrAOut2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
 
 .Object@parameters[['mImportRow']] <- createParameter('mImportRow', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
+.Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
 .Object@parameters[['mImportRowUp']] <- createParameter('mImportRowUp', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
-.Object@parameters[['mExportRowUp']] <- createParameter('mExportRowUp', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
+.Object@parameters[['mExportRowUp']] <- createParameter('mExportRowUp', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
 .Object@parameters[['mImportAccumulatedRowUp']] <- createParameter('mImportAccumulatedRowUp', c('imp', 'comm'), 'map') 
-.Object@parameters[['mExportRowAccumulatedUp']] <- createParameter('mExportRowAccumulatedUp', c('imp', 'comm'), 'map') 
+.Object@parameters[['mExportRowAccumulatedUp']] <- createParameter('mExportRowAccumulatedUp', c('expp', 'comm'), 'map') 
 
 .Object@parameters[['mExport']] <- createParameter('mExport', c('comm', 'region', 'year', 'slice'), 'map') 
 .Object@parameters[['mImport']] <- createParameter('mImport', c('comm', 'region', 'year', 'slice'), 'map') 
@@ -184,15 +184,15 @@ prec <- .Object
                                                   merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'acomm', 'region', 'year', 'slice')])
 
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
-    tmp <- merge(tmp$mImpComm, merge(tmp$mImpSlice, tmp_nozero$pImportRow))
-    prec@parameters[['mImportRow']] <- addData(prec@parameters[['mImportRow']], tmp)
+    aa <- merge(tmp$mImpComm, merge(tmp$mImpSlice, tmp_nozero$pImportRow))[, c("imp", "comm", "region", "year", "slice")]
+    prec@parameters[['mImportRow']] <- addData(prec@parameters[['mImportRow']], aa)
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf) 
-    prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], merge(tmp_noinf$pImportRow, tmp))
+    prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], merge(tmp_noinf$pImportRow, aa))
     prec@parameters[['mImportAccumulatedRowUp']] <- addData(prec@parameters[['mImportAccumulatedRowUp']], tmp_noinf$pImportRowRes)
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
-    tmp <- merge(tmp$mExpComm, merge(tmp$mExpSlice, tmp_nozero$pExportRow))
-    prec@parameters[['mExportRow']] <- addData(prec@parameters[['mExportRow']], tmp)
-    prec@parameters[['mExportRowUp']] <- addData(prec@parameters[['mExportRowUp']], merge(tmp_noinf$pExportRow, tmp))
+    aa <- merge(tmp$mExpComm, merge(tmp$mExpSlice, tmp_nozero$pExportRow))[, c("expp", "comm", "region", "year", "slice")]
+    prec@parameters[['mExportRow']] <- addData(prec@parameters[['mExportRow']], aa)
+    prec@parameters[['mExportRowUp']] <- addData(prec@parameters[['mExportRowUp']], merge(tmp_noinf$pExportRow, aa))
     prec@parameters[['mExportRowAccumulatedUp']] <- addData(prec@parameters[['mExportRowAccumulatedUp']], tmp_noinf$pExportRowRes)
 
     
@@ -205,8 +205,9 @@ prec <- .Object
 
     
         # * (sum(trade$(mTradeSlice(trade, slice) and mTradeComm(trade, comm) and mTradeSrc(trade, src)), 1) + sum(expp$(mExpSlice(expp, slice) and mExpComm(expp, comm)), 1))
-    merge(tmp$mTradeComm, getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'region', 'year', 'slice')]
-    reduce.sect(getParameterData(prec@parameters[['mExportRow']]), c('comm', 'region', 'year', 'slice'))
+    prec@parameters[['mExport']] <- addData(prec@parameters[['mExport']], 
+      rbind(merge(tmp$mTradeComm, getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'region', 'year', 'slice')],
+        reduce.sect(getParameterData(prec@parameters[['mExportRow']]), c('comm', 'region', 'year', 'slice'))))
     
     
 
