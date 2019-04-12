@@ -337,7 +337,7 @@ setMethod("initialize", "modInp",
     drt1 <- c('pTradeIrCsrc2Aout', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Aout', 'pTradeIrCdst2Ainp')
     drt2 <- c(        'csrc2aout',         'csrc2ainp',         'cdst2aout',         'cdst2ainp')
     for (i in seq_along(drt1))
-      .Object@parameters[[drt1[i]]] <- createParameter(drt1[i], c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
+      .Object@parameters[[drt1[i]]] <- createParameter(drt1[i], c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), 'simple', 
                                                             defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = drt2[i])    
     
     .Object@parameters[['pTradeIrCost']] <- createParameter('pTradeIrCost', 
