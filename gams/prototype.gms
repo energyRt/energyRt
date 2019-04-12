@@ -1184,7 +1184,7 @@ eqTechEmsFuel(tech, comm, region, year, slice)  Emissions from commodity consump
 
 
 
-eqAggOut(comm, region, year, slice)$(mMidMilestone(year) and sum(commp$pAggregateFactor(comm, commp), 1))..
+eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
          vAggOut(comm, region, year, slice)
          =e=
          sum(commp$pAggregateFactor(comm, commp),
@@ -1541,7 +1541,7 @@ eqOut2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(com
   sum(slicep$(mAllSliceParentChild(slicep, slice) and mCommSlice(comm, slicep)), vOut2Up(comm, region, year, slicep, slice)) =e=
          vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, slice) +
          vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
-         vAggOut(comm, region, year, slice)$(sum(commp$pAggregateFactor(comm, commp), 1)) +
+         vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice) +
          vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
          vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice) +
@@ -1567,8 +1567,8 @@ eqOutTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
          vOutTot(comm, region, year, slice)
          =e=
          vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, slice) +
-         vEmsFuelTot(comm, region, year, slice)$(sum(tech$(mTechSlice(tech, slice) and mTechEmitedComm(tech, comm)), 1)) +
-         vAggOut(comm, region, year, slice)$(sum(commp$pAggregateFactor(comm, commp), 1)) +
+         vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
+         vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice) +
          vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
          vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice) +

@@ -35,6 +35,7 @@ if (FALSE) {
 .Object@parameters[['mSubsCost']] <- createParameter('mSubsCost', c('comm', 'region', 'year'), 'map') 
 .Object@parameters[['mAggOut']] <- createParameter('mAggOut', c('comm', 'region', 'year', 'slice'), 'map') 
 
+
 prec <- .Object
 
 
@@ -139,11 +140,9 @@ prec <- .Object
 #  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)), 1)) 
     prec@parameters[['mTechEmsFuel']] <- addData(prec@parameters[['mTechEmsFuel']], 
        merge(tmp$mTechSpan, merge(tmp$mTechSlice, tmp$mTechEmitedComm, by = 'tech'), by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
-# mEmsFuelTot(comm, region, year, slice)
-#  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)), 1)) 
-    prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']], 
-     reduce.sect(getParameterData(prec@parameters[['mTechEmsFuel']]), 
-                 c('comm', 'region', 'year', 'slice')))
+# mEmsFuelTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and mTechSlice(tech, slice) and mTechEmitedComm(tech, comm)), 1))  
+prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']], 
+                                            reduce.sect(getParameterData(prec@parameters[['mTechEmsFuel']]), c('comm', 'region', 'year', 'slice')))
 # mDummyImport(comm, region, year, slice)
 #    (mCommSlice(comm, slice) and pDummyImportCost(comm, region, year, slice) <> Inf)    
     prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], 
@@ -233,7 +232,6 @@ prec <- .Object
 #    (sum(commp$pAggregateFactor(comm, commp), 1))
     prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], 
       merge(merge(merge(reduce.sect(tmp_nozero$pAggregateFactor, 'comm'), tmp$region), tmp$year), tmp$slice))
-  
-    
+                                            
     
 }
