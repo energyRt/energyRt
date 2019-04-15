@@ -460,12 +460,12 @@ setMethod("initialize", "modInp",
   .Object@parameters[['mAggOut']] <- createParameter('mAggOut', c('comm', 'region', 'year', 'slice'), 'map') 
   
   .Object@parameters[['mSupOutTot']] <- createParameter('mSupOutTot', c('comm', 'region', 'slice'), 'map') 
-  .Object@parameters[['mSupAvaUp']] <- createParameter('mSupAvaUp', c('sup', 'comm', 'region', 'slice'), 'map') 
+  .Object@parameters[['mSupAvaUp']] <- createParameter('mSupAvaUp', c('sup', 'comm', 'region', 'year', 'slice'), 'map') 
   .Object@parameters[['mSupReserveUp']] <- createParameter('mSupReserveUp', c('sup', 'comm', 'region'), 'map') 
   
   .Object@parameters[['mTechAfUp']] <- createParameter('mTechAfUp', c('tech', 'region', 'year', 'slice'), 'map') 
   .Object@parameters[['mTechAfcUp']] <- createParameter('mTechAfcUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
-  .Object@parameters[['mTechOlifeInf']] <- createParameter('mTechAfcUp', c('tech', 'region'), 'map') 
+  .Object@parameters[['mTechOlifeInf']] <- createParameter('mTechOlifeInf', c('tech', 'region'), 'map') 
   .Object@parameters[['mStorageOlifeInf']] <- createParameter('mStorageOlifeInf', c('stg', 'region'), 'map') 
   .Object
 })

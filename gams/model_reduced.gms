@@ -492,7 +492,7 @@ mTechAfcUp(tech, comm, region, year, slice)
 mSupAvaUp(sup, comm, region, year, slice)
 mSupReserveUp(sup, comm, region)
 ;
-
+                          
 
 ********************************************************************************
 * Equations
