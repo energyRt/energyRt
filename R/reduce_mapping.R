@@ -9,6 +9,7 @@
 
 .reduce_mapping <- function(prec) {
   assign('prec', prec, globalenv())
+  stop('reduce mapping')
   #! need add tech reductions
   generate_haveval <- function(nam, val, invert = FALSE, type = 'l') {
     gg <- getParameterData(prec@parameters[[nam]])
@@ -33,14 +34,25 @@
       if (any(i == c('src', 'dst'))) j <- 'region'
       tmp <- getParameterData(prec@parameters[[j]])
       colnames(tmp) <- i
+      if (any(i == c('comm', 'slice')) && any(colnames(sets) %in% c('comm', 'slice'))) {
+        tmp <- merge(getParameterData(prec@parameters$mCommSlice), tmp)
+      } 
+      if (any(i == c('comm', 'sup')) && any(colnames(sets) %in% c('comm', 'sup'))) {
+        tmp <- merge(getParameterData(prec@parameters$mSupComm), tmp)
+      }
+      if (i == 'src') {
+        tmp <- merge(getParameterData(prec@parameters$mTradeSrc), tmp)
+      }
+      if (i == 'dst') {
+        tmp <- merge(getParameterData(prec@parameters$mTradeDst), tmp)
+      }
+      if (any(i == c('comm')) && any(colnames(sets) == c('trade'))) {
+        tmp <- merge(getParameterData(prec@parameters$mTradeComm), tmp)
+      }
       if (is.null(sets)) {
         sets <- tmp
       } else {
-        if (any(i == c('comm', 'slice')) && any(colnames(sets) %in% c('comm', 'slice'))) {
-          sets <- merge(sets, merge(getParameterData(prec@parameters$mCommSlice), tmp))
-        } else {
           sets <- merge(sets, tmp)
-        }
       }
     }
     if (nrow(sets) > 0) {
@@ -52,6 +64,7 @@
       return(gg[gg$value == val, colnames(gg) != 'value', drop = FALSE])
     return(gg[gg$value != val, colnames(gg) != 'value', drop = FALSE])
   }
+  
   generate_noinf <- function(nam) {
     generate_haveval(nam, Inf, TRUE)
   }
@@ -67,8 +80,13 @@
   for (i in c('pTradeIr', 'pExportRow', 'pImportRow')) 
     tmp_noinf[[i]] <- generate_haveval(i, Inf, TRUE, 'up')
   tmp_nozero <- list()
-  for (i in c('pTradeIr', 'pExportRow', 'pImportRow', 'pSupAva', 'pTechAf', 'pTechAfc')) 
+  p1 <- proc.time()[3]
+  for (i in c('pTradeIr', 'pExportRow', 'pImportRow', 'pSupAva', 'pTechAf', 'pTechAfc')) {
+    cat('begin: ', i, ', time: ', round(proc.time()[3] - p1, 2), '\n', sep = '')
     tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'up')
+    cat('end: ', i, ', time: ', round(proc.time()[3] - p1, 2), '\n', sep = ''); flush.console()
+  }
+  
   for (i in c('pDummyImportCost', 'pDummyExportCost', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Ainp', 
               'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor', 'pSupReserve')) 
     tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'l')
