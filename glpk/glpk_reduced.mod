@@ -95,7 +95,7 @@ param mTradeIrAOut2{trade, comm, region, year, slice};
 param mTradeIrAOutTot{comm, region, year, slice};
 param mImportRow{imp, comm, region, year, slice};
 param mImportRowUp{imp, comm, region, year, slice};
-param mImportAccumulatedRowUp{imp, comm};
+param mImportRowAccumulatedUp{imp, comm};
 param mExportRow{expp, comm, region, year, slice};
 param mExportRowUp{expp, comm, region, year, slice};
 param mExportRowAccumulatedUp{expp, comm};
@@ -494,7 +494,7 @@ s.t.  eqStorageSalv0{ st1 in stg,r in region,ye in year : (mDiscountZero[r] and 
 
 s.t.  eqStorageSalv{ st1 in stg,r in region,ye in year : (not((mDiscountZero[r])) and mMilestoneLast[ye] and sum{y in year:(mStorageNew[st1,r,y])}(1) <> 0)}: vStorageSalv[st1,r]+sum{y in year,yn in year:((mStartMilestone[yn,y] and mMidMilestone[yn] and mStorageNew[st1,r,yn] and ordYear[yn]+pStorageOlife[st1,r]-1>ordYear[ye] and not((mStorageOlifeInf[st1,r])) and pStorageInvcost[st1,r,yn] <> 0))}((((pDiscountFactor[r,yn]) / (pDiscountFactor[r,ye]))*pStorageInvcost[st1,r,yn]*vStorageNewCap[st1,r,yn]) / ((1+((sum{yp in year:((ordYear[yp] >= ordYear[yn]))}(pDiscountFactor[r,yp]))) / (pDiscountFactor[r,ye]*(((1-((1+pDiscount[r,ye]))^(ordYear[ye]-pStorageOlife[st1,r]-ordYear[yn]+1))*(1+pDiscount[r,ye])) / (pDiscount[r,ye]))))))  =  0;
 
-s.t.  eqImport{ c in comm,dst in region,y in year,s in slice : mImport[c,dst,y,s]}: vImport[c,dst,y,s]  =  sum{t1 in trade,src in region:(mTradeIr[t1,src,dst,y,s])}(vTradeIr[t1,c,src,dst,y,s])+sum{i in imp:(mImportRow[i,c,dst,y,s])}(vImportRow[i,c,dst,y,s]);
+s.t.  eqImport{ c in comm,dst in region,y in year,s in slice : mImport[c,dst,y,s]}: vImport[c,dst,y,s]  =  sum{t1 in trade,src in region:((mTradeIr[t1,src,dst,y,s] and mTradeComm[t1,c]))}(vTradeIr[t1,c,src,dst,y,s])+sum{i in imp:(mImportRow[i,c,dst,y,s])}(vImportRow[i,c,dst,y,s]);
 
 s.t.  eqExport{ c in comm,src in region,y in year,s in slice : mExport[c,src,y,s]}: vExport[c,src,y,s]  =  sum{t1 in trade,dst in region:(mTradeIr[t1,src,dst,y,s])}(vTradeIr[t1,c,src,dst,y,s])+sum{e in expp:(mExportRow[e,c,src,y,s])}(vExportRow[e,c,src,y,s]);
 
@@ -512,7 +512,7 @@ s.t.  eqExportRowUp{ e in expp,c in comm,r in region,y in year,s in slice : mExp
 
 s.t.  eqExportRowLo{ e in expp,c in comm,r in region,y in year,s in slice : (mExportRow[e,c,r,y,s] and pExportRowLo[e,r,y,s] <> 0)}: vExportRow[e,c,r,y,s]  >=  pExportRowLo[e,r,y,s];
 
-s.t.  eqExportRowCumulative{ e in expp,c in comm}: vExportRowAccumulated[e,c]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp] and mExportRow[e,c,r,y,s]))}((ordYear[yp]-ordYear[ye]+1)*vExportRow[e,c,r,y,s]);
+s.t.  eqExportRowCumulative{ e in expp,c in comm : mExpComm[e,c]}: vExportRowAccumulated[e,c]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp] and mExportRow[e,c,r,y,s]))}((ordYear[yp]-ordYear[ye]+1)*vExportRow[e,c,r,y,s]);
 
 s.t.  eqExportRowResUp{ e in expp,c in comm : (mExportRowAccumulatedUp[e,c] and mExpComm[e,c])}: vExportRowAccumulated[e,c] <=  pExportRowRes[e];
 
@@ -520,9 +520,9 @@ s.t.  eqImportRowUp{ i in imp,c in comm,r in region,y in year,s in slice : mImpo
 
 s.t.  eqImportRowLo{ i in imp,c in comm,r in region,y in year,s in slice : (mImportRow[i,c,r,y,s] and pImportRowLo[i,r,y,s] <> 0)}: vImportRow[i,c,r,y,s]  >=  pImportRowLo[i,r,y,s];
 
-s.t.  eqImportRowAccumulated{ i in imp,c in comm}: vImportRowAccumulated[i,c]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mImportRow[i,c,r,y,s] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ordYear[yp]-ordYear[ye]+1)*vImportRow[i,c,r,y,s]);
+s.t.  eqImportRowAccumulated{ i in imp,c in comm : mImpComm[i,c]}: vImportRowAccumulated[i,c]  =  sum{r in region,y in year,s in slice,ye in year,yp in year:((mImportRow[i,c,r,y,s] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ordYear[yp]-ordYear[ye]+1)*vImportRow[i,c,r,y,s]);
 
-s.t.  eqImportRowResUp{ i in imp,c in comm : mImportAccumulatedRowUp[i,c]}: vImportRowAccumulated[i,c] <=  pImportRowRes[i];
+s.t.  eqImportRowResUp{ i in imp,c in comm : mImportRowAccumulatedUp[i,c]}: vImportRowAccumulated[i,c] <=  pImportRowRes[i];
 
 s.t.  eqTradeIrAInp{ t1 in trade,c in comm,r in region,y in year,s in slice : mTradeIrAInp2[t1,c,r,y,s]}: vTradeIrAInp[t1,c,r,y,s]  =  sum{dst in region:((mTradeSrc[t1,r] and mTradeDst[t1,dst] and not((mSameRegion[r,dst]))))}(pTradeIrCsrc2Ainp[t1,c,r,dst,y,s]*vTradeIr[t1,c,r,dst,y,s])+sum{src in region:((mTradeSrc[t1,src] and mTradeDst[t1,r] and not((mSameRegion[r,src]))))}(pTradeIrCdst2Ainp[t1,c,src,r,y,s]*vTradeIr[t1,c,src,r,y,s]);
 

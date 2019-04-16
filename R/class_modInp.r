@@ -446,9 +446,9 @@ setMethod("initialize", "modInp",
   .Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
   .Object@parameters[['mImportRowUp']] <- createParameter('mImportRowUp', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
   .Object@parameters[['mExportRowUp']] <- createParameter('mExportRowUp', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
-  .Object@parameters[['mImportAccumulatedRowUp']] <- createParameter('mImportAccumulatedRowUp', c('imp', 'comm'), 'map') 
+  .Object@parameters[['mImportRowAccumulatedUp']] <- createParameter('mImportRowAccumulatedUp', c('imp', 'comm'), 'map') 
   .Object@parameters[['mExportRowAccumulatedUp']] <- createParameter('mExportRowAccumulatedUp', c('expp', 'comm'), 'map') 
-  
+
   .Object@parameters[['mExport']] <- createParameter('mExport', c('comm', 'region', 'year', 'slice'), 'map') 
   .Object@parameters[['mImport']] <- createParameter('mImport', c('comm', 'region', 'year', 'slice'), 'map') 
   

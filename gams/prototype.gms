@@ -472,7 +472,7 @@ mImportRow(imp, comm, region, year, slice)
 * (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf)
 mImportRowUp(imp, comm, region, year, slice)
 * pImportRowRes <> Inf
-mImportAccumulatedRowUp(imp, comm)
+mImportRowAccumulatedUp(imp, comm)
 
 mExportRow(expp, comm, region, year, slice)
 mExportRowUp(expp, comm, region, year, slice)
@@ -499,7 +499,7 @@ mTechAfcUp(tech, comm, region, year, slice)
 mSupAvaUp(sup, comm, region, year, slice)
 mSupReserveUp(sup, comm, region)
 ;
-                          
+
 
 ********************************************************************************
 * Equations
@@ -1406,7 +1406,7 @@ eqImportRowResUp(imp, comm)                       Accumulated import from ROW up
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
   vImport(comm, dst, year, slice) =e=
-  sum((trade, src)$mTradeIr(trade, src, dst, year, slice), vTradeIr(trade, comm, src, dst, year, slice))
+  sum((trade, src)$(mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm)), vTradeIr(trade, comm, src, dst, year, slice))
          + sum(imp$mImportRow(imp, comm, dst, year, slice), vImportRow(imp, comm, dst, year, slice));
 
 
@@ -1448,7 +1448,7 @@ eqExportRowUp(expp, comm, region, year, slice)$mExportRowUp(expp, comm, region, 
 eqExportRowLo(expp, comm, region, year, slice)$(mExportRow(expp, comm, region, year, slice) and pExportRowLo(expp, region, year, slice) <> 0)..
   vExportRow(expp, comm, region, year, slice)  =g= pExportRowLo(expp, region, year, slice);
 
-eqExportRowCumulative(expp, comm).. vExportRowAccumulated(expp, comm) =e=
+eqExportRowCumulative(expp, comm)$mExpComm(expp, comm).. vExportRowAccumulated(expp, comm) =e=
     sum((region, year, slice, yeare, yearp)$(mMidMilestone(year) and mStartMilestone(year, yeare) and
                  mEndMilestone(year, yearp) and mExportRow(expp, comm, region, year, slice)),
        (ordYear(yearp) - ordYear(yeare) + 1) * vExportRow(expp, comm, region, year, slice)
@@ -1464,13 +1464,14 @@ eqImportRowUp(imp, comm, region, year, slice)$mImportRowUp(imp, comm, region, ye
 eqImportRowLo(imp, comm, region, year, slice)$(mImportRow(imp, comm, region, year, slice) and pImportRowLo(imp, region, year, slice) <> 0)..
   vImportRow(imp, comm, region, year, slice)  =g= pImportRowLo(imp, region, year, slice);
 
-eqImportRowAccumulated(imp, comm).. vImportRowAccumulated(imp, comm) =e=
+eqImportRowAccumulated(imp, comm)$mImpComm(imp, comm).. vImportRowAccumulated(imp, comm) =e=
     sum((region, year, slice, yeare, yearp)$(mImportRow(imp, comm, region, year, slice) and
                 mStartMilestone(year, yeare) and mEndMilestone(year, yearp)),
          (ordYear(yearp) - ordYear(yeare) + 1) * vImportRow(imp, comm, region, year, slice)
 );
 
-eqImportRowResUp(imp, comm)$mImportAccumulatedRowUp(imp, comm).. vImportRowAccumulated(imp, comm) =l= pImportRowRes(imp);
+
+eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccumulated(imp, comm) =l= pImportRowRes(imp);
 
 
 ********************************************************************************

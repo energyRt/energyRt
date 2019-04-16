@@ -11,6 +11,11 @@
   assign('prec', prec, globalenv())
   cat('begin reduce mapping\n'); flush.console()
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
+  # Remove not milestone data
+  #for (i in c('mTechSpan')) {
+  #  getParameterData(prec@parameters[[i]])
+  #}
+  
   #! need add tech reductions
   generate_haveval <- function(nam, val, invert = FALSE, type = 'l') {
     gg <- getParameterData(prec@parameters[[nam]])
@@ -41,6 +46,9 @@
       if (i == 'comm' && any(colnames(sets) == 'sup')) {
         tmp <- merge(tmp_map$mSupComm, tmp)
       }      
+      if (i == 'year') {
+        tmp <- merge(tmp_map$year, tmp)
+      }
       if (i == 'year' && any(colnames(sets) == 'tech')) {
         tmp <- merge(tmp_map$mTechSpan, tmp)
       }
@@ -87,6 +95,7 @@
   for (i in names(prec@parameters)) 
     if (prec@parameters[[i]]@type %in% c('map', 'set'))
       tmp_map[[i]] <- getParameterData(prec@parameters[[i]])
+  tmp_map$year <- tmp_map$mMidMilestone
   # For Inf problem
   tmp_noinf <- list()
   for (i in c('pDummyImportCost', 'pDummyExportCost', 'pImportRowRes', 'pExportRowRes')) 
@@ -105,7 +114,10 @@
               'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor')) 
     tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'l')
   
-  
+  for (i in c('pDummyImportCost', 'pDummyExportCost')) {
+    tmp_nozero[[i]] <- merge(tmp_nozero[[i]], tmp_map$mCommSlice)[, c('comm', 'region', 'year', 'slice')]
+    tmp_noinf[[i]] <- merge(tmp_noinf[[i]], tmp_map$mCommSlice)[, c('comm', 'region', 'year', 'slice')]
+  }
   # Non zeros
   #tmp_map$pAggregateFactor <- getParameterData(prec@parameters$pAggregateFactor)
   #tmp_map$pAggregateFactor <- tmp_map$pAggregateFactor[tmp_map$pAggregateFactor$value != 0, colnames(tmp_map$pAggregateFactor) != 'value', drop = FALSE]
@@ -206,9 +218,10 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf) 
     prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], 
                                                  reduce.sect(merge(tmp_noinf$pImportRow, aa), c("imp", "comm", "region", "year", "slice")))
-    prec@parameters[['mImportAccumulatedRowUp']] <- addData(prec@parameters[['mImportAccumulatedRowUp']], tmp_noinf$pImportRowRes)
+    prec@parameters[['mImportRowAccumulatedUp']] <- addData(prec@parameters[['mImportRowAccumulatedUp']], tmp_noinf$pImportRowRes)
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
     aa <- reduce.sect(merge(tmp_map$mExpComm, merge(tmp_map$mExpSlice, tmp_nozero$pExportRow)), c("expp", "comm", "region", "year", "slice"))
+    
     prec@parameters[['mExportRow']] <- addData(prec@parameters[['mExportRow']], aa)
     prec@parameters[['mExportRowUp']] <- addData(prec@parameters[['mExportRowUp']], reduce.sect(merge(tmp_noinf$pExportRow, aa), c("expp", "comm", "region", "year", "slice")))
     prec@parameters[['mExportRowAccumulatedUp']] <- addData(prec@parameters[['mExportRowAccumulatedUp']], tmp_noinf$pExportRowRes)
