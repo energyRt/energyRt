@@ -10,6 +10,7 @@
 .reduce_mapping <- function(prec) {
   assign('prec', prec, globalenv())
   cat('begin reduce mapping\n'); flush.console()
+  reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
   #! need add tech reductions
   generate_haveval <- function(nam, val, invert = FALSE, type = 'l') {
     gg <- getParameterData(prec@parameters[[nam]])
@@ -147,17 +148,17 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
 # mDummyImport(comm, region, year, slice)
 #    (mCommSlice(comm, slice) and pDummyImportCost(comm, region, year, slice) <> Inf)    
     prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], 
-                                                 rbind(tmp_noinf$pDummyImportCost, tmp_nozero$pDummyImportCost))
+                                                 reduce.duplicate(merge(tmp_noinf$pDummyImportCost, tmp_nozero$pDummyImportCost)))
 # mDummyExport(comm, region, year, slice)
 #    (mCommSlice(comm, slice) and pDummyExportCost(comm, region, year, slice) <> Inf)    
     prec@parameters[['mDummyExport']] <- addData(prec@parameters[['mDummyExport']], 
-                                                 rbind(tmp_noinf$pDummyExportCost, tmp_nozero$pDummyExportCost))
+                                                 reduce.duplicate(merge(tmp_noinf$pDummyExportCost, tmp_nozero$pDummyExportCost)))
     
 # mDummyCost(comm, region, year)
 #    (pDummyImportCost(comm, region, year, slice) <> Inf or pDummyExportCost(comm, region, year, slice) <> Inf)   
     prec@parameters[['mDummyCost']] <- addData(prec@parameters[['mDummyCost']], 
-        reduce.sect(rbind(tmp_noinf$pDummyImportCost, tmp_noinf$pDummyExportCost, 
-                          tmp_nozero$pDummyImportCost, tmp_nozero$pDummyExportCost), c('comm', 'region', 'year')))
+        reduce.sect(rbind(getParameterData(prec@parameters[['mDummyImport']]), 
+                          getParameterData(prec@parameters[['mDummyExport']])), c('comm', 'region', 'year')))
 # mTradeIr(trade, region, region, year, slice)         Total physical trade flows between regions
 # mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> 0 and
 #    mTradeSrc(trade, src) and mTradeDst(trade, dst) and not(mSameRegion(src, dst))
@@ -203,12 +204,13 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     aa <- merge(tmp_map$mImpComm, merge(tmp_map$mImpSlice, tmp_nozero$pImportRow))[, c("imp", "comm", "region", "year", "slice")]
     prec@parameters[['mImportRow']] <- addData(prec@parameters[['mImportRow']], aa)
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf) 
-    prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], merge(tmp_noinf$pImportRow, aa)[, c("imp", "comm", "region", "year", "slice")])
+    prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], 
+                                                 reduce.sect(merge(tmp_noinf$pImportRow, aa), c("imp", "comm", "region", "year", "slice")))
     prec@parameters[['mImportAccumulatedRowUp']] <- addData(prec@parameters[['mImportAccumulatedRowUp']], tmp_noinf$pImportRowRes)
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
-    aa <- merge(tmp_map$mExpComm, merge(tmp_map$mExpSlice, tmp_nozero$pExportRow))[, c("expp", "comm", "region", "year", "slice")]
+    aa <- reduce.sect(merge(tmp_map$mExpComm, merge(tmp_map$mExpSlice, tmp_nozero$pExportRow)), c("expp", "comm", "region", "year", "slice"))
     prec@parameters[['mExportRow']] <- addData(prec@parameters[['mExportRow']], aa)
-    prec@parameters[['mExportRowUp']] <- addData(prec@parameters[['mExportRowUp']], merge(tmp_noinf$pExportRow, aa)[, c("expp", "comm", "region", "year", "slice")])
+    prec@parameters[['mExportRowUp']] <- addData(prec@parameters[['mExportRowUp']], reduce.sect(merge(tmp_noinf$pExportRow, aa), c("expp", "comm", "region", "year", "slice")))
     prec@parameters[['mExportRowAccumulatedUp']] <- addData(prec@parameters[['mExportRowAccumulatedUp']], tmp_noinf$pExportRowRes)
     # sum(expp$mExportRow(expp, comm, region, year, slice), 1) + sum((trade, dst)$(mTradeIr(trade, region, dst, year, slice) and mTradeComm(trade, comm)), 1) <> 0
     prec@parameters[['mExport']] <- addData(prec@parameters[['mExport']], reduce.sect(
@@ -238,14 +240,15 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
 # mSubsCost(comm, region, year)  sum(slice$pSubsCost(comm, region, year, slice), 1)
     prec@parameters[['mSubsCost']] <- addData(prec@parameters[['mSubsCost']], reduce.sect(tmp_nozero$pSubsCost, c('comm', 'region', 'year')))
 #    (sum(commp$pAggregateFactor(comm, commp), 1))
-    prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], 
-                                            merge(merge(merge(reduce.sect(tmp_nozero$pAggregateFactor, 'comm'), tmp_map$region), tmp_map$year), tmp_map$slice))
+    prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], reduce.duplicate(merge(merge(merge(reduce.sect(
+      tmp_nozero$pAggregateFactor, 'comm'), tmp_map$region), tmp_map$year), tmp_map$slice)))
     
-    prec@parameters[['mSupAvaUp']] <- addData(prec@parameters[['mSupAvaUp']], merge(tmp_nozero$pSupAva, tmp_noinf$pSupAva))
-    prec@parameters[['mSupReserveUp']] <- addData(prec@parameters[['mSupReserveUp']], merge(tmp_nozero$pSupReserve, tmp_noinf$pSupReserve))
+    prec@parameters[['mSupAvaUp']] <- addData(prec@parameters[['mSupAvaUp']], reduce.duplicate(merge(tmp_nozero$pSupAva, tmp_noinf$pSupAva)))
+    prec@parameters[['mSupReserveUp']] <- addData(prec@parameters[['mSupReserveUp']], reduce.duplicate(
+      merge(tmp_nozero$pSupReserve, tmp_noinf$pSupReserve)))
     
-    prec@parameters[['mTechAfUp']] <- addData(prec@parameters[['mTechAfUp']], merge(tmp_nozero$pTechAf, tmp_noinf$pTechAf))
-    prec@parameters[['mTechAfcUp']] <- addData(prec@parameters[['mTechAfcUp']], merge(tmp_nozero$pTechAfc, tmp_noinf$pTechAfc))
+    prec@parameters[['mTechAfUp']] <- addData(prec@parameters[['mTechAfUp']], reduce.duplicate(merge(tmp_nozero$pTechAf, tmp_noinf$pTechAf)))
+    prec@parameters[['mTechAfcUp']] <- addData(prec@parameters[['mTechAfcUp']], reduce.duplicate(merge(tmp_nozero$pTechAfc, tmp_noinf$pTechAfc)))
     prec@parameters[['mTechOlifeInf']] <- addData(prec@parameters[['mTechOlifeInf']], generate_haveval('pTechOlife', Inf))
     prec@parameters[['mStorageOlifeInf']] <- addData(prec@parameters[['mStorageOlifeInf']], generate_haveval('pStorageOlife', Inf))
     cat('end reduce mapping\n'); flush.console()
