@@ -1342,14 +1342,14 @@ eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
 
 eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)..
   vExport(comm, src, year, slice) =e=
-  sum((trade, dst)$mTradeIr(trade, src, dst, year, slice), vTradeIr(trade, comm, src, dst, year, slice))
+  sum((trade, dst)$(mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm)), vTradeIr(trade, comm, src, dst, year, slice))
          + sum(expp$mExportRow(expp, comm, src, year, slice), vExportRow(expp, comm, src, year, slice));
 
 eqTradeFlowUp(trade, comm, src, dst, year, slice)$(mTradeIrUp(trade, src, dst, year, slice) and mTradeComm(trade, comm))..
       vTradeIr(trade, comm, src, dst, year, slice) =l= pTradeIrUp(trade, src, dst, year, slice);
 
 eqTradeFlowLo(trade, comm, src, dst, year, slice)$(mTradeIr(trade, src, dst, year, slice) and
-    pTradeIrLo(trade, src, dst, year, slice))..
+    pTradeIrLo(trade, src, dst, year, slice) and mTradeComm(trade, comm))..
       vTradeIr(trade, comm, src, dst, year, slice) =g= pTradeIrLo(trade, src, dst, year, slice);
 
 
@@ -1365,11 +1365,13 @@ eqCostRowTrade(region, year)$mMidMilestone(year).. vTradeRowCost(region, year) =
 
 eqCostIrTrade(region, year)$mMidMilestone(year).. vTradeIrCost(region, year) =e=
 * Import
-  sum((trade, comm, src, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, src) and mTradeDst(trade, region) and not(mSameRegion(src, region)) and mTradeComm(trade, comm)),
+  sum((trade, comm, src, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, src) and mTradeDst(trade, region)
+         and not(mSameRegion(src, region)) and mTradeComm(trade, comm)),
     (pTradeIrCost(trade, src, region, year, slice) + pTradeIrMarkup(trade, src, region, year, slice)) *
         vTradeIr(trade, comm, src, region, year, slice))
 * Plus markup from export
-  - sum((trade, comm, dst, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, region) and mTradeDst(trade, dst) and not(mSameRegion(dst, region))),
+  - sum((trade, comm, dst, slice)$(mTradeSlice(trade, slice) and mTradeSrc(trade, region) and mTradeDst(trade, dst)
+         and not(mSameRegion(dst, region)) and mTradeComm(trade, comm)),
     pTradeIrMarkup(trade, region, dst, year, slice) * vTradeIr(trade, comm, region, dst, year, slice));
 
 eqExportRowUp(expp, comm, region, year, slice)$mExportRowUp(expp, comm, region, year, slice)..
@@ -1417,16 +1419,16 @@ eqTradeIrAOutTot(comm, region, year, slice) Trade auxiliary commodity output
 eqTradeIrAInp(trade, comm, region, year, slice)$mTradeIrAInp2(trade, comm, region, year, slice)..
   vTradeIrAInp(trade, comm, region, year, slice) =e=
     sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and not(mSameRegion(region, dst))),
-      pTradeIrCsrc2Ainp(trade, comm, region, dst, year, slice) * vTradeIr(trade, comm, region, dst, year, slice))
+      pTradeIrCsrc2Ainp(trade, comm, region, dst, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, region, dst, year, slice)))
     + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and not(mSameRegion(region, src))),
-      pTradeIrCdst2Ainp(trade, comm, src, region, year, slice) * vTradeIr(trade, comm, src, region, year, slice));
+      pTradeIrCdst2Ainp(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
 eqTradeIrAOut(trade, comm, region, year, slice)$mTradeIrAOut2(trade, comm, region, year, slice)..
   vTradeIrAOut(trade, comm, region, year, slice) =e=
     sum(dst$(mTradeSrc(trade, region) and mTradeDst(trade, dst) and not(mSameRegion(region, dst))),
-      pTradeIrCsrc2Aout(trade, comm, region, dst, year, slice) * vTradeIr(trade, comm, region, dst, year, slice))
+      pTradeIrCsrc2Aout(trade, comm, region, dst, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, region, dst, year, slice)))
     + sum(src$(mTradeSrc(trade, src) and mTradeDst(trade, region) and not(mSameRegion(region, src))),
-      pTradeIrCdst2Aout(trade, comm, src, region, year, slice) * vTradeIr(trade, comm, src, region, year, slice));
+      pTradeIrCdst2Aout(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
 eqTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice)..
   vTradeIrAInpTot(comm, region, year, slice) =e= sum(trade$mTradeIrAInp2(trade, comm, region, year, slice), vTradeIrAInp(trade, comm, region, year, slice));
