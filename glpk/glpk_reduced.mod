@@ -353,8 +353,6 @@ var vSupReserve{sup, comm, region} >= 0;
 var vDemInp{comm, region, year, slice} >= 0;
 var vOutTot{comm, region, year, slice} >= 0;
 var vInpTot{comm, region, year, slice} >= 0;
-var vInp2Up{comm, region, year, slice, slice} >= 0;
-var vOut2Up{comm, region, year, slice, slice} >= 0;
 var vSupOutTot{comm, region, year, slice} >= 0;
 var vTechInpTot{comm, region, year, slice} >= 0;
 var vTechOutTot{comm, region, year, slice} >= 0;
@@ -532,10 +530,6 @@ s.t.  eqTradeIrAInpTot{ c in comm,r in region,y in year,s in slice : mTradeIrAIn
 
 s.t.  eqTradeIrAOutTot{ c in comm,r in region,y in year,s in slice : mTradeIrAOutTot[c,r,y,s]}: vTradeIrAOutTot[c,r,y,s]  =  sum{t1 in trade:(mTradeIrAOut2[t1,c,r,y,s])}(vTradeIrAOut[t1,c,r,y,s]);
 
-s.t.  eqInp2Bal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and not((mCommSlice[c,s])))}: sum{sp in slice:((mAllSliceParentChild[sp,s] and mCommSlice[c,sp]))}(vInp2Up[c,r,y,sp,s])+sum{sp in slice:((mAllSliceParentChild[s,sp] and mCommSlice[c,sp]))}(vInp2Up[c,r,y,s,sp])  =  sum{FORIF: mTechInpTot[c,r,y,s]} (vTechInpTot[c,r,y,s])+sum{FORIF: mDemInp[c,s]} (vDemInp[c,r,y,s])+sum{FORIF: mStorageInpTot[c,r,y,s]} (vStorageInpTot[c,r,y,s])+sum{FORIF: mDummyExport[c,r,y,s]} (vDummyExport[c,r,y,s])+sum{FORIF: mExport[c,r,y,s]} (vExport[c,r,y,s])+sum{FORIF: mTradeIrAInpTot[c,r,y,s]} (vTradeIrAInpTot[c,r,y,s]);
-
-s.t.  eqOut2Bal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and not((mCommSlice[c,s])))}: sum{sp in slice:((mAllSliceParentChild[s,sp] and mCommSlice[c,sp]))}(vOut2Up[c,r,y,s,sp])+sum{sp in slice:((mAllSliceParentChild[sp,s] and mCommSlice[c,sp]))}(vOut2Up[c,r,y,sp,s])  =  sum{FORIF: mSupOutTot[c,r,s]} (vSupOutTot[c,r,y,s])+sum{FORIF: mEmsFuelTot[c,r,y,s]} (vEmsFuelTot[c,r,y,s])+sum{FORIF: mAggOut[c,r,y,s]} (vAggOut[c,r,y,s])+sum{FORIF: mTechOutTot[c,r,y,s]} (vTechOutTot[c,r,y,s])+sum{FORIF: mDummyImport[c,r,y,s]} (vDummyImport[c,r,y,s])+sum{FORIF: mStorageOutTot[c,r,y,s]} (vStorageOutTot[c,r,y,s])+sum{FORIF: mImport[c,r,y,s]} (vImport[c,r,y,s])+sum{FORIF: mTradeIrAOutTot[c,r,y,s]} (vTradeIrAOutTot[c,r,y,s]);
-
 s.t.  eqBalLo{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mLoComm[c] and mCommSlice[c,s])}: vBalance[c,r,y,s]  >=  0;
 
 s.t.  eqBalUp{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mUpComm[c] and mCommSlice[c,s])}: vBalance[c,r,y,s] <=  0;
@@ -544,9 +538,9 @@ s.t.  eqBalFx{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] an
 
 s.t.  eqBal{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vBalance[c,r,y,s]  =  vOutTot[c,r,y,s]-vInpTot[c,r,y,s];
 
-s.t.  eqOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vOutTot[c,r,y,s]  =  sum{FORIF: mSupOutTot[c,r,s]} (vSupOutTot[c,r,y,s])+sum{FORIF: mEmsFuelTot[c,r,y,s]} (vEmsFuelTot[c,r,y,s])+sum{FORIF: mAggOut[c,r,y,s]} (vAggOut[c,r,y,s])+sum{FORIF: mTechOutTot[c,r,y,s]} (vTechOutTot[c,r,y,s])+sum{FORIF: mDummyImport[c,r,y,s]} (vDummyImport[c,r,y,s])+sum{FORIF: mStorageOutTot[c,r,y,s]} (vStorageOutTot[c,r,y,s])+sum{FORIF: mImport[c,r,y,s]} (vImport[c,r,y,s])+sum{t1 in trade:(mTradeIrAOut2[t1,c,r,y,s])}(vTradeIrAOut[t1,c,r,y,s])+sum{sp in slice:(mAllSliceParentChild[sp,s])}(vOut2Up[c,r,y,sp,s])+sum{sp in slice:(mAllSliceParentChild[s,sp])}(vOut2Up[c,r,y,s,sp]);
+s.t.  eqOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vOutTot[c,r,y,s]  =  sum{FORIF: mDummyImport[c,r,y,s]} (vDummyImport[c,r,y,s])+sum{sp in slice:((mSameSlice[s,sp] or mAllSliceParentChild[sp,s] or mAllSliceParentChild[s,sp]))}(sum{FORIF: mSupOutTot[c,r,sp]} (vSupOutTot[c,r,y,sp])+sum{FORIF: mEmsFuelTot[c,r,y,sp]} (vEmsFuelTot[c,r,y,sp])+sum{FORIF: mAggOut[c,r,y,sp]} (vAggOut[c,r,y,sp])+sum{FORIF: mTechOutTot[c,r,y,sp]} (vTechOutTot[c,r,y,sp])+sum{FORIF: mStorageOutTot[c,r,y,sp]} (vStorageOutTot[c,r,y,sp])+sum{FORIF: mImport[c,r,y,sp]} (vImport[c,r,y,sp])+sum{FORIF: mTradeIrAOutTot[c,r,y,sp]} (vTradeIrAOutTot[c,r,y,sp]));
 
-s.t.  eqInpTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vInpTot[c,r,y,s]  =  sum{FORIF: mTechInpTot[c,r,y,s]} (vTechInpTot[c,r,y,s])+sum{FORIF: mDemInp[c,s]} (vDemInp[c,r,y,s])+sum{FORIF: mStorageInpTot[c,r,y,s]} (vStorageInpTot[c,r,y,s])+sum{FORIF: mDummyExport[c,r,y,s]} (vDummyExport[c,r,y,s])+sum{FORIF: mExport[c,r,y,s]} (vExport[c,r,y,s])+sum{sp in slice:(mAllSliceParentChild[sp,s])}(vInp2Up[c,r,y,sp,s])+sum{sp in slice:(mAllSliceParentChild[s,sp])}(vInp2Up[c,r,y,s,sp]);
+s.t.  eqInpTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mCommSlice[c,s])}: vInpTot[c,r,y,s]  =  sum{FORIF: mDemInp[c,s]} (vDemInp[c,r,y,s])+sum{FORIF: mDummyExport[c,r,y,s]} (vDummyExport[c,r,y,s])+sum{sp in slice:((mSameSlice[s,sp] or mAllSliceParentChild[sp,s] or mAllSliceParentChild[s,sp]))}(sum{FORIF: mTechInpTot[c,r,y,sp]} (vTechInpTot[c,r,y,sp])+sum{FORIF: mStorageInpTot[c,r,y,sp]} (vStorageInpTot[c,r,y,sp])+sum{FORIF: mExport[c,r,y,sp]} (vExport[c,r,y,sp])+sum{FORIF: mTradeIrAInpTot[c,r,y,sp]} (vTradeIrAInpTot[c,r,y,sp]));
 
 s.t.  eqSupOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mSupOutTot[c,r,s])}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(vSupOut[s1,c,r,y,s]);
 
@@ -3581,14 +3575,6 @@ printf "comm,region,year,slice,value\n" > "vInpTot.csv";
 for {c in comm,r in region,y in year,s in slice : vInpTot[c,r,y,s] <> 0} { 
     printf "%s,%s,%s,%s,%f\n", c,r,y,s, vInpTot[c,r,y,s] >> "vInpTot.csv";
 } 
-printf "comm,region,year,slice,slicep,value\n" > "vInp2Up.csv";
-for {c in comm,r in region,y in year,s in slice,sp in slice : vInp2Up[c,r,y,s,sp] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", c,r,y,s,sp, vInp2Up[c,r,y,s,sp] >> "vInp2Up.csv";
-} 
-printf "comm,region,year,slice,slicep,value\n" > "vOut2Up.csv";
-for {c in comm,r in region,y in year,s in slice,sp in slice : vOut2Up[c,r,y,s,sp] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", c,r,y,s,sp, vOut2Up[c,r,y,s,sp] >> "vOut2Up.csv";
-} 
 printf "comm,region,year,slice,value\n" > "vSupOutTot.csv";
 for {c in comm,r in region,y in year,s in slice : vSupOutTot[c,r,y,s] <> 0} { 
     printf "%s,%s,%s,%s,%f\n", c,r,y,s, vSupOutTot[c,r,y,s] >> "vSupOutTot.csv";
@@ -3732,8 +3718,6 @@ printf "value\n" > "variable_list.csv";
     printf "vDemInp\n" >> "variable_list.csv";
     printf "vOutTot\n" >> "variable_list.csv";
     printf "vInpTot\n" >> "variable_list.csv";
-    printf "vInp2Up\n" >> "variable_list.csv";
-    printf "vOut2Up\n" >> "variable_list.csv";
     printf "vSupOutTot\n" >> "variable_list.csv";
     printf "vTechInpTot\n" >> "variable_list.csv";
     printf "vTechOutTot\n" >> "variable_list.csv";

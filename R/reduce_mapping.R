@@ -159,12 +159,10 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
                                             reduce.sect(getParameterData(prec@parameters[['mTechEmsFuel']]), c('comm', 'region', 'year', 'slice')))
 # mDummyImport(comm, region, year, slice)
 #    (mCommSlice(comm, slice) and pDummyImportCost(comm, region, year, slice) <> Inf)    
-    prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], 
-                                                 reduce.duplicate(merge(tmp_noinf$pDummyImportCost, tmp_nozero$pDummyImportCost)))
+    prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], tmp_noinf$pDummyImportCost)
 # mDummyExport(comm, region, year, slice)
 #    (mCommSlice(comm, slice) and pDummyExportCost(comm, region, year, slice) <> Inf)    
-    prec@parameters[['mDummyExport']] <- addData(prec@parameters[['mDummyExport']], 
-                                                 reduce.duplicate(merge(tmp_noinf$pDummyExportCost, tmp_nozero$pDummyExportCost)))
+    prec@parameters[['mDummyExport']] <- addData(prec@parameters[['mDummyExport']], tmp_noinf$pDummyExportCost)
     
 # mDummyCost(comm, region, year)
 #    (pDummyImportCost(comm, region, year, slice) <> Inf or pDummyExportCost(comm, region, year, slice) <> Inf)   
@@ -267,3 +265,4 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     cat('end reduce mapping\n'); flush.console()
     prec
 }
+

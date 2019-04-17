@@ -326,13 +326,6 @@ vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
 vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
 ;
 variable
-*! Full model : begin
-vTechFixom(tech, region, year)                       Fixed O&M costs
-vTechVarom(tech, region, year, slice)                Variable O&M costs
-vTechActVarom(tech, region, year, slice)             Activity Varom costs
-vTechCVarom(tech, region, year, slice)               Commodity Varom costs
-vTechAVarom(tech, region, year, slice)               Auxilary commodity Varom costs
-*! Full model : end
 vTechInv(tech, region, year)                         Overnight investment costs
 vTechEac(tech, region, year)                         Annualized investment costs
 vTechSalv(tech, region)                              Salvage value (on the end of the model horizon, to substract from costs)
@@ -363,8 +356,6 @@ vBalance(comm, region, year, slice)                  Net commodity balance
 positive variable
 vOutTot(comm, region, year, slice)                   Total commodity output (consumption is not counted)
 vInpTot(comm, region, year, slice)                   Total commodity input
-vInp2Up(comm, region, year, slice, slice)           From coomodity slice to up level...
-vOut2Up(comm, region, year, slice, slice)           From coomodity slice to up level...
 vSupOutTot(comm, region, year, slice)                Total commodity supply
 vTechInpTot(comm, region, year, slice)               Total commodity input
 vTechOutTot(comm, region, year, slice)               Total technology output
@@ -905,13 +896,6 @@ eqTechSalv(tech, region, yeare)     Technology salvage costs
 eqTechSalv0(tech, region, yeare)    Technology salvage costs when discount is zero
 * Aggregated annual costs
 eqTechOMCost(tech, region, year)    Technology O&M costs
-*! Full model : begin
-eqTechFixom(tech, region, year)     Technology total fixed O&M costs
-eqTechVarom(tech, region, year, slice)  Technology total variable O&M costs
-eqTechActVarom(tech, region, year, slice)   Technology activity-related variable costs
-eqTechCVarom(tech, region, year, slice)   Technology commodity-related variable costs
-eqTechAVarom(tech, region, year, slice)   Technology auxiliary commodity-related variable costs
-*! Full model : end
 ;
 
 
@@ -1048,62 +1032,6 @@ eqTechOMCost(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region
          );
 
 
-*! Full model : begin
-eqTechFixom(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region, year))..
-  vTechFixom(tech, region, year) =e= pTechFixom(tech, region, year) * vTechCap(tech, region, year);
-
-eqTechVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year))..
-         vTechVarom(tech, region, year, slice)
-         =e=
-                  pTechVarom(tech, region, year, slice) *
-                  vTechAct(tech, region, year, slice) +
-                  sum(comm$mTechInpComm(tech, comm),
-                          pTechCvarom(tech, comm, region, year, slice) *
-                          vTechInp(tech, comm, region, year, slice)
-                  ) +
-                  sum(comm$mTechOutComm(tech, comm),
-                          pTechCvarom(tech, comm, region, year, slice) *
-                          vTechOut(tech, comm, region, year, slice)
-                  )
-                  +
-                  sum(comm$mTechAOut(tech, comm),
-                          pTechAvarom(tech, comm, region, year, slice) *
-                          vTechAOut(tech, comm, region, year, slice)
-                  )
-                  +
-                  sum(comm$mTechAInp(tech, comm),
-                          pTechAvarom(tech, comm, region, year, slice) *
-                          vTechAInp(tech, comm, region, year, slice)
-                  );
-
-eqTechActVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year))..
-  vTechActVarom(tech, region, year, slice) =e= pTechVarom(tech, region, year, slice) * vTechAct(tech, region, year, slice);
-
-eqTechCVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year))..
-         vTechCVarom(tech, region, year, slice)
-         =e=
-                  sum(comm$mTechInpComm(tech, comm),
-                          pTechCvarom(tech, comm, region, year, slice) *
-                          vTechInp(tech, comm, region, year, slice)
-                  )+
-                 sum(comm$mTechOutComm(tech, comm),
-                          pTechCvarom(tech, comm, region, year, slice) *
-                          vTechOut(tech, comm, region, year, slice)
-                  );
-
-eqTechAVarom(tech, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and mTechSpan(tech, region, year))..
-         vTechAVarom(tech, region, year, slice)
-         =e=
-                  sum(comm$mTechAInp(tech, comm),
-                          pTechAvarom(tech, comm, region, year, slice) *
-                          vTechAInp(tech, comm, region, year, slice)
-                  ) +
-                  sum(comm$mTechAOut(tech, comm),
-                          pTechAvarom(tech, comm, region, year, slice) *
-                          vTechAOut(tech, comm, region, year, slice)
-                  );
-
-*! Full model : end
 
 **************************************
 * Supply equations
@@ -1510,8 +1438,6 @@ eqTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, 
 * Balance equations & dummy import & export
 **************************************
 Equation
-eqInp2Bal(comm, region, year, slice) Matching (aggregation by) slices for input commodities
-eqOut2Bal(comm, region, year, slice) Matching (aggregation by) slices for output commodities
 eqBalUp(comm, region, year, slice)   PRODUCTION <= CONSUMPTION commodity balance
 eqBalLo(comm, region, year, slice)   PRODUCTION >= CONSUMPTION commodity balance
 eqBalFx(comm, region, year, slice)   PRODUCTION = CONSUMPTION commodity balance
@@ -1524,32 +1450,6 @@ eqTechOutTot(comm, region, year, slice)     Technology total output
 eqStorageInpTot(comm, region, year, slice)  Storage total input
 eqStorageOutTot(comm, region, year, slice)  Storage total output
 
-;
-
-* vInp2Up(comm, region, year, slice, slicep) From coomodity slice to up level
-* vOut2Up(comm, region, year, slice, slicep) From coomodity slice to up level
-
-eqInp2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(comm, slice)))..
-  sum(slicep$(mAllSliceParentChild(slicep, slice) and mCommSlice(comm, slicep)), vInp2Up(comm, region, year, slicep, slice)) +
-  sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), vInp2Up(comm, region, year, slice, slicep)) =e=
-         vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice) +
-         vDemInp(comm, region, year, slice)$mDemInp(comm, slice) +
-         vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice) +
-         vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice) +
-         vExport(comm, region, year, slice)$mExport(comm, region, year, slice)
-         + vTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice);
-
-eqOut2Bal(comm, region, year, slice)$(mMidMilestone(year) and not(mCommSlice(comm, slice)))..
-  sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), vOut2Up(comm, region, year, slice, slicep)) +
-  sum(slicep$(mAllSliceParentChild(slicep, slice) and mCommSlice(comm, slicep)), vOut2Up(comm, region, year, slicep, slice)) =e=
-         vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, slice) +
-         vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
-         vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice) +
-         vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
-         vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
-         vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice) +
-         vImport(comm, region, year, slice)$mImport(comm, region, year, slice)
-     + vTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice)
 ;
 
 
@@ -1569,29 +1469,29 @@ eqBal(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, slice
 eqOutTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, slice))..
          vOutTot(comm, region, year, slice)
          =e=
-         vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, slice) +
-         vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
-         vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice) +
-         vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
-         vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice) +
-         vImport(comm, region, year, slice)$mImport(comm, region, year, slice)
-     + sum(trade$mTradeIrAOut2(trade, comm, region, year, slice), vTradeIrAOut(trade, comm, region, year, slice))
-  + sum(slicep$mAllSliceParentChild(slicep, slice), vOut2Up(comm, region, year, slicep, slice))
-  + sum(slicep$mAllSliceParentChild(slice, slicep), vOut2Up(comm, region, year, slice, slicep))
-;
+         sum(slicep$(mSameSlice(slice, slicep) or mAllSliceParentChild(slicep, slice) or mAllSliceParentChild(slice, slicep)),
+                  vSupOutTot(comm, region, year, slicep)$mSupOutTot(comm, region, slicep) +
+                  vEmsFuelTot(comm, region, year, slicep)$mEmsFuelTot(comm, region, year, slicep) +
+                  vAggOut(comm, region, year, slicep)$mAggOut(comm, region, year, slicep) +
+                  vTechOutTot(comm, region, year, slicep)$mTechOutTot(comm, region, year, slicep)  +
+                  vStorageOutTot(comm, region, year, slicep)$mStorageOutTot(comm, region, year, slicep) +
+                  vImport(comm, region, year, slicep)$mImport(comm, region, year, slicep) +
+                  vTradeIrAOutTot(comm, region, year, slicep)$mTradeIrAOutTot(comm, region, year, slicep)
+         );
+
 
 eqInpTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, slice))..
          vInpTot(comm, region, year, slice)
          =e=
-         vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice) +
          vDemInp(comm, region, year, slice)$mDemInp(comm, slice) +
-         vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice) +
          vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice) +
-         vExport(comm, region, year, slice)$mExport(comm, region, year, slice)
-  + sum(slicep$mAllSliceParentChild(slicep, slice), vInp2Up(comm, region, year, slicep, slice))
-  + sum(slicep$mAllSliceParentChild(slice, slicep), vInp2Up(comm, region, year, slice, slicep))
-;
+         sum(slicep$(mSameSlice(slice, slicep) or mAllSliceParentChild(slicep, slice) or mAllSliceParentChild(slice, slicep)),
+                  vTechInpTot(comm, region, year, slicep)$mTechInpTot(comm, region, year, slicep) +
+                  vStorageInpTot(comm, region, year, slicep)$mStorageInpTot(comm, region, year, slicep) +
+                  vExport(comm, region, year, slicep)$mExport(comm, region, year, slicep) +
+                  vTradeIrAInpTot(comm, region, year, slicep)$mTradeIrAInpTot(comm, region, year, slicep)
+         );
 
 eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and mSupOutTot(comm, region, slice))..
          vSupOutTot(comm, region, year, slice)
@@ -1692,6 +1592,7 @@ eqObjective..
                  pDiscountFactor(region, year) * vTechSalv(tech, region)) +
          sum((region, year, stg)$(mMilestoneLast(year) and  sum(yearp$mStorageNew(stg, region, yearp), 1) <> 0),
                  pDiscountFactor(region, year) * vStorageSalv(stg, region));
+
 
 * End generation latex file
 *\end{document}
@@ -21076,8 +20977,6 @@ eqImportRowResUp
 **************************************
 * Ballance equation & dummy
 **************************************
-eqInp2Bal
-eqOut2Bal
 eqBalUp
 eqBalLo
 eqBalFx
