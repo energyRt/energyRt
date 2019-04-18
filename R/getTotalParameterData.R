@@ -1,27 +1,69 @@
 .getTotalParameterData <- function(prec, name) {
-  dtt <- getParameterData(prec@parameters[[name]])
-  approxim <- lapply(prec@parameters[[name]]@dimSetNames, function(x)
-    getParameterData(prec@parameters[[x]])[, x])
-  names(approxim) <- prec@parameters[[name]]@dimSetNames
-  if (prec@parameters[[name]]@type == 'multi') approxim$type <- c('lo', 'up')
-  if (nrow(dtt) == prod(sapply(approxim, length))) 
-    return(dtt)
-  # Create full set array
-  gg <- data.frame(stringsAsFactors = FALSE)
-  for (i in names(approxim)) gg[, i] <- character()
-  gg[, 'value'] <- numeric()
-  gg[prod(sapply(approxim, length)), ] <- NA
-  k <- 1
-  for (i in names(approxim)) {
-    nl <- length(approxim[[i]])
-    gg[, i] <- approxim[[i]][c(t(matrix(1:nl, nl, k)))]
-    k <- k * nl
+  reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
+  getAllDefVal <- function(prec, name) {
+    sets0 <- prec@parameters[[name]]@dimSetNames
+    sets <- NULL
+    for (i in sets0) {
+      j <- i
+      if (any(i == c('src', 'dst'))) j <- 'region'
+      tmp <- getParameterData(prec@parameters[[j]])
+      colnames(tmp) <- i
+      if (i == 'slice' && any(colnames(sets) == 'comm')) {
+        tmp <- merge(getParameterData(prec@parameters$mCommSlice), tmp)
+      } 
+      if (i == 'comm' && any(colnames(sets) == 'sup')) {
+        tmp <- merge(getParameterData(prec@parameters$mSupComm), tmp)
+      }      
+      if (i == 'year') {
+        tmp <- merge(getParameterData(prec@parameters$mMidMilestone), tmp)
+      }
+      if (i == 'year' && any(colnames(sets) == 'tech')) {
+        tmp <- merge(getParameterData(prec@parameters$mTechSpan), tmp)
+      }
+      if (i == 'region' && any(colnames(sets) == 'tech') && all(sets0 != 'year')) {
+        tmp <- merge(reduce.duplicate(getParameterData(prec@parameters$mTechSpan)[, c('tech', 'region')]), tmp)
+      }
+      
+      if (i == 'comm' && any(colnames(sets) == 'tech')) {
+        tmp <- merge(rbind(getParameterData(prec@parameters$mTechInpComm), getParameterData(prec@parameters$mTechOutComm)), tmp)
+      }
+      if (i == 'slice' && any(colnames(sets) == 'tech')) {
+        tmp <- merge(getParameterData(prec@parameters$mTechSlice), tmp)
+      }
+      if (i == 'src') {
+        aa <- getParameterData(prec@parameters$mTradeSrc)
+        colnames(aa)[2] <- 'src'
+        tmp <- merge(aa, tmp)
+      }
+      if (i == 'dst') {
+        aa <- getParameterData(prec@parameters$mTradeDst)
+        colnames(aa)[2] <- 'dst'
+        tmp <- merge(aa, tmp)
+      }
+      if (i == 'comm' && any(colnames(sets) == 'trade')) {
+        tmp <- merge(getParameterData(prec@parameters$mTradeComm), tmp)
+      }
+      if (is.null(sets)) {
+        sets <- tmp
+      } else {
+        sets <- merge(sets, tmp)
+      }
+    }
+    if (prec@parameters[[name]]@type == 'simple') {
+      sets$value <- prec@parameters[[name]]@defVal
+    } 
+    if (prec@parameters[[name]]@type == 'multi') {
+      sets$type <- 'lo'
+      sets$value <- prec@parameters[[name]]@defVal[1]
+      sets2 <- sets
+      sets2$type <- 'up'
+      sets2$value <- prec@parameters[[name]]@defVal[2]
+      sets <- rbind(sets, sets2)
+    } 
+    sets
   }
-  gg[, 'value'] <- prec@parameters[[name]]@defVal[1]
-  if (prec@parameters[[name]]@type == 'multi') 
-    gg[gg$type == 'up', 'value'] <- prec@parameters[[name]]@defVal[2]
-  # reduce set array
-  f1 <- apply(dtt[, -ncol(dtt)], 1, paste, collapse = '##')
-  f2 <- apply(gg[, -ncol(gg)], 1, paste, collapse = '##')
-  rbind(dtt, gg[!(f2 %in% f1),, drop = FALSE])
+  tmp <- getAllDefVal(prec, name)
+  dtt <- getParameterData(prec@parameters[[name]])
+  gg <- rbind(dtt, tmp)
+  gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
 }

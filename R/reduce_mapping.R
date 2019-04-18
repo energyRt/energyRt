@@ -11,6 +11,7 @@
   assign('prec', prec, globalenv())
   cat('begin reduce mapping\n'); flush.console()
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
+  stop()
   # Remove not milestone data
   #for (i in c('mTechSpan')) {
   #  getParameterData(prec@parameters[[i]])
@@ -52,6 +53,10 @@
       if (i == 'year' && any(colnames(sets) == 'tech')) {
         tmp <- merge(tmp_map$mTechSpan, tmp)
       }
+      if (i == 'region' && any(colnames(sets) == 'tech') && all(sets0 != 'year')) {
+        tmp <- merge(reduce.duplicate(tmp_map$mTechSpan[, c('tech', 'region')]), tmp)
+      }
+      
       if (i == 'comm' && any(colnames(sets) == 'tech')) {
         tmp <- merge(rbind(tmp_map$mTechInpComm, tmp_map$mTechOutComm), tmp)
       }
@@ -80,7 +85,7 @@
     if (nrow(sets) > 0) {
       sets$value <- dff
       gg <- rbind(gg, sets)
-      gg <- gg[!duplicated(gg),, drop = FALSE]
+      gg <- gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
     }
     if (!invert) 
       return(gg[gg$value == val, colnames(gg) != 'value', drop = FALSE])

@@ -1367,9 +1367,9 @@ eqCostTrade(region, year)$mMidMilestone(year)..
 
 eqCostRowTrade(region, year)$mMidMilestone(year).. vTradeRowCost(region, year) =e=
 * Row
-  sum((imp, comm, slice)$(mImpSlice(imp, slice) and mImpComm(imp, comm)), pImportRowPrice(imp, region, year, slice) *
+  sum((imp, comm, slice)$mImportRow(imp, comm, region, year, slice), pImportRowPrice(imp, region, year, slice) *
      vImportRow(imp, comm, region, year, slice)) -
-  sum((expp, comm, slice)$(mExpSlice(expp, slice) and mExpComm(expp, comm)), pExportRowPrice(expp, region, year, slice) *
+  sum((expp, comm, slice)$mExportRow(expp, comm, region, year, slice), pExportRowPrice(expp, region, year, slice) *
       vExportRow(expp, comm, region, year, slice));
 
 eqCostIrTrade(region, year)$mMidMilestone(year).. vTradeIrCost(region, year) =e=

@@ -611,9 +611,9 @@ LL1 <- proc.time()[3]
       if (prec@parameters$mTechRetirement@nValues != -1)
         prec@parameters$mTechRetirement@nValues <- 0
     }
-  
    # up to year
    if (!is.null(startYear)) {
+     assign('prec.before.startYear', prec, globalenv())
      prec0 <- prec
      # begin
      mile.stone <- prec@parameters$mMidMilestone@data$year
@@ -680,6 +680,7 @@ LL1 <- proc.time()[3]
          }
        }
      }
+     assign('prec.after.startYear', prec, globalenv())
    }
    # Reduce mapping
    prec <- .reduce_mapping(prec)

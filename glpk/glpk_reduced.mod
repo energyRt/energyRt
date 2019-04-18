@@ -506,7 +506,7 @@ s.t.  eqTradeFlowLo{ t1 in trade,c in comm,src in region,dst in region,y in year
 
 s.t.  eqCostTrade{ r in region,y in year : mMidMilestone[y]}: vTradeCost[r,y]  =  vTradeRowCost[r,y]+vTradeIrCost[r,y];
 
-s.t.  eqCostRowTrade{ r in region,y in year : mMidMilestone[y]}: vTradeRowCost[r,y]  =  sum{i in imp,c in comm,s in slice:((mImpSlice[i,s] and mImpComm[i,c]))}(pImportRowPrice[i,r,y,s]*vImportRow[i,c,r,y,s])-sum{e in expp,c in comm,s in slice:((mExpSlice[e,s] and mExpComm[e,c]))}(pExportRowPrice[e,r,y,s]*vExportRow[e,c,r,y,s]);
+s.t.  eqCostRowTrade{ r in region,y in year : mMidMilestone[y]}: vTradeRowCost[r,y]  =  sum{i in imp,c in comm,s in slice:(mImportRow[i,c,r,y,s])}(pImportRowPrice[i,r,y,s]*vImportRow[i,c,r,y,s])-sum{e in expp,c in comm,s in slice:(mExportRow[e,c,r,y,s])}(pExportRowPrice[e,r,y,s]*vExportRow[e,c,r,y,s]);
 
 s.t.  eqCostIrTrade{ r in region,y in year : mMidMilestone[y]}: vTradeIrCost[r,y]  =  sum{t1 in trade,c in comm,src in region,s in slice:((mTradeSlice[t1,s] and mTradeSrc[t1,src] and mTradeDst[t1,r] and not((mSameRegion[src,r])) and mTradeComm[t1,c]))}((pTradeIrCost[t1,src,r,y,s]+pTradeIrMarkup[t1,src,r,y,s])*vTradeIr[t1,c,src,r,y,s])-sum{t1 in trade,c in comm,dst in region,s in slice:((mTradeSlice[t1,s] and mTradeSrc[t1,r] and mTradeDst[t1,dst] and not((mSameRegion[dst,r])) and mTradeComm[t1,c]))}(pTradeIrMarkup[t1,r,dst,y,s]*vTradeIr[t1,c,r,dst,y,s]);
 

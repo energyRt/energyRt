@@ -815,8 +815,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
                                                 obj@parameters[['pTechStock']]@data$tech == tech@name & 
                                                 obj@parameters[['pTechStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 
   dd0 <- .start_end_fix(approxim, tech, 'tech', stock_exist)
-  dd0$new <- dd0$new[dd0$new$year %in% approxim$mileStoneYears,, drop = FALSE]
-  dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears,, drop = FALSE]
+  dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
+  dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
   obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
   obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
   # Weather part
@@ -1133,8 +1133,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
                                                          obj@parameters[['pStorageStock']]@data$stg == stg@name & 
                                                          obj@parameters[['pStorageStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 
     dd0 <- .start_end_fix(approxim, stg, 'stg', stock_exist)
-    dd0$new <- dd0$new[dd0$new$year %in% approxim$mileStoneYears,, drop = FALSE]
-    dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears,, drop = FALSE]
+    dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
+    dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
     obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
     obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
     # Weather part
