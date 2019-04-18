@@ -262,6 +262,33 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     prec@parameters[['mTechAfcUp']] <- addData(prec@parameters[['mTechAfcUp']], reduce.duplicate(merge(tmp_nozero$pTechAfc, tmp_noinf$pTechAfc)))
     prec@parameters[['mTechOlifeInf']] <- addData(prec@parameters[['mTechOlifeInf']], generate_haveval('pTechOlife', Inf))
     prec@parameters[['mStorageOlifeInf']] <- addData(prec@parameters[['mStorageOlifeInf']], generate_haveval('pStorageOlife', Inf))
+    
+    
+    #sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) and
+    #(mSupOutTot(comm, region, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
+    #  mTechOutTot(comm, region, year, slice) or mStorageOutTot(comm, region, year, slice) or mImport(comm, region, year, slice) or
+    #  mTradeIrAOutTot(comm, region, year, slice))
+    a1 <- tmp_map$mCommSlice; colnames(a1)[2] <- 'slicep'
+    a2 <- tmp_map$mAllSliceParentChild
+    for2Lo <- merge(a1, a2, by = 'slicep'); for2Lo$slicep <- NULL
+    for2Lo <- reduce.duplicate(for2Lo)
+    for (i in c('mSupOutTot', 'mEmsFuelTot', 'mAggOut', 'mTechOutTot', 'mStorageOutTot', 'mImport', 'mTradeIrAOutTot', 'mTechInpTot', 
+                'mStorageInpTot', 'mExport', 'mTradeIrAInpTot')) 
+        tmp_map[[i]] <- getParameterData(prec@parameters[[i]])
+    cll <- c('comm', 'region', 'year', 'slice')
+    
+    prec@parameters[['mOut2Lo']] <- addData(prec@parameters[['mOut2Lo']], merge(reduce.duplicate(rbind(merge(tmp_map$mSupOutTot, tmp_map$year)[, cll], 
+      tmp_map$mEmsFuelTot[, cll], tmp_map$mAggOut[, cll], tmp_map$mTechOutTot[, cll], tmp_map$mStorageOutTot[, cll], 
+      tmp_map$mImport[, cll], tmp_map$mTradeIrAOutTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll])
+    
+    # sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
+    #   and (mTechInpTot(comm, region, year, slice) or  mStorageInpTot(comm, region, year, slice) or
+    #   or mExport(comm, region, year, slice) or mTradeIrAInpTot(comm, region, year, slice))
+    
+    prec@parameters[['mInp2Lo']] <- addData(prec@parameters[['mInp2Lo']], merge(reduce.duplicate(rbind(tmp_map$mTechInpTot[, cll], 
+        tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll])
+    
+    
     cat('end reduce mapping\n'); flush.console()
     prec
 }

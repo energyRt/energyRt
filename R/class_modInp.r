@@ -467,6 +467,10 @@ setMethod("initialize", "modInp",
   .Object@parameters[['mTechAfcUp']] <- createParameter('mTechAfcUp', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
   .Object@parameters[['mTechOlifeInf']] <- createParameter('mTechOlifeInf', c('tech', 'region'), 'map') 
   .Object@parameters[['mStorageOlifeInf']] <- createParameter('mStorageOlifeInf', c('stg', 'region'), 'map') 
+
+  .Object@parameters[['mInp2Lo']] <- createParameter('mInp2Lo', c('comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mOut2Lo']] <- createParameter('mOut2Lo', c('comm', 'region', 'year', 'slice'), 'map') 
+  
   .Object
 })
 
