@@ -10,8 +10,9 @@
 .reduce_mapping <- function(prec) {
   assign('prec', prec, globalenv())
   cat('begin reduce mapping\n'); flush.console()
+  # stop()
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
-  stop()
+
   # Remove not milestone data
   #for (i in c('mTechSpan')) {
   #  getParameterData(prec@parameters[[i]])
@@ -259,7 +260,8 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], reduce.duplicate(merge(merge(merge(reduce.sect(
       tmp_nozero$pAggregateFactor, 'comm'), tmp_map$region), tmp_map$year), tmp_map$slice)))
     
-    prec@parameters[['mSupAvaUp']] <- addData(prec@parameters[['mSupAvaUp']], reduce.duplicate(merge(tmp_nozero$pSupAva, tmp_noinf$pSupAva)))
+    prec@parameters[['mSupAvaUp']] <- addData(prec@parameters[['mSupAvaUp']],
+                                              reduce.duplicate(merge(tmp_nozero$pSupAva, tmp_noinf$pSupAva)))
     prec@parameters[['mSupReserveUp']] <- addData(prec@parameters[['mSupReserveUp']], reduce.duplicate(
       merge(tmp_nozero$pSupReserve, tmp_noinf$pSupReserve)))
     

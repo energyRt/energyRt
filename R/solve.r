@@ -660,8 +660,9 @@ LL1 <- proc.time()[3]
      sup.res.use <- sup.res.use0
      sup.res.use0$type <- 'up'
      sup.res.use <- rbind(sup.res.use0, sup.res.use, sup.res.par)
-     sup.res.use2 <- aggregate(sup.res.use$value, by = list(sup = sup.res.use$sup, comm = sup.res.use$comm, region = sup.res.use$region, 
-                                                            type = sup.res.use$type), sum, simplify = TRUE, drop = FALSE)
+     sup.res.use2 <- aggregate(sup.res.use$value, 
+                               by = list(sup = sup.res.use$sup, comm = sup.res.use$comm, region = sup.res.use$region, 
+                                                            type = sup.res.use$type), sum)
      colnames(sup.res.use2)[ncol(sup.res.use2)] <- 'value'
      sup.res.use2$value[sup.res.use2$value < 0] <- 0
      prec <- energyRt:::.setParameterData(prec, 'pSupReserve', sup.res.use2)
