@@ -549,7 +549,7 @@
   
   if (length(arg) != 0) warning('Unknown argument ', names(arg))
 # ---------------------------------------------------------------------------------------------------------  
-      gg <- .getTotalParameterData(prec, 'pDiscount')
+      gg <- .getTotalParameterData(prec, 'pDiscount', need.reduce = FALSE)
       gg <- gg[sort(gg$year, index.return = TRUE)$ix,, drop = FALSE]
       ll <- gg[0,, drop = FALSE]
       for(l in unique(gg$region)) {
@@ -613,7 +613,7 @@ LL1 <- proc.time()[3]
     }
    # up to year
    if (!is.null(startYear)) {
-     assign('prec.before.startYear', prec, globalenv())
+     assign('prec.before.startYear', prec, globalenv()) # prec = prec.before.startYear
      prec0 <- prec
      # begin
      mile.stone <- prec@parameters$mMidMilestone@data$year
@@ -643,9 +643,8 @@ LL1 <- proc.time()[3]
          tech.stock <- rbind(tech.stock, tmp)
        } 
      }
-     tech.stock2 <- aggregate(tech.stock$value, by = list(tech = tech.stock$tech, region = tech.stock$region, 
-                                                          year = tech.stock$year), sum, simplify = !FALSE, drop = FALSE)
-     colnames(tech.stock2)[ncol(tech.stock2)] <- 'value'
+     fl <-  tech.stock$year >= startYear
+     tech.stock2 <- aggregate(tech.stock[fl, 'value', drop = FALSE], tech.stock[fl, c('tech', 'region', 'year')], sum)
      # have to replace tech.stock2 -> pTechStock
      prec <- energyRt:::.setParameterData(prec, 'pTechStock', tech.stock2)
      # Move new capacity before up to to stock (supply)
@@ -657,13 +656,10 @@ LL1 <- proc.time()[3]
      sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear,, drop = FALSE]
      sup.res.use0$value <- (-sup.res.use0$value * mile.stone.length[as.character(sup.res.use0$year)])
      sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", 'type', 'value')]
-     sup.res.use <- sup.res.use0
+     sup.res.use1 <- sup.res.use0
      sup.res.use0$type <- 'up'
-     sup.res.use <- rbind(sup.res.use0, sup.res.use, sup.res.par)
-     sup.res.use2 <- aggregate(sup.res.use$value, 
-                               by = list(sup = sup.res.use$sup, comm = sup.res.use$comm, region = sup.res.use$region, 
-                                                            type = sup.res.use$type), sum)
-     colnames(sup.res.use2)[ncol(sup.res.use2)] <- 'value'
+     sup.res.use <- rbind(sup.res.use0, sup.res.use1, sup.res.par)
+     sup.res.use2 <- aggregate(sup.res.use[, 'value', drop = FALSE], sup.res.use[, c('sup', 'comm', 'region', 'type')], sum)
      sup.res.use2$value[sup.res.use2$value < 0] <- 0
      prec <- energyRt:::.setParameterData(prec, 'pSupReserve', sup.res.use2)
 

@@ -1,4 +1,4 @@
-.getTotalParameterData <- function(prec, name) {
+.getTotalParameterData <- function(prec, name, need.reduce = TRUE) {
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
   getAllDefVal <- function(prec, name) {
     sets0 <- prec@parameters[[name]]@dimSetNames
@@ -8,40 +8,48 @@
       if (any(i == c('src', 'dst'))) j <- 'region'
       tmp <- getParameterData(prec@parameters[[j]])
       colnames(tmp) <- i
-      if (i == 'slice' && any(colnames(sets) == 'comm')) {
-        tmp <- merge(getParameterData(prec@parameters$mCommSlice), tmp)
-      } 
-      if (i == 'comm' && any(colnames(sets) == 'sup')) {
-        tmp <- merge(getParameterData(prec@parameters$mSupComm), tmp)
-      }      
-      if (i == 'year') {
-        tmp <- merge(getParameterData(prec@parameters$mMidMilestone), tmp)
-      }
-      if (i == 'year' && any(colnames(sets) == 'tech')) {
-        tmp <- merge(getParameterData(prec@parameters$mTechSpan), tmp)
-      }
-      if (i == 'region' && any(colnames(sets) == 'tech') && all(sets0 != 'year')) {
-        tmp <- merge(reduce.duplicate(getParameterData(prec@parameters$mTechSpan)[, c('tech', 'region')]), tmp)
-      }
-      
-      if (i == 'comm' && any(colnames(sets) == 'tech')) {
-        tmp <- merge(rbind(getParameterData(prec@parameters$mTechInpComm), getParameterData(prec@parameters$mTechOutComm)), tmp)
-      }
-      if (i == 'slice' && any(colnames(sets) == 'tech')) {
-        tmp <- merge(getParameterData(prec@parameters$mTechSlice), tmp)
-      }
-      if (i == 'src') {
-        aa <- getParameterData(prec@parameters$mTradeSrc)
-        colnames(aa)[2] <- 'src'
-        tmp <- merge(aa, tmp)
-      }
-      if (i == 'dst') {
-        aa <- getParameterData(prec@parameters$mTradeDst)
-        colnames(aa)[2] <- 'dst'
-        tmp <- merge(aa, tmp)
-      }
-      if (i == 'comm' && any(colnames(sets) == 'trade')) {
-        tmp <- merge(getParameterData(prec@parameters$mTradeComm), tmp)
+      if (need.reduce) {
+        if (i == 'slice' && any(colnames(sets) == 'comm')) {
+          tmp <- merge(getParameterData(prec@parameters$mCommSlice), tmp)
+        } 
+        if (i == 'comm' && any(colnames(sets) == 'sup')) {
+          tmp <- merge(getParameterData(prec@parameters$mSupComm), tmp)
+        }      
+        if (i == 'region' && any(colnames(sets) == 'sup') && all(sets0 != 'year')) {
+          tmp <- merge(reduce.duplicate(getParameterData(prec@parameters$mSupSpan)[, c('sup', 'region')]), tmp)
+        }      
+        if (i == 'year' && any(colnames(sets) == 'sup') && any(colnames(sets) == 'region')) {
+          tmp <- merge(getParameterData(prec@parameters$mSupSpan), tmp)
+        }      
+        if (i == 'year') {
+          tmp <- merge(getParameterData(prec@parameters$mMidMilestone), tmp)
+        }
+        if (i == 'year' && any(colnames(sets) == 'tech')) {
+          tmp <- merge(getParameterData(prec@parameters$mTechSpan), tmp)
+        }
+        if (i == 'region' && any(colnames(sets) == 'tech') && all(sets0 != 'year')) {
+          tmp <- merge(reduce.duplicate(getParameterData(prec@parameters$mTechSpan)[, c('tech', 'region')]), tmp)
+        }
+        
+        if (i == 'comm' && any(colnames(sets) == 'tech')) {
+          tmp <- merge(rbind(getParameterData(prec@parameters$mTechInpComm), getParameterData(prec@parameters$mTechOutComm)), tmp)
+        }
+        if (i == 'slice' && any(colnames(sets) == 'tech')) {
+          tmp <- merge(getParameterData(prec@parameters$mTechSlice), tmp)
+        }
+        if (i == 'src') {
+          aa <- getParameterData(prec@parameters$mTradeSrc)
+          colnames(aa)[2] <- 'src'
+          tmp <- merge(aa, tmp)
+        }
+        if (i == 'dst') {
+          aa <- getParameterData(prec@parameters$mTradeDst)
+          colnames(aa)[2] <- 'dst'
+          tmp <- merge(aa, tmp)
+        }
+        if (i == 'comm' && any(colnames(sets) == 'trade')) {
+          tmp <- merge(getParameterData(prec@parameters$mTradeComm), tmp)
+        }
       }
       if (is.null(sets)) {
         sets <- tmp
