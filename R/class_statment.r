@@ -155,6 +155,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 
 #  .vrb_map <- energyRt:::.vrb_map
+#  .vrb_mapping <- energyRt:::.vrb_mapping
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
   assign('prec', prec,  globalenv())
@@ -207,7 +208,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     adf$need.new <- TRUE
     # if set contain all
     for (i in seq_along(add.set)) {
-      if (!(is.null(add.set[[i]]) || !all(add.set[[i]] %in% prec@set[[adf[i, 'set']]])))
+      if (is.null(add.set[[i]]) || all(add.set[[i]] %in% prec@set[[adf[i, 'set']]]))
         adf[i, 'need.new'] <- FALSE
     }
     # if set in lhs the same as for.each

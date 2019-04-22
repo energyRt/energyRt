@@ -449,11 +449,11 @@ vStorageCost(stg, region, year)                    Storage O&M costs
 
 * Trade and Row variable
 positive variable
-*@ mImport(comm, dst, year, slice)
+*@ mImport(comm, region, year, slice)
 vImport(comm, region, year, slice)                   Total regional import (Ir + ROW)
-*@ mExport(comm, dst, year, slice)
+*@ mExport(comm, region, year, slice)
 vExport(comm, region, year, slice)                   Total regional export (Ir + ROW)
-*@ (mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm))
+*@ (mTradeIr(trade, region, region, year, slice) and mTradeComm(trade, comm))
 vTradeIr(trade, comm, region, region, year, slice)         Total physical trade flows between regions
 *@ mTradeIrAInp2(trade, comm, region, year, slice)
 vTradeIrAInp(trade, comm, region, year, slice)       auxilari input
@@ -465,7 +465,7 @@ vTradeIrAOut(trade, comm, region, year, slice)       auxilari output
 vTradeIrAOutTot(comm, region, year, slice)       auxilari output
 *@ mExpComm(expp, comm)
 vExportRowAccumulated(expp, comm)              Accumulated export to ROW
-*@ mExportRow(expp, comm, src, year, slice)
+*@ mExportRow(expp, comm, region, year, slice)
 vExportRow(expp, comm, region, year, slice)                Export to ROW
 *@ mImpComm(imp, comm)
 vImportRowAccumulated(imp, comm)               Accumulated import from ROW
