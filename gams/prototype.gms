@@ -311,115 +311,173 @@ $ontext
 >>>>>>> 59858bf63953f28d2c24fd90456ced6d76912388
 $offtext
 positive variable
+*@ (mTechSpan(tech, region, year) and mTechSlice(tech, slice))
 vTechUse(tech, region, year, slice)                  Use level in technology
+*@ mTechNew(tech, region, year)
 vTechNewCap(tech, region, year)                      New capacity
+*@ mTechSpan(tech, region, year)
 vTechRetiredCap(tech, region, year, year)            Early retired capacity
 *vTechRetrofitCap(tech, region, year, year)
 *vTechUpgradeCap(tech, region, year)
 * Activity and intput-output
+*@ mTechSpan(tech, region, year)
 vTechCap(tech, region, year)                         Total capacity of the technology
+*@ (mTechSpan(tech, region, year) and mTechSlice(tech, slice))
 vTechAct(tech, region, year, slice)                  Activity level of technology
+*@ (mTechInpComm(tech, comm) and mTechSpan(tech, region, year) and mTechSlice(tech, slice))
 vTechInp(tech, comm, region, year, slice)            Input level
+*@ (mTechOutComm(tech, comm) and mTechSpan(tech, region, year) and mTechSlice(tech, slice))
 vTechOut(tech, comm, region, year, slice)            Output level
 * Auxiliary input & output
+*@ (mTechAInp(tech, comm) and mTechSpan(tech, region, year) and mTechSlice(tech, slice))
 vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
+*@ (mTechAOut(tech, comm) and mTechSpan(tech, region, year) and mTechSlice(tech, slice))
 vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
 ;
 variable
+*@ mTechNew(tech, region, year)
 vTechInv(tech, region, year)                         Overnight investment costs
+*@ mTechSpan(tech, region, year)
 vTechEac(tech, region, year)                         Annualized investment costs
+*@ (sum(year_cns$mTechNew(tech, region, year_cns), 1) <> 0)
 vTechSalv(tech, region)                              Salvage value (on the end of the model horizon, to substract from costs)
+*@ mTechSpan(tech, region, year)
 vTechOMCost(tech, region, year)                      Sum of all technology-related costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)
 ;
 positive variable
 * Supply
+*@ (mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region))
 vSupOut(sup, comm, region, year, slice)              Output of supply processes
+*@ mSupReserveUp(sup, comm, region)
 vSupReserve(sup, comm, region)                       Cumulative used supply reserve
 ;
 variable
+*@ mSupSpan(sup, region)
 vSupCost(sup, region, year)                          Supply costs
 ;
 positive variable
 * Demand
-*#! RENAME?
+*@ (mMidMilestone(year) and mDemInp(comm, slice))
 vDemInp(comm, region, year, slice)                   Satisfierd level of demands
 ;
 variable
 * Emission
+*@ mEmsFuelTot(comm, region, year, slice)
 vEmsFuelTot(comm, region, year, slice)                   Total fuel emissions
+*@ mTechEmsFuel(tech, comm, region, year, slice)
 vTechEmsFuel(tech, comm, region, year, slice)            Emissions on technology level by fuel
 ;
 variable
 * Ballance
+*@ (mMidMilestone(year) and mCommSlice(comm, slice))
 vBalance(comm, region, year, slice)                  Net commodity balance
 ;
 positive variable
+*@ (mMidMilestone(year) and mCommSlice(comm, slice))
 vOutTot(comm, region, year, slice)                   Total commodity output (consumption is not counted)
+*@ (mMidMilestone(year) and mCommSlice(comm, slice))
 vInpTot(comm, region, year, slice)                   Total commodity input
+*@ mInp2Lo(comm, region, year, slice)
 vInp2Lo(comm, region, year, slicep, slice)           To low level
+*@ mOut2Lo(comm, region, year, slice)
 vOut2Lo(comm, region, year, slicep, slice)           To low level
+*@ mSupOutTot(comm, region, slice)
 vSupOutTot(comm, region, year, slice)                Total commodity supply
+*@ mTechInpTot(comm, region, year, slice)
 vTechInpTot(comm, region, year, slice)               Total commodity input
+*@ mTechOutTot(comm, region, year, slice)
 vTechOutTot(comm, region, year, slice)               Total technology output
+*@ mStorageInpTot(comm, region, year, slice)
 vStorageInpTot(comm, region, year, slice)            Total storage input
+*@ mStorageOutTot(comm, region, year, slice)
 vStorageOutTot(comm, region, year, slice)            Total storage output
+*@ (mStorageAInp(stg, comm) and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))
 vStorageAInp(stg, comm, region, year, slice)
+*@ (mStorageAOut(stg, comm) and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))
 vStorageAOut(stg, comm, region, year, slice)
 ;
 variable
 * Costs variable
+*@ mMidMilestone(year)
 vCost(region, year)                                  Total costs
 vObjective                                           Objective costs
 ;
 positive variable
 * Dummy import
+*@ mDummyImport(comm, region, year, slice)
 vDummyImport(comm, region, year, slice)                   Dummy import (for debugging)
+*@ mDummyExport(comm, region, year, slice)
 vDummyExport(comm, region, year, slice)                   Dummy export (for debugging)
+*@ mDummyCost(comm, region, year)
 vDummyCost(comm, region, year)                         Dummy import & export costs  (for debugging)
 ;
 variable
 * Tax
+*@ mTaxCost(comm, region, year)
 vTaxCost(comm, region, year)                         Total tax levies (tax costs)
 * Subs
+*@ mSubsCost(comm, region, year)
 vSubsCost(comm, region, year)                        Total subsidies (for substraction from costs)
 ;
 
 variable
+*@ mAggOut(comm, region, year, slice)
 vAggOut(comm, region, year, slice)                   Aggregated commodity output
 ;
 
 
 * Reserves
 positive variable
+*@ (mStorageSlice(stg, slice) and mStorageSpan(stg, region, year) and mStorageComm(stg, comm))
 vStorageInp(stg, comm, region, year, slice)          Storage input
+*@ (mStorageSlice(stg, slice) and mStorageSpan(stg, region, year) and mStorageComm(stg, comm))
 vStorageOut(stg, comm, region, year, slice)          Storage output
+*@ (mStorageSlice(stg, slice) and mStorageSpan(stg, region, year) and mStorageComm(stg, comm))
 vStorageStore(stg, comm, region, year, slice)              Storage level
+*@ mStorageNew(stg, region, year)
 vStorageInv(stg, region, year)                       Storage technology investments
+*@ mStorageSpan(stg, region, year)
 vStorageCap(stg, region, year)                       Storage capacity
+*@ mStorageNew(stg, region, year)
 vStorageNewCap(stg, region, year)                    Storage new capacity
 ;
 variable
 vStorageSalv(stg, region)                            Storage salvage costs
+*@ mStorageSpan(stg, region, year)
 vStorageCost(stg, region, year)                    Storage O&M costs
 ;
 
 * Trade and Row variable
 positive variable
+*@ mImport(comm, dst, year, slice)
 vImport(comm, region, year, slice)                   Total regional import (Ir + ROW)
+*@ mExport(comm, dst, year, slice)
 vExport(comm, region, year, slice)                   Total regional export (Ir + ROW)
+*@ (mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm))
 vTradeIr(trade, comm, region, region, year, slice)         Total physical trade flows between regions
+*@ mTradeIrAInp2(trade, comm, region, year, slice)
 vTradeIrAInp(trade, comm, region, year, slice)       auxilari input
+*@ mTradeIrAInpTot(comm, region, year, slice)
 vTradeIrAInpTot(comm, region, year, slice)       auxilari input
+*@ mTradeIrAOut2(trade, comm, region, year, slice)
 vTradeIrAOut(trade, comm, region, year, slice)       auxilari output
+*@ mTradeIrAOutTot(comm, region, year, slice)
 vTradeIrAOutTot(comm, region, year, slice)       auxilari output
+*@ mExpComm(expp, comm)
 vExportRowAccumulated(expp, comm)              Accumulated export to ROW
+*@ mExportRow(expp, comm, src, year, slice)
 vExportRow(expp, comm, region, year, slice)                Export to ROW
+*@ mImpComm(imp, comm)
 vImportRowAccumulated(imp, comm)               Accumulated import from ROW
+*@ mImportRow(imp, comm, region, year, slice)
 vImportRow(imp, comm, region, year, slice)                 Import from ROW
 ;
 variable
+*@ mMidMilestone(year)
 vTradeCost(region, year)                             Total trade costs
+*@ mMidMilestone(year)
 vTradeRowCost(region, year)                          Trade costs with ROW
+*@  mMidMilestone(year)
 vTradeIrCost(region, year)                           Interregional trade costs
 ;
 
@@ -1019,11 +1077,6 @@ eqTechOMCost(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region
                   sum(comm$mTechInpComm(tech, comm),
                           pTechCvarom(tech, comm, region, year, slice) *
                           vTechInp(tech, comm, region, year, slice)
-                  )
-                  +
-                  sum(comm$mTechOutComm(tech, comm),
-                          pTechCvarom(tech, comm, region, year, slice) *
-                          vTechOut(tech, comm, region, year, slice)
                   )
                   +
                   sum(comm$mTechOutComm(tech, comm),

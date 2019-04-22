@@ -38,7 +38,7 @@ setMethod("initialize", "statement", function(.Object, ...) {
 setClass('summand', 
          representation(
            description   = "character",       # description
-           variable       = "character",
+           variable      = "character",
            for.sum       = "list",
            mult          = "data.frame",
            defVal        = "numeric",
