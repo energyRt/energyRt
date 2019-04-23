@@ -348,5 +348,4 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   prec
 }
 
-# 
-.getSetEquation(prec, stm, approxim) 
+#  .getSetEquation(prec, stm, approxim) 
