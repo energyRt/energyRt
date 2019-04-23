@@ -249,12 +249,14 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   } else {
     res$equationDeclaration <- paste0(res$equationDeclaration2Model, '(', paste0(names(stm@for.each), collapse = ', '), ')')
   }
-  # Equationbefore ..
+  # Equation before ..
   res$equation <- res$equationDeclaration
   if (any(adf$type == 'for.each') || any(names(stm@for.each) == 'year')) {
     fl <- (adf$type == 'for.each')
-    res$equation <- paste0(res$equation, '$(', paste0(c(paste0(adf[fl, 'new.name'], '(', adf[fl, 'name'], ')'), 
-                                                        'mMidMilestone(year)'[any(names(stm@for.each) == 'year')]), collapse = ' and '), ')')
+    hh <- NULL
+    if (any(fl)) 
+      hh <- paste0(adf[fl, 'new.name'], '(', adf[fl, 'name'], ')')
+    res$equation <- paste0(res$equation, '$(', paste0(c(hh, 'mMidMilestone(year)'[any(names(stm@for.each) == 'year')]), collapse = ' and '), ')')
   }
   res$equation <- paste0(res$equation, '.. ')
   # Add lhs
@@ -346,3 +348,5 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   prec
 }
 
+# 
+.getSetEquation(prec, stm, approxim) 
