@@ -177,6 +177,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     set = character(),
     type = character(), # for.each, lhs
     num = numeric(),    # number for lhs
+    lead.year = logical(),   # use only for year & lhs
+    lag.year = logical(),    # use only for year & lhs
     stringsAsFactors = FALSE
   )
   add.set <- list()
@@ -185,6 +187,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   if (nn > 0) {
     add.set <- lapply(1:nn, function(x) NULL)
     adf[1:nn, ] <- NA
+    for (i in nn[sapply(adf, class) == 'logical']) 
+      adf[, i] <- FALSE
     k <- 0
     for (i in seq_along(stm@for.each)) {
       k <- k + 1
@@ -199,6 +203,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         adf[k, 'set'] <- i
         adf[k, 'type'] <- 'lhs'
         adf[k, 'num'] <- j
+        if (i == 'lead.year' || i == 'lag.year') {
+          adf[k, 'set'] <- 'year'
+          adf[k, i] <- TRUE
+        }
         if (!is.null(stm@lhs[[j]]@for.sum[[i]]))
           add.set[[k]] <- unique(stm@lhs[[j]]@for.sum[[i]])
       }
