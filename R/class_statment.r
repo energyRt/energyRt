@@ -208,7 +208,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     adf$need.new <- TRUE
     # if set contain all
     for (i in seq_along(add.set)) {
-      if (is.null(add.set[[i]]) || all(add.set[[i]] %in% prec@set[[adf[i, 'set']]]))
+      if (is.null(add.set[[i]]) || all(prec@set[[adf[i, 'set']]] %in% add.set[[i]]))
         adf[i, 'need.new'] <- FALSE
     }
     # if set in lhs the same as for.each
