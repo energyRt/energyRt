@@ -235,9 +235,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     adf <- adf[adf$need.new,, drop = FALSE]
     if (nrow(adf) > 0) {
       adf$new.name <- paste0('mCns', stm@name, '_', adf$set)
-      for (i in seq_len(nrow(adf))) {
-        add.set[[i]] <- prec@set[[adf[i,  'set']]]
-      }
+      #for (i in seq_len(nrow(adf))) {
+      #  add.set[[i]] <- prec@set[[adf[i,  'set']]]
+      #}
       if (anyDuplicated(adf$new.name) != 0) {
         tmp <- rep(0, nrow(adf))
         while (anyDuplicated(paste0(adf$new.name, tmp)) != 0) {
@@ -248,7 +248,6 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         adf$new.name <- paste0(adf$new.name, tmp)
       }
       for (i in seq_len(nrow(adf))) {
-        browser()
         prec@parameters[[adf[i, 'new.name']]] <- addMultipleSet(createParameter(adf[i, 'new.name'], adf[i, 'set'], 'map'), add.set[[i]])
       }
     }
