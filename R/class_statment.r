@@ -161,10 +161,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   assign('prec', prec,  globalenv())
   assign('stm', stm,  globalenv())
   assign('approxim', approxim,  globalenv())
+  get.need.set <- function(x, y) {
+    need.set <- .vrb_map[[x@lhs[[y]]@variable]]
+    kk <- names(x@for.each)
+    #if (any(names(x@lhs[[y]]@for.sum) %in% c('lead.year', 'lag.year')))
+    #  kk <- kk[kk != 'year']
+    need.set[!(need.set %in% c(kk, names(x@lhs[[y]]@for.sum)))]
+  }
   # Add for.sum for lhs if set not declarate before
   for (i in seq_along(stm@lhs)) {
-    need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
-    need.set <- need.set[!(need.set %in% c(names(stm@for.each), names(stm@lhs[[i]]@for.sum)))]
+    need.set <- get.need.set(stm, i)
     if (length(need.set) != 0) {
       need.set <- c(need.set, names(stm@lhs[[i]]@for.sum))
       stm@lhs[[i]]@for.sum <- lapply(need.set, function(j) stm@lhs[[i]]@for.sum[[j]])
@@ -187,7 +193,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   if (nn > 0) {
     add.set <- lapply(1:nn, function(x) NULL)
     adf[1:nn, ] <- NA
-    for (i in nn[sapply(adf, class) == 'logical']) 
+    for (i in (1:ncol(adf))[sapply(adf, class) == 'logical']) 
       adf[, i] <- FALSE
     k <- 0
     for (i in seq_along(stm@for.each)) {
@@ -242,11 +248,15 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         adf$new.name <- paste0(adf$new.name, tmp)
       }
       for (i in seq_len(nrow(adf))) {
+        browser()
         prec@parameters[[adf[i, 'new.name']]] <- addMultipleSet(createParameter(adf[i, 'new.name'], adf[i, 'set'], 'map'), add.set[[i]])
       }
     }
   }
-  
+  if ((any(adf$lag.year) || any(adf$lead.year)) && !any(adf$type == 'for.each' & adf$set == 'year')) {
+    stop(paste0('There are lag.year or lead.year, without year (for.each), for statment: "', stm@name, '"'))
+  }
+    
   # Generate GAMS code with mult & rhs parameters
   res <- list()  
   # Declaration equation in model
@@ -262,9 +272,21 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   if (any(adf$type == 'for.each') || any(names(stm@for.each) == 'year')) {
     fl <- (adf$type == 'for.each')
     hh <- NULL
-    if (any(fl)) 
-      hh <- paste0(adf[fl, 'new.name'], '(', adf[fl, 'name'], ')')
-    res$equation <- paste0(res$equation, '$(', paste0(c(hh, 'mMidMilestone(year)'[any(names(stm@for.each) == 'year')]), collapse = ' and '), ')')
+    if (any(fl)) { 
+      hh <- c(hh, paste0(adf[fl, 'new.name'], '(', adf[fl, 'name'], ')'))
+    }
+    if (any(adf$lag.year)) { 
+      hh <- c(hh, 'not(mStartMilestone(year))')
+    }
+    if (any(adf$lead.year)) { 
+      hh <- c(hh, 'mMilestoneHasNext(year)')
+    }
+    if (any(names(stm@for.each) == 'year')) { 
+      hh <- c(hh, 'mMidMilestone(year)')
+    }
+    res$equation <- paste0(res$equation, '$', '('[length(hh) > 1], 
+                           paste0(hh, collapse = ' and '), ')'[length(hh) > 1])
+    
   }
   res$equation <- paste0(res$equation, '.. ')
   # Add lhs
@@ -275,7 +297,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     adf3 <- adf2[adf2$name != adf2$set,, drop = FALSE]
     if (nrow(adf3) > 0) {
       need.set[adf3$set] <- adf3$name
-      names(stm@lhs[[i]]@for.sum) <- need.set[names(stm@lhs[[i]]@for.sum)]
+      kk <- names(stm@lhs[[i]]@for.sum)
+      kk[kk %in% c('lead.year', 'lag.year')] <- 'year'
+      names(stm@lhs[[i]]@for.sum) <- need.set[kk]
     }
     lft <- ''; rgt <- '';
     if (length(stm@lhs[[i]]@for.sum) != 0) {
@@ -285,7 +309,17 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         lft <- paste0('sum((', paste0(names(stm@lhs[[i]]@for.sum), collapse = ', '), ')')
       }
       if (nrow(adf2) > 0) {
-        lft <- paste0(lft, '$', '('[nrow(adf2) != 1], paste0(paste0(adf2$new.name, '(', adf2$name, ')'), collapse = ' and '), ')'[nrow(adf2) != 1])
+        ss <- paste0(paste0(adf2$new.name, '(', adf2$name, ')'), collapse = ' and ')
+        fl <- (nrow(adf2) > 1)
+        if (any(adf2$lead.year)) {
+          ss <- paste0('mMilestoneNext(year,', adf2[adf2$lead.year, 'name'], ') and ', ss)
+          fl <- TRUE
+        }
+        if (any(adf2$lag.year)) {
+          ss <- paste0('mMilestoneNext(', adf2[adf2$lead.year, 'name'], ', year) and ', ss)
+          fl <- TRUE
+        }
+        lft <- paste0(lft, '$', '('[fl], ss, ')'[fl])
       }
       lft <- paste0(lft, ', ')
       rgt <- ')'
@@ -356,4 +390,4 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   prec
 }
 
-#  .getSetEquation(prec, stm, approxim) 
+#  .getSetEquation(prec, stm, approxim)@gams.equation
