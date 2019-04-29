@@ -161,22 +161,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   assign('prec', prec,  globalenv())
   assign('stm', stm,  globalenv())
   assign('approxim', approxim,  globalenv())
-  get.need.set <- function(x, y) {
-    need.set <- .vrb_map[[x@lhs[[y]]@variable]]
-    kk <- names(x@for.each)
-    #if (any(names(x@lhs[[y]]@for.sum) %in% c('lead.year', 'lag.year')))
-    #  kk <- kk[kk != 'year']
-    need.set[!(need.set %in% c(kk, names(x@lhs[[y]]@for.sum)))]
-  }
-  # Add for.sum for lhs if set not declarate before
-  for (i in seq_along(stm@lhs)) {
-    need.set <- get.need.set(stm, i)
-    if (length(need.set) != 0) {
-      need.set <- c(need.set, names(stm@lhs[[i]]@for.sum))
-      stm@lhs[[i]]@for.sum <- lapply(need.set, function(j) stm@lhs[[i]]@for.sum[[j]])
-      names(stm@lhs[[i]]@for.sum) <- need.set
-    }
-  }
+
   # Need estimate all additional sets
   adf <- data.frame(
     name = character(),
@@ -185,6 +170,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     num = numeric(),    # number for lhs
     lead.year = logical(),   # use only for year & lhs
     lag.year = logical(),    # use only for year & lhs
+    use.for.each = logical(),    # use only for year & lhs
     stringsAsFactors = FALSE
   )
   add.set <- list()
@@ -217,37 +203,35 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
           add.set[[k]] <- unique(stm@lhs[[j]]@for.sum[[i]])
       }
     }
-    adf$name <- adf$set
     # 
     adf$need.new <- TRUE
-    # if set contain all
+    # if set contain all do not need new
     for (i in seq_along(add.set)) {
       if (is.null(add.set[[i]]) || all(prec@set[[adf[i, 'set']]] %in% add.set[[i]]))
         adf[i, 'need.new'] <- FALSE
     }
     # if set in lhs the same as for.each
+    adf$name <- adf$set
     fl <- (adf$type =='lhs' & adf$name %in% adf$set[adf$type == 'for.each'])
     if (any(fl)) {
       #adf[fl, 'need.new'] <- TRUE
       adf[fl, 'name'] <- paste0(adf[fl, 'name'], 'p')
     }
-    add.set <- add.set[adf$need.new]
+    #add.set <- add.set[adf$need.new]
     # adf <- adf[adf$need.new,, drop = FALSE]
     if (sum(adf$need.new) > 0) {
-      adf$new.name <- paste0('mCns', stm@name, '_', adf$set)
-      #for (i in seq_len(nrow(adf))) {
-      #  add.set[[i]] <- prec@set[[adf[i,  'set']]]
-      #}
-      if (anyDuplicated(adf$new.name) != 0) {
-        tmp <- rep(0, nrow(adf))
-        while (anyDuplicated(paste0(adf$new.name, tmp)) != 0) {
-          fl <- duplicated(paste0(adf$new.name, tmp))
-          tmp[fl] <- tmp[fl] + 1
+      adf[adf$need.new, 'new.name'] <- paste0('mCns', stm@name, '_', adf[adf$need.new, 'set'])
+      if (anyDuplicated(adf[adf$need.new, 'new.name']) != 0) {
+        reduce.duplic <- function(x) {
+          y <- x
+          while(anyDuplicated(x)) x[duplicated(x)] <- paste0(x[duplicated(x)], '.')
+          fl <- nchar(x) - nchar(y)
+          y[fl != 0] <- paste0(y[fl != 0], (nchar(x) - nchar(y))[fl != 0])
+          y
         }
-        tmp[tmp == 0] <- ''
-        adf$new.name <- paste0(adf$new.name, tmp)
+        adf[adf$need.new, 'new.name'] <- reduce.duplic(adf[adf$need.new, 'new.name'])
       }
-      for (i in seq_len(nrow(adf))) {
+      for (i in seq_len(nrow(adf))[adf$need.new]) {
         prec@parameters[[adf[i, 'new.name']]] <- addMultipleSet(createParameter(adf[i, 'new.name'], adf[i, 'set'], 'map'), add.set[[i]])
       }
     }
