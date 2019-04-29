@@ -228,12 +228,12 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     # if set in lhs the same as for.each
     fl <- (adf$type =='lhs' & adf$name %in% adf$set[adf$type == 'for.each'])
     if (any(fl)) {
-      adf[fl, 'need.new'] <- TRUE
+      #adf[fl, 'need.new'] <- TRUE
       adf[fl, 'name'] <- paste0(adf[fl, 'name'], 'p')
     }
     add.set <- add.set[adf$need.new]
-    adf <- adf[adf$need.new,, drop = FALSE]
-    if (nrow(adf) > 0) {
+    # adf <- adf[adf$need.new,, drop = FALSE]
+    if (sum(adf$need.new) > 0) {
       adf$new.name <- paste0('mCns', stm@name, '_', adf$set)
       #for (i in seq_len(nrow(adf))) {
       #  add.set[[i]] <- prec@set[[adf[i,  'set']]]
