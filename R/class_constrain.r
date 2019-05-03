@@ -90,7 +90,7 @@ setMethod("initialize", "constrain", function(.Object, ...) {
 #' 
 #' @name newConstrain
 #' 
-newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
+newConstrain0 <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
    for.each = list(), defVal = 0, rule = NULL, comm = NULL,
     cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
   obj <- new('constrain')

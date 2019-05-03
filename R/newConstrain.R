@@ -10,14 +10,14 @@
 # for.sum = list(comm = 'BIO', region = NULL), for.each = list(year = 2012:2050), 
 # rhs = data.frame(year = 2012:2050, rhs = as.numeric(s.curve(10, 4e3, .35, 2030))))
 
-name = 'BIOup'
-type = 'output'
-eq = '<='
-for.sum = list(comm = 'BIO', region = NULL)
-for.each = list(year = 2012:2050)
-rhs = data.frame(year = 2012:2050, rhs = as.numeric(s.curve(10, 4e3, .35, 2030)))
+#name = 'BIOup'
+#type = 'output'
+#eq = '<='
+#for.sum = list(comm = 'BIO', region = NULL)
+#for.each = list(year = 2012:2050)
+#rhs = data.frame(year = 2012:2050, rhs = as.numeric(s.curve(10, 4e3, .35, 2030)))
 
-newConstrain2 <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
+newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
                          for.each = list(), defVal = 0, rule = NULL, comm = NULL,
                          cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
   stop.newconstr <- function(x) 
@@ -87,12 +87,35 @@ newConstrain2 <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
     defVal <- 0
     arg[[length(arg) + 1]] <- term
   }
+  # To growth 
+  if (any(grep('growth', type))) {
+    if (length(c(rhs, recursive = TRUE)) == 0) {
+      rhs <- (-defVal)
+    } else {
+      rhs$value <- (-rhs$rhs)
+      rhs$rhs <- NULL
+    }
+    nn <- seq_along(arg)
+    nk <- length(arg)
+    for (i in nn) {
+      arg[[i + nk]] <- arg[[i]]
+      arg[[i + nk]]$mult <- rhs
+      arg[[i + nk]]$for.sum['lead.year'] <- list(NULL)
+      arg[[i + nk]]$for.sum$year <- NULL
+    }
+    rhs <- 0
+    defVal <- 0
+  }
   newStatement(name, eq = eq, for.each = for.each, defVal = defVal, rhs = rhs, arg = arg)
 }
 
 
-newConstrain2('BIOup', 'share.output', '<=', 
-              for.sum = list(comm = 'BIO', region = NULL, sup = NULL), for.each = list(year = 2012:2050), 
-              rhs = data.frame(year = 2012:2050, rhs = as.numeric(s.curve(10, 4e3, .35, 2030))))
+#newConstrain2('BIOup', 'share.output', '<=', 
+#              for.sum = list(comm = 'BIO', region = NULL, sup = NULL), for.each = list(year = 2012:2050), 
+#              rhs = data.frame(year = 2012:2050, rhs = as.numeric(s.curve(10, 4e3, .35, 2030))))
+
+#newConstrain2('BIOup', 'growth.output', '<=', 
+#              for.sum = list(comm = 'BIO'), for.each = list(year = 2012:2050), 
+#              rhs = data.frame(year = 2012:2050, rhs = as.numeric(s.curve(10, 4e3, .35, 2030))))
 
 
