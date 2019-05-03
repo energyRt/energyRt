@@ -139,7 +139,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   for (i in need.set) {
     st@for.sum[[i]] <- NULL
   }
-  if (!all(names(st@mult) %in% c(names(st@for.sum), 'value')))
+  if (!all(names(st@mult) %in% c(names(for.each), names(st@for.sum), 'value')))
     stop(paste0('Wrong mult parameter, excessive set: "', paste0(names(st@mult)[!(names(st@mult) %in% names(st@for.sum))], collapse = '", "'), '"'))
   names(st@defVal) <- NULL
   names(st@variable) <- NULL

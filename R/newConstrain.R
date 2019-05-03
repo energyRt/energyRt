@@ -26,7 +26,7 @@ newConstrain2 <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   
   if (type == 'tax') stop.newconstr('Tax have to do')
   if (type == 'subs') stop.newconstr('Subs have to do')
-  if (any(grep('(share|growth)', type))) stop.newconstr(paste(type, 'have to do'))
+  #if (any(grep('(share|growth)', type))) stop.newconstr(paste(type, 'have to do'))
   # For wich kind of variables (capacity, newcapacity, input or output)
   if (any(grep('inp', type))) {
     inpout <- 'Inp'
@@ -71,6 +71,28 @@ newConstrain2 <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
     term$variable <- i
     arg[[length(arg) + 1]] <- term
   }
+  # To share 
+  if (any(grep('share', type))) {
+    if (length(c(rhs, recursive = TRUE)) == 0) {
+      rhs <- defVal
+    } else {
+      rhs$value <- (rhs$rhs)
+      rhs$rhs <- NULL
+    }
+    for (i in seq_along(arg)) {
+      arg[[i]]$mult <- rhs
+    }
+    term = list(for.sum = for.sum[!(names(for.sum) %in% psb.vec)], variable =paste0('v', inpout,'Tot'), mult = -1)
+    rhs <- 0
+    defVal <- 0
+    arg[[length(arg) + 1]] <- term
+  }
   newStatement(name, eq = eq, for.each = for.each, defVal = defVal, rhs = rhs, arg = arg)
 }
+
+
+newConstrain2('BIOup', 'share.output', '<=', 
+              for.sum = list(comm = 'BIO', region = NULL, sup = NULL), for.each = list(year = 2012:2050), 
+              rhs = data.frame(year = 2012:2050, rhs = as.numeric(s.curve(10, 4e3, .35, 2030))))
+
 
