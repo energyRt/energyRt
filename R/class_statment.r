@@ -58,7 +58,7 @@ setClass('summand',
 );
 
 
-newStatement <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ...) {
+newStatement <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ..., arg = NULL) {
   obj <- new('statement')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq)))   {
@@ -97,6 +97,9 @@ newStatement <- function(name, eq = '==', rhs = data.frame(), for.each = list(),
   obj@defVal    <- defVal
   obj@name      <- name
   obj@for.each  <- for.each
+  for (i in seq_along(arg)) {
+    obj <- addSummand(obj, arg = arg[[i]])
+  }
   arg <- list(...)
   for (i in seq_along(arg)) {
     obj <- addSummand(obj, arg = arg[[i]])
@@ -162,7 +165,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   assign('stm', stm,  globalenv())
   assign('approxim', approxim,  globalenv())
   stop.constr <- function(x) 
-    stop(paste0('constrain "', stm@name, '" error: ', x))
+    stop(paste0('Statement "', stm@name, '" error: ', x))
   
   # all.set contain all set for for.each & lhs
   # Estimate is need sum for for.each
