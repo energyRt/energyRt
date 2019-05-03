@@ -438,6 +438,7 @@
     hh <- sum(sapply(obj@data, function(x) length(x@data)))
     k <- 0
       prorgess_bar_p <- proc.time()[3]
+      # assign('approxim_test', approxim, globalenv())
     # Fill DB main data
       for(i in seq(along = obj@data)) {
           for(j in seq(along = obj@data[[i]]@data)) { 

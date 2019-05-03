@@ -247,7 +247,11 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       all.set[!all.set$for.each & !all.set$def.lhs & all.set$set == all.set$set[i], 'new.map'] <- i
     }
   }
-  
+  if (nrow(all.set) > 0) {
+    st <- unique(all.set$set)
+    st <- st[!(st %in% names(approxim))]
+    for (ss in st) approxim[[ss]] <- prec@set[[ss]]
+  }
 
   # Generate GAMS code with mult & rhs parameters
   res <- list()  
