@@ -161,85 +161,94 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   assign('prec', prec,  globalenv())
   assign('stm', stm,  globalenv())
   assign('approxim', approxim,  globalenv())
-
-  # Need estimate all additional sets
-  adf <- data.frame(
-    name = character(),
-    set = character(),
-    type = character(), # for.each, lhs
-    num = numeric(),    # number for lhs
-    lead.year = logical(),   # use only for year & lhs
-    lag.year = logical(),    # use only for year & lhs
-    use.for.each = logical(),    # use only for year & lhs
+  stop.constr <- function(x) 
+    stop(paste0('constrain "', stm@name, '" error: ', x))
+  
+  # all.set contain all set for for.each & lhs
+  # Estimate is need sum for for.each
+  # set.map need special mapping or consist all set
+  all.set <- data.frame(
+    alias = character(), # name in equation
+    set = character(),  # original set 
+    for.each = logical(), # for.each, lhs
+    lhs.num = numeric(),    # number for lhs
+    lead.year = logical(),   # use only for year & lhs (next year)
+    lag.year = logical(),    # use only for year & lhs (old year)
+    def.lhs  = logical(),    # not in for.each
+    new.map  = numeric(),    # need new sub set
     stringsAsFactors = FALSE
   )
-  add.set <- list()
+  set.map <- list()
+  set.map.name <- NULL # Temp vector with name for list set.map
+  # all.set & set.map
   # for.each
-  nn <- length(stm@for.each) + sapply(stm@lhs, function(x) sum(names(x@for.sum) != 'value'))
-  if (nn > 0) {
-    add.set <- lapply(1:nn, function(x) NULL)
-    adf[1:nn, ] <- NA
-    for (i in (1:ncol(adf))[sapply(adf, class) == 'logical']) 
-      adf[, i] <- FALSE
-    k <- 0
-    for (i in seq_along(stm@for.each)) {
-      k <- k + 1
-      adf[k, 'set'] <- names(stm@for.each)[i]
-      adf[k, 'type'] <- 'for.each'
-      if (!is.null(stm@for.each[[k]]))
-        add.set[[k]] <- stm@for.each[[k]]
-    }
-    for (j in seq_along(stm@lhs)) {
-      for (i in names(stm@lhs[[j]]@for.sum)[names(stm@lhs[[j]]@for.sum) != 'value']) {
-        k <- k + 1
-        adf[k, 'set'] <- i
-        adf[k, 'type'] <- 'lhs'
-        adf[k, 'num'] <- j
-        if (i == 'lead.year' || i == 'lag.year') {
-          adf[k, 'set'] <- 'year'
-          adf[k, i] <- TRUE
-        }
-        if (!is.null(stm@lhs[[j]]@for.sum[[i]]))
-          add.set[[k]] <- unique(stm@lhs[[j]]@for.sum[[i]])
+  nn <- seq_len(length(stm@for.each) + sum(sapply(stm@lhs, function(x) length(.vrb_map[[x@variable]]))))
+  all.set[seq_along(nn), ] <- NA
+  for (i in (1:ncol(all.set))[sapply(all.set, class) == 'logical']) 
+    all.set[, i] <- FALSE
+  nn <- 0
+  if (length(stm@for.each) > 0) {
+    nn <- seq_along(stm@for.each)
+    all.set[nn, 'set'] <- names(stm@for.each)
+    all.set[nn, 'alias'] <- names(stm@for.each)
+    all.set[nn, 'for.each'] <- TRUE
+    for.each.set <- names(stm@for.each)
+    # Fill add.map for for.each
+    for (j in for.each.set) {
+      if (!is.null(stm@for.each[[j]]) && !all(prec@set[[j]] %in% stm@for.each[[j]])) {
+        set.map.name <- c(set.map.name, j)
+        set.map[[length(set.map.name)]] <- stm@for.each[[j]]
+        all.set[nn[names(stm@for.each) == j], 'new.map'] <- length(set.map.name)
       }
     }
-    # 
-    adf$need.new <- TRUE
-    # if set contain all do not need new
-    for (i in seq_along(add.set)) {
-      if (is.null(add.set[[i]]) || all(prec@set[[adf[i, 'set']]] %in% add.set[[i]]))
-        adf[i, 'need.new'] <- FALSE
+  } else lhs.set <- NULL
+  # lhs
+  for (i in seq_along(stm@lhs)) {
+    need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
+    nn <- (nn[length(nn)] + seq_along(need.set))
+    all.set[nn, 'set'] <- need.set
+    all.set[nn, 'alias'] <- need.set
+    all.set[nn, 'lhs.num'] <- i
+    if (any(names(stm@lhs[[i]]@for.sum) == 'lag.year')) {
+      if (all(need.set != 'year'))
+        stop.constr('For lag.year have to define use variable with year')
+      all.set[nn[need.set == 'year'], c('lag.year', 'def.lhs')] <- TRUE
     }
-    # if set in lhs the same as for.each
-    adf$name <- adf$set
-    fl <- (adf$type =='lhs' & adf$name %in% adf$set[adf$type == 'for.each'])
-    if (any(fl)) {
-      #adf[fl, 'need.new'] <- TRUE
-      adf[fl, 'name'] <- paste0(adf[fl, 'name'], 'p')
+    if (any(names(stm@lhs[[i]]@for.sum) == 'lead.year')) {
+      if (all(need.set != 'year'))
+        stop.constr('For lead.year have to define use variable with year')
+      all.set[nn[need.set == 'year'], c('lead.year', 'def.lhs')] <- TRUE
     }
-    #add.set <- add.set[adf$need.new]
-    # adf <- adf[adf$need.new,, drop = FALSE]
-    if (sum(adf$need.new) > 0) {
-      adf[adf$need.new, 'new.name'] <- paste0('mCns', stm@name, '_', adf[adf$need.new, 'set'])
-      if (anyDuplicated(adf[adf$need.new, 'new.name']) != 0) {
-        reduce.duplic <- function(x) {
-          y <- x
-          while(anyDuplicated(x)) x[duplicated(x)] <- paste0(x[duplicated(x)], '.')
-          fl <- nchar(x) - nchar(y)
-          y[fl != 0] <- paste0(y[fl != 0], (nchar(x) - nchar(y))[fl != 0])
-          y
-        }
-        adf[adf$need.new, 'new.name'] <- reduce.duplic(adf[adf$need.new, 'new.name'])
-      }
-      for (i in seq_len(nrow(adf))[adf$need.new]) {
-        prec@parameters[[adf[i, 'new.name']]] <- addMultipleSet(createParameter(adf[i, 'new.name'], adf[i, 'set'], 'map'), add.set[[i]])
+    all.set[nn[need.set %in% names(stm@lhs[[i]]@for.sum)], 'def.lhs'] <- TRUE
+    all.set[nn[!(need.set %in% for.each.set)], 'def.lhs'] <- TRUE
+    # Add to set map
+    st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & !sapply(stm@lhs[[i]]@for.sum, is.null)]
+    # Fill add.map for for.lhs
+    for (j in st) {
+      if (!all(prec@set[[j]] %in% stm@lhs[[i]]@for.sum[[j]])) {
+        set.map.name <- c(set.map.name, j)
+        set.map[[length(set.map.name)]] <- stm@lhs[[i]]@for.sum[[j]]
+        all.set[nn[need.set == j], 'new.map'] <- length(set.map.name)
       }
     }
   }
-  if ((any(adf$lag.year) || any(adf$lead.year)) && !any(adf$type == 'for.each' & adf$set == 'year')) {
-    stop(paste0('There are lag.year or lead.year, without year (for.each), for statment: "', stm@name, '"'))
+  # Add alias
+  fl <- (!all.set$for.each & all.set$def.lhs & all.set$set %in% for.each.set)
+  if (any(fl)) 
+    all.set[fl, 'alias'] <- paste0(all.set[fl, 'set'], 'p')
+  if (length(set.map) > 0) {
+    new.map.name <- paste0('mCns', stm@name, seq_along(set.map))
+    new.map.name.full <- paste0(new.map.name, '(', all.set[!is.na(all.set$new.map), 'alias'], ')')
+    for (i in seq_along(set.map)) 
+      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), set.map[[i]])
+    # copy new.map for lhs set that define in for each
+    fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
+    for (i in fl) {
+      all.set[!all.set$for.each & !all.set$def.lhs & all.set$set == all.set$set[i], 'new.map'] <- i
+    }
   }
-    
+  
+
   # Generate GAMS code with mult & rhs parameters
   res <- list()  
   # Declaration equation in model
@@ -252,68 +261,33 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   }
   # Equation before ..
   res$equation <- res$equationDeclaration
-  if (any(adf$type == 'for.each') || any(names(stm@for.each) == 'year')) {
-    fl <- (adf$type == 'for.each')
+  if (any(all.set$for.each & (all.set == 'year') | !is.na(all.set$new.map))) {
+    for.each.set0 <- all.set[all.set$for.each,, drop = FALSE]
     hh <- NULL
-    if (any(fl)) { 
-      hh <- c(hh, paste0(adf[fl, 'new.name'], '(', adf[fl, 'name'], ')'))
+    if (any(!is.na(for.each.set0$new.map))) { 
+      hh <- c(hh, new.map.name.full[for.each.set0$new.map[!is.na(for.each.set0$new.map)]])
     }
-    if (any(adf$lag.year)) { 
+    if (any(for.each.set0$set == 'year')) { 
+      hh <- c(hh, 'mMidMilestone(year)')
+    }
+    if (any(all.set$lag.year)) { 
       hh <- c(hh, 'not(mStartMilestone(year))')
     }
-    if (any(adf$lead.year)) { 
+    if (any(all.set$lead.year)) { 
       hh <- c(hh, 'mMilestoneHasNext(year)')
-    }
-    if (any(names(stm@for.each) == 'year')) { 
-      hh <- c(hh, 'mMidMilestone(year)')
     }
     res$equation <- paste0(res$equation, '$', '('[length(hh) > 1], 
                            paste0(hh, collapse = ' and '), ')'[length(hh) > 1])
     
   }
   res$equation <- paste0(res$equation, '.. ')
-  # Add lhs
+  # Add lhs to equation
+  lhs.set <- all.set[!all.set$for.each,, drop = FALSE]
   for (i in seq_along(stm@lhs)) {
-    need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
-    names(need.set) <- need.set
-    adf2 <- adf[adf$type == 'lhs' & adf$num == i,, drop = FALSE]
-    adf3 <- adf2[adf2$name != adf2$set,, drop = FALSE]
-    if (nrow(adf3) > 0) {
-      need.set[adf3$set] <- adf3$name
-      kk <- names(stm@lhs[[i]]@for.sum)
-      kk[kk %in% c('lead.year', 'lag.year')] <- 'year'
-      names(stm@lhs[[i]]@for.sum) <- need.set[kk]
-    }
-    lft <- ''; rgt <- '';
-    if (length(stm@lhs[[i]]@for.sum) != 0) {
-      if (length(stm@lhs[[i]]@for.sum) == 1) {
-        lft <- paste0('sum(', names(stm@lhs[[i]]@for.sum))
-      } else {
-        lft <- paste0('sum((', paste0(names(stm@lhs[[i]]@for.sum), collapse = ', '), ')')
-      }
-      if (nrow(adf2) > 0) {
-        ss <- paste0(paste0(adf2$new.name, '(', adf2$name, ')'), collapse = ' and ')
-        fl <- (nrow(adf2) > 1)
-        if (any(adf2$lead.year)) {
-          ss <- paste0('mMilestoneNext(year,', adf2[adf2$lead.year, 'name'], ') and ', ss)
-          fl <- TRUE
-        }
-        if (any(adf2$lag.year)) {
-          ss <- paste0('mMilestoneNext(', adf2[adf2$lead.year, 'name'], ', year) and ', ss)
-          fl <- TRUE
-        }
-        lft <- paste0(lft, '$', '('[fl], ss, ')'[fl])
-      }
-      lft <- paste0(lft, ', ')
-      rgt <- ')'
-    }
-    vrm <- .vrb_mapping[[stm@lhs[[i]]@variable]]
-    if (length(need.set) != 0) {
-      for (k in names(need.set)) {
-        vrm <- gsub(paste0(' ', k, ' '), paste0(' ', need.set[k], ' '), vrm)
-      }
-    }
-    vrm <- gsub('[ ]*$', '', gsub('[(] ', '(', gsub(' [)]', ')', gsub(' [$] ', '$', gsub(' , ', ', ', vrm)))))
+    vrb <- stm@lhs[[i]]@variable
+    lhs.set2 <- lhs.set[lhs.set$lhs.num == i, ]
+    vrb.lhs <- .vrb_mapping[[vrb]]
+    # Add multiple to vrb
     # Add multiplier
     if (nrow(stm@lhs[[i]]@mult) != 0) {
       # Complicated parameter
@@ -322,21 +296,64 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       if (any(names(approxim2) == 'slice')) {
         approxim2$slice <- approxim2$slice@all_slice
       }
-      need.set2 <- need.set
-      need.set2 <- need.set2[names(need.set2) %in% colnames(stm@lhs[[i]]@mult)]
-      for (j in names(need.set2)) {
-        approxim2[[j]] <- unique(c(stm@lhs[[i]]@mult[, j], add.set[adf$set == j], recursive = TRUE))
+      need.set <- lhs.set2[lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), 'set']
+      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), ]
+      for (j in seq_len(nrow(need.set2))) {
+        approxim2[[j]] <- set.map[[need.set2[j, 'new.map']]]
       }
-      xx <- createParameter(paste0('pCnsMult', i), need.set2, 'simple', defVal = stm@lhs[[i]]@defVal, interpolation = 'back.inter.forth')
+      xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
+                            interpolation = 'back.inter.forth')
       prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
       # Add mult
-      vrm <- paste0(xx@name, '(', paste0(need.set2, collapse = ', '), ') * ', vrm)
+      vrb.lhs <- paste0(xx@name, '(', paste0(need.set, collapse = ', '), ') * ', vrb.lhs)
     } else if (stm@lhs[[i]]@defVal != 1) {
-      vrm <- paste0(stm@lhs[[i]]@defVal, ' * ', vrm)
+      vrb.lhs <- paste0(stm@lhs[[i]]@defVal, ' * ', vrb.lhs)
     }
-    # Finish lhs
-    vrm <- paste0(lft, vrm, rgt)
-    res$equation <- paste0(res$equation, ' + '[i != 1], vrm)
+    # Replace setsname
+    for (j in seq_len(nrow(lhs.set2))[lhs.set2$alias != lhs.set2$set]) {
+      vrb.lhs <- gsub(paste0(' ', lhs.set2$set[j], ' '), lhs.set2$alias[j], vrb.lhs)
+    }
+    vrb.lhs <- gsub('[ ]*[$][ ]*', '$', gsub('[ ]*[)]', ')', gsub('[ ]*[(][ ]*', '(', gsub('[ ]*[,][ ]*', ', ', vrb.lhs))))
+    # Generate data to equation
+    if (i != 1) res$equation <- paste0(res$equation, '+')
+    if (all(!lhs.set2$def.lhs)) {
+      res$equation <- paste0(res$equation, vrb.lhs)
+    } else {
+      lhs.set3 <- lhs.set2[lhs.set2$def.lhs,, drop = FALSE]
+      cnd <- NULL
+      if (any(!is.na(lhs.set3$new.map))) { 
+        cnd <- c(cnd, new.map.name.full[lhs.set3$new.map[!is.na(lhs.set3$new.map)]])
+      }
+      if (any(lhs.set3$lag.year == 'year')) { 
+        cnd <- c(cnd, 'mMilestoneNext(yearp, year)')
+      } else if (any(lhs.set3$lead.year)) { 
+        cnd <- c(cnd, 'mMilestoneNext(year, yearp)')
+      } else if (any(lhs.set3$set == 'year')) { 
+        cnd <- c(cnd, 'mMidMilestone(year)')
+      }
+      if (any(grep('[$]', vrb.lhs))) {
+        tmp <- gsub('.*[$]', '', vrb.lhs)
+        if (substr(tmp, 1, 1) == '(') 
+          tmp <- substr(tmp, 2, nchar(tmp) - 1)
+        cnd <- c(cnd, tmp)
+        vrb.lhs <- gsub('[$].*', '', vrb.lhs)
+      }
+      if (any(!is.na(lhs.set3$new.map))) 
+        cnd <- c(cnd, new.map.name.full[lhs.set3$new.map[!is.na(lhs.set3$new.map)]])
+      # Finish for sum
+      if (sum(lhs.set2$def.lhs) == 1) {
+        res$equation <- paste0(res$equation, ' sum(', lhs.set3$alias);
+      } else {
+        res$equation <- paste0(res$equation, ' sum((', paste0(lhs.set3$alias, collapse = ', '), ')');
+      }
+      if (length(cnd) == 1) {
+        res$equation <- paste0(res$equation, '$', cnd, ', ', vrb.lhs, ')')
+      } else if (length(cnd) > 1) {
+        res$equation <- paste0(res$equation, '$(', paste0(cnd, collapse = ' and '), '), ', vrb.lhs, ')')
+      } else {
+        stop('error!')
+      }
+    }
   }
   # Add eq
   res$equation <- paste0(res$equation, ' ', c('==' = '=e=', '>=' = '=g=', '<=' = '=l=')[as.character(stm@eq)], ' ')
@@ -348,23 +365,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     if (any(names(approxim2) == 'slice')) {
       approxim2$slice <- approxim2$slice@all_slice
     }
-    need.set2 <- names(stm@for.each)
-    names(need.set2) <- need.set2
-    need.set2 <- need.set2[names(need.set2) %in% colnames(stm@rhs)]
-    ################ for.each
-    adf2 <- adf[adf$type == 'for.each',, drop = FALSE]
-    adf3 <- adf2[adf2$name != adf2$set,, drop = FALSE]
-    if (nrow(adf3) > 0) {
-      need.set2[adf3$set] <- adf3$name
+    need.set <- all.set[all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs),, drop = FALSE]
+    for (j in seq_len(nrow(need.set))) {
+      approxim2[[j]] <- set.map[[need.set[j, 'new.map']]]
     }
-    for (j in names(need.set2)) {
-      approxim2[[j]] <- unique(c(stm@rhs[, j], add.set[adf$set == j], recursive = TRUE))
-    }
-    xx <- createParameter(paste0('pCnsRhs', stm@name), need.set2, 'simple', defVal = stm@defVal, 
+    need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
+    xx <- createParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
                           interpolation = 'back.inter.forth', colName = 'rhs')
     prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@rhs, 'rhs', xx, approxim2))
     # Add mult
-    res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set2, collapse = ', '), ')')
+    res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')
   } else {
     res$equation <- paste0(res$equation, stm@defVal)
   }
