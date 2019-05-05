@@ -145,8 +145,11 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   names(st@variable) <- NULL
   eqt@lhs[[length(eqt@lhs) + 1]] <- st
   eqt  
-S}
+}
 
+#stm <- newConstrain('useElc2018Coa1', 'input', '>=', rhs = 2742*(1 - .025),
+#             for.sum = list(tech = base.elc.tech, slice = 'ANNUAL', region = NULL, comm = c("COA")),
+#             for.each = list(year = 2018))
 
 #stm <- newStatement('testEx', for.each = list(year = 2012), rhs = data.frame(year = 2012, value = 5),
 #                    summand1 = list(variable = 'vTechOut', for.sum = list(year = 2012, tech = c('ELC_COA', 'ELC_GAS')), 
@@ -240,7 +243,7 @@ S}
   if (any(fl)) 
     all.set[fl, 'alias'] <- paste0(all.set[fl, 'set'], 'p')
   if (length(set.map) > 0) {
-    new.map.name <- paste0('mCns', stm@name, seq_along(set.map))
+    new.map.name <- paste0('mCns', stm@name, '_', all.set[!is.na(all.set$new.map), 'new.map'])
     new.map.name.full <- paste0(new.map.name, '(', all.set[!is.na(all.set$new.map), 'alias'], ')')
     for (i in seq_along(set.map)) 
       prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), set.map[[i]])

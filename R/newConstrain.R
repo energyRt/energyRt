@@ -20,7 +20,6 @@
 newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
                          for.each = list(), defVal = 0, rule = NULL, comm = NULL,
                          cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
-  #browser()
   stop.newconstr <- function(x) 
     stop(paste0('Constrain "', name, '" error: ', x))
   
@@ -113,6 +112,12 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   }
   newStatement(name, eq = eq, for.each = for.each, defVal = defVal, rhs = rhs, arg = arg)
 }
+
+
+
+#newConstrain('MINGASgrow2', 'growth.output', '>=', 
+#             for.sum = list(comm = 'MINGAS', region = NULL, slice = NULL), 
+#             for.each = list(year = 2012:2050), rhs = .9)
 
 #newConstrain('MINGASgrow2', 'growth.output', '>=', 
 #             for.sum = list(comm = 'MINGAS', region = NULL, slice = NULL), 
