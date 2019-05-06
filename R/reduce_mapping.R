@@ -45,8 +45,15 @@
       if (i == 'slice' && any(colnames(sets) == 'comm')) {
         tmp <- merge(tmp_map$mCommSlice, tmp)
       } 
+      # Sup
       if (i == 'comm' && any(colnames(sets) == 'sup')) {
         tmp <- merge(tmp_map$mSupComm, tmp)
+      }      
+      if (i == 'slice' && any(colnames(sets) == 'sup')) {
+        tmp <- merge(tmp_map$mSupSlice, tmp)
+      }      
+      if (i == 'region' && any(colnames(sets) == 'sup')) {
+        tmp <- merge(tmp_map$mSupSpan, tmp)
       }      
       if (i == 'year') {
         tmp <- merge(tmp_map$year, tmp)
@@ -261,6 +268,7 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
       tmp_nozero$pAggregateFactor, 'comm'), tmp_map$region), tmp_map$year), tmp_map$slice)))
     
     prec@parameters[['mSupAva']] <- addData(prec@parameters[['mSupAva']], tmp_nozero$pSupAva)
+    
     prec@parameters[['mSupAvaUp']] <- addData(prec@parameters[['mSupAvaUp']],
                                               reduce.duplicate(merge(tmp_nozero$pSupAva, tmp_noinf$pSupAva)))
     prec@parameters[['mSupReserveUp']] <- addData(prec@parameters[['mSupReserveUp']], reduce.duplicate(
