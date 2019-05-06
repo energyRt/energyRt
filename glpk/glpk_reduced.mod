@@ -110,6 +110,7 @@ param mTechOlifeInf{tech, region};
 param mStorageOlifeInf{stg, region};
 param mTechAfcUp{tech, comm, region, year, slice};
 param mSupAvaUp{sup, comm, region, year, slice};
+param mSupAva{sup, comm, region, year, slice};
 param mSupReserveUp{sup, comm, region};
 param mOut2Lo{comm, region, year, slice};
 param mInp2Lo{comm, region, year, slice};
@@ -361,15 +362,15 @@ s.t.  eqTechOMCost{ t in tech,r in region,y in year : (mMidMilestone[y] and mTec
 
 s.t.  eqSupAvaUp{ s1 in sup,c in comm,r in region,y in year,s in slice : mSupAvaUp[s1,c,r,y,s]}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mSupWeatherUp[s1,wth1] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pSupWeatherUp[s1,wth1]);
 
-s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : (mSupSlice[s1,s] and mMidMilestone[y] and mSupComm[s1,c] and mSupSpan[s1,r])}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mSupWeatherLo[s1,wth1] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pSupWeatherLo[s1,wth1]);
+s.t.  eqSupAvaLo{ s1 in sup,c in comm,r in region,y in year,s in slice : mSupAva[s1,c,r,y,s]}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:((mWeatherRegion[wth1,r] and mWeatherSlice[wth1,sp] and mSupWeatherLo[s1,wth1] and (mAllSliceParentChild[s,sp] or mSameSlice[s,sp])))}(pWeather[wth1,r,y,s]*pSupWeatherLo[s1,wth1]);
 
-s.t.  eqSupTotal{ s1 in sup,c in comm,r in region : (mSupComm[s1,c] and mSupSpan[s1,r])}: vSupReserve[s1,c,r]  =  sum{y in year,s in slice,ye in year,yp in year:((mSupSlice[s1,s] and mMidMilestone[y] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ordYear[yp]-ordYear[ye]+1)*vSupOut[s1,c,r,y,s]);
+s.t.  eqSupTotal{ s1 in sup,c in comm,r in region : (mSupComm[s1,c] and mSupSpan[s1,r])}: vSupReserve[s1,c,r]  =  sum{y in year,s in slice,ye in year,yp in year:((mSupAva[s1,c,r,y,s] and mStartMilestone[y,ye] and mEndMilestone[y,yp]))}((ordYear[yp]-ordYear[ye]+1)*vSupOut[s1,c,r,y,s]);
 
 s.t.  eqSupReserveUp{ s1 in sup,c in comm,r in region : mSupReserveUp[s1,c,r]}: pSupReserveUp[s1,c,r]  >=  vSupReserve[s1,c,r];
 
 s.t.  eqSupReserveLo{ s1 in sup,c in comm,r in region : (mSupComm[s1,c] and pSupReserveLo[s1,c,r] <> 0 and mSupSpan[s1,r])}: vSupReserve[s1,c,r]  >=  pSupReserveLo[s1,c,r];
 
-s.t.  eqSupCost{ s1 in sup,r in region,y in year : (mMidMilestone[y] and mSupSpan[s1,r])}: vSupCost[s1,r,y]  =  sum{c in comm,s in slice:((mSupSlice[s1,s] and mSupComm[s1,c]))}(pSupCost[s1,c,r,y,s]*vSupOut[s1,c,r,y,s]);
+s.t.  eqSupCost{ s1 in sup,r in region,y in year : (mMidMilestone[y] and mSupSpan[s1,r])}: vSupCost[s1,r,y]  =  sum{c in comm,s in slice:(mSupAva[s1,c,r,y,s])}(pSupCost[s1,c,r,y,s]*vSupOut[s1,c,r,y,s]);
 
 s.t.  eqDemInp{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mDemInp[c,s])}: vDemInp[c,r,y,s]  =  sum{d in dem:(mDemComm[d,c])}(pDemand[d,c,r,y,s]);
 
@@ -463,7 +464,7 @@ s.t.  eqInpTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] a
 
 s.t.  eqInp2Lo{ c in comm,r in region,y in year,s in slice : mInp2Lo[c,r,y,s]}: sum{sp in slice:((mAllSliceParentChild[s,sp] and mCommSlice[c,sp]))}(vInp2Lo[c,r,y,s,sp])  =  sum{FORIF: mTechInpTot[c,r,y,s]} (vTechInpTot[c,r,y,s])+sum{FORIF: mStorageInpTot[c,r,y,s]} (vStorageInpTot[c,r,y,s])+sum{FORIF: mExport[c,r,y,s]} (vExport[c,r,y,s])+sum{FORIF: mTradeIrAInpTot[c,r,y,s]} (vTradeIrAInpTot[c,r,y,s]);
 
-s.t.  eqSupOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mSupOutTot[c,r,s])}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup:((mSupSlice[s1,s] and mSupComm[s1,c] and mSupSpan[s1,r]))}(vSupOut[s1,c,r,y,s]);
+s.t.  eqSupOutTot{ c in comm,r in region,y in year,s in slice : (mMidMilestone[y] and mSupOutTot[c,r,s])}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup:(mSupAva[s1,c,r,y,s])}(vSupOut[s1,c,r,y,s]);
 
 s.t.  eqTechInpTot{ c in comm,r in region,y in year,s in slice : mTechInpTot[c,r,y,s]}: vTechInpTot[c,r,y,s]  =  sum{t in tech:((mTechSpan[t,r,y] and mTechInpComm[t,c] and mTechSlice[t,s]))}(vTechInp[t,c,r,y,s])+sum{t in tech:((mTechSpan[t,r,y] and mTechAInp[t,c] and mTechSlice[t,s]))}(vTechAInp[t,c,r,y,s]);
 

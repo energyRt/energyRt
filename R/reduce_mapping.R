@@ -260,6 +260,7 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], reduce.duplicate(merge(merge(merge(reduce.sect(
       tmp_nozero$pAggregateFactor, 'comm'), tmp_map$region), tmp_map$year), tmp_map$slice)))
     
+    prec@parameters[['mSupAva']] <- addData(prec@parameters[['mSupAva']], tmp_nozero$pSupAva)
     prec@parameters[['mSupAvaUp']] <- addData(prec@parameters[['mSupAvaUp']],
                                               reduce.duplicate(merge(tmp_nozero$pSupAva, tmp_noinf$pSupAva)))
     prec@parameters[['mSupReserveUp']] <- addData(prec@parameters[['mSupReserveUp']], reduce.duplicate(
@@ -269,7 +270,6 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     prec@parameters[['mTechAfcUp']] <- addData(prec@parameters[['mTechAfcUp']], reduce.duplicate(merge(tmp_nozero$pTechAfc, tmp_noinf$pTechAfc)))
     prec@parameters[['mTechOlifeInf']] <- addData(prec@parameters[['mTechOlifeInf']], generate_haveval('pTechOlife', Inf))
     prec@parameters[['mStorageOlifeInf']] <- addData(prec@parameters[['mStorageOlifeInf']], generate_haveval('pStorageOlife', Inf))
-    
     
     #sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) and
     #(mSupOutTot(comm, region, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or

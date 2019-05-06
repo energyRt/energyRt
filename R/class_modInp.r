@@ -422,6 +422,7 @@ setMethod("initialize", "modInp",
   
   .Object@parameters[['mSupOutTot']] <- createParameter('mSupOutTot', c('comm', 'region', 'slice'), 'map') 
   .Object@parameters[['mSupAvaUp']] <- createParameter('mSupAvaUp', c('sup', 'comm', 'region', 'year', 'slice'), 'map') 
+  .Object@parameters[['mSupAva']] <- createParameter('mSupAva', c('sup', 'comm', 'region', 'year', 'slice'), 'map') 
   .Object@parameters[['mSupReserveUp']] <- createParameter('mSupReserveUp', c('sup', 'comm', 'region'), 'map') 
   
   .Object@parameters[['mTechAfUp']] <- createParameter('mTechAfUp', c('tech', 'region', 'year', 'slice'), 'map') 

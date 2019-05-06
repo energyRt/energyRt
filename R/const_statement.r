@@ -73,7 +73,7 @@
   vTechEac = "vTechEac( tech , region , year ) $ mTechSpan( tech , region , year )",
   vTechSalv = "vTechSalv( tech , region ) $ ( sum( year_cns $ mTechNew( tech , region , year_cns ) , 1 ) <> 0 )",
   vTechOMCost = "vTechOMCost( tech , region , year ) $ mTechSpan( tech , region , year )",
-  vSupOut = "vSupOut( sup , comm , region , year , slice ) $ ( mSupSlice( sup , slice ) and mSupComm( sup , comm ) and mSupSpan( sup , region ) )",
+  vSupOut = "vSupOut( sup , comm , region , year , slice ) $ mSupAva( sup , comm , region , year , slice )",
   vSupReserve = "vSupReserve( sup , comm , region ) $ mSupReserveUp( sup , comm , region )",
   vSupCost = "vSupCost( sup , region , year ) $ mSupSpan( sup , region )",
   vDemInp = "vDemInp( comm , region , year , slice ) $ ( mMidMilestone( year ) and mDemInp( comm , slice ) )",

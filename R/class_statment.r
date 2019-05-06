@@ -169,7 +169,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   assign('approxim', approxim,  globalenv())
   stop.constr <- function(x) 
     stop(paste0('Statement "', stm@name, '" error: ', x))
-  
+  get.all.child <- function(x)  {
+    unique(c(x, c(approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% x, 'child'])))
+  }
   # all.set contain all set for for.each & lhs
   # Estimate is need sum for for.each
   # set.map need special mapping or consist all set
@@ -231,10 +233,28 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & !sapply(stm@lhs[[i]]@for.sum, is.null)]
     # Fill add.map for for.lhs
     for (j in st) {
-      if (!all(prec@set[[j]] %in% stm@lhs[[i]]@for.sum[[j]])) {
-        set.map.name <- c(set.map.name, j)
-        set.map[[length(set.map.name)]] <- stm@lhs[[i]]@for.sum[[j]]
-        all.set[nn[need.set == j], 'new.map'] <- length(set.map.name)
+      if (!all(prec@set[[j]] %in% stm@lhs[[i]]@for.sum[[j]]) && (j != 'slice' || 
+                !all(prec@set[[j]] %in% get.all.child(stm@lhs[[i]]@for.sum[[j]])))) {
+        # check if the same set in lhs exist
+        fl <- FALSE
+        if (all(!c(all.set[nn[need.set == j], c('lead.year', 'lag.year')], recursive = TRUE))) {
+          fl <- (!all.set$for.each & all.set$set == j & !is.na(all.set$new.map))
+        }
+        add.new <- TRUE
+        if (any(fl)) {
+          for (k in all.set[fl, 'new.map']) {
+            if (length(stm@lhs[[i]]@for.sum[[j]]) == length(set.map[[k]]) && 
+                all(stm@lhs[[i]]@for.sum[[j]] %in% set.map[[k]])  && all(set.map[[k]] %in% stm@lhs[[i]]@for.sum[[j]])) {
+              all.set[nn[need.set == j], 'new.map'] <- k
+              add.new <- FALSE
+            }
+          }
+        }
+        if (add.new) {
+          set.map.name <- c(set.map.name, j)
+          set.map[[length(set.map.name)]] <- stm@lhs[[i]]@for.sum[[j]]
+          all.set[nn[need.set == j], 'new.map'] <- length(set.map.name)
+        }
       }
     }
   }
@@ -246,6 +266,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   # Maaping
   if (length(set.map) > 0) {
     mpp <- all.set[!is.na(all.set$new.map), c('new.map', 'alias')]
+    mpp <- mpp[!duplicated(mpp$new.map), ]
     mpp <- mpp[sort(mpp$new.map, index.return = TRUE)$ix,, drop = FALSE]
     new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
     new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
@@ -400,7 +421,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 #  .getSetEquation(prec, stm, approxim)@gams.equation
 
-#stm <- newConstrain('useElc2018Coa1', 'input', '>=', rhs = 2742*(1 - .025),
-#                    for.sum = list(tech = base.elc.tech, slice = 'ANNUAL', region = NULL, comm = c("COA")),
+#stm <- newConstrain('useElc2018Gas1', 'input', '>=', rhs = 8128*(1 - .025),
+#                    for.sum = list(tech = base.elc.tech, slice = 'ANNUAL', region = NULL, comm = c("GAS")),
 #                    for.each = list(year = 2018))
 
