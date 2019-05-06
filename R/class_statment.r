@@ -242,11 +242,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   fl <- (!all.set$for.each & all.set$def.lhs & all.set$set %in% for.each.set)
   if (any(fl)) 
     all.set[fl, 'alias'] <- paste0(all.set[fl, 'set'], 'p')
+  # Need add code to reduce additional mapping
+  # Maaping
   if (length(set.map) > 0) {
-    new.map.name <- paste0('mCns', stm@name, '_', all.set[!is.na(all.set$new.map), 'new.map'])
-    new.map.name.full <- paste0(new.map.name, '(', all.set[!is.na(all.set$new.map), 'alias'], ')')
+    mpp <- all.set[!is.na(all.set$new.map), c('new.map', 'alias')]
+    mpp <- mpp[sort(mpp$new.map, index.return = TRUE)$ix,, drop = FALSE]
+    new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
+    new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
     for (i in seq_along(set.map)) 
       prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), set.map[[i]])
+    
     # copy new.map for lhs set that define in for each
     fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
     for (i in fl) {
@@ -394,3 +399,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 }
 
 #  .getSetEquation(prec, stm, approxim)@gams.equation
+
+#stm <- newConstrain('useElc2018Coa1', 'input', '>=', rhs = 2742*(1 - .025),
+#                    for.sum = list(tech = base.elc.tech, slice = 'ANNUAL', region = NULL, comm = c("COA")),
+#                    for.each = list(year = 2018))
+
