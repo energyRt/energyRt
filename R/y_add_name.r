@@ -1,16 +1,16 @@
 
 ################################################################################
-# Add statement
+# Add constrain
 ################################################################################
-setMethod('add_name', signature(obj = 'modInp', app = 'statement',
+setMethod('add_name', signature(obj = 'modInp', app = 'constrain',
                                 approxim = 'list'), function(obj, app, approxim) {
                                   if (!energyRt:::.chec_correct_name(app@name)) {
-                                    stop(paste('Incorrect statement name "', app@name, '"', sep = ''))
+                                    stop(paste('Incorrect constrain name "', app@name, '"', sep = ''))
                                   }
-                                  if (isStatement(obj, app@name)) {
-                                    warning(paste('There is statement name "', app@name,
+                                  if (isConstrain(obj, app@name)) {
+                                    warning(paste('There is constrain name "', app@name,
                                                   '" now, all previous information will be removed', sep = ''))
-                                    obj <- removePreviousStatement(obj, cmd@name)
+                                    obj <- removePreviousConstrain(obj, cmd@name)
                                   }
                                   obj
                                 })

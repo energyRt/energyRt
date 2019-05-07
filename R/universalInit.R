@@ -130,9 +130,6 @@ setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
 setMethod('newImport', signature(name = 'character'), function(name, ...) 
   universalInit('import', name, ...))
 
-#setGeneric("newConstrain", function(name, ...) standardGeneric("newConstrain"))
-#setMethod('newConstrain', signature(name = 'character'), function(name, ...) 
-#  universalInit('constrain', name, ...))
 
 setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #' Create new model object

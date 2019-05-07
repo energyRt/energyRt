@@ -26,24 +26,6 @@ setMethod('isCommodity', signature(obj = 'modInp', name = 'character'),
 
 
 ################################################################################
-# Remove previous statement
-################################################################################
-setMethod('removePreviousStatement',
-          signature(obj = 'modInp', name = 'character'),
-          function(obj, name) {
-            obj@gams.equation <- obj@gams.equation[names(obj@gams.equation) != name]
-            obj
-          })
-################################################################################
-# is statement name
-################################################################################
-
-setMethod('isStatement', signature(obj = 'modInp', name = 'character'), 
-          function(obj, name) {
-            return(any(names(obj@gams.equation) == name))
-          })
-
-################################################################################
 # Remove previous demand
 ################################################################################
 setMethod('removePreviousDemand',

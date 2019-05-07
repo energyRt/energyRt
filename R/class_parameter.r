@@ -46,7 +46,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   attr(.Object, 'GUID') <- '8732f62e-0f23-4853-878b-ec8a5cbd5224'
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'weather', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
-                 'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade', 'cns')
+                 'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade')
   if (!is.character(name) || length(name) != 1 || !energyRt:::.chec_correct_name(name)) 
     stop(paste('Wrong name: "', name, '"', sep = ''))
   if (length(dimSetNames) == 0 || any(!is.character(dimSetNames)) || 
@@ -83,7 +83,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
       region = character(), regionp = character(), src = character(), dst = character(), 
       year = numeric(), yearp = numeric(), slicep = character(), 
       slice = character(), stg = character(),
-      expp = character(), imp = character(), trade = character(), cns = character(), 
+      expp = character(), imp = character(), trade = character(), 
       type = factor(levels = c('lo', 'up')),
       value = numeric(), stringsAsFactors = FALSE)
   dimSetNames <- .Object@dimSetNames

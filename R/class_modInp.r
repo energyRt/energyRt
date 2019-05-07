@@ -7,7 +7,6 @@ setClass("modInp", # modInp
   representation(
     set = "list", # @sets List with set : tech, sup, group, comm, region, year, slice
     parameters = "list", # @parameters List with techology parameter
-    customConstrains = "list", # @customConstrains
     modelVersion        = "character",
     solver              = "character",
     gams.equation  = 'list',
@@ -18,7 +17,6 @@ setClass("modInp", # modInp
                 comm = c(), region = c(), year = c(), slice = c()
     ),
     parameters = list(), # List with techology parameter
-    customConstrains = list(), 
     modelVersion        = "",
     solver              = "",
     gams.equation  = list(),
@@ -48,7 +46,6 @@ setMethod("initialize", "modInp",
     .Object@parameters[['expp']]    <- createSet('expp')    
     .Object@parameters[['imp']]    <- createSet('imp')    
     .Object@parameters[['trade']]    <- createSet('trade')    
-    .Object@parameters[['cns']] <- createSet('cns')    
     .Object@parameters[['weather']] <- createSet('weather')    
 
     # weather

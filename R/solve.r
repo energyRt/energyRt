@@ -220,13 +220,6 @@
     if (all(model.type != c('reduced', 'full')))
      stop('Unknown model.type argument, have to be "full" or "reduced"')
   } else model.type <- 'reduced'
-  if (model.type == 'reduced') {
-    if (length(getNames(obj, class = 'constrain', type = '(fixom|varom|actvarom|cvarom|avarom)')) > 0) {
-      stop(paste('Unexeptable constrain for reduced model: "', 
-        paste(getNames(obj, class = 'constrain', type = '(fixom|varom|actvarom|cvarom|avarom)'), 
-          collapse = '", "'), '"', sep = ''))
-    }
-  }
   if (any(names(arg) == 'useDataTable')) {
     useDataTable <- arg$useDataTable
     arg <- arg[names(arg) != 'useDataTable', drop = FALSE]    
@@ -594,24 +587,6 @@ LL1 <- proc.time()[3]
       #cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
       #  Remove unused technology
 ########
-    for(i in seq(along = obj@data)) {
-        FF <- rep(TRUE, length(obj@data[[i]]@data))
-        for(j in seq(along = obj@data[[i]]@data)) if (class(obj@data[[i]]@data[[j]]) == 'constrain') {
-          if (any(names(obj@data[[i]]@data[[j]]@for.each) == 'tech') && 
-            !is.null(obj@data[[i]]@data[[j]]@for.each$tech)) {
-            obj@data[[i]]@data[[j]]@for.each$tech <- obj@data[[i]]@data[[j]]@for.each$tech[
-              obj@data[[i]]@data[[j]]@for.each$tech %in% prec@parameters$tech@data$tech]
-              if (length(obj@data[[i]]@data[[j]]@for.each$tech) == 0) FF[j] <- FALSE
-          }
-          if (any(names(obj@data[[i]]@data[[j]]@for.sum) == 'tech') && 
-            !is.null(obj@data[[i]]@data[[j]]@for.sum$tech)) {
-            obj@data[[i]]@data[[j]]@for.sum$tech <- obj@data[[i]]@data[[j]]@for.sum$tech[
-              obj@data[[i]]@data[[j]]@for.sum$tech %in% prec@parameters$tech@data$tech]
-              if (length(obj@data[[i]]@data[[j]]@for.sum$tech) == 0) FF[j] <- FALSE
-          }
-        }
-        obj@data[[i]]@data <- obj@data[[i]]@data[FF]
-    }
     # Early reteirment
     if (!obj@early.retirement) {
       prec@parameters$mTechRetirement@data <- prec@parameters$mTechRetirement@data[0,, drop = FALSE]
@@ -833,9 +808,6 @@ LL1 <- proc.time()[3]
       zz <- file(paste(tmpdir, '/glpk.mod', sep = ''), 'w')
       if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
       cat(run_code[1:(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
-#      for(i in seq(along = CNS)) {
-#        cat(CNS[[i]]$add_code, sep = '\n', file = zz)
-#      }
       cat(run_code[grep('^minimize', run_code):(grep('^end[;]', run_code) - 1)], 
           sep = '\n', file = zz)
       cat(run_code[grep('^end[;]', run_code):length(run_code)], sep = '\n', file = zz)
@@ -854,9 +826,6 @@ LL1 <- proc.time()[3]
     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
       cat(energyRt:::.sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
     }                            
-#    for(i in seq(along = CNS)) {
-#      cat(CNS[[i]]$add_data, sep = '\n', file = zz)
-#    }
     ##!!!!!!!!!!!!!!!!!!!!!
     ## ORD function
     #cat('param ORD :=', sep = '\n', file = zz)

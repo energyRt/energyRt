@@ -1,795 +1,429 @@
 #---------------------------------------------------------------------------------------------------------
-# Constrain
+# equation
 #---------------------------------------------------------------------------------------------------------
 setClass('constrain', 
-      representation(
-          name          = "character",
-          description   = "character",
-          #variable      = "character",
-          #gamsVariable  = "character",
-          eq            = "factor",
-          type          = "factor",
-          rhs           = "data.frame",
-          unit          = "character",
-          for.sum        = "list",
-          for.each       = "list",
-          defVal       = "numeric", 
-          rule          = "character",
-          comm          = "character",
-          cout          = "logical",
-          cinp          = "logical",
-          aout          = "logical",
-          ainp          = "logical",
-          emis          = "logical",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-          misc = "list"
-      ),
-      prototype(
-          name          = "",
-          description   = "",
-          #variable      = "",
-          #gamsVariable  = "",
-          eq            = factor('==', levels = c('>=', '<=', '==')),
-          type          = factor(NA, levels = c('capacity', 
-                                                'newcapacity', 
-                                                'invcost', 
-                                                'varom', 
-                                                'fixom', 
-                                                'eac', 
-                                                'activity', 
-                                                'actvarom', 
-                                                'balance', 
-                                                'cvarom', 
-                                                'avarom', 
-                                                'input', 
-                                                'output',
-                                                'sharein',
-                                                'shareout',
-                                                'tax',
-                                                'subsidy',
-                                                'growth.cap',  # >= meen minimum growth temp
-                                                'growth.newcap', 
-                                                'growth.output', 
-                                                'growth.input', 
-                                                'growth.eac', 
-                                                'growth.invcost', 
-                                                'growth.fixom', 
-                                                'growth.varom', 
-                                                'growth.actvarom', 
-                                                'growth.cvarom', 
-                                                'growth.avarom', 
-                                                'growth.balance', 
-                                                'growth.activity'
-                                                )),
-          rhs           = data.frame(),
-          unit          = "",
-          for.sum       = list(),
-          for.each      = list(),
-          defVal       = 0, 
-          rule          = as.character('inter.forth'),
-          comm          = NULL,
-          cout          = TRUE,
-          cinp          = TRUE,
-          aout          = TRUE,
-          ainp          = TRUE,
-          emis          = TRUE,
-          GIS           = NULL,
-        #! Misc
-        misc = list(
-        )),
-      S3methods = TRUE
+         representation(
+           name          = "character",
+           description   = "character",       # description
+           eq            = "factor",
+           for.each      = "list",
+           rhs           = "data.frame",
+           defVal        = "numeric",
+           lhs           = "list",
+           misc = "list"
+           # parameter= list() # For the future
+         ),
+         prototype(
+           name          = NULL,
+           description   = '',       # description
+           eq            = factor('==', levels = c('>=', '<=', '==')),
+           for.each      = list(),
+           rhs           = data.frame(),
+           defVal        = 0,
+           lhs           = list(),
+           #! Misc
+           misc = list(
+           )),
+         S3methods = TRUE
 );
-
 setMethod("initialize", "constrain", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '0c9e0d17-222c-481e-8796-bbed7b0c0cc8'
+  attr(.Object, 'GUID') <- 'b8b3c68c-8d82-4844-aff9-8b12ba6da878'
   .Object
 })
-             
-#----------------------------------------------------------------------------------
-#' Create new constrain object
-#' 
-#' @name newConstrain
-#' 
-newConstrain0 <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
-   for.each = list(), defVal = 0, rule = NULL, comm = NULL,
-    cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
+
+
+#---------------------------------------------------------------------------------------------------------
+# term for equation
+#---------------------------------------------------------------------------------------------------------
+setClass('summand', 
+         representation(
+           description   = "character",       # description
+           variable      = "character",
+           for.sum       = "list",
+           mult          = "data.frame",
+           defVal        = "numeric",
+           misc = "list"
+           # parameter= list() # For the future
+         ),
+         prototype(
+           description   = NULL,       # description
+           variable      = NULL,
+           for.sum       = list(),
+           mult          = data.frame(),
+           defVal        = 1,
+           #! Misc
+           misc = list(
+           )),
+         S3methods = TRUE
+);
+
+
+newConstrain <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ..., arg = NULL) {
   obj <- new('constrain')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq)))   {
     stop('Wrong condition type')
   }
   obj@eq[] <- eq
+  if (is.numeric(rhs)) {
+    defVal <- rhs
+    rhs <- data.frame()
+  }
+  if (!is.data.frame(rhs) && is.list(rhs) && length(rhs) == 1 && length(rhs[[1]]) == 1) {
+    defVal <- rhs[[1]]
+    rhs <- data.frame()
+  }
+  if (is.data.frame(rhs) && ncol(rhs) == 1 && nrow(rhs) == 1) {
+    defVal <- rhs[1, 1]
+    rhs <- data.frame()
+  }
+  if (is.numeric(rhs)) {
+    defVal <- rhs
+    rhs <- data.frame()
+  }
+  if (!is.data.frame(rhs) && is.list(rhs)) {
+    xx <- sapply(rhs, length)
+    if (any(xx[1] != xx))
+      stop(paste0('Wrong rhs parameters '))
+    if (xx[1] >= 1) {
+      xx <- data.frame(stringsAsFactors = FALSE)
+      xx[seq_len(length(rhs[[1]])), ] <- NA
+      for (i in names(rhs)) xx[, i] <- rhs[[i]]
+      rhs <- xx
+    }
+  }
   # TYPE vs SET   
-  if (length(type) != 1 || !(type %in% levels(obj@type)))
-    stop('Wrong type')
-  if (!is.null(rule)) obj@rule[]     <- rule
-  obj@type[] <- type
-  obj@defVal  <- defVal
-  obj@name     <- name
-  obj@cout     <- cout
-  obj@cinp     <- cinp
-  obj@aout     <- aout
-  obj@ainp     <- ainp
-  obj@emis     <- emis
-  if (type == 'tax') {
-      obj@comm     <- comm
-      # if (rule == 'defVal')  rule <- 'inter.forth'
-      # obj@rule     <- rule
-      obj@rhs <- data.frame(region = character(), 
-                              year = numeric(), 
-                              slice = character(), 
-                              tax = numeric(), 
-                              stringsAsFactors = FALSE
-                              )
-      if (is.data.frame(rhs)) {
-        if (nrow(rhs) == 0) stop('Wrong rhs in tax constrain')
-        nn <- 1:nrow(rhs)
-        if (any(colnames(rhs) == 'region')) 
-            obj@rhs[nn, 'region'] <- as.character(rhs$region)
-        if (any(colnames(rhs) == 'year')) 
-            obj@rhs[nn, 'year'] <- as.numeric(rhs$year)
-        if (any(colnames(rhs) == 'slice')) 
-            obj@rhs[nn, 'slice'] <- as.character(rhs$slice)
-        if (any(colnames(rhs) == 'tax')) {
-            obj@rhs[nn, 'tax'] <- as.numeric(rhs$tax)
-        } else stop('Wrong rhs in tax constrain')
-      } else{
-        obj@rhs[1, 'tax'] <- rhs
-      }
-      if (length(for.sum) != 0) warning('for.sum unacceptable for tax constrain')
-      if (length(for.each) != 0) {
-        uncpt <- names(for.each)[!(names(for.each) %in% c('comm', 'region', 'year', 'slice'))]
-        if (any(uncpt)) {
-          for.each <- for.each[!(names(for.each) %in% uncpt)]
-          warning('for.each unacceptable for tax constrain')
-        }
-        obj@for.each <- for.each
-      }
-   } else if (type == 'subsidy') {
-      obj@comm     <- comm
-      # if (rule == 'defVal')  rule <- 'inter.forth'
-      # obj@rule     <- rule
-      obj@rhs <- data.frame(region = character(), 
-                              year = numeric(), 
-                              slice = character(), 
-                              subsidy = numeric(), 
-                              stringsAsFactors = FALSE
-                              )
-      if (is.data.frame(rhs)) {
-        if (nrow(rhs) == 0) stop('Wrong rhs in subsidy constrain')
-        nn <- 1:nrow(rhs)
-        if (any(colnames(rhs) == 'region')) 
-            obj@rhs[nn, 'region'] <- as.character(rhs$region)
-        if (any(colnames(rhs) == 'year')) 
-            obj@rhs[nn, 'year'] <- as.numeric(rhs$year)
-        if (any(colnames(rhs) == 'slice')) 
-            obj@rhs[nn, 'slice'] <- as.character(rhs$slice)
-        if (any(colnames(rhs) == 'subsidy')) {
-            obj@rhs[nn, 'subsidy'] <- as.numeric(rhs$subsidy)
-        } else stop('Wrong rhs in subsidy constrain')
-      } else{
-        obj@rhs[1, 'subsidy'] <- rhs
-      }
-      if (length(for.sum) != 0) warning('for.sum unacceptable for subs constrain')
-      if (length(for.each) != 0) {
-        uncpt <- names(for.each)[!(names(for.each) %in% c('comm', 'region', 'year', 'slice'))]
-        if (any(uncpt)) {
-          for.each <- for.each[!(names(for.each) %in% uncpt)]
-          warning('for.each unacceptable for subs constrain')
-        }
-        obj@for.each <- for.each
-      }
-  } else {
-#      if (rule == 'defVal')  rule <- 'back.inter.forth'
-#      if (rule == 'defVal')  rule <- new('constrain')@rule
-#      obj@rule     <- rule
-      minset <- list()
-      minset$capacity <- c('region', 'year')
-      minset$newcapacity <- c('region', 'year')
-      minset$invcost <- c('region', 'year')
-      minset$fixom <- c('region', 'year')
-      minset$varom <- c('region', 'year', 'slice')
-      minset$actvarom <- c('region', 'year', 'slice')
-      minset$cvarom <- c('region', 'year', 'slice')
-      minset$avarom <- c('region', 'year', 'slice')
-      minset$eac <- c('region', 'year')
-      minset$activity <- c('region', 'year', 'slice')
-      minset$input <- c('comm', 'region', 'year', 'slice')
-      minset$output <- c('comm', 'region', 'year', 'slice')
-      minset$sharein <- c('comm', 'region', 'year', 'slice')
-      minset$shareout <- c('comm', 'region', 'year', 'slice')
-      minset$balance <- c('comm', 'region', 'year', 'slice')
-      
-      minset$growth.capacity <- c('region', 'year')
-      minset$growth.newcapacity <- c('region', 'year')
-      minset$growth.invcost <- c('region', 'year')
-      minset$growth.varom <- c('region', 'year', 'slice')
-      minset$growth.actvarom <- c('region', 'year', 'slice')
-      minset$growth.avarom <- c('region', 'year', 'slice')
-      minset$growth.cvarom <- c('region', 'year', 'slice')
-      minset$growth.fixom <- c('region', 'year')
-      minset$growth.eac <- c('region', 'year')
-      minset$growth.activity <- c('region', 'year', 'slice')
-      minset$growth.input <- c('comm', 'region', 'year', 'slice')
-      minset$growth.output <- c('comm', 'region', 'year', 'slice')
-      minset$growth.balance <- c('region', 'year', 'slice')
-      
-      addset <- list()
-      addset$input <- c('tech', 'sup', 'res', 'trade', 'row')
-      addset$output <- c('tech', 'sup', 'res', 'trade', 'row')
-
-      addset$growth.input <- c('tech', 'sup', 'res', 'trade', 'row')
-      addset$growth.output <- c('tech', 'sup', 'res', 'trade', 'row')
-
-      addset$sharein <- c('tech', 'sup', 'res', 'trade', 'row')
-      addset$shareout <- c('tech', 'sup', 'res', 'trade', 'row')
-
-      unqset <- list()
-      unqset$capacity <- c('tech', 'res')
-      unqset$newcapacity <- c('tech', 'res')
-      unqset$invcost <- c('tech', 'res')
-      unqset$fixom <- c('tech', 'res')
-      unqset$varom <- c('tech', 'res')
-      unqset$actvarom <- c('tech', 'res')
-      unqset$cvarom <- c('tech', 'res')
-      unqset$avarom <- c('tech', 'res')
-      unqset$eac <- c('tech', 'res')
-      unqset$activity <- c('tech', 'res')
-
-      unqset$growth.capacity <- c('tech', 'res')
-      unqset$growth.newcapacity <- c('tech', 'res')
-      unqset$growth.invcost <- c('tech', 'res')
-      unqset$growth.fixom <- c('tech', 'res')
-      unqset$growth.varom <- c('tech', 'res')
-      unqset$growth.actvarom <- c('tech', 'res')
-      unqset$growth.cvarom <- c('tech', 'res')
-      unqset$growth.avarom <- c('tech', 'res')
-      unqset$growth.eac <- c('tech', 'res')
-      unqset$growth.activity <- c('tech', 'res')
-
-      # Check duplicat set
-      if (anyDuplicated(c(names(for.sum), names(for.each)))) {
-        stop('There are duplicated set')
-      }
-      # Check odd set
-      if (any(!(c(names(for.sum), names(for.each)) %in% 
-        c(minset[[as.character(type)]], addset[[as.character(type)]], 
-             unqset[[as.character(type)]])))) {  
-        stop('There are odd set')
-      }
-      # Check minimum set
-      tps <- minset[[as.character(type)]]
-      if (any(!(tps %in% c(names(for.sum), names(for.each))))) {
-        for(i in tps[!(tps %in% c(names(for.sum), names(for.each)))])
-          for.each[i] <- list(NULL)
-      }
-      ### HAVE TO FIX
-      # Check additional set
-    #  if (length(addset[[as.character(type)]]) != 0 && 
-    #  # For future
-    #  #  !any(c(names(for.sum), names(for.each)) %in% addset[[as.character(type)]])) {
-    #    sum(c(names(for.sum), names(for.each)) %in% addset[[as.character(type)]]) != 1) {
-    #    stop('Wrong set sets')
-    #    #stop('There is not minimum additional set')
-    #  }
-      # Check unique set
-      if (length(unqset[[as.character(type)]]) != 0 && 
-        sum(c(names(for.sum), names(for.each)) %in% unqset[[as.character(type)]]) != 1) {
-        stop('Wrong set sets')
-      }
-      obj@rhs <- data.frame(tech = character(), 
-                              trade = character(), 
-                              row = character(), 
-                              res = character(), 
-                              sup = character(), 
-                              comm = character(), 
-                              region = character(), 
-                              year = numeric(), 
-                              slice = character(), 
-                              rhs = numeric(), 
-                              stringsAsFactors = FALSE
-                              )
-      obj@rhs <- obj@rhs[colnames(obj@rhs) %in% c(names(for.each), 'rhs')]
-      if (is.list(rhs) && !is.data.frame(rhs)) {
-        rhs2 <- data.frame(stringsAsFactors = FALSE)
-        rhs2[1:max(sapply(rhs, length)), ] <- NA
-        for(i in names(rhs)) rhs2[, i] <- rhs[[i]]
-        rhs <- rhs2
-      }
-      if (is.numeric(rhs)) {
-        obj@defVal <- rhs
-      } else if (is.data.frame(rhs)) {
-        if (any(!(colnames(rhs) %in% colnames(obj@rhs)))) 
-          stop('Uncorrect rhs column name')
-        if (nrow(rhs) != 0) {
-          obj@rhs[1:nrow(rhs), ] <- NA
-          for(cl in colnames(rhs))
-            obj@rhs[, cl] <- rhs[, cl]
-        }
-      } else stop('Uncorrect rhs type')
-      #obj@variable <- variable
-      #obj@gamsVariable <- paste(variable, '(', paste(ss, collapse = ', '), ')', sep = '')
-      obj@for.each  <- for.each
-      obj@for.sum   <- for.sum
-      if (!energyRt:::.chec_correct_name(name)) stop('Uncorrect constrain name "', name, '"') 
-  } 
-  # Remove factor problem
-  for(i in colnames(obj@rhs)[sapply(obj@rhs, class) == 'factor']) {
-    obj@rhs[, i] <- as.character(obj@rhs[, i])
-    if (any(i == c('year', 'rhs'))) obj@rhs[, i] <- as.numeric(obj@rhs[, i])
+  obj@rhs       <- rhs
+  obj@defVal    <- defVal
+  obj@name      <- name
+  obj@for.each  <- for.each
+  for (i in seq_along(arg)) {
+    obj <- addSummand(obj, arg = arg[[i]])
   }
-  for(i in colnames(obj@rhs)[colnames(obj@rhs) %in% c('year', 'rhs') &
-    sapply(obj@rhs, class) == 'character']) {
-    obj@rhs[, i] <- as.numeric(obj@rhs[, i])
+  arg <- list(...)
+  for (i in seq_along(arg)) {
+    obj <- addSummand(obj, arg = arg[[i]])
   }
-  for(i in names(obj@for.each)[sapply(obj@for.each, class) == 'factor']) {
-    obj@for.each[[i]] <- as.character(obj@for.each[[i]])
-  }
-  for(i in names(obj@for.each)[names(obj@for.each) %in% c('year', 'rhs') &
-    sapply(obj@for.each, class) == 'character'])
-      obj@for.each[[i]] <- as.numeric(obj@for.each[[i]])
-  for(i in names(obj@for.sum)[sapply(obj@for.sum, class) == 'factor']) {
-    obj@for.sum[[i]] <- as.character(obj@for.sum[[i]])
-  }
-  for(i in names(obj@for.sum)[names(obj@for.sum) %in% c('year', 'rhs') &
-    sapply(obj@for.sum, class) == 'character'])
-      obj@for.sum[[i]] <- as.numeric(obj@for.sum[[i]])
   obj
 }
 
 
+addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list(), arg) {
+  if (!is.null(names(arg))) {
+    if (any(names(arg) == 'variable')) variable <- arg$variable
+    if (any(names(arg) == 'mult')) mult <- arg$mult
+    if (any(names(arg) == 'for.sum')) for.sum <- arg$for.sum
+    if (any(names(arg) == 'defVal')) defVal <- arg$defVal
+  }
+  st <- new('summand')
+  st@variable <- variable
+  if (!is.data.frame(mult) && is.list(mult)) {
+    xx <- sapply(mult, length)
+    if (any(xx[1] != xx))
+      stop(paste0('Wrong mult parameters '))
+    if (xx[1] >= 1) {
+      xx <- data.frame(stringsAsFactors = FALSE)
+      xx[seq_len(length(mult[[1]])), ] <- NA
+      for (i in names(mult)) xx[, i] <- mult[[i]]
+      mult <- xx
+    }
+  }
+  if (is.data.frame(mult)) {
+    st@mult <- mult
+  } else st@defVal <- mult
+  st@for.sum <- for.sum
+  if (all(names(.vrb_map) != variable)) 
+    stop(paste0('Unknown variables "', variable, '"in summands "', eqt@name, '"'))
+  need.set <- .vrb_map[[variable]];
+  need.set <- need.set[!(need.set %in% c(names(eqt@for.each), names(st@for.sum)))];
+  for (i in need.set) {
+    st@for.sum[[i]] <- NULL
+  }
+  if (!all(names(st@mult) %in% c(names(eqt@for.each), names(st@for.sum), 'value')))
+    stop(paste0('Wrong mult parameter, excessive set: "', paste0(names(st@mult)[!(names(st@mult) %in% names(st@for.sum))], collapse = '", "'), '"'))
+  names(st@defVal) <- NULL
+  names(st@variable) <- NULL
+  eqt@lhs[[length(eqt@lhs) + 1]] <- st
+  eqt  
+}
 
-##----------------------------------------------------------------------------------
-#sm_toGams_constrain <- function(obj, approxim, year_range) {
-#  eqDecFull <- NULL
-#  add_code <- c()
-#  add_set <- c()
-#  eqDec <- c()
-#  if (all(obj@type != c('tax', 'subsidy'))) {
-#      # Add set
-#      specSet <- list()
-#      for(i in names(obj@for.each)[!sapply(obj@for.each, is.null)])
-#        specSet[[i]] <- obj@for.each[[i]]   
-#      for(i in names(obj@for.sum)[!sapply(obj@for.sum, is.null)])
-#        specSet[[i]] <- obj@for.sum[[i]]   
-#      aliasSet <- paste('alsCns', obj@name, names(specSet), sep = '')
-#      aliasSetFull <- paste('alsCns', obj@name, names(specSet), '(', 
-#           names(specSet), ')', sep = '')
-#      names(aliasSetFull) <- names(specSet)
-#      if (any(names(specSet) == 'year')) {
-#        specSet$year <- specSet$year[year_range[1] <= as.numeric(specSet$year) &
-#           as.numeric(specSet$year) <= year_range[2]]
-#      } 
-#      #
-#      for(i in names(specSet)) {
-#       add_code <- c(add_code, 'set', aliasSetFull[[i]], ';')
-#       add_set <- c(add_set, 'set', paste(aliasSetFull[[i]], '/'), specSet[[i]], '/;')
-#      }
-#      #
-#      tp <- as.character(obj@type)
-#      # Add equation
-#      eqDec <- paste('eqCns', obj@name, sep = '')
-#      eqDecFull <- paste('eqCns', obj@name, '(', 
-#        paste(names(obj@for.each), collapse = ', '), ')', sep = '')
-#      eqDec2 <- eqDecFull
-#      if (any(names(specSet) %in% names(obj@for.each))) {
-#        if (sum(names(specSet) %in% names(obj@for.each)) != 1) {
-#          eqDecFull <- paste(eqDecFull, '$(', paste(
-#            aliasSetFull[names(aliasSetFull) %in% names(obj@for.each)], 
-#              collapse = ' and '), ')', sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, '$', 
-#            aliasSetFull[names(aliasSetFull) %in% names(obj@for.each)], sep = '')
-#        }
-#      }
-#      eqDecFull <- paste(eqDecFull, '.. ', sep = '')
-#      # Add LHS
-#      if (length(obj@for.sum) != 0) {
-#        if (length(obj@for.sum) != 1) {
-#          eqDecFull <- paste(eqDecFull, 'sum((', paste(names(obj@for.sum), 
-#            collapse = ', '), ')', sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, 'sum(', names(obj@for.sum), 
-#           '', sep = '')
-#        }
-#        if (any(names(specSet) %in% names(obj@for.sum))) {
-#          if (sum(names(aliasSetFull) %in% names(obj@for.sum)) != 1) {
-#            eqDecFull <- paste(eqDecFull, '$(', 
-#              paste(aliasSetFull[names(aliasSetFull) %in% names(obj@for.sum)], 
-#                collapse = ' and '), ')', sep = '')
-#          } else {
-#            eqDecFull <- paste(eqDecFull, '$', 
-#              aliasSetFull[names(aliasSetFull) %in% names(obj@for.sum)], sep = '')
-#          }
-#        }
-#        eqDecFull <- paste(eqDecFull, ', ', sep = '')
-#      }                                                  
-#      # add variable
-#      if (tp == 'input' && all(!(c(names(obj@for.sum), names(obj@for.each)) %in% 
-#         c('tech', 'sup', 'res', 'trade', 'row')))) vrb <- 'vInpTot' else
-#      if (tp == 'output' && all(!(c(names(obj@for.sum), names(obj@for.each)) %in% 
-#         c('tech', 'sup', 'res', 'trade', 'row')))) vrb <- 'vOutTot' else {
-#        gg <- c('tech', 'sup', 'res', 'trade', 'row')
-#        g2 <- c('vTech', 'vSup', 'vRes', 'vTrade', 'vRow')
-#        g3 <- c('Tech', 'Sup', 'Res', 'Trade', 'Row')
-#        names(g2) <- gg   
-#        names(g3) <- gg   
-#        gg <- gg[gg %in% c(names(obj@for.sum), names(obj@for.each))]
-#        if (length(gg) != 1) {
-#          if (tp %in% c('sharein', 'shareout')) stop('Undefined LHS variable') else
-#            stop('Internal error 1')
-#        }
-#        vrb <- g2[gg]
-#        if (tp == 'capacity') vrb <- paste(vrb, 'Cap', sep = '') else
-#        if (tp == 'newcapacity') vrb <- paste(vrb, 'NewCap', sep = '') else
-#        if (tp == 'activity') vrb <- paste(vrb, 'Act', sep = '') else
-#        if (tp %in% c('input', 'sharein')) vrb <- paste(vrb, 'Inp', sep = '') else
-#        if (tp %in% c('output', 'shareout')) vrb <- paste(vrb, 'Out', sep = '')
-#      } 
-#      eqDecFull <- paste(eqDecFull, vrb, '(', 
-#        paste(order_set(c(names(obj@for.sum), names(obj@for.each))), 
-#          collapse = ', '), ')', sep = '')
-#      if (tp %in% c('input', 'sharein', 'output', 'shareout') && 
-#        !(vrb %in% c('vInpTot', 'vOutTot'))) {
-#        eqDecFull <- paste(eqDecFull, '$m', g3[gg], sep = '')
-#        if (tp %in% c('input', 'sharein')) {
-#          eqDecFull <- paste(eqDecFull, 'InpComm', sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, 'OutComm', sep = '')
-#        }
-#          hh <- c(names(obj@for.sum), names(obj@for.each))
-#          hh <- hh[!(hh %in% c('region', 'year', 'slice'))]
-#        eqDecFull <- paste(eqDecFull, '(',
-#          paste(order_set(hh), collapse = ', '), ')', sep = '')
-#      }
-#      #  
-#      if (length(obj@for.sum) != 0) {
-#        eqDecFull <- paste(eqDecFull, ')', sep = '')
-#      }
-#      # Condition
-#      if (obj@eq == '<=') eqDecFull <- paste(eqDecFull, ' =l= ', sep = '') else
-#      if (obj@eq == '=') eqDecFull <- paste(eqDecFull, ' =e= ', sep = '') else
-#      if (obj@eq == '>=') eqDecFull <- paste(eqDecFull, ' =g= ', sep = '') else
-#        stop('Unknown equation type')
-#      # RHS  
-#      if (nrow(obj@rhs) == 0) {
-#        if (tp %in% c('sharein', 'shareout')) {
-#          if (tp == 'sharein') {
-#            vv <- 'vInpTot(comm, region, year, slice)'
-#          } else {
-#            vv <- 'vOutTot(comm, region, year, slice)'
-#          }          
-#          eqDecFull <- paste(eqDecFull, obj@defVal, ' * ', vv, ';', sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, obj@defVal, ';', sep = '')
-#        }
-#      } else {                                                               
-#        gg <- obj@rhs
-#        for(cl in colnames(gg)[colnames(gg) %in% names(approxim)])
-#          gg[, cl] <- as.character(gg[, cl])
-#        if (any(colnames(gg) == 'year')) gg[, 'year'] <- as.numeric(gg[, 'year'])
-#        for (i in colnames(gg)[colnames(gg) %in% names(obj@for.each)]) {
-#          if (!is.null(obj@for.each[[i]])) {
-#            gg <- gg[is.na(gg[, i]) | gg[, i] %in% obj@for.each[[i]], , drop = FALSE]
-#            approxim[[i]] <- approxim[[i]][approxim[[i]] %in% obj@for.each[[i]]]
-#          }  
-#        }
-#        for (i in colnames(gg)[colnames(gg) %in% names(obj@for.sum)]) {
-#          if (!is.null(obj@for.sum[[i]])) {
-#            gg <- gg[is.na(gg[, i]) | gg[, i] %in% obj@for.sum[[i]], , drop = FALSE]
-#            approxim[[i]] <- approxim[[i]][approxim[[i]] %in% obj@for.each[[i]]]
-#          }  
-#        }
-#        rhs <- interpolation(gg, 'rhs', approxim = approxim, year_range = year_range,
-#            rule = obj@rule, defVal = obj@defVal)  
-#        prm <- paste('rhsCns', obj@name, '(', paste(colnames(rhs)[-ncol(rhs)], 
-#           collapse = ', '), ')', sep = '')
-#        if (tp == 'sharein' || tp == 'shareout') {
-#          if (all(names(obj@for.each) != 'comm')) stop('There is no commodity definition to ', tp, ' type')
-#          if (tp == 'sharein') {
-#            vv <- 'vInpTot(comm, region, year, slice)'
-#          } else {
-#            vv <- 'vOutTot(comm, region, year, slice)'
-#          }
-#          if (all(c('comm', 'region', 'year', 'slice') %in% names(obj@for.each))) {
-#            eqDecFull <- paste(eqDecFull, prm, ' * ', vv, ';', sep = '')
-#          } else {      
-#            qq <- c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') 
-#                  %in% names(obj@for.sum)]
-#            if (length(qq) == 1) {
-#              eqDecFull <- paste(eqDecFull, 'sum(', qq, '', sep = '')
-#            } else {
-#              eqDecFull <- paste(eqDecFull, 'sum((', paste(qq, collapse = ', '), ')', sep = '')
-#            }
-#            q2 <- names(obj@for.sum[qq])[!sapply(obj@for.sum[qq], is.null)]
-#            if (length(q2) == 1) {
-#              eqDecFull <- paste(eqDecFull, '$', aliasSetFull[q2], '', sep = '')
-#            } else if (length(q2) > 1) {
-#              eqDecFull <- paste(eqDecFull, '$(', paste(aliasSetFull[q2], collapse = ' and '), ')', sep = '')
-#            }
-#            eqDecFull <- paste(eqDecFull, ', ', prm, ' * ', vv, ');', sep = '')
-#          }
-#        } else {
-#            eqDecFull <- paste(eqDecFull, prm, ';', sep = '')
-#        }
-#        add_set <- c(add_set, 'parameter', paste(prm, '/'), paste(
-#        apply(rhs[, -ncol(rhs), drop = FALSE], 1, function(x) paste(x, collapse = '.'))
-#        , rhs[, ncol(rhs)]), '/;')
-#        add_code <- c(add_code, 'parameter', prm, ';')
-#      }  
-#      add_code <- c(add_code, 'Equation', eqDec, ';', '', eqDecFull)
-#      #cat(eqDecFull, '\n')
-#  }
-#  debug_code <- function(xx) {
-#    nm <- gsub('[($].*', '', gsub('[.][.].*', '', xx))
-#    ll <- gsub('[=].[=].*', '', gsub('.*[.][.]', '', xx))
-#    ff <- strsplit(ll, '')[[1]]
-#    f2 <- grep('[[:alnum:]_]', ff, invert = TRUE)
-#    k <- 0
-#    for(i in seq(length.out = nchar(ll))[ff == 'v']) {
-#      if (any(f2 == i - 1)) {
-#        j <- min(f2[f2 > i])
-#        ll <- paste(substr(ll, 1, j - 1 + k), '.l', substr(ll, j + k, nchar(ll)), sep = '')
-#        k <- k + 2
-#      }
-#    }
-#    hdd <- paste(ll, ':0:15","',  gsub(';', '', gsub('.*[=].[=]', '(', xx)), '):0:15/;', sep = '')
-#    hdd <- gsub('vOutTot[(]', 'vOutTot.l(', hdd)
-#    hdd <- gsub('vInpTot[(]', 'vInpTot.l(', hdd)
-#    l2 <- gsub('[.][.].*', '', xx)
-#    use_set <- character()
-#    # There is loop
-#    if (any(grep('[(]', gsub('[$].*', '', l2)))) {
-#      use_set <- gsub('[$].*', '', gsub('^[[:alnum:]_]*', '', l2))
-#      use_set <- strsplit(gsub('[ ()]', '', use_set), ',')[[1]]
-#      hdd <- paste('loop(', gsub('^[[:alnum:]_]*', '', l2), ', put ', 
-#           paste(use_set, '.tl:0","', sep = '', collapse = ''), hdd, ');', sep = '')
-#    } else if (any(grep('[$]', l2))) { # there is only condition
-#      hdd <- paste('if(', gsub('^.*[$]', '', l2), ', put ', hdd, '));', sep = '')
-#    } else {
-#      hdd <- paste('put ', hdd, sep = '')
-#    }
-#    eqd <- paste("file ", nm, "_csv / '", nm, ".csv'/;\n", 
-#    nm, "_csv.lp = 1;\nput ", nm, "_csv;\n", sep = '')
-#    if (length(use_set) == 0) {
-#      eqd <- c(eqd, 'put "value,rhs"/;')
-#    } else {
-#      eqd <- c(eqd, paste('put "', paste(use_set, collapse = ','), ',value,rhs"/;', sep = ''))
-#    }
-#    eqd <- paste(c(eqd, hdd, 'putclose;\n\n'), collapse = '\n')
-#    names(eqd) <- nm
-#    eqd
-#  } 
-#  if (is.null(eqDecFull)) debug_data <- NULL else debug_data <- debug_code(eqDecFull) 
-#  list(add_code = add_code, add_data = add_set, eq_decl = eqDec, debug_data = debug_data)
-#}
-#
-#
-#
-##----------------------------------------------------------------------------------
-#sm_toGlpk_constrain <- function(obj, approxim, year_range) {
-##  assign('year_range', year_range, globalenv())
-##  assign('approxim', approxim, globalenv())
-##  assign('obj', obj, globalenv())
-#  eqDecFull <- NULL
-#  add_code <- c()
-#  add_set <- c()
-#  eqDec <- c()
-#  if (all(obj@type != c('tax', 'subsidy'))) {
-#      # Add set
-#      slc <- c('tech', 'sup', 'res', 'row', 'trade', 'group', 'comm', 'region', 'year', 'slice')
-#      al_slc <- c('t', 'sp', 'rs', 'rw', 'trd', 'g', 'c', 'r', 'y', 's')
-#      names(al_slc) <- slc 
-#      # Add set
-#      specSet <- list()
-#      for(i in names(obj@for.each)[!sapply(obj@for.each, is.null)])
-#        specSet[[i]] <- obj@for.each[[i]]   
-#      for(i in names(obj@for.sum)[!sapply(obj@for.sum, is.null)])
-#        specSet[[i]] <- obj@for.sum[[i]]   
-#      aliasSet <- paste('alsCns', obj@name, names(specSet), sep = '')
-#      names(aliasSet) <- names(specSet)
-#      aliasSetFull <- paste('alsCns', obj@name, names(specSet), '{', names(specSet), '}', sep = '')
-#      names(aliasSetFull) <- names(specSet)
-#      aliasSetFull2 <- paste('alsCns', obj@name, names(specSet), '[', al_slc[names(specSet)], ']', sep = '')
-#      names(aliasSetFull2) <- names(specSet)
-#      if (any(names(specSet) == 'year')) {
-#        specSet$year <- specSet$year[year_range[1] <= as.numeric(specSet$year) &
-#           as.numeric(specSet$year) <= year_range[2]]
-#      } 
-#      #
-#      for(i in names(specSet)) {
-#       add_code <- c(add_code, paste('param ', aliasSetFull[[i]], ';', sep = ''))
-#       add_set <- c(add_set, paste('param ', aliasSet[[i]], ' defVal 0 := ', sep = ''), 
-#         paste('[', specSet[[i]], '] 1', sep = ''), ';')
-#      }
-#      #
-#      tp <- as.character(obj@type)
-#      # Add equation
-#      eqDec <- paste('eqCns', obj@name, sep = '')
-#      eqDecFull <- paste('eqCns', obj@name, '{', 
-#        paste(paste(al_slc[names(obj@for.each)], 'in', 
-#          names(obj@for.each)), collapse = ', '), sep = '')
-#      eqDec2 <- eqDecFull
-#      if (any(names(specSet) %in% names(obj@for.each))) {
-#        if (sum(names(specSet) %in% names(obj@for.each)) != 1) {
-#          eqDecFull <- paste(eqDecFull, ' : ( ', paste(
-#            aliasSetFull2[names(aliasSetFull2) %in% names(obj@for.each)], 
-#              collapse = ' and '), ' )', sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, ' : ', 
-#            aliasSetFull2[names(aliasSetFull2) %in% names(obj@for.each)], sep = '')
-#        }
-#      }
-#      eqDecFull <- paste(eqDecFull, ' }: ', sep = '')
-#      # Add LHS
-#      if (length(obj@for.sum) != 0) {
-#        if (length(obj@for.sum) != 1) {
-#          eqDecFull <- paste(eqDecFull, 'sum{', 
-#            paste(paste(al_slc[names(obj@for.sum)],  
-#              'in', names(obj@for.sum)), collapse = ', '), sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, 'sum{',  paste(al_slc[names(obj@for.sum)],  
-#              'in', names(obj@for.sum)), sep = '')
-#        }
-#        if (any(names(specSet) %in% names(obj@for.sum))) {
-#          if (sum(names(aliasSetFull) %in% names(obj@for.sum)) != 1) {
-#            eqDecFull <- paste(eqDecFull, ' : ', 
-#              paste(aliasSetFull2[names(aliasSetFull) %in% names(obj@for.sum)], 
-#                collapse = ' and '), '', sep = '')
-#          } else {
-#            eqDecFull <- paste(eqDecFull, ' : ', 
-#              aliasSetFull2[names(aliasSetFull) %in% names(obj@for.sum)], sep = '')
-#          }
-#        }
-#        eqDecFull <- paste(eqDecFull, '} (', sep = '')
-#      }                                                  
-#      # add variable
-#      if (tp == 'input' && all(!(c(names(obj@for.sum), names(obj@for.each)) %in% 
-#         c('tech', 'sup', 'res', 'trade', 'row')))) vrb <- 'vInpTot' else
-#      if (tp == 'output' && all(!(c(names(obj@for.sum), names(obj@for.each)) %in% 
-#         c('tech', 'sup', 'res', 'trade', 'row')))) vrb <- 'vOutTot' else {
-#        gg <- c('tech', 'sup', 'res', 'trade', 'row')
-#        g2 <- c('vTech', 'vSup', 'vRes', 'vTrade', 'vRow')
-#        g3 <- c('Tech', 'Sup', 'Res', 'Trade', 'Row')
-#        names(g2) <- gg   
-#        names(g3) <- gg   
-#        gg <- gg[gg %in% c(names(obj@for.sum), names(obj@for.each))]
-#        if (length(gg) != 1) {
-#          if (tp %in% c('sharein', 'shareout')) stop('Undefined LHS variable') else
-#            stop('Internal error 1')
-#        }
-#        vrb <- g2[gg]
-#        if (tp == 'capacity') vrb <- paste(vrb, 'Cap', sep = '') else
-#        if (tp == 'newcapacity') vrb <- paste(vrb, 'NewCap', sep = '') else
-#        if (tp == 'activity') vrb <- paste(vrb, 'Act', sep = '') else
-#        if (tp %in% c('input', 'sharein')) vrb <- paste(vrb, 'Inp', sep = '') else
-#        if (tp %in% c('output', 'shareout')) vrb <- paste(vrb, 'Out', sep = '')
-#      }
-#      eqDecFull <- paste(eqDecFull, vrb, '[', 
-#        paste(al_slc[order_set(c(names(obj@for.sum), names(obj@for.each)))], 
-#          collapse = ', '), ']', sep = '')
-#      ## Add check
-#      if (tp %in% c('input', 'sharein', 'output', 'shareout') && 
-#        !(vrb %in% c('vInpTot', 'vOutTot'))) {
-#        eqDecFull <- paste(eqDecFull, ' * m', g3[gg], sep = '')
-#        if (tp %in% c('input', 'sharein')) {
-#          eqDecFull <- paste(eqDecFull, 'InpComm', sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, 'OutComm', sep = '')
-#        }
-#          hh <- c(names(obj@for.sum), names(obj@for.each))
-#          hh <- hh[!(hh %in% c('region', 'year', 'slice'))]
-#        eqDecFull <- paste(eqDecFull, '[',
-#          paste(al_slc[order_set(hh)], collapse = ', '), ']', sep = '')
-#      }
-#      #        
-#      if (length(obj@for.sum) != 0) {
-#        eqDecFull <- paste(eqDecFull, ')', sep = '')
-#      }
-#      # Condition
-#      if (obj@eq == '<=') eqDecFull <- paste(eqDecFull, ' <= ', sep = '') else
-#      if (obj@eq == '=') eqDecFull <- paste(eqDecFull, ' = ', sep = '') else
-#      if (obj@eq == '>=') eqDecFull <- paste(eqDecFull, ' >= ', sep = '') else
-#        stop('Unknown equation type')
-#      # RHS  
-#      if (nrow(obj@rhs) == 0) {
-#        if (tp %in% c('sharein', 'shareout')) {
-#          if (tp == 'sharein') {
-#            vv <- 'vInpTot(comm, region, year, slice)'
-#          } else {
-#            vv <- 'vOutTot(comm, region, year, slice)'
-#          }          
-#          eqDecFull <- paste(eqDecFull, obj@defVal, ' * ', vv, ';', sep = '')
-#        } else {
-#          eqDecFull <- paste(eqDecFull, obj@defVal, ';', sep = '')
-#        }
-#      } else {                                                               
-#        gg <- obj@rhs
-#        for(cl in colnames(gg)[colnames(gg) %in% names(approxim)])
-#          gg[, cl] <- as.character(gg[, cl])
-#        if (any(colnames(gg) == 'year')) gg[, 'year'] <- as.numeric(gg[, 'year'])
-#        for (i in colnames(gg)[colnames(gg) %in% names(obj@for.each)]) {
-#          if (!is.null(obj@for.each[[i]])) {
-#            gg <- gg[is.na(gg[, i]) | gg[, i] %in% obj@for.each[[i]], , drop = FALSE]
-#            approxim[[i]] <- approxim[[i]][approxim[[i]] %in% obj@for.each[[i]]]
-#          }  
-#        }
-#        for (i in colnames(gg)[colnames(gg) %in% names(obj@for.sum)]) {
-#          if (!is.null(obj@for.sum[[i]])) {
-#            gg <- gg[is.na(gg[, i]) | gg[, i] %in% obj@for.sum[[i]], , drop = FALSE]
-#            approxim[[i]] <- approxim[[i]][approxim[[i]] %in% obj@for.each[[i]]]
-#          }  
-#        }
-#        rhs <- interpolation(gg, 'rhs', approxim = approxim, year_range = year_range,
-#            rule = obj@rule, defVal = obj@defVal)
-#        prm <- paste('rhsCns', obj@name, '[', paste(al_slc[colnames(rhs)[-ncol(rhs)]], 
-#           collapse = ', '), ']', sep = '')
-#        prm2 <- paste('rhsCns', obj@name, '{', paste(colnames(rhs)[-ncol(rhs)], 
-#           collapse = ', '), '}', sep = '')
-#        prm3 <- paste('rhsCns', obj@name, sep = '')
-#        if (tp == 'sharein' || tp == 'shareout') {
-#          if (all(names(obj@for.each) != 'comm')) stop('There is no commodity definition to ', tp, ' type')
-#          if (tp == 'sharein') {
-#            vv <- 'vInpTot[c, r, y, s]'
-#          } else {
-#            vv <- 'vOutTot[c, r, y, s]'
-#          }
-#          if (all(c('comm', 'region', 'year', 'slice') %in% names(obj@for.each))) {
-#            eqDecFull <- paste(eqDecFull, prm, ' * ', vv, ';', sep = '')
-#          } else {      
-#            qq <- c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') 
-#              %in% names(obj@for.sum)]
-#            if (length(qq) == 1) {
-#              eqDecFull <- paste(eqDecFull, 'sum{', paste(al_slc[qq], 'in', qq), '', sep = '')
-#            } else {
-#              eqDecFull <- paste(eqDecFull, 'sum{', paste(paste(al_slc[qq], 'in', qq), 
-#                 collapse = ', '), '', sep = '')
-#            }
-#            q2 <- names(obj@for.sum[qq])[!sapply(obj@for.sum[qq], is.null)]
-#            if (length(q2) == 1) {
-#              eqDecFull <- paste(eqDecFull, ': ', aliasSetFull2[q2], '', sep = '')
-#            } else if (length(q2) > 1) {
-#              eqDecFull <- paste(eqDecFull, ': ', paste(aliasSetFull2[q2], collapse = ' and '), sep = '')
-#            }
-#            eqDecFull <- paste(eqDecFull, ' }( ', prm, ' * ', vv, ');', sep = '')
-#          }
-#        } else {
-#            eqDecFull <- paste(eqDecFull, prm, ';', sep = '')
-#        }
-#        add_code <- c(add_code, paste('param ', prm2, ';', sep = ''))
-#        add_set <- c(add_set, paste('param ', prm3, ' defVal 0 := ', sep = ''), 
-#          paste('[', apply(rhs[, -ncol(rhs), drop = FALSE], 1, function(x) paste(x, collapse = ',')),
-#            '] ', rhs[, ncol(rhs)], sep = ''), ';')
-#      }  
-#      add_code <- c(add_code, paste('s.t.', eqDecFull))
-#      #cat(eqDecFull, '\n')
-#  }
-#  debug_code <- function(xx) {
-#    nm <- gsub('[{].*', '', xx)
-#    cnd <- gsub('.*[{]', '', gsub('[}].*', '', xx))
-#    vrb <- strsplit(gsub(' in [[:alnum:]]*', '', gsub('[:].*', '', cnd)), ',')[[1]]
-#    rr <- gsub('.*[}][[:blank:]]*[:]', '', xx)
-#    slc <- gsub('[ ]', '', strsplit(gsub('[[:alnum:]]* in ', '', gsub('[:].*', '', cnd)), ',')[[1]])
-#    dbg <- paste('printf "', paste(slc, rep(',', length(slc)), sep = '', collapse = ''), 
-#      'value,rhs\\n" > "', nm, '.csv";\n', collapse = '', sep = '')
-#    dbg <- paste(dbg, 'for{', cnd, '} {\nprintf "', paste(rep('%s,', length(vrb)), collapse = ''),
-#      '%d,%d\\n", ', paste(vrb, rep(',', length(vrb)), collapse = '', sep = ''), gsub('[<>=][=]*.*', '', rr),
-#      ',', gsub('[;]', '', gsub('.*[<>=][=]*', '', rr)), ' >> "', nm, '.csv";\n',
-#      '}\n', sep = '')
-#    names(dbg) <- nm
-#    dbg
-#  } 
-#  if (is.null(eqDecFull)) debug_data <- NULL else debug_data <- debug_code(eqDecFull) 
-#  list(add_code = add_code, add_data = add_set, eq_decl = eqDec, debug_data = debug_data)
-#}
-#
+#  .vrb_map <- energyRt:::.vrb_map
+#  .vrb_mapping <- energyRt:::.vrb_mapping
+# Calculate do equation need additional set, and add it
+.getSetEquation <- function(prec, stm, approxim) {
+  #assign('prec', prec,  globalenv())
+  #assign('stm', stm,  globalenv())
+  #assign('approxim', approxim,  globalenv())
+  stop.constr <- function(x) 
+    stop(paste0('Constrain "', stm@name, '" error: ', x))
+  get.all.child <- function(x)  {
+    unique(c(x, c(approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% x, 'child'])))
+  }
+  # all.set contain all set for for.each & lhs
+  # Estimate is need sum for for.each
+  # set.map need special mapping or consist all set
+  all.set <- data.frame(
+    alias = character(), # name in equation
+    set = character(),  # original set 
+    for.each = logical(), # for.each, lhs
+    lhs.num = numeric(),    # number for lhs
+    lead.year = logical(),   # use only for year & lhs (next year)
+    lag.year = logical(),    # use only for year & lhs (old year)
+    def.lhs  = logical(),    # not in for.each
+    new.map  = numeric(),    # need new sub set
+    stringsAsFactors = FALSE
+  )
+  set.map <- list()
+  set.map.name <- NULL # Temp vector with name for list set.map
+  # all.set & set.map
+  # for.each
+  nn <- seq_len(length(stm@for.each) + sum(sapply(stm@lhs, function(x) length(.vrb_map[[x@variable]]))))
+  all.set[seq_along(nn), ] <- NA
+  for (i in (1:ncol(all.set))[sapply(all.set, class) == 'logical']) 
+    all.set[, i] <- FALSE
+  nn <- 0
+  if (length(stm@for.each) > 0) {
+    nn <- seq_along(stm@for.each)
+    all.set[nn, 'set'] <- names(stm@for.each)
+    all.set[nn, 'alias'] <- names(stm@for.each)
+    all.set[nn, 'for.each'] <- TRUE
+    for.each.set <- names(stm@for.each)
+    # Fill add.map for for.each
+    for (j in for.each.set) {
+      if (!is.null(stm@for.each[[j]]) && !all(prec@set[[j]] %in% stm@for.each[[j]])) {
+        set.map.name <- c(set.map.name, j)
+        set.map[[length(set.map.name)]] <- stm@for.each[[j]]
+        all.set[nn[names(stm@for.each) == j], 'new.map'] <- length(set.map.name)
+      }
+    }
+  } else lhs.set <- NULL
+  # lhs
+  for (i in seq_along(stm@lhs)) {
+    need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
+    nn <- (nn[length(nn)] + seq_along(need.set))
+    all.set[nn, 'set'] <- need.set
+    all.set[nn, 'alias'] <- need.set
+    all.set[nn, 'lhs.num'] <- i
+    if (any(names(stm@lhs[[i]]@for.sum) == 'lag.year')) {
+      if (all(need.set != 'year'))
+        stop.constr('For lag.year have to define use variable with year')
+      all.set[nn[need.set == 'year'], c('lag.year', 'def.lhs')] <- TRUE
+    }
+    if (any(names(stm@lhs[[i]]@for.sum) == 'lead.year')) {
+      if (all(need.set != 'year'))
+        stop.constr('For lead.year have to define use variable with year')
+      all.set[nn[need.set == 'year'], c('lead.year', 'def.lhs')] <- TRUE
+    }
+    all.set[nn[need.set %in% names(stm@lhs[[i]]@for.sum)], 'def.lhs'] <- TRUE
+    all.set[nn[!(need.set %in% for.each.set)], 'def.lhs'] <- TRUE
+    # Add to set map
+    st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & !sapply(stm@lhs[[i]]@for.sum, is.null)]
+    # Fill add.map for for.lhs
+    for (j in st) {
+      if (!all(prec@set[[j]] %in% stm@lhs[[i]]@for.sum[[j]]) && (j != 'slice' || 
+                !all(prec@set[[j]] %in% get.all.child(stm@lhs[[i]]@for.sum[[j]])))) {
+        # check if the same set in lhs exist
+        fl <- FALSE
+        if (all(!c(all.set[nn[need.set == j], c('lead.year', 'lag.year')], recursive = TRUE))) {
+          fl <- (!all.set$for.each & all.set$set == j & !is.na(all.set$new.map))
+        }
+        add.new <- TRUE
+        if (any(fl)) {
+          for (k in all.set[fl, 'new.map']) {
+            if (length(stm@lhs[[i]]@for.sum[[j]]) == length(set.map[[k]]) && 
+                all(stm@lhs[[i]]@for.sum[[j]] %in% set.map[[k]])  && all(set.map[[k]] %in% stm@lhs[[i]]@for.sum[[j]])) {
+              all.set[nn[need.set == j], 'new.map'] <- k
+              add.new <- FALSE
+            }
+          }
+        }
+        if (add.new) {
+          set.map.name <- c(set.map.name, j)
+          set.map[[length(set.map.name)]] <- stm@lhs[[i]]@for.sum[[j]]
+          all.set[nn[need.set == j], 'new.map'] <- length(set.map.name)
+        }
+      }
+    }
+  }
+  # Add alias
+  fl <- (!all.set$for.each & all.set$def.lhs & all.set$set %in% for.each.set)
+  if (any(fl)) 
+    all.set[fl, 'alias'] <- paste0(all.set[fl, 'set'], 'p')
+  # Need add code to reduce additional mapping
+  # Maaping
+  if (length(set.map) > 0) {
+    mpp <- all.set[!is.na(all.set$new.map), c('new.map', 'alias')]
+    mpp <- mpp[!duplicated(mpp$new.map), ]
+    mpp <- mpp[sort(mpp$new.map, index.return = TRUE)$ix,, drop = FALSE]
+    new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
+    new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
+    for (i in seq_along(set.map)) 
+      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), set.map[[i]])
+    
+    # copy new.map for lhs set that define in for each
+    fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
+    for (i in fl) {
+      all.set[!all.set$for.each & !all.set$def.lhs & all.set$set == all.set$set[i], 'new.map'] <- i
+    }
+  }
+  if (nrow(all.set) > 0) {
+    st <- unique(all.set$set)
+    st <- st[!(st %in% names(approxim))]
+    for (ss in st) approxim[[ss]] <- prec@set[[ss]]
+  }
 
-#setMethod('toGams', signature(obj = 'constrain'), sm_toGams_constrain)
+  # Generate GAMS code with mult & rhs parameters
+  res <- list()  
+  # Declaration equation in model
+  res$equationDeclaration2Model <- paste0('eqCns', stm@name)
+  # Declaration equation
+  if (length(stm@for.each) == 0) {
+    res$equationDeclaration <- res$equationDeclaration2Model
+  } else {
+    res$equationDeclaration <- paste0(res$equationDeclaration2Model, '(', paste0(names(stm@for.each), collapse = ', '), ')')
+  }
+  # Equation before ..
+  res$equation <- res$equationDeclaration
+  if (any(all.set$for.each & (all.set == 'year') | !is.na(all.set$new.map))) {
+    for.each.set0 <- all.set[all.set$for.each,, drop = FALSE]
+    hh <- NULL
+    if (any(!is.na(for.each.set0$new.map))) { 
+      hh <- c(hh, new.map.name.full[for.each.set0$new.map[!is.na(for.each.set0$new.map)]])
+    }
+    if (any(for.each.set0$set == 'year')) { 
+      hh <- c(hh, 'mMidMilestone(year)')
+    }
+    if (any(all.set$lag.year)) { 
+      hh <- c(hh, 'not(mStartMilestone(year))')
+    }
+    if (any(all.set$lead.year)) { 
+      hh <- c(hh, 'mMilestoneHasNext(year)')
+    }
+    res$equation <- paste0(res$equation, '$', '('[length(hh) > 1], 
+                           paste0(hh, collapse = ' and '), ')'[length(hh) > 1])
+    
+  }
+  res$equation <- paste0(res$equation, '.. ')
+  # Add lhs to equation
+  lhs.set <- all.set[!all.set$for.each,, drop = FALSE]
+  for (i in seq_along(stm@lhs)) {
+    vrb <- stm@lhs[[i]]@variable
+    lhs.set2 <- lhs.set[lhs.set$lhs.num == i, ]
+    vrb.lhs <- .vrb_mapping[[vrb]]
+    # Add multiple to vrb
+    # Add to year multiplier if lag.year | lead.year
+    if ((any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) && (nrow(stm@lhs[[i]]@mult) == 0 ||  all(colnames(stm@lhs[[i]]@mult) != 'year'))) {
+      if (nrow(stm@lhs[[i]]@mult) == 0) {
+        stm@lhs[[i]]@mult <- data.frame(year = NA, value = stm@lhs[[i]]@defVal, stringsAsFactors = FALSE)
+      } else {
+        stm@lhs[[i]]@mult$year <- NA
+      }
+    }
+    # Add multiplier
+    if (nrow(stm@lhs[[i]]@mult) != 0) {
+      # Complicated parameter
+      # Generate approxim
+      approxim2 <- approxim[unique(c(colnames(stm@lhs[[i]]@mult)[colnames(stm@lhs[[i]]@mult) %in% names(approxim)], 'solver', 'year'))]
+      if (any(names(approxim2) == 'slice')) {
+        approxim2$slice <- approxim2$slice@all_slice
+      }
+      need.set <- lhs.set2[lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), 'set']
+      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), ]
+      for (j in seq_len(nrow(need.set2))) {
+        approxim2[[j]] <- set.map[[need.set2[j, 'new.map']]]
+      }
+      xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
+                            interpolation = 'back.inter.forth')
+      prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
+      if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
+        yy <- energyRt:::.getTotalParameterData(prec, xx@name)
+        nn <- approxim$mileStoneForGrowth[as.character(yy$year)]
+        if (any(lhs.set2$lag.year)) nn <- (-nn)
+        yy$value <- (sign(yy$value) * abs(yy$value) ^ nn)
+        prec@parameters[[xx@name]] <- addData(xx, yy)
+      }
+      # Add mult
+      vrb.lhs <- paste0(xx@name, '(', paste0(need.set, collapse = ', '), ') * ', vrb.lhs)
+    } else if (stm@lhs[[i]]@defVal != 1) {
+      vrb.lhs <- paste0(stm@lhs[[i]]@defVal, ' * ', vrb.lhs)
+    }
+    # Replace setsname
+    for (j in seq_len(nrow(lhs.set2))[lhs.set2$alias != lhs.set2$set]) {
+      vrb.lhs <- gsub(paste0(' ', lhs.set2$set[j], ' '), lhs.set2$alias[j], vrb.lhs)
+    }
+    vrb.lhs <- gsub('[ ]*[$][ ]*', '$', gsub('[ ]*[)]', ')', gsub('[ ]*[(][ ]*', '(', gsub('[ ]*[,][ ]*', ', ', vrb.lhs))))
+    # Generate data to equation
+    if (i != 1) res$equation <- paste0(res$equation, '+')
+    if (all(!lhs.set2$def.lhs)) {
+      res$equation <- paste0(res$equation, vrb.lhs)
+    } else {
+      lhs.set3 <- lhs.set2[lhs.set2$def.lhs,, drop = FALSE]
+      cnd <- NULL
+      if (any(!is.na(lhs.set3$new.map))) { 
+        cnd <- c(cnd, new.map.name.full[lhs.set3$new.map[!is.na(lhs.set3$new.map)]])
+      }
+      if (any(lhs.set3$lag.year == 'year')) { 
+        cnd <- c(cnd, 'mMilestoneNext(yearp, year)')
+      } else if (any(lhs.set3$lead.year)) { 
+        cnd <- c(cnd, 'mMilestoneNext(year, yearp)')
+      } else if (any(lhs.set3$set == 'year')) { 
+        cnd <- c(cnd, 'mMidMilestone(year)')
+      }
+      if (any(grep('[$]', vrb.lhs))) {
+        tmp <- gsub('.*[$]', '', vrb.lhs)
+        if (substr(tmp, 1, 1) == '(') 
+          tmp <- substr(tmp, 2, nchar(tmp) - 1)
+        cnd <- c(cnd, tmp)
+        vrb.lhs <- gsub('[$].*', '', vrb.lhs)
+      }
+      if (any(!is.na(lhs.set3$new.map))) 
+        cnd <- c(cnd, new.map.name.full[lhs.set3$new.map[!is.na(lhs.set3$new.map)]])
+      # Finish for sum
+      if (sum(lhs.set2$def.lhs) == 1) {
+        res$equation <- paste0(res$equation, ' sum(', lhs.set3$alias);
+      } else {
+        res$equation <- paste0(res$equation, ' sum((', paste0(lhs.set3$alias, collapse = ', '), ')');
+      }
+      if (length(cnd) == 1) {
+        res$equation <- paste0(res$equation, '$', cnd, ', ', vrb.lhs, ')')
+      } else if (length(cnd) > 1) {
+        res$equation <- paste0(res$equation, '$(', paste0(cnd, collapse = ' and '), '), ', vrb.lhs, ')')
+      } else {
+        stop('error!')
+      }
+    }
+  }
+  # Add eq
+  res$equation <- paste0(res$equation, ' ', c('==' = '=e=', '>=' = '=g=', '<=' = '=l=')[as.character(stm@eq)], ' ')
+  # Add rhs
+  if (nrow(stm@rhs) != 0) {
+    # Complicated rhs
+    # Generate approxim
+    approxim2 <- approxim[unique(c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)], 'solver', 'year'))]
+    if (any(names(approxim2) == 'slice')) {
+      approxim2$slice <- approxim2$slice@all_slice
+    }
+    need.set <- all.set[all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs),, drop = FALSE]
+    for (j in seq_len(nrow(need.set))) {
+      approxim2[[j]] <- set.map[[need.set[j, 'new.map']]]
+    }
+    need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
+    xx <- createParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
+                          interpolation = 'back.inter.forth', colName = 'rhs')
+    prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@rhs, 'rhs', xx, approxim2))
+    # Add mult
+    res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')
+  } else {
+    res$equation <- paste0(res$equation, stm@defVal)
+  }
+  res$equation <- paste0(res$equation, ';')
+  prec@gams.equation[[stm@name]] <- res
+  prec
+}
 
-#obj <- newConstrain('f3', 'capacity', 'FX', for.each = list(tech = NULL))
-#obj <- newConstrain('f3', 'capacity', 'FX', for.each = list(tech = c('ELCCOA', 'ELCGAS')))
-#obj <- newConstrain('f3', 'capacity', 'FX', for.each = list(tech = c('ELCCOA', 'ELCGAS')),
-#  rhs = data.frame(year = 2005:2010, rhs = 1:6, region = c('CHN', rep(NA, 5))))
-#toGams(obj)
-# sm_toGams_constrain(obj)
+#  .getSetEquation(prec, stm, approxim)@gams.equation
+
+#stm <- newConstrain('useElc2018Gas1', 'input', '>=', rhs = 8128*(1 - .025),
+#                    for.sum = list(tech = base.elc.tech, slice = 'ANNUAL', region = NULL, comm = c("GAS")),
+#                    for.each = list(year = 2018))
 

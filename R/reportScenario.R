@@ -626,42 +626,6 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
             '.\n\n', '\n', sep = '', file = zz)
         }
       }
-  cat('Constrain\n'); flush.console()
-      ## Constrain
-      if (length(dtt$constrain) != 0) {
-        cat('\\section{Constrain analysis}\n\n', '\n', sep = '', file = zz)
-        for(cc in seq(along = dtt$constrain)) {
-  cat(cc, 'Constrain\n'); flush.console()
-         cns <- dtt$constrain[[cc]]
-          cat('\\subsection{', gsub('_', '\\\\_', 
-             as.character(cns@name)), '}\n\n', '\n', sep = '', file = zz)
-          energyRt:::.cat_bottomup(cns, file = zz)
-          rd <- obj@modOut@data[[paste('eqCns', cns@name, sep = '')]]
-          if (!is.null(rd)) {
-            gr <- apply(rd, seq(length.out = length(dim(rd)))[(names(dimnames(rd)) 
-              %in% c('year', 'type'))], sum)
-            if (length(dim(gr)) == 1) {
-             cat('RHS (sum from all set): ', gr['rhs'], ', value: ', gr['value'], '\n\n', sep = '', file = zz)
-            } else {
-               cat('RHS (sum from all set): ', gr['rhs'], ', value: ', gr['value'], '\n\n', sep = '', file = zz)
-              png2(paste(cns@name, '_rhs.png', sep = ''), width = 640)
-              par(mar = c(5, 4, 4, 2) + .1)
-              plot(dimnames(gr)$year, gr[, 'rhs'], ylim = range(gr),
-                   main = 'Constrain (sum from all set, except year)', xlab = '', ylab = '', type = 'l', lwd = 2)
-              lines(dimnames(gr)$year, gr[, 'value'], lty = 2, col = 'red', lwd = 2)
-              dev.off2()
-              cat('\\begin{figure}[H]\n', sep = '', file = zz)
-              cat('  \\centering\n', sep = '', file = zz)
-              cat('  \\includegraphics[width = 7in]{', cns@name, '_rhs.png}\n', sep = '', file = zz)
-              cat('  \\caption{Constrain ', gsub('_', '\\\\_', cns@name), 
-                  ', sum from all set, except year.}\n', sep = '', file = zz)
-              cat('\\end{figure}\n', sep = '', file = zz)
-            }
-          }
-          if (all(!(as.character(cns@type) %in% c('tax', 'subsidy'))))
-            energyRt:::.cat_bottomup_data_frame(getConstrainResults(obj, as.character(cns@name))[[1]], 'Constrain data', zz)
-        }
-      }
   cat('Supply\n')
     ##########!!
       ## Supply

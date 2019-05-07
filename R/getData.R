@@ -372,7 +372,7 @@ getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
 #'   #, regex = FALSE
 #'   # browser()
 #'   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-#'                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
+#'                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'src', 'dst')
 #'   arg <- list(...) #, scenario(s) and 
 #'   if (is.null(names(arg))) names(arg) <- rep('', length(arg))
 #'   # if (any(names(arg) == 'parameters')) parameter <- arg$parameters
@@ -435,7 +435,7 @@ getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
 #'                      ignore.case = FALSE, fixed = FALSE, useBytes = FALSE, invert = FALSE) {
 #'   # Find set
 #'   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-#'                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
+#'                'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'src', 'dst')
 #'   src_set <- obj@modOut@sets[psb_set]
 #'   psb_set2 <- paste(psb_set, '_', sep = '')
 #'   psb_set3 <- c(psb_set, psb_set2)
