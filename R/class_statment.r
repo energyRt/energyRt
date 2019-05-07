@@ -324,6 +324,14 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     lhs.set2 <- lhs.set[lhs.set$lhs.num == i, ]
     vrb.lhs <- .vrb_mapping[[vrb]]
     # Add multiple to vrb
+    # Add to year multiplier if lag.year | lead.year
+    if ((any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) && (nrow(stm@lhs[[i]]@mult) == 0 ||  all(colnames(stm@lhs[[i]]@mult) != 'year'))) {
+      if (nrow(stm@lhs[[i]]@mult) == 0) {
+        stm@lhs[[i]]@mult <- data.frame(year = NA, value = stm@lhs[[i]]@defVal, stringsAsFactors = FALSE)
+      } else {
+        stm@lhs[[i]]@mult$year <- NA
+      }
+    }
     # Add multiplier
     if (nrow(stm@lhs[[i]]@mult) != 0) {
       # Complicated parameter
@@ -340,6 +348,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
                             interpolation = 'back.inter.forth')
       prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
+      if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
+        yy <- energyRt:::.getTotalParameterData(prec, xx@name)
+        nn <- approxim$mileStoneLen[as.character(yy$year)]
+        if (any(lhs.set2$lag.year)) nn <- (-nn)
+        yy$value <- (sign(yy$value) * abs(yy$value) ^ nn)
+        prec@parameters[[xx@name]] <- addData(xx, yy)
+      }
       # Add mult
       vrb.lhs <- paste0(xx@name, '(', paste0(need.set, collapse = ', '), ') * ', vrb.lhs)
     } else if (stm@lhs[[i]]@defVal != 1) {

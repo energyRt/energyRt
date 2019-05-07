@@ -920,8 +920,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
     app <- setMileStoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
   }
 
-  obj@parameters[['mMidMilestone']] <- addData(obj@parameters[['mMidMilestone']], 
-    data.frame(year = app@milestone$mid))
+  #obj@parameters[['mMidMilestone']] <- addData(obj@parameters[['mMidMilestone']], 
+  #  data.frame(year = app@milestone$mid))
   obj@parameters[['mStartMilestone']] <- addData(obj@parameters[['mStartMilestone']], 
     data.frame(year = app@milestone$mid, yearp = app@milestone$start))
   obj@parameters[['mEndMilestone']] <- addData(obj@parameters[['mEndMilestone']], 

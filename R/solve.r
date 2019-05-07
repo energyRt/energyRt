@@ -292,13 +292,16 @@
   prec <- new('modInp')
   obj@sysInfo@slice <- .init_slice(obj@sysInfo@slice)
   
+  xx <- (obj@sysInfo@milestone$end - obj@sysInfo@milestone$start + 1)
+  names(xx) <-  obj@sysInfo@milestone$mid
   # List for approximation
   approxim <- list(
       region = obj@sysInfo@region,
       year   = obj@sysInfo@year,
       slice  = obj@sysInfo@slice,
       solver = solver,
-      mileStoneYears = obj@sysInfo@milestone$mid
+      mileStoneYears = obj@sysInfo@milestone$mid,
+      mileStoneLen = xx
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
@@ -338,7 +341,10 @@
   prec@parameters[['slice']] <- addData(prec@parameters[['slice']], approxim$slice@all_slice)
   # Fill DB by year
   prec@parameters[['year']] <- addData(prec@parameters[['year']], as.numeric(approxim[['year']]))
+  prec@parameters[['mMidMilestone']] <- addData(prec@parameters[['mMidMilestone']], data.frame(year = approxim$mileStoneYears))
+  
   prec <- read_default_data(prec, obj@sysInfo)
+  
   commodity_slice_map <- list()
   # add set 
   for(i in seq(along = obj@data)) {
