@@ -90,12 +90,12 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   # To growth 
   if (any(grep('growth', type))) {
     if (length(c(rhs, recursive = TRUE)) == 0) {
-      rhs <- (-defVal)
+      rhs <- (1/defVal)
     } else {
       if (is.numeric(rhs)) {
-        rhs <- (-rhs)
+        rhs <- (1/rhs)
       } else {
-        rhs$value <- (-rhs$rhs)
+        rhs$value <- (1/rhs$rhs)
         rhs$rhs <- NULL
       }
     }
@@ -106,6 +106,7 @@ newConstrain <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       arg[[i + nk]]$mult <- rhs
       arg[[i + nk]]$for.sum['lead.year'] <- list(NULL)
       arg[[i + nk]]$for.sum$year <- NULL
+      arg[[i]]$mult <- (-1)
     }
     rhs <- 0
     defVal <- 0

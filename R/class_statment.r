@@ -350,7 +350,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
         yy <- energyRt:::.getTotalParameterData(prec, xx@name)
-        nn <- approxim$mileStoneLen[as.character(yy$year)]
+        nn <- approxim$mileStoneForGrowth[as.character(yy$year)]
         if (any(lhs.set2$lag.year)) nn <- (-nn)
         yy$value <- (sign(yy$value) * abs(yy$value) ^ nn)
         prec@parameters[[xx@name]] <- addData(xx, yy)

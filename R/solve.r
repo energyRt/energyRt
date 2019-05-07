@@ -292,7 +292,7 @@
   prec <- new('modInp')
   obj@sysInfo@slice <- .init_slice(obj@sysInfo@slice)
   
-  xx <- (obj@sysInfo@milestone$end - obj@sysInfo@milestone$start + 1)
+  xx <- c(obj@sysInfo@milestone$mid[-1] - obj@sysInfo@milestone$mid[-nrow(obj@sysInfo@milestone)], 1)
   names(xx) <-  obj@sysInfo@milestone$mid
   # List for approximation
   approxim <- list(
@@ -301,7 +301,7 @@
       slice  = obj@sysInfo@slice,
       solver = solver,
       mileStoneYears = obj@sysInfo@milestone$mid,
-      mileStoneLen = xx
+      mileStoneForGrowth = xx
   )
   if (any(names(arg) == 'region')) {
       approxim$region = arg$region
