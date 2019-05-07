@@ -358,7 +358,7 @@
   }
   approxim$commodity_slice_map <- commodity_slice_map
   prec@set <- lapply(prec@parameters[sapply(prec@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
-  assign('approxim', approxim, globalenv())
+  # assign('approxim', approxim, globalenv())
   prec@gams.equation <- list()
   cat('Generating model input files ')
   # Fill DB main data
@@ -467,7 +467,7 @@
 #          prec@parameters[[i]]@data <- prec@parameters[[i]]@data[1:prec@parameters[[i]]@nValues,, drop = FALSE]
 #      }
 #    }
-  assign('prec', prec, globalenv())
+  # assign('prec', prec, globalenv())
 #####################################################################################
 # Handle data
 #####################################################################################
@@ -588,7 +588,7 @@ LL1 <- proc.time()[3]
           data.frame(tech = tec, comm = rep(g, length(tec))))
       }
       # Check user error
-       assign('prec', prec, globalenv())
+      #  assign('prec', prec, globalenv())
       # check_parameters(prec)
       ########
       #cat('pzz2: ', round(proc.time()[3] - pzz, 2), '\n')
@@ -704,7 +704,7 @@ LL1 <- proc.time()[3]
    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
    # cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
    # prec <<- prec 
-   assign('prec', prec, globalenv())
+   # assign('prec', prec, globalenv())
    # cat('.....---------........\n')
    # pzz <- proc.time()[3]
    file_w <- c()

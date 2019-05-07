@@ -8,8 +8,8 @@
 #prec <- .Object
 
 .reduce_mapping <- function(prec) {
-  assign('prec', prec, globalenv())
-  cat('begin reduce mapping\n'); flush.console()
+  #assign('prec', prec, globalenv())
+  # cat('begin reduce mapping\n'); flush.console()
   # stop()
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
 
@@ -304,7 +304,7 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
         tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll])
     
     
-    cat('end reduce mapping\n'); flush.console()
+    # cat('end reduce mapping\n'); flush.console()
     prec
 }
 

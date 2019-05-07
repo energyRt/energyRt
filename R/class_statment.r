@@ -164,9 +164,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 #  .vrb_mapping <- energyRt:::.vrb_mapping
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
-  assign('prec', prec,  globalenv())
-  assign('stm', stm,  globalenv())
-  assign('approxim', approxim,  globalenv())
+  #assign('prec', prec,  globalenv())
+  #assign('stm', stm,  globalenv())
+  #assign('approxim', approxim,  globalenv())
   stop.constr <- function(x) 
     stop(paste0('Statement "', stm@name, '" error: ', x))
   get.all.child <- function(x)  {
