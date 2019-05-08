@@ -9,11 +9,11 @@ solve.model <- function(obj, name = NULL, solver = "GAMS",
     warning('Scenario name is not specified, using "DEFAULT" name')
     name = "DEFAULT"
   }
-  
   if(is.null(tmp.dir) || tmp.dir == "") stop("Incorrect directory tmp.dir: ", tmp.del)
   message("The solver working directory: ", tmp.dir)
   message("Starting time: ", Sys.time())
-  scenario = solver_solve(obj, name = name, dir.result = tmp.dir, tmp.del = tmp.del, ...)
+  scenario = interpolate(obj, name = name)
+  scenario = solver_solve(scenario, name = name, dir.result = tmp.dir, tmp.del = tmp.del, ..., readresult = TRUE)
   if (tmp.del) unlink(tmp.dir, recursive = TRUE)
   invisible(scenario)
 }
