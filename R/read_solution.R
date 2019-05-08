@@ -11,7 +11,8 @@ read_solution <- function(scenario, ...) {
   if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
   if (is.null(arg$dir.result)) {
     arg$dir.result <- scenario@misc$dir.result 
-    stop('There is not define dir.result, including scenario@misc$dir.result')
+    if (is.null(arg$dir.result))
+      stop('There is not define dir.result, including scenario@misc$dir.result')
   }
   
 
@@ -21,7 +22,7 @@ read_solution <- function(scenario, ...) {
   if (file.exists(paste(arg$dir.result, '/variable_list2.csv', sep = ''))) {
     vrb_list2 <- arg$readOutputFunction(paste(arg$dir.result, '/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
   } else vrb_list2 <- character()
-  rr <- list(variables = c(vrb_list, vrb_list), 
+  rr <- list(variables = list(), 
              set = arg$readOutputFunction(paste(arg$dir.result, '/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
   # Read set and alias
   ss <- list()
@@ -37,33 +38,33 @@ read_solution <- function(scenario, ...) {
   ss$commp <- ss$comm
   ss$slicep <- ss$slice
   rr$set_vec <- ss
-  
+
   # Read variable data
-  for(i in vrb_list) {
-    gg <- arg$readOutputFunction(paste(arg$dir.result, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
-    if (ncol(gg) == 1) {
-      rr$variables[[i]] <- data.frame(value = gg[1, 1])
+  for(i in c(vrb_list, vrb_list2)) {
+    jj <- arg$readOutputFunction(paste(arg$dir.result, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
+    if (ncol(jj) == 1) {
+      rr$variables[[i]] <- data.frame(value = jj[1, 1])
     } else {
-      rr$variables[[i]] <- gg
-      jj <- gg[, -ncol(gg), drop = FALSE]
-      for(j in seq_along(ncol(jj))) {
+      for(j in seq_len(ncol(jj))[colnames(jj) != 'value']) {
         # Remove [.][:digit:] if any
         if (all(colnames(jj)[j] != names(rr$set_vec))) 
           colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
         # Save all data with all levels
         jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
       }
+      rr$variables[[i]] <- jj
     }
   }
  
   rr[['solution_report']] <- list(finish = arg$readOutputFunction(paste(arg$dir.result, '/pFinish.csv', sep = ''))$value, 
                                   status = arg$readOutputFunction(paste(arg$dir.result, '/pStat.csv', sep = ''))$value)
-  if(echo) cat('Read result time: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
+  scenario@modOut <- new('modOut')
   scenario@modOut@sets <- rr$set_vec
   scenario@modOut@variables <- rr$variables
   scenario@modOut@compilationStatus <- as.character(rr$solution_report$finish)
   scenario@modOut@solutionStatus <- as.character(rr$solution_report$status)
   if (rr$solution_report$finish != 2 || rr$solution_report$status != 1)
     warning('Unsuccessful finish')
+  if(arg$echo) cat('Read result time: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
   invisible(scenario)
 }

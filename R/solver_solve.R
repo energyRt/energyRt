@@ -24,10 +24,10 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     arg$dir.result <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, scenario@name, 
           format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
   }
-  scenario@misc$dir.result <- arg$dir.result
   
   # interpolate if need  
   if (interpolate) scenario <- energyRt::interpolate(scenario, ...)
+  scenario@misc$dir.result <- arg$dir.result
   
   # Misc
   solver_solver_time <- proc.time()[3]
