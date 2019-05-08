@@ -86,6 +86,11 @@
   scen
 }
 
+.remove.early.retirment <- function(scen) {
+  .apply_to_code_ret_scen(scen = scen, clss = 'technology', def.level, func = function(x) x@early.retirement <- FALSE)
+  scen
+}
+
 # Add commodity slice_level map to approxim
 .get_map_commodity_slice_map <- function(scen) {
   .apply_to_code_ret_list(scen = scen, clss = 'commodity', func = function(x) {

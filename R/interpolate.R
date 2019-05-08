@@ -87,6 +87,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
   )
   # Fill basic parameter interplotaion from sysInfo
   scen@modInp <- .read_default_data(scen@modInp, scen@model@sysInfo)
+ 
+  # Remove early retirement if not need
+  if (!scen@model@early.retirement) {
+    scen <- .remove.early.retirment(scen)
+  }
   
   # Fill slice level for commodity if not defined
   scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
