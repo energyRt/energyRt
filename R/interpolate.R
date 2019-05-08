@@ -86,13 +86,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
     mileStoneYears = scen@model@sysInfo@milestone$mid,
     mileStoneForGrowth = xx
   )
+  # Fill basic parameter interplotaion from sysInfo
+  scen@modInp <- .read_default_data(scen@modInp, scen@model@sysInfo)
   
-
-  
-  # Fill DB by year
-  
-  prec <- .read_default_data(prec, obj@sysInfo)
-  
+  .get_map_commodity_slice_map
   commodity_slice_map <- list()
   # add set 
   for(i in seq(along = obj@data)) {

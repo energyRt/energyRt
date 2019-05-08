@@ -22,3 +22,18 @@
   }
   mdl
 }
+
+# Get commodity slice map for interpolate
+.get_map_commodity_slice_map <- function(obh) {
+  xx <- list()
+  for(i in seq(along = obj@data)) {
+    for(j in seq(along = obj@data[[i]]@data)) { #
+      prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
+      if (class(obj@data[[i]]@data[[j]]) == 'commodity') {
+        if (length(obj@data[[i]]@data[[j]]@slice) == 0) 
+          obj@data[[i]]@data[[j]]@slice <- approxim$slice@default_slice_level
+        commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@slice
+      }
+    }
+  }
+}
