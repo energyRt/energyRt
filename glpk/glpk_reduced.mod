@@ -38,7 +38,6 @@ param mTechAOut{tech, comm};
 param mTechNew{tech, region, year};
 param mTechSpan{tech, region, year};
 param mTechSlice{tech, slice};
-param mTechEmitedComm{tech, comm};
 param mSupSlice{sup, slice};
 param mSupComm{sup, comm};
 param mSupSpan{sup, region};

@@ -100,8 +100,6 @@ mTechAOut(tech, comm)            Auxiliary output commodity
 mTechNew(tech, region, year)     Technologies available for investment
 mTechSpan(tech, region, year)    Availability of each technology by regions and milestone years
 mTechSlice(tech, slice)          Technology work in slice
-* Emissions
-mTechEmitedComm(tech, comm)      Technologies with emissions
 * Supply
 mSupSlice(sup, slice)            Supply by time slices
 mSupComm(sup, comm)              Supplied commodities
@@ -494,7 +492,7 @@ mTechOutTot(comm, region, year, slice)               Total technology output map
 mSupOutTot(comm, region, slice)
 * (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))
 mDemInp(comm, slice)
-*  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)), 1))
+*  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and pEmissionFactor(comm, commp) <> 0), 1)), 1))
 mEmsFuelTot(comm, region, year, slice)
 *  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)), 1))
 mTechEmsFuel(tech, comm, region, year, slice)

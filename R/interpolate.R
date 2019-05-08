@@ -38,7 +38,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   
   if (!is.null(arg$name)) scen@name <- arg$name
   if (!is.null(arg$description)) scen@description <- arg$description
-  if (is.null(arg$n.threads))  arg$n.threads <- detectCores()
+  if (is.null(arg$n.threads))  arg$n.threads <- 1 + 0*detectCores()
   if (is.null(arg$startYear) != is.null(arg$fixTo)) 
     stop('startYear && fixTo have to define both (or not define both')
   if (!is.null(arg$year)) scen@model@sysInfo@year <- arg$year  
@@ -99,7 +99,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Begin interpolate data  
   if (arg$echo) cat('Generating model input files ')
   if (arg$n.threads == 1) {
-    scen <- add0.nthreads_1(scen, arg)
+    scen <- add0.nthreads_1(scen, arg, approxim)
   } else {
     stop('have to do')
   }

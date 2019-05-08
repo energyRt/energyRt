@@ -24,7 +24,7 @@
 }
 
 # Get commodity slice map for interpolate
-.get_map_commodity_slice_map <- function(obh) {
+.get_map_commodity_slice_map <- function(obj) {
   xx <- list()
   for(i in seq(along = obj@data)) {
     for(j in seq(along = obj@data[[i]]@data)) { #
@@ -41,7 +41,7 @@
 .apply_to_code_ret_scen <- function(scen, func, ..., clss = NULL) {
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) {
-      if (is.null(clss) || any(class(obj@data[[i]]@data[[j]]) == clss)) {
+      if (is.null(clss) || any(class(scen@model@data[[i]]@data[[j]]) == clss)) {
         scen@model@data[[i]]@data[[j]] <- func(scen@model@data[[i]]@data[[j]], ...)
       }
     }
@@ -54,7 +54,7 @@
   rs <- list()
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) {
-      if (is.null(clss) || any(class(obj@data[[i]]@data[[j]]) == clss)) {
+      if (is.null(clss) || any(class(scen@model@data[[i]]@data[[j]]) == clss)) {
         if (need.name) {
           rr <- func(scen@model@data[[i]]@data[[j]], ...)
           rs[[rr$name]] <- rr$val
@@ -106,4 +106,6 @@ add0.nthreads_1 <- function(scen, arg, approxim) {
       }
     }
   }
+  if (arg$echo) cat(' ')
+  scen
 }

@@ -123,8 +123,8 @@
     #cat('end: ', i, ', time: ', round(proc.time()[3] - p1, 2), '\n', sep = ''); flush.console()
   }
   
-  for (i in c('pDummyImportCost', 'pDummyExportCost', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Ainp', 
-              'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor')) 
+  for (i in c('pDummyImportCost', 'pDummyExportCost', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Ainp', 'pTechEmisComm', 
+              'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor', 'pEmissionFactor')) 
     tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'l')
   
   for (i in c('pDummyImportCost', 'pDummyExportCost')) {
@@ -163,10 +163,17 @@
 #   (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))    
     prec@parameters[['mDemInp']] <- addData(prec@parameters[['mDemInp']], 
         reduce.sect(merge(tmp_map$mCommSlice, tmp_map$mDemComm, by = 'comm'), c('comm', 'slice')))
+    
+    
 # mTechEmsFuel(tech, comm, region, year, slice)
-#  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)), 1)) 
+#  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and 
+#    (sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and pEmissionFactor(comm, commp) <> 0), 1)), 1)) 
+    tmp <- merge(tmp_map$mTechInpComm, tmp_nozero$pTechEmisComm, by = c('tech', 'comm'))
+    colnames(tmp)[colnames(tmp) == 'comm'] <- 'commp'
+    tmp <- merge(tmp_nozero$pEmissionFactor, tmp)[, c('tech', 'comm')]
+    tmp <- tmp[!duplicated(tmp),, drop = FALSE]
     prec@parameters[['mTechEmsFuel']] <- addData(prec@parameters[['mTechEmsFuel']], 
-       merge(tmp_map$mTechSpan, merge(tmp_map$mTechSlice, tmp_map$mTechEmitedComm, by = 'tech'), by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
+       merge(tmp_map$mTechSpan, merge(tmp_map$mTechSlice, tmp, by = 'tech'), by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
 # mEmsFuelTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and mTechSlice(tech, slice) and mTechEmitedComm(tech, comm)), 1))  
 prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']], 
                                             reduce.sect(getParameterData(prec@parameters[['mTechEmsFuel']]), c('comm', 'region', 'year', 'slice')))
@@ -302,19 +309,7 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     
     prec@parameters[['mInp2Lo']] <- addData(prec@parameters[['mInp2Lo']], merge(reduce.duplicate(rbind(tmp_map$mTechInpTot[, cll], 
         tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll])
-    
-    # mTechEmitedComm
-    browser()
-    # Totally wrong
-    g1 <- getParameterData(prec@parameters$pTechEmisComm)
-    g2 <- getParameterData(prec@parameters$pEmissionFactor)
-    g1 <- g1[g1$value != 0, , drop = FALSE]
-    for(g in unique(g2$comm)) {
-      cmd <- g2[g2$comm == g, 'commp']
-      tec <- unique(g1[g1$comm %in% cmd, 'tech'])
-      prec@parameters$mTechEmitedComm <- addData(prec@parameters$mTechEmitedComm,
-                                                 data.frame(tech = tec, comm = rep(g, length(tec))))
-    }
+
     prec
 }
 

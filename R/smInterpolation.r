@@ -3,7 +3,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
   # cat('simple_data_frame_approximation_chk:', parameter, '\n')
   there.is.year <- any(colnames(frm) == 'year')
-  if (approxim$solver == 'GAMS' && nrow(frm) == 0) return(frm)
+  if (nrow(frm) == 0) return(frm)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
@@ -25,15 +25,13 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'value'), drop = FALSE])
   }
   # For increase speed, not work for GLPK
-  if (approxim$solver == 'GAMS') {
-    dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
-    if (!is.null(remove_duplicate) && nrow(dd) != 0) {
-      fl <- rep(TRUE, nrow(dd))
-      for (i in seq_along(remove_duplicate)) {
-        fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
-      }
-      dd <- dd[fl,, drop = FALSE]
+  dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
+  if (!is.null(remove_duplicate) && nrow(dd) != 0) {
+    fl <- rep(TRUE, nrow(dd))
+    for (i in seq_along(remove_duplicate)) {
+      fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
     }
+    dd <- dd[fl,, drop = FALSE]
   }
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
     dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
@@ -43,7 +41,6 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
 
 multiInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
-  # if (approxim$solver == 'GAMS' && nrow(frm) == 0) return(frm)
   there.is.year <- any(colnames(frm) == 'year')
   dd <- interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
@@ -65,15 +62,13 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'type', 'value'), drop = FALSE])
   }
   # For increase speed, not work for GLPK
-  if (approxim$solver == 'GAMS') {
-    dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
-    if (!is.null(remove_duplicate) && nrow(dd) != 0) {
-      fl <- rep(TRUE, nrow(dd))
-      for (i in seq_along(remove_duplicate)) {
-        fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
-      }
-      dd <- dd[fl,, drop = FALSE]
+  dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+  if (!is.null(remove_duplicate) && nrow(dd) != 0) {
+    fl <- rep(TRUE, nrow(dd))
+    for (i in seq_along(remove_duplicate)) {
+      fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
     }
+    dd <- dd[fl,, drop = FALSE]
   }
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
     dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]

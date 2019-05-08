@@ -1,4 +1,4 @@
-solver_solve(scenario, ..., interpolate = FALSE) { # - solves scenario, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
+solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenario, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # solver = 'GAMS' use solver for model
   # tmp.dir - dir for solver
