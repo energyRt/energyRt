@@ -171,7 +171,7 @@ setMethod("initialize", "modInp",
   # Technology
     # Map
     for(i in c('mTechInpComm', 'mTechOutComm', 'mTechOneComm', 
-      'mTechEmitedComm', 'mTechAInp', 'mTechAOut'))
+      'mTechAInp', 'mTechAOut'))
         .Object@parameters[[i]] <- createParameter(i, c('tech', 'comm'), 'map', cls = 'technology')    
     for(i in c('mTechInpGroup', 'mTechOutGroup'))
         .Object@parameters[[i]] <- createParameter(i, c('tech', 'group'), 'map', cls = 'technology')    

@@ -21,14 +21,10 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
   if (is.null(arg$tmp.del)) arg$tmp.del <- FALSE
   if (is.null(arg$readresult)) arg$readresult <- TRUE
   if (is.null(arg$dir.result)) {
-    dir.result <- getwd()
-    dir.result <-  paste(dir.result, '/solwork/', sep = '')
-    add_drr <- paste0(arg$solver, '_', scenario@name, '_', 
-                      format(Sys.Date(), format = '%Y_%m_%d'), '_', 
-                      format(Sys.time(), format = '%H_%M_%S'))
-    arg$dir.result <- paste(dir.result, '/', add_drr, sep = '')
-    scenario@misc$dir.result <- arg$dir.result
+    arg$dir.result <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, scenario@name, 
+          format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
   }
+  scenario@misc$dir.result <- arg$dir.result
   
   # interpolate if need  
   if (interpolate) scenario <- energyRt::interpolate(scenario, ...)
@@ -131,7 +127,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     if (arg$only.listing) {
       return(readLines(paste(arg$dir.result, '/mdl.lst', sep = '')))
     }
-    if(arg$echo) cat('GAMS time: ', round(gams_run_time - proc.time()[3], 2), 's\n', sep = '')
+    if(arg$echo) cat('GAMS time: ', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
   } else if (solver == 'GLPK' || solver == 'CBC') {  
     ##################################################################################################################################    
     # GLPK & CBC part

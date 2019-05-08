@@ -20,8 +20,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # repository - class for add to model (repository or list of repository)
   # echo - print working data
   
-  interpolation.time.begin <- proc.time()[3]
   arg <- list(...)
+
+    
+  interpolation.time.begin <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
   
   if (class(obj) == 'model') {
@@ -92,6 +94,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   approxim$commodity_slice_map <- .get_map_commodity_slice_map(scen)
 
   # Fill set list for interpolation and os one  
+  scen <- .add_name_for_basic_set(scen, approxim)
   scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
 
   ## Begin interpolate data   by year, slice, ...
@@ -115,13 +118,13 @@ interpolate <- function(obj, ...) { #- returns class scenario
   scen@modInp <- .reduce_mapping(scen@modInp)  
   
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
-  for(i in names(scn@modInp@parameters)) {
-    if (scn@modInp@parameters[[i]]@nValues != -1) {
-      scn@modInp@parameters[[i]]@data <- scn@modInp@parameters[[i]]@data[
-        seq(length.out = scn@modInp@parameters[[i]]@nValues),, drop = FALSE]
+  for(i in names(scen@modInp@parameters)) {
+    if (scen@modInp@parameters[[i]]@nValues != -1) {
+      scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
+        seq(length.out = scen@modInp@parameters[[i]]@nValues),, drop = FALSE]
     }
   }
   
   if (arg$echo) cat(' ', round(proc.time()[3] - interpolation.time.begin, 2), 's\n')
-  scen
+  invisible(scen)
 }

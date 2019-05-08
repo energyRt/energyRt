@@ -76,6 +76,16 @@
   })
 }
 
+# Add name for basic set
+.add_name_for_basic_set <- function(scen, approxim) {
+  for(i in seq(along = scen@model@data)) {
+    for(j in seq(along = scen@model@data[[i]]@data)) {
+        scen@modInp <- add_name(scen@modInp, scen@model@data[[i]]@data[[j]], approxim)
+    }
+  }
+  scen
+}
+
 # Add commodity slice_level map to approxim
 .get_map_commodity_slice_map <- function(scen) {
   .apply_to_code_ret_list(scen = scen, clss = 'commodity', func = function(x) {
