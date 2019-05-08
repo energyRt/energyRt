@@ -749,6 +749,22 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   obj@parameters[['ordYear']] <- addData(obj@parameters[['ordYear']], tmp)
   obj@parameters[['cardYear']] <- addData(obj@parameters[['cardYear']], tmp[nrow(tmp),, drop = FALSE])
   
+  ####################################################
+  gg <- .getTotalParameterData(obj, 'pDiscount', need.reduce = FALSE)
+  gg <- gg[sort(gg$year, index.return = TRUE)$ix,, drop = FALSE]
+  ll <- gg[0,, drop = FALSE]
+  for(l in unique(gg$region)) {
+    dd <- gg[gg$region == l,, drop = FALSE]
+    dd$value <- cumprod(1 / (1 + dd$value))
+    ll <- rbind(ll, dd)
+  }
+  obj@parameters[['pDiscountFactor']] <- addData(obj@parameters[['pDiscountFactor']], ll)
+  hh <- gg[gg$year == as.character(max(app@year)), -2]
+  hh <- hh[hh$value == 0, 'region', drop = FALSE]
+  # Add mDiscountZero - zero discount rate in final period
+  if (nrow(hh) != 0) {
+    obj@parameters[['mDiscountZero']] <- addData(obj@parameters[['mDiscountZero']], hh)
+  } 
   obj
 })
 

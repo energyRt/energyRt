@@ -37,3 +37,73 @@
     }
   }
 }
+# Apply func to data in scenario by class and return scenario
+.apply_to_code_ret_scen <- function(scen, func, ..., clss = NULL) {
+  for(i in seq(along = scen@model@data)) {
+    for(j in seq(along = scen@model@data[[i]]@data)) {
+      if (is.null(clss) || any(class(obj@data[[i]]@data[[j]]) == clss)) {
+        scen@model@data[[i]]@data[[j]] <- func(scen@model@data[[i]]@data[[j]], ...)
+      }
+    }
+  }
+  scen
+}
+
+# Apply func to data in scenario by class and return list
+.apply_to_code_ret_list <- function(scen, func, ..., clss = NULL, need.name = TRUE) {
+  rs <- list()
+  for(i in seq(along = scen@model@data)) {
+    for(j in seq(along = scen@model@data[[i]]@data)) {
+      if (is.null(clss) || any(class(obj@data[[i]]@data[[j]]) == clss)) {
+        if (need.name) {
+          rr <- func(scen@model@data[[i]]@data[[j]], ...)
+          rs[[rr$name]] <- rr$val
+        } else {
+          rs[[length(rs) + 1]] <- func(scen@model@data[[i]]@data[[j]], ...)
+        }
+      }
+    }
+  }
+  rs
+}
+
+# Fill slice level for commodity if not defined
+.fill_default_slice_leve4comm <- function(scen, def.level) {
+  .apply_to_code_ret_scen(scen = scen, clss = 'commodity', def.level,
+      func = function(x, def.level) {
+        if (length(x@slice) == 0) x@slice <- def.level
+        x
+  })
+}
+
+# Add commodity slice_level map to approxim
+.get_map_commodity_slice_map <- function(scen) {
+  .apply_to_code_ret_list(scen = scen, clss = 'commodity', func = function(x) {
+      list(name = x@name, val = x@slice)
+    })
+}
+
+
+# Implement add0 for all parameters
+add0.nthreads_1 <- function(scen, arg, approxim) {
+  # A couple of string for progress bar
+  num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
+  if (num_classes_for_progrees_bar < 50) {
+    need.tick <- rep(TRUE, num_classes_for_progrees_bar)
+  } else {
+    need.tick <- rep(FALSE, num_classes_for_progrees_bar)
+    need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
+  }
+  # Fill DB main data
+  k <- 0
+  for(i in seq(along = scen@model@data)) {
+    for(j in seq(along = scen@model@data[[i]]@data)) { 
+      k <- k + 1
+      scen@modInp <- add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
+      if (need.tick[k] && arg$echo) {
+        cat('.')
+        flush.console() 
+      }
+    }
+  }
+}
