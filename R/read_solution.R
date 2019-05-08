@@ -4,6 +4,7 @@ read_solution <- function(scenario, ...) {
   # readOutputFunction = read.csv (may use data.table::fread)
   # dir.result dir from wich read results, by default in scenario@misc$dir.result 
   # echo = TRUE - print working data
+  arg <- list(...)
   
   read_result_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
