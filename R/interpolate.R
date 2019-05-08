@@ -113,6 +113,15 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }
   # Reduce mapping
   scen@modInp <- .reduce_mapping(scen@modInp)  
+  
+  # Clean parameters, need when nValues != -1, and mean that add NA row for speed
+  for(i in names(scn@modInp@parameters)) {
+    if (scn@modInp@parameters[[i]]@nValues != -1) {
+      scn@modInp@parameters[[i]]@data <- scn@modInp@parameters[[i]]@data[
+        seq(length.out = scn@modInp@parameters[[i]]@nValues),, drop = FALSE]
+    }
+  }
+  
   if (arg$echo) cat(' ', round(proc.time()[3] - interpolation.time.begin, 2), 's\n')
   scen
 }

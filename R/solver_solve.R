@@ -1,13 +1,16 @@
-solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenario, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
+solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE) { # - solves scenario, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # solver = 'GAMS' use solver for model
-  # tmp.dir - dir for solver
+  # dir.result - dir for solver work
   # gamsCompileParameter, glpkCompileParameter, cbcCompileParameter - parameter for compiler (to cmd/sh)
   # echo = TRUE - print working data
   # open.folder = FALSE - open folder befor run
   # show.output.on.console = FALSE & invisible = FALSE arg for command system
   # only.listing = FALSE generate only listing file (work only for gams)
-  # tmp.del = TRUE - delete temporary file 
+  # readresult = TRUE read result
+  # tmp.del need delete result in case of emergency
+  
+  
   arg <- list(...)
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) arg$solver <- 'GAMS'
@@ -15,15 +18,16 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
   if (is.null(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
   if (is.null(arg$invisible)) arg$invisible <- FALSE
   if (is.null(arg$only.listing)) arg$only.listing <- FALSE
-  if (is.null(arg$tmp.del)) arg$tmp.del <- TRUE
-  if (is.null(arg$tmp.dir)) {
-    tmp.dir <- getwd()
-    tmp.dir <-  paste(tmp.dir, '/solwork/', sep = '')
+  if (is.null(arg$tmp.del)) arg$tmp.del <- FALSE
+  if (is.null(arg$readresult)) arg$readresult <- TRUE
+  if (is.null(arg$dir.result)) {
+    dir.result <- getwd()
+    dir.result <-  paste(dir.result, '/solwork/', sep = '')
     add_drr <- paste0(arg$solver, '_', scenario@name, '_', 
                       format(Sys.Date(), format = '%Y_%m_%d'), '_', 
                       format(Sys.time(), format = '%H_%M_%S'))
-    arg$tmp.dir <- paste(tmp.dir, '/', add_drr, sep = '')
-    scenario@misc$tmp.dir <- arg$tmp.dir
+    arg$dir.result <- paste(dir.result, '/', add_drr, sep = '')
+    scenario@misc$dir.result <- arg$dir.result
   }
   
   # interpolate if need  
@@ -33,8 +37,8 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
   solver_solver_time <- proc.time()[3]
   
   # Important miscs
-  dir.create(arg$tmp.dir, recursive = TRUE)
-  if (arg$open.folder) shell.exec(arg$tmp.dir)
+  dir.create(arg$dir.result, recursive = TRUE)
+  if (arg$open.folder) shell.exec(arg$dir.result)
   # Check if gams (if it use) is available
   if (arg$solver == 'GAMS') {
     rs <- try(system('gams'))
@@ -55,8 +59,8 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
     }
     
     ### Model code to text
-    .generate_gpr_gams_file(arg$tmp.dir)
-    zz <- file(paste(arg$tmp.dir, '/mdl.gms', sep = ''), 'w')
+    .generate_gpr_gams_file(arg$dir.result)
+    zz <- file(paste(arg$dir.result, '/mdl.gms', sep = ''), 'w')
     cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
     cat(file_w, sep = '\n', file = zz)
     # Add constraint equation 
@@ -106,7 +110,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
     gams_run_time <- proc.time()[3]
     tryCatch({
       BEGINDR <- getwd()
-      setwd(arg$tmp.dir)
+      setwd(arg$dir.result)
       if (.Platform$OS.type == "windows") {
         rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter), invisible = arg$invisible, 
                      show.output.on.console = arg$show.output.on.console)
@@ -115,17 +119,17 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
       }
       setwd(BEGINDR)  
     }, interrupt = function(x) {
-      if (arg$tmp.del) unlink(arg$tmp.dir, recursive = TRUE)
+      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
       setwd(BEGINDR)
       stop('Solver has been interrupted')
     }, error = function(x) {
-      if (arg$tmp.del) unlink(arg$tmp.dir, recursive = TRUE)
+      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
       setwd(BEGINDR)
       stop(x)
     })    
     if (rs != 0) stop(paste('Solution error code', rs))
     if (arg$only.listing) {
-      return(readLines(paste(arg$tmp.dir, '/mdl.lst', sep = '')))
+      return(readLines(paste(arg$dir.result, '/mdl.lst', sep = '')))
     }
     if(arg$echo) cat('GAMS time: ', round(gams_run_time - proc.time()[3], 2), 's\n', sep = '')
   } else if (solver == 'GLPK' || solver == 'CBC') {  
@@ -134,14 +138,14 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
     ##################################################################################################################################    
     stop('Have to do')
     ### FUNC GLPK 
-    zz <- file(paste(arg$tmp.dir, '/glpk.mod', sep = ''), 'w')
+    zz <- file(paste(arg$dir.result, '/glpk.mod', sep = ''), 'w')
     if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
     cat(run_code[1:(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
     cat(run_code[grep('^minimize', run_code):(grep('^end[;]', run_code) - 1)], 
         sep = '\n', file = zz)
     cat(run_code[grep('^end[;]', run_code):length(run_code)], sep = '\n', file = zz)
     close(zz)
-    zz <- file(paste(arg$tmp.dir, '/glpk.dat', sep = ''), 'w') 
+    zz <- file(paste(arg$dir.result, '/glpk.dat', sep = ''), 'w') 
     for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
       cat(energyRt:::.sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
     }
@@ -163,7 +167,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
       flush.console()
     }
     tryCatch({
-      setwd(arg$tmp.dir)
+      setwd(arg$dir.result)
       if (.Platform$OS.type == "windows") {
         if (solver  == 'GLPK') {
           rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log log.csv', arg$glpkCompileParameter), 
@@ -183,25 +187,26 @@ solver_solve <- function(scenario, ..., interpolate = FALSE) { # - solves scenar
       setwd(BEGINDR)  
       if (rs != 0) stop(paste('Error in compilation with code', rs))
     }, interrupt = function(x) {
-      if (arg$tmp.del) unlink(arg$tmp.dir, recursive = TRUE)
+      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
       setwd(BEGINDR)
       stop('Solver have been interrupted')
     }, error = function(x) {
-      if (arg$tmp.del) unlink(arg$tmp.dir, recursive = TRUE)
+      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
       setwd(BEGINDR)
       stop(x)
     })    
     pp3 <- proc.time()[3]
     if(echo) cat('GLPK/MathProg time: ', round(pp3 - pp2, 2), 's\n', sep = '')
-    if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$tmp.dir, '/log.csv', sep = ''))))) {
-      z3 <- file(paste(arg$tmp.dir, '/pStat.csv', sep = ''), 'w')
+    if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/log.csv', sep = ''))))) {
+      z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
       cat('value\n1.00\n', file = z3)
       close(z3)
     } else {
-      z3 <- file(paste(arg$tmp.dir, '/pStat.csv', sep = ''), 'w')
+      z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
       cat('value\n2.00\n', file = z3)
       close(z3)
     }
   } else stop('Unknown solver ', solver) 
+  if (readresult) scenario <- read_solution(scenario)
   invisible(scenario)
 }
