@@ -87,7 +87,10 @@
 }
 
 .remove.early.retirment <- function(scen) {
-  .apply_to_code_ret_scen(scen = scen, clss = 'technology', func = function(x) x@early.retirement <- FALSE)
+  scen <- .apply_to_code_ret_scen(scen = scen, clss = 'technology', 
+                                  func = function(x) {
+                                    x@early.retirement <- FALSE
+                                    x})
   scen
 }
 
