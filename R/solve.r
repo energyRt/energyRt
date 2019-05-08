@@ -344,7 +344,8 @@
         for(j in seq(along = obj@data[[i]]@data)) { #if (class(obj@data[[i]]@data[[j]]) == 'technology') {
           prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
           if (class(obj@data[[i]]@data[[j]]) == 'commodity') {
-            if (is.null(obj@data[[i]]@data[[j]]@slice)) obj@data[[i]]@data[[j]]@slice <- approxim$slice@default_slice_level
+            if (length(obj@data[[i]]@data[[j]]@slice) == 0) 
+              obj@data[[i]]@data[[j]]@slice <- approxim$slice@default_slice_level
             commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@slice
           }
         }

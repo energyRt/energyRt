@@ -58,9 +58,9 @@
         nm <- names(arg)[a]
         cnd <- arg[[a]]
         if (s1[nm] == 'list') stop(error_msg)
-        if (s1[nm] %in% c("character", 'factor', 'characterOrNULL')) {
+        if (s1[nm] %in% c("character", 'factor')) {
         # Character
-         if (!(class(cnd)  %in% c("character", 'factor', 'characterOrNULL'))) stop(error_msg)
+         if (!(class(cnd)  %in% c("character", 'factor'))) stop(error_msg)
           for(i in seq(length.out = nrow(rst))) 
             rst[i, 'use']  <- any(grep2(cnd, slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), FL[nm]))
           rst <- rst[rst$use,, drop = FALSE]
@@ -117,8 +117,8 @@
             cnd2 <- cnd[[nm2]]       
             if (all(colnames(slot(s2, nm)) != nm2)) stop(error_msg)
             # Character
-            if (class(cnd2)  %in% c("character", 'factor', 'characterOrNULL')) {
-              if (!(class(cnd2)  %in% c("character", 'factor', 'characterOrNULL'))) stop(error_msg)
+            if (class(cnd2)  %in% c("character", 'factor')) {
+              if (!(class(cnd2)  %in% c("character", 'factor'))) stop(error_msg)
               for(i in seq(length.out = nrow(rst))) 
                 rst[i, 'use']  <- any(grep2(cnd2, 
                        slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], FL2[nm2]), na.rm = TRUE)

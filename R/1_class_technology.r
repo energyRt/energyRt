@@ -46,8 +46,8 @@ setClass("technology",
           stock         = "data.frame", #
           early.retirement = "logical",
           upgrade.technology = "character",
-          slice         = "characterOrNULL",
-          region        = "characterOrNULL",
+          slice         = "character",
+          region        = "character",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ), #
@@ -211,8 +211,8 @@ setClass("technology",
                                             stringsAsFactors = FALSE),
           early.retirement = TRUE,
           upgrade.technology = character(),
-          region        = NULL,
-          slice         = NULL,
+          region        = character(),
+          slice         = character(),
           GIS           = NULL,
         #! Misc
         misc = list(

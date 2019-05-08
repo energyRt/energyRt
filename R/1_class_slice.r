@@ -8,8 +8,8 @@ setClass("slice",
           parent_child     = "data.frame", # Stright relation parent-child
           all_parent_child = "data.frame", # All relation parent-child
           slice_map        = "list", # Slices set by level
-          default_slice_level = "characterOrNULL", # Default slice map
-          all_slice        = "characterOrNULL", 
+          default_slice_level = "character", # Default slice map
+          all_slice        = "character", 
           misc             = "list"
       ),
       prototype(
@@ -18,8 +18,8 @@ setClass("slice",
         parent_child     = data.frame(parent = character(), child = character(), stringsAsFactors = FALSE),
         all_parent_child = data.frame(parent = character(), child = character(), stringsAsFactors = FALSE),
         slice_map        = list(), # Slices set by level
-        default_slice_level      = NULL, # Default slice map
-        all_slice        = NULL,
+        default_slice_level      = character(), # Default slice map
+        all_slice        = character(),
         misc = list()
       ),                           
       S3methods = TRUE

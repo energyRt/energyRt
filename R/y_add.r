@@ -2,7 +2,7 @@
 # Check is slice level exist
 ################################################################################
 .checkSliceLevel <- function(app, approxim) {
-  if (!is.null(app@slice) && all(app@slice != colnames(approxim$slice@levels)[-ncol(approxim$slice@levels)]))
+  if (length(app@slice) != 0 && all(app@slice != colnames(approxim$slice@levels)[-ncol(approxim$slice@levels)]))
     stop(paste0('Unknown slice level "', app@slice, '" for ', class(app), ': "', app@name, '"'))
 }
 ################################################################################
@@ -97,8 +97,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 # Add apporoximation list (auxgilary list for approximation) to standart view
 ################################################################################
 .fix_approximation_list <- function(approxim, lev = NULL, comm = NULL) {
-  if (is.null(lev)) {
-    if (is.null(comm)) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
+  if (length(lev) == 0) {
+    if (length(comm) == 0) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
     lev <- approxim$commodity_slice_map[[comm]]
   }
   approxim$parent_child <- approxim$slice@all_parent_child
@@ -140,13 +140,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
 setMethod('add0', signature(obj = 'modInp', app = 'weather',
                             approxim = 'list'), function(obj, app, approxim) {    
                               wth <- energyRt:::.upper_case(app)
-                              if (is.null(wth@slice) && length(approxim$slice@misc$nlevel) > 1) {
+                              if (length(wth@slice) == 0&& length(approxim$slice@misc$nlevel) > 1) {
                                 stop('For weather slice level have to be define, if more than one slice level')
                               }
-                              if (is.null(wth@slice)) wth@slice <- names(approxim$slice@misc$nlevel)[1]
+                              if (length(wth@slice) == 0) wth@slice <- names(approxim$slice@misc$nlevel)[1]
                               approxim <- .fix_approximation_list(approxim, lev = wth@slice)
                               # region fix
-                              if (!is.null(wth@region)) {
+                              if (length(wth@region) != 0) {
                                 approxim$region <- approxim$region[approxim$region %in% wth@region]
                               }
                               wth@region <- approxim$region
@@ -167,11 +167,10 @@ setMethod('add0', signature(obj = 'modInp', app = 'weather',
 setMethod('add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
-    # if (!is.null(app@slice)) browser() else cat('-')
     sup <- energyRt:::.upper_case(app)
     approxim <- .fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
     sup <- .disaggregateSliceLevel(sup, approxim)
-    if (!is.null(sup@region)) {
+    if (length(sup@region) != 0) {
       approxim$region <- approxim$region[approxim$region %in% sup@region]
       ss <- getSlots('supply')
       ss <- names(ss)[ss == 'data.frame']
@@ -402,7 +401,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 #  mLoComm(comm)  PRODUCTION >= CONSUMPTION
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
   tech <- energyRt:::.upper_case(app)
-  if (is.null(tech@slice)) {
+  if (length(tech@slice) == 0) {
     use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
     tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]
   }
@@ -411,7 +410,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   obj@parameters[['mTechSlice']] <- addData(obj@parameters[['mTechSlice']],
                                            data.frame(tech = rep(tech@name, length(approxim$slice)), slice = approxim$slice, 
                                                       stringsAsFactors = FALSE))
-  if (!is.null(tech@region)) {
+  if (length(tech@region) != 0) {
     approxim$region <- approxim$region[approxim$region %in% tech@region]
     ss <- getSlots('technology')
     ss <- names(ss)[ss == 'data.frame']
@@ -655,17 +654,17 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
     list(m = m, p = waf20)
   }
   tmp <- merge.weather(tech, 'waf')
-  if (!is.null(tmp)) {
+  if (length(tmp) != 0) {
     obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$m)
     obj@parameters[['pTechWeatherAf']] <- addData(obj@parameters[['pTechWeatherAf']], tmp$p)
   }
   tmp <- merge.weather(tech, 'wafs')
-  if (!is.null(tmp)) {
+  if (length(tmp) != 0) {
     obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$m)
     obj@parameters[['pTechWeatherAfs']] <- addData(obj@parameters[['pTechWeatherAfs']], tmp$p)
   }
   tmp <- merge.weather(tech, 'wafc', 'comm')
-  if (!is.null(tmp)) {
+  if (length(tmp) != 0) {
     obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$m)
     obj@parameters[['pTechWeatherAfc']] <- addData(obj@parameters[['pTechWeatherAfc']], tmp$p)
   }
@@ -691,7 +690,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
       data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
                  slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
-  if (!is.null(approxim$slice@misc$next_slice))
+  if (length(approxim$slice@misc$next_slice) != 0)
     obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
   # Discount
   approxim.no.mileStone.Year <- approxim
@@ -765,13 +764,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   trd <- .disaggregateSliceLevel(trd, approxim)
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
                                             data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
-  if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
+  if (length(trd@commodity) == 0) stop('There is not commodity for trade flow ', trd@name)
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
-  if (is.null(trd@source)) rg <- obj@parameters$region@data$region else rg <- trd@source
+  if (length(trd@source) == 0) rg <- obj@parameters$region@data$region else rg <- trd@source
   obj@parameters[['mTradeSrc']] <- addData(obj@parameters[['mTradeSrc']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
-  if (is.null(trd@destination)) rg <- obj@parameters$region@data$region else rg <- trd@destination
+  if (length(trd@destination) == 0) rg <- obj@parameters$region@data$region else rg <- trd@destination
   obj@parameters[['mTradeDst']] <- addData(obj@parameters[['mTradeDst']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
   #
@@ -841,7 +840,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
     stg <- energyRt:::.upper_case(app)
     approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = stg@slice)
     stg <- .disaggregateSliceLevel(stg, approxim)
-    if (!is.null(stg@region)) {
+    if (length(stg@region) != 0) {
       approxim$region <- approxim$region[approxim$region %in% stg@region]
       ss <- getSlots('storage')
       ss <- names(ss)[ss == 'data.frame']
@@ -974,17 +973,17 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
       list(m = m, p = waf20)
     }
     tmp <- merge.weather(stg, 'waf')
-    if (!is.null(tmp)) {
+    if (length(tmp) != 0) {
       obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$m)
       obj@parameters[['pStorageWeatherAf']] <- addData(obj@parameters[['pStorageWeatherAf']], tmp$p)
     }
     tmp <- merge.weather(stg, 'wcinp')
-    if (!is.null(tmp)) {
+    if (length(tmp) != 0) {
       obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$m)
       obj@parameters[['pStorageWeatherCinp']] <- addData(obj@parameters[['pStorageWeatherCinp']], tmp$p)
     }
     tmp <- merge.weather(stg, 'wcout')
-    if (!is.null(tmp)) {
+    if (length(tmp) != 0) {
       obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$m)
       obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
     }

@@ -10,7 +10,7 @@ setClass("import",
           unit          = "character",
           reserve       = "numeric",
           imp           = "data.frame",
-          slice         = "characterOrNULL",
+          slice         = "character",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
@@ -31,7 +31,7 @@ setClass("import",
                                      imp.fx   = numeric(),
                                      price     = numeric(),
                                      stringsAsFactors = FALSE),
-      slice         = NULL,
+      slice         = character(),
       GIS           = NULL,
       #! Misc
       misc = list(

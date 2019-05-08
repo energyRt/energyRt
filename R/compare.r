@@ -12,7 +12,7 @@ compare <- function(obj1, obj2, just_name = FALSE) {
       names(RT) <- names(sl) 
     }        
     # Check
-    for(nm in names(sl[sl != 'characterOrNULL'])) {
+    for(nm in names(sl[sl != 'character'])) {
       CLS <- class(slot(obj1, nm)); if (CLS == 'integer') CLS <- 'numeric'
       if (CLS != sl[nm]) {
         stop('Wrong slot "', nm, '" class in object 1\n')
@@ -50,10 +50,10 @@ compare <- function(obj1, obj2, just_name = FALSE) {
       (is.na(a) | (!is.na(a) & as.character(a) == as.character(b))))
     # Compare
     #fl <- rep(TRUE, length(sl)); names(fl) <- names(sl)
-    for(nm in names(sl)[sl %in% c('factor', 'numeric', 'logical', 'character', 'characterOrNULL')]) {
+    for(nm in names(sl)[sl %in% c('factor', 'numeric', 'logical', 'character')]) {
       s1 <- slot(obj1, nm)
       s2 <- slot(obj2, nm)
-      if (sl[nm] == 'characterOrNULL') {
+      if (sl[nm] == 'character') {
         if (is.null(s1)) s1 <- ''
         if (is.null(s2)) s2 <- ''
       }
@@ -61,7 +61,7 @@ compare <- function(obj1, obj2, just_name = FALSE) {
         if (!all(chk(s1, s2))) {
           FL <- FALSE
           if (just_name) RT[nm] <- TRUE else {
-            if (sl[nm] %in% c('character', 'characterOrNULL')) {
+            if (sl[nm] %in% c('character')) {
               cat('Differences slot "', nm, '": "', as.character(s1), '",\t"', 
                  as.character(s2), '"\n', sep = '')
             } else {
