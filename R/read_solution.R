@@ -2,9 +2,13 @@ read_solution <- function(scenario, ...) {
   ## arguments
   # scenario
   # readOutputFunction = read.csv (may use data.table::fread)
-  # 
+  # dir.result dir from wich read results, by default in scenario@misc$tmp.dir 
   
   if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
+  if (is.null(arg$dir.result)) {
+    arg$dir.result <- scenario@misc$dir.result 
+    stop('There is not define dir.result, including ')
+  }
   
 
   

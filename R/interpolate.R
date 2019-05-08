@@ -23,7 +23,6 @@ interpolate <- function(obj, ...) { #- returns class scenario
   interpolation.time.begin <- proc.time()[3]
   arg <- list(...)
   if (is.null(arg$echo)) arg$echo <- TRUE
-  if (arg$echo) cat('Interplote model\n')
   
   if (class(obj) == 'model') {
     scen <- new('scenario')
@@ -97,14 +96,13 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
-  if (arg$echo) cat('Generating model input files ')
+  if (arg$echo) cat('Generating model input tables ')
   if (arg$n.threads == 1) {
     scen <- add0.nthreads_1(scen, arg, approxim)
   } else {
     stop('have to do')
   }
   scen@modInp <- add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
-  if (arg$echo) cat(' ', round(proc.time()[3] - interpolation.time.begin, 2), 's\n')
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
     prec@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
@@ -115,5 +113,6 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }
   # Reduce mapping
   scen@modInp <- .reduce_mapping(scen@modInp)  
+  if (arg$echo) cat(' ', round(proc.time()[3] - interpolation.time.begin, 2), 's\n')
   scen
 }
