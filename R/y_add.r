@@ -56,7 +56,7 @@
 ################################################################################
 # Add commodity
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'commodity',
+setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
   .checkSliceLevel(app, approxim)
   cmd <- energyRt:::.upper_case(app)
@@ -110,7 +110,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 ################################################################################
 # Add demand
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'demand',
+setMethod('.add0', signature(obj = 'modInp', app = 'demand',
                             approxim = 'list'), function(obj, app, approxim) {     
                               dem <- energyRt:::.upper_case(app)
                               dem <- stayOnlyVariable(dem, approxim$region, 'region')
@@ -137,7 +137,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
 ################################################################################
 # Add weather
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'weather',
+setMethod('.add0', signature(obj = 'modInp', app = 'weather',
                             approxim = 'list'), function(obj, app, approxim) {    
                               wth <- energyRt:::.upper_case(app)
                               if (length(wth@slice) == 0&& length(approxim$slice@misc$nlevel) > 1) {
@@ -164,7 +164,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'weather',
 ################################################################################
 # Add supply
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'supply',
+setMethod('.add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     sup <- energyRt:::.upper_case(app)
@@ -244,7 +244,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
 ################################################################################
 # Add export
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'export',
+setMethod('.add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     exp <- energyRt:::.upper_case(app)
@@ -278,7 +278,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
 ################################################################################
 # Add import
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'import',
+setMethod('.add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     imp <- energyRt:::.upper_case(app)
@@ -376,7 +376,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'import',
 ################################################################################
 # Add technology
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'technology',
+setMethod('.add0', signature(obj = 'modInp', app = 'technology',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     #  mTechInpComm(tech, comm)       Input commodity
@@ -680,7 +680,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 ################################################################################
 # Add sysInfo
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
+setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   approxim = 'list'), function(obj, app, approxim) {
   #  assign('obj', obj, globalenv())
   #  assign('app', app, globalenv())
@@ -693,11 +693,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   if (length(approxim$slice@misc$next_slice) != 0)
     obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
   # Discount
-  approxim.no.mileStone.Year <- approxim
-  approxim.no.mileStone.Year$mileStoneYears <- NULL
+  approxim_no_mileStone_Year <- approxim
+  approxim_no_mileStone_Year$mileStoneYears <- NULL
       obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
         simpleInterpolation(app@discount, 'discount',
-          obj@parameters[['pDiscount']], approxim.no.mileStone.Year))
+          obj@parameters[['pDiscount']], approxim_no_mileStone_Year))
   approxim_comm <- approxim
   approxim_comm[['comm']] <- obj@parameters$comm@data$comm
   obj@parameters[['pSliceShare']] <- addData(obj@parameters[['pSliceShare']], 
@@ -723,7 +723,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
 #          obj@parameters[['pSubsCost']], approxim_comm))
   }
   if (nrow(app@milestone) == 0) {
-    app <- setMileStoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
+    app <- setMilestoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
   }
 
   #obj@parameters[['mMidMilestone']] <- addData(obj@parameters[['mMidMilestone']], 
@@ -771,7 +771,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
 ################################################################################
 # Add trade
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'trade',
+setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
@@ -850,7 +850,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
 ################################################################################
 # Add storage
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'storage',
+setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     stg <- energyRt:::.upper_case(app)
@@ -1011,7 +1011,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
 ################################################################################
 # Add constrain
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'constrain',
+setMethod('.add0', signature(obj = 'modInp', app = 'constrain',
   approxim = 'list'), function(obj, app, approxim) {
     .getSetEquation(obj, app, approxim)
 })

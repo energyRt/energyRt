@@ -28,7 +28,7 @@ setGeneric('addMultipleSet', function(obj, dimSetNames) standardGeneric("addMult
 #setGeneric('solve', function(obj, ...) standardGeneric("solve"))
 setGeneric('levcost', function(obj, ...) standardGeneric("levcost"))
 setGeneric('interpolation', function(obj, parameter, defVal, ...) standardGeneric("interpolation"))
-setGeneric("add0", function(obj, app, approxim) standardGeneric("add0"))
+setGeneric(".add0", function(obj, app, approxim) standardGeneric(".add0"))
 setGeneric("add_name", function(obj, app, approxim) standardGeneric("add_name"))
 setGeneric("removePreviousWeather", function(obj, name) standardGeneric("removePreviousWeather"))
 setGeneric("isWeather", function(obj, name) standardGeneric("isWeather"))

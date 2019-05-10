@@ -23,7 +23,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   arg <- list(...)
 
     
-  interpolation.time.begin <- proc.time()[3]
+  interpolation_time_begin <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
   
   if (class(obj) == 'model') {
@@ -43,7 +43,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (is.null(arg$startYear) != is.null(arg$fixTo)) 
     stop('startYear && fixTo have to define both (or not define both')
   if (!is.null(arg$year)) scen@model@sysInfo@year <- arg$year  
-  if (!is.null(arg$repository)) scen@model <- .add.repository(scen@model, arg$repository)
+  if (!is.null(arg$repository)) scen@model <- .add_repository(scen@model, arg$repository)
   if (!is.null(arg$region)) scen@model@sysInfo@region <- arg$region
   if (!is.null(arg$discount)) scen@model@sysInfo@discount <- arg$discount
   
@@ -90,7 +90,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
  
   # Remove early retirement if not need
   if (!scen@model@early.retirement) {
-    scen <- .remove.early.retirment(scen)
+    scen <- .remove_early_retirment(scen)
   }
   
   # Fill slice level for commodity if not defined
@@ -106,11 +106,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Begin interpolate data  
   if (arg$echo) cat('Generating model input tables ')
   if (arg$n.threads == 1) {
-    scen <- add0.nthreads_1(scen, arg, approxim)
+    scen <- .add2_nthreads_1(scen, arg, approxim)
   } else {
     stop('have to do')
   }
-  scen@modInp <- add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
+  scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
     prec@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
@@ -130,6 +130,6 @@ interpolate <- function(obj, ...) { #- returns class scenario
     }
   }
   
-  if (arg$echo) cat(' ', round(proc.time()[3] - interpolation.time.begin, 2), 's\n')
+  if (arg$echo) cat(' ', round(proc.time()[3] - interpolation_time_begin, 2), 's\n')
   invisible(scen)
 }

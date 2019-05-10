@@ -12,7 +12,7 @@
   prec
 }
 
-.add.repository <- function(mdl, x) {
+.add_repository <- function(mdl, x) {
   if (class(x) == 'list') {
     for (i in seq_along(x)) {
       mdl <- .add.repository(mdl, x[[i]])
@@ -86,7 +86,7 @@
   scen
 }
 
-.remove.early.retirment <- function(scen) {
+.remove_early_retirment <- function(scen) {
   scen <- .apply_to_code_ret_scen(scen = scen, clss = 'technology', 
                                   func = function(x) {
                                     x@early.retirement <- FALSE
@@ -103,7 +103,7 @@
 
 
 # Implement add0 for all parameters
-add0.nthreads_1 <- function(scen, arg, approxim) {
+.add2_nthreads_1 <- function(scen, arg, approxim) {
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
   if (num_classes_for_progrees_bar < 50) {
@@ -117,7 +117,7 @@ add0.nthreads_1 <- function(scen, arg, approxim) {
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) { 
       k <- k + 1
-      scen@modInp <- add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
+      scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
       if (need.tick[k] && arg$echo) {
         cat('.')
         flush.console() 
