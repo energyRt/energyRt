@@ -298,18 +298,20 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
                 'mStorageInpTot', 'mExport', 'mTradeIrAInpTot')) 
         tmp_map[[i]] <- getParameterData(prec@parameters[[i]])
     cll <- c('comm', 'region', 'year', 'slice')
-    
-    prec@parameters[['mOut2Lo']] <- addData(prec@parameters[['mOut2Lo']], merge(reduce.duplicate(rbind(merge(tmp_map$mSupOutTot, tmp_map$year)[, cll], 
-      tmp_map$mEmsFuelTot[, cll], tmp_map$mAggOut[, cll], tmp_map$mTechOutTot[, cll], tmp_map$mStorageOutTot[, cll], 
-      tmp_map$mImport[, cll], tmp_map$mTradeIrAOutTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll])
+    mOut2Lo <- merge(reduce.duplicate(rbind(merge(tmp_map$mSupOutTot, tmp_map$year)[, cll], 
+                                 tmp_map$mEmsFuelTot[, cll], tmp_map$mAggOut[, cll], tmp_map$mTechOutTot[, cll], tmp_map$mStorageOutTot[, cll], 
+                                 tmp_map$mImport[, cll], tmp_map$mTradeIrAOutTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll]
+    mOut2Lo <- mOut2Lo[!(paste0(mOut2Lo$comm, '#', mOut2Lo$slice) %in% paste0(tmp_map$mCommSlice$comm, '#', tmp_map$mCommSlice$slice)), ]
+    prec@parameters[['mOut2Lo']] <- addData(prec@parameters[['mOut2Lo']], mOut2Lo)
     
     # sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
     #   and (mTechInpTot(comm, region, year, slice) or  mStorageInpTot(comm, region, year, slice) or
     #   or mExport(comm, region, year, slice) or mTradeIrAInpTot(comm, region, year, slice))
     
-    prec@parameters[['mInp2Lo']] <- addData(prec@parameters[['mInp2Lo']], merge(reduce.duplicate(rbind(tmp_map$mTechInpTot[, cll], 
-        tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll])
-
+    mInp2Lo <- merge(reduce.duplicate(rbind(tmp_map$mTechInpTot[, cll], 
+            tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll]
+    mInp2Lo <- mInp2Lo[!(paste0(mInp2Lo$comm, '#', mInp2Lo$slice) %in% paste0(tmp_map$mCommSlice$comm, '#', tmp_map$mCommSlice$slice)), ]
+    prec@parameters[['mInp2Lo']] <- addData(prec@parameters[['mInp2Lo']], mInp2Lo)
     prec
 }
 
