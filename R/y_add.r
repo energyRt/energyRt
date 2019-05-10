@@ -691,8 +691,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
                                   data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
                                              slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
   obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
-                  data.frame(slice = as.character(app@slice@all_slice, approxim$slice@all_parent_child$parent), 
-                             slicep = as.character(app@slice@all_slice, approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
+                  data.frame(slice = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$parent)), 
+                             slicep = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$child)), stringsAsFactors = FALSE))
   if (length(approxim$slice@misc$next_slice) != 0)
     obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
   # Discount
