@@ -60,7 +60,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     if (any(sort(scen@model@sysInfo@year) != scen@model@sysInfo@year) || 
         max(scen@model@sysInfo@year) - min(scen@model@sysInfo@year) + 1 != length(scen@model@sysInfo@year))
       stop('wrong year parameter')
-    obj <- setMilestoneYears(obj, start = scen@model@sysInfo@year[1], 
+    scen@model <- setMilestoneYears(scen@model, start = scen@model@sysInfo@year[1], 
                              interval = rep(1, length(scen@model@sysInfo@year)))
   }
   scen@modInp@parameters[['year']] <- addData(scen@modInp@parameters[['year']], scen@model@sysInfo@year)
