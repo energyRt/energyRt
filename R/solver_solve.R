@@ -10,7 +10,6 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
   # readresult = TRUE read result
   # tmp.del need delete result in case of emergency
   
-  
   arg <- list(...)
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) arg$solver <- 'GAMS'
@@ -31,6 +30,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
   
   # Misc
   solver_solver_time <- proc.time()[3]
+  BEGINDR <- getwd()
   
   # Important miscs
   dir.create(arg$dir.result, recursive = TRUE)
@@ -43,6 +43,8 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
   
   # Generate code for GAMS
   run_code <- energyRt::modelCode[[arg$solver]][[1]]
+  
+  
   if (arg$solver == 'GAMS') {
     ##################################################################################################################################    
     # GAMS part
@@ -105,7 +107,6 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     ## Run model
     gams_run_time <- proc.time()[3]
     tryCatch({
-      BEGINDR <- getwd()
       setwd(arg$dir.result)
       if (.Platform$OS.type == "windows") {
         rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter), invisible = arg$invisible, 
@@ -128,12 +129,19 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
       return(readLines(paste(arg$dir.result, '/mdl.lst', sep = '')))
     }
     if(arg$echo) cat('GAMS time: ', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
-  } else if (solver == 'GLPK' || solver == 'CBC') {  
+  } else if (arg$solver == 'GLPK' || arg$solver == 'CBC') {  
     ##################################################################################################################################    
     # GLPK & CBC part
     ##################################################################################################################################    
 
-      ### FUNC GLPK 
+    file_w <- c()
+    for (j in c('set', 'map', 'simple', 'multi')) {
+      for(i in names(scenario@modInp@parameters)) if (scenario@modInp@parameters[[i]]@type == j) {
+        file_w <- c(file_w, energyRt:::.sm_to_glpk(scenario@modInp@parameters[[i]]))
+      }
+    }
+    
+    ### FUNC GLPK 
     zz <- file(paste(arg$dir.result, '/glpk.mod', sep = ''), 'w')
     if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
     cat(run_code[1:(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
@@ -142,30 +150,20 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     cat(run_code[grep('^end[;]', run_code):length(run_code)], sep = '\n', file = zz)
     close(zz)
     zz <- file(paste(arg$dir.result, '/glpk.dat', sep = ''), 'w') 
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'set') {
-      cat(energyRt:::.sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
     cat('set FORIF := FORIFSET;\n', sep = '\n', file = zz)
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'map') {
-      cat(energyRt:::.sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'simple') {
-      cat(energyRt:::.sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
-    }
-    for(i in names(prec@parameters)) if (prec@parameters[[i]]@type == 'multi') {
-      cat(energyRt:::.sm_to_glpk(prec@parameters[[i]]), sep = '\n', file = zz)
-    }                            
+    cat(file_w, sep = '\n', file = zz) 
     cat('end;', '', sep = '\n', file = zz) 
     close(zz)
-    pp2 <- proc.time()[3]
-    if(echo) {
-      cat('Total preprocessing time: ', round(pp2 - pp1, 2), 's\n', sep = '')
+    
+    if (arg$echo) { 
+      cat('Write model to disk: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
       flush.console()
     }
+
     tryCatch({
       setwd(arg$dir.result)
       if (.Platform$OS.type == "windows") {
-        if (solver  == 'GLPK') {
+        if (arg$solver  == 'GLPK') {
           rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log log.csv', arg$glpkCompileParameter), 
                        invisible = arg$invisible, show.output.on.console = arg$show.output.on.console)
         } else {
@@ -173,7 +171,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
                              show.output.on.console = arg$show.output.on.console,  invisible = arg$invisible))
         }
       } else {
-        if (solver  == 'GLPK') {
+        if (arg$solver  == 'GLPK') {
           rs <- system(paste('glpsol -m glpk.mod -d glpk.dat --log log.csv', 
                              arg$glpkCompileParameter)) #, mustWork = TRUE)
         } else {
@@ -190,7 +188,9 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
       if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
       setwd(BEGINDR)
       stop(x)
-    })    
+    })
+    
+    
     pp3 <- proc.time()[3]
     if(echo) cat('GLPK/MathProg time: ', round(pp3 - pp2, 2), 's\n', sep = '')
     if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/log.csv', sep = ''))))) {
@@ -202,7 +202,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
       cat('value\n2.00\n', file = z3)
       close(z3)
     }
-  } else stop('Unknown solver ', solver) 
+  } else stop('Unknown solver ', arg$solver) 
   if (readresult) scenario <- read_solution(scenario)
   invisible(scenario)
 }

@@ -99,7 +99,9 @@ setMethod("initialize", "modInp",
     .Object@parameters[['ordYear']] <- createParameter('ordYear', 'year', 'simple', 
         defVal = 0, interpolation = 'inter.forth', colName = '') # for glpk    
     .Object@parameters[['cardYear']] <- createParameter('cardYear', 'year', 'simple', 
-        defVal = 0, interpolation = 'inter.forth', colName = '') # for glpk    
+                                                        defVal = 0, interpolation = 'inter.forth', colName = '') # for glpk    
+    .Object@parameters[['pPeriodLen']] <- createParameter('pPeriodLen', 'year', 'simple', 
+                                                        defVal = 0, interpolation = 'inter.forth', colName = '') # for glpk    
     
     # Commodity
     # Map
@@ -117,6 +119,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mTradeSlice']] <- createParameter('mTradeSlice', c('trade', 'slice'), 'map', cls = 'trade')   
     .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
     .Object@parameters[['mAllSliceParentChild']] <- createParameter('mAllSliceParentChild', c('slice', 'slicep'), 'map')   
+    .Object@parameters[['mAllSliceParentChildNotSame']] <- createParameter('mAllSliceParentChildNotSame', c('slice', 'slicep'), 'map')   
     # simple
     .Object@parameters[['pSliceShare']] <- createParameter('pSliceShare', 'slice', 'simple')   
     .Object@parameters[['pEmissionFactor']] <- 

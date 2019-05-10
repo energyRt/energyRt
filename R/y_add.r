@@ -687,9 +687,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   #  assign('approxim', approxim, globalenv())
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
+  obj@parameters[['mAllSliceParentChildNotSame']] <- addData(obj@parameters[['mAllSliceParentChildNotSame']],
+                                  data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
+                                             slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
   obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
-      data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
-                 slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
+                  data.frame(slice = as.character(app@slice@all_slice, approxim$slice@all_parent_child$parent), 
+                             slicep = as.character(app@slice@all_slice, approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
   if (length(approxim$slice@misc$next_slice) != 0)
     obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
   # Discount
@@ -748,6 +751,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   tmp$value <- seq_along(tmp$year)
   obj@parameters[['ordYear']] <- addData(obj@parameters[['ordYear']], tmp)
   obj@parameters[['cardYear']] <- addData(obj@parameters[['cardYear']], tmp[nrow(tmp),, drop = FALSE])
+  
+  obj@parameters[['pPeriodLen']] <- addData(obj@parameters[['pPeriodLen']], 
+     data.frame(year = app@milestone$mid, value = (app@milestone$end - app@milestone$start + 1), stringsAsFactors = FALSE))
   
   ####################################################
   gg <- .getTotalParameterData(obj, 'pDiscount', need.reduce = FALSE)
