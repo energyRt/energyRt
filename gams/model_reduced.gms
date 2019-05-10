@@ -1052,7 +1052,7 @@ eqTechSalv0(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare
     ))  =e= 0;
 
 
-eqTechSalv(tech, region, yeare)$mMilestoneLast(yeare) and (not(mDiscountZero(region)) and sum(year$mTechNew(tech, region, year), 1) <> 0)..
+eqTechSalv(tech, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(region)) and sum(year$mTechNew(tech, region, year), 1) <> 0)..
     vTechSalv(tech, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
@@ -1359,7 +1359,7 @@ eqStorageSalv0(stg, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yea
     ))  =e= 0;
 
 
-eqStorageSalv(stg, region, yeare)$(not(mDiscountZero(region)) and mMilestoneLast(yeare) and sum(year$mStorageNew(stg, region, year), 1) <> 0)..
+eqStorageSalv(stg, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(region)) and sum(year$mStorageNew(stg, region, year), 1) <> 0)..
     vStorageSalv(stg, region)
     +
    sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
