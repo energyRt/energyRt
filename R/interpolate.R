@@ -113,7 +113,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
-    prec@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
+    scen@modInp@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
     if (length(obj@LECdata$pLECLoACT) == 1) {
       scen@modInp@parameters$pLECLoACT <- addData(scen@modInp@parameters$pLECLoACT, 
                                            data.frame(region = scen@model@LECdata$region, value = scen@model@LECdata$pLECLoACT))

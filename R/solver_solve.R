@@ -132,8 +132,8 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     ##################################################################################################################################    
     # GLPK & CBC part
     ##################################################################################################################################    
-    stop('Have to do')
-    ### FUNC GLPK 
+
+      ### FUNC GLPK 
     zz <- file(paste(arg$dir.result, '/glpk.mod', sep = ''), 'w')
     if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
     cat(run_code[1:(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
