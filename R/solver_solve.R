@@ -191,8 +191,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     })
     
     
-    pp3 <- proc.time()[3]
-    if(arg$echo) cat('GLPK/MathProg time: ', round(pp3 - pp2, 2), 's\n', sep = '')
+    if(arg$echo) cat('GLPK/MathProg time: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
     if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/log.csv', sep = ''))))) {
       z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
       cat('value\n1.00\n', file = z3)
