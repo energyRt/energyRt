@@ -68,8 +68,8 @@ Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yea
 Alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
 alias (region, src), (region, dst);
 * Alias for statment
-Alias (year, year_cns), (tech, tech_cns), (dem, dem_cns), (sup, sup_cns), (stg, stg_cns);
-Alias (slice_cns, slice), (trade, trade_cns), (imp, imp_cns), (expp, expp_cns);
+*Alias (year, year_cns), (tech, tech_cns), (dem, dem_cns), (sup, sup_cns), (stg, stg_cns);
+*Alias (slice_cns, slice), (trade, trade_cns), (imp, imp_cns), (expp, expp_cns);
 
 * Mapping sets
 set
@@ -339,7 +339,7 @@ variable
 vTechInv(tech, region, year)                         Overnight investment costs
 *@ mTechSpan(tech, region, year)
 vTechEac(tech, region, year)                         Annualized investment costs
-*@ (sum(year_cns$mTechNew(tech, region, year_cns), 1) <> 0)
+*@ (sum(year$mTechNew(tech, region, year_cns), 1) <> 0)
 vTechSalv(tech, region)                              Salvage value (on the end of the model horizon, to substract from costs)
 *@ mTechSpan(tech, region, year)
 vTechOMCost(tech, region, year)                      Sum of all technology-related costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)
@@ -443,6 +443,7 @@ vStorageCap(stg, region, year)                       Storage capacity
 vStorageNewCap(stg, region, year)                    Storage new capacity
 ;
 variable
+*@ (sum(year$mStorageSpan(stg, region, year_cns), 1) <> 0)
 vStorageSalv(stg, region)                            Storage salvage costs
 *@ mStorageSpan(stg, region, year)
 vStorageCost(stg, region, year)                    Storage O&M costs

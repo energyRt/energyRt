@@ -687,10 +687,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   #  assign('approxim', approxim, globalenv())
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
-  obj@parameters[['mAllSliceParentChildNotSame']] <- addData(obj@parameters[['mAllSliceParentChildNotSame']],
+  obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
                                   data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
                                              slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
-  obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
+  obj@parameters[['mAllSliceParentChildAndSame']] <- addData(obj@parameters[['mAllSliceParentChildAndSame']],
                   data.frame(slice = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$parent)), 
                              slicep = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$child)), stringsAsFactors = FALSE))
   if (length(approxim$slice@misc$next_slice) != 0)
