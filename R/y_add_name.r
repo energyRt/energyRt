@@ -196,4 +196,19 @@ setMethod('add_name', signature(obj = 'modInp', app = 'trade',
 })
 
 
+################################################################################
+# Add tax
+################################################################################
+setMethod('add_name', signature(obj = 'modInp', app = 'tax',
+                                approxim = 'list'), function(obj, app, approxim) {
+                                  obj
+                                })
+################################################################################
+# Add subs
+################################################################################
+setMethod('add_name', signature(obj = 'modInp', app = 'subs',
+                                approxim = 'list'), function(obj, app, approxim) {
+                                  obj
+                                })
+
 

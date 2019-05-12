@@ -1018,9 +1018,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 # Add constrain
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'constrain',
-  approxim = 'list'), function(obj, app, approxim) {
-    .getSetEquation(obj, app, approxim)
-})
+                             approxim = 'list'), function(obj, app, approxim) {
+                               obj
+                             })
+
+################################################################################
+# Add tax
+################################################################################
+setMethod('.add0', signature(obj = 'modInp', app = 'tax',
+                             approxim = 'list'), function(obj, app, approxim) {
+                               obj
+                             })
 
 
 
