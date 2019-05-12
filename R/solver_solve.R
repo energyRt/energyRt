@@ -141,6 +141,12 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
       }
     }
     
+    # Add constrain
+    add_eq <- NULL
+    if (length(scenario@modInp@gams.equation) > 0) {
+      add_eq <- sapply(scenario@modInp@gams.equation, function(x) .equation.from.gams.to.glpk(x$equation)) 
+    }
+    
     ### FUNC GLPK 
     zz <- file(paste(arg$dir.result, '/glpk.mod', sep = ''), 'w')
     if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
