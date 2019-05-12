@@ -303,6 +303,8 @@ var vImportRow{imp, comm, region, year, slice} >= 0;
 
 
 
+# Guid for add equation and add mapping & parameter to constrain
+# 22b584bd-a17a-4fa0-9cd9-f603ab684e47
 s.t.  eqTechSng2Sng{(t, s) in mTechSlice, (t, r, y) in mTechSpan, (t, c) in (mTechInpComm inter mTechOneComm), (t, cp) in (mTechOutComm inter mTechOneComm) : y in mMidMilestone and pTechCinp2use[t,c,r,y,s] <> 0}: vTechInp[t,c,r,y,s]*pTechCinp2use[t,c,r,y,s]  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);
 
 s.t.  eqTechGrp2Sng{(t, s) in mTechSlice, (t, r, y) in mTechSpan, (t, g) in mTechInpGroup, (t, cp) in (mTechOutComm inter mTechOneComm) : y in mMidMilestone}: pTechGinp2use[t,g,r,y,s]*sum{c in comm:(((t,c) in mTechInpComm and (t,g,c) in mTechGroupComm))}(vTechInp[t,c,r,y,s]*pTechCinp2ginp[t,c,r,y,s])  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);

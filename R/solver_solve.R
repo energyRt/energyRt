@@ -142,15 +142,27 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     }
     
     # Add constrain
-    add_eq <- NULL
     if (length(scenario@modInp@gams.equation) > 0) {
       add_eq <- sapply(scenario@modInp@gams.equation, function(x) .equation.from.gams.to.glpk(x$equation)) 
+      # Add additional maps
+      mps_name <- grep('^[m]Cns', names(scenario@modInp@parameters), value = TRUE)
+      mps_name_def <- paste0(mps_name, ' dimen ', sapply(scenario@modInp@parameters[mps_name], function(x) length(x@dimSetNames)), ';')
+      pps_name <- grep('^[p]Cns', names(scenario@modInp@parameters), value = TRUE)
+      pps_name_def <- paste0(pps_name, ' {', sapply(scenario@modInp@parameters[mps_name], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
     }
     
     ### FUNC GLPK 
     zz <- file(paste(arg$dir.result, '/glpk.mod', sep = ''), 'w')
     if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
-    cat(run_code[1:(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
+    
+    cat(run_code[1:(grep('22b584bd-a17a-4fa0-9cd9-f603ab684e47', run_code) - 1)], sep = '\n', file = zz)
+    if (length(scenario@modInp@gams.equation) > 0) {
+      cat(mps_name_def, sep = '\n', file = zz)
+      cat(pps_name_def, sep = '\n', file = zz)
+      cat(add_eq, sep = '\n', file = zz)
+    }
+    cat(run_code[grep('22b584bd-a17a-4fa0-9cd9-f603ab684e47', run_code):(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
+    #cat(run_code[1:(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
     cat(run_code[grep('^minimize', run_code):(grep('^end[;]', run_code) - 1)], 
         sep = '\n', file = zz)
     cat(run_code[grep('^end[;]', run_code):length(run_code)], sep = '\n', file = zz)
