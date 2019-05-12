@@ -146,9 +146,9 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
       add_eq <- sapply(scenario@modInp@gams.equation, function(x) .equation.from.gams.to.glpk(x$equation)) 
       # Add additional maps
       mps_name <- grep('^[m]Cns', names(scenario@modInp@parameters), value = TRUE)
-      mps_name_def <- paste0(mps_name, ' dimen ', sapply(scenario@modInp@parameters[mps_name], function(x) length(x@dimSetNames)), ';')
+      mps_name_def <- paste0('set ', mps_name, ' dimen ', sapply(scenario@modInp@parameters[mps_name], function(x) length(x@dimSetNames)), ';')
       pps_name <- grep('^[p]Cns', names(scenario@modInp@parameters), value = TRUE)
-      pps_name_def <- paste0(pps_name, ' {', sapply(scenario@modInp@parameters[mps_name], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
+      pps_name_def <- paste0('param ', pps_name, ' {', sapply(scenario@modInp@parameters[pps_name], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
     }
     
     ### FUNC GLPK 
