@@ -376,8 +376,6 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         cnd <- c(cnd, tmp)
         vrb.lhs <- gsub('[$].*', '', vrb.lhs)
       }
-      if (any(!is.na(lhs.set3$new.map))) 
-        cnd <- c(cnd, new.map.name.full[lhs.set3$new.map[!is.na(lhs.set3$new.map)]])
       # Finish for sum
       if (sum(lhs.set2$def.lhs) == 1) {
         res$equation <- paste0(res$equation, ' sum(', lhs.set3$alias);

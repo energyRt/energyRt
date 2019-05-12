@@ -62,6 +62,10 @@ names(.alias_set) <- .set_al
   #assign('set_loop', set_loop, globalenv())
   #if (set_num == 'comm, region, slice') stop()
   # Consdition split and divet by subset
+  while (!is.null(set_loop) && substr(set_loop, 1, 1) == '(' && substr(set_loop, nchar(set_loop), nchar(set_loop)) == ')')
+    set_loop <- substr(set_loop, 2, nchar(set_loop) - 1)
+  while (!is.null(set_num) && substr(set_num, 1, 1) == '(' && substr(set_num, nchar(set_num), nchar(set_num)) == ')')
+    set_num <- substr(set_num, 2, nchar(set_num) - 1)
   cnd <- gsub(' ', '', strsplit(set_loop, 'and ')[[1]])
   cnd_slice <- strsplit(gsub('(.*[(]|[)]| )', '', strsplit(set_loop, 'and ')[[1]]), ',')
   cnd_slice <- lapply(cnd_slice, .aliasName)
@@ -85,8 +89,10 @@ names(.alias_set) <- .set_al
       not_use[tt] <- TRUE
     }
   }
+  
   in_slc <- .aliasName(gsub(' ', '', strsplit(set_num, ',')[[1]]))
-  not_use[sapply(strsplit(sss, '#'), function(x) !all(x %in% in_slc))] <- TRUE
+  not_use[sapply(strsplit(sss, '#'), function(x) length(x) == 1 && all(x != in_slc))] <- TRUE
+  
   if (any(not_use)) {
     tend <- paste0(rs[not_use], collapse = ' and ')
   } else tend <- NULL
@@ -125,7 +131,7 @@ names(.alias_set) <- .set_al
 
 # "s.t. eqCnsMINGASgrow2{y in (mMidMilestone inter mMilestoneHasNext)}: sum{y in mMidMilestone, (c, s) in mCommSlice, r in region : c in (mCnsMINGASgrow2_1 inter mCnsMINGASgrow2_1)}(-1 * vOutTot[c, r, y, s]+ sum{(y, yp) in mMilestoneNext, (c, s) in mCommSlice, r in region : c in (mCnsMINGASgrow2_1 inter mCnsMINGASgrow2_1) and yp in mMidMilestone}(pCnsMultMINGASgrow2_2[y]* vOutTot[c, r, yp, s]>=0;"
 
-# 
+# tmp = '((comm, region, slice)$(mCnsMINGASgrow2_1(comm) and mMidMilestone(year) and mCommSlice(comm, slice) and mCnsMINGASgrow2_1(comm)), -1 * vOutTot(comm, region, year, slice))'
 .handle.sum <- function(tmp) {
   hh <- .get.bracket(tmp)
   a1 <- sub('^[(]', '', sub('[)]$', '', hh$beg))
