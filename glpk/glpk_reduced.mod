@@ -552,7 +552,7 @@ for{(s1, c, r, y, s) in mSupAva : vSupOut[s1,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", s1,c,r,y,s,vSupOut[s1,c,r,y,s] >> "vSupOut.csv";
 }
 printf "sup,comm,region,value\n" > "vSupReserve.csv";
-for{(s1, c, r) in mSupReserveUp : vSupReserve[s1,c,r] <> 0} {
+for{(s1, c) in mSupComm, (s1, r) in mSupSpan : vSupReserve[s1,c,r] <> 0} {
   printf "%s,%s,%s,%f\n", s1,c,r,vSupReserve[s1,c,r] >> "vSupReserve.csv";
 }
 printf "sup,region,year,value\n" > "vSupCost.csv";

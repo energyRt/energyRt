@@ -349,7 +349,7 @@ positive variable
 * (mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region))
 *@ mSupAva(sup, comm, region, year, slice)
 vSupOut(sup, comm, region, year, slice)              Output of supply processes
-*@ mSupReserveUp(sup, comm, region)
+*@ (mSupComm(sup, comm) and mSupSpan(sup, region))
 vSupReserve(sup, comm, region)                       Cumulative used supply reserve
 ;
 variable
