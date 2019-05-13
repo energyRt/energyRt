@@ -382,10 +382,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       } else {
         res$equation <- paste0(res$equation, ' sum((', paste0(lhs.set3$alias, collapse = ', '), ')');
       }
-      if (length(cnd) == 1) {
-        res$equation <- paste0(res$equation, '$', cnd, ', ', vrb.lhs, ')')
-      } else if (length(cnd) > 1) {
+      if (length(cnd) > 1 || any(grep('[ )]and[ (]', cnd))) {
         res$equation <- paste0(res$equation, '$(', paste0(cnd, collapse = ' and '), '), ', vrb.lhs, ')')
+      } else if (length(cnd) == 1) {
+        res$equation <- paste0(res$equation, '$', cnd, ', ', vrb.lhs, ')')
       } else {
         stop('error!')
       }
