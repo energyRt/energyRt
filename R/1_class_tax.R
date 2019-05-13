@@ -8,6 +8,7 @@ setClass("tax",
            region        = "character",      #
            year          = "numeric",      #
            slice         = "character",      #
+           defVal        = "numeric",      # 
            value         = "data.frame",      # 
            misc = "list"
          ),
@@ -18,6 +19,7 @@ setClass("tax",
            region        = character(),      #
            year          = numeric(),      #
            slice         = character(),      #
+           defVal        = 0,      # 
            value        = data.frame(stringsAsFactors = FALSE),
            #! Misc
            misc = list(
@@ -35,6 +37,7 @@ setClass("sub",
            region        = "character",      #
            year          = "numeric",      #
            slice         = "character",      #
+           defVal        = "numeric",      # 
            value         = "data.frame",      # 
            misc = "list"
          ),
@@ -45,6 +48,7 @@ setClass("sub",
            region        = character(),      #
            year          = numeric(),      #
            slice         = character(),      #
+           defVal        = 0,      # 
            value        = data.frame(stringsAsFactors = FALSE),
            #! Misc
            misc = list(

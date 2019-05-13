@@ -1022,26 +1022,72 @@ setMethod('.add0', signature(obj = 'modInp', app = 'constrain',
                                obj
                              })
 
-.subtax_approxim <- function(obj, app, tax) {
+################################################################################
+# Add tax & sub
+################################################################################
+.subtax_approxim <- function(obj, app, tax, whr) {
+  if (all(app@comm != names(approxim$commodity_slice_map)))
+    stop('Unknown commodity "', app@comm, '" in ', whr, ' "', app@name, '"')
   if (length(app@region) != 0) {
     if (!all(app@region %in% approxim$region))
-      stop(paste0('Tax: unknown region "', paste0(app@region[!(app@region %in% approxim$region)], collapse = '", "'), '"'))
+      stop(paste0(whr, ': unknown region "', paste0(app@region[!(app@region %in% approxim$region)], collapse = '", "'), '"'))
     approxim$region <- app@region
   }
   if (length(app@year) != 0) {
     if (!all(app@year %in% approxim$year))
-      stop(paste0('Tax: unknown year "', paste0(app@year[!(app@year %in% approxim$year)], collapse = '", "'), '"'))
+      stop(paste0(whr, ': unknown year "', paste0(app@year[!(app@year %in% approxim$year)], collapse = '", "'), '"'))
     approxim$year <- app@year
   }
+  
+  
   if (length(app@slice) != 0) {
     if (!all(app@slice %in% approxim$slice@all_slice))
-      stop(paste0('Tax: unknown slice "', paste0(app@slice[!(app@slice %in% approxim$slice@all_slice)], collapse = '", "'), '"'))
-    approxim$slice <- app@slice
+      stop(paste0(whr, ': unknown slice "', paste0(app@slice[!(app@slice %in% approxim$slice@all_slice)], collapse = '", "'), '"'))
+
+    slc <- approxim$commodity_slice_map[[app@comm]]
+    # if there are child slice on commodity
+    if (!all(app@slice %in% slc)) {
+      not_alowed <- approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% slc, 'child']
+      if (any(not_alowed %in% app@slice))
+        stop(paste0(whr, ': child slice for commodity level is not allowed: "', paste0(not_alowed[not_alowed %in% app@slice], collapse = '", "'), '"'))
+    }
+    # if there are parent slice on commodity
+    if (!all(app@slice %in% slc)) {
+      have_to_split <- app@slice[!(app@slice %in% slc)]
+      ust_slc <-  approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% have_to_split & 
+                                                    approxim$slice@all_parent_child$child %in% slc, ]
+      approxim$slice <- c(app@slice[app@slice %in% slc], ust_slc$child)
+      # split slice on data.frame
+      if (is.data.frame(app@value) && !is.null(app@value$slice) && any(app@value$slice %in% have_to_split)) {
+        rr0 <- app@value[!(app@value$slice %in% have_to_split), ]
+        tmp <- app@value[app@value$slice %in% have_to_split, ]; 
+        tmp_slice <- tmp$slice; tmp$slice <- NULL
+        for (spl in have_to_split) {
+          spl2 <- ust_slc[ust_slc$parent == spl, 'child']
+          rr0 <- rbind(rr0, merge(tmp[tmp_slice == spl,], data.frame(slice = spl2, stringsAsFactors=FALSE))[, colnames(rr0)])
+        }
+        app@value <- rr0
+      }
+    }
   } else {
-    approxim$slice <- approxim$slice@all_slice
+    approxim$slice <- approxim$commodity_slice_map[[app@comm]]
   }
-  
-  
+  # Generate app@value
+  if (nrow(app@value) == 0) {
+    app@value <- data.frame(region = NA, year = NA, slice = NA, value = app@defVal) 
+  }
+  for (i in c('region', 'year', 'slice')) {
+    if (all(colnames(app@value) != i)) {
+      app@value[, i] <- NA
+    }
+  }
+  if (whr == 'tax') {
+    par <- 'pTaxCost'
+  } else if (whr == 'subsidy') {
+    par <- 'pSubsCost'
+  } else stop('internal error ', whr)
+  obj@parameters[[par]] <- addData(obj@parameters[[par]],
+      simpleInterpolation(app@value, 'value', obj@parameters[[par]], approxim, 'comm', app@comm))
   obj
 }
 ################################################################################
@@ -1052,7 +1098,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'tax',
                                assign('obj', obj, globalenv())
                                assign('app', app, globalenv())
                                assign('approxim', approxim, globalenv())
-                               .subtax_approxim(obj, app, tax) 
+                               .subtax_approxim(obj, app, tax, whr = 'tax') 
                              })
 
 
@@ -1061,7 +1107,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'tax',
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'sub',
                              approxim = 'list'), function(obj, app, approxim) {
-                               .subtax_approxim(obj, app, tax) 
+                               .subtax_approxim(obj, app, tax, whr = 'subsidy') 
                              })
 
 

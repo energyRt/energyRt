@@ -1664,12 +1664,12 @@ eqCost(region, year)$(mMidMilestone(year))..
 
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
          vTaxCost(comm, region, year)
-         =e= sum(slice, pTaxCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
+         =e= sum(slice$mCommSlice(comm, slice), pTaxCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
 
 
 eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)..
          vSubsCost(comm, region, year)
-         =e= sum(slice, pSubsCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
+         =e= sum(slice$mCommSlice(comm, slice), pSubsCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
 
 eqObjective..
    vObjective =e= sum((region, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),

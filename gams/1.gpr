@@ -13,7 +13,7 @@
 [OPENWINDOW_1]
 FILE0=C:\111\Github\energyRt\gams\model_full.gms
 FILE1=C:\111\Github\energyRt\gams\prototype.gms
-FILE2=C:\111\GitHub\energyRt\gams\prototype.lst
+FILE2=C:\111\Github\energyRt\gams\prototype.lst
 FILE3=C:\111\Github\energyRt\gams\prototype.gms
 MAXIM=0
 TOP=0
