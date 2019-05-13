@@ -11,9 +11,9 @@ setClass("supply",
           weather       = "data.frame", # weather factor (availability multiplier)
           reserve       = "data.frame",         # Total available resource
           availability  = "data.frame",     # Availability of the resource with prices
-          region        = "characterOrNULL",
+          region        = "character",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-          slice         = "characterOrNULL",
+          slice         = "character",
           misc = "list"
       ),
       prototype(
@@ -42,9 +42,9 @@ setClass("supply",
                                      ava.fx   = numeric(),
                                      cost     = numeric(),
                                      stringsAsFactors = FALSE),
-        region = NULL,
+        region = character(),
         GIS           = NULL,
-        slice         = NULL,
+        slice         = character(),
         #! Misc
         misc = list(
         )),

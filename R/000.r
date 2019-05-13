@@ -1,4 +1,3 @@
-setClassUnion("characterOrNULL", members=c("character", "NULL"))
 setGeneric("isCommodity", function(obj, name) standardGeneric("isCommodity"))
 setGeneric("removePreviousCommodity", function(obj, name) standardGeneric("removePreviousCommodity"))
 setGeneric("isStorage", function(obj, name) standardGeneric("isStorage"))
@@ -19,9 +18,6 @@ setGeneric("removePreviousTrade", function(obj, name) standardGeneric("removePre
 setGeneric("isTrade", function(obj, name) standardGeneric("isTrade"))
 setGeneric('addData', function(obj, data) standardGeneric("addData"))
 
-setGeneric("removePreviousStatement", function(obj, name) standardGeneric("removePreviousStatement"))
-setGeneric("isStatement", function(obj, name) standardGeneric("isStatement"))
-
 setGeneric('clear', function(obj) standardGeneric("clear"))
 setGeneric('getSet', function(obj, dimSetNames) standardGeneric("getSet"))
 setGeneric('getParameterData', function(obj, set) standardGeneric("getParameterData"))
@@ -32,7 +28,7 @@ setGeneric('addMultipleSet', function(obj, dimSetNames) standardGeneric("addMult
 #setGeneric('solve', function(obj, ...) standardGeneric("solve"))
 setGeneric('levcost', function(obj, ...) standardGeneric("levcost"))
 setGeneric('interpolation', function(obj, parameter, defVal, ...) standardGeneric("interpolation"))
-setGeneric("add0", function(obj, app, approxim) standardGeneric("add0"))
+setGeneric(".add0", function(obj, app, approxim) standardGeneric(".add0"))
 setGeneric("add_name", function(obj, app, approxim) standardGeneric("add_name"))
 setGeneric("removePreviousWeather", function(obj, name) standardGeneric("removePreviousWeather"))
 setGeneric("isWeather", function(obj, name) standardGeneric("isWeather"))

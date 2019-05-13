@@ -6,8 +6,8 @@ setClass("weather",
            name          = "character",
            description   = "character",
            unit          = "character",
-           region        = "characterOrNULL",
-           slice         = "characterOrNULL",
+           region        = "character",
+           slice         = "character",
            weather       = "data.frame", # weather factor (availability multiplier)
            color         = "data.frame",      #
            misc = "list"
@@ -16,8 +16,8 @@ setClass("weather",
            name          = "",
            description   = "",
            unit          = as.character(NA),
-           region = NULL,
-           slice         = NULL,
+           region = character(),
+           slice         = character(),
            weather       = data.frame(region   = character(), # 
                                       year     = numeric(),
                                       slice    = character(),

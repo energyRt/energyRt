@@ -130,9 +130,6 @@ setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
 setMethod('newImport', signature(name = 'character'), function(name, ...) 
   universalInit('import', name, ...))
 
-#setGeneric("newConstrain", function(name, ...) standardGeneric("newConstrain"))
-#setMethod('newConstrain', signature(name = 'character'), function(name, ...) 
-#  universalInit('constrain', name, ...))
 
 setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #' Create new model object
@@ -204,3 +201,20 @@ setMethod('newWeather', signature(name = 'character'), function(name, ...)
   universalInit('weather', name, ...))
 
 
+setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
+setMethod('newTax', signature(name = 'character'), function(name, ..., value = NULL) {
+  if (is.numeric(value)) {
+    defVal <- value
+    value <- NULL
+  } else defVal <- NULL
+  universalInit('tax', name, ..., value = value, defVal = defVal)
+})
+setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
+
+setMethod('newSub', signature(name = 'character'), function(name, ..., value = NULL) {
+  if (is.numeric(value)) {
+    defVal <- value
+    value <- NULL
+  } else defVal <- NULL
+  universalInit('sub', name, ..., value = value, defVal = defVal)
+})

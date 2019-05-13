@@ -46,7 +46,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   attr(.Object, 'GUID') <- '8732f62e-0f23-4853-878b-ec8a5cbd5224'
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'weather', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
-                 'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade', 'cns')
+                 'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade')
   if (!is.character(name) || length(name) != 1 || !energyRt:::.chec_correct_name(name)) 
     stop(paste('Wrong name: "', name, '"', sep = ''))
   if (length(dimSetNames) == 0 || any(!is.character(dimSetNames)) || 
@@ -83,7 +83,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
       region = character(), regionp = character(), src = character(), dst = character(), 
       year = numeric(), yearp = numeric(), slicep = character(), 
       slice = character(), stg = character(),
-      expp = character(), imp = character(), trade = character(), cns = character(), 
+      expp = character(), imp = character(), trade = character(), 
       type = factor(levels = c('lo', 'up')),
       value = numeric(), stringsAsFactors = FALSE)
   dimSetNames <- .Object@dimSetNames
@@ -371,158 +371,5 @@ setMethod('print', 'parameter', function(x, ...) {
   }
 })
 
-.sm_to_glpk <-  function(obj) {
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
-  }
-  if (obj@type == 'set') {
-    if (nrow(obj@data) == 0) {
-      ret <- c(paste('set ', obj@name, ' := 1;', sep = ''), '')
-    } else {
-      ret <- c(paste('set ', obj@name, ' := ', paste(obj@data[, 1], collapse = ' '), ';', sep = ''), '')
-    }
-  } else if (obj@type == 'map') {
-    if (nrow(obj@data) == 0) {
-      ret <- paste('param ', obj@name, ' default 0 := ;', sep = '')
-    } else {
-      ret <- paste('param ', obj@name, ' default 0 := ', sep = '')
-      ret <- c(ret, apply(obj@data, 1, function(x) paste('[', paste(x, collapse = ','), '] 1', sep = '')))
-      ret <- c(ret, ';', '')
-    }
-  } else if (obj@type == 'simple') {
-    if (nrow(obj@data) == 0) {
-      dd <- obj@defVal
-      if (dd == Inf) dd <- 0
-      ret <- paste('param ', obj@name, ' default ', dd, ' := ;', sep = '')
-    } else {
-      dd <- obj@defVal
-      if (dd == Inf) dd <- 0
-      ret <- paste('param ', obj@name, ' default ', dd, ' := ', sep = '')
-      fl <- obj@data[, 'value'] != Inf
-      if (any(fl)) {
-        ret <- c(ret, paste('[', apply(obj@data[fl, -ncol(obj@data), drop = FALSE], 1, 
-                                       function(x) paste(x, collapse = ',')), '] ', obj@data[fl, 'value'], sep = ''))
-      }
-      ret <- c(ret, ';', '')
-    }
-  } else if (obj@type == 'multi') {
-    gg <- obj@data
-    gg <- gg[gg$type == 'lo', , drop = FALSE]
-    gg <- gg[, colnames(gg) != 'type'] 
-    if (nrow(gg) == 0 || all(gg$value[1] == gg$value)) {
-      if (nrow(gg) == 0) dd <- obj@defVal[1] else dd <- gg$value[1]
-      if (dd == Inf) dd <- 0
-      ret <- paste('param ', obj@name, 'Lo default ', dd, ' := ;', sep = '')
-    } else {
-      dd <- obj@defVal[1]
-      if (dd == Inf) dd <- 0
-      ret <- paste('param ', obj@name, 'Lo default ', dd, ' := ', sep = '')
-      fl <- gg[, 'value'] != Inf
-      if (any(fl)) {
-        ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
-                                       function(x) paste(x, collapse = ',')), '] ', gg[fl, 'value'], sep = ''))
-      }
-      ret <- c(ret, ';', '')
-    }
-    gg <- obj@data
-    gg <- gg[gg$type == 'up', , drop = FALSE]
-    gg <- gg[, colnames(gg) != 'type'] 
-    if (nrow(gg) == 0 || all(gg$value[1] == gg$value)) {
-      if (nrow(gg) == 0) dd <- obj@defVal[2] else dd <- gg$value[1]
-      if (dd == Inf) dd <- 0
-      ret <- c(ret, paste('param ', obj@name, 'Up default ', dd, ' := ;', sep = ''))
-    } else {
-      dd <- obj@defVal[2]
-      if (dd == Inf) dd <- 0
-      ret <- c(ret, paste('param ', obj@name, 'Up default ', dd, ' := ', sep = ''))
-      fl <- gg[, 'value'] != Inf
-      if (any(fl)) {
-        ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
-                                       function(x) paste(x, collapse = ',')), '] ', gg[fl, 'value'], sep = ''))
-      }
-      ret <- c(ret, ';', '')
-    }
-  } else stop('Must realise')
-  ret
-}
 
-#dd <- new('parameter', 'comm', 'comm', 'simple')
-#dd <- addData(dd, data.frame(comm = 'a1'))
 
-## Test
-# dd <- new('parameter', 'comm', 'comm', 'simple')
-# toGams(dd)
-# dd <- addData(dd, data.frame(comm = 'a1'))
-# toGams(dd)
-# dd <- createSet('comm')
-# dd <- addSet(dd, 'hyt')
-# dd <- addMultipleSet(dd, 'hyt2')
-# createParameter('gh', 'comm', 'multi')
-# dd <- createParameter('gh', 'comm', 'map')
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'a1'))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2'))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- createParameter('gh', c('comm', 'year'), 'map')
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'a1', year = 2005))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2', year = 2012))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- createParameter('gh', 'comm', 'simple')
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'a1', value = 5))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2', value = 51))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- createParameter('gh', c('comm', 'year'), 'simple')
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'a1', year = 2005, value = 51))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2', year = 2012, value = 52))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- createParameter('gh', 'comm', 'multi')
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'a1', type = 'lo', value = 5))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2', type = 'lo', value = 51))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2', type = 'up', value = 53))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- createParameter('gh', c('comm', 'year'), 'multi')
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'a1', year = 2005, type = 'up', value = 51))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2', year = 2012, type = 'lo', value = 52))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# dd <- addData(dd, data.frame(comm = 'b2', year = 2012, type = 'up', value = 53))
-# toGams(dd)
-# checkDuplicatedRow(dd)
-# ##dd <- addData(dd, data.frame(comm = 'b2', year = 2012, type = 'up', value = 53))
-# ##checkDuplicatedRow(dd) # Gerate error
-# validObject(createParameter('gh', 'comm', 'simple'))
-# dd <- createParameter('gh', c('comm', 'year'), 'multi')
-# dd <- addData(dd, data.frame(comm = '1', year = 2, type = 'lo', value = 2, stringsAsFactors = FALSE))
-# getSet(dd, 'year')
-# clear(dd)
-# removeBySet(dd, 'comm', '21')

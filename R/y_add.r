@@ -2,7 +2,7 @@
 # Check is slice level exist
 ################################################################################
 .checkSliceLevel <- function(app, approxim) {
-  if (!is.null(app@slice) && all(app@slice != colnames(approxim$slice@levels)[-ncol(approxim$slice@levels)]))
+  if (length(app@slice) != 0 && all(app@slice != colnames(approxim$slice@levels)[-ncol(approxim$slice@levels)]))
     stop(paste0('Unknown slice level "', app@slice, '" for ', class(app), ': "', app@name, '"'))
 }
 ################################################################################
@@ -56,7 +56,7 @@
 ################################################################################
 # Add commodity
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'commodity',
+setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
   .checkSliceLevel(app, approxim)
   cmd <- energyRt:::.upper_case(app)
@@ -97,8 +97,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 # Add apporoximation list (auxgilary list for approximation) to standart view
 ################################################################################
 .fix_approximation_list <- function(approxim, lev = NULL, comm = NULL) {
-  if (is.null(lev)) {
-    if (is.null(comm)) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
+  if (length(lev) == 0) {
+    if (length(comm) == 0) stop('Internal error: 66a37cde-24e2-4ac5-ab24-b79e0f603bf7')
     lev <- approxim$commodity_slice_map[[comm]]
   }
   approxim$parent_child <- approxim$slice@all_parent_child
@@ -110,7 +110,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'commodity',
 ################################################################################
 # Add demand
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'demand',
+setMethod('.add0', signature(obj = 'modInp', app = 'demand',
                             approxim = 'list'), function(obj, app, approxim) {     
                               dem <- energyRt:::.upper_case(app)
                               dem <- stayOnlyVariable(dem, approxim$region, 'region')
@@ -137,16 +137,16 @@ setMethod('add0', signature(obj = 'modInp', app = 'demand',
 ################################################################################
 # Add weather
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'weather',
+setMethod('.add0', signature(obj = 'modInp', app = 'weather',
                             approxim = 'list'), function(obj, app, approxim) {    
                               wth <- energyRt:::.upper_case(app)
-                              if (is.null(wth@slice) && length(approxim$slice@misc$nlevel) > 1) {
+                              if (length(wth@slice) == 0&& length(approxim$slice@misc$nlevel) > 1) {
                                 stop('For weather slice level have to be define, if more than one slice level')
                               }
-                              if (is.null(wth@slice)) wth@slice <- names(approxim$slice@misc$nlevel)[1]
+                              if (length(wth@slice) == 0) wth@slice <- names(approxim$slice@misc$nlevel)[1]
                               approxim <- .fix_approximation_list(approxim, lev = wth@slice)
                               # region fix
-                              if (!is.null(wth@region)) {
+                              if (length(wth@region) != 0) {
                                 approxim$region <- approxim$region[approxim$region %in% wth@region]
                               }
                               wth@region <- approxim$region
@@ -164,14 +164,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'weather',
 ################################################################################
 # Add supply
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'supply',
+setMethod('.add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
-    # if (!is.null(app@slice)) browser() else cat('-')
     sup <- energyRt:::.upper_case(app)
     approxim <- .fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
     sup <- .disaggregateSliceLevel(sup, approxim)
-    if (!is.null(sup@region)) {
+    if (length(sup@region) != 0) {
       approxim$region <- approxim$region[approxim$region %in% sup@region]
       ss <- getSlots('supply')
       ss <- names(ss)[ss == 'data.frame']
@@ -245,7 +244,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'supply',
 ################################################################################
 # Add export
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'export',
+setMethod('.add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     exp <- energyRt:::.upper_case(app)
@@ -279,7 +278,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'export',
 ################################################################################
 # Add import
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'import',
+setMethod('.add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     imp <- energyRt:::.upper_case(app)
@@ -310,199 +309,6 @@ setMethod('add0', signature(obj = 'modInp', app = 'import',
   obj
 })
 
-################################################################################
-# Add constrain
-################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'constrain',
-  approxim = 'list'), function(obj, app, approxim) {
-  app <- energyRt:::.upper_case(app)
-  if (!energyRt:::.chec_correct_name(app@name)) {
-    stop(paste('Incorrect constrain name "', app@name, '"', sep = ''))
-  }
-  if (isConstrain(obj, app@name)) {
-    stop(paste('There is constrain name "', app@name,
-       '" now', sep = ''))
-#    warning(paste('There is constrain name "', app@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousConstrain(obj, app@name)
-  }
-##  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
-##  obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
-##      data.frame(sup = sup@name, comm = sup@commodity))
-##  obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
-##      simpleInterpolation(sup@availability, 'cost',
-##          obj@parameters[['pSupCost']], approxim, 'sup', sup@name))
-##  obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
-##      data.frame(sup = sup@name, value = sup@reserve))
-##  obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
-##            multiInterpolation(sup@availability, 'ava',
-##            obj@parameters[['pSupAva']], approxim, 'sup', sup@name))
-#  if (!energyRt:::.chec_correct_name(app@name)) {
-#    stop(paste('Incorrect technology name "', app@name, '"', sep = ''))
-#  }
-#  if (isConstrain(obj, app@name)) {
-#    warning(paste('There is constrain name "', app@name,
-#        '" now, all previous information will be removed', sep = ''))
-#  }
-#  tt <- showEquation(app, approxim)
-#  obj@constrain[[app@name]] <- tt 
-  if (any(names(app@for.each) == 'year') && !is.null(app@for.each$year) && 
-    (max(app@for.each$year) < min(approxim$year) || min(app@for.each$year) > max(approxim$year))) {
-     return(obj)
-  }
-  if (any(names(app@for.sum) == 'year') && !is.null(app@for.sum$year) && 
-    (max(app@for.sum$year) < min(approxim$year) || min(app@for.sum$year) > max(approxim$year))) {
-     return(obj)
-  }
-  if (app@type == 'tax') {
-      approxim2 <- .fix_approximation_list(approxim, comm = app@comm)
-      for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
-        approxim2[[cc]] <- app@for.each[[cc]]
-      }
-     obj@parameters[['pTaxCost']] <- addData(obj@parameters[['pTaxCost']],
-        simpleInterpolation(app@rhs, 'tax',
-         obj@parameters[['pTaxCost']], approxim2, 'comm', app@comm))
-  } else
-  if (app@type == 'subsidy') {
-      approxim2 <- .fix_approximation_list(approxim, comm = app@comm)
-      for(cc in names(app@for.each)) if (!is.null(app@for.each[[cc]])) {
-        approxim2[[cc]] <- app@for.each[[cc]]
-      }
-     obj@parameters[['pSubsCost']] <- addData(obj@parameters[['pSubsCost']],
-        simpleInterpolation(app@rhs, 'subsidy',
-         obj@parameters[['pSubsCost']], approxim2, 'comm', app@comm))
-  } else {
-    # Define lhs equation type
-    ccc <- c("comm", "region", "year", "slice")
-    if (app@type %in% c('capacity', 'newcapacity', 'invcost', 'eac', 'fixom', 'growth.capacity', 
-      'growth.newcapacity', 'growth.invcost', 'growth.eac', 'growth.fixom')) ccc <- c("region", "year")
-    if (app@type %in% c('activity', 'growth.activity')) ccc <- c("region", "year", "slice")
-    # capacity newcapacity activity input output sharein shareout
-    if (app@type %in% c('growth.output', 'output', 'shareout')) before <- 'Out' else
-    if (app@type %in% c('growth.input', 'input', 'sharein'))   before <- 'Inp' else
-    if (app@type %in% c('growth.capacity', 'capacity')) before <- 'Cap' else
-    if (app@type %in% c('growth.newcapacity', 'newcapacity')) before <- 'NewCap' else 
-    if (app@type %in% c('growth.invcost', 'invcost')) before <- 'Inv' else
-    if (app@type %in% c('growth.varom', 'varom')) before <- 'Varom' else
-    if (app@type %in% c('growth.varom', 'actvarom')) before <- 'ActVarom' else
-    if (app@type %in% c('growth.varom', 'cvarom')) before <- 'CVarom' else
-    if (app@type %in% c('growth.varom', 'avarom')) before <- 'AVarom' else
-    if (app@type %in% c('growth.fixom', 'fixom')) before <- 'Fixom' else
-    if (app@type %in% c('growth.balance', 'balance')) before <- 'Balance' else
-    if (app@type %in% c('growth.activity', 'activity')) before <- 'Act' else
-    if (app@type %in% c('growth.eac', 'eac')) before <- 'Eac' else stop('Unknown constrain type')
-    ast <- c(names(app@for.sum), names(app@for.each))[!(c(names(app@for.sum), names(app@for.each)) %in% ccc)] 
-    if (length(ast) > 1) stop('Wrong constrain') else
-    if (length(ast) == 1) {
-      before <- paste(before, toupper(substr(ast, 1, 1)), substr(ast, 2, nchar(ast)), sep = '')
-      if (any(names(app@for.each) == ast)) {
-        obj@parameters[['mCnsLType']] <- addData(obj@parameters[['mCnsLType']], 
-             data.frame(cns = app@name, stringsAsFactors = FALSE))
-      }
-    }
-    FL <- TRUE
-    for(cc in ccc) if (nrow(obj@parameters[[cc]]@data) == 0) FL <- FALSE
-    if (length(ast) != 0 && nrow(obj@parameters[[ast]]@data) == 0) FL <- FALSE
-   if (FL) {
-      obj@parameters[['cns']] <- addData(obj@parameters[['cns']], app@name)
-      obj@parameters[[paste('mCns', before, sep = '')]] <- 
-        addData(obj@parameters[[paste('mCns', before, sep = '')]], 
-           data.frame(cns = app@name, stringsAsFactors = FALSE))  
-      if (app@type == 'sharein')  
-        obj@parameters[['mCnsRhsTypeShareIn']] <- 
-           addData(obj@parameters[['mCnsRhsTypeShareIn']], 
-             data.frame(cns = app@name, stringsAsFactors = FALSE)) else
-      if (app@type == 'shareout')  obj@parameters[['mCnsRhsTypeShareOut']] <- 
-        addData(obj@parameters[['mCnsRhsTypeShareOut']], 
-          data.frame(cns = app@name, stringsAsFactors = FALSE)) else
-      if (any(grep('growth', as.character(app@type))))  
-        obj@parameters[['mCnsRhsTypeGrowth']] <- 
-           addData(obj@parameters[['mCnsRhsTypeGrowth']], 
-             data.frame(cns = app@name, stringsAsFactors = FALSE)) else
-              obj@parameters[['mCnsRhsTypeConst']] <- addData(obj@parameters[['mCnsRhsTypeConst']], 
-                  data.frame(cns = app@name, stringsAsFactors = FALSE))
-      for(cc in c(ccc, ast[length(ast) == 1])) {
-        if (length(ast) == 1 && cc == ast) {
-          if (cc %in% names(app@for.sum)) {
-            if (is.null(app@for.sum[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
-              ll <- app@for.sum[[cc]]
-          } else {
-            if (is.null(app@for.each[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
-              ll <- app@for.each[[cc]]
-            }
-        } else if (cc %in% names(app@for.sum)) {
-          if (is.null(app@for.sum[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
-            ll <- app@for.sum[[cc]]
-          nn <- paste('mCnsLhs', toupper(substr(cc, 1, 1)), substr(cc, 2, nchar(cc)), sep = '')
-          obj@parameters[[nn]] <- addData(obj@parameters[[nn]], data.frame(cns = app@name,
-            stringsAsFactors = FALSE))
-        } else if (cc %in% names(app@for.each)) {
-          if (is.null(app@for.each[[cc]])) ll <- obj@parameters[[cc]]@data[, cc] else
-            ll <- app@for.each[[cc]]
-          approxim[[cc]] <- ll
-        } else stop('Wrong constrain')
-        if (cc == 'year') ll <- ll[ll %in% obj@parameters$year@data[, 'year']] 
-        nn <- paste('mCns', toupper(substr(cc, 1, 1)), substr(cc, 2, nchar(cc)), sep = '')
-        dtt <- data.frame(cns = rep(app@name, length(ll)), ll, stringsAsFactors = FALSE)
-        colnames(dtt) <- c('cns', cc)
-        obj@parameters[[nn]] <- addData(obj@parameters[[nn]], dtt)
-      }
-      # Choose technology output
-      if (any(ast == 'tech')) {
-        if (app@type %in% c('growth.output', 'output', 'shareout')) {
-          if (app@cout) obj@parameters[['mCnsTechCOut']] <- addData(obj@parameters[['mCnsTechCOut']], 
-            data.frame(cns = app@name, stringsAsFactors = FALSE))
-          if (app@aout) obj@parameters[['mCnsTechAOut']] <- addData(obj@parameters[['mCnsTechAOut']], 
-            data.frame(cns = app@name, stringsAsFactors = FALSE))
-          if (app@emis) obj@parameters[['mCnsTechEmis']] <- addData(obj@parameters[['mCnsTechEmis']], 
-            data.frame(cns = app@name, stringsAsFactors = FALSE))
-        } else if (app@type %in% c('growth.input', 'input', 'sharein')) {
-          if (app@cinp) obj@parameters[['mCnsTechCInp']] <- addData(obj@parameters[['mCnsTechCInp']], 
-            data.frame(cns = app@name, stringsAsFactors = FALSE))
-          if (app@ainp) obj@parameters[['mCnsTechAInp']] <- addData(obj@parameters[['mCnsTechAInp']], 
-            data.frame(cns = app@name, stringsAsFactors = FALSE))
-        }
-      }
-      # Define rhs type
-      if (app@eq == '>=') obj@parameters[['mCnsGe']] <- addData(obj@parameters[['mCnsGe']], 
-          data.frame(cns = app@name, stringsAsFactors = FALSE))
-      if (app@eq == '<=') obj@parameters[['mCnsLe']] <- addData(obj@parameters[['mCnsLe']], 
-          data.frame(cns = app@name, stringsAsFactors = FALSE))
-    }
-    # Define rhs
-        year_range <- range(obj@parameters$year@data[, 'year'])
-        approxim <- approxim[names(approxim) %in% names(app@for.each)] 
-        if (any(colnames(approxim) == 'year')) {
-          year_range <- c(max(c(min(approxim$year), year_range[1])), min(c(max(approxim$year), year_range[2]))) 
-        }
-        if (any(names(app@for.each) == 'year') && !is.null(app@for.each$year)) {
-          approxim$year <- min(app@for.each$year):max(app@for.each$year)
-          year_range <- c(max(c(min(approxim$year), year_range[1])), min(c(max(approxim$year), year_range[2]))) 
-        }
-        for(i in names(app@for.each)[!(names(app@for.each) %in% names(approxim))]) 
-            approxim[[i]] <- app@for.each[[i]]
-        if (length(approxim) != 0) {
-          rhs <- interpolation(app@rhs, 'rhs', approxim = approxim, year_range = year_range,
-              rule = app@rule, defVal = app@defVal)
-          colnames(rhs)[ncol(rhs)] <- 'value'
-          rhs <- cbind(cns = rep(app@name, nrow(rhs)), rhs)
-        } else {
-          if (nrow(app@rhs) == 0) 
-            rhs <- data.frame(cns = app@name, value = app@defVal, stringsAsFactors = FALSE) else
-          if (nrow(app@rhs) == 1) 
-            rhs <- data.frame(cns = app@name, value = app@rhs$rhs, stringsAsFactors = FALSE) else
-          stop('Wrong rhs constrain: "', app@name, '"')
-        }
-        if (any(colnames(rhs) == 'year')) rhs$year <- as.numeric(as.character(rhs$year))
-        if (all(names(app@for.each) != ast)) ii <- '' else ii <- paste(toupper(substr(ast, 1, 1)), 
-          substr(ast, 2, nchar(ast)), sep = '')
-        nn <- paste('pRhs', ii, paste(toupper(substr(ccc[ccc %in% names(app@for.each)], 1, 1)), 
-          collapse = ''), sep = '')
-      obj@parameters[[nn]] <- addData(obj@parameters[[nn]], rhs[, colnames(obj@parameters[[nn]]@data)])
-    # Define sharein & shareout type
-  }
-  obj
-})
 
 .start_end_fix <- function(approxim, app, als, stock_exist) {
   # Start / End year
@@ -570,7 +376,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'constrain',
 ################################################################################
 # Add technology
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'technology',
+setMethod('.add0', signature(obj = 'modInp', app = 'technology',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     #  mTechInpComm(tech, comm)       Input commodity
@@ -595,7 +401,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 #  mLoComm(comm)  PRODUCTION >= CONSUMPTION
 #  mFxComm(comm)  PRODUCTION = CONSUMPTION
   tech <- energyRt:::.upper_case(app)
-  if (is.null(tech@slice)) {
+  if (length(tech@slice) == 0) {
     use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
     tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]
   }
@@ -604,7 +410,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
   obj@parameters[['mTechSlice']] <- addData(obj@parameters[['mTechSlice']],
                                            data.frame(tech = rep(tech@name, length(approxim$slice)), slice = approxim$slice, 
                                                       stringsAsFactors = FALSE))
-  if (!is.null(tech@region)) {
+  if (length(tech@region) != 0) {
     approxim$region <- approxim$region[approxim$region %in% tech@region]
     ss <- getSlots('technology')
     ss <- names(ss)[ss == 'data.frame']
@@ -815,6 +621,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
                                                 obj@parameters[['pTechStock']]@data$tech == tech@name & 
                                                 obj@parameters[['pTechStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 
   dd0 <- .start_end_fix(approxim, tech, 'tech', stock_exist)
+  dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
+  dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
   obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
   obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
   # Weather part
@@ -846,17 +654,17 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
     list(m = m, p = waf20)
   }
   tmp <- merge.weather(tech, 'waf')
-  if (!is.null(tmp)) {
+  if (length(tmp) != 0) {
     obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$m)
     obj@parameters[['pTechWeatherAf']] <- addData(obj@parameters[['pTechWeatherAf']], tmp$p)
   }
   tmp <- merge.weather(tech, 'wafs')
-  if (!is.null(tmp)) {
+  if (length(tmp) != 0) {
     obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$m)
     obj@parameters[['pTechWeatherAfs']] <- addData(obj@parameters[['pTechWeatherAfs']], tmp$p)
   }
   tmp <- merge.weather(tech, 'wafc', 'comm')
-  if (!is.null(tmp)) {
+  if (length(tmp) != 0) {
     obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$m)
     obj@parameters[['pTechWeatherAfc']] <- addData(obj@parameters[['pTechWeatherAfc']], tmp$p)
   }
@@ -872,7 +680,7 @@ setMethod('add0', signature(obj = 'modInp', app = 'technology',
 ################################################################################
 # Add sysInfo
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
+setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   approxim = 'list'), function(obj, app, approxim) {
   #  assign('obj', obj, globalenv())
   #  assign('app', app, globalenv())
@@ -880,16 +688,19 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
   obj@parameters[['mAllSliceParentChild']] <- addData(obj@parameters[['mAllSliceParentChild']],
-      data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
-                 slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
-  if (!is.null(approxim$slice@misc$next_slice))
+                                  data.frame(slice = as.character(approxim$slice@all_parent_child$parent), 
+                                             slicep = as.character(approxim$slice@all_parent_child$child), stringsAsFactors = FALSE))
+  obj@parameters[['mAllSliceParentChildAndSame']] <- addData(obj@parameters[['mAllSliceParentChildAndSame']],
+                  data.frame(slice = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$parent)), 
+                             slicep = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$child)), stringsAsFactors = FALSE))
+  if (length(approxim$slice@misc$next_slice) != 0)
     obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
   # Discount
-  approxim.no.mileStone.Year <- approxim
-  approxim.no.mileStone.Year$mileStoneYears <- NULL
+  approxim_no_mileStone_Year <- approxim
+  approxim_no_mileStone_Year$mileStoneYears <- NULL
       obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
         simpleInterpolation(app@discount, 'discount',
-          obj@parameters[['pDiscount']], approxim.no.mileStone.Year))
+          obj@parameters[['pDiscount']], approxim_no_mileStone_Year))
   approxim_comm <- approxim
   approxim_comm[['comm']] <- obj@parameters$comm@data$comm
   obj@parameters[['pSliceShare']] <- addData(obj@parameters[['pSliceShare']], 
@@ -915,11 +726,11 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
 #          obj@parameters[['pSubsCost']], approxim_comm))
   }
   if (nrow(app@milestone) == 0) {
-    app <- setMileStoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
+    app <- setMilestoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
   }
 
-  obj@parameters[['mMidMilestone']] <- addData(obj@parameters[['mMidMilestone']], 
-    data.frame(year = app@milestone$mid))
+  #obj@parameters[['mMidMilestone']] <- addData(obj@parameters[['mMidMilestone']], 
+  #  data.frame(year = app@milestone$mid))
   obj@parameters[['mStartMilestone']] <- addData(obj@parameters[['mStartMilestone']], 
     data.frame(year = app@milestone$mid, yearp = app@milestone$start))
   obj@parameters[['mEndMilestone']] <- addData(obj@parameters[['mEndMilestone']], 
@@ -941,13 +752,32 @@ setMethod('add0', signature(obj = 'modInp', app = 'sysInfo',
   obj@parameters[['ordYear']] <- addData(obj@parameters[['ordYear']], tmp)
   obj@parameters[['cardYear']] <- addData(obj@parameters[['cardYear']], tmp[nrow(tmp),, drop = FALSE])
   
+  obj@parameters[['pPeriodLen']] <- addData(obj@parameters[['pPeriodLen']], 
+     data.frame(year = app@milestone$mid, value = (app@milestone$end - app@milestone$start + 1), stringsAsFactors = FALSE))
+  
+  ####################################################
+  gg <- .getTotalParameterData(obj, 'pDiscount', need.reduce = FALSE)
+  gg <- gg[sort(gg$year, index.return = TRUE)$ix,, drop = FALSE]
+  ll <- gg[0,, drop = FALSE]
+  for(l in unique(gg$region)) {
+    dd <- gg[gg$region == l,, drop = FALSE]
+    dd$value <- cumprod(1 / (1 + dd$value))
+    ll <- rbind(ll, dd)
+  }
+  obj@parameters[['pDiscountFactor']] <- addData(obj@parameters[['pDiscountFactor']], ll)
+  hh <- gg[gg$year == as.character(max(app@year)), -2]
+  hh <- hh[hh$value == 0, 'region', drop = FALSE]
+  # Add mDiscountZero - zero discount rate in final period
+  if (nrow(hh) != 0) {
+    obj@parameters[['mDiscountZero']] <- addData(obj@parameters[['mDiscountZero']], hh)
+  } 
   obj
 })
 
 ################################################################################
 # Add trade
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'trade',
+setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
@@ -956,13 +786,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
   trd <- .disaggregateSliceLevel(trd, approxim)
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
                                             data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
-  if (is.null(trd@commodity)) stop('There is not commodity for trade flow ', trd@name)
+  if (length(trd@commodity) == 0) stop('There is not commodity for trade flow ', trd@name)
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
-  if (is.null(trd@source)) rg <- obj@parameters$region@data$region else rg <- trd@source
+  if (length(trd@source) == 0) rg <- obj@parameters$region@data$region else rg <- trd@source
   obj@parameters[['mTradeSrc']] <- addData(obj@parameters[['mTradeSrc']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
-  if (is.null(trd@destination)) rg <- obj@parameters$region@data$region else rg <- trd@destination
+  if (length(trd@destination) == 0) rg <- obj@parameters$region@data$region else rg <- trd@destination
   obj@parameters[['mTradeDst']] <- addData(obj@parameters[['mTradeDst']],
       data.frame(trade = rep(trd@name, length(rg)), region = rg))
   #
@@ -1026,13 +856,13 @@ setMethod('add0', signature(obj = 'modInp', app = 'trade',
 ################################################################################
 # Add storage
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'storage',
+setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     stg <- energyRt:::.upper_case(app)
     approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = stg@slice)
     stg <- .disaggregateSliceLevel(stg, approxim)
-    if (!is.null(stg@region)) {
+    if (length(stg@region) != 0) {
       approxim$region <- approxim$region[approxim$region %in% stg@region]
       ss <- getSlots('storage')
       ss <- names(ss)[ss == 'data.frame']
@@ -1131,6 +961,8 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
                                                          obj@parameters[['pStorageStock']]@data$stg == stg@name & 
                                                          obj@parameters[['pStorageStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 
     dd0 <- .start_end_fix(approxim, stg, 'stg', stock_exist)
+    dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
+    dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
     obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
     obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
     # Weather part
@@ -1163,17 +995,17 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
       list(m = m, p = waf20)
     }
     tmp <- merge.weather(stg, 'waf')
-    if (!is.null(tmp)) {
+    if (length(tmp) != 0) {
       obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$m)
       obj@parameters[['pStorageWeatherAf']] <- addData(obj@parameters[['pStorageWeatherAf']], tmp$p)
     }
     tmp <- merge.weather(stg, 'wcinp')
-    if (!is.null(tmp)) {
+    if (length(tmp) != 0) {
       obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$m)
       obj@parameters[['pStorageWeatherCinp']] <- addData(obj@parameters[['pStorageWeatherCinp']], tmp$p)
     }
     tmp <- merge.weather(stg, 'wcout')
-    if (!is.null(tmp)) {
+    if (length(tmp) != 0) {
       obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$m)
       obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
     }
@@ -1183,12 +1015,100 @@ setMethod('add0', signature(obj = 'modInp', app = 'storage',
 
 
 ################################################################################
-# Add statement
+# Add constrain
 ################################################################################
-setMethod('add0', signature(obj = 'modInp', app = 'statement',
-  approxim = 'list'), function(obj, app, approxim) {
-    .getSetEquation(obj, app, approxim)
-})
+setMethod('.add0', signature(obj = 'modInp', app = 'constrain',
+                             approxim = 'list'), function(obj, app, approxim) {
+                               .getSetEquation(obj, app, approxim)
+                             })
+
+################################################################################
+# Add tax & sub
+################################################################################
+.subtax_approxim <- function(obj, app, tax, whr) {
+  if (all(app@comm != names(approxim$commodity_slice_map)))
+    stop('Unknown commodity "', app@comm, '" in ', whr, ' "', app@name, '"')
+  if (length(app@region) != 0) {
+    if (!all(app@region %in% approxim$region))
+      stop(paste0(whr, ': unknown region "', paste0(app@region[!(app@region %in% approxim$region)], collapse = '", "'), '"'))
+    approxim$region <- app@region
+  }
+  if (length(app@year) != 0) {
+    if (!all(app@year %in% approxim$year))
+      stop(paste0(whr, ': unknown year "', paste0(app@year[!(app@year %in% approxim$year)], collapse = '", "'), '"'))
+    approxim$year <- app@year
+  }
+  
+  
+  if (length(app@slice) != 0) {
+    if (!all(app@slice %in% approxim$slice@all_slice))
+      stop(paste0(whr, ': unknown slice "', paste0(app@slice[!(app@slice %in% approxim$slice@all_slice)], collapse = '", "'), '"'))
+
+    slc <- approxim$commodity_slice_map[[app@comm]]
+    # if there are child slice on commodity
+    if (!all(app@slice %in% slc)) {
+      not_alowed <- approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% slc, 'child']
+      if (any(not_alowed %in% app@slice))
+        stop(paste0(whr, ': child slice for commodity level is not allowed: "', paste0(not_alowed[not_alowed %in% app@slice], collapse = '", "'), '"'))
+    }
+    # if there are parent slice on commodity
+    if (!all(app@slice %in% slc)) {
+      have_to_split <- app@slice[!(app@slice %in% slc)]
+      ust_slc <-  approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% have_to_split & 
+                                                    approxim$slice@all_parent_child$child %in% slc, ]
+      approxim$slice <- c(app@slice[app@slice %in% slc], ust_slc$child)
+      # split slice on data.frame
+      if (is.data.frame(app@value) && !is.null(app@value$slice) && any(app@value$slice %in% have_to_split)) {
+        rr0 <- app@value[!(app@value$slice %in% have_to_split), ]
+        tmp <- app@value[app@value$slice %in% have_to_split, ]; 
+        tmp_slice <- tmp$slice; tmp$slice <- NULL
+        for (spl in have_to_split) {
+          spl2 <- ust_slc[ust_slc$parent == spl, 'child']
+          rr0 <- rbind(rr0, merge(tmp[tmp_slice == spl,], data.frame(slice = spl2, stringsAsFactors=FALSE))[, colnames(rr0)])
+        }
+        app@value <- rr0
+      }
+    }
+  } else {
+    approxim$slice <- approxim$commodity_slice_map[[app@comm]]
+  }
+  # Generate app@value
+  if (nrow(app@value) == 0) {
+    app@value <- data.frame(region = NA, year = NA, slice = NA, value = app@defVal) 
+  }
+  for (i in c('region', 'year', 'slice')) {
+    if (all(colnames(app@value) != i)) {
+      app@value[, i] <- NA
+    }
+  }
+  if (whr == 'tax') {
+    par <- 'pTaxCost'
+  } else if (whr == 'subsidy') {
+    par <- 'pSubsCost'
+  } else stop('internal error ', whr)
+  obj@parameters[[par]] <- addData(obj@parameters[[par]],
+      simpleInterpolation(app@value, 'value', obj@parameters[[par]], approxim, 'comm', app@comm))
+  obj
+}
+################################################################################
+# Add tax
+################################################################################
+setMethod('.add0', signature(obj = 'modInp', app = 'tax',
+                             approxim = 'list'), function(obj, app, approxim) {
+                               assign('obj', obj, globalenv())
+                               assign('app', app, globalenv())
+                               assign('approxim', approxim, globalenv())
+                               .subtax_approxim(obj, app, tax, whr = 'tax') 
+                             })
+
+
+################################################################################
+# Add sub
+################################################################################
+setMethod('.add0', signature(obj = 'modInp', app = 'sub',
+                             approxim = 'list'), function(obj, app, approxim) {
+                               .subtax_approxim(obj, app, tax, whr = 'subsidy') 
+                             })
 
 
 

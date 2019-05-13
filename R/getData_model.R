@@ -3,7 +3,7 @@ getInpuData <- function(..., parameter = NULL, name = NULL, object.class = NULL,
   # Get condiotion of work
   arg <- list(...)
   psb_set <- c('tech', 'dem', 'sup', 'comm', 'group', 'region', 
-               'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'cns', 'src', 'dst')
+               'year', 'slice', 'stg', 'expp', 'imp', 'trade', 'src', 'dst')
   if (is.null(names(arg))) names(arg) <- rep('', length(arg))
   if (any(names(arg) == 'parameters')) parameter <- arg$parameters
   arg <- arg[!(names(arg) %in% c('parameters'))]

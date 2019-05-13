@@ -6,16 +6,16 @@ setClass("modOut", #        @modOut
           sets         = "list", # @sets     
           data          = "list", # Should be remove
           variables     = "list",
-          compilationStatus = 'characterOrNULL',
-          solutionStatus    = 'characterOrNULL',
+          compilationStatus = 'character',
+          solutionStatus    = 'character',
           misc = "list"
       ),
       prototype(
           sets          = list(),      
           data          = list(),
           variables     = list(),
-          compilationStatus = NULL,
-          solutionStatus    = NULL,
+          compilationStatus = character(),
+          solutionStatus    = character(),
           #! Misc
         misc = list(
         )),

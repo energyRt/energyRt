@@ -4,14 +4,13 @@ setClass("trade",
           name          = "character",       # Short name
           description   = "character",       # Details
           commodity     = "character",       # Vector if NULL that
-          source        = "characterOrNULL",       # if NULL that in all region
-          destination   = "characterOrNULL",       # if NULL that in all region
+          source        = "character",       # if NULL that in all region
+          destination   = "character",       # if NULL that in all region
       # Performance parameters
           trade         = "data.frame",
           aux           = "data.frame",      #
           aeff         = "data.frame",    #  Commodity efficiency
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-          # slice = "characterOrNULL", # imported from commodity
           misc = "list"
       ),
       # Default values and structure of slots
