@@ -303,6 +303,8 @@ var vImportRow{imp, comm, region, year, slice} >= 0;
 
 
 
+# Guid for add equation and add mapping & parameter to constrain
+# 22b584bd-a17a-4fa0-9cd9-f603ab684e47
 s.t.  eqTechSng2Sng{(t, s) in mTechSlice, (t, r, y) in mTechSpan, (t, c) in (mTechInpComm inter mTechOneComm), (t, cp) in (mTechOutComm inter mTechOneComm) : y in mMidMilestone and pTechCinp2use[t,c,r,y,s] <> 0}: vTechInp[t,c,r,y,s]*pTechCinp2use[t,c,r,y,s]  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);
 
 s.t.  eqTechGrp2Sng{(t, s) in mTechSlice, (t, r, y) in mTechSpan, (t, g) in mTechInpGroup, (t, cp) in (mTechOutComm inter mTechOneComm) : y in mMidMilestone}: pTechGinp2use[t,g,r,y,s]*sum{c in comm:(((t,c) in mTechInpComm and (t,g,c) in mTechGroupComm))}(vTechInp[t,c,r,y,s]*pTechCinp2ginp[t,c,r,y,s])  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);
@@ -493,247 +495,247 @@ solve;
 
 
 printf "value\n2.00\n" > "pFinish.csv";
-printf "tech,region,year,value\n" > "vTechInv.csv";
-for {t in tech,r in region,y in year : vTechInv[t,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", t,r,y, vTechInv[t,r,y] >> "vTechInv.csv";
-} 
-printf "tech,region,year,value\n" > "vTechEac.csv";
-for {t in tech,r in region,y in year : vTechEac[t,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", t,r,y, vTechEac[t,r,y] >> "vTechEac.csv";
-} 
-printf "tech,region,value\n" > "vTechSalv.csv";
-for {t in tech,r in region : vTechSalv[t,r] <> 0} { 
-    printf "%s,%s,%f\n", t,r, vTechSalv[t,r] >> "vTechSalv.csv";
-} 
-printf "tech,region,year,value\n" > "vTechOMCost.csv";
-for {t in tech,r in region,y in year : vTechOMCost[t,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", t,r,y, vTechOMCost[t,r,y] >> "vTechOMCost.csv";
-} 
-printf "sup,region,year,value\n" > "vSupCost.csv";
-for {s1 in sup,r in region,y in year : vSupCost[s1,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", s1,r,y, vSupCost[s1,r,y] >> "vSupCost.csv";
-} 
-printf "comm,region,year,slice,value\n" > "vEmsFuelTot.csv";
-for {c in comm,r in region,y in year,s in slice : vEmsFuelTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vEmsFuelTot[c,r,y,s] >> "vEmsFuelTot.csv";
-} 
-printf "tech,comm,region,year,slice,value\n" > "vTechEmsFuel.csv";
-for {t in tech,c in comm,r in region,y in year,s in slice : vTechEmsFuel[t,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s, vTechEmsFuel[t,c,r,y,s] >> "vTechEmsFuel.csv";
-} 
-printf "comm,region,year,slice,value\n" > "vBalance.csv";
-for {c in comm,r in region,y in year,s in slice : vBalance[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vBalance[c,r,y,s] >> "vBalance.csv";
-} 
-printf "region,year,value\n" > "vCost.csv";
-for {r in region,y in year : vCost[r,y] <> 0} { 
-    printf "%s,%s,%f\n", r,y, vCost[r,y] >> "vCost.csv";
-} 
-printf "value\n%s\n",vObjective > "vObjective.csv";
-printf "comm,region,year,value\n" > "vTaxCost.csv";
-for {c in comm,r in region,y in year : vTaxCost[c,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", c,r,y, vTaxCost[c,r,y] >> "vTaxCost.csv";
-} 
-printf "comm,region,year,value\n" > "vSubsCost.csv";
-for {c in comm,r in region,y in year : vSubsCost[c,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", c,r,y, vSubsCost[c,r,y] >> "vSubsCost.csv";
-} 
-printf "comm,region,year,slice,value\n" > "vAggOut.csv";
-for {c in comm,r in region,y in year,s in slice : vAggOut[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vAggOut[c,r,y,s] >> "vAggOut.csv";
-} 
-printf "stg,region,value\n" > "vStorageSalv.csv";
-for {st1 in stg,r in region : vStorageSalv[st1,r] <> 0} { 
-    printf "%s,%s,%f\n", st1,r, vStorageSalv[st1,r] >> "vStorageSalv.csv";
-} 
-printf "stg,region,year,value\n" > "vStorageCost.csv";
-for {st1 in stg,r in region,y in year : vStorageCost[st1,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", st1,r,y, vStorageCost[st1,r,y] >> "vStorageCost.csv";
-} 
-printf "region,year,value\n" > "vTradeCost.csv";
-for {r in region,y in year : vTradeCost[r,y] <> 0} { 
-    printf "%s,%s,%f\n", r,y, vTradeCost[r,y] >> "vTradeCost.csv";
-} 
-printf "region,year,value\n" > "vTradeRowCost.csv";
-for {r in region,y in year : vTradeRowCost[r,y] <> 0} { 
-    printf "%s,%s,%f\n", r,y, vTradeRowCost[r,y] >> "vTradeRowCost.csv";
-} 
-printf "region,year,value\n" > "vTradeIrCost.csv";
-for {r in region,y in year : vTradeIrCost[r,y] <> 0} { 
-    printf "%s,%s,%f\n", r,y, vTradeIrCost[r,y] >> "vTradeIrCost.csv";
-} 
 printf "tech,region,year,slice,value\n" > "vTechUse.csv";
-for {t in tech,r in region,y in year,s in slice : vTechUse[t,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", t,r,y,s, vTechUse[t,r,y,s] >> "vTechUse.csv";
-} 
+for{(t, r, y) in mTechSpan, (t, s) in mTechSlice : vTechUse[t,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", t,r,y,s,vTechUse[t,r,y,s] >> "vTechUse.csv";
+}
 printf "tech,region,year,value\n" > "vTechNewCap.csv";
-for {t in tech,r in region,y in year : vTechNewCap[t,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", t,r,y, vTechNewCap[t,r,y] >> "vTechNewCap.csv";
-} 
+for{(t, r, y) in mTechNew : vTechNewCap[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechNewCap[t,r,y] >> "vTechNewCap.csv";
+}
 printf "tech,region,year,yearp,value\n" > "vTechRetiredCap.csv";
-for {t in tech,r in region,y in year,yp in year : vTechRetiredCap[t,r,y,yp] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", t,r,y,yp, vTechRetiredCap[t,r,y,yp] >> "vTechRetiredCap.csv";
-} 
+for{(t, r, y) in mTechSpan, yp in year : vTechRetiredCap[t,r,y,yp] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", t,r,y,yp,vTechRetiredCap[t,r,y,yp] >> "vTechRetiredCap.csv";
+}
 printf "tech,region,year,value\n" > "vTechCap.csv";
-for {t in tech,r in region,y in year : vTechCap[t,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", t,r,y, vTechCap[t,r,y] >> "vTechCap.csv";
-} 
+for{(t, r, y) in mTechSpan : vTechCap[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechCap[t,r,y] >> "vTechCap.csv";
+}
 printf "tech,region,year,slice,value\n" > "vTechAct.csv";
-for {t in tech,r in region,y in year,s in slice : vTechAct[t,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", t,r,y,s, vTechAct[t,r,y,s] >> "vTechAct.csv";
-} 
+for{(t, r, y) in mTechSpan, (t, s) in mTechSlice : vTechAct[t,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", t,r,y,s,vTechAct[t,r,y,s] >> "vTechAct.csv";
+}
 printf "tech,comm,region,year,slice,value\n" > "vTechInp.csv";
-for {t in tech,c in comm,r in region,y in year,s in slice : vTechInp[t,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s, vTechInp[t,c,r,y,s] >> "vTechInp.csv";
-} 
+for{(t, c) in mTechInpComm, (t, r, y) in mTechSpan, (t, s) in mTechSlice : vTechInp[t,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechInp[t,c,r,y,s] >> "vTechInp.csv";
+}
 printf "tech,comm,region,year,slice,value\n" > "vTechOut.csv";
-for {t in tech,c in comm,r in region,y in year,s in slice : vTechOut[t,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s, vTechOut[t,c,r,y,s] >> "vTechOut.csv";
-} 
+for{(t, c) in mTechOutComm, (t, r, y) in mTechSpan, (t, s) in mTechSlice : vTechOut[t,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechOut[t,c,r,y,s] >> "vTechOut.csv";
+}
 printf "tech,comm,region,year,slice,value\n" > "vTechAInp.csv";
-for {t in tech,c in comm,r in region,y in year,s in slice : vTechAInp[t,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s, vTechAInp[t,c,r,y,s] >> "vTechAInp.csv";
-} 
+for{(t, c) in mTechAInp, (t, r, y) in mTechSpan, (t, s) in mTechSlice : vTechAInp[t,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAInp[t,c,r,y,s] >> "vTechAInp.csv";
+}
 printf "tech,comm,region,year,slice,value\n" > "vTechAOut.csv";
-for {t in tech,c in comm,r in region,y in year,s in slice : vTechAOut[t,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s, vTechAOut[t,c,r,y,s] >> "vTechAOut.csv";
-} 
+for{(t, c) in mTechAOut, (t, r, y) in mTechSpan, (t, s) in mTechSlice : vTechAOut[t,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAOut[t,c,r,y,s] >> "vTechAOut.csv";
+}
+printf "tech,region,year,value\n" > "vTechInv.csv";
+for{(t, r, y) in mTechNew : vTechInv[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechInv[t,r,y] >> "vTechInv.csv";
+}
+printf "tech,region,year,value\n" > "vTechEac.csv";
+for{(t, r, y) in mTechSpan : vTechEac[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechEac[t,r,y] >> "vTechEac.csv";
+}
+printf "tech,region,value\n" > "vTechSalv.csv";
+for{t in tech, r in region : vTechSalv[t,r] <> 0} {
+  printf "%s,%s,%f\n", t,r,vTechSalv[t,r] >> "vTechSalv.csv";
+}
+printf "tech,region,year,value\n" > "vTechOMCost.csv";
+for{(t, r, y) in mTechSpan : vTechOMCost[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechOMCost[t,r,y] >> "vTechOMCost.csv";
+}
 printf "sup,comm,region,year,slice,value\n" > "vSupOut.csv";
-for {s1 in sup,c in comm,r in region,y in year,s in slice : vSupOut[s1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", s1,c,r,y,s, vSupOut[s1,c,r,y,s] >> "vSupOut.csv";
-} 
+for{(s1, c, r, y, s) in mSupAva : vSupOut[s1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", s1,c,r,y,s,vSupOut[s1,c,r,y,s] >> "vSupOut.csv";
+}
 printf "sup,comm,region,value\n" > "vSupReserve.csv";
-for {s1 in sup,c in comm,r in region : vSupReserve[s1,c,r] <> 0} { 
-    printf "%s,%s,%s,%f\n", s1,c,r, vSupReserve[s1,c,r] >> "vSupReserve.csv";
-} 
+for{(s1, c) in mSupComm, (s1, r) in mSupSpan : vSupReserve[s1,c,r] <> 0} {
+  printf "%s,%s,%s,%f\n", s1,c,r,vSupReserve[s1,c,r] >> "vSupReserve.csv";
+}
+printf "sup,region,year,value\n" > "vSupCost.csv";
+for{(s1, r) in mSupSpan, y in year : vSupCost[s1,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", s1,r,y,vSupCost[s1,r,y] >> "vSupCost.csv";
+}
 printf "comm,region,year,slice,value\n" > "vDemInp.csv";
-for {c in comm,r in region,y in year,s in slice : vDemInp[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vDemInp[c,r,y,s] >> "vDemInp.csv";
-} 
+for{y in mMidMilestone, (c, s) in mDemInp, r in region : vDemInp[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vDemInp[c,r,y,s] >> "vDemInp.csv";
+}
+printf "comm,region,year,slice,value\n" > "vEmsFuelTot.csv";
+for{(c, r, y, s) in mEmsFuelTot : vEmsFuelTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vEmsFuelTot[c,r,y,s] >> "vEmsFuelTot.csv";
+}
+printf "tech,comm,region,year,slice,value\n" > "vTechEmsFuel.csv";
+for{(t, c, r, y, s) in mTechEmsFuel : vTechEmsFuel[t,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechEmsFuel[t,c,r,y,s] >> "vTechEmsFuel.csv";
+}
+printf "comm,region,year,slice,value\n" > "vBalance.csv";
+for{y in mMidMilestone, (c, s) in mCommSlice, r in region : vBalance[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vBalance[c,r,y,s] >> "vBalance.csv";
+}
 printf "comm,region,year,slice,value\n" > "vOutTot.csv";
-for {c in comm,r in region,y in year,s in slice : vOutTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vOutTot[c,r,y,s] >> "vOutTot.csv";
-} 
+for{y in mMidMilestone, (c, s) in mCommSlice, r in region : vOutTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vOutTot[c,r,y,s] >> "vOutTot.csv";
+}
 printf "comm,region,year,slice,value\n" > "vInpTot.csv";
-for {c in comm,r in region,y in year,s in slice : vInpTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vInpTot[c,r,y,s] >> "vInpTot.csv";
-} 
+for{y in mMidMilestone, (c, s) in mCommSlice, r in region : vInpTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vInpTot[c,r,y,s] >> "vInpTot.csv";
+}
 printf "comm,region,year,slice,slicep,value\n" > "vInp2Lo.csv";
-for {c in comm,r in region,y in year,s in slice,sp in slice : vInp2Lo[c,r,y,s,sp] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", c,r,y,s,sp, vInp2Lo[c,r,y,s,sp] >> "vInp2Lo.csv";
-} 
+for{(c, r, y, s) in mInp2Lo, sp in slice : vInp2Lo[c,r,y,s,sp] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", c,r,y,s,sp,vInp2Lo[c,r,y,s,sp] >> "vInp2Lo.csv";
+}
 printf "comm,region,year,slice,slicep,value\n" > "vOut2Lo.csv";
-for {c in comm,r in region,y in year,s in slice,sp in slice : vOut2Lo[c,r,y,s,sp] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", c,r,y,s,sp, vOut2Lo[c,r,y,s,sp] >> "vOut2Lo.csv";
-} 
+for{(c, r, y, s) in mOut2Lo, sp in slice : vOut2Lo[c,r,y,s,sp] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", c,r,y,s,sp,vOut2Lo[c,r,y,s,sp] >> "vOut2Lo.csv";
+}
 printf "comm,region,year,slice,value\n" > "vSupOutTot.csv";
-for {c in comm,r in region,y in year,s in slice : vSupOutTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vSupOutTot[c,r,y,s] >> "vSupOutTot.csv";
-} 
+for{(c, r, s) in mSupOutTot, y in year : vSupOutTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vSupOutTot[c,r,y,s] >> "vSupOutTot.csv";
+}
 printf "comm,region,year,slice,value\n" > "vTechInpTot.csv";
-for {c in comm,r in region,y in year,s in slice : vTechInpTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vTechInpTot[c,r,y,s] >> "vTechInpTot.csv";
-} 
+for{(c, r, y, s) in mTechInpTot : vTechInpTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTechInpTot[c,r,y,s] >> "vTechInpTot.csv";
+}
 printf "comm,region,year,slice,value\n" > "vTechOutTot.csv";
-for {c in comm,r in region,y in year,s in slice : vTechOutTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vTechOutTot[c,r,y,s] >> "vTechOutTot.csv";
-} 
+for{(c, r, y, s) in mTechOutTot : vTechOutTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTechOutTot[c,r,y,s] >> "vTechOutTot.csv";
+}
 printf "comm,region,year,slice,value\n" > "vStorageInpTot.csv";
-for {c in comm,r in region,y in year,s in slice : vStorageInpTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vStorageInpTot[c,r,y,s] >> "vStorageInpTot.csv";
-} 
+for{(c, r, y, s) in mStorageInpTot : vStorageInpTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vStorageInpTot[c,r,y,s] >> "vStorageInpTot.csv";
+}
 printf "comm,region,year,slice,value\n" > "vStorageOutTot.csv";
-for {c in comm,r in region,y in year,s in slice : vStorageOutTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vStorageOutTot[c,r,y,s] >> "vStorageOutTot.csv";
-} 
+for{(c, r, y, s) in mStorageOutTot : vStorageOutTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vStorageOutTot[c,r,y,s] >> "vStorageOutTot.csv";
+}
 printf "stg,comm,region,year,slice,value\n" > "vStorageAInp.csv";
-for {st1 in stg,c in comm,r in region,y in year,s in slice : vStorageAInp[st1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s, vStorageAInp[st1,c,r,y,s] >> "vStorageAInp.csv";
-} 
+for{(st1, c) in mStorageAInp, (st1, s) in mStorageSlice, (st1, r, y) in mStorageSpan : vStorageAInp[st1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s,vStorageAInp[st1,c,r,y,s] >> "vStorageAInp.csv";
+}
 printf "stg,comm,region,year,slice,value\n" > "vStorageAOut.csv";
-for {st1 in stg,c in comm,r in region,y in year,s in slice : vStorageAOut[st1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s, vStorageAOut[st1,c,r,y,s] >> "vStorageAOut.csv";
-} 
+for{(st1, c) in mStorageAOut, (st1, s) in mStorageSlice, (st1, r, y) in mStorageSpan : vStorageAOut[st1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s,vStorageAOut[st1,c,r,y,s] >> "vStorageAOut.csv";
+}
+printf "region,year,value\n" > "vCost.csv";
+for{y in mMidMilestone, r in region : vCost[r,y] <> 0} {
+  printf "%s,%s,%f\n", r,y,vCost[r,y] >> "vCost.csv";
+}
 printf "comm,region,year,slice,value\n" > "vDummyImport.csv";
-for {c in comm,r in region,y in year,s in slice : vDummyImport[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vDummyImport[c,r,y,s] >> "vDummyImport.csv";
-} 
+for{(c, r, y, s) in mDummyImport : vDummyImport[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vDummyImport[c,r,y,s] >> "vDummyImport.csv";
+}
 printf "comm,region,year,slice,value\n" > "vDummyExport.csv";
-for {c in comm,r in region,y in year,s in slice : vDummyExport[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vDummyExport[c,r,y,s] >> "vDummyExport.csv";
-} 
+for{(c, r, y, s) in mDummyExport : vDummyExport[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vDummyExport[c,r,y,s] >> "vDummyExport.csv";
+}
 printf "comm,region,year,value\n" > "vDummyCost.csv";
-for {c in comm,r in region,y in year : vDummyCost[c,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", c,r,y, vDummyCost[c,r,y] >> "vDummyCost.csv";
-} 
+for{(c, r, y) in mDummyCost : vDummyCost[c,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", c,r,y,vDummyCost[c,r,y] >> "vDummyCost.csv";
+}
+printf "comm,region,year,value\n" > "vTaxCost.csv";
+for{(c, r, y) in mTaxCost : vTaxCost[c,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", c,r,y,vTaxCost[c,r,y] >> "vTaxCost.csv";
+}
+printf "comm,region,year,value\n" > "vSubsCost.csv";
+for{(c, r, y) in mSubsCost : vSubsCost[c,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", c,r,y,vSubsCost[c,r,y] >> "vSubsCost.csv";
+}
+printf "comm,region,year,slice,value\n" > "vAggOut.csv";
+for{(c, r, y, s) in mAggOut : vAggOut[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vAggOut[c,r,y,s] >> "vAggOut.csv";
+}
 printf "stg,comm,region,year,slice,value\n" > "vStorageInp.csv";
-for {st1 in stg,c in comm,r in region,y in year,s in slice : vStorageInp[st1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s, vStorageInp[st1,c,r,y,s] >> "vStorageInp.csv";
-} 
+for{(st1, s) in mStorageSlice, (st1, r, y) in mStorageSpan, (st1, c) in mStorageComm : vStorageInp[st1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s,vStorageInp[st1,c,r,y,s] >> "vStorageInp.csv";
+}
 printf "stg,comm,region,year,slice,value\n" > "vStorageOut.csv";
-for {st1 in stg,c in comm,r in region,y in year,s in slice : vStorageOut[st1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s, vStorageOut[st1,c,r,y,s] >> "vStorageOut.csv";
-} 
+for{(st1, s) in mStorageSlice, (st1, r, y) in mStorageSpan, (st1, c) in mStorageComm : vStorageOut[st1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s,vStorageOut[st1,c,r,y,s] >> "vStorageOut.csv";
+}
 printf "stg,comm,region,year,slice,value\n" > "vStorageStore.csv";
-for {st1 in stg,c in comm,r in region,y in year,s in slice : vStorageStore[st1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s, vStorageStore[st1,c,r,y,s] >> "vStorageStore.csv";
-} 
+for{(st1, s) in mStorageSlice, (st1, r, y) in mStorageSpan, (st1, c) in mStorageComm : vStorageStore[st1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", st1,c,r,y,s,vStorageStore[st1,c,r,y,s] >> "vStorageStore.csv";
+}
 printf "stg,region,year,value\n" > "vStorageInv.csv";
-for {st1 in stg,r in region,y in year : vStorageInv[st1,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", st1,r,y, vStorageInv[st1,r,y] >> "vStorageInv.csv";
-} 
+for{(st1, r, y) in mStorageNew : vStorageInv[st1,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", st1,r,y,vStorageInv[st1,r,y] >> "vStorageInv.csv";
+}
 printf "stg,region,year,value\n" > "vStorageCap.csv";
-for {st1 in stg,r in region,y in year : vStorageCap[st1,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", st1,r,y, vStorageCap[st1,r,y] >> "vStorageCap.csv";
-} 
+for{(st1, r, y) in mStorageSpan : vStorageCap[st1,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", st1,r,y,vStorageCap[st1,r,y] >> "vStorageCap.csv";
+}
 printf "stg,region,year,value\n" > "vStorageNewCap.csv";
-for {st1 in stg,r in region,y in year : vStorageNewCap[st1,r,y] <> 0} { 
-    printf "%s,%s,%s,%f\n", st1,r,y, vStorageNewCap[st1,r,y] >> "vStorageNewCap.csv";
-} 
+for{(st1, r, y) in mStorageNew : vStorageNewCap[st1,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", st1,r,y,vStorageNewCap[st1,r,y] >> "vStorageNewCap.csv";
+}
+printf "stg,region,value\n" > "vStorageSalv.csv";
+for{st1 in stg, r in region : vStorageSalv[st1,r] <> 0} {
+  printf "%s,%s,%f\n", st1,r,vStorageSalv[st1,r] >> "vStorageSalv.csv";
+}
+printf "stg,region,year,value\n" > "vStorageCost.csv";
+for{(st1, r, y) in mStorageSpan : vStorageCost[st1,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", st1,r,y,vStorageCost[st1,r,y] >> "vStorageCost.csv";
+}
 printf "comm,region,year,slice,value\n" > "vImport.csv";
-for {c in comm,r in region,y in year,s in slice : vImport[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vImport[c,r,y,s] >> "vImport.csv";
-} 
+for{(c, r, y, s) in mImport : vImport[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vImport[c,r,y,s] >> "vImport.csv";
+}
 printf "comm,region,year,slice,value\n" > "vExport.csv";
-for {c in comm,r in region,y in year,s in slice : vExport[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vExport[c,r,y,s] >> "vExport.csv";
-} 
-printf "trade,comm,region,regionp,year,slice,value\n" > "vTradeIr.csv";
-for {t1 in trade,c in comm,r in region,rp in region,y in year,s in slice : vTradeIr[t1,c,r,rp,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%s,%f\n", t1,c,r,rp,y,s, vTradeIr[t1,c,r,rp,y,s] >> "vTradeIr.csv";
-} 
+for{(c, r, y, s) in mExport : vExport[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vExport[c,r,y,s] >> "vExport.csv";
+}
+printf "trade,comm,src,dst,year,slice,value\n" > "vTradeIr.csv";
+for{(t1, src, dst, y, s) in mTradeIr, (t1, c) in mTradeComm : vTradeIr[t1,c,src,dst,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%s,%f\n", t1,c,src,dst,y,s,vTradeIr[t1,c,src,dst,y,s] >> "vTradeIr.csv";
+}
 printf "trade,comm,region,year,slice,value\n" > "vTradeIrAInp.csv";
-for {t1 in trade,c in comm,r in region,y in year,s in slice : vTradeIrAInp[t1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t1,c,r,y,s, vTradeIrAInp[t1,c,r,y,s] >> "vTradeIrAInp.csv";
-} 
+for{(t1, c, r, y, s) in mTradeIrAInp2 : vTradeIrAInp[t1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t1,c,r,y,s,vTradeIrAInp[t1,c,r,y,s] >> "vTradeIrAInp.csv";
+}
 printf "comm,region,year,slice,value\n" > "vTradeIrAInpTot.csv";
-for {c in comm,r in region,y in year,s in slice : vTradeIrAInpTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vTradeIrAInpTot[c,r,y,s] >> "vTradeIrAInpTot.csv";
-} 
+for{(c, r, y, s) in mTradeIrAInpTot : vTradeIrAInpTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTradeIrAInpTot[c,r,y,s] >> "vTradeIrAInpTot.csv";
+}
 printf "trade,comm,region,year,slice,value\n" > "vTradeIrAOut.csv";
-for {t1 in trade,c in comm,r in region,y in year,s in slice : vTradeIrAOut[t1,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", t1,c,r,y,s, vTradeIrAOut[t1,c,r,y,s] >> "vTradeIrAOut.csv";
-} 
+for{(t1, c, r, y, s) in mTradeIrAOut2 : vTradeIrAOut[t1,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t1,c,r,y,s,vTradeIrAOut[t1,c,r,y,s] >> "vTradeIrAOut.csv";
+}
 printf "comm,region,year,slice,value\n" > "vTradeIrAOutTot.csv";
-for {c in comm,r in region,y in year,s in slice : vTradeIrAOutTot[c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%f\n", c,r,y,s, vTradeIrAOutTot[c,r,y,s] >> "vTradeIrAOutTot.csv";
-} 
+for{(c, r, y, s) in mTradeIrAOutTot : vTradeIrAOutTot[c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTradeIrAOutTot[c,r,y,s] >> "vTradeIrAOutTot.csv";
+}
 printf "expp,comm,value\n" > "vExportRowAccumulated.csv";
-for {e in expp,c in comm : vExportRowAccumulated[e,c] <> 0} { 
-    printf "%s,%s,%f\n", e,c, vExportRowAccumulated[e,c] >> "vExportRowAccumulated.csv";
-} 
+for{(e, c) in mExpComm : vExportRowAccumulated[e,c] <> 0} {
+  printf "%s,%s,%f\n", e,c,vExportRowAccumulated[e,c] >> "vExportRowAccumulated.csv";
+}
 printf "expp,comm,region,year,slice,value\n" > "vExportRow.csv";
-for {e in expp,c in comm,r in region,y in year,s in slice : vExportRow[e,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", e,c,r,y,s, vExportRow[e,c,r,y,s] >> "vExportRow.csv";
-} 
+for{(e, c, r, y, s) in mExportRow : vExportRow[e,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", e,c,r,y,s,vExportRow[e,c,r,y,s] >> "vExportRow.csv";
+}
 printf "imp,comm,value\n" > "vImportRowAccumulated.csv";
-for {i in imp,c in comm : vImportRowAccumulated[i,c] <> 0} { 
-    printf "%s,%s,%f\n", i,c, vImportRowAccumulated[i,c] >> "vImportRowAccumulated.csv";
-} 
+for{(i, c) in mImpComm : vImportRowAccumulated[i,c] <> 0} {
+  printf "%s,%s,%f\n", i,c,vImportRowAccumulated[i,c] >> "vImportRowAccumulated.csv";
+}
 printf "imp,comm,region,year,slice,value\n" > "vImportRow.csv";
-for {i in imp,c in comm,r in region,y in year,s in slice : vImportRow[i,c,r,y,s] <> 0} { 
-    printf "%s,%s,%s,%s,%s,%f\n", i,c,r,y,s, vImportRow[i,c,r,y,s] >> "vImportRow.csv";
-} 
+for{(i, c, r, y, s) in mImportRow : vImportRow[i,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", i,c,r,y,s,vImportRow[i,c,r,y,s] >> "vImportRow.csv";
+}
+printf "region,year,value\n" > "vTradeCost.csv";
+for{y in mMidMilestone, r in region : vTradeCost[r,y] <> 0} {
+  printf "%s,%s,%f\n", r,y,vTradeCost[r,y] >> "vTradeCost.csv";
+}
+printf "region,year,value\n" > "vTradeRowCost.csv";
+for{y in mMidMilestone, r in region : vTradeRowCost[r,y] <> 0} {
+  printf "%s,%s,%f\n", r,y,vTradeRowCost[r,y] >> "vTradeRowCost.csv";
+}
+printf "region,year,value\n" > "vTradeIrCost.csv";
+for{y in mMidMilestone, r in region : vTradeIrCost[r,y] <> 0} {
+  printf "%s,%s,%f\n", r,y,vTradeIrCost[r,y] >> "vTradeIrCost.csv";
+}
+printf "value\n%s\n",vObjective > "vObjective.csv";
 
 
 printf "value\n" > "variable_list.csv";
@@ -831,7 +833,7 @@ for {c in comm} {
 for {r in region} {
     printf "region,%s\n", r >> "raw_data_set.csv";
 }
-for {y in year : mMidMilestone[y] <> 0} {
+for {y in mMidMilestone} {
     printf "year,%s\n", y >> "raw_data_set.csv";
 }
 for {s in slice} {
