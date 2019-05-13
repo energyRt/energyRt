@@ -201,3 +201,9 @@ setMethod('newWeather', signature(name = 'character'), function(name, ...)
   universalInit('weather', name, ...))
 
 
+setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
+setMethod('newTax', signature(name = 'character'), function(name, ...) 
+  universalInit('tax', name, ...))
+setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
+setMethod('newSub', signature(name = 'character'), function(name, ...) 
+  universalInit('sub', name, ...))

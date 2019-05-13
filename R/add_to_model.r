@@ -2,7 +2,8 @@
 #! add_to_model <- function(x, y) : Add to model
 #---------------------------------------------------------------------------------------------------------
 add.model <- function(obj, ..., repos.name = NULL) {
-  cls <- c('commodity', 'demand', 'supply', 'export', 'import', 'constrain', 'technology', 'trade', 'storage')
+  cls <- c('technology', 'commodity', 'region', 'commodity', 'constrain', 
+           'stock', 'supply', 'weather', 'demand', 'reserve', 'trade', 'export', 'import', 'storage', 'tax', 'sub')
   if (class(obj) != "model") stop('Wrong argument')
   app <- list(...)
   if (any(!(sapply(app, class) %in% c(cls, 'repository')))) {

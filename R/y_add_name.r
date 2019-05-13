@@ -206,7 +206,7 @@ setMethod('add_name', signature(obj = 'modInp', app = 'tax',
 ################################################################################
 # Add subs
 ################################################################################
-setMethod('add_name', signature(obj = 'modInp', app = 'subs',
+setMethod('add_name', signature(obj = 'modInp', app = 'sub',
                                 approxim = 'list'), function(obj, app, approxim) {
                                   obj
                                 })

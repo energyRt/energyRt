@@ -2,7 +2,8 @@
 setClass("tax",
          representation(
            # General information
-           comm          = "character",      # Short name
+           name          = "character",      # Short name
+           comm          = "character",      # 
            description   = "character",      # Details
            region        = "character",      #
            year          = "numeric",      #
@@ -11,6 +12,7 @@ setClass("tax",
            misc = "list"
          ),
          prototype(
+           name          = "",      # Short name
            comm          = "",
            description   = "",
            region        = character(),      #
@@ -24,10 +26,11 @@ setClass("tax",
 )
 
 # Subs on commodity
-setClass("subs",
+setClass("sub",
          representation(
            # General information
-           comm          = "character",      # Short name
+           name          = "character",      # Short name
+           comm          = "character",      # 
            description   = "character",      # Details
            region        = "character",      #
            year          = "numeric",      #
@@ -36,6 +39,7 @@ setClass("subs",
            misc = "list"
          ),
          prototype(
+           name          = "",      # Short name
            comm          = "",
            description   = "",
            region        = character(),      #

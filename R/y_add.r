@@ -1022,12 +1022,46 @@ setMethod('.add0', signature(obj = 'modInp', app = 'constrain',
                                obj
                              })
 
+.subtax_approxim <- function(obj, app, tax) {
+  if (length(app@region) != 0) {
+    if (!all(app@region %in% approxim$region))
+      stop(paste0('Tax: unknown region "', paste0(app@region[!(app@region %in% approxim$region)], collapse = '", "'), '"'))
+    approxim$region <- app@region
+  }
+  if (length(app@year) != 0) {
+    if (!all(app@year %in% approxim$year))
+      stop(paste0('Tax: unknown year "', paste0(app@year[!(app@year %in% approxim$year)], collapse = '", "'), '"'))
+    approxim$year <- app@year
+  }
+  if (length(app@slice) != 0) {
+    if (!all(app@slice %in% approxim$slice@all_slice))
+      stop(paste0('Tax: unknown slice "', paste0(app@slice[!(app@slice %in% approxim$slice@all_slice)], collapse = '", "'), '"'))
+    approxim$slice <- app@slice
+  } else {
+    approxim$slice <- approxim$slice@all_slice
+  }
+  
+  
+  obj
+}
 ################################################################################
 # Add tax
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'tax',
                              approxim = 'list'), function(obj, app, approxim) {
-                               obj
+                               assign('obj', obj, globalenv())
+                               assign('app', app, globalenv())
+                               assign('approxim', approxim, globalenv())
+                               .subtax_approxim(obj, app, tax) 
+                             })
+
+
+################################################################################
+# Add tax
+################################################################################
+setMethod('.add0', signature(obj = 'modInp', app = 'sub',
+                             approxim = 'list'), function(obj, app, approxim) {
+                               .subtax_approxim(obj, app, tax) 
                              })
 
 
