@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy technology modeling R-toolbox, alpha-version, for testing only
-Version: 0.00.00.9039
-Date: 2019-05-07
+Version: 0.00.00.9040
+Date: 2019-05-12
 Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com", 
                     role = c("aut", "cre"), comment = ""), 
              person("Vladimir", "Potashnikov", email = "potashnikov.vu@gmail.com", 
@@ -18,3 +18,4 @@ Suggests: WriteXLS, GISTools,
 License: AGLP-3
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
+LazyData: true

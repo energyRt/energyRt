@@ -2,36 +2,56 @@
 % Please edit documentation in R/getData.R
 \name{getData}
 \alias{getData}
-\title{Extracts information from _scenario_, based on filters.}
+\title{Extracts information from scenario objects, based on filters.}
 \usage{
 getData(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
-  merge = FALSE, na.rm = FALSE, drop = FALSE,
-  stringsAsFactors = FALSE, yearsAsFactors = FALSE, verbose = FALSE,
-  asTibble = TRUE, scenNameInList = as.logical(length(scen) - 1))
+  ignore.case = FALSE, newNames = NULL, merge = FALSE,
+  newValues = NULL, na.rm = FALSE, drop = FALSE, asTibble = TRUE,
+  stringsAsFactors = FALSE, yearsAsFactors = FALSE,
+  scenNameInList = as.logical(length(scen) - 1), verbose = FALSE)
 }
 \arguments{
-\item{scen}{}
+\item{scen}{Object scenario or list with scenarios.}
 
-\item{...}{}
+\item{...}{filters for various sets (setname = c(val1, val2) or setname_ = "matching pattern"), see details.}
 
-\item{name}{}
+\item{name}{character vector with names of parameters and/or variables.}
 
-\item{parameters}{}
+\item{parameters}{if TRUE, parameters will be included in the search and returned if found.}
 
-\item{variables}{}
+\item{variables}{if TRUE, variables will be included in the search and returned if found.}
 
-\item{merge}{}
+\item{ignore.case}{grepl parameter if regular expressions are used in '...' or 'name_'.}
 
-\item{na.rm}{}
+\item{newNames}{renaming sets, named character vector or list with new names as values, and old names as names - the input parameter to renameSets function. The operation is performed before merging the data (merge parameter).}
 
-\item{drop}{}
+\item{merge}{if TRUE, the search results will be merged in one dataframe; the named list will be returned if FALSE.}
 
-\item{stringsAsFactors}{}
+\item{newValues}{revalue sets, named character vector or list with new values as values, and old values as names - the input parameter to revalueSets function. The operation is performed after merging the data (merge parameter).}
+
+\item{na.rm}{if TRUE, NA values will be dropped.}
+
+\item{drop}{if TRUE, the sets with only one unique value will be dropped (not implemented)}
+
+\item{asTibble}{logical, if the data.frames should be converted into tibbles.}
+
+\item{stringsAsFactors}{logical, should the sets values be converted to factors?}
+
+\item{yearsAsFactors}{logical, should years  be converted to factors? Set 'year' is integer by default.}
+
+\item{scenNameInList}{logical, should the name of the scenarios be used if not provided in the list with several scenarios?}
 
 \item{verbose}{}
-
-\item{asTibble}{}
 }
 \description{
-Extracts information from _scenario_, based on filters.
+Extracts information from scenario objects, based on filters.
+}
+\examples{
+  data("utopia_scen_BAU.RData")
+  getData(scen, name = "pDemand", year = 2015, merge = T)
+  getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015)
+  elc2050 <- getData(scen, parameters = FALSE, comm = "ELC", year = 2050)
+  names(elc2050)
+  elc2050$vBalance
+
 }

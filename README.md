@@ -75,4 +75,4 @@ For Mac: http://tug.org/mactex/ (other options are possible but not tested)
 ### energyRt
 Currently the package is hosted only on GitHub. To install the package:   
 devtools::install_github("olugovoy/energyRt")   
-
+ 

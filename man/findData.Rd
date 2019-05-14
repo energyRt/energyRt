@@ -6,22 +6,29 @@
 \usage{
 findData(scen, dataType = c("parameters", "variables"),
   setsNames_ = NULL, valueColumn = TRUE, allSets = TRUE,
-  dropEmpty = TRUE, dfDim = TRUE, dfNames = TRUE, asMatrix = FALSE)
+  ignore.case = FALSE, dropEmpty = TRUE, dfDim = TRUE,
+  dfNames = TRUE, asMatrix = FALSE)
 }
 \arguments{
-\item{scen}{object _scenario_ with model solution}
+\item{scen}{object _scenario_ with model solution.}
 
-\item{dataType}{type of data to lok for (currently only "parameters" and "variables")}
+\item{dataType}{type of data to lok for (currently only "parameters" and "variables").}
 
-\item{valueColumn}{logical, if TRUE will return variables and parameters with 'value' column (to filter sets and mappings)}
+\item{setsNames_}{regular expression pattern for names of sets which will be included in search.}
 
-\item{dropEmpty}{logical, if TRUE drops parameters and variables with zero length}
+\item{valueColumn}{logical, if TRUE will return variables and parameters with 'value' column (to filter sets and mappings).}
 
-\item{dfDim}{logical, if TRUE returnes dimension _dim_}
+\item{allSets}{logical, if TRUE _and_ operator should be used in search the sets, _or_ will be used if FALSE.}
 
-\item{dfNames}{logical, whent TRUE regurnes names of the data frame column}
+\item{ignore.case}{grepl parameter for matchin names.}
 
-\item{asMatrix}{return results as a matric (not implemented)}
+\item{dropEmpty}{logical, if TRUE drops parameters and variables with zero length.}
+
+\item{dfDim}{logical, if TRUE returns dimension _dim_.}
+
+\item{dfNames}{logical, when TRUE returns names of the data frame column.}
+
+\item{asMatrix}{return results as a matric (not implemented).}
 }
 \value{
 list with variables and parameters name, each includes _dim_ and _names_ character vectors.

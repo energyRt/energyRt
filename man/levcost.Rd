@@ -33,6 +33,3 @@
 \code{levcost} is a method for class \code{technology} to calculate 
 levelized costs of production of commodity
 }
-\examples{
-
-}

@@ -20,10 +20,7 @@
 #' @param height 
 #' @param elementId 
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' 
 pivot <- function(scen = NULL, 
                   # Parameters to _getData_:
                   name = NULL, get_data = FALSE, ...,
@@ -66,3 +63,5 @@ pivot <- function(scen = NULL,
     return(dft)
   }
 }
+
+ 

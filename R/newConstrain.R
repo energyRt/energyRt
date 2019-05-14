@@ -1,12 +1,4 @@
 
-#----------------------------------------------------------------------------------
-#' Create new constrain object
-#' 
-#' @name newConstrainS
-#' 
-#' # 
-#' 
-
 newConstrainS <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
                          for.each = list(), defVal = 0, rule = NULL, comm = NULL,
                          cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
@@ -103,5 +95,5 @@ newConstrainS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   }
   newConstrain(name, eq = eq, for.each = for.each, defVal = defVal, rhs = rhs, arg = arg)
 }
-
+ 
 

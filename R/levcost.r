@@ -326,7 +326,6 @@ summary.levcost <- function(x) x$total
 #' @param tmp.dir a dirrectory for temporary files to run the model, by default
 #'                '/solwork' in the project directory.
 #' @param tmp.del a logical scalar indicating if solver temporary files should be deleted. 
-#' @example 
 #'  
 #' 
 
@@ -371,3 +370,5 @@ setMethod('levcost', signature(obj = 'scenario'), function(obj, commodity) {
     * apply(obj@modOut@data$vDemInp[commodity,,,, drop  = FALSE], 2:3, sum)
   ))
 })
+
+ 

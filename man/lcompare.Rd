@@ -19,6 +19,3 @@ Returns either TRUE if the objects are identical, or a bested list with the obje
 \description{
 Comparison of two objects.
 }
-\examples{
-
-}

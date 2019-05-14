@@ -5,9 +5,6 @@
 #' @param showDiff ligical, if TRUE will return only different parts of the object
 #'
 #' @return Returns either TRUE if the objects are identical, or a bested list with the objects (x) structure and differences with object y.
-#' @export
-#'
-#' @examples
 #' 
 lcompare <- function(x, y, depth = 0, showDiff = TRUE) {
   # similar to base::all.equal(), testthat::compare(), but returns list with differences.
@@ -72,3 +69,5 @@ if (F) {
   str(cc[!ii])
   
 }
+
+ 
