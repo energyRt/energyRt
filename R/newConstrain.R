@@ -18,7 +18,9 @@ newConstrainS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
     inpout <- 'Cap'
   } else if (type == 'newcapacity') {
     inpout <- 'NewCap'
-  }else {
+  }else if ('balance' == type) {
+    inpout <- 'Balance'
+  } else {
     stop.newconstr(paste0('Unknown type: ', type))
   }
   #   
@@ -31,9 +33,9 @@ newConstrainS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
       stop.newconstr(paste0('There are more than one subsets'))
   vec.tp <- psb.vec.tp[is.set]
   if (length(is.set) == 0) {
-    if (all(inpout != c('Inp', 'Out')))
+    if (all(inpout != c('Inp', 'Out', 'Balance')))
       stop.newconstr(paste0('For ', type, ' have to define some subsets'))
-    vrb <- paste0('v', inpout,'Tot')
+    vrb <- paste0('v', inpout,'Tot'[inpout != 'Balance'])
   } else {
     if (is.set == 'tech' && inpout == 'Inp') {
       vrb <- paste0('vTech', c('', 'A')[c(cinp, ainp)], 'Inp')

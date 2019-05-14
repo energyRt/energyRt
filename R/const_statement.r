@@ -121,6 +121,4 @@
   vTradeCost = "vTradeCost( region , year ) $ mMidMilestone( year )",
   vTradeRowCost = "vTradeRowCost( region , year ) $ mMidMilestone( year )",
   vTradeIrCost = "vTradeIrCost( region , year ) $ mMidMilestone( year )"
-)
-
- 
+);
