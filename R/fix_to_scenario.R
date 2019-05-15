@@ -59,23 +59,17 @@
 	  # have to replace stg.stock2 -> pStorageStock
 	  scen@modInp <- energyRt:::.setParameterData(scen@modInp, 'pStorageStock', stg.stock2)
   }
+  # Chage supply reserve startYear (remove use in base period)
   if (length(scen@modInp@set$sup) > 0) {
-	  # Chage supply reserve startYear (remove use in base period)
-	  sup.res.use0 <- src@modOut@variables$vSupOut
-	  sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
-	  sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
-	  													sup.res.use0[, c('sup', 'comm', 'region')], sum)
-	  sup.res.use0$type <- 'lo'
-	  sup.res.use0$value <- (-sup.res.use0$value)
-	  sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", 'type', 'value')]
-	  sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, 'pSupReserve')
-	  sup.res.par <- rbind(sup.res.par, sup.res.use0)
-	  sup.res.use0$type <- 'up'
-	  sup.res.par <- rbind(sup.res.par, sup.res.use0)
-	  sup.res.par <- aggregate(sup.res.par[, 'value', drop = FALSE], sup.res.par[, -ncol(sup.res.par)], sum) 
-	  sup.res.par <- sup.res.par[!(sup.res.par$type == 'lo' & sup.res.par$value <= 0), ]
-	  sup.res.par[sup.res.par$value < 0, 'value'] <- 0
-	  scen@modInp <- energyRt:::.setParameterData(scen@modInp, 'pSupReserve', sup.res.par)
+  	scen <- .fix.couple.cummulitive.uplo(scen, src, startYear, var.name = 'vSupOut', var.par = 'pSupReserve')
+  }
+  # Chage ExportRow reserve startYear (remove use in base period)
+  if (length(scen@modInp@set$expp) > 0) {
+  	scen <- .fix.couple.cummulitive(scen, src, startYear, var.name = 'vExportRow', var.par = 'pExportRowRes')
+  }
+  # Chage supply reserve startYear (remove use in base period)
+  if (length(scen@modInp@set$imp) > 0) {
+  	scen <- .fix.couple.cummulitive(scen, src, startYear, var.name = 'vImportRow', var.par = 'pImportRowRes')
   }
   # Remove all data after start year
   als_year <- c('year', 'yearn', 'yearp', 'yeare')
@@ -98,23 +92,39 @@
 }
 
 
+.fix.couple.cummulitive.uplo <- function(scen, src, startYear, var.name, var.par) {
+	# Chage supply reserve startYear (remove use in base period)
+	sup.res.use0 <- src@modOut@variables[[var.name]]
+	sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, var.par)
+	sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
+	sup.res.use0$type <- 'lo'
+	sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
+														sup.res.use0[, colnames(sup.res.par)[colnames(sup.res.par) != 'value']], sum)
+	
+	sup.res.use0$value <- (-sup.res.use0$value)
+	sup.res.par <- rbind(sup.res.par, sup.res.use0)
+	sup.res.use0$type <- 'up'
+	sup.res.par <- rbind(sup.res.par, sup.res.use0)
+	sup.res.par <- aggregate(sup.res.par[, 'value', drop = FALSE], sup.res.par[, -ncol(sup.res.par)], sum) 
+	sup.res.par <- sup.res.par[!(sup.res.par$type == 'lo' & sup.res.par$value <= 0), ]
+	sup.res.par[sup.res.par$value < 0, 'value'] <- 0
+	scen@modInp <- energyRt:::.setParameterData(scen@modInp, var.par, sup.res.par)
+	scen
+}
 
 
-.fix.couple <- function(scen, src, startYear, var.name, var.par) {
+.fix.couple.cummulitive <- function(scen, src, startYear, var.name, var.par) {
 		# Chage supply reserve startYear (remove use in base period)
-		sup.res.use0 <- src@modOut@variables$vSupOut
+		sup.res.use0 <- src@modOut@variables[[var.name]]
+		sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, var.par)
 		sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
 		sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
-															sup.res.use0[, c('sup', 'comm', 'region')], sum)
-		sup.res.use0$type <- 'lo'
+															sup.res.use0[, colnames(sup.res.par)[colnames(sup.res.par) != 'value'], drop = FALSE], sum)
+		
 		sup.res.use0$value <- (-sup.res.use0$value)
-		sup.res.use0 <- sup.res.use0[, c("sup", "comm", "region", 'type', 'value')]
-		sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, 'pSupReserve')
 		sup.res.par <- rbind(sup.res.par, sup.res.use0)
-		sup.res.use0$type <- 'up'
-		sup.res.par <- rbind(sup.res.par, sup.res.use0)
-		sup.res.par <- aggregate(sup.res.par[, 'value', drop = FALSE], sup.res.par[, -ncol(sup.res.par)], sum) 
-		sup.res.par <- sup.res.par[!(sup.res.par$type == 'lo' & sup.res.par$value <= 0), ]
+		sup.res.par <- aggregate(sup.res.par[, 'value', drop = FALSE], sup.res.par[, -ncol(sup.res.par), drop = FALSE], sum) 
 		sup.res.par[sup.res.par$value < 0, 'value'] <- 0
-		scen@modInp <- energyRt:::.setParameterData(scen@modInp, 'pSupReserve', sup.res.par)
+		scen@modInp <- energyRt:::.setParameterData(scen@modInp, var.par, sup.res.par)
+		scen
 }
