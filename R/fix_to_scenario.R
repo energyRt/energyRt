@@ -1,5 +1,4 @@
 .fix_to_scenario <- function(scen, src, startYear) {
-	scen = BAU; src = BAU; startYear = 2020
   # up to year
   # assign('prec.before.startYear', scen@modInp, globalenv()) # prec = prec.before.startYear
   # begin
@@ -61,15 +60,15 @@
   }
   # Chage supply reserve startYear (remove use in base period)
   if (length(scen@modInp@set$sup) > 0) {
-  	scen <- .fix.couple.cummulitive.uplo(scen, src, startYear, var.name = 'vSupOut', var.par = 'pSupReserve')
+  	scen <- .fix.couple.cummulitive.uplo(scen, src, startYear, var.name = 'vSupOut', var.par = 'pSupReserve', mile.stone.length)
   }
   # Chage ExportRow reserve startYear (remove use in base period)
   if (length(scen@modInp@set$expp) > 0) {
-  	scen <- .fix.couple.cummulitive(scen, src, startYear, var.name = 'vExportRow', var.par = 'pExportRowRes')
+  	scen <- .fix.couple.cummulitive(scen, src, startYear, var.name = 'vExportRow', var.par = 'pExportRowRes', mile.stone.length)
   }
   # Chage supply reserve startYear (remove use in base period)
   if (length(scen@modInp@set$imp) > 0) {
-  	scen <- .fix.couple.cummulitive(scen, src, startYear, var.name = 'vImportRow', var.par = 'pImportRowRes')
+  	scen <- .fix.couple.cummulitive(scen, src, startYear, var.name = 'vImportRow', var.par = 'pImportRowRes', mile.stone.length)
   }
   # Remove all data after start year
   als_year <- c('year', 'yearn', 'yearp', 'yeare')
@@ -92,7 +91,7 @@
 }
 
 
-.fix.couple.cummulitive.uplo <- function(scen, src, startYear, var.name, var.par) {
+.fix.couple.cummulitive.uplo <- function(scen, src, startYear, var.name, var.par, mile.stone.length) {
 	# Chage supply reserve startYear (remove use in base period)
 	sup.res.use0 <- src@modOut@variables[[var.name]]
 	sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, var.par)
@@ -113,7 +112,7 @@
 }
 
 
-.fix.couple.cummulitive <- function(scen, src, startYear, var.name, var.par) {
+.fix.couple.cummulitive <- function(scen, src, startYear, var.name, var.par, mile.stone.length) {
 		# Chage supply reserve startYear (remove use in base period)
 		sup.res.use0 <- src@modOut@variables[[var.name]]
 		sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, var.par)
