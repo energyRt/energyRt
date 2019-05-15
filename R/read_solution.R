@@ -50,7 +50,8 @@ read_solution <- function(scenario, ...) {
         if (all(colnames(jj)[j] != names(rr$set_vec))) 
           colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
         # Save all data with all levels
-        jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+        if (colnames(jj)[j] != 'year')
+        	jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
       }
       rr$variables[[i]] <- jj
     }
