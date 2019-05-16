@@ -213,6 +213,7 @@ param pStorageCap2AInp{stg, comm, region, year, slice};
 param pStorageCap2AOut{stg, comm, region, year, slice};
 param pStorageNCap2AInp{stg, comm, region, year, slice};
 param pStorageNCap2AOut{stg, comm, region, year, slice};
+param pTradeIrEff{trade, region, region, year, slice};
 param pTradeIrUp{trade, region, region, year, slice};
 param pTradeIrLo{trade, region, region, year, slice};
 param pTradeIrCost{trade, region, region, year, slice};
@@ -413,7 +414,7 @@ s.t.  eqStorageSalv0{r in mDiscountZero, ye in mMilestoneLast, st1 in stg : sum{
 
 s.t.  eqStorageSalv{ye in mMilestoneLast, st1 in stg, r in region : not((r in mDiscountZero)) and sum{y in year:((st1,r,y) in mStorageNew)}(1) <> 0}: vStorageSalv[st1,r]+sum{y in year,yn in year:(((yn,y) in mStartMilestone and yn in mMidMilestone and (st1,r,yn) in mStorageNew and ordYear[yn]+pStorageOlife[st1,r]-1>ordYear[ye] and not(((st1,r) in mStorageOlifeInf)) and pStorageInvcost[st1,r,yn] <> 0))}((((pDiscountFactor[r,yn]) / (pDiscountFactor[r,ye]))*pStorageInvcost[st1,r,yn]*vStorageNewCap[st1,r,yn]) / ((1+((sum{yp in year:((ordYear[yp] >= ordYear[yn]))}(pDiscountFactor[r,yp]))) / (pDiscountFactor[r,ye]*(((1-((1+pDiscount[r,ye]))^(ordYear[ye]-pStorageOlife[st1,r]-ordYear[yn]+1))*(1+pDiscount[r,ye])) / (pDiscount[r,ye]))))))  =  0;
 
-s.t.  eqImport{(c, dst, y, s) in mImport}: vImport[c,dst,y,s]  =  sum{t1 in trade,src in region:(((t1,src,dst,y,s) in mTradeIr and (t1,c) in mTradeComm))}(vTradeIr[t1,c,src,dst,y,s])+sum{i in imp:((i,c,dst,y,s) in mImportRow)}(vImportRow[i,c,dst,y,s]);
+s.t.  eqImport{(c, dst, y, s) in mImport}: vImport[c,dst,y,s]  =  sum{t1 in trade,src in region:(((t1,src,dst,y,s) in mTradeIr and (t1,c) in mTradeComm))}(pTradeIrEff[t1,src,dst,y,s]*vTradeIr[t1,c,src,dst,y,s])+sum{i in imp:((i,c,dst,y,s) in mImportRow)}(vImportRow[i,c,dst,y,s]);
 
 s.t.  eqExport{(c, src, y, s) in mExport}: vExport[c,src,y,s]  =  sum{t1 in trade,dst in region:(((t1,src,dst,y,s) in mTradeIr and (t1,c) in mTradeComm))}(vTradeIr[t1,c,src,dst,y,s])+sum{e in expp:((e,c,src,y,s) in mExportRow)}(vExportRow[e,c,src,y,s]);
 

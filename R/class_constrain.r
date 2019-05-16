@@ -329,7 +329,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       hh <- c(hh, 'mMidMilestone(year)')
     }
     if (any(all.set$lag.year)) { 
-      hh <- c(hh, 'not(mStartMilestone(year))')
+      hh <- c(hh, 'not(mMilestoneFirst(year))')
     }
     if (any(all.set$lead.year)) { 
       hh <- c(hh, 'mMilestoneHasNext(year)')
@@ -456,7 +456,4 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 #  .getSetEquation(prec, stm, approxim)@gams.equation
 
-#stm <- newConstrain('useElc2018Gas1', 'input', '>=', rhs = 8128*(1 - .025),
-#                    for.sum = list(tech = base.elc.tech, slice = 'ANNUAL', region = NULL, comm = c("GAS")),
-#                    for.each = list(year = 2018))
 
