@@ -736,8 +736,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   obj@parameters[['mEndMilestone']] <- addData(obj@parameters[['mEndMilestone']], 
     data.frame(year = app@milestone$mid, yearp = app@milestone$end))
   obj@parameters[['mMilestoneLast']] <- addData(obj@parameters[['mMilestoneLast']], 
-    data.frame(year = max(app@milestone$mid)))
-
+  	data.frame(year = max(app@milestone$mid)))
+  obj@parameters[['mMilestoneFirst']] <- addData(obj@parameters[['mMilestoneFirst']], 
+  	data.frame(year = min(app@milestone$mid)))
+  
   obj@parameters[['mMilestoneNext']] <- addData(obj@parameters[['mMilestoneNext']], 
     data.frame(year = app@milestone$mid[-nrow(app@milestone)], yearp = app@milestone$mid[-1])) 
   obj@parameters[['mMilestoneHasNext']] <- addData(obj@parameters[['mMilestoneHasNext']], 
@@ -807,8 +809,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   approxim <- approxim[names(approxim) != 'region']
   # pTradeIrCost
   obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
-    simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
-      approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+  	simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
+  		approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+  obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']],
+  	simpleInterpolation(trd@trade, 'eff', obj@parameters[['pTradeIrEff']], 
+  		approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIrMarkup
   obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
     simpleInterpolation(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 

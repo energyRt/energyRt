@@ -341,8 +341,11 @@ setMethod("initialize", "modInp",
                                                             defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = drt2[i])    
     
     .Object@parameters[['pTradeIrCost']] <- createParameter('pTradeIrCost', 
-          c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
-            defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cost')    
+    	c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
+    	defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cost')    
+    .Object@parameters[['pTradeIrEff']] <- createParameter('pTradeIrEff', 
+    	c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
+    	defVal = 1, interpolation = 'back.inter.forth', cls = 'trade', colName = 'eff')    
     .Object@parameters[['pTradeIrMarkup']] <- createParameter('pTradeIrMarkup', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
             defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'markup')    
@@ -383,6 +386,7 @@ setMethod("initialize", "modInp",
   ## Milestone set
   .Object@parameters[['mMidMilestone']] <- createParameter('mMidMilestone', 'year', 'map', defVal = 1) 
   .Object@parameters[['mMilestoneHasNext']] <- createParameter('mMilestoneHasNext', 'year', 'map', defVal = 1) 
+  .Object@parameters[['mMilestoneFirst']] <- createParameter('mMilestoneFirst', 'year', 'map', defVal = 1) 
   .Object@parameters[['mMilestoneLast']] <- createParameter('mMilestoneLast', 'year', 'map', defVal = 1) 
   .Object@parameters[['mStartMilestone']] <- createParameter('mStartMilestone', c('year', 'yearp'), 'map', defVal = 1) 
   .Object@parameters[['mEndMilestone']] <- createParameter('mEndMilestone', c('year', 'yearp'), 'map', defVal = 1) 

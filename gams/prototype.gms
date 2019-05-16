@@ -264,6 +264,7 @@ pStorageNCap2AOut(stg, comm, region, year, slice)   Auxilary output
 ;
 * Trade parameters
 parameter
+pTradeIrEff(trade, region, region, year, slice)     IR Trade efficiency
 pTradeIrUp(trade, region, region, year, slice)      Upper bound on trage flow
 pTradeIrLo(trade, region, region, year, slice)      Lower bound on trade flow
 pTradeIrCost(trade, region, region, year, slice)    Costs of trade flow
@@ -1363,7 +1364,8 @@ eqImportRowResUp(imp, comm)                       Accumulated import from ROW up
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
   vImport(comm, dst, year, slice) =e=
-  sum((trade, src)$(mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm)), vTradeIr(trade, comm, src, dst, year, slice))
+  sum((trade, src)$(mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm)),
+    pTradeIrEff(trade, src, dst, year, slice) * vTradeIr(trade, comm, src, dst, year, slice))
          + sum(imp$mImportRow(imp, comm, dst, year, slice), vImportRow(imp, comm, dst, year, slice));
 
 eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)..
@@ -1850,6 +1852,7 @@ eqLECActivity
 
 *$exit
 * f374f3df-5fd6-44f1-b08a-1a09485cbe3d
+
 
 Solve energyRt minimizing vObjective using LP;
 
