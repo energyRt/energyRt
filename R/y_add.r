@@ -812,7 +812,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   	simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
   		approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']],
-  	simpleInterpolation(trd@trade, 'eff', obj@parameters[['pTradeIrEff']], 
+  	simpleInterpolation(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
   		approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIrMarkup
   obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],

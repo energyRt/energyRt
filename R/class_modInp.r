@@ -345,7 +345,7 @@ setMethod("initialize", "modInp",
     	defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cost')    
     .Object@parameters[['pTradeIrEff']] <- createParameter('pTradeIrEff', 
     	c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
-    	defVal = 1, interpolation = 'back.inter.forth', cls = 'trade', colName = 'eff')    
+    	defVal = 1, interpolation = 'back.inter.forth', cls = 'trade', colName = 'teff')    
     .Object@parameters[['pTradeIrMarkup']] <- createParameter('pTradeIrMarkup', 
           c('trade', 'src', 'dst', 'year', 'slice'), 'simple', 
             defVal = 0, interpolation = 'back.inter.forth', cls = 'trade', colName = 'markup')    
