@@ -239,6 +239,28 @@ get_labpt <- function(scen) {
   return(labpt)
 }
 
+get_labpt_spdf <- function(spdf) {
+  labpt <- sapply(1:length(spdf@data[,1]), function(x) {
+    spdf@polygons[[x]]@labpt
+  })
+  labpt <- cbind(
+    spdf@data$region,
+    as.data.frame(t(labpt))
+  )
+  names(labpt) <- c("region", "x", "y")
+  return(labpt)
+}
+
+fact2char <- function(df, asTibble = TRUE) {
+  stopifnot(is.data.frame(df))
+  jj <- sapply(df, is.factor)
+  for (j in names(df)[jj]) {
+    df[[j]] <- as.character(df[[j]])
+  }
+  if (asTibble) {df <- as_tibble(df)}
+  df
+}
+
 add_labpt <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = NULL) {
   # Adding coordnates of regions' centers
   names(labpt) <- c(ID, paste0(pref, names(labpt) [2:3], sfx))
