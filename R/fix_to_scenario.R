@@ -70,10 +70,10 @@
   if (length(scen@modInp@set$imp) > 0) {
   	scen <- .fix.couple.cummulitive(scen, src, startYear, var.name = 'vImportRow', var.par = 'pImportRowRes', mile.stone.length)
   }
-  # Remove unused constrain
-  scen <- .fix_to_remove_unused_constrain(scen, src, min(mile.stone.after)) 
-  # Fix to lag and lead constrain
-  scen <- .fix_to_laglead_constrain(scen, src, mile.stone.after, max(mile.stone[mile.stone < startYear])) 
+  # Remove unused constraint
+  scen <- .fix_to_remove_unused_constraint(scen, src, min(mile.stone.after)) 
+  # Fix to lag and lead constraint
+  scen <- .fix_to_laglead_constraint(scen, src, mile.stone.after, max(mile.stone[mile.stone < startYear])) 
   # Remove all data after start year
   als_year <- c('year', 'yearn', 'yearp', 'yeare')
   for (nn in names(scen@modInp@parameters)) {
@@ -134,7 +134,7 @@
 		scen
 }
 
-.remove_constrain <- function(scen, cnst4rem) {
+.remove_constraint <- function(scen, cnst4rem) {
 	scen@modInp@gams.equation <- scen@modInp@gams.equation[!(names(scen@modInp@gams.equation) %in% cnst4rem)] 
 	# Set and parameters for removing
 	tmp <- paste0('(', paste0(cnst4rem, collapse = '|'), ')')
@@ -146,19 +146,19 @@
 	scen
 }
 # scen = BAU; src = BAU; startYear = 2020
-.fix_to_remove_unused_constrain <- function(scen, src, startYear) {
+.fix_to_remove_unused_constraint <- function(scen, src, startYear) {
 	map_cnd <- grep('^mCns', names(scen@modInp@parameters), value = TRUE)
 	if (length(map_cnd) == 0) return(scen);
 	map_cnd <- map_cnd[sapply(scen@modInp@parameters[map_cnd], 
 														function(x) (any(x@dimSetNames == 'year') && all(x@data$year < startYear)))]
 	if (length(map_cnd) == 0) return(scen);
 	cnst4rem <- unique(sub('[_][[:digit:]]+$', '', sub('^mCns', '', map_cnd)))
-	.remove_constrain(scen, cnst4rem)
+	.remove_constraint(scen, cnst4rem)
 }
 
 
 # last_noinc_mile = max(mile.stone[mile.stone < startYear])
-.fix_to_laglead_constrain <- function(scen, src, mile.stone.after, last_noinc_mile) {
+.fix_to_laglead_constraint <- function(scen, src, mile.stone.after, last_noinc_mile) {
 	# Find scenario with lead & lag year 
 	l_year_cns <- names(scen@modInp@gams.equation)[sapply(scen@modInp@gams.equation, function(x) any(grep('([ ]|[$]|[(])mMilestoneNext[(]', x$equation)))]
 	# if lag stop (not realised now)
@@ -174,7 +174,7 @@
 		rst <- scen@modInp@gams.equation[[x]]
 		rst$equationDeclaration2Model <- sub('^eqCns', 'eqCns2', rst$equationDeclaration2Model)
 		rst$equationDeclaration <- sub('^eqCns', 'eqCns2', rst$equationDeclaration)
-		# Make a copy constrain for init period
+		# Make a copy constraint for init period
 	  eqt <- scen@modInp@gams.equation[[cns]]$equation
 	  eqt <- sub(' mMilestoneHasNext[(]year[)]', ' mMilestoneFirst(year)', eqt)
 	  eqt <- sub('^eqCns', ' eqCns2', eqt)
@@ -238,7 +238,7 @@
 						eqt_en <- paste0(eqt_en, ' sum((',paste0(loop, collapse = ', '), gsub('^[^)]*', '', eqt2), ')')
 						eqt0 <- brk$end
 					} else {
-						stop('fix to lead constrain: have to write for removing sum condition')
+						stop('fix to lead constraint: have to write for removing sum condition')
 					}
 				} else if (any(grep('( |[(]|[,])year([ ]|[)]|[,])', brk$beg))) {
 					#### There are year, and it have to replace to constant or parameter

@@ -42,7 +42,7 @@ summary.levcost <- function(x) x$total
     tax$year <- as.numeric(tax$year)
     tax$slice <- as.character(tax$slice)
     for(i in unique(tax$comm)) {
-      txx <- newConstrainS(paste('TAX', i, sep = ''), 'tax', comm = i, 
+      txx <- newConstraintS(paste('TAX', i, sep = ''), 'tax', comm = i, 
          rhs = tax[tax$comm == i, colnames(tax) != 'comm'])
       reps <- add(reps, txx);
     }
@@ -63,7 +63,7 @@ summary.levcost <- function(x) x$total
     subs$year <- as.numeric(subs$year)
     subs$slice <- as.character(subs$slice)
     for(i in unique(subs$comm)) {
-      sbs <- newConstrainS(paste('SUBS', i, sep = ''), 'subs', comm = i, 
+      sbs <- newConstraintS(paste('SUBS', i, sep = ''), 'subs', comm = i, 
          rhs = subs[subs$comm == i, colnames(subs) != 'comm'])
       reps <- add(reps, sbs);
     }

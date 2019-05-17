@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------------------------------------------
 # equation
 #---------------------------------------------------------------------------------------------------------
-setClass('constrain', 
+setClass('constraint', 
          representation(
            name          = "character",
            description   = "character",       # description
@@ -26,7 +26,7 @@ setClass('constrain',
            )),
          S3methods = TRUE
 );
-setMethod("initialize", "constrain", function(.Object, ...) {
+setMethod("initialize", "constraint", function(.Object, ...) {
   attr(.Object, 'GUID') <- 'b8b3c68c-8d82-4844-aff9-8b12ba6da878'
   .Object
 })
@@ -58,8 +58,8 @@ setClass('summand',
 );
 
 
-newConstrain <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ..., arg = NULL) {
-  obj <- new('constrain')
+newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ..., arg = NULL) {
+  obj <- new('constraint')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq)))   {
     stop('Wrong condition type')
@@ -155,7 +155,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   #assign('stm', stm,  globalenv())
   #assign('approxim', approxim,  globalenv())
   stop.constr <- function(x) 
-    stop(paste0('Constrain "', stm@name, '" error: ', x))
+    stop(paste0('Constraint "', stm@name, '" error: ', x))
   get.all.child <- function(x)  {
     unique(c(x, c(approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% x, 'child'])))
   }

@@ -45,10 +45,10 @@
 }
 
 # Upper case all set in 
-.upper_case.constrain <- function(cns) {
+.upper_case.constraint <- function(cns) {
 #  slc <- c('tech', 'sup', 'res', 'row', 'trade', 'region', 'comm', 'slice')
 #  cns@name <- toupper(cns@name)
-#  gg <- getClass('constrain')
+#  gg <- getClass('constraint')
 #  for(i in names(gg@slots)[gg@slots == 'data.frame'])
 #  if (nrow(slot(cns, i)) > 0) {
 #    zz <- slot(cns, i)

@@ -21,7 +21,7 @@ compare <- function(obj1, obj2, just_name = FALSE) {
       if (CLS != sl[nm]) {
         stop('Wrong slot "', nm, '" class in object 2\n')
       }
-      if (class(obj) != 'constrain' || nm != 'rhs') {
+      if (class(obj) != 'constraint' || nm != 'rhs') {
         if (class(slot(obj, nm)) == 'data.frame') {
           if (ncol(slot(obj1, nm)) != ncol(slot(obj, nm)) ||
             any(colnames(slot(obj1, nm)) != colnames(slot(obj, nm))) ||
@@ -84,8 +84,8 @@ compare <- function(obj1, obj2, just_name = FALSE) {
     for(nm in names(sl)[sl %in% 'data.frame']) {
       s1 <- slot(obj1, nm)
       s2 <- slot(obj2, nm)
-      # Exception for constrain
-      if (nm == 'rhs' && class(obj2) == 'constrain' && ncol(obj2@rhs) != 0) {
+      # Exception for constraint
+      if (nm == 'rhs' && class(obj2) == 'constraint' && ncol(obj2@rhs) != 0) {
             if (just_name) RT[nm] <- TRUE else {
               cat('Differences slot "', nm, '":\n', sep = '')
               print(obj2@rhs)

@@ -35,7 +35,7 @@ getInpuData <- function(..., parameter = NULL, name = NULL, object.class = NULL,
   alias_set$year = c('year', 'yearp', 'yeare')
   alias_set <- alias_set[gsub('_$', '', names(set))]  
   # Merge parse objecte
-  psb_cls <- c('commodity', 'demand', 'supply', 'export', 'import', 'constrain', 'technology', 'trade')
+  psb_cls <- c('commodity', 'demand', 'supply', 'export', 'import', 'constraint', 'technology', 'trade')
   obj <- list()
   if (any(sapply(arg, class) == 'list')) {
     j <- seq(along = arg)[sapply(arg, class) == 'list']

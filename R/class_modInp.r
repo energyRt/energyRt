@@ -147,11 +147,11 @@ setMethod("initialize", "modInp",
     # Tax
     .Object@parameters[['pTaxCost']] <- 
         createParameter('pTaxCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'inter.forth', colName = 'tax', cls = 'constrain')    
+        defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'tax')    
     # Subs
     .Object@parameters[['pSubsCost']] <- 
         createParameter('pSubsCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-        defVal = 0, interpolation = 'inter.forth', colName = 'subs', cls = 'constrain')    
+        defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'sub')    
   # Supply
     # Map
     .Object@parameters[['mSupComm']] <- 
