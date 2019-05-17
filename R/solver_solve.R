@@ -141,7 +141,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
       }
     }
     
-    # Add constrain
+    # Add constraint
     if (length(scenario@modInp@gams.equation) > 0) {
       add_eq <- sapply(scenario@modInp@gams.equation, function(x) .equation.from.gams.to.glpk(x$equation)) 
       # Add additional maps

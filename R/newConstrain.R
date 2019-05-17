@@ -1,9 +1,9 @@
 
-newConstrainS <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
+newConstraintS <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
                          for.each = list(), defVal = 0, rule = NULL, comm = NULL,
                          cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
   stop.newconstr <- function(x) 
-    stop(paste0('Constrain "', name, '" error: ', x))
+    stop(paste0('Constraint "', name, '" error: ', x))
   
   
   if (type == 'tax') stop.newconstr('Tax have to do')
@@ -95,7 +95,7 @@ newConstrainS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
     rhs <- 0
     defVal <- 0
   }
-  newConstrain(name, eq = eq, for.each = for.each, defVal = defVal, rhs = rhs, arg = arg)
+  newConstraint(name, eq = eq, for.each = for.each, defVal = defVal, rhs = rhs, arg = arg)
 }
  
 

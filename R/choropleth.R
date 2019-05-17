@@ -10,6 +10,7 @@ choropleth.scenario <- function(scen, # scenario object
                                 # from_reg = NULL, # character vector with names of source regions
                                 # to_reg = NULL, # character vector with names of destimation regions
                                 # constrain = NULL, 
+                                # constraint = NULL, 
                                 # supply = NULL,
                                 # demand = NULL,
                                 # shading = GISTools::auto.shading(variable), # shading schema - see GISTools 

@@ -199,7 +199,7 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     aa <- merge(aa, merge(tmp_nozero$pTradeIr, tmp_map$mTradeSlice))[, c("trade", "src", "dst", "year", "slice")] 
     colnames(aa)[2:3] <- 'region'
     prec@parameters[['mTradeIr']] <- addData(prec@parameters[['mTradeIr']], aa[, ])
-# mTradeIrUp(trade, region, region, year, slice)         Total physical trade flows between regions is constrain
+# mTradeIrUp(trade, region, region, year, slice)         Total physical trade flows between regions is constraint
 # mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) != Inf and
 #    mTradeSrc(trade, src) and mTradeDst(trade, dst) and not(mSameRegion(src, dst))
     a1 <- tmp_map$mTradeSrc; colnames(a1)[2] <- 'src'

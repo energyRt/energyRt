@@ -1020,9 +1020,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 
 
 ################################################################################
-# Add constrain
+# Add constraint
 ################################################################################
-setMethod('.add0', signature(obj = 'modInp', app = 'constrain',
+setMethod('.add0', signature(obj = 'modInp', app = 'constraint',
                              approxim = 'list'), function(obj, app, approxim) {
                                .getSetEquation(obj, app, approxim)
                              })

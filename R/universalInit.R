@@ -163,8 +163,8 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
 #      exclude = c(names(args)[!(names(args) %in% sysInfVec)], mlst_vec), ...)
       exclude = c('slice', names(args)[!(names(args) %in% sysInfVec)]), ...)
     if (any(names(args) == 'slice')) {
-      mdl@sysInfo <- setSlice(mdl@sysInfo, slice = args$slice)
-    } else mdl@sysInfo <- setSlice(mdl@sysInfo, slice = 'ANNUAL')
+      mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = args$slice)
+    } else mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = 'ANNUAL')
 #    args <- list(...)
 #    if (any(names(args) %in% mlst_vec)) {
 #      if (sum(names(args) %in% mlst_vec) != 2) stop('Undefined all need parameters for setMileStoneYears')

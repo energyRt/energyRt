@@ -12,7 +12,7 @@ setGeneric("removePreviousImport", function(obj, name) standardGeneric("removePr
 setGeneric("isImport", function(obj, name) standardGeneric("isImport"))
 setGeneric("removePreviousTechnology", function(obj, name) standardGeneric("removePreviousTechnology"))
 setGeneric("isTechnology", function(obj, name) standardGeneric("isTechnology"))
-setGeneric("isConstrain", function(obj, name) standardGeneric("isConstrain"))
+setGeneric("isConstraint", function(obj, name) standardGeneric("isConstraint"))
 setGeneric("removePreviousSysInfo", function(obj) standardGeneric("removePreviousSysInfo"))
 setGeneric("removePreviousTrade", function(obj, name) standardGeneric("removePreviousTrade"))
 setGeneric("isTrade", function(obj, name) standardGeneric("isTrade"))
@@ -49,7 +49,7 @@ getData <- function (...) UseMethod("getData")
 setGeneric("milestoneYears", function(start, interval) standardGeneric("milestoneYears"))
 setGeneric("setMilestoneYears", function(obj, start, interval) standardGeneric("setMilestoneYears"))
 setGeneric("getMilestone", function(obj) standardGeneric("getMilestone"))
-setGeneric("setSlice", function(obj, ...) standardGeneric("setSlice"))
+setGeneric("setTimeSlices", function(obj, ...) standardGeneric("setTimeSlices"))
 
 setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
 

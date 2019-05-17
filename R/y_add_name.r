@@ -1,16 +1,16 @@
 
 ################################################################################
-# Add constrain
+# Add constraint
 ################################################################################
-setMethod('add_name', signature(obj = 'modInp', app = 'constrain',
+setMethod('add_name', signature(obj = 'modInp', app = 'constraint',
                                 approxim = 'list'), function(obj, app, approxim) {
                                   if (!energyRt:::.chec_correct_name(app@name)) {
-                                    stop(paste('Incorrect constrain name "', app@name, '"', sep = ''))
+                                    stop(paste('Incorrect constraint name "', app@name, '"', sep = ''))
                                   }
-                                  if (isConstrain(obj, app@name)) {
-                                    warning(paste('There is constrain name "', app@name,
+                                  if (isConstraint(obj, app@name)) {
+                                    warning(paste('There is constraint name "', app@name,
                                                   '" now, all previous information will be removed', sep = ''))
-                                    obj <- removePreviousConstrain(obj, cmd@name)
+                                    obj <- removePreviousConstraint(obj, cmd@name)
                                   }
                                   obj
                                 })
@@ -73,9 +73,9 @@ setMethod('add_name', signature(obj = 'modInp', app = 'weather',
                                 })
 
 ################################################################################
-# Add constrain
+# Add constraint
 ################################################################################
-setMethod('add_name', signature(obj = 'modInp', app = 'constrain',
+setMethod('add_name', signature(obj = 'modInp', app = 'constraint',
   approxim = 'list'), function(obj, app, approxim) { 
   obj
 })

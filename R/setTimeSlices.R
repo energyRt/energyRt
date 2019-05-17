@@ -1,45 +1,45 @@
-# setSlice(level1= 'MON', TH', ..., level2= '1H', 2H', ...)
-# setSlice(level1= list(name 'WEEKDAY', 'MON' = 1/12, 'TH' = 1/13), ..., level2= '1H', 2H', ...)setSlice(level1= list('MON' = list(1/12, c('1H' = 1/13)), ...)
+# setTimeSlices(level1= 'MON', TH', ..., level2= '1H', 2H', ...)
+# setTimeSlices(level1= list(name 'WEEKDAY', 'MON' = 1/12, 'TH' = 1/13), ..., level2= '1H', 2H', ...)setTimeSlices(level1= list('MON' = list(1/12, c('1H' = 1/13)), ...)
 
 # require(energyRt)
 #mdl <- new('model')
 
 
 .slice_check_data <- function(dtf) {
-  if (ncol(dtf) < 2) stop(".setSlice: slice data frame have to greate or equal two")
-  if (colnames(dtf)[ncol(dtf)] != "share") stop(".setSlice: last slice data frame have to name 'share'")
+  if (ncol(dtf) < 2) stop(".setTimeSlices: slice data frame have to greate or equal two")
+  if (colnames(dtf)[ncol(dtf)] != "share") stop(".setTimeSlices: last slice data frame have to name 'share'")
   rcs <- colnames(dtf)[-ncol(dtf)]
   if (anyDuplicated(rcs))
-    stop(paste('.setSlice: there are duplicated slice levels: "', 
+    stop(paste('.setTimeSlices: there are duplicated slice levels: "', 
                paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
   fl <- apply(dtf[, -c(1, ncol(dtf)), drop = FALSE], 2, function(x) length(unique(x)) == 1)
   if (any(fl)) 
-    stop(paste('.setSlice: all slice except first, have to consist from more than one slice, incorrect levels: "', 
+    stop(paste('.setTimeSlices: all slice except first, have to consist from more than one slice, incorrect levels: "', 
                paste(colnames(dtf)[c(FALSE, fl, FALSE)], collapse = '", "'), '"', sep = ''))
   if (length(unique(dtf[, 1])) != 1)
-    stop(".setSlice: first slice have to consist only one slice")
+    stop(".setTimeSlices: first slice have to consist only one slice")
   rcs <- c(apply(dtf[, -ncol(dtf), drop = FALSE], 2, function(x) unique(x)), recursive = TRUE)
   if (anyDuplicated(rcs))
-    stop(paste('.setSlice: there are duplicated slice in different levels: "', 
+    stop(paste('.setTimeSlices: there are duplicated slice in different levels: "', 
                paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
   # Check
-  if (round(sum(dtf$share), 5) != 1) stop('.setSlice: Sum of share have to be equal one, not: ', sum(dtf$share))
+  if (round(sum(dtf$share), 5) != 1) stop('.setTimeSlices: Sum of share have to be equal one, not: ', sum(dtf$share))
   ll <- apply(dtf[, -ncol(dtf), drop = FALSE], 1, paste, collapse = '.')
   if (anyDuplicated(ll))
-    stop(paste('.setSlice: There are duplicate set of slice. ("',  paste(ll[duplicated(ll)], collapse = '", "'), '").', sep = ''))
+    stop(paste('.setTimeSlices: There are duplicate set of slice. ("',  paste(ll[duplicated(ll)], collapse = '", "'), '").', sep = ''))
   if (length(ll) != prod(sapply(dtf[, -ncol(dtf), drop = FALSE], function(x) length(unique(x))))) {
     dtf2 <- unique(dtf[, 1])
     for (i in seq(length = ncol(dtf) - 2) + 1) {
       ln <- length(unique(dtf[, i]))
       dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), '.', unique(dtf[, i]), sep = '')
     }
-    stop(paste('.setSlice: There are uncovered set of slice. ("',  paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").', sep = ''))
+    stop(paste('.setTimeSlices: There are uncovered set of slice. ("',  paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").', sep = ''))
   }
 }
 
 # set Slice name vectors
-.setSlice <- function(slice = NULL, ...) {
-  if (!is.null(slice) && length(list(...))) stop('setSlice: only one argument could be define: "slice" or "..."')
+.setTimeSlices <- function(slice = NULL, ...) {
+  if (!is.null(slice) && length(list(...))) stop('setTimeSlices: only one argument could be define: "slice" or "..."')
   if (!is.null(slice)) {
     arg <- slice
   } else {
@@ -47,7 +47,7 @@
   }
   rcs <- names(arg)
   if (anyDuplicated(rcs))
-    stop(paste('.setSlice: there are duplicated slice levels: "', 
+    stop(paste('.setTimeSlices: there are duplicated slice levels: "', 
                paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
   check_colnames <- function(dtf, nm) {
     if (any(colnames(dtf) == nm) || any(grep('^[!A-z]', nm)) || any(gsub('[[:alnum:]]*', nm)))
@@ -72,7 +72,7 @@
   }
   slice_def <- function(dtf, arg) {
     if (is.null(names(arg)) || any(names(arg) == ""))
-      stop(paste('.setSlice: Un named arguments: ', paste(capture.output(print(arg)), collapse = '\n'), sep = '\n'))
+      stop(paste('.setTimeSlices: Un named arguments: ', paste(capture.output(print(arg)), collapse = '\n'), sep = '\n'))
     add_val <- function(dtf, val_sh, val_nm) {
       dtf0 <- dtf; 
       dtf <- dtf[0,, drop = FALSE];
@@ -102,24 +102,24 @@
         }
         check_slice(val_nm)
         if (any(val_nm <= 0) || sum(val_sh) != 1)
-          stop(paste(paste('.setSlice: There are wrong slice data for level "', lv, '"\n', 
+          stop(paste(paste('.setTimeSlices: There are wrong slice data for level "', lv, '"\n', 
                            sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
         arg <- arg[-1]
         dtf <- add_val(dtf, val_sh, val_nm)
       } else if (is.list(arg[[1]])) {
         arg2 <- arg[[1]]; #arg <- arg[-1]
         if (is.null(names(arg2)) || any(names(arg2) == ''))
-          stop(paste(paste('.setSlice: There are wrong slice data for level "', lv, '"\n', 
+          stop(paste(paste('.setTimeSlices: There are wrong slice data for level "', lv, '"\n', 
                            sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
         if (is.numeric(arg2[[1]])) {
           if (!all(sapply(arg2, is.numeric)))
-            stop(paste(paste('.setSlice: There are wrong slice data for level "', lv, '"\n', 
+            stop(paste(paste('.setTimeSlices: There are wrong slice data for level "', lv, '"\n', 
                              sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
           dtf <- add_val(dtf, c(arg2, recursive = TRUE), names(arg2))
           arg <- arg[-1]
         } else {
           if (!all(sapply(arg2, is.list)))
-            stop(paste(paste('.setSlice: There are wrong slice data for level "', lv, '"\n', 
+            stop(paste(paste('.setTimeSlices: There are wrong slice data for level "', lv, '"\n', 
                              sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
           dtf0 <- dtf;
           dtf <- NULL
@@ -130,13 +130,13 @@
               dtf <- dtf1
             } else {
               if (ncol(dtf) != ncol(dtf1) || any(colnames(dtf) != colnames(dtf1)))
-                stop(paste('.setSlice: Set of slice have to be the same for all (check list slice arguments).', sep = ''))
+                stop(paste('.setTimeSlices: Set of slice have to be the same for all (check list slice arguments).', sep = ''))
               dtf <- rbind(dtf, dtf1)
             }
           }
           arg <- arg[-1]
         }
-      } else stop(paste('.setSlice: Unknown type of argument for slice level "', lv, '"', sep = ''))
+      } else stop(paste('.setTimeSlices: Unknown type of argument for slice level "', lv, '"', sep = ''))
     }
     dtf
   }
@@ -149,9 +149,9 @@
   }
   dtf <- dtf[, c(2:ncol(dtf), 1), drop = FALSE]
   if (length(unique(dtf[, 1])) != 1) {
-    warning('.setSlice: first slice have to consist only one slice, add "ANNUAL"')
+    warning('.setTimeSlices: first slice have to consist only one slice, add "ANNUAL"')
     if (any(colnames(dtf) == 'ANNUAL') || any(c(dtf == "ANNUAL", recursive = TRUE)))
-      stop('.setSlice: cannot add level "ANNUAL" slice, with level "ANNUAL"')
+      stop('.setTimeSlices: cannot add level "ANNUAL" slice, with level "ANNUAL"')
     dtf$ANNUAL  <- rep('ANNUAL', nrow(dtf))
     dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
   }
@@ -162,33 +162,33 @@
   sl
 }
 
-setMethod('setSlice', signature(obj = 'model'), function(obj, ...) {
-  obj@sysInfo@slice <- .setSlice(...)
+setMethod('setTimeSlices', signature(obj = 'model'), function(obj, ...) {
+  obj@sysInfo@slice <- .setTimeSlices(...)
   obj
 })
                               
-setMethod('setSlice', signature(obj = 'scenario'), function(obj, ...) {
-  obj@model@sysInfo@slice <- .setSlice(...)
+setMethod('setTimeSlices', signature(obj = 'scenario'), function(obj, ...) {
+  obj@model@sysInfo@slice <- .setTimeSlices(...)
   obj
 })
 
-setMethod('setSlice', signature(obj = 'sysInfo'), function(obj, ...) {
-  obj@slice <- .setSlice(...)
+setMethod('setTimeSlices', signature(obj = 'sysInfo'), function(obj, ...) {
+  obj@slice <- .setTimeSlices(...)
   obj
 })
 
 
 
 #! 1
-# .setSlice("SEASON" = c("WINTER", "SUMMER"))
-# .setSlice("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
-# .setSlice("SEASON" = list("WINTER" = .6, "SUMMER" = .4))
-# .setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING'))))
-# .setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING')))) # have to error
+# .setTimeSlices("SEASON" = c("WINTER", "SUMMER"))
+# .setTimeSlices("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
+# .setTimeSlices("SEASON" = list("WINTER" = .6, "SUMMER" = .4))
+# .setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING'))))
+# .setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING')))) # have to error
 
 #! 2
-#.setSlice("SEASON" = c("WINTER", "SUMMER"), HOUR = paste('H', seq(0, 21, by = 3), sep = ''))
-#.setSlice("SEASON" = list("WINTER" = list(.3, DAY = list('MORNING' = list(.5, tp = c('x1' = .1, 'x2' = .9)), 'EVENING' = list(.5, tp = c('x1', 'x2')))), 
+#.setTimeSlices("SEASON" = c("WINTER", "SUMMER"), HOUR = paste('H', seq(0, 21, by = 3), sep = ''))
+#.setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = list('MORNING' = list(.5, tp = c('x1' = .1, 'x2' = .9)), 'EVENING' = list(.5, tp = c('x1', 'x2')))), 
 #                          "SUMMER" = list(.7, DAY = list('MORNING' = list(.5, tp = c('x1', 'x2')), 'EVENING' = list(.5, tp = c('x1', 'x2'))))))
 
-# sl = .setSlice("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING', 'PEAK')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING', 'PEAK'))))
+# sl = .setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING', 'PEAK')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING', 'PEAK'))))

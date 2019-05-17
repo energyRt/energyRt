@@ -31,7 +31,7 @@ report.model <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''), tm
     dtt$technology <- list()
     dtt$supply <- list()
     dtt$demand <- list()
-    dtt$constrain <- list()
+    dtt$constraint <- list()
     dtt$import <- list()
     dtt$export <- list()
     dtt$trade <- list()

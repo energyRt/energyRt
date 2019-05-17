@@ -170,11 +170,11 @@ setMethod('isTechnology', signature(obj = 'modInp', name = 'character'),
 })
 
 ################################################################################
-# Get constrain
+# Get constraint
 ################################################################################
-setMethod('isConstrain', signature(obj = 'modInp', name = 'character'),
+setMethod('isConstraint', signature(obj = 'modInp', name = 'character'),
       function(obj, name) {
-  any(names(obj@parameters$constrain) == name)
+  any(names(obj@parameters$constraint) == name)
 })
 
 
