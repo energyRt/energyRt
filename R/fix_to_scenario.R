@@ -171,7 +171,7 @@
 	for (cns in l_year_cns) {
 		NEW_PAR <- 0
 		new_cns <- paste0('2', cns)
-		rst <- scen@modInp@gams.equation[[x]]
+		rst <- scen@modInp@gams.equation[[cns]]
 		rst$equationDeclaration2Model <- sub('^eqCns', 'eqCns2', rst$equationDeclaration2Model)
 		rst$equationDeclaration <- sub('^eqCns', 'eqCns2', rst$equationDeclaration)
 		# Make a copy constraint for init period
