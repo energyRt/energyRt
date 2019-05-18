@@ -69,6 +69,7 @@ set
 mSameRegion(region, region)   The same region (used in GLPK)
 mSameSlice(slice, slice)      The same slice (used in GLPK)
 *! technology:input
+mMilestoneFirst(year)          First period milestone
 mMilestoneLast(year)           Last period milestone
 mMilestoneNext(year, year)     Next period milestone
 mMilestoneHasNext(year)        Is there next period milestone

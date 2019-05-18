@@ -18,6 +18,7 @@ set FORIF;
 
 set mSameRegion dimen 2;
 set mSameSlice dimen 2;
+set mMilestoneFirst dimen 1;
 set mMilestoneLast dimen 1;
 set mMilestoneNext dimen 2;
 set mMilestoneHasNext dimen 1;
