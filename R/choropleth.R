@@ -240,7 +240,21 @@ get_labpt <- function(scen) {
   return(labpt)
 }
 
-get_labpt_spdf <- function(spdf) {
+#' Get coordinates of region centers (labpt)
+#'
+#' @param spdf SpatialPolygonDataFrame object
+#' @param regionsAsCharacters logical, should `regions` column in case of `factor` being coerced to character?
+#'
+#' @return data frame with coordinates of the regions' centers.
+#' @export getCenters get_labpt_spdf
+#' @aliases get_labpt_spdf
+#'
+#' @examples
+#' 
+#' getCenters(spdf)
+#' get_labpt_spdf(spdf)
+#' 
+getCenters <- function(spdf, regionsAsCharacters = TRUE, asTibble = TRUE) {
   labpt <- sapply(1:length(spdf@data[,1]), function(x) {
     spdf@polygons[[x]]@labpt
   })
@@ -249,8 +263,12 @@ get_labpt_spdf <- function(spdf) {
     as.data.frame(t(labpt))
   )
   names(labpt) <- c("region", "x", "y")
+  if (regionsAsCharacters) labpt <- fact2char(labpt)
+  if (asTibble & !is.tibble(labpt)) labpt <- tibble::as_tibble(labpt)
   return(labpt)
 }
+
+get_labpt_spdf <- getCenters
 
 fact2char <- function(df, asTibble = TRUE) {
   stopifnot(is.data.frame(df))
@@ -262,12 +280,27 @@ fact2char <- function(df, asTibble = TRUE) {
   df
 }
 
-add_labpt <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = NULL) {
+#' Adding region centers coordinate to a data frame
+#'
+#' @param dat data.frame, should have a column with regions' IDs
+#' @param labpt data.frame with regions' coordinates
+#' @param ID character, name of the column with region IDs (default = "region")
+#' @param pref ...
+#' @param sfx ...
+#'
+#' @return ...
+#' @export ...
+#'
+#' @examples
+#' ...
+#' 
+addCenters <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = NULL) {
   # Adding coordnates of regions' centers
   names(labpt) <- c(ID, paste0(pref, names(labpt) [2:3], sfx))
   dat <- merge(dat, labpt, by = ID)
-  
 }
+
+add_labpt <- addCenters
 
 getSPDF <- function(scen, ...) {
   SPDF <- scen@model@sysInfo@GIS
