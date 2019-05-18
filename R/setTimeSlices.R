@@ -178,10 +178,17 @@ setMethod('setTimeSlices', signature(obj = 'sysInfo'), function(obj, ...) {
   obj
 })
 
-timeSlices <- function(xx) {
-  invisible(newModel("dummymod", slice = xx)@sysInfo@slice)
+timeSlices <- function(x, asTibble = T, stringsAsFactors = FALSE) {
+  # invisible(newModel("dummymod", slice = xx)@sysInfo@slice)
+  mm <- newModel("dummymod", slice = x)
+  slev <- mm@sysInfo@slice@levels
+  nlev <- length(mm@sysInfo@slice@slice_map)
+  slev$slice <- mm@sysInfo@slice@slice_map[[nlev]]
+  # dd <- data.frame(slice = snam, share = ssha, stringsAsFactors = sliceAsFactors)
+  if (!stringsAsFactors) slev <- fact2char(slev)
+  if (asTibble) slev <- tibble::as_tibble(slev)
+  slev
 }
-
 #! 1
 # .setTimeSlices("SEASON" = c("WINTER", "SUMMER"))
 # .setTimeSlices("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
