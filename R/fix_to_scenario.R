@@ -177,7 +177,7 @@
 		# Make a copy constraint for init period
 	  eqt <- scen@modInp@gams.equation[[cns]]$equation
 	  eqt <- sub(' mMilestoneHasNext[(]year[)]', ' mMilestoneFirst(year)', eqt)
-	  eqt <- sub('^eqCns', ' eqCns2', eqt)
+	  eqt <- sub('^eqCns', 'eqCns2', eqt)
 	  # Split eqt by summand
 	  eqt0 <- sub('.*[.][.][[:blank:]]*', '', eqt)
 		eqt_en <- sub('[.][.].*', '.. ', eqt)
@@ -279,7 +279,7 @@
 						eqt_en <- paste0(eqt_en, xx@name, '(', paste0(xx@dimSetNames, collapse = ', '), ')')
 					} else {
 						tpr <- sum(tpr$value)
-						eqt_en <- paste0(eqt_en, '+'[tpr >= 0], tpr) 
+						if (tpr != 0) eqt_en <- paste0(eqt_en, '+'[tpr >= 0], tpr) 
 					}
 					eqt0 <- brk$end
 				} else  {
@@ -304,6 +304,8 @@
 			}  
 			
 		}
+		eqt_en <- gsub('([+][[:blank:]]*)*[-]', '-', eqt_en)
+		eqt_en <- gsub('([+][[:blank:]]*)*[+]', '+', eqt_en)
 		rst$equation <- eqt_en
 		scen@modInp@gams.equation[[sub('^eqCns', '', rst$equationDeclaration2Model)]] <- rst
 	}
