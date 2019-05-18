@@ -159,6 +159,7 @@
   .slice_check_data(dtf)
   sl <- new('slice')
   sl@levels <- dtf
+  sl <- .init_slice(sl)
   sl
 }
 
