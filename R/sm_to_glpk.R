@@ -55,7 +55,7 @@
     gg <- obj@data
     gg <- gg[gg$type == 'up', , drop = FALSE]
     gg <- gg[, colnames(gg) != 'type'] 
-    if (nrow(gg) == 0 || all(gg$value[1] == gg$value)) {
+    if (nrow(gg) == 0) {  #  || all(gg$value[1] == gg$value)
       if (nrow(gg) == 0) dd <- obj@defVal[2] else dd <- gg$value[1]
       if (dd == Inf) dd <- 0
       ret <- c(ret, paste('param ', obj@name, 'Up default ', dd, ' := ;', sep = ''))
