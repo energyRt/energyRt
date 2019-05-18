@@ -194,7 +194,7 @@
 				# .get.bracket = energyRt:::.get.bracket
 				brk <- .get.bracket(substr(eqt0, 4, nchar(eqt0)))
 				if (any(grep('( |[(]|[$])mMilestoneNext[(]year, yearp[)]', brk$beg))) {
-					# There are next, and it have to rename yearp to year, and remove slice
+################ There are next, and it have to rename yearp to year, and remove slice
 					# Replace yearp -> year
 					eqt2 <- brk$beg
 					nn <- strsplit(eqt2, 'yearp')[[1]]
@@ -241,7 +241,7 @@
 						stop('fix to lead constraint: have to write for removing sum condition')
 					}
 				} else if (any(grep('( |[(]|[,])year([ ]|[)]|[,])', brk$beg))) {
-					#### There are year, and it have to replace to constant or parameter
+######## There are year, and it have to replace to constant or parameter
 					xx <- sub('^[(]', '', sub('[)]$', '', brk$beg))
 					cond <- sub('[,][[:blank:]]*(|[+-]*[[:blank:]]*([[:digit:].]*|pCnsMult.*)[[:blank:]]*[*][[:blank:]]*)[[:blank:]]*v[[:alnum:]]*[(][^)]*[)]$', '', xx)
 					to_const <- sub('^[[:blank:]]*', '', substr(xx, nchar(cond) + 2, nchar(xx)))
@@ -261,9 +261,13 @@
 					# Reduce by mapping
 					cond2 <- sub('^[^$]*[$]', '', cond)
 					if (substr(cond2, 1, 1) == '(') cond2 <- sub('^[(]', '', sub('[)]$', '', cond2))
+					if (!is.null(tpr$year)) {
+						tpr <- tpr[tpr$year == last_noinc_mile, ]
+					}
 					forMrg <- gsub('[(].*$', '', strsplit(cond2, 'and ')[[1]])
 					for (fr in forMrg) {
-						tmp <- energyRt:::.getTotalParameterData(scen@modInp, fr)
+						tmp <- getParameterData(prec@parameters[[fr]])
+						#tmp <- energyRt:::.getTotalParameterData(scen@modInp, fr)
 						tpr <- merge(tpr, tmp, by = colnames(tmp)[colnames(tmp) != 'value'])
 					}
 					# Summing sum set & year
