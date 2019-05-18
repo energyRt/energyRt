@@ -42,8 +42,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
   }
   
   # Generate code for GAMS
-  run_code <- energyRt::.modelCode[[arg$solver]][[1]]
-  
+  run_code <- scen@source[[arg$solver]] # energyRt::.modelCode[[arg$solver]]
   
   if (arg$solver == 'GAMS') {
     ##################################################################################################################################    
