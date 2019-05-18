@@ -5,7 +5,7 @@
   }
   if (obj@type == 'set') {
     if (nrow(obj@data) == 0) {
-      ret <- c(paste('set ', obj@name, ' := 1;', sep = ''), '')
+      ret <- c(paste('set ', obj@name, ' := ;', sep = ''), '')
     } else {
       ret <- c(paste('set ', obj@name, ' := ', paste(obj@data[, 1], collapse = ' '), ';', sep = ''), '')
     }
