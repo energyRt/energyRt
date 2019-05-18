@@ -51,7 +51,6 @@ setClass("supply",
       S3methods = TRUE
 );
 setMethod("initialize", "supply", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '75321e73-f425-4d45-a36c-72dc4a769a28'
   .Object
 })
                                               

@@ -38,7 +38,6 @@ setClass('constraint',
          S3methods = TRUE
 );
 setMethod("initialize", "constraint", function(.Object, ...) {
-  attr(.Object, 'GUID') <- 'b8b3c68c-8d82-4844-aff9-8b12ba6da878'
   .Object
 })
 

@@ -118,7 +118,6 @@ setClass("storage",
       S3methods = TRUE
 );
 setMethod("initialize", "storage", function(.Object, ...) {
-  attr(.Object, 'GUID') <- 'd25eda0d-ed46-4d00-b6d5-38a88d11a313'
   .Object
 })
 #

@@ -39,7 +39,6 @@ setClass("export",
       S3methods = TRUE
 );
 setMethod("initialize", "export", function(.Object, ...) {
-  attr(.Object, 'GUID') <- 'cbeee0e8-4f3b-4c79-8765-fbae9fd7578e'
   .Object
 })
              

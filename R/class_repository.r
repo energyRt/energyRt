@@ -20,7 +20,6 @@ setClass("repository",
       S3methods = TRUE
 );
 setMethod("initialize", "repository", function(.Object, ...) {
-  attr(.Object, 'GUID') <- 'd8433f44-c3c6-42fd-ae89-780e4e8b7329'
   .Object
 })
                                               

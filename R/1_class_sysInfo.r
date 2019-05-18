@@ -207,7 +207,6 @@ setClass("sysInfo",
       S3methods = TRUE
 );
 setMethod("initialize", "sysInfo", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '00ca6370-61ca-4c20-8b94-443f78331bb8'
   .Object
 })
                                                              

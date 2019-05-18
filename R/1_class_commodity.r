@@ -97,7 +97,6 @@ setClass("commodity",
       S3methods = TRUE
 )
 setMethod("initialize", "commodity", function(.Object, ...) {
-  attr(.Object, 'GUID') <- 'f1a88a0f-9376-4c81-8725-57bb1f495a2b'
   .Object
 })
 

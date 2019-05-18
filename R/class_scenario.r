@@ -22,7 +22,6 @@ setClass("scenario",
       S3methods = TRUE
 );
 setMethod("initialize", "scenario", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '50b2affe-fd21-43f8-abbd-de74d55e854b'
   .Object
 })
                                               

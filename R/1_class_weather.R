@@ -33,6 +33,5 @@ setClass("weather",
          S3methods = TRUE
 );
 setMethod("initialize", "weather", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '98271d3b-9704-42c2-8748-9fd1b3760eba'
   .Object
 })

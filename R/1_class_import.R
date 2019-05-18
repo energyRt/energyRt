@@ -39,7 +39,6 @@ setClass("import",
       S3methods = TRUE
 );
 setMethod("initialize", "import", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '8954c52f-6514-49ae-9688-17d6c5e74f06'
   .Object
 })
                                               

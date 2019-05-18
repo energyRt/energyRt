@@ -29,7 +29,6 @@ setClass("model",
       S3methods = TRUE
 )
 setMethod("initialize", "model", function(.Object, ...) {
-  attr(.Object, 'GUID') <- 'e4be2c7e-8ddf-4952-8f27-8fd12ca79e78'
   .Object
 })
              

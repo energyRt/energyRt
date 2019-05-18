@@ -221,7 +221,6 @@ setClass("technology",
       S3methods = TRUE
 )
 setMethod("initialize", "technology", function(.Object, ...) {
-  attr(.Object, 'GUID') <- 'fdaa0d09-9524-405d-b2d8-b6cc1d1ca032'
   .Object
 })
               

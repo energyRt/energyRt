@@ -56,6 +56,5 @@ setClass("trade",
       S3methods = TRUE
 );
 setMethod("initialize", "trade", function(.Object, ...) {
-  attr(.Object, 'GUID') <- '97e0ed37-fc8a-4210-ad95-702cf75bed56'
   .Object
 })
