@@ -179,7 +179,7 @@ setMethod('setTimeSlices', signature(obj = 'sysInfo'), function(obj, ...) {
 })
 
 timeSlices <- function(xx) {
-  invisible(newModel("dummymod", xx)@sysInfo@slice)
+  invisible(newModel("dummymod", slice = xx)@sysInfo@slice)
 }
 
 #! 1
