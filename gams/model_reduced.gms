@@ -424,7 +424,7 @@ variable
 *@ (sum(year$mStorageSpan(stg, region, year_cns), 1) <> 0)
 vStorageSalv(stg, region)                            Storage salvage costs
 *@ mStorageSpan(stg, region, year)
-vStorageCost(stg, region, year)                      Storage O&M costs
+vStorageOMCost(stg, region, year)                      Storage O&M costs
 ;
 
 * Trade and Row variable
@@ -1298,15 +1298,14 @@ eqStorageInv(stg, region, year)$(mMidMilestone(year) and mStorageNew(stg, region
 
 * FIX O & M + Inv Costequation
 eqStorageCost(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
-         vStorageCost(stg, region, year)
+         vStorageOMCost(stg, region, year)
          =e=
          pStorageFixom(stg, region, year) * vStorageCap(stg, region, year) +
          sum((comm, slice)$(mStorageSlice(stg, slice) and mStorageComm(stg, comm)),
              pStorageCostInp(stg, region, year, slice) * vStorageInp(stg, comm, region, year, slice)
              + pStorageCostOut(stg, region, year, slice) * vStorageOut(stg, comm, region, year, slice)
              + pStorageCostStore(stg, region, year, slice) * vStorageStore(stg, comm, region, year, slice)
-         )
-         + vStorageInv(stg, region, year)$mStorageNew(stg, region, year);
+         );
 
 * Salvage value
 eqStorageSalv0(stg, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare) and sum(year$mStorageNew(stg, region, year), 1) <> 0)..
@@ -1610,7 +1609,7 @@ eqCost(region, year)$(mMidMilestone(year))..
          + sum(comm$mDummyCost(comm, region, year), vDummyCost(comm, region, year))
          + sum(comm$mTaxCost(comm, region, year), vTaxCost(comm, region, year))
          - sum(comm$mSubsCost(comm, region, year), vSubsCost(comm, region, year))
-         + sum(stg$mStorageSpan(stg, region, year), vStorageCost(stg, region, year))
+         + sum(stg$mStorageSpan(stg, region, year), vStorageOMCost(stg, region, year))
          + vTradeCost(region, year);
 
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
@@ -1622,8 +1621,11 @@ eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)..
          =e= sum(slice$mCommSlice(comm, slice), pSubsCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
 
 eqObjective..
-   vObjective =e= sum((region, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
+   vObjective =e=
+         sum((region, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
            pDiscountFactor(region, yearp) *  sum(tech$mTechNew(tech, region, year), vTechInv(tech, region, year))) +
+         sum((region, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
+           pDiscountFactor(region, yearp) *  sum(stg$mStorageNew(stg, region, year), vStorageInv(stg, region, year))) +
          sum((region, year)$mMidMilestone(year),
            vCost(region, year) * sum((yeare, yearp, yearn)$(mStartMilestone(year, yearp) and mEndMilestone(year, yeare)
                  and ordYear(yearn) >= ordYear(yearp) and ordYear(yearn) <= ordYear(yeare)), pDiscountFactor(region, yearn))) +
@@ -2002,14 +2004,14 @@ put vStorageSalv_csv;
 put "stg,region,value"/;
 loop((stg,region)$vStorageSalv.l(stg,region), put stg.tl:0",", region.tl:0","vStorageSalv.l(stg,region):0:15/;);
 putclose; 
-file vStorageCost_csv / 'vStorageCost.csv'/;
-vStorageCost_csv.lp = 1;
-vStorageCost_csv.nd = 1;
-vStorageCost_csv.nz = 1e-25;
-vStorageCost_csv.nr = 2;
-put vStorageCost_csv;
+file vStorageOMCost_csv / 'vStorageOMCost.csv'/;
+vStorageOMCost_csv.lp = 1;
+vStorageOMCost_csv.nd = 1;
+vStorageOMCost_csv.nz = 1e-25;
+vStorageOMCost_csv.nr = 2;
+put vStorageOMCost_csv;
 put "stg,region,year,value"/;
-loop((stg,region,year)$(vStorageCost.l(stg,region,year) and mMidMilestone(year)), put stg.tl:0",", region.tl:0",", year.tl:0","vStorageCost.l(stg,region,year):0:15/;);
+loop((stg,region,year)$(vStorageOMCost.l(stg,region,year) and mMidMilestone(year)), put stg.tl:0",", region.tl:0",", year.tl:0","vStorageOMCost.l(stg,region,year):0:15/;);
 putclose; 
 file vTradeCost_csv / 'vTradeCost.csv'/;
 vTradeCost_csv.lp = 1;
@@ -2443,7 +2445,7 @@ put variable_list_csv;
     put "vSubsCost"/;
     put "vAggOut"/;
     put "vStorageSalv"/;
-    put "vStorageCost"/;
+    put "vStorageOMCost"/;
     put "vTradeCost"/;
     put "vTradeRowCost"/;
     put "vTradeIrCost"/;

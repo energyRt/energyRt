@@ -250,7 +250,7 @@ var vTaxCost{comm, region, year};
 var vSubsCost{comm, region, year};
 var vAggOut{comm, region, year, slice};
 var vStorageSalv{stg, region};
-var vStorageCost{stg, region, year};
+var vStorageOMCost{stg, region, year};
 var vTradeCost{region, year};
 var vTradeRowCost{region, year};
 var vTradeIrCost{region, year};
@@ -409,7 +409,7 @@ s.t.  eqStorageCap{(st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageCa
 
 s.t.  eqStorageInv{(st1, r, y) in mStorageNew : y in mMidMilestone}: vStorageInv[st1,r,y]  =  pStorageInvcost[st1,r,y]*vStorageNewCap[st1,r,y];
 
-s.t.  eqStorageCost{(st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageCost[st1,r,y]  =  pStorageFixom[st1,r,y]*vStorageCap[st1,r,y]+sum{c in comm,s in slice:(((st1,s) in mStorageSlice and (st1,c) in mStorageComm))}(pStorageCostInp[st1,r,y,s]*vStorageInp[st1,c,r,y,s]+pStorageCostOut[st1,r,y,s]*vStorageOut[st1,c,r,y,s]+pStorageCostStore[st1,r,y,s]*vStorageStore[st1,c,r,y,s])+sum{FORIF: (st1,r,y) in mStorageNew} (vStorageInv[st1,r,y]);
+s.t.  eqStorageCost{(st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageOMCost[st1,r,y]  =  pStorageFixom[st1,r,y]*vStorageCap[st1,r,y]+sum{c in comm,s in slice:(((st1,s) in mStorageSlice and (st1,c) in mStorageComm))}(pStorageCostInp[st1,r,y,s]*vStorageInp[st1,c,r,y,s]+pStorageCostOut[st1,r,y,s]*vStorageOut[st1,c,r,y,s]+pStorageCostStore[st1,r,y,s]*vStorageStore[st1,c,r,y,s]);
 
 s.t.  eqStorageSalv0{r in mDiscountZero, ye in mMilestoneLast, st1 in stg : sum{y in year:((st1,r,y) in mStorageNew)}(1) <> 0}: vStorageSalv[st1,r]+sum{y in year,yn in year:(((yn,y) in mStartMilestone and yn in mMidMilestone and (st1,r,yn) in mStorageNew and ordYear[yn]+pStorageOlife[st1,r]-1>ordYear[ye] and not(((st1,r) in mStorageOlifeInf)) and pStorageInvcost[st1,r,yn] <> 0))}((((pDiscountFactor[r,yn]) / (pDiscountFactor[r,ye]))*pStorageInvcost[st1,r,yn]*vStorageNewCap[st1,r,yn]) / ((1+((sum{yp in year:((ordYear[yp] >= ordYear[yn]))}(pDiscountFactor[r,yp]))) / ((pDiscountFactor[r,ye])*((pStorageOlife[st1,r]+ordYear[yn]-1-ordYear[ye]))))))  =  0;
 
@@ -481,13 +481,13 @@ s.t.  eqStorageOutTot{(c, r, y, s) in mStorageOutTot}: vStorageOutTot[c,r,y,s]  
 
 s.t.  eqDummyCost{(c, r, y) in mDummyCost : y in mMidMilestone}: vDummyCost[c,r,y]  =  sum{s in slice:((c,r,y,s) in mDummyImport)}(pDummyImportCost[c,r,y,s]*vDummyImport[c,r,y,s])+sum{s in slice:((c,r,y,s) in mDummyExport)}(pDummyExportCost[c,r,y,s]*vDummyExport[c,r,y,s]);
 
-s.t.  eqCost{y in mMidMilestone, r in region}: vCost[r,y]  =  sum{t in tech:((t,r,y) in mTechSpan)}(vTechOMCost[t,r,y])+sum{s1 in sup:((s1,r) in mSupSpan)}(vSupCost[s1,r,y])+sum{c in comm:((c,r,y) in mDummyCost)}(vDummyCost[c,r,y])+sum{c in comm:((c,r,y) in mTaxCost)}(vTaxCost[c,r,y])-sum{c in comm:((c,r,y) in mSubsCost)}(vSubsCost[c,r,y])+sum{st1 in stg:((st1,r,y) in mStorageSpan)}(vStorageCost[st1,r,y])+vTradeCost[r,y];
+s.t.  eqCost{y in mMidMilestone, r in region}: vCost[r,y]  =  sum{t in tech:((t,r,y) in mTechSpan)}(vTechOMCost[t,r,y])+sum{s1 in sup:((s1,r) in mSupSpan)}(vSupCost[s1,r,y])+sum{c in comm:((c,r,y) in mDummyCost)}(vDummyCost[c,r,y])+sum{c in comm:((c,r,y) in mTaxCost)}(vTaxCost[c,r,y])-sum{c in comm:((c,r,y) in mSubsCost)}(vSubsCost[c,r,y])+sum{st1 in stg:((st1,r,y) in mStorageSpan)}(vStorageOMCost[st1,r,y])+vTradeCost[r,y];
 
 s.t.  eqTaxCost{(c, r, y) in mTaxCost}: vTaxCost[c,r,y]  =  sum{s in slice:((c,s) in mCommSlice)}(pTaxCost[c,r,y,s]*vOutTot[c,r,y,s]);
 
 s.t.  eqSubsCost{(c, r, y) in mSubsCost}: vSubsCost[c,r,y]  =  sum{s in slice:((c,s) in mCommSlice)}(pSubsCost[c,r,y,s]*vOutTot[c,r,y,s]);
 
-s.t.  eqObjective: vObjective  =  sum{r in region,y in year,yp in year:((y in mMidMilestone and (y,yp) in mStartMilestone))}(pDiscountFactor[r,yp]*sum{t in tech:((t,r,y) in mTechNew)}(vTechInv[t,r,y]))+sum{r in region,y in year:(y in mMidMilestone)}(vCost[r,y]*sum{ye in year,yp in year,yn in year:(((y,yp) in mStartMilestone and (y,ye) in mEndMilestone and ordYear[yn] >= ordYear[yp] and ordYear[yn] <= ordYear[ye]))}(pDiscountFactor[r,yn]))+sum{r in region,y in year,t in tech:((y in mMilestoneLast and sum{yp in year:((t,r,yp) in mTechNew)}(1) <> 0))}(pDiscountFactor[r,y]*vTechSalv[t,r])+sum{r in region,y in year,st1 in stg:((y in mMilestoneLast and sum{yp in year:((st1,r,yp) in mStorageNew)}(1) <> 0))}(pDiscountFactor[r,y]*vStorageSalv[st1,r]);
+s.t.  eqObjective: vObjective  =  sum{r in region,y in year,yp in year:((y in mMidMilestone and (y,yp) in mStartMilestone))}(pDiscountFactor[r,yp]*sum{t in tech:((t,r,y) in mTechNew)}(vTechInv[t,r,y]))+sum{r in region,y in year,yp in year:((y in mMidMilestone and (y,yp) in mStartMilestone))}(pDiscountFactor[r,yp]*sum{st1 in stg:((st1,r,y) in mStorageNew)}(vStorageInv[st1,r,y]))+sum{r in region,y in year:(y in mMidMilestone)}(vCost[r,y]*sum{ye in year,yp in year,yn in year:(((y,yp) in mStartMilestone and (y,ye) in mEndMilestone and ordYear[yn] >= ordYear[yp] and ordYear[yn] <= ordYear[ye]))}(pDiscountFactor[r,yn]))+sum{r in region,y in year,t in tech:((y in mMilestoneLast and sum{yp in year:((t,r,yp) in mTechNew)}(1) <> 0))}(pDiscountFactor[r,y]*vTechSalv[t,r])+sum{r in region,y in year,st1 in stg:((y in mMilestoneLast and sum{yp in year:((st1,r,yp) in mStorageNew)}(1) <> 0))}(pDiscountFactor[r,y]*vStorageSalv[st1,r]);
 
 s.t.  eqLECActivity{(t, r, y) in mTechSpan : r in mLECRegion}: sum{s in slice:((t,s) in mTechSlice)}(vTechAct[t,r,y,s])  >=  pLECLoACT[r];
 
@@ -677,9 +677,9 @@ printf "stg,region,value\n" > "vStorageSalv.csv";
 for{st1 in stg, r in region : vStorageSalv[st1,r] <> 0} {
   printf "%s,%s,%f\n", st1,r,vStorageSalv[st1,r] >> "vStorageSalv.csv";
 }
-printf "stg,region,year,value\n" > "vStorageCost.csv";
-for{(st1, r, y) in mStorageSpan : vStorageCost[st1,r,y] <> 0} {
-  printf "%s,%s,%s,%f\n", st1,r,y,vStorageCost[st1,r,y] >> "vStorageCost.csv";
+printf "stg,region,year,value\n" > "vStorageOMCost.csv";
+for{(st1, r, y) in mStorageSpan : vStorageOMCost[st1,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", st1,r,y,vStorageOMCost[st1,r,y] >> "vStorageOMCost.csv";
 }
 printf "comm,region,year,slice,value\n" > "vImport.csv";
 for{(c, r, y, s) in mImport : vImport[c,r,y,s] <> 0} {
@@ -755,7 +755,7 @@ printf "value\n" > "variable_list.csv";
     printf "vSubsCost\n" >> "variable_list.csv";
     printf "vAggOut\n" >> "variable_list.csv";
     printf "vStorageSalv\n" >> "variable_list.csv";
-    printf "vStorageCost\n" >> "variable_list.csv";
+    printf "vStorageOMCost\n" >> "variable_list.csv";
     printf "vTradeCost\n" >> "variable_list.csv";
     printf "vTradeRowCost\n" >> "variable_list.csv";
     printf "vTradeIrCost\n" >> "variable_list.csv";

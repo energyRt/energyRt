@@ -1075,7 +1075,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'constraint',
       }
     }
   } else {
-    approxim$slice <- approxim$commodity_slice_map[[app@comm]]
+    approxim$slice <- approxim$slice@slice_map[[approxim$commodity_slice_map[[app@comm]]]]
   }
   # Generate app@value
   if (nrow(app@value) == 0) {
