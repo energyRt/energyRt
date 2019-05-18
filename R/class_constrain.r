@@ -1,6 +1,17 @@
 #---------------------------------------------------------------------------------------------------------
 # equation
 #---------------------------------------------------------------------------------------------------------
+#' Class 'constraint'
+#'
+#' @slot name character. 
+#' @slot description character. 
+#' @slot eq factor. 
+#' @slot for.each list. 
+#' @slot rhs data.frame. 
+#' @slot defVal numeric. 
+#' @slot lhs list. 
+#' @slot misc list. 
+#'
 setClass('constraint', 
          representation(
            name          = "character",
@@ -35,6 +46,15 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 #---------------------------------------------------------------------------------------------------------
 # term for equation
 #---------------------------------------------------------------------------------------------------------
+#' Title
+#'
+#' @slot description character. 
+#' @slot variable character. 
+#' @slot for.sum list. 
+#' @slot mult data.frame. 
+#' @slot defVal numeric. 
+#' @slot misc list. 
+#' 
 setClass('summand', 
          representation(
            description   = "character",       # description
@@ -58,6 +78,21 @@ setClass('summand',
 );
 
 
+#' Create (equality or inequality) constraint object
+#'
+#' @param name Name of the constrain object (will be used in GAMS or GLPK as an element in sets)
+#' @param eq Type of the relation ('==' default, '<=', '>=')
+#' @param for.each list with sets for which constraint will be created.
+#' @param ... Left-hand side (LHS) terms of the statement - list objects with
+#' @param rhs list or data frame with named sets ()
+#' @param defVal the default value for the rhs.
+#' @param arg 
+#'
+#' @return Object of class `constraint`.
+#'
+#' @examples
+#'    add here
+#'    
 newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ..., arg = NULL) {
   obj <- new('constraint')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))

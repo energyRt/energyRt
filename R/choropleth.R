@@ -9,6 +9,7 @@ choropleth.scenario <- function(scen, # scenario object
                                 # reg = NULL, # names of regions to plot, all if NULL (NA?)
                                 # from_reg = NULL, # character vector with names of source regions
                                 # to_reg = NULL, # character vector with names of destimation regions
+                                # constrain = NULL, 
                                 # constraint = NULL, 
                                 # supply = NULL,
                                 # demand = NULL,
@@ -237,6 +238,28 @@ get_labpt <- function(scen) {
   )
   names(labpt) <- c("region", "x", "y")
   return(labpt)
+}
+
+get_labpt_spdf <- function(spdf) {
+  labpt <- sapply(1:length(spdf@data[,1]), function(x) {
+    spdf@polygons[[x]]@labpt
+  })
+  labpt <- cbind(
+    spdf@data$region,
+    as.data.frame(t(labpt))
+  )
+  names(labpt) <- c("region", "x", "y")
+  return(labpt)
+}
+
+fact2char <- function(df, asTibble = TRUE) {
+  stopifnot(is.data.frame(df))
+  jj <- sapply(df, is.factor)
+  for (j in names(df)[jj]) {
+    df[[j]] <- as.character(df[[j]])
+  }
+  if (asTibble) {df <- as_tibble(df)}
+  df
 }
 
 add_labpt <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = NULL) {
