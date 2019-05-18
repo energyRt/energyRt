@@ -1242,4 +1242,3 @@ if (!is.null(all) && all) {parameter = TRUE; set = TRUE; map = TRUE;}
      getVariablesDim <- function() {energyRt:::.getVariablesDim}
     .getEquationsDim <- ..getEquationsDim()
      getEquationsDim <- function() {energyRt:::.getEquationsDim}
-     '.getEquationsDim'))

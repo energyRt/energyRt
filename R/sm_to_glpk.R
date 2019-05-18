@@ -37,7 +37,7 @@
     gg <- obj@data
     gg <- gg[gg$type == 'lo', , drop = FALSE]
     gg <- gg[, colnames(gg) != 'type'] 
-    if (nrow(gg) == 0 || all(gg$value[1] == gg$value)) {
+    if (nrow(gg) == 0) { #  || all(gg$value[1] == gg$value)
       if (nrow(gg) == 0) dd <- obj@defVal[1] else dd <- gg$value[1]
       if (dd == Inf) dd <- 0
       ret <- paste('param ', obj@name, 'Lo default ', dd, ' := ;', sep = '')
