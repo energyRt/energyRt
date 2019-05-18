@@ -313,5 +313,14 @@
 		rst$equation <- eqt_en
 		scen@modInp@gams.equation[[sub('^eqCns', '', rst$equationDeclaration2Model)]] <- rst
 	}
+	# Save all before data to misc
+	data.before <- scen@modOut@variables
+	data.before$vObjective <- NULL
+	for (i in names(data.before)) 
+		if (!is.null(data.before[[i]]$year)) {
+		  cat(i, '\n')
+			data.before[[i]] <- data.before[[i]][data.before[[i]]$year <= last_noinc_mile,, drop = FALSE]
+	}
+	scen@misc$data.before <- data.before
 	scen
 }

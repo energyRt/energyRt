@@ -1,4 +1,4 @@
-solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE) { # - solves scenario, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
+solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # solver = 'GAMS' use solver for model
   # dir.result - dir for solver work
@@ -20,13 +20,13 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
   if (is.null(arg$tmp.del)) arg$tmp.del <- FALSE
   if (is.null(arg$readresult)) arg$readresult <- TRUE
   if (is.null(arg$dir.result)) {
-    arg$dir.result <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, scenario@name, 
+    arg$dir.result <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, scen@name, 
           format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
   }
   
   # interpolate if need  
-  if (interpolate) scenario <- energyRt::interpolate(scenario, ...)
-  scenario@misc$dir.result <- arg$dir.result
+  if (interpolate) scen <- energyRt::interpolate(scen, ...)
+  scen@misc$dir.result <- arg$dir.result
   
   # Misc
   solver_solver_time <- proc.time()[3]
@@ -51,8 +51,8 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     ##################################################################################################################################    
     file_w <- c()
     for (j in c('set', 'map', 'simple', 'multi')) {
-      for(i in names(scenario@modInp@parameters)) if (scenario@modInp@parameters[[i]]@type == j) {
-        file_w <- c(file_w, energyRt:::.toGams(scenario@modInp@parameters[[i]]))
+      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+        file_w <- c(file_w, energyRt:::.toGams(scen@modInp@parameters[[i]]))
       }
     }
     
@@ -62,25 +62,25 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
     cat(file_w, sep = '\n', file = zz)
     # Add constraint equation 
-    if (length(scenario@modInp@gams.equation) > 0) {
+    if (length(scen@modInp@gams.equation) > 0) {
       # Declaration
-      cat('equation', sapply(scenario@modInp@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
+      cat('equation', sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
       # Body equation
-      cat(sapply(scenario@modInp@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
+      cat(sapply(scen@modInp@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
     }
-    if (!is.null(scenario@model@misc$additionalEquationGAMS)) 
-      cat(scenario@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
+    if (!is.null(scen@model@misc$additionalEquationGAMS)) 
+      cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
 
     cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
                    (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
     
     # Add constraint equation to model declaration
-    if (length(scenario@modInp@gams.equation) > 0) {
-      cat(sapply(scenario@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
+    if (length(scen@modInp@gams.equation) > 0) {
+      cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
     }
     
-    if (!is.null(scenario@model@misc$additionalEquationGAMS)) 
-      cat(scenario@model@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
+    if (!is.null(scen@model@misc$additionalEquationGAMS)) 
+      cat(scen@model@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
     
     cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
                    (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) - 1)], sep = '\n', file = zz)
@@ -93,10 +93,10 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
           'option iterlim = 0;\n', 
           'Solve st_model minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
     }
-    cat(scenario@model@misc$additionalCode, sep = '\n', file = zz)
+    cat(scen@model@misc$additionalCode, sep = '\n', file = zz)
     cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
       grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) - 1)], sep = '\n', file = zz)
-    cat(scenario@model@misc$additionalCodeAfter, sep = '\n', file = zz)
+    cat(scen@model@misc$additionalCodeAfter, sep = '\n', file = zz)
     cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
     close(zz)
     if (arg$echo) { 
@@ -136,19 +136,19 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
 
     file_w <- c()
     for (j in c('set', 'map', 'simple', 'multi')) {
-      for(i in names(scenario@modInp@parameters)) if (scenario@modInp@parameters[[i]]@type == j) {
-        file_w <- c(file_w, energyRt:::.sm_to_glpk(scenario@modInp@parameters[[i]]))
+      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+        file_w <- c(file_w, energyRt:::.sm_to_glpk(scen@modInp@parameters[[i]]))
       }
     }
     
     # Add constraint
-    if (length(scenario@modInp@gams.equation) > 0) {
-      add_eq <- sapply(scenario@modInp@gams.equation, function(x) .equation.from.gams.to.glpk(x$equation)) 
+    if (length(scen@modInp@gams.equation) > 0) {
+      add_eq <- sapply(scen@modInp@gams.equation, function(x) .equation.from.gams.to.glpk(x$equation)) 
       # Add additional maps
-      mps_name <- grep('^[m]Cns', names(scenario@modInp@parameters), value = TRUE)
-      mps_name_def <- paste0('set ', mps_name, ' dimen ', sapply(scenario@modInp@parameters[mps_name], function(x) length(x@dimSetNames)), ';')
-      pps_name <- grep('^[p]Cns', names(scenario@modInp@parameters), value = TRUE)
-      pps_name_def <- paste0('param ', pps_name, ' {', sapply(scenario@modInp@parameters[pps_name], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
+      mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
+      mps_name_def <- paste0('set ', mps_name, ' dimen ', sapply(scen@modInp@parameters[mps_name], function(x) length(x@dimSetNames)), ';')
+      pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
+      pps_name_def <- paste0('param ', pps_name, ' {', sapply(scen@modInp@parameters[pps_name], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
     }
     
     ### FUNC GLPK 
@@ -156,7 +156,7 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
     if (length(grep('^minimize', run_code)) != 1) stop('Wrong GLPK model')
     
     cat(run_code[1:(grep('22b584bd-a17a-4fa0-9cd9-f603ab684e47', run_code) - 1)], sep = '\n', file = zz)
-    if (length(scenario@modInp@gams.equation) > 0) {
+    if (length(scen@modInp@gams.equation) > 0) {
       cat(mps_name_def, sep = '\n', file = zz)
       cat(pps_name_def, sep = '\n', file = zz)
       cat(add_eq, sep = '\n', file = zz)
@@ -220,6 +220,6 @@ solver_solve <- function(scenario, ..., interpolate = FALSE, readresult = FALSE)
       close(z3)
     }
   } else stop('Unknown solver ', arg$solver) 
-  if (readresult) scenario <- read_solution(scenario)
-  invisible(scenario)
+  if (readresult) scen <- read_solution(scen)
+  invisible(scen)
 }

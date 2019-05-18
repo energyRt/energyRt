@@ -1,8 +1,8 @@
-read_solution <- function(scenario, ...) {
+read_solution <- function(scen, ...) {
   ## arguments
-  # scenario
+  # scen
   # readOutputFunction = read.csv (may use data.table::fread)
-  # dir.result dir from wich read results, by default in scenario@misc$dir.result 
+  # dir.result dir from wich read results, by default in scen@misc$dir.result 
   # echo = TRUE - print working data
   arg <- list(...)
   
@@ -10,9 +10,9 @@ read_solution <- function(scenario, ...) {
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
   if (is.null(arg$dir.result)) {
-    arg$dir.result <- scenario@misc$dir.result 
+    arg$dir.result <- scen@misc$dir.result 
     if (is.null(arg$dir.result))
-      stop('There is not define dir.result, including scenario@misc$dir.result')
+      stop('There is not define dir.result, including scen@misc$dir.result')
   }
   
 
@@ -59,13 +59,15 @@ read_solution <- function(scenario, ...) {
  
   rr[['solution_report']] <- list(finish = arg$readOutputFunction(paste(arg$dir.result, '/pFinish.csv', sep = ''))$value, 
                                   status = arg$readOutputFunction(paste(arg$dir.result, '/pStat.csv', sep = ''))$value)
-  scenario@modOut <- new('modOut')
-  scenario@modOut@sets <- rr$set_vec
-  scenario@modOut@variables <- rr$variables
-  scenario@modOut@compilationStatus <- as.character(rr$solution_report$finish)
-  scenario@modOut@solutionStatus <- as.character(rr$solution_report$status)
+  scen@modOut <- new('modOut')
+  scen@modOut@sets <- rr$set_vec
+  scen@modOut@variables <- rr$variables
+  scen@modOut@compilationStatus <- as.character(rr$solution_report$finish)
+  scen@modOut@solutionStatus <- as.character(rr$solution_report$status)
   if (rr$solution_report$finish != 2 || rr$solution_report$status != 1)
     warning('Unsuccessful finish')
+  if (!is.null()) {
+  }
   if(arg$echo) cat('Read result time: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
-  invisible(scenario)
+  invisible(scen)
 }
