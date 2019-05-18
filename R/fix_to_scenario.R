@@ -266,7 +266,7 @@
 					}
 					forMrg <- gsub('[(].*$', '', strsplit(cond2, 'and ')[[1]])
 					for (fr in forMrg) {
-						tmp <- getParameterData(prec@parameters[[fr]])
+						tmp <- getParameterData(scen@modInp@parameters[[fr]])
 						#tmp <- energyRt:::.getTotalParameterData(scen@modInp, fr)
 						tpr <- merge(tpr, tmp, by = colnames(tmp)[colnames(tmp) != 'value'])
 					}
@@ -318,9 +318,32 @@
 	data.before$vObjective <- NULL
 	for (i in names(data.before)) 
 		if (!is.null(data.before[[i]]$year)) {
-		  cat(i, '\n')
 			data.before[[i]] <- data.before[[i]][data.before[[i]]$year <= last_noinc_mile,, drop = FALSE]
+		}
+	if (nrow(data.before$vExportRowAccumulated) > 0) {
+		data.before$vExportRowAccumulated <- aggregate(data.before$vExportRow[, 'value', drop = FALSE], 
+			data.before$vExportRow[data.before$vExportRow$year <= last_noinc_mile, c('expp', 'comm'), drop = FALSE], sum)
+	}
+	if (nrow(data.before$vImportRowAccumulated) > 0) {
+		data.before$vImportRowAccumulated <- aggregate(data.before$vImportRow[, 'value', drop = FALSE], data.before$vImportRow[data.before$vImportRow$year <= last_noinc_mile, 
+			c('imp', 'comm'), drop = FALSE], sum)
 	}
 	scen@misc$data.before <- data.before
+	scen
+}
+
+
+
+update_parameters <- function(scen, ..., fix2scen = NULL, up2year = NULL) {
+	if (length(list(...)) != 0) stop('Have to realised for additional class')
+	if (is.null(fix2scen) != is.null(up2year)) stop('fix2scen && up2year have to define or not define together')
+	if (!is.null(fix2scen)) {
+		if (class(fix2scen) != "scenario") stop('fix2scen have to class "scenario"')
+		if (up2year < min(fix2scen@model@sysInfo@milestone$start)) 
+			stop('up2year have to large than start year')
+		# Shift for appropriate start year
+		up2year <- min(fix2scen@model@sysInfo@milestone$start[fix2scen@model@sysInfo@milestone$start >= up2year] - 1)
+		scen <- .fix_to_scenario(scen, fix2scen, up2year)
+	}
 	scen
 }

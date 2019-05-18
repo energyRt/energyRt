@@ -66,8 +66,26 @@ read_solution <- function(scen, ...) {
   scen@modOut@solutionStatus <- as.character(rr$solution_report$status)
   if (rr$solution_report$finish != 2 || rr$solution_report$status != 1)
     warning('Unsuccessful finish')
-  if (!is.null()) {
+  if (!is.null(scen@misc$data.before)) {
+  	scen <- .paste_base_result2new(scen)
   }
   if(arg$echo) cat('Read result time: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
   invisible(scen)
 }
+.paste_base_result2new <- function(scen) {
+	# Have to recalculate vObjective (need recalculate salvage before and so on, draft in Github/Misc/package/temp/interpolate_after_for_rest.R)
+	for (i in names(scen@misc$data.before)) {
+		scen@modOut@variables[[i]] <- rbind(scen@modOut@variables[[i]], scen@misc$data.before[[i]])
+	}
+	# Correct RowTradeAccumulated
+	if (nrow(scen@modOut@variables$vExportRowAccumulated) > 0)
+		scen@modOut@variables$vExportRowAccumulated <- aggregate(scen@modOut@variables$vExportRowAccumulated[, 'value', drop = TRUE],
+			scen@modOut@variables$vExportRowAccumulated[, c('expp', 'comm'), drop = TRUE], sum)
+	if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0)
+		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', drop = TRUE],
+			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = TRUE], sum)
+  scen	
+}
+
+
+# 
