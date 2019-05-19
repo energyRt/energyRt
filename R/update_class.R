@@ -81,18 +81,22 @@
       scen <- .replace_taxsub(scen, arg[[i]])
     }
   # Clean
-  # scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = scen@misc$approxim) 
   # Reduce mapping
+  sys_info_par <- c('mAllSliceParentChild', 
+                    'mAllSliceParentChildAndSame', 'mSliceNext', 'pDiscount', 'pSliceShare', 'pDummyImportCost', 'pDummyExportCost', 
+                    'mStartMilestone', 'mEndMilestone', 'mMilestoneLast', 'mMilestoneFirst', 'mMilestoneNext', 'mMilestoneHasNext', 
+                    'mSameSlice', 'mSameRegion', 'ordYear', 'cardYear', 'pPeriodLen', 'pDiscountFactor', 'mDiscountZero')
   reduce_map <- c('mTechInpTot',  'mTechOutTot',  'mSupOutTot',  'mDemInp',  'mTechEmsFuel',  'mEmsFuelTot',  
                    'mDummyImport',  'mDummyExport',  'mDummyCost',  'mTradeIr',  'mTradeIrUp',  'mTradeIrAInp2',  'mTradeIrAInpTot',  
                    'mTradeIrAOut2',  'mTradeIrAOutTot',  'mImportRow',  'mImportRowUp',  'mImportRowAccumulatedUp',  'mExportRow',  'mExportRowUp',  
                    'mExportRowAccumulatedUp',  'mExport',  'mImport',  'mStorageInpTot',  'mStorageOutTot',  'mTaxCost',  'mSubsCost',  'mAggOut',  'mSupAva',  
                    'mSupAvaUp',  'mSupReserveUp',  'mTechAfUp',  'mTechAfcUp',  'mTechOlifeInf',  'mStorageOlifeInf',  'mOut2Lo',  'mInp2Lo')
-  for (i in reduce_map) {
+  for (i in c(sys_info_par, reduce_map)) {
     scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[0,, drop = FALSE]
     if (scen@modInp@parameters[[i]]@nValues != -1) 
       scen@modInp@parameters[[i]]@nValues <- 0
   }
+  scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = scen@misc$approxim) 
   scen@modInp <- energyRt:::.reduce_mapping(scen@modInp)
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
   for(i in names(scen@modInp@parameters)) {
