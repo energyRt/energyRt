@@ -130,7 +130,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
         seq(length.out = scen@modInp@parameters[[i]]@nValues),, drop = FALSE]
     }
   }
-  scen@source <- energyRt::.modelCode
+  scen@source <- energyRt:::.modelCode
   if (arg$echo) cat(' ', round(proc.time()[3] - interpolation_time_begin, 2), 's\n')
   invisible(scen)
 }
