@@ -55,6 +55,14 @@
   scen
 }
 
+
+.replace_constraint <- function(scen, lst) {
+  scen <- energyRt:::.remove_constraint(scen, sapply(lst, function(x) x@name))
+  for(i in seq_along(lst)) {
+    scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)@gams.equation
+  }
+  scen
+}
 .update_scenario_class <- function(scen, ...) {
   p1 = proc.time()[3];
   cat('Update model ')
@@ -63,7 +71,7 @@
     arg <- arg[[1]]
   }
   cls <- sapply(arg, class)
-  not_rel <- cls[!(cls %in%c('technology', 'supply', 'storage', 'demand', 'tax', 'sub'))]
+  not_rel <- cls[!(cls %in%c('technology', 'supply', 'storage', 'demand', 'tax', 'sub', 'constraint'))]
   if (length(not_rel))
     stop(paste0('Not relised class for "', paste0(not_rel, collapse = '", "'), '"'))
   # Replace in model
@@ -80,6 +88,8 @@
     if (!is.null(arg[[i]])) {
       scen <- .replace_taxsub(scen, arg[[i]])
     }
+  if (!is.null(arg$constraint)) 
+    scen <- .replace_constraint(scen, arg$constraint)
   # Clean
   # Reduce mapping
   sys_info_par <- c('mAllSliceParentChild', 
