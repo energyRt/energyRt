@@ -79,11 +79,11 @@ read_solution <- function(scen, ...) {
 	}
 	# Correct RowTradeAccumulated
 	if (nrow(scen@modOut@variables$vExportRowAccumulated) > 0)
-		scen@modOut@variables$vExportRowAccumulated <- aggregate(scen@modOut@variables$vExportRowAccumulated[, 'value', drop = TRUE],
-			scen@modOut@variables$vExportRowAccumulated[, c('expp', 'comm'), drop = TRUE], sum)
+		scen@modOut@variables$vExportRowAccumulated <- aggregate(scen@modOut@variables$vExportRowAccumulated[, 'value', drop = FALSE],
+			scen@modOut@variables$vExportRowAccumulated[, c('expp', 'comm'), drop = FALSE], sum)
 	if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0)
-		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', drop = TRUE],
-			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = TRUE], sum)
+		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', drop = FALSE],
+			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
   scen	
 }
 
