@@ -44,6 +44,16 @@
   scen
 }
 
+.replace_inmodel <- function(scen, arg) {
+  nms <- sapply(arg, function(x) x@name)
+  for(i in seq(along = scen@model@data)) {
+    scen@model@data[[i]]@data <- scen@model@data[[i]]@data[sapply(scen@model@data[[i]]@data, function(x) !(x@name %in% nms))]
+  }
+  for(i in seq(along = arg)) {
+    scen@model <- add(scen@model, arg[[i]])
+  }
+  scen
+}
 
 .update_scenario_class <- function(scen, ...) {
   p1 = proc.time()[3];
@@ -53,6 +63,13 @@
     arg <- arg[[1]]
   }
   cls <- sapply(arg, class)
+  not_rel <- cls[!(cls %in%c('technology', 'supply', 'storage', 'demand', 'tax', 'sub'))]
+  if (length(not_rel))
+    stop(paste0('Not relised class for "', paste0(not_rel, collapse = '", "'), '"'))
+  # Replace in model
+  scen <- .replace_inmodel(scen, arg)
+  
+  #Replace in parameters
   arg <- lapply(unique(cls), function(x) arg[x == cls])  
   names(arg) <- unique(cls)
   for (i in c('technology', 'supply', 'storage', 'demand'))
@@ -63,9 +80,6 @@
     if (!is.null(arg[[i]])) {
       scen <- .replace_taxsub(scen, arg[[i]])
     }
-  not_rel <- cls[!(cls %in%c('technology', 'supply', 'storage', 'demand', 'tax', 'sub'))]
-  if (length(not_rel))
-    stop(paste0('Not relised class for "', paste0(not_rel, collapse = '", "'), '"'))
   # Clean
   # scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = scen@misc$approxim) 
   # Reduce mapping
