@@ -1,24 +1,24 @@
 #' Title Pivot table for scenario objects, using _rpivotTable_ package
 #'
-#' @param scen 
+#' @param scen  tbd
 #' # Parameters to _getData_:
-#' @param name 
-#' @param get_data 
-#' @param ... 
+#' @param name tbd
+#' @param get_data tbd 
+#' @param ... tbd
 #' # Parameters to _rpivotTable_:
-#' @param aggregatorName 
-#' @param rendererName 
-#' @param cols 
-#' @param rows 
-#' @param vals 
-#' @param sorter 
-#' @param exclusions 
-#' @param inclusions 
-#' @param locale 
-#' @param subtotals 
-#' @param width 
-#' @param height 
-#' @param elementId 
+#' @param aggregatorName tbd
+#' @param rendererName tbd
+#' @param cols tbd
+#' @param rows tbd
+#' @param vals tbd
+#' @param sorter tbd
+#' @param exclusions tbd 
+#' @param inclusions tbd
+#' @param locale tbd
+#' @param subtotals tbd
+#' @param width tbd
+#' @param height tbd
+#' @param elementId tbd
 #'
 #' 
 pivot <- function(scen = NULL, 

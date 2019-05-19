@@ -18,9 +18,10 @@ depending on input, the renamed data.frame or the list with renamed data.frames.
 Rename names of data.frame columns of list of data.frames.
 }
 \examples{
+\dontrun{
   x <- data.frame(a = letters, n = 1:length(letters))
   x
   renameSets(x[1:3,], c(a = "A", n = "N"))
   renameSets(x[1:3,], list(a = "B", n = "M"))
-
+}
 }

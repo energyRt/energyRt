@@ -8,9 +8,6 @@
 #' @return numeric vector with converted values
 #' @export convert
 #'
-#' @examples
-#' convert("GJ", "tce", 1)
-#' convert("USD/MWh", "MUSD/PJ", 100)
 #' 
 convert <- function (from, to, value = 1, database = "user") 
 {
@@ -27,7 +24,8 @@ convert <- function (from, to, value = 1, database = "user")
 add_to_convert <- function (type, unit, convert_coefficient, alias = "", database = "user", 
                             simple = TRUE, update = TRUE) 
 {
-    convert_data <- get("convert_data", globalenv())
+    # convert_data <- get("convert_data", globalenv())
+    data("convert_data")
     if (all(names(convert_data[[database]]) != type)) {
         if (!simple) 
             stop("First unit must be standart")
@@ -109,7 +107,8 @@ add_to_convert <- function (type, unit, convert_coefficient, alias = "", databas
 
 .simple_.find_unit <- function (unit, database = "user", need_error = TRUE) 
 {
-    convert_data <- get("convert_data", globalenv())
+    # convert_data <- get("convert_data", globalenv())
+    data("convert_data")
     i <- 1
     fl <- FALSE
     while (i <= length(convert_data[[database]])) {

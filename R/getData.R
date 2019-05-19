@@ -98,6 +98,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @param scenNameInList logical, should the name of the scenarios be used if not provided in the list with several scenarios?
 #' @param verbose 
 #'
+#' \dontrun{
 #' @examples 
 #'   data("utopia_scen_BAU.RData")
 #'   getData(scen, name = "pDemand", year = 2015, merge = T)
@@ -105,7 +106,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'   elc2050 <- getData(scen, parameters = FALSE, comm = "ELC", year = 2050)
 #'   names(elc2050)
 #'   elc2050$vBalance
-#'
+#'}
 getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
                     newNames = NULL, merge = FALSE, newValues = NULL, na.rm = FALSE, drop = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
@@ -384,13 +385,14 @@ if (F) {# test
 #' @param newNames named character vector or list with new names as values, and old names as names.
 #'
 #' @return depending on input, the renamed data.frame or the list with renamed data.frames.
-#'
+#' @export renameSets
 #' @examples
+#' \dontrun{
 #'   x <- data.frame(a = letters, n = 1:length(letters))
 #'   x
 #'   renameSets(x[1:3,], c(a = "A", n = "N"))
 #'   renameSets(x[1:3,], list(a = "B", n = "M"))
-#'
+#'}
 renameSets <- function(x, newNames = NULL) {
   if(any(class(x) == "list")) {
     returnList <- TRUE
@@ -418,12 +420,13 @@ renameSets <- function(x, newNames = NULL) {
 
 #' Replace specified values with new values, in factor or character columns of a data.frame.
 #' 
-#' @param x 
+#' @param x vector
 #' @param newValues a names list with named vectors. The names of the list should be equal to the names of the data.frame columns in wich values will be replaced. The named vector should have new names as values and old values as names.
 #'
 #' @return the x data.frame with revalued variables.
-#'
+#' @export revalueSets
 #' @examples
+#' \dontrun{
 #'   x <- data.frame(a = letters, n = 1:length(letters))
 #'   nw1 <- LETTERS[1:10]
 #'   names(nw1) <- letters[1:10]
@@ -432,7 +435,7 @@ renameSets <- function(x, newNames = NULL) {
 #'   newValues <- list(a = nw1, n = nw2)
 #'   newValues
 #'   revalueSets(x, newValues)
-#'
+#'}
 revalueSets <- function(x, newValues = NULL) {
   stopifnot(any(class(newValues) == "list"))
   stopifnot(any(class(x) == "data.frame"))

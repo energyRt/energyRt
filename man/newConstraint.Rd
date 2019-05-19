@@ -20,15 +20,11 @@ newConstraint(name, eq = "==", rhs = data.frame(), for.each = list(),
 
 \item{...}{Left-hand side (LHS) terms of the statement - list objects with}
 
-\item{arg}{}
+\item{arg}{tbc}
 }
 \value{
 Object of class `constraint`.
 }
 \description{
 Create (equality or inequality) constraint object
-}
-\examples{
-   add here
-   
 }

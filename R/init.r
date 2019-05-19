@@ -6,4 +6,4 @@
 #.modelCode <- list(GAMS = readLines('gams/energyRt.gms'),
 #                   GLPK = readLines('glpk/energyRt.mod'))
 
-
+# data("convert_data")

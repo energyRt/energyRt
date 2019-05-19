@@ -244,15 +244,17 @@ get_labpt <- function(scen) {
 #'
 #' @param spdf SpatialPolygonDataFrame object
 #' @param regionsAsCharacters logical, should `regions` column in case of `factor` being coerced to character?
+#' @param asTibble logical
 #'
 #' @return data frame with coordinates of the regions' centers.
 #' @export getCenters get_labpt_spdf
 #' @aliases get_labpt_spdf
 #'
 #' @examples
-#' 
+#' \dontrun{
 #' getCenters(spdf)
 #' get_labpt_spdf(spdf)
+#' }
 #' 
 getCenters <- function(spdf, regionsAsCharacters = TRUE, asTibble = TRUE) {
   labpt <- sapply(1:length(spdf@data[,1]), function(x) {
@@ -285,14 +287,8 @@ fact2char <- function(df, asTibble = TRUE) {
 #' @param dat data.frame, should have a column with regions' IDs
 #' @param labpt data.frame with regions' coordinates
 #' @param ID character, name of the column with region IDs (default = "region")
-#' @param pref ...
-#' @param sfx ...
-#'
-#' @return ...
-#' @export ...
-#'
-#' @examples
-#' ...
+#' @param pref tbd
+#' @param sfx tbd
 #' 
 addCenters <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = NULL) {
   # Adding coordnates of regions' centers

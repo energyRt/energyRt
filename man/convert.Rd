@@ -21,8 +21,3 @@ numeric vector with converted values
 \description{
 Convert units
 }
-\examples{
-convert("GJ", "tce", 1)
-convert("USD/MWh", "MUSD/PJ", 100)
-
-}

@@ -217,7 +217,7 @@ setClass("technology",
         #! Misc
         misc = list(
         )),
-      validity = .check_technology_data_frame,
+      # validity = .check_technology_data_frame,
       S3methods = TRUE
 )
 setMethod("initialize", "technology", function(.Object, ...) {

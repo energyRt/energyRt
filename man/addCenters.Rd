@@ -14,17 +14,10 @@ addCenters(dat, labpt, ID = "region", pref = paste0(ID, "."),
 
 \item{ID}{character, name of the column with region IDs (default = "region")}
 
-\item{pref}{...}
+\item{pref}{tbd}
 
-\item{sfx}{...}
-}
-\value{
-...
+\item{sfx}{tbd}
 }
 \description{
 Adding region centers coordinate to a data frame
-}
-\examples{
-...
-
 }

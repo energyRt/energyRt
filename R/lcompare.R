@@ -1,6 +1,7 @@
 #' Comparison of two objects.
 #'
-#' @param x, y    objects to compare
+#' @param x object to compare
+#' @param y object to compare
 #' @param depth   starting level of depth of the object
 #' @param showDiff ligical, if TRUE will return only different parts of the object
 #'

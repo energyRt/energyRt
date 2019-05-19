@@ -11,6 +11,8 @@ getCenters(spdf, regionsAsCharacters = TRUE, asTibble = TRUE)
 \item{spdf}{SpatialPolygonDataFrame object}
 
 \item{regionsAsCharacters}{logical, should `regions` column in case of `factor` being coerced to character?}
+
+\item{asTibble}{logical}
 }
 \value{
 data frame with coordinates of the regions' centers.
@@ -19,8 +21,9 @@ data frame with coordinates of the regions' centers.
 Get coordinates of region centers (labpt)
 }
 \examples{
-
+\dontrun{
 getCenters(spdf)
 get_labpt_spdf(spdf)
+}
 
 }

@@ -7,7 +7,9 @@
 lcompare(x, y, depth = 0, showDiff = TRUE)
 }
 \arguments{
-\item{x, }{y    objects to compare}
+\item{x}{object to compare}
+
+\item{y}{object to compare}
 
 \item{depth}{starting level of depth of the object}
 

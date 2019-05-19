@@ -85,12 +85,10 @@ setClass('summand',
 #' @param ... Left-hand side (LHS) terms of the statement - list objects with
 #' @param rhs list or data frame with named sets ()
 #' @param defVal the default value for the rhs.
-#' @param arg 
+#' @param arg tbc
 #'
 #' @return Object of class `constraint`.
 #'
-#' @examples
-#'    add here
 #'    
 newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ..., arg = NULL) {
   obj <- new('constraint')

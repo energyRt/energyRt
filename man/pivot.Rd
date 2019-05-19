@@ -12,39 +12,41 @@ pivot(scen = NULL, name = NULL, get_data = FALSE, ...,
   height = 600, elementId = NULL)
 }
 \arguments{
-\item{scen}{# Parameters to _getData_:}
+\item{scen}{tbd
+# Parameters to _getData_:}
 
-\item{name}{}
+\item{name}{tbd}
 
-\item{get_data}{}
+\item{get_data}{tbd}
 
-\item{...}{# Parameters to _rpivotTable_:}
+\item{...}{tbd
+# Parameters to _rpivotTable_:}
 
-\item{aggregatorName}{}
+\item{aggregatorName}{tbd}
 
-\item{rendererName}{}
+\item{rendererName}{tbd}
 
-\item{cols}{}
+\item{cols}{tbd}
 
-\item{rows}{}
+\item{rows}{tbd}
 
-\item{vals}{}
+\item{vals}{tbd}
 
-\item{sorter}{}
+\item{sorter}{tbd}
 
-\item{exclusions}{}
+\item{exclusions}{tbd}
 
-\item{inclusions}{}
+\item{inclusions}{tbd}
 
-\item{locale}{}
+\item{locale}{tbd}
 
-\item{subtotals}{}
+\item{subtotals}{tbd}
 
-\item{width}{}
+\item{width}{tbd}
 
-\item{height}{}
+\item{height}{tbd}
 
-\item{elementId}{}
+\item{elementId}{tbd}
 }
 \description{
 Title Pivot table for scenario objects, using _rpivotTable_ package
