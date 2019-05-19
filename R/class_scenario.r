@@ -8,6 +8,7 @@ setClass("scenario",
           model         = "model",
           modInp        = "modInp",     # @modInp // @parameters 
           modOut        = "modOut",          # @modOut // @variables
+          source  = "list",          # Model source
           misc = "list"
       ),
       prototype(
@@ -16,7 +17,8 @@ setClass("scenario",
           model         = NULL,
           modInp        = NULL,      
           modOut        = NULL,
-      #! Misc
+          source  = list(),          # Model source
+          #! Misc
       misc = list(
       )),
       S3methods = TRUE
