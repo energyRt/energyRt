@@ -335,7 +335,9 @@
 
 
 update_parameters <- function(scen, ..., fix2scen = NULL, up2year = NULL) {
-	if (length(list(...)) != 0) stop('Have to realised for additional class')
+	if (length(list(...)) != 0) 
+	  scen <- .update_scenario_class(scen, ...)
+	#stop('Have to realised for additional class')
 	if (is.null(fix2scen) != is.null(up2year)) stop('fix2scen && up2year have to define or not define together')
 	if (!is.null(fix2scen)) {
 		if (class(fix2scen) != "scenario") stop('fix2scen have to class "scenario"')
