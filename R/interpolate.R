@@ -104,7 +104,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
-  if (arg$echo) cat('Generating model input tables ')
+  if (arg$echo) cat('Interpolation ')
   if (arg$n.threads == 1) {
     scen <- .add2_nthreads_1(scen, arg, approxim)
   } else {

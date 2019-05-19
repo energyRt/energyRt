@@ -69,7 +69,7 @@ read_solution <- function(scen, ...) {
   if (!is.null(scen@misc$data.before)) {
   	scen <- .paste_base_result2new(scen)
   }
-  if(arg$echo) cat('Read result time: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
+  if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
   invisible(scen)
 }
 .paste_base_result2new <- function(scen) {
