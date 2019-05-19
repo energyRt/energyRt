@@ -59,7 +59,7 @@
 .replace_constraint <- function(scen, lst) {
   scen <- energyRt:::.remove_constraint(scen, sapply(lst, function(x) x@name))
   for(i in seq_along(lst)) {
-    scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)@gams.equation
+    scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)
   }
   scen
 }
