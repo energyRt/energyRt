@@ -97,7 +97,8 @@ interpolate <- function(obj, ...) { #- returns class scenario
   scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
   # Add commodity slice_level map to approxim
   approxim$commodity_slice_map <- .get_map_commodity_slice_map(scen)
-
+  scen@misc$approxim <- approxim
+  
   # Fill set list for interpolation and os one  
   scen <- .add_name_for_basic_set(scen, approxim)
   scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
