@@ -1,4 +1,4 @@
-.remove_all_par_from_param <- function(scen, lst) {
+.replace_tech_sup_stg_dem <- function(scen, lst) {
   cls <- class(lst[[1]])
   slc <- c(technology = 'tech', supply = 'sup', storage = 'stg', demand = 'dem')[cls]
   all_par <- grep('^(p|m)Cns', names(scen@modInp@parameters), value = TRUE, invert = TRUE)
@@ -25,6 +25,26 @@
   }
   scen
 }
+
+.replace_taxsub <- function(scen, lst) {
+  cls <- class(lst[[1]])
+  if (cls == 'tax') prm <- 'pTaxCost' else prm <- 'pSubsCost' 
+  comm_out <- sapply(lst, function(x) x@comm)
+  
+  if (scen@modInp@parameters[[prm]]@nValues != -1) {
+    scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[seq_len(scen@modInp@parameters[[prm]]@nValues),, drop = FALSE]
+  }
+  scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[!(scen@modInp@parameters[[prm]]@data[, 'comm'] %in% comm_out),, drop = FALSE]
+  if (scen@modInp@parameters[[prm]]@nValues != -1) {
+    scen@modInp@parameters[[prm]]@nValues <- nrow(scen@modInp@parameters[[prm]]@data)
+  }
+  # Add data
+  for (i in seq_along(lst))
+    scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)
+  scen
+}
+
+
 .update_scenario_class <- function(scen, ...) {
   p1 = proc.time()[3];
   cat('Update model ')
@@ -37,8 +57,15 @@
   names(arg) <- unique(cls)
   for (i in c('technology', 'supply', 'storage', 'demand'))
     if (!is.null(arg[[i]])) {
-      scen <- .remove_all_par_from_param(scen, arg[[i]])
-  }
+      scen <- .replace_tech_sup_stg_dem(scen, arg[[i]])
+    }
+  for (i in c('tax', 'sub'))
+    if (!is.null(arg[[i]])) {
+      scen <- .replace_taxsub(scen, arg[[i]])
+    }
+  not_rel <- cls[!(cls %in%c('technology', 'supply', 'storage', 'demand', 'tax', 'sub'))]
+  if (length(not_rel))
+    stop(paste0('Not relised class for "', paste0(not_rel, collapse = '", "'), '"'))
   # Clean
   # scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = scen@misc$approxim) 
   # Reduce mapping
