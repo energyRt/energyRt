@@ -33,7 +33,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
   BEGINDR <- getwd()
   
   # Important miscs
-  dir.create(arg$dir.result, recursive = TRUE)
+  dir.create(arg$dir.result, recursive = TRUE, showWarnings = FALSE)
   if (arg$open.folder) shell.exec(arg$dir.result)
   # Check if gams (if it use) is available
   if (arg$solver == 'GAMS') {
@@ -99,7 +99,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
     cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
     close(zz)
     if (arg$echo) { 
-      cat('Write model to disk: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+      cat('Writing files: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
       flush.console()
     }
 
@@ -173,7 +173,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
     close(zz)
     
     if (arg$echo) { 
-      cat('Write model to disk: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+      cat('Writing files: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
       flush.console()
     }
 
