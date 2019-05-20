@@ -59,8 +59,8 @@ This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <
 We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/olugovoy/energyRt/>).   
 ```{r setup}
 # Choose your solver-software
-mysolver = "GAMS"
-# mysolver = "GLPK"
+# mysolver = "GAMS"
+mysolver = "GLPK"
 
 if (T) {
   # Installation of required packages - if not installed.
@@ -225,7 +225,7 @@ timeSlices(timeslices3)
 
 # Choose time slices level
 timeslices <- timeslices2
-timeslices <- timeslices3
+# timeslices <- timeslices3
 
 slc <- timeSlices(timeslices)
 (nslc <- length(slc$slice))
