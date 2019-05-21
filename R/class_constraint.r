@@ -331,8 +331,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     if (any(all.set$lead.year)) { 
       hh <- c(hh, 'mMilestoneHasNext(year)')
     }
-    res$equation <- paste0(res$equation, '$', '('[length(hh) > 1], 
-                           paste0(hh, collapse = ' and '), ')'[length(hh) > 1])
+    if (length(hh) > 0)
+	    res$equation <- paste0(res$equation, '$', '('[length(hh) > 1], 
+	                           paste0(hh, collapse = ' and '), ')'[length(hh) > 1])
     
   }
   res$equation <- paste0(res$equation, '.. ')
