@@ -228,7 +228,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         all.set[nn[names(stm@for.each) == j], 'new.map'] <- length(set.map.name)
       }
     }
-  } else lhs.set <- NULL
+  } else for.each.set <- NULL
   # lhs
   for (i in seq_along(stm@lhs)) {
     need.set <- .vrb_map[[stm@lhs[[i]]@variable]]

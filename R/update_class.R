@@ -45,6 +45,7 @@
 }
 
 .replace_inmodel <- function(scen, arg) {
+	arg <- arg[sapply(arg, class) != 'sysInfo']
   nms <- sapply(arg, function(x) x@name)
   for(i in seq(along = scen@model@data)) {
     scen@model@data[[i]]@data <- scen@model@data[[i]]@data[sapply(scen@model@data[[i]]@data, function(x) !(x@name %in% nms))]
@@ -71,7 +72,7 @@
     arg <- arg[[1]]
   }
   cls <- sapply(arg, class)
-  not_rel <- cls[!(cls %in%c('technology', 'supply', 'storage', 'demand', 'tax', 'sub', 'constraint'))]
+  not_rel <- cls[!(cls %in%c('technology', 'supply', 'storage', 'demand', 'tax', 'sub', 'constraint', 'sysInfo'))]
   if (length(not_rel))
     stop(paste0('Not relised class for "', paste0(not_rel, collapse = '", "'), '"'))
   # Replace in model
@@ -89,7 +90,9 @@
       scen <- .replace_taxsub(scen, arg[[i]])
     }
   if (!is.null(arg$constraint)) 
-    scen <- .replace_constraint(scen, arg$constraint)
+  	scen <- .replace_constraint(scen, arg$constraint)
+  if (!is.null(arg$sysInfo))
+  	scen@model@sysInfo <- arg$sysInfo[[1]]
   # Clean
   # Reduce mapping
   sys_info_par <- c('mAllSliceParentChild', 
