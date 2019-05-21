@@ -248,6 +248,7 @@
 					# Get variable and parameter if need data
 					vrb <- sub(paste0('^[+-]*[[:blank:]]*([[:digit:].]*|pCnsMult', cns, '[_][[:digit:]]*[(][^)]*[)])[[:blank:]]*[*][[:blank:]]*'), '', to_const)
 					param <- sub('[[:blank:]]*[*][[:blank:]]*$', '', substr(to_const, 1, nchar(to_const) - nchar(vrb)))
+					if (param == '') param <- 1
 					tpr <- src@modOut@variables[[sub('[(].*', '', vrb)]]
 					if (any(grep('pCnsMult', param))) {
 						const <- energyRt:::.getTotalParameterData(scen@modInp, gsub('([[:blank:]]*|[+-]|[(].*)', '', param))

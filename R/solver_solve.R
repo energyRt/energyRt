@@ -59,6 +59,17 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
     .generate_gpr_gams_file(arg$dir.result)
     zz <- file(paste(arg$dir.result, '/mdl.gms', sep = ''), 'w')
     cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
+    # Add parameter constraint declaration
+    if (length(scen@modInp@gams.equation) > 0) {
+    	mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
+    	mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
+    		function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    	pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
+    	pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
+    		function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    	cat(mps_name_def, sep = '\n', file = zz)
+    	cat(pps_name_def, sep = '\n', file = zz)
+    }
     cat(file_w, sep = '\n', file = zz)
     # Add constraint equation 
     if (length(scen@modInp@gams.equation) > 0) {
@@ -67,15 +78,15 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
       # Body equation
       cat(sapply(scen@modInp@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
     }
-    if (!is.null(scen@model@misc$additionalEquationGAMS)) 
-      cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
-
+    if (!is.null(scen@model@misc$additionalEquationGAMS)) {
+    	cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
+    }
     cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
                    (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
     
     # Add constraint equation to model declaration
     if (length(scen@modInp@gams.equation) > 0) {
-      cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
+    	cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
     }
     
     if (!is.null(scen@model@misc$additionalEquationGAMS)) 
