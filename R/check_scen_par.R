@@ -1,10 +1,10 @@
 # Check parameters
 .check_scen_par <- function(scen) {
-	# Check for non negative parameters, all except 'pAggregateFactor'
+	# Check for non negative parameters, all except 'pAggregateFactor', 'pTechCvarom', 'pTechAvarom', 'pTechVarom', 'pTechInvcost'
 	non_negative <- unique(c('pSliceShare', 'pTechOlife', 'pTechCinp2ginp', 'pTechGinp2use', 'pTechCinp2use', 'pTechUse2cact', 'pTechCact2cout', 
 		'pTechEmisComm', 'pTechUse2AInp', 'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp', 'pTechCinp2AInp', 'pTechCout2AInp', 'pTechUse2AOut', 
-		'pTechAct2AOut', 'pTechCap2AOut', 'pTechNCap2AOut', 'pTechCinp2AOut', 'pTechCout2AOut', 'pTechFixom', 'pTechVarom', 'pTechInvcost', 'pTechShare', 
-		'pTechShare', 'pTechAf', 'pTechAf', 'pTechAfs', 'pTechAfs', 'pTechAfc', 'pTechAfc', 'pTechStock', 'pTechCap2act', 'pTechCvarom', 'pTechAvarom', 'pDiscount', 
+		'pTechAct2AOut', 'pTechCap2AOut', 'pTechNCap2AOut', 'pTechCinp2AOut', 'pTechCout2AOut', 'pTechFixom', 'pTechShare', 
+		'pTechShare', 'pTechAf', 'pTechAf', 'pTechAfs', 'pTechAfs', 'pTechAfc', 'pTechAfc', 'pTechStock', 'pTechCap2act', 'pDiscount', 
 		'pDiscountFactor', 'pSupCost', 'pSupAva', 'pSupAva', 'pSupReserve', 'pSupReserve', 'pDemand', 'pEmissionFactor', 'pDummyImportCost', 'pDummyExportCost', 
 		'pTaxCost', 'pSubsCost', 'pWeather', 'pSupWeather', 'pSupWeather', 'pTechWeatherAf', 'pTechWeatherAf', 'pTechWeatherAfs', 'pTechWeatherAfs', 
 		'pTechWeatherAfc', 'pTechWeatherAfc', 'pStorageWeatherAf', 'pStorageWeatherAf', 'pStorageWeatherCinp', 'pStorageWeatherCinp', 'pStorageWeatherCout', 
