@@ -33,6 +33,7 @@
 	for(i in seq_along(lst)) {
 		scen@modInp <- add_name(scen@modInp, lst[[i]], scen@misc$approxim)
 	}
+	scen@misc$approxim$commodity_slice_map <- .get_map_commodity_slice_map(scen)
 	scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
 	for(i in seq_along(lst)) {
 		scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)
@@ -97,6 +98,8 @@
   #Replace in parameters
   arg <- lapply(unique(cls), function(x) arg[x == cls])  
   names(arg) <- unique(cls)
+  if (!is.null(arg$commodity)) 
+  	scen <- .replace_comm(scen, arg$commodity)
   for (i in c('technology', 'supply', 'storage', 'demand', 'export', 'import'))
     if (!is.null(arg[[i]])) {
       scen <- .replace_tech_sup_stg_dem(scen, arg[[i]])
@@ -107,8 +110,6 @@
     }
   if (!is.null(arg$constraint)) 
   	scen <- .replace_constraint(scen, arg$constraint)
-  if (!is.null(arg$commodity)) 
-  	scen <- .replace_comm(scen, arg$commodity)
   if (!is.null(arg$sysInfo))
   	scen@model@sysInfo <- arg$sysInfo[[1]]
   # Clean
