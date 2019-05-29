@@ -10,7 +10,11 @@ setClass("trade",
           trade         = "data.frame",
           aux           = "data.frame",      #
           aeff         = "data.frame",    #  Commodity efficiency
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+      	invcost = "data.frame",
+      	olife = "data.frame",
+      	start = "data.frame",
+      	end = "data.frame",
+      	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       # Default values and structure of slots
@@ -33,7 +37,28 @@ setClass("trade",
 														         markup     = numeric(),
 														         teff        = numeric(),
 														         stringsAsFactors = FALSE),
-         aux           = data.frame(acomm     = character(),
+      	invcost = data.frame(
+      		src        = character(),
+      		dst        = character(),
+      		year       = numeric(),
+      		invcost    = numeric(),
+      		stringsAsFactors = FALSE),
+      	olife = data.frame(
+      		src        = character(),
+      		dst        = character(),
+      		olife    = numeric(),
+      		stringsAsFactors = FALSE),
+      	start = data.frame(
+      		src        = character(),
+      		dst        = character(),
+      		start    = numeric(),
+      		stringsAsFactors = FALSE),
+      	end = data.frame(
+      		src        = character(),
+      		dst        = character(),
+      		end    = numeric(),
+      		stringsAsFactors = FALSE),
+      	aux           = data.frame(acomm     = character(),
                                     unit     = character(),
                                     stringsAsFactors = FALSE),
          # Auxilary parameter
