@@ -629,44 +629,40 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
   
    
   
-  if (nrow(dd0$new) > 10) browser()
+  #  if (nrow(dd0$new) > 10) browser()
   olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters$pTechOlife, approxim, 'tech', tech@name)
 	tmp <- merge(dd0$new, olife, by = c('tech', 'region'))
 	end_year <- max(approxim$year)
 	tmp <- tmp[tmp$year + tmp$value > end_year, ]
 	tmp2 <- tmp[, c('tech', 'region')]
-	obj@parameters[['mTechSalv']] <- addData(obj@parameters[['mTechSalv']], tmp2[!duplicated(tmp2), ])
-	# pTechSalv calculation
-	tmp2 <- tmp; tmp2$life <- tmp2$value; tmp2$value <- NULL
-	
-	tmp2 <- merge(tmp2, approxim$discountFactor, by = c('region', 'year'))
-	tmp3 <- approxim$discountFactor[approxim$discountFactor$year == end_year, c('region', 'value')]
-	tmp2 <- merge(tmp2, tmp3, 'region')
-	tmp2$value <- tmp2$
-	
-	tmp2$life <- tmp2$value; tmp2$value <- NULL
-	
-	tmp2$rest <- (tmp2$value - (end_year - tmp2$year))
-	
-	
-	tmp2$rest_discount <- 0
-	tmp2$rest_discount[] <- 0
-
-
-	approxim$discountFactor
-	
-	# 
-	# sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
-	# 	and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
-	# 	(pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *  / (
-	# 		1
-	# 		+ (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
-	# 		/ (pDiscountFactor(region, yeare)
-	# 		) / (
-	# 			(pTechOlife(tech, region) + ordYear(yearn) - 1 - ordYear(yeare)
-	# 			))
-	# 	)) 
-	
+	mTechSalv <- tmp2[!duplicated(tmp2), ]
+	if (nrow(mTechSalv) > 0) {
+		obj@parameters[['mTechSalv']] <- addData(obj@parameters[['mTechSalv']], mTechSalv)
+		# pTechSalv calculation
+		tmp2 <- tmp; tmp2$life <- tmp2$value; tmp2$value <- NULL
+		tmp2 <- merge(tmp2, approxim$discountCum, by = c('region', 'year'))
+		tmp3 <- approxim$discountCum[approxim$discountCum$year == end_year, c('region', 'value')]
+		tmp2 <- merge(tmp2, tmp3, 'region')
+		tmp2$s1 <- tmp2$value.y - tmp2$value.x; tmp2$value.y <- NULL; tmp2$value.x <- NULL
+		# tmp2$s1 = sum_y 1 ^ rest 1 / (1 + r) ^ y
+		tmp2$rest <- (tmp2$life - (end_year - tmp2$year) - 1)
+		tmp2 <- merge(tmp2, approxim$discount[approxim$discount$year == end_year, c('region', 'value')], by = 'region')
+		tmp2$fin_dsc <- tmp2$value; tmp2$value <- NULL
+		tmp2$s2 <- 0
+		fl <- (tmp2$fin_dsc == 0)
+		if (any(fl)) {
+			tmp2[fl, 's2'] <- tmp2[fl, 'rest']
+		} 
+		if (any(!fl)) {
+			tmp2[!fl, 's2'] <- ((1 + tmp2[!fl, 'fin_dsc']) ^ (-tmp2[!fl, 'rest']) - 1) / (1 / (1 + tmp2[!fl, 'fin_dsc']) - 1)
+		} 
+		tmp2 <- merge(tmp2, approxim$discountFactor[approxim$discountFactor$year == end_year, c('region', 'value')], by = 'region')
+		tmp2$s2 <- (tmp2$s2 * tmp2$value); tmp2$value <- NULL
+		# tmp2$s2 = sum_y rest ^ life 1 / (1 + r) ^ y
+		tmp2$value <- tmp2$s1 / (tmp2$s1 + tmp2$s2) - 1
+		obj@parameters[['pTechSalv']] <- addData(obj@parameters[['pTechSalv']],
+			tmp2[, c('tech', 'region', 'year', 'value')])
+	}
 	
 	# Weather part
   merge.weather <- function(tech, nm, add = NULL) {

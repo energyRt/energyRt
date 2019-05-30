@@ -188,8 +188,11 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     # simple & multi
     .Object@parameters[['pTechCap2act']] <- 
-        createParameter('pTechCap2act', 'tech', 'simple', 
-        defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2act', slot = 'cap2act')    
+    	createParameter('pTechCap2act', 'tech', 'simple', 
+    		defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2act', slot = 'cap2act')    
+    .Object@parameters[['pTechSalv']] <- 
+    	createParameter('pTechSalv', c('tech', 'region', 'year'), 'simple', 
+    		defVal = 1, interpolation = 'back.inter.forth', cls = 'technology')    
     .Object@parameters[['pTechEmisComm']] <- createParameter('pTechEmisComm', c('tech', 'comm'), 'simple', 
                                                              defVal = 1, cls = 'technology', colName = 'combustion')    
     .Object@parameters[['pTechOlife']] <- 
