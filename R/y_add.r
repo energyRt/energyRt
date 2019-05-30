@@ -619,13 +619,56 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
     
   stock_exist <- obj@parameters[["pTechStock"]]@data[!is.na(obj@parameters[["pTechStock"]]@data$tech) & 
                                                 obj@parameters[['pTechStock']]@data$tech == tech@name & 
-                                                obj@parameters[['pTechStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 
+                                                obj@parameters[['pTechStock']]@data$value != 0, c('region', 'year'), 
+  	drop = FALSE] 
   dd0 <- .start_end_fix(approxim, tech, 'tech', stock_exist)
   dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
   dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
   obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
   obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
-  # Weather part
+  
+   
+  
+  if (nrow(dd0$new) > 10) browser()
+  olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters$pTechOlife, approxim, 'tech', tech@name)
+	tmp <- merge(dd0$new, olife, by = c('tech', 'region'))
+	end_year <- max(approxim$year)
+	tmp <- tmp[tmp$year + tmp$value > end_year, ]
+	tmp2 <- tmp[, c('tech', 'region')]
+	obj@parameters[['mTechSalv']] <- addData(obj@parameters[['mTechSalv']], tmp2[!duplicated(tmp2), ])
+	# pTechSalv calculation
+	tmp2 <- tmp; tmp2$life <- tmp2$value; tmp2$value <- NULL
+	
+	tmp2 <- merge(tmp2, approxim$discountFactor, by = c('region', 'year'))
+	tmp3 <- approxim$discountFactor[approxim$discountFactor$year == end_year, c('region', 'value')]
+	tmp2 <- merge(tmp2, tmp3, 'region')
+	tmp2$value <- tmp2$
+	
+	tmp2$life <- tmp2$value; tmp2$value <- NULL
+	
+	tmp2$rest <- (tmp2$value - (end_year - tmp2$year))
+	
+	
+	tmp2$rest_discount <- 0
+	tmp2$rest_discount[] <- 0
+
+
+	approxim$discountFactor
+	
+	# 
+	# sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
+	# 	and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
+	# 	(pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *  / (
+	# 		1
+	# 		+ (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
+	# 		/ (pDiscountFactor(region, yeare)
+	# 		) / (
+	# 			(pTechOlife(tech, region) + ordYear(yearn) - 1 - ordYear(yeare)
+	# 			))
+	# 	)) 
+	
+	
+	# Weather part
   merge.weather <- function(tech, nm, add = NULL) {
     waf <- tech@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
     waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
