@@ -93,6 +93,7 @@ mTechAOut(tech, comm)            Auxiliary output
 *
 mTechNew(tech, region, year)     Technologies available for investment
 mTechSpan(tech, region, year)    Availability of each technology by regions and milestone years
+mTechSalv(tech, region)          Need calculate salvage cost
 mTechSlice(tech, slice)          Technology to slice-level
 * Supply
 mSupSlice(sup, slice)             Supply to slices-level
@@ -180,6 +181,7 @@ pTechCout2AOut(tech, comm, comm, region, year, slice)     Multiplier to commodit
 pTechFixom(tech, region, year)                      Fixed Operating and maintenance (O&M) costs (per unit of capacity)
 pTechVarom(tech, region, year, slice)               Variable O&M costs (per unit of acticity)
 pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
+pTechSalv(tech, region, year)                       Salvage coefficient for investment costs (per unit of capacity)
 pTechShareLo(tech, comm, region, year, slice)       Lower bound for share of the commodity in total group input or output
 pTechShareUp(tech, comm, region, year, slice)       Upper bound for share of the commodity in total group input or output
 pTechAfLo(tech, region, year, slice)                Lower bound for activity for each slice
@@ -937,9 +939,7 @@ eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
 * Investment equation
 eqTechInv(tech, region, year)       Technology investment costs
 * Salvage value
-*eqTechSalv1(tech, region)
 eqTechSalv(tech, region, yeare)     Technology salvage costs
-eqTechSalv0(tech, region, yeare)    Technology salvage costs when discount is zero
 * Aggregated annual costs
 eqTechOMCost(tech, region, year)    Technology O&M costs
 ;
@@ -1008,38 +1008,14 @@ eqTechInv(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region, ye
    pTechInvcost(tech, region, year) * vTechNewCap(tech, region, year);
 
 * Salvage value
-eqTechSalv0(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare) and sum(year$mTechNew(tech, region, year), 1) <> 0)..
+eqTechSalv(tech, region, yeare)$(mTechSalv(tech, region) and mMilestoneLast(yeare))..
     vTechSalv(tech, region)
-    +
-   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
-         and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
-    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
-    pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
-     - sum(yearp$(mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp)))  / (
-      1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
-        / (pDiscountFactor(region, yeare)
-          ) / (
-           (pTechOlife(tech, region) + ordYear(yearn) - 1 - ordYear(yeare)
-           ))
-    ))  =e= 0;
+    =e=
+   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ordYear(year) + pTechOlife(tech, region) - 1 > ordYear(yeare) and
+                 not(mTechOlifeInf(tech, region))  and pTechInvcost(tech, region, year) <> 0),
+    pTechSalv(tech, region, year) * pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
+     - sum(yearp$mTechRetirement(tech), vTechRetiredCap(tech, region, year, yearp))));
 
-
-eqTechSalv(tech, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(region)) and sum(year$mTechNew(tech, region, year), 1) <> 0)..
-    vTechSalv(tech, region)
-    +
-   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
-  and mTechNew(tech, region, yearn) and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))
-   and pTechInvcost(tech, region, yearn) <> 0),
-    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
-    pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
-      - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp))) / (
-      1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
-        / pDiscountFactor(region, yeare) / ((
-           1 - (1 + pDiscount(region, yeare)) ** (ordYear(yeare) - pTechOlife(tech, region) - ordYear(yearn) + 1)
-           )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare))
-    ))  =e= 0;
 
 * Annual O&M costs
 eqTechOMCost(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region, year))..
@@ -1340,6 +1316,8 @@ eqStorageSalv(stg, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(r
     ))  =e= 0;
 
 
+
+
 ********************************************************************************
 * Interregional and ROW Trade equations
 ********************************************************************************
@@ -1427,6 +1405,12 @@ eqImportRowAccumulated(imp, comm)$mImpComm(imp, comm).. vImportRowAccumulated(im
 );
 
 eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccumulated(imp, comm) =l= pImportRowRes(imp);
+
+
+********************************************************************************
+* Trade IR capacity equations
+********************************************************************************
+
 
 
 ********************************************************************************
@@ -1734,8 +1718,6 @@ eqTechInv
 eqTechEac
 * FIX O & M equation
 * Salvage value
-*eqTechSalv1
-eqTechSalv0
 eqTechSalv
 * Commodity Varom O & M and Varom O & M aggregate by year equation
 * Aggregated annual costs
@@ -1853,7 +1835,7 @@ eqLECActivity
 
 *option lp = cbc;
 
-*$exit
+* $exit
 * f374f3df-5fd6-44f1-b08a-1a09485cbe3d
 
 
