@@ -893,6 +893,16 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
                                                                      approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
       }
     }
+    # mTradeSpan(trade, region, region, year)
+    # mTradeNew(trade, region, region, year)
+    # mTradeOlifeInf(trade, region, region)
+    # mTradeSalv(trade, region, region)
+    # 
+    # pTradeStock(trade, region, region, year)
+    # pTradeOlife(trade, region, region)
+    # pTradeInvcost(trade, region, region, year)
+    # pTradeSalv(trade, region, region, year)
+    # mCapacityVariable(trade)
   obj
 })
 

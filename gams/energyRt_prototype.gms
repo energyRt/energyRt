@@ -142,6 +142,13 @@ mTechWeatherAfc(tech, weather, comm)
 mStorageWeatherAf(stg, weather)
 mStorageWeatherCinp(stg, weather)
 mStorageWeatherCout(stg, weather)
+
+
+mTradeSpan(trade, region, region, year)
+mTradeNew(trade, region, region, year)
+mTradeOlifeInf(trade, region, region)
+mTradeSalv(trade, region, region)
+mCapacityVariable(trade)
 ;
 
 * Set priority
@@ -285,6 +292,10 @@ pImportRowRes(imp)                                   Upper bound on accumulated 
 pImportRowUp(imp, region, year, slice)               Upper bount on import from ROW
 pImportRowLo(imp, region, year, slice)               Lower bound on import from ROW
 pImportRowPrice(imp, region, year, slice)            Import prices from ROW
+pTradeStock(trade, region, region, year)
+pTradeOlife(trade, region, region)
+pTradeInvcost(trade, region, region, year)
+pTradeSalv(trade, region, region, year)
 ;
 
 $ontext
@@ -461,6 +472,14 @@ vTradeCost(region, year)                             Total trade costs
 vTradeRowCost(region, year)                          Trade with ROW costs
 *@  mMidMilestone(year)
 vTradeIrCost(region, year)                           Interregional trade costs
+*@ (mCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))
+vTradeCap(trade, region, region, year)
+*@ (mCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
+vTradeInv(trade, region, region, year)
+*@ (mCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))
+vTradeSalv(trade, region, region)
+*@ (mCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
+vTradeNewCap(trade, region, region, year)
 ;
 
 ********************************************************************************
@@ -1338,6 +1357,9 @@ eqImportRowUp(imp, comm, region, year, slice)     Import from ROW upper bound
 eqImportRowLo(imp, comm, region, year, slice)     Import of ROW lower bound
 eqImportRowAccumulated(imp, comm)                 Accumulated import from ROW
 eqImportRowResUp(imp, comm)                       Accumulated import from ROW upper bound
+eqTradeCap(trade, src, dst, year)
+eqTradeInv(trade, src, dst, year)
+eqTradeSalv(trade, src, dst, yeare)
 ;
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
@@ -1411,6 +1433,29 @@ eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccum
 * Trade IR capacity equations
 ********************************************************************************
 
+* Capacity equation
+eqTradeCap(trade, src, dst, year)$(mCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))..
+         vTradeCap(trade, src, dst, year)
+         =e=
+         pTradeStock(trade, src, dst, year) +
+         sum((yearp)$
+                 (       mTradeNew(trade, src, dst, yearp) and mMidMilestone(yearp) and
+                         ordYear(year) >= ordYear(yearp) and
+                         (ordYear(year) < pTradeOlife(trade, src, dst) + ordYear(yearp) or mTradeOlifeInf(trade, src, dst))
+                 ), vTradeNewCap(trade, src, dst, yearp));
+
+
+* Investment equation
+eqTradeInv(trade, src, dst, year)$(mCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))..  vTradeInv(trade, src, dst, year) =e=
+   pTradeInvcost(trade, src, dst, year) * vTradeNewCap(trade, src, dst, year);
+
+* Salvage value
+eqTradeSalv(trade, src, dst, yeare)$(mCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))..
+    vTradeSalv(trade, src, dst)
+    =e=
+   sum(year$(mMidMilestone(year) and mTradeNew(trade, src, dst, year) and ordYear(year) + pTradeOlife(trade, src, dst) - 1 > ordYear(yeare) and
+                 not(mTradeOlifeInf(trade, src, dst))  and pTradeInvcost(trade, src, dst, year) <> 0),
+    pTradeSalv(trade, src, dst, year) * pTradeInvcost(trade, src, dst, year) * vTradeNewCap(trade, src, dst, year));
 
 
 ********************************************************************************
@@ -1613,10 +1658,18 @@ eqObjective..
          sum((region, year)$mMidMilestone(year),
            vCost(region, year) * sum((yeare, yearp, yearn)$(mStartMilestone(year, yearp) and mEndMilestone(year, yeare)
                  and ordYear(yearn) >= ordYear(yearp) and ordYear(yearn) <= ordYear(yeare)), pDiscountFactor(region, yearn))) +
-         sum((region, year, tech)$(mMilestoneLast(year) and  sum(yearp$mTechNew(tech, region, yearp), 1) <> 0),
+         sum((region, year, tech)$(mMilestoneLast(year) and  mTechSalv(tech, region)),
                  pDiscountFactor(region, year) * vTechSalv(tech, region)) +
          sum((region, year, stg)$(mMilestoneLast(year) and  sum(yearp$mStorageNew(stg, region, yearp), 1) <> 0),
-                 pDiscountFactor(region, year) * vStorageSalv(stg, region));
+                 pDiscountFactor(region, year) * vStorageSalv(stg, region)) +
+
+         sum((src, dst, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
+           pDiscountFactor(src, yearp) *
+                 sum(trade$(mCapacityVariable(trade) and mTradeNew(trade, src, dst, year)), vTradeInv(trade, src, dst, year))) +
+         sum((src, dst, year, trade)$(mCapacityVariable(trade) and mMilestoneLast(year) and mTradeSalv(trade, src, dst)),
+                 pDiscountFactor(src, year) * vTradeSalv(trade, src, dst))
+
+;
 
 * Latex file end
 *\end{document}
@@ -1790,6 +1843,9 @@ eqImportRowUp
 eqImportRowLo
 eqImportRowAccumulated
 eqImportRowResUp
+eqTradeCap
+eqTradeInv
+eqTradeSalv
 **************************************
 * Ballance equation & dummy
 **************************************
