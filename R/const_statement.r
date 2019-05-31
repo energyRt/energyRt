@@ -125,8 +125,8 @@
   vTradeCost = "vTradeCost( region , year ) $ mMidMilestone( year )",
   vTradeRowCost = "vTradeRowCost( region , year ) $ mMidMilestone( year )",
   vTradeIrCost = "vTradeIrCost( region , year ) $ mMidMilestone( year )",
-  vTradeCap = "vTradeCap( trade , region , region , year ) $ ( mCapacityVariable( trade ) and mMidMilestone( year ) and mTradeSpan( trade , src , dst , year ) )",
-  vTradeInv = "vTradeInv( trade , region , region , year ) $ ( mCapacityVariable( trade ) and mMidMilestone( year ) and mTradeNew( trade , src , dst , year ) )",
-  vTradeSalv = "vTradeSalv( trade , region , region ) $ ( mCapacityVariable( trade ) and mTradeSalv( trade , src , dst ) and mMilestoneLast( yeare ) )",
-  vTradeNewCap = "vTradeNewCap( trade , region , region , year ) $ ( mCapacityVariable( trade ) and mMidMilestone( year ) and mTradeNew( trade , src , dst , year ) )"
+  vTradeCap = "vTradeCap( trade , region , region , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeSpan( trade , src , dst , year ) )",
+  vTradeInv = "vTradeInv( trade , region , region , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeNew( trade , src , dst , year ) )",
+  vTradeSalv = "vTradeSalv( trade , region , region ) $ ( mTradeCapacityVariable( trade ) and mTradeSalv( trade , src , dst ) and mMilestoneLast( yeare ) )",
+  vTradeNewCap = "vTradeNewCap( trade , region , region , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeNew( trade , src , dst , year ) )"
 );
