@@ -113,10 +113,7 @@
     vTradeCost = c("region", "year"), 
     vTradeRowCost = c("region", "year"), 
     vTradeIrCost = c("region", "year"), 
-    vTradeCap = c("trade", "region", "region", "year"), 
-    vTradeInv = c("trade", "region", "region", "year"), 
     vTradeSalv = c("trade", "region", "region"), 
-    vTradeNewCap = c("trade", "region", "region", "year"), 
     vTechUse = c("tech", "region", "year", "slice"), 
     vTechNewCap = c("tech", "region", "year"), 
     vTechRetiredCap = c("tech", "region", "year", "year"), 
@@ -159,7 +156,10 @@
     vExportRowAccumulated = c("expp", "comm"), 
     vExportRow = c("expp", "comm", "region", "year", "slice"), 
     vImportRowAccumulated = c("imp", "comm"), 
-    vImportRow = c("imp", "comm", "region", "year", "slice"))
+    vImportRow = c("imp", "comm", "region", "year", "slice"), 
+    vTradeCap = c("trade", "region", "region", "year"), 
+    vTradeInv = c("trade", "region", "region", "year"), 
+    vTradeNewCap = c("trade", "region", "region", "year"))
 }
 ..getEquations <- function() {
     rs <- data.frame(name = character(), description = character(), 
@@ -194,10 +194,7 @@
    vTradeCost  = logical(),
    vTradeRowCost  = logical(),
    vTradeIrCost  = logical(),
-   vTradeCap  = logical(),
-   vTradeInv  = logical(),
    vTradeSalv  = logical(),
-   vTradeNewCap  = logical(),
    vTechUse  = logical(),
    vTechNewCap  = logical(),
    vTechRetiredCap  = logical(),
@@ -241,6 +238,9 @@
    vExportRow  = logical(),
    vImportRowAccumulated  = logical(),
    vImportRow  = logical(),
+   vTradeCap  = logical(),
+   vTradeInv  = logical(),
+   vTradeNewCap  = logical(),
       stringsAsFactors = FALSE);
     rs[1:94,] <- NA;
     rownames(rs) <- c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechUse2Sng", "eqTechUse2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechSalv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupReserveUp", "eqSupReserveLo", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqTechEmsFuel", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageCost", "eqStorageSalv0", "eqStorageSalv", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqExportRowResUp", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqImportRowResUp", "eqTradeCap", "eqTradeInv", "eqTradeSalv", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqDummyCost", "eqObjective", "eqLECActivity");
@@ -429,7 +429,7 @@
     rs["eqDummyCost", c("name", "description")] <- c("eqDummyCost", "Dummy import and export costs");
     rs["eqDummyCost", c("comm", "region", "year", "slice", "vDummyImport", "vDummyExport", "vDummyCost")] <- TRUE;
     rs["eqObjective", c("name", "description")] <- c("eqObjective", "Objective equation");
-    rs["eqObjective", c("tech", "stg", "trade", "region", "year", "vTechInv", "vTechSalv", "vCost", "vObjective", "vStorageSalv", "vTradeInv", "vTradeSalv", "vStorageInv")] <- TRUE;
+    rs["eqObjective", c("tech", "stg", "trade", "region", "year", "vTechInv", "vTechSalv", "vCost", "vObjective", "vStorageSalv", "vTradeSalv", "vStorageInv", "vTradeInv")] <- TRUE;
     rs["eqLECActivity", c("name", "description")] <- c("eqLECActivity", "");
     rs["eqLECActivity", c("tech", "region", "year", "slice", "vTechAct")] <- TRUE;
     rs[, -(1:2)][is.na(rs[, -(1:2)])] <- FALSE;
@@ -546,7 +546,7 @@ rs
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
     rs[1:65,] <- NA;
-    rownames(rs) <- c("vTechInv", "vTechEac", "vTechSalv", "vTechOMCost", "vSupCost", "vEmsFuelTot", "vTechEmsFuel", "vBalance", "vCost", "vObjective", "vTaxCost", "vSubsCost", "vAggOut", "vStorageSalv", "vStorageOMCost", "vTradeCost", "vTradeRowCost", "vTradeIrCost", "vTradeCap", "vTradeInv", "vTradeSalv", "vTradeNewCap", "vTechUse", "vTechNewCap", "vTechRetiredCap", "vTechCap", "vTechAct", "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", "vSupReserve", "vDemInp", "vOutTot", "vInpTot", "vInp2Lo", "vOut2Lo", "vSupOutTot", "vTechInpTot", "vTechOutTot", "vStorageInpTot", "vStorageOutTot", "vStorageAInp", "vStorageAOut", "vDummyImport", "vDummyExport", "vDummyCost", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageInv", "vStorageCap", "vStorageNewCap", "vImport", "vExport", "vTradeIr", "vTradeIrAInp", "vTradeIrAInpTot", "vTradeIrAOut", "vTradeIrAOutTot", "vExportRowAccumulated", "vExportRow", "vImportRowAccumulated", "vImportRow");
+    rownames(rs) <- c("vTechInv", "vTechEac", "vTechSalv", "vTechOMCost", "vSupCost", "vEmsFuelTot", "vTechEmsFuel", "vBalance", "vCost", "vObjective", "vTaxCost", "vSubsCost", "vAggOut", "vStorageSalv", "vStorageOMCost", "vTradeCost", "vTradeRowCost", "vTradeIrCost", "vTradeSalv", "vTechUse", "vTechNewCap", "vTechRetiredCap", "vTechCap", "vTechAct", "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", "vSupReserve", "vDemInp", "vOutTot", "vInpTot", "vInp2Lo", "vOut2Lo", "vSupOutTot", "vTechInpTot", "vTechOutTot", "vStorageInpTot", "vStorageOutTot", "vStorageAInp", "vStorageAOut", "vDummyImport", "vDummyExport", "vDummyCost", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageInv", "vStorageCap", "vStorageNewCap", "vImport", "vExport", "vTradeIr", "vTradeIrAInp", "vTradeIrAInpTot", "vTradeIrAOut", "vTradeIrAOutTot", "vExportRowAccumulated", "vExportRow", "vImportRowAccumulated", "vImportRow", "vTradeCap", "vTradeInv", "vTradeNewCap");
     rs["vTechInv", c("name", "description")] <- c("vTechInv", "Overnight investment costs");
     rs["vTechInv", c("tech", "region", "year", "eqTechInv", "eqObjective")] <- TRUE;
     rs["vTechEac", c("name", "description")] <- c("vTechEac", "Annualized investment costs");
@@ -583,14 +583,8 @@ rs
     rs["vTradeRowCost", c("region", "year", "eqCostTrade", "eqCostRowTrade")] <- TRUE;
     rs["vTradeIrCost", c("name", "description")] <- c("vTradeIrCost", "Interregional trade costs");
     rs["vTradeIrCost", c("region", "year", "eqCostTrade", "eqCostIrTrade")] <- TRUE;
-    rs["vTradeCap", c("name", "description")] <- c("vTradeCap", "");
-    rs["vTradeCap", c("trade", "region", "year", "eqTradeCap")] <- TRUE;
-    rs["vTradeInv", c("name", "description")] <- c("vTradeInv", "");
-    rs["vTradeInv", c("trade", "region", "year", "eqTradeInv", "eqObjective")] <- TRUE;
     rs["vTradeSalv", c("name", "description")] <- c("vTradeSalv", "");
     rs["vTradeSalv", c("trade", "region", "eqTradeSalv", "eqObjective")] <- TRUE;
-    rs["vTradeNewCap", c("name", "description")] <- c("vTradeNewCap", "");
-    rs["vTradeNewCap", c("trade", "region", "year", "eqTradeCap", "eqTradeInv", "eqTradeSalv")] <- TRUE;
     rs["vTechUse", c("name", "description")] <- c("vTechUse", "Use level in technology");
     rs["vTechUse", c("tech", "region", "year", "slice", "eqTechUse2Sng", "eqTechUse2Grp", "eqTechAInp", "eqTechAOut")] <- TRUE;
     rs["vTechNewCap", c("name", "description")] <- c("vTechNewCap", "New capacity");
@@ -677,6 +671,12 @@ rs
     rs["vImportRowAccumulated", c("imp", "comm", "eqImportRowAccumulated", "eqImportRowResUp")] <- TRUE;
     rs["vImportRow", c("name", "description")] <- c("vImportRow", "Import from ROW");
     rs["vImportRow", c("imp", "comm", "region", "year", "slice", "eqImport", "eqCostRowTrade", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated")] <- TRUE;
+    rs["vTradeCap", c("name", "description")] <- c("vTradeCap", "");
+    rs["vTradeCap", c("trade", "region", "year", "eqTradeCap")] <- TRUE;
+    rs["vTradeInv", c("name", "description")] <- c("vTradeInv", "");
+    rs["vTradeInv", c("trade", "region", "year", "eqTradeInv", "eqObjective")] <- TRUE;
+    rs["vTradeNewCap", c("name", "description")] <- c("vTradeNewCap", "");
+    rs["vTradeNewCap", c("trade", "region", "year", "eqTradeCap", "eqTradeInv", "eqTradeSalv")] <- TRUE;
     rs[, -(1:2)][is.na(rs[, -(1:2)])] <- FALSE;
 rs
 }

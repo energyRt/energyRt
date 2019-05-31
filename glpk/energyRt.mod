@@ -265,10 +265,7 @@ var vStorageOMCost{stg, region, year};
 var vTradeCost{region, year};
 var vTradeRowCost{region, year};
 var vTradeIrCost{region, year};
-var vTradeCap{trade, region, region, year};
-var vTradeInv{trade, region, region, year};
 var vTradeSalv{trade, region, region};
-var vTradeNewCap{trade, region, region, year};
 
 
 
@@ -316,6 +313,9 @@ var vExportRowAccumulated{expp, comm} >= 0;
 var vExportRow{expp, comm, region, year, slice} >= 0;
 var vImportRowAccumulated{imp, comm} >= 0;
 var vImportRow{imp, comm, region, year, slice} >= 0;
+var vTradeCap{trade, region, region, year} >= 0;
+var vTradeInv{trade, region, region, year} >= 0;
+var vTradeNewCap{trade, region, region, year} >= 0;
 
 
 
@@ -756,6 +756,10 @@ printf "region,year,value\n" > "vTradeIrCost.csv";
 for{y in mMidMilestone, r in region : vTradeIrCost[r,y] <> 0} {
   printf "%s,%s,%f\n", r,y,vTradeIrCost[r,y] >> "vTradeIrCost.csv";
 }
+printf "trade,src,dst,value\n" > "vTradeSalv.csv";
+for{t1 in trade, src in region, dst in region : vTradeSalv[t1,src,dst] <> 0} {
+  printf "%s,%s,%s,%f\n", t1,src,dst,vTradeSalv[t1,src,dst] >> "vTradeSalv.csv";
+}
 printf "trade,src,dst,year,value\n" > "vTradeCap.csv";
 for{(t1, src, dst, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMidMilestonevTradeCap[t1,src,dst,y] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t1,src,dst,y,vTradeCap[t1,src,dst,y] >> "vTradeCap.csv";
@@ -763,10 +767,6 @@ for{(t1, src, dst, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMid
 printf "trade,src,dst,year,value\n" > "vTradeInv.csv";
 for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestonevTradeInv[t1,src,dst,y] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t1,src,dst,y,vTradeInv[t1,src,dst,y] >> "vTradeInv.csv";
-}
-printf "trade,src,dst,value\n" > "vTradeSalv.csv";
-for{t1 in trade, src in region, dst in region : vTradeSalv[t1,src,dst] <> 0} {
-  printf "%s,%s,%s,%f\n", t1,src,dst,vTradeSalv[t1,src,dst] >> "vTradeSalv.csv";
 }
 printf "trade,src,dst,year,value\n" > "vTradeNewCap.csv";
 for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestonevTradeNewCap[t1,src,dst,y] <> 0} {
@@ -794,10 +794,7 @@ printf "value\n" > "variable_list.csv";
     printf "vTradeCost\n" >> "variable_list.csv";
     printf "vTradeRowCost\n" >> "variable_list.csv";
     printf "vTradeIrCost\n" >> "variable_list.csv";
-    printf "vTradeCap\n" >> "variable_list.csv";
-    printf "vTradeInv\n" >> "variable_list.csv";
     printf "vTradeSalv\n" >> "variable_list.csv";
-    printf "vTradeNewCap\n" >> "variable_list.csv";
     printf "vTechUse\n" >> "variable_list.csv";
     printf "vTechNewCap\n" >> "variable_list.csv";
     printf "vTechRetiredCap\n" >> "variable_list.csv";
@@ -841,6 +838,9 @@ printf "value\n" > "variable_list.csv";
     printf "vExportRow\n" >> "variable_list.csv";
     printf "vImportRowAccumulated\n" >> "variable_list.csv";
     printf "vImportRow\n" >> "variable_list.csv";
+    printf "vTradeCap\n" >> "variable_list.csv";
+    printf "vTradeInv\n" >> "variable_list.csv";
+    printf "vTradeNewCap\n" >> "variable_list.csv";
 
 
 printf "set,value\n" > "raw_data_set.csv";

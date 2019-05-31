@@ -199,7 +199,7 @@ prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']],
     aa <- merge(aa, merge(tmp_nozero$pTradeIr, tmp_map$mTradeSlice))[, c("trade", "src", "dst", "year", "slice")] 
     if (nrow(tmp_map$mTradeCapacityVariable) > 0) {
     	fl <- (aa$trade %in% tmp_map$mTradeCapacityVariable$trade)
-    	aa <- rbind(aa[!fl, ], merge(a0, tmp_map$mTradeSpan, by = c("trade", "src", "dst", "year")))
+    	aa <- rbind(aa[!fl, ], merge(aa[fl, ], tmp_map$mTradeSpan, by = c("trade", "src", "dst", "year")))
     }
     colnames(aa)[2:3] <- 'region'
     prec@parameters[['mTradeIr']] <- addData(prec@parameters[['mTradeIr']], aa[, ])

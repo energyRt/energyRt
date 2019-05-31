@@ -472,12 +472,14 @@ vTradeCost(region, year)                             Total trade costs
 vTradeRowCost(region, year)                          Trade with ROW costs
 *@  mMidMilestone(year)
 vTradeIrCost(region, year)                           Interregional trade costs
+*@ (mTradeCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))
+vTradeSalv(trade, region, region)
+;
+positive variable
 *@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))
 vTradeCap(trade, region, region, year)
 *@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
 vTradeInv(trade, region, region, year)
-*@ (mTradeCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))
-vTradeSalv(trade, region, region)
 *@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
 vTradeNewCap(trade, region, region, year)
 ;
@@ -2078,24 +2080,6 @@ put vTradeIrCost_csv;
 put "region,year,value"/;
 loop((region,year)$(vTradeIrCost.l(region,year) and mMidMilestone(year)), put region.tl:0",", year.tl:0","vTradeIrCost.l(region,year):0:15/;);
 putclose; 
-file vTradeCap_csv / 'vTradeCap.csv'/;
-vTradeCap_csv.lp = 1;
-vTradeCap_csv.nd = 1;
-vTradeCap_csv.nz = 1e-25;
-vTradeCap_csv.nr = 2;
-put vTradeCap_csv;
-put "trade,region,regionp,year,value"/;
-loop((trade,region,regionp,year)$(vTradeCap.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeCap.l(trade,region,regionp,year):0:15/;);
-putclose; 
-file vTradeInv_csv / 'vTradeInv.csv'/;
-vTradeInv_csv.lp = 1;
-vTradeInv_csv.nd = 1;
-vTradeInv_csv.nz = 1e-25;
-vTradeInv_csv.nr = 2;
-put vTradeInv_csv;
-put "trade,region,regionp,year,value"/;
-loop((trade,region,regionp,year)$(vTradeInv.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeInv.l(trade,region,regionp,year):0:15/;);
-putclose; 
 file vTradeSalv_csv / 'vTradeSalv.csv'/;
 vTradeSalv_csv.lp = 1;
 vTradeSalv_csv.nd = 1;
@@ -2104,15 +2088,6 @@ vTradeSalv_csv.nr = 2;
 put vTradeSalv_csv;
 put "trade,region,regionp,value"/;
 loop((trade,region,regionp)$vTradeSalv.l(trade,region,regionp), put trade.tl:0",", region.tl:0",", regionp.tl:0","vTradeSalv.l(trade,region,regionp):0:15/;);
-putclose; 
-file vTradeNewCap_csv / 'vTradeNewCap.csv'/;
-vTradeNewCap_csv.lp = 1;
-vTradeNewCap_csv.nd = 1;
-vTradeNewCap_csv.nz = 1e-25;
-vTradeNewCap_csv.nr = 2;
-put vTradeNewCap_csv;
-put "trade,region,regionp,year,value"/;
-loop((trade,region,regionp,year)$(vTradeNewCap.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeNewCap.l(trade,region,regionp,year):0:15/;);
 putclose; 
 file vTechUse_csv / 'vTechUse.csv'/;
 vTechUse_csv.lp = 1;
@@ -2501,6 +2476,33 @@ put vImportRow_csv;
 put "imp,comm,region,year,slice,value"/;
 loop((imp,comm,region,year,slice)$(vImportRow.l(imp,comm,region,year,slice) and mMidMilestone(year)), put imp.tl:0",", comm.tl:0",", region.tl:0",", year.tl:0",", slice.tl:0","vImportRow.l(imp,comm,region,year,slice):0:15/;);
 putclose; 
+file vTradeCap_csv / 'vTradeCap.csv'/;
+vTradeCap_csv.lp = 1;
+vTradeCap_csv.nd = 1;
+vTradeCap_csv.nz = 1e-25;
+vTradeCap_csv.nr = 2;
+put vTradeCap_csv;
+put "trade,region,regionp,year,value"/;
+loop((trade,region,regionp,year)$(vTradeCap.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeCap.l(trade,region,regionp,year):0:15/;);
+putclose; 
+file vTradeInv_csv / 'vTradeInv.csv'/;
+vTradeInv_csv.lp = 1;
+vTradeInv_csv.nd = 1;
+vTradeInv_csv.nz = 1e-25;
+vTradeInv_csv.nr = 2;
+put vTradeInv_csv;
+put "trade,region,regionp,year,value"/;
+loop((trade,region,regionp,year)$(vTradeInv.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeInv.l(trade,region,regionp,year):0:15/;);
+putclose; 
+file vTradeNewCap_csv / 'vTradeNewCap.csv'/;
+vTradeNewCap_csv.lp = 1;
+vTradeNewCap_csv.nd = 1;
+vTradeNewCap_csv.nz = 1e-25;
+vTradeNewCap_csv.nr = 2;
+put vTradeNewCap_csv;
+put "trade,region,regionp,year,value"/;
+loop((trade,region,regionp,year)$(vTradeNewCap.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeNewCap.l(trade,region,regionp,year):0:15/;);
+putclose; 
 file variable_list_csv / 'variable_list.csv'/;
 variable_list_csv.lp = 1;
 put variable_list_csv;
@@ -2523,10 +2525,7 @@ put variable_list_csv;
     put "vTradeCost"/;
     put "vTradeRowCost"/;
     put "vTradeIrCost"/;
-    put "vTradeCap"/;
-    put "vTradeInv"/;
     put "vTradeSalv"/;
-    put "vTradeNewCap"/;
     put "vTechUse"/;
     put "vTechNewCap"/;
     put "vTechRetiredCap"/;
@@ -2570,6 +2569,9 @@ put variable_list_csv;
     put "vExportRow"/;
     put "vImportRowAccumulated"/;
     put "vImportRow"/;
+    put "vTradeCap"/;
+    put "vTradeInv"/;
+    put "vTradeNewCap"/;
  putclose;
 file raw_data_set_csv / 'raw_data_set.csv'/;
 raw_data_set_csv.lp = 1;
