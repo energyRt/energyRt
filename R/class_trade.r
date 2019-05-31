@@ -17,6 +17,7 @@ setClass("trade",
       	stock = "data.frame",
       	capacityVariable = "logical",
       	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+      	cap2act       = "numeric",         #
       	misc = "list"
       ),
 	# Default values and structure of slots
@@ -82,6 +83,7 @@ setClass("trade",
 			cdst2aout  = numeric(),
 			cdst2ainp  = numeric(),
 			stringsAsFactors = FALSE),
+		cap2act       = 1,         #
 		GIS           = NULL,
 		# slice = NULL,
 		#! Misc

@@ -242,6 +242,7 @@ param pTradeStock{trade, region, region, year};
 param pTradeOlife{trade, region, region};
 param pTradeInvcost{trade, region, region, year};
 param pTradeSalv{trade, region, region, year};
+param pTradeCap2Act{trade};
 param pLECLoACT{region};
 param ORD{year};
 
@@ -457,6 +458,8 @@ s.t.  eqImportRowLo{(i, c, r, y, s) in mImportRow : pImportRowLo[i,r,y,s] <> 0}:
 s.t.  eqImportRowAccumulated{(i, c) in mImpComm}: vImportRowAccumulated[i,c]  =  sum{r in region,y in year,s in slice:((i,c,r,y,s) in mImportRow)}(pPeriodLen[y]*vImportRow[i,c,r,y,s]);
 
 s.t.  eqImportRowResUp{(i, c) in mImportRowAccumulatedUp}: vImportRowAccumulated[i,c] <=  pImportRowRes[i];
+
+s.t.  eqTradeCapFlow{(t1, c) in mTradeComm, (t1, s) in mTradeSlice, (t1, src, dst, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMidMilestone}: vTradeCap[t1,src,dst,y]  >=  pTradeCap2Act[t1]*vTradeIr[t1,c,src,dst,y,s];
 
 s.t.  eqTradeCap{(t1, src, dst, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMidMilestone}: vTradeCap[t1,src,dst,y]  =  pTradeStock[t1,src,dst,y]+sum{yp in year:(((t1,src,dst,yp) in mTradeNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTradeOlife[t1,src,dst]+ordYear[yp] or (t1,src,dst) in mTradeOlifeInf)))}(vTradeNewCap[t1,src,dst,yp]);
 

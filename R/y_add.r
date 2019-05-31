@@ -917,6 +917,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
     
     # Add trade data
     if (trd@capacityVariable) {
+    	obj@parameters[['pTradeCap2act']] <- addData(obj@parameters[['pTradeCap2act']],
+    		data.frame(trade = trd@name, value = trd@cap2act))
+
     	obj@parameters[['mTradeCapacityVariable']] <- addData(obj@parameters[['mTradeCapacityVariable']], data.frame(trade = trd@name))
     	
      	dd <- data.frame(list = c('pTradeOlife', 'pTradeInvcost', 'pTradeStock'),

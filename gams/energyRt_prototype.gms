@@ -296,6 +296,7 @@ pTradeStock(trade, region, region, year)
 pTradeOlife(trade, region, region)
 pTradeInvcost(trade, region, region, year)
 pTradeSalv(trade, region, region, year)
+pTradeCap2Act(trade)
 ;
 
 $ontext
@@ -1362,6 +1363,7 @@ eqImportRowResUp(imp, comm)                       Accumulated import from ROW up
 eqTradeCap(trade, src, dst, year)
 eqTradeInv(trade, src, dst, year)
 eqTradeSalv(trade, src, dst, yeare)
+eqTradeCapFlow(trade, comm, src, dst, year, slice)
 ;
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
@@ -1436,7 +1438,13 @@ eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccum
 ********************************************************************************
 
 * Capacity equation
-eqTradeCap(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))..
+eqTradeCapFlow(trade, comm, src, dst, year, slice)$(mTradeCapacityVariable(trade) and mTradeComm(trade, comm)
+                 and mTradeSlice(trade, slice) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))..
+         vTradeCap(trade, src, dst, year) =g= pTradeCap2Act(trade) * vTradeIr(trade, comm, src, dst, year, slice);
+
+* Capacity equation
+eqTradeCap(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilestone(year)
+                 and  mTradeSpan(trade, src, dst, year))..
          vTradeCap(trade, src, dst, year)
          =e=
          pTradeStock(trade, src, dst, year) +
@@ -1846,6 +1854,7 @@ eqImportRowLo
 eqImportRowAccumulated
 eqImportRowResUp
 eqTradeCap
+eqTradeCapFlow
 eqTradeInv
 eqTradeSalv
 **************************************
