@@ -67,9 +67,9 @@ setClass("trade",
 			stock = numeric(),
 			stringsAsFactors = FALSE),
 		capacityVariable = FALSE,
-      	aux           = data.frame(acomm     = character(),
-                                    unit     = character(),
-      		stringsAsFactors = FALSE),
+		aux           = data.frame(acomm     = character(),
+			unit     = character(),
+			stringsAsFactors = FALSE),
 		# Auxilary parameter
 		aeff          = data.frame(
 			acomm      = character(),

@@ -1665,8 +1665,8 @@ eqObjective..
 
          sum((src, dst, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
            pDiscountFactor(src, yearp) *
-                 sum(trade$(mCapacityVariablemTradeCapacityVariable(trade) and mTradeNew(trade, src, dst, year)), vTradeInv(trade, src, dst, year))) +
-         sum((src, dst, year, trade)$(mCapacityVariablemTradeCapacityVariable(trade) and mMilestoneLast(year) and mTradeSalv(trade, src, dst)),
+                 sum(trade$(mTradeCapacityVariable(trade) and mTradeNew(trade, src, dst, year)), vTradeInv(trade, src, dst, year))) +
+         sum((src, dst, year, trade)$(mTradeCapacityVariable(trade) and mMilestoneLast(year) and mTradeSalv(trade, src, dst)),
                  pDiscountFactor(src, year) * vTradeSalv(trade, src, dst))
 
 ;

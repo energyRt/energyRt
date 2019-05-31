@@ -954,7 +954,7 @@ rs
     rs["mTradeSalv", c("name", "description", "type")] <- c("mTradeSalv", "", "map");
     rs["mTradeSalv", c("trade", "region")] <- TRUE;
     rs["mTradeCapacityVariable", c("name", "description", "type")] <- c("mTradeCapacityVariable", "", "map");
-    rs["mTradeCapacityVariable", c("trade", "eqTradeCap", "eqTradeInv", "eqTradeSalv")] <- TRUE;
+    rs["mTradeCapacityVariable", c("trade", "eqTradeCap", "eqTradeInv", "eqTradeSalv", "eqObjective")] <- TRUE;
     rs["mTechInpTot", c("name", "description", "type")] <- c("mTechInpTot", "Total technology input mapp", "map");
     rs["mTechInpTot", c("comm", "region", "year", "slice", "eqInpTot", "eqInp2Lo", "eqTechInpTot")] <- TRUE;
     rs["mTechOutTot", c("name", "description", "type")] <- c("mTechOutTot", "Total technology output mapp", "map");
