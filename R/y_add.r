@@ -893,6 +893,33 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
                                                                      approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
       }
     }
+    
+    # Add trade data
+    if (trd@capacityVariable) {
+    	
+    	
+    }
+    
+    # .Object@parameters[['mTradeSpan']] <- createParameter('mTradeSpan', c('trade', 'region', 'region', 'year'), 'map', cls = 'trade')    
+    # .Object@parameters[['mTradeSpan']] <- createParameter('mTradeSpan', c('trade', 'region', 'region', 'year'), 'map', cls = 'trade')    
+    # .Object@parameters[['mTradeNew']] <- createParameter('mTradeNew', c('trade', 'region', 'region', 'year'), 'map', cls = 'trade')    
+    # .Object@parameters[['mTradeOlifeInf']] <- createParameter('mTradeOlifeInf', c('trade', 'region', 'region'), 'map', cls = 'trade')    
+    # .Object@parameters[['mTradeSalv']] <- createParameter('mTradeSalv', c('trade', 'region', 'region'), 'map', cls = 'trade')    
+    # .Object@parameters[['mCapacityVariable']] <- createParameter('mCapacityVariable', 'trade', 'map', cls = 'trade')    
+    # 
+    # .Object@parameters[['pTradeStock']] <- createParameter('pTradeStock', 
+    # 	c('trade', 'region', 'region', 'year'), 'simple', 
+    # 	defVal = 0, interpolation = 'back.inter.forth', colName = 'stock', cls = 'trade')    
+    # .Object@parameters[['pTradeOlife']] <- createParameter('pTradeOlife', 
+    # 	c('trade', 'region', 'region'), 'simple', 
+    # 	defVal = 0, interpolation = 'back.inter.forth', colName = 'olife', cls = 'trade')    
+    # .Object@parameters[['pTradeInvcost']] <- createParameter('pTradeInvcost', 
+    # 	c('trade', 'region', 'region', 'year'), 'simple', 
+    # 	defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'trade')    
+    # .Object@parameters[['pTradeSalv']] <- createParameter('pTradeSalv', 
+    # 	c('trade', 'region', 'region', 'year'), 'simple', 
+    # 	defVal = 0, interpolation = 'back.inter.forth', colName = '', cls = 'trade')    
+    
     # mTradeSpan(trade, region, region, year)
     # mTradeNew(trade, region, region, year)
     # mTradeOlifeInf(trade, region, region)

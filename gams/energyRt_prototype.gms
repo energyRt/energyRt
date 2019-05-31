@@ -148,7 +148,7 @@ mTradeSpan(trade, region, region, year)
 mTradeNew(trade, region, region, year)
 mTradeOlifeInf(trade, region, region)
 mTradeSalv(trade, region, region)
-mCapacityVariable(trade)
+mTradeCapacityVariable(trade)
 ;
 
 * Set priority
@@ -472,13 +472,13 @@ vTradeCost(region, year)                             Total trade costs
 vTradeRowCost(region, year)                          Trade with ROW costs
 *@  mMidMilestone(year)
 vTradeIrCost(region, year)                           Interregional trade costs
-*@ (mCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))
+*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))
 vTradeCap(trade, region, region, year)
-*@ (mCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
+*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
 vTradeInv(trade, region, region, year)
-*@ (mCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))
+*@ (mTradeCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))
 vTradeSalv(trade, region, region)
-*@ (mCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
+*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
 vTradeNewCap(trade, region, region, year)
 ;
 
@@ -1434,7 +1434,7 @@ eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccum
 ********************************************************************************
 
 * Capacity equation
-eqTradeCap(trade, src, dst, year)$(mCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))..
+eqTradeCap(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))..
          vTradeCap(trade, src, dst, year)
          =e=
          pTradeStock(trade, src, dst, year) +
@@ -1446,11 +1446,11 @@ eqTradeCap(trade, src, dst, year)$(mCapacityVariable(trade) and mMidMilestone(ye
 
 
 * Investment equation
-eqTradeInv(trade, src, dst, year)$(mCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))..  vTradeInv(trade, src, dst, year) =e=
+eqTradeInv(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))..  vTradeInv(trade, src, dst, year) =e=
    pTradeInvcost(trade, src, dst, year) * vTradeNewCap(trade, src, dst, year);
 
 * Salvage value
-eqTradeSalv(trade, src, dst, yeare)$(mCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))..
+eqTradeSalv(trade, src, dst, yeare)$(mTradeCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))..
     vTradeSalv(trade, src, dst)
     =e=
    sum(year$(mMidMilestone(year) and mTradeNew(trade, src, dst, year) and ordYear(year) + pTradeOlife(trade, src, dst) - 1 > ordYear(yeare) and
@@ -1665,8 +1665,8 @@ eqObjective..
 
          sum((src, dst, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
            pDiscountFactor(src, yearp) *
-                 sum(trade$(mCapacityVariable(trade) and mTradeNew(trade, src, dst, year)), vTradeInv(trade, src, dst, year))) +
-         sum((src, dst, year, trade)$(mCapacityVariable(trade) and mMilestoneLast(year) and mTradeSalv(trade, src, dst)),
+                 sum(trade$(mCapacityVariablemTradeCapacityVariable(trade) and mTradeNew(trade, src, dst, year)), vTradeInv(trade, src, dst, year))) +
+         sum((src, dst, year, trade)$(mCapacityVariablemTradeCapacityVariable(trade) and mMilestoneLast(year) and mTradeSalv(trade, src, dst)),
                  pDiscountFactor(src, year) * vTradeSalv(trade, src, dst))
 
 ;

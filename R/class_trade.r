@@ -17,78 +17,78 @@ setClass("trade",
       	stock = "data.frame",
       	capacityVariable = "logical",
       	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-          misc = "list"
+      	misc = "list"
       ),
-      # Default values and structure of slots
-      prototype(
-      # General information
-         name           = "default_trade",       # Short name
-         description    = "",
-         commodity      = NULL,       #
-         source         = character(),
-         destination    = character(),
-         trade          = data.frame(
-                                     src        = character(),
-                                     dst        = character(),
-                                     year       = numeric(),
-                                     slice      = character(),
-                                     ava.up     = numeric(),
-                                     ava.fx     = numeric(),
-                                     ava.lo     = numeric(),
-                                     cost       = numeric(),
-														         markup     = numeric(),
-														         teff        = numeric(),
-														         stringsAsFactors = FALSE),
-      	invcost = data.frame(
-      		src        = character(),
-      		dst        = character(),
-      		year       = numeric(),
-      		invcost    = numeric(),
-      		stringsAsFactors = FALSE),
-      	olife = data.frame(
-      		src        = character(),
-      		dst        = character(),
-      		olife    = numeric(),
-      		stringsAsFactors = FALSE),
-      	start = data.frame(
-      		src        = character(),
-      		dst        = character(),
-      		start    = numeric(),
-      		stringsAsFactors = FALSE),
-      	end = data.frame(
-      		src        = character(),
-      		dst        = character(),
-      		end    = numeric(),
-      		stringsAsFactors = FALSE),
-      	stock         = data.frame(
-      		src = character(),
-      		dst = character(),
-      		year  = integer(),
-      		stock = numeric(),
-      		stringsAsFactors = FALSE),
-      	capacityVariable = FALSE,
+	# Default values and structure of slots
+	prototype(
+		# General information
+		name           = "default_trade",       # Short name
+		description    = "",
+		commodity      = NULL,       #
+		source         = character(),
+		destination    = character(),
+		trade          = data.frame(
+			src        = character(),
+			dst        = character(),
+			year       = numeric(),
+			slice      = character(),
+			ava.up     = numeric(),
+			ava.fx     = numeric(),
+			ava.lo     = numeric(),
+			cost       = numeric(),
+			markup     = numeric(),
+			teff        = numeric(),
+			stringsAsFactors = FALSE),
+		invcost = data.frame(
+			src        = character(),
+			dst        = character(),
+			year       = numeric(),
+			invcost    = numeric(),
+			stringsAsFactors = FALSE),
+		olife = data.frame(
+			src        = character(),
+			dst        = character(),
+			olife    = numeric(),
+			stringsAsFactors = FALSE),
+		start = data.frame(
+			src        = character(),
+			dst        = character(),
+			start    = numeric(),
+			stringsAsFactors = FALSE),
+		end = data.frame(
+			src        = character(),
+			dst        = character(),
+			end    = numeric(),
+			stringsAsFactors = FALSE),
+		stock         = data.frame(
+			src = character(),
+			dst = character(),
+			year  = integer(),
+			stock = numeric(),
+			stringsAsFactors = FALSE),
+		capacityVariable = FALSE,
       	aux           = data.frame(acomm     = character(),
                                     unit     = character(),
-                                    stringsAsFactors = FALSE),
-         # Auxilary parameter
-         aeff          = data.frame(
-                                     acomm      = character(),
-                                     src     = character(),
-                                     dst     = character(),
-                                     year       = numeric(),
-                                     slice      = character(),
-                                     csrc2aout  = numeric(),
-                                     csrc2ainp  = numeric(),
-                                     cdst2aout  = numeric(),
-                                     cdst2ainp  = numeric(),
-                                     stringsAsFactors = FALSE),
-        GIS           = NULL,
-        # slice = NULL,
-        #! Misc
-        misc = list(
-        )),
-      S3methods = TRUE
+      		stringsAsFactors = FALSE),
+		# Auxilary parameter
+		aeff          = data.frame(
+			acomm      = character(),
+			src     = character(),
+			dst     = character(),
+			year       = numeric(),
+			slice      = character(),
+			csrc2aout  = numeric(),
+			csrc2ainp  = numeric(),
+			cdst2aout  = numeric(),
+			cdst2ainp  = numeric(),
+			stringsAsFactors = FALSE),
+		GIS           = NULL,
+		# slice = NULL,
+		#! Misc
+		misc = list(
+		)),
+	S3methods = TRUE
 );
 setMethod("initialize", "trade", function(.Object, ...) {
-  .Object
+	.Object
 })
