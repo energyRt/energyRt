@@ -67,8 +67,8 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
     	pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
     	pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
     		function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    	cat(mps_name_def, sep = '\n', file = zz)
-    	cat(pps_name_def, sep = '\n', file = zz)
+    	if (length(mps_name) != 0) cat(mps_name_def, sep = '\n', file = zz)
+    	if (length(pps_name) != 0) cat(pps_name_def, sep = '\n', file = zz)
     }
     cat(file_w, sep = '\n', file = zz)
     # Add constraint equation 
