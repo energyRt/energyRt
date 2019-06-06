@@ -315,7 +315,7 @@
 		scen@modInp@gams.equation[[sub('^eqCns', '', rst$equationDeclaration2Model)]] <- rst
 	}
 	# Save all before data to misc
-	data.before <- scen@modOut@variables
+	data.before <- src@modOut@variables
 	data.before$vObjective <- NULL
 	for (i in names(data.before)) 
 		if (!is.null(data.before[[i]]$year)) {
