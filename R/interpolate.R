@@ -87,7 +87,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
   )
   # Fill basic parameter interplotaion from sysInfo
   scen@modInp <- .read_default_data(scen@modInp, scen@model@sysInfo)
- 
+  scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
+  
+  # Add discount data to approxim
+  approxim <- .add_discount_approxim(scen, approxim)
+  
   # Remove early retirement if not need
   if (!scen@model@early.retirement) {
     scen <- .remove_early_retirment(scen)
@@ -103,6 +107,8 @@ interpolate <- function(obj, ...) { #- returns class scenario
   scen <- .add_name_for_basic_set(scen, approxim)
   scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
 
+
+  
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation ')
@@ -111,7 +117,6 @@ interpolate <- function(obj, ...) { #- returns class scenario
   } else {
     stop('have to do')
   }
-  scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
     scen@modInp@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)

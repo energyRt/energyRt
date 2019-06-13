@@ -93,6 +93,7 @@ mTechAOut(tech, comm)            Auxiliary output
 *
 mTechNew(tech, region, year)     Technologies available for investment
 mTechSpan(tech, region, year)    Availability of each technology by regions and milestone years
+mTechSalv(tech, region)          Need calculate salvage cost
 mTechSlice(tech, slice)          Technology to slice-level
 * Supply
 mSupSlice(sup, slice)             Supply to slices-level
@@ -141,6 +142,13 @@ mTechWeatherAfc(tech, weather, comm)
 mStorageWeatherAf(stg, weather)
 mStorageWeatherCinp(stg, weather)
 mStorageWeatherCout(stg, weather)
+
+
+mTradeSpan(trade, region, region, year)
+mTradeNew(trade, region, region, year)
+mTradeOlifeInf(trade, region, region)
+mTradeSalv(trade, region, region)
+mTradeCapacityVariable(trade)
 ;
 
 * Set priority
@@ -180,6 +188,7 @@ pTechCout2AOut(tech, comm, comm, region, year, slice)     Multiplier to commodit
 pTechFixom(tech, region, year)                      Fixed Operating and maintenance (O&M) costs (per unit of capacity)
 pTechVarom(tech, region, year, slice)               Variable O&M costs (per unit of acticity)
 pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
+pTechSalv(tech, region, year)                       Salvage coefficient for investment costs (per unit of capacity)
 pTechShareLo(tech, comm, region, year, slice)       Lower bound for share of the commodity in total group input or output
 pTechShareUp(tech, comm, region, year, slice)       Upper bound for share of the commodity in total group input or output
 pTechAfLo(tech, region, year, slice)                Lower bound for activity for each slice
@@ -283,6 +292,11 @@ pImportRowRes(imp)                                   Upper bound on accumulated 
 pImportRowUp(imp, region, year, slice)               Upper bount on import from ROW
 pImportRowLo(imp, region, year, slice)               Lower bound on import from ROW
 pImportRowPrice(imp, region, year, slice)            Import prices from ROW
+pTradeStock(trade, region, region, year)
+pTradeOlife(trade, region, region)
+pTradeInvcost(trade, region, region, year)
+pTradeSalv(trade, region, region, year)
+pTradeCap2Act(trade)
 ;
 
 $ontext
@@ -459,6 +473,16 @@ vTradeCost(region, year)                             Total trade costs
 vTradeRowCost(region, year)                          Trade with ROW costs
 *@  mMidMilestone(year)
 vTradeIrCost(region, year)                           Interregional trade costs
+*@ (mTradeCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))
+vTradeSalv(trade, region, region)
+;
+positive variable
+*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))
+vTradeCap(trade, region, region, year)
+*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
+vTradeInv(trade, region, region, year)
+*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))
+vTradeNewCap(trade, region, region, year)
 ;
 
 ********************************************************************************
@@ -937,9 +961,7 @@ eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
 * Investment equation
 eqTechInv(tech, region, year)       Technology investment costs
 * Salvage value
-*eqTechSalv1(tech, region)
 eqTechSalv(tech, region, yeare)     Technology salvage costs
-eqTechSalv0(tech, region, yeare)    Technology salvage costs when discount is zero
 * Aggregated annual costs
 eqTechOMCost(tech, region, year)    Technology O&M costs
 ;
@@ -1008,38 +1030,14 @@ eqTechInv(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region, ye
    pTechInvcost(tech, region, year) * vTechNewCap(tech, region, year);
 
 * Salvage value
-eqTechSalv0(tech, region, yeare)$(mDiscountZero(region) and mMilestoneLast(yeare) and sum(year$mTechNew(tech, region, year), 1) <> 0)..
+eqTechSalv(tech, region, yeare)$(mTechSalv(tech, region) and mMilestoneLast(yeare))..
     vTechSalv(tech, region)
-    +
-   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn) and mTechNew(tech, region, yearn)
-         and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))  and pTechInvcost(tech, region, yearn) <> 0),
-    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
-    pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
-     - sum(yearp$(mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp)))  / (
-      1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
-        / (pDiscountFactor(region, yeare)
-          ) / (
-           (pTechOlife(tech, region) + ordYear(yearn) - 1 - ordYear(yeare)
-           ))
-    ))  =e= 0;
+    =e=
+   sum(year$(mMidMilestone(year) and mTechNew(tech, region, year) and ordYear(year) + pTechOlife(tech, region) - 1 > ordYear(yeare) and
+                 not(mTechOlifeInf(tech, region))  and pTechInvcost(tech, region, year) <> 0),
+    pTechSalv(tech, region, year) * pTechInvcost(tech, region, year) * (vTechNewCap(tech, region, year)
+     - sum(yearp$mTechRetirement(tech), vTechRetiredCap(tech, region, year, yearp))));
 
-
-eqTechSalv(tech, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(region)) and sum(year$mTechNew(tech, region, year), 1) <> 0)..
-    vTechSalv(tech, region)
-    +
-   sum((year, yearn)$(mStartMilestone(yearn, year) and mMidMilestone(yearn)
-  and mTechNew(tech, region, yearn) and ordYear(yearn) + pTechOlife(tech, region) - 1 > ordYear(yeare) and not(mTechOlifeInf(tech, region))
-   and pTechInvcost(tech, region, yearn) <> 0),
-    (pDiscountFactor(region, yearn) /  pDiscountFactor(region, yeare)) *
-    pTechInvcost(tech, region, yearn) * (vTechNewCap(tech, region, yearn)
-      - sum(yearp$(mMidMilestone(yearp) and mTechRetirement(tech)), vTechRetiredCap(tech, region, year, yearp))) / (
-      1
-        + (sum(yearp$(ordYear(yearp) >= ordYear(yearn)), pDiscountFactor(region, yearp)))
-        / pDiscountFactor(region, yeare) / ((
-           1 - (1 + pDiscount(region, yeare)) ** (ordYear(yeare) - pTechOlife(tech, region) - ordYear(yearn) + 1)
-           )  *  (1 + pDiscount(region, yeare)) / pDiscount(region, yeare))
-    ))  =e= 0;
 
 * Annual O&M costs
 eqTechOMCost(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region, year))..
@@ -1340,6 +1338,8 @@ eqStorageSalv(stg, region, yeare)$(mMilestoneLast(yeare) and not(mDiscountZero(r
     ))  =e= 0;
 
 
+
+
 ********************************************************************************
 * Interregional and ROW Trade equations
 ********************************************************************************
@@ -1360,6 +1360,10 @@ eqImportRowUp(imp, comm, region, year, slice)     Import from ROW upper bound
 eqImportRowLo(imp, comm, region, year, slice)     Import of ROW lower bound
 eqImportRowAccumulated(imp, comm)                 Accumulated import from ROW
 eqImportRowResUp(imp, comm)                       Accumulated import from ROW upper bound
+eqTradeCap(trade, src, dst, year)
+eqTradeInv(trade, src, dst, year)
+eqTradeSalv(trade, src, dst, yeare)
+eqTradeCapFlow(trade, comm, src, dst, year, slice)
 ;
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
@@ -1427,6 +1431,41 @@ eqImportRowAccumulated(imp, comm)$mImpComm(imp, comm).. vImportRowAccumulated(im
 );
 
 eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccumulated(imp, comm) =l= pImportRowRes(imp);
+
+
+********************************************************************************
+* Trade IR capacity equations
+********************************************************************************
+
+* Capacity equation
+eqTradeCapFlow(trade, comm, src, dst, year, slice)$(mTradeCapacityVariable(trade) and mTradeComm(trade, comm)
+                 and mTradeSlice(trade, slice) and mMidMilestone(year) and  mTradeSpan(trade, src, dst, year))..
+         vTradeCap(trade, src, dst, year) =g= pTradeCap2Act(trade) * vTradeIr(trade, comm, src, dst, year, slice);
+
+* Capacity equation
+eqTradeCap(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilestone(year)
+                 and  mTradeSpan(trade, src, dst, year))..
+         vTradeCap(trade, src, dst, year)
+         =e=
+         pTradeStock(trade, src, dst, year) +
+         sum((yearp)$
+                 (       mTradeNew(trade, src, dst, yearp) and mMidMilestone(yearp) and
+                         ordYear(year) >= ordYear(yearp) and
+                         (ordYear(year) < pTradeOlife(trade, src, dst) + ordYear(yearp) or mTradeOlifeInf(trade, src, dst))
+                 ), vTradeNewCap(trade, src, dst, yearp));
+
+
+* Investment equation
+eqTradeInv(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))..  vTradeInv(trade, src, dst, year) =e=
+   pTradeInvcost(trade, src, dst, year) * vTradeNewCap(trade, src, dst, year);
+
+* Salvage value
+eqTradeSalv(trade, src, dst, yeare)$(mTradeCapacityVariable(trade) and mTradeSalv(trade, src, dst) and mMilestoneLast(yeare))..
+    vTradeSalv(trade, src, dst)
+    =e=
+   sum(year$(mMidMilestone(year) and mTradeNew(trade, src, dst, year) and ordYear(year) + pTradeOlife(trade, src, dst) - 1 > ordYear(yeare) and
+                 not(mTradeOlifeInf(trade, src, dst))  and pTradeInvcost(trade, src, dst, year) <> 0),
+    pTradeSalv(trade, src, dst, year) * pTradeInvcost(trade, src, dst, year) * vTradeNewCap(trade, src, dst, year));
 
 
 ********************************************************************************
@@ -1629,10 +1668,18 @@ eqObjective..
          sum((region, year)$mMidMilestone(year),
            vCost(region, year) * sum((yeare, yearp, yearn)$(mStartMilestone(year, yearp) and mEndMilestone(year, yeare)
                  and ordYear(yearn) >= ordYear(yearp) and ordYear(yearn) <= ordYear(yeare)), pDiscountFactor(region, yearn))) +
-         sum((region, year, tech)$(mMilestoneLast(year) and  sum(yearp$mTechNew(tech, region, yearp), 1) <> 0),
+         sum((region, year, tech)$(mMilestoneLast(year) and  mTechSalv(tech, region)),
                  pDiscountFactor(region, year) * vTechSalv(tech, region)) +
          sum((region, year, stg)$(mMilestoneLast(year) and  sum(yearp$mStorageNew(stg, region, yearp), 1) <> 0),
-                 pDiscountFactor(region, year) * vStorageSalv(stg, region));
+                 pDiscountFactor(region, year) * vStorageSalv(stg, region)) +
+
+         sum((src, dst, year, yearp)$(mMidMilestone(year) and mStartMilestone(year, yearp)),
+           pDiscountFactor(src, yearp) *
+                 sum(trade$(mTradeCapacityVariable(trade) and mTradeNew(trade, src, dst, year)), vTradeInv(trade, src, dst, year))) +
+         sum((src, dst, year, trade)$(mTradeCapacityVariable(trade) and mMilestoneLast(year) and mTradeSalv(trade, src, dst)),
+                 pDiscountFactor(src, year) * vTradeSalv(trade, src, dst))
+
+;
 
 * Latex file end
 *\end{document}
@@ -1734,8 +1781,6 @@ eqTechInv
 eqTechEac
 * FIX O & M equation
 * Salvage value
-*eqTechSalv1
-eqTechSalv0
 eqTechSalv
 * Commodity Varom O & M and Varom O & M aggregate by year equation
 * Aggregated annual costs
@@ -1808,6 +1853,10 @@ eqImportRowUp
 eqImportRowLo
 eqImportRowAccumulated
 eqImportRowResUp
+eqTradeCap
+eqTradeCapFlow
+eqTradeInv
+eqTradeSalv
 **************************************
 * Ballance equation & dummy
 **************************************
@@ -1853,7 +1902,7 @@ eqLECActivity
 
 *option lp = cbc;
 
-*$exit
+* $exit
 * f374f3df-5fd6-44f1-b08a-1a09485cbe3d
 
 
@@ -2039,6 +2088,15 @@ vTradeIrCost_csv.nr = 2;
 put vTradeIrCost_csv;
 put "region,year,value"/;
 loop((region,year)$(vTradeIrCost.l(region,year) and mMidMilestone(year)), put region.tl:0",", year.tl:0","vTradeIrCost.l(region,year):0:15/;);
+putclose; 
+file vTradeSalv_csv / 'vTradeSalv.csv'/;
+vTradeSalv_csv.lp = 1;
+vTradeSalv_csv.nd = 1;
+vTradeSalv_csv.nz = 1e-25;
+vTradeSalv_csv.nr = 2;
+put vTradeSalv_csv;
+put "trade,region,regionp,value"/;
+loop((trade,region,regionp)$vTradeSalv.l(trade,region,regionp), put trade.tl:0",", region.tl:0",", regionp.tl:0","vTradeSalv.l(trade,region,regionp):0:15/;);
 putclose; 
 file vTechUse_csv / 'vTechUse.csv'/;
 vTechUse_csv.lp = 1;
@@ -2427,6 +2485,33 @@ put vImportRow_csv;
 put "imp,comm,region,year,slice,value"/;
 loop((imp,comm,region,year,slice)$(vImportRow.l(imp,comm,region,year,slice) and mMidMilestone(year)), put imp.tl:0",", comm.tl:0",", region.tl:0",", year.tl:0",", slice.tl:0","vImportRow.l(imp,comm,region,year,slice):0:15/;);
 putclose; 
+file vTradeCap_csv / 'vTradeCap.csv'/;
+vTradeCap_csv.lp = 1;
+vTradeCap_csv.nd = 1;
+vTradeCap_csv.nz = 1e-25;
+vTradeCap_csv.nr = 2;
+put vTradeCap_csv;
+put "trade,region,regionp,year,value"/;
+loop((trade,region,regionp,year)$(vTradeCap.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeCap.l(trade,region,regionp,year):0:15/;);
+putclose; 
+file vTradeInv_csv / 'vTradeInv.csv'/;
+vTradeInv_csv.lp = 1;
+vTradeInv_csv.nd = 1;
+vTradeInv_csv.nz = 1e-25;
+vTradeInv_csv.nr = 2;
+put vTradeInv_csv;
+put "trade,region,regionp,year,value"/;
+loop((trade,region,regionp,year)$(vTradeInv.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeInv.l(trade,region,regionp,year):0:15/;);
+putclose; 
+file vTradeNewCap_csv / 'vTradeNewCap.csv'/;
+vTradeNewCap_csv.lp = 1;
+vTradeNewCap_csv.nd = 1;
+vTradeNewCap_csv.nz = 1e-25;
+vTradeNewCap_csv.nr = 2;
+put vTradeNewCap_csv;
+put "trade,region,regionp,year,value"/;
+loop((trade,region,regionp,year)$(vTradeNewCap.l(trade,region,regionp,year) and mMidMilestone(year)), put trade.tl:0",", region.tl:0",", regionp.tl:0",", year.tl:0","vTradeNewCap.l(trade,region,regionp,year):0:15/;);
+putclose; 
 file variable_list_csv / 'variable_list.csv'/;
 variable_list_csv.lp = 1;
 put variable_list_csv;
@@ -2449,6 +2534,7 @@ put variable_list_csv;
     put "vTradeCost"/;
     put "vTradeRowCost"/;
     put "vTradeIrCost"/;
+    put "vTradeSalv"/;
     put "vTechUse"/;
     put "vTechNewCap"/;
     put "vTechRetiredCap"/;
@@ -2492,6 +2578,9 @@ put variable_list_csv;
     put "vExportRow"/;
     put "vImportRowAccumulated"/;
     put "vImportRow"/;
+    put "vTradeCap"/;
+    put "vTradeInv"/;
+    put "vTradeNewCap"/;
  putclose;
 file raw_data_set_csv / 'raw_data_set.csv'/;
 raw_data_set_csv.lp = 1;

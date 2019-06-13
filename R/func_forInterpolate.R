@@ -23,6 +23,19 @@
   mdl
 }
 
+.add_discount_approxim <- function(scen, approxim) {
+	approxim$discountFactor <- .getTotalParameterData(scen@modInp, 'pDiscountFactor')
+	approxim$discount <- .getTotalParameterData(scen@modInp, 'pDiscount')
+	yy <- approxim$discountFactor
+	ll <- NULL
+	for (rg in unique(yy$region)) {
+		l1 <- yy[yy$region == rg, ]
+		l1$value <- cumsum(l1$value)
+		if (is.null(ll)) ll <- l1 else ll <- rbind(ll, l1)
+	}
+	approxim$discountCum <- ll
+	approxim
+}
 # Get commodity slice map for interpolate
 .get_map_commodity_slice_map <- function(obj) {
   xx <- list()
