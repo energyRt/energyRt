@@ -380,7 +380,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'technology',
   approxim = 'list'), function(obj, app, approxim) {
-    .checkSliceLevel(app, approxim)
+    energyRt:::.checkSliceLevel(app, approxim)
     #  mTechInpComm(tech, comm)       Input commodity
 #  mTechOutComm(tech, comm)       Output commodity
 #  mTechCapComm(tech, comm)       Capacity fix commodity
@@ -407,7 +407,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
     use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
     tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]
   }
-  approxim <- .fix_approximation_list(approxim, lev = tech@slice)
+  approxim <- energyRt:::.fix_approximation_list(approxim, lev = tech@slice)
   tech <- .disaggregateSliceLevel(tech, approxim)
   obj@parameters[['mTechSlice']] <- addData(obj@parameters[['mTechSlice']],
                                            data.frame(tech = rep(tech@name, length(approxim$slice)), slice = approxim$slice, 
@@ -623,7 +623,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
                                                 obj@parameters[['pTechStock']]@data$tech == tech@name & 
                                                 obj@parameters[['pTechStock']]@data$value != 0, c('region', 'year'), 
   	drop = FALSE] 
-  dd0 <- .start_end_fix(approxim, tech, 'tech', stock_exist)
+  dd0 <- energyRt:::.start_end_fix(approxim, tech, 'tech', stock_exist)
   dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
   dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
   obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)

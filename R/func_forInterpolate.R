@@ -24,8 +24,8 @@
 }
 
 .add_discount_approxim <- function(scen, approxim) {
-	approxim$discountFactor <- .getTotalParameterData(scen@modInp, 'pDiscountFactor')
-	approxim$discount <- .getTotalParameterData(scen@modInp, 'pDiscount')
+	approxim$discountFactor <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscountFactor', FALSE)
+	approxim$discount <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscount', FALSE)
 	yy <- approxim$discountFactor
 	ll <- NULL
 	for (rg in unique(yy$region)) {
@@ -130,6 +130,10 @@
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) { 
       k <- k + 1
+      assign('i', i, globalenv())
+      assign('j', j, globalenv())
+      assign('scen', scen, globalenv())
+      assign('approxim', approxim, globalenv())
       scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
       if (need.tick[k] && arg$echo) {
         cat('.')
