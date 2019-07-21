@@ -130,11 +130,18 @@
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) { 
       k <- k + 1
-      assign('i', i, globalenv())
-      assign('j', j, globalenv())
-      assign('scen', scen, globalenv())
-      assign('approxim', approxim, globalenv())
-      scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
+      tryCatch({
+        scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
+      }, error = function(e) {
+        cat(paste0('There are error during interpolation. Check main parameters for repository # ', 
+            i, ', member # ', j, '. Wrong assign in wrg.\n'))
+            assign('wrg', scen@model@data[[i]]@data[[j]], globalenv())
+            assign('i', i, globalenv())
+            assign('j', j, globalenv())
+            assign('scen', scen, globalenv())
+            assign('approxim', approxim, globalenv())
+            stop(e)
+      })
       if (need.tick[k] && arg$echo) {
         cat('.')
         flush.console() 

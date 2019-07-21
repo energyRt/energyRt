@@ -223,6 +223,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     # Fill add.map for for.each
     for (j in for.each.set) {
       if (!is.null(stm@for.each[[j]]) && !all(prec@set[[j]] %in% stm@for.each[[j]])) {
+        if (any(stm@for.each[[j]] %in% prec@set[[j]])) {
+          # warning(paste0('Set "'))
+          stm@for.each[[j]] <- stm@for.each[[j]][stm@for.each[[j]] %in% prec@set[[j]]]
+        }
         set.map.name <- c(set.map.name, j)
         set.map[[length(set.map.name)]] <- stm@for.each[[j]]
         all.set[nn[names(stm@for.each) == j], 'new.map'] <- length(set.map.name)
