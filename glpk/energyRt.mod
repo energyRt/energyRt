@@ -764,15 +764,15 @@ for{t1 in trade, src in region, dst in region : vTradeSalv[t1,src,dst] <> 0} {
   printf "%s,%s,%s,%f\n", t1,src,dst,vTradeSalv[t1,src,dst] >> "vTradeSalv.csv";
 }
 printf "trade,src,dst,year,value\n" > "vTradeCap.csv";
-for{(t1, src, dst, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMidMilestonevTradeCap[t1,src,dst,y] <> 0} {
+for{(t1, src, dst, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMidMilestone and vTradeCap[t1,src,dst,y] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t1,src,dst,y,vTradeCap[t1,src,dst,y] >> "vTradeCap.csv";
 }
 printf "trade,src,dst,year,value\n" > "vTradeInv.csv";
-for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestonevTradeInv[t1,src,dst,y] <> 0} {
+for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestone and vTradeInv[t1,src,dst,y] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t1,src,dst,y,vTradeInv[t1,src,dst,y] >> "vTradeInv.csv";
 }
 printf "trade,src,dst,year,value\n" > "vTradeNewCap.csv";
-for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestonevTradeNewCap[t1,src,dst,y] <> 0} {
+for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestone and vTradeNewCap[t1,src,dst,y] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t1,src,dst,y,vTradeNewCap[t1,src,dst,y] >> "vTradeNewCap.csv";
 }
 printf "value\n%s\n",vObjective > "vObjective.csv";
