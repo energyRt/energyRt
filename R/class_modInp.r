@@ -462,7 +462,7 @@ setMethod("initialize", "modInp",
     	c('trade', 'src', 'dst', 'year'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = '', cls = 'trade')    
     
-    .Object@parameters[['pTradeCap2act']] <- createParameter('pTradeCap2act', 'trade', 'simple', 
+    .Object@parameters[['pTradeCap2Act']] <- createParameter('pTradeCap2Act', 'trade', 'simple', 
     	defVal = 1, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cap2act', slot = 'cap2act')    
     
     .Object
