@@ -1,3 +1,7 @@
+write <-  <- function(..., solve = FALSE) {
+  solver_solve(..., solve = solve)
+}
+
 solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # solver = 'GAMS' use solver for model
@@ -19,6 +23,8 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
   if (is.null(arg$only.listing)) arg$only.listing <- FALSE
   if (is.null(arg$tmp.del)) arg$tmp.del <- FALSE
   if (is.null(arg$readresult)) arg$readresult <- TRUE
+  if (is.null(arg$solve)) arg$solve <- TRUE
+  if (is.null(arg$onefile)) arg$onefile <- FALSE
   if (is.null(arg$dir.result)) {
     arg$dir.result <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, scen@name, 
           format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
