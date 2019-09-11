@@ -18,12 +18,12 @@ read_solution <- function(scen, ...) {
 
   
   # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
-  vrb_list <- arg$readOutputFunction(paste(arg$dir.result, '/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
-  if (file.exists(paste(arg$dir.result, '/variable_list2.csv', sep = ''))) {
-    vrb_list2 <- arg$readOutputFunction(paste(arg$dir.result, '/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
+  vrb_list <- arg$readOutputFunction(paste(arg$dir.result, '/output/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
+  if (file.exists(paste(arg$dir.result, '/output/variable_list2.csv', sep = ''))) {
+    vrb_list2 <- arg$readOutputFunction(paste(arg$dir.result, '/output/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
   } else vrb_list2 <- character()
   rr <- list(variables = list(), 
-             set = arg$readOutputFunction(paste(arg$dir.result, '/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
+             set = arg$readOutputFunction(paste(arg$dir.result, '/output/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
   # Read set and alias
   ss <- list()
   for(k in unique(rr$set$set)) {
@@ -41,7 +41,7 @@ read_solution <- function(scen, ...) {
 
   # Read variable data
   for(i in c(vrb_list, vrb_list2)) {
-    jj <- arg$readOutputFunction(paste(arg$dir.result, '/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
+    jj <- arg$readOutputFunction(paste(arg$dir.result, '/output/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
     if (ncol(jj) == 1) {
       rr$variables[[i]] <- data.frame(value = jj[1, 1])
     } else {
@@ -57,8 +57,8 @@ read_solution <- function(scen, ...) {
     }
   }
  
-  rr[['solution_report']] <- list(finish = arg$readOutputFunction(paste(arg$dir.result, '/pFinish.csv', sep = ''))$value, 
-                                  status = arg$readOutputFunction(paste(arg$dir.result, '/pStat.csv', sep = ''))$value)
+  rr[['solution_report']] <- list(finish = arg$readOutputFunction(paste(arg$dir.result, '/output/pFinish.csv', sep = ''))$value, 
+                                  status = arg$readOutputFunction(paste(arg$dir.result, '/output/pStat.csv', sep = ''))$value)
   scen@modOut <- new('modOut')
   scen@modOut@sets <- rr$set_vec
   scen@modOut@variables <- rr$variables

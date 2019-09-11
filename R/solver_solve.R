@@ -1,5 +1,5 @@
-write <-  <- function(..., solve = FALSE) {
-  solver_solve(..., solve = solve)
+write <- function(..., run = FALSE) {
+  solver_solve(..., run = run)
 }
 
 solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
@@ -23,8 +23,8 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
   if (is.null(arg$only.listing)) arg$only.listing <- FALSE
   if (is.null(arg$tmp.del)) arg$tmp.del <- FALSE
   if (is.null(arg$readresult)) arg$readresult <- TRUE
-  if (is.null(arg$solve)) arg$solve <- TRUE
-  if (is.null(arg$onefile)) arg$onefile <- FALSE
+  if (is.null(arg$run)) arg$run <- TRUE
+  # if (is.null(arg$onefile)) arg$onefile <- FALSE
   if (is.null(arg$dir.result)) {
     arg$dir.result <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, scen@name, 
           format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
@@ -54,13 +54,22 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
     ##################################################################################################################################    
     # GAMS part
     ##################################################################################################################################    
+    dir.create(paste(arg$dir.result, '/input', sep = ''))
+    dir.create(paste(arg$dir.result, '/output', sep = ''))
+    zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
+    cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
+    close(zz_output)  
+    zz_data_gms <- file(paste(arg$dir.result, '/data.gms', sep = ''), 'w')
     file_w <- c()
     for (j in c('set', 'map', 'simple', 'multi')) {
       for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-        file_w <- c(file_w, energyRt:::.toGams(scen@modInp@parameters[[i]]))
+        zz_data_tmp <- file(paste(arg$dir.result, '/input/', i, '.gms', sep = ''), 'w')
+        cat(energyRt:::.toGams(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_tmp)
+        close(zz_data_tmp) 
+        cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
       }
     }
-    
+    close(zz_data_gms)    
     ### Model code to text
     .generate_gpr_gams_file(arg$dir.result)
     zz <- file(paste(arg$dir.result, '/mdl.gms', sep = ''), 'w')
@@ -73,7 +82,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
     	pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
     	pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
     		function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    	if (length(mps_name) != 0) cat(mps_name_def, sep = '\n', file = zz)
+  	  if (length(mps_name) != 0) cat(mps_name_def, sep = '\n', file = zz)
     	if (length(pps_name) != 0) cat(pps_name_def, sep = '\n', file = zz)
     }
     cat(file_w, sep = '\n', file = zz)
@@ -121,35 +130,38 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
     }
 
     ## Run model
-    gams_run_time <- proc.time()[3]
-    tryCatch({
-      setwd(arg$dir.result)
-      if (.Platform$OS.type == "windows") {
-        rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter), invisible = arg$invisible, 
-                     show.output.on.console = arg$show.output.on.console)
-      } else {
-        rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter))
+    if (arg$run) {
+      gams_run_time <- proc.time()[3]
+      tryCatch({
+        setwd(arg$dir.result)
+        if (.Platform$OS.type == "windows") {
+          rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter), invisible = arg$invisible, 
+                       show.output.on.console = arg$show.output.on.console)
+        } else {
+          rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter))
+        }
+        setwd(BEGINDR)  
+      }, interrupt = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop('Solver has been interrupted')
+      }, error = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop(x)
+      })    
+      if (rs != 0) stop(paste('Solution error code', rs))
+      if (arg$only.listing) {
+        return(readLines(paste(arg$dir.result, '/mdl.lst', sep = '')))
       }
-      setwd(BEGINDR)  
-    }, interrupt = function(x) {
-      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
-      setwd(BEGINDR)
-      stop('Solver has been interrupted')
-    }, error = function(x) {
-      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
-      setwd(BEGINDR)
-      stop(x)
-    })    
-    if (rs != 0) stop(paste('Solution error code', rs))
-    if (arg$only.listing) {
-      return(readLines(paste(arg$dir.result, '/mdl.lst', sep = '')))
+      if(arg$echo) cat('GAMS time: ', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
     }
-    if(arg$echo) cat('GAMS time: ', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
   } else if (arg$solver == 'GLPK' || arg$solver == 'CBC') {  
     ##################################################################################################################################    
     # GLPK & CBC part
     ##################################################################################################################################    
 
+    dir.create(paste(arg$dir.result, '/output', sep = ''))
     file_w <- c()
     for (j in c('set', 'map', 'simple', 'multi')) {
       for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
@@ -193,49 +205,51 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
       cat('Writing files: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
       flush.console()
     }
-
-    tryCatch({
-      setwd(arg$dir.result)
-      if (.Platform$OS.type == "windows") {
-        if (arg$solver  == 'GLPK') {
-          rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log log.csv', arg$glpkCompileParameter), 
-                       invisible = arg$invisible, show.output.on.console = arg$show.output.on.console)
+    if (arg$run) {
+      tryCatch({
+        setwd(arg$dir.result)
+        if (.Platform$OS.type == "windows") {
+          if (arg$solver  == 'GLPK') {
+            rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log log.csv', arg$glpkCompileParameter), 
+                         invisible = arg$invisible, show.output.on.console = arg$show.output.on.console)
+          } else {
+            rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter, 
+                               show.output.on.console = arg$show.output.on.console,  invisible = arg$invisible))
+          }
         } else {
-          rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter, 
-                             show.output.on.console = arg$show.output.on.console,  invisible = arg$invisible))
+          if (arg$solver  == 'GLPK') {
+            rs <- system(paste('glpsol -m glpk.mod -d glpk.dat --log log.csv', 
+                               arg$glpkCompileParameter)) #, mustWork = TRUE)
+          } else {
+            rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter))
+          }
         }
+        setwd(BEGINDR)  
+        if (rs != 0) stop(paste('Error in compilation with code', rs))
+      }, interrupt = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop('Solver have been interrupted')
+      }, error = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop(x)
+      })
+      
+      
+      if(arg$echo) cat('GLPK/MathProg time: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+      if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/log.csv', sep = ''))))) {
+        z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
+        cat('value\n1.00\n', file = z3)
+        close(z3)
       } else {
-        if (arg$solver  == 'GLPK') {
-          rs <- system(paste('glpsol -m glpk.mod -d glpk.dat --log log.csv', 
-                             arg$glpkCompileParameter)) #, mustWork = TRUE)
-        } else {
-          rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter))
-        }
+        z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
+        cat('value\n2.00\n', file = z3)
+        close(z3)
       }
-      setwd(BEGINDR)  
-      if (rs != 0) stop(paste('Error in compilation with code', rs))
-    }, interrupt = function(x) {
-      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
-      setwd(BEGINDR)
-      stop('Solver have been interrupted')
-    }, error = function(x) {
-      if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
-      setwd(BEGINDR)
-      stop(x)
-    })
-    
-    
-    if(arg$echo) cat('GLPK/MathProg time: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
-    if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/log.csv', sep = ''))))) {
-      z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
-      cat('value\n1.00\n', file = z3)
-      close(z3)
-    } else {
-      z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
-      cat('value\n2.00\n', file = z3)
-      close(z3)
     }
   } else stop('Unknown solver ', arg$solver) 
-  if (readresult) scen <- read_solution(scen)
+  if (readresult && arg$run) scen <- read_solution(scen)
+
   invisible(scen)
 }

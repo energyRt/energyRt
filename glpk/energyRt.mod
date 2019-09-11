@@ -1,4 +1,4 @@
-printf "value\n1.00\n" > "pFinish.csv";
+printf "value\n1.00\n" > "output/pFinish.csv";
 set tech;
 set sup;
 set dem;
@@ -518,7 +518,7 @@ minimize vObjective2 : vObjective;
 solve;
 
 
-printf "value\n2.00\n" > "pFinish.csv";
+printf "value\n2.00\n" > "output/pFinish.csv";
 printf "tech,region,year,slice,value\n" > "vTechUse.csv";
 for{(t, r, y) in mTechSpan, (t, s) in mTechSlice : vTechUse[t,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t,r,y,s,vTechUse[t,r,y,s] >> "vTechUse.csv";
@@ -778,113 +778,113 @@ for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidM
 printf "value\n%s\n",vObjective > "vObjective.csv";
 
 
-printf "value\n" > "variable_list.csv";
-    printf "vTechInv\n" >> "variable_list.csv";
-    printf "vTechEac\n" >> "variable_list.csv";
-    printf "vTechSalv\n" >> "variable_list.csv";
-    printf "vTechOMCost\n" >> "variable_list.csv";
-    printf "vSupCost\n" >> "variable_list.csv";
-    printf "vEmsFuelTot\n" >> "variable_list.csv";
-    printf "vTechEmsFuel\n" >> "variable_list.csv";
-    printf "vBalance\n" >> "variable_list.csv";
-    printf "vCost\n" >> "variable_list.csv";
-    printf "vObjective\n" >> "variable_list.csv";
-    printf "vTaxCost\n" >> "variable_list.csv";
-    printf "vSubsCost\n" >> "variable_list.csv";
-    printf "vAggOut\n" >> "variable_list.csv";
-    printf "vStorageSalv\n" >> "variable_list.csv";
-    printf "vStorageOMCost\n" >> "variable_list.csv";
-    printf "vTradeCost\n" >> "variable_list.csv";
-    printf "vTradeRowCost\n" >> "variable_list.csv";
-    printf "vTradeIrCost\n" >> "variable_list.csv";
-    printf "vTradeSalv\n" >> "variable_list.csv";
-    printf "vTechUse\n" >> "variable_list.csv";
-    printf "vTechNewCap\n" >> "variable_list.csv";
-    printf "vTechRetiredCap\n" >> "variable_list.csv";
-    printf "vTechCap\n" >> "variable_list.csv";
-    printf "vTechAct\n" >> "variable_list.csv";
-    printf "vTechInp\n" >> "variable_list.csv";
-    printf "vTechOut\n" >> "variable_list.csv";
-    printf "vTechAInp\n" >> "variable_list.csv";
-    printf "vTechAOut\n" >> "variable_list.csv";
-    printf "vSupOut\n" >> "variable_list.csv";
-    printf "vSupReserve\n" >> "variable_list.csv";
-    printf "vDemInp\n" >> "variable_list.csv";
-    printf "vOutTot\n" >> "variable_list.csv";
-    printf "vInpTot\n" >> "variable_list.csv";
-    printf "vInp2Lo\n" >> "variable_list.csv";
-    printf "vOut2Lo\n" >> "variable_list.csv";
-    printf "vSupOutTot\n" >> "variable_list.csv";
-    printf "vTechInpTot\n" >> "variable_list.csv";
-    printf "vTechOutTot\n" >> "variable_list.csv";
-    printf "vStorageInpTot\n" >> "variable_list.csv";
-    printf "vStorageOutTot\n" >> "variable_list.csv";
-    printf "vStorageAInp\n" >> "variable_list.csv";
-    printf "vStorageAOut\n" >> "variable_list.csv";
-    printf "vDummyImport\n" >> "variable_list.csv";
-    printf "vDummyExport\n" >> "variable_list.csv";
-    printf "vDummyCost\n" >> "variable_list.csv";
-    printf "vStorageInp\n" >> "variable_list.csv";
-    printf "vStorageOut\n" >> "variable_list.csv";
-    printf "vStorageStore\n" >> "variable_list.csv";
-    printf "vStorageInv\n" >> "variable_list.csv";
-    printf "vStorageCap\n" >> "variable_list.csv";
-    printf "vStorageNewCap\n" >> "variable_list.csv";
-    printf "vImport\n" >> "variable_list.csv";
-    printf "vExport\n" >> "variable_list.csv";
-    printf "vTradeIr\n" >> "variable_list.csv";
-    printf "vTradeIrAInp\n" >> "variable_list.csv";
-    printf "vTradeIrAInpTot\n" >> "variable_list.csv";
-    printf "vTradeIrAOut\n" >> "variable_list.csv";
-    printf "vTradeIrAOutTot\n" >> "variable_list.csv";
-    printf "vExportRowAccumulated\n" >> "variable_list.csv";
-    printf "vExportRow\n" >> "variable_list.csv";
-    printf "vImportRowAccumulated\n" >> "variable_list.csv";
-    printf "vImportRow\n" >> "variable_list.csv";
-    printf "vTradeCap\n" >> "variable_list.csv";
-    printf "vTradeInv\n" >> "variable_list.csv";
-    printf "vTradeNewCap\n" >> "variable_list.csv";
+printf "value\n" > "output/variable_list.csv";
+    printf "vTechInv\n" >> "output/variable_list.csv";
+    printf "vTechEac\n" >> "output/variable_list.csv";
+    printf "vTechSalv\n" >> "output/variable_list.csv";
+    printf "vTechOMCost\n" >> "output/variable_list.csv";
+    printf "vSupCost\n" >> "output/variable_list.csv";
+    printf "vEmsFuelTot\n" >> "output/variable_list.csv";
+    printf "vTechEmsFuel\n" >> "output/variable_list.csv";
+    printf "vBalance\n" >> "output/variable_list.csv";
+    printf "vCost\n" >> "output/variable_list.csv";
+    printf "vObjective\n" >> "output/variable_list.csv";
+    printf "vTaxCost\n" >> "output/variable_list.csv";
+    printf "vSubsCost\n" >> "output/variable_list.csv";
+    printf "vAggOut\n" >> "output/variable_list.csv";
+    printf "vStorageSalv\n" >> "output/variable_list.csv";
+    printf "vStorageOMCost\n" >> "output/variable_list.csv";
+    printf "vTradeCost\n" >> "output/variable_list.csv";
+    printf "vTradeRowCost\n" >> "output/variable_list.csv";
+    printf "vTradeIrCost\n" >> "output/variable_list.csv";
+    printf "vTradeSalv\n" >> "output/variable_list.csv";
+    printf "vTechUse\n" >> "output/variable_list.csv";
+    printf "vTechNewCap\n" >> "output/variable_list.csv";
+    printf "vTechRetiredCap\n" >> "output/variable_list.csv";
+    printf "vTechCap\n" >> "output/variable_list.csv";
+    printf "vTechAct\n" >> "output/variable_list.csv";
+    printf "vTechInp\n" >> "output/variable_list.csv";
+    printf "vTechOut\n" >> "output/variable_list.csv";
+    printf "vTechAInp\n" >> "output/variable_list.csv";
+    printf "vTechAOut\n" >> "output/variable_list.csv";
+    printf "vSupOut\n" >> "output/variable_list.csv";
+    printf "vSupReserve\n" >> "output/variable_list.csv";
+    printf "vDemInp\n" >> "output/variable_list.csv";
+    printf "vOutTot\n" >> "output/variable_list.csv";
+    printf "vInpTot\n" >> "output/variable_list.csv";
+    printf "vInp2Lo\n" >> "output/variable_list.csv";
+    printf "vOut2Lo\n" >> "output/variable_list.csv";
+    printf "vSupOutTot\n" >> "output/variable_list.csv";
+    printf "vTechInpTot\n" >> "output/variable_list.csv";
+    printf "vTechOutTot\n" >> "output/variable_list.csv";
+    printf "vStorageInpTot\n" >> "output/variable_list.csv";
+    printf "vStorageOutTot\n" >> "output/variable_list.csv";
+    printf "vStorageAInp\n" >> "output/variable_list.csv";
+    printf "vStorageAOut\n" >> "output/variable_list.csv";
+    printf "vDummyImport\n" >> "output/variable_list.csv";
+    printf "vDummyExport\n" >> "output/variable_list.csv";
+    printf "vDummyCost\n" >> "output/variable_list.csv";
+    printf "vStorageInp\n" >> "output/variable_list.csv";
+    printf "vStorageOut\n" >> "output/variable_list.csv";
+    printf "vStorageStore\n" >> "output/variable_list.csv";
+    printf "vStorageInv\n" >> "output/variable_list.csv";
+    printf "vStorageCap\n" >> "output/variable_list.csv";
+    printf "vStorageNewCap\n" >> "output/variable_list.csv";
+    printf "vImport\n" >> "output/variable_list.csv";
+    printf "vExport\n" >> "output/variable_list.csv";
+    printf "vTradeIr\n" >> "output/variable_list.csv";
+    printf "vTradeIrAInp\n" >> "output/variable_list.csv";
+    printf "vTradeIrAInpTot\n" >> "output/variable_list.csv";
+    printf "vTradeIrAOut\n" >> "output/variable_list.csv";
+    printf "vTradeIrAOutTot\n" >> "output/variable_list.csv";
+    printf "vExportRowAccumulated\n" >> "output/variable_list.csv";
+    printf "vExportRow\n" >> "output/variable_list.csv";
+    printf "vImportRowAccumulated\n" >> "output/variable_list.csv";
+    printf "vImportRow\n" >> "output/variable_list.csv";
+    printf "vTradeCap\n" >> "output/variable_list.csv";
+    printf "vTradeInv\n" >> "output/variable_list.csv";
+    printf "vTradeNewCap\n" >> "output/variable_list.csv";
 
 
-printf "set,value\n" > "raw_data_set.csv";
+printf "set,value\n" > "output/raw_data_set.csv";
 for {t in tech} {
-    printf "tech,%s\n", t >> "raw_data_set.csv";
+    printf "tech,%s\n", t >> "output/raw_data_set.csv";
 }
 for {s1 in sup} {
-    printf "sup,%s\n", s1 >> "raw_data_set.csv";
+    printf "sup,%s\n", s1 >> "output/raw_data_set.csv";
 }
 for {d in dem} {
-    printf "dem,%s\n", d >> "raw_data_set.csv";
+    printf "dem,%s\n", d >> "output/raw_data_set.csv";
 }
 for {st1 in stg} {
-    printf "stg,%s\n", st1 >> "raw_data_set.csv";
+    printf "stg,%s\n", st1 >> "output/raw_data_set.csv";
 }
 for {e in expp} {
-    printf "expp,%s\n", e >> "raw_data_set.csv";
+    printf "expp,%s\n", e >> "output/raw_data_set.csv";
 }
 for {i in imp} {
-    printf "imp,%s\n", i >> "raw_data_set.csv";
+    printf "imp,%s\n", i >> "output/raw_data_set.csv";
 }
 for {t1 in trade} {
-    printf "trade,%s\n", t1 >> "raw_data_set.csv";
+    printf "trade,%s\n", t1 >> "output/raw_data_set.csv";
 }
 for {g in group} {
-    printf "group,%s\n", g >> "raw_data_set.csv";
+    printf "group,%s\n", g >> "output/raw_data_set.csv";
 }
 for {c in comm} {
-    printf "comm,%s\n", c >> "raw_data_set.csv";
+    printf "comm,%s\n", c >> "output/raw_data_set.csv";
 }
 for {r in region} {
-    printf "region,%s\n", r >> "raw_data_set.csv";
+    printf "region,%s\n", r >> "output/raw_data_set.csv";
 }
 for {y in mMidMilestone} {
-    printf "year,%s\n", y >> "raw_data_set.csv";
+    printf "year,%s\n", y >> "output/raw_data_set.csv";
 }
 for {s in slice} {
-    printf "slice,%s\n", s >> "raw_data_set.csv";
+    printf "slice,%s\n", s >> "output/raw_data_set.csv";
 }
 for {wth1 in weather} {
-    printf "weather,%s\n", wth1 >> "raw_data_set.csv";
+    printf "weather,%s\n", wth1 >> "output/raw_data_set.csv";
 }
 end;
 
