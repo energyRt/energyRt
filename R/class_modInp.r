@@ -325,7 +325,7 @@ setMethod("initialize", "modInp",
     		defVal = 0, interpolation = 'back.inter.forth')    
     # Trade
     # Map
-    .Object@parameters[['mTradeBiderect']] <- createParameter('mTradeBiderect', c('trade', 'comm'), 'map', cls = 'trade')   
+    .Object@parameters[['mTradeBiderect']] <- createParameter('mTradeBiderect', 'trade', 'map', cls = 'trade')   
     .Object@parameters[['mTradeIrAInp']] <- createParameter('mTradeIrAInp', c('trade', 'comm'), 'map', cls = 'trade')   
     .Object@parameters[['mTradeIrAOut']] <- createParameter('mTradeIrAOut', c('trade', 'comm'), 'map', cls = 'trade')   
     .Object@parameters[['mExpComm']] <- 
