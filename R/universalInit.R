@@ -179,8 +179,14 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
 #' 
 
 setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
-setMethod('newTrade', signature(name = 'character'), function(name, ...) 
-  universalInit('trade', name, ...))
+setMethod('newTrade', signature(name = 'character'), function(name, ..., avaUpDef = Inf) {
+  trd <-  universalInit('trade', name, ...)
+	if (avaUpDef != Inf) {
+		trd@trade[nrow(trd@trade) + 1, ] <- NA
+		trd@trade[nrow(trd@trade), 'ava.up'] <- avaUpDef
+	}
+	trd
+})
   
 
 setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))

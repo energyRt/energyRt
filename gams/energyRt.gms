@@ -149,6 +149,7 @@ mTradeNew(trade, region, region, year)
 mTradeOlifeInf(trade, region, region)
 mTradeSalv(trade, region, region)
 mTradeCapacityVariable(trade)
+mTradeBiderect(trade)
 ;
 
 * Set priority
@@ -1364,6 +1365,7 @@ eqTradeCap(trade, src, dst, year)
 eqTradeInv(trade, src, dst, year)
 eqTradeSalv(trade, src, dst, yeare)
 eqTradeCapFlow(trade, comm, src, dst, year, slice)
+eqTradeBiderect(trade, src, dst, year)
 ;
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
@@ -1448,12 +1450,16 @@ eqTradeCap(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilesto
          vTradeCap(trade, src, dst, year)
          =e=
          pTradeStock(trade, src, dst, year) +
+         pTradeStock(trade, dst, src, year)$mTradeBiderect(trade) +
          sum((yearp)$
                  (       mTradeNew(trade, src, dst, yearp) and mMidMilestone(yearp) and
                          ordYear(year) >= ordYear(yearp) and
                          (ordYear(year) < pTradeOlife(trade, src, dst) + ordYear(yearp) or mTradeOlifeInf(trade, src, dst))
                  ), vTradeNewCap(trade, src, dst, yearp));
 
+eqTradeBiderect(trade, src, dst, year)$(mTradeBiderect(trade) and mTradeCapacityVariable(trade) and mMidMilestone(year)
+         and mTradeSpan(trade, src, dst, year) and mTradeNew(trade, dst, src, year))..
+            vTradeCap(trade, src, dst, year) =e= vTradeCap(trade, dst, src, year);
 
 * Investment equation
 eqTradeInv(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, src, dst, year))..  vTradeInv(trade, src, dst, year) =e=
@@ -1857,6 +1863,7 @@ eqTradeCap
 eqTradeCapFlow
 eqTradeInv
 eqTradeSalv
+eqTradeBiderect
 **************************************
 * Ballance equation & dummy
 **************************************
@@ -1914,6 +1921,8 @@ Solve energyRt minimizing vObjective using LP;
 $include output.gms
 
 * 99089425-31110-4440-be57-2ca102e9cee1
+
+
 
 
 

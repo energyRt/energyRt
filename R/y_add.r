@@ -1009,6 +1009,23 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
     	}
     }
     
+    if (trd@biderectional) {
+	    obj@parameters[['mTradeBiderect']] <- addData(obj@parameters[['mTradeBiderect']], data.frame(trade = trd@name))
+	    if (length(trd@source) != length(trd@destination) || any(sort(trd@source) != sort(trd@destination)))
+	    	stop(paste0('For bi directional trade sorce & destination have to be equal, for class trade: "', trd@name, '"'))
+	    	for (chk_slot in c('invcost', 'olife', 'start', 'end', 'stock')) {
+	    		tmp <- slot(trd, chk_slot)
+	    		tmp <- tmp[(!is.na(tmp$src) & !is.na(tmp$dst)), c('src', 'dst')]
+	    		if (nrow(tmp) > 0) {
+    				tmp <- tmp[!duplicated(tmp), ]
+    				if (anyDuplicated(rbind(tmp, data.frame(dst = tmp$src, src = tmp$dst, stringsAsFactors=FALSE))))
+    					stop(paste0('For bi directional trade couple sorce & destination in slot "', chk_slot, '" have to use in one order, for trade: "', trd@name, '"'))
+    			}
+	    	}
+	    	stop('For bi directional trade sorce & destination have to be equal')
+    }
+    
+    
     # .Object@parameters[['mTradeSalv']] <- createParameter('mTradeSalv', c('trade', 'region', 'region'), 'map', cls = 'trade')    
     # 
     # .Object@parameters[['pTradeSalv']] <- createParameter('pTradeSalv', 
