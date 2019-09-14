@@ -426,20 +426,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
     }
   }
   tech <- stayOnlyVariable(tech, approxim$region, 'region')
-  # Temporary solution for immortality technology
-  if (nrow(tech@olife) == 0) {
-    tech@olife[1, ] <- NA;
-    tech@olife[1, 'olife'] <- Inf;
-  }
-#  if (!energyRt:::.chec_correct_name(tech@name)) {
-#    stop(paste('Incorrect technology name "', tech@name, '"', sep = ''))
-#  }
-#  if (isTechnology(obj, tech@name)) {
-#    warning(paste('There is technology name "', tech@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousTechnology(obj, tech@name)
-#  }
-#  obj@parameters[['tech']] <- addData(obj@parameters[['tech']], tech@name)
+  # # Temporary solution for immortality technology
+  # if (nrow(tech@olife) == 0) {
+  #   tech@olife[1, ] <- NA;
+  #   tech@olife[1, 'olife'] <- Inf;
+  # }
+
   # Map
   ctype <- checkInpOut(tech)
   # Need choose comm more accuracy
@@ -586,15 +578,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
     # simple & multi
     obj@parameters[['pTechCap2act']] <- addData(obj@parameters[['pTechCap2act']],
       data.frame(tech = tech@name, value = tech@cap2act))
-    dd <- data.frame(list = c('pTechOlife', 'pTechFixom', 'pTechInvcost', 'pTechStock',
+    dd <- data.frame(list = c('pTechFixom', 'pTechInvcost', 'pTechStock', # 'pTechOlife', 
       'pTechVarom'),
-      table = c('olife', 'fixom', 'invcost', 'stock', 'varom'),
+      table = c('fixom', 'invcost', 'stock', 'varom'), # 'olife', 
       stringsAsFactors = FALSE)
     for(i in 1:nrow(dd)) {
       obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
         simpleInterpolation(slot(tech, dd[i, 'table']),
           dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim, 'tech', tech@name))
     }
+    obj@parameters[['pTechOlife']] <- addData(obj@parameters[['pTechOlife']],
+    	simpleInterpolation(slot(tech, 'olife'),
+    		'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = !FALSE))
     if (nrow(tech@aeff) != 0) {
         for(i in 1:4) {
           tech@aeff <- tech@aeff[!is.na(tech@aeff$acomm),]
@@ -632,7 +627,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
    
   
   #  if (nrow(dd0$new) > 10) browser()
-  olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters$pTechOlife, approxim, 'tech', tech@name)
+  olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters$pTechOlife, approxim, 'tech', tech@name, removeDefault = FALSE)
 	tmp <- merge(dd0$new, olife, by = c('tech', 'region'))
 	end_year <- max(approxim$year)
 	tmp <- tmp[tmp$year + tmp$value > end_year, ]
@@ -866,7 +861,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   			slot(trd, chk_slot) <- rbind(tmp, tmp2[!is.na(tmp$src) | !is.na(tmp$dst),])
   		}
   	}
-  	stop('For bi directional trade sorce & destination have to be equal')
   }
   # other flag
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
@@ -945,15 +939,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 
     	obj@parameters[['mTradeCapacityVariable']] <- addData(obj@parameters[['mTradeCapacityVariable']], data.frame(trade = trd@name))
     	
-     	dd <- data.frame(list = c('pTradeOlife', 'pTradeInvcost', 'pTradeStock'),
-    		table = c('olife', 'invcost', 'stock'),
+     	dd <- data.frame(list = c('pTradeInvcost', 'pTradeStock'),
+    		table = c('invcost', 'stock'),
     		stringsAsFactors = FALSE)
     	for(i in 1:nrow(dd)) {
     		obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
     			simpleInterpolation(slot(trd, dd[i, 'table']),
     				dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim, 'trade', trd@name))
     	}
-    	stock_exist <- getParameterData(obj@parameters[["pTradeStock"]])[, c('trade', 'src', 'dst', 'year')]
+     	obj@parameters[['pTradeOlife']] <- addData(obj@parameters[['pTradeOlife']],
+     		simpleInterpolation(slot(trd, 'olife'),
+     			'olife', obj@parameters[['pTradeOlife']], approxim, 'trade', trd@name, removeDefault = FALSE))
+     	stock_exist <- getParameterData(obj@parameters[["pTradeStock"]])[, c('trade', 'src', 'dst', 'year')]
     	dd0 <- list()
     	dd0$new <- merge(merge(approxim$src, approxim$dst), approxim$mileStoneYears, by = NULL)
     	colnames(dd0$new) <- c('src', 'dst', 'year')
@@ -973,10 +970,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
     	obj@parameters[['mTradeNew']] <- addData(obj@parameters[['mTradeNew']], dd0$new)
     	obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], dd0$old)    	
 			# mTradeOlifeInf				    		 
-    	mTradeOlifeInf <- getParameterData(obj@parameters[["pTradeOlife"]])
-    	mTradeOlifeInf <- mTradeOlifeInf[mTradeOlifeInf$value == Inf, ]
+    	olife <- simpleInterpolation(trd@olife, 'olife', obj@parameters$pTradeOlife, approxim, 'trade', trd@name, removeDefault = FALSE)
+    	mTradeOlifeInf <- olife
+    	mTradeOlifeInf <- mTradeOlifeInf[mTradeOlifeInf$value == Inf, colnames(mTradeOlifeInf) != 'value']
     	obj@parameters[['mTradeOlifeInf']] <- addData(obj@parameters[['mTradeOlifeInf']], mTradeOlifeInf)
-    	olife <- simpleInterpolation(trd@olife, 'olife', obj@parameters$pTradeOlife, approxim, 'trade', trd@name)
     	## Salvage parameter
     	tmp <- merge(dd0$new, olife, by = c('trade', 'src', 'dst'))
     	end_year <- max(approxim$year)
@@ -1084,7 +1081,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
                                             data.frame(stg = stg@name, comm = stg@commodity))
     obj@parameters[['pStorageOlife']] <- addData(obj@parameters[['pStorageOlife']],
                                                    simpleInterpolation(stg@olife, 'olife', obj@parameters[['pStorageOlife']], 
-                                                                       approxim, 'stg', stg@name))
+                                                                       approxim, 'stg', stg@name, removeDefault = FALSE))
     # Loss
     obj@parameters[['pStorageInpEff']] <- addData(obj@parameters[['pStorageInpEff']],
                                                    simpleInterpolation(stg@seff, 'inpeff', obj@parameters[['pStorageInpEff']], 

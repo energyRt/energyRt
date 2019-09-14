@@ -1,9 +1,9 @@
 #### Deprecated version due to deprecetate simple_data_frame_approximation
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE) {
   # cat('simple_data_frame_approximation_chk:', parameter, '\n')
   there.is.year <- any(colnames(frm) == 'year')
-  if (nrow(frm) == 0) return(frm)
+  #if (nrow(frm) == 0) return(frm)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
@@ -24,8 +24,9 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'value'), drop = FALSE])
   }
-  # For increase speed, not work for GLPK
-  dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
+  # For increase speed
+  if (removeDefault)
+  	dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
