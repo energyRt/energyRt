@@ -855,10 +855,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   				stop(paste0('For bi directional trade couple sorce & destination in slot "', chk_slot, '" have to use in one order, for trade: "', trd@name, '"'))
   		}
   		if (chk_slot == 'invcost' & (nrow(tmp) > 0)) {
+  		  tmp <- trd@invcost
   			tmp2 <- tmp
   			tmp2$src <- tmp$dst
   			tmp2$dst <- tmp$src
-  			slot(trd, chk_slot) <- rbind(tmp, tmp2[!is.na(tmp$src) | !is.na(tmp$dst),])
+  			trd@invcost <- rbind(tmp, tmp2[!is.na(tmp$src) | !is.na(tmp$dst),])
   		}
   	}
   }
