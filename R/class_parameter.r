@@ -212,10 +212,11 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 # Generate GAMS code, return character == GAMS code 
 .toGams <- function(obj) {
   gen_gg <- function(name, dtt) {
-    ret <- c('parameter', paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-    gg <- paste(dtt[, ncol(dtt) - 1], dtt[, ncol(dtt)])
-    if (ncol(dtt) > 2) for(i in seq(ncol(dtt) - 2, 1)) gg <- paste0(dtt[, i], '.', gg)
-    c(ret, gg, '/;')
+  	ret <- paste0(name, '("', dtt[, 1])
+  	for (i in seq_len(ncol(dtt) - 2) + 1) {
+  		ret <- paste0(ret, '", "', dtt[, i])
+  	}
+  	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
   }
     as_simple <- function(dtt, name, def) {
       add_cnd <- function(y, x) { 
@@ -237,20 +238,9 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
       if (nrow(dtt) == 0 || all(dtt$value == def)) {
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
-        if (def != 0) {
-          if (def == Inf) {
-            vnn <- max(dtt$value[dtt$value != Inf]) + 1;
-          } else {
-            vnn <- max(c(def, dtt$value[dtt$value != Inf])) + 1;
-          }
-          ppl <- paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
-          zz <- c(
-            paste(ppl, '$( ', add_cond2, ' and '[add_cond2 != ''], ppl, '= ', 0, ') = ', def, ';', sep = ''),
-            paste(ppl, '$( ', add_cond2, ' and '[add_cond2 != ''], ppl, '= ', vnn, ') = ', 0, ';', sep = '')
-          )
-          dtt[dtt$value == 0, 'value'] <- vnn;
-          dtt <- dtt[dtt$value != def,, drop = FALSE];
-          return(c(gen_gg(name, dtt), zz))
+        if (def != 0 && def != Inf) {
+          zz <- paste0(name, '(', paste0(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';')
+          return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE])))
         } else {
           return(gen_gg(name, dtt))
         }
