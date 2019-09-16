@@ -464,7 +464,7 @@ s.t.  eqTradeCapFlow{(t1, c) in mTradeComm, (t1, s) in mTradeSlice, (t1, src, ds
 
 s.t.  eqTradeCap{(t1, src, dst, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMidMilestone}: vTradeCap[t1,src,dst,y]  =  pTradeStock[t1,src,dst,y]+sum{FORIF: t1 in mTradeBidirectional} (pTradeStock[t1,dst,src,y])+sum{yp in year:(((t1,src,dst,yp) in mTradeNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTradeOlife[t1,src,dst]+ordYear[yp] or (t1,src,dst) in mTradeOlifeInf)))}(vTradeNewCap[t1,src,dst,yp]);
 
-s.t.  eqTradeBiderect{(t1, src, dst, y) in mTradeSpan, (t1, dst, src, y) in mTradeNew : t1 in (mTradeBidirectional inter mTradeCapacityVariable) and y in mMidMilestone}: vTradeCap[t1,src,dst,y]  =  vTradeCap[t1,dst,src,y];
+s.t.  eqTradeBiderect{(t1, src, dst, y) in mTradeSpan : t1 in (mTradeBidirectional inter mTradeCapacityVariable) and y in mMidMilestone}: vTradeCap[t1,src,dst,y]  =  vTradeCap[t1,dst,src,y];
 
 s.t.  eqTradeInv{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestone}: vTradeInv[t1,src,dst,y]  =  pTradeInvcost[t1,src,dst,y]*vTradeNewCap[t1,src,dst,y];
 
