@@ -118,10 +118,10 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
           'option iterlim = 0;\n', 
           'Solve st_model minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
     }
-    cat(scen@model@misc$additionalCode, sep = '\n', file = zz)
+    cat(scen@model@misc$includeBeforeSolve, sep = '\n', file = zz)
     cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
       grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) - 1)], sep = '\n', file = zz)
-    cat(scen@model@misc$additionalCodeAfter, sep = '\n', file = zz)
+    cat(scen@model@misc$includeAfterSolve, sep = '\n', file = zz)
     cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
     close(zz)
     if (arg$echo) { 

@@ -171,8 +171,6 @@ summary.levcost <- function(x) x$total
         reps <- add(reps, tmpm)
       }
   }  
- # browser()
-  additionalCode <- ''
   if (!is.null(slice)) {
     if (any(class(slice) == c('scenario', 'model', 'sysInfo', 'slice'))) {
       mdl <- newModel(paste('Levelized cost technology', tech@name))
