@@ -2,8 +2,8 @@ write_model <- function(..., tmp.dir = NULL) {
   solver_solve(..., run = FALSE, tmp.dir = tmp.dir, write = TRUE)
 }
 
-solve_model <- function(tmp.dir, scen = NULL, write = FALSE, ...) {
-  solver_solve(scen, tmp.dir = tmp.dir,  write = write, ...)
+solve_model <- function(tmp.dir, ...) {
+  solver_solve(scen = NULL, tmp.dir = tmp.dir,  write = FALSE, ...)
 }
 
 solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, write = TRUE) { # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
@@ -45,13 +45,17 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   }
   arg$dir.result <- arg$tmp.dir
   
-  if (is.null(scen) & (!is.null(interpolate) | !is.null(arg$write))) {
-    stop("scenario object is not provided")
+  if (is.null(scen)) {
+    # browser()
+    if (interpolate | arg$write) {
+      stop("scenario object is not provided")
+    }
+  } else {
+    scen@misc$dir.result <- arg$dir.result
   }
   
   # interpolate 
   if (interpolate) scen <- energyRt::interpolate(scen, ...)
-  scen@misc$dir.result <- arg$dir.result
   
   # Misc
   solver_solver_time <- proc.time()[3]
