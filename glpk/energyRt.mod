@@ -778,7 +778,7 @@ printf "trade,src,dst,year,value\n" > "output/vTradeNewCap.csv";
 for{(t1, src, dst, y) in mTradeNew : t1 in mTradeCapacityVariable and y in mMidMilestone and vTradeNewCap[t1,src,dst,y] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t1,src,dst,y,vTradeNewCap[t1,src,dst,y] >> "output/vTradeNewCap.csv";
 }
-printf "value\n%s\n",vObjective > "vObjective.csv";
+printf "value\n%s\n",vObjective > "output/vObjective.csv";
 
 
 printf "value\n" > "output/variable_list.csv";

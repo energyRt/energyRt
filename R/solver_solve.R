@@ -210,7 +210,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
           if (arg$solver  == 'GLPK') {
-            rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log log.csv', arg$glpkCompileParameter), 
+            rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log output/log.csv', arg$glpkCompileParameter), 
                          invisible = arg$invisible, show.output.on.console = arg$show.output.on.console)
           } else {
             rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter, 
@@ -218,7 +218,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
           }
         } else {
           if (arg$solver  == 'GLPK') {
-            rs <- system(paste('glpsol -m glpk.mod -d glpk.dat --log log.csv', 
+            rs <- system(paste('glpsol -m glpk.mod -d glpk.dat --log output/log.csv', 
                                arg$glpkCompileParameter)) #, mustWork = TRUE)
           } else {
             rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter))
@@ -238,12 +238,12 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE) { #
       
       
       if(arg$echo) cat('GLPK/MathProg time: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
-      if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/log.csv', sep = ''))))) {
-        z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
+      if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/output/log.csv', sep = ''))))) {
+        z3 <- file(paste(arg$dir.result, '/output/pStat.csv', sep = ''), 'w')
         cat('value\n1.00\n', file = z3)
         close(z3)
       } else {
-        z3 <- file(paste(arg$dir.result, '/pStat.csv', sep = ''), 'w')
+        z3 <- file(paste(arg$dir.result, '/output/pStat.csv', sep = ''), 'w')
         cat('value\n2.00\n', file = z3)
         close(z3)
       }
