@@ -23,8 +23,8 @@ setClass("model",
           early.retirement = FALSE,
       #! Misc
       misc = list(
-        additionalCode = "",        # move 2 misc
-        additionalCodeAfter = ""   # move 2 misc
+      	includeBeforeSolve = "",        # move 2 misc
+      	includeAfterSolve = ""   # move 2 misc
       )),                           
       S3methods = TRUE
 )
