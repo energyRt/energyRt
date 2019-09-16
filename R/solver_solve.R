@@ -140,10 +140,10 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
             'option iterlim = 0;\n', 
             'Solve energyRt minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
       }
-      cat(scen@model@misc$additionalCode, sep = '\n', file = zz)
+      cat(scen@model@misc$includeBeforeSolve, sep = '\n', file = zz)
       cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
         grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) - 1)], sep = '\n', file = zz)
-      cat(scen@model@misc$additionalCodeAfter, sep = '\n', file = zz)
+      cat(scen@model@misc$includeAfterSolve, sep = '\n', file = zz)
       cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
       close(zz)
       if (arg$echo) { 
@@ -151,72 +151,10 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
         flush.console()
       }
     }
-# <<<<<<< HEAD
-#   
-# =======
-    close(zz_data_gms)    
-    ### Model code to text
-    .generate_gpr_gams_file(arg$dir.result)
-    zz <- file(paste(arg$dir.result, '/mdl.gms', sep = ''), 'w')
-    cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
-    # Add parameter constraint declaration
-    if (length(scen@modInp@gams.equation) > 0) {
-    	mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
-    	mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
-    		function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    	pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
-    	pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
-    		function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-  	  if (length(mps_name) != 0) cat(mps_name_def, sep = '\n', file = zz)
-    	if (length(pps_name) != 0) cat(pps_name_def, sep = '\n', file = zz)
-    }
-    cat(file_w, sep = '\n', file = zz)
-    # Add constraint equation 
-    if (length(scen@modInp@gams.equation) > 0) {
-      # Declaration
-      cat('equation', sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
-      # Body equation
-      cat(sapply(scen@modInp@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
-    }
-    if (!is.null(scen@model@misc$additionalEquationGAMS)) {
-    	cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
-    }
-    cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
-                   (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
-    
-    # Add constraint equation to model declaration
-    if (length(scen@modInp@gams.equation) > 0) {
-    	cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
-    }
-    
-    if (!is.null(scen@model@misc$additionalEquationGAMS)) 
-      cat(scen@model@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
-    
-    cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
-                   (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) - 1)], sep = '\n', file = zz)
-    cat(run_code[(grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) + 1):
-                   (grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) - 1)], sep = '\n', file = zz)
-    
-    if (arg$only.listing) {
-      cat('OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;\n',
-          'OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;\n',
-          'option iterlim = 0;\n', 
-          'Solve st_model minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
-    }
-    cat(scen@model@misc$includeBeforeSolve, sep = '\n', file = zz)
-    cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
-      grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) - 1)], sep = '\n', file = zz)
-    cat(scen@model@misc$includeAfterSolve, sep = '\n', file = zz)
-    cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
-    close(zz)
-    if (arg$echo) { 
-      cat('Writing files: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
-      flush.console()
-    }
 
-# >>>>>>> 7cb60c2908e508c080d2a0d5bb75ccd3b44686f5
     ## Run model
     if (arg$run) {
+      if(arg$echo) cat('GAMS time: ')
       gams_run_time <- proc.time()[3]
       tryCatch({
         setwd(arg$dir.result)
@@ -240,7 +178,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
       if (arg$only.listing) {
         return(readLines(paste(arg$dir.result, '/mdl.lst', sep = '')))
       }
-      if(arg$echo) cat('GAMS time: ', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
+      if(arg$echo) cat('', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
     }
   } else if (arg$solver == 'GLPK' || arg$solver == 'CBC') {  
     ##################################################################################################################################    
@@ -248,7 +186,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     ##################################################################################################################################    
     if (arg$write) {
       if (arg$echo) cat('Writing files: ')
-    dir.create(paste(arg$dir.result, '/output', sep = ''))
+    dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
     file_w <- c()
     for (j in c('set', 'map', 'simple', 'multi')) {
       for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
@@ -294,6 +232,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     }
     }
     if (arg$run) {
+      if(arg$echo) cat('GLPK/MathProg time: ')
       tryCatch({
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
@@ -325,7 +264,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
       })
       
       
-      if(arg$echo) cat('GLPK/MathProg time: ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+      if(arg$echo) cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
       if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/output/log.csv', sep = ''))))) {
         z3 <- file(paste(arg$dir.result, '/output/pStat.csv', sep = ''), 'w')
         cat('value\n1.00\n', file = z3)

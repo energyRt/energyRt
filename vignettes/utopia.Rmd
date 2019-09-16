@@ -1315,8 +1315,8 @@ scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC),
                    name = "RBAU", 
                    description = "Adding renewables",
                   # tmp.path = "C:/solwork",
-                   solver = mysolver,
-                  # solver = "GLPK",
+                   # solver = mysolver,
+                  solver = "GLPK",
                   # solver = "GAMS",
                    tmp.name = "UTOPIA_REN",
                    tmp.del = F
@@ -1341,6 +1341,8 @@ size(scen_RBAU2)
 
 getData(list(scen_RBAU, scen_RBAU2), name = "vObjective", merge = T)
 
+getData(scen_RBAU2, name = "vTradeCap")
+getData(scen_RBAU, name = "vTradeIr")
 
 ```
 
