@@ -1,6 +1,6 @@
 # interpolate(scenario, overwrite = TRUE) - updates interpolation in scenario objects
 
-# solver_solve(scenario, interpolate = NULL) - solves scenario, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
+# solve_model(scenario, interpolate = NULL) - solves scenario, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
 # returns list with solution status and folder
 
 #read_solution(scen = NULL, folder) - reads results and updates scen, if scen = NULL, creates empty scenario with solution data

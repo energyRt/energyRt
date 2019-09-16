@@ -59,8 +59,8 @@ This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <
 We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/olugovoy/energyRt/>).   
 ```{r setup}
 # Choose your solver-software
-# mysolver = "GAMS"
-mysolver = "GLPK"
+mysolver = "GAMS"
+# mysolver = "GLPK"
 
 if (T) {
   # Installation of required packages - if not installed.
@@ -1050,8 +1050,10 @@ trd_dt$distance_km <- 0.
 for (i in 1:dim(trd_dt)[1]) {
   rg_dst <- trd_dt$dst[i]
   rg_src <- trd_dt$src[i]
-  lab_dst <- reg_centers[rg_dst, 2:3]
-  lab_src <- reg_centers[rg_src, 2:3]
+  # lab_dst <- reg_centers[rg_dst, 2:3]
+  # lab_src <- reg_centers[rg_src, 2:3]
+  lab_dst <- reg_centers[reg_centers$region == rg_dst, c("x","y")]
+  lab_src <- reg_centers[reg_centers$region == rg_src, c("x","y")]
   trd_dt$distance_km[i] <- raster::pointDistance(
     lab_src, lab_dst, T)/1e3
 }
@@ -1083,15 +1085,101 @@ for (src_nm in unique(trd_dt$src)) {
                   trade = data.frame(
                     src = src_nm,
                     dst = dst_nms,
-                    ava.up = convert("GWh", "PJ", 10), # Maximum capacity per route in GW
+                    ava.up = convert("GWh", "PJ", 100), # Maximum capacity per route in GW
                     teff = trd_dt$teff[ii], # trade losses
                     cost = trd_dt$cost[ii]  # trade costs
-                    )
+                    # markup = trd_dt$cost[ii] # and/or markup
+                    ),
+                  #!!! New stuff - testing
+                  capacityVariable = TRUE, # The trade route has capacity (not just flow) and can be endogenous
+                  bidirectional = TRUE, #
+                  invcost = data.frame(
+                    src = src_nm,
+                    dst = dst_nms,
+                    invcost = trd_dt$distance_km[ii] / 1e3 * 250 # Assuming $250 MUSD/1000km
+                  )
                   )
   TRD_ELC_ALL <- add(TRD_ELC_ALL, trd)
 }
 
-names(TRD_ELC_ALL@data)
+### Bi-directional trade routes with endogenous capacity - !!!testing
+# first - find unique pairs of regions
+trd_dt2 <- trd_dt
+trd_dt2$src <- trd_dt$dst
+trd_dt2$dst <- trd_dt$src
+trd_dt3 <- bind_rows(trd_dt, trd_dt2)
+trd_dt <- unique(trd_dt3)
+trd_dt <- trd_dt[order(trd_dt$src),]
+rm(trd_dt2, trd_dt3)
+
+TRBD_ELC_ALL <- newRepository(name = "TRBD_ELC_ALL")
+
+for (i in 1:dim(trd_dt)[1]) {
+  src <- trd_dt$src[i]
+  dst <- trd_dt$dst[i]
+  trd_nm <- paste0("TRBD_ELC_", src, "_", dst)  # Trade object name
+  cmd_nm <- "ELC"
+  # Trade class for every route
+  trd <- newTrade(trd_nm,
+                  commodity = cmd_nm,
+                  source = c(src, dst),
+                  destination = c(src, dst),
+                  trade = data.frame(
+                    src = src,
+                    dst = dst,
+                    ava.up = convert("GWh", "PJ", 1000), # Maximum capacity per route in GW
+                    teff = trd_dt$teff[i] # trade losses
+                    # cost = trd_dt$cost[i]  # trade costs
+                    # markup = trd_dt$cost[ii] # and/or markup
+                    ),
+                  #!!! New stuff - testing
+                  capacityVariable = TRUE, # The trade route has capacity (not just flow) and can be endogenous
+                  bidirectional = TRUE, #
+                  invcost = data.frame(
+                    src = src,
+                    dst = dst,
+                    year = 2010,
+                    invcost = trd_dt$distance_km[i] / 1e3 * 250 # Assuming $250 MUSD/1000km
+                  ),
+                  olife = data.frame(
+                    olife = 80
+                  ),
+                  cap2act = convert("GWh", "PJ", 24*365)
+                  )
+  
+    # trd <- newTrade(trd_nm, 
+    #               commodity = cmd_nm,
+    #               source = c(src, dst),
+    #               destination = c(src, dst),
+    #               # trade = data.frame(
+    #               #   src = src,
+    #               #   dst = dst,
+    #               #   ava.up = convert("GWh", "PJ", 100), # Maximum capacity per route in GW
+    #               #   teff = trd_dt$teff[i], # trade losses
+    #               #   cost = trd_dt$cost[i]  # trade costs
+    #               #   # markup = trd_dt$cost[ii] # and/or markup
+    #               #   ),
+    #               #!!! New stuff - testing
+    #               capacityVariable = TRUE, # The trade route has capacity (not just flow) and can be endogenous
+    #               bidirectional = TRUE #
+    #               # invcost = data.frame(
+    #               #   src = src,
+    #               #   dst = dst,
+    #               #   invcost = trd_dt$distance_km[i] / 1e3 * 250 # Assuming $250 MUSD/1000km
+    #               # )
+    #               # invcost = data.frame(
+    #               #   src = c(src, dst),
+    #               #   dst = c(dst, src),
+    #               #   invcost = rep(trd_dt$distance_km[i] / 1e3 * 250, 2) # Assuming $250 MUSD/1000km
+    #               # )
+    #               )
+
+  
+  TRBD_ELC_ALL <- add(TRBD_ELC_ALL, trd)
+}
+  
+names(TRBD_ELC_ALL@data)
+TRBD_ELC_ALL@data[[1]]
 
 ```
 
@@ -1195,6 +1283,7 @@ mdl@sysInfo@milestone
 scen_BASE <- solve(mdl, name = "BASE", 
                    # tmp.path = "C:/solwork",
                    solver = mysolver,
+                   # solver = "GLPK",
                    tmp.name = "UTOPIA_BASE",
                    tmp.del = F
                    )
@@ -1206,12 +1295,13 @@ summary(scen_BASE)
 ## "GRID": traditional techs and interregional trade
 ```{r GRID, eval=T}
 
-scen_GRID <- solve(add(mdl, TRD_ELC_ALL), # Adding trade routes
+scen_GRID <- solve(add(mdl, TRBD_ELC_ALL), # Adding trade routes
                    name = "GRID", 
                   # tmp.path = "C:/solwork",
                    solver = mysolver,
                    tmp.name = "UTOPIA_GRID",
                    tmp.del = F
+                   # n.threads = 1
                   )
 summary(scen_GRID)
 
@@ -1219,9 +1309,9 @@ summary(scen_GRID)
 
 
 ## "RBAU": traditional techs and interregional trade
-```{r REN, eval=T}
+```{r REN, eval=F}
 
-scen_RBAU <- solve(add(mdl, TRD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
+scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
                    name = "RBAU", 
                    description = "Adding renewables",
                   # tmp.path = "C:/solwork",
@@ -1232,6 +1322,24 @@ scen_RBAU <- solve(add(mdl, TRD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC),
                    tmp.del = F
                   )
 summary(scen_RBAU)
+
+# alternative workflow to solve the model:
+## Interpolation of parameters
+scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
+                         name = "RBAU2")
+## Writing the model code and data on disk
+write_model(scen_RBAU2, solver = mysolver, tmp.dir = "UTOPIA_REN")
+
+## Solving the model
+solve_model(scen_RBAU2, tmp.dir = "solwork/UTOPIA_REN", write = FALSE)
+
+## Read solution
+scen_RBAU2 <- read_solution(scen_RBAU2, dir.result = "solwork/UTOPIA_REN")
+summary(scen_RBAU2)
+size(scen_RBAU)
+size(scen_RBAU2)
+
+getData(list(scen_RBAU, scen_RBAU2), name = "vObjective", merge = T)
 
 
 ```
@@ -1328,12 +1436,47 @@ ggplot(fumxr, aes(as.factor(year), PJ, fill = comm)) +
 
 ### Trade
 ```{r, eval=FALSE}
-trd <- getData(scen, name = "vTradeIr", comm = "ELC", merge = T)
-head(trd)
-# There are two sets with names of regions: `src` and `dst`
-# to plot the flows we will need to ...
+# Names of all unempty variables and parameters for trade
+names(getData(scen, name_ = "trd|trade|Trade", merge = F))
 
-trd <- getData(scen, name = "vTradeIr", comm = "ELC", merge = T)
+# Capacity of the trade routes (the Grid)
+trd_cap <- getData(scen, name = "vTradeCap", merge = T,
+                   newNames = c("value" = "GW"))
+trd_cap
+trd_cap <- trd_cap %>%
+  left_join(reg_centers[,1:3], by = c("region" = "region")) %>%
+  left_join(reg_centers[,1:3], by = c("regionp" = "region")) %>%
+  rename(xsrc = x.x, ysrc = y.x, xdst = x.y, ydst = y.y) 
+  # mutate(GWh = convert("PJ", "GWh", value))
+
+
+ftrd_cap_map <- function(trd_cap, year = sample(unique(trd_cap$year), 1)) {
+  ii <- trd_cap$year == year
+  trd_cap_map <-
+    ggplot(data = ggis) +
+      geom_polygon(aes(x = long, y = lat, group = group), fill = "wheat",
+                   colour = "white", alpha = 1, size = .5) + # aes fill = id,
+      coord_fixed(1.) +
+      guides(fill=FALSE) +  # do this to leave off the color legend
+      theme_void() +
+      labs(title = paste0("Interregional electricity grid, year = ", year))  +
+      theme(plot.title = element_text(hjust = 0.5),
+            plot.subtitle = element_text(hjust = 0.5)) +
+      geom_segment(aes(x=xsrc, y=ysrc, xend=xdst, yend=ydst, size = GW), 
+                   data = trd_cap[ii,], inherit.aes = FALSE,  
+                   alpha = 1, colour = "dodgerblue", lineend = "round", show.legend = T) +
+      scale_size_area(limits = range(trd_cap$GW), max_size = 8) +
+      geom_point(data = reg_centers, aes(x, y), colour = "red")
+  trd_cap_map
+}
+yrs <- sort(unique(trd_cap$year))
+ftrd_cap_map(trd_cap, yrs[1])
+ftrd_cap_map(trd_cap, yrs[3])
+ftrd_cap_map(trd_cap, yrs[length(yrs)])
+
+# Trade flows
+trd <- getData(scen_RBAU, name = "vTradeIr", comm = "ELC", merge = T)
+head(trd)
 
 trd_flo <- trd %>%
   left_join(reg_centers[,1:3], by = c("src" = "region")) %>%
