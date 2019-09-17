@@ -20,7 +20,7 @@ solve.model <- function(obj, name = NULL, solver = "GAMS",
     message("Starting time: ", Sys.time())
   }
   scen = interpolate(obj, name = name)
-  scen = solver_solve(scen, name = name, solver = solver, dir.result = tmp.dir, tmp.del = tmp.del, ..., readresult = TRUE)
+  scen = solver_solve(scen, name = name, solver = solver, tmp.dir = tmp.dir, tmp.del = tmp.del, ..., readresult = TRUE)
   if (tmp.del) unlink(tmp.dir, recursive = TRUE)
   invisible(scen)
 }

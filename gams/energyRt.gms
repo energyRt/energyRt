@@ -1458,7 +1458,7 @@ eqTradeCap(trade, src, dst, year)$(mTradeCapacityVariable(trade) and mMidMilesto
                  ), vTradeNewCap(trade, src, dst, yearp));
 
 eqTradeBiderect(trade, src, dst, year)$(mTradeBidirectional(trade) and mTradeCapacityVariable(trade) and mMidMilestone(year)
-         and mTradeSpan(trade, src, dst, year) and mTradeNew(trade, dst, src, year))..
+         and mTradeSpan(trade, src, dst, year))..
             vTradeCap(trade, src, dst, year) =e= vTradeCap(trade, dst, src, year);
 
 * Investment equation
@@ -1921,6 +1921,38 @@ Solve energyRt minimizing vObjective using LP;
 $include output.gms
 
 * 99089425-31110-4440-be57-2ca102e9cee1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
