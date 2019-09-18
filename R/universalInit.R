@@ -213,7 +213,17 @@ setMethod('newTax', signature(name = 'character'), function(name, ..., value = N
     defVal <- value
     value <- NULL
   } else defVal <- NULL
-  universalInit('tax', name, ..., value = value, defVal = defVal)
+  tt <- universalInit('tax', name, ..., defVal = defVal)
+  if (!is.null(value)) {
+  	if (!is.data.frame(value) && is.list(value)) 
+  		value <- as.data.frame(value)
+  	for (i in c('region', 'year', 'slice')) 
+  		if (all(colnames(value) != i))
+  			value[, i] <- rep(NA, nrow(value))
+  	value <- value[, c('region', 'year', 'slice', 'value')]
+  	tt@value <- value
+  }
+  tt	
 })
 setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
 
