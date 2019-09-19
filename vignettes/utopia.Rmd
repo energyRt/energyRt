@@ -51,16 +51,14 @@ This tutorial demonstrates the application of `energyRt` package to develop a **
   
 The `energyRt` package provides a set of S4 classes, methods, and functions to design the model elements, such as technologies, commodities, supply, demand, and constraints, save them in a `model` object, process the data and save it in a format readable by solver-software (currently GAMS or GLPK/Mathprog), run the model code in the solver-software, read the results back to R, and manipulate the data to produce charts and tables.  
 
-**Disclosure note:** The `energyRt` package is a by-product of the authors' more than a decade energy-modeling-related research, teaching, and training. It evolved from an attempt to simplify our own everyday's life by automating repeating steps, to save more time for studies themselves. Though the project has been open-source from its very beginning, we think, it has (finally) reached the point where it can be helpful to others, for those who start learning RES models and for more experienced energy modelers, interested in developing state-of-the-art models and studies. We also convinced that being open means being able to learn from others, from broad modeling community, and is beneficial for any project.
-
 This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <https://github.com/olugovoy/energyRt/vignettes>). It can be run step-by-step or at once to reproduce the results below. Playing with parameters and data is highly recommended for learning the package and the RES-models. This is the first beta-version of the package and the tutorial. Please report bugs, issues, thoughts here: <https://github.com/olugovoy/energyRt/issues>.    
 
 # Prerequisites
 We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/olugovoy/energyRt/>).   
 ```{r setup}
 # Choose your solver-software
-mysolver = "GAMS"
-# mysolver = "GLPK"
+# mysolver = "GAMS"
+mysolver = "GLPK"
 
 if (T) {
   # Installation of required packages - if not installed.
@@ -1288,8 +1286,8 @@ scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC),
                    name = "RBAU", 
                    description = "Adding renewables",
                   # tmp.path = "C:/solwork",
-                   # solver = mysolver,
-                  solver = "GLPK",
+                   solver = mysolver,
+                  # solver = "GLPK",
                   # solver = "GAMS",
                    tmp.name = "UTOPIA_REN",
                    tmp.del = F
@@ -1304,7 +1302,7 @@ scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC)
 write_model(scen_RBAU2, solver = mysolver, tmp.dir = "solwork/UTOPIA_REN")
 
 ## Solving the model
-solve_model(tmp.dir = "solwork/UTOPIA_REN")
+solve_model(tmp.dir = "solwork/UTOPIA_REN", solver = mysolver)
 
 ## Read solution
 scen_RBAU2 <- read_solution(scen_RBAU2, dir.result = "solwork/UTOPIA_REN")
@@ -1534,21 +1532,66 @@ setwd(homedir)
 
 
 # Scenarios with constraints
-tbc...
 
-## NXSX: NOX and SO2 control
 ```{r}
+## NXSX: NOX and SO2 control
+NOXSO2control <- newConstraint(
+  'NOXSO2control', 
+  eq = '<=', 
+  rhs = 1e6, 
+  for.each = list(year = NULL), 
+  variable = list(variable = 'vOutTot', 
+                  for.sum = list(comm = c("NOX", "SO2"))))
+
+NOXSO2controlMult <- newConstraint(
+  'NOXSO2control', 
+  eq = '<=', 
+  rhs = 1e6, 
+  for.each = list(year = NULL), 
+  variable = list(
+    variable = 'vOutTot', 
+    for.sum = list(comm ="NOX"),
+    mult = 1.5), 
+  # for the case of different multipliers
+  variable = list(variable = 'vOutTot', 
+                  for.sum = list(comm = "SO2"), 
+                  mult = 1.25) 
+)
+
+NOXSO2controlCum <- newConstraint(
+  'NOXSO2control', 
+  eq = '<=', 
+  rhs = 1e8, 
+  variable = list(
+    variable = 'vOutTot', 
+    for.sum = list(
+      comm =c("NOX", "SO2"))))
 
 ```
 
 
 ## GHG50: Cap and trade
 
-```{r }
+```{r}
 
+GHG50tax <- newTax('HGtax', comm = 'HG', value = 100)
 
+# GHG50tax <- newTax('HGtax', comm = 'HG', year = 2025:2035, value = data.frame(year = c(2025, 2030), value = c(1, 100)))
+
+GHG50CapTrade <- add(newRepository('GHG50CapTrade'),
+  # Aggregate HG
+  newCommodity('HGtrade'), # Commodity to take to account trade
+  # Equation that provide quote mechanisme
+  newConstraint('HGcap', eq = '<=', rhs = list(year = c(2015, 2055), rhs = c(1e8, 1e3)), 
+  for.each = list(year = NULL), # Cap total emission
+  variable = list(variable = 'vOutTot', for.sum = list(comm = "HG")),
+  variable = list(variable = 'vOutTot', for.sum = list(comm = "HGtrade"), mult = -1)
+  ),
+  newTax('HGtax', comm = 'HGtrade', value = 100) # Cost of quote
+)
 ```
 
+tbc...
 
 # Comparative figures
 ```{r}
@@ -1615,5 +1658,4 @@ kableExtra::kable(pp, row.names = F, longtable = T, booktabs = T,
   kableExtra::column_spec(2, width = "5cm") #%>%
 
 ```
-
 
