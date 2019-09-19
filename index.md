@@ -23,7 +23,8 @@
 ### Development status
 
 The project has the first *beta* release, which includes *Utopia* model examples, solvable with *GAMS* or *GLPK*. Main functions have been documented, the extended tutorial is in process. By now, the functionaligy of the package allows developing multi-region models with hierarhical time-slices, exogenous and endogenous trade routes, and flexible technologies. Several large-scale projects are on the way, including "CHN_ELC_PRO" (China Electric Power Sector province level) and "usensys" (US energy system model). A visualization of some scenarios is available here:  
- - [usensys](https://www.youtube.com/channel/UCw4fCrRTozmAqwHY63oLT2A)   
+ - [usensys](https://github.com/olugovoy/usensys)   
+ - [usensys-youtube](https://www.youtube.com/channel/UCw4fCrRTozmAqwHY63oLT2A)   
  - [CHN_ELC_PRO](https://www.youtube.com/channel/UC27Gbh61fGX4-WrGi6jd_og).  
 ...
 
