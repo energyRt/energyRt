@@ -76,3 +76,6 @@ For Mac: http://tug.org/mactex/ (other options are possible but not tested)
 Currently the package is hosted only on GitHub. To install the package:   
 devtools::install_github("olugovoy/energyRt")   
  
+# Examples
+* **UTOPIA** -- up to 11 regions model is saved in vignettes of the project `energyRt/vignettes/`.   
+* **USENSYS** -- large scale model of US energy system is in progress. First version(s) are available here (https://github.com/olugovoy/usensys).  
