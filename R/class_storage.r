@@ -19,7 +19,7 @@ setClass("storage",
           varom         = "data.frame",    #
           invcost       = "data.frame",
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-          slice         = "character",
+          fullYear         = "logical",
           region        = "character",
           cap2stg       = "numeric", # cap2stg cinp
           weather       = "data.frame",    # weather condisions multiplier
@@ -99,7 +99,7 @@ setClass("storage",
                                      stringsAsFactors = FALSE),
       cap2stg       = 1,
       GIS           = NULL,
-      slice         = character(),
+      fullYear      = TRUE,
       region        = character(),
       weather      = data.frame(weather  = character(),
                                 waf.lo    = numeric(),

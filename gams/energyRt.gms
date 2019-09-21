@@ -110,13 +110,14 @@ mUpComm(comm)  Commodity balance type PRODUCTION <= CONSUMPTION
 mLoComm(comm)  Commodity balance type PRODUCTION >= CONSUMPTION
 mFxComm(comm)  Commodity balance type PRODUCTION == CONSUMPTION
 * Storage
-mStorageSlice(stg, slice)          Storage work in slice
+mStorageFullYear(stg)                 Mapping of storage with joint slice
 mStorageComm(stg, comm)            Mapping of storage technology and respective commodity
 mStorageAInp(stg, comm)            Aux-commodity input to storage
 mStorageAOut(stg, comm)            Aux-commodity output from storage
 mStorageNew(stg, region, year)     Storage available for investment
 mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the year and region
 mSliceNext(slice, slice)           Next slice
+mSliceFYearNext(slice, slice)           Next slice joint
 * Trade and ROW
 mTradeSlice(trade, slice)          Trade to slice
 mTradeComm(trade, comm)            Trade commodities
@@ -386,9 +387,9 @@ vTechOutTot(comm, region, year, slice)               Total commodity output from
 vStorageInpTot(comm, region, year, slice)            Total commodity input to storages
 *@ mStorageOutTot(comm, region, year, slice)
 vStorageOutTot(comm, region, year, slice)            Total commodity output from storages
-*@ (mStorageAInp(stg, comm) and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))
+*@ (mStorageAInp(stg, comm) and mCommSlice(comm, slice)  and mStorageSpan(stg, region, year))
 vStorageAInp(stg, comm, region, year, slice)         Aux-commodity input to storage
-*@ (mStorageAOut(stg, comm) and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))
+*@ (mStorageAOut(stg, comm) and mCommSlice(comm, slice)  and mStorageSpan(stg, region, year))
 vStorageAOut(stg, comm, region, year, slice)         Aux-commodity input from storage
 ;
 variable
@@ -422,11 +423,11 @@ vAggOut(comm, region, year, slice)                   Aggregated commodity output
 
 * Reserves
 positive variable
-*@ (mStorageSlice(stg, slice) and mStorageSpan(stg, region, year) and mStorageComm(stg, comm))
+*@ (mStorageSpan(stg, region, year) and mStorageComm(stg, comm) and mCommSlice(comm, slice))
 vStorageInp(stg, comm, region, year, slice)          Storage input
-*@ (mStorageSlice(stg, slice) and mStorageSpan(stg, region, year) and mStorageComm(stg, comm))
+*@ (mStorageSpan(stg, region, year) and mStorageComm(stg, comm) and mCommSlice(comm, slice))
 vStorageOut(stg, comm, region, year, slice)          Storage output
-*@ (mStorageSlice(stg, slice) and mStorageSpan(stg, region, year) and mStorageComm(stg, comm))
+*@ (mStorageSpan(stg, region, year) and mStorageComm(stg, comm) and mCommSlice(comm, slice))
 vStorageStore(stg, comm, region, year, slice)        Storage accumulated level
 *@ mStorageNew(stg, region, year)
 vStorageInv(stg, region, year)                       Storage technology investments
@@ -538,9 +539,9 @@ mExportRowAccumulatedUp(expp, comm)
 mExport(comm, region, year, slice)
 * sum(imp$mImportRow(imp, comm, region, year, slice), 1) + sum((trade, src)$(mTradeIr(trade, src, region, year, slice) and mTradeComm(trade, comm)), 1) <> 0
 mImport(comm, region, year, slice)
-* (sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAInp(stg, comm)))
+* (sum(stg$(mCommSlice(comm, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAInp(stg, comm)))
 mStorageInpTot(comm, region, year, slice)
-* (sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAOut(stg, comm)))
+* (sum(stg$(mCommSlice(comm, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAOut(stg, comm)))
 mStorageOutTot(comm, region, year, slice)
 *   sum(slice$pTaxCost(comm, region, year, slice), 1)
 mTaxCost(comm, region, year)
@@ -1175,7 +1176,7 @@ eqStorageOutLo(stg, comm, region, year, slice)
 ;
 
 eqStorageAInp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageAInp(stg, comm)
-  and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))..
+  and mCommSlice(comm, slice)  and mStorageSpan(stg, region, year))..
   vStorageAInp(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
          pStorageStg2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
          pStorageInp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
@@ -1185,7 +1186,7 @@ eqStorageAInp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageA
 );
 
 eqStorageAOut(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageAOut(stg, comm)
-  and mStorageSlice(stg, slice)  and mStorageSpan(stg, region, year))..
+  and mCommSlice(comm, slice)  and mStorageSpan(stg, region, year))..
   vStorageAOut(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
          pStorageStg2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
          pStorageInp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
@@ -1195,45 +1196,46 @@ eqStorageAOut(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageA
 );
 
 
-eqStorageStore(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm))..
+eqStorageStore(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)  and mStorageComm(stg, comm)
+and mStorageSpan(stg, region, year))..
   vStorageStore(stg, comm, region, year, slice) =e=
   pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice) -
   vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice) +
-  sum(slicep$(mStorageSlice(stg, slicep) and mSliceNext(slicep, slice)),
+  sum(slicep$(mCommSlice(comm, slicep) and ((not(mStorageFullYear(stg)) and mSliceNext(slicep, slice)) or (mStorageFullYear(stg) and mSliceFYearNext(slicep, slice)))),
   pStorageStgEff(stg, comm, region, year, slice) * vStorageStore(stg, comm, region, year, slicep));
 
-eqStorageAfLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm) and pStorageAfLo(stg, region, year, slice))..
+eqStorageAfLo(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)
+  and mStorageComm(stg, comm) and mStorageSpan(stg, region, year) 
+  and pStorageAfLo(stg, region, year, slice))..
   vStorageStore(stg, comm, region, year, slice) =g= pStorageAfLo(stg, region, year, slice) *
      pStorageCap2stg(stg) * vStorageCap(stg, region, year) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherAf(stg, weather)
                  and pStorageWeatherAfLo(stg, weather) >= 0 and mAllSliceParentChildAndSame(slice, slicep)),
                     pWeather(weather, region, year, slice) * pStorageWeatherAfLo(stg, weather));
 
-eqStorageAfUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm))..
+eqStorageAfUp(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)  and mStorageComm(stg, comm)
+   and mStorageSpan(stg, region, year))..
   vStorageStore(stg, comm, region, year, slice) =l= pStorageAfUp(stg, region, year, slice) *
      pStorageCap2stg(stg) * vStorageCap(stg, region, year) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherAf(stg, weather)
                  and pStorageWeatherAfUp(stg, weather) >= 0 and mAllSliceParentChildAndSame(slice, slicep)),
                     pWeather(weather, region, year, slice) * pStorageWeatherAfUp(stg, weather));
 
-eqStorageClean(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm))..
+eqStorageClean(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year) and mStorageComm(stg, comm)
+  and mStorageSpan(stg, region, year))..
   vStorageInp(stg, comm, region, year, slice) =l= vStorageStore(stg, comm, region, year, slice);
 
 *
-eqStorageInpUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm) and pStorageCinpUp(stg, comm, region, year, slice) >= 0)..
+eqStorageInpUp(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year) and mStorageComm(stg, comm) 
+  and mStorageSpan(stg, region, year) and pStorageCinpUp(stg, comm, region, year, slice) >= 0)..
   pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice) =l=
     pStorageCinpUp(stg, comm, region, year, slice) * pSliceShare(slice) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCinp(stg, weather)
                  and pStorageWeatherCinpUp(stg, weather) >= 0 and mAllSliceParentChildAndSame(slice, slicep)),
                     pWeather(weather, region, year, slice) * pStorageWeatherCinpUp(stg, weather));
 
-eqStorageInpLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm) and pStorageCinpLo(stg, comm, region, year, slice) > 0)..
+eqStorageInpLo(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)
+  and mStorageComm(stg, comm) and mStorageSpan(stg, region, year) and pStorageCinpLo(stg, comm, region, year, slice) > 0)..
   pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice) =g=
     pStorageCinpLo(stg, comm, region, year, slice) * pSliceShare(slice) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCinp(stg, weather)
@@ -1241,16 +1243,16 @@ eqStorageInpLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mM
                     pWeather(weather, region, year, slice) * pStorageWeatherCinpLo(stg, weather));
 
 *
-eqStorageOutUp(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm) and pStorageCoutUp(stg, comm, region, year, slice) >= 0)..
+eqStorageOutUp(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)
+  and mStorageComm(stg, comm) and mStorageSpan(stg, region, year) and pStorageCoutUp(stg, comm, region, year, slice) >= 0)..
   vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice) =l=
     pStorageCoutUp(stg, comm, region, year, slice) * pSliceShare(slice) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCout(stg, weather)
                  and pStorageWeatherCoutUp(stg, weather) >= 0 and mAllSliceParentChildAndSame(slice, slicep)),
                     pWeather(weather, region, year, slice) * pStorageWeatherCoutUp(stg, weather));
 
-eqStorageOutLo(stg, comm, region, year, slice)$(mStorageSlice(stg, slice) and mMidMilestone(year) and mStorageSpan(stg, region, year)
-  and mStorageComm(stg, comm) and pStorageCoutLo(stg, comm, region, year, slice) > 0)..
+eqStorageOutLo(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year) and mStorageComm(stg, comm) 
+  and mStorageSpan(stg, region, year) and pStorageCoutLo(stg, comm, region, year, slice) > 0)..
   vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice)  =g=
     pStorageCoutLo(stg, comm, region, year, slice) * pSliceShare(slice) *
          prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mStorageWeatherCout(stg, weather)
@@ -1300,7 +1302,7 @@ eqStorageCost(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regi
          vStorageOMCost(stg, region, year)
          =e=
          pStorageFixom(stg, region, year) * vStorageCap(stg, region, year) +
-         sum((comm, slice)$(mStorageSlice(stg, slice) and mStorageComm(stg, comm)),
+         sum((comm, slice)$(mCommSlice(comm, slice) and mStorageComm(stg, comm)),
              pStorageCostInp(stg, region, year, slice) * vStorageInp(stg, comm, region, year, slice)
              + pStorageCostOut(stg, region, year, slice) * vStorageOut(stg, comm, region, year, slice)
              + pStorageCostStore(stg, region, year, slice) * vStorageStore(stg, comm, region, year, slice)
@@ -1609,10 +1611,10 @@ eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, sl
          vStorageInpTot(comm, region, year, slice)
          =e=
          sum(stg$(mStorageComm(stg, comm) and pStorageInpEff(stg, comm, region, year, slice)
-                 and mStorageSlice(stg, slice)and mStorageSpan(stg, region, year)),
+                 and mCommSlice(comm, slice)and mStorageSpan(stg, region, year)),
                  vStorageInp(stg, comm, region, year, slice)
          ) +
-         sum(stg$(mStorageAInp(stg, comm) and mStorageSlice(stg, slice) and mStorageSpan(stg, region, year)),
+         sum(stg$(mStorageAInp(stg, comm) and mCommSlice(comm, slice) and mStorageSpan(stg, region, year)),
                  vStorageAInp(stg, comm, region, year, slice)
          );
 
@@ -1620,10 +1622,10 @@ eqStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, sl
          vStorageOutTot(comm, region, year, slice)
          =e=
          sum(stg$(mStorageComm(stg, comm) and pStorageOutEff(stg, comm, region, year, slice)
-                 and mStorageSlice(stg, slice) and mStorageSpan(stg, region, year)),
+                 and mCommSlice(comm, slice) and mStorageSpan(stg, region, year)),
                  vStorageOut(stg, comm, region, year, slice)
          ) +
-         sum(stg$(mStorageAOut(stg, comm) and mStorageSlice(stg, slice) and mStorageSpan(stg, region, year)),
+         sum(stg$(mStorageAOut(stg, comm) and mCommSlice(comm, slice) and mStorageSpan(stg, region, year)),
                  vStorageAOut(stg, comm, region, year, slice)
          );
 
@@ -1903,6 +1905,7 @@ eqLECActivity
 * c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f
 /;
 
+*$EXIT
 $include data.gms
 
 * Place to insert your data
@@ -1911,7 +1914,6 @@ $include data.gms
 
 *option lp = cbc;
 
-* $exit
 * f374f3df-5fd6-44f1-b08a-1a09485cbe3d
 
 
@@ -1921,6 +1923,42 @@ Solve energyRt minimizing vObjective using LP;
 $include output.gms
 
 * 99089425-31110-4440-be57-2ca102e9cee1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

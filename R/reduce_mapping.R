@@ -265,12 +265,12 @@
     # mStorageInpTot(comm, region, year, slice)
     #     (sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAInp(stg, comm)))
     prec@parameters[['mStorageInpTot']] <- addData(prec@parameters[['mStorageInpTot']], 
-    	reduce.sect(merge(tmp_map$mStorageSpan, merge(merge(tmp_map$mStorageSlice, tmp_map$mStorageComm, by = 'stg'),
+    	reduce.sect(merge(tmp_map$mStorageSpan, merge(merge(tmp_map$mCommSlice, tmp_map$mStorageComm, by = 'comm'),
     		rbind(tmp_map$mStorageComm, tmp_map$mStorageAInp))), c('comm', 'region', 'year', 'slice')))
     # mStorageOutTot(comm, region, year, slice)
     #     (sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAOut(stg, comm)))
     prec@parameters[['mStorageOutTot']] <- addData(prec@parameters[['mStorageOutTot']], 
-    	reduce.sect(merge(tmp_map$mStorageSpan, merge(merge(tmp_map$mStorageSlice, tmp_map$mStorageComm, by = 'stg'),
+    	reduce.sect(merge(tmp_map$mStorageSpan, merge(merge(tmp_map$mCommSlice, tmp_map$mStorageComm, by = 'comm'),
     		rbind(tmp_map$mStorageComm, tmp_map$mStorageAOut))), c('comm', 'region', 'year', 'slice')))
     # mTaxCost(comm, region, year)  sum(slice$pTaxCost(comm, region, year, slice), 1)
     prec@parameters[['mTaxCost']] <- addData(prec@parameters[['mTaxCost']], reduce.sect(tmp_nozero$pTaxCost, c('comm', 'region', 'year')))

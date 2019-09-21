@@ -748,8 +748,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   obj@parameters[['mAllSliceParentChildAndSame']] <- addData(obj@parameters[['mAllSliceParentChildAndSame']],
                   data.frame(slice = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$parent)), 
                              slicep = as.character(c(app@slice@all_slice, approxim$slice@all_parent_child$child)), stringsAsFactors = FALSE))
-  if (length(approxim$slice@misc$next_slice) != 0)
+  if (length(approxim$slice@misc$next_slice) != 0) {
     obj@parameters[['mSliceNext']] <- addData(obj@parameters[['mSliceNext']], approxim$slice@misc$next_slice)
+    obj@parameters[['mSliceFYearNext']] <- addData(obj@parameters[['mSliceFYearNext']], 
+                                                   approxim$slice@misc$fyear_next_slice)
+  }
   # Discount
   approxim_no_mileStone_Year <- approxim
   approxim_no_mileStone_Year$mileStoneYears <- NULL
@@ -1060,7 +1063,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     stg <- energyRt:::.upper_case(app)
-    approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = stg@slice)
+    approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = NULL)
     stg <- .disaggregateSliceLevel(stg, approxim)
     if (length(stg@region) != 0) {
       approxim$region <- approxim$region[approxim$region %in% stg@region]
@@ -1076,8 +1079,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
       }
     }
     stg <- stayOnlyVariable(stg, approxim$region, 'region')
-    obj@parameters[['mStorageSlice']] <- addData(obj@parameters[['mStorageSlice']],
-                                             data.frame(stg = rep(stg@name, length(approxim$slice)), slice = approxim$slice))
+    if (stg@fullYear)
+      obj@parameters[['mStorageFullYear']] <- addData(obj@parameters[['mStorageFullYear']],
+                                             data.frame(stg = stg@name))
     obj@parameters[['mStorageComm']] <- addData(obj@parameters[['mStorageComm']],
                                             data.frame(stg = stg@name, comm = stg@commodity))
     obj@parameters[['pStorageOlife']] <- addData(obj@parameters[['pStorageOlife']],

@@ -91,6 +91,7 @@ setMethod("initialize", "modInp",
     #
     
     .Object@parameters[['mSliceNext']] <- createParameter('mSliceNext', c('slice', 'slicep'), 'map')    
+    .Object@parameters[['mSliceFYearNext']] <- createParameter('mSliceFYearNext', c('slice', 'slicep'), 'map')    
     
     .Object@parameters[['mSameRegion']] <- createParameter('mSameRegion', c('region', 'regionp'), 'map') # for glpk    
     .Object@parameters[['mSameSlice']] <- createParameter('mSameSlice', c('slice', 'slicep'), 'map') # for glpk    
@@ -114,7 +115,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mImpSlice']] <- createParameter('mImpSlice', c('imp', 'slice'), 'map', cls = 'import')   
     .Object@parameters[['mTechSlice']] <- createParameter('mTechSlice', c('tech', 'slice'), 'map', cls = 'technology')   
     .Object@parameters[['mSupSlice']] <- createParameter('mSupSlice', c('sup', 'slice'), 'map', cls = 'supply')   
-    .Object@parameters[['mStorageSlice']] <- createParameter('mStorageSlice', c('stg', 'slice'), 'map', cls = 'storage')   
+    .Object@parameters[['mStorageFullYear']] <- createParameter('mStorageFullYear', c('stg'), 'map', cls = 'storage')   
     .Object@parameters[['mTradeSlice']] <- createParameter('mTradeSlice', c('trade', 'slice'), 'map', cls = 'trade')   
     .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
     .Object@parameters[['mAllSliceParentChildAndSame']] <- createParameter('mAllSliceParentChildAndSame', c('slice', 'slicep'), 'map')   

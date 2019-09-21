@@ -104,10 +104,7 @@ setClass("slice",
   sl@misc$next_slice <- NULL
   if (nrow(sl@levels) != 1) {
     tmp <- sl@parent_child; 
-    #tmp$lv <- NA; 
     tmp$next_slice <- NA
-    #for (i in names(sl@slice_map))
-    #  tmp[tmp$parent %in% sl@slice_map[[i]], 'lv'] <- i
     j <- 1
     for (i in 1:(nrow(tmp) - 1)) {
       if (tmp[i, 'parent'] == tmp[i + 1, 'parent']) {
@@ -119,6 +116,10 @@ setClass("slice",
     }
     tmp[i + 1, 'next_slice'] <- tmp[j, 'child']
     sl@misc$next_slice <- data.frame(slice = tmp$child, slicep = tmp$next_slice, stringsAsFactors = FALSE)
+    n1 <- c(lapply(sl@slice_map[-1], function(x) x), recursive = TRUE); names(n1) <- NULL
+    n2 <- c(lapply(sl@slice_map[-1], function(x) c(x[-1], x[1])), recursive = TRUE); 
+    names(n2) <- NULL
+    sl@misc$fyear_next_slice <- data.frame(slice = n1, slicep = n2, stringsAsFactors = FALSE)
   }
   sl
 }
