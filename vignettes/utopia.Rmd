@@ -955,7 +955,6 @@ STGELC <- newStorage(
   name = 'STGELC',
   commodity = 'ELC',
   description = "Energy storage systems",
-  slice = 'HOUR', 
   cap2stg = 1, 
   olife = list(olife = 10), 
   invcost = list(
@@ -1282,7 +1281,7 @@ summary(scen_GRID)
 ## "RBAU": traditional techs and interregional trade
 ```{r REN, eval=T}
 
-scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
+scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), #
                    name = "RBAU", 
                    description = "Adding renewables",
                   # tmp.path = "C:/solwork",

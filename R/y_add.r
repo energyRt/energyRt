@@ -1061,7 +1061,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   approxim = 'list'), function(obj, app, approxim) {
-    .checkSliceLevel(app, approxim)
     stg <- energyRt:::.upper_case(app)
     approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = NULL)
     stg <- .disaggregateSliceLevel(stg, approxim)
