@@ -114,8 +114,8 @@
   	scen@model@sysInfo <- arg$sysInfo[[1]]
   # Clean
   # Reduce mapping
-  sys_info_par <- c('mAllSliceParentChild', 
-                    'mAllSliceParentChildAndSame', 'mSliceNext', 'pDiscount', 'pSliceShare', 'pDummyImportCost', 'pDummyExportCost', 
+  sys_info_par <- c('mSliceParentChild', 
+                    'mSliceParentChildE', 'mSliceNext', 'pDiscount', 'pSliceShare', 'pDummyImportCost', 'pDummyExportCost', 
                     'mStartMilestone', 'mEndMilestone', 'mMilestoneLast', 'mMilestoneFirst', 'mMilestoneNext', 'mMilestoneHasNext', 
                     'mSameSlice', 'mSameRegion', 'ordYear', 'cardYear', 'pPeriodLen', 'pDiscountFactor', 'mDiscountZero')
   reduce_map <- c('mTechInpTot',  'mTechOutTot',  'mSupOutTot',  'mDemInp',  'mTechEmsFuel',  'mEmsFuelTot',  

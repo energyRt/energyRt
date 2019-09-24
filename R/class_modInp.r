@@ -118,8 +118,8 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mStorageFullYear']] <- createParameter('mStorageFullYear', c('stg'), 'map', cls = 'storage')   
     .Object@parameters[['mTradeSlice']] <- createParameter('mTradeSlice', c('trade', 'slice'), 'map', cls = 'trade')   
     .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
-    .Object@parameters[['mAllSliceParentChildAndSame']] <- createParameter('mAllSliceParentChildAndSame', c('slice', 'slicep'), 'map')   
-    .Object@parameters[['mAllSliceParentChild']] <- createParameter('mAllSliceParentChild', c('slice', 'slicep'), 'map')   
+    .Object@parameters[['mSliceParentChildE']] <- createParameter('mSliceParentChildE', c('slice', 'slicep'), 'map')   
+    .Object@parameters[['mSliceParentChild']] <- createParameter('mSliceParentChild', c('slice', 'slicep'), 'map')   
     # simple
     .Object@parameters[['pSliceShare']] <- createParameter('pSliceShare', 'slice', 'simple')   
     .Object@parameters[['pEmissionFactor']] <- 

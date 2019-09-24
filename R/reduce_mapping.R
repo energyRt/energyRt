@@ -292,12 +292,12 @@
     prec@parameters[['mTechOlifeInf']] <- addData(prec@parameters[['mTechOlifeInf']], generate_haveval('pTechOlife', Inf))
     prec@parameters[['mStorageOlifeInf']] <- addData(prec@parameters[['mStorageOlifeInf']], generate_haveval('pStorageOlife', Inf))
     
-    #sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) and
+    #sum(slicep$(mSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) and
     #(mSupOutTot(comm, region, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
     #  mTechOutTot(comm, region, year, slice) or mStorageOutTot(comm, region, year, slice) or mImport(comm, region, year, slice) or
     #  mTradeIrAOutTot(comm, region, year, slice))
     a1 <- tmp_map$mCommSlice; colnames(a1)[2] <- 'slicep'
-    a2 <- tmp_map$mAllSliceParentChild
+    a2 <- tmp_map$mSliceParentChild
     for2Lo <- merge(a1, a2, by = 'slicep'); for2Lo$slicep <- NULL
     for2Lo <- reduce.duplicate(for2Lo)
     for (i in c('mSupOutTot', 'mEmsFuelTot', 'mAggOut', 'mTechOutTot', 'mStorageOutTot', 'mImport', 'mTradeIrAOutTot', 'mTechInpTot', 
@@ -310,7 +310,7 @@
     mOut2Lo <- mOut2Lo[!(paste0(mOut2Lo$comm, '#', mOut2Lo$slice) %in% paste0(tmp_map$mCommSlice$comm, '#', tmp_map$mCommSlice$slice)), ]
     prec@parameters[['mOut2Lo']] <- addData(prec@parameters[['mOut2Lo']], mOut2Lo)
     
-    # sum(slicep$(mAllSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
+    # sum(slicep$(mSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
     #   and (mTechInpTot(comm, region, year, slice) or  mStorageInpTot(comm, region, year, slice) or
     #   or mExport(comm, region, year, slice) or mTradeIrAInpTot(comm, region, year, slice))
     
