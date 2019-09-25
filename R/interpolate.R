@@ -86,6 +86,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
     mileStoneForGrowth = xx
   )
   # Fill basic parameter interplotaion from sysInfo
+  approxim$all_comm <- c(lapply(scen@model@data, function(x) c(lapply(x@data, function(y) {
+  	if (class(y) != 'commodity') return(NULL)
+  	return(y@name)
+  }), recursive = TRUE)), recursive = TRUE)
+  names(approxim$all_comm) <- NULL
   scen@modInp <- .read_default_data(scen@modInp, scen@model@sysInfo)
   scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
   

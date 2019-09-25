@@ -1088,7 +1088,8 @@ eqSupAvaUp(sup, comm, region, year, slice)$mSupAvaUp(sup, comm, region, year, sl
          pSupAvaUp(sup, comm, region, year, slice) * prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mSupWeatherUp(sup, weather)
            and mSliceParentChildE(slice, slicep)), pWeather(weather, region, year, slice) * pSupWeatherUp(sup, weather));
 
-eqSupAvaLo(sup, comm, region, year, slice)$ mSupAva(sup, comm, region, year, slice)..
+eqSupAvaLo(sup, comm, region, year, slice)$(pSupAvaLo(sup, comm, region, year, slice) > 0
+         and mSupAva(sup, comm, region, year, slice))..
          vSupOut(sup, comm, region, year, slice)
          =g=
          pSupAvaLo(sup, comm, region, year, slice) * prod((slicep, weather)$(mWeatherRegion(weather, region) and mWeatherSlice(weather, slicep) and mSupWeatherLo(sup, weather)
@@ -1923,6 +1924,26 @@ Solve energyRt minimizing vObjective using LP;
 $include output.gms
 
 * 99089425-31110-4440-be57-2ca102e9cee1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

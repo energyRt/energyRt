@@ -1036,7 +1036,7 @@ rs
     rs["mSupAvaUp", c("name", "description", "type")] <- c("mSupAvaUp", "", "map");
     rs["mSupAvaUp", c("sup", "comm", "region", "year", "slice", "eqSupAvaUp")] <- TRUE;
     rs["mSupAva", c("name", "description", "type")] <- c("mSupAva", "", "map");
-    rs["mSupAva", c("sup", "comm", "region", "year", "slice", "eqSupAvaLo", "eqSupTotal", "eqSupCost", "eqSupOutTot")] <- TRUE;
+    rs["mSupAva", c("sup", "comm", "region", "year", "slice", "eqSupTotal", "eqSupCost", "eqSupOutTot")] <- TRUE;
     rs["mSupReserveUp", c("name", "description", "type")] <- c("mSupReserveUp", "", "map");
     rs["mSupReserveUp", c("sup", "comm", "region", "eqSupReserveUp")] <- TRUE;
     rs["mOut2Lo", c("name", "description", "type")] <- c("mOut2Lo", "", "map");
