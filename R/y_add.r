@@ -841,6 +841,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   approxim = 'list'), function(obj, app, approxim) {
   trd <- energyRt:::.upper_case(app)
   trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
+  cat(trd@name, ' 1\n')
   remove_duplicate <- list(c('src', 'dst'))
   approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
   trd <- .disaggregateSliceLevel(trd, approxim)
@@ -851,7 +852,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
   obj@parameters[['mTradeRoutes']] <- addData(obj@parameters[['mTradeRoutes']],
-                                              rbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes))
+                                              cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes))
   approxim <- approxim[names(approxim) != 'region']
   # Apply routes to approximation
   routes <- trd@routes
@@ -895,39 +896,47 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
         }
         tmp <- tmp[-fl,, drop = FALSE]
       }
-      # src & dst NA
-      fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
-      if (length(fl) > 0) {
-        kk <- rbind(tmp[, c('src', 'dst'), drop = FALSE], routes)
-        kk <- kk[!duplicated(kk),, drop = FALSE]
-      }
-      if (length(fl) > 0 && nrow(kk) > 0) {
-        nn <- nrow(tmp) + seq_len(nrow(kk) * length(fl))
-        tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),, drop = FALSE])
-        tmp[nn, 'src'] <- kk$src
-        tmp[nn, 'dst'] <- kk$dst
-      }
-        tmp <- tmp[-fl,, drop = FALSE]
-      }
-      rownames(tmp) <- NULL
     }
+    # src & dst NA
+    fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
+    if (length(fl) > 0) {
+      kk <- rbind(tmp[-fl, c('src', 'dst'), drop = FALSE], routes)
+      kk <- kk[!duplicated(kk),, drop = FALSE]
+    }
+    if (length(fl) > 0 && nrow(kk) > 0) {
+      nn <- nrow(tmp) + seq_len(nrow(kk) * length(fl))
+      tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),, drop = FALSE])
+      tmp[nn, 'src'] <- kk$src
+      tmp[nn, 'dst'] <- kk$dst
+    }
+    tmp <- tmp[-fl,, drop = FALSE]
+    rownames(tmp) <- NULL
+    slot(trd, pr) <- tmp
   }
+cat(trd@name, ' 2\n')
+if (trd@name == 'trd_ELC_1') browser()
   # pTradeIrCost
-  obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
-  	simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
-  		approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
-  obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']],
-  	simpleInterpolation(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
-  		approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+  if (any(!is.na(trd@trade$cost)))
+    obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
+  	  simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
+    		approxim, 'trade', trd@name))
+  if (any(!is.na(trd@trade$teff)))
+    obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']],
+    	simpleInterpolation(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
+  	  	approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIrMarkup
-  obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
-    simpleInterpolation(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
-      approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+  if (any(!is.na(trd@trade$markup)))
+    obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
+      simpleInterpolation(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
+        approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIr
+  if (any(!is.na(trd@trade$ava.up)) || any(!is.na(trd@trade$ava.fx)) || any(!is.na(trd@trade$ava.lo))) {
     gg <- multiInterpolation(trd@trade, 'ava',
             obj@parameters[['pTradeIr']], approxim, 'trade', trd@name, remove_duplicate = remove_duplicate)
     obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
-    # Trade ainp
+  }
+cat(trd@name, ' 3\n')
+  # Trade ainp
     if (nrow(trd@aux) != 0) {
       if (any(is.na(trd@aux$acomm))) 
         stop('Wrong aux commodity for trade "', trd@name, '"')
@@ -959,7 +968,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
                                                                      approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
       }
     }
-    
+cat(trd@name, ' 4\n')
+
     # Add trade data
     if (trd@capacityVariable) {
     	obj@parameters[['pTradeCap2Act']] <- addData(obj@parameters[['pTradeCap2Act']],
@@ -967,6 +977,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 
     	obj@parameters[['mTradeCapacityVariable']] <- addData(obj@parameters[['mTradeCapacityVariable']], data.frame(trade = trd@name))
     	
+    	##!!! Trade 
+    	if (nrow(trd@invcost) > 0) {
+    	  if (any(is.na(trd@invcost$invcost)) && nrow(trd@invcost) > 1)
+    	    stop('There is "NA" and other data for invcost in trade class "', trd@name, '".')
+    	  if (any(is.na(trd@invcost$invcost))) {
+    	    warning('There is a" NA "area for invcost in the"', trd@name, '"trade class. Investments will be smoothed along all routes of the regions.')
+    	    rgg <- unique(c(trd@routes, recursive = TRUE))
+    	    trd@invcost <- trd@invcost[rep(1, length(rgg)),, drop = FALSE]
+    	    trd@invcost[, 'region'] <- rgg
+    	    trd@invcost[, 'region'] <- trd@invcost[1, 'invcost'] / length(rgg)
+    	  }
+    	}
      	dd <- data.frame(list = c('pTradeInvcost', 'pTradeStock'),
     		table = c('invcost', 'stock'),
     		stringsAsFactors = FALSE)
@@ -1019,7 +1041,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
     		discountFactor$region <- NULL
     		discount$region <- NULL
     		
-    		obj@parameters[['mTradeSalv']] <- addData(obj@parameters[['mTradeSalv']], mTradeSalv)
+      		obj@parameters[['mTradeSalv']] <- addData(obj@parameters[['mTradeSalv']], mTradeSalv)
     		# pTradeSalv calculation
     		tmp2 <- tmp; tmp2$life <- tmp2$value; tmp2$value <- NULL
     		tmp2 <- merge(tmp2, discountCum, by = c('src', 'year'))

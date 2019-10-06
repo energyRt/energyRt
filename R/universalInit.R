@@ -179,13 +179,22 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
 #' 
 
 setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
-setMethod('newTrade', signature(name = 'character'), function(name, ..., avaUpDef = Inf) {
+setMethod('newTrade', signature(name = 'character'), function(name, ..., source = NULL, destination = NULL, avaUpDef = Inf) {
   trd <-  universalInit('trade', name, ...)
 	if (avaUpDef != Inf) {
 		trd@trade[nrow(trd@trade) + 1, ] <- NA
 		trd@trade[nrow(trd@trade), 'ava.up'] <- avaUpDef
 	}
-	trd
+  if (is.null(source) != is.null(destination))
+    stop('There are contradict in source/destination data for trade "', trd@name, '"')
+  if (!is.null(source) && !is.null(list(...)$routes))
+    stop('There are contradict in source/destination and routes data for trade "', trd@name, '"')
+  if (!is.null(source)) {
+    trd@routes <- merge(data.frame(src = source, stringsAsFactors = FALSE), 
+                        data.frame(dst = destination, stringsAsFactors = FALSE))
+    trd@routes <- trd@routes[trd@routes$src != trd@routes$dst,, drop = FALSE]
+  }
+  trd
 })
   
 

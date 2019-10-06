@@ -18,7 +18,6 @@ setClass("trade",
       	capacityVariable = "logical",
       	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
       	cap2act       = "numeric",         #
-      	bidirectional = "logical",
       	misc = "list"
       ),
 	# Default values and structure of slots
@@ -27,7 +26,7 @@ setClass("trade",
 		name           = "default_trade",       # Short name
 		description    = "",
 		commodity      = NULL,       #
-		routes         data.frame(
+		routes       = data.frame(
 		  src        = character(),
 		  dst        = character(),
 		  stringsAsFactors = FALSE),
