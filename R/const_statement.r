@@ -59,10 +59,10 @@
     vTradeCost = c("region", "year"), 
     vTradeRowCost = c("region", "year"), 
     vTradeIrCost = c("region", "year"), 
-    vTradeSalv = c("trade", "region", "region"), 
-    vTradeCap = c("trade", "region", "region", "year"), 
-    vTradeInv = c("trade", "region", "region", "year"), 
-    vTradeNewCap = c("trade", "region", "region", "year")
+    vTradeSalv = c("trade", "region"), 
+    vTradeCap = c("trade", "year"), 
+    vTradeInv = c("trade", "region", "year"), 
+    vTradeNewCap = c("trade", "year")
 );
 .vrb_mapping = list(
     vTechUse = "vTechUse( tech , region , year , slice ) $ ( mTechSpan( tech , region , year ) and mTechSlice( tech , slice ) )",
@@ -125,8 +125,8 @@
   vTradeCost = "vTradeCost( region , year ) $ mMidMilestone( year )",
   vTradeRowCost = "vTradeRowCost( region , year ) $ mMidMilestone( year )",
   vTradeIrCost = "vTradeIrCost( region , year ) $ mMidMilestone( year )",
-  vTradeSalv = "vTradeSalv( trade , region , region ) $ ( mTradeCapacityVariable( trade ) and mTradeSalv( trade , src , dst ) and mMilestoneLast( yeare ) )",
-  vTradeCap = "vTradeCap( trade , region , region , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeSpan( trade , src , dst , year ) )",
-  vTradeInv = "vTradeInv( trade , region , region , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeNew( trade , src , dst , year ) )",
-  vTradeNewCap = "vTradeNewCap( trade , region , region , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeNew( trade , src , dst , year ) )"
+  vTradeSalv = "vTradeSalv( trade , region ) $ ( mTradeCapacityVariable( trade ) and mTradeSalv( trade , region ) and mMilestoneLast( yeare ) )",
+  vTradeCap = "vTradeCap( trade , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeCap( trade , year ) )",
+  vTradeInv = "vTradeInv( trade , region , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeInv( trade , region , year ) )",
+  vTradeNewCap = "vTradeNewCap( trade , year ) $ ( mTradeCapacityVariable( trade ) and mMidMilestone( year ) and mTradeNew( trade , year ) )"
 );
