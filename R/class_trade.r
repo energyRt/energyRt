@@ -4,7 +4,7 @@ setClass("trade",
           name          = "character",       # Short name
           description   = "character",       # Details
           commodity     = "character",       # Vector if NULL that
-          source        = "character",       # if NULL that in all region
+          routes        = "data.frame",       
           destination   = "character",       # if NULL that in all region
       # Performance parameters
           trade         = "data.frame",
@@ -27,8 +27,10 @@ setClass("trade",
 		name           = "default_trade",       # Short name
 		description    = "",
 		commodity      = NULL,       #
-		source         = character(),
-		destination    = character(),
+		routes         data.frame(
+		  src        = character(),
+		  dst        = character(),
+		  stringsAsFactors = FALSE),
 		trade          = data.frame(
 			src        = character(),
 			dst        = character(),
@@ -42,29 +44,20 @@ setClass("trade",
 			teff        = numeric(),
 			stringsAsFactors = FALSE),
 		invcost = data.frame(
-			src        = character(),
-			dst        = character(),
+			region        = character(),
 			year       = numeric(),
 			invcost    = numeric(),
 			stringsAsFactors = FALSE),
 		olife = data.frame(
-			src        = character(),
-			dst        = character(),
 			olife    = numeric(),
 			stringsAsFactors = FALSE),
 		start = data.frame(
-			src        = character(),
-			dst        = character(),
 			start    = numeric(),
 			stringsAsFactors = FALSE),
 		end = data.frame(
-			src        = character(),
-			dst        = character(),
 			end    = numeric(),
 			stringsAsFactors = FALSE),
 		stock         = data.frame(
-			src = character(),
-			dst = character(),
 			year  = integer(),
 			stock = numeric(),
 			stringsAsFactors = FALSE),
@@ -86,8 +79,6 @@ setClass("trade",
 			stringsAsFactors = FALSE),
 		cap2act       = 1,         #
 		GIS           = NULL,
-		# slice = NULL,
-		bidirectional = FALSE,
 		#! Misc
 		misc = list(
 		)),

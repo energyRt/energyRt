@@ -121,7 +121,7 @@ mSliceFYearNext(slice, slice)           Next slice joint
 * Trade and ROW
 mTradeSlice(trade, slice)          Trade to slice
 mTradeComm(trade, comm)            Trade commodities
-mTradeRoute(trade, region, region)
+mTradeRoutes(trade, region, region)
 mTradeIrAInp(trade, comm)          Auxiliary  input commodity in source region
 mTradeIrAOut(trade, comm)          Auxiliary output commodity in source region
 mTradeIrCdstAInp(trade, comm)      Auxiliary  input commodity in destination region
@@ -144,7 +144,7 @@ mStorageWeatherCinp(stg, weather)
 mStorageWeatherCout(stg, weather)
 
 
-mTradeRoute(trade, region, region)
+mTradeRoutes(trade, region, region)
 mTradeSpan(trade, year)
 mTradeNew(trade, year)
 mTradeOlifeInf(trade)
@@ -512,7 +512,7 @@ mDummyImport(comm, region, year, slice)
 mDummyExport(comm, region, year, slice)
 * mDummyExport(comm, region, year, slice) or mDummyImport(comm, region, year, slice)
 mDummyCost(comm, region, year)
-* mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> 0 and mTradeRoute(trade, src, dst))
+* mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> 0 and mTradeRoutes(trade, src, dst))
 mTradeIr(trade, region, region, year, slice)
 * mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> Inf and mTradeIr(trade, region, region, year, slice))
 mTradeIrUp(trade, region, region, year, slice)
@@ -1923,6 +1923,8 @@ Solve energyRt minimizing vObjective using LP;
 $include output.gms
 
 * 99089425-31110-4440-be57-2ca102e9cee1
+
+
 
 
 

@@ -61,7 +61,7 @@ set mSliceNext dimen 2;
 set mSliceFYearNext dimen 2;
 set mTradeSlice dimen 2;
 set mTradeComm dimen 2;
-set mTradeRoute dimen 3;
+set mTradeRoutes dimen 3;
 set mTradeIrAInp dimen 2;
 set mTradeIrAOut dimen 2;
 set mTradeIrCdstAInp dimen 2;

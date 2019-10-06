@@ -326,7 +326,6 @@ setMethod("initialize", "modInp",
     		defVal = 0, interpolation = 'back.inter.forth')    
     # Trade
     # Map
-    .Object@parameters[['mTradeBidirectional']] <- createParameter('mTradeBidirectional', 'trade', 'map', cls = 'trade')   
     .Object@parameters[['mTradeIrAInp']] <- createParameter('mTradeIrAInp', c('trade', 'comm'), 'map', cls = 'trade')   
     .Object@parameters[['mTradeIrAOut']] <- createParameter('mTradeIrAOut', c('trade', 'comm'), 'map', cls = 'trade')   
     .Object@parameters[['mExpComm']] <- 
@@ -335,10 +334,6 @@ setMethod("initialize", "modInp",
     	createParameter('mImpComm', c('imp', 'comm'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeComm']] <- 
     	createParameter('mTradeComm', c('trade', 'comm'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeSrc']] <- 
-    	createParameter('mTradeSrc', c('trade', 'region'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeDst']] <- 
-    	createParameter('mTradeDst', c('trade', 'region'), 'map', cls = 'trade')  
     drt1 <- c('pTradeIrCsrc2Aout', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Aout', 'pTradeIrCdst2Ainp')
     drt2 <- c(        'csrc2aout',         'csrc2ainp',         'cdst2aout',         'cdst2ainp')
     for (i in seq_along(drt1))
@@ -444,24 +439,26 @@ setMethod("initialize", "modInp",
     
     # Trade capacity data
     # For disable technology with unexceptable start year
-    .Object@parameters[['mTradeSpan']] <- createParameter('mTradeSpan', c('trade', 'src', 'dst', 'year'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeSpan']] <- createParameter('mTradeSpan', c('trade', 'src', 'dst', 'year'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeNew']] <- createParameter('mTradeNew', c('trade', 'src', 'dst', 'year'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeOlifeInf']] <- createParameter('mTradeOlifeInf', c('trade', 'src', 'dst'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeSalv']] <- createParameter('mTradeSalv', c('trade', 'src', 'dst'), 'map', cls = 'trade')    
+    .Object@parameters[['mTradeSpan']] <- createParameter('mTradeSpan', c('trade', 'year'), 'map', cls = 'trade')    
+    .Object@parameters[['mTradeNew']] <- createParameter('mTradeNew', c('trade', 'year'), 'map', cls = 'trade')    
+    .Object@parameters[['mTradeOlifeInf']] <- createParameter('mTradeOlifeInf', c('trade'), 'map', cls = 'trade')    
+    .Object@parameters[['mTradeSalv']] <- createParameter('mTradeSalv', c('trade', 'map', cls = 'trade')    
     .Object@parameters[['mTradeCapacityVariable']] <- createParameter('mTradeCapacityVariable', 'trade', 'map', cls = 'trade')    
+    .Object@parameters[['mTradeRoute']] <- createParameter('mTradeRoute', c('trade', 'src', 'dst', 'year'), 'map', cls = 'trade')    
+    .Object@parameters[['mTradeCap']] <- createParameter('mTradeCap', c('trade', 'year'), 'map', cls = 'trade')    
+    .Object@parameters[['mTradeInv']] <- createParameter('mTradeInv', c('trade', 'region', 'year'), 'map', cls = 'trade')    
     
     .Object@parameters[['pTradeStock']] <- createParameter('pTradeStock', 
-    	c('trade', 'src', 'dst', 'year'), 'simple', 
+    	c('trade', 'year'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'stock', cls = 'trade')    
     .Object@parameters[['pTradeOlife']] <- createParameter('pTradeOlife', 
-    	c('trade', 'src', 'dst'), 'simple', 
+    	c('trade'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'olife', cls = 'trade')    
     .Object@parameters[['pTradeInvcost']] <- createParameter('pTradeInvcost', 
-    	c('trade', 'src', 'dst', 'year'), 'simple', 
+    	c('trade', 'region', 'year'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'trade')    
     .Object@parameters[['pTradeSalv']] <- createParameter('pTradeSalv', 
-    	c('trade', 'src', 'dst', 'year'), 'simple', 
+    	c('trade', 'region', 'year'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = '', cls = 'trade')    
     
     .Object@parameters[['pTradeCap2Act']] <- createParameter('pTradeCap2Act', 'trade', 'simple', 

@@ -844,50 +844,74 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
   remove_duplicate <- list(c('src', 'dst'))
   approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
   trd <- .disaggregateSliceLevel(trd, approxim)
-  # bi derectional flag
-  if (trd@bidirectional) {
-  	obj@parameters[['mTradeBidirectional']] <- addData(obj@parameters[['mTradeBidirectional']], data.frame(trade = trd@name))
-  	if (length(trd@source) != length(trd@destination) || any(sort(trd@source) != sort(trd@destination)))
-  		stop(paste0('For bi directional trade sorce & destination have to be equal, for class trade: "', trd@name, '"'))
-  	for (chk_slot in c('invcost', 'olife', 'start', 'end', 'stock')) {
-  		tmp <- slot(trd, chk_slot)
-  		tmp <- tmp[(!is.na(tmp$src) & !is.na(tmp$dst)), c('src', 'dst')]
-  		if (nrow(tmp) > 0) {
-  			tmp <- tmp[!duplicated(tmp), ]
-  			if (anyDuplicated(rbind(tmp, data.frame(dst = tmp$src, src = tmp$dst, stringsAsFactors=FALSE))))
-  				stop(paste0('For bi directional trade couple sorce & destination in slot "', chk_slot, '" have to use in one order, for trade: "', trd@name, '"'))
-  		}
-  		if (chk_slot == 'invcost' & (nrow(tmp) > 0)) {
-  		  tmp <- trd@invcost
-  			tmp2 <- tmp
-  			tmp2$src <- tmp$dst
-  			tmp2$dst <- tmp$src
-  			trd@invcost <- rbind(tmp, tmp2[!is.na(tmp$src) | !is.na(tmp$dst),])
-  		}
-  	}
-  }
   # other flag
   obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
                                             data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
   if (length(trd@commodity) == 0) stop('There is not commodity for trade flow ', trd@name)
   obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
       data.frame(trade = trd@name, comm = trd@commodity))
-  if (length(trd@source) == 0) rg <- obj@parameters$region@data$region else rg <- trd@source
-  obj@parameters[['mTradeSrc']] <- addData(obj@parameters[['mTradeSrc']],
-      data.frame(trade = rep(trd@name, length(rg)), region = rg))
-  if (length(trd@destination) == 0) rg <- obj@parameters$region@data$region else rg <- trd@destination
-  obj@parameters[['mTradeDst']] <- addData(obj@parameters[['mTradeDst']],
-      data.frame(trade = rep(trd@name, length(rg)), region = rg))
-  #
-  if (length(trd@source) != 0) {
-    approxim$src <- trd@source; 
-    approxim$src <- approxim$src[approxim$src %in% approxim$region]
-  } else approxim$src <- approxim$region 
-  if (length(trd@destination) != 0) {
-    approxim$dst <- trd@destination; 
-    approxim$dst <- approxim$dst[approxim$dst %in% approxim$region]
-  } else approxim$dst <- approxim$region
+  obj@parameters[['mTradeRoutes']] <- addData(obj@parameters[['mTradeRoutes']],
+                                              rbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes))
   approxim <- approxim[names(approxim) != 'region']
+  # Apply routes to approximation
+  routes <- trd@routes
+  for (pr in c('trade', 'aeff')) if (nrow(slot(trd, pr)) > 0) { 
+    tmp <- slot(trd, pr)
+    # Checking user data for errors
+    kk <- tmp[!is.na(tmp$src) & !is.na(tmp$dst), c('src', 'dst'), drop = FALSE]
+    if (nrow(kk) > 0) {
+      if (nrow(kk) != nrow(merge(kk, routes))) {
+        cat('There are data for class trade "', trd@name, '", in slot "', 
+            pr, '" for unknown routes:\n', sep = '')
+        kk$ind <- seq_len(nrow(kk))
+        print(kk[kk$ind[!(kk$ind %in% merge(kk, routes))], c('src', 'dst'), drop = FALSE])
+      }
+    }
+    # Approximation src/dst pair
+    if (any(is.na(tmp$src) != is.na(tmp$dst))) {
+      # src NA
+      fl <- seq_len(nrow(tmp))[is.na(tmp$src) & !is.na(tmp$dst)]
+      if (length(fl) > 0) {
+        for (i in fl) {
+          dst <- routes$dst[!(routes$dst %in% tmp[i, 'dst'])]
+          if (length(dst) > 0) {
+            nn <- nrow(tmp) + seq_along(dst)
+            tmp <- rbind(tmp, tmp[rep(i, length(dst)),, drop = FALSE])
+            tmp[nn, 'dst'] <- dst
+          }
+        }
+        tmp <- tmp[-fl,, drop = FALSE]
+      }
+      # dst NA
+      fl <- seq_len(nrow(tmp))[!is.na(tmp$src) & is.na(tmp$dst)]
+      if (length(fl) > 0) {
+        for (i in fl) {
+          src <- routes$dst[!(routes$src %in% tmp[i, 'src'])]
+          if (length(src) > 0) {
+            nn <- nrow(tmp) + seq_along(src)
+            tmp <- rbind(tmp, tmp[rep(i, length(src)),, drop = FALSE])
+            tmp[nn, 'src'] <- src
+          }
+        }
+        tmp <- tmp[-fl,, drop = FALSE]
+      }
+      # src & dst NA
+      fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
+      if (length(fl) > 0) {
+        kk <- rbind(tmp[, c('src', 'dst'), drop = FALSE], routes)
+        kk <- kk[!duplicated(kk),, drop = FALSE]
+      }
+      if (length(fl) > 0 && nrow(kk) > 0) {
+        nn <- nrow(tmp) + seq_len(nrow(kk) * length(fl))
+        tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),, drop = FALSE])
+        tmp[nn, 'src'] <- kk$src
+        tmp[nn, 'dst'] <- kk$dst
+      }
+        tmp <- tmp[-fl,, drop = FALSE]
+      }
+      rownames(tmp) <- NULL
+    }
+  }
   # pTradeIrCost
   obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
   	simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
