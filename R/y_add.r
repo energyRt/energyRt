@@ -853,17 +853,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
       data.frame(trade = trd@name, comm = trd@commodity))
   obj@parameters[['mTradeRoutes']] <- addData(obj@parameters[['mTradeRoutes']],
                                               cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes))
-  approxim <- approxim[names(approxim) != 'region']
+  # approxim <- approxim[names(approxim) != 'region']
+  approxim$region <- paste0(trd@routes$src, '##', trd@routes$dst)
   # Apply routes to approximation
   routes <- trd@routes
-  for (pr in c('trade', 'aeff')) if (nrow(slot(trd, pr)) > 0) { 
-    tmp <- slot(trd, pr)
+cat(trd@name, ' 2\n')
+  imply_routes <- function(tmp) {
     # Checking user data for errors
     kk <- tmp[!is.na(tmp$src) & !is.na(tmp$dst), c('src', 'dst'), drop = FALSE]
     if (nrow(kk) > 0) {
       if (nrow(kk) != nrow(merge(kk, routes))) {
-        cat('There are data for class trade "', trd@name, '", in slot "', 
-            pr, '" for unknown routes:\n', sep = '')
+        cat('There are data for class trade "', trd@name, ' for unknown routes:\n', sep = '')
         kk$ind <- seq_len(nrow(kk))
         print(kk[kk$ind[!(kk$ind %in% merge(kk, routes))], c('src', 'dst'), drop = FALSE])
       }
@@ -911,30 +911,46 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
     }
     tmp <- tmp[-fl,, drop = FALSE]
     rownames(tmp) <- NULL
-    slot(trd, pr) <- tmp
+    tmp
   }
-cat(trd@name, ' 2\n')
-if (trd@name == 'trd_ELC_1') browser()
+  simpleInterpolation2 <- function(frm, ...) {
+    # browser()
+    if (nrow(frm) == 0) return(data.frame())
+    frm <- imply_routes(frm)
+    frm$region <- paste0(trd@routes$src, '##', trd@routes$dst)
+    frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
+    dd <- simpleInterpolation(frm, ...)
+    dd$src <- gsub('##.*', dd$region)
+    dd$dst <- gsub('.*##', dd$region)
+    dd
+  }
+  multiInterpolation2 <- function(frm, ...) {
+    if (nrow(frm) == 0) return(data.frame())
+    frm <- imply_routes(frm)
+    frm$region <- paste0(trd@routes$src, '##', trd@routes$dst)
+    frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
+    dd <- multiInterpolation(frm, ...)
+    dd$src <- gsub('##.*', dd$region)
+    dd$dst <- gsub('.*##', dd$region)
+    dd
+  }
+  if (trd@name == 'trd_ELC_1') browser() # debug(simpleInterpolation)
+  # browser()
   # pTradeIrCost
-  if (any(!is.na(trd@trade$cost)))
     obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
-  	  simpleInterpolation(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
+  	  simpleInterpolation2(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
     		approxim, 'trade', trd@name))
-  if (any(!is.na(trd@trade$teff)))
     obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']],
-    	simpleInterpolation(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
+    	simpleInterpolation2(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
   	  	approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIrMarkup
-  if (any(!is.na(trd@trade$markup)))
     obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
-      simpleInterpolation(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
+      simpleInterpolation2(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
         approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
   # pTradeIr
-  if (any(!is.na(trd@trade$ava.up)) || any(!is.na(trd@trade$ava.fx)) || any(!is.na(trd@trade$ava.lo))) {
-    gg <- multiInterpolation(trd@trade, 'ava',
+    gg <- multiInterpolation2(trd@trade, 'ava',
             obj@parameters[['pTradeIr']], approxim, 'trade', trd@name, remove_duplicate = remove_duplicate)
     obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
-  }
 cat(trd@name, ' 3\n')
   # Trade ainp
     if (nrow(trd@aux) != 0) {
