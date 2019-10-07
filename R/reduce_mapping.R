@@ -71,18 +71,15 @@
       if (i == 'slice' && any(colnames(sets) == 'tech')) {
         tmp <- merge(tmp_map$mTechSlice, tmp)
       }
-      if (i == 'src') {
-        aa <- tmp_map$mTradeSrc
-        colnames(aa)[2] <- 'src'
-        tmp <- merge(aa, tmp)
-      }
       if (i == 'dst') {
-        aa <- tmp_map$mTradeDst
-        colnames(aa)[2] <- 'dst'
+        aa <- tmp_map$mTradeRoutes
         tmp <- merge(aa, tmp)
       }
       if (i == 'comm' && any(colnames(sets) == 'trade')) {
-        tmp <- merge(tmp_map$mTradeComm, tmp)
+      	tmp <- merge(tmp_map$mTradeComm, tmp)
+      }
+      if (i == 'slice' && any(colnames(sets) == 'trade')) {
+      	tmp <- merge(tmp_map$mTradeSlice, tmp)
       }
       if (is.null(sets)) {
       	sets <- tmp
@@ -192,29 +189,21 @@
   # mTradeIr(trade, region, region, year, slice)         Total physical trade flows between regions
   # mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> 0 and
   #    mTradeSrc(trade, src) and mTradeDst(trade, dst) and not(mSameRegion(src, dst))
-  a1 <- tmp_map$mTradeSrc; colnames(a1)[2] <- 'src'
-  a2 <- tmp_map$mTradeDst; colnames(a2)[2] <- 'dst'
-  aa <- merge(a1, a2)
-  aa <- aa[aa$src != aa$dst,, drop = FALSE]
-  aa <- merge(aa, merge(tmp_nozero$pTradeIr, tmp_map$mTradeSlice))[, c("trade", "src", "dst", "year", "slice")] 
+  aa <- merge(tmp_map$mTradeRoutes, tmp_nozero$pTradeIr, by = c('trade', 'src', 'dst'))[, c("trade", "src", "dst", "year", "slice")] 
   if (nrow(tmp_map$mTradeCapacityVariable) > 0) {
   	fl <- (aa$trade %in% tmp_map$mTradeCapacityVariable$trade)
-  	aa <- rbind(aa[!fl, ], merge(aa[fl, ], tmp_map$mTradeSpan, by = c("trade", "src", "dst", "year")))
+  	aa <- rbind(aa[!fl, ], merge(aa[fl,, drop = FALSE], tmp_map$mTradeSpan, by = c("trade", "year")))
   }
-  colnames(aa)[2:3] <- 'region'
+  # colnames(aa)[2:3] <- 'region'
   prec@parameters[['mTradeIr']] <- addData(prec@parameters[['mTradeIr']], aa[, ])
+  tmp_map$mTradeIr <- aa
   
   
   # mTradeIrUp(trade, region, region, year, slice)         Total physical trade flows between regions is constraint
   # mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) != Inf and
   #    mTradeSrc(trade, src) and mTradeDst(trade, dst) and not(mSameRegion(src, dst))
-  a1 <- tmp_map$mTradeSrc; colnames(a1)[2] <- 'src'
-  a2 <- tmp_map$mTradeDst; colnames(a2)[2] <- 'dst'
-  bb <- merge(a1, a2)
-  bb <- bb[bb$src != bb$dst,, drop = FALSE]
-  bb <- merge(bb, merge(merge(tmp_noinf$pTradeIr, tmp_nozero$pTradeIr), 
-  	tmp_map$mTradeSlice))[, c("trade", "src", "dst", "year", "slice")]
-  colnames(bb)[2:3] <- 'region'
+
+  bb <- merge(tmp_map$mTradeIr, tmp_noinf$pTradeIr, by = c("trade", "src", "dst", "year", "slice"))[, c("trade", "src", "dst", "year", "slice")]
   prec@parameters[['mTradeIrUp']] <- addData(prec@parameters[['mTradeIrUp']], bb[, ])
   # mTradeIrAInp2(trade, comm, region, year, slice)
   a0 <- tmp_map$mTradeIrAInp; colnames(a0)[2] <- 'acomm' 
@@ -250,12 +239,13 @@
     prec@parameters[['mExportRowUp']] <- addData(prec@parameters[['mExportRowUp']], reduce.sect(merge(tmp_noinf$pExportRow, aa), c("expp", "comm", "region", "year", "slice")))
     prec@parameters[['mExportRowAccumulatedUp']] <- addData(prec@parameters[['mExportRowAccumulatedUp']], tmp_noinf$pExportRowRes)
     # sum(expp$mExportRow(expp, comm, region, year, slice), 1) + sum((trade, dst)$(mTradeIr(trade, region, dst, year, slice) and mTradeComm(trade, comm)), 1) <> 0
-    prec@parameters[['mExport']] <- addData(prec@parameters[['mExport']], reduce.sect(
-    	rbind(merge(tmp_map$mTradeComm, getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'region', 'year', 'slice')],
+    tmp <- merge(tmp_map$mTradeComm, getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'src', 'year', 'slice')]
+    colnames(tmp)[2] <- 'region'
+    prec@parameters[['mExport']] <- addData(prec@parameters[['mExport']], reduce.sect(rbind(tmp,
     		getParameterData(prec@parameters[['mExportRow']])[, c('comm', 'region', 'year', 'slice')]), 
     	c('comm', 'region', 'year', 'slice')))
     # sum(expp$mImportRow(imp, comm, region, year, slice), 1) + sum((trade, src)$(mTradeIr(trade, src, region, year, slice) and mTradeComm(trade, comm)), 1) <> 0
-    zz <- merge(tmp_map$mTradeComm, getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'region.1', 'year', 'slice')]
+    zz <- merge(tmp_map$mTradeComm, getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'dst', 'year', 'slice')]
     colnames(zz)[2] <- 'region'
     prec@parameters[['mImport']] <- addData(prec@parameters[['mImport']], reduce.sect(
     	rbind(zz, getParameterData(prec@parameters[['mImportRow']])[, c('comm', 'region', 'year', 'slice')]), 
