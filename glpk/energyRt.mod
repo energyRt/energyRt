@@ -84,7 +84,6 @@ set mTradeNew dimen 2;
 set mTradeOlifeInf dimen 1;
 set mTradeSalv dimen 2;
 set mTradeCapacityVariable dimen 1;
-set mTradeCap dimen 2;
 set mTradeInv dimen 3;
 set mTechInpTot dimen 4;
 set mTechOutTot dimen 4;
@@ -766,7 +765,7 @@ for{t1 in trade, r in region : vTradeSalv[t1,r] <> 0} {
   printf "%s,%s,%f\n", t1,r,vTradeSalv[t1,r] >> "output/vTradeSalv.csv";
 }
 printf "trade,year,value\n" > "output/vTradeCap.csv";
-for{(t1, y) in mTradeCap : t1 in mTradeCapacityVariable and y in mMidMilestone and vTradeCap[t1,y] <> 0} {
+for{(t1, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in mMidMilestone and vTradeCap[t1,y] <> 0} {
   printf "%s,%s,%f\n", t1,y,vTradeCap[t1,y] >> "output/vTradeCap.csv";
 }
 printf "trade,region,year,value\n" > "output/vTradeInv.csv";

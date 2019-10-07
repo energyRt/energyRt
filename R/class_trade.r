@@ -11,9 +11,9 @@ setClass("trade",
           aux           = "data.frame",      #
           aeff         = "data.frame",    #  Commodity efficiency
       	invcost = "data.frame",
-      	olife = "data.frame",
-      	start = "data.frame",
-      	end = "data.frame",
+      	olife = "numeric",
+      	start = "numeric",
+      	end = "numeric",
       	stock = "data.frame",
       	capacityVariable = "logical",
       	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
@@ -47,15 +47,9 @@ setClass("trade",
 			year       = numeric(),
 			invcost    = numeric(),
 			stringsAsFactors = FALSE),
-		olife = data.frame(
-			olife    = numeric(),
-			stringsAsFactors = FALSE),
-		start = data.frame(
-			start    = numeric(),
-			stringsAsFactors = FALSE),
-		end = data.frame(
-			end    = numeric(),
-			stringsAsFactors = FALSE),
+		olife = Inf,
+		start = -Inf,
+		end = Inf,
 		stock         = data.frame(
 			year  = integer(),
 			stock = numeric(),

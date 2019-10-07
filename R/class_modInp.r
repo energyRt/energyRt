@@ -442,11 +442,10 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mTradeSpan']] <- createParameter('mTradeSpan', c('trade', 'year'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeNew']] <- createParameter('mTradeNew', c('trade', 'year'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeOlifeInf']] <- createParameter('mTradeOlifeInf', c('trade'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeSalv']] <- createParameter('mTradeSalv', c('trade', 'region'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeCapacityVariable']] <- createParameter('mTradeCapacityVariable', 'trade', 'map', cls = 'trade')    
     .Object@parameters[['mTradeRoutes']] <- createParameter('mTradeRoutes', c('trade', 'src', 'dst'), 'map', cls = 'trade')    
-    .Object@parameters[['mTradeCap']] <- createParameter('mTradeCap', c('trade', 'year'), 'map', cls = 'trade')    
     .Object@parameters[['mTradeInv']] <- createParameter('mTradeInv', c('trade', 'region', 'year'), 'map', cls = 'trade')    
+    .Object@parameters[['mTradeSalv']] <- createParameter('mTradeSalv', c('trade', 'region'), 'map', cls = 'trade')    
     
     .Object@parameters[['pTradeStock']] <- createParameter('pTradeStock', 
     	c('trade', 'year'), 'simple', 

@@ -192,7 +192,7 @@
   aa <- merge(tmp_map$mTradeRoutes, tmp_nozero$pTradeIr, by = c('trade', 'src', 'dst'))[, c("trade", "src", "dst", "year", "slice")] 
   if (nrow(tmp_map$mTradeCapacityVariable) > 0) {
   	fl <- (aa$trade %in% tmp_map$mTradeCapacityVariable$trade)
-  	aa <- rbind(aa[!fl, ], merge(aa[fl,, drop = FALSE], tmp_map$mTradeSpan, by = c("trade", "year")))
+  	aa <- rbind(aa[!fl, ], merge(aa[fl,, drop = FALSE], tmp_map$mTradeSpan, by = c("trade", "year")))[, c("trade", "src", "dst", "year", "slice")] 
   }
   # colnames(aa)[2:3] <- 'region'
   prec@parameters[['mTradeIr']] <- addData(prec@parameters[['mTradeIr']], aa[, ])

@@ -150,7 +150,6 @@ mTradeNew(trade, year)
 mTradeOlifeInf(trade)
 mTradeSalv(trade, region)
 mTradeCapacityVariable(trade)
-mTradeCap(trade, year)
 * mTradeNew(trade, year) and pTradeInvcost(trade, region, year) <> 0
 mTradeInv(trade, region, year)
 ;
@@ -481,7 +480,7 @@ vTradeIrCost(region, year)                           Interregional trade costs
 vTradeSalv(trade, region)
 ;
 positive variable
-*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and  mTradeCap(trade, year))
+*@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and  mTradeSpan(trade, year))
 vTradeCap(trade, year)
 *@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeInv(trade, region, year))
 vTradeInv(trade, region, year)
