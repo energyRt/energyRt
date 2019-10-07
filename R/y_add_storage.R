@@ -1,0 +1,159 @@
+################################################################################
+# Add storage
+################################################################################
+setMethod('.add0', signature(obj = 'modInp', app = 'storage',
+	approxim = 'list'), function(obj, app, approxim) {
+		stg <- energyRt:::.upper_case(app)
+		approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = NULL)
+		stg <- .disaggregateSliceLevel(stg, approxim)
+		if (length(stg@region) != 0) {
+			approxim$region <- approxim$region[approxim$region %in% stg@region]
+			ss <- getSlots('storage')
+			ss <- names(ss)[ss == 'data.frame']
+			ss <- ss[sapply(ss, function(x) (any(colnames(slot(stg, x)) == 'region') 
+				&& any(!is.na(slot(stg, x)$region))))]
+			for(sl in ss) if (any(!is.na(slot(stg, sl)$region) & !(slot(stg, sl)$region %in% stg@region))) {
+				rr <- !is.na(slot(stg, sl)$region) & !(slot(stg, sl)$region %in% stg@region)
+				warning(paste('There are data storage "', stg@name, '" for unused region: "', 
+					paste(unique(slot(stg, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
+				slot(stg, sl) <- slot(stg, sl)[!rr,, drop = FALSE]
+			}
+		}
+		stg <- stayOnlyVariable(stg, approxim$region, 'region')
+		if (stg@fullYear)
+			obj@parameters[['mStorageFullYear']] <- addData(obj@parameters[['mStorageFullYear']],
+				data.frame(stg = stg@name))
+		obj@parameters[['mStorageComm']] <- addData(obj@parameters[['mStorageComm']],
+			data.frame(stg = stg@name, comm = stg@commodity))
+		obj@parameters[['pStorageOlife']] <- addData(obj@parameters[['pStorageOlife']],
+			simpleInterpolation(stg@olife, 'olife', obj@parameters[['pStorageOlife']], 
+				approxim, 'stg', stg@name, removeDefault = FALSE))
+		# Loss
+		obj@parameters[['pStorageInpEff']] <- addData(obj@parameters[['pStorageInpEff']],
+			simpleInterpolation(stg@seff, 'inpeff', obj@parameters[['pStorageInpEff']], 
+				approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+		obj@parameters[['pStorageOutEff']] <- addData(obj@parameters[['pStorageOutEff']],
+			simpleInterpolation(stg@seff, 'outeff', obj@parameters[['pStorageOutEff']], 
+				approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+		obj@parameters[['pStorageStgEff']] <- addData(obj@parameters[['pStorageStgEff']], 
+			simpleInterpolation(stg@seff, 'stgeff',  obj@parameters[['pStorageStgEff']], 
+				approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+		# Cost
+		obj@parameters[['pStorageCostInp']] <- addData(obj@parameters[['pStorageCostInp']],
+			simpleInterpolation(stg@varom, 'inpcost',
+				obj@parameters[['pStorageCostInp']], approxim, 'stg', stg@name))
+		obj@parameters[['pStorageCostOut']] <- addData(obj@parameters[['pStorageCostOut']],
+			simpleInterpolation(stg@varom, 'outcost',
+				obj@parameters[['pStorageCostOut']], approxim, 'stg', stg@name))
+		obj@parameters[['pStorageCostStore']] <- addData(obj@parameters[['pStorageCostStore']],
+			simpleInterpolation(stg@varom, 'stgcost',
+				obj@parameters[['pStorageCostStore']], approxim, 'stg', stg@name))
+		obj@parameters[['pStorageInvcost']] <- addData(obj@parameters[['pStorageInvcost']],
+			simpleInterpolation(stg@invcost, 'invcost',
+				obj@parameters[['pStorageInvcost']], approxim, 'stg', stg@name))
+		obj@parameters[['pStorageFixom']] <- addData(obj@parameters[['pStorageFixom']],
+			simpleInterpolation(stg@fixom, 'fixom',
+				obj@parameters[['pStorageFixom']], approxim, 'stg', stg@name))
+		# Ava/Cap
+		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']],
+			simpleInterpolation(stg@stock, 'stock',
+				obj@parameters[['pStorageStock']], approxim, 'stg', stg@name))
+		obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']],
+			multiInterpolation(stg@af, 'af',
+				obj@parameters[['pStorageAf']], approxim, 'stg', stg@name))
+		obj@parameters[['pStorageCap2stg']] <- addData(obj@parameters[['pStorageCap2stg']],
+			data.frame(stg = stg@name, value = stg@cap2stg))
+		obj@parameters[['pStorageCinp']] <- addData(obj@parameters[['pStorageCinp']], multiInterpolation(stg@seff, 'cinp',
+			obj@parameters[['pStorageCinp']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+		obj@parameters[['pStorageCout']] <- addData(obj@parameters[['pStorageCout']], multiInterpolation(stg@seff, 'cout',
+			obj@parameters[['pStorageCout']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+		# Aux input/output
+		if (nrow(stg@aux) != 0) {
+			if (any(!(stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]))) {
+				cmm <- stg@aeff$acomm[!is.na(stg@aeff$acomm)][stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]]
+				stop(paste0('Unknown aux commodity "', paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
+			}
+			stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),, drop = FALSE]
+			ainp_flag <- c('stg2ainp', 'inp2ainp', 'out2ainp', 'cap2ainp', 'ncap2ainp')
+			aout_flag <- c('stg2aout', 'inp2aout', 'out2aout', 'cap2aout', 'ncap2aout')
+			cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), 'acomm']
+			cmp_out <- stg@aeff[apply(!is.na(stg@aeff[, aout_flag]), 1, any), 'acomm']
+			obj@parameters[['mStorageAInp']] <- addData(obj@parameters[['mStorageAInp']],
+				data.frame(stg = rep(stg@name, length(cmp_inp)), comm = cmp_inp))
+			obj@parameters[['mStorageAOut']] <- addData(obj@parameters[['mStorageAOut']],
+				data.frame(stg = rep(stg@name, length(cmp_out)), comm = cmp_out))
+			dd <- data.frame(list = c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 'pStorageOut2AInp', 
+				'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 'pStorageNCap2AInp', 'pStorageNCap2AOut'),
+				table = c('stg2ainp', 'stg2aout', 'inp2ainp', 'inp2aout', 'out2ainp', 'out2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 
+					'ncap2aout'),
+				stringsAsFactors = FALSE)
+			approxim_comm <- approxim
+			for(i in 1:nrow(dd)) {
+				approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
+				approxim_comm[['acomm']] <- unique(stg@aeff[!is.na(stg@aeff[, dd[i, 'table']]), 'acomm'])
+				if (length(approxim_comm[['acomm']]) != 0) {
+					obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
+						simpleInterpolation(stg@aeff, dd[i, 'table'], 
+							obj@parameters[[dd[i, 'list']]], approxim_comm, 'stg', stg@name))
+				}
+			}                
+		} else {
+			if (nrow(stg@aeff) != 0)
+				stop(paste0('Unknown aux commodity "', paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'), '", in storage "', stg@name, '"'))
+		}
+		# Some slice
+		stock_exist <- obj@parameters[["pStorageStock"]]@data[!is.na(obj@parameters[["pStorageStock"]]@data$stg) & 
+				obj@parameters[['pStorageStock']]@data$stg == stg@name & 
+				obj@parameters[['pStorageStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 
+		dd0 <- .start_end_fix(approxim, stg, 'stg', stock_exist)
+		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
+		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
+		obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
+		obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
+		# Weather part
+		# Weather part
+		merge.weather <- function(stg, nm, add = NULL) {
+			waf <- stg@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
+			waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
+			if (nrow(waf) == 0) return(NULL)
+			# Map parts
+			if (length(add) == 0) {
+				m <- unique(waf$weather)
+				m <- data.frame(stg = rep(stg@name, length(m)), weather = m)
+			} else {
+				m <- waf[, c('weather', add), drop = FALSE]
+				m <- m[(!duplicated(apply(m, 1, paste0, collapse = '#'))),, drop = FALSE]
+				m$stg <- stg@name
+				m <- m[, c(ncol(m), 1:(ncol(m) - 1)), drop = FALSE]
+			}
+			waf20 <- data.frame(
+				stg = rep(stg@name, 4 * nrow(waf)),
+				weather = rep(waf$weather, 4),
+				stringsAsFactors = FALSE)
+			for (i in add) {
+				waf20[, i] <- rep(waf[, i], 4)
+			}
+			waf20$type <- c(rep('lo', 2 * nrow(waf)), rep('up', 2 * nrow(waf)))
+			waf20$value <- c(waf[, paste0(nm, '.lo')], waf[, paste0(nm, '.fx')], 
+				waf[, paste0(nm, '.up')], waf[, paste0(nm, '.fx')])
+			waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
+			list(m = m, p = waf20)
+		}
+		tmp <- merge.weather(stg, 'waf')
+		if (length(tmp) != 0) {
+			obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$m)
+			obj@parameters[['pStorageWeatherAf']] <- addData(obj@parameters[['pStorageWeatherAf']], tmp$p)
+		}
+		tmp <- merge.weather(stg, 'wcinp')
+		if (length(tmp) != 0) {
+			obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$m)
+			obj@parameters[['pStorageWeatherCinp']] <- addData(obj@parameters[['pStorageWeatherCinp']], tmp$p)
+		}
+		tmp <- merge.weather(stg, 'wcout')
+		if (length(tmp) != 0) {
+			obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$m)
+			obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
+		}
+		
+		obj
+	})
