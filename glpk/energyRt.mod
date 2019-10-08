@@ -254,7 +254,6 @@ param ORD{year};
 
 var vTechInv{tech, region, year};
 var vTechEac{tech, region, year};
-var vTechSalv{tech, region};
 var vTechOMCost{tech, region, year};
 var vSupCost{sup, region, year};
 var vEmsFuelTot{comm, region, year, slice};
@@ -563,10 +562,6 @@ printf "tech,region,year,value\n" > "output/vTechEac.csv";
 for{(t, r, y) in mTechSpan : vTechEac[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechEac[t,r,y] >> "output/vTechEac.csv";
 }
-printf "tech,region,value\n" > "output/vTechSalv.csv";
-for{t in tech, r in region : vTechSalv[t,r] <> 0} {
-  printf "%s,%s,%f\n", t,r,vTechSalv[t,r] >> "output/vTechSalv.csv";
-}
 printf "tech,region,year,value\n" > "output/vTechOMCost.csv";
 for{(t, r, y) in mTechSpan : vTechOMCost[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechOMCost[t,r,y] >> "output/vTechOMCost.csv";
@@ -699,10 +694,6 @@ printf "stg,region,year,value\n" > "output/vStorageNewCap.csv";
 for{(st1, r, y) in mStorageNew : vStorageNewCap[st1,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", st1,r,y,vStorageNewCap[st1,r,y] >> "output/vStorageNewCap.csv";
 }
-printf "stg,region,value\n" > "output/*vStorageSalv.csv";
-for{st1 in stg, r in region : *vStorageSalv[st1,r] <> 0} {
-  printf "%s,%s,%f\n", st1,r,*vStorageSalv[st1,r] >> "output/*vStorageSalv.csv";
-}
 printf "stg,region,year,value\n" > "output/vStorageOMCost.csv";
 for{(st1, r, y) in mStorageSpan : vStorageOMCost[st1,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", st1,r,y,vStorageOMCost[st1,r,y] >> "output/vStorageOMCost.csv";
@@ -785,7 +776,6 @@ printf "value\n%s\n",vObjective > "output/vObjective.csv";
 printf "value\n" > "output/variable_list.csv";
     printf "vTechInv\n" >> "output/variable_list.csv";
     printf "vTechEac\n" >> "output/variable_list.csv";
-    printf "vTechSalv\n" >> "output/variable_list.csv";
     printf "vTechOMCost\n" >> "output/variable_list.csv";
     printf "vSupCost\n" >> "output/variable_list.csv";
     printf "vEmsFuelTot\n" >> "output/variable_list.csv";

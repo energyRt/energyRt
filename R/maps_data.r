@@ -97,7 +97,6 @@
   list(
     vTechInv = c("tech", "region", "year"), 
     vTechEac = c("tech", "region", "year"), 
-    vTechSalv = c("tech", "region"), 
     vTechOMCost = c("tech", "region", "year"), 
     vSupCost = c("sup", "region", "year"), 
     vEmsFuelTot = c("comm", "region", "year", "slice"), 
@@ -177,7 +176,6 @@
    weather  = logical(),
    vTechInv  = logical(),
    vTechEac  = logical(),
-   vTechSalv  = logical(),
    vTechOMCost  = logical(),
    vSupCost  = logical(),
    vEmsFuelTot  = logical(),
@@ -541,14 +539,12 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:65,] <- NA;
-    rownames(rs) <- c("vTechInv", "vTechEac", "vTechSalv", "vTechOMCost", "vSupCost", "vEmsFuelTot", "vTechEmsFuel", "vBalance", "vTotalCost", "vObjective", "vTaxCost", "vSubsCost", "vAggOut", "vStorageOMCost", "vTradeCost", "vTradeRowCost", "vTradeIrCost", "vTechUse", "vTechNewCap", "vTechRetiredCap", "vTechCap", "vTechAct", "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", "vSupReserve", "vDemInp", "vOutTot", "vInpTot", "vInp2Lo", "vOut2Lo", "vSupOutTot", "vTechInpTot", "vTechOutTot", "vStorageInpTot", "vStorageOutTot", "vStorageAInp", "vStorageAOut", "vDummyImport", "vDummyExport", "vDummyCost", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageInv", "vStorageEac", "vStorageCap", "vStorageNewCap", "vImport", "vExport", "vTradeIr", "vTradeIrAInp", "vTradeIrAInpTot", "vTradeIrAOut", "vTradeIrAOutTot", "vExportRowAccumulated", "vExportRow", "vImportRowAccumulated", "vImportRow", "vTradeCap", "vTradeInv", "vTradeEac", "vTradeNewCap");
+    rs[1:64,] <- NA;
+    rownames(rs) <- c("vTechInv", "vTechEac", "vTechOMCost", "vSupCost", "vEmsFuelTot", "vTechEmsFuel", "vBalance", "vTotalCost", "vObjective", "vTaxCost", "vSubsCost", "vAggOut", "vStorageOMCost", "vTradeCost", "vTradeRowCost", "vTradeIrCost", "vTechUse", "vTechNewCap", "vTechRetiredCap", "vTechCap", "vTechAct", "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", "vSupReserve", "vDemInp", "vOutTot", "vInpTot", "vInp2Lo", "vOut2Lo", "vSupOutTot", "vTechInpTot", "vTechOutTot", "vStorageInpTot", "vStorageOutTot", "vStorageAInp", "vStorageAOut", "vDummyImport", "vDummyExport", "vDummyCost", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageInv", "vStorageEac", "vStorageCap", "vStorageNewCap", "vImport", "vExport", "vTradeIr", "vTradeIrAInp", "vTradeIrAInpTot", "vTradeIrAOut", "vTradeIrAOutTot", "vExportRowAccumulated", "vExportRow", "vImportRowAccumulated", "vImportRow", "vTradeCap", "vTradeInv", "vTradeEac", "vTradeNewCap");
     rs["vTechInv", c("name", "description")] <- c("vTechInv", "Overnight investment costs");
     rs["vTechInv", c("tech", "region", "year", "eqTechInv")] <- TRUE;
     rs["vTechEac", c("name", "description")] <- c("vTechEac", "Annualized investment costs");
     rs["vTechEac", c("tech", "region", "year", "eqTechEac", "eqCost")] <- TRUE;
-    rs["vTechSalv", c("name", "description")] <- c("vTechSalv", "Salvage value (on the end of the model horizon, to substract from costs)");
-    rs["vTechSalv", c("tech", "region")] <- TRUE;
     rs["vTechOMCost", c("name", "description")] <- c("vTechOMCost", "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)");
     rs["vTechOMCost", c("tech", "region", "year", "eqTechOMCost", "eqCost")] <- TRUE;
     rs["vSupCost", c("name", "description")] <- c("vSupCost", "Supply costs");

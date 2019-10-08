@@ -48,16 +48,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		obj@parameters[['pStorageCostStore']] <- addData(obj@parameters[['pStorageCostStore']],
 			simpleInterpolation(stg@varom, 'stgcost',
 				obj@parameters[['pStorageCostStore']], approxim, 'stg', stg@name))
-		obj@parameters[['pStorageInvcost']] <- addData(obj@parameters[['pStorageInvcost']],
-			simpleInterpolation(stg@invcost, 'invcost',
-				obj@parameters[['pStorageInvcost']], approxim, 'stg', stg@name))
 		obj@parameters[['pStorageFixom']] <- addData(obj@parameters[['pStorageFixom']],
 			simpleInterpolation(stg@fixom, 'fixom',
 				obj@parameters[['pStorageFixom']], approxim, 'stg', stg@name))
 		# Ava/Cap
-		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']],
-			simpleInterpolation(stg@stock, 'stock',
-				obj@parameters[['pStorageStock']], approxim, 'stg', stg@name))
 		obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']],
 			multiInterpolation(stg@af, 'af',
 				obj@parameters[['pStorageAf']], approxim, 'stg', stg@name))
@@ -102,14 +96,40 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 				stop(paste0('Unknown aux commodity "', paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'), '", in storage "', stg@name, '"'))
 		}
 		# Some slice
-		stock_exist <- obj@parameters[["pStorageStock"]]@data[!is.na(obj@parameters[["pStorageStock"]]@data$stg) & 
-				obj@parameters[['pStorageStock']]@data$stg == stg@name & 
-				obj@parameters[['pStorageStock']]@data$value != 0, c('region', 'year'), drop = FALSE] 
-		dd0 <- .start_end_fix(approxim, stg, 'stg', stock_exist)
+		browser()
+		
+		stock_exist <- simpleInterpolation(stg@stock, 'stock', obj@parameters[['pStorageStock']], approxim, 'stg', stg@name)
+		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']], stock_exist)
+		invcost <- simpleInterpolation(stg@invcost, 'invcost', obj@parameters[['pStorageInvcost']], approxim, 'stg', stg@name)
+		obj@parameters[['pStorageInvcost']] <- addData(obj@parameters[['pStorageInvcost']], invcost)
+
+		dd0 <- energyRt:::.start_end_fix(approxim, stg, 'stg', stock_exist)
 		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
 		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
 		obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
 		obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
+		
+		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
+		  salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
+  		salv_data$value[is.na(salv_data$value)] <- 0
+  		salv_data$discount <- salv_data$value; salv_data$value <- NULL
+  		olife$olife <- olife$value; olife$value <- NULL
+  		salv_data <- merge(salv_data, olife)
+  		invcost$invcost <- invcost$value; invcost$value <- NULL
+  		salv_data <- merge(salv_data, invcost)
+  		# EAC
+  		salv_data$eac <- salv_data$invcost / salv_data$olife
+  		fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
+  		salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl]) ^ salv_data$olife[fl] / 
+  		    ((1 + salv_data$discount[fl]) ^ salv_data$olife[fl] - 1))
+  		fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
+  		salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
+  		salv_data$tech <- stg@name
+  		salv_data$value <- salv_data$eac
+  		pTechEac <- salv_data[, c('stg', 'region', 'year', 'value')]
+  		obj@parameters[['pStorageEac']] <- addData(obj@parameters[['pStorageEac']], pStorageEac)
+    }
+				
 		# Weather part
 		# Weather part
 		merge.weather <- function(stg, nm, add = NULL) {

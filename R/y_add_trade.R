@@ -188,71 +188,29 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 					data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE))
 			
 			# mTradeInv
-			if (nrow(trade_inv) > 0) {
+			if (nrow(trade_inv) > 0 && nrow(invcost) > 0) {
 				end_year <- max(approxim$year)
 				obj@parameters[['pTradeInvcost']] <- addData(obj@parameters[['pTradeInvcost']], trade_inv)
 				obj@parameters[['mTradeInv']] <- addData(obj@parameters[['mTradeInv']], trade_inv[, colnames(trade_inv) != 'value'])
-				salv_reg <- unique(trade_inv[trade_inv$year + trd@olife > end_year, 'region'])
-				if (length(salv_reg) > 0) {
-					obj@parameters[['mTradeSalv']] <- addData(obj@parameters[['mTradeSalv']], 
-						data.frame(trade = rep(trd@name, length(salv_reg)), region = salv_reg, stringsAsFactors=FALSE))
-				# Calculate salvage coefficients	
-					
-				## Salvage parameter
-				discountCum <- approxim$discountCum
-				discountFactor <- approxim$discountFactor
-				discount <- approxim$discount
-
 				trade_inv$invcost <- trade_inv$value; trade_inv$value <- NULL
-				discountCum$discountCum <- discountCum$value; discountCum$value <- NULL
-				discount$discount <- discount$value; discount$value <- NULL
-				discountFactor$discountFactor <- discountFactor$value; discountFactor$value <- NULL
-				trade_inv_salv <- merge(trade_inv, discountCum)
 				
-					# Calculate
-					# tmp3 <- merge(merge(
-					# 	discount[discount$year == end_year, c('region', 'discount')],
-					# 	discountCum[discountCum$year == end_year, c('region', 'discountCum')],
-					# 	by = 'region'),
-					# 	discountFactor[discountFactor$year == end_year, c('region', 'discountFactor')],
-					# 	by = 'region')
-					# tmp3$value <- tmp3$discountFactor / (1 + tmp3$discount) + tmp3$discountCum
-					# tmp3 <- tmp3[, c('region', 'value')]
-					# 
-					# browser()
-					# tmp2 <- trade_inv; tmp2$life <- tmp2$value; tmp2$value <- NULL
-					# tmp2 <- merge(tmp2, discountCum, by = c('src', 'year'))
-					# 
-					# tmp2 <- merge(tmp2, tmp3, 'src')
-					# tmp2$s1 <- tmp2$value.y - tmp2$value.x; tmp2$value.y <- NULL; tmp2$value.x <- NULL
-					# # tmp2$s1 = sum_y 1 ^ rest 1 / (1 + r) ^ y
-					# tmp2$rest <- (tmp2$life - (end_year - tmp2$year) - 1)
-					# tmp2 <- merge(tmp2, discount[discount$year == end_year, c('src', 'value')], by = 'src')
-					# tmp2$fin_dsc <- tmp2$value; tmp2$value <- NULL
-					# tmp2$s2 <- 0
-					# fl <- (tmp2$fin_dsc == 0)
-					# if (any(fl)) {
-					# 	tmp2[fl, 's2'] <- tmp2[fl, 'rest']
-					# }
-					# if (any(!fl)) {
-					# 	tmp2[!fl, 's2'] <- ((1 + tmp2[!fl, 'fin_dsc']) ^ (-tmp2[!fl, 'rest']) - 1) / (1 / (1 + tmp2[!fl, 'fin_dsc']) - 1)
-					# }
-					# tmp2 <- merge(tmp2, discountFactor[discountFactor$year == end_year, c('src', 'value')], by = 'src')
-					# tmp2$s2 <- (tmp2$s2 * tmp2$value / (tmp2$fin_dsc + 1)); tmp2$fn_factor <- tmp2$value;  tmp2$value <- NULL
-					# # tmp2$s2 = sum_y rest ^ life 1 / (1 + r) ^ y
-					# tmp2$value <- tmp2$s1 / (tmp2$s1 + tmp2$s2) - 1
-					# 
-					# tmp2 <- merge(tmp2, discountFactor, by = c('src', 'year'))
-					# tmp2$value <- tmp2$value.x * tmp2$value.y / tmp2$fn_factor
-					# obj@parameters[['pTradeSalv']] <- addData(obj@parameters[['pTradeSalv']], tmp2[, c('trade', 'src', 'dst', 'year', 'value')])
-					# 
-					# 
-				}
+				salv_data <- merge(trade_inv, approxim$discount, all.x = TRUE)
+				salv_data$value[is.na(salv_data$value)] <- 0
+				salv_data$discount <- salv_data$value; salv_data$value <- NULL
+				salv_data$olife <- trd@olife
+				# EAC
+				salv_data$eac <- salv_data$invcost / salv_data$olife
+				fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
+				salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl]) ^ salv_data$olife[fl] / 
+				    ((1 + salv_data$discount[fl]) ^ salv_data$olife[fl] - 1))
+				fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
+				salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
+				salv_data$trade <- trd@name
+				salv_data$value <- salv_data$eac
+				pTradeEac <- salv_data[, c('trade', 'region', 'year', 'value')]
+				obj@parameters[['pTradeEac']] <- addData(obj@parameters[['pTradeEac']], pTradeEac)
 			}
-
 		}
-		
-
 		obj
 	})
 

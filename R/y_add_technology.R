@@ -236,30 +236,33 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = !FALSE)
 		obj@parameters[['pTechOlife']] <- addData(obj@parameters[['pTechOlife']], olife)		
 		
-		browser()
-
 		dd0 <- energyRt:::.start_end_fix(approxim, tech, 'tech', stock_exist)
 		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
 		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
 		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
 		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
 		
-		salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
-		salv_data$value[is.na(salv_data$value)] <- 0
-		salv_data$discount <- salv_data$value; salv_data$value <- NULL
-		olife$olife <- olife$value; olife$value <- NULL
-		salv_data <- merge(salv_data, olife)
-		invcost$invcost <- invcost$value; invcost$value <- NULL
-		salv_data <- merge(salv_data, invcost)
+		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
+  		salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
+  		salv_data$value[is.na(salv_data$value)] <- 0
+  		salv_data$discount <- salv_data$value; salv_data$value <- NULL
+  		olife$olife <- olife$value; olife$value <- NULL
+  		salv_data <- merge(salv_data, olife)
+  		invcost$invcost <- invcost$value; invcost$value <- NULL
+  		salv_data <- merge(salv_data, invcost)
   		# EAC
 		  salv_data$eac <- salv_data$invcost / salv_data$olife
-		  fl <- (salv_data$discount != 0)
+		  fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
 		  salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl]) ^ salv_data$olife[fl] / 
 		      ((1 + salv_data$discount[fl]) ^ salv_data$olife[fl] - 1))
-		  salv_data$tech <- tech@name
-		  pTechEac <- salv_data[, c('tech', 'region', 'year')]
-		  obj@parameters[['pTechEac']] <- addData(obj@parameters[['mTechEac']], pTechEac)
+		  fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
+		  salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
 		  
+		  salv_data$tech <- tech@name
+		  salv_data$value <- salv_data$eac
+		  pTechEac <- salv_data[, c('tech', 'region', 'year', 'value')]
+		  obj@parameters[['pTechEac']] <- addData(obj@parameters[['pTechEac']], pTechEac)
+		}
 		# Weather part
 		merge.weather <- function(tech, nm, add = NULL) {
 			waf <- tech@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]

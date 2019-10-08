@@ -338,8 +338,6 @@ variable
 vTechInv(tech, region, year)                         Overnight investment costs
 *@ mTechSpan(tech, region, year)
 vTechEac(tech, region, year)                         Annualized investment costs
-*@ (sum(year$mTechNew(tech, region, year_cns), 1) <> 0)
-vTechSalv(tech, region)                              Salvage value (on the end of the model horizon, to substract from costs)
 *@ mTechSpan(tech, region, year)
 vTechOMCost(tech, region, year)                      Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)
 ;
@@ -443,8 +441,6 @@ vStorageCap(stg, region, year)                       Storage capacity
 vStorageNewCap(stg, region, year)                    Storage new capacity
 ;
 variable
-*@ (sum(year$mStorageSpan(stg, region, year_cns), 1) <> 0)
-*vStorageSalv(stg, region)                            Storage salvage costs
 *@ mStorageSpan(stg, region, year)
 vStorageOMCost(stg, region, year)                    Storage O&M costs
 ;
