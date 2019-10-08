@@ -5,7 +5,6 @@ setClass("trade",
           description   = "character",       # Details
           commodity     = "character",       # Vector if NULL that
           routes        = "data.frame",       
-          destination   = "character",       # if NULL that in all region
       # Performance parameters
           trade         = "data.frame",
           aux           = "data.frame",      #

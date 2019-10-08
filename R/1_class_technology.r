@@ -48,7 +48,7 @@ setClass("technology",
       	upgrade.technology = "character",
       	slice         = "character",
       	region        = "character",
-      	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+        GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
       	misc = "list"
       ), #
 	# Default values and structure of slots
@@ -213,7 +213,7 @@ setClass("technology",
 		upgrade.technology = character(),
 		region        = character(),
 		slice         = character(),
-		GIS           = NULL,
+	  GIS           = NULL,
 		#! Misc
 		misc = list(
 		)),
