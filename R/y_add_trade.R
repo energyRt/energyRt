@@ -71,8 +71,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),, drop = FALSE])
 				tmp[nn, 'src'] <- kk$src
 				tmp[nn, 'dst'] <- kk$dst
+				tmp <- tmp[-fl,, drop = FALSE]
 			}
-			tmp <- tmp[-fl,, drop = FALSE]
 			rownames(tmp) <- NULL
 			tmp
 		}
@@ -98,17 +98,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
+		# browser()
 		# pTradeIrCost
 		obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
 			simpleInterpolation2(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
 				approxim_srcdst, 'trade', trd@name))
 		obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']],
 			simpleInterpolation2(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
-				approxim_srcdst, 'trade', trd@name, remove_duplicate = remove_duplicate))
+				approxim_srcdst, 'trade', trd@name))
 		# pTradeIrMarkup
 		obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
 			simpleInterpolation2(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
-				approxim_srcdst, 'trade', trd@name, remove_duplicate = remove_duplicate))
+				approxim_srcdst, 'trade', trd@name))
 		# pTradeIr
 		gg <- multiInterpolation2(trd@trade, 'ava',
 			obj@parameters[['pTradeIr']], approxim, 'trade', trd@name)
@@ -129,20 +130,20 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			for (cc in inp_comm) {
 				approxim$acomm <- cc
 				obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(
-					obj@parameters[['pTradeIrCsrc2Ainp']], simpleInterpolation(trd@aeff, 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
-						approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+					obj@parameters[['pTradeIrCsrc2Ainp']], simpleInterpolation2(trd@aeff, 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
+					  approxim_srcdst, 'trade', trd@name))
 				obj@parameters[['pTradeIrCdst2Ainp']] <- addData(
-					obj@parameters[['pTradeIrCdst2Ainp']], simpleInterpolation(trd@aeff, 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
-						approxim, 'trade', trd@name, remove_duplicate = list('src', 'dst')))
+					obj@parameters[['pTradeIrCdst2Ainp']], simpleInterpolation2(trd@aeff, 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
+					  approxim_srcdst, 'trade', trd@name, remove_duplicate = list('src', 'dst')))
 			}
 			for (cc in out_comm) {
 				approxim$acomm <- cc
 				obj@parameters[['pTradeIrCsrc2Aout']] <- addData(
-					obj@parameters[['pTradeIrCsrc2Aout']], simpleInterpolation(trd@aeff, 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
-						approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+					obj@parameters[['pTradeIrCsrc2Aout']], simpleInterpolation2(trd@aeff, 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
+					  approxim_srcdst, 'trade', trd@name))
 				obj@parameters[['pTradeIrCdst2Aout']] <- addData(
-					obj@parameters[['pTradeIrCdst2Aout']], simpleInterpolation(trd@aeff, 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
-						approxim, 'trade', trd@name, remove_duplicate = remove_duplicate))
+					obj@parameters[['pTradeIrCdst2Aout']], simpleInterpolation2(trd@aeff, 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
+					  approxim_srcdst, 'trade', trd@name))
 			}
 		}
 		# Add trade data
