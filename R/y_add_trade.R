@@ -98,7 +98,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
-		# browser()
 		# pTradeIrCost
 		obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
 			simpleInterpolation2(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
@@ -156,7 +155,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (nrow(trd@invcost) > 0) {
 				if (any(is.na(trd@invcost$invcost)) && nrow(trd@invcost) > 1)
 					stop('There is "NA" and other data for invcost in trade class "', trd@name, '".')
-				if (any(is.na(trd@invcost$invcost))) {
+				if (any(is.na(trd@invcost$region))) {
 					warning('There is a" NA "area for invcost in the"', trd@name, '"trade class. Investments will be smoothed along all routes of the regions.')
 					rgg <- unique(c(trd@routes, recursive = TRUE))
 					trd@invcost <- trd@invcost[rep(1, length(rgg)),, drop = FALSE]
