@@ -10,6 +10,8 @@ put pFinish2_csv;
 put 'value'/;
 put 2:0/;
 putclose;
+parameter zModelStat;
+zModelStat = energyRt.ModelStat; 
 file vTechInv_csv / 'output/vTechInv.csv'/;
 vTechInv_csv.lp = 1;
 vTechInv_csv.nd = 1;
