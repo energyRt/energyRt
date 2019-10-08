@@ -64,10 +64,36 @@ read_solution <- function(scen, ...) {
   scen@modOut@variables <- rr$variables
   scen@modOut@compilationStatus <- as.character(rr$solution_report$finish)
   scen@modOut@solutionStatus <- as.character(rr$solution_report$status)
-  if (rr$solution_report$finish != 2 || rr$solution_report$status != 1)
-    warning('Unsuccessful finish')
   if (!is.null(scen@misc$data.before)) {
   	scen <- .paste_base_result2new(scen)
+  }
+  ## Salvage cost calculation
+  salvage_cost0 <- function(scen, par) {
+    invcost <- energyRt:::.getTotalParameterData(scen@modInp, paste0('p', par, 'Invcost'))
+    olife <- energyRt:::.getTotalParameterData(scen@modInp, paste0('p', par, 'Olife'))
+    discount <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscount')
+    newcap <- scen@modOut@variables[[paste0('v', par, 'NewCap')]]
+    invcost$invcost <- invcost$value; invcost$value <- NULL
+    olife$olife <- olife$value; olife$value <- NULL
+    discount$discount <- discount$value; discount$value <- NULL
+    newcap$newcap <- newcap$value; newcap$value <- NULL
+    
+    salvage <- merge(merge(newcap, merge(olife, invcost)), discount, all.x = TRUE)
+    end_year <- max(energyRt::getParameterData(scen@modInp@parameters$mEndMilestone)$yearp)
+    salvage <- merge(salvage, energyRt::getParameterData(scen@modInp@parameters$mStartMilestone))
+    salvage$start <- salvage$yearp; salvage$yearp <- NULL
+    salvage <- salvage[salvage$start + salvage$olife > end_year, ]
+    
+    salvage$value <- salvage$newcap * salvage$invcost * ((1 + salvage$discount)^(salvage$olife) - 
+        (1 + salvage$discount)^(end_year - salvage$start + 1)) / ((1 + salvage$discount)^salvage$olife - 1) 
+    salvage[, c(3, 2, 1, 9)]
+  }
+  if (rr$solution_report$finish != 2 || rr$solution_report$status != 1) {
+    warning('Unsuccessful finish')
+  } else {
+    scen@modOut@variables$vTechSalv <- salvage_cost0(scen, 'Tech')
+    scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, 'Storage')
+    scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, 'Trade')
   }
   if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
   invisible(scen)
