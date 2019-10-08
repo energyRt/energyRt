@@ -25,9 +25,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 				data.frame(stg = stg@name))
 		obj@parameters[['mStorageComm']] <- addData(obj@parameters[['mStorageComm']],
 			data.frame(stg = stg@name, comm = stg@commodity))
-		obj@parameters[['pStorageOlife']] <- addData(obj@parameters[['pStorageOlife']],
-			simpleInterpolation(stg@olife, 'olife', obj@parameters[['pStorageOlife']], 
-				approxim, 'stg', stg@name, removeDefault = FALSE))
+		olife <- simpleInterpolation(stg@olife, 'olife', obj@parameters[['pStorageOlife']], 
+		  approxim, 'stg', stg@name, removeDefault = FALSE)
+		obj@parameters[['pStorageOlife']] <- addData(obj@parameters[['pStorageOlife']], olife)
 		# Loss
 		obj@parameters[['pStorageInpEff']] <- addData(obj@parameters[['pStorageInpEff']],
 			simpleInterpolation(stg@seff, 'inpeff', obj@parameters[['pStorageInpEff']], 
@@ -96,7 +96,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 				stop(paste0('Unknown aux commodity "', paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'), '", in storage "', stg@name, '"'))
 		}
 		# Some slice
-		browser()
 		
 		stock_exist <- simpleInterpolation(stg@stock, 'stock', obj@parameters[['pStorageStock']], approxim, 'stg', stg@name)
 		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']], stock_exist)
@@ -126,7 +125,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   		salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
   		salv_data$tech <- stg@name
   		salv_data$value <- salv_data$eac
-  		pTechEac <- salv_data[, c('stg', 'region', 'year', 'value')]
+  		pStorageEac <- salv_data[, c('stg', 'region', 'year', 'value')]
   		obj@parameters[['pStorageEac']] <- addData(obj@parameters[['pStorageEac']], pStorageEac)
     }
 				

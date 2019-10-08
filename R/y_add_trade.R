@@ -164,8 +164,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 					trd@invcost[, 'region'] <- trd@invcost[1, 'invcost'] / length(rgg)
 				}
 			}
-			trade_inv <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
-			trade_inv <- trade_inv[trade_inv$value != 0,, drop = FALSE]
+			invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
+			invcost <- invcost[invcost$value != 0,, drop = FALSE]
 			stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
 			obj@parameters[['pTradeStock']] <- addData(obj@parameters[['pTradeStock']], stock_exist)
 			obj@parameters[['pTradeOlife']] <- addData(obj@parameters[['pTradeOlife']], 
@@ -188,13 +188,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 					data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE))
 			
 			# mTradeInv
-			if (nrow(trade_inv) > 0 && nrow(invcost) > 0) {
+			if (nrow(invcost) > 0 && nrow(invcost) > 0) {
 				end_year <- max(approxim$year)
-				obj@parameters[['pTradeInvcost']] <- addData(obj@parameters[['pTradeInvcost']], trade_inv)
-				obj@parameters[['mTradeInv']] <- addData(obj@parameters[['mTradeInv']], trade_inv[, colnames(trade_inv) != 'value'])
-				trade_inv$invcost <- trade_inv$value; trade_inv$value <- NULL
+				obj@parameters[['pTradeInvcost']] <- addData(obj@parameters[['pTradeInvcost']], invcost)
+				obj@parameters[['mTradeInv']] <- addData(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
+				invcost$invcost <- invcost$value; invcost$value <- NULL
 				
-				salv_data <- merge(trade_inv, approxim$discount, all.x = TRUE)
+				salv_data <- merge(invcost, approxim$discount, all.x = TRUE)
 				salv_data$value[is.na(salv_data$value)] <- 0
 				salv_data$discount <- salv_data$value; salv_data$value <- NULL
 				salv_data$olife <- trd@olife
