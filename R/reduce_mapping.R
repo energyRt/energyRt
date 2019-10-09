@@ -114,14 +114,18 @@
   	tmp_noinf[[i]] <- generate_haveval(i, Inf, TRUE, 'up')
   tmp_nozero <- list()
   # p1 <- proc.time()[3]
-  for (i in c('pTradeIr', 'pExportRow', 'pImportRow', 'pSupAva', 'pTechAf', 'pTechAfc', 'pSupReserve')) {
+  for (i in c('pTradeIr', 'pExportRow', 'pImportRow', 'pSupAva', 'pTechAf', 
+    'pTechAfc', 'pSupReserve')) {
   	# cat('begin: ', i, ', time: ', round(proc.time()[3] - p1, 2), '\n', sep = '')
   	tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'up')
   	#cat('end: ', i, ', time: ', round(proc.time()[3] - p1, 2), '\n', sep = ''); flush.console()
   }
   
   for (i in c('pDummyImportCost', 'pDummyExportCost', 'pTradeIrCsrc2Ainp', 'pTradeIrCdst2Ainp', 'pTechEmisComm', 
-  	'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor', 'pEmissionFactor')) 
+  	'pTradeIrCsrc2Aout', 'pTradeIrCdst2Aout', 'pTaxCost', 'pSubsCost', 'pAggregateFactor', 'pEmissionFactor', 
+    'pTechFixom', 'pTechVarom', 'pTechCvarom', 'pTechAvarom',
+    'pStorageFixom', 'pStorageCostInp', 'pStorageCostOut', 'pStorageCostStore'
+    )) 
   	tmp_nozero[[i]] <- generate_haveval(i, 0, TRUE, 'l')
   
   for (i in c('pDummyImportCost', 'pDummyExportCost')) {
@@ -308,6 +312,17 @@
     	tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll]
     mInp2Lo <- mInp2Lo[!(paste0(mInp2Lo$comm, '#', mInp2Lo$slice) %in% paste0(tmp_map$mCommSlice$comm, '#', tmp_map$mCommSlice$slice)), ]
     prec@parameters[['mInp2Lo']] <- addData(prec@parameters[['mInp2Lo']], mInp2Lo)
+    ##
+    # mTechOMCost(tech, region, year) 
+    mTechOMCost <- rbind(tmp_nozero$pTechFixom, tmp_nozero$pTechVarom[, c('tech', 'region', 'year')], 
+      tmp_nozero$pTechCvarom[, c('tech', 'region', 'year')], tmp_nozero$pTechAvarom[, c('tech', 'region', 'year')])
+    mTechOMCost <- merge(mTechOMCost[!duplicated(mTechOMCost), ], tmp_map$mTechSpan)
+    prec@parameters[['mTechOMCost']] <- addData(prec@parameters[['mTechOMCost']], mTechOMCost)
+    # mStorageOMCost(stg, region, year) 
+    mStorageOMCost <- rbind(tmp_nozero$pStorageFixom, tmp_nozero$pStorageCostInp[, c('stg', 'year')], 
+      tmp_nozero$pStorageCostOut[, c('stg', 'region', 'year')], tmp_nozero$pStorageCostStore[, c('stg', 'region', 'year')])
+    mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], tmp_map$mStorageSpan)
+    prec@parameters[['mStorageOMCost']] <- addData(prec@parameters[['mStorageOMCost']], mStorageOMCost)
     prec
 }
 

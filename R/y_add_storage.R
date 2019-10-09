@@ -107,6 +107,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
 		obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
 		obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
+		obj@parameters[['mStorageEac']] <- addData(obj@parameters[['mStorageEac']], dd0$eac)
 		
 		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
 		  salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)

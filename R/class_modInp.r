@@ -186,6 +186,8 @@ setMethod("initialize", "modInp",
     # For disable technology with unexceptable start year
     .Object@parameters[['mTechNew']] <- createParameter('mTechNew', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map', cls = 'technology')    
+    .Object@parameters[['mTechOMCost']] <- createParameter('mTechOMCost', c('tech', 'region', 'year'), 'map', cls = 'technology')    
+    .Object@parameters[['mTechEac']] <- createParameter('mTechEac', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     # simple & multi
     .Object@parameters[['pTechCap2act']] <- 
     	createParameter('pTechCap2act', 'tech', 'simple', 
@@ -309,6 +311,9 @@ setMethod("initialize", "modInp",
     	defVal = c(0, -1), interpolation = rep('back.inter.forth', 2), cls = 'storage', colName = c('cinp.lo', 'cinp.up'), slot = 'seff')
     .Object@parameters[['mStorageNew']] <- createParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     .Object@parameters[['mStorageSpan']] <- createParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
+    .Object@parameters[['mStorageEac']] <- createParameter('mStorageEac', c('stg', 'region', 'year'), 'map')    
+    .Object@parameters[['mStorageOMCost']] <- createParameter('mStorageOMCost', c('stg', 'region', 'year'), 'map')    
+    
     .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
     .Object@parameters[['mStorageAOut']] <- createParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    
     for(i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 

@@ -241,6 +241,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
 		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
 		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
+		obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
 		
 		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
   		salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)

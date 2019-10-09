@@ -365,13 +365,16 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
     if (any(dd_able$year >= dend[rr, 'year'] + dlife[rr, 'year'])) 
       dd_able[dd_able$region == rr & dd_able$year >= dend[rr, 'year'] + dlife[rr, 'year'], 'enable'] <- FALSE
   }  
+  dd_eac <- dd_able
   if (nrow(stock_exist) != 0 && any(!dd_able$enable)) {
     for(rr in unique(stock_exist$region)) {
       dd_able[dd_able$region == rr & dd_able$year %in% stock_exist[stock_exist$region == rr, 'year'], 'enable'] <- TRUE
     }
   }   
+  # 
   dd_able <- dd_able[dd_able$enable, -1, drop = FALSE]
-  list(new = dd, span = dd_able)
+  dd_eac <- dd_eac[dd_eac$enable, -1, drop = FALSE]
+  list(new = dd, span = dd_able, eac = dd_eac)
 }
 
 

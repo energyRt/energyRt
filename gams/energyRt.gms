@@ -116,6 +116,8 @@ mStorageAInp(stg, comm)            Aux-commodity input to storage
 mStorageAOut(stg, comm)            Aux-commodity output from storage
 mStorageNew(stg, region, year)     Storage available for investment
 mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the year and region
+mStorageOMCost(stg, region, year)
+mStorageEac(stg, region, year)
 mSliceNext(slice, slice)           Next slice
 mSliceFYearNext(slice, slice)           Next slice joint
 * Trade and ROW
@@ -334,9 +336,9 @@ vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
 variable
 *@ mTechNew(tech, region, year)
 vTechInv(tech, region, year)                         Overnight investment costs
-*@ mTechSpan(tech, region, year)
+*@ mTechEac(tech, region, year)
 vTechEac(tech, region, year)                         Annualized investment costs
-*@ mTechSpan(tech, region, year)
+*@ mTechOMCost(tech, region, year)
 vTechOMCost(tech, region, year)                      Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)
 ;
 positive variable
@@ -431,7 +433,7 @@ vStorageOut(stg, comm, region, year, slice)          Storage output
 vStorageStore(stg, comm, region, year, slice)        Storage accumulated level
 *@ mStorageNew(stg, region, year)
 vStorageInv(stg, region, year)                       Storage technology investments
-*@ mStorageSpan(stg, region, year)
+*@ mStorageEac(stg, region, year)
 vStorageEac(stg, region, year)                       Storage technology EAC investments
 *@ mStorageSpan(stg, region, year)
 vStorageCap(stg, region, year)                       Storage capacity
@@ -439,7 +441,7 @@ vStorageCap(stg, region, year)                       Storage capacity
 vStorageNewCap(stg, region, year)                    Storage new capacity
 ;
 variable
-*@ mStorageSpan(stg, region, year)
+*@ mStorageOMCost(stg, region, year)
 vStorageOMCost(stg, region, year)                    Storage O&M costs
 ;
 
@@ -481,7 +483,7 @@ positive variable
 vTradeCap(trade, year)
 *@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeInv(trade, region, year))
 vTradeInv(trade, region, year)
-*@ (mTradeCapacityVariable(trade) and mTradeSpan(trade, region) and mMilestoneLast(yeare))
+*@ (mTradeEac(trade, region, year))
 vTradeEac(trade, region, year)
 *@ (mTradeCapacityVariable(trade) and mMidMilestone(year) and mTradeNew(trade, year))
 vTradeNewCap(trade, year)
@@ -496,6 +498,8 @@ set
 mTechInpTot(comm, region, year, slice)               Total technology input  mapp
 * (mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1))
 mTechOutTot(comm, region, year, slice)               Total technology output mapp
+mTechEac(tech, region, year)
+mTechOMCost(tech, region, year)
 * (sum(sup$(mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region)), 1))
 mSupOutTot(comm, region, slice)
 * (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))
@@ -964,7 +968,7 @@ eqTechNewCap(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region,
          ) =l= vTechNewCap(tech, region, year);
 
 * EAC equation
-eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, year))..
+eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechEac(tech, region, year))..
          vTechEac(tech, region, year)
          =e=
          sum((yearp)$
@@ -995,7 +999,7 @@ eqTechInv(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region, ye
 
 
 * Annual O&M costs
-eqTechOMCost(tech, region, year)$(mMidMilestone(year) and mTechSpan(tech, region, year))..
+eqTechOMCost(tech, region, year)$(mMidMilestone(year) and mTechOMCost(tech, region, year))..
          vTechOMCost(tech, region, year)
          =e=
          pTechFixom(tech, region, year) * vTechCap(tech, region, year) +
@@ -1251,7 +1255,7 @@ eqStorageInv(stg, region, year)$(mMidMilestone(year) and mStorageNew(stg, region
          vStorageNewCap(stg, region, year);
 
 * EAC equation
-eqStorageEac(stg, region, year)$(mMidMilestone(year) and  mStorageSpan(stg, region, year))..
+eqStorageEac(stg, region, year)$(mMidMilestone(year) and  mStorageEac(stg, region, year))..
          vStorageEac(stg, region, year)
          =e=
          sum((yearp)$
@@ -1264,8 +1268,8 @@ eqStorageEac(stg, region, year)$(mMidMilestone(year) and  mStorageSpan(stg, regi
          );
 
 
-* FIX O & M + Inv Costequation
-eqStorageCost(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
+* FIX O & M
+eqStorageCost(stg, region, year)$(mMidMilestone(year) and mStorageOMCost(stg, region, year))..
          vStorageOMCost(stg, region, year)
          =e=
          pStorageFixom(stg, region, year) * vStorageCap(stg, region, year) +
@@ -1397,7 +1401,7 @@ eqTradeInv(trade, region, year)$(mTradeCapacityVariable(trade) and mMidMilestone
                  pTradeInvcost(trade, region, year) * vTradeNewCap(trade, year);
 
 * EAC equation
-eqTradeEac(trade, region, year)$(mMidMilestone(year) and  mTradeEac(trade, region, year))..
+eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          vTradeEac(trade, region, year)
          =e=
          sum((yearp)$
@@ -1584,16 +1588,19 @@ eqDummyCost(comm, region, year)$(mMidMilestone(year) and  mDummyCost(comm, regio
          sum(slice$mDummyExport(comm, region, year, slice),
            pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
 
-eqCost(region, year)$(mMidMilestone(year))..
+eqCost(region, year)$mMidMilestone(year)..
          vTotalCost(region, year)
          =e=
-         sum(tech$mTechSpan(tech, region, year), vTechEac(tech, region, year) + vTechOMCost(tech, region, year))
+         sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year))
+         + sum(tech$mTechOMCost(tech, region, year), vTechOMCost(tech, region, year))
          + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
          + sum(comm$mDummyCost(comm, region, year), vDummyCost(comm, region, year))
          + sum(comm$mTaxCost(comm, region, year), vTaxCost(comm, region, year))
          - sum(comm$mSubsCost(comm, region, year), vSubsCost(comm, region, year))
-         + sum(stg$mStorageSpan(stg, region, year), vStorageOMCost(stg, region, year) + vStorageEac(stg, region, year))
+         + sum(stg$mStorageOMCost(stg, region, year), vStorageOMCost(stg, region, year))
+         + sum(stg$mStorageEac(stg, region, year), vStorageEac(stg, region, year))
          + vTradeCost(region, year);
+
 
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
          vTaxCost(comm, region, year)

@@ -57,6 +57,8 @@ set mStorageAInp dimen 2;
 set mStorageAOut dimen 2;
 set mStorageNew dimen 3;
 set mStorageSpan dimen 3;
+set mStorageOMCost dimen 3;
+set mStorageEac dimen 3;
 set mSliceNext dimen 2;
 set mSliceFYearNext dimen 2;
 set mTradeSlice dimen 2;
@@ -87,6 +89,8 @@ set mTradeCapacityVariable dimen 1;
 set mTradeInv dimen 3;
 set mTechInpTot dimen 4;
 set mTechOutTot dimen 4;
+set mTechEac dimen 3;
+set mTechOMCost dimen 3;
 set mSupOutTot dimen 3;
 set mDemInp dimen 2;
 set mEmsFuelTot dimen 4;
@@ -369,11 +373,11 @@ s.t.  eqTechCap{(t, r, y) in mTechSpan : y in mMidMilestone}: vTechCap[t,r,y]  =
 
 s.t.  eqTechNewCap{(t, r, y) in mTechNew : y in mMidMilestone and t in mTechRetirement}: sum{yp in year:((yp in mMidMilestone and ordYear[yp] >= ordYear[y] and ordYear[yp]<ordYear[y]+pTechOlife[t,r]))}(vTechRetiredCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
 
-s.t.  eqTechEac{(t, r, y) in mTechSpan : y in mMidMilestone}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ordYear[y]<pTechOlife[t,r]+ordYear[yp] and not(((t,r) in mTechOlifeInf)) and pTechInvcost[t,r,yp] <> 0))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t in mTechRetirement and ye in mMidMilestone and ordYear[ye] >= ordYear[yp] and ordYear[ye] <= ordYear[y]))}(vTechRetiredCap[t,r,yp,ye])));
+s.t.  eqTechEac{(t, r, y) in mTechEac : y in mMidMilestone}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ordYear[y]<pTechOlife[t,r]+ordYear[yp] and not(((t,r) in mTechOlifeInf)) and pTechInvcost[t,r,yp] <> 0))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t in mTechRetirement and ye in mMidMilestone and ordYear[ye] >= ordYear[yp] and ordYear[ye] <= ordYear[y]))}(vTechRetiredCap[t,r,yp,ye])));
 
 s.t.  eqTechInv{(t, r, y) in mTechNew : y in mMidMilestone}: vTechInv[t,r,y]  =  pTechInvcost[t,r,y]*vTechNewCap[t,r,y];
 
-s.t.  eqTechOMCost{(t, r, y) in mTechSpan : y in mMidMilestone}: vTechOMCost[t,r,y]  =  pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice:((t,s) in mTechSlice)}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:((t,c) in mTechInpComm)}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:((t,c) in mTechOutComm)}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:((t,c) in mTechAOut)}(pTechAvarom[t,c,r,y,s]*vTechAOut[t,c,r,y,s])+sum{c in comm:((t,c) in mTechAInp)}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s]));
+s.t.  eqTechOMCost{(t, r, y) in mTechOMCost : y in mMidMilestone}: vTechOMCost[t,r,y]  =  pTechFixom[t,r,y]*vTechCap[t,r,y]+sum{s in slice:((t,s) in mTechSlice)}(pTechVarom[t,r,y,s]*vTechAct[t,r,y,s]+sum{c in comm:((t,c) in mTechInpComm)}(pTechCvarom[t,c,r,y,s]*vTechInp[t,c,r,y,s])+sum{c in comm:((t,c) in mTechOutComm)}(pTechCvarom[t,c,r,y,s]*vTechOut[t,c,r,y,s])+sum{c in comm:((t,c) in mTechAOut)}(pTechAvarom[t,c,r,y,s]*vTechAOut[t,c,r,y,s])+sum{c in comm:((t,c) in mTechAInp)}(pTechAvarom[t,c,r,y,s]*vTechAInp[t,c,r,y,s]));
 
 s.t.  eqSupAvaUp{(s1, c, r, y, s) in mSupAvaUp}: vSupOut[s1,c,r,y,s] <=  pSupAvaUp[s1,c,r,y,s]*prod{sp in slice,wth1 in weather:(((wth1,r) in mWeatherRegion and (wth1,sp) in mWeatherSlice and (s1,wth1) in mSupWeatherUp and (s,sp) in mSliceParentChildE))}(pWeather[wth1,r,y,s]*pSupWeatherUp[s1,wth1]);
 
@@ -419,9 +423,9 @@ s.t.  eqStorageCap{(st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageCa
 
 s.t.  eqStorageInv{(st1, r, y) in mStorageNew : y in mMidMilestone}: vStorageInv[st1,r,y]  =  pStorageInvcost[st1,r,y]*vStorageNewCap[st1,r,y];
 
-s.t.  eqStorageEac{(st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageEac[st1,r,y]  =  sum{yp in year:(((st1,r,yp) in mStorageNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ordYear[y]<pStorageOlife[st1,r]+ordYear[yp] and not(((st1,r) in mStorageOlifeInf)) and pStorageInvcost[st1,r,yp] <> 0))}(pStorageEac[st1,r,yp]*vStorageNewCap[st1,r,yp]);
+s.t.  eqStorageEac{(st1, r, y) in mStorageEac : y in mMidMilestone}: vStorageEac[st1,r,y]  =  sum{yp in year:(((st1,r,yp) in mStorageNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ordYear[y]<pStorageOlife[st1,r]+ordYear[yp] and not(((st1,r) in mStorageOlifeInf)) and pStorageInvcost[st1,r,yp] <> 0))}(pStorageEac[st1,r,yp]*vStorageNewCap[st1,r,yp]);
 
-s.t.  eqStorageCost{(st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageOMCost[st1,r,y]  =  pStorageFixom[st1,r,y]*vStorageCap[st1,r,y]+sum{c in comm,s in slice:(((c,s) in mCommSlice and (st1,c) in mStorageComm))}(pStorageCostInp[st1,r,y,s]*vStorageInp[st1,c,r,y,s]+pStorageCostOut[st1,r,y,s]*vStorageOut[st1,c,r,y,s]+pStorageCostStore[st1,r,y,s]*vStorageStore[st1,c,r,y,s]);
+s.t.  eqStorageCost{(st1, r, y) in mStorageOMCost : y in mMidMilestone}: vStorageOMCost[st1,r,y]  =  pStorageFixom[st1,r,y]*vStorageCap[st1,r,y]+sum{c in comm,s in slice:(((c,s) in mCommSlice and (st1,c) in mStorageComm))}(pStorageCostInp[st1,r,y,s]*vStorageInp[st1,c,r,y,s]+pStorageCostOut[st1,r,y,s]*vStorageOut[st1,c,r,y,s]+pStorageCostStore[st1,r,y,s]*vStorageStore[st1,c,r,y,s]);
 
 s.t.  eqImport{(c, dst, y, s) in mImport}: vImport[c,dst,y,s]  =  sum{t1 in trade,src in region:(((t1,src,dst,y,s) in mTradeIr and (t1,c) in mTradeComm))}(pTradeIrEff[t1,src,dst,y,s]*vTradeIr[t1,c,src,dst,y,s])+sum{i in imp:((i,c,dst,y,s) in mImportRow)}(vImportRow[i,c,dst,y,s]);
 
@@ -459,7 +463,7 @@ s.t.  eqTradeCap{(t1, y) in mTradeSpan : t1 in mTradeCapacityVariable and y in m
 
 s.t.  eqTradeInv{(t1, r, y) in mTradeInv : t1 in mTradeCapacityVariable and y in mMidMilestone}: vTradeInv[t1,r,y]  =  pTradeInvcost[t1,r,y]*vTradeNewCap[t1,y];
 
-s.t.  eqTradeEac{(t1, r, y) in mTradeEac : y in mMidMilestone}: vTradeEac[t1,r,y]  =  sum{yp in year:(((t1,r,yp) in mTradeInv and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ordYear[y]<pTradeOlife[t1]+ordYear[yp] and not((t1 in mTradeOlifeInf)) and pTradeInvcost[t1,r,yp] <> 0))}(pTradeEac[t1,r,yp]*vTradeNewCap[t1,yp]);
+s.t.  eqTradeEac{(t1, r, y) in mTradeEac}: vTradeEac[t1,r,y]  =  sum{yp in year:(((t1,r,yp) in mTradeInv and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ordYear[y]<pTradeOlife[t1]+ordYear[yp] and not((t1 in mTradeOlifeInf)) and pTradeInvcost[t1,r,yp] <> 0))}(pTradeEac[t1,r,yp]*vTradeNewCap[t1,yp]);
 
 s.t.  eqTradeIrAInp{(t1, c, r, y, s) in mTradeIrAInp2}: vTradeIrAInp[t1,c,r,y,s]  =  sum{dst in region:((t1,r,dst,y,s) in mTradeIr)}(pTradeIrCsrc2Ainp[t1,c,r,dst,y,s]*sum{cp in comm:((t1,cp) in mTradeComm)}(vTradeIr[t1,cp,r,dst,y,s]))+sum{src in region:((t1,src,r,y,s) in mTradeIr)}(pTradeIrCdst2Ainp[t1,c,src,r,y,s]*sum{cp in comm:((t1,cp) in mTradeComm)}(vTradeIr[t1,cp,src,r,y,s]));
 
@@ -497,7 +501,7 @@ s.t.  eqStorageOutTot{(c, r, y, s) in mStorageOutTot}: vStorageOutTot[c,r,y,s]  
 
 s.t.  eqDummyCost{(c, r, y) in mDummyCost : y in mMidMilestone}: vDummyCost[c,r,y]  =  sum{s in slice:((c,r,y,s) in mDummyImport)}(pDummyImportCost[c,r,y,s]*vDummyImport[c,r,y,s])+sum{s in slice:((c,r,y,s) in mDummyExport)}(pDummyExportCost[c,r,y,s]*vDummyExport[c,r,y,s]);
 
-s.t.  eqCost{y in mMidMilestone, r in region}: vTotalCost[r,y]  =  sum{t in tech:((t,r,y) in mTechSpan)}(vTechEac[t,r,y]+vTechOMCost[t,r,y])+sum{s1 in sup:((s1,r) in mSupSpan)}(vSupCost[s1,r,y])+sum{c in comm:((c,r,y) in mDummyCost)}(vDummyCost[c,r,y])+sum{c in comm:((c,r,y) in mTaxCost)}(vTaxCost[c,r,y])-sum{c in comm:((c,r,y) in mSubsCost)}(vSubsCost[c,r,y])+sum{st1 in stg:((st1,r,y) in mStorageSpan)}(vStorageOMCost[st1,r,y]+vStorageEac[st1,r,y])+vTradeCost[r,y];
+s.t.  eqCost{y in mMidMilestone, r in region}: vTotalCost[r,y]  =  sum{t in tech:((t,r,y) in mTechEac)}(vTechEac[t,r,y])+sum{t in tech:((t,r,y) in mTechOMCost)}(vTechOMCost[t,r,y])+sum{s1 in sup:((s1,r) in mSupSpan)}(vSupCost[s1,r,y])+sum{c in comm:((c,r,y) in mDummyCost)}(vDummyCost[c,r,y])+sum{c in comm:((c,r,y) in mTaxCost)}(vTaxCost[c,r,y])-sum{c in comm:((c,r,y) in mSubsCost)}(vSubsCost[c,r,y])+sum{st1 in stg:((st1,r,y) in mStorageOMCost)}(vStorageOMCost[st1,r,y])+sum{st1 in stg:((st1,r,y) in mStorageEac)}(vStorageEac[st1,r,y])+vTradeCost[r,y];
 
 s.t.  eqTaxCost{(c, r, y) in mTaxCost}: vTaxCost[c,r,y]  =  sum{s in slice:((c,s) in mCommSlice)}(pTaxCost[c,r,y,s]*vOutTot[c,r,y,s]);
 
@@ -550,11 +554,11 @@ for{(t, r, y) in mTechNew : vTechInv[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechInv[t,r,y] >> "output/vTechInv.csv";
 }
 printf "tech,region,year,value\n" > "output/vTechEac.csv";
-for{(t, r, y) in mTechSpan : vTechEac[t,r,y] <> 0} {
+for{(t, r, y) in mTechEac : vTechEac[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechEac[t,r,y] >> "output/vTechEac.csv";
 }
 printf "tech,region,year,value\n" > "output/vTechOMCost.csv";
-for{(t, r, y) in mTechSpan : vTechOMCost[t,r,y] <> 0} {
+for{(t, r, y) in mTechOMCost : vTechOMCost[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechOMCost[t,r,y] >> "output/vTechOMCost.csv";
 }
 printf "sup,comm,region,year,slice,value\n" > "output/vSupOut.csv";
@@ -674,7 +678,7 @@ for{(st1, r, y) in mStorageNew : vStorageInv[st1,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", st1,r,y,vStorageInv[st1,r,y] >> "output/vStorageInv.csv";
 }
 printf "stg,region,year,value\n" > "output/vStorageEac.csv";
-for{(st1, r, y) in mStorageSpan : vStorageEac[st1,r,y] <> 0} {
+for{(st1, r, y) in mStorageEac : vStorageEac[st1,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", st1,r,y,vStorageEac[st1,r,y] >> "output/vStorageEac.csv";
 }
 printf "stg,region,year,value\n" > "output/vStorageCap.csv";
@@ -686,7 +690,7 @@ for{(st1, r, y) in mStorageNew : vStorageNewCap[st1,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", st1,r,y,vStorageNewCap[st1,r,y] >> "output/vStorageNewCap.csv";
 }
 printf "stg,region,year,value\n" > "output/vStorageOMCost.csv";
-for{(st1, r, y) in mStorageSpan : vStorageOMCost[st1,r,y] <> 0} {
+for{(st1, r, y) in mStorageOMCost : vStorageOMCost[st1,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", st1,r,y,vStorageOMCost[st1,r,y] >> "output/vStorageOMCost.csv";
 }
 printf "comm,region,year,slice,value\n" > "output/vImport.csv";
@@ -754,7 +758,7 @@ for{(t1, r, y) in mTradeInv : t1 in mTradeCapacityVariable and y in mMidMileston
   printf "%s,%s,%s,%f\n", t1,r,y,vTradeInv[t1,r,y] >> "output/vTradeInv.csv";
 }
 printf "trade,region,year,value\n" > "output/vTradeEac.csv";
-for{(t1, r) in mTradeSpan, ye in mMilestoneLast, y in year : t1 in mTradeCapacityVariable and vTradeEac[t1,r,y] <> 0} {
+for{(t1, r, y) in mTradeEac : vTradeEac[t1,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t1,r,y,vTradeEac[t1,r,y] >> "output/vTradeEac.csv";
 }
 printf "trade,year,value\n" > "output/vTradeNewCap.csv";
