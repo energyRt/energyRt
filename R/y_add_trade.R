@@ -164,7 +164,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				}
 			}
 			invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
-			invcost <- invcost[invcost$value != 0,, drop = FALSE]
+			invcost <- invcost[invcost$value != 0 & trd@start <= invcost$year & invcost$year < trd@end,, drop = FALSE]
 			stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
 			obj@parameters[['pTradeStock']] <- addData(obj@parameters[['pTradeStock']], stock_exist)
 			obj@parameters[['pTradeOlife']] <- addData(obj@parameters[['pTradeOlife']], 
@@ -187,17 +187,22 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (length(trade_span) > 0)
 			  obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], 
 			    data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE))
-			if (length(trade_eac) > 0)
-			  obj@parameters[['mTradeEac']] <- addData(obj@parameters[['mTradeEac']], 
-			    data.frame(trade = rep(trd@name, length(trade_span)), year = trade_eac, stringsAsFactors=FALSE))
 			
 			# mTradeInv
-			if (nrow(invcost) > 0 && nrow(invcost) > 0) {
+			if (nrow(invcost) > 0) {
 				end_year <- max(approxim$year)
 				obj@parameters[['pTradeInvcost']] <- addData(obj@parameters[['pTradeInvcost']], invcost)
 				obj@parameters[['mTradeInv']] <- addData(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
 				invcost$invcost <- invcost$value; invcost$value <- NULL
-				
+				if (length(trade_eac) > 0) {
+				  mTradeEac <- merge(unique(invcost$region), trade_eac)
+				  mTradeEac$trade <- trd@name
+				  mTradeEac$region <- as.character(mTradeEac$x)
+				  mTradeEac$year <- mTradeEac$y
+				  mTradeEac$x <- NULL; mTradeEac$y <- NULL
+				  obj@parameters[['mTradeEac']] <- addData(obj@parameters[['mTradeEac']], mTradeEac)
+				}
+
 				salv_data <- merge(invcost, approxim$discount, all.x = TRUE)
 				salv_data$value[is.na(salv_data$value)] <- 0
 				salv_data$discount <- salv_data$value; salv_data$value <- NULL
