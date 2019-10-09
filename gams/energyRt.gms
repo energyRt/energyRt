@@ -1098,10 +1098,14 @@ eqEmsFuelTot(comm, region, year, slice)         Emissions from commodity consump
 eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
          vAggOut(comm, region, year, slice)
          =e=
-         sum(commp$pAggregateFactor(comm, commp),
+         sum((commp, slicep)$(pAggregateFactor(comm, commp) and
+         ((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+                (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice))))
+         ),
                  pAggregateFactor(comm, commp) *
-                  vOutTot(commp, region, year, slice)
+                  vOutTot(commp, region, year, slicep)
          );
+
 
 *eqTechEmsFuel(tech, comm, region, year, slice)$mTechEmsFuel(tech, comm, region, year, slice)..
 *         vTechEmsFuel(tech, comm, region, year, slice)
@@ -1113,12 +1117,16 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
 *                   vTechInp(tech, commp, region, year, slice)
 *         );
 
+
+
 eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
      vEmsFuelTot(comm, region, year, slice)
-         =e= sum((tech, commp)$(mTechEmsFuel(tech, comm, region, year, slice)
+         =e= sum((tech, commp, slicep)$(mTechEmsFuel(tech, comm, region, year, slice)
                   and mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and
-                         pEmissionFactor(comm, commp) <> 0),
-                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slice)
+                         pEmissionFactor(comm, commp) <> 0 and
+         ((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+       (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice))))),
+                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slicep)
          );
 
 ********************************************************************************
@@ -1313,14 +1321,19 @@ eqTradeCapFlow(trade, comm, year, slice)
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
   vImport(comm, dst, year, slice) =e=
-  sum((trade, src)$(mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm)),
-    pTradeIrEff(trade, src, dst, year, slice) * vTradeIr(trade, comm, src, dst, year, slice))
-         + sum(imp$mImportRow(imp, comm, dst, year, slice), vImportRow(imp, comm, dst, year, slice));
+         sum(slicep$((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+           (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice)))),
+             sum((trade, src)$(mTradeIr(trade, src, dst, year, slicep) and mTradeComm(trade, comm)),
+               pTradeIrEff(trade, src, dst, year, slicep) * vTradeIr(trade, comm, src, dst, year, slicep))
+                  + sum(imp$mImportRow(imp, comm, dst, year, slicep), vImportRow(imp, comm, dst, year, slicep)));
 
 eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)..
   vExport(comm, src, year, slice) =e=
-  sum((trade, dst)$(mTradeIr(trade, src, dst, year, slice) and mTradeComm(trade, comm)), vTradeIr(trade, comm, src, dst, year, slice))
-         + sum(expp$mExportRow(expp, comm, src, year, slice), vExportRow(expp, comm, src, year, slice));
+   sum(slicep$((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+       (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice)))),
+           sum((trade, dst)$(mTradeIr(trade, src, dst, year, slicep) and mTradeComm(trade, comm)), vTradeIr(trade, comm, src, dst, year, slicep))
+         + sum(expp$mExportRow(expp, comm, src, year, slicep), vExportRow(expp, comm, src, year, slicep)));
+
 
 eqTradeFlowUp(trade, comm, src, dst, year, slice)$(mTradeIrUp(trade, src, dst, year, slice) and mTradeComm(trade, comm))..
       vTradeIr(trade, comm, src, dst, year, slice) =l= pTradeIrUp(trade, src, dst, year, slice);
@@ -1444,10 +1457,18 @@ eqTradeIrAOut(trade, comm, region, year, slice)$mTradeIrAOut2(trade, comm, regio
       pTradeIrCdst2Aout(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
 eqTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice)..
-  vTradeIrAInpTot(comm, region, year, slice) =e= sum(trade$mTradeIrAInp2(trade, comm, region, year, slice), vTradeIrAInp(trade, comm, region, year, slice));
+  vTradeIrAInpTot(comm, region, year, slice) =e=
+   sum((trade, slicep)$(((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+       (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice)))) and
+                 mTradeIrAInp2(trade, comm, region, year, slicep)), vTradeIrAInp(trade, comm, region, year, slicep));
 
 eqTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice)..
-  vTradeIrAOutTot(comm, region, year, slice) =e= sum(trade$mTradeIrAOut2(trade, comm, region, year, slice), vTradeIrAOut(trade, comm, region, year, slice));
+  vTradeIrAOutTot(comm, region, year, slice) =e=
+
+   sum((trade, slicep)$(((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+       (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice)))) and
+                 mTradeIrAOut2(trade, comm, region, year, slicep)), vTradeIrAOut(trade, comm, region, year, slicep));
+
 
 
 ********************************************************************************
@@ -1485,15 +1506,13 @@ eqOutTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
          vOutTot(comm, region, year, slice)
          =e=
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
-         sum(slicep$mSliceParentChildE(slice, slicep),
-                  vSupOutTot(comm, region, year, slicep)$mSupOutTot(comm, region, slicep) +
-                  vEmsFuelTot(comm, region, year, slicep)$mEmsFuelTot(comm, region, year, slicep) +
-                  vAggOut(comm, region, year, slicep)$mAggOut(comm, region, year, slicep) +
-                  vTechOutTot(comm, region, year, slicep)$mTechOutTot(comm, region, year, slicep)  +
-                  vStorageOutTot(comm, region, year, slicep)$mStorageOutTot(comm, region, year, slicep) +
-                  vImport(comm, region, year, slicep)$mImport(comm, region, year, slicep) +
-                  vTradeIrAOutTot(comm, region, year, slicep)$mTradeIrAOutTot(comm, region, year, slicep)
-         ) +
+                  vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, slice) +
+                  vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
+                  vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice) +
+                  vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
+                  vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice) +
+                  vImport(comm, region, year, slice)$mImport(comm, region, year, slice) +
+                  vTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice) +
          sum(slicep$(mSliceParentChild(slicep, slice) and mOut2Lo(comm, region, year, slicep)),
                  vOut2Lo(comm, region, year, slicep, slice));
 
@@ -1514,12 +1533,11 @@ eqInpTot(comm, region, year, slice)$(mMidMilestone(year) and mCommSlice(comm, sl
          =e=
          vDemInp(comm, region, year, slice)$mDemInp(comm, slice) +
          vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice) +
-         sum(slicep$mSliceParentChildE(slice, slicep),
-                  vTechInpTot(comm, region, year, slicep)$mTechInpTot(comm, region, year, slicep) +
-                  vStorageInpTot(comm, region, year, slicep)$mStorageInpTot(comm, region, year, slicep) +
-                  vExport(comm, region, year, slicep)$mExport(comm, region, year, slicep) +
-                  vTradeIrAInpTot(comm, region, year, slicep)$mTradeIrAInpTot(comm, region, year, slicep)
-         ) + sum(slicep$(mSliceParentChild(slicep, slice) and mInp2Lo(comm, region, year, slicep)),
+         vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice) +
+         vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice) +
+         vExport(comm, region, year, slice)$mExport(comm, region, year, slice) +
+         vTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice) +
+         sum(slicep$(mSliceParentChild(slicep, slice) and mInp2Lo(comm, region, year, slicep)),
                  vInp2Lo(comm, region, year, slicep, slice));
 
 eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
@@ -1533,45 +1551,53 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
 
 eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and mSupOutTot(comm, region, slice))..
          vSupOutTot(comm, region, year, slice) =e=
-                 sum(sup$mSupAva(sup, comm, region, year, slice), vSupOut(sup, comm, region, year, slice));
+         sum((sup, slicep)$(((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+           (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice)))) and
+                 mSupAva(sup, comm, region, year, slicep)), vSupOut(sup, comm, region, year, slicep));
 
 eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
          vTechInpTot(comm, region, year, slice)
          =e=
-         sum(tech$(mTechSpan(tech, region, year) and mTechInpComm(tech, comm) and mTechSlice(tech, slice)),
-             vTechInp(tech, comm, region, year, slice)) +
-         sum(tech$(mTechSpan(tech, region, year) and mTechAInp(tech, comm) and mTechSlice(tech, slice)),
-             vTechAInp(tech, comm, region, year, slice));
+         sum(slicep$((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+           (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice)))),
+                  sum(tech$(mTechSpan(tech, region, year) and mTechInpComm(tech, comm) and mTechSlice(tech, slicep)),
+                      vTechInp(tech, comm, region, year, slicep)) +
+                  sum(tech$(mTechSpan(tech, region, year) and mTechAInp(tech, comm) and mTechSlice(tech, slicep)),
+                      vTechAInp(tech, comm, region, year, slicep)));
 
 eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)..
          vTechOutTot(comm, region, year, slice)
          =e=
-         sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year)  and mTechSlice(tech, slice) and mTechOutComm(tech, comm)),
-             vTechOut(tech, comm, region, year, slice)) +
-         sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year)  and mTechSlice(tech, slice) and mTechAOut(tech, comm)),
-             vTechAOut(tech, comm, region, year, slice));
+         sum(slicep$((mSliceParentChildE(slice, slicep) and mCommSlice(comm, slice)) or
+           (mSameSlice(slice, slicep) and not(mCommSlice(comm, slice)))),
+         sum(tech$(mTechSlice(tech, slicep) and mTechSpan(tech, region, year) and mTechOutComm(tech, comm)),
+             vTechOut(tech, comm, region, year, slicep)) +
+         sum(tech$(mTechSlice(tech, slicep) and mTechSpan(tech, region, year) and mTechAOut(tech, comm)),
+             vTechAOut(tech, comm, region, year, slicep)));
+
 
 eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)..
          vStorageInpTot(comm, region, year, slice)
          =e=
          sum(stg$(mStorageComm(stg, comm) and pStorageInpEff(stg, comm, region, year, slice)
-                 and mCommSlice(comm, slice)and mStorageSpan(stg, region, year)),
+                 and mStorageSpan(stg, region, year)),
                  vStorageInp(stg, comm, region, year, slice)
          ) +
-         sum(stg$(mStorageAInp(stg, comm) and mCommSlice(comm, slice) and mStorageSpan(stg, region, year)),
+         sum(stg$(mStorageAInp(stg, comm) and mStorageSpan(stg, region, year)),
                  vStorageAInp(stg, comm, region, year, slice)
          );
 
 eqStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)..
          vStorageOutTot(comm, region, year, slice)
          =e=
-         sum(stg$(mStorageComm(stg, comm) and pStorageOutEff(stg, comm, region, year, slice)
-                 and mCommSlice(comm, slice) and mStorageSpan(stg, region, year)),
+          sum(stg$(mStorageComm(stg, comm) and pStorageOutEff(stg, comm, region, year, slice)
+                 and mStorageSpan(stg, region, year)),
                  vStorageOut(stg, comm, region, year, slice)
          ) +
-         sum(stg$(mStorageAOut(stg, comm) and mCommSlice(comm, slice) and mStorageSpan(stg, region, year)),
+         sum(stg$(mStorageAOut(stg, comm) and mStorageSpan(stg, region, year)),
                  vStorageAOut(stg, comm, region, year, slice)
          );
+
 
 **************************************
 * Objective and aggregated costs equations
