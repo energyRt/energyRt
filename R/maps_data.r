@@ -795,7 +795,7 @@ rs
     rs["mEndMilestone", c("name", "description", "type")] <- c("mEndMilestone", "End of the period", "map");
     rs["mEndMilestone", c("year")] <- TRUE;
     rs["mMidMilestone", c("name", "description", "type")] <- c("mMidMilestone", "Milestone year", "map");
-    rs["mMidMilestone", c("year", "eqTechAfsLo", "eqTechAfsUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqSupCost", "eqDemInp", "eqStorageAInp", "eqStorageAOut", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowCumulative", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqSupOutTot", "eqCost", "eqObjective")] <- TRUE;
+    rs["mMidMilestone", c("year", "eqTechAfsLo", "eqTechAfsUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqSupCost", "eqDemInp", "eqStorageAInp", "eqStorageAOut", "eqStorageCap", "eqStorageInv", "eqStorageCost", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowCumulative", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqSupOutTot", "eqCost", "eqObjective")] <- TRUE;
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
     rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mTechRetirement", c("name", "description", "type")] <- c("mTechRetirement", "Early retirement option", "map");
@@ -863,7 +863,7 @@ rs
     rs["mStorageOMCost", c("name", "description", "type")] <- c("mStorageOMCost", "", "map");
     rs["mStorageOMCost", c("stg", "region", "year", "eqCost")] <- TRUE;
     rs["mStorageEac", c("name", "description", "type")] <- c("mStorageEac", "", "map");
-    rs["mStorageEac", c("stg", "region", "year", "eqCost")] <- TRUE;
+    rs["mStorageEac", c("stg", "region", "year", "eqStorageEac", "eqCost")] <- TRUE;
     rs["mSliceNext", c("name", "description", "type")] <- c("mSliceNext", "Next slice", "map");
     rs["mSliceNext", c("slice")] <- TRUE;
     rs["mSliceFYearNext", c("name", "description", "type")] <- c("mSliceFYearNext", "Next slice joint", "map");

@@ -1118,7 +1118,7 @@ eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
          =e= sum((tech, commp)$(mTechEmsFuel(tech, comm, region, year, slice)
                   and mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and
                          pEmissionFactor(comm, commp) <> 0),
-                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slice)  
+                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slice)
          );
 
 ********************************************************************************
@@ -1246,7 +1246,7 @@ eqStorageCap(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regio
                  (
                          ordYear(year) >= ordYear(yearp) and
                          (mStorageOlifeInf(stg, region) or ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp)) and
-                         mStorageNew(stg, region, year)
+                         mStorageNew(stg, region, yearp)
                  ),
                  vStorageNewCap(stg, region, yearp)
          );
@@ -1259,7 +1259,7 @@ eqStorageInv(stg, region, year)$(mMidMilestone(year) and mStorageNew(stg, region
          vStorageNewCap(stg, region, year);
 
 * EAC equation
-eqStorageEac(stg, region, year)$(mMidMilestone(year) and  mStorageEac(stg, region, year))..
+eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
          vStorageEac(stg, region, year)
          =e=
          sum((yearp)$

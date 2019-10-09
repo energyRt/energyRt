@@ -110,9 +110,14 @@ read_solution <- function(scen, ...) {
     vTechEmsFuel <- merge(merge(energyRt:::getParameterData(scen@modInp@parameters$pTechEmisComm), 
       scen@modOut@variables$vTechInp, by = c('tech', 'comm')), tmp, by = 'comm')
     vTechEmsFuel$comm <- vTechEmsFuel$commp
-    vTechEmsFuel <- aggregate(vTechEmsFuel$value.x * vTechEmsFuel$value.y * vTechEmsFuel$value, 
-      vTechEmsFuel[, c('tech', 'comm', 'region', 'year', 'slice')], sum)
-    vTechEmsFuel$value <- vTechEmsFuel$x; vTechEmsFuel$x <- NULL
+    if (nrow(vTechEmsFuel) > 0) {
+      vTechEmsFuel <- aggregate(vTechEmsFuel$value.x * vTechEmsFuel$value.y * vTechEmsFuel$value, 
+        vTechEmsFuel[, c('tech', 'comm', 'region', 'year', 'slice')], sum)
+      vTechEmsFuel$value <- vTechEmsFuel$x; vTechEmsFuel$x <- NULL
+    } else {
+      vTechEmsFuel <- data.frame(tech = character(), comm = character(), region = character(), 
+        year = numeric(), value = numeric(), stringsAsFactors=FALSE)
+    }
     scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
   }
   if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')

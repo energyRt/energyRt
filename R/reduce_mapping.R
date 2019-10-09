@@ -281,8 +281,8 @@
     prec@parameters[['mSupReserveUp']] <- addData(prec@parameters[['mSupReserveUp']], reduce.duplicate(
     	merge(tmp_nozero$pSupReserve, tmp_noinf$pSupReserve)))
     
-    prec@parameters[['mTechAfUp']] <- addData(prec@parameters[['mTechAfUp']], reduce.duplicate(merge(tmp_nozero$pTechAf, tmp_noinf$pTechAf)))
-    prec@parameters[['mTechAfcUp']] <- addData(prec@parameters[['mTechAfcUp']], reduce.duplicate(merge(tmp_nozero$pTechAfc, tmp_noinf$pTechAfc)))
+    prec@parameters[['mTechAfUp']] <- addData(prec@parameters[['mTechAfUp']], tmp_noinf$pTechAf)
+    prec@parameters[['mTechAfcUp']] <- addData(prec@parameters[['mTechAfcUp']], tmp_noinf$pTechAfc)
     prec@parameters[['mTechOlifeInf']] <- addData(prec@parameters[['mTechOlifeInf']], generate_haveval('pTechOlife', Inf))
     prec@parameters[['mStorageOlifeInf']] <- addData(prec@parameters[['mStorageOlifeInf']], generate_haveval('pStorageOlife', Inf))
     
