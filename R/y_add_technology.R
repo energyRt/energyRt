@@ -184,9 +184,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 			obj@parameters[['mTechAInp']] <- addData(obj@parameters[['mTechAInp']],
 				data.frame(tech = rep(tech@name, length(cmm)), comm = cmm))
 		}
-		dd <- data.frame(list = c('pTechUse2AOut', 'pTechAct2AOut', 'pTechCap2AOut', 
-			'pTechUse2AInp', 'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp', 'pTechNCap2AOut'),
-			table = c('use2aout', 'act2aout', 'cap2aout', 'use2ainp', 'act2ainp', 'cap2ainp', 'ncap2ainp', 'ncap2aout'),
+		dd <- data.frame(list = c('pTechAct2AOut', 'pTechCap2AOut', 
+			'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp', 'pTechNCap2AOut'),
+			table = c('act2aout', 'cap2aout', 'act2ainp', 'cap2ainp', 'ncap2ainp', 'ncap2aout'),
 			stringsAsFactors = FALSE)
 		for(i in 1:nrow(dd)) {
 			approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']

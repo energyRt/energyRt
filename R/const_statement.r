@@ -1,5 +1,4 @@
 .vrb_map = list(
-    vTechUse = c("tech", "region", "year", "slice"), 
     vTechNewCap = c("tech", "region", "year"), 
     vTechRetiredCap = c("tech", "region", "year", "year"), 
     vTechCap = c("tech", "region", "year"), 
@@ -64,8 +63,7 @@
     vTradeNewCap = c("trade", "year")
 );
 .vrb_mapping = list(
-    vTechUse = "vTechUse( tech , region , year , slice ) $ ( mTechSpan( tech , region , year ) and mTechSlice( tech , slice ) )",
-  vTechNewCap = "vTechNewCap( tech , region , year ) $ mTechNew( tech , region , year )",
+    vTechNewCap = "vTechNewCap( tech , region , year ) $ mTechNew( tech , region , year )",
   vTechRetiredCap = "vTechRetiredCap( tech , region , year , year ) $ mTechSpan( tech , region , year )",
   vTechCap = "vTechCap( tech , region , year ) $ mTechSpan( tech , region , year )",
   vTechAct = "vTechAct( tech , region , year , slice ) $ ( mTechSpan( tech , region , year ) and mTechSlice( tech , slice ) )",

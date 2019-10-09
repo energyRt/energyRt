@@ -228,18 +228,12 @@ setMethod("initialize", "modInp",
     	c('tech', 'comm', 'region', 'year', 'slice'), 'simple', 
     	defVal = 1, interpolation = 'back.inter.forth', colName = 'use2cact', cls = 'technology')    
     # Aux
-    .Object@parameters[['pTechUse2AInp']] <- createParameter('pTechUse2AInp', 
-    	c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-    	defVal = 0, interpolation = 'back.inter.forth', colName = 'use2ainp', cls = 'technology')    
     .Object@parameters[['pTechAct2AInp']] <- createParameter('pTechAct2AInp', 
     	c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'act2ainp', cls = 'technology')    
     .Object@parameters[['pTechCap2AInp']] <- createParameter('pTechCap2AInp', 
     	c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'cap2ainp', cls = 'technology')    
-    .Object@parameters[['pTechUse2AOut']] <- createParameter('pTechUse2AOut', 
-    	c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
-    	defVal = 0, interpolation = 'back.inter.forth', colName = 'use2aout', cls = 'technology')    
     .Object@parameters[['pTechAct2AOut']] <- createParameter('pTechAct2AOut', 
     	c('tech', 'acomm', 'region', 'year', 'slice'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'act2aout', cls = 'technology')    

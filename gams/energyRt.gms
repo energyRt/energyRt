@@ -310,8 +310,6 @@ $ontext
 ** Technology
 $offtext
 positive variable
-*@ (mTechSpan(tech, region, year) and mTechSlice(tech, slice))
-vTechUse(tech, region, year, slice)                  Use level in technology
 *@ mTechNew(tech, region, year)
 vTechNewCap(tech, region, year)                      New capacity
 *@ mTechSpan(tech, region, year)
@@ -590,8 +588,6 @@ eqTechSng2Sng(tech, region, comm, commp, year, slice)      Technology input to o
 eqTechGrp2Sng(tech, region, group, commp, year, slice)     Technology group input to output
 eqTechSng2Grp(tech, region, comm, groupp, year, slice)     Technology input to group output
 eqTechGrp2Grp(tech, region, group, groupp, year, slice)    Technology group input to group output
-eqTechUse2Sng(tech, region, commp, year, slice)            Technology use to output
-eqTechUse2Grp(tech, region, groupp, year, slice)           Technology use to group output
 ;
 
 eqTechSng2Sng(tech, region, comm, commp, year, slice)$
@@ -655,23 +651,6 @@ eqTechGrp2Grp(tech, region, group, groupp, year, slice)$
            pTechCact2cout(tech, commp, region, year, slice)
    );
 
-eqTechUse2Sng(tech, region, commp, year, slice)$
-   ( mTechSlice(tech, slice) and  mMidMilestone(year) and mTechSpan(tech, region, year) and
-     mTechOutComm(tech, commp) and mTechOneComm(tech, commp)
-   )..
-   vTechUse(tech, region, year, slice) =e=
-         vTechOut(tech, commp, region, year, slice) /
-         pTechCact2cout(tech, commp, region, year, slice);
-
-eqTechUse2Grp(tech, region, groupp, year, slice)$
-   ( mTechSlice(tech, slice) and  mMidMilestone(year) and mTechSpan(tech, region, year) and
-     mTechOutGroup(tech, groupp)
-   )..
-   vTechUse(tech, region, year, slice) =e=
-   sum(commp$(mTechOutComm(tech, commp) and mTechGroupComm(tech, groupp, commp)),
-           vTechOut(tech, commp, region, year, slice) /
-           pTechCact2cout(tech, commp, region, year, slice)
-   );
 
 ********************************************************************************
 * Shares equations for grouped commodities
@@ -754,8 +733,6 @@ eqTechAOut(tech, comm, region, year, slice) Technology auxiliary commodity outpu
 
 eqTechAInp(tech, comm, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and mTechAInp(tech, comm)  and mTechSpan(tech, region, year))..
   vTechAInp(tech, comm, region, year, slice) =e=
-  (vTechUse(tech, region, year, slice) *
-    pTechUse2AInp(tech, comm, region, year, slice)) +
   (vTechAct(tech, region, year, slice) *
     pTechAct2AInp(tech, comm, region, year, slice)) +
   (vTechCap(tech, region, year) *
@@ -771,8 +748,6 @@ eqTechAInp(tech, comm, region, year, slice)$(mTechSlice(tech, slice) and mMidMil
 
 eqTechAOut(tech, comm, region, year, slice)$(mTechSlice(tech, slice) and mMidMilestone(year) and mTechAOut(tech, comm) and mTechSpan(tech, region, year))..
   vTechAOut(tech, comm, region, year, slice) =e=
-  (vTechUse(tech, region, year, slice) *
-    pTechUse2AOut(tech, comm, region, year, slice)) +
   (vTechAct(tech, region, year, slice) *
     pTechAct2AOut(tech, comm, region, year, slice)) +
   (vTechCap(tech, region, year) *
@@ -1675,8 +1650,6 @@ eqTechSng2Sng
 eqTechGrp2Sng
 eqTechSng2Grp
 eqTechGrp2Grp
-eqTechUse2Sng
-eqTechUse2Grp
 ********************************************************************************
 * Share equations
 ********************************************************************************
