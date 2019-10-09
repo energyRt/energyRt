@@ -406,8 +406,8 @@ positive variable
 vDummyImport(comm, region, year, slice)               Dummy import (for debugging)
 *@ mDummyExport(comm, region, year, slice)
 vDummyExport(comm, region, year, slice)               Dummy export (for debugging)
-*@ mDummyCost(comm, region, year)
-vDummyCost(comm, region, year)                        Dummy import & export costs  (for debugging)
+** mDummyCost(comm, region, year)
+*vDummyCost(comm, region, year)                        Dummy import & export costs  (for debugging)
 ;
 variable
 * Tax
@@ -1576,17 +1576,17 @@ Equation
 eqCost(region, year)                Total costs
 eqTaxCost(comm, region, year)       Commodity taxes
 eqSubsCost(comm, region, year)      Commodity subsidy
-eqDummyCost(comm, region, year)     Dummy import and export costs
+*eqDummyCost(comm, region, year)     Dummy import and export costs
 eqObjective                         Objective equation
 ;
 
-eqDummyCost(comm, region, year)$(mMidMilestone(year) and  mDummyCost(comm, region, year))..
-         vDummyCost(comm, region, year)
-         =e=
-         sum(slice$mDummyImport(comm, region, year, slice),
-           pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice)) +
-         sum(slice$mDummyExport(comm, region, year, slice),
-           pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
+*eqDummyCost(comm, region, year)$(mMidMilestone(year) and  mDummyCost(comm, region, year))..
+*         vDummyCost(comm, region, year)
+*         =e=
+*         sum(slice$mDummyImport(comm, region, year, slice),
+*           pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice)) +
+*         sum(slice$mDummyExport(comm, region, year, slice),
+*           pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
 
 eqCost(region, year)$mMidMilestone(year)..
          vTotalCost(region, year)
@@ -1594,7 +1594,11 @@ eqCost(region, year)$mMidMilestone(year)..
          sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year))
          + sum(tech$mTechOMCost(tech, region, year), vTechOMCost(tech, region, year))
          + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
-         + sum(comm$mDummyCost(comm, region, year), vDummyCost(comm, region, year))
+*        + sum(comm$mDummyCost(comm, region, year), vDummyCost(comm, region, year))
+         + sum((comm, slice)$mDummyImport(comm, region, year, slice),
+                    pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice))
+         + sum((comm, slice)$mDummyExport(comm, region, year, slice),
+                   pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice))
          + sum(comm$mTaxCost(comm, region, year), vTaxCost(comm, region, year))
          - sum(comm$mSubsCost(comm, region, year), vSubsCost(comm, region, year))
          + sum(stg$mStorageOMCost(stg, region, year), vStorageOMCost(stg, region, year))
@@ -1807,7 +1811,7 @@ eqStorageOutTot
 **************************************
 * Costs' equations
 **************************************
-eqDummyCost
+*eqDummyCost
 eqCost
 eqObjective
 * Tax

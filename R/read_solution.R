@@ -91,9 +91,20 @@ read_solution <- function(scen, ...) {
   if (rr$solution_report$finish != 2 || rr$solution_report$status != 1) {
     warning('Unsuccessful finish')
   } else {
+    # Postprocessing
     scen@modOut@variables$vTechSalv <- salvage_cost0(scen, 'Tech')
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, 'Storage')
     scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, 'Trade')
+    vDummyImportCost <- merge(energyRt:::getParameterData(scen@modInp@parameters$pDummyImportCost), scen@modOut@variables$vDummyImport, 
+      by = c('comm', 'region', 'year', 'slice'))
+    vDummyImportCost$value <- vDummyImportCost$value.x * vDummyImportCost$value.y;
+    vDummyImportCost$value.x <- NULL; vDummyImportCost$value.y <- NULL;
+    scen@modOut@variables$vDummyImportCost <- vDummyImportCost
+    vDummyExportCost <- merge(energyRt:::getParameterData(scen@modInp@parameters$pDummyExportCost), scen@modOut@variables$vDummyExport, 
+      by = c('comm', 'region', 'year', 'slice'))
+    vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y;
+    vDummyExportCost$value.x <- NULL; vDummyExportCost$value.y <- NULL;
+    scen@modOut@variables$vDummyExportCost <- vDummyExportCost
   }
   if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
   invisible(scen)
