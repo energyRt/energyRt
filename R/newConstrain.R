@@ -1,7 +1,7 @@
 
 newConstraintS <- function(name, type, eq = '==', rhs = 0, for.sum = list(), 
                          for.each = list(), defVal = 0, rule = NULL, comm = NULL,
-                         cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE, emis = TRUE) {
+                         cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE) { # , emis = TRUE
   stop.newconstr <- function(x) 
     stop(paste0('Constraint "', name, '" error: ', x))
   
@@ -40,7 +40,7 @@ newConstraintS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
     if (is.set == 'tech' && inpout == 'Inp') {
       vrb <- paste0('vTech', c('', 'A')[c(cinp, ainp)], 'Inp')
     } else if (is.set == 'tech' && inpout == 'Out') {
-      vrb <- paste0('vTech', c('Out', 'AOut', 'EmsFuel')[c(cout, aout, emis)])
+      vrb <- paste0('vTech', c('Out', 'AOut')[c(cout, aout)]) # , 'EmsFuel' , emis
     } else if (any(type == c('newcapacity', 'capacity'))) {
       if (all(is.set != c('stg', 'tech')))
         stop.newconstr(paste0('For ', type, ' could be define only for tech and storage'))

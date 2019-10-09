@@ -261,7 +261,6 @@ var vTechEac{tech, region, year};
 var vTechOMCost{tech, region, year};
 var vSupCost{sup, region, year};
 var vEmsFuelTot{comm, region, year, slice};
-var vTechEmsFuel{tech, comm, region, year, slice};
 var vBalance{comm, region, year, slice};
 var vTotalCost{region, year};
 var vObjective;
@@ -394,9 +393,7 @@ s.t.  eqDemInp{y in mMidMilestone, (c, s) in mDemInp, r in region}: vDemInp[c,r,
 
 s.t.  eqAggOut{(c, r, y, s) in mAggOut}: vAggOut[c,r,y,s]  =  sum{cp in comm:(pAggregateFactor[c,cp])}(pAggregateFactor[c,cp]*vOutTot[cp,r,y,s]);
 
-s.t.  eqTechEmsFuel{(t, c, r, y, s) in mTechEmsFuel}: vTechEmsFuel[t,c,r,y,s]  =  sum{cp in comm:(((t,cp) in mTechInpComm and pTechEmisComm[t,cp] <> 0 and pEmissionFactor[c,cp] <> 0))}(pTechEmisComm[t,cp]*pEmissionFactor[c,cp]*vTechInp[t,cp,r,y,s]);
-
-s.t.  eqEmsFuelTot{(c, r, y, s) in mEmsFuelTot}: vEmsFuelTot[c,r,y,s]  =  sum{t in tech:((t,c,r,y,s) in mTechEmsFuel)}(vTechEmsFuel[t,c,r,y,s]);
+s.t.  eqEmsFuelTot{(c, r, y, s) in mEmsFuelTot}: vEmsFuelTot[c,r,y,s]  =  sum{t in tech,cp in comm:(((t,c,r,y,s) in mTechEmsFuel and (t,cp) in mTechInpComm and pTechEmisComm[t,cp] <> 0 and pEmissionFactor[c,cp] <> 0))}(pTechEmisComm[t,cp]*pEmissionFactor[c,cp]*vTechInp[t,cp,r,y,s]);
 
 s.t.  eqStorageAInp{(st1, c) in mStorageAInp, (c, s) in mCommSlice, (st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageAInp[st1,c,r,y,s]  =  sum{cp in comm:((st1,cp) in mStorageComm)}(pStorageStg2AInp[st1,c,r,y,s]*vStorageStore[st1,cp,r,y,s]+pStorageInp2AInp[st1,c,r,y,s]*vStorageInp[st1,cp,r,y,s]+pStorageOut2AInp[st1,c,r,y,s]*vStorageOut[st1,cp,r,y,s]+pStorageCap2AInp[st1,c,r,y,s]*vStorageCap[st1,r,y]+pStorageNCap2AInp[st1,c,r,y,s]*vStorageNewCap[st1,r,y]);
 
@@ -577,10 +574,6 @@ for{y in mMidMilestone, (c, s) in mDemInp, r in region : vDemInp[c,r,y,s] <> 0} 
 printf "comm,region,year,slice,value\n" > "output/vEmsFuelTot.csv";
 for{(c, r, y, s) in mEmsFuelTot : vEmsFuelTot[c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%f\n", c,r,y,s,vEmsFuelTot[c,r,y,s] >> "output/vEmsFuelTot.csv";
-}
-printf "tech,comm,region,year,slice,value\n" > "output/vTechEmsFuel.csv";
-for{(t, c, r, y, s) in mTechEmsFuel : vTechEmsFuel[t,c,r,y,s] <> 0} {
-  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechEmsFuel[t,c,r,y,s] >> "output/vTechEmsFuel.csv";
 }
 printf "comm,region,year,slice,value\n" > "output/vBalance.csv";
 for{y in mMidMilestone, (c, s) in mCommSlice, r in region : vBalance[c,r,y,s] <> 0} {
@@ -767,7 +760,6 @@ printf "value\n" > "output/variable_list.csv";
     printf "vTechOMCost\n" >> "output/variable_list.csv";
     printf "vSupCost\n" >> "output/variable_list.csv";
     printf "vEmsFuelTot\n" >> "output/variable_list.csv";
-    printf "vTechEmsFuel\n" >> "output/variable_list.csv";
     printf "vBalance\n" >> "output/variable_list.csv";
     printf "vTotalCost\n" >> "output/variable_list.csv";
     printf "vObjective\n" >> "output/variable_list.csv";

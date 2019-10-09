@@ -362,8 +362,8 @@ variable
 * Emission
 *@ mEmsFuelTot(comm, region, year, slice)
 vEmsFuelTot(comm, region, year, slice)                   Total fuel emissions
-*@ mTechEmsFuel(tech, comm, region, year, slice)
-vTechEmsFuel(tech, comm, region, year, slice)            Emissions from commodity input to tech (like fuel combustion)
+** mTechEmsFuel(tech, comm, region, year, slice)
+*vTechEmsFuel(tech, comm, region, year, slice)            Emissions from commodity input to tech (like fuel combustion)
 ;
 variable
 * Ballance
@@ -1092,7 +1092,7 @@ eqDemInp(comm, region, year, slice)$(mMidMilestone(year) and mDemInp(comm, slice
 Equation
 eqAggOut(comm, region, year, slice)            Aggregating commodity output
 eqEmsFuelTot(comm, region, year, slice)         Emissions from commodity consumption (i.e. fuels combustion)
-eqTechEmsFuel(tech, comm, region, year, slice)  Emissions from commodity consumption by technologies
+*eqTechEmsFuel(tech, comm, region, year, slice)  Emissions from commodity consumption by technologies
 ;
 
 eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
@@ -1103,19 +1103,23 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
                   vOutTot(commp, region, year, slice)
          );
 
-eqTechEmsFuel(tech, comm, region, year, slice)$mTechEmsFuel(tech, comm, region, year, slice)..
-         vTechEmsFuel(tech, comm, region, year, slice)
-         =e=
-         sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and
-                         pEmissionFactor(comm, commp) <> 0
-                 ),
-                   pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) *
-                   vTechInp(tech, commp, region, year, slice)
-         );
+*eqTechEmsFuel(tech, comm, region, year, slice)$mTechEmsFuel(tech, comm, region, year, slice)..
+*         vTechEmsFuel(tech, comm, region, year, slice)
+*         =e=
+*         sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and
+*                         pEmissionFactor(comm, commp) <> 0
+*                 ),
+*                   pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) *
+*                   vTechInp(tech, commp, region, year, slice)
+*         );
 
 eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
      vEmsFuelTot(comm, region, year, slice)
-         =e= sum(tech$mTechEmsFuel(tech, comm, region, year, slice), vTechEmsFuel(tech, comm, region, year, slice));
+         =e= sum((tech, commp)$(mTechEmsFuel(tech, comm, region, year, slice)
+                  and mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and
+                         pEmissionFactor(comm, commp) <> 0),
+                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slice)  
+         );
 
 ********************************************************************************
 * Storage equations
@@ -1741,7 +1745,7 @@ eqDemInp
 **************************************
 eqAggOut
 eqEmsFuelTot
-eqTechEmsFuel
+*eqTechEmsFuel
 ********************************************************************************
 * Store equations for reserve
 ********************************************************************************

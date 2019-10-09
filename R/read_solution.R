@@ -105,6 +105,15 @@ read_solution <- function(scen, ...) {
     vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y;
     vDummyExportCost$value.x <- NULL; vDummyExportCost$value.y <- NULL;
     scen@modOut@variables$vDummyExportCost <- vDummyExportCost
+    tmp <- energyRt:::getParameterData(scen@modInp@parameters$pEmissionFactor)
+    tmp$comm2 <- tmp$commp; tmp$commp <- tmp$comm; tmp$comm <- tmp$comm2; tmp$comm2 <- NULL
+    vTechEmsFuel <- merge(merge(energyRt:::getParameterData(scen@modInp@parameters$pTechEmisComm), 
+      scen@modOut@variables$vTechInp, by = c('tech', 'comm')), tmp, by = 'comm')
+    vTechEmsFuel$comm <- vTechEmsFuel$commp
+    vTechEmsFuel <- aggregate(vTechEmsFuel$value.x * vTechEmsFuel$value.y * vTechEmsFuel$value, 
+      vTechEmsFuel[, c('tech', 'comm', 'region', 'year', 'slice')], sum)
+    vTechEmsFuel$value <- vTechEmsFuel$x; vTechEmsFuel$x <- NULL
+    scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
   }
   if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
   invisible(scen)
