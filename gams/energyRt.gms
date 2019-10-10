@@ -1170,7 +1170,7 @@ and mStorageSpan(stg, region, year))..
   vStorageStore(stg, comm, region, year, slice) =e=
   sum(slicep$(mCommSlice(comm, slicep) and ((not(mStorageFullYear(stg)) and mSliceNext(slicep, slice))
          or (mStorageFullYear(stg) and mSliceFYearNext(slicep, slice)))),
-     pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice)
+     pStorageInpEff(stg, comm, region, year, slicep) * vStorageInp(stg, comm, region, year, slicep)
     +     (pStorageStgEff(stg, comm, region, year, slice) ** pSliceShare(slice)) * vStorageStore(stg, comm, region, year, slicep))
    - vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice);
 
