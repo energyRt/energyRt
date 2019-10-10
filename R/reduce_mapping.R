@@ -293,8 +293,9 @@
     # mSubsCost(comm, region, year)  sum(slice$pSubsCost(comm, region, year, slice), 1)
     prec@parameters[['mSubsCost']] <- addData(prec@parameters[['mSubsCost']], reduce.sect(tmp_nozero$pSubsCost, c('comm', 'region', 'year')))
     #    (sum(commp$pAggregateFactor(comm, commp), 1))
-    prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], reduce_total_map(reduce.duplicate(merge(merge(merge(reduce.sect(
-    	tmp_nozero$pAggregateFactor, 'comm'), tmp_map$region), tmp_map$year), tmp_map$slice))))
+    if (nrow(tmp_nozero$pAggregateFactor) > 0)
+      prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], reduce_total_map(reduce.duplicate(
+        merge(merge(merge(reduce.sect(tmp_nozero$pAggregateFactor, 'comm'), tmp_map$region), tmp_map$year), tmp_map$slice))))
     
     prec@parameters[['mSupAva']] <- addData(prec@parameters[['mSupAva']], tmp_nozero$pSupAva)
     
