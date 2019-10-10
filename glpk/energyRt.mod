@@ -26,6 +26,7 @@ set mStartMilestone dimen 2;
 set mEndMilestone dimen 2;
 set mMidMilestone dimen 1;
 set mCommSlice dimen 2;
+set mCommSliceOrParent dimen 3;
 set mTechRetirement dimen 1;
 set mTechUpgrade dimen 2;
 set mTechInpComm dimen 2;
@@ -391,9 +392,9 @@ s.t.  eqSupCost{y in mMidMilestone, (s1, r) in mSupSpan}: vSupCost[s1,r,y]  =  s
 
 s.t.  eqDemInp{y in mMidMilestone, (c, s) in mDemInp, r in region}: vDemInp[c,r,y,s]  =  sum{d in dem:((d,c) in mDemComm)}(pDemand[d,c,r,y,s]);
 
-s.t.  eqAggOut{(c, r, y, s) in mAggOut}: vAggOut[c,r,y,s]  =  sum{cp in comm,sp in slice:((pAggregateFactor[c,cp] and (((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice))))))}(pAggregateFactor[c,cp]*vOutTot[cp,r,y,sp]);
+s.t.  eqAggOut{(c, r, y, s) in mAggOut}: vAggOut[c,r,y,s]  =  sum{cp in comm,sp in slice:((pAggregateFactor[c,cp] and (s,sp) in mSliceParentChildE and (cp,sp) in mCommSlice))}(pAggregateFactor[c,cp]*vOutTot[cp,r,y,sp]);
 
-s.t.  eqEmsFuelTot{(c, r, y, s) in mEmsFuelTot}: vEmsFuelTot[c,r,y,s]  =  sum{t in tech,cp in comm,sp in slice:(((t,c,r,y,s) in mTechEmsFuel and (t,cp) in mTechInpComm and pTechEmisComm[t,cp] <> 0 and pEmissionFactor[c,cp] <> 0 and (((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice))))))}(pTechEmisComm[t,cp]*pEmissionFactor[c,cp]*vTechInp[t,cp,r,y,sp]);
+s.t.  eqEmsFuelTot{(c, r, y, s) in mEmsFuelTot}: vEmsFuelTot[c,r,y,s]  =  sum{t in tech,cp in comm,sp in slice:(((t,c,r,y,sp) in mTechEmsFuel and (t,cp) in mTechInpComm and pTechEmisComm[t,cp] <> 0 and pEmissionFactor[c,cp] <> 0 and (c,s,sp) in mCommSliceOrParent))}(pTechEmisComm[t,cp]*pEmissionFactor[c,cp]*vTechInp[t,cp,r,y,sp]);
 
 s.t.  eqStorageAInp{(st1, c) in mStorageAInp, (c, s) in mCommSlice, (st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageAInp[st1,c,r,y,s]  =  sum{cp in comm:((st1,cp) in mStorageComm)}(pStorageStg2AInp[st1,c,r,y,s]*vStorageStore[st1,cp,r,y,s]+pStorageInp2AInp[st1,c,r,y,s]*vStorageInp[st1,cp,r,y,s]+pStorageOut2AInp[st1,c,r,y,s]*vStorageOut[st1,cp,r,y,s]+pStorageCap2AInp[st1,c,r,y,s]*vStorageCap[st1,r,y]+pStorageNCap2AInp[st1,c,r,y,s]*vStorageNewCap[st1,r,y]);
 
@@ -423,9 +424,9 @@ s.t.  eqStorageEac{(st1, r, y) in mStorageEac}: vStorageEac[st1,r,y]  =  sum{yp 
 
 s.t.  eqStorageCost{(st1, r, y) in mStorageOMCost : y in mMidMilestone}: vStorageOMCost[st1,r,y]  =  pStorageFixom[st1,r,y]*vStorageCap[st1,r,y]+sum{c in comm,s in slice:(((c,s) in mCommSlice and (st1,c) in mStorageComm))}(pStorageCostInp[st1,r,y,s]*vStorageInp[st1,c,r,y,s]+pStorageCostOut[st1,r,y,s]*vStorageOut[st1,c,r,y,s]+pStorageCostStore[st1,r,y,s]*vStorageStore[st1,c,r,y,s]);
 
-s.t.  eqImport{(c, dst, y, s) in mImport}: vImport[c,dst,y,s]  =  sum{sp in slice:((((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice)))))}(sum{t1 in trade,src in region:(((t1,src,dst,y,sp) in mTradeIr and (t1,c) in mTradeComm))}(pTradeIrEff[t1,src,dst,y,sp]*vTradeIr[t1,c,src,dst,y,sp])+sum{i in imp:((i,c,dst,y,sp) in mImportRow)}(vImportRow[i,c,dst,y,sp]));
+s.t.  eqImport{(c, dst, y, s) in mImport}: vImport[c,dst,y,s]  =  sum{sp in slice:((c,s,sp) in mCommSliceOrParent)}(sum{t1 in trade,src in region:(((t1,src,dst,y,sp) in mTradeIr and (t1,c) in mTradeComm))}(pTradeIrEff[t1,src,dst,y,sp]*vTradeIr[t1,c,src,dst,y,sp])+sum{i in imp:((i,c,dst,y,sp) in mImportRow)}(vImportRow[i,c,dst,y,sp]));
 
-s.t.  eqExport{(c, src, y, s) in mExport}: vExport[c,src,y,s]  =  sum{sp in slice:((((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice)))))}(sum{t1 in trade,dst in region:(((t1,src,dst,y,sp) in mTradeIr and (t1,c) in mTradeComm))}(vTradeIr[t1,c,src,dst,y,sp])+sum{e in expp:((e,c,src,y,sp) in mExportRow)}(vExportRow[e,c,src,y,sp]));
+s.t.  eqExport{(c, src, y, s) in mExport}: vExport[c,src,y,s]  =  sum{sp in slice:((c,s,sp) in mCommSliceOrParent)}(sum{t1 in trade,dst in region:(((t1,src,dst,y,sp) in mTradeIr and (t1,c) in mTradeComm))}(vTradeIr[t1,c,src,dst,y,sp])+sum{e in expp:((e,c,src,y,sp) in mExportRow)}(vExportRow[e,c,src,y,sp]));
 
 s.t.  eqTradeFlowUp{(t1, src, dst, y, s) in mTradeIrUp, (t1, c) in mTradeComm}: vTradeIr[t1,c,src,dst,y,s] <=  pTradeIrUp[t1,src,dst,y,s];
 
@@ -465,9 +466,9 @@ s.t.  eqTradeIrAInp{(t1, c, r, y, s) in mTradeIrAInp2}: vTradeIrAInp[t1,c,r,y,s]
 
 s.t.  eqTradeIrAOut{(t1, c, r, y, s) in mTradeIrAOut2}: vTradeIrAOut[t1,c,r,y,s]  =  sum{dst in region:((t1,r,dst,y,s) in mTradeIr)}(pTradeIrCsrc2Aout[t1,c,r,dst,y,s]*sum{cp in comm:((t1,cp) in mTradeComm)}(vTradeIr[t1,cp,r,dst,y,s]))+sum{src in region:((t1,src,r,y,s) in mTradeIr)}(pTradeIrCdst2Aout[t1,c,src,r,y,s]*sum{cp in comm:((t1,cp) in mTradeComm)}(vTradeIr[t1,cp,src,r,y,s]));
 
-s.t.  eqTradeIrAInpTot{(c, r, y, s) in mTradeIrAInpTot}: vTradeIrAInpTot[c,r,y,s]  =  sum{t1 in trade,sp in slice:(((((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice)))) and (t1,c,r,y,sp) in mTradeIrAInp2))}(vTradeIrAInp[t1,c,r,y,sp]);
+s.t.  eqTradeIrAInpTot{(c, r, y, s) in mTradeIrAInpTot}: vTradeIrAInpTot[c,r,y,s]  =  sum{t1 in trade,sp in slice:(((c,s,sp) in mCommSliceOrParent and (t1,c,r,y,sp) in mTradeIrAInp2))}(vTradeIrAInp[t1,c,r,y,sp]);
 
-s.t.  eqTradeIrAOutTot{(c, r, y, s) in mTradeIrAOutTot}: vTradeIrAOutTot[c,r,y,s]  =  sum{t1 in trade,sp in slice:(((((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice)))) and (t1,c,r,y,sp) in mTradeIrAOut2))}(vTradeIrAOut[t1,c,r,y,sp]);
+s.t.  eqTradeIrAOutTot{(c, r, y, s) in mTradeIrAOutTot}: vTradeIrAOutTot[c,r,y,s]  =  sum{t1 in trade,sp in slice:(((c,s,sp) in mCommSliceOrParent and (t1,c,r,y,sp) in mTradeIrAOut2))}(vTradeIrAOut[t1,c,r,y,sp]);
 
 s.t.  eqBalLo{y in mMidMilestone, (c, s) in mCommSlice, r in region : c in mLoComm}: vBalance[c,r,y,s]  >=  0;
 
@@ -485,11 +486,11 @@ s.t.  eqInpTot{y in mMidMilestone, (c, s) in mCommSlice, r in region}: vInpTot[c
 
 s.t.  eqInp2Lo{(c, r, y, s) in mInp2Lo}: sum{sp in slice:(((s,sp) in mSliceParentChild and (c,sp) in mCommSlice))}(vInp2Lo[c,r,y,s,sp])  =  sum{FORIF: (c,r,y,s) in mTechInpTot} (vTechInpTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mStorageInpTot} (vStorageInpTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mExport} (vExport[c,r,y,s])+sum{FORIF: (c,r,y,s) in mTradeIrAInpTot} (vTradeIrAInpTot[c,r,y,s]);
 
-s.t.  eqSupOutTot{y in mMidMilestone, (c, r, s) in mSupOutTot}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup,sp in slice:(((((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice)))) and (s1,c,r,y,sp) in mSupAva))}(vSupOut[s1,c,r,y,sp]);
+s.t.  eqSupOutTot{y in mMidMilestone, (c, r, s) in mSupOutTot}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup,sp in slice:(((c,s,sp) in mCommSliceOrParent and (s1,c,r,y,sp) in mSupAva))}(vSupOut[s1,c,r,y,sp]);
 
-s.t.  eqTechInpTot{(c, r, y, s) in mTechInpTot}: vTechInpTot[c,r,y,s]  =  sum{sp in slice:((((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice)))))}(sum{t in tech:(((t,r,y) in mTechSpan and (t,c) in mTechInpComm and (t,sp) in mTechSlice))}(vTechInp[t,c,r,y,sp])+sum{t in tech:(((t,r,y) in mTechSpan and (t,c) in mTechAInp and (t,sp) in mTechSlice))}(vTechAInp[t,c,r,y,sp]));
+s.t.  eqTechInpTot{(c, r, y, s) in mTechInpTot}: vTechInpTot[c,r,y,s]  =  sum{t in tech,sp in slice:(((c,s,sp) in mCommSliceOrParent and (t,r,y) in mTechSpan and (t,c) in mTechInpComm and (t,sp) in mTechSlice))}(vTechInp[t,c,r,y,sp])+sum{t in tech,sp in slice:(((c,s,sp) in mCommSliceOrParent and (t,r,y) in mTechSpan and (t,c) in mTechAInp and (t,sp) in mTechSlice))}(vTechAInp[t,c,r,y,sp]);
 
-s.t.  eqTechOutTot{(c, r, y, s) in mTechOutTot}: vTechOutTot[c,r,y,s]  =  sum{sp in slice:((((s,sp) in mSliceParentChildE and (c,s) in mCommSlice) or ((s,sp) in mSameSlice and not(((c,s) in mCommSlice)))))}(sum{t in tech:(((t,sp) in mTechSlice and (t,r,y) in mTechSpan and (t,c) in mTechOutComm))}(vTechOut[t,c,r,y,sp])+sum{t in tech:(((t,sp) in mTechSlice and (t,r,y) in mTechSpan and (t,c) in mTechAOut))}(vTechAOut[t,c,r,y,sp]));
+s.t.  eqTechOutTot{(c, r, y, s) in mTechOutTot}: vTechOutTot[c,r,y,s]  =  sum{t in tech,sp in slice:(((c,s,sp) in mCommSliceOrParent and (t,sp) in mTechSlice and (t,r,y) in mTechSpan and (t,c) in mTechOutComm))}(vTechOut[t,c,r,y,sp])+sum{t in tech,sp in slice:(((c,s,sp) in mCommSliceOrParent and (t,sp) in mTechSlice and (t,r,y) in mTechSpan and (t,c) in mTechAOut))}(vTechAOut[t,c,r,y,sp]);
 
 s.t.  eqStorageInpTot{(c, r, y, s) in mStorageInpTot}: vStorageInpTot[c,r,y,s]  =  sum{st1 in stg:(((st1,c) in mStorageComm and pStorageInpEff[st1,c,r,y,s] and (st1,r,y) in mStorageSpan))}(vStorageInp[st1,c,r,y,s])+sum{st1 in stg:(((st1,c) in mStorageAInp and (st1,r,y) in mStorageSpan))}(vStorageAInp[st1,c,r,y,s]);
 

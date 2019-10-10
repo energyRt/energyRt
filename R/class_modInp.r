@@ -118,6 +118,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mStorageFullYear']] <- createParameter('mStorageFullYear', c('stg'), 'map', cls = 'storage')   
     .Object@parameters[['mTradeSlice']] <- createParameter('mTradeSlice', c('trade', 'slice'), 'map', cls = 'trade')   
     .Object@parameters[['mCommSlice']] <- createParameter('mCommSlice', c('comm', 'slice'), 'map', cls = 'commodity')   
+    .Object@parameters[['mCommSliceOrParent']] <- createParameter('mCommSliceOrParent', c('comm', 'slice', 'slicep'), 'map', cls = 'commodity')   
     .Object@parameters[['mSliceParentChildE']] <- createParameter('mSliceParentChildE', c('slice', 'slicep'), 'map')   
     .Object@parameters[['mSliceParentChild']] <- createParameter('mSliceParentChild', c('slice', 'slicep'), 'map')   
     # simple

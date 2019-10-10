@@ -152,8 +152,20 @@
   map_for_comm <- merge(tmp_map$mCommSlice, uu)[, c('comm', 'slicep')]
   colnames(map_for_comm) <- c('comm', 'slice')
   map_for_comm <- map_for_comm[!duplicated(map_for_comm), ]
+  # mCommSliceOrParent
+  l1 <- merge(getParameterData(prec@parameters$comm), getParameterData(prec@parameters$slice))
+  l2 <-merge(tmp_map$mCommSlice, tmp_map$mSliceParentChildE)[, c('comm', 'slice', 'slicep')]
+  l3 <- l2[!duplicated(l2[, c('comm', 'slicep')]), c('comm', 'slicep')]
+  colnames(l3)[2] <- 'slice'
+  l3 <- rbind(l1, l3)
+  l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast=TRUE), ]
+  l3$slicep <- l3$slice
+  mCommSliceOrParent <- rbind(l2, l3)
+  prec@parameters[['mCommSliceOrParent']] <- addData(prec@parameters[['mCommSliceOrParent']], mCommSliceOrParent)
+  
   reduce_total_map <- function(yy) {
-    merge(yy, map_for_comm, by = c('comm', 'slice'))[, colnames(yy)]
+    yy$slicep <- yy$slice; yy$slice <- NULL
+    reduce.duplicate(merge(yy, mCommSliceOrParent, by = c('comm', 'slicep'))[, -2])
   }
   prec@parameters[['mTechInpTot']] <- addData(prec@parameters[['mTechInpTot']], reduce_total_map(reduce.sect(merge(
       merge(tmp_map$mTechSlice, tmp_map$mTechSpan, by = 'tech'), rbind(tmp_map$mTechInpComm, tmp_map$mTechAInp), 
