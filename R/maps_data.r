@@ -306,7 +306,7 @@
     rs["eqStorageAfUp", c("name", "description")] <- c("eqStorageAfUp", "Storage availability factor upper");
     rs["eqStorageAfUp", c("stg", "comm", "region", "year", "slice", "vStorageStore", "vStorageCap")] <- TRUE;
     rs["eqStorageClean", c("name", "description")] <- c("eqStorageClean", "Storage input less Stote");
-    rs["eqStorageClean", c("stg", "comm", "region", "year", "slice", "vStorageInp", "vStorageStore")] <- TRUE;
+    rs["eqStorageClean", c("stg", "comm", "region", "year", "slice", "vStorageOut", "vStorageStore")] <- TRUE;
     rs["eqStorageAInp", c("name", "description")] <- c("eqStorageAInp", "");
     rs["eqStorageAInp", c("stg", "comm", "region", "year", "slice", "vStorageAInp", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageCap", "vStorageNewCap")] <- TRUE;
     rs["eqStorageAOut", c("name", "description")] <- c("eqStorageAOut", "");
@@ -598,9 +598,9 @@ rs
     rs["vDummyExport", c("name", "description")] <- c("vDummyExport", "Dummy export (for debugging)");
     rs["vDummyExport", c("comm", "region", "year", "slice", "eqInpTot", "eqCost")] <- TRUE;
     rs["vStorageInp", c("name", "description")] <- c("vStorageInp", "Storage input");
-    rs["vStorageInp", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageCost", "eqStorageInpTot")] <- TRUE;
+    rs["vStorageInp", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageCost", "eqStorageInpTot")] <- TRUE;
     rs["vStorageOut", c("name", "description")] <- c("vStorageOut", "Storage output");
-    rs["vStorageOut", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageAInp", "eqStorageAOut", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqStorageOutTot")] <- TRUE;
+    rs["vStorageOut", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqStorageOutTot")] <- TRUE;
     rs["vStorageStore", c("name", "description")] <- c("vStorageStore", "Storage accumulated level");
     rs["vStorageStore", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageCost")] <- TRUE;
     rs["vStorageInv", c("name", "description")] <- c("vStorageInv", "Storage technology investments");
@@ -1143,7 +1143,7 @@ rs
     rs["pStorageInpEff", c("name", "description", "type")] <- c("pStorageInpEff", "Storage input efficiency", "parameter");
     rs["pStorageInpEff", c("stg", "comm", "region", "year", "slice", "eqStorageStore")] <- TRUE;
     rs["pStorageOutEff", c("name", "description", "type")] <- c("pStorageOutEff", "Storage output efficiency", "parameter");
-    rs["pStorageOutEff", c("stg", "comm", "region", "year", "slice", "eqStorageStore")] <- TRUE;
+    rs["pStorageOutEff", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageClean")] <- TRUE;
     rs["pStorageStgEff", c("name", "description", "type")] <- c("pStorageStgEff", "Storage time-efficiency (annual)", "parameter");
     rs["pStorageStgEff", c("stg", "comm", "region", "year", "slice", "eqStorageStore")] <- TRUE;
     rs["pStorageStock", c("name", "description", "type")] <- c("pStorageStock", "Storage capacity stock", "parameter");

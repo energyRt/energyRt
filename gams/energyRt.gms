@@ -1168,10 +1168,10 @@ eqStorageAOut(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageA
 eqStorageStore(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)  and mStorageComm(stg, comm)
 and mStorageSpan(stg, region, year))..
   vStorageStore(stg, comm, region, year, slice) =e=
-  pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice)
-  +   sum(slicep$(mCommSlice(comm, slicep) and ((not(mStorageFullYear(stg)) and mSliceNext(slicep, slice))
+  sum(slicep$(mCommSlice(comm, slicep) and ((not(mStorageFullYear(stg)) and mSliceNext(slicep, slice))
          or (mStorageFullYear(stg) and mSliceFYearNext(slicep, slice)))),
-(pStorageStgEff(stg, comm, region, year, slice) ** pSliceShare(slice)) * vStorageStore(stg, comm, region, year, slicep))
+     pStorageInpEff(stg, comm, region, year, slice) * vStorageInp(stg, comm, region, year, slice)
+    +     (pStorageStgEff(stg, comm, region, year, slice) ** pSliceShare(slice)) * vStorageStore(stg, comm, region, year, slicep))
    - vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice);
 
 eqStorageAfLo(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)
@@ -1193,7 +1193,10 @@ eqStorageAfUp(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidM
 
 eqStorageClean(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year) and mStorageComm(stg, comm)
   and mStorageSpan(stg, region, year))..
-  vStorageInp(stg, comm, region, year, slice) =l= vStorageStore(stg, comm, region, year, slice);
+  vStorageOut(stg, comm, region, year, slice)  / pStorageOutEff(stg, comm, region, year, slice) =l=
+                 vStorageStore(stg, comm, region, year, slice);
+
+
 
 * Have to be simple
 eqStorageInpUp(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year) and mStorageComm(stg, comm)
