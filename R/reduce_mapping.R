@@ -342,7 +342,7 @@
     mTechOMCost <- merge(mTechOMCost[!duplicated(mTechOMCost), ], tmp_map$mTechSpan)
     prec@parameters[['mTechOMCost']] <- addData(prec@parameters[['mTechOMCost']], mTechOMCost)
     # mStorageOMCost(stg, region, year) 
-    mStorageOMCost <- rbind(tmp_nozero$pStorageFixom, tmp_nozero$pStorageCostInp[, c('stg', 'year')], 
+    mStorageOMCost <- rbind(tmp_nozero$pStorageFixom, tmp_nozero$pStorageCostInp[, c('stg', 'region', 'year')], 
       tmp_nozero$pStorageCostOut[, c('stg', 'region', 'year')], tmp_nozero$pStorageCostStore[, c('stg', 'region', 'year')])
     mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], tmp_map$mStorageSpan)
     prec@parameters[['mStorageOMCost']] <- addData(prec@parameters[['mStorageOMCost']], mStorageOMCost)
