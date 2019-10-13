@@ -975,8 +975,7 @@ eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechEac(tech, region, y
          sum((yearp)$
                  (       mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
                          ordYear(year) >= ordYear(yearp) and
-                         ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) and
-                         not(mTechOlifeInf(tech, region)) and pTechInvcost(tech, region, yearp) <> 0
+                         (mTechOlifeInf(tech, region) or ordYear(year) < pTechOlife(tech, region) + ordYear(yearp)) and pTechInvcost(tech, region, yearp) <> 0
                  ),
                   pTechEac(tech, region, yearp) * (
                    vTechNewCap(tech, region, yearp) -
@@ -1277,8 +1276,7 @@ eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
          sum((yearp)$
                  (       mStorageNew(stg, region, yearp) and mMidMilestone(yearp) and
                          ordYear(year) >= ordYear(yearp) and
-                         ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp) and
-                         not(mStorageOlifeInf(stg, region)) and pStorageInvcost(stg, region, yearp) <> 0
+                         (mStorageOlifeInf(stg, region) or ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp)) and pStorageInvcost(stg, region, yearp) <> 0
                  ),
                   pStorageEac(stg, region, yearp) * vStorageNewCap(stg, region, yearp)
          );
@@ -1426,8 +1424,8 @@ eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          sum((yearp)$
                  (       mTradeInv(trade, region, yearp) and mMidMilestone(yearp) and
                          ordYear(year) >= ordYear(yearp) and
-                         ordYear(year) < pTradeOlife(trade) + ordYear(yearp) and
-                         not(mTradeOlifeInf(trade)) and pTradeInvcost(trade, region, yearp) <> 0
+                         (mTradeOlifeInf(trade) or ordYear(year) < pTradeOlife(trade) + ordYear(yearp))
+                         and pTradeInvcost(trade, region, yearp) <> 0
                  ), pTradeEac(trade, region, yearp) * vTradeNewCap(trade, yearp));
 
 ********************************************************************************
