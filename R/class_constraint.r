@@ -147,6 +147,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     if (any(names(arg) == 'for.sum')) for.sum <- arg$for.sum
     if (any(names(arg) == 'defVal')) defVal <- arg$defVal
   }
+  # eqt, variable, mult, for.sum, arg
   st <- new('summand')
   st@variable <- variable
   if (!is.data.frame(mult) && is.list(mult)) {
@@ -169,7 +170,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   need.set <- .vrb_map[[variable]];
   need.set <- need.set[!(need.set %in% c(names(eqt@for.each), names(st@for.sum)))];
   for (i in need.set) {
-    st@for.sum[[i]] <- NULL
+    st@for.sum[i] <- list(NULL)
   }
   if (!all(names(st@mult) %in% c(names(eqt@for.each), names(st@for.sum), 'value')))
     stop(paste0('Wrong mult parameter, excessive set: "', paste0(names(st@mult)[!(names(st@mult) %in% names(st@for.sum))], collapse = '", "'), '"'))

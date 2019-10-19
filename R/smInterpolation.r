@@ -22,7 +22,13 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     for(i in 1:length(add_set_value))
         d3[1:nrow(dd), i] <- rep(add_set_value[i])
     colnames(d3) <- add_set_name
-    dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'value'), drop = FALSE])
+    stnd <- mtp@dimSetNames[-(1:length(d3))]
+    # It was added for trading routes
+    if (sum(colnames(frm) %in% c('region', 'src', 'dst')) == 3) {
+    	stnd[stnd == 'src'] <- 'region'
+    	stnd <- stnd[stnd != 'dst']
+    } 
+    dd <- cbind(d3, dd[, c(stnd, 'value'), drop = FALSE])
   }
   # For increase speed
   if (removeDefault)
@@ -60,7 +66,13 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     for(i in 1:length(add_set_value))
         d3[1:nrow(dd), i] <- rep(add_set_value[i])
     colnames(d3) <- add_set_name
-    dd <- cbind(d3, dd[, c(mtp@dimSetNames[-(1:length(d3))], 'type', 'value'), drop = FALSE])
+    stnd <- mtp@dimSetNames[-(1:length(d3))]
+    # It was added for trading routes
+    if (sum(colnames(frm) %in% c('region', 'src', 'dst')) == 3) {
+    	stnd[stnd == 'src'] <- 'region'
+    	stnd <- stnd[stnd != 'dst']
+    } 
+    dd <- cbind(d3, dd[, c(stnd, 'type', 'value'), drop = FALSE])
   }
   # For increase speed, not work for GLPK
   dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]

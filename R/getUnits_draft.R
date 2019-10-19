@@ -166,27 +166,11 @@ getUnits <- function(tech) {
   
   u$act2ainp <- n2acomm(tech@aeff, "act2ainp", u$act)
   u$act2aout <- n2acomm(tech@aeff, "act2aout", u$act)
-  u$use2ainp <- n2acomm(tech@aeff, "use2ainp", u$use)
-  u$use2aout <- n2acomm(tech@aeff, "use2aout", u$use)
   u$cap2ainp <- n2acomm(tech@aeff, "cap2ainp", u$cap)
   u$cap2aout <- n2acomm(tech@aeff, "cap2aout", u$cap)
   u$ncap2ainp <- n2acomm(tech@aeff, "ncap2ainp", u$cap)
   u$ncap2aout <- n2acomm(tech@aeff, "ncap2aout", u$cap)
-  # } else {
-  #   u$cinp2ainp <- NA 
-  #   u$cinp2aout <- NA
-  #   u$cout2ainp <- NA
-  #   u$cout2aout <- NA
-  #   u$act2ainp <- NA
-  #   u$act2aout <- NA
-  #   u$use2ainp <- NA
-  #   u$use2aout <- NA
-  #   u$cap2ainp <- NA
-  #   u$cap2aout <- NA
-  #   u$ncap2ainp <- NA
-  #   u$ncap2aout <- NA
-  #   }
-  
+
   u$af <- NA # !!!
   
   #costs ========================================= ####

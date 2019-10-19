@@ -4,21 +4,19 @@ setClass("trade",
           name          = "character",       # Short name
           description   = "character",       # Details
           commodity     = "character",       # Vector if NULL that
-          source        = "character",       # if NULL that in all region
-          destination   = "character",       # if NULL that in all region
+          routes        = "data.frame",       
       # Performance parameters
           trade         = "data.frame",
           aux           = "data.frame",      #
           aeff         = "data.frame",    #  Commodity efficiency
       	invcost = "data.frame",
-      	olife = "data.frame",
-      	start = "data.frame",
-      	end = "data.frame",
+      	olife = "numeric",
+      	start = "numeric",
+      	end = "numeric",
       	stock = "data.frame",
       	capacityVariable = "logical",
       	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
       	cap2act       = "numeric",         #
-      	bidirectional = "logical",
       	misc = "list"
       ),
 	# Default values and structure of slots
@@ -27,8 +25,10 @@ setClass("trade",
 		name           = "default_trade",       # Short name
 		description    = "",
 		commodity      = NULL,       #
-		source         = character(),
-		destination    = character(),
+		routes       = data.frame(
+		  src        = character(),
+		  dst        = character(),
+		  stringsAsFactors = FALSE),
 		trade          = data.frame(
 			src        = character(),
 			dst        = character(),
@@ -42,29 +42,14 @@ setClass("trade",
 			teff        = numeric(),
 			stringsAsFactors = FALSE),
 		invcost = data.frame(
-			src        = character(),
-			dst        = character(),
+			region        = character(),
 			year       = numeric(),
 			invcost    = numeric(),
 			stringsAsFactors = FALSE),
-		olife = data.frame(
-			src        = character(),
-			dst        = character(),
-			olife    = numeric(),
-			stringsAsFactors = FALSE),
-		start = data.frame(
-			src        = character(),
-			dst        = character(),
-			start    = numeric(),
-			stringsAsFactors = FALSE),
-		end = data.frame(
-			src        = character(),
-			dst        = character(),
-			end    = numeric(),
-			stringsAsFactors = FALSE),
+		olife = Inf,
+		start = -Inf,
+		end = Inf,
 		stock         = data.frame(
-			src = character(),
-			dst = character(),
 			year  = integer(),
 			stock = numeric(),
 			stringsAsFactors = FALSE),
@@ -86,8 +71,6 @@ setClass("trade",
 			stringsAsFactors = FALSE),
 		cap2act       = 1,         #
 		GIS           = NULL,
-		# slice = NULL,
-		bidirectional = FALSE,
 		#! Misc
 		misc = list(
 		)),

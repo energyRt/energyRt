@@ -9,9 +9,10 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
   arg <- list(...)
   if (length(defVal) != 1) stop('defVal value not define')
   # Get slice
-  prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'regionp', 'src', 'dst', 'slice', 'year')
-  true_prior <- c('tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 'regionp', 'src', 'dst', 
-    'year', 'slice')
+  prior <-      c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
+    'regionp', 'src', 'dst', 'slice', 'year')
+  true_prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
+    'regionp', 'src', 'dst', 'year', 'slice')
   rule <- arg$rule
   approxim <- arg$approxim
   if (is.null(approxim)) {
