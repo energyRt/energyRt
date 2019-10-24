@@ -22,7 +22,7 @@
 
 ### Development status
 
-The current functionality allows development of multi-regional RES models frombasic to well advanced level of complexity, including exogenous or endogenous trade routes (for example, electricity grid), multilevel/nested time-slices, flexible definition of technologies, storages. By now, the best way to test the functionality of the package is to check the fully functional examples of the model (see bellow). The package documentation is in development. 
+The current functionality allows development of multi-regional RES models from basic to well advanced level of complexity, including multiple regions, exogenous or endogenous interregional trade routes (for example, electricity grid), multilevel/nested time-slices, as well as flexible definition of technologies, storages. The package documentation is in development. By now, the best way to test the functionality of the package is to check fully functional examples of the model (see *Examples* bellow).  
 
 ## Installation
 
