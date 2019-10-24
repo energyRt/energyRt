@@ -9,9 +9,11 @@ summary.scenario <- function(scen) {
   cat("Scenario: ", scen@name, "\n")
   cat("Model: ", scen@model@name, "\n")
   cat("Solution status: ", scen@modOut@solutionStatus, "\n")
+  vObj <- getData(scen, "vObjective")
+  cat("vObjective: ", vObj$value, "\n")
   dum <- sum(scen@modOut@variables$vDummyCost$value)
-  cat("Dummy import/export costs: ", dum, "\n")
   if (abs(dum) >= 0) {
+    cat("Dummy import/export costs: ", dum, "\n")
     # Dummy import
     # Dummy export
   }

@@ -9,7 +9,7 @@
 - helps to analyze data, check for errors and bugs before parsing it into solver,  
 - parses your dataset to GAMS or GLPK and runs them to solve the model,  
 - reads the solution and imports results back to R,  
-- assists with an analysis of results and reporting. 
+- assists with an analysis of results and reporting.  
 
 ### Motivation
 
@@ -22,14 +22,14 @@
 
 ### Development status
 
-The project is in an preparation of the first official release, which includes the documentation and a set of examples (**expected - Nov 2018**). Current functionality allows development of multi-regional RES models with trade, time-slices, and variety of technologies, an integration with GIS (via _sp_ and _choropleth_ packages), pivot tables (via _rPivotTable_), authomatic _pdf-reports_ for models and scenarios, analysis of levelized costs of tehcnologies, and other features.
+The current functionality allows development of multi-regional RES models frombasic to well advanced level of complexity, including exogenous or endogenous trade routes (for example, electricity grid), multilevel/nested time-slices, flexible definition of technologies, storages. By now, the best way to test the functionality of the package is to check the fully functional examples of the model (see bellow). The package documentation is in development. 
 
 ## Installation
 
 ### Prerequisites
    
 #### R and RStudio
-Assuming that R is already installed (if not, please download and install from https://www.r-project.org/), we also recommend RStudio (https://www.rstudio.com/), a powerful IDE (Integrated Development Environment) for R. It simplifies usage of R, provides number of features such as reproducible research (integration with Markdown, Sweave), integration with  version control (github, svn).  
+Assuming that R is already installed (if not, please download and install from https://www.r-project.org/), we also recommend RStudio (https://www.rstudio.com/), a powerful IDE (Integrated Development Environment) for R. It simplifies usage of R, provides number of features such as reproducible research (integration with Markdown, Sweave), integration with  version control (github, svn).   
 
 #### GAMS or GLPK to solve the model   
 The cost-minimising linear programming model (the set of equation for LP problem), emboddied into *energyRt* package requires additional software to solve it. Currently *energyRt* model code  is written in *GAMS* and *GLPK*, *Julia* version is in progress, at least one of them is required to solve the model.
@@ -40,11 +40,12 @@ GAMS path should be also added to the environmental variables in your operating 
 
 *GLPK* is an open source Linear Programming Kit which includes powerful LP and MIP solver, and basic language for creating mathematical programming models (Mathprog or GMPL – for details see https://en.wikibooks.org/wiki/GLPK/GMPL_%28MathProg%29) 
 
-GLPK/GMPL is an open source alternative to GAMS, but only for LP and MIP problems. GLPK/GMPL is a bit slower than GAMS for small models, and significantly slower for large models, partially because of the slower Mathprog (GMPL) language processor.
-Installing GLPK on PC/Windows systems
-##### Download GLPK binaries for Windows:
-https://sourceforge.net/projects/winglpk/
+GLPK/GMPL is an open source alternative to GAMS, but only for LP and MIP problems. GLPK/GMPL is a bit slower than GAMS for small models, and significantly slower for large models, partially because of the slower Mathprog (GMPL) language processor.  
 
+##### Installing GLPK on PC/Windows systems   
+Download GLPK binaries for Windows:
+https://sourceforge.net/projects/winglpk/
+Follow the installation instructions, and add the path to the Windows environment variables.   
 
 ##### Installing GLPK on Mac systems
 We are not familiar if there are any GLPK-binaries/installers for Mac OSx. Therefore the following example is for installed from source with a standard procedure:
