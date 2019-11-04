@@ -98,7 +98,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
       close(zz_data_gms)    
       ### Model code to text
       .generate_gpr_gams_file(arg$dir.result)
-      zz <- file(paste(arg$dir.result, '/mdl.gms', sep = ''), 'w')
+      zz <- file(paste(arg$dir.result, '/energyRt.gms', sep = ''), 'w')
       cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
       # Add parameter constraint declaration
       if (length(scen@modInp@gams.equation) > 0) {
@@ -163,10 +163,10 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
       tryCatch({
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
-          rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter), invisible = arg$invisible, 
+          rs <- system(paste('gams energyRt.gms', arg$gamsCompileParameter), invisible = arg$invisible, 
                        show.output.on.console = arg$show.output.on.console)
         } else {
-          rs <- system(paste('gams mdl.gms', arg$gamsCompileParameter))
+          rs <- system(paste('gams energyRt.gms', arg$gamsCompileParameter))
         }
         setwd(BEGINDR)  
       }, interrupt = function(x) {
@@ -180,7 +180,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
       })    
       if (rs != 0) stop(paste('Solution error code', rs))
       if (arg$only.listing) {
-        return(readLines(paste(arg$dir.result, '/mdl.lst', sep = '')))
+        return(readLines(paste(arg$dir.result, '/energyRt.lst', sep = '')))
       }
       if(arg$echo) cat('', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
     }
@@ -209,7 +209,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     }
     
     ### FUNC GLPK 
-    zz <- file(paste(arg$dir.result, '/glpk.mod', sep = ''), 'w')
+    zz <- file(paste(arg$dir.result, '/energyRt.mod', sep = ''), 'w')
     if (length(grep('^minimize', run_code)) != 1) stop('Errors in GLPK model')
     
     cat(run_code[1:(grep('22b584bd-a17a-4fa0-9cd9-f603ab684e47', run_code) - 1)], sep = '\n', file = zz)
@@ -224,7 +224,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
         sep = '\n', file = zz)
     cat(run_code[grep('^end[;]', run_code):length(run_code)], sep = '\n', file = zz)
     close(zz)
-    zz <- file(paste(arg$dir.result, '/glpk.dat', sep = ''), 'w') 
+    zz <- file(paste(arg$dir.result, '/energyRt.dat', sep = ''), 'w') 
     cat('set FORIF := FORIFSET;\n', sep = '\n', file = zz)
     cat(file_w, sep = '\n', file = zz) 
     cat('end;', '', sep = '\n', file = zz) 
@@ -241,18 +241,18 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
           if (arg$solver  == 'GLPK') {
-            rs <- system(paste('glpsol.exe -m glpk.mod -d glpk.dat --log output/log.csv', arg$glpkCompileParameter), 
+            rs <- system(paste('glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
                          invisible = arg$invisible, show.output.on.console = arg$show.output.on.console)
           } else {
-            rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter, 
+            rs <- system(paste("cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter, 
                                show.output.on.console = arg$show.output.on.console,  invisible = arg$invisible))
           }
         } else {
           if (arg$solver  == 'GLPK') {
-            rs <- system(paste('glpsol -m glpk.mod -d glpk.dat --log output/log.csv', 
+            rs <- system(paste('glpsol -m energyRt.mod -d energyRt.dat --log output/log.csv', 
                                arg$glpkCompileParameter)) #, mustWork = TRUE)
           } else {
-            rs <- system(paste("cbc glpk.mod%glpk.dat -solve", arg$cbcCompileParameter))
+            rs <- system(paste("cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter))
           }
         }
         setwd(BEGINDR)  
