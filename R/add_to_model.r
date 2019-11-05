@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------------------------------------------
 #! add_to_model <- function(x, y) : Add to model
 #---------------------------------------------------------------------------------------------------------
-add.model <- function(obj, ..., repos.name = NULL) {
+add.model <- function(obj, ..., overwrite = FALSE, repos.name = NULL) {
   cls <- c('technology', 'commodity', 'region', 'commodity', 'constraint', 
            'stock', 'supply', 'weather', 'demand', 'reserve', 'trade', 'export', 'import', 'storage', 'tax', 'sub')
   if (class(obj) != "model") stop('Wrong argument')
@@ -28,7 +28,7 @@ add.model <- function(obj, ..., repos.name = NULL) {
     ff <- c(sapply(obj@data, function(z) z@name), recursive = TRUE)
     fl <- seq(alon = ff)[ff ==  repos.name]
     for(i in seq(along = app)) {
-      obj@data[[fl]] <- add(obj@data[[fl]], app[[i]])
+      obj@data[[fl]] <- add(obj@data[[fl]], app[[i]], overwrite = overwrite)
     }
   }
   app <- list(...)
