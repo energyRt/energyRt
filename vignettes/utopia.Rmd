@@ -525,7 +525,7 @@ ECOA <- newTechnology(
   ),
   aeff = list(
     acomm = c("HG", "NOX", "SO2", "PM"),
-    use2aout = c(0.1, 1.0, 2.0, .2)
+    act2aout = c(0.1, 1.0, 2.0, .2)
   ),
   afs = list(
     slice = "ANNUAL",
@@ -582,7 +582,7 @@ EGAS <- newTechnology(
   ),
   aeff = list(
     acomm = c("NOX", "CH4"),
-    use2aout = c(1.5, .1) # arbitrary
+    act2aout = c(1.5, .1) # arbitrary
   ),
   afs = list(
     slice = "ANNUAL",
@@ -637,7 +637,7 @@ EBIO <- newTechnology(
   ),
   aeff = list(
     acomm = c("NOX", "PM", "CH4"),
-    use2aout = c(0.1, 1, .01)
+    act2aout = c(0.1, 1, .01)
   ),
   afs = list(
     # activity level bounds per sum of listed slices ('ANNUAL')
