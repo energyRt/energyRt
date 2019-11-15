@@ -65,7 +65,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   dir.create(arg$dir.result, recursive = TRUE, showWarnings = FALSE)
   if (arg$open.folder) shell.exec(arg$dir.result)
   # Check if gams (if it use) is available
-  if (arg$solver == 'GAMS') {
+  if (arg$solver == 'GAMS' && arg$run) {
     rs <- try(system('gams'))
     if (rs != 0) stop('There is no gams')
   }
