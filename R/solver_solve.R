@@ -2,11 +2,12 @@ write_model <- function(..., tmp.dir = NULL) {
   solver_solve(..., run = FALSE, tmp.dir = tmp.dir, write = TRUE)
 }
 
-solve_model <- function(tmp.dir, ...) {
-  solver_solve(scen = NULL, tmp.dir = tmp.dir,  write = FALSE, ...)
+solve_model <- function(tmp.dir, wait = TRUE, invisible = wait, ...) {
+  solver_solve(scen = NULL, tmp.dir = tmp.dir, wait = wait, write = FALSE, invisible = invisible, ...)
 }
 
-solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, write = TRUE) { # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
+solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, 
+                         write = TRUE, wait = TRUE, invisible = wait) { # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # solver = 'GAMS' use solver for model
   # tmp.dir - solver working directore
@@ -23,11 +24,13 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   if (is.null(arg$solver)) arg$solver <- 'GAMS'
   if (is.null(arg$open.folder)) arg$open.folder <- FALSE
   if (is.null(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
-  if (is.null(arg$invisible)) arg$invisible <- FALSE
+  # if (is.null(arg$invisible)) arg$invisible <- FALSE
+  arg$invisible <- invisible
   if (is.null(arg$only.listing)) arg$only.listing <- FALSE
   if (is.null(arg$tmp.del)) arg$tmp.del <- FALSE
   if (is.null(arg$readresult)) arg$readresult <- TRUE
   arg$write <- write
+  arg$wait < wait
   if (is.null(arg$write)) arg$write <- TRUE
   if (is.null(arg$run)) arg$run <- TRUE
   # if (is.null(arg$onefile)) arg$onefile <- FALSE
@@ -38,12 +41,10 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     } else {
       stop("check `dir.result` and `tmp.dir` - only one should be used")
     }
+  } else {
+    # temporary - will be depreciated
+    arg$dir.result <- arg$tmp.dir
   }
-  if (is.null(arg$tmp.dir)) {
-    arg$tmp.dir <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, scen@name, 
-          format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
-  }
-  arg$dir.result <- arg$tmp.dir
   
   if (is.null(scen)) {
     # browser()
@@ -52,7 +53,14 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     }
   } else {
     scen@misc$dir.result <- arg$dir.result
+    tmp_name <- scen@name
   }
+  
+  if (is.null(arg$tmp.dir)) {
+    arg$tmp.dir <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, tmp_name, #scen@name, 
+          format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
+  }
+  arg$dir.result <- arg$tmp.dir
   
   # interpolate 
   if (interpolate) scen <- energyRt::interpolate(scen, ...)
@@ -67,7 +75,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   # Check if gams (if it use) is available
   if (arg$solver == 'GAMS' && arg$run) {
     rs <- try(system('gams'))
-    if (rs != 0) stop('There is no gams')
+    if (rs != 0) stop('GAMS is not found')
   }
   
   # Generate code for GAMS
@@ -163,10 +171,16 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
       tryCatch({
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
-          rs <- system(paste('gams energyRt.gms', arg$gamsCompileParameter), invisible = arg$invisible, 
-                       show.output.on.console = arg$show.output.on.console)
+          if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
+          rs <- shell(paste(cmd, 'gams energyRt.gms', arg$gamsCompileParameter), 
+                       invisible = arg$invisible, wait = wait
+                       # show.output.on.console = arg$show.output.on.console
+                      )
         } else {
-          rs <- system(paste('gams energyRt.gms', arg$gamsCompileParameter))
+          rs <- system(paste('gams energyRt.gms', arg$gamsCompileParameter), 
+                       invisible = arg$invisible, wait = wait
+                       # show.output.on.console = arg$show.output.on.console
+                       )
         }
         setwd(BEGINDR)  
       }, interrupt = function(x) {
@@ -240,19 +254,25 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
       tryCatch({
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
+          if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
           if (arg$solver  == 'GLPK') {
-            rs <- system(paste('glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
-                         invisible = arg$invisible, show.output.on.console = arg$show.output.on.console)
+            rs <- shell(paste(cmd, 'glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
+                         invisible = arg$invisible, wait = wait,
+                         show.output.on.console = arg$show.output.on.console)
           } else {
-            rs <- system(paste("cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter, 
-                               show.output.on.console = arg$show.output.on.console,  invisible = arg$invisible))
+            rs <- shell(paste(cmd, "cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter, 
+                               invisible = arg$invisible, wait = wait,
+                               show.output.on.console = arg$show.output.on.console))
           }
         } else {
           if (arg$solver  == 'GLPK') {
             rs <- system(paste('glpsol -m energyRt.mod -d energyRt.dat --log output/log.csv', 
+                               invisible = arg$invisible, wait = wait,
                                arg$glpkCompileParameter)) #, mustWork = TRUE)
           } else {
-            rs <- system(paste("cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter))
+            rs <- system(paste("cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter),
+                         invisible = arg$invisible, wait = wait,
+                         show.output.on.console = arg$show.output.on.console)
           }
         }
         setwd(BEGINDR)  
