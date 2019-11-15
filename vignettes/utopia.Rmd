@@ -1090,7 +1090,7 @@ for (src_nm in unique(trd_dt$src)) {
                     ),
                   #!!! New stuff - testing
                   capacityVariable = TRUE, # endogenous trade capacity & investments
-                  bidirectional = TRUE, # oppenes reverse direction of the trade
+                  #bidirectional = TRUE, # oppenes reverse direction of the trade
                   invcost = data.frame(
                     src = src_nm,
                     dst = dst_nms,
@@ -1132,7 +1132,7 @@ for (i in 1:dim(trd_dt)[1]) {
                     ),
                   #!!! New stuff - testing
                   capacityVariable = TRUE, # The trade route has capacity (not just flow) and can be endogenous
-                  bidirectional = TRUE, #
+                  #bidirectional = TRUE, #
                   invcost = data.frame(
                     src = src,
                     dst = dst,
