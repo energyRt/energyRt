@@ -1092,8 +1092,8 @@ for (src_nm in unique(trd_dt$src)) {
                   capacityVariable = TRUE, # endogenous trade capacity & investments
                   #bidirectional = TRUE, # oppenes reverse direction of the trade
                   invcost = data.frame(
-                    src = src_nm,
-                    dst = dst_nms,
+                    region = src_nm,
+                    #dst = dst_nms,
                     invcost = trd_dt$distance_km[ii] / 1e3 * 250 # Assuming $250 MUSD/1000km
                   )
                   )
@@ -1134,14 +1134,14 @@ for (i in 1:dim(trd_dt)[1]) {
                   capacityVariable = TRUE, # The trade route has capacity (not just flow) and can be endogenous
                   #bidirectional = TRUE, #
                   invcost = data.frame(
-                    src = src,
-                    dst = dst,
+                    region = src,
+                    #dst = dst,
                     year = 2010,
                     invcost = trd_dt$distance_km[i] / 1e3 * 250 # Assuming $250 MUSD/1000km
                   ),
-                  olife = data.frame(
-                    olife = 80
-                  ),
+                  # olife = data.frame(
+                    olife = 80,
+                  # ),
                   cap2act = convert("GWh", "PJ", 24*365)
                   )
 
