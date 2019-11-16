@@ -8,6 +8,17 @@
 #prec <- .Object
 
 .reduce_mapping <- function(prec) {
+  
+  # Clean previous set data if any
+  clean_list <- c('mCommSliceOrParent', 'mTechInpTot', 'mTechOutTot', 'mSupOutTot', 'mDemInp', 'mTechEmsFuel', 'mEmsFuelTot',
+                  'mDummyImport', 'mDummyExport', 'mDummyCost', 'mTradeIr', 'mTradeIrUp','mTradeIrAInp2','mTradeIrAInpTot',
+                  'mTradeIrAOut2','mTradeIrAOutTot','mImportRow','mImportRowUp','mImportRowAccumulatedUp','mExportRow','mExportRowUp',
+                  'mExportRowAccumulatedUp','mExport','mImport','mStorageInpTot','mStorageOutTot','mTaxCost',
+                  'mSubsCost','mAggOut','mSupAva','mSupAvaUp','mSupReserveUp','mTechAfUp','mTechAfcUp','mTechOlifeInf',
+                  'mStorageOlifeInf','mOut2Lo','mInp2Lo','mTechOMCost','mStorageOMCost')
+  for (i in clean_list)
+    prec@parameters[[i]] <- .clearParameter(prec@parameters[[i]])
+  
   #assign('prec', prec, globalenv())
   # cat('begin reduce mapping\n'); flush.console()
   # stop()

@@ -94,7 +94,12 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
 })
 
 createParameter <- function(...) new('parameter', ...)
-
+.clearParameter <- function(x) {
+  x@data <- x@data[0,, drop = FALSE]
+  if (x@nValues > 0)
+    x@nValues <- 0
+  x
+} 
 # Add data to Map Table with check new data
 setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
   function(obj, data) {

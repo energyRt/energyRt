@@ -383,7 +383,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   approxim = 'list'), function(obj, app, approxim) {
-  #  assign('obj', obj, globalenv())
+    clean_list <- c('mSliceParentChild', 'mSliceParentChildE', 'mSliceNext', 'mSliceFYearNext', 'pDiscount', 'pSliceShare', 'pDummyImportCost', 
+      'pDummyExportCost', 'mStartMilestone', 'mEndMilestone', 'mMilestoneLast', 'mMilestoneFirst', 'mMilestoneNext', 
+      'mMilestoneHasNext', 'mSameSlice', 'mSameRegion', 'ordYear', 'cardYear', 'pPeriodLen', 'pDiscountFactor', 'mDiscountZero')
+    for (i in clean_list)
+      obj@parameters[[i]] <- .clearParameter(obj@parameters[[i]])
+    #  assign('obj', obj, globalenv())
   #  assign('app', app, globalenv())
   #  assign('approxim', approxim, globalenv())
   obj <- removePreviousSysInfo(obj)
