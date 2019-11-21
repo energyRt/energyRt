@@ -92,12 +92,36 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 				}
 			}                
 		} else {
-			if (nrow(stg@aeff) != 0)
-				stop(paste0('Unknown aux commodity "', paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'), '", in storage "', stg@name, '"'))
+			if (nrow(stg@aeff) != 0 && any(stg@aeff$acomm[!is.na(stg@aeff$acomm)]))
+				stop(paste0('Unknown aux commodity "', paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'), 
+				            '", in storage "', stg@name, '"'))
+		}
+		if (any(!is.na(stg@aeff$ncap2stg) & stg@aeff$ncap2stg != 0)) {
+		  fl <- (!is.na(stg@aeff$ncap2stg) & stg@aeff$ncap2stg != 0)
+		  if (any(is.na(stg@aeff[fl, c('region', 'year', 'slice')])))
+		    stop(paste0('Approximation is not allowed for storage "', stg@name, '" parameter ncap2stg'))
+		  tmp <- stg@aeff[fl, c('region', 'year', 'slice', 'ncap2stg')]
+		  tmp$stg <- stg@name
+		  tmp$comm <- stg@commodity
+		  tmp$value <- tmp$ncap2stg
+		  tmp <- tmp[, c('stg', 'comm', 'region', 'year', 'slice', 'value')]
+		  obj@parameters[['pStorageNCap2Stg']] <- addData(obj@parameters[['pStorageNCap2Stg']], tmp)
+		}
+		if (any(!is.na(stg@stock$charge) & stg@stock$charge != 0)) {
+		  fl <- (!is.na(stg@stock$charge) & stg@stock$charge != 0)
+		  if (any(is.na(stg@stock[fl, c('region', 'year', 'slice')])))
+		    stop(paste0('Approximation is not allowed for storage "', stg@name, '" parameter charge'))
+		  tmp <- stg@stock[fl, c('region', 'year', 'slice', 'charge')]
+		  tmp$stg <- stg@name
+		  tmp$comm <- stg@commodity
+		  tmp$value <- tmp$charge
+		  tmp <- tmp[, c('stg', 'comm', 'region', 'year', 'slice', 'value')]
+		  obj@parameters[['pStorageCharge']] <- addData(obj@parameters[['pStorageCharge']], tmp)
 		}
 		# Some slice
 		
-		stock_exist <- simpleInterpolation(stg@stock, 'stock', obj@parameters[['pStorageStock']], approxim, 'stg', stg@name)
+		stock_exist <- simpleInterpolation(stg@stock[, colnames(stg@stock) != 'slice'], 'stock', 
+		                                   obj@parameters[['pStorageStock']], approxim, 'stg', stg@name)
 		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']], stock_exist)
 		invcost <- simpleInterpolation(stg@invcost, 'invcost', obj@parameters[['pStorageInvcost']], approxim, 'stg', stg@name)
 		obj@parameters[['pStorageInvcost']] <- addData(obj@parameters[['pStorageInvcost']], invcost)
