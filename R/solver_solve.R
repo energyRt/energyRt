@@ -256,11 +256,11 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         if (.Platform$OS.type == "windows") {
           if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
           if (arg$solver  == 'GLPK') {
-            rs <- shell(paste(cmd, 'glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
+            rs <- system(paste(cmd, 'glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
                          invisible = arg$invisible, wait = wait,
                          show.output.on.console = arg$show.output.on.console)
           } else {
-            rs <- shell(paste(cmd, "cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter, 
+            rs <- system(paste(cmd, "cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter, 
                                invisible = arg$invisible, wait = wait,
                                show.output.on.console = arg$show.output.on.console))
           }
