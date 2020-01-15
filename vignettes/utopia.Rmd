@@ -1249,6 +1249,12 @@ mdl@sysInfo@milestone
 
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T}
+mysolver = 'GLPK'
+mdl@data[[1]]@data$ECOA
+scen_BASE <- interpolate(mdl, name = "BASE")
+
+pTechStock <- scen_BASE@modInp@parameters$pTechStock@data
+pTechStock[pTechStock$tech == 'ECOA' & pTechStock$region == 'R1', ]
 
 scen_BASE <- solve(mdl, name = "BASE", 
                    # tmp.path = "C:/solwork",
@@ -1418,11 +1424,14 @@ trd_cap <- getData(scen, name = "vTradeCap", merge = T,
                    newNames = c("value" = "GW"))
 trd_cap
 
+trd_cap$src <- sapply(strsplit(trd_cap$trade, '_'), function(x) x[3])
+trd_cap$dst <- sapply(strsplit(trd_cap$trade, '_'), function(x) x[4])
+
 # Adding location information for regions' centers
 trd_cap <- trd_cap %>%
   left_join(reg_centers[,1:3], by = c("src" = "region")) %>%
   left_join(reg_centers[,1:3], by = c("dst" = "region")) %>%
-  rename(xsrc = x.x, ysrc = y.x, xdst = x.y, ydst = y.y) 
+  rename(xsrc = x.x, ysrc = y.x, xdst = x.y, ydst = y.y)  
   # mutate(GWh = convert("PJ", "GWh", value))
 trd_cap
 
@@ -1507,7 +1516,7 @@ figpath <- file.path(homedir, "tmp/fig")
 if (!dir.exists(figpath)) dir.create(figpath, recursive = T, showWarnings = F)
 library(animation)
 setwd(figpath)
-saveLatex({
+  saveLatex({
   n <- 1
   for (s in slc$slice) {
     pp <- ftrd_flo_map(s, year = 2055)
