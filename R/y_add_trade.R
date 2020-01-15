@@ -79,7 +79,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		simpleInterpolation2 <- function(frm, ...) {
 			if (nrow(frm) == 0) return(data.frame())
 			frm <- imply_routes(frm)
-			frm$region <- paste0(trd@routes$src, '##', trd@routes$dst)
+			frm$region <- paste0(frm$src, '##', frm$dst)
 			frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
 			dd <- simpleInterpolation(frm, ...)
 			dd$src <- gsub('##.*', '', dd$region)
@@ -90,7 +90,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		multiInterpolation2 <- function(frm, ...) {
 			if (nrow(frm) == 0) return(data.frame())
 			frm <- imply_routes(frm)
-			frm$region <- paste0(trd@routes$src, '##', trd@routes$dst)
+			frm$region <- paste0(frm$src, '##', frm$dst)
 			frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
 			dd <- multiInterpolation(frm, ...)
 			dd$src <- gsub('##.*', '', dd$region)
