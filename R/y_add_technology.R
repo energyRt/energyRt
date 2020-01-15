@@ -202,8 +202,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		obj@parameters[['pTechCap2act']] <- addData(obj@parameters[['pTechCap2act']],
 			data.frame(tech = tech@name, value = tech@cap2act))
 		dd <- data.frame(
-		  list = c('pTechFixom', 'pTechStock', 'pTechVarom'),
-			table = c('fixom', 'stock', 'varom'), 
+		  list = c('pTechFixom', 'pTechVarom'),
+			table = c('fixom', 'varom'), 
 			stringsAsFactors = FALSE)
 		for(i in 1:nrow(dd)) {
 			obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
