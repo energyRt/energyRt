@@ -27,13 +27,13 @@
 	approxim$discountFactor <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscountFactor', FALSE)
 	approxim$discount <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscount', FALSE)
 	yy <- approxim$discountFactor
-	ll <- NULL
-	for (rg in unique(yy$region)) {
-		l1 <- yy[yy$region == rg, ]
-		l1$value <- cumsum(l1$value)
-		if (is.null(ll)) ll <- l1 else ll <- rbind(ll, l1)
-	}
-	approxim$discountCum <- ll
+	# ll <- NULL
+	# for (rg in unique(yy$region)) {
+	# 	l1 <- yy[yy$region == rg, ]
+	# 	l1$value <- cumsum(l1$value)
+	# 	if (is.null(ll)) ll <- l1 else ll <- rbind(ll, l1)
+	# }
+	# approxim$discountCum <- ll
 	approxim
 }
 # Get commodity slice map for interpolate
