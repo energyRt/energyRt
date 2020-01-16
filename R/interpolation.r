@@ -1,10 +1,12 @@
 .interpolation0 <- function(obj, parameter, defVal, arg) { 
-
+  # obj <- interpolation_message$interpolation0_arg$obj;
+  # parameter <- interpolation_message$interpolation0_arg$parameter;
+  # defVal <- interpolation_message$interpolation0_arg$defVal;
+  # arg <- interpolation_message$interpolation0_arg$arg;
   # Remove not used approxim
-  
   if (length(defVal) != 1) stop('defVal value not define')
   # Get slice
-  prior <-      c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
+  prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
     'regionp', 'src', 'dst', 'slice', 'year')
   true_prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
     'regionp', 'src', 'dst', 'year', 'slice')
@@ -150,7 +152,7 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
       .interpolation0(obj, parameter, defVal, arg)
     }, error = function(cond) {
       assign('interpolation_message', list(tracedata = sys.calls(), 
-        interpolation0_arg = list(obj = obj, parameter = parameter, defVal = defVal, arg)), globalenv())
+        interpolation0_arg = list(obj = obj, parameter = parameter, defVal = defVal, arg = arg)), globalenv())
       message('\nThere are error during interpolation function, more information in "interpolation_message"\n')
       stop(cond)
     })
