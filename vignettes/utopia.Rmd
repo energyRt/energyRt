@@ -5,6 +5,12 @@ author: "Oleg Lugovoy, Vladimir Potashnikov"
 date: "`r Sys.Date()`"
 # output: rmarkdown::html_vignette
 output:
+  html_document: 
+    highlight: tango
+    theme: journal
+    toc: yes
+    toc_depth: 5
+    toc_float: yes
   pdf_document: 
     fig_caption: yes
     fig_crop: no
@@ -13,16 +19,12 @@ output:
     highlight: tango
     toc: yes
     toc_depth: 4
-  html_document: 
-    highlight: tango
-    theme: journal
-    toc: yes
-    toc_depth: 5
-    toc_float: yes
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -57,18 +59,28 @@ This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <
 We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/olugovoy/energyRt/>).   
 ```{r setup}
 # Choose your solver-software
-# mysolver = "GAMS"
+# 
+mysolver = "GAMS"
 mysolver = "GLPK"
 
 if (T) {
   # Installation of required packages - if not installed.
   mypks <- rownames(installed.packages())
+  # General tools, data handling, visualisation
   if (!any(mypks == "devtools")) install.packages("devtools") 
-  if (!any(mypks == "energyRt")) devtools::install_github("olugovoy/energyRt")
-  if (!any(mypks == "scales")) install.packages("scales")
   if (!any(mypks == "tidyverse")) install.packages("tidyverse")
   if (!any(mypks == "lubridate")) install.packages("lubridate")
+  # energyRt 
+  if (!any(mypks == "energyRt")) devtools::install_github("olugovoy/energyRt")
+  # GIS tools
+  if (!any(mypks == "rgeos")) install.packages("rgeos")
+  if (!any(mypks == "rgdal")) install.packages("rgdal")
+  if (!any(mypks == "gpclib")) install.packages("gpclib", type="source")
+  if (!any(mypks == "maptools")) install.packages("maptools")
+  # Reporting
+  if (!any(mypks == "scales")) install.packages("scales")
   if (!any(mypks == "spdep")) install.packages("spdep")
+  if (!any(mypks == "kableExtra")) install.packages("kableExtra")
 }
 # Load required packages
 library(energyRt)
@@ -861,7 +873,7 @@ if (F) {
 
 ```
 
-### Solar farms
+### Solar arrays
 ```{r solar_PV}
 ESOL <- newTechnology(
   name = "ESOL",
@@ -1249,7 +1261,6 @@ mdl@sysInfo@milestone
 
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T}
-mysolver = 'GLPK'
 mdl@data[[1]]@data$ECOA
 scen_BASE <- interpolate(mdl, name = "BASE")
 
@@ -1307,7 +1318,7 @@ scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC)
 write_model(scen_RBAU2, solver = mysolver, tmp.dir = "solwork/UTOPIA_REN")
 
 ## Solving the model
-solve_model(tmp.dir = "solwork/UTOPIA_REN", solver = mysolver)
+solve_model(tmp.dir = "solwork/UTOPIA_REN", solver = mysolver, wait = TRUE)
 
 ## Read solution
 scen_RBAU2 <- read_solution(scen_RBAU2, dir.result = "solwork/UTOPIA_REN")
@@ -1415,7 +1426,7 @@ ggplot(fumxr, aes(as.factor(year), PJ, fill = comm)) +
 ```
 
 ### Trade
-```{r, eval=FALSE}
+```{r, eval=T}
 # Names of all unempty variables and parameters for trade
 names(getData(scen, name_ = "trd|trade|Trade", merge = F))
 
@@ -1510,11 +1521,20 @@ ftrd_flo_map <- function(slice = sample(unique(trd_flo$slice), 1),
 ftrd_flo_map()
 ftrd_flo_map()
 
-# Save figures in provided directory
 if (!exists("homedir")) homedir <- getwd()
+
+```
+
+```{r aminated_pdf, eval=FALSE}
+# This step requires LaTeX installed, as well as 'animation' package
+# install.packages("animation")
+library(animation)
+
+# A temporary directory for figures
 figpath <- file.path(homedir, "tmp/fig")
 if (!dir.exists(figpath)) dir.create(figpath, recursive = T, showWarnings = F)
-library(animation)
+if (!exists("homedir")) homedir <- getwd()
+
 setwd(figpath)
   saveLatex({
   n <- 1
@@ -1537,6 +1557,40 @@ setwd(figpath)
 setwd(homedir)
 
 ```
+
+
+```{r trade_flows_video, eval=FALSE}
+
+figpath2 <- file.path(homedir, "tmp/fig2")
+if (!dir.exists(figpath2)) dir.create(figpath2, recursive = T, showWarnings = F)
+if (!exists("homedir")) homedir <- getwd()
+setwd(figpath2)
+
+# Figures output parameters
+scl1 <- 1
+dpi <- 160*scl1
+n <- 1
+for (y in mdl@sysInfo@milestone$mid) {
+  for (s in slc$slice) {
+    fname <- paste0("Rplot", n, ".png")
+    cat(y, " ", s, " ",  fname, "\n")
+    pp <- ftrd_flo_map(s, year = y)
+    ggsave(fname, pp, device = "png",
+           dpi = dpi, width = scl1*1920/dpi, height = scl1*1080/dpi)
+    n <- n + 1
+  }
+}
+
+# Download and unpack ffmpeg (https://www.ffmpeg.org/) on your computer
+# correct the path below
+
+system("c:/utils/ffmpeg/bin/ffmpeg -r 4 -f image2 -s 1920x1080 -i Rplot%d.png -vcodec libx264 -crf 25 -pix_fmt yuv420p -y utopia_example_trade.mp4")
+
+setwd(homedir)
+
+```
+
+
 
 
 # Scenarios with constraints
@@ -1600,30 +1654,6 @@ GHG50CapTrade <- add(newRepository('GHG50CapTrade'),
 ```
 
 tbc...
-
-# Comparative figures
-```{r}
-
-```
-
-## Costs
-```{r}
-
-
-```
-
-
-## Output
-tbc...
-
-## Emissions
-tbc...
-
-## Average electricity price
-```{r}
-
-
-```
 
 
 # References
