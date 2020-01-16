@@ -51,8 +51,8 @@
     ddd <- t(as.matrix(dd[, -ncol(dd), drop = FALSE]))
     dff <- dd[, -ncol(dd), drop = FALSE]
     for(i in 1:ncol(dff)) dff[, i] <- as.factor(as.character(dff[, i]))
-    for(i in 1:ncol(dff)) obj[, i] <- factor(as.character(obj[, i]), levels = levels(dff[, i]))
-    for(i in 1:ncol(dff)) obj[, i] <- as.numeric(obj[, i])
+    for(i in 1:ncol(dff)) obj[, i] <- factor(as.character(obj[[i]]), levels = levels(dff[, i]))
+    for(i in 1:ncol(dff)) obj[, i] <- as.numeric(obj[[i]])
     for(i in 1:ncol(dff)) dff[, i] <- as.numeric(dff[, i])
     hh <- sapply(dff, max)
     #kk <- t(c(1, cumprod(hh[-length(hh)])) * t(dff))
