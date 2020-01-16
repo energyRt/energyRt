@@ -1,12 +1,7 @@
+.interpolation0 <- function(obj, parameter, defVal, arg) { 
 
-setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
-  defVal = 'numeric'), function(obj, parameter, defVal, ...) { 
-   # assign('obj', obj, globalenv())
-  #  assign('parameter', parameter, globalenv())
-  #  assign('defVal', defVal, globalenv())
-  #  assign('arg', list(...), globalenv())
   # Remove not used approxim
-  arg <- list(...)
+  
   if (length(defVal) != 1) stop('defVal value not define')
   # Get slice
   prior <-      c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
@@ -22,7 +17,7 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
   }
   approxim <- approxim[names(approxim) %in% prior]
   if (any(colnames(obj) == 'year') && any(names(arg) == 'year_range') && 
-    all(names(approxim) != 'year')) approxim$year <- arg$year_range
+      all(names(approxim) != 'year')) approxim$year <- arg$year_range
   prior <- prior[prior %in% names(approxim)]
   prior <- prior[prior %in% colnames(obj)[-ncol(obj)]]
   true_prior <- true_prior[true_prior %in% prior]
@@ -31,12 +26,12 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
   obj <- obj[,colnames(obj) %in% c(prior, parameter), drop = FALSE]
   # Sort column
   obj <- obj[,c(prior[prior %in% colnames(obj)], 
-      colnames(obj)[ncol(obj)]), drop = FALSE]
+    colnames(obj)[ncol(obj)]), drop = FALSE]
   obj <- obj[!is.na(obj[, parameter]), , drop = FALSE]
   if (any(colnames(obj)[-ncol(obj)] == 'year')) {
     year_range <- arg$year_range
     yy <- range(c(year_range[1], year_range[2], 
-          obj$year), na.rm = TRUE) 
+      obj$year), na.rm = TRUE) 
     approxim$year <- yy[1]:yy[2]
     apr <- approxim[c('year', true_prior[true_prior != 'year'])]
     if (any(sapply(apr, length) == 0)) return(NULL)
@@ -104,7 +99,7 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
           ee <- seq(along = f1)[!f1]
           if (length(ee) == 1) ll <- ee else {
             ll <- ee[apply(is.na(zz[, ee[1]]) == is.na(zz[, ee]) & 
-              (is.na(zz[, ee[1]]) | zz[, ee[1]] == zz[, ee]), 2, all)]
+                (is.na(zz[, ee[1]]) | zz[, ee[1]] == zz[, ee]), 2, all)]
           }
           # Approximate
           hh <- zz[, ee[1]]
@@ -141,12 +136,24 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
       dd <- dd[, c(true_prior, parameter), drop = FALSE]
     }
     if (length(approxim$year) != year_range[2] - year_range[1] + 1) {
-        dd <- dd[rep(year_range[1] <= approxim$year & approxim$year <= year_range[2], 
-              nrow(dd) / length(approxim$year)), , drop = FALSE]
+      dd <- dd[rep(year_range[1] <= approxim$year & approxim$year <= year_range[2], 
+        nrow(dd) / length(approxim$year)), , drop = FALSE]
     }
     
   }
-    return(dd)
+  return(dd)
+}
+setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
+  defVal = 'numeric'), function(obj, parameter, defVal, ...) {
+    arg <- list(...)
+    tryCatch({
+      .interpolation0(obj, parameter, defVal, arg)
+    }, error = function(cond) {
+      assign('interpolation_message', list(tracedata = sys.calls(), 
+        interpolation0_arg = list(obj = obj, parameter = parameter, defVal = defVal, arg)), globalenv())
+      message('\nThere are error during interpolation function, more information in "interpolation_message"\n')
+      stop(cond)
+    })
 })
 
 # 

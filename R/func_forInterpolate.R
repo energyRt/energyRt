@@ -133,14 +133,11 @@
       tryCatch({
         scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
       }, error = function(e) {
-        cat(paste0('There are error during interpolation. Check main parameters for repository # ', 
-            i, ', member # ', j, '. Wrong assign in wrg.\n'))
-            assign('wrg', scen@model@data[[i]]@data[[j]], globalenv())
-            assign('i', i, globalenv())
-            assign('j', j, globalenv())
-            assign('scen', scen, globalenv())
-            assign('approxim', approxim, globalenv())
-            stop(e)
+        assign('add0_message', list(tracedata = sys.calls(),
+          add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
+          globalenv())
+        message('\nThere are error during work .add0. More information in "add0_message"\n')
+        stop(e)
       })
       if (need.tick[k] && arg$echo) {
         cat('.')
