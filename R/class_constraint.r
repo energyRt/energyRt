@@ -180,13 +180,14 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   eqt  
 }
 
-#  .vrb_map <- energyRt:::.vrb_map
-#  .vrb_mapping <- energyRt:::.vrb_mapping
+# .vrb_map <- energyRt:::.vrb_map
+# .vrb_mapping <- energyRt:::.vrb_mapping
+# prec <- add0_message$add0_arg$obj
+# stm <- add0_message$add0_arg$app
+# approxim <- add0_message$add0_arg$approxim
+
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
-  #assign('prec', prec,  globalenv())
-  #assign('stm', stm,  globalenv())
-  #assign('approxim', approxim,  globalenv())
   stop.constr <- function(x) 
     stop(paste0('Constraint "', stm@name, '" error: ', x))
   get.all.child <- function(x)  {
@@ -368,7 +369,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       need.set <- lhs.set2[lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), 'set']
       need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), ]
       for (j in seq_len(nrow(need.set2))) {
-        approxim2[[j]] <- set.map[[need.set2[j, 'new.map']]]
+        approxim2[[need.set[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
       }
       xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
                             interpolation = 'back.inter.forth')
@@ -439,9 +440,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     if (any(names(approxim2) == 'slice')) {
       approxim2$slice <- approxim2$slice@all_slice
     }
-    need.set <- all.set[all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs),, drop = FALSE]
+    fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
+    need.set <- all.set[fl,, drop = FALSE]
     for (j in seq_len(nrow(need.set))) {
-      approxim2[[j]] <- set.map[[need.set[j, 'new.map']]]
+      approxim2[[need.set[j, 'set']]] <- set.map[[need.set[j, 'new.map']]]
     }
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
     xx <- createParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 

@@ -284,7 +284,7 @@
 						eqt_en <- paste0(eqt_en, xx@name, '(', paste0(xx@dimSetNames, collapse = ', '), ')')
 					} else {
 						tpr <- sum(tpr$value)
-						if (tpr != 0) eqt_en <- paste0(eqt_en, '+'[tpr >= 0], tpr) 
+						eqt_en <- paste0(eqt_en, '+'[tpr >= 0], tpr) 
 					}
 					eqt0 <- brk$end
 				} else  {
@@ -293,11 +293,13 @@
 					eqt_en <- paste0(eqt_en, 'sum', brk$beg)
 					eqt0 <- brk$end
 				} 
-			} else if (any(substr(eqt0, 1, 3) == 'pCns')) {
-				stop('fix to: pCns')
+			} else if (any(substr(eqt0, 1, 4) == 'pCns')) {
+			  tmp <- sub('^[[:alnum:]_]*[(][[:alnum:], ]*[)]', '', eqt0)
+			  eqt_en <- paste0(eqt_en, ' ', substr(eqt0, 1, nchar(eqt0) - nchar(tmp)))
+			  eqt0 <- tmp;
 			} else if (any(grep('^[[:digit:].]+', eqt0))) {
 				tmp <- sub('^[[:digit:].]*', '', eqt0)
-				eqt_en <- paste0(eqt_en, ' ', substr(eqt0, 1, nchar(tmp)))
+				eqt_en <- paste0(eqt_en, ' ', substr(eqt0, 1, nchar(eqt0) - nchar(tmp)))
 				eqt0 <- tmp
 			} else if (substr(eqt0, 1, 1) == ';') {
 				eqt_en <- paste0(eqt_en, ' ', substr(eqt0, 1, 1))

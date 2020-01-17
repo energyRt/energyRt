@@ -269,6 +269,8 @@ pStorageCinpUp(stg, comm, region, year, slice)      Storage input upper bound
 pStorageCinpLo(stg, comm, region, year, slice)      Storage input lower bound
 pStorageCoutUp(stg, comm, region, year, slice)      Storage output upper bound
 pStorageCoutLo(stg, comm, region, year, slice)      Storage output lower bound
+pStorageNCap2Stg(stg, comm, region, year, slice)   Initial storage charging for new investment
+pStorageCharge(stg, comm, region, year, slice)    Initial storage charging for stock
 pStorageStg2AInp(stg, comm, region, year, slice)    Storage accumulated volume to auxilary input
 pStorageStg2AOut(stg, comm, region, year, slice)    Storage accumulated volume output
 pStorageInp2AInp(stg, comm, region, year, slice)    Storage input to auxilary input coefficient
@@ -1144,12 +1146,13 @@ eqStorageOutLo(stg, comm, region, year, slice)
 
 eqStorageAInp(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageAInp(stg, comm)
   and mCommSlice(comm, slice)  and mStorageSpan(stg, region, year))..
-  vStorageAInp(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
+  vStorageAInp(stg, comm, region, year, slice) =e=
+         sum(commp$mStorageComm(stg, commp),
          pStorageStg2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
          pStorageInp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
          pStorageOut2AInp(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
          pStorageCap2AInp(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
-         pStorageNCap2AInp(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year)
+         (pStorageNCap2AInp(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year)
 );
 
 
@@ -1160,14 +1163,15 @@ eqStorageAOut(stg, comm, region, year, slice)$(mMidMilestone(year) and mStorageA
          pStorageInp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
          pStorageOut2AOut(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
          pStorageCap2AOut(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
-         pStorageNCap2AOut(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year)
+         (pStorageNCap2AOut(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year)
 );
 
 
 eqStorageStore(stg, comm, region, year, slice)$(mCommSlice(comm, slice) and mMidMilestone(year)  and mStorageComm(stg, comm)
 and mStorageSpan(stg, region, year))..
-  vStorageStore(stg, comm, region, year, slice) =e=
-  sum(slicep$(mCommSlice(comm, slicep) and ((not(mStorageFullYear(stg)) and mSliceNext(slicep, slice))
+  vStorageStore(stg, comm, region, year, slice) =e= pStorageCharge(stg, comm, region, year, slice) +
+          (pStorageNCap2Stg(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year) +
+          sum(slicep$(mCommSlice(comm, slicep) and ((not(mStorageFullYear(stg)) and mSliceNext(slicep, slice))
          or (mStorageFullYear(stg) and mSliceFYearNext(slicep, slice)))),
      pStorageInpEff(stg, comm, region, year, slicep) * vStorageInp(stg, comm, region, year, slicep)
     +     (pStorageStgEff(stg, comm, region, year, slice) ** pSliceShare(slice)) * vStorageStore(stg, comm, region, year, slicep)

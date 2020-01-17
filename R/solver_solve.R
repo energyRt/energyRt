@@ -73,7 +73,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
   dir.create(arg$dir.result, recursive = TRUE, showWarnings = FALSE)
   if (arg$open.folder) shell.exec(arg$dir.result)
   # Check if gams (if it use) is available
-  if (arg$solver == 'GAMS') {
+  if (arg$solver == 'GAMS' && arg$run) {
     rs <- try(system('gams'))
     if (rs != 0) stop('GAMS is not found')
   }
@@ -256,11 +256,11 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         if (.Platform$OS.type == "windows") {
           if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
           if (arg$solver  == 'GLPK') {
-            rs <- shell(paste(cmd, 'glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
+            rs <- system(paste(cmd, 'glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
                          invisible = arg$invisible, wait = wait,
                          show.output.on.console = arg$show.output.on.console)
           } else {
-            rs <- shell(paste(cmd, "cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter, 
+            rs <- system(paste(cmd, "cbc energyRt.mod%energyRt.dat -solve", arg$cbcCompileParameter, 
                                invisible = arg$invisible, wait = wait,
                                show.output.on.console = arg$show.output.on.console))
           }

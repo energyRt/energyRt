@@ -320,8 +320,12 @@ setMethod("initialize", "modInp",
     for(i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 
     	'pStorageOut2AInp', 'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
     	'pStorageNCap2AInp', 'pStorageNCap2AOut'))
-    	.Object@parameters[[i]] <- createParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'back.inter.forth')    
+      .Object@parameters[[i]] <- createParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 
+                                                 defVal = 0, interpolation = 'back.inter.forth')    
+    .Object@parameters[['pStorageNCap2Stg']] <- createParameter('pStorageNCap2Stg', 
+                 c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '')    
+    .Object@parameters[['pStorageCharge']] <- createParameter('pStorageCharge', 
+              c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '')    
     # Trade
     # Map
     .Object@parameters[['mTradeIrAInp']] <- createParameter('mTradeIrAInp', c('trade', 'comm'), 'map', cls = 'trade')   
