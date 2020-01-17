@@ -5,12 +5,6 @@ author: "Oleg Lugovoy, Vladimir Potashnikov"
 date: "`r Sys.Date()`"
 # output: rmarkdown::html_vignette
 output:
-  html_document: 
-    highlight: tango
-    theme: journal
-    toc: yes
-    toc_depth: 5
-    toc_float: yes
   pdf_document: 
     fig_caption: yes
     fig_crop: no
@@ -19,6 +13,12 @@ output:
     highlight: tango
     toc: yes
     toc_depth: 4
+  html_document: 
+    highlight: tango
+    theme: journal
+    toc: yes
+    toc_depth: 5
+    toc_float: yes
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEncoding{UTF-8}
@@ -780,9 +780,6 @@ EHYD <- newTechnology(
 draw(EHYD)
 
 ```
-
-
-## RBAU: Adding renewables
 
 ### Weather factors
 ```{r weather}
