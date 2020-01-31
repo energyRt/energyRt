@@ -10,7 +10,7 @@ Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com",
 URL: https://github.com/olugovoy/energyRt
 BugReports: https://github.com/olugovoy/energyRt/issues
 Description: Energy Technology Modeling Toolbox
-Depends: sp, parallel, ggplot2
+Depends: R (>= 3.5), sp, parallel, ggplot2
 Imports: rpivotTable, data.table, tidyverse
 Suggests: WriteXLS, GISTools,
     knitr,
