@@ -57,9 +57,8 @@ This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <
 We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/olugovoy/energyRt/>).   
 ```{r setup}
 # Choose your solver-software
-# 
+# mysolver = "GAMS"
 mysolver = "GLPK"
-# mysolver = "GAMS" if you have
 
 if (T) {
   # Installation of required packages - if not installed.
@@ -1250,6 +1249,13 @@ mdl@sysInfo@milestone
 
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T}
+mysolver = 'GLPK'
+mdl@data[[1]]@data$ECOA
+scen_BASE <- interpolate(mdl, name = "BASE")
+
+pTechStock <- scen_BASE@modInp@parameters$pTechStock@data
+pTechStock[pTechStock$tech == 'ECOA' & pTechStock$region == 'R1', ]
+
 scen_BASE <- solve(mdl, name = "BASE", 
                    # tmp.path = "C:/solwork",
                    solver = mysolver,
@@ -1595,7 +1601,6 @@ GHG50CapTrade <- add(newRepository('GHG50CapTrade'),
 
 tbc...
 
-
 # Comparative figures
 ```{r}
 
@@ -1626,7 +1631,6 @@ tbc...
 
 \pagebreak
 # Appendix: **energyRt** variables and parameters.
-
 
 ```{r, results="markup", echo=FALSE, eval=T}
 # library()
