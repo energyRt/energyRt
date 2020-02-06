@@ -107,11 +107,11 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'   names(elc2050)
 #'   elc2050$vBalance
 #'}
-getData <- function(scen, ..., name = NULL, parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
-                    newNames = NULL, merge = FALSE, newValues = NULL, na.rm = FALSE, drop = FALSE,
+getData <- function(scen, name = NULL, merge = FALSE, parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
+                    newNames = NULL, newValues = NULL, na.rm = FALSE, drop = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
                     asTibble = TRUE, stringsAsFactors = FALSE, yearsAsFactors = FALSE, 
-                    scenNameInList = as.logical(length(scen)-1), verbose = FALSE) {
+                    scenNameInList = as.logical(length(scen)-1), verbose = FALSE, ...) {
   
   arg <- list(...)
   argnam <- names(arg)

@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy technology modeling R-toolbox, alpha-version, for testing only
-Version: 0.01.03.9000
-Date: 2019-10-24
+Version: 0.01.04.9000
+Date: 2020-01-17
 Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com", 
                     role = c("aut", "cre"), comment = ""), 
              person("Vladimir", "Potashnikov", email = "potashnikov.vu@gmail.com", 
@@ -10,8 +10,8 @@ Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com",
 URL: https://github.com/olugovoy/energyRt
 BugReports: https://github.com/olugovoy/energyRt/issues
 Description: Energy Technology Modeling Toolbox
-Depends: sp, parallel, ggplot2
-Imports: rpivotTable, data.table
+Depends: R (>= 3.5), sp, parallel, ggplot2
+Imports: rpivotTable, data.table, tidyverse
 Suggests: WriteXLS, GISTools,
     knitr,
     rmarkdown
