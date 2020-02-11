@@ -21,8 +21,10 @@
     eqTechAfcInpLo = c("tech", "region", "comm", "year", "slice"), 
     eqTechAfcInpUp = c("tech", "region", "comm", "year", "slice"), 
     eqTechCap = c("tech", "region", "year"), 
-    eqTechNewCap = c("tech", "region", "year"), 
+    eqTechRetCap = c("tech", "region", "year"), 
     eqTechEac = c("tech", "region", "year"), 
+    eqTechCapClear = c("tech", "region", "year"), 
+    eqTechCapClearRet = c("tech", "region", "year"), 
     eqTechInv = c("tech", "region", "year"), 
     eqTechOMCost = c("tech", "region", "year"), 
     eqSupAvaUp = c("sup", "comm", "region", "year", "slice"), 
@@ -106,7 +108,8 @@
     vTradeRowCost = c("region", "year"), 
     vTradeIrCost = c("region", "year"), 
     vTechNewCap = c("tech", "region", "year"), 
-    vTechRetiredCap = c("tech", "region", "year", "year"), 
+    vTechRetCap = c("tech", "region", "year"), 
+    vTechERetCap = c("tech", "region", "year"), 
     vTechCap = c("tech", "region", "year"), 
     vTechAct = c("tech", "region", "year", "slice"), 
     vTechInp = c("tech", "comm", "region", "year", "slice"), 
@@ -183,7 +186,8 @@
    vTradeRowCost  = logical(),
    vTradeIrCost  = logical(),
    vTechNewCap  = logical(),
-   vTechRetiredCap  = logical(),
+   vTechRetCap  = logical(),
+   vTechERetCap  = logical(),
    vTechCap  = logical(),
    vTechAct  = logical(),
    vTechInp  = logical(),
@@ -229,8 +233,8 @@
    vTradeEac  = logical(),
    vTradeNewCap  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:89,] <- NA;
-    rownames(rs) <- c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupReserveUp", "eqSupReserveLo", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqExportRowResUp", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqImportRowResUp", "eqTradeCap", "eqTradeInv", "eqTradeEac", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqObjective", "eqLECActivity");
+    rs[1:91,] <- NA;
+    rownames(rs) <- c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechRetCap", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet", "eqTechInv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupReserveUp", "eqSupReserveLo", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqExportRowResUp", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqImportRowResUp", "eqTradeCap", "eqTradeInv", "eqTradeEac", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqObjective", "eqLECActivity");
     rs["eqTechSng2Sng", c("name", "description")] <- c("eqTechSng2Sng", "Technology input to output");
     rs["eqTechSng2Sng", c("tech", "comm", "region", "year", "slice", "vTechInp", "vTechOut")] <- TRUE;
     rs["eqTechGrp2Sng", c("name", "description")] <- c("eqTechGrp2Sng", "Technology group input to output");
@@ -272,11 +276,15 @@
     rs["eqTechAfcInpUp", c("name", "description")] <- c("eqTechAfcInpUp", "Technology commodity availability factor upper bound");
     rs["eqTechAfcInpUp", c("tech", "comm", "region", "year", "slice", "vTechCap", "vTechInp")] <- TRUE;
     rs["eqTechCap", c("name", "description")] <- c("eqTechCap", "Technology capacity");
-    rs["eqTechCap", c("tech", "region", "year", "vTechNewCap", "vTechRetiredCap", "vTechCap")] <- TRUE;
-    rs["eqTechNewCap", c("name", "description")] <- c("eqTechNewCap", "Technology new capacity");
-    rs["eqTechNewCap", c("tech", "region", "year", "vTechNewCap", "vTechRetiredCap")] <- TRUE;
+    rs["eqTechCap", c("tech", "region", "year", "vTechNewCap", "vTechRetCap", "vTechERetCap", "vTechCap")] <- TRUE;
+    rs["eqTechRetCap", c("name", "description")] <- c("eqTechRetCap", "Technology retirement capacity");
+    rs["eqTechRetCap", c("tech", "region", "year", "vTechNewCap", "vTechRetCap", "vTechCap")] <- TRUE;
     rs["eqTechEac", c("name", "description")] <- c("eqTechEac", "Technology Equivalent Annual Cost (EAC)");
-    rs["eqTechEac", c("tech", "region", "year", "vTechEac", "vTechNewCap", "vTechRetiredCap")] <- TRUE;
+    rs["eqTechEac", c("tech", "region", "year", "vTechEac", "vTechNewCap")] <- TRUE;
+    rs["eqTechCapClear", c("name", "description")] <- c("eqTechCapClear", "");
+    rs["eqTechCapClear", c("tech", "region", "year", "vTechNewCap", "vTechRetCap", "vTechERetCap")] <- TRUE;
+    rs["eqTechCapClearRet", c("name", "description")] <- c("eqTechCapClearRet", "");
+    rs["eqTechCapClearRet", c("tech", "region", "year", "vTechNewCap", "vTechRetCap", "vTechERetCap")] <- TRUE;
     rs["eqTechInv", c("name", "description")] <- c("eqTechInv", "Technology investment costs");
     rs["eqTechInv", c("tech", "region", "year", "vTechInv", "vTechNewCap")] <- TRUE;
     rs["eqTechOMCost", c("name", "description")] <- c("eqTechOMCost", "Technology O&M costs");
@@ -448,8 +456,10 @@ rs
    eqTechAfcInpLo  = logical(),
    eqTechAfcInpUp  = logical(),
    eqTechCap  = logical(),
-   eqTechNewCap  = logical(),
+   eqTechRetCap  = logical(),
    eqTechEac  = logical(),
+   eqTechCapClear  = logical(),
+   eqTechCapClearRet  = logical(),
    eqTechInv  = logical(),
    eqTechOMCost  = logical(),
    eqSupAvaUp  = logical(),
@@ -517,8 +527,8 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:61,] <- NA;
-    rownames(rs) <- c("vTechInv", "vTechEac", "vTechOMCost", "vSupCost", "vEmsFuelTot", "vBalance", "vTotalCost", "vObjective", "vTaxCost", "vSubsCost", "vAggOut", "vStorageOMCost", "vTradeCost", "vTradeRowCost", "vTradeIrCost", "vTechNewCap", "vTechRetiredCap", "vTechCap", "vTechAct", "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", "vSupReserve", "vDemInp", "vOutTot", "vInpTot", "vInp2Lo", "vOut2Lo", "vSupOutTot", "vTechInpTot", "vTechOutTot", "vStorageInpTot", "vStorageOutTot", "vStorageAInp", "vStorageAOut", "vDummyImport", "vDummyExport", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageInv", "vStorageEac", "vStorageCap", "vStorageNewCap", "vImport", "vExport", "vTradeIr", "vTradeIrAInp", "vTradeIrAInpTot", "vTradeIrAOut", "vTradeIrAOutTot", "vExportRowAccumulated", "vExportRow", "vImportRowAccumulated", "vImportRow", "vTradeCap", "vTradeInv", "vTradeEac", "vTradeNewCap");
+    rs[1:62,] <- NA;
+    rownames(rs) <- c("vTechInv", "vTechEac", "vTechOMCost", "vSupCost", "vEmsFuelTot", "vBalance", "vTotalCost", "vObjective", "vTaxCost", "vSubsCost", "vAggOut", "vStorageOMCost", "vTradeCost", "vTradeRowCost", "vTradeIrCost", "vTechNewCap", "vTechRetCap", "vTechERetCap", "vTechCap", "vTechAct", "vTechInp", "vTechOut", "vTechAInp", "vTechAOut", "vSupOut", "vSupReserve", "vDemInp", "vOutTot", "vInpTot", "vInp2Lo", "vOut2Lo", "vSupOutTot", "vTechInpTot", "vTechOutTot", "vStorageInpTot", "vStorageOutTot", "vStorageAInp", "vStorageAOut", "vDummyImport", "vDummyExport", "vStorageInp", "vStorageOut", "vStorageStore", "vStorageInv", "vStorageEac", "vStorageCap", "vStorageNewCap", "vImport", "vExport", "vTradeIr", "vTradeIrAInp", "vTradeIrAInpTot", "vTradeIrAOut", "vTradeIrAOutTot", "vExportRowAccumulated", "vExportRow", "vImportRowAccumulated", "vImportRow", "vTradeCap", "vTradeInv", "vTradeEac", "vTradeNewCap");
     rs["vTechInv", c("name", "description")] <- c("vTechInv", "Overnight investment costs");
     rs["vTechInv", c("tech", "region", "year", "eqTechInv")] <- TRUE;
     rs["vTechEac", c("name", "description")] <- c("vTechEac", "Annualized investment costs");
@@ -550,11 +560,13 @@ rs
     rs["vTradeIrCost", c("name", "description")] <- c("vTradeIrCost", "Interregional trade costs");
     rs["vTradeIrCost", c("region", "year", "eqCostTrade", "eqCostIrTrade")] <- TRUE;
     rs["vTechNewCap", c("name", "description")] <- c("vTechNewCap", "New capacity");
-    rs["vTechNewCap", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv")] <- TRUE;
-    rs["vTechRetiredCap", c("name", "description")] <- c("vTechRetiredCap", "Early retired capacity");
-    rs["vTechRetiredCap", c("tech", "region", "year", "eqTechCap", "eqTechNewCap", "eqTechEac")] <- TRUE;
+    rs["vTechNewCap", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechRetCap", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet", "eqTechInv")] <- TRUE;
+    rs["vTechRetCap", c("name", "description")] <- c("vTechRetCap", "");
+    rs["vTechRetCap", c("tech", "region", "year", "eqTechCap", "eqTechRetCap", "eqTechCapClear", "eqTechCapClearRet")] <- TRUE;
+    rs["vTechERetCap", c("name", "description")] <- c("vTechERetCap", "");
+    rs["vTechERetCap", c("tech", "region", "year", "eqTechCap", "eqTechCapClear", "eqTechCapClearRet")] <- TRUE;
     rs["vTechCap", c("name", "description")] <- c("vTechCap", "Total capacity of the technology");
-    rs["vTechCap", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechOMCost")] <- TRUE;
+    rs["vTechCap", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechRetCap", "eqTechOMCost")] <- TRUE;
     rs["vTechAct", c("name", "description")] <- c("vTechAct", "Activity level of technology");
     rs["vTechAct", c("tech", "region", "year", "slice", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechOMCost", "eqLECActivity")] <- TRUE;
     rs["vTechInp", c("name", "description")] <- c("vTechInp", "Input level");
@@ -681,8 +693,10 @@ rs
    eqTechAfcInpLo  = logical(),
    eqTechAfcInpUp  = logical(),
    eqTechCap  = logical(),
-   eqTechNewCap  = logical(),
+   eqTechRetCap  = logical(),
    eqTechEac  = logical(),
+   eqTechCapClear  = logical(),
+   eqTechCapClearRet  = logical(),
    eqTechInv  = logical(),
    eqTechOMCost  = logical(),
    eqSupAvaUp  = logical(),
@@ -750,10 +764,10 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:241,] <- NA;
-    rownames(rs) <- c("tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice", "weather", "mSameRegion", "mSameSlice", "mMilestoneFirst", "mMilestoneLast", "mMilestoneNext", "mMilestoneHasNext", "mStartMilestone", "mEndMilestone", "mMidMilestone", "mCommSlice", "mCommSliceOrParent", "mTechRetirement", "mTechUpgrade", "mTechInpComm", "mTechOutComm", "mTechInpGroup", "mTechOutGroup", "mTechOneComm", "mTechGroupComm", "mTechAInp", "mTechAOut", "mTechNew", "mTechSpan", "mTechSlice", "mSupSlice", "mSupComm", "mSupSpan", "mSupWeatherLo", "mSupWeatherUp", "mWeatherSlice", "mWeatherRegion", "mDemComm", "mUpComm", "mLoComm", "mFxComm", "mStorageFullYear", "mStorageComm", "mStorageAInp", "mStorageAOut", "mStorageNew", "mStorageSpan", "mStorageOMCost", "mStorageEac", "mSliceNext", "mSliceFYearNext", "mTradeSlice", "mTradeComm", "mTradeRoutes", "mTradeIrAInp", "mTradeIrAOut", "mExpComm", "mImpComm", "mExpSlice", "mImpSlice", "mDiscountZero", "mSliceParentChildE", "mSliceParentChild", "mTechWeatherAf", "mTechWeatherAfs", "mTechWeatherAfc", "mStorageWeatherAf", "mStorageWeatherCinp", "mStorageWeatherCout", "mTradeSpan", "mTradeNew", "mTradeOlifeInf", "mTradeEac", "mTradeCapacityVariable", "mTradeInv", "mTechInpTot", "mTechOutTot", "mTechEac", "mTechOMCost", "mSupOutTot", "mDemInp", "mEmsFuelTot", "mTechEmsFuel", "mDummyImport", "mDummyExport", "mDummyCost", "mTradeIr", "mTradeIrUp", "mTradeIrAInp2", "mTradeIrAInpTot", "mTradeIrAOut2", "mTradeIrAOutTot", "mImportRow", "mImportRowUp", "mImportRowAccumulatedUp", "mExportRow", "mExportRowUp", "mExportRowAccumulatedUp", "mExport", "mImport", "mStorageInpTot", "mStorageOutTot", "mTaxCost", "mSubsCost", "mAggOut", "mTechAfUp", "mTechOlifeInf", "mStorageOlifeInf", "mTechAfcUp", "mSupAvaUp", "mSupAva", "mSupReserveUp", "mOut2Lo", "mInp2Lo", "mLECRegion", "ordYear", "cardYear", "pPeriodLen", "pSliceShare", "pAggregateFactor", "pTechOlife", "pTechCinp2ginp", "pTechGinp2use", "pTechCinp2use", "pTechUse2cact", "pTechCact2cout", "pTechEmisComm", "pTechAct2AInp", "pTechCap2AInp", "pTechNCap2AInp", "pTechCinp2AInp", "pTechCout2AInp", "pTechAct2AOut", "pTechCap2AOut", "pTechNCap2AOut", "pTechCinp2AOut", "pTechCout2AOut", "pTechFixom", "pTechVarom", "pTechInvcost", "pTechEac", "pTechShareLo", "pTechShareUp", "pTechAfLo", "pTechAfUp", "pTechAfsLo", "pTechAfsUp", "pTechAfcLo", "pTechAfcUp", "pTechStock", "pTechCap2act", "pTechCvarom", "pTechAvarom", "pDiscount", "pDiscountFactor", "pSupCost", "pSupAvaUp", "pSupAvaLo", "pSupReserveUp", "pSupReserveLo", "pDemand", "pEmissionFactor", "pDummyImportCost", "pDummyExportCost", "pTaxCost", "pSubsCost", "pWeather", "pSupWeatherLo", "pSupWeatherUp", "pTechWeatherAfLo", "pTechWeatherAfUp", "pTechWeatherAfsLo", "pTechWeatherAfsUp", "pTechWeatherAfcLo", "pTechWeatherAfcUp", "pStorageWeatherAfUp", "pStorageWeatherAfLo", "pStorageWeatherCinpUp", "pStorageWeatherCinpLo", "pStorageWeatherCoutUp", "pStorageWeatherCoutLo", "pStorageInpEff", "pStorageOutEff", "pStorageStgEff", "pStorageStock", "pStorageOlife", "pStorageCostStore", "pStorageCostInp", "pStorageCostOut", "pStorageFixom", "pStorageInvcost", "pStorageEac", "pStorageCap2stg", "pStorageAfLo", "pStorageAfUp", "pStorageCinpUp", "pStorageCinpLo", "pStorageCoutUp", "pStorageCoutLo", "pStorageNCap2Stg", "pStorageCharge", "pStorageStg2AInp", "pStorageStg2AOut", "pStorageInp2AInp", "pStorageInp2AOut", "pStorageOut2AInp", "pStorageOut2AOut", "pStorageCap2AInp", "pStorageCap2AOut", "pStorageNCap2AInp", "pStorageNCap2AOut", "pTradeIrEff", "pTradeIrUp", "pTradeIrLo", "pTradeIrCost", "pTradeIrMarkup", "pTradeIrCsrc2Ainp", "pTradeIrCsrc2Aout", "pTradeIrCdst2Ainp", "pTradeIrCdst2Aout", "pExportRowRes", "pExportRowUp", "pExportRowLo", "pExportRowPrice", "pImportRowRes", "pImportRowUp", "pImportRowLo", "pImportRowPrice", "pTradeStock", "pTradeOlife", "pTradeInvcost", "pTradeEac", "pTradeCap2Act", "pLECLoACT");
+    rs[1:245,] <- NA;
+    rownames(rs) <- c("tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice", "weather", "mSameRegion", "mSameSlice", "mMilestoneFirst", "mMilestoneLast", "mMilestoneNext", "mMilestoneHasNext", "mStartMilestone", "mEndMilestone", "mMidMilestone", "mCommSlice", "mCommSliceOrParent", "mTechRetirement", "mTechUpgrade", "mTechInpComm", "mTechOutComm", "mTechInpGroup", "mTechOutGroup", "mTechOneComm", "mTechGroupComm", "mTechAInp", "mTechAOut", "mTechNew", "mTechSpan", "mTechSlice", "mSupSlice", "mSupComm", "mSupSpan", "mSupWeatherLo", "mSupWeatherUp", "mWeatherSlice", "mWeatherRegion", "mDemComm", "mUpComm", "mLoComm", "mFxComm", "mStorageFullYear", "mStorageComm", "mStorageAInp", "mStorageAOut", "mStorageNew", "mStorageSpan", "mStorageOMCost", "mStorageEac", "mSliceNext", "mSliceFYearNext", "mTradeSlice", "mTradeComm", "mTradeRoutes", "mTradeIrAInp", "mTradeIrAOut", "mExpComm", "mImpComm", "mExpSlice", "mImpSlice", "mDiscountZero", "mSliceParentChildE", "mSliceParentChild", "mTechWeatherAf", "mTechWeatherAfs", "mTechWeatherAfc", "mStorageWeatherAf", "mStorageWeatherCinp", "mStorageWeatherCout", "mTradeSpan", "mTradeNew", "mTradeOlifeInf", "mTradeEac", "mTradeCapacityVariable", "mTradeInv", "mTechInpTot", "mTechOutTot", "mTechEac", "mTechOMCost", "mSupOutTot", "mDemInp", "mEmsFuelTot", "mTechEmsFuel", "mDummyImport", "mDummyExport", "mDummyCost", "mTradeIr", "mTradeIrUp", "mTradeIrAInp2", "mTradeIrAInpTot", "mTradeIrAOut2", "mTradeIrAOutTot", "mImportRow", "mImportRowUp", "mImportRowAccumulatedUp", "mExportRow", "mExportRowUp", "mExportRowAccumulatedUp", "mExport", "mImport", "mStorageInpTot", "mStorageOutTot", "mTaxCost", "mSubsCost", "mAggOut", "mTechAfUp", "mTechOlifeInf", "mStorageOlifeInf", "mTechAfcUp", "mSupAvaUp", "mSupAva", "mSupReserveUp", "mOut2Lo", "mInp2Lo", "mTechNewRetCap", "mTechRetCap", "mLECRegion", "ordYear", "cardYear", "pPeriodLen", "pSliceShare", "pAggregateFactor", "pTechOlife", "pTechCinp2ginp", "pTechGinp2use", "pTechCinp2use", "pTechUse2cact", "pTechCact2cout", "pTechEmisComm", "pTechAct2AInp", "pTechCap2AInp", "pTechNCap2AInp", "pTechCinp2AInp", "pTechCout2AInp", "pTechAct2AOut", "pTechCap2AOut", "pTechNCap2AOut", "pTechCinp2AOut", "pTechCout2AOut", "pTechFixom", "pTechVarom", "pTechInvcost", "pTechEac", "pTechShareLo", "pTechShareUp", "pTechAfLo", "pTechAfUp", "pTechAfsLo", "pTechAfsUp", "pTechAfcLo", "pTechAfcUp", "pTechStock", "pTechDStock", "pTechCap2act", "pTechCvarom", "pTechAvarom", "pDiscount", "pDiscountFactor", "pSupCost", "pSupAvaUp", "pSupAvaLo", "pSupReserveUp", "pSupReserveLo", "pDemand", "pEmissionFactor", "pDummyImportCost", "pDummyExportCost", "pTaxCost", "pSubsCost", "pWeather", "pSupWeatherLo", "pSupWeatherUp", "pTechWeatherAfLo", "pTechWeatherAfUp", "pTechWeatherAfsLo", "pTechWeatherAfsUp", "pTechWeatherAfcLo", "pTechWeatherAfcUp", "pStorageWeatherAfUp", "pStorageWeatherAfLo", "pStorageWeatherCinpUp", "pStorageWeatherCinpLo", "pStorageWeatherCoutUp", "pStorageWeatherCoutLo", "pStorageInpEff", "pStorageOutEff", "pStorageStgEff", "pStorageStock", "pStorageOlife", "pStorageCostStore", "pStorageCostInp", "pStorageCostOut", "pStorageFixom", "pStorageInvcost", "pStorageEac", "pStorageCap2stg", "pStorageAfLo", "pStorageAfUp", "pStorageCinpUp", "pStorageCinpLo", "pStorageCoutUp", "pStorageCoutLo", "pStorageNCap2Stg", "pStorageCharge", "pStorageStg2AInp", "pStorageStg2AOut", "pStorageInp2AInp", "pStorageInp2AOut", "pStorageOut2AInp", "pStorageOut2AOut", "pStorageCap2AInp", "pStorageCap2AOut", "pStorageNCap2AInp", "pStorageNCap2AOut", "pTradeIrEff", "pTradeIrUp", "pTradeIrLo", "pTradeIrCost", "pTradeIrMarkup", "pTradeIrCsrc2Ainp", "pTradeIrCsrc2Aout", "pTradeIrCdst2Ainp", "pTradeIrCdst2Aout", "pExportRowRes", "pExportRowUp", "pExportRowLo", "pExportRowPrice", "pImportRowRes", "pImportRowUp", "pImportRowLo", "pImportRowPrice", "pTradeStock", "pTradeOlife", "pTradeInvcost", "pTradeEac", "pTradeCap2Act", "pTechCStock", "pLECLoACT");
     rs["tech", c("name", "description", "type")] <- c("tech", "technology", "set");
-    rs["tech", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqEmsFuelTot", "eqTechInpTot", "eqTechOutTot", "eqCost", "eqLECActivity")] <- TRUE;
+    rs["tech", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechRetCap", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet", "eqTechInv", "eqTechOMCost", "eqEmsFuelTot", "eqTechInpTot", "eqTechOutTot", "eqCost", "eqLECActivity")] <- TRUE;
     rs["sup", c("name", "description", "type")] <- c("sup", "supply", "set");
     rs["sup", c("eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupReserveUp", "eqSupReserveLo", "eqSupCost", "eqSupOutTot", "eqCost")] <- TRUE;
     rs["dem", c("name", "description", "type")] <- c("dem", "demand", "set");
@@ -771,9 +785,9 @@ rs
     rs["comm", c("name", "description", "type")] <- c("comm", "commodity", "set");
     rs["comm", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupReserveUp", "eqSupReserveLo", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqExportRowResUp", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqImportRowResUp", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["region", c("name", "description", "type")] <- c("region", "region", "set");
-    rs["region", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupReserveUp", "eqSupReserveLo", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqTradeInv", "eqTradeEac", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqObjective", "eqLECActivity")] <- TRUE;
+    rs["region", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechRetCap", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet", "eqTechInv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupReserveUp", "eqSupReserveLo", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqTradeInv", "eqTradeEac", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqObjective", "eqLECActivity")] <- TRUE;
     rs["year", c("name", "description", "type")] <- c("year", "year", "set");
-    rs["year", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqTradeCap", "eqTradeInv", "eqTradeEac", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqObjective", "eqLECActivity")] <- TRUE;
+    rs["year", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechRetCap", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet", "eqTechInv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqTradeCap", "eqTradeInv", "eqTradeEac", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqObjective", "eqLECActivity")] <- TRUE;
     rs["slice", c("name", "description", "type")] <- c("slice", "time slice", "set");
     rs["slice", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqLECActivity")] <- TRUE;
     rs["weather", c("name", "description", "type")] <- c("weather", "weather", "set");
@@ -787,7 +801,7 @@ rs
     rs["mMilestoneLast", c("name", "description", "type")] <- c("mMilestoneLast", "Last period milestone", "map");
     rs["mMilestoneLast", c("year")] <- TRUE;
     rs["mMilestoneNext", c("name", "description", "type")] <- c("mMilestoneNext", "Next period milestone", "map");
-    rs["mMilestoneNext", c("year")] <- TRUE;
+    rs["mMilestoneNext", c("year", "eqTechRetCap")] <- TRUE;
     rs["mMilestoneHasNext", c("name", "description", "type")] <- c("mMilestoneHasNext", "Is there next period milestone", "map");
     rs["mMilestoneHasNext", c("year")] <- TRUE;
     rs["mStartMilestone", c("name", "description", "type")] <- c("mStartMilestone", "Start of the period", "map");
@@ -795,13 +809,13 @@ rs
     rs["mEndMilestone", c("name", "description", "type")] <- c("mEndMilestone", "End of the period", "map");
     rs["mEndMilestone", c("year")] <- TRUE;
     rs["mMidMilestone", c("name", "description", "type")] <- c("mMidMilestone", "Milestone year", "map");
-    rs["mMidMilestone", c("year", "eqTechAfsLo", "eqTechAfsUp", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqSupCost", "eqDemInp", "eqStorageAInp", "eqStorageAOut", "eqStorageCap", "eqStorageInv", "eqStorageCost", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowCumulative", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqSupOutTot", "eqCost", "eqObjective")] <- TRUE;
+    rs["mMidMilestone", c("year", "eqTechAfsLo", "eqTechAfsUp", "eqTechCap", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet", "eqTechInv", "eqTechOMCost", "eqSupCost", "eqDemInp", "eqStorageAInp", "eqStorageAOut", "eqStorageCap", "eqStorageInv", "eqStorageCost", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowCumulative", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqSupOutTot", "eqCost", "eqObjective")] <- TRUE;
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
     rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
     rs["mCommSliceOrParent", c("comm", "slice", "eqImport", "eqExport", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot")] <- TRUE;
     rs["mTechRetirement", c("name", "description", "type")] <- c("mTechRetirement", "Early retirement option", "map");
-    rs["mTechRetirement", c("tech", "eqTechCap", "eqTechEac")] <- TRUE;
+    rs["mTechRetirement", c("tech", "eqTechEac", "eqTechCapClear")] <- TRUE;
     rs["mTechUpgrade", c("name", "description", "type")] <- c("mTechUpgrade", "Upgrade technology (not implemented yet)", "map");
     rs["mTechUpgrade", c("tech")] <- TRUE;
     rs["mTechInpComm", c("name", "description", "type")] <- c("mTechInpComm", "Input commodity", "map");
@@ -994,10 +1008,14 @@ rs
     rs["mOut2Lo", c("comm", "region", "year", "slice", "eqOut2Lo")] <- TRUE;
     rs["mInp2Lo", c("name", "description", "type")] <- c("mInp2Lo", "", "map");
     rs["mInp2Lo", c("comm", "region", "year", "slice", "eqInp2Lo")] <- TRUE;
+    rs["mTechNewRetCap", c("name", "description", "type")] <- c("mTechNewRetCap", "", "map");
+    rs["mTechNewRetCap", c("tech", "region", "year", "eqTechRetCap")] <- TRUE;
+    rs["mTechRetCap", c("name", "description", "type")] <- c("mTechRetCap", "", "map");
+    rs["mTechRetCap", c("tech", "region", "year", "eqTechCap", "eqTechRetCap", "eqTechCapClear", "eqTechCapClearRet")] <- TRUE;
     rs["mLECRegion", c("name", "description", "type")] <- c("mLECRegion", "", "map");
     rs["mLECRegion", c("region", "eqLECActivity")] <- TRUE;
     rs["ordYear", c("name", "description", "type")] <- c("ordYear", "ord year for GLPK", "parameter");
-    rs["ordYear", c("year", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqStorageCap", "eqStorageEac", "eqTradeCap", "eqTradeEac", "eqObjective")] <- TRUE;
+    rs["ordYear", c("year", "eqTechCap", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet", "eqStorageCap", "eqStorageEac", "eqTradeCap", "eqTradeEac", "eqObjective")] <- TRUE;
     rs["cardYear", c("name", "description", "type")] <- c("cardYear", "card year for GLPK", "parameter");
     rs["cardYear", c("year")] <- TRUE;
     rs["pPeriodLen", c("name", "description", "type")] <- c("pPeriodLen", "Length of perios for milestone year", "parameter");
@@ -1007,7 +1025,7 @@ rs
     rs["pAggregateFactor", c("name", "description", "type")] <- c("pAggregateFactor", "Aggregation factor of commodities", "parameter");
     rs["pAggregateFactor", c("comm", "eqAggOut")] <- TRUE;
     rs["pTechOlife", c("name", "description", "type")] <- c("pTechOlife", "Operational life of technologies", "parameter");
-    rs["pTechOlife", c("tech", "region", "eqTechCap", "eqTechNewCap", "eqTechEac")] <- TRUE;
+    rs["pTechOlife", c("tech", "region", "eqTechEac", "eqTechCapClear", "eqTechCapClearRet")] <- TRUE;
     rs["pTechCinp2ginp", c("name", "description", "type")] <- c("pTechCinp2ginp", "Multiplier that transforms commodity input into group input", "parameter");
     rs["pTechCinp2ginp", c("tech", "comm", "region", "year", "slice", "eqTechGrp2Sng", "eqTechGrp2Grp")] <- TRUE;
     rs["pTechGinp2use", c("name", "description", "type")] <- c("pTechGinp2use", "Multiplier that transforms group input into use", "parameter");
@@ -1065,7 +1083,9 @@ rs
     rs["pTechAfcUp", c("name", "description", "type")] <- c("pTechAfcUp", "Upper bound for commodity output", "parameter");
     rs["pTechAfcUp", c("tech", "comm", "region", "year", "slice", "eqTechAfcOutUp", "eqTechAfcInpUp")] <- TRUE;
     rs["pTechStock", c("name", "description", "type")] <- c("pTechStock", "Technology capacity stock", "parameter");
-    rs["pTechStock", c("tech", "region", "year", "eqTechCap")] <- TRUE;
+    rs["pTechStock", c("tech", "region", "year", "eqTechCapClear", "eqTechCapClearRet")] <- TRUE;
+    rs["pTechDStock", c("name", "description", "type")] <- c("pTechDStock", "Technology absolute differences capacity stock", "parameter");
+    rs["pTechDStock", c("tech", "region", "year", "eqTechCap", "eqTechCapClear", "eqTechCapClearRet")] <- TRUE;
     rs["pTechCap2act", c("name", "description", "type")] <- c("pTechCap2act", "Technology capacity units to activity units conversion factor", "parameter");
     rs["pTechCap2act", c("tech", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp")] <- TRUE;
     rs["pTechCvarom", c("name", "description", "type")] <- c("pTechCvarom", "Commodity-specific variable costs (per unit of commodity input or output)", "parameter");
@@ -1232,6 +1252,8 @@ rs
     rs["pTradeEac", c("trade", "region", "year", "eqTradeEac")] <- TRUE;
     rs["pTradeCap2Act", c("name", "description", "type")] <- c("pTradeCap2Act", "", "parameter");
     rs["pTradeCap2Act", c("trade", "eqTradeCapFlow")] <- TRUE;
+    rs["pTechCStock", c("name", "description", "type")] <- c("pTechCStock", "", "parameter");
+    rs["pTechCStock", c("tech", "region", "year")] <- TRUE;
     rs["pLECLoACT", c("name", "description", "type")] <- c("pLECLoACT", "", "parameter");
     rs["pLECLoACT", c("region", "eqLECActivity")] <- TRUE;
     rs$type <- factor(rs$type, levels = c("set", "map", "parameter"))

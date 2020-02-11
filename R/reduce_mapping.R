@@ -357,6 +357,28 @@
       tmp_nozero$pStorageCostOut[, c('stg', 'region', 'year')], tmp_nozero$pStorageCostStore[, c('stg', 'region', 'year')])
     mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], tmp_map$mStorageSpan)
     prec@parameters[['mStorageOMCost']] <- addData(prec@parameters[['mStorageOMCost']], mStorageOMCost)
+    
+    
+    ## mTechRetCap(tech, region, year)
+    # generate vector year - closet mid milestone year
+    tomlst <- merge(getParameterData(prec@parameters$mStartMilestone), getParameterData(prec@parameters$mEndMilestone), by = 'year')
+    closest_mid_year <- tomlst[1, 2]:tomlst[nrow(tomlst), 3]
+    names(closest_mid_year) <- c(apply(cbind(tomlst[, 3] - tomlst[, 2] + 1, tomlst[, 1]), 1, function(x) rep(x[2], x[1])), recursive = TRUE)
+    max_year <- tomlst[nrow(tomlst), 3]
+    
+    mTechNewRetCap0 <- merge(tmp_map$mTechNew, getParameterData(prec@parameters$pTechOlife), by = c('tech', 'region'))
+    mTechNewRetCap0 <- mTechNewRetCap0[mTechNewRetCap0$value != Inf, ]
+    mTechNewRetCap0$year.1 <- mTechNewRetCap0$year 
+    mTechNewRetCap0$year <- mTechNewRetCap0$year + mTechNewRetCap0$value - 1 # year - year phase out
+    mTechNewRetCap0$value <- NULL  # value has olife, not need it
+    mTechNewRetCap0 <- mTechNewRetCap0[mTechNewRetCap0$year <= max_year,, drop = FALSE]
+    mTechNewRetCap0$year <- closest_mid_year[as.character(mTechNewRetCap0$year)]
+    mTechNewRetCap <- mTechNewRetCap0[, c('tech', 'region', 'year', 'year.1'), drop = FALSE]
+    prec@parameters[['mTechNewRetCap']] <- addData(prec@parameters[['mTechNewRetCap']], mTechNewRetCap)
+    
+    prec@parameters[['mTechRetCap']] <- addData(prec@parameters[['mTechRetCap']], 
+      mTechNewRetCap[!duplicated(mTechNewRetCap[, c('tech', 'region', 'year')]), c('tech', 'region', 'year')])
+    
     prec
 }
 

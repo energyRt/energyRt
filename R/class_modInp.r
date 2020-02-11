@@ -185,6 +185,9 @@ setMethod("initialize", "modInp",
     	c('tech', 'techp'), 'map', cls = 'technology')    
     .Object@parameters[['mTechRetirement']] <- createParameter('mTechRetirement', c('tech'), 'map', cls = 'technology')    
     # For disable technology with unexceptable start year
+    .Object@parameters[['mTechRetCap']] <- createParameter('mTechRetCap', c('tech', 'region', 'year'), 'map', cls = 'technology')    
+    .Object@parameters[['mTechNewRetCap']] <- createParameter('mTechNewRetCap', c('tech', 'region', 'year', 'year'), 
+      'map', cls = 'technology')
     .Object@parameters[['mTechNew']] <- createParameter('mTechNew', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechOMCost']] <- createParameter('mTechOMCost', c('tech', 'region', 'year'), 'map', cls = 'technology')    
@@ -210,6 +213,9 @@ setMethod("initialize", "modInp",
     .Object@parameters[['pTechStock']] <- createParameter('pTechStock', 
     	c('tech', 'region', 'year'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'stock', cls = 'technology')    
+    .Object@parameters[['pTechDStock']] <- createParameter('pTechDStock', 
+      c('tech', 'region', 'year'), 'simple', 
+      defVal = 0, interpolation = 'back.inter.forth', colName = 'stock', cls = 'technology')    
     .Object@parameters[['pTechVarom']] <- createParameter('pTechVarom', 
     	c('tech', 'region', 'year', 'slice'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'varom', cls = 'technology')    

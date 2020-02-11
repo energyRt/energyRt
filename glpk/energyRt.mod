@@ -124,6 +124,8 @@ set mSupAva dimen 5;
 set mSupReserveUp dimen 3;
 set mOut2Lo dimen 4;
 set mInp2Lo dimen 4;
+set mTechNewRetCap dimen 4;
+set mTechRetCap dimen 3;
 set mLECRegion dimen 1;
 
 
@@ -164,6 +166,7 @@ param pTechAfsUp{tech, region, year, slice};
 param pTechAfcLo{tech, comm, region, year, slice};
 param pTechAfcUp{tech, comm, region, year, slice};
 param pTechStock{tech, region, year};
+param pTechDStock{tech, region, year};
 param pTechCap2act{tech};
 param pTechCvarom{tech, comm, region, year, slice};
 param pTechAvarom{tech, comm, region, year, slice};
@@ -247,6 +250,7 @@ param pTradeOlife{trade};
 param pTradeInvcost{trade, region, year};
 param pTradeEac{trade, region, year};
 param pTradeCap2Act{trade};
+param pTechCStock{tech, region, year};
 param pLECLoACT{region};
 param ORD{year};
 
@@ -272,7 +276,8 @@ var vTradeIrCost{region, year};
 
 
 var vTechNewCap{tech, region, year} >= 0;
-var vTechRetiredCap{tech, region, year, year} >= 0;
+var vTechRetCap{tech, region, year} >= 0;
+var vTechERetCap{tech, region, year} >= 0;
 var vTechCap{tech, region, year} >= 0;
 var vTechAct{tech, region, year, slice} >= 0;
 var vTechInp{tech, comm, region, year, slice} >= 0;
@@ -363,9 +368,13 @@ s.t.  eqTechAfcInpLo{(t, s) in mTechSlice, (t, r, y) in mTechSpan, (t, c) in mTe
 
 s.t.  eqTechAfcInpUp{(t, c, r, y, s) in mTechAfcUp : (t, s) in mTechSlice and y in mMidMilestone and (t, r, y) in mTechSpan and (t, c) in mTechInpComm and (t, r, y, s) in mTechAfUp}: vTechInp[t,c,r,y,s] <=  pTechAfcUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:(((wth1,r) in mWeatherRegion and (wth1,sp) in mWeatherSlice and pTechWeatherAfcUp[t,wth1,c] >= 0 and (t,wth1,c) in mTechWeatherAfc and (s,sp) in mSliceParentChildE))}(pWeather[wth1,r,y,s]*pTechWeatherAfcUp[t,wth1,c]);
 
-s.t.  eqTechCap{(t, r, y) in mTechSpan : y in mMidMilestone}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:(((t,r,yp) in mTechNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(vTechNewCap[t,r,yp]-sum{ye in year:((t in mTechRetirement and ye in mMidMilestone and ordYear[ye] >= ordYear[yp] and ordYear[ye] <= ordYear[y]))}(vTechRetiredCap[t,r,yp,ye]));
+s.t.  eqTechCap{(t, r, y) in mTechSpan : y in mMidMilestone}: vTechCap[t,r,y]  =  pTechDStock[t,r,y]+sum{yp in year:(((t,r,yp) in mTechNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp]))}(vTechNewCap[t,r,yp])-sum{yp in year:((yp in mMidMilestone and ordYear[y] >= ordYear[yp] and (t,r,yp) in mTechSpan))}(sum{FORIF: (t,r,y) in mTechRetCap} (vTechRetCap[t,r,yp])+vTechERetCap[t,r,yp]);
 
-s.t.  eqTechNewCap{(t, r, y) in mTechNew : y in mMidMilestone and t in mTechRetirement}: sum{yp in year:((yp in mMidMilestone and ordYear[yp] >= ordYear[y] and ordYear[yp]<ordYear[y]+pTechOlife[t,r]))}(vTechRetiredCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
+s.t.  eqTechRetCap{(t, r, y) in mTechRetCap}: vTechRetCap[t,r,y]  =  sum{yp in year:((t,r,y,yp) in mTechNewRetCap)}(vTechNewCap[t,r,yp])-sum{yp in year:((yp,y) in mMilestoneNext)}(vTechCap[t,r,yp]);
+
+s.t.  eqTechCapClear{(t, r, y) in mTechSpan : y in mMidMilestone and not((t in mTechRetirement))}: sum{yp in year:((yp in mMidMilestone and ordYear[yp] >= ordYear[y] and (t,r,yp) in mTechNew and ordYear[yp]<ordYear[y]+pTechOlife[t,r]))}(vTechNewCap[t,r,yp])+pTechDStock[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:((yp in mMidMilestone and ordYear[y] >= ordYear[yp] and (t,r,yp) in mTechSpan))}(sum{FORIF: (t,r,y) in mTechRetCap} (vTechRetCap[t,r,yp])+vTechERetCap[t,r,yp]);
+
+s.t.  eqTechCapClearRet{(t, r, y) in mTechSpan : y in mMidMilestone and t in mTechRetirement}: sum{yp in year:((yp in mMidMilestone and ordYear[yp] >= ordYear[y] and (t,r,yp) in mTechNew and ordYear[yp]<ordYear[y]+pTechOlife[t,r]))}(vTechNewCap[t,r,yp])+pTechDStock[t,r,y] <=  pTechStock[t,r,y]+sum{yp in year:((yp in mMidMilestone and ordYear[y] >= ordYear[yp] and (t,r,yp) in mTechSpan))}(sum{FORIF: (t,r,y) in mTechRetCap} (vTechRetCap[t,r,yp])+vTechERetCap[t,r,yp]);
 
 s.t.  eqTechEac{(t, r, y) in mTechEac : y in mMidMilestone}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ((t,r) in mTechOlifeInf or ordYear[y]<pTechOlife[t,r]+ordYear[yp]) and pTechInvcost[t,r,yp] <> 0))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t in mTechRetirement and ye in mMidMilestone and ordYear[ye] >= ordYear[yp] and ordYear[ye] <= ordYear[y]))}(vTechRetiredCap[t,r,yp,ye])));
 
@@ -511,9 +520,13 @@ printf "tech,region,year,value\n" > "output/vTechNewCap.csv";
 for{(t, r, y) in mTechNew : vTechNewCap[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechNewCap[t,r,y] >> "output/vTechNewCap.csv";
 }
-printf "tech,region,year,yearp,value\n" > "output/vTechRetiredCap.csv";
-for{(t, r, y) in mTechSpan, yp in year : vTechRetiredCap[t,r,y,yp] <> 0} {
-  printf "%s,%s,%s,%s,%f\n", t,r,y,yp,vTechRetiredCap[t,r,y,yp] >> "output/vTechRetiredCap.csv";
+printf "tech,region,year,value\n" > "output/vTechRetCap.csv";
+for{(t, r, y) in mTechRetCap : vTechRetCap[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechRetCap[t,r,y] >> "output/vTechRetCap.csv";
+}
+printf "tech,region,year,value\n" > "output/vTechERetCap.csv";
+for{(t, r, y) in mTechSpan : vTechERetCap[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechERetCap[t,r,y] >> "output/vTechERetCap.csv";
 }
 printf "tech,region,year,value\n" > "output/vTechCap.csv";
 for{(t, r, y) in mTechSpan : vTechCap[t,r,y] <> 0} {
@@ -767,7 +780,8 @@ printf "value\n" > "output/variable_list.csv";
     printf "vTradeRowCost\n" >> "output/variable_list.csv";
     printf "vTradeIrCost\n" >> "output/variable_list.csv";
     printf "vTechNewCap\n" >> "output/variable_list.csv";
-    printf "vTechRetiredCap\n" >> "output/variable_list.csv";
+    printf "vTechRetCap\n" >> "output/variable_list.csv";
+    printf "vTechERetCap\n" >> "output/variable_list.csv";
     printf "vTechCap\n" >> "output/variable_list.csv";
     printf "vTechAct\n" >> "output/variable_list.csv";
     printf "vTechInp\n" >> "output/variable_list.csv";

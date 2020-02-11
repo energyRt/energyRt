@@ -26,8 +26,8 @@ $offtext
 
 OPTION RESLIM=50000, PROFILE=0, SOLVEOPT=REPLACE;
 OPTION ITERLIM=999999, LIMROW=0, LIMCOL=0, SOLPRINT=OFF;
-*OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;
-*OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;
+OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;
+OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;
 file pFinish1_csv / 'output/pFinish.csv'/;
 pFinish1_csv.lp = 1;
 put pFinish1_csv;
@@ -311,10 +311,10 @@ $offtext
 positive variable
 *@ mTechNew(tech, region, year)
 vTechNewCap(tech, region, year)                      New capacity
+*@ mTechRetCap(tech, region, year)
+vTechRetCap(tech, region, year)
 *@ mTechSpan(tech, region, year)
-vTechRetiredCap(tech, region, year, year)            Early retired capacity
-*vTechRetrofitCap(tech, region, year, year)
-*vTechUpgradeCap(tech, region, year)
+vTechERetCap(tech, region, year)
 * Activity and intput-output
 *@ mTechSpan(tech, region, year)
 vTechCap(tech, region, year)                         Total capacity of the technology
@@ -947,10 +947,6 @@ parameter
 pTechCStock(tech, region, year)
 ;
 
-positive variable
-vTechRetCap(tech, region, year)
-vTechERetCap(tech, region, year)
-;
 
 * Capacity equation
 eqTechCap(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, year))..
@@ -970,7 +966,7 @@ eqTechRetCap(tech, region, year)$mTechRetCap(tech, region, year)..
          ;
 
 
-eqTechCapClear(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, year) and mTechRetirement(tech))..
+eqTechCapClear(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, year) and not(mTechRetirement(tech)))..
          sum(yearp$(mMidMilestone(yearp) and ordYear(yearp) >= ordYear(year) and
              mTechNew(tech, region, yearp) and ordYear(yearp) < ordYear(year) + pTechOlife(tech, region)),
                  vTechNewCap(tech, region, yearp)) + pTechDStock(tech, region, year) =e=
@@ -989,18 +985,7 @@ eqTechCapClearRet(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, 
 
 * EAC equation
 eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechEac(tech, region, year))..
-         vTechEac(tech, region, year)
-         =e=
-         sum((yearp)$
-                 (       mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
-                         ordYear(year) >= ordYear(yearp) and
-                         (mTechOlifeInf(tech, region) or ordYear(year) < pTechOlife(tech, region) + ordYear(yearp)) and pTechInvcost(tech, region, yearp) <> 0
-                 ),
-                  pTechEac(tech, region, yearp) * (
-                   vTechNewCap(tech, region, yearp) -
-                   sum((yeare)$(mTechRetirement(tech) and mMidMilestone(yeare) and ordYear(yeare) >= ordYear(yearp) and ordYear(yeare) <= ordYear(year)),
-                       vTechRetiredCap(tech, region, yearp, yeare)))
-         );
+         vTechEac(tech, region, year) =e= pTechEac(tech, region, year) * vTechCap(tech, region, year);
 
 *eqTechRetirementCap(tech, region, year, yearp)$(not(mTechRetirement(tech)) or
 *  ordYear(yearp) < ordYear(year) or ordYear(yearp) >= ordYear(year) + pTechOlife(tech, region))..

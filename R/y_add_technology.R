@@ -230,6 +230,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		}
 		# Stock & Capacity
 		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
+		if (nrow(stock_exist) != 0) { # For testing
+		  # dstock_exist need implement
+		  obj@parameters[['pTechDStock']] <- addData(obj@parameters[['pTechDStock']], dstock_exist)
+		  browser()
+		}
 		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
 		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
 		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
