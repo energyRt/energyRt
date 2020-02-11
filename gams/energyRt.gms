@@ -94,7 +94,6 @@ mTechAOut(tech, comm)            Auxiliary output
 *
 mTechNew(tech, region, year)     Technologies available for investment
 mTechSpan(tech, region, year)    Availability of each technology by regions and milestone years
-mTechSalv(tech, region)          Need calculate salvage cost
 mTechSlice(tech, slice)          Technology to slice-level
 * Supply
 mSupSlice(sup, slice)             Supply to slices-level
@@ -127,8 +126,6 @@ mTradeComm(trade, comm)            Trade commodities
 mTradeRoutes(trade, region, region)
 mTradeIrAInp(trade, comm)          Auxiliary  input commodity in source region
 mTradeIrAOut(trade, comm)          Auxiliary output commodity in source region
-mTradeIrCdstAInp(trade, comm)      Auxiliary  input commodity in destination region
-mTradeIrCdstAOut(trade, comm)      Auxiliary output commodity in destination region
 mExpComm(expp, comm)               Export commodities
 mImpComm(imp, comm)                Import commodities
 mExpSlice(expp, slice)             Export to slice
@@ -177,14 +174,12 @@ pTechUse2cact(tech, comm, region, year, slice)     Multiplier that transforms us
 pTechCact2cout(tech, comm, region, year, slice)    Multiplier that transforms commodity activity to commodity output
 pTechEmisComm(tech, comm)                          Combustion factor for input commodity (from 0 to 1)
 * Auxiliary input commodities
-pTechUse2AInp(tech, comm, region, year, slice)     Multiplier to use to get aux-commodity input
 pTechAct2AInp(tech, comm, region, year, slice)     Multiplier to activity to calculate aux-commodity input
 pTechCap2AInp(tech, comm, region, year, slice)     Multiplier to capacity to calculate aux-commodity input
 pTechNCap2AInp(tech, comm, region, year, slice)     Multiplier to new-capacity to calculate aux-commodity input
 pTechCinp2AInp(tech, comm, comm, region, year, slice)    Multiplier to commodity-input to calculate aux-commodity input
 pTechCout2AInp(tech, comm, comm, region, year, slice)    Multiplier to commodity-output to calculate aux-commodity input
 * Aux output comm map
-pTechUse2AOut(tech, comm, region, year, slice)     Multiplier to use to calculate aux-commodity output
 pTechAct2AOut(tech, comm, region, year, slice)     Multiplier to activity to calculate aux-commodity output
 pTechCap2AOut(tech, comm, region, year, slice)     Multiplier to capacity to calculate aux-commodity output
 pTechNCap2AOut(tech, comm, region, year, slice)     Multiplier to new capacity to calculate aux-commodity output
@@ -194,7 +189,6 @@ pTechCout2AOut(tech, comm, comm, region, year, slice)     Multiplier to commodit
 pTechFixom(tech, region, year)                      Fixed Operating and maintenance (O&M) costs (per unit of capacity)
 pTechVarom(tech, region, year, slice)               Variable O&M costs (per unit of acticity)
 pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
-pTechSalv(tech, region, year)                       Salvage coefficient for investment costs (per unit of capacity)
 pTechEac(tech, region, year)                        Eac coefficient for investment costs (per unit of capacity)
 pTechShareLo(tech, comm, region, year, slice)       Lower bound for share of the commodity in total group input or output
 pTechShareUp(tech, comm, region, year, slice)       Upper bound for share of the commodity in total group input or output
@@ -306,7 +300,6 @@ pTradeStock(trade, year)
 pTradeOlife(trade)
 pTradeInvcost(trade, region, year)
 pTradeEac(trade, region, year)
-pTradeSalv(trade, region, year)
 pTradeCap2Act(trade)
 ;
 
@@ -585,7 +578,6 @@ mInp2Lo(comm, region, year, slice)
 *** Activity Input & Output equations
 ********************************************************************************
 
-* pTechUse2aout(tech, comm, region, year, slice)
 * pTechUse2cact(tech, comm, region, year, slice) * pTechCact2cout(tech, comm, region, year, slice)
 
 
