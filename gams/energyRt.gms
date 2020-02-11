@@ -199,6 +199,7 @@ pTechAfsUp(tech, region, year, slice)               Upper bound for activity for
 pTechAfcLo(tech, comm, region, year, slice)         Lower bound for commodity output
 pTechAfcUp(tech, comm, region, year, slice)         Upper bound for commodity output
 pTechStock(tech, region, year)                      Technology capacity stock
+pTechDStock(tech, region, year)                     Technology absolute differences capacity stock
 pTechCap2act(tech)                                  Technology capacity units to activity units conversion factor
 pTechCvarom(tech, comm, region, year, slice)        Commodity-specific variable costs (per unit of commodity input or output)
 pTechAvarom(tech, comm, region, year, slice)        Auxilary Commodity-specific variable costs (per unit of commodity input or output)
@@ -930,37 +931,61 @@ eqTechAfcInpUp(tech, region, comm, year, slice)$
 Equation
 * Capacity equation
 eqTechCap(tech, region, year)       Technology capacity
-eqTechNewCap(tech, region, year)    Technology new capacity
+eqTechRetCap(tech, region, year)    Technology retirement capacity
 eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
-*eqTechRetirementCap(tech, region, year, year)
-*eqTechRetrofitCap(tech, region, year, year)
-*eqTechUpgradeCap(tech, region, year)
-* Investment equation
+eqTechCapClear(tech, region, year)
+eqTechCapClearRet(tech, region, year)
 eqTechInv(tech, region, year)       Technology investment costs
-* Aggregated annual costs
 eqTechOMCost(tech, region, year)    Technology O&M costs
+;
+set
+mTechNewRetCap(tech, region, year, year)
+mTechRetCap(tech, region, year)
+;
+
+parameter
+pTechCStock(tech, region, year)
+;
+
+positive variable
+vTechRetCap(tech, region, year)
+vTechERetCap(tech, region, year)
 ;
 
 * Capacity equation
 eqTechCap(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, year))..
          vTechCap(tech, region, year)
          =e=
-         pTechStock(tech, region, year) +
-         sum((yearp)$
-                 (       mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
-                         ordYear(year) >= ordYear(yearp) and
-                         (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))
-                 ),
-                 vTechNewCap(tech, region, yearp) -
-                   sum(yeare$(mTechRetirement(tech) and mMidMilestone(yeare) and
-                       ordYear(yeare) >= ordYear(yearp) and ordYear(yeare) <= ordYear(year)),
-                         vTechRetiredCap(tech, region, yearp, yeare))
-         );
+         pTechDStock(tech, region, year) +
+         sum(yearp$(mTechNew(tech, region, yearp) and mMidMilestone(yearp) and
+               ordYear(year) >= ordYear(yearp)), vTechNewCap(tech, region, yearp))
+         - sum(yearp$(mMidMilestone(yearp) and ordYear(year) >= ordYear(yearp)
+                 and  mTechSpan(tech, region, yearp)),
+                         vTechRetCap(tech, region, yearp)$mTechRetCap(tech, region, year) + vTechERetCap(tech, region, yearp));
 
-eqTechNewCap(tech, region, year)$(mMidMilestone(year) and mTechNew(tech, region, year) and mTechRetirement(tech))..
-    sum(yearp$(mMidMilestone(yearp) and ordYear(yearp) >= ordYear(year) and ordYear(yearp) < ordYear(year) + pTechOlife(tech, region)),
-                         vTechRetiredCap(tech, region, year, yearp)
-         ) =l= vTechNewCap(tech, region, year);
+eqTechRetCap(tech, region, year)$mTechRetCap(tech, region, year)..
+    vTechRetCap(tech, region, year) =e=
+         sum(yearp$mTechNewRetCap(tech, region, year, yearp), vTechNewCap(tech, region, yearp))
+         - sum(yearp$mMilestoneNext(yearp, year), vTechCap(tech, region, yearp))
+         ;
+
+
+eqTechCapClear(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, year) and mTechRetirement(tech))..
+         sum(yearp$(mMidMilestone(yearp) and ordYear(yearp) >= ordYear(year) and
+             mTechNew(tech, region, yearp) and ordYear(yearp) < ordYear(year) + pTechOlife(tech, region)),
+                 vTechNewCap(tech, region, yearp)) + pTechDStock(tech, region, year) =e=
+                         pTechStock(tech, region, year) +
+              sum(yearp$(mMidMilestone(yearp) and ordYear(year) >= ordYear(yearp) and  mTechSpan(tech, region, yearp)),
+                         vTechRetCap(tech, region, yearp)$mTechRetCap(tech, region, year) + vTechERetCap(tech, region, yearp));
+
+
+eqTechCapClearRet(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, year) and mTechRetirement(tech))..
+         sum(yearp$(mMidMilestone(yearp) and ordYear(yearp) >= ordYear(year) and
+             mTechNew(tech, region, yearp) and ordYear(yearp) < ordYear(year) + pTechOlife(tech, region)),
+                 vTechNewCap(tech, region, yearp)) + pTechDStock(tech, region, year) =l=
+                         pTechStock(tech, region, year) +
+              sum(yearp$(mMidMilestone(yearp) and ordYear(year) >= ordYear(yearp) and  mTechSpan(tech, region, yearp)),
+                         vTechRetCap(tech, region, yearp)$mTechRetCap(tech, region, year) + vTechERetCap(tech, region, yearp));
 
 * EAC equation
 eqTechEac(tech, region, year)$(mMidMilestone(year) and  mTechEac(tech, region, year))..
@@ -1729,10 +1754,9 @@ eqTechAfcInpUp
 ********************************************************************************
 * Capacity equation
 eqTechCap
-eqTechNewCap
-*eqTechRetirementCap
-*eqTechRetrofitCap
-*eqTechUpgradeCap
+eqTechRetCap
+eqTechCapClear
+eqTechCapClearRet
 * Investition equation
 eqTechInv
 eqTechEac
