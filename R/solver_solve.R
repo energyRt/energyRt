@@ -299,6 +299,232 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         close(z3)
       }
     }
+  } else if (arg$solver == 'PYOMO') {
+    ##################################################################################################################################    
+    # PYOMO part
+    ##################################################################################################################################    
+    if (arg$write) {
+      if (arg$echo) cat('Writing files: ')
+      #dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = F)
+      #dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = F)
+      #zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
+      #cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
+      #close(zz_output)  
+      zz_data_pyomo <- file(paste(arg$dir.result, 'data.dat', sep = ''), 'w')
+      file_w <- c()
+      for (j in c('set', 'map', 'simple', 'multi')) {
+        for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+          cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
+        }
+      }
+      close(zz_data_pyomo)    
+      #   ### Model code to text
+      #   .generate_gpr_gams_file(arg$dir.result)
+      #   zz <- file(paste(arg$dir.result, '/energyRt.gms', sep = ''), 'w')
+      #   cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
+      #   # Add parameter constraint declaration
+      #   if (length(scen@modInp@gams.equation) > 0) {
+      #     mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
+      #     mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
+      #       function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+      #     pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
+      #     pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
+      #       function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+      #     if (length(mps_name) != 0) cat(mps_name_def, sep = '\n', file = zz)
+      #     if (length(pps_name) != 0) cat(pps_name_def, sep = '\n', file = zz)
+      #   }
+      #   cat(file_w, sep = '\n', file = zz)
+      #   # Add constraint equation 
+      #   if (length(scen@modInp@gams.equation) > 0) {
+      #     # Declaration
+      #     cat('equation', sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
+      #     # Body equation
+      #     cat(sapply(scen@modInp@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
+      #   }
+      #   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
+      #     cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
+      #   }
+      #   cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
+      #       (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+      #   
+      #   # Add constraint equation to model declaration
+      #   if (length(scen@modInp@gams.equation) > 0) {
+      #     cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
+      #   }
+      #   
+      #   if (!is.null(scen@model@misc$additionalEquationGAMS)) 
+      #     cat(scen@model@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
+      #   
+      #   cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
+      #       (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) - 1)], sep = '\n', file = zz)
+      #   cat(run_code[(grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) + 1):
+      #       (grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) - 1)], sep = '\n', file = zz)
+      #   
+      #   if (arg$only.listing) {
+      #     cat('OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;\n',
+      #       'OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;\n',
+      #       'option iterlim = 0;\n', 
+      #       'Solve energyRt minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
+      #   }
+      #   cat(scen@model@misc$includeBeforeSolve, sep = '\n', file = zz)
+      #   cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
+      #     grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) - 1)], sep = '\n', file = zz)
+      #   cat(scen@model@misc$includeAfterSolve, sep = '\n', file = zz)
+      #   cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
+      #   close(zz)
+      #   if (arg$echo) { 
+      #     cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+      #     flush.console()
+      #   }
+      # }
+      # 
+      # ## Run model
+      # if (arg$run) {
+      #   if(arg$echo) cat('GAMS time: ')
+      #   gams_run_time <- proc.time()[3]
+      #   tryCatch({
+      #     setwd(arg$dir.result)
+      #     if (.Platform$OS.type == "windows") {
+      #       if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
+      #       rs <- shell(paste(cmd, 'gams energyRt.gms', arg$gamsCompileParameter), 
+      #         invisible = arg$invisible, wait = wait
+      #         # show.output.on.console = arg$show.output.on.console
+      #       )
+      #     } else {
+      #       rs <- system(paste('gams energyRt.gms', arg$gamsCompileParameter), 
+      #         invisible = arg$invisible, wait = wait
+      #         # show.output.on.console = arg$show.output.on.console
+      #       )
+      #     }
+      #     setwd(BEGINDR)  
+      #   }, interrupt = function(x) {
+      #     if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+      #     setwd(BEGINDR)
+      #     stop('Solver has been interrupted')
+      #   }, error = function(x) {
+      #     if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+      #     setwd(BEGINDR)
+      #     stop(x)
+      #   })    
+      #   if (rs != 0) stop(paste('Solution error code', rs))
+      #   if (arg$only.listing) {
+      #     return(readLines(paste(arg$dir.result, '/energyRt.lst', sep = '')))
+      #   }
+      #   if(arg$echo) cat('', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
+    }
+    } else if (arg$solver == 'JULIA') {
+      ##################################################################################################################################    
+      # Julia part
+      ##################################################################################################################################    
+      if (arg$write) {
+        if (arg$echo) cat('Writing files: ')
+        #dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = F)
+        #dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = F)
+        #zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
+        #cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
+        #close(zz_output)  
+        zz_data_julia <- file(paste(arg$dir.result, 'data.jl', sep = ''), 'w')
+        file_w <- c()
+        for (j in c('set', 'map', 'simple', 'multi')) {
+          for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+            cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_julia)
+          }
+        }
+        close(zz_data_julia)    
+        #   ### Model code to text
+        #   .generate_gpr_gams_file(arg$dir.result)
+        #   zz <- file(paste(arg$dir.result, '/energyRt.gms', sep = ''), 'w')
+        #   cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
+        #   # Add parameter constraint declaration
+        #   if (length(scen@modInp@gams.equation) > 0) {
+        #     mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
+        #     mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
+        #       function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+        #     pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
+        #     pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
+        #       function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+        #     if (length(mps_name) != 0) cat(mps_name_def, sep = '\n', file = zz)
+        #     if (length(pps_name) != 0) cat(pps_name_def, sep = '\n', file = zz)
+        #   }
+        #   cat(file_w, sep = '\n', file = zz)
+        #   # Add constraint equation 
+        #   if (length(scen@modInp@gams.equation) > 0) {
+        #     # Declaration
+        #     cat('equation', sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz) 
+        #     # Body equation
+        #     cat(sapply(scen@modInp@gams.equation, function(x) x$equation), '', sep = '\n', file = zz) 
+        #   }
+        #   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
+        #     cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz)
+        #   }
+        #   cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
+        #       (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+        #   
+        #   # Add constraint equation to model declaration
+        #   if (length(scen@modInp@gams.equation) > 0) {
+        #     cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz) 
+        #   }
+        #   
+        #   if (!is.null(scen@model@misc$additionalEquationGAMS)) 
+        #     cat(scen@model@misc$additionalEquationGAMS$declaration, sep = '\n', file = zz)
+        #   
+        #   cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):
+        #       (grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) - 1)], sep = '\n', file = zz)
+        #   cat(run_code[(grep('ddd355e0-0023-45e9-b0d3-1ad83ba74b3a', run_code) + 1):
+        #       (grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) - 1)], sep = '\n', file = zz)
+        #   
+        #   if (arg$only.listing) {
+        #     cat('OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;\n',
+        #       'OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;\n',
+        #       'option iterlim = 0;\n', 
+        #       'Solve energyRt minimizing vObjective using LP;\n$EXIT\n', file = zz, sep = '')
+        #   }
+        #   cat(scen@model@misc$includeBeforeSolve, sep = '\n', file = zz)
+        #   cat(run_code[(grep('f374f3df-5fd6-44f1-b08a-1a09485cbe3d', run_code) + 1):(
+        #     grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) - 1)], sep = '\n', file = zz)
+        #   cat(scen@model@misc$includeAfterSolve, sep = '\n', file = zz)
+        #   cat(run_code[(min(c(grep('99089425-31110-4440-be57-2ca102e9cee1', run_code) + 1, length(run_code)))):length(run_code)], sep = '\n', file = zz)
+        #   close(zz)
+        #   if (arg$echo) { 
+        #     cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+        #     flush.console()
+        #   }
+        # }
+        # 
+        # ## Run model
+        # if (arg$run) {
+        #   if(arg$echo) cat('GAMS time: ')
+        #   gams_run_time <- proc.time()[3]
+        #   tryCatch({
+        #     setwd(arg$dir.result)
+        #     if (.Platform$OS.type == "windows") {
+        #       if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
+        #       rs <- shell(paste(cmd, 'gams energyRt.gms', arg$gamsCompileParameter), 
+        #         invisible = arg$invisible, wait = wait
+        #         # show.output.on.console = arg$show.output.on.console
+        #       )
+        #     } else {
+        #       rs <- system(paste('gams energyRt.gms', arg$gamsCompileParameter), 
+        #         invisible = arg$invisible, wait = wait
+        #         # show.output.on.console = arg$show.output.on.console
+        #       )
+        #     }
+        #     setwd(BEGINDR)  
+        #   }, interrupt = function(x) {
+        #     if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        #     setwd(BEGINDR)
+        #     stop('Solver has been interrupted')
+        #   }, error = function(x) {
+        #     if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        #     setwd(BEGINDR)
+        #     stop(x)
+        #   })    
+        #   if (rs != 0) stop(paste('Solution error code', rs))
+        #   if (arg$only.listing) {
+        #     return(readLines(paste(arg$dir.result, '/energyRt.lst', sep = '')))
+        #   }
+        #   if(arg$echo) cat('', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
+      }
   } else stop('Unknown solver ', arg$solver) 
   if (readresult && arg$run) scen <- read_solution(scen)
 
