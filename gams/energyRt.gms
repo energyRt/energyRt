@@ -1012,12 +1012,12 @@ eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)..
                           vTechOut(tech, comm, region, year, slice)
                   )
                   +
-                  sum(comm$vTechAOut(tech, comm, region, year, slice),
+                  sum(comm$mvTechAOut(tech, comm, region, year, slice),
                           pTechAvarom(tech, comm, region, year, slice) *
                           vTechAOut(tech, comm, region, year, slice)
                   )
                   +
-                  sum(comm$vTechAInp(tech, comm, region, year, slice),
+                  sum(comm$mvTechAInp(tech, comm, region, year, slice),
                           pTechAvarom(tech, comm, region, year, slice) *
                           vTechAInp(tech, comm, region, year, slice)
                   )
@@ -1538,7 +1538,7 @@ eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
          vTechInpTot(comm, region, year, slice)
          =e=
          sum((tech, slicep)$(mCommSliceOrParent(comm, slice, slicep) and mvTechInp(tech, comm, region, year, slicep)), vTechInp(tech, comm, region, year, slicep)) +
-         sum((tech, slicep)$(mCommSliceOrParent(comm, slice, slicep) and vTechAInp(tech, comm, region, year, slicep)), vTechAInp(tech, comm, region, year, slicep));
+         sum((tech, slicep)$(mCommSliceOrParent(comm, slice, slicep) and mvTechAInp(tech, comm, region, year, slicep)), vTechAInp(tech, comm, region, year, slicep));
 
 eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)..
          vTechOutTot(comm, region, year, slice)

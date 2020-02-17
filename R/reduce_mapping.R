@@ -382,8 +382,7 @@
       merge(mvTechAct, tmp_map$mTechAInp, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
     prec@parameters[['mvTechAOut']] <- addData(prec@parameters[['mvTechAOut']], 
       merge(mvTechAct, tmp_map$mTechAOut, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
-    
-    dregion <- data.frame(region = tmp$region, stringsAsFactors = FALSE)
+    dregion <- data.frame(region = tmp_map$region, stringsAsFactors = FALSE)
     prec@parameters[['mvDemInp']] <- addData(prec@parameters[['mvDemInp']], 
       merge(merge(tmp_map$mMidMilestone, dregion), getParameterData(prec@parameters[['mDemInp']])
         )[,c('comm', 'region', 'year', 'slice')])

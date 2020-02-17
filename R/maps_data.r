@@ -927,9 +927,9 @@ rs
     rs["mvTechOut", c("name", "description", "type")] <- c("mvTechOut", "", "map");
     rs["mvTechOut", c("tech", "comm", "region", "year", "slice", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechActSng", "eqTechActGrp")] <- TRUE;
     rs["mvTechAInp", c("name", "description", "type")] <- c("mvTechAInp", "", "map");
-    rs["mvTechAInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mvTechAInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp", "eqTechOMCost")] <- TRUE;
     rs["mvTechAOut", c("name", "description", "type")] <- c("mvTechAOut", "", "map");
-    rs["mvTechAOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mvTechAOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut", "eqTechOMCost")] <- TRUE;
     rs["mvDemInp", c("name", "description", "type")] <- c("mvDemInp", "", "map");
     rs["mvDemInp", c("comm", "region", "year", "slice", "eqDemInp", "eqInpTot")] <- TRUE;
     rs["mvBalance", c("name", "description", "type")] <- c("mvBalance", "", "map");
