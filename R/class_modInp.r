@@ -404,8 +404,8 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mDummyCost']] <- createParameter('mDummyCost', c('comm', 'region', 'year'), 'map') 
     .Object@parameters[['mTradeIr']] <- createParameter('mTradeIr', c('trade', 'src', 'dst', 'year', 'slice'), 'map') 
     .Object@parameters[['mTradeIrUp']] <- createParameter('mTradeIrUp', c('trade', 'src', 'dst', 'year', 'slice'), 'map') 
-    .Object@parameters[['mTradeIrAInp2']] <- createParameter('mTradeIrAInp2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
-    .Object@parameters[['mTradeIrAOut2']] <- createParameter('mTradeIrAOut2', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTradeIrAInp']] <- createParameter('mvTradeIrAInp', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTradeIrAOut']] <- createParameter('mvTradeIrAOut', c('trade', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mTradeIrAInpTot']] <- createParameter('mTradeIrAInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mTradeIrAOutTot']] <- createParameter('mTradeIrAOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
     
@@ -461,6 +461,32 @@ setMethod("initialize", "modInp",
     
     .Object@parameters[['pTradeCap2Act']] <- createParameter('pTradeCap2Act', 'trade', 'simple', 
     	defVal = 1, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cap2act', slot = 'cap2act')    
+    
+    # mv Mapping
+    .Object@parameters[['mvSupReserve']] <- createParameter('mvSupReserve', c('sup', 'comm', 'region'), 'map') 
+    .Object@parameters[['mvTechRetiredCap']] <- createParameter('mvTechRetiredCap', c('tech', 'region', 'year', 'year'), 'map') 
+    .Object@parameters[['mvTechAct']] <- createParameter('mvTechAct', c('tech', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTechInp']] <- createParameter('mvTechInp', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTechOut']] <- createParameter('mvTechOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTechAInp']] <- createParameter('mvTechAInp', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTechAOut']] <- createParameter('mvTechAOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvDemInp']] <- createParameter('mvDemInp', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvBalance']] <- createParameter('mvBalance', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvInp2Lo']] <- createParameter('mvInp2Lo', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
+    .Object@parameters[['mvOut2Lo']] <- createParameter('mvOut2Lo', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
+    .Object@parameters[['mvStorageAInp']] <- createParameter('mvvStorageAInp', c('stg', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvStorageAOut']] <- createParameter('mvvStorageAInp', c('stg', 'comm', 'region', 'year', 'slice'), 'map') 
+
+    
+    .Object@parameters[['mvStorageStore']] <- createParameter('mvStorageStore', c('stg', 'comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTradeIr']] <- createParameter('mvTradeIr', c('trade', 'comm', 'src', 'dst', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvTradeCost']] <- createParameter('mvTradeCost', c('region', 'year'), 'map') 
+
+    .Object@parameters[['mvTradeCost']] <- createParameter('mvTradeCost', c('region', 'year'), 'map') 
+    .Object@parameters[['mvTradeRowCost']] <- createParameter('mvTradeRowCost', c('region', 'year'), 'map') 
+    .Object@parameters[['mvTradeCap']] <- createParameter('mvTradeCap', c('trade', 'year'), 'map') 
+    .Object@parameters[['mvTradeIrCost']] <- createParameter('mvTradeIrCost', c('region', 'year'), 'map') 
+    .Object@parameters[['mvTradeNewCap']] <- createParameter('mvTradeNewCap', c('trade', 'year'), 'map') 
     
     .Object
   })

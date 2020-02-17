@@ -449,10 +449,7 @@ setMethod('print', 'parameter', function(x, ...) {
   ret
 }
 
-load("C:/111/Github/RUENERGY/RUREG/experiment/Golub_2019/bau_3/bau0_20191023.RData")
-dpp <- BAU@modInp@parameters
 
-cat(.toJulia(dpp$mMidMilestone), sep = '\n')
 # Generate Julia code, return character vector
 .toJulia <- function(obj) {
   gen_gg <- function(name, dtt) {

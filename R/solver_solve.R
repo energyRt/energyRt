@@ -427,7 +427,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         file_w <- c()
         for (j in c('set', 'map', 'simple', 'multi')) {
           for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-            cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_julia)
+            cat(energyRt:::.toJulia(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_julia)
           }
         }
         close(zz_data_julia)    
