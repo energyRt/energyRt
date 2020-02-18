@@ -30,6 +30,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 			use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
 			tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]
 		}
+		# Disaggregated AFS, if there is a slice level
+		if (nrow(tech@afs) != 0 && any(tech@afs$slice %in% names(approxim$slice@slice_map))) {
+		  chk <- seq_len(nrow(tech@afs))[tech@afs$slice %in% names(approxim$slice@slice_map)]
+		  for (cc in chk) {
+		    slc <- approxim$slice@slice_map[[tech@afs[cc, 'slice']]]
+		    tmp <- tech@afs[rep(cc, length(slc)), ]
+		    tmp$slice <- slc
+		    tech@afs <- rbind(tech@afs, tmp)
+		  }
+		  tech@afs <- tech@afs[-chk, ]
+		}
+		
 		approxim <- energyRt:::.fix_approximation_list(approxim, lev = tech@slice)
 		tech <- .disaggregateSliceLevel(tech, approxim)
 		obj@parameters[['mTechSlice']] <- addData(obj@parameters[['mTechSlice']],
