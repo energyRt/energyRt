@@ -343,13 +343,13 @@ var vTradeNewCap{trade, year} >= 0;
 
 # Guid for add equation and add mapping & parameter to constrain
 # 22b584bd-a17a-4fa0-9cd9-f603ab684e47
-s.t.  eqTechSng2Sng{(t, c, r, y, s) in mvTechInp, (t, cp, r, y, s) in mvTechOut : pTechCinp2use[t,c,r,y,s] <> 0}: vTechInp[t,c,r,y,s]*pTechCinp2use[t,c,r,y,s]  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);
+s.t.  eqTechSng2Sng{(t, c, r, y, s) in mvTechInp, (t, cp, r, y, s) in mvTechOut : pTechCinp2use[t,c,r,y,s] <> 0 and (t,c) in mTechOneComm and (t,cp) in mTechOneComm and pTechCact2cout[t,cp,r,y,s] <> 0}: vTechInp[t,c,r,y,s]*pTechCinp2use[t,c,r,y,s]  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);
 
-s.t.  eqTechGrp2Sng{(t, cp, r, y, s) in mvTechOut, (t, g) in mTechInpGroup : (t, cp) in mTechOneComm}: pTechGinp2use[t,g,r,y,s]*sum{c in comm:(((t,c,r,y,s) in mvTechInp and (t,g,c) in mTechGroupComm))}(vTechInp[t,c,r,y,s]*pTechCinp2ginp[t,c,r,y,s])  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);
+s.t.  eqTechGrp2Sng{(t, cp, r, y, s) in mvTechOut, (t, g) in mTechInpGroup : (t, cp) in mTechOneComm and pTechCact2cout[t,cp,r,y,s] <> 0}: pTechGinp2use[t,g,r,y,s]*sum{c in comm:(((t,c,r,y,s) in mvTechInp and (t,g,c) in mTechGroupComm))}(vTechInp[t,c,r,y,s]*pTechCinp2ginp[t,c,r,y,s])  =  (vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]);
 
-s.t.  eqTechSng2Grp{(t, c, r, y, s) in mvTechInp, (t, gp) in mTechOutGroup : (t, c) in mTechOneComm and pTechCinp2use[t,c,r,y,s] <> 0}: vTechInp[t,c,r,y,s]*pTechCinp2use[t,c,r,y,s]  =  sum{cp in comm:(((t,cp,r,y,s) in mvTechOut and (t,gp,cp) in mTechGroupComm))}((vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]));
+s.t.  eqTechSng2Grp{(t, c, r, y, s) in mvTechInp, (t, gp) in mTechOutGroup : (t, c) in mTechOneComm and pTechCinp2use[t,c,r,y,s] <> 0}: vTechInp[t,c,r,y,s]*pTechCinp2use[t,c,r,y,s]  =  sum{cp in comm:(((t,cp,r,y,s) in mvTechOut and (t,gp,cp) in mTechGroupComm and pTechCact2cout[t,cp,r,y,s] <> 0))}((vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]));
 
-s.t.  eqTechGrp2Grp{(t, r, y, s) in mvTechAct, (t, g) in mTechInpGroup, (t, gp) in mTechOutGroup}: pTechGinp2use[t,g,r,y,s]*sum{c in comm:(((t,c,r,y,s) in mvTechInp and (t,g,c) in mTechGroupComm))}(vTechInp[t,c,r,y,s]*pTechCinp2ginp[t,c,r,y,s])  =  sum{cp in comm:(((t,cp,r,y,s) in mvTechOut and (t,gp,cp) in mTechGroupComm))}((vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]));
+s.t.  eqTechGrp2Grp{(t, r, y, s) in mvTechAct, (t, g) in mTechInpGroup, (t, gp) in mTechOutGroup}: pTechGinp2use[t,g,r,y,s]*sum{c in comm:(((t,c,r,y,s) in mvTechInp and (t,g,c) in mTechGroupComm))}(vTechInp[t,c,r,y,s]*pTechCinp2ginp[t,c,r,y,s])  =  sum{cp in comm:(((t,cp,r,y,s) in mvTechOut and (t,gp,cp) in mTechGroupComm and pTechCact2cout[t,cp,r,y,s] <> 0))}((vTechOut[t,cp,r,y,s]) / (pTechUse2cact[t,cp,r,y,s]*pTechCact2cout[t,cp,r,y,s]));
 
 s.t.  eqTechShareInpLo{(t, c, r, y, s) in mvTechInp, (t, g, c) in mTechGroupComm : (t, g) in mTechInpGroup and pTechShareLo[t,c,r,y,s] <> 0}: vTechInp[t,c,r,y,s]  >=  pTechShareLo[t,c,r,y,s]*sum{cp in comm:(((t,cp,r,y,s) in mvTechInp and (t,g,cp) in mTechGroupComm))}(vTechInp[t,cp,r,y,s]);
 
@@ -383,11 +383,11 @@ s.t.  eqTechAfcInpLo{(t, c, r, y, s) in mvTechInp : pTechAfcLo[t,c,r,y,s] <> 0}:
 
 s.t.  eqTechAfcInpUp{(t, c, r, y, s) in (mvTechInp inter mTechAfcUp)}: vTechInp[t,c,r,y,s] <=  pTechAfcUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{sp in slice,wth1 in weather:(((wth1,r) in mWeatherRegion and (wth1,sp) in mWeatherSlice and pTechWeatherAfcUp[t,wth1,c] >= 0 and (t,wth1,c) in mTechWeatherAfc and (s,sp) in mSliceParentChildE))}(pWeather[wth1,r,y,s]*pTechWeatherAfcUp[t,wth1,c]);
 
-s.t.  eqTechCap{(t, r, y) in mTechSpan : y in mMidMilestone}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:((t,r,yp) in mTechNew)}(vTechNewCap[t,r,yp]-sum{ye in year:((t,r,yp,ye) in mvTechRetiredCap)}(vTechRetiredCap[t,r,yp,ye]));
+s.t.  eqTechCap{(t, r, y) in mTechSpan : y in mMidMilestone}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(vTechNewCap[t,r,yp]-sum{ye in year:(((t,r,yp,ye) in mvTechRetiredCap and ordYear[y] >= ordYear[ye]))}(vTechRetiredCap[t,r,yp,ye]));
 
 s.t.  eqTechNewCap{(t, r, y) in mTechNew : t in mTechRetirement}: sum{yp in year:((t,r,y,yp) in mvTechRetiredCap)}(vTechRetiredCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
 
-s.t.  eqTechEac{(t, r, y) in mTechEac}: vTechEac[t,r,y]  =  sum{yp in year:((t,r,yp) in mTechNew)}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t,r,yp,ye) in mvTechRetiredCap)}(vTechRetiredCap[t,r,yp,ye])));
+s.t.  eqTechEac{(t, r, y) in mTechEac}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t,r,yp,ye) in mvTechRetiredCap)}(vTechRetiredCap[t,r,yp,ye])));
 
 s.t.  eqTechInv{(t, r, y) in mTechNew}: vTechInv[t,r,y]  =  pTechInvcost[t,r,y]*vTechNewCap[t,r,y];
 
@@ -431,11 +431,11 @@ s.t.  eqStorageOutUp{(c, s) in mCommSlice, (st1, c) in mStorageComm, (st1, r, y)
 
 s.t.  eqStorageOutLo{(c, s) in mCommSlice, (st1, c) in mStorageComm, (st1, r, y) in mStorageSpan : y in mMidMilestone and pStorageCoutLo[st1,c,r,y,s]>0}: vStorageOut[st1,c,r,y,s]  >=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCoutLo[st1,c,r,y,s]*pSliceShare[s]*prod{sp in slice,wth1 in weather:(((wth1,r) in mWeatherRegion and (wth1,sp) in mWeatherSlice and (st1,wth1) in mStorageWeatherCout and pStorageWeatherCoutLo[st1,wth1] >= 0 and (s,sp) in mSliceParentChildE))}(pWeather[wth1,r,y,s]*pStorageWeatherCoutLo[st1,wth1]);
 
-s.t.  eqStorageCap{(st1, r, y) in mStorageSpan : y in mMidMilestone}: vStorageCap[st1,r,y]  =  pStorageStock[st1,r,y]+sum{yp in year:((ordYear[y] >= ordYear[yp] and ((st1,r) in mStorageOlifeInf or ordYear[y]<pStorageOlife[st1,r]+ordYear[yp]) and (st1,r,yp) in mStorageNew))}(vStorageNewCap[st1,r,yp]);
+s.t.  eqStorageCap{(st1, r, y) in mStorageSpan}: vStorageCap[st1,r,y]  =  pStorageStock[st1,r,y]+sum{yp in year:((ordYear[y] >= ordYear[yp] and ((st1,r) in mStorageOlifeInf or ordYear[y]<pStorageOlife[st1,r]+ordYear[yp]) and (st1,r,yp) in mStorageNew))}(vStorageNewCap[st1,r,yp]);
 
-s.t.  eqStorageInv{(st1, r, y) in mStorageNew : y in mMidMilestone}: vStorageInv[st1,r,y]  =  pStorageInvcost[st1,r,y]*vStorageNewCap[st1,r,y];
+s.t.  eqStorageInv{(st1, r, y) in mStorageNew}: vStorageInv[st1,r,y]  =  pStorageInvcost[st1,r,y]*vStorageNewCap[st1,r,y];
 
-s.t.  eqStorageEac{(st1, r, y) in mStorageEac}: vStorageEac[st1,r,y]  =  sum{yp in year:(((st1,r,yp) in mStorageNew and yp in mMidMilestone and ordYear[y] >= ordYear[yp] and ((st1,r) in mStorageOlifeInf or ordYear[y]<pStorageOlife[st1,r]+ordYear[yp]) and pStorageInvcost[st1,r,yp] <> 0))}(pStorageEac[st1,r,yp]*vStorageNewCap[st1,r,yp]);
+s.t.  eqStorageEac{(st1, r, y) in mStorageEac}: vStorageEac[st1,r,y]  =  sum{yp in year:(((st1,r,yp) in mStorageNew and ordYear[y] >= ordYear[yp] and ((st1,r) in mStorageOlifeInf or ordYear[y]<pStorageOlife[st1,r]+ordYear[yp]) and pStorageInvcost[st1,r,yp] <> 0))}(pStorageEac[st1,r,yp]*vStorageNewCap[st1,r,yp]);
 
 s.t.  eqStorageCost{(st1, r, y) in mStorageOMCost : y in mMidMilestone}: vStorageOMCost[st1,r,y]  =  pStorageFixom[st1,r,y]*vStorageCap[st1,r,y]+sum{c in comm,s in slice:(((c,s) in mCommSlice and (st1,c) in mStorageComm))}(pStorageCostInp[st1,r,y,s]*vStorageInp[st1,c,r,y,s]+pStorageCostOut[st1,r,y,s]*vStorageOut[st1,c,r,y,s]+pStorageCostStore[st1,r,y,s]*vStorageStore[st1,c,r,y,s]);
 
@@ -471,11 +471,11 @@ s.t.  eqImportRowResUp{(i, c) in mImportRowAccumulatedUp}: vImportRowAccumulated
 
 s.t.  eqTradeCapFlow{(t1, y) in mvTradeCap, (t1, c) in mTradeComm, (t1, s) in mTradeSlice}: pSliceShare[s]*pTradeCap2Act[t1]*vTradeCap[t1,y]  >=  sum{src in region,dst in region:((t1,c,src,dst,y,s) in mvTradeIr)}(vTradeIr[t1,c,src,dst,y,s]);
 
-s.t.  eqTradeCap{(t1, y) in mvTradeCap}: vTradeCap[t1,y]  =  pTradeStock[t1,y]+sum{yp in year:((t1,yp) in mvTradeNewCap)}(vTradeNewCap[t1,yp]);
+s.t.  eqTradeCap{(t1, y) in mvTradeCap}: vTradeCap[t1,y]  =  pTradeStock[t1,y]+sum{yp in year:(((t1,yp) in mvTradeNewCap and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTradeOlife[t1]+ordYear[yp] or t1 in mTradeOlifeInf)))}(vTradeNewCap[t1,yp]);
 
 s.t.  eqTradeInv{(t1, r, y) in mTradeInv}: vTradeInv[t1,r,y]  =  pTradeInvcost[t1,r,y]*vTradeNewCap[t1,y];
 
-s.t.  eqTradeEac{(t1, r, y) in mTradeEac}: vTradeEac[t1,r,y]  =  sum{yp in year:((t1,yp) in mvTradeNewCap)}(pTradeEac[t1,r,yp]*vTradeNewCap[t1,yp]);
+s.t.  eqTradeEac{(t1, r, y) in mTradeEac}: vTradeEac[t1,r,y]  =  sum{yp in year:(((t1,yp) in mvTradeNewCap and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTradeOlife[t1]+ordYear[yp] or t1 in mTradeOlifeInf)))}(pTradeEac[t1,r,yp]*vTradeNewCap[t1,yp]);
 
 s.t.  eqTradeIrAInp{(t1, c, r, y, s) in mvTradeIrAInp}: vTradeIrAInp[t1,c,r,y,s]  =  sum{dst in region:((t1,r,dst,y,s) in mTradeIr)}(pTradeIrCsrc2Ainp[t1,c,r,dst,y,s]*sum{cp in comm:((t1,cp) in mTradeComm)}(vTradeIr[t1,cp,r,dst,y,s]))+sum{src in region:((t1,src,r,y,s) in mTradeIr)}(pTradeIrCdst2Ainp[t1,c,src,r,y,s]*sum{cp in comm:((t1,cp) in mTradeComm)}(vTradeIr[t1,cp,src,r,y,s]));
 

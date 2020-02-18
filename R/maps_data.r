@@ -795,7 +795,7 @@ rs
     rs["mEndMilestone", c("name", "description", "type")] <- c("mEndMilestone", "End of the period", "map");
     rs["mEndMilestone", c("year")] <- TRUE;
     rs["mMidMilestone", c("name", "description", "type")] <- c("mMidMilestone", "Milestone year", "map");
-    rs["mMidMilestone", c("year", "eqTechCap", "eqStorageCap", "eqStorageInv", "eqStorageCost", "eqExportRowCumulative", "eqSupOutTot", "eqCost", "eqObjective")] <- TRUE;
+    rs["mMidMilestone", c("year", "eqTechCap", "eqStorageCost", "eqExportRowCumulative", "eqSupOutTot", "eqCost", "eqObjective")] <- TRUE;
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
     rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
@@ -857,9 +857,9 @@ rs
     rs["mStorageAOut", c("name", "description", "type")] <- c("mStorageAOut", "Aux-commodity output from storage", "map");
     rs["mStorageAOut", c("stg", "comm")] <- TRUE;
     rs["mStorageNew", c("name", "description", "type")] <- c("mStorageNew", "Storage available for investment", "map");
-    rs["mStorageNew", c("stg", "region", "year", "eqStorageStore", "eqStorageAInp", "eqStorageAOut", "eqStorageEac")] <- TRUE;
+    rs["mStorageNew", c("stg", "region", "year", "eqStorageStore", "eqStorageAInp", "eqStorageAOut", "eqStorageInv", "eqStorageEac")] <- TRUE;
     rs["mStorageSpan", c("name", "description", "type")] <- c("mStorageSpan", "Storage set showing if the storage may exist in the year and region", "map");
-    rs["mStorageSpan", c("stg", "region", "year")] <- TRUE;
+    rs["mStorageSpan", c("stg", "region", "year", "eqStorageCap")] <- TRUE;
     rs["mStorageOMCost", c("name", "description", "type")] <- c("mStorageOMCost", "", "map");
     rs["mStorageOMCost", c("stg", "region", "year", "eqCost")] <- TRUE;
     rs["mStorageEac", c("name", "description", "type")] <- c("mStorageEac", "", "map");
@@ -1037,7 +1037,7 @@ rs
     rs["mLECRegion", c("name", "description", "type")] <- c("mLECRegion", "", "map");
     rs["mLECRegion", c("region", "eqLECActivity")] <- TRUE;
     rs["ordYear", c("name", "description", "type")] <- c("ordYear", "ord year for GLPK", "parameter");
-    rs["ordYear", c("year", "eqStorageCap", "eqStorageEac", "eqObjective")] <- TRUE;
+    rs["ordYear", c("year", "eqTechCap", "eqTechEac", "eqStorageCap", "eqStorageEac", "eqTradeCap", "eqTradeEac", "eqObjective")] <- TRUE;
     rs["cardYear", c("name", "description", "type")] <- c("cardYear", "card year for GLPK", "parameter");
     rs["cardYear", c("year")] <- TRUE;
     rs["pPeriodLen", c("name", "description", "type")] <- c("pPeriodLen", "Length of perios for milestone year", "parameter");
@@ -1047,7 +1047,7 @@ rs
     rs["pAggregateFactor", c("name", "description", "type")] <- c("pAggregateFactor", "Aggregation factor of commodities", "parameter");
     rs["pAggregateFactor", c("comm", "eqAggOut")] <- TRUE;
     rs["pTechOlife", c("name", "description", "type")] <- c("pTechOlife", "Operational life of technologies", "parameter");
-    rs["pTechOlife", c("tech", "region")] <- TRUE;
+    rs["pTechOlife", c("tech", "region", "eqTechCap", "eqTechEac")] <- TRUE;
     rs["pTechCinp2ginp", c("name", "description", "type")] <- c("pTechCinp2ginp", "Multiplier that transforms commodity input into group input", "parameter");
     rs["pTechCinp2ginp", c("tech", "comm", "region", "year", "slice", "eqTechGrp2Sng", "eqTechGrp2Grp")] <- TRUE;
     rs["pTechGinp2use", c("name", "description", "type")] <- c("pTechGinp2use", "Multiplier that transforms group input into use", "parameter");
@@ -1265,7 +1265,7 @@ rs
     rs["pTradeStock", c("name", "description", "type")] <- c("pTradeStock", "", "parameter");
     rs["pTradeStock", c("trade", "year", "eqTradeCap")] <- TRUE;
     rs["pTradeOlife", c("name", "description", "type")] <- c("pTradeOlife", "", "parameter");
-    rs["pTradeOlife", c("trade")] <- TRUE;
+    rs["pTradeOlife", c("trade", "eqTradeCap", "eqTradeEac")] <- TRUE;
     rs["pTradeInvcost", c("name", "description", "type")] <- c("pTradeInvcost", "", "parameter");
     rs["pTradeInvcost", c("trade", "region", "year", "eqTradeInv")] <- TRUE;
     rs["pTradeEac", c("name", "description", "type")] <- c("pTradeEac", "", "parameter");

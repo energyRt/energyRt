@@ -616,9 +616,11 @@ eqTechSng2Grp(tech, region, comm, groupp, year, slice)     Technology input to g
 eqTechGrp2Grp(tech, region, group, groupp, year, slice)    Technology group input to group output
 ;
 
+
 eqTechSng2Sng(tech, region, comm, commp, year, slice)$
    (mvTechInp(tech, comm, region, year, slice) and mvTechOut(tech, commp, region, year, slice)
-     and pTechCinp2use(tech, comm, region, year, slice) <> 0
+     and pTechCinp2use(tech, comm, region, year, slice) <> 0 and  mTechOneComm(tech, comm) and
+          mTechOneComm(tech, commp)  and pTechCact2cout(tech, commp, region, year, slice) <> 0
    )..
    vTechInp(tech, comm, region, year, slice) *
    pTechCinp2use(tech, comm, region, year, slice)
@@ -630,7 +632,7 @@ eqTechSng2Sng(tech, region, comm, commp, year, slice)$
 
 eqTechGrp2Sng(tech, region, group, commp, year, slice)$
    (mvTechOut(tech, commp, region, year, slice) and
-     mTechInpGroup(tech, group) and mTechOneComm(tech, commp)
+     mTechInpGroup(tech, group) and mTechOneComm(tech, commp)  and pTechCact2cout(tech, commp, region, year, slice) <> 0
    )..
    pTechGinp2use(tech, group, region, year, slice) *
    sum(comm$(mvTechInp(tech, comm, region, year, slice) and mTechGroupComm(tech, group, comm)),
@@ -650,7 +652,8 @@ eqTechSng2Grp(tech, region, comm, groupp, year, slice)$
    vTechInp(tech, comm, region, year, slice) *
    pTechCinp2use(tech, comm, region, year, slice)
    =e=
-    sum(commp$(mvTechOut(tech, commp, region, year, slice) and mTechGroupComm(tech, groupp, commp)),
+    sum(commp$(mvTechOut(tech, commp, region, year, slice) and mTechGroupComm(tech, groupp, commp) and
+                 pTechCact2cout(tech, commp, region, year, slice) <> 0),
            vTechOut(tech, commp, region, year, slice) /
            pTechUse2cact(tech, commp, region, year, slice) /
            pTechCact2cout(tech, commp, region, year, slice)
@@ -666,11 +669,13 @@ eqTechGrp2Grp(tech, region, group, groupp, year, slice)$
            pTechCinp2ginp(tech, comm, region, year, slice)
    )
    =e=
-   sum(commp$(mvTechOut(tech, commp, region, year, slice) and mTechGroupComm(tech, groupp, commp)),
+   sum(commp$(mvTechOut(tech, commp, region, year, slice) and mTechGroupComm(tech, groupp, commp) and
+         pTechCact2cout(tech, commp, region, year, slice) <> 0),
            vTechOut(tech, commp, region, year, slice) /
            pTechUse2cact(tech, commp, region, year, slice) /
            pTechCact2cout(tech, commp, region, year, slice)
    );
+
 
 
 ********************************************************************************
@@ -957,9 +962,11 @@ eqTechCap(tech, region, year)$(mMidMilestone(year) and  mTechSpan(tech, region, 
          vTechCap(tech, region, year)
          =e=
          pTechStock(tech, region, year) +
-         sum(yearp$mTechNew(tech, region, yearp),
+         sum(yearp$(mTechNew(tech, region, yearp) and ordYear(year) >= ordYear(yearp) and
+                         (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))),
                  vTechNewCap(tech, region, yearp) -
-                   sum(yeare$mvTechRetiredCap(tech, region, yearp, yeare), vTechRetiredCap(tech, region, yearp, yeare))
+                   sum(yeare$(mvTechRetiredCap(tech, region, yearp, yeare) and
+                 ordYear(year) >= ordYear(yeare)), vTechRetiredCap(tech, region, yearp, yeare))
          );
 
 eqTechNewCap(tech, region, year)$(mTechNew(tech, region, year) and mTechRetirement(tech))..
@@ -971,7 +978,8 @@ eqTechNewCap(tech, region, year)$(mTechNew(tech, region, year) and mTechRetireme
 eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
          vTechEac(tech, region, year)
          =e=
-         sum(yearp$mTechNew(tech, region, yearp),
+         sum(yearp$(mTechNew(tech, region, yearp) and ordYear(year) >= ordYear(yearp) and
+                         (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))),
                   pTechEac(tech, region, yearp) * (
                    vTechNewCap(tech, region, yearp) -
                    sum(yeare$mvTechRetiredCap(tech, region, yearp, yeare),
@@ -1240,7 +1248,7 @@ eqStorageCost(stg, region, year)  Storage total costs
 ;
 
 * Capacity equation
-eqStorageCap(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, region, year))..
+eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)..
          vStorageCap(stg, region, year)
          =e=
          pStorageStock(stg, region, year) +
@@ -1254,7 +1262,7 @@ eqStorageCap(stg, region, year)$(mMidMilestone(year) and mStorageSpan(stg, regio
          );
 
 * Investition equation
-eqStorageInv(stg, region, year)$(mMidMilestone(year) and mStorageNew(stg, region, year))..
+eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)..
          vStorageInv(stg, region, year)
          =e=
          pStorageInvcost(stg, region, year) *
@@ -1265,8 +1273,7 @@ eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
          vStorageEac(stg, region, year)
          =e=
          sum((yearp)$
-                 (       mStorageNew(stg, region, yearp) and mMidMilestone(yearp) and
-                         ordYear(year) >= ordYear(yearp) and
+                 (       mStorageNew(stg, region, yearp) and ordYear(year) >= ordYear(yearp) and
                          (mStorageOlifeInf(stg, region) or ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp)) and pStorageInvcost(stg, region, yearp) <> 0
                  ),
                   pStorageEac(stg, region, yearp) * vStorageNewCap(stg, region, yearp)
@@ -1397,7 +1404,8 @@ eqTradeCap(trade, year)$mvTradeCap(trade, year)..
          vTradeCap(trade, year)
          =e=
          pTradeStock(trade, year) +
-         sum((yearp)$mvTradeNewCap(trade, yearp), vTradeNewCap(trade, yearp));
+         sum(yearp$(mvTradeNewCap(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
+            (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))), vTradeNewCap(trade, yearp));
 
 * Investment equation
 eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)..
@@ -1408,7 +1416,9 @@ eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)..
 eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          vTradeEac(trade, region, year)
          =e=
-         sum(yearp$mvTradeNewCap(trade, yearp), pTradeEac(trade, region, yearp) * vTradeNewCap(trade, yearp));
+         sum(yearp$(mvTradeNewCap(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
+            (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))), 
+                pTradeEac(trade, region, yearp) * vTradeNewCap(trade, yearp));
 
 ********************************************************************************
 * Auxiliary input & output equations

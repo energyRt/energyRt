@@ -364,10 +364,10 @@
       merge(tmp_map$mSupComm, tmp_map$mSupSpan, by = 'sup')[, c('sup', 'comm', 'region')])
 
     
-    
-    mvTechRetiredCap0 <- merge(merge(tmp_map$mTechNew, tmp_map$mTechSpan, by = c('tech', 'region')),
+    mvTechRetiredCap0 <- merge(merge(merge(tmp_map$mTechNew, tmp_map$mTechRetirement), tmp_map$mTechSpan, by = c('tech', 'region')),
       getParameterData(prec@parameters[['pTechOlife']]), by = c('tech', 'region'))
-    mvTechRetiredCap0 <- mvTechRetiredCap0[mvTechRetiredCap0$year.x + mvTechRetiredCap0$value > mvTechRetiredCap0$year.y, -5] 
+    mvTechRetiredCap0 <- mvTechRetiredCap0[(mvTechRetiredCap0$year.x + mvTechRetiredCap0$value > mvTechRetiredCap0$year.y &
+        mvTechRetiredCap0$year.x <= mvTechRetiredCap0$year.y), -5] 
     colnames(mvTechRetiredCap0)[3:4] <- c('year', 'year.1')
     prec@parameters[['mvTechRetiredCap']] <- addData(prec@parameters[['mvTechRetiredCap']], mvTechRetiredCap0)
 
