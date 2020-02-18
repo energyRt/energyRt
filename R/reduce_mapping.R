@@ -11,8 +11,8 @@
   
   # Clean previous set data if any
   clean_list <- c('mCommSliceOrParent', 'mTechInpTot', 'mTechOutTot', 'mSupOutTot', 'mDemInp', 'mTechEmsFuel', 'mEmsFuelTot',
-                  'mDummyImport', 'mDummyExport', 'mDummyCost', 'mTradeIr', 'mTradeIrUp','mvTradeIrAInp','mTradeIrAInpTot',
-                  'mvTradeIrAOut','mTradeIrAOutTot','mImportRow','mImportRowUp','mImportRowAccumulatedUp','mExportRow','mExportRowUp',
+                  'mDummyImport', 'mDummyExport', 'mDummyCost', 'mTradeIr', 'mTradeIrUp','mvTradeIrAInp','mvTradeIrAInpTot',
+                  'mvTradeIrAOut','mvTradeIrAOutTot','mImportRow','mImportRowUp','mImportRowAccumulatedUp','mExportRow','mExportRowUp',
                   'mExportRowAccumulatedUp','mExport','mImport','mStorageInpTot','mStorageOutTot','mTaxCost',
                   'mSubsCost','mAggOut','mSupAva','mSupAvaUp','mSupReserveUp','mTechAfUp','mTechAfcUp','mTechOlifeInf',
                   'mStorageOlifeInf','mOut2Lo','mInp2Lo','mTechOMCost','mStorageOMCost')
@@ -248,8 +248,8 @@
   colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
   prec@parameters[['mvTradeIrAInp']] <- addData(prec@parameters[['mvTradeIrAInp']], 
   	merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
-  # mTradeIrAInpTot
-  prec@parameters[['mTradeIrAInpTot']] <- addData(prec@parameters[['mTradeIrAInpTot']], reduce_total_map(
+  # mvTradeIrAInpTot
+  prec@parameters[['mvTradeIrAInpTot']] <- addData(prec@parameters[['mvTradeIrAInpTot']], reduce_total_map(
   	reduce.sect(getParameterData(prec@parameters$mvTradeIrAInp), c('comm', 'region', 'year', 'slice'))))
     
     # mvTradeIrAOut(trade, comm, region, year, slice)
@@ -258,8 +258,8 @@
     colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
     prec@parameters[['mvTradeIrAOut']] <- addData(prec@parameters[['mvTradeIrAOut']], 
     	merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
-    # mTradeIrAOutTot
-    prec@parameters[['mTradeIrAOutTot']] <- addData(prec@parameters[['mTradeIrAOutTot']], reduce_total_map(
+    # mvTradeIrAOutTot
+    prec@parameters[['mvTradeIrAOutTot']] <- addData(prec@parameters[['mvTradeIrAOutTot']], reduce_total_map(
     	reduce.sect(getParameterData(prec@parameters$mvTradeIrAOut), c('comm', 'region', 'year', 'slice'))))
     
     # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
@@ -325,27 +325,27 @@
     #sum(slicep$(mSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) and
     #(mSupOutTot(comm, region, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
     #  mTechOutTot(comm, region, year, slice) or mStorageOutTot(comm, region, year, slice) or mImport(comm, region, year, slice) or
-    #  mTradeIrAOutTot(comm, region, year, slice))
+    #  mvTradeIrAOutTot(comm, region, year, slice))
     a1 <- tmp_map$mCommSlice; colnames(a1)[2] <- 'slicep'
     a2 <- tmp_map$mSliceParentChild
     for2Lo <- merge(a1, a2, by = 'slicep'); for2Lo$slicep <- NULL
     for2Lo <- reduce.duplicate(for2Lo)
-    for (i in c('mSupOutTot', 'mEmsFuelTot', 'mAggOut', 'mTechOutTot', 'mStorageOutTot', 'mImport', 'mTradeIrAOutTot', 'mTechInpTot', 
-    	'mStorageInpTot', 'mExport', 'mTradeIrAInpTot')) 
+    for (i in c('mSupOutTot', 'mEmsFuelTot', 'mAggOut', 'mTechOutTot', 'mStorageOutTot', 'mImport', 'mvTradeIrAOutTot', 'mTechInpTot', 
+    	'mStorageInpTot', 'mExport', 'mvTradeIrAInpTot')) 
     	tmp_map[[i]] <- getParameterData(prec@parameters[[i]])
     cll <- c('comm', 'region', 'year', 'slice')
     mOut2Lo <- merge(reduce.duplicate(rbind(merge(tmp_map$mSupOutTot, tmp_map$year)[, cll], 
     	tmp_map$mEmsFuelTot[, cll], tmp_map$mAggOut[, cll], tmp_map$mTechOutTot[, cll], tmp_map$mStorageOutTot[, cll], 
-    	tmp_map$mImport[, cll], tmp_map$mTradeIrAOutTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll]
+    	tmp_map$mImport[, cll], tmp_map$mvTradeIrAOutTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll]
     mOut2Lo <- mOut2Lo[!(paste0(mOut2Lo$comm, '#', mOut2Lo$slice) %in% paste0(tmp_map$mCommSlice$comm, '#', tmp_map$mCommSlice$slice)), ]
     prec@parameters[['mOut2Lo']] <- addData(prec@parameters[['mOut2Lo']], mOut2Lo)
     
     # sum(slicep$(mSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
     #   and (mTechInpTot(comm, region, year, slice) or  mStorageInpTot(comm, region, year, slice) or
-    #   or mExport(comm, region, year, slice) or mTradeIrAInpTot(comm, region, year, slice))
+    #   or mExport(comm, region, year, slice) or mvTradeIrAInpTot(comm, region, year, slice))
     
     mInp2Lo <- merge(reduce.duplicate(rbind(tmp_map$mTechInpTot[, cll], 
-    	tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll]
+    	tmp_map$mStorageInpTot[, cll], tmp_map$mExport[, cll], tmp_map$mvTradeIrAInpTot[, cll])), for2Lo, by =  c('comm', 'slice'))[, cll]
     mInp2Lo <- mInp2Lo[!(paste0(mInp2Lo$comm, '#', mInp2Lo$slice) %in% paste0(tmp_map$mCommSlice$comm, '#', tmp_map$mCommSlice$slice)), ]
     prec@parameters[['mInp2Lo']] <- addData(prec@parameters[['mInp2Lo']], mInp2Lo)
     ##

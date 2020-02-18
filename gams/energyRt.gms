@@ -482,7 +482,7 @@ vTradeIrAInp(trade, comm, region, year, slice)       Trade auxilari input
 vTradeIrAInpTot(comm, region, year, slice)           Trade total auxilari input
 *@ mvTradeIrAOut(trade, comm, region, year, slice)
 vTradeIrAOut(trade, comm, region, year, slice)       Trade auxilari output
-*@ mTradeIrAOutTot(comm, region, year, slice)
+*@ mvTradeIrAOutTot(comm, region, year, slice)
 vTradeIrAOutTot(comm, region, year, slice)           Trade auxilari output
 *@ mExpComm(expp, comm)
 vExportRowAccumulated(expp, comm)                    Accumulated export to ROW
@@ -545,12 +545,12 @@ mTradeIrUp(trade, region, region, year, slice)
 *  (sum(src$(mTradeIr(trade, src, region, year, slice) and sum(comm$pTradeIrCsrc2Ainp(trade, comm, src, region, year, slice), 1) <> 0), 1) <> 0))
 mvTradeIrAInp(trade, comm, region, year, slice)
 * (sum(trade$mvTradeIrAInp(trade, comm, region, year, slice), 1) <> 0)
-mTradeIrAInpTot(comm, region, year, slice)
+mvTradeIrAInpTot(comm, region, year, slice)
 * ((sum(dst$(mTradeIr(trade, region, dst, year, slice) and sum(comm$pTradeIrCdst2Aout(trade, comm, region, dst, year, slice), 1) <> 0), 1) <> 0) or
 *  (sum(src$(mTradeIr(trade, src, region, year, slice) and sum(comm$pTradeIrCsrc2Aout(trade, comm, src, region, year, slice), 1) <> 0), 1) <> 0))
 mvTradeIrAOut(trade, comm, region, year, slice)
 * (sum(trade$mvTradeIrAOut(trade, comm, region, year, slice), 1) <> 0)
-mTradeIrAOutTot(comm, region, year, slice)
+mvTradeIrAOutTot(comm, region, year, slice)
 * (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
 mImportRow(imp, comm, region, year, slice)
 * (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf)
@@ -586,7 +586,7 @@ mSupReserveUp(sup, comm, region)
 * sum(slicep$(mSliceParentChildE(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0 and
 *(mSupOutTot(comm, region, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
 *mTechOutTot(comm, region, year, slice) or mStorageOutTot(comm, region, year, slice) or mImport(comm, region, year, slice) or
-*mTradeIrAOutTot(comm, region, year, slice))
+*mvTradeIrAOutTot(comm, region, year, slice))
 mOut2Lo(comm, region, year, slice)
 * sum(slicep$(mSliceParentChildE(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
 * and (mTechInpTot(comm, region, year, slice) or  mStorageInpTot(comm, region, year, slice) or
@@ -1448,12 +1448,12 @@ eqTradeIrAOut(trade, comm, region, year, slice)$mvTradeIrAOut(trade, comm, regio
     + sum(src$mTradeIr(trade, src, region, year, slice),
       pTradeIrCdst2Aout(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
-eqTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice)..
+eqTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)..
   vTradeIrAInpTot(comm, region, year, slice) =e=
    sum((trade, slicep)$(mCommSliceOrParent(comm, slice, slicep) and mvTradeIrAInp(trade, comm, region, year, slicep)),
                  vTradeIrAInp(trade, comm, region, year, slicep));
 
-eqTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice)..
+eqTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice)..
   vTradeIrAOutTot(comm, region, year, slice) =e=
 
    sum((trade, slicep)$(mCommSliceOrParent(comm, slice, slicep) and mvTradeIrAOut(trade, comm, region, year, slicep)),
@@ -1502,7 +1502,7 @@ eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
                   vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
                   vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice) +
                   vImport(comm, region, year, slice)$mImport(comm, region, year, slice) +
-                  vTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice) +
+                  vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice) +
          sum(slicep$(mSliceParentChild(slicep, slice) and mvOut2Lo(comm, region, year, slicep, slice)),
                  vOut2Lo(comm, region, year, slicep, slice));
 
@@ -1516,7 +1516,7 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
                   vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
                   vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice) +
                   vImport(comm, region, year, slice)$mImport(comm, region, year, slice) +
-                  vTradeIrAOutTot(comm, region, year, slice)$mTradeIrAOutTot(comm, region, year, slice);
+                  vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice);
 
 eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
          vInpTot(comm, region, year, slice)
@@ -1526,7 +1526,7 @@ eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
          vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice) +
          vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice) +
          vExport(comm, region, year, slice)$mExport(comm, region, year, slice) +
-         vTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice) +
+         vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice) +
          sum(slicep$(mSliceParentChild(slicep, slice) and mvInp2Lo(comm, region, year, slicep, slice)),
                  vInp2Lo(comm, region, year, slicep, slice));
 
@@ -1537,7 +1537,7 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
                   vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice) +
                   vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice) +
                   vExport(comm, region, year, slice)$mExport(comm, region, year, slice) +
-                  vTradeIrAInpTot(comm, region, year, slice)$mTradeIrAInpTot(comm, region, year, slice);
+                  vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice);
 
 eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and mSupOutTot(comm, region, slice))..
          vSupOutTot(comm, region, year, slice) =e=

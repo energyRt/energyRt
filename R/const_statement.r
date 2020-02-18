@@ -109,7 +109,7 @@
   vTradeIrAInp = "vTradeIrAInp( trade , comm , region , year , slice ) $ mvTradeIrAInp( trade , comm , region , year , slice )",
   vTradeIrAInpTot = "vTradeIrAInpTot( comm , region , year , slice ) $ mvTradeIrAInpTot( comm , region , year , slice )",
   vTradeIrAOut = "vTradeIrAOut( trade , comm , region , year , slice ) $ mvTradeIrAOut( trade , comm , region , year , slice )",
-  vTradeIrAOutTot = "vTradeIrAOutTot( comm , region , year , slice ) $ mTradeIrAOutTot( comm , region , year , slice )",
+  vTradeIrAOutTot = "vTradeIrAOutTot( comm , region , year , slice ) $ mvTradeIrAOutTot( comm , region , year , slice )",
   vExportRowAccumulated = "vExportRowAccumulated( expp , comm ) $ mExpComm( expp , comm )",
   vExportRow = "vExportRow( expp , comm , region , year , slice ) $ mExportRow( expp , comm , region , year , slice )",
   vImportRowAccumulated = "vImportRowAccumulated( imp , comm ) $ mImpComm( imp , comm )",
