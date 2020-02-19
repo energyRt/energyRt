@@ -456,8 +456,11 @@ setMethod('print', 'parameter', function(x, ...) {
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
-        paste0(name, ' = ', data)))
+        paste0(name, ' = ', data$value)))
     } else {
+      if (nrow(data) == 0) {
+        return(c(paste0("# ", name, name2, '\n', name, ' = Dict()')))
+      }
       data <- data[data$value != Inf, ]
       kk <- paste0('  (:', data[, 1])
       for (i in seq_len(ncol(data) - 2) + 1)
@@ -485,12 +488,13 @@ setMethod('print', 'parameter', function(x, ...) {
         function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), ']')))
     }
   } else if (obj@type == 'simple') {
-    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')))
+    return(as_simple(obj@data[obj@data$value != Inf, ], obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')))
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
     return(c(
       as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Lo', sep = ''), hh),
-      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Up', sep = ''), hh)
+      as_simple(obj@data[obj@data$type == 'up' & obj@data$value != Inf, 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Up', sep = ''), hh)
     ))
   } else stop('Must realise')
 }

@@ -423,8 +423,8 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         #zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
         #cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
         #close(zz_output)  
-        zz_data_julia <- file(paste(arg$dir.result, 'data.jl', sep = ''), 'w')
-        file_w <- c()
+        zz_data_julia <- file(paste(arg$dir.result, '/data.jl', sep = ''), 'w')
+        cat('using JuMP\nmodel = Model()\n', file = zz_data_julia)
         for (j in c('set', 'map', 'simple', 'multi')) {
           for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
             cat(energyRt:::.toJulia(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_julia)
