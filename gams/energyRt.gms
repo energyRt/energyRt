@@ -506,7 +506,7 @@ positive variable
 vTradeCap(trade, year)
 *@ mTradeEac(trade, region, year)
 vTradeInv(trade, region, year)
-*@ (mTradeEac(trade, region, year))
+*@ mTradeEac(trade, region, year)
 vTradeEac(trade, region, year)
 *@ mvTradeNewCap(trade, year)
 vTradeNewCap(trade, year)
