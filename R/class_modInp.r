@@ -426,7 +426,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mSubsCost']] <- createParameter('mSubsCost', c('comm', 'region', 'year'), 'map') 
     .Object@parameters[['mAggOut']] <- createParameter('mAggOut', c('comm', 'region', 'year', 'slice'), 'map') 
     
-    .Object@parameters[['mSupOutTot']] <- createParameter('mSupOutTot', c('comm', 'region', 'slice'), 'map') 
+    .Object@parameters[['mSupOutTot']] <- createParameter('mSupOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mSupAvaUp']] <- createParameter('mSupAvaUp', c('sup', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mSupAva']] <- createParameter('mSupAva', c('sup', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mSupReserveUp']] <- createParameter('mSupReserveUp', c('sup', 'comm', 'region'), 'map') 
@@ -487,6 +487,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mvTradeCap']] <- createParameter('mvTradeCap', c('trade', 'year'), 'map') 
     .Object@parameters[['mvTradeIrCost']] <- createParameter('mvTradeIrCost', c('region', 'year'), 'map') 
     .Object@parameters[['mvTradeNewCap']] <- createParameter('mvTradeNewCap', c('trade', 'year'), 'map') 
+    .Object@parameters[['mvTotalCost']] <- createParameter('mvTotalCost', c('region', 'year'), 'map') 
     
     .Object
   })

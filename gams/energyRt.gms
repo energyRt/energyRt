@@ -327,7 +327,7 @@ mvTradeRowCost(region, year)
 mvTradeIrCost(region, year)
 mvTradeCap(trade, year)
 mvTradeNewCap(trade, year)
-
+mvTotalCost(region, year)
 ;
 
 $ontext
@@ -402,7 +402,7 @@ vInpTot(comm, region, year, slice)                   Total commodity input
 vInp2Lo(comm, region, year, slice, slice)            Desagregation of slices for input parent to (grand)child
 *@ mvOut2Lo(comm, region, year, slice, slice)
 vOut2Lo(comm, region, year, slice, slice)            Desagregation of slices for output parent to (grand)child
-*@ mSupOutTot(comm, region, slice)
+*@ mSupOutTot(comm, region, year, slice)
 vSupOutTot(comm, region, year, slice)                Total commodity supply
 *@ mTechInpTot(comm, region, year, slice)
 vTechInpTot(comm, region, year, slice)               Total commodity input to technologies
@@ -419,7 +419,7 @@ vStorageAOut(stg, comm, region, year, slice)         Aux-commodity input from st
 ;
 variable
 * Costs variable
-*@ mMidMilestone(year)
+*@ mvTotalCost(region, year)
 vTotalCost(region, year)                             Regional annual total costs
 vObjective                                           Objective costs
 ;
@@ -524,7 +524,7 @@ mTechOutTot(comm, region, year, slice)               Total technology output map
 mTechEac(tech, region, year)
 mTechOMCost(tech, region, year)
 * (sum(sup$(mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region)), 1))
-mSupOutTot(comm, region, slice)
+mSupOutTot(comm, region, year, slice)
 * (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))
 mDemInp(comm, slice)
 *  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and pEmissionFactor(comm, commp) <> 0), 1)), 1))
@@ -584,7 +584,7 @@ mSupAvaUp(sup, comm, region, year, slice)
 mSupAva(sup, comm, region, year, slice)
 mSupReserveUp(sup, comm, region)
 * sum(slicep$(mSliceParentChildE(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0 and
-*(mSupOutTot(comm, region, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
+*(mSupOutTot(comm, region, year, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
 *mTechOutTot(comm, region, year, slice) or mStorageOutTot(comm, region, year, slice) or mImport(comm, region, year, slice) or
 *mvTradeIrAOutTot(comm, region, year, slice))
 mOut2Lo(comm, region, year, slice)
@@ -1417,7 +1417,7 @@ eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          vTradeEac(trade, region, year)
          =e=
          sum(yearp$(mvTradeNewCap(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
-            (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))), 
+            (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))),
                 pTradeEac(trade, region, yearp) * vTradeNewCap(trade, yearp));
 
 ********************************************************************************
@@ -1496,7 +1496,7 @@ eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
          vOutTot(comm, region, year, slice)
          =e=
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
-                  vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, slice) +
+                  vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice) +
                   vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
                   vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice) +
                   vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
@@ -1510,7 +1510,7 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
          sum(slicep$(mSliceParentChild(slice, slicep) and mvOut2Lo(comm, region, year, slice, slicep)),
                  vOut2Lo(comm, region, year, slice, slicep))
          =e=
-                  vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, slice) +
+                  vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice) +
                   vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
                   vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice) +
                   vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)  +
@@ -1539,7 +1539,7 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
                   vExport(comm, region, year, slice)$mExport(comm, region, year, slice) +
                   vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice);
 
-eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and mSupOutTot(comm, region, slice))..
+eqSupOutTot(comm, region, year, slice)$(mMidMilestone(year) and mSupOutTot(comm, region, year, slice))..
          vSupOutTot(comm, region, year, slice) =e=
          sum((sup, slicep)$(mCommSliceOrParent(comm, slice, slicep) and mSupAva(sup, comm, region, year, slicep)),
                  vSupOut(sup, comm, region, year, slicep));
@@ -1597,7 +1597,7 @@ eqObjective                         Objective equation
 *         sum(slice$mDummyExport(comm, region, year, slice),
 *           pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
 
-eqCost(region, year)$mMidMilestone(year)..
+eqCost(region, year)$mvTotalCost(region, year)..
          vTotalCost(region, year)
          =e=
          sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year))
@@ -1625,7 +1625,7 @@ eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)..
 
 eqObjective..
    vObjective =e=
-         sum((region, year)$mMidMilestone(year),
+         sum((region, year)$mvTotalCost(region, year),
            vTotalCost(region, year) * sum((yeare, yearp, yearn)$(mStartMilestone(year, yearp) and mEndMilestone(year, yeare)
                  and ordYear(yearn) >= ordYear(yearp) and ordYear(yearn) <= ordYear(yeare)), pDiscountFactor(region, yearn)))
 ;

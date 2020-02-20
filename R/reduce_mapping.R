@@ -153,6 +153,8 @@
   	x <- x[, set, drop = FALSE]
   	x[!duplicated(x),, drop = FALSE]
   }
+  dregion <- data.frame(region = tmp_map$region, stringsAsFactors = FALSE)
+  dregionyear <- merge(dregion, tmp_map$mMidMilestone)
   
   # mTechInpTot(comm, region, year, slice)
   #   (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and 
@@ -190,9 +192,9 @@
   		by = 'tech'), c('comm', 'region', 'year', 'slice'))))
   # mSupOutTot(comm, region, slice)
   #   (sum(sup$(mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region)), 1))
-  prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], reduce_total_map(
-  	reduce.sect(merge(merge(tmp_map$mSupSlice, tmp_map$mSupComm, by = 'sup'), tmp_map$mSupSpan, by = 'sup'), 
-  		c('comm', 'region', 'slice'))))
+  tmp <- merge(merge(tmp_map$mSupComm, tmp_map$mSupSpan), tmp_map$mSupSlice)[, c('comm', 'region', 'slice')]
+  tmp <- merge(tmp[!duplicated(tmp), ], tmp_map$mMidMilestone)[, c('comm', 'region', 'year', 'slice')]
+  prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], tmp)
   # mDemInp(comm, slice)
   #   (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))    
   prec@parameters[['mDemInp']] <- addData(prec@parameters[['mDemInp']], 
@@ -382,10 +384,10 @@
       merge(mvTechAct, tmp_map$mTechAInp, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
     prec@parameters[['mvTechAOut']] <- addData(prec@parameters[['mvTechAOut']], 
       merge(mvTechAct, tmp_map$mTechAOut, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
-    dregion <- data.frame(region = tmp_map$region, stringsAsFactors = FALSE)
     prec@parameters[['mvDemInp']] <- addData(prec@parameters[['mvDemInp']], 
-      merge(merge(tmp_map$mMidMilestone, dregion), getParameterData(prec@parameters[['mDemInp']])
-        )[,c('comm', 'region', 'year', 'slice')])
+      merge(dregionyear, getParameterData(prec@parameters[['mDemInp']]))[,c('comm', 'region', 'year', 'slice')])
+
+    prec@parameters[['mvTotalCost']] <- addData(prec@parameters[['mvTotalCost']], dregionyear)
     
     prec@parameters[['mvBalance']] <- addData(prec@parameters[['mvBalance']], 
       merge(merge(tmp_map$mMidMilestone, dregion), getParameterData(prec@parameters[['mCommSlice']])
