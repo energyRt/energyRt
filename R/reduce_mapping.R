@@ -195,6 +195,7 @@
   tmp <- merge(merge(tmp_map$mSupComm, tmp_map$mSupSpan), tmp_map$mSupSlice)[, c('comm', 'region', 'slice')]
   tmp <- merge(tmp[!duplicated(tmp), ], tmp_map$mMidMilestone)[, c('comm', 'region', 'year', 'slice')]
   prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], tmp)
+  prec@parameters[['mvSupCost']] <- addData(prec@parameters[['mvSupCost']], merge(tmp_map$mSupSpan, tmp_map$mMidMilestone))
   # mDemInp(comm, slice)
   #   (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))    
   prec@parameters[['mDemInp']] <- addData(prec@parameters[['mDemInp']], 

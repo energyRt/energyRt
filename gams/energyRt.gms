@@ -304,6 +304,7 @@ pTradeCap2Act(trade)
 ;
 
 set
+mvSupCost(sup, region, year)
 mvTechInp(tech, comm, region, year, slice)
 mvSupReserve(sup, comm, region)
 mvTechRetiredCap(tech, region, year, year)
@@ -373,7 +374,7 @@ vSupOut(sup, comm, region, year, slice)              Output of supply
 vSupReserve(sup, comm, region)                       Total supply reserve
 ;
 variable
-*@ mSupSpan(sup, region)
+*@ mvSupCost(sup, region, year)
 vSupCost(sup, region, year)                          Supply costs
 ;
 positive variable
@@ -1070,7 +1071,7 @@ eqSupReserveLo(sup, comm, region)$(mvSupReserve(sup, comm, region) and  pSupRese
          vSupReserve(sup, comm, region) =g= pSupReserveLo(sup, comm, region);
 
 
-eqSupCost(sup, region, year)$mSupSpan(sup, region)..
+eqSupCost(sup, region, year)$mvSupCost(sup, region, year)..
          vSupCost(sup, region, year)
          =e=
          sum((comm, slice)$mSupAva(sup, comm, region, year, slice),
@@ -1602,7 +1603,7 @@ eqCost(region, year)$mvTotalCost(region, year)..
          =e=
          sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year))
          + sum(tech$mTechOMCost(tech, region, year), vTechOMCost(tech, region, year))
-         + sum(sup$mSupSpan(sup, region), vSupCost(sup, region, year))
+         + sum(sup$mvSupCost(sup, region, year), vSupCost(sup, region, year))
 *        + sum(comm$mDummyCost(comm, region, year), vDummyCost(comm, region, year))
          + sum((comm, slice)$mDummyImport(comm, region, year, slice),
                     pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice))

@@ -157,8 +157,8 @@ setMethod("initialize", "modInp",
     # Map
     .Object@parameters[['mSupComm']] <- 
     	createParameter('mSupComm', c('sup', 'comm'), 'map', cls = 'supply')    
-    .Object@parameters[['mSupSpan']] <- 
-    	createParameter('mSupSpan', c('sup', 'region'), 'map')    
+    .Object@parameters[['mSupSpan']] <- createParameter('mSupSpan', c('sup', 'region'), 'map')    
+    .Object@parameters[['mvSupCost']] <- createParameter('mvSupCost', c('sup', 'region', 'year'), 'map')    
     # simple
     .Object@parameters[['pSupCost']] <- 
     	createParameter('pSupCost', c('sup', 'comm', 'region', 'year', 'slice'), 'simple', 

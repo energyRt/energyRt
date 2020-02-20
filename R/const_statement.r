@@ -74,7 +74,7 @@
   vTechOMCost = "vTechOMCost( tech , region , year ) $ mTechOMCost( tech , region , year )",
   vSupOut = "vSupOut( sup , comm , region , year , slice ) $ mSupAva( sup , comm , region , year , slice )",
   vSupReserve = "vSupReserve( sup , comm , region ) $ mvSupReserve( sup , comm , region )",
-  vSupCost = "vSupCost( sup , region , year ) $ mSupSpan( sup , region )",
+  vSupCost = "vSupCost( sup , region , year ) $ mvSupCost( sup , region , year )",
   vDemInp = "vDemInp( comm , region , year , slice ) $ mvDemInp( comm , region , year , slice )",
   vEmsFuelTot = "vEmsFuelTot( comm , region , year , slice ) $ mEmsFuelTot( comm , region , year , slice )",
   vBalance = "vBalance( comm , region , year , slice ) $ mvBalance( comm , region , year , slice )",
