@@ -75,19 +75,19 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		if (length(approxim_comm[['comm']]) != 0) {
 			obj@parameters[['pTechCvarom']] <- addData(obj@parameters[['pTechCvarom']],
 				simpleInterpolation(tech@varom, 'cvarom',
-					obj@parameters[['pTechCvarom']], approxim_comm, 'tech', tech@name))
+					obj@parameters[['pTechCvarom']], approxim_comm, 'tech', tech@name, remValue = 0))
 		}
 		approxim_acomm <- approxim
 		approxim_acomm[['acomm']] <- rownames(ctype$aux)
 		if (length(approxim_acomm[['acomm']]) != 0) {
 			obj@parameters[['pTechAvarom']] <- addData(obj@parameters[['pTechAvarom']],
 				simpleInterpolation(tech@varom, 'avarom',
-					obj@parameters[['pTechAvarom']], approxim_acomm, 'tech', tech@name))
+					obj@parameters[['pTechAvarom']], approxim_acomm, 'tech', tech@name, remValue = 0))
 		}
 		approxim_comm[['comm']] <- rownames(ctype$comm)
 		if (length(approxim_comm[['comm']]) != 0) {
 			gg <- multiInterpolation(tech@ceff, 'afc',
-				obj@parameters[['pTechAfc']], approxim_comm, 'tech', tech@name)
+				obj@parameters[['pTechAfc']], approxim_comm, 'tech', tech@name, remValueUp = Inf, remValueLo = 0)
 			obj@parameters[['pTechAfc']] <- addData(obj@parameters[['pTechAfc']], gg)
 			#gg <- gg[gg$type == 'up' & gg$value == Inf, ]
 			#if (nrow(gg) != 0) 
@@ -96,14 +96,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 			
 		}
 		gg <- multiInterpolation(tech@af, 'af',
-			obj@parameters[['pTechAf']], approxim, 'tech', tech@name)
+			obj@parameters[['pTechAf']], approxim, 'tech', tech@name, remValueUp = Inf, remValueLo = 0)
 		obj@parameters[['pTechAf']] <- addData(obj@parameters[['pTechAf']], gg)
 		if (nrow(tech@afs) > 0) {
 			afs_slice <- unique(tech@afs$slice)
 			afs_slice <- afs_slice[!is.na(afs_slice)]
 			approxim.afs <- approxim
 			approxim.afs$slice <- afs_slice
-			gg <- multiInterpolation(tech@afs, 'afs', obj@parameters[['pTechAfs']], approxim.afs, 'tech', tech@name)
+			gg <- multiInterpolation(tech@afs, 'afs', obj@parameters[['pTechAfs']], approxim.afs, 'tech', 
+			  tech@name, remValueUp = Inf, remValueLo = 0)
 			obj@parameters[['pTechAfs']] <- addData(obj@parameters[['pTechAfs']], gg)
 		}
 		#gg <- gg[gg$type == 'up' & gg$value == Inf, ]
@@ -157,7 +158,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		if (length(approxim_comm[['comm']]) != 0)
 			obj@parameters[['pTechShare']] <- addData(obj@parameters[['pTechShare']],
 				multiInterpolation(tech@ceff, 'share',
-					obj@parameters[['pTechShare']], approxim_comm, 'tech', tech@name))
+					obj@parameters[['pTechShare']], approxim_comm, 'tech', tech@name, remValueUp = 1, remValueLo = 0))
 		cmm <- rownames(ctype$comm)[ctype$comm$comb != 0]
 		if (length(cmm) != 0) {
 			obj@parameters[['pTechEmisComm']] <- addData(obj@parameters[['pTechEmisComm']],

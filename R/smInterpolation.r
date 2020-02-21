@@ -1,6 +1,6 @@
 #### Deprecated version due to deprecetate simple_data_frame_approximation
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, remValue = NULL) {
   # cat('simple_data_frame_approximation_chk:', parameter, '\n')
   there.is.year <- any(colnames(frm) == 'year')
   #if (nrow(frm) == 0) return(frm)
@@ -31,8 +31,8 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     dd <- cbind(d3, dd[, c(stnd, 'value'), drop = FALSE])
   }
   # For increase speed
-  if (removeDefault)
-  	dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
+  # if (removeDefault)
+  # 	dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
@@ -43,11 +43,13 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
     dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
   }
+  if (!is.null(remValue))
+    dd <- dd[!(dd$value %in% remValue), ]
   dd
 }
 
 multiInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, remValueUp = NULL, remValueLo = NULL) {
   there.is.year <- any(colnames(frm) == 'year')
   dd <- interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
@@ -75,7 +77,8 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     dd <- cbind(d3, dd[, c(stnd, 'type', 'value'), drop = FALSE])
   }
   # For increase speed, not work for GLPK
-  dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+  # dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+  dd <- dd[(dd$type == 'lo') | (dd$type == 'up'),, drop = FALSE]
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
@@ -86,5 +89,9 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
     dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
   }
+  if (!is.null(remValueUp))
+    dd <- dd[!(dd$value %in% remValueUp & dd$type == 'up'), ]
+  if (!is.null(remValueLo))
+    dd <- dd[!(dd$value %in% remValueLo & dd$type == 'lo'), ]
   dd
 }

@@ -311,8 +311,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
 
 
 .start_end_fix <- function(approxim, app, als, stock_exist) {
+  stock_exist <- stock_exist[stock_exist$value != 0, ]
   # Start / End year
-  dd <- data.frame(enable = rep(TRUE, length(approxim$region) * length(approxim$year)),
+    dd <- data.frame(enable = rep(TRUE, length(approxim$region) * length(approxim$year)),
                    app = rep(app@name, length(approxim$region) * length(approxim$year)),
                    region = rep(approxim$region, length(approxim$year)), 
                    year = c(t(matrix(rep(approxim$year, length(approxim$region)), length(approxim$year)))), 
@@ -374,6 +375,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   # 
   dd_able <- dd_able[dd_able$enable, -1, drop = FALSE]
   dd_eac <- dd_eac[dd_eac$enable, -1, drop = FALSE]
+  dd <- dd[dd$year %in% approxim$mileStoneYears, ]
+  dd_eac <- dd_eac[dd_eac$year %in% approxim$mileStoneYears, ]
+  dd_able <- dd_able[dd_able$year %in% approxim$mileStoneYears, ]
   list(new = dd, span = dd_able, eac = dd_eac)
 }
 

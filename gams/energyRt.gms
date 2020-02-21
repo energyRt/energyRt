@@ -540,8 +540,6 @@ mDummyExport(comm, region, year, slice)
 mDummyCost(comm, region, year)
 * mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> 0 and mTradeRoutes(trade, src, dst))
 mTradeIr(trade, region, region, year, slice)
-* mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> Inf and mTradeIr(trade, region, region, year, slice))
-mTradeIrUp(trade, region, region, year, slice)
 * ((sum(dst$(mTradeIr(trade, region, dst, year, slice) and sum(comm$pTradeIrCdst2Ainp(trade, comm, region, dst, year, slice), 1) <> 0), 1) <> 0) or
 *  (sum(src$(mTradeIr(trade, src, region, year, slice) and sum(comm$pTradeIrCsrc2Ainp(trade, comm, src, region, year, slice), 1) <> 0), 1) <> 0))
 mvTradeIrAInp(trade, comm, region, year, slice)
@@ -615,30 +613,24 @@ meqTechAfcOutLo(tech, region, comm, year, slice)
 meqTechAfcOutUp(tech, region, comm, year, slice)
 meqTechAfcInpLo(tech, region, comm, year, slice)
 meqTechAfcInpUp(tech, region, comm, year, slice)
-meqTechCap(tech, region, year)
 meqTechNewCap(tech, region, year)
 meqSupAvaLo(sup, comm, region, year, slice)
 meqSupReserveLo(sup, comm, region)
-meqStorageStore(stg, comm, region, year, slice)
 meqStorageAfLo(stg, comm, region, year, slice)
 meqStorageAfUp(stg, comm, region, year, slice)
-meqStorageClean(stg, comm, region, year, slice)
 meqStorageInpUp(stg, comm, region, year, slice)
 meqStorageInpLo(stg, comm, region, year, slice)
 meqStorageOutUp(stg, comm, region, year, slice)
 meqStorageOutLo(stg, comm, region, year, slice)
-meqStorageCost(stg, region, year)
 meqTradeFlowUp(trade, comm, region, region, year, slice)
 meqTradeFlowLo(trade, comm, region, region, year, slice)
 meqExportRowLo(expp, comm, region, year, slice)
-meqExportRowResUp(expp, comm)
 meqImportRowUp(imp, comm, region, year, slice)
 meqImportRowLo(imp, comm, region, year, slice)
 meqTradeCapFlow(trade, comm, year, slice)
 meqBalLo(comm, region, year, slice)
 meqBalUp(comm, region, year, slice)
 meqBalFx(comm, region, year, slice)
-meqSupOutTot(comm, region, year, slice)
 meqLECActivity(tech, region, year)
 ;
 ********************************************************************************
@@ -957,7 +949,7 @@ eqTechOMCost(tech, region, year)    Technology O&M costs
 ;
 
 * Capacity equation
-eqTechCap(tech, region, year)$meqTechCap(tech, region, year)..
+eqTechCap(tech, region, year)$mTechSpan(tech, region, year)..
          vTechCap(tech, region, year)
          =e=
          pTechStock(tech, region, year) +
@@ -1162,7 +1154,7 @@ eqStorageAOut(stg, comm, region, year, slice)$mvStorageAOut(stg, comm, region, y
 );
 
 
-eqStorageStore(stg, comm, region, year, slice)$meqStorageStore(stg, comm, region, year, slice)..
+eqStorageStore(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)..
   vStorageStore(stg, comm, region, year, slice) =e= pStorageCharge(stg, comm, region, year, slice) +
           (pStorageNCap2Stg(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year) +
           sum(slicep$(mCommSlice(comm, slicep) and ((not(mStorageFullYear(stg)) and mSliceNext(slicep, slice))
@@ -1186,7 +1178,7 @@ eqStorageAfUp(stg, comm, region, year, slice)$meqStorageAfUp(stg, comm, region, 
                  and pStorageWeatherAfUp(stg, weather) >= 0 and mSliceParentChildE(slice, slicep)),
                     pWeather(weather, region, year, slice) * pStorageWeatherAfUp(stg, weather));
 
-eqStorageClean(stg, comm, region, year, slice)$meqStorageClean(stg, comm, region, year, slice)..
+eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)..
   vStorageOut(stg, comm, region, year, slice)  / pStorageOutEff(stg, comm, region, year, slice) =l=
                  vStorageStore(stg, comm, region, year, slice);
 
@@ -1272,7 +1264,7 @@ eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
 
 
 * FIX O & M
-eqStorageCost(stg, region, year)$meqStorageCost(stg, region, year)..
+eqStorageCost(stg, region, year)$mStorageOMCost(stg, region, year)..
          vStorageOMCost(stg, region, year)
          =e=
          pStorageFixom(stg, region, year) * vStorageCap(stg, region, year) +
@@ -1362,7 +1354,7 @@ eqExportRowCumulative(expp, comm)$mExpComm(expp, comm).. vExportRowAccumulated(e
         pPeriodLen(year) * vExportRow(expp, comm, region, year, slice)
 );
 
-eqExportRowResUp(expp, comm)$meqExportRowResUp(expp, comm)..
+eqExportRowResUp(expp, comm)$mExportRowAccumulatedUp(expp, comm)..
                  vExportRowAccumulated(expp, comm) =l= pExportRowRes(expp);
 
 eqImportRowUp(imp, comm, region, year, slice)$mImportRowUp(imp, comm, region, year, slice)..
@@ -1528,7 +1520,7 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
                   vExport(comm, region, year, slice)$mExport(comm, region, year, slice) +
                   vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice);
 
-eqSupOutTot(comm, region, year, slice)$meqSupOutTot(comm, region, year, slice)..
+eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)..
          vSupOutTot(comm, region, year, slice) =e=
          sum((sup, slicep)$(mCommSliceOrParent(comm, slice, slicep) and mSupAva(sup, comm, region, year, slicep)),
                  vSupOut(sup, comm, region, year, slicep));

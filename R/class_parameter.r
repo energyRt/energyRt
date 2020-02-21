@@ -105,8 +105,9 @@ setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
   function(obj, data) {
     if (nrow(data) > 0) {
       if (ncol(data) != ncol(obj@data) ||
-        any(colnames(data) != colnames(obj@data)))
+        any(sort(colnames(data)) != sort(colnames(obj@data))))
           stop('Internal error: Wrong new data 1')
+      data <- data[, colnames(obj@data), drop = FALSE]
       if (any(colnames(data) == 'type')) {
         if (any(!(data$type %in% c('lo', 'up'))))
           stop('Internal error: Wrong new data 2')
@@ -240,12 +241,12 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
       if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
       
-      if (nrow(dtt) == 0 || all(dtt$value == def)) {
+      if (nrow(dtt) == 0) { #  || all(dtt$value == def)
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
         if (def != 0 && def != Inf) {
           zz <- paste0(name, '(', paste0(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';')
-          return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE])))
+          return(c(zz, gen_gg(name, dtt))) # [dtt$value != def,, drop = FALSE]
         } else {
           return(gen_gg(name, dtt))
         }
