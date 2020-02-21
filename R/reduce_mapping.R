@@ -574,6 +574,45 @@
     prec@parameters[['meqLECActivity']] <- addData(prec@parameters[['meqLECActivity']], 
       merge(getParameterData(prec@parameters[['mTechSpan']]), getParameterData(prec@parameters[['mLECRegion']])))
     
+    
+    # prod Weathe
+    browser()
+    tmp_func3 <- function(x) x[x$type == 'lo' & x$value >= 0, -(ncol(x) - 1)]
+    tmp_func4 <- function(x) x[x$type == 'Up' & x$value >= 0, -(ncol(x) - 1)]
+    aggregate3 <- function(x) {
+      if (nrow(x) == 0)
+        return(x[, colnames(x) != 'slicep', drop = FALSE])
+      aggregate(x[, 'value', drop = FALSE], x[, !(colnames(x) %in% c('slicep', 'value')), drop = FALSE], prod)
+    }
+    # paTechWeatherAf*
+    tmp <- merge(merge(merge(tmp_map$meqTechAfLo, tmp_map$mTechWeatherAf), tmp_map$mWeatherRegion),
+      merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
+    prec@parameters[['paTechWeatherAfLo']] <- addData(prec@parameters[['paTechWeatherAfLo']], 
+      aggregate3(merge(tmp, tmp_func3(getParameterData(prec@parameters[['pTechWeatherAf']])))))
+    tmp <- merge(merge(merge(tmp_map$meqTechAfUp, tmp_map$mTechWeatherAf), tmp_map$mWeatherRegion),
+      merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
+    prec@parameters[['paTechWeatherAfUp']] <- addData(prec@parameters[['paTechWeatherAfUp']], 
+      aggregate3(merge(tmp, tmp_func4(getParameterData(prec@parameters[['pTechWeatherAf']])))))
+    
+    # paTechWeatherAfs*
+    tmp <- merge(merge(merge(tmp_map$meqTechAfsLo, tmp_map$mTechWeatherAfs), tmp_map$mWeatherRegion),
+      merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
+    prec@parameters[['paTechWeatherAfsLo']] <- addData(prec@parameters[['paTechWeatherAfsLo']], 
+      aggregate3(merge(tmp, tmp_func3(getParameterData(prec@parameters[['pTechWeatherAfs']])))))
+    tmp <- merge(merge(merge(tmp_map$meqTechAfsUp, tmp_map$mTechWeatherAfs), tmp_map$mWeatherRegion),
+      merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
+    prec@parameters[['paTechWeatherAfsUp']] <- addData(prec@parameters[['paTechWeatherAfsUp']], 
+      aggregate3(merge(tmp, tmp_func4(getParameterData(prec@parameters[['pTechWeatherAfs']])))))
+    # paTechWeatherAf*
+    tmp <- merge(merge(merge(tmp_map$meqTechAfsLo, tmp_map$mTechWeatherAfc), tmp_map$mWeatherRegion),
+      merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
+    prec@parameters[['paTechWeatherAfcLo']] <- addData(prec@parameters[['paTechWeatherAfcLo']], 
+      aggregate3(merge(tmp, tmp_func3(getParameterData(prec@parameters[['pTechWeatherAfc']])))))
+    tmp <- merge(merge(merge(tmp_map$meqTechAfsUp, tmp_map$mTechWeatherAfc), tmp_map$mWeatherRegion),
+      merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
+    prec@parameters[['paTechWeatherAfcUp']] <- addData(prec@parameters[['paTechWeatherAfcUp']], 
+      aggregate3(merge(tmp, tmp_func4(getParameterData(prec@parameters[['pTechWeatherAfc']])))))
+    
     prec
 }
 
