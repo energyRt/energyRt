@@ -152,6 +152,7 @@ mTradeEac(trade, region, year)
 mTradeCapacityVariable(trade)
 * mTradeNew(trade, year) and pTradeInvcost(trade, region, year) <> 0
 mTradeInv(trade, region, year)
+mAggregateFactor(comm, comm)
 ;
 
 * Set priority
@@ -549,7 +550,7 @@ mDemInp(comm, slice)
 *  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and pEmissionFactor(comm, commp) <> 0), 1)), 1))
 mEmsFuelTot(comm, region, year, slice)
 *  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)), 1))
-mTechEmsFuel(tech, comm, region, year, slice)
+mTechEmsFuel(tech, comm, comm, region, year, slice)
 *  (mCommSlice(comm, slice) and pDummyImportCost(comm, region, year, slice) <> Inf)
 mDummyImport(comm, region, year, slice)
 *  (mCommSlice(comm, slice) and pDummyExportCost(comm, region, year, slice) <> Inf)
@@ -1044,7 +1045,7 @@ eqSupAvaUp(sup, comm, region, year, slice)$mSupAvaUp(sup, comm, region, year, sl
 eqSupAvaLo(sup, comm, region, year, slice)$meqSupAvaLo(sup, comm, region, year, slice)..
          vSupOut(sup, comm, region, year, slice)
          =g=
-         pSupAvaLo(sup, comm, region, year, slice) * paSupWeatherUp(sup, comm, region, year, slice);
+         pSupAvaLo(sup, comm, region, year, slice) * paSupWeatherLo(sup, comm, region, year, slice);
 
 eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)..
          vSupReserve(sup, comm, region)
@@ -1089,7 +1090,7 @@ eqEmsFuelTot(comm, region, year, slice)         Emissions from commodity consump
 eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
          vAggOut(comm, region, year, slice)
          =e=
-         sum((commp, slicep)$(pAggregateFactor(comm, commp) and
+         sum((commp, slicep)$(mvBalance(commp, region, year, slicep) and mAggregateFactor(comm, commp) and
          mSliceParentChildE(slice, slicep) and mCommSlice(commp, slicep)),
                  pAggregateFactor(comm, commp) *
                   vOutTot(commp, region, year, slicep)
@@ -1111,9 +1112,8 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
 
 eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
      vEmsFuelTot(comm, region, year, slice)
-         =e= sum((tech, commp, slicep)$(mTechEmsFuel(tech, comm, region, year, slicep)
-                  and mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and
-                         pEmissionFactor(comm, commp) <> 0 and mCommSliceOrParent(comm, slice, slicep)),
+         =e= sum((tech, commp, slicep)$(mTechEmsFuel(tech, comm, commp, region, year, slicep)
+                    and mCommSliceOrParent(comm, slice, slicep)),
                  pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slicep)
          );
 

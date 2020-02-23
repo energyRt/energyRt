@@ -838,7 +838,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:313,] <- NA;
+    rs[1:314,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -921,6 +921,7 @@ rs
 "mTradeEac",
 "mTradeCapacityVariable",
 "mTradeInv",
+"mAggregateFactor",
 "mvSupCost",
 "mvTechInp",
 "mvSupReserve",
@@ -1315,6 +1316,8 @@ rs
     rs["mTradeCapacityVariable", c("trade")] <- TRUE;
     rs["mTradeInv", c("name", "description", "type")] <- c("mTradeInv", "", "map");
     rs["mTradeInv", c("trade", "region", "year", "eqTradeInv")] <- TRUE;
+    rs["mAggregateFactor", c("name", "description", "type")] <- c("mAggregateFactor", "", "map");
+    rs["mAggregateFactor", c("comm")] <- TRUE;
     rs["mvSupCost", c("name", "description", "type")] <- c("mvSupCost", "", "map");
     rs["mvSupCost", c("sup", "region", "year", "eqSupCost", "eqCost")] <- TRUE;
     rs["mvTechInp", c("name", "description", "type")] <- c("mvTechInp", "", "map");
@@ -1334,7 +1337,7 @@ rs
     rs["mvDemInp", c("name", "description", "type")] <- c("mvDemInp", "", "map");
     rs["mvDemInp", c("comm", "region", "year", "slice", "eqDemInp", "eqInpTot")] <- TRUE;
     rs["mvBalance", c("name", "description", "type")] <- c("mvBalance", "", "map");
-    rs["mvBalance", c("comm", "region", "year", "slice", "eqBal", "eqOutTot", "eqInpTot")] <- TRUE;
+    rs["mvBalance", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqInpTot")] <- TRUE;
     rs["mvInp2Lo", c("name", "description", "type")] <- c("mvInp2Lo", "", "map");
     rs["mvInp2Lo", c("comm", "region", "year", "slice")] <- TRUE;
     rs["mvOut2Lo", c("name", "description", "type")] <- c("mvOut2Lo", "", "map");
@@ -1760,9 +1763,9 @@ rs
     rs["paTechWeatherAfcUp", c("name", "description", "type")] <- c("paTechWeatherAfcUp", "", "parameter");
     rs["paTechWeatherAfcUp", c("tech", "comm", "region", "year", "slice", "eqTechAfcOutUp", "eqTechAfcInpUp")] <- TRUE;
     rs["paSupWeatherUp", c("name", "description", "type")] <- c("paSupWeatherUp", "", "parameter");
-    rs["paSupWeatherUp", c("sup", "comm", "region", "year", "slice", "eqSupAvaUp", "eqSupAvaLo")] <- TRUE;
+    rs["paSupWeatherUp", c("sup", "comm", "region", "year", "slice", "eqSupAvaUp")] <- TRUE;
     rs["paSupWeatherLo", c("name", "description", "type")] <- c("paSupWeatherLo", "", "parameter");
-    rs["paSupWeatherLo", c("sup", "comm", "region", "year", "slice")] <- TRUE;
+    rs["paSupWeatherLo", c("sup", "comm", "region", "year", "slice", "eqSupAvaLo")] <- TRUE;
     rs["paStorageWeatherAfLo", c("name", "description", "type")] <- c("paStorageWeatherAfLo", "", "parameter");
     rs["paStorageWeatherAfLo", c("stg", "comm", "region", "year", "slice", "eqStorageAfLo")] <- TRUE;
     rs["paStorageWeatherAfUp", c("name", "description", "type")] <- c("paStorageWeatherAfUp", "", "parameter");

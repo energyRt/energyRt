@@ -468,8 +468,9 @@ setMethod('print', 'parameter', function(x, ...) {
         kk <- paste0(kk, ', :', data[, i])
       kk <- paste0(kk, ') => ', data[, 'value'])
       t1 <- ''; t2 <- ''
-      # if (ncol(data) > 2) {t1 <- 'JuMP.Containers.SparseAxisArray('; t2 <- ')'}
-      kk <- c(paste0("# ", name, name2, '\n', name, ' = ', t1, 'Dict('), paste0(kk, collapse = ',\n'), t2, ')')
+      if (ncol(data) > 2) {t1 <- 'JuMP.Containers.SparseAxisArray('; t2 <- ')'}
+      kk <- c(paste0("# ", name, name2, '\n', name, ' = ', t1, 'Dict('), 
+              paste0(kk, collapse = ',\n'), t2, ');')
       return(kk)
     }
   }
@@ -488,7 +489,7 @@ setMethod('print', 'parameter', function(x, ...) {
       return(c(ret, paste0(obj@name, ' = []')))
     } else {
       return(c(ret, paste0(obj@name, ' = [\n', paste0(paste0('  (:', apply(obj@data, 1, 
-        function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), ']')))
+        function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), '];')))
     }
   } else if (obj@type == 'simple') {
     return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')))
