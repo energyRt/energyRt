@@ -575,8 +575,7 @@
       merge(getParameterData(prec@parameters[['mTechSpan']]), getParameterData(prec@parameters[['mLECRegion']])))
     
     
-    # prod Weathe
-    browser()
+    # prod Weather
     tmp_func3 <- function(x) x[x$type == 'lo' & x$value >= 0, -(ncol(x) - 1)]
     tmp_func4 <- function(x) x[x$type == 'Up' & x$value >= 0, -(ncol(x) - 1)]
     aggregate3 <- function(x) {
@@ -613,6 +612,11 @@
     prec@parameters[['paTechWeatherAfcUp']] <- addData(prec@parameters[['paTechWeatherAfcUp']], 
       aggregate3(merge(tmp, tmp_func4(getParameterData(prec@parameters[['pTechWeatherAfc']])))))
     
+    # paSupWeather*
+    # paStorageWeatherAf*
+    # paStorageWeatherCinp*
+    # paStorageWeatherCout*
+    browser()
     prec
 }
 
