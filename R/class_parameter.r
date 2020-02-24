@@ -217,13 +217,13 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 
 # Generate GAMS code, return character == GAMS code 
 .toGams <- function(obj) {
-  gen_gg <- function(name, dtt) {
-  	ret <- paste0(name, '("', dtt[, 1])
-  	for (i in seq_len(ncol(dtt) - 2) + 1) {
-  		ret <- paste0(ret, '", "', dtt[, i])
-  	}
-  	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
-  }
+    gen_gg <- function(name, dtt) {
+    	ret <- paste0(name, '("', dtt[, 1])
+    	for (i in seq_len(ncol(dtt) - 2) + 1) {
+    		ret <- paste0(ret, '", "', dtt[, i])
+    	}
+    	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
+    }
     as_simple <- function(dtt, name, def) {
       add_cnd <- function(y, x) { 
         if (x == '') return(x) else return(paste(x, 'and', y))
@@ -241,15 +241,17 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
       if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
       
-      if (nrow(dtt) == 0) { #  || all(dtt$value == def)
+      if (nrow(dtt) == 0 || all(dtt$value == def)) { #
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
+        # if (def != 0 && def != Inf) {
         if (def != 0 && def != Inf) {
           zz <- paste0(name, '(', paste0(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';')
-          return(c(zz, gen_gg(name, dtt))) # [dtt$value != def,, drop = FALSE]
-        } else {
-          return(gen_gg(name, dtt))
-        }
+        } else zz <- ''
+          return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE]))) # 
+        # } else {
+          # return(gen_gg(name, dtt))
+        # }
       }  
     }
   if (obj@nValues != -1) {
@@ -453,24 +455,28 @@ setMethod('print', 'parameter', function(x, ...) {
 
 # Generate Julia code, return character vector
 .toJulia <- function(obj) {
-  as_simple <- function(data, name, name2) {
+  as_simple <- function(data, name, name2, def) {
+    if (def == Inf)
+      def = -1;
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
         paste0(name, ' = ', data$value)))
     } else {
-      data <- data[data$value != Inf, ]
+      data <- data[data$value != Inf & data$value != def, ]
+      rtt <- paste0("# ", name, name2, '\n', name, "Def = ", def, ";\n")
       if (nrow(data) == 0) {
-        return(c(paste0("# ", name, name2, '\n', name, ' = Dict()')))
+        return(paste0(rtt, name, ' = Dict()'))
       }
       kk <- paste0('  (:', data[, 1])
       for (i in seq_len(ncol(data) - 2) + 1)
         kk <- paste0(kk, ', :', data[, i])
       kk <- paste0(kk, ') => ', data[, 'value'])
-      t1 <- ''; t2 <- ''
-      if (ncol(data) > 2) {t1 <- 'JuMP.Containers.SparseAxisArray('; t2 <- ')'}
-      kk <- c(paste0("# ", name, name2, '\n', name, ' = ', t1, 'Dict('), 
-              paste0(kk, collapse = ',\n'), t2, ');')
+      # t1 <- ''; t2 <- ''
+      # if (ncol(data) > 2) {t1 <- 'JuMP.Containers.SparseAxisArray('; t2 <- ')'}
+      # kk <- c(paste0("# ", name, name2, '\n', name, ' = ', t1, 'Dict('), 
+      #   paste0(kk, collapse = ',\n'), t2, ');')
+      kk <- c(rtt, paste0(name, ' = Dict('), paste0(kk, collapse = ',\n'), ');')
       return(kk)
     }
   }
@@ -492,13 +498,14 @@ setMethod('print', 'parameter', function(x, ...) {
         function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), '];')))
     }
   } else if (obj@type == 'simple') {
-    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')))
+    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
     return(c(
-      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Lo', sep = ''), hh),
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
       as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
-        paste(obj@name, 'Up', sep = ''), hh)
+        paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
   } else stop('Must realise')
 }

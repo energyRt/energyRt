@@ -412,9 +412,9 @@ s.t.  eqTechShareOutLo{(t, r, g, c, y, s) in meqTechShareOutLo}: vTechOut[t,c,r,
 
 s.t.  eqTechShareOutUp{(t, r, g, c, y, s) in meqTechShareOutUp}: vTechOut[t,c,r,y,s] <=  pTechShareUp[t,c,r,y,s]*sum{cp in comm:(((t,cp,r,y,s) in mvTechOut and (t,g,cp) in mTechGroupComm))}(vTechOut[t,cp,r,y,s]);
 
-s.t.  eqTechAInp{(t, c, r, y, s) in mvTechAInp}: vTechAInp[t,c,r,y,s]  =  (vTechAct[t,r,y,s]*pTechAct2AInp[t,c,r,y,s])+(vTechCap[t,r,y]*pTechCap2AInp[t,c,r,y,s])+(vTechNewCap[t,r,y]*pTechNCap2AInp[t,c,r,y,s])+sum{cp in comm:(pTechCinp2AInp[t,c,cp,r,y,s])}(pTechCinp2AInp[t,c,cp,r,y,s]*vTechInp[t,cp,r,y,s])+sum{cp in comm:(pTechCout2AInp[t,c,cp,r,y,s])}(pTechCout2AInp[t,c,cp,r,y,s]*vTechOut[t,cp,r,y,s]);
+s.t.  eqTechAInp{(t, c, r, y, s) in mvTechAInp}: vTechAInp[t,c,r,y,s]  =  (vTechAct[t,r,y,s]*pTechAct2AInp[t,c,r,y,s])+(vTechCap[t,r,y]*pTechCap2AInp[t,c,r,y,s])+sum{FORIF: (t,r,y) in mTechNew} ((vTechNewCap[t,r,y]*pTechNCap2AInp[t,c,r,y,s]))+sum{cp in comm:(pTechCinp2AInp[t,c,cp,r,y,s])}(pTechCinp2AInp[t,c,cp,r,y,s]*vTechInp[t,cp,r,y,s])+sum{cp in comm:(pTechCout2AInp[t,c,cp,r,y,s])}(pTechCout2AInp[t,c,cp,r,y,s]*vTechOut[t,cp,r,y,s]);
 
-s.t.  eqTechAOut{(t, c, r, y, s) in mvTechAOut}: vTechAOut[t,c,r,y,s]  =  (vTechAct[t,r,y,s]*pTechAct2AOut[t,c,r,y,s])+(vTechCap[t,r,y]*pTechCap2AOut[t,c,r,y,s])+(vTechNewCap[t,r,y]*pTechNCap2AOut[t,c,r,y,s])+sum{cp in comm:(pTechCinp2AOut[t,c,cp,r,y,s])}(pTechCinp2AOut[t,c,cp,r,y,s]*vTechInp[t,cp,r,y,s])+sum{cp in comm:(pTechCout2AOut[t,c,cp,r,y,s])}(pTechCout2AOut[t,c,cp,r,y,s]*vTechOut[t,cp,r,y,s]);
+s.t.  eqTechAOut{(t, c, r, y, s) in mvTechAOut}: vTechAOut[t,c,r,y,s]  =  (vTechAct[t,r,y,s]*pTechAct2AOut[t,c,r,y,s])+(vTechCap[t,r,y]*pTechCap2AOut[t,c,r,y,s])+sum{FORIF: (t,r,y) in mTechNew} ((vTechNewCap[t,r,y]*pTechNCap2AOut[t,c,r,y,s]))+sum{cp in comm:(pTechCinp2AOut[t,c,cp,r,y,s])}(pTechCinp2AOut[t,c,cp,r,y,s]*vTechInp[t,cp,r,y,s])+sum{cp in comm:(pTechCout2AOut[t,c,cp,r,y,s])}(pTechCout2AOut[t,c,cp,r,y,s]*vTechOut[t,cp,r,y,s]);
 
 s.t.  eqTechAfLo{(t, r, y, s) in meqTechAfLo}: pTechAfLo[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*paTechWeatherAfLo[t,r,y,s] <=  vTechAct[t,r,y,s];
 

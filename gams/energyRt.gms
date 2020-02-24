@@ -788,11 +788,11 @@ eqTechAInp(tech, comm, region, year, slice)$mvTechAInp(tech, comm, region, year,
   (vTechCap(tech, region, year) *
     pTechCap2AInp(tech, comm, region, year, slice)) +
   (vTechNewCap(tech, region, year) *
-    pTechNCap2AInp(tech, comm, region, year, slice)) +
-  sum(commp$pTechCinp2AInp(tech, comm, commp, region, year, slice),
+    pTechNCap2AInp(tech, comm, region, year, slice))$mTechNew(tech, region, year) +
+  sum(commp$(pTechCinp2AInp(tech, comm, commp, region, year, slice) > 0),
       pTechCinp2AInp(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$pTechCout2AInp(tech, comm, commp, region, year, slice),
+  sum(commp$(pTechCout2AInp(tech, comm, commp, region, year, slice) > 0),
       pTechCout2AInp(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 
@@ -803,11 +803,11 @@ eqTechAOut(tech, comm, region, year, slice)$mvTechAOut(tech, comm, region, year,
   (vTechCap(tech, region, year) *
     pTechCap2AOut(tech, comm, region, year, slice)) +
   (vTechNewCap(tech, region, year) *
-    pTechNCap2AOut(tech, comm, region, year, slice)) +
-  sum(commp$pTechCinp2AOut(tech, comm, commp, region, year, slice),
+    pTechNCap2AOut(tech, comm, region, year, slice))$mTechNew(tech, region, year) +
+  sum(commp$(pTechCinp2AOut(tech, comm, commp, region, year, slice) > 0),
       pTechCinp2AOut(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$pTechCout2AOut(tech, comm, commp, region, year, slice),
+  sum(commp$(pTechCout2AOut(tech, comm, commp, region, year, slice) > 0),
       pTechCout2AOut(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 
@@ -1090,11 +1090,11 @@ eqEmsFuelTot(comm, region, year, slice)         Emissions from commodity consump
 eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
          vAggOut(comm, region, year, slice)
          =e=
-         sum((commp, slicep)$(mvBalance(commp, region, year, slicep) and mAggregateFactor(comm, commp) and
-         mSliceParentChildE(slice, slicep) and mCommSlice(commp, slicep)),
-                 pAggregateFactor(comm, commp) *
-                  vOutTot(commp, region, year, slicep)
-         );
+         sum(commp$mAggregateFactor(comm, commp),
+                 pAggregateFactor(comm, commp) *  sum(slicep$(mvBalance(commp, region, year, slicep) and
+                           mSliceParentChildE(slice, slicep) and mCommSlice(commp, slicep)),
+                                    vOutTot(commp, region, year, slicep)
+         ));
 
 
 
@@ -1112,10 +1112,20 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
 
 eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
      vEmsFuelTot(comm, region, year, slice)
-         =e= sum((tech, commp, slicep)$(mTechEmsFuel(tech, comm, commp, region, year, slicep)
-                    and mCommSliceOrParent(comm, slice, slicep)),
-                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slicep)
-         );
+         =e= sum(commp$(pEmissionFactor(comm, commp) > 0),
+                 pEmissionFactor(comm, commp) *  sum(slicep$mCommSliceOrParent(comm, slice, slicep),
+                         sum(tech$(mTechInpComm(tech, commp) and mTechEmsFuel(tech, comm, commp, region, year, slicep)),
+                 pTechEmisComm(tech, commp) * vTechInp(tech, commp, region, year, slicep)
+         )));
+
+
+*eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
+*     vEmsFuelTot(comm, region, year, slice)
+*         =e= sum(commp$(pEmissionFactor(comm, commp) > 0),
+*                 sum(slicep$mCommSliceOrParent(comm, slice, slicep),
+*                         sum(tech$mTechEmsFuel(tech, comm, commp, region, year, slicep),
+*                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slicep)
+*         )));
 
 ********************************************************************************
 * Storage equations

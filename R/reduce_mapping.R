@@ -463,7 +463,7 @@
     prec@parameters[['meqTechShareInpLo']] <- addData(prec@parameters[['meqTechShareInpLo']], 
       techGroupInp[techGroupInp$type == 'lo' & techGroupInp$value != 0, 1:6])
     prec@parameters[['meqTechShareInpUp']] <- addData(prec@parameters[['meqTechShareInpUp']], 
-      techGroupInp[techGroupInp$type == 'up' & techGroupInp$value != Inf, 1:6])
+      techGroupInp[techGroupInp$type == 'up' & techGroupInp$value < 1, 1:6])
     
     techGroupOut <- merge(merge(merge(getParameterData(prec@parameters[['mvTechOut']]), 
       getParameterData(prec@parameters[['mTechOutGroup']])), getParameterData(prec@parameters[['mTechGroupComm']])),
@@ -471,7 +471,7 @@
     prec@parameters[['meqTechShareOutLo']] <- addData(prec@parameters[['meqTechShareOutLo']], 
       techGroupOut[techGroupOut$type == 'lo' & techGroupOut$value != 0, 1:6])
     prec@parameters[['meqTechShareOutUp']] <- addData(prec@parameters[['meqTechShareOutUp']], 
-      techGroupOut[techGroupOut$type == 'up' & techGroupOut$value != Inf, 1:6])
+      techGroupOut[techGroupOut$type == 'up' & techGroupOut$value < 1, 1:6])
     
     tmp_func1 <- function(x) x[x$type == 'lo' & x$value > 0, 1:(ncol(x) - 2)]
     tmp_func2 <- function(x) x[x$type == 'up' & x$value >= 0 &  x$value != Inf, 1:(ncol(x) - 2)]

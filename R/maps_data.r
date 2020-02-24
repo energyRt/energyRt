@@ -1221,7 +1221,7 @@ rs
     rs["mTechAOut", c("name", "description", "type")] <- c("mTechAOut", "Auxiliary output", "map");
     rs["mTechAOut", c("tech", "comm")] <- TRUE;
     rs["mTechNew", c("name", "description", "type")] <- c("mTechNew", "Technologies available for investment", "map");
-    rs["mTechNew", c("tech", "region", "year", "eqTechCap", "eqTechEac", "eqTechInv")] <- TRUE;
+    rs["mTechNew", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechEac", "eqTechInv")] <- TRUE;
     rs["mTechSpan", c("name", "description", "type")] <- c("mTechSpan", "Availability of each technology by regions and milestone years", "map");
     rs["mTechSpan", c("tech", "region", "year", "eqTechCap")] <- TRUE;
     rs["mTechSlice", c("name", "description", "type")] <- c("mTechSlice", "Technology to slice-level", "map");
