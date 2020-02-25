@@ -182,11 +182,7 @@ names(.alias_set) <- .set_al
   rs
 }
 
-# eqt <- BAU@modInp@gams.equation$MINGASgrow2$equation
-#eqt <- "eqCnsMINGASgrow2(year)$(mMidMilestone(year) and mMilestoneHasNext(year))..  sum((comm, region, slice)$(mCnsMINGASgrow2_1(comm) and mMidMilestone(year) and mCommSlice(comm, slice) and mCnsMINGASgrow2_1(comm)), -1 * vOutTot(comm, region, year, slice))+ sum((comm, region, yearp, slice)$(mCnsMINGASgrow2_1(comm) and mMilestoneNext(year, yearp) and mMidMilestone(yearp) and mCommSlice(comm, slice) and mCnsMINGASgrow2_1(comm)), pCnsMultMINGASgrow2_2(year) * vOutTot(comm, region, yearp, slice)) =g= 0;"
-
 # Begin equation declaration
-
 .equation.from.gams.to.glpk <- function(eqt) {
   declaration <- gsub('[.][.].*', '', eqt)
   rs <- paste0('s.t. ', gsub('[($].*', '', declaration))
