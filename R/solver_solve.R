@@ -325,6 +325,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
       ##################################################################################################################################    
       if (arg$write) {
         if (arg$echo) cat('Writing files: ')
+        dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
         zz_data_julia <- file(paste(arg$dir.result, '/data.jl', sep = ''), 'w')
         for (j in c('set', 'map', 'simple', 'multi')) {
           for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
@@ -353,6 +354,51 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
           flush.console()
         }
       }
+    if (arg$run) {
+      if(arg$echo) cat('JULIA time: ')
+      tryCatch({
+        setwd(arg$dir.result)
+        if (.Platform$OS.type == "windows") {
+          if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
+            rs <- system(paste(cmd, 'glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
+              invisible = arg$invisible, wait = wait,
+              show.output.on.console = arg$show.output.on.console)
+        } else {
+            rs <- system(paste('glpsol -m energyRt.mod -d energyRt.dat --log output/log.csv', 
+              invisible = arg$invisible, wait = wait,
+              arg$glpkCompileParameter)) #, mustWork = TRUE)
+        }
+        setwd(BEGINDR)  
+        if (rs != 0) stop(paste('Error in compilation with code', rs))
+      }, interrupt = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop('Solver have been interrupted')
+      }, error = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop(x)
+      })
+      
+      
+      if(arg$echo) cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+      if (any(grep('OPTIMAL.*SOLUTION FOUND', readLines(paste(arg$dir.result, '/output/log.csv', sep = ''))))) {
+        z3 <- file(paste(arg$dir.result, '/output/pStat.csv', sep = ''), 'w')
+        cat('value\n1.00\n', file = z3)
+        close(z3)
+        z3 <- file(paste(arg$dir.result, '/output/pFinish', sep = ''), 'w')
+        cat('value\n2.00\n', file = z3)
+        close(z3)
+      } else {
+        z3 <- file(paste(arg$dir.result, '/output/pStat.csv', sep = ''), 'w')
+        cat('value\n2.00\n', file = z3)
+        close(z3)
+        z3 <- file(paste(arg$dir.result, '/output/pFinish', sep = ''), 'w')
+        cat('value\n1.00\n', file = z3)
+        close(z3)
+      }
+    }
+    
   } else stop('Unknown solver ', arg$solver) 
   if (readresult && arg$run) scen <- read_solution(scen)
 

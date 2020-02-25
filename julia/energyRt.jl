@@ -517,335 +517,335 @@ set_optimizer(model, Cbc.Optimizer)
 optimize!(model)
 
 # Print solution
-fvTechInv = open("vTechInv.csv", "w");
+fvTechInv = open("output/vTechInv.csv", "w");
 for (t,r,y) in mTechNew if JuMP.value(vTechInv[(t,r,y)]) != 0
   println(fvTechInv, t, ",", r, ",", y, ",", JuMP.value(vTechInv[(t,r,y)]));
 end;
 end;
 close(fvTechInv);
 
-fvTechEac = open("vTechEac.csv", "w");
+fvTechEac = open("output/vTechEac.csv", "w");
 for (t,r,y) in mTechEac if JuMP.value(vTechEac[(t,r,y)]) != 0
   println(fvTechEac, t, ",", r, ",", y, ",", JuMP.value(vTechEac[(t,r,y)]));
 end;
 end;
 close(fvTechEac);
 
-fvTechOMCost = open("vTechOMCost.csv", "w");
+fvTechOMCost = open("output/vTechOMCost.csv", "w");
 for (t,r,y) in mTechOMCost if JuMP.value(vTechOMCost[(t,r,y)]) != 0
   println(fvTechOMCost, t, ",", r, ",", y, ",", JuMP.value(vTechOMCost[(t,r,y)]));
 end;
 end;
 close(fvTechOMCost);
 
-fvSupCost = open("vSupCost.csv", "w");
+fvSupCost = open("output/vSupCost.csv", "w");
 for (s1,r,y) in mvSupCost if JuMP.value(vSupCost[(s1,r,y)]) != 0
   println(fvSupCost, s1, ",", r, ",", y, ",", JuMP.value(vSupCost[(s1,r,y)]));
 end;
 end;
 close(fvSupCost);
 
-fvEmsFuelTot = open("vEmsFuelTot.csv", "w");
+fvEmsFuelTot = open("output/vEmsFuelTot.csv", "w");
 for (c,r,y,s) in mEmsFuelTot if JuMP.value(vEmsFuelTot[(c,r,y,s)]) != 0
   println(fvEmsFuelTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vEmsFuelTot[(c,r,y,s)]));
 end;
 end;
 close(fvEmsFuelTot);
 
-fvBalance = open("vBalance.csv", "w");
+fvBalance = open("output/vBalance.csv", "w");
 for (c,r,y,s) in mvBalance if JuMP.value(vBalance[(c,r,y,s)]) != 0
   println(fvBalance, c, ",", r, ",", y, ",", s, ",", JuMP.value(vBalance[(c,r,y,s)]));
 end;
 end;
 close(fvBalance);
 
-fvTotalCost = open("vTotalCost.csv", "w");
+fvTotalCost = open("output/vTotalCost.csv", "w");
 for (r,y) in mvTotalCost if JuMP.value(vTotalCost[(r,y)]) != 0
   println(fvTotalCost, r, ",", y, ",", JuMP.value(vTotalCost[(r,y)]));
 end;
 end;
 close(fvTotalCost);
 
-fvObjective = open("vObjective.csv", "w");
+fvObjective = open("output/vObjective.csv", "w");
 println(fvObjective, "value");
 println(fvObjective, JuMP.value(vObjective));
 close(fvObjective);
 
-fvTaxCost = open("vTaxCost.csv", "w");
+fvTaxCost = open("output/vTaxCost.csv", "w");
 for (c,r,y) in mTaxCost if JuMP.value(vTaxCost[(c,r,y)]) != 0
   println(fvTaxCost, c, ",", r, ",", y, ",", JuMP.value(vTaxCost[(c,r,y)]));
 end;
 end;
 close(fvTaxCost);
 
-fvSubsCost = open("vSubsCost.csv", "w");
+fvSubsCost = open("output/vSubsCost.csv", "w");
 for (c,r,y) in mSubsCost if JuMP.value(vSubsCost[(c,r,y)]) != 0
   println(fvSubsCost, c, ",", r, ",", y, ",", JuMP.value(vSubsCost[(c,r,y)]));
 end;
 end;
 close(fvSubsCost);
 
-fvAggOut = open("vAggOut.csv", "w");
+fvAggOut = open("output/vAggOut.csv", "w");
 for (c,r,y,s) in mAggOut if JuMP.value(vAggOut[(c,r,y,s)]) != 0
   println(fvAggOut, c, ",", r, ",", y, ",", s, ",", JuMP.value(vAggOut[(c,r,y,s)]));
 end;
 end;
 close(fvAggOut);
 
-fvStorageOMCost = open("vStorageOMCost.csv", "w");
+fvStorageOMCost = open("output/vStorageOMCost.csv", "w");
 for (st1,r,y) in mStorageOMCost if JuMP.value(vStorageOMCost[(st1,r,y)]) != 0
   println(fvStorageOMCost, st1, ",", r, ",", y, ",", JuMP.value(vStorageOMCost[(st1,r,y)]));
 end;
 end;
 close(fvStorageOMCost);
 
-fvTradeCost = open("vTradeCost.csv", "w");
+fvTradeCost = open("output/vTradeCost.csv", "w");
 for (r,y) in mvTradeCost if JuMP.value(vTradeCost[(r,y)]) != 0
   println(fvTradeCost, r, ",", y, ",", JuMP.value(vTradeCost[(r,y)]));
 end;
 end;
 close(fvTradeCost);
 
-fvTradeRowCost = open("vTradeRowCost.csv", "w");
+fvTradeRowCost = open("output/vTradeRowCost.csv", "w");
 for (r,y) in mvTradeRowCost if JuMP.value(vTradeRowCost[(r,y)]) != 0
   println(fvTradeRowCost, r, ",", y, ",", JuMP.value(vTradeRowCost[(r,y)]));
 end;
 end;
 close(fvTradeRowCost);
 
-fvTradeIrCost = open("vTradeIrCost.csv", "w");
+fvTradeIrCost = open("output/vTradeIrCost.csv", "w");
 for (r,y) in mvTradeIrCost if JuMP.value(vTradeIrCost[(r,y)]) != 0
   println(fvTradeIrCost, r, ",", y, ",", JuMP.value(vTradeIrCost[(r,y)]));
 end;
 end;
 close(fvTradeIrCost);
 
-fvTechNewCap = open("vTechNewCap.csv", "w");for (t,r,y) in mTechNew if JuMP.value(vTechNewCap[(t,r,y)]) != 0
+fvTechNewCap = open("output/vTechNewCap.csv", "w");for (t,r,y) in mTechNew if JuMP.value(vTechNewCap[(t,r,y)]) != 0
   println(fvTechNewCap, t, ",", r, ",", y, ",", JuMP.value(vTechNewCap[(t,r,y)]));
 end;
 end;close(fvTechNewCap);
 
-fvTechRetiredCap = open("vTechRetiredCap.csv", "w");for (t,r,y,yp) in mvTechRetiredCap if JuMP.value(vTechRetiredCap[(t,r,y,yp)]) != 0
+fvTechRetiredCap = open("output/vTechRetiredCap.csv", "w");for (t,r,y,yp) in mvTechRetiredCap if JuMP.value(vTechRetiredCap[(t,r,y,yp)]) != 0
   println(fvTechRetiredCap, t, ",", r, ",", y, ",", yp, ",", JuMP.value(vTechRetiredCap[(t,r,y,yp)]));
 end;
 end;close(fvTechRetiredCap);
 
-fvTechCap = open("vTechCap.csv", "w");for (t,r,y) in mTechSpan if JuMP.value(vTechCap[(t,r,y)]) != 0
+fvTechCap = open("output/vTechCap.csv", "w");for (t,r,y) in mTechSpan if JuMP.value(vTechCap[(t,r,y)]) != 0
   println(fvTechCap, t, ",", r, ",", y, ",", JuMP.value(vTechCap[(t,r,y)]));
 end;
 end;close(fvTechCap);
 
-fvTechAct = open("vTechAct.csv", "w");for (t,r,y,s) in mvTechAct if JuMP.value(vTechAct[(t,r,y,s)]) != 0
+fvTechAct = open("output/vTechAct.csv", "w");for (t,r,y,s) in mvTechAct if JuMP.value(vTechAct[(t,r,y,s)]) != 0
   println(fvTechAct, t, ",", r, ",", y, ",", s, ",", JuMP.value(vTechAct[(t,r,y,s)]));
 end;
 end;close(fvTechAct);
 
-fvTechInp = open("vTechInp.csv", "w");for (t,c,r,y,s) in mvTechInp if JuMP.value(vTechInp[(t,c,r,y,s)]) != 0
+fvTechInp = open("output/vTechInp.csv", "w");for (t,c,r,y,s) in mvTechInp if JuMP.value(vTechInp[(t,c,r,y,s)]) != 0
   println(fvTechInp, t, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechInp[(t,c,r,y,s)]));
 end;
 end;close(fvTechInp);
 
-fvTechOut = open("vTechOut.csv", "w");for (t,c,r,y,s) in mvTechOut if JuMP.value(vTechOut[(t,c,r,y,s)]) != 0
+fvTechOut = open("output/vTechOut.csv", "w");for (t,c,r,y,s) in mvTechOut if JuMP.value(vTechOut[(t,c,r,y,s)]) != 0
   println(fvTechOut, t, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechOut[(t,c,r,y,s)]));
 end;
 end;close(fvTechOut);
 
-fvTechAInp = open("vTechAInp.csv", "w");for (t,c,r,y,s) in mvTechAInp if JuMP.value(vTechAInp[(t,c,r,y,s)]) != 0
+fvTechAInp = open("output/vTechAInp.csv", "w");for (t,c,r,y,s) in mvTechAInp if JuMP.value(vTechAInp[(t,c,r,y,s)]) != 0
   println(fvTechAInp, t, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechAInp[(t,c,r,y,s)]));
 end;
 end;close(fvTechAInp);
 
-fvTechAOut = open("vTechAOut.csv", "w");for (t,c,r,y,s) in mvTechAOut if JuMP.value(vTechAOut[(t,c,r,y,s)]) != 0
+fvTechAOut = open("output/vTechAOut.csv", "w");for (t,c,r,y,s) in mvTechAOut if JuMP.value(vTechAOut[(t,c,r,y,s)]) != 0
   println(fvTechAOut, t, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechAOut[(t,c,r,y,s)]));
 end;
 end;close(fvTechAOut);
 
-fvSupOut = open("vSupOut.csv", "w");for (s1,c,r,y,s) in mSupAva if JuMP.value(vSupOut[(s1,c,r,y,s)]) != 0
+fvSupOut = open("output/vSupOut.csv", "w");for (s1,c,r,y,s) in mSupAva if JuMP.value(vSupOut[(s1,c,r,y,s)]) != 0
   println(fvSupOut, s1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vSupOut[(s1,c,r,y,s)]));
 end;
 end;close(fvSupOut);
 
-fvSupReserve = open("vSupReserve.csv", "w");for (s1,c,r) in mvSupReserve if JuMP.value(vSupReserve[(s1,c,r)]) != 0
+fvSupReserve = open("output/vSupReserve.csv", "w");for (s1,c,r) in mvSupReserve if JuMP.value(vSupReserve[(s1,c,r)]) != 0
   println(fvSupReserve, s1, ",", c, ",", r, ",", JuMP.value(vSupReserve[(s1,c,r)]));
 end;
 end;close(fvSupReserve);
 
-fvDemInp = open("vDemInp.csv", "w");for (c,r,y,s) in mvDemInp if JuMP.value(vDemInp[(c,r,y,s)]) != 0
+fvDemInp = open("output/vDemInp.csv", "w");for (c,r,y,s) in mvDemInp if JuMP.value(vDemInp[(c,r,y,s)]) != 0
   println(fvDemInp, c, ",", r, ",", y, ",", s, ",", JuMP.value(vDemInp[(c,r,y,s)]));
 end;
 end;close(fvDemInp);
 
-fvOutTot = open("vOutTot.csv", "w");for (c,r,y,s) in mvBalance if JuMP.value(vOutTot[(c,r,y,s)]) != 0
+fvOutTot = open("output/vOutTot.csv", "w");for (c,r,y,s) in mvBalance if JuMP.value(vOutTot[(c,r,y,s)]) != 0
   println(fvOutTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vOutTot[(c,r,y,s)]));
 end;
 end;close(fvOutTot);
 
-fvInpTot = open("vInpTot.csv", "w");for (c,r,y,s) in mvBalance if JuMP.value(vInpTot[(c,r,y,s)]) != 0
+fvInpTot = open("output/vInpTot.csv", "w");for (c,r,y,s) in mvBalance if JuMP.value(vInpTot[(c,r,y,s)]) != 0
   println(fvInpTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vInpTot[(c,r,y,s)]));
 end;
 end;close(fvInpTot);
 
-fvInp2Lo = open("vInp2Lo.csv", "w");for (c,r,y,s,sp) in mvInp2Lo if JuMP.value(vInp2Lo[(c,r,y,s,sp)]) != 0
+fvInp2Lo = open("output/vInp2Lo.csv", "w");for (c,r,y,s,sp) in mvInp2Lo if JuMP.value(vInp2Lo[(c,r,y,s,sp)]) != 0
   println(fvInp2Lo, c, ",", r, ",", y, ",", s, ",", sp, ",", JuMP.value(vInp2Lo[(c,r,y,s,sp)]));
 end;
 end;close(fvInp2Lo);
 
-fvOut2Lo = open("vOut2Lo.csv", "w");for (c,r,y,s,sp) in mvOut2Lo if JuMP.value(vOut2Lo[(c,r,y,s,sp)]) != 0
+fvOut2Lo = open("output/vOut2Lo.csv", "w");for (c,r,y,s,sp) in mvOut2Lo if JuMP.value(vOut2Lo[(c,r,y,s,sp)]) != 0
   println(fvOut2Lo, c, ",", r, ",", y, ",", s, ",", sp, ",", JuMP.value(vOut2Lo[(c,r,y,s,sp)]));
 end;
 end;close(fvOut2Lo);
 
-fvSupOutTot = open("vSupOutTot.csv", "w");for (c,r,y,s) in mSupOutTot if JuMP.value(vSupOutTot[(c,r,y,s)]) != 0
+fvSupOutTot = open("output/vSupOutTot.csv", "w");for (c,r,y,s) in mSupOutTot if JuMP.value(vSupOutTot[(c,r,y,s)]) != 0
   println(fvSupOutTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vSupOutTot[(c,r,y,s)]));
 end;
 end;close(fvSupOutTot);
 
-fvTechInpTot = open("vTechInpTot.csv", "w");for (c,r,y,s) in mTechInpTot if JuMP.value(vTechInpTot[(c,r,y,s)]) != 0
+fvTechInpTot = open("output/vTechInpTot.csv", "w");for (c,r,y,s) in mTechInpTot if JuMP.value(vTechInpTot[(c,r,y,s)]) != 0
   println(fvTechInpTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechInpTot[(c,r,y,s)]));
 end;
 end;close(fvTechInpTot);
 
-fvTechOutTot = open("vTechOutTot.csv", "w");for (c,r,y,s) in mTechOutTot if JuMP.value(vTechOutTot[(c,r,y,s)]) != 0
+fvTechOutTot = open("output/vTechOutTot.csv", "w");for (c,r,y,s) in mTechOutTot if JuMP.value(vTechOutTot[(c,r,y,s)]) != 0
   println(fvTechOutTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechOutTot[(c,r,y,s)]));
 end;
 end;close(fvTechOutTot);
 
-fvStorageInpTot = open("vStorageInpTot.csv", "w");for (c,r,y,s) in mStorageInpTot if JuMP.value(vStorageInpTot[(c,r,y,s)]) != 0
+fvStorageInpTot = open("output/vStorageInpTot.csv", "w");for (c,r,y,s) in mStorageInpTot if JuMP.value(vStorageInpTot[(c,r,y,s)]) != 0
   println(fvStorageInpTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vStorageInpTot[(c,r,y,s)]));
 end;
 end;close(fvStorageInpTot);
 
-fvStorageOutTot = open("vStorageOutTot.csv", "w");for (c,r,y,s) in mStorageOutTot if JuMP.value(vStorageOutTot[(c,r,y,s)]) != 0
+fvStorageOutTot = open("output/vStorageOutTot.csv", "w");for (c,r,y,s) in mStorageOutTot if JuMP.value(vStorageOutTot[(c,r,y,s)]) != 0
   println(fvStorageOutTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vStorageOutTot[(c,r,y,s)]));
 end;
 end;close(fvStorageOutTot);
 
-fvStorageAInp = open("vStorageAInp.csv", "w");for (st1,c,r,y,s) in mvStorageAInp if JuMP.value(vStorageAInp[(st1,c,r,y,s)]) != 0
+fvStorageAInp = open("output/vStorageAInp.csv", "w");for (st1,c,r,y,s) in mvStorageAInp if JuMP.value(vStorageAInp[(st1,c,r,y,s)]) != 0
   println(fvStorageAInp, st1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vStorageAInp[(st1,c,r,y,s)]));
 end;
 end;close(fvStorageAInp);
 
-fvStorageAOut = open("vStorageAOut.csv", "w");for (st1,c,r,y,s) in mvStorageAOut if JuMP.value(vStorageAOut[(st1,c,r,y,s)]) != 0
+fvStorageAOut = open("output/vStorageAOut.csv", "w");for (st1,c,r,y,s) in mvStorageAOut if JuMP.value(vStorageAOut[(st1,c,r,y,s)]) != 0
   println(fvStorageAOut, st1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vStorageAOut[(st1,c,r,y,s)]));
 end;
 end;close(fvStorageAOut);
 
-fvDummyImport = open("vDummyImport.csv", "w");for (c,r,y,s) in mDummyImport if JuMP.value(vDummyImport[(c,r,y,s)]) != 0
+fvDummyImport = open("output/vDummyImport.csv", "w");for (c,r,y,s) in mDummyImport if JuMP.value(vDummyImport[(c,r,y,s)]) != 0
   println(fvDummyImport, c, ",", r, ",", y, ",", s, ",", JuMP.value(vDummyImport[(c,r,y,s)]));
 end;
 end;close(fvDummyImport);
 
-fvDummyExport = open("vDummyExport.csv", "w");for (c,r,y,s) in mDummyExport if JuMP.value(vDummyExport[(c,r,y,s)]) != 0
+fvDummyExport = open("output/vDummyExport.csv", "w");for (c,r,y,s) in mDummyExport if JuMP.value(vDummyExport[(c,r,y,s)]) != 0
   println(fvDummyExport, c, ",", r, ",", y, ",", s, ",", JuMP.value(vDummyExport[(c,r,y,s)]));
 end;
 end;close(fvDummyExport);
 
-fvStorageInp = open("vStorageInp.csv", "w");for (st1,c,r,y,s) in mvStorageStore if JuMP.value(vStorageInp[(st1,c,r,y,s)]) != 0
+fvStorageInp = open("output/vStorageInp.csv", "w");for (st1,c,r,y,s) in mvStorageStore if JuMP.value(vStorageInp[(st1,c,r,y,s)]) != 0
   println(fvStorageInp, st1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vStorageInp[(st1,c,r,y,s)]));
 end;
 end;close(fvStorageInp);
 
-fvStorageOut = open("vStorageOut.csv", "w");for (st1,c,r,y,s) in mvStorageStore if JuMP.value(vStorageOut[(st1,c,r,y,s)]) != 0
+fvStorageOut = open("output/vStorageOut.csv", "w");for (st1,c,r,y,s) in mvStorageStore if JuMP.value(vStorageOut[(st1,c,r,y,s)]) != 0
   println(fvStorageOut, st1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vStorageOut[(st1,c,r,y,s)]));
 end;
 end;close(fvStorageOut);
 
-fvStorageStore = open("vStorageStore.csv", "w");for (st1,c,r,y,s) in mvStorageStore if JuMP.value(vStorageStore[(st1,c,r,y,s)]) != 0
+fvStorageStore = open("output/vStorageStore.csv", "w");for (st1,c,r,y,s) in mvStorageStore if JuMP.value(vStorageStore[(st1,c,r,y,s)]) != 0
   println(fvStorageStore, st1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vStorageStore[(st1,c,r,y,s)]));
 end;
 end;close(fvStorageStore);
 
-fvStorageInv = open("vStorageInv.csv", "w");for (st1,r,y) in mStorageNew if JuMP.value(vStorageInv[(st1,r,y)]) != 0
+fvStorageInv = open("output/vStorageInv.csv", "w");for (st1,r,y) in mStorageNew if JuMP.value(vStorageInv[(st1,r,y)]) != 0
   println(fvStorageInv, st1, ",", r, ",", y, ",", JuMP.value(vStorageInv[(st1,r,y)]));
 end;
 end;close(fvStorageInv);
 
-fvStorageEac = open("vStorageEac.csv", "w");for (st1,r,y) in mStorageEac if JuMP.value(vStorageEac[(st1,r,y)]) != 0
+fvStorageEac = open("output/vStorageEac.csv", "w");for (st1,r,y) in mStorageEac if JuMP.value(vStorageEac[(st1,r,y)]) != 0
   println(fvStorageEac, st1, ",", r, ",", y, ",", JuMP.value(vStorageEac[(st1,r,y)]));
 end;
 end;close(fvStorageEac);
 
-fvStorageCap = open("vStorageCap.csv", "w");for (st1,r,y) in mStorageSpan if JuMP.value(vStorageCap[(st1,r,y)]) != 0
+fvStorageCap = open("output/vStorageCap.csv", "w");for (st1,r,y) in mStorageSpan if JuMP.value(vStorageCap[(st1,r,y)]) != 0
   println(fvStorageCap, st1, ",", r, ",", y, ",", JuMP.value(vStorageCap[(st1,r,y)]));
 end;
 end;close(fvStorageCap);
 
-fvStorageNewCap = open("vStorageNewCap.csv", "w");for (st1,r,y) in mStorageNew if JuMP.value(vStorageNewCap[(st1,r,y)]) != 0
+fvStorageNewCap = open("output/vStorageNewCap.csv", "w");for (st1,r,y) in mStorageNew if JuMP.value(vStorageNewCap[(st1,r,y)]) != 0
   println(fvStorageNewCap, st1, ",", r, ",", y, ",", JuMP.value(vStorageNewCap[(st1,r,y)]));
 end;
 end;close(fvStorageNewCap);
 
-fvImport = open("vImport.csv", "w");for (c,r,y,s) in mImport if JuMP.value(vImport[(c,r,y,s)]) != 0
+fvImport = open("output/vImport.csv", "w");for (c,r,y,s) in mImport if JuMP.value(vImport[(c,r,y,s)]) != 0
   println(fvImport, c, ",", r, ",", y, ",", s, ",", JuMP.value(vImport[(c,r,y,s)]));
 end;
 end;close(fvImport);
 
-fvExport = open("vExport.csv", "w");for (c,r,y,s) in mExport if JuMP.value(vExport[(c,r,y,s)]) != 0
+fvExport = open("output/vExport.csv", "w");for (c,r,y,s) in mExport if JuMP.value(vExport[(c,r,y,s)]) != 0
   println(fvExport, c, ",", r, ",", y, ",", s, ",", JuMP.value(vExport[(c,r,y,s)]));
 end;
 end;close(fvExport);
 
-fvTradeIr = open("vTradeIr.csv", "w");for (t1,c,r,rp,y,s) in mvTradeIr if JuMP.value(vTradeIr[(t1,c,r,rp,y,s)]) != 0
+fvTradeIr = open("output/vTradeIr.csv", "w");for (t1,c,r,rp,y,s) in mvTradeIr if JuMP.value(vTradeIr[(t1,c,r,rp,y,s)]) != 0
   println(fvTradeIr, t1, ",", c, ",", r, ",", rp, ",", y, ",", s, ",", JuMP.value(vTradeIr[(t1,c,r,rp,y,s)]));
 end;
 end;close(fvTradeIr);
 
-fvTradeIrAInp = open("vTradeIrAInp.csv", "w");for (t1,c,r,y,s) in mvTradeIrAInp if JuMP.value(vTradeIrAInp[(t1,c,r,y,s)]) != 0
+fvTradeIrAInp = open("output/vTradeIrAInp.csv", "w");for (t1,c,r,y,s) in mvTradeIrAInp if JuMP.value(vTradeIrAInp[(t1,c,r,y,s)]) != 0
   println(fvTradeIrAInp, t1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTradeIrAInp[(t1,c,r,y,s)]));
 end;
 end;close(fvTradeIrAInp);
 
-fvTradeIrAInpTot = open("vTradeIrAInpTot.csv", "w");for (c,r,y,s) in mvTradeIrAInpTot if JuMP.value(vTradeIrAInpTot[(c,r,y,s)]) != 0
+fvTradeIrAInpTot = open("output/vTradeIrAInpTot.csv", "w");for (c,r,y,s) in mvTradeIrAInpTot if JuMP.value(vTradeIrAInpTot[(c,r,y,s)]) != 0
   println(fvTradeIrAInpTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vTradeIrAInpTot[(c,r,y,s)]));
 end;
 end;close(fvTradeIrAInpTot);
 
-fvTradeIrAOut = open("vTradeIrAOut.csv", "w");for (t1,c,r,y,s) in mvTradeIrAOut if JuMP.value(vTradeIrAOut[(t1,c,r,y,s)]) != 0
+fvTradeIrAOut = open("output/vTradeIrAOut.csv", "w");for (t1,c,r,y,s) in mvTradeIrAOut if JuMP.value(vTradeIrAOut[(t1,c,r,y,s)]) != 0
   println(fvTradeIrAOut, t1, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTradeIrAOut[(t1,c,r,y,s)]));
 end;
 end;close(fvTradeIrAOut);
 
-fvTradeIrAOutTot = open("vTradeIrAOutTot.csv", "w");for (c,r,y,s) in mvTradeIrAOutTot if JuMP.value(vTradeIrAOutTot[(c,r,y,s)]) != 0
+fvTradeIrAOutTot = open("output/vTradeIrAOutTot.csv", "w");for (c,r,y,s) in mvTradeIrAOutTot if JuMP.value(vTradeIrAOutTot[(c,r,y,s)]) != 0
   println(fvTradeIrAOutTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vTradeIrAOutTot[(c,r,y,s)]));
 end;
 end;close(fvTradeIrAOutTot);
 
-fvExportRowAccumulated = open("vExportRowAccumulated.csv", "w");for (e,c) in mExpComm if JuMP.value(vExportRowAccumulated[(e,c)]) != 0
+fvExportRowAccumulated = open("output/vExportRowAccumulated.csv", "w");for (e,c) in mExpComm if JuMP.value(vExportRowAccumulated[(e,c)]) != 0
   println(fvExportRowAccumulated, e, ",", c, ",", JuMP.value(vExportRowAccumulated[(e,c)]));
 end;
 end;close(fvExportRowAccumulated);
 
-fvExportRow = open("vExportRow.csv", "w");for (e,c,r,y,s) in mExportRow if JuMP.value(vExportRow[(e,c,r,y,s)]) != 0
+fvExportRow = open("output/vExportRow.csv", "w");for (e,c,r,y,s) in mExportRow if JuMP.value(vExportRow[(e,c,r,y,s)]) != 0
   println(fvExportRow, e, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vExportRow[(e,c,r,y,s)]));
 end;
 end;close(fvExportRow);
 
-fvImportRowAccumulated = open("vImportRowAccumulated.csv", "w");for (i,c) in mImpComm if JuMP.value(vImportRowAccumulated[(i,c)]) != 0
+fvImportRowAccumulated = open("output/vImportRowAccumulated.csv", "w");for (i,c) in mImpComm if JuMP.value(vImportRowAccumulated[(i,c)]) != 0
   println(fvImportRowAccumulated, i, ",", c, ",", JuMP.value(vImportRowAccumulated[(i,c)]));
 end;
 end;close(fvImportRowAccumulated);
 
-fvImportRow = open("vImportRow.csv", "w");for (i,c,r,y,s) in mImportRow if JuMP.value(vImportRow[(i,c,r,y,s)]) != 0
+fvImportRow = open("output/vImportRow.csv", "w");for (i,c,r,y,s) in mImportRow if JuMP.value(vImportRow[(i,c,r,y,s)]) != 0
   println(fvImportRow, i, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vImportRow[(i,c,r,y,s)]));
 end;
 end;close(fvImportRow);
 
-fvTradeCap = open("vTradeCap.csv", "w");for (t1,y) in mvTradeCap if JuMP.value(vTradeCap[(t1,y)]) != 0
+fvTradeCap = open("output/vTradeCap.csv", "w");for (t1,y) in mvTradeCap if JuMP.value(vTradeCap[(t1,y)]) != 0
   println(fvTradeCap, t1, ",", y, ",", JuMP.value(vTradeCap[(t1,y)]));
 end;
 end;close(fvTradeCap);
 
-fvTradeInv = open("vTradeInv.csv", "w");for (t1,r,y) in mTradeEac if JuMP.value(vTradeInv[(t1,r,y)]) != 0
+fvTradeInv = open("output/vTradeInv.csv", "w");for (t1,r,y) in mTradeEac if JuMP.value(vTradeInv[(t1,r,y)]) != 0
   println(fvTradeInv, t1, ",", r, ",", y, ",", JuMP.value(vTradeInv[(t1,r,y)]));
 end;
 end;close(fvTradeInv);
 
-fvTradeEac = open("vTradeEac.csv", "w");for (t1,r,y) in mTradeEac if JuMP.value(vTradeEac[(t1,r,y)]) != 0
+fvTradeEac = open("output/vTradeEac.csv", "w");for (t1,r,y) in mTradeEac if JuMP.value(vTradeEac[(t1,r,y)]) != 0
   println(fvTradeEac, t1, ",", r, ",", y, ",", JuMP.value(vTradeEac[(t1,r,y)]));
 end;
 end;close(fvTradeEac);
 
-fvTradeNewCap = open("vTradeNewCap.csv", "w");for (t1,y) in mvTradeNewCap if JuMP.value(vTradeNewCap[(t1,y)]) != 0
+fvTradeNewCap = open("output/vTradeNewCap.csv", "w");for (t1,y) in mvTradeNewCap if JuMP.value(vTradeNewCap[(t1,y)]) != 0
   println(fvTradeNewCap, t1, ",", y, ",", JuMP.value(vTradeNewCap[(t1,y)]));
 end;
 end;close(fvTradeNewCap);
