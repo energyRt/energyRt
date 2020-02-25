@@ -17,7 +17,7 @@ setClass('constraint',
            name          = "character",
            description   = "character",       # description
            eq            = "factor",
-           for.each      = "list",
+           for.each      = "data.frame",
            rhs           = "data.frame",
            defVal        = "numeric",
            lhs           = "list",
@@ -28,7 +28,7 @@ setClass('constraint',
            name          = NULL,
            description   = '',       # description
            eq            = factor('==', levels = c('>=', '<=', '==')),
-           for.each      = list(),
+           for.each      = data.frame(),
            rhs           = data.frame(),
            defVal        = 0,
            lhs           = list(),
@@ -90,7 +90,7 @@ setClass('summand',
 #' @return Object of class `constraint`.
 #'
 #'    
-newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = list(), defVal = 0, ..., arg = NULL) {
+newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = NULL, defVal = 0, ..., arg = NULL) {
   obj <- new('constraint')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq)))   {
@@ -128,7 +128,27 @@ newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = list()
   obj@rhs       <- rhs
   obj@defVal    <- defVal
   obj@name      <- name
-  obj@for.each  <- for.each
+  if (!is.null(for.each)) {
+    if (!is.data.frame(for.each) && is.list(for.each)) {
+      tmp <- data.frame(stringsAsFactors = FALSE)
+      fl_null <- sapply(for.each, is.null)
+      for (i in names(for.each)[fl_null]) {
+        for.each[[i]] <- NA
+      }     
+      for (i in names(for.each)) {
+        t2 <- data.frame(for.each[[i]], stringsAsFactors = FALSE)
+        colnames(t2) <- i
+        if (ncol(tmp) == 0) {
+          tmp <- t2
+        } else {
+          tmp <- merge(tmp, t2)
+        }
+      }
+      obj@for.each  <- tmp
+    } else if (is.data.frame(for.each)) {
+      obj@for.each  <- for.each
+    } else stop("Unknown argument 'for.each'")
+  }
   for (i in seq_along(arg)) {
     obj <- addSummand(obj, arg = arg[[i]])
   }
@@ -211,27 +231,33 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   set.map.name <- NULL # Temp vector with name for list set.map
   # all.set & set.map
   # for.each
-  nn <- seq_len(length(stm@for.each) + sum(sapply(stm@lhs, function(x) length(.vrb_map[[x@variable]]))))
+  
+  old_for_each <- lapply(stm@for.each, function(x) {
+    if (any(is.na(x))) return(NULL) 
+    return (unique(x))
+  })
+  names(old_for_each) <- colnames(stm@for.each)
+  nn <- seq_len(length(old_for_each) + sum(sapply(stm@lhs, function(x) length(.vrb_map[[x@variable]]))))
   all.set[seq_along(nn), ] <- NA
   for (i in (1:ncol(all.set))[sapply(all.set, class) == 'logical']) 
     all.set[, i] <- FALSE
   nn <- 0
-  if (length(stm@for.each) > 0) {
-    nn <- seq_along(stm@for.each)
-    all.set[nn, 'set'] <- names(stm@for.each)
-    all.set[nn, 'alias'] <- names(stm@for.each)
+  if (length(old_for_each) > 0) {
+    nn <- seq_along(old_for_each)
+    all.set[nn, 'set'] <- names(old_for_each)
+    all.set[nn, 'alias'] <- names(old_for_each)
     all.set[nn, 'for.each'] <- TRUE
-    for.each.set <- names(stm@for.each)
+    for.each.set <- names(old_for_each)
     # Fill add.map for for.each
     for (j in for.each.set) {
-      if (!is.null(stm@for.each[[j]]) && !all(prec@set[[j]] %in% stm@for.each[[j]])) {
-        if (any(stm@for.each[[j]] %in% prec@set[[j]])) {
+      if (!is.null(old_for_each[[j]]) && !all(prec@set[[j]] %in% old_for_each[[j]])) {
+        if (any(old_for_each[[j]] %in% prec@set[[j]])) {
           # warning(paste0('Set "'))
-          stm@for.each[[j]] <- stm@for.each[[j]][stm@for.each[[j]] %in% prec@set[[j]]]
+          old_for_each[[j]] <- old_for_each[[j]][old_for_each[[j]] %in% prec@set[[j]]]
         }
         set.map.name <- c(set.map.name, j)
-        set.map[[length(set.map.name)]] <- stm@for.each[[j]]
-        all.set[nn[names(stm@for.each) == j], 'new.map'] <- length(set.map.name)
+        set.map[[length(set.map.name)]] <- old_for_each[[j]]
+        all.set[nn[names(old_for_each) == j], 'new.map'] <- length(set.map.name)
       }
     }
   } else for.each.set <- NULL
@@ -315,32 +341,47 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   # Declaration equation in model
   res$equationDeclaration2Model <- paste0('eqCns', stm@name)
   # Declaration equation
-  if (length(stm@for.each) == 0) {
+  if (length(old_for_each) == 0) {
     res$equationDeclaration <- res$equationDeclaration2Model
   } else {
-    res$equationDeclaration <- paste0(res$equationDeclaration2Model, '(', paste0(names(stm@for.each), collapse = ', '), ')')
+    res$equationDeclaration <- paste0(res$equationDeclaration2Model, '(', paste0(names(old_for_each), collapse = ', '), ')')
   }
   # Equation before ..
   res$equation <- res$equationDeclaration
-  if (any(all.set$for.each & (all.set == 'year') | !is.na(all.set$new.map))) {
-    for.each.set0 <- all.set[all.set$for.each,, drop = FALSE]
-    hh <- NULL
-    if (any(!is.na(for.each.set0$new.map))) { 
-      hh <- c(hh, new.map.name.full[for.each.set0$new.map[!is.na(for.each.set0$new.map)]])
+  if (any(is.na(stm@for.each))) {
+    tmp_fe <- stm@for.each
+    fl_na <- colnames(stm@for.each)[sapply(is.na(stm@for.each), any)]
+    for (i in fl_na) {
+      tmg <- prec@parameters[[i]]@data
+      if (i == 'year') {
+        tmg <- prec@parameters[['mMidMilestone']]@data
+        if (any(all.set$lag.year)) { 
+          tmg <- tmg[!(tmg$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, drop = FALSE]
+        }
+        if (any(all.set$lead.year)) { 
+          tmg <- tmg[tmg$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, drop = FALSE]
+        }
+      }
+      tmp_fe <- rbind(merge(tmp_fe[, colnames(tmp_fe) != i, drop = FALSE], tmg),
+        tmp_fe[!is.na(tmp_fe[[i]]),, drop = FALSE])
+      tmp_fe <- tmp_fe[!duplicated(tmp_fe),, drop = FALSE]
     }
-    if (any(for.each.set0$set == 'year')) { 
-      hh <- c(hh, 'mMidMilestone(year)')
-    }
+    stm@for.each <- tmp_fe
+  }
+  if (!is.null(stm@for.each$year)) {
+    stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMidMilestone']]@data$year,, drop = FALSE]
     if (any(all.set$lag.year)) { 
-      hh <- c(hh, 'not(mMilestoneFirst(year))')
+      stm@for.each <- stm@for.each[!(stm@for.each$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, drop = FALSE]
     }
     if (any(all.set$lead.year)) { 
-      hh <- c(hh, 'mMilestoneHasNext(year)')
+      stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, drop = FALSE]
     }
-    if (length(hh) > 0)
-	    res$equation <- paste0(res$equation, '$', '('[length(hh) > 1], 
-	                           paste0(hh, collapse = ' and '), ')'[length(hh) > 1])
-    
+  }
+  if (nrow(stm@for.each) > 0) {
+    nmn <- paste0('mCnsForEach', stm@name)
+    prec@parameters[[nmn]] <- addData(createParameter(nmn, colnames(stm@for.each), 'map'),
+      stm@for.each)
+    res$equation <- paste0(res$equation, '$', nmn, '(', paste0(colnames(stm@for.each), collapse = ', '), ')')
   }
   res$equation <- paste0(res$equation, '.. ')
   # Add lhs to equation
@@ -448,7 +489,11 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
     xx <- createParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
                           interpolation = 'back.inter.forth', colName = 'rhs')
-    prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@rhs, 'rhs', xx, approxim2))
+    yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
+    n1 <- colnames(yy)[colnames(yy) != 'value']
+    yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 
+      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, drop = FALSE]
+    prec@parameters[[xx@name]] <- addData(xx, yy)
     # Add mult
     res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')
   } else {
