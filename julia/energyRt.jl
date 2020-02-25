@@ -2,10 +2,10 @@ using Dates
 f = open("log.txt", "w")
 println(f, "start ", Dates.format(now(), "HH:MM:SS"))
 println("start ", Dates.format(now(), "HH:MM:SS"))
+using Cbc
 using JuMP
 include("data.jl")
 model = Model();
-using Dates
 @variable(model, vTechInv[mTechNew]);
 @variable(model, vTechEac[mTechEac]);
 @variable(model, vTechOMCost[mTechOMCost]);
@@ -513,7 +513,6 @@ println("eqLECActivity(tech, region, year) done ", Dates.format(now(), "HH:MM:SS
 println(f, "eqLECActivity(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 
 @objective(model, Min, vObjective)
-using Cbc
 set_optimizer(model, Cbc.Optimizer)
 optimize!(model)
 
