@@ -622,14 +622,49 @@
       x$value <- 1
       x
     }
+    tmp_g0 <- function(x) {
+      x$value <- NULL
+      x
+    }
     prec@parameters[['paTechWeatherAfLo']] <- addData(prec@parameters[['paTechWeatherAfLo']], 
       tmp_f0(getParameterData(prec@parameters[['meqTechAfLo']])))
     prec@parameters[['paTechWeatherAfUp']] <- addData(prec@parameters[['paTechWeatherAfUp']], 
-                                                      tmp_f0(getParameterData(prec@parameters[['meqTechAfUp']])))
+      tmp_g0(getParameterData(prec@parameters[['meqTechAfUp']])))
     
+    
+    # Split pWeather for all slice
+    # Aggregate pWeather by template
+    # 
+
+    # paTechWeatherAfsLo, meqTechAfsLo, mTechWeatherAfs
+    # paTechWeatherAfsUp, meqTechAfsUp, mTechWeatherAfs
+    
+    # paTechWeatherAfcLo, meqTechAfcOutLo, mTechWeatherAfc
+    # paTechWeatherAfsUp, meqTechAfcOutUp, mTechWeatherAfc
+    
+    # paTechWeatherAfcLo, meqTechAfcOutLo & meqTechAfcInpLo, mTechWeatherAfc
+    # paTechWeatherAfsUp, meqTechAfcOutUp & meqTechAfcInpLo, mTechWeatherAfc
+    
+    # paTechWeatherAfLo, meqTechAfLo, mTechWeatherAf
+    # paTechWeatherAfUp, meqTechAfUp, mTechWeatherAf
+
+    # paSupWeatherLo, meqSupAvaLo, mSupWeatherLo
+    # paSupWeatherUp,   mSupAvaUp, mSupWeatherUp
+    
+
+    # paStorageWeatherAfLo, mStorageWeatherAf, meqStorageAfLo
+    # paStorageWeatherAfUp, mStorageWeatherAf, meqStorageAfUp
+
+    # paStorageWeatherCinpLo, meqStorageInpLo, mStorageWeatherCinp
+    # paStorageWeatherCinpUp, meqStorageInpUp, mStorageWeatherCinp
+    
+    # paStorageWeatherCoutLo, meqStorageOutLo, mStorageWeatherCout
+    # paStorageWeatherCoutUp, meqStorageOutUp, mStorageWeatherCout
+    
+ 
     # paTechWeatherAfs*
     prec@parameters[['paTechWeatherAfsLo']] <- addData(prec@parameters[['paTechWeatherAfsLo']], 
-                                                      tmp_f0(getParameterData(prec@parameters[['meqTechAfsLo']])))
+      aggregate_weather(paTechWeatherAfsLo, tmp_f0(getParameterData(prec@parameters[['meqTechAfsLo']]))))
     prec@parameters[['paTechWeatherAfsUp']] <- addData(prec@parameters[['paTechWeatherAfsUp']], 
                                                       tmp_f0(getParameterData(prec@parameters[['meqTechAfsUp']])))
     # paTechWeatherAfc*
@@ -653,10 +688,10 @@
     prec@parameters[['paStorageWeatherCinpUp']] <- addData(prec@parameters[['paStorageWeatherCinpUp']], 
                                                          tmp_f0(getParameterData(prec@parameters[['meqStorageInpUp']])))
     # paStorageWeatherCout*
-    prec@parameters[['paStorageWeatherCinpLo']] <- addData(prec@parameters[['paStorageWeatherCinpLo']], 
-                                                           tmp_f0(getParameterData(prec@parameters[['meqStorageInpLo']])))
-    prec@parameters[['paStorageWeatherCinpUp']] <- addData(prec@parameters[['paStorageWeatherCinpUp']], 
-                                                           tmp_f0(getParameterData(prec@parameters[['meqStorageInpUp']])))
+    prec@parameters[['paStorageWeatherCoutLo']] <- addData(prec@parameters[['paStorageWeatherCoutLo']], 
+                                                           tmp_f0(getParameterData(prec@parameters[['meqStorageOutLo']])))
+    prec@parameters[['paStorageWeatherCoutUp']] <- addData(prec@parameters[['paStorageWeatherCoutUp']], 
+                                                           tmp_f0(getParameterData(prec@parameters[['meqStorageOutUp']])))
     
     tmp <- getParameterData(prec@parameters[['pAggregateFactor']])
     tmp <- tmp[tmp$value != 0, ]
