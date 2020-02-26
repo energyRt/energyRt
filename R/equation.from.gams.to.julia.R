@@ -71,7 +71,7 @@ names(.fremset) <-   c("stg", "trade", "expp", "imp", "tech", "dem", "sup", "wea
   .get_julia_loop_fast(beg, end)
 }
 
-.get.bracket <- function(tmp) {
+.get.bracket.julia <- function(tmp) {
   brk0 <- gsub('[^)(]', '', tmp)
   brk <- cumsum(c('(' = 1, ')' = -1)[strsplit(brk0, '')[[1]]])
   k <- seq_along(brk)[brk == 0][1]
@@ -79,14 +79,14 @@ names(.fremset) <-   c("stg", "trade", "expp", "imp", "tech", "dem", "sup", "wea
   list(beg = substr(tmp, 1, nchar(tmp) - nchar(end)), end = end)
 }
 
-.handle.sum <- function(tmp) {
-  hh <- .get.bracket(tmp)
+.handle.sum.julia <- function(tmp) {
+  hh <- .get.bracket.julia(tmp)
   a1 <- sub('^[(]', '', sub('[)]$', '', hh$beg))
   a2 <- a1
   while (substr(a2, 1, 1) != ',') {
     a2 <- gsub('^([[:alnum:]]|[+]|[-]|[*]|[$])*', '', a2)
     if (substr(a2, 1, 1) == '(') 
-      a2 <- .get.bracket(a2)$end
+      a2 <- .get.bracket.julia(a2)$end
   }
   paste0('(', .eqt.to.julia(substr(a2, 2, nchar(a2))), ' for ', .get_julia_loop_fast2(substr(a1, 1, nchar(a1) - nchar(a2))), ')', 
     .eqt.to.julia(hh$end)) 
@@ -96,7 +96,7 @@ names(.fremset) <-   c("stg", "trade", "expp", "imp", "tech", "dem", "sup", "wea
   while (nchar(tmp) != 0) {
     tmp <- gsub('^[ ]*', '', tmp) 
     if (substr(tmp, 1, 4) == "sum(") {
-      rs <- paste0(rs, 'sum', .handle.sum(substr(tmp, 4, nchar(tmp))))
+      rs <- paste0(rs, 'sum', .handle.sum.julia(substr(tmp, 4, nchar(tmp))))
       tmp <- ''
     } else if (any(grep('^([.[:digit:]]|[+]|[-]|[ ]|[*])', tmp))) {
       a3 <- gsub('^([.[:digit:]_]|[+]|[-]|[ ]|[*])*', '', tmp)
@@ -105,11 +105,15 @@ names(.fremset) <-   c("stg", "trade", "expp", "imp", "tech", "dem", "sup", "wea
     } else if (substr(tmp, 1, 1) %in% c('m', 'v', 'p')) {
       a1 <- sub('^[[:alnum:]_]*', '', tmp)
       vrb <- substr(tmp, 1, nchar(tmp) - nchar(a1))
-      a2 <- .get.bracket(a1)
+      a2 <- .get.bracket.julia(a1)
+      arg <- paste0('(', paste0(.aliasName(strsplit(gsub('[() ]', '', a2$beg), ',')[[1]]), collapse = ', '), ')')
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == '$') {
-        browser()        
+        # There are condition
+        rs <- paste0(rs, '(if ', arg, ' in ', gsub('([$]|[(].*)', '', a2$end), '; ', vrb, '[', arg, ']; else 0;end)',
+          .eqt.to.julia(gsub('^[^)]*[)]', '', a2$end)))
+        tmp <- ''
       } else {
-        rs <- paste0(rs, vrb, '[', paste0(.aliasName(strsplit(gsub('[() ]', '', a2$beg), ',')[[1]]), collapse = ', '), ']',
+        rs <- paste0(rs, vrb, '[', arg, ']',
                      .eqt.to.julia(a2$end))
         tmp <- ''
       }
@@ -137,4 +141,3 @@ names(.fremset) <-   c("stg", "trade", "expp", "imp", "tech", "dem", "sup", "wea
   rs <- paste0(rs, .eqt.to.julia(gsub('.*[.][.][ ]*', '', eqt)))
   rs
 }
-

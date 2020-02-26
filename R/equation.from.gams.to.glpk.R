@@ -11,7 +11,7 @@
   if (!is.null(set_cond) && substr(set_cond, 1, 1) == '(')
     set_cond <- sub('^[(]', '', sub('[)]$', '', set_cond))
   set_loop <- sub('^[(]', '', sub('[)]$', '', set_loop))
-  xx <- .generate_loop_glk(set_loop, set_cond)
+  xx <- .generate_loop_glpk(set_loop, set_cond)
   rs <- paste0('{', xx$first)
   if (!is.null(xx$end) || !is.null(add_cond))
     rs <- paste0(rs, ' : ', paste0(xx$end, add_cond, collapse = ' and '))
@@ -22,32 +22,6 @@
 .alias_set <- c("st1", "t1", "e", "i", "t", "d", "s1", "wth1", "r", "y", "s", "g", "c", "cn1", "st1p", "t1p", "ep", "ip", "tp", "dp", "s1p", "wth1p", "rp", "yp", "sp", "gp", "cp", "cn1p", "st1e", "t1e", "ee", "ie", "te", "de", "s1e", "wth1e", "re", "ye", "se", "ge", "ce", "cn1e", "st1n", "t1n", "en", "in", "tn", "dn", "s1n", "wth1n", "rn", "yn", "sn", "gn", "cn", "cn1n", "src", "dst")
 names(.alias_set) <- .set_al
 .aliasName <- function(x) {
-  #.set_al <- c("stg", "trade", "expp", "imp", "tech", "dem", "sup", 'weather', "region", 
-  #             "year", "slice", "group", "comm", "cns")
-  #.set_al0 <- c(rep(.set_al, 4), 'src', 'dst')
-  #.alias_set <- substr(.set_al, 1, 1)
-  #.set_al <- c(.set_al, paste(.set_al, 'p', sep = ''), paste(.set_al, 'e', sep = ''),
-  #             paste(.set_al, 'n', sep = ''), 'src', 'dst')
-  #.alias_set <- c(.alias_set, paste(.alias_set, 'p', sep = ''), 
-  #                paste(.alias_set, 'e', sep = ''),  paste(.alias_set, 'n', sep = ''), 'src', 'dst')
-  #names(.alias_set) <- .set_al
-  ## Remove misunderstanding sup and s1
-  #gg <- grep('^sup', .set_al)
-  #.alias_set[gg] <- paste('s1', substr(.alias_set[gg], 2, nchar(.alias_set[gg])), sep = '')
-  #gg <- grep('^weather', .set_al)
-  #.alias_set[gg] <- paste('wth1', substr(.alias_set[gg], 2, nchar(.alias_set[gg])), sep = '')
-  #gg <- grep('^stg', .set_al)
-  #.alias_set[gg] <- paste('st1', substr(.alias_set[gg], 2, nchar(.alias_set[gg])), sep = '')
-  #gg <- grep('^row', .set_al)
-  #.alias_set[gg] <- paste('r2', substr(.alias_set[gg], 2, nchar(.alias_set[gg])), sep = '')
-  #gg <- grep('^trade', .set_al)
-  #.alias_set[gg] <- paste('t1', substr(.alias_set[gg], 2, nchar(.alias_set[gg])), sep = '')
-  #gg <- grep('^cns', .set_al)
-  #.alias_set[gg] <- paste('cn1', substr(.alias_set[gg], 2, nchar(.alias_set[gg])), sep = '')
-  #.alias_set
-  #all(.set_al2 == .set_al)
-  #all(.alias_set2 == .alias_set)
-  #all(names(.alias_set2) == names(.alias_set))
   if (!all(x %in% .set_al)) {
     cat('Unknown .set_al\n')
     browser()
@@ -56,11 +30,7 @@ names(.alias_set) <- .set_al
   .alias_set[x]
 }
 
-.generate_loop_glk <- function(set_num, set_loop) {
-  #cat('set_num ', set_num, '\n')
-  #assign('set_num', set_num, globalenv())
-  #assign('set_loop', set_loop, globalenv())
-  #if (set_num == 'comm, region, slice') stop()
+.generate_loop_glpk <- function(set_num, set_loop) {
   # Consdition split and divet by subset
   while (!is.null(set_loop) && substr(set_loop, 1, 1) == '(' && substr(set_loop, nchar(set_loop), nchar(set_loop)) == ')')
     set_loop <- substr(set_loop, 2, nchar(set_loop) - 1)
@@ -120,7 +90,7 @@ names(.alias_set) <- .set_al
   .get_glpk_loop_fast(beg, end)
 }
 
-.get.bracket <- function(tmp) {
+.get.bracket.glpk <- function(tmp) {
   brk0 <- gsub('[^)(]', '', tmp)
   brk <- cumsum(c('(' = 1, ')' = -1)[strsplit(brk0, '')[[1]]])
   k <- seq_along(brk)[brk == 0][1]
@@ -132,14 +102,14 @@ names(.alias_set) <- .set_al
 # "s.t. eqCnsMINGASgrow2{y in (mMidMilestone inter mMilestoneHasNext)}: sum{y in mMidMilestone, (c, s) in mCommSlice, r in region : c in (mCnsMINGASgrow2_1 inter mCnsMINGASgrow2_1)}(-1 * vOutTot[c, r, y, s]+ sum{(y, yp) in mMilestoneNext, (c, s) in mCommSlice, r in region : c in (mCnsMINGASgrow2_1 inter mCnsMINGASgrow2_1) and yp in mMidMilestone}(pCnsMultMINGASgrow2_2[y]* vOutTot[c, r, yp, s]>=0;"
 
 # tmp = '((comm, region, slice)$(mCnsMINGASgrow2_1(comm) and mMidMilestone(year) and mCommSlice(comm, slice) and mCnsMINGASgrow2_1(comm)), -1 * vOutTot(comm, region, year, slice))'
-.handle.sum <- function(tmp) {
-  hh <- .get.bracket(tmp)
+.handle.sum.glpk <- function(tmp) {
+  hh <- .get.bracket.glpk(tmp)
   a1 <- sub('^[(]', '', sub('[)]$', '', hh$beg))
   a2 <- a1
   while (substr(a2, 1, 1) != ',') {
     a2 <- gsub('^([[:alnum:]]|[+]|[-]|[*]|[$])*', '', a2)
     if (substr(a2, 1, 1) == '(') 
-      a2 <- .get.bracket(a2)$end
+      a2 <- .get.bracket.glpk(a2)$end
   }
   paste0(.get_glpk_loop_fast2(substr(a1, 1, nchar(a1) - nchar(a2))), '(', .eqt.to.glpk(substr(a2, 2, nchar(a2))), ')', .eqt.to.glpk(hh$end)) 
 }
@@ -152,7 +122,7 @@ names(.alias_set) <- .set_al
   while (nchar(tmp) != 0) {
     tmp <- gsub('^[ ]*', '', tmp) 
     if (substr(tmp, 1, 4) == "sum(") {
-      rs <- paste0(rs, 'sum', .handle.sum(substr(tmp, 4, nchar(tmp))))
+      rs <- paste0(rs, 'sum', .handle.sum.glpk(substr(tmp, 4, nchar(tmp))))
       tmp <- ''
     } else if (any(grep('^([.[:digit:]]|[+]|[-]|[ ]|[*])', tmp))) {
       a3 <- gsub('^([.[:digit:]_]|[+]|[-]|[ ]|[*])*', '', tmp)
@@ -161,12 +131,14 @@ names(.alias_set) <- .set_al
     } else if (substr(tmp, 1, 1) %in% c('m', 'v', 'p')) {
       a1 <- sub('^[[:alnum:]_]*', '', tmp)
       vrb <- substr(tmp, 1, nchar(tmp) - nchar(a1))
-      a2 <- .get.bracket(a1)
+      a2 <- .get.bracket.glpk(a1)
+      arg <- paste0(.aliasName(strsplit(gsub('[() ]', '', a2$beg), ',')[[1]]), collapse = ', ')
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == '$') {
-        browser()        
+        rs <- paste0(rs, 'sum{FORIF: (', arg, ') in ', gsub('([$]|[(].*)', '', a2$end), '} (', vrb, '[', arg, '])',
+            .eqt.to.glpk(gsub('^[^)]*[)]', '', a2$end)))
+        tmp <- ''
       } else {
-        rs <- paste0(rs, vrb, '[', paste0(.aliasName(strsplit(gsub('[() ]', '', a2$beg), ',')[[1]]), collapse = ', '), ']',
-                     .eqt.to.glpk(a2$end))
+        rs <- paste0(rs, vrb, '[', arg, ']', .eqt.to.glpk(a2$end))
         tmp <- ''
       }
     } else if (substr(tmp, 1, 1) == '=') {
