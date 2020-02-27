@@ -574,46 +574,7 @@
     
     prec@parameters[['meqLECActivity']] <- addData(prec@parameters[['meqLECActivity']], 
       merge(getParameterData(prec@parameters[['mTechSpan']]), getParameterData(prec@parameters[['mLECRegion']])))
-    
-    
-    # prod Weather
-    # tmp_func3 <- function(x) x[x$type == 'lo' & x$value >= 0, -(ncol(x) - 1)]
-    # tmp_func4 <- function(x) x[x$type == 'Up' & x$value >= 0, -(ncol(x) - 1)]
-    # aggregate3 <- function(x) {
-    #   if (nrow(x) == 0)
-    #     return(x[, colnames(x) != 'slicep', drop = FALSE])
-    #   aggregate(x[, 'value', drop = FALSE], x[, !(colnames(x) %in% c('slicep', 'value')), drop = FALSE], prod)
-    # }
-    # # paTechWeatherAf*
-    # tmp <- merge(merge(merge(tmp_map$meqTechAfLo, tmp_map$mTechWeatherAf), tmp_map$mWeatherRegion),
-    #   merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
-    # prec@parameters[['paTechWeatherAfLo']] <- addData(prec@parameters[['paTechWeatherAfLo']], 
-    #   aggregate3(merge(tmp, tmp_func3(getParameterData(prec@parameters[['pTechWeatherAf']])))))
-    # tmp <- merge(merge(merge(tmp_map$meqTechAfUp, tmp_map$mTechWeatherAf), tmp_map$mWeatherRegion),
-    #   merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
-    # prec@parameters[['paTechWeatherAfUp']] <- addData(prec@parameters[['paTechWeatherAfUp']], 
-    #   aggregate3(merge(tmp, tmp_func4(getParameterData(prec@parameters[['pTechWeatherAf']])))))
-    # 
-    # # paTechWeatherAfs*
-    # tmp <- merge(merge(merge(tmp_map$meqTechAfsLo, tmp_map$mTechWeatherAfs), tmp_map$mWeatherRegion),
-    #   merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
-    # prec@parameters[['paTechWeatherAfsLo']] <- addData(prec@parameters[['paTechWeatherAfsLo']], 
-    #   aggregate3(merge(tmp, tmp_func3(getParameterData(prec@parameters[['pTechWeatherAfs']])))))
-    # tmp <- merge(merge(merge(tmp_map$meqTechAfsUp, tmp_map$mTechWeatherAfs), tmp_map$mWeatherRegion),
-    #   merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
-    # prec@parameters[['paTechWeatherAfsUp']] <- addData(prec@parameters[['paTechWeatherAfsUp']], 
-    #   aggregate3(merge(tmp, tmp_func4(getParameterData(prec@parameters[['pTechWeatherAfs']])))))
-    # # paTechWeatherAf*
-    # tmp <- merge(merge(merge(tmp_map$meqTechAfsLo, tmp_map$mTechWeatherAfc), tmp_map$mWeatherRegion),
-    #   merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
-    # prec@parameters[['paTechWeatherAfcLo']] <- addData(prec@parameters[['paTechWeatherAfcLo']], 
-    #   aggregate3(merge(tmp, tmp_func3(getParameterData(prec@parameters[['pTechWeatherAfc']])))))
-    # tmp <- merge(merge(merge(tmp_map$meqTechAfsUp, tmp_map$mTechWeatherAfc), tmp_map$mWeatherRegion),
-    #   merge(tmp_map$mWeatherSlice, tmp_map$mSliceParentChildE))
-    # prec@parameters[['paTechWeatherAfcUp']] <- addData(prec@parameters[['paTechWeatherAfcUp']], 
-    #   aggregate3(merge(tmp, tmp_func4(getParameterData(prec@parameters[['pTechWeatherAfc']])))))
-    
-    # paTechWeatherAf*
+
     tmp_f0 <- function(x) {
       if (nrow(x) == 0) {
         x$value <- numeric()
@@ -622,78 +583,63 @@
       x$value <- 1
       x
     }
-    tmp_g0 <- function(x) {
-      x$value <- NULL
-      x
+    
+    # Generate pWeather for all slice, including parent & child 
+    pWeather <- getParameterData(prec@parameters[['pWeather']])
+    pSliceShare <- getParameterData(prec@parameters[['pSliceShare']])
+    colnames(pSliceShare)[ncol(pSliceShare)] <- 'share'
+    mSliceCP <- getParameterData(prec@parameters$mSliceParentChild)
+    colnames(mSliceCP) <- c('slicep', 'slice')
+    pWeatherUp <- merge(merge(pWeather, pSliceShare, by = 'slice'), mSliceCP, by = 'slice')
+    pWeatherUp$slice <- pWeatherUp$slicep; pWeatherUp$slicep <- NULL 
+    pWeatherUp <- aggregate(data.frame(tot = pWeatherUp$value * pWeatherUp$share, share = pWeatherUp$share), 
+      pWeatherUp[, c('weather', 'region', 'year', 'slice')], sum)
+    pWeatherUp$value <- pWeatherUp$tot / pWeatherUp$share
+    pWeatherUp <- pWeatherUp[, c('weather', 'region', 'year', 'slice', 'value')]
+    
+    pWeatherLo <- merge(pWeather, getParameterData(prec@parameters$mSliceParentChild), by = 'slice')
+    pWeatherLo$slice <- pWeatherLo$slicep;
+    pWeatherLo <- pWeatherLo[, c('weather', 'region', 'year', 'slice', 'value')]
+    pWeather <- rbind(pWeatherUp, pWeatherLo, pWeather)
+    pWeather$mwth <- pWeather$value; pWeather$value <- NULL
+    
+    towth <- data.frame(par = character(), base_map = character(), map_to = character(), stringsAsFactors = FALSE)
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfUp', 'meqTechAfUp', 'mTechWeatherAf')
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfLo', 'meqTechAfLo', 'mTechWeatherAf')
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfsLo', 'meqTechAfsLo', 'mTechWeatherAfs')
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfsUp', 'meqTechAfsUp', 'mTechWeatherAfs')
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcLo', 'meqTechAfcOutLo', 'mTechWeatherAfc')
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcLo', 'meqTechAfcInpLo', 'mTechWeatherAfc')
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcUp', 'meqTechAfcOutUp', 'mTechWeatherAfc')
+    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcUp', 'meqTechAfcInpUp', 'mTechWeatherAfc')
+
+    towth[nrow(towth) + 1, ] <- c('paSupWeatherLo', 'meqSupAvaLo', 'mSupWeatherLo')
+    towth[nrow(towth) + 1, ] <- c('paSupWeatherUp', 'mSupAvaUp', 'mSupWeatherUp')
+    
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfLo', 'mStorageWeatherAf', 'meqStorageAfLo')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfUp', 'mStorageWeatherAf', 'meqStorageAfUp')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpLo', 'mStorageWeatherCinp', 'meqStorageInpLo')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpUp', 'mStorageWeatherCinp', 'meqStorageInpUp')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutLo', 'mStorageWeatherCout', 'meqStorageOutLo')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutUp', 'mStorageWeatherCout', 'meqStorageOutUp')
+    
+    for (i in seq_len(nrow(towth))) {
+      rft <- getParameterData(prec@parameters[[towth[i, 'base_map']]])
+      rdd <- getParameterData(prec@parameters[[towth[i, 'map_to']]])
+      if (nrow(rft) > 0) {
+        rft <- tmp_f0(rft)
+        if (nrow(rdd) > 0) {
+          tmp <- merge(rdd, pWeather); tmp$weather <- NULL
+          tmp <- aggregate(tmp[, 'mwth', drop = FALSE], tmp[, -ncol(tmp), drop = FALSE], prod)
+          tmp <- merge(rft, tmp, all.x = TRUE)
+          tmp$value <- tmp$value * tmp$mwth; tmp$mwth <- NULL
+          prec@parameters[[towth[i, 'par']]] <- addData(prec@parameters[[towth[i, 'par']]], tmp)
+        } else {
+          prec@parameters[[towth[i, 'par']]] <- addData(prec@parameters[[towth[i, 'par']]], rft)
+        }
+      }
     }
-    
-    
-    # Split pWeather for all slice
-    # Aggregate pWeather by template
-    # 
 
-    # paTechWeatherAfsLo, meqTechAfsLo, mTechWeatherAfs
-    # paTechWeatherAfsUp, meqTechAfsUp, mTechWeatherAfs
-    
-    # paTechWeatherAfcLo, meqTechAfcOutLo, mTechWeatherAfc
-    # paTechWeatherAfsUp, meqTechAfcOutUp, mTechWeatherAfc
-    
-    # paTechWeatherAfcLo, meqTechAfcOutLo & meqTechAfcInpLo, mTechWeatherAfc
-    # paTechWeatherAfsUp, meqTechAfcOutUp & meqTechAfcInpLo, mTechWeatherAfc
-    
-    # paTechWeatherAfLo, meqTechAfLo, mTechWeatherAf
-    # paTechWeatherAfUp, meqTechAfUp, mTechWeatherAf
-
-    # paSupWeatherLo, meqSupAvaLo, mSupWeatherLo
-    # paSupWeatherUp,   mSupAvaUp, mSupWeatherUp
-    
-
-    # paStorageWeatherAfLo, mStorageWeatherAf, meqStorageAfLo
-    # paStorageWeatherAfUp, mStorageWeatherAf, meqStorageAfUp
-
-    # paStorageWeatherCinpLo, meqStorageInpLo, mStorageWeatherCinp
-    # paStorageWeatherCinpUp, meqStorageInpUp, mStorageWeatherCinp
-    
-    # paStorageWeatherCoutLo, meqStorageOutLo, mStorageWeatherCout
-    # paStorageWeatherCoutUp, meqStorageOutUp, mStorageWeatherCout
-    
-    # paTechWeatherAf*
-    prec@parameters[['paTechWeatherAfLo']] <- addData(prec@parameters[['paTechWeatherAfLo']], 
-      tmp_f0(getParameterData(prec@parameters[['meqTechAfLo']])))
-    prec@parameters[['paTechWeatherAfUp']] <- addData(prec@parameters[['paTechWeatherAfUp']], 
-      tmp_f0(getParameterData(prec@parameters[['meqTechAfUp']])))
-    
-    # paTechWeatherAfs*
-    prec@parameters[['paTechWeatherAfsLo']] <- addData(prec@parameters[['paTechWeatherAfsLo']], 
-      aggregate_weather(paTechWeatherAfsLo, tmp_f0(getParameterData(prec@parameters[['meqTechAfsLo']]))))
-    prec@parameters[['paTechWeatherAfsUp']] <- addData(prec@parameters[['paTechWeatherAfsUp']], 
-                                                      tmp_f0(getParameterData(prec@parameters[['meqTechAfsUp']])))
-    # paTechWeatherAfc*
-    prec@parameters[['paTechWeatherAfcLo']] <- addData(prec@parameters[['paTechWeatherAfcLo']], 
-                                                       tmp_f0(getParameterData(prec@parameters[['meqTechAfcOutLo']])))
-    prec@parameters[['paTechWeatherAfcUp']] <- addData(prec@parameters[['paTechWeatherAfcUp']], 
-                                                       tmp_f0(getParameterData(prec@parameters[['meqTechAfcOutUp']])))
-    # paSupWeather*
-    prec@parameters[['paSupWeatherLo']] <- addData(prec@parameters[['paSupWeatherLo']], 
-                                                       tmp_f0(getParameterData(prec@parameters[['meqSupAvaLo']])))
-    prec@parameters[['paSupWeatherUp']] <- addData(prec@parameters[['paSupWeatherUp']], 
-                                                       tmp_f0(getParameterData(prec@parameters[['mSupAvaUp']])))
-    # paStorageWeatherAf*
-    prec@parameters[['paStorageWeatherAfLo']] <- addData(prec@parameters[['paStorageWeatherAfLo']], 
-                                                   tmp_f0(getParameterData(prec@parameters[['meqStorageAfLo']])))
-    prec@parameters[['paStorageWeatherAfUp']] <- addData(prec@parameters[['paStorageWeatherAfUp']], 
-                                                   tmp_f0(getParameterData(prec@parameters[['meqStorageAfUp']])))
-    # paStorageWeatherCinp*
-    prec@parameters[['paStorageWeatherCinpLo']] <- addData(prec@parameters[['paStorageWeatherCinpLo']], 
-                                                         tmp_f0(getParameterData(prec@parameters[['meqStorageInpLo']])))
-    prec@parameters[['paStorageWeatherCinpUp']] <- addData(prec@parameters[['paStorageWeatherCinpUp']], 
-                                                         tmp_f0(getParameterData(prec@parameters[['meqStorageInpUp']])))
-    # paStorageWeatherCout*
-    prec@parameters[['paStorageWeatherCoutLo']] <- addData(prec@parameters[['paStorageWeatherCoutLo']], 
-                                                           tmp_f0(getParameterData(prec@parameters[['meqStorageOutLo']])))
-    prec@parameters[['paStorageWeatherCoutUp']] <- addData(prec@parameters[['paStorageWeatherCoutUp']], 
-                                                           tmp_f0(getParameterData(prec@parameters[['meqStorageOutUp']])))
-    
     tmp <- getParameterData(prec@parameters[['pAggregateFactor']])
     tmp <- tmp[tmp$value != 0, ]
     if (nrow(tmp)) {
