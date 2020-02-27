@@ -629,7 +629,7 @@
     prec@parameters[['paTechWeatherAfLo']] <- addData(prec@parameters[['paTechWeatherAfLo']], 
       tmp_f0(getParameterData(prec@parameters[['meqTechAfLo']])))
     prec@parameters[['paTechWeatherAfUp']] <- addData(prec@parameters[['paTechWeatherAfUp']], 
-      tmp_g0(getParameterData(prec@parameters[['meqTechAfUp']])))
+      tmp_f0(getParameterData(prec@parameters[['meqTechAfUp']])))
     
     
     # Split pWeather for all slice
