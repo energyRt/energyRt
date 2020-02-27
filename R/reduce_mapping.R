@@ -586,22 +586,24 @@
     
     # Generate pWeather for all slice, including parent & child 
     pWeather <- getParameterData(prec@parameters[['pWeather']])
-    pSliceShare <- getParameterData(prec@parameters[['pSliceShare']])
-    colnames(pSliceShare)[ncol(pSliceShare)] <- 'share'
-    mSliceCP <- getParameterData(prec@parameters$mSliceParentChild)
-    colnames(mSliceCP) <- c('slicep', 'slice')
-    pWeatherUp <- merge(merge(pWeather, pSliceShare, by = 'slice'), mSliceCP, by = 'slice')
-    pWeatherUp$slice <- pWeatherUp$slicep; pWeatherUp$slicep <- NULL 
-    pWeatherUp <- aggregate(data.frame(tot = pWeatherUp$value * pWeatherUp$share, share = pWeatherUp$share), 
-      pWeatherUp[, c('weather', 'region', 'year', 'slice')], sum)
-    pWeatherUp$value <- pWeatherUp$tot / pWeatherUp$share
-    pWeatherUp <- pWeatherUp[, c('weather', 'region', 'year', 'slice', 'value')]
-    
-    pWeatherLo <- merge(pWeather, getParameterData(prec@parameters$mSliceParentChild), by = 'slice')
-    pWeatherLo$slice <- pWeatherLo$slicep;
-    pWeatherLo <- pWeatherLo[, c('weather', 'region', 'year', 'slice', 'value')]
-    pWeather <- rbind(pWeatherUp, pWeatherLo, pWeather)
-    pWeather$mwth <- pWeather$value; pWeather$value <- NULL
+    if (nrow(pWeather) > 0) {
+      pSliceShare <- getParameterData(prec@parameters[['pSliceShare']])
+      colnames(pSliceShare)[ncol(pSliceShare)] <- 'share'
+      mSliceCP <- getParameterData(prec@parameters$mSliceParentChild)
+      colnames(mSliceCP) <- c('slicep', 'slice')
+      pWeatherUp <- merge(merge(pWeather, pSliceShare, by = 'slice'), mSliceCP, by = 'slice')
+      pWeatherUp$slice <- pWeatherUp$slicep; pWeatherUp$slicep <- NULL 
+      pWeatherUp <- aggregate(data.frame(tot = pWeatherUp$value * pWeatherUp$share, share = pWeatherUp$share), 
+        pWeatherUp[, c('weather', 'region', 'year', 'slice')], sum)
+      pWeatherUp$value <- pWeatherUp$tot / pWeatherUp$share
+      pWeatherUp <- pWeatherUp[, c('weather', 'region', 'year', 'slice', 'value')]
+      
+      pWeatherLo <- merge(pWeather, getParameterData(prec@parameters$mSliceParentChild), by = 'slice')
+      pWeatherLo$slice <- pWeatherLo$slicep;
+      pWeatherLo <- pWeatherLo[, c('weather', 'region', 'year', 'slice', 'value')]
+      pWeather <- rbind(pWeatherUp, pWeatherLo, pWeather)
+      pWeather$mwth <- pWeather$value; pWeather$value <- NULL
+    }
     
     towth <- data.frame(par = character(), base_map = character(), map_to = character(), stringsAsFactors = FALSE)
     towth[nrow(towth) + 1, ] <- c('paTechWeatherAfUp', 'meqTechAfUp', 'mTechWeatherAf')
