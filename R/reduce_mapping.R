@@ -626,10 +626,6 @@
       x$value <- NULL
       x
     }
-    prec@parameters[['paTechWeatherAfLo']] <- addData(prec@parameters[['paTechWeatherAfLo']], 
-      tmp_f0(getParameterData(prec@parameters[['meqTechAfLo']])))
-    prec@parameters[['paTechWeatherAfUp']] <- addData(prec@parameters[['paTechWeatherAfUp']], 
-      tmp_f0(getParameterData(prec@parameters[['meqTechAfUp']])))
     
     
     # Split pWeather for all slice
@@ -661,7 +657,12 @@
     # paStorageWeatherCoutLo, meqStorageOutLo, mStorageWeatherCout
     # paStorageWeatherCoutUp, meqStorageOutUp, mStorageWeatherCout
     
- 
+    # paTechWeatherAf*
+    prec@parameters[['paTechWeatherAfLo']] <- addData(prec@parameters[['paTechWeatherAfLo']], 
+      tmp_f0(getParameterData(prec@parameters[['meqTechAfLo']])))
+    prec@parameters[['paTechWeatherAfUp']] <- addData(prec@parameters[['paTechWeatherAfUp']], 
+      tmp_f0(getParameterData(prec@parameters[['meqTechAfUp']])))
+    
     # paTechWeatherAfs*
     prec@parameters[['paTechWeatherAfsLo']] <- addData(prec@parameters[['paTechWeatherAfsLo']], 
       aggregate_weather(paTechWeatherAfsLo, tmp_f0(getParameterData(prec@parameters[['meqTechAfsLo']]))))
