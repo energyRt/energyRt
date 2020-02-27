@@ -175,8 +175,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				obj@parameters[['mTradeNew']] <- addData(obj@parameters[['mTradeNew']], 
 					data.frame(trade = rep(trd@name, length(possible_invest_year)), year = possible_invest_year, stringsAsFactors=FALSE))
 			
+			min0 <- function(x) {
+			  if (length(x) == 0) return(-Inf)
+			  return(min(x))
+			}
 			if (trd@olife == Inf) {
-			  trade_eac <- unique(approxim$year[min(possible_invest_year) <= approxim$year])
+			  trade_eac <- unique(approxim$year[min0(possible_invest_year) <= approxim$year])
 			  trade_span <- unique(c(trd@stock$year, trade_eac))
 				obj@parameters[['mTradeOlifeInf']] <- addData(obj@parameters[['mTradeOlifeInf']], data.frame(trade = trd@name))
 			} else {
