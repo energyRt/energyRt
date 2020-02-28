@@ -30,9 +30,9 @@
   obj <- obj[,c(prior[prior %in% colnames(obj)], 
     colnames(obj)[ncol(obj)]), drop = FALSE]
   obj <- obj[!is.na(obj[, parameter]), , drop = FALSE]
-  # if (anyDuplicated(obj[, -ncol(obj)])) {
-  #   stop("Data duplication is not allowed")
-  # }
+  if (anyDuplicated(obj[, -ncol(obj)])) {
+     warning("there are duplicates in the data, use checkDuplication function to get more information")
+  }
   obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
   # Check do need realy approximation 
   approxim2 <- approxim
