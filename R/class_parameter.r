@@ -368,88 +368,58 @@ setMethod('print', 'parameter', function(x, ...) {
   }
 })
 
+
 # Generate PYOMO code, return character vector
 .toPyomo <- function(obj) {
-  # gen_gg <- function(name, dtt) {
-  #   ret <- paste0(name, '("', dtt[, 1])
-  #   for (i in seq_len(ncol(dtt) - 2) + 1) {
-  #     ret <- paste0(ret, '", "', dtt[, i])
-  #   }
-  #   paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
-  # }
-  # as_simple <- function(dtt, name, def) {
-  #   add_cnd <- function(y, x) { 
-  #     if (x == '') return(x) else return(paste(x, 'and', y))
-  #   }
-  #   add_cond2 <- ''
-  #   if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) {
-  #     add_cond2 <- '(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))'
-  #     if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('not(mTechOneComm(tech, comm)) and  ', add_cond2, sep = '')
-  #   }
-  #   if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'slice')) 
-  #     add_cond2 <- add_cnd('mTechSlice(tech, slice)', add_cond2)
-  #   if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'acomm')) 
-  #     add_cond2 <- add_cnd('(mTechAInp(tech, acomm) or mTechAOut(tech, acomm))', add_cond2)
-  #   if (any(obj@dimSetNames == 'year')) 
-  #     add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
-  #   if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
-  #   
-  #   if (nrow(dtt) == 0 || all(dtt$value == def)) {
-  #     return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
-  #   } else {
-  #     if (def != 0 && def != Inf) {
-  #       zz <- paste0(name, '(', paste0(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';')
-  #       return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE])))
-  #     } else {
-  #       return(gen_gg(name, dtt))
-  #     }
-  #   }  
-  # }
-  # if (obj@nValues != -1) {
-  #   obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
-  # }
-  # if (obj@type == 'set') {                             
-  #   if (nrow(obj@data) == 0) {                         
-  #     ret <- c('set', paste(obj@name, ' /', sep = ''))
-  #     ret <- c(ret, '1')
-  #     ret <- c(ret, '/;', '')
-  #   } else {
-  #     return(c('set', paste(obj@name, ' /', sep = ''), obj@data[, 1], '/;', ''))
-  #   }
-  # } else if (obj@type == 'map') {
-  #   add_nl <- ''
-  #   if (obj@not_data) {
-  #     add_nl <-  paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
-  #     add_nl <-  paste(add_nl, ' = not(', add_nl, ');', sep = '')
-  #   }
-  #   if (nrow(obj@data) == 0) {
-  #     if (obj@not_data) {
-  #       ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = YES;', sep = '')
-  #     } else {
-  #       ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
-  #     }
-  #     return(ret)
-  #   } else {
-  #     ret <- c('set', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-  #     return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', add_nl, ''))
-  #   }
-  # } else if (obj@type == 'simple') {
-  #   ret <- as_simple(obj@data, obj@name, obj@defVal)
-  # } else if (obj@type == 'multi') {     
-  #   if (nrow(obj@data) == 0) {
-  #     ret <- c()
-  #     ret <- c(ret, paste(obj@name, 'Lo(', paste(obj@dimSetNames, collapse = ', '), ') = ', 
-  #       obj@defVal[1], ';', sep = ''))
-  #     ret <- c(ret, paste(obj@name, 'Up(', paste(obj@dimSetNames, collapse = ', '), ') = ', 
-  #       obj@defVal[2], ';', sep = ''))
-  #   } else {
-  #     ret <- c(
-  #       as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Lo', sep = ''), obj@defVal[1]),
-  #       as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Up', sep = ''), obj@defVal[2])
-  #     )
-  #   }
-  # } else stop('Must realise')
-  ret
+  as_simple <- function(data, name, name2, def) {
+    if (def == Inf)
+      def = -1;
+    if (ncol(obj@data) == 1) {
+      return(c(
+        paste0("# ", name),
+        paste0(name, ' := ', data$value)))
+    } else {
+      data <- data[data$value != Inf & data$value != def, ]
+      rtt <- paste0("# ", name, name2, "\n", name, ' default ', def, ' := ')
+      if (nrow(data) == 0) {
+        return(paste0(rtt, ';\n'))
+      }
+      kk <- paste0('  ', data[, 1])
+      for (i in seq_len(ncol(data) - 2) + 1)
+        kk <- paste0(kk, ' ', data[, i])
+      kk <- paste0(kk, ' ', data[, 'value'])
+      kk <- c(rtt, paste0(kk, collapse = ',\n'), '\n;\n')
+      return(kk)
+    }
+  }
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+  }
+  if (obj@type == 'set') {
+    tmp <- ''
+    if (nrow(obj@data) > 0)
+      tmp <- paste0('\n  ', obj@data[, 1], collapse = '')
+    return(c(paste0("# ", obj@name), paste0('\nset ', obj@name, ' := ', tmp, ';')))
+  } else if (obj@type == 'map') {
+    ret <- paste0('# ', obj@name)
+    if (ncol(obj@data) > 1) ret <- paste0(ret, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    if (nrow(obj@data) == 0) {
+      return(c(ret, paste0('\nset ', obj@name, ' = ;')))
+    } else {
+      return(c(ret, paste0('\nset ', obj@name, ' = \n', paste0(paste0('  ', apply(obj@data, 1, 
+            function(x) paste(x, collapse = ' ')), '\n'), collapse = ''), ';')))
+    }
+  } else if (obj@type == 'simple') {
+    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+  } else if (obj@type == 'multi') {
+    hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    return(c(
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+                paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+                paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
+    ))
+  } else stop('Must realise')
 }
 
 
