@@ -375,20 +375,18 @@ setMethod('print', 'parameter', function(x, ...) {
     if (def == Inf)
       def = -1;
     if (ncol(obj@data) == 1) {
-      return(c(
-        paste0("# ", name),
-        paste0(name, ' := ', data$value)))
+      return(paste0("# ", name, '\nparam ', name, ' := ', data$value, '\n'))
     } else {
       data <- data[data$value != Inf & data$value != def, ]
-      rtt <- paste0("# ", name, name2, "\n", name, ' default ', def, ' := ')
+      rtt <- paste0("# ", name, name2, "\nparam ", name, ' default ', def, ' := ')
       if (nrow(data) == 0) {
-        return(paste0(rtt, ';\n'))
+        return(paste0("# ", name, name2, " no data except default\n"))
       }
       kk <- paste0('  ', data[, 1])
       for (i in seq_len(ncol(data) - 2) + 1)
         kk <- paste0(kk, ' ', data[, i])
       kk <- paste0(kk, ' ', data[, 'value'])
-      kk <- c(rtt, paste0(kk, collapse = ',\n'), '\n;\n')
+      kk <- c(rtt, paste0(kk, collapse = '\n'), '\n;\n')
       return(kk)
     }
   }
@@ -401,12 +399,11 @@ setMethod('print', 'parameter', function(x, ...) {
       tmp <- paste0('\n  ', obj@data[, 1], collapse = '')
     return(c(paste0("# ", obj@name), paste0('\nset ', obj@name, ' := ', tmp, ';')))
   } else if (obj@type == 'map') {
-    ret <- paste0('# ', obj@name)
-    if (ncol(obj@data) > 1) ret <- paste0(ret, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
     if (nrow(obj@data) == 0) {
-      return(c(ret, paste0('\nset ', obj@name, ' = ;')))
+      return(c(ret, paste0('set ', obj@name, ' := ;')))
     } else {
-      return(c(ret, paste0('\nset ', obj@name, ' = \n', paste0(paste0('  ', apply(obj@data, 1, 
+      return(c(ret, paste0('set ', obj@name, ' := \n', paste0(paste0('  ', apply(obj@data, 1, 
             function(x) paste(x, collapse = ' ')), '\n'), collapse = ''), ';')))
     }
   } else if (obj@type == 'simple') {
