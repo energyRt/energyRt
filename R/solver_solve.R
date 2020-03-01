@@ -305,11 +305,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
     ##################################################################################################################################    
     if (arg$write) {
       if (arg$echo) cat('Writing files: ')
-      #dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = F)
-      #dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = F)
-      #zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
-      #cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
-      #close(zz_output)  
+      dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = F)
       zz_data_pyomo <- file(paste(arg$dir.result, 'data.dat', sep = ''), 'w')
       file_w <- c()
       for (j in c('set', 'map', 'simple', 'multi')) {
@@ -318,6 +314,55 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         }
       }
       close(zz_data_pyomo)    
+      # Add constraint
+      zz_mod <- file(paste(arg$dir.result, '/energyRt.py', sep = ''), 'w')
+      npar <- grep('^##### decl par #####', run_code)[1]
+      cat(run_code[1:npar], sep = '\n', file = zz_mod)
+      cat(.generate.pyomo.par(scen@modInp@parameters), sep = '\n', file = zz_mod)
+      if (length(scen@modInp@gams.equation) > 0) {
+        for (i in seq_along(scen@modInp@gams.equation)) {
+          eqt <- scen@modInp@gams.equation[[i]]
+          # cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_mod)
+        }
+      }
+      cat(run_code[-(1:npar)], sep = '\n', file = zz_mod)
+      cat('f = open("output/raw_data_set.csv","w");\n', file = zz_mod)
+      cat("f.write('set,value\\n')\n", file = zz_mod)
+      for (tmp in scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')]) 
+        cat("for i in instance.", tmp@name, ":\n    f.write('", tmp@name, ",' + str(i) + '\\n')\n", sep = '', file = zz_mod)
+      cat('f.close()\n', file = zz_mod)
+      close(zz_mod)
+      if (arg$echo) {
+        cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+        flush.console()
+      }
+    }
+    
+    if (arg$run) {
+      if(arg$echo) cat('PYOMO time: ')
+      tryCatch({
+        setwd(arg$dir.result)
+        if (.Platform$OS.type == "windows") {
+          if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
+          rs <- 0
+          shell('python energyRt.py') 
+        } else {
+          rs <- system(paste('python energyRt.py', 
+                             invisible = arg$invisible, wait = wait,
+                             arg$glpkCompileParameter)) #, mustWork = TRUE)
+        }
+        setwd(BEGINDR)  
+        # if (rs != 0) stop(paste('Error in compilation with code', rs))
+      }, interrupt = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop('Solver have been interrupted')
+      }, error = function(x) {
+        if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+        setwd(BEGINDR)
+        stop(x)
+      })
+      if(arg$echo) cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
     }
   } else if (arg$solver == 'JULIA') {
       ##################################################################################################################################    
