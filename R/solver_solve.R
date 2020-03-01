@@ -322,7 +322,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
       if (length(scen@modInp@gams.equation) > 0) {
         for (i in seq_along(scen@modInp@gams.equation)) {
           eqt <- scen@modInp@gams.equation[[i]]
-          # cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_mod)
+          cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_mod)
         }
       }
       cat(run_code[-(1:npar)], sep = '\n', file = zz_mod)
