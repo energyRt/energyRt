@@ -6,7 +6,8 @@
   }
   # Generate map declaration
   for (tmp in param[sapply(param, function(x) x@type == 'map')]) {
-    decl <- c(decl, paste0('model.', tmp@name, ' = Set(within = ', paste0('model.', energyRt:::.removeEndSet(tmp@dimSetNames), collapse = '*'), ');'))
+    decl <- c(decl, paste0('model.', tmp@name, ' = Set(within = ', paste0('model.', energyRt:::.removeEndSet(tmp@dimSetNames), collapse = '*'), 
+      ');'))
   }
   value_or_zero <- function(x) {
     if (x == Inf || x == -Inf) return(0)

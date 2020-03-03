@@ -53,12 +53,26 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   set_num1 <- strsplit(gsub('[[:blank:]]', '', set_num), ',')[[1]]
   set_num2 <- .aliasName(set_num1)
   names(set_num2) <- set_num1
-  
-  rs <- paste0('(', paste0(set_num2, collapse =', '), ') in (', paste0('model.', .removeEndSet(names(set_num2)), collapse = ', '), ')')
+  rs <- paste0('(', paste0(set_num2, collapse =', '), ') in (', paste0('model.', .removeEndSet(names(set_num2)), collapse = '*'), ')')
   if (length(cnd_slice) != 0) {
-    iii <- c(lapply(cnd_slice, paste0, collapse = ', '), recursive = TRUE)
-    iii[grep(',', iii)] <- paste0('(', iii[grep(',', iii)], ')')
-    rs <- paste0(rs, ' if ', paste0(paste0(iii, ' in model.', names(cnd_slice)), collapse = ' and '))
+    fl <- (sapply(cnd_slice, length) == 1)
+    if (any(fl)) {
+      ff <- c(cnd_slice[fl], recursive = TRUE); ff <- ff[!duplicated(ff)]; names(ff) <- gsub('[.].*', '', names(ff))
+      kk <- seq_along(set_num2); names(kk) <- set_num2
+      names(set_num2) <- .removeEndSet(names(set_num2))
+      names(set_num2)[kk[ff]] <- names(ff)
+      rs <- paste0('(', paste0(set_num2, collapse =', '), ') in (', paste0('model.', names(set_num2), collapse = '*'), ')')
+      cnd_slice <- cnd_slice[!(names(cnd_slice) %in% names(ff))]
+      if (length(cnd_slice) != 0) {
+        iii <- c(lapply(cnd_slice, paste0, collapse = ', '), recursive = TRUE)
+        iii[grep(',', iii)] <- paste0('(', iii[grep(',', iii)], ')')
+        rs <- paste0(rs, ' if ', paste0(paste0(iii, ' in model.', names(cnd_slice)), collapse = ' and '))
+      }
+    } else {
+      iii <- c(lapply(cnd_slice, paste0, collapse = ', '), recursive = TRUE)
+      iii[grep(',', iii)] <- paste0('(', iii[grep(',', iii)], ')')
+      rs <- paste0(rs, ' if ', paste0(paste0(iii, ' in model.', names(cnd_slice)), collapse = ' and '))  
+    }
   }
   list(first = NULL, end = rs)
 }
@@ -147,6 +161,8 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   } else {
     rs <- paste0(rs, 'rule = lambda model : ')
   }
-  rs <- paste0(rs, .eqt.to.pyomo(gsub('.*[.][.][ ]*', '', eqt)))
+  rs <- paste0(rs, 'model.fornontriv + ', .eqt.to.pyomo(gsub('.*[.][.][ ]*', '', eqt)))
   rs
 }
+
+

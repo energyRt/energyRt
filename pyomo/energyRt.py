@@ -252,7 +252,7 @@ print("model.create_instance begin ", round(time.time() - seconds, 2));
 instance = model.create_instance("data.dat");
 print("model.create_instance end ", round(time.time() - seconds, 2));
 
-opt = SolverFactory('glpk');
+opt = SolverFactory('cplex');
 opt.solve(instance);
 print("opt solve ", round(time.time() - seconds, 2));
 head_val =  { "vTechInv": "tech,region,year,value",
@@ -319,20 +319,21 @@ head_val =  { "vTechInv": "tech,region,year,value",
 flist = open("output/variable_list.csv","w");
 flist.write("value\n");
 for v in instance.component_objects(Var):
-    f = open("output/" + str(v) + ".csv","w");
-    f.write(head_val[str(v)] + "\n");
-    flist.write(str(v) + "\n");
-    for index in v:
-        if not v[index].stale and v[index].value != 0:
-            u = ''
-            if index != None:
-                for i in index:
-                    u = u + str(i) + ','
-                u = u + str(v[index].value)
-            else:
-                u = str(v[index].value)
-            f.write(u + '\n')
-    f.close();
+    if str(v) != "fornontriv":
+      f = open("output/" + str(v) + ".csv","w");
+      f.write(head_val[str(v)] + "\n");
+      flist.write(str(v) + "\n");
+      for index in v:
+          if not v[index].stale and v[index].value != 0:
+              u = ''
+              if index != None:
+                  for i in index:
+                      u = u + str(i) + ','
+                  u = u + str(v[index].value)
+              else:
+                  u = str(v[index].value)
+              f.write(u + '\n')
+      f.close();
 f = open("output/pStat.csv",'w');
 f.write("value\n1.00\n");
 f.close();

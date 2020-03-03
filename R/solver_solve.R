@@ -319,13 +319,19 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
       npar <- grep('^##### decl par #####', run_code)[1]
       cat(run_code[1:npar], sep = '\n', file = zz_mod)
       cat(.generate.pyomo.par(scen@modInp@parameters), sep = '\n', file = zz_mod)
+
+      npar2 <- (grep('^model[.]obj ', run_code)[1] - 1)
+      cat(run_code[npar:npar2], sep = '\n', file = zz_mod)
       if (length(scen@modInp@gams.equation) > 0) {
+        cat('\n', file = zz_mod)
+        cat('model.fornontriv = Var(domain = pyo.NonNegativeReals)\n', file = zz_mod)
+        cat('model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)\n', file = zz_mod)
         for (i in seq_along(scen@modInp@gams.equation)) {
           eqt <- scen@modInp@gams.equation[[i]]
           cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_mod)
         }
       }
-      cat(run_code[-(1:npar)], sep = '\n', file = zz_mod)
+      cat(run_code[-(1:npar2)], sep = '\n', file = zz_mod)
       cat('f = open("output/raw_data_set.csv","w");\n', file = zz_mod)
       cat("f.write('set,value\\n')\n", file = zz_mod)
       for (tmp in scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')]) 
