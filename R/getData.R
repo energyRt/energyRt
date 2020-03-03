@@ -107,11 +107,11 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'   names(elc2050)
 #'   elc2050$vBalance
 #'}
-getData <- function(scen, name = NULL, merge = FALSE, parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
+getData <- function(scen, name = NULL, ..., merge = FALSE, parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
                     newNames = NULL, newValues = NULL, na.rm = FALSE, drop = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
                     asTibble = TRUE, stringsAsFactors = FALSE, yearsAsFactors = FALSE, 
-                    scenNameInList = as.logical(length(scen)-1), verbose = FALSE, ...) {
+                    scenNameInList = as.logical(length(scen)-1), verbose = FALSE) {
   
   arg <- list(...)
   argnam <- names(arg)
@@ -351,7 +351,7 @@ getData <- function(scen, name = NULL, merge = FALSE, parameters = TRUE, variabl
 }
 
 if (F) {# test
-  load("C:/Users/olugo/Dropbox/R/Projects/energyRt_tutorial/data/utopia_scen_BAU.RData")
+  load("energyRt_tutorial/data/utopia_scen_BAU.RData")
   (dem <- getData(scen, name = "pDemand", year = 2015, merge = T))
   (vTechOut <- getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015))
   # Storage capacity
