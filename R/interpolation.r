@@ -41,7 +41,8 @@
     if (is.null(approxim2$year))
       approxim2$year <- arg$approxim$year
   }
-  if (all(!is.na(obj))) { # There is not NA column
+  tmp_nona <- (!is.na(obj[, -ncol(obj), drop = FALSE]))
+  if (all(tmp_nona)) { # There is not NA column
     possible_comb <- prod(sapply(approxim2, length))
     if (nrow(obj) >= possible_comb) {
       for (i in names(approxim2))
@@ -50,26 +51,13 @@
         return(obj)
     }
   } else { # There are only NA and not NA column
-    f1 <- apply(!is.na(obj[, -ncol(obj), drop = FALSE]), 2, any)
-    f2 <- apply(!is.na(obj[, -ncol(obj), drop = FALSE]), 2, all)
-    if (all(!f2)) { # Only NA
-      if (length(approxim2) == 1) {
-        obj2 <- data.frame(approxim2[[1]], stringsAsFactors = FALSE)
-        colnames(obj2) <- names(approxim2)
-        obj2[[parameter]] <- obj[1, ncol(obj)]
-      } else {
-        obj2 <- merge(approxim2[[1]], approxim2[[2]], by = NULL)
-        for (i in approxim2[-(1:2)])
-          obj2 <- merge(obj2, i, by = NULL)
-        colnames(obj2) <- names(approxim2)
-        obj2[[parameter]] <- obj[1, ncol(obj)]
-      }
-      return (obj2)
-    } else if (all(f1 == f2)) { # Could be small appr
-      obj2 <- obj[, c(f1, TRUE)]
+    f1 <- apply(tmp_nona, 2, any)
+    f2 <- apply(tmp_nona, 2, all)
+    if (all(f1 == f2)) { # Could be small appr
+      obj2 <- obj[, c(f1, TRUE), drop = FALSE]
       for (i in colnames(obj2)[-ncol(obj2)])
         obj2 <- obj2[obj2[[i]] %in% approxim2[[i]],, drop = FALSE]
-      if (nrow(obj2) == prod(sapply(approxim2[names(obj2)[-ncol(obj2)]], length))) { # Simple approximation is possible
+      if (ncol(obj2) == 1 || nrow(obj2) == prod(sapply(approxim2[names(obj2)[-ncol(obj2)]], length))) { # Simple approximation is possible
         for (i in names(obj)[c(!f1, FALSE)]) {
           obj2 <- merge(obj2, approxim2[i])
         }

@@ -372,8 +372,6 @@ setMethod('print', 'parameter', function(x, ...) {
 # Generate PYOMO code, return character vector
 .toPyomo <- function(obj) {
   as_simple <- function(data, name, name2, def) {
-    if (def == Inf)
-      def = -1;
     if (ncol(obj@data) == 1) {
       return(paste0("# ", name, '\nparam ', name, ' := ', data$value, '\n'))
     } else {
@@ -423,8 +421,6 @@ setMethod('print', 'parameter', function(x, ...) {
 # Generate Julia code, return character vector
 .toJulia <- function(obj) {
   as_simple <- function(data, name, name2, def) {
-    if (def == Inf)
-      def = -1;
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
