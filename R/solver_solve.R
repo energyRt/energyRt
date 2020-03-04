@@ -364,7 +364,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
     }
     
     if (arg$run) {
-      if(arg$echo) cat('PYOMO time: ')
+      if(arg$echo) cat('PYOMO run\n')
       tryCatch({
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
@@ -387,7 +387,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         setwd(BEGINDR)
         stop(x)
       })
-      if(arg$echo) cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
+      if(arg$echo) cat('PYOMO run time ', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
     }
   } else if (arg$solver == 'JULIA') {
       ##################################################################################################################################    
