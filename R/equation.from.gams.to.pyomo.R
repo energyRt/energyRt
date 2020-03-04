@@ -128,7 +128,6 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
       #   browser()
       # }
         vrb <- paste0('model.', substr(tmp, 1, nchar(tmp) - nchar(a1)))
-      cat(vrb, '\n')
       a2 <- .get.bracket.pyomo(a1)
       arg <- paste0('', paste0(.aliasName(strsplit(gsub('[() ]', '', a2$beg), ',')[[1]]), collapse = ', '), '')
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == '$') {
