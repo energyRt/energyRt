@@ -32,8 +32,9 @@ checkDuplication <- function(x) {
       }
       tmp <- checkDuplication0(x@sysInfo)
       if (!is.null(tmp)) {
-        tmp$repository <- 'slot::sysInfo'
-        rs <- rbind(rs, tmp)
+        tmp$repository <- '-'
+        tmp$object <- 'sysInfo'
+        rs <- rbind(rs, tmp[, c(ncol(tmp), 2:ncol(tmp) - 1)])
       }
       if (is.null(rs)) return(NULL)
       return(rs[, c(ncol(rs), 1:(ncol(rs) - 1))])
