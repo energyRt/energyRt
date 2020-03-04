@@ -33,6 +33,8 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
   arg$wait < wait
   if (is.null(arg$write)) arg$write <- TRUE
   if (is.null(arg$run)) arg$run <- TRUE
+  if (is.null(arg$JuMP)) arg$JuMP <- FALSE
+  
   # if (is.null(arg$onefile)) arg$onefile <- FALSE
   if (!is.null(arg$dir.result)) {
     warning("solve_model: parameter `dir.result` is depreciated, use `tmp.dir` instead")
@@ -80,7 +82,11 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
   
   # Generate code for GAMS
   if (arg$write) {
-    run_code <- scen@source[[arg$solver]] # energyRt::.modelCode[[arg$solver]]
+    # energyRt::.modelCode[[arg$solver]]
+    run_code <- scen@source[[arg$solver]]
+    if (arg$solver == 'PYOMO' && arg$JuMP)
+      run_code <- scen@source[[paste0(arg$solver, 'JuMP')]]
+    
   }
     if (arg$solver == 'GAMS') {
     ##################################################################################################################################    
@@ -305,20 +311,27 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
     ##################################################################################################################################    
     if (arg$write) {
       if (arg$echo) cat('Writing files: ')
-      dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = F)
-      zz_data_pyomo <- file(paste(arg$dir.result, 'data.dat', sep = ''), 'w')
-      file_w <- c()
-      for (j in c('set', 'map', 'simple', 'multi')) {
-        for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-          cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
-        }
-      }
-      close(zz_data_pyomo)    
+      dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
       # Add constraint
       zz_mod <- file(paste(arg$dir.result, '/energyRt.py', sep = ''), 'w')
       npar <- grep('^##### decl par #####', run_code)[1]
       cat(run_code[1:npar], sep = '\n', file = zz_mod)
-      cat(.generate.pyomo.par(scen@modInp@parameters), sep = '\n', file = zz_mod)
+      if (arg$JuMP) 
+        cat(.generate.pyomo.par(scen@modInp@parameters), sep = '\n', file = zz_mod)
+      if (arg$JuMP)
+        zz_data_pyomo <- file(paste(arg$dir.result, 'data.dat', sep = ''), 'w')
+      file_w <- c()
+      for (j in c('set', 'map', 'simple', 'multi')) {
+        for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+          if (arg$JuMP) {
+            cat(energyRt:::.toPyomoJump(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
+          } else {
+            cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
+          }
+        }
+      }
+      if (arg$JuMP)
+        close(zz_data_pyomo)    
 
       npar2 <- (grep('^model[.]obj ', run_code)[1] - 1)
       cat(run_code[npar:npar2], sep = '\n', file = zz_mod)
@@ -328,15 +341,21 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         cat('model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)\n', file = zz_mod)
         for (i in seq_along(scen@modInp@gams.equation)) {
           eqt <- scen@modInp@gams.equation[[i]]
-          cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_mod)
+          if (arg$JuMP) {
+            cat(energyRt:::.equation.from.gams.to.pyomo.jump(eqt$equation), sep = '\n', file = zz_mod)
+          } else {
+            cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_mod)
+          }
         }
       }
       cat(run_code[-(1:npar2)], sep = '\n', file = zz_mod)
-      cat('f = open("output/raw_data_set.csv","w");\n', file = zz_mod)
-      cat("f.write('set,value\\n')\n", file = zz_mod)
-      for (tmp in scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')]) 
-        cat("for i in instance.", tmp@name, ":\n    f.write('", tmp@name, ",' + str(i) + '\\n')\n", sep = '', file = zz_mod)
-      cat('f.close()\n', file = zz_mod)
+      if (arg$JuMP) {
+        cat('f = open("output/raw_data_set.csv","w");\n', file = zz_mod)
+        cat("f.write('set,value\\n')\n", file = zz_mod)
+        for (tmp in scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')]) 
+          cat("for i in instance.", tmp@name, ":\n    f.write('", tmp@name, ",' + str(i) + '\\n')\n", sep = '', file = zz_mod)
+        cat('f.close()\n', file = zz_mod)
+      }
       close(zz_mod)
       if (arg$echo) {
         cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')

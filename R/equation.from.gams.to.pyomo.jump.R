@@ -1,5 +1,5 @@
 
-# GAMS constraints to pyomo
+# GAMS constraints to pyomo.jump
 # Generate convinient vecrtor .alias_set (from gams to alias) and set_alias
 
 #set_alias <- .set_al0
@@ -7,11 +7,11 @@
 
 
 ## Function 
-.get_pyomo_loop_fast <- function(set_loop, set_cond, add_cond = NULL) {
+.get_pyomo.jump_loop_fast <- function(set_loop, set_cond, add_cond = NULL) {
   if (!is.null(set_cond) && substr(set_cond, 1, 1) == '(')
     set_cond <- sub('^[(]', '', sub('[)]$', '', set_cond))
   set_loop <- sub('^[(]', '', sub('[)]$', '', set_loop))
-  xx <- .generate_loop_pyomo(set_loop, set_cond)
+  xx <- .generate_loop_pyomo.jump(set_loop, set_cond)
   rs <- xx$first
   if (!is.null(xx$end) || !is.null(add_cond))
     rs <- paste0(rs, ' ', paste0(xx$end, add_cond, collapse = ' and '))
@@ -36,7 +36,7 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
 .removeEndSet <- function(x) {
   .fremset[x]
 }
-.generate_loop_pyomo <- function(set_num, set_loop) {
+.generate_loop_pyomo.jump <- function(set_num, set_loop) {
   # if (any(grep('mCnsuseElc2018Coa1_3', c(set_loop, set_num)))) browser()
   
   # Consdition split and divet by subset
@@ -53,8 +53,7 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   set_num1 <- strsplit(gsub('[[:blank:]]', '', set_num), ',')[[1]]
   set_num2 <- .aliasName(set_num1)
   names(set_num2) <- set_num1
-  rs <- paste0('(', paste0(set_num2, collapse =', '), ') in ', 'itertools.product'[length(set_num2) > 1], 
-    '(', paste0('', .removeEndSet(names(set_num2)), collapse = '*'), ')')
+  rs <- paste0('(', paste0(set_num2, collapse =', '), ') in (', paste0('model.', .removeEndSet(names(set_num2)), collapse = '*'), ')')
   if (length(cnd_slice) != 0) {
     fl <- (sapply(cnd_slice, length) == 1)
     if (any(fl)) {
@@ -62,24 +61,23 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
       kk <- seq_along(set_num2); names(kk) <- set_num2
       names(set_num2) <- .removeEndSet(names(set_num2))
       names(set_num2)[kk[ff]] <- names(ff)
-      rs <- paste0('(', paste0(set_num2, collapse =', '), ') in ', 'itertools.product'[length(set_num2) > 1], 
-        '(', paste0('', names(set_num2), collapse = ','), ')')
+      rs <- paste0('(', paste0(set_num2, collapse =', '), ') in (', paste0('model.', names(set_num2), collapse = '*'), ')')
       cnd_slice <- cnd_slice[!(names(cnd_slice) %in% names(ff))]
       if (length(cnd_slice) != 0) {
         iii <- c(lapply(cnd_slice, paste0, collapse = ', '), recursive = TRUE)
         iii[grep(',', iii)] <- paste0('(', iii[grep(',', iii)], ')')
-        rs <- paste0(rs, ' if ', paste0(paste0(iii, ' in ', names(cnd_slice)), collapse = ' and '))
+        rs <- paste0(rs, ' if ', paste0(paste0(iii, ' in model.', names(cnd_slice)), collapse = ' and '))
       }
     } else {
       iii <- c(lapply(cnd_slice, paste0, collapse = ', '), recursive = TRUE)
       iii[grep(',', iii)] <- paste0('(', iii[grep(',', iii)], ')')
-      rs <- paste0(rs, ' if ', paste0(paste0(iii, ' in ', names(cnd_slice)), collapse = ' and '))  
+      rs <- paste0(rs, ' if ', paste0(paste0(iii, ' in model.', names(cnd_slice)), collapse = ' and '))  
     }
   }
   list(first = NULL, end = rs)
 }
 
-.get_pyomo_loop_fast2 <- function(xxx) {
+.get_pyomo.jump_loop_fast2 <- function(xxx) {
   if (any(grep('[$]', xxx))) {
     beg <- gsub('[$].*', '', xxx)
     end <- substr(xxx, nchar(beg) + 2, nchar(xxx))
@@ -87,10 +85,10 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
     beg <- xxx
     end <- NULL
   }
-  .get_pyomo_loop_fast(beg, end)
+  .get_pyomo.jump_loop_fast(beg, end)
 }
 
-.get.bracket.pyomo <- function(tmp) {
+.get.bracket.pyomo.jump <- function(tmp) {
   brk0 <- gsub('[^)(]', '', tmp)
   brk <- cumsum(c('(' = 1, ')' = -1)[strsplit(brk0, '')[[1]]])
   k <- seq_along(brk)[brk == 0][1]
@@ -98,24 +96,24 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   list(beg = substr(tmp, 1, nchar(tmp) - nchar(end)), end = end)
 }
 
-.handle.sum.pyomo <- function(tmp) {
-  hh <- .get.bracket.pyomo(tmp)
+.handle.sum.pyomo.jump <- function(tmp) {
+  hh <- .get.bracket.pyomo.jump(tmp)
   a1 <- sub('^[(]', '', sub('[)]$', '', hh$beg))
   a2 <- a1
   while (substr(a2, 1, 1) != ',') {
     a2 <- gsub('^([[:alnum:]]|[+]|[-]|[*]|[$])*', '', a2)
     if (substr(a2, 1, 1) == '(') 
-      a2 <- .get.bracket.pyomo(a2)$end
+      a2 <- .get.bracket.pyomo.jump(a2)$end
   }
-  paste0('(', .eqt.to.pyomo(substr(a2, 2, nchar(a2))), ' for ', .get_pyomo_loop_fast2(substr(a1, 1, nchar(a1) - nchar(a2))), ')', 
-    .eqt.to.pyomo(hh$end)) 
+  paste0('(', .eqt.to.pyomo.jump(substr(a2, 2, nchar(a2))), ' for ', .get_pyomo.jump_loop_fast2(substr(a1, 1, nchar(a1) - nchar(a2))), ')', 
+    .eqt.to.pyomo.jump(hh$end)) 
 }
-.eqt.to.pyomo <- function(tmp) {
+.eqt.to.pyomo.jump <- function(tmp) {
   rs <- ''
   while (nchar(tmp) != 0) {
     tmp <- gsub('^[ ]*', '', tmp) 
     if (substr(tmp, 1, 4) == "sum(") {
-      rs <- paste0(rs, 'sum', .handle.sum.pyomo(substr(tmp, 4, nchar(tmp))))
+      rs <- paste0(rs, 'sum', .handle.sum.pyomo.jump(substr(tmp, 4, nchar(tmp))))
       tmp <- ''
     } else if (any(grep('^([.[:digit:]]|[+]|[-]|[ ]|[*])', tmp))) {
       a3 <- gsub('^([.[:digit:]_]|[+]|[-]|[ ]|[*])*', '', tmp)
@@ -123,24 +121,19 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c('m', 'v', 'p')) {
       a1 <- sub('^[[:alnum:]_]*', '', tmp)
-      # if (substr(tmp, 1, 1) == 'p') {
-      #   vrb <- paste0('model.', substr(tmp, 1, nchar(tmp) - nchar(a1)))
-      #   browser()
-      # }
-        vrb <- paste0('model.', substr(tmp, 1, nchar(tmp) - nchar(a1)))
-      cat(vrb, '\n')
-      a2 <- .get.bracket.pyomo(a1)
+      vrb <- paste0('model.', substr(tmp, 1, nchar(tmp) - nchar(a1)))
+      a2 <- .get.bracket.pyomo.jump(a1)
       arg <- paste0('', paste0(.aliasName(strsplit(gsub('[() ]', '', a2$beg), ',')[[1]]), collapse = ', '), '')
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == '$') {
         # There are condition
         arg2 <- arg
         if (any(grep(',', arg2))) arg2 <- paste0('(', arg2, ')')
         rs <- paste0(rs, '(', vrb, '[', arg, '] ', 'if ', arg2, ' in model.', gsub('([$]|[(].*)', '', a2$end), 
-                     ' else 0)', .eqt.to.pyomo(gsub('^[^)]*[)]', '', a2$end)))
+                     ' else 0)', .eqt.to.pyomo.jump(gsub('^[^)]*[)]', '', a2$end)))
         tmp <- ''
       } else {
         rs <- paste0(rs, vrb, '[', arg, ']',
-                     .eqt.to.pyomo(a2$end))
+                     .eqt.to.pyomo.jump(a2$end))
         tmp <- ''
       }
     } else if (substr(tmp, 1, 1) == '=') {
@@ -157,34 +150,19 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
 }
 
 # Begin equation declaration
-.equation.from.gams.to.pyomo <- function(eqt) {
+.equation.from.gams.to.pyomo.jump <- function(eqt) {
   declaration <- gsub('[.][.].*', '', eqt)
   rs <- paste0('model.', gsub('[$.(].*', '', eqt), ' = Constraint(')
   
   if (nchar(declaration) != nchar(gsub('[($].*', '', declaration))) {
-    rs <- paste0(rs, '', gsub('[(].*', '', gsub('.*[$]', '', declaration)), ', rule = lambda model, ',
+    rs <- paste0(rs, 'model.', gsub('[(].*', '', gsub('.*[$]', '', declaration)), ', rule = lambda model, ',
                  paste0(.aliasName(strsplit(gsub('(.*[(]|[)]|[[:blank:]]*)', '', declaration), ',')[[1]]), 
                         collapse = ', '), ' : ')
   } else {
     rs <- paste0(rs, 'rule = lambda model : ')
   }
-  rs <- paste0(rs, 'model.fornontriv + ', .eqt.to.pyomo(gsub('.*[.][.][ ]*', '', eqt)))
-  # Change parameter notation
-  spl <- strsplit(rs, 'model[.]p')[[1]]
-  if (length(spl) > 1) {
-    cnd <- grep('^[[:alnum:]_]*[[]', spl[-1]) + 1
-    rst <- sub('[^]]*[]]', '', spl[cnd])
-    frs <- substr(spl[cnd], 1, nchar(spl[cnd]) - nchar(rst))
-    spl[cnd] <- paste0(gsub('[]]', '))', gsub('[[]', '.get((', frs)), rst)
-    rs <- paste0(spl, collapse = 'p')
-  }
-  spl <- strsplit(rs, 'model[.]m')[[1]]
-  if (length(spl) > 1) {
-    cnd <- grep('^[[:alnum:]_]*[[]', spl[-1]) + 1
-    rst <- sub('[^]]*[]]', '', spl[cnd])
-    frs <- substr(spl[cnd], 1, nchar(spl[cnd]) - nchar(rst))
-    spl[cnd] <- paste0(gsub('[]]', ')]', gsub('[[]', '[(', frs)), rst)
-    rs <- paste0(spl, collapse = 'm')
-  }
+  rs <- paste0(rs, 'model.fornontriv + ', .eqt.to.pyomo.jump(gsub('.*[.][.][ ]*', '', eqt)))
   rs
 }
+
+
