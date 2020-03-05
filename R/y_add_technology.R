@@ -95,6 +95,48 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 			#        gg[, obj@parameters[['ndefpTechAfcUp']]@dimSetNames])
 			
 		}
+		
+		# Stock & Capacity
+		# if (nrow(obj@parameters[['pTechStock']]@data) > 0) browser()
+		# save(list = c('approxim', 'obj', 'app', 'tech'), file = 'c:/tmp/1.rdata')
+		# stock_exist <- interpolation_dtf(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim$ry, 'tech', tech@name)
+		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
+		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
+		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
+		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
+		olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = FALSE)
+		obj@parameters[['pTechOlife']] <- addData(obj@parameters[['pTechOlife']], olife)		
+		
+		dd0 <- energyRt:::.start_end_fix(approxim, tech, 'tech', stock_exist)
+		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
+		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
+		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
+		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
+		obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
+		
+		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
+		  salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
+		  salv_data$value[is.na(salv_data$value)] <- 0
+		  salv_data$discount <- salv_data$value; salv_data$value <- NULL
+		  olife$olife <- olife$value; olife$value <- NULL
+		  salv_data <- merge(salv_data, olife)
+		  invcost$invcost <- invcost$value; invcost$value <- NULL
+		  salv_data <- merge(salv_data, invcost)
+		  # EAC
+		  salv_data$eac <- salv_data$invcost / salv_data$olife
+		  fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
+		  salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl]) ^ salv_data$olife[fl] / 
+		      ((1 + salv_data$discount[fl]) ^ salv_data$olife[fl] - 1))
+		  fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
+		  salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
+		  
+		  salv_data$tech <- tech@name
+		  salv_data$value <- salv_data$eac
+		  pTechEac <- salv_data[, c('tech', 'region', 'year', 'value')]
+		  obj@parameters[['pTechEac']] <- addData(obj@parameters[['pTechEac']], pTechEac)
+		}
+		
+		
 		gg <- multiInterpolation(tech@af, 'af',
 			obj@parameters[['pTechAf']], approxim, 'tech', tech@name, remValueUp = Inf, remValueLo = 0)
 		obj@parameters[['pTechAf']] <- addData(obj@parameters[['pTechAf']], gg)
@@ -240,42 +282,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 							approxim_commp, 'tech', tech@name))
 				}
 			}
-		}
-		# Stock & Capacity
-		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
-		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
-		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
-		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
-		olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = FALSE)
-		obj@parameters[['pTechOlife']] <- addData(obj@parameters[['pTechOlife']], olife)		
-		
-		dd0 <- energyRt:::.start_end_fix(approxim, tech, 'tech', stock_exist)
-		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
-		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
-		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
-		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
-		obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
-		
-		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
-  		salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
-  		salv_data$value[is.na(salv_data$value)] <- 0
-  		salv_data$discount <- salv_data$value; salv_data$value <- NULL
-  		olife$olife <- olife$value; olife$value <- NULL
-  		salv_data <- merge(salv_data, olife)
-  		invcost$invcost <- invcost$value; invcost$value <- NULL
-  		salv_data <- merge(salv_data, invcost)
-  		# EAC
-		  salv_data$eac <- salv_data$invcost / salv_data$olife
-		  fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
-		  salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl]) ^ salv_data$olife[fl] / 
-		      ((1 + salv_data$discount[fl]) ^ salv_data$olife[fl] - 1))
-		  fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
-		  salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
-		  
-		  salv_data$tech <- tech@name
-		  salv_data$value <- salv_data$eac
-		  pTechEac <- salv_data[, c('tech', 'region', 'year', 'value')]
-		  obj@parameters[['pTechEac']] <- addData(obj@parameters[['pTechEac']], pTechEac)
 		}
 		# Weather part
 		merge.weather <- function(tech, nm, add = NULL) {

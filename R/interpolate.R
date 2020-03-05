@@ -85,6 +85,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
     mileStoneYears = scen@model@sysInfo@milestone$mid,
     mileStoneForGrowth = xx
   )
+  approxim$ry <- merge(data.frame(region = approxim$region, stringsAsFactors = FALSE), 
+    data.frame(year = approxim$mileStoneYears, stringsAsFactors = FALSE))
+  approxim$rys <- merge(approxim$ry,
+    data.frame(slice = approxim$slice@all_slice, stringsAsFactors = FALSE))
   # Fill basic parameter interplotaion from sysInfo
   approxim$all_comm <- c(lapply(scen@model@data, function(x) c(lapply(x@data, function(y) {
   	if (class(y) != 'commodity') return(NULL)
