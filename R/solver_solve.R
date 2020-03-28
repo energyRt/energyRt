@@ -430,7 +430,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
           if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
-            rs <- system(paste(cmd, 'glpsol.exe -m energyRt.mod -d energyRt.dat --log output/log.csv', arg$glpkCompileParameter), 
+            rs <- system(paste(cmd, 'julia energyRt.jl', arg$glpkCompileParameter), 
               invisible = arg$invisible, wait = wait,
               show.output.on.console = arg$show.output.on.console)
         } else {

@@ -2,7 +2,8 @@ using Dates
 f = open("log.txt", "w")
 println(f, "start ", Dates.format(now(), "HH:MM:SS"))
 println("start ", Dates.format(now(), "HH:MM:SS"))
-using Cbc
+# using Cbc
+# using CPLEX
 using JuMP
 include("data.jl")
 model = Model();
@@ -513,7 +514,7 @@ println("eqLECActivity(tech, region, year) done ", Dates.format(now(), "HH:MM:SS
 println(f, "eqLECActivity(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 
 @objective(model, Min, vObjective)
-set_optimizer(model, Cbc.Optimizer)
+# set_optimizer(model, Cbc.Optimizer)
 optimize!(model)
 
 # Print solution
