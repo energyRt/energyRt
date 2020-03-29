@@ -1,4 +1,3 @@
-# Import
 import time
 seconds = time.time()
 import itertools
