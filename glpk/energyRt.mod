@@ -1,4 +1,6 @@
-printf "value\n1.00\n" > "output/pFinish.csv";
+printf "parameter,value,time\n" > "output/log.csv";
+printf  '"model language",glpk,"%s"\n', time2str(gmtime(), "%Y-%m-%d %M:%H:S %TZ") >> "output/log.csv";
+printf  '"model definition",,"%s"\n', time2str(gmtime(), "%Y-%m-%d %M:%H:S %TZ") >> "output/log.csv";
 set tech;
 set sup;
 set dem;
@@ -574,12 +576,14 @@ s.t.  eqObjective: vObjective  =  sum{r in region,y in year:((r,y) in mvTotalCos
 
 s.t.  eqLECActivity{(t, r, y) in meqLECActivity}: sum{s in slice:((t,s) in mTechSlice)}(vTechAct[t,r,y,s])  >=  pLECLoACT[r];
 
+printf  '"solver",,"%s"\n', time2str(gmtime(), "%Y-%m-%d %M:%H:S %TZ") >> "output/log.csv";
 minimize vObjective2 : vObjective;
 
 solve;
 
 
-printf "value\n2.00\n" > "output/pFinish.csv";
+printf  '"solution status",1,"%s"\n', time2str(gmtime(), "%Y-%m-%d %M:%H:S %TZ") >> "output/log.csv";
+printf  '"export results",,"%s"\n', time2str(gmtime(), "%Y-%m-%d %M:%H:S %TZ") >> "output/log.csv";
 printf "tech,region,year,value\n" > "output/vTechNewCap.csv";
 for{(t, r, y) in mTechNew : vTechNewCap[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechNewCap[t,r,y] >> "output/vTechNewCap.csv";
@@ -927,6 +931,7 @@ for {s in slice} {
 for {wth1 in weather} {
     printf "weather,%s\n", wth1 >> "output/raw_data_set.csv";
 }
+printf  '"done",,"%s"\n', time2str(gmtime(), "%Y-%m-%d %M:%H:S %TZ") >> "output/log.csv";
 end;
 
 

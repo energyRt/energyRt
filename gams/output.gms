@@ -1,17 +1,3 @@
-file pModelStat_csv / 'output/pStat.csv'/;
-pModelStat_csv.lp = 1;
-put pModelStat_csv;
-put 'value'/;
-put energyRt.Modelstat:0:9/;
-putclose;
-file pFinish2_csv / 'output/pFinish.csv'/;
-pFinish2_csv.lp = 1;
-put pFinish2_csv;
-put 'value'/;
-put 2:0/;
-putclose;
-parameter zModelStat;
-zModelStat = energyRt.ModelStat; 
 file vTechInv_csv / 'output/vTechInv.csv'/;
 vTechInv_csv.lp = 1;
 vTechInv_csv.nd = 1;

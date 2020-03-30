@@ -9,6 +9,8 @@ setClass("scenario",
           modInp        = "modInp",     # @modInp // @parameters 
           modOut        = "modOut",          # @modOut // @variables
           source  = "list",          # Model source
+          solver  = "list",
+          status  = "list",
           misc = "list"
       ),
       prototype(
@@ -18,6 +20,10 @@ setClass("scenario",
           modInp        = NULL,      
           modOut        = NULL,
           source  = list(),          # Model source
+          solver = list(),
+          status = list(
+            interpolated = FALSE,
+            optimial = FALSE),
           #! Misc
       misc = list(
       )),

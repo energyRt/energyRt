@@ -56,14 +56,25 @@ read_solution <- function(scen, ...) {
       rr$variables[[i]] <- jj
     }
   }
- 
-  rr[['solution_report']] <- list(finish = arg$readOutputFunction(paste(arg$dir.result, '/output/pFinish.csv', sep = ''))$value, 
-                                  status = arg$readOutputFunction(paste(arg$dir.result, '/output/pStat.csv', sep = ''))$value)
+  
   scen@modOut <- new('modOut')
+  # Read solution status
+  scen@modOut@solutionLogs <- read.csv(paste(arg$dir.result, '/output/log.csv', sep = ''))
+  
+  if (all(scen@modOut@solutionLogs$parameter != "solution status")) {
+    scen@modOut@stage <- "Scenario isn't solved"
+  } else if (all(scen@modOut@solutionLogs[scen@modOut@solutionLogs$parameter == "solution status", 'value'] != 1)) {
+    scen@modOut@stage <- paste0('The solution code is not correct (', 
+        scen@modOut@solutionLogs[scen@modOut@solutionLogs$parameter == "solution status", 'value'], ')')
+  } else if (all(scen@modOut@solutionLogs$parameter != "done")) {
+    scen@modOut@stage <- "Unexpected end"
+  } else scen@modOut@stage <- 'solved'
+ 
+  if (scen@modOut@stage != 'solved')
+    warning(scen@modOut@stage)
+  
   scen@modOut@sets <- rr$set_vec
   scen@modOut@variables <- rr$variables
-  scen@modOut@compilationStatus <- as.character(rr$solution_report$finish)
-  scen@modOut@solutionStatus <- as.character(rr$solution_report$status)
   if (!is.null(scen@misc$data.before)) {
   	scen <- .paste_base_result2new(scen)
   }
@@ -88,9 +99,7 @@ read_solution <- function(scen, ...) {
         (1 + salvage$discount)^(end_year - salvage$start + 1)) / ((1 + salvage$discount)^salvage$olife - 1) 
     salvage[, c(3, 2, 1, 9)]
   }
-  if (rr$solution_report$finish != 2 || rr$solution_report$status != 1) {
-    warning('Unsuccessful finish')
-  } else {
+  if (scen@modOut@stage == 'solved') {
     # Postprocessing
     scen@modOut@variables$vTechSalv <- salvage_cost0(scen, 'Tech')
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, 'Storage')
@@ -135,6 +144,7 @@ read_solution <- function(scen, ...) {
 	if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0)
 		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', drop = FALSE],
 			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
+	scen@status$optimial <- TRUE
   scen	
 }
 

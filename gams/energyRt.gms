@@ -24,16 +24,19 @@ $ontext
 \end{abstract}
 $offtext
 
+$include inc1.gms
+
 OPTION RESLIM=50000, PROFILE=0, SOLVEOPT=REPLACE;
 OPTION ITERLIM=999999, LIMROW=0, LIMCOL=0, SOLPRINT=OFF;
 *OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;
 *OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;
-file pFinish1_csv / 'output/pFinish.csv'/;
-pFinish1_csv.lp = 1;
-put pFinish1_csv;
-put "value"/;
-put 1:0:9/;
-putclose;
+
+file log_stat / 'output/log.csv'/;
+log_stat.lp = 1;
+put log_stat;
+put "parameter,value,time"/;
+put '"model language",gams,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
+put '"model definition",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
 ********************************************************************************
 $ontext
@@ -652,6 +655,9 @@ meqBalUp(comm, region, year, slice)
 meqBalFx(comm, region, year, slice)
 meqLECActivity(tech, region, year)
 ;
+
+$include inc2.gms
+
 ********************************************************************************
 * Equations
 ********************************************************************************
@@ -1652,6 +1658,7 @@ eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)..
 *$INCLUDE data.inc
 * e0fc7d1e-fd81-4745-a0eb-2a142f837d1c
 
+$ontext
 model energyRt /
 ********************************************************************************
 * Activity Input & Output equations
@@ -1830,24 +1837,41 @@ eqLECActivity
 * Additional equation (e.g. Constrain)
 * c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f
 /;
+$offtext
+
+model energyRt / all / ;
 
 *$EXIT
+
+put log_stat;
+put '"load data",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
+
 $include data.gms
 
-* Place to insert your data
 * ddd355e0-0023-45e9-b0d3-1ad83ba74b3a
 *$EXIT
 
 *option lp = cbc;
 
-* f374f3df-5fd6-44f1-b08a-1a09485cbe3d
+$include inc3.gms
+
+put log_stat;
+put '"solver",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
 
 Solve energyRt minimizing vObjective using LP;
 
+put log_stat;
+put '"solution status",' energyRt.Modelstat:0:0 ',"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
+put '"export results",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
+
+$include inc4.gms
 
 $include output.gms
 
-* 99089425-31110-4440-be57-2ca102e9cee1
+$include inc5.gms
 
 
+put log_stat;
+put 'done,,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0 '"'/;
+putclose;

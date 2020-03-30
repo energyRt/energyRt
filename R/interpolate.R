@@ -145,8 +145,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
     }
   }
   scen@source <- energyRt:::.modelCode
+  scen@status$interpolated <- TRUE
+
   # Check parameters
   scen <- .check_scen_par(scen)
   if (arg$echo) cat(' ', round(proc.time()[3] - interpolation_time_begin, 2), 's\n')
+  
   invisible(scen)
 }
