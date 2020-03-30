@@ -1,3 +1,8 @@
+import datetime
+flog = open('output/log.csv', 'w')
+flog.write('parameter,value,time\n')
+flog.write('"model language",PyomoConcrete,"' + str(datetime.datetime.now()) + '"\n')
+flog.write('"load data",,"' + str(datetime.datetime.now()) + '"\n')
 # Import
 import time
 seconds = time.time()
@@ -253,8 +258,11 @@ instance = model.create_instance("data.dat");
 print("model.create_instance end ", round(time.time() - seconds, 2));
 
 opt = SolverFactory('cplex');
-opt.solve(instance);
+flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
+slv = opt.solve(instance);
 print("opt solve ", round(time.time() - seconds, 2));
+flog.write('"solution status",' + str((slv.solver.status == SolverStatus.ok) *1) + ',"' + str(datetime.datetime.now()) + '"\n')
+flog.write('"export results",,"' + str(datetime.datetime.now()) + '"\n')
 head_val =  { "vTechInv": "tech,region,year,value",
   "vTechEac": "tech,region,year,value",
   "vTechOMCost": "tech,region,year,value",
@@ -334,10 +342,6 @@ for v in instance.component_objects(Var):
                   u = str(v[index].value)
               f.write(u + '\n')
       f.close();
-f = open("output/pStat.csv",'w');
-f.write("value\n1.00\n");
-f.close();
-f = open("output/pFinish.csv",'w');
-f.write("value\n2.00\n");
-f.close();
 flist.close();
+flog.write('"done",,"' + str(datetime.datetime.now()) + '"\n')
+flog.close();

@@ -724,6 +724,6 @@ for i in slice:
 for i in weather:
     f.write('weather,' + str(i) + '\n')
 f.close()
-flog.write('"done",,"' + str(datetime.datetime.now()) + '"\n')
 flist.close();
+flog.write('"done",,"' + str(datetime.datetime.now()) + '"\n')
 flog.close();

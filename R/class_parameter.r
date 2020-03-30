@@ -420,7 +420,7 @@ setMethod('print', 'parameter', function(x, ...) {
   } else stop('Must realise')
 }
 
-.toPyomoJump <- function(obj) {
+.toPyomoAbstractModel <- function(obj) {
   as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(paste0("# ", name, '\nparam ', name, ' := ', data$value, '\n'))
