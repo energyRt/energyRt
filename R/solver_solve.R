@@ -18,6 +18,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
   # only.listing = FALSE (!depreciated?) generate only listing file (works for gams only)
   # readresult = TRUE read result
   # tmp.del delete results
+  fix_path <- function(x) gsub('[\\/]+', '/', paste0(x, '/'))
   arg <- list(...)
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) {
@@ -58,6 +59,9 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
     scen@misc$dir.result <- arg$dir.result
     tmp_name <- scen@name
   }
+  arg$dir.result <- fix_path(arg$dir.result)
+  arg$tmp.dir <- fix_path(arg$tmp.dir)
+  scen@misc$dir.result <- fix_path(scen@misc$dir.result)
   
   if (is.null(arg$tmp.dir)) {
     arg$tmp.dir <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, tmp_name, #scen@name, 
