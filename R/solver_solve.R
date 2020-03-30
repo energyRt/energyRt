@@ -369,12 +369,13 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
           if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
-          rs <- 0
-          shell('python energyRt.py') 
+          rs <- system('python energyRt.py',
+                       invisible = arg$invisible, wait = wait,
+                       show.output.on.console = arg$show.output.on.console) 
         } else {
-          rs <- system(paste('python energyRt.py', 
+          rs <- system(paste('python energyRt.py'), 
                              invisible = arg$invisible, wait = wait,
-                             arg$glpkCompileParameter)) #, mustWork = TRUE)
+                             show.output.on.console = arg$show.output.on.console)
         }
         setwd(BEGINDR)  
         # if (rs != 0) stop(paste('Error in compilation with code', rs))
@@ -430,13 +431,13 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
         setwd(arg$dir.result)
         if (.Platform$OS.type == "windows") {
           if (invisible) {cmd <- ""} else {cmd <- "cmd /k"}
-            rs <- system(paste(cmd, 'julia energyRt.jl', arg$glpkCompileParameter), 
+            rs <- system(paste(cmd, 'julia energyRt.jl'), 
               invisible = arg$invisible, wait = wait,
               show.output.on.console = arg$show.output.on.console)
         } else {
-            rs <- system(paste('glpsol -m energyRt.mod -d energyRt.dat --log output/log.csv', 
-              invisible = arg$invisible, wait = wait,
-              arg$glpkCompileParameter)) #, mustWork = TRUE)
+            rs <- system(paste('julia energyRt.jl'), 
+                         invisible = arg$invisible, wait = wait,
+                         show.output.on.console = arg$show.output.on.console) #, mustWork = TRUE)
         }
         setwd(BEGINDR)  
         if (rs != 0) stop(paste('Error in compilation with code', rs))
