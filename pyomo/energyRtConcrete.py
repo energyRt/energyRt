@@ -1,3 +1,8 @@
+import datetime
+flog = open('output/log.csv', 'w')
+flog.write('parameter,value,time\n')
+flog.write('"model language",PyomoConcrete,"' + str(datetime.datetime.now()) + '"\n')
+flog.write('"load data",,"' + str(datetime.datetime.now()) + '"\n')
 import time
 seconds = time.time()
 import itertools
@@ -258,8 +263,12 @@ model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : 
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 print("Equation finish ", round(time.time() - seconds, 2))
 opt = SolverFactory('cplex');
-opt.solve(model)
+flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
+slv = opt.solve(model)
 print("Solving finish ", round(time.time() - seconds, 2));
+slv = opt.solve(model)
+flog.write('"solution status",' + str((slv.solver.status == SolverStatus.ok) *1) + ',"' + str(datetime.datetime.now()) + '"\n')
+flog.write('"export results",,"' + str(datetime.datetime.now()) + '"\n')
 flist = open("output/variable_list.csv","w");
 flist.write("value\n");
 flist.write("vTechInv\n");
@@ -715,10 +724,6 @@ for i in slice:
 for i in weather:
     f.write('weather,' + str(i) + '\n')
 f.close()
-f = open("output/pStat.csv",'w');
-f.write("value\n1.00\n");
-f.close();
-f = open("output/pFinish.csv",'w');
-f.write("value\n2.00\n");
-f.close();
+flog.write('"done",,"' + str(datetime.datetime.now()) + '"\n')
 flist.close();
+flog.close();

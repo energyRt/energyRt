@@ -2,7 +2,6 @@
 # PYOMO part
 ##################################################################################################################################    
 .solver_run_PYOMO <- function(arg, scen) {
-  
   AbstractModel <- any(grep('abstract', scen@solver$lang, ignore.case = TRUE))
   if (AbstractModel) {
     run_code <- scen@source[["PYOMOAbstract"]]

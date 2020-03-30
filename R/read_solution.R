@@ -130,6 +130,7 @@ read_solution <- function(scen, ...) {
     scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
   }
   if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
+  scen@status$optimial <- TRUE
   invisible(scen)
 }
 .paste_base_result2new <- function(scen) {
@@ -144,7 +145,6 @@ read_solution <- function(scen, ...) {
 	if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0)
 		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', drop = FALSE],
 			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
-	scen@status$optimial <- TRUE
   scen	
 }
 
