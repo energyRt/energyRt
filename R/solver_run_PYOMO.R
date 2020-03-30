@@ -5,8 +5,10 @@
   AbstractModel <- any(grep('abstract', scen@solver$lang, ignore.case = TRUE))
   if (AbstractModel) {
     run_code <- scen@source[["PYOMOAbstract"]]
+    run_codeout = ''
   } else {
     run_code <- scen@source[["PYOMOConcrete"]]
+    run_codeout <- scen@source[["PYOMOConcreteOutput"]]
   }
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   # Add constraint
@@ -52,6 +54,9 @@
     cat('f.close()\n', file = zz_mod)
   }
   close(zz_mod)
+  zz_modout <- file(paste(arg$dir.result, '/output.py', sep = ''), 'w')
+  cat(run_codeout, sep = '\n', file = zz_modout)
+  close(zz_modout)
   .add_five_includes(arg, scen, ".py")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'python energyRt.py'
