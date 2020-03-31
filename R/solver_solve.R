@@ -18,13 +18,14 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
   # only.listing = FALSE (!depreciated?) generate only listing file (works for gams only)
   # readresult = TRUE read result
   # tmp.del delete results
+  # browser()
   fix_path <- function(x) gsub('[\\/]+', '/', paste0(x, '/'))
   arg <- list(...)
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) {
     scen@solver <- list(lang = "GAMS")
   } else if (is.character(arg$solver)) {
-    scen@solver <- list(lang = arg$solver)
+    if (!is.null(scen)) scen@solver <- list(lang = arg$solver)
   }
   if (is.null(arg$open.folder)) arg$open.folder <- FALSE
   if (is.null(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
@@ -53,7 +54,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
   
   if (is.null(scen)) {
     if (interpolate | arg$write) {
-      stop("scenario object is not provided")
+      stop("scenario object is not found")
     }
   } else {
     scen@misc$dir.result <- arg$dir.result
@@ -61,7 +62,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE,
   }
   arg$dir.result <- fix_path(arg$dir.result)
   arg$tmp.dir <- fix_path(arg$tmp.dir)
-  scen@misc$dir.result <- fix_path(scen@misc$dir.result)
+  if (!is.null(scen)) scen@misc$dir.result <- fix_path(scen@misc$dir.result)
   
   if (is.null(arg$tmp.dir)) {
     arg$tmp.dir <- file.path(file.path(getwd(), "solwork"), paste(arg$solver, tmp_name, #scen@name, 

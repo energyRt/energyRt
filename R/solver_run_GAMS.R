@@ -7,6 +7,7 @@
     rs <- try(system('gams'))
     if (rs != 0) stop('GAMS is not found')
   }
+  # browser()
   run_code <- scen@source[["GAMS"]]
   dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
@@ -64,10 +65,10 @@
   
   cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):length(run_code)], sep = '\n', file = zz)
   
-  if (!is.null(scen@model@misc$includeBeforeSolve))
-    warning('includeBeforeSolve deprecated, use solver inc4')
-  if (!is.null(scen@model@misc$includeAfterSolve))
-    warning('includeAfterSolve now not use, use solver inc5')
+  # if (!is.null(scen@model@misc$includeBeforeSolve))
+  #   warning('includeBeforeSolve deprecated, use solver inc4')
+  # if (!is.null(scen@model@misc$includeAfterSolve))
+  #   warning('includeAfterSolve now not use, use solver inc5')
   close(zz)
   .add_five_includes(arg, scen, ".gms")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
