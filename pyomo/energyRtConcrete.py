@@ -1,4 +1,5 @@
 import datetime
+print("start time: " + str(datetime.datetime.now()) + "\n")
 flog = open('output/log.csv', 'w')
 flog.write('parameter,value,time\n')
 flog.write('"model language",PyomoConcrete,"' + str(datetime.datetime.now()) + '"\n')
