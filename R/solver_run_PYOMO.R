@@ -5,7 +5,7 @@
   AbstractModel <- any(grep('abstract', scen@solver$lang, ignore.case = TRUE))
   if (AbstractModel) {
     run_code <- scen@source[["PYOMOAbstract"]]
-    run_codeout = ''
+    run_codeout <- scen@source[["PYOMOAbstractOutput"]]
   } else {
     run_code <- scen@source[["PYOMOConcrete"]]
     run_codeout <- scen@source[["PYOMOConcreteOutput"]]
