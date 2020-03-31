@@ -3,6 +3,7 @@ write_model <- function(..., tmp.dir = NULL) {
 }
 
 solve_model <- function(scen = NULL, solver = NULL, tmp.dir, ...) {
+  if (is.character(solver)) solver <- list(lang = solver)
   solv_par <- read.csv(paste0(.fix_path(tmp.dir), 'solver'), stringsAsFactors = FALSE)
   solver0 <- list()
   for (i in seq_len(nrow(solv_par))) {
