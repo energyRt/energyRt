@@ -10,7 +10,7 @@ solve_model <- function(scen = NULL, solver = NULL, tmp.dir, ...) {
     if (tmp %in% c('TRUE', 'FALSE')) tmp <- (tmp == 'TRUE')
     solver0[[solv_par[i, 'name']]] <- tmp
   }
-  if (!is.null(scen))
+  if (!is.null(scen) && !is.null(scen@solver))
     for (i in grep('^(inc[1-5]|files)$', names(scen@solver), value = TRUE, invert = TRUE)) 
       solver0[[i]] <- scen@solver[[i]]
   for (i in grep('^(inc[1-5]|files)$', names(solver), value = TRUE, invert = TRUE)) 

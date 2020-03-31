@@ -32,5 +32,15 @@ setClass("scenario",
 setMethod("initialize", "scenario", function(.Object, ...) {
   .Object
 })
-                                              
+
+.modelCode <- list(
+  GAMS = readLines('gams/energyRt.gms'),
+  JULIA = readLines('julia/energyRt.jl'),
+  PYOMOConcrete = readLines('pyomo/energyRtConcrete.py'),
+  PYOMOConcreteOutput = readLines('pyomo/energyRtConcreteOutput.py'),
+  PYOMOAbstract = readLines('pyomo/energyRtAbstract.py'),
+  PYOMOAbstractOutput = readLines('pyomo/energyRtAbstractOutput.py'),
+  GLPK = readLines('glpk/energyRt.mod'),
+  GAMS_output = readLines('gams/output.gms'))
+
 
