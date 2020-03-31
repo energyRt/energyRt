@@ -1,7 +1,7 @@
 ##################################################################################################################################    
 # GLPK & CBC part
 ##################################################################################################################################    
-.solver_run_GLPK_CBC <- function(arg, scen) { 
+.write_model_GLPK_CBC <- function(arg, scen) { 
   run_code <- scen@source[["GLPK"]]
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   file_w <- c()

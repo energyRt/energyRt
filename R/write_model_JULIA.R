@@ -1,7 +1,7 @@
 ##################################################################################################################################    
 # Julia part
 ##################################################################################################################################    
-.solver_run_JULIA <- function(arg, scen) {
+.write_model_JULIA <- function(arg, scen) {
   run_code <- scen@source[["JULIA"]]
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   zz_data_julia <- file(paste(arg$dir.result, '/data.jl', sep = ''), 'w')
