@@ -27,11 +27,8 @@
   }
   cat(run_code[-(1:nobj)], sep = '\n', file = zz_mod)
   close(zz_mod)
-  if (arg$echo) {
-    cat('', round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
-    flush.console()
-  }
   .add_five_includes(arg, scen, ".jl")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'julia energyRt.jl'
+  scen
 }
