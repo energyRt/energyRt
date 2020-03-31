@@ -20,7 +20,7 @@ class toPar:
 exec(open("inc1.py").read())
 model = ConcreteModel()
 ##### decl par #####
-print("Load finish ", round(time.time() - seconds, 2))
+print("load data ", round(time.time() - seconds, 2))
 model.vTechInv = Var(mTechNew, doc = "Overnight investment costs");
 model.vTechEac = Var(mTechEac, doc = "Annualized investment costs");
 model.vTechOMCost = Var(mTechOMCost, doc = "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)");
@@ -83,7 +83,7 @@ model.vTradeInv = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeNewCap = Var(mvTradeNewCap, domain = pyo.NonNegativeReals, doc = "");
 exec(open("inc2.py").read())
-print("Variable finish ", round(time.time() - seconds, 2))
+print("variables ", round(time.time() - seconds, 2))
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 model.eqTechSng2Sng = Constraint(meqTechSng2Sng, rule = lambda model, t, r, c, cp, y, s : model.vTechInp[t,c,r,y,s]*pTechCinp2use.get((t,c,r,y,s))  ==  (model.vTechOut[t,cp,r,y,s]) / (pTechUse2cact.get((t,cp,r,y,s))*pTechCact2cout.get((t,cp,r,y,s))));
 # eqTechGrp2Sng(tech, region, group, commp, year, slice)$meqTechGrp2Sng(tech, region, group, commp, year, slice)
@@ -263,14 +263,15 @@ model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(m
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)
 model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in slice if (t,s) in mTechSlice)  >=  pLECLoACT.get((r)));
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
-print("Equation finish ", round(time.time() - seconds, 2))
+print("equations ", round(time.time() - seconds, 2))
 exec(open("inc3.py").read())
 opt = SolverFactory('cplex');
 exec(open("inc4.py").read())
 flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
 slv = opt.solve(model)
-print("Solving finish ", round(time.time() - seconds, 2));
+print("solving ", round(time.time() - seconds, 2));
 slv = opt.solve(model)
+print("done ", round(time.time() - seconds, 2));
 flog.write('"solution status",' + str((slv.solver.status == SolverStatus.ok) *1) + ',"' + str(datetime.datetime.now()) + '"\n')
 flog.write('"export results",,"' + str(datetime.datetime.now()) + '"\n')
 exec(open("inc5.py").read())
