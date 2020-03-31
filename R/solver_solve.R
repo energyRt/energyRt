@@ -18,7 +18,7 @@ solve_model <- function(scen = NULL, solver = NULL, tmp.dir, ...) {
   if (is.null(scen)) {
     scen = new('scenario')
   }
-  solver_solve(scen = scen, solver = solver0, tmp.dir = tmp.dir, write = FALSE, ...)
+  solver_solve(scen = scen, run = TRUE, solver = solver0, tmp.dir = tmp.dir, write = FALSE, ...)
 }
 
 .fix_path <- function(x) gsub('[\\/]+', '/', paste0(x, '/'))
