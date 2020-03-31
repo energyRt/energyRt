@@ -7,12 +7,12 @@
     setwd(arg$dir.result)
     if (.Platform$OS.type == "windows") {
       if (arg$invisible) {cmd <- ""} else {cmd <- "cmd /k"}
-      rs <- shell(paste(cmd, scen@solver$cmd), #'gams energyRt.gms', arg$gamsCompileParameter), 
+      rs <- shell(paste(cmd, scen@solver$cmdline), #'gams energyRt.gms', arg$gamsCompileParameter), 
         invisible = arg$invisible, wait = arg$wait
         # show.output.on.console = arg$show.output.on.console
   )
     } else {
-      rs <- system(paste(scen@solver$cmd), 
+      rs <- system(paste(scen@solver$cmdline), 
         invisible = arg$invisible, wait = arg$wait
         # show.output.on.console = arg$show.output.on.console
       )

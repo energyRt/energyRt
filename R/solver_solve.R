@@ -3,7 +3,7 @@ write_model <- function(..., tmp.dir = NULL) {
 }
 
 solve_model <- function(scen = NULL, solver = NULL, tmp.dir, ...) {
-  solv_par <- read.csv(paste0(.fix_path(tmp.dir), 'solver'))
+  solv_par <- read.csv(paste0(.fix_path(tmp.dir), 'solver'), stringsAsFactors = FALSE)
   solver0 <- list()
   for (i in seq_len(nrow(solv_par))) {
     tmp <- solv_par[i, 'value']
@@ -41,7 +41,9 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   if (is.null(arg$solver)) {
     scen@solver <- list(lang = "GAMS")
   } else if (is.character(arg$solver)) {
-    if (!is.null(scen)) scen@solver <- list(lang = arg$solver)
+    scen@solver <- list(lang = arg$solver)
+  } else if (is.list(arg$solver)) {
+    scen@solver <- arg$solver
   }
   if (is.null(arg$open.folder)) arg$open.folder <- FALSE
   if (is.null(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
@@ -89,7 +91,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   if (!is.null(scen)) scen@misc$dir.result <- .fix_path(scen@misc$dir.result)
   
   if (is.null(arg$tmp.dir)) {
-    arg$tmp.dir <- .file.path(file.path(getwd(), "solwork"), paste(arg$solver, tmp_name, #scen@name, 
+    arg$tmp.dir <- .file.path(file.path(getwd(), "solwork"), paste(arg$solver$lang, tmp_name, #scen@name, 
           format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
   }
   arg$dir.result <- arg$tmp.dir
