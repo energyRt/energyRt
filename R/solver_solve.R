@@ -56,7 +56,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     if (is.null(scen@solver$wait)) {
       arg$wait <- TRUE
     } else arg$wait <- scen@solver$wait
-  }
+  } else if (is.null(arg$invisible)) arg$invisible <- arg$wait
   scen@solver$wait <- arg$wait
   if (is.null(arg$invisible)) {
     if (is.null(scen@solver$invisible)) {

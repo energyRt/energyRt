@@ -18,7 +18,7 @@
   }
   for (i in names(scen@solver$files)) {
     zz <- file(paste0(arg$dir.result, i), 'w')
-    cat(scen@solver[[paste0('inc', i)]], sep = '\n', file = zz)
+    cat(scen@solver$files[[i]], sep = '\n', file = zz)
     close(zz)
   }
 }
