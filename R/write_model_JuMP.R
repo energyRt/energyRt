@@ -1,9 +1,9 @@
 ##################################################################################################################################    
-# Julia part
+# Julia JuMP part
 ##################################################################################################################################    
-.write_model_JULIA <- function(arg, scen) {
-  run_code <- scen@source[["JULIA"]]
-  run_codeout <- scen@source[["JULIAOutput"]]
+.write_model_JuMP <- function(arg, scen) {
+  run_code <- scen@source[["JuMP"]]
+  run_codeout <- scen@source[["JuMPOutput"]]
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   zz_data_julia <- file(paste(arg$dir.result, '/data.jl', sep = ''), 'w')
   for (j in c('set', 'map', 'simple', 'multi')) {
