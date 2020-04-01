@@ -2,7 +2,7 @@ write_model <- function(..., tmp.dir = NULL) {
   solver_solve(..., run = FALSE, tmp.dir = tmp.dir, write = TRUE)
 }
 
-solve_model <- function(scen = NULL, solver = NULL, tmp.dir, ...) {
+solve_model <- function(tmp.dir = NULL, scen = NULL, solver = NULL, ...) {
   if (is.character(solver)) solver <- list(lang = solver)
   solv_par <- read.csv(paste0(.fix_path(tmp.dir), 'solver'), stringsAsFactors = FALSE)
   solver0 <- list()
