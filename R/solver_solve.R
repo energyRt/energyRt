@@ -107,14 +107,14 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   if (arg$write) { 
     if (arg$echo) cat('Writing files: ')
     solver_solver_time <- proc.time()[3]
-    if (scen@solver$lang == 'GAMS') {
+    if (any(grep("^gams$", scen@solver$lang, ignore.case = TRUE))) {
       scen <- .write_model_GAMS(arg, scen)
-    } else if (scen@solver$lang %in% c('GLPK', 'CBC')) { 
+    } else if (any(grep("^(glpk|cbcb)$", scen@solver$lang, ignore.case = TRUE))) { 
       scen <- .write_model_GLPK_CBC(arg, scen)
     } else if (any(grep("^pyomo", scen@solver$lang, ignore.case = TRUE))) {
       scen <- .write_model_PYOMO(arg, scen)
-    } else if (scen@solver$lang == 'JULIA') {
-      scen <- .write_model_JULIA(arg, scen)
+    } else if (any(grep("^jump$", scen@solver$lang, ignore.case = TRUE))) {
+      scen <- .write_model_JuMP(arg, scen)
     } else stop('Unknown solver ', scen@solver$lang) 
     
     ## Write solver parameter
