@@ -119,18 +119,24 @@
 .add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim) {
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
-  if (num_classes_for_progrees_bar < 50) {
-    need.tick <- rep(TRUE, num_classes_for_progrees_bar)
-  } else {
-    need.tick <- rep(FALSE, num_classes_for_progrees_bar)
-    need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
-  }
+  # if (num_classes_for_progrees_bar < 50) {
+  #   need.tick <- rep(TRUE, num_classes_for_progrees_bar)
+  # } else {
+  #   need.tick <- rep(FALSE, num_classes_for_progrees_bar)
+  #   need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
+  # }
   # Fill DB main data
+  paste_txt <- ''
   k <- 0
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) { 
       k <- k + 1
       if (k %% max.thread == n.thread) {
+        nch <- nchar(paste_txt)
+        paste_txt <- paste0(trunc(10000 * k / num_classes_for_progrees_bar) / 100, '% ', scen@model@data[[i]]@data[[j]]@name)
+        if (arg$echo)
+          cat(paste0(rep('\b', nch), collapse = ''), paste_txt, sep = '')
+        
         tryCatch({
           scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
         }, error = function(e) {
@@ -140,14 +146,14 @@
           message('\nThere are error during work .add0. More information in "add0_message"\n')
           stop(e)
         })
-        if (need.tick[k] && arg$echo) {
-          cat('.')
-          flush.console() 
-        }
+        # if (need.tick[k] && arg$echo) {
+        #   cat('.')
+        #   flush.console() 
+        # }
       }
     }
   }
-  if (arg$echo) cat(' ')
+  # if (arg$echo) cat(' ')
   scen
 }
 .merge_scen <- function(scen_pr, use_par) {
