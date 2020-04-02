@@ -126,17 +126,21 @@
   #   need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
   # }
   # Fill DB main data
-  paste_txt <- ''
-  k <- 0
+  paste_txt <- ''; nch <- 0; tmlg <- 0; mnch <- 0
+  k <- 0;
+  time.log.nm <- rep(NA, num_classes_for_progrees_bar)
+  time.log.tm <- rep(NA, num_classes_for_progrees_bar)
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) { 
-      k <- k + 1
+      k <- k + 1;
       if (k %% max.thread == n.thread) {
-        nch <- nchar(paste_txt)
-        paste_txt <- paste0(trunc(10000 * k / num_classes_for_progrees_bar) / 100, '% ', scen@model@data[[i]]@data[[j]]@name)
+        tmlg <- tmlg + 1
+        paste_txt <- paste0(k, ' (', num_classes_for_progrees_bar, ') ', scen@model@data[[i]]@data[[j]]@name)
         if (arg$echo)
           cat(paste0(rep('\b', nch), collapse = ''), paste_txt, sep = '')
-        
+        nch <- nchar(paste_txt)
+        mnch <- max(c(mnch, nch))
+        p1 <- proc.time()[3]
         tryCatch({
           scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
         }, error = function(e) {
@@ -146,6 +150,8 @@
           message('\nThere are error during work .add0. More information in "add0_message"\n')
           stop(e)
         })
+        time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name
+        time.log.tm[tmlg] <- proc.time()[3] - p1
         # if (need.tick[k] && arg$echo) {
         #   cat('.')
         #   flush.console() 
@@ -153,9 +159,14 @@
       }
     }
   }
+  scen@misc$time.log <- data.frame(name = time.log.nm[seq_len(tmlg)], 
+                                   time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
   # if (arg$echo) cat(' ')
+  if (arg$echo)
+    cat(paste0(rep('\b', nch), collapse = ''), paste0(rep(' ', mnch), collapse = ''), paste0(rep('\b', mnch), collapse = ''), sep = '')
   scen
 }
+
 .merge_scen <- function(scen_pr, use_par) {
   if (scen_pr[[1]]@modInp@parameters$mCommSlice@nValues == -1)
     stop('have to do')
@@ -172,6 +183,9 @@
     }
     
   }
+  for (i in seq_along(scen_pr)) 
+    scen@misc$time.log <- rbind(scen@misc$time.log, scen_pr[[i]]@misc$time.log)
+  
   scen
 }
 
