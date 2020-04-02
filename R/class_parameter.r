@@ -523,3 +523,7 @@ setMethod('print', 'parameter', function(x, ...) {
   } else stop('Must realise')
 }
 
+setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
+          function(obj, data) return(obj))
+
+

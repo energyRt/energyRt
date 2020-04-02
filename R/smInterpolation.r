@@ -1,14 +1,14 @@
 #### Deprecated version due to deprecetate simple_data_frame_approximation
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, remValue = NULL) {
-  # cat('simple_data_frame_approximation_chk:', parameter, '\n')
   there.is.year <- any(colnames(frm) == 'year')
-  #if (nrow(frm) == 0) return(frm)
+  if (nrow(frm) == 0) return(frm)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
                     year_range = range(approxim$year),
                     approxim   = approxim)
+  if (is.null(dd)) return(NULL)
   # Must fixed in the future
   colnames(dd)[[ncol(dd)]] <- 'value'
   for(i in colnames(dd)[-ncol(dd)]) {
@@ -24,9 +24,8 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     stnd <- mtp@dimSetNames[-(1:length(d3))]
     # It was added for trading routes
-    if (sum(colnames(frm) %in% c('region', 'src', 'dst')) == 3) {
-    	stnd[stnd == 'src'] <- 'region'
-    	stnd <- stnd[stnd != 'dst']
+    if (sum(stnd %in% c('src', 'dst')) == 2) {
+    	stnd <- c(stnd[stnd != 'src' & stnd != 'dst'], 'region')
     } 
     dd <- cbind(d3, dd[, c(stnd, 'value'), drop = FALSE])
   }
@@ -49,13 +48,15 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
 }
 
 multiInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, remValueUp = NULL, remValueLo = NULL) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, 
+  remValueUp = NULL, remValueLo = NULL) {
   there.is.year <- any(colnames(frm) == 'year')
   dd <- interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
                     rule       = mtp@interpolation,
                     year_range = range(approxim$year),
                     approxim   = approxim)
+  if (is.null(dd)) return(NULL)
   colnames(dd)[[ncol(dd)]] <- 'value'
   for(i in colnames(dd)[-ncol(dd)]) {
       dd[[i]] <- as.character(dd[[i]])
@@ -70,10 +71,10 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     stnd <- mtp@dimSetNames[-(1:length(d3))]
     # It was added for trading routes
-    if (sum(colnames(frm) %in% c('region', 'src', 'dst')) == 3) {
-    	stnd[stnd == 'src'] <- 'region'
-    	stnd <- stnd[stnd != 'dst']
+    if (sum(stnd %in% c('src', 'dst')) == 2) {
+      stnd <- c(stnd[stnd != 'src' & stnd != 'dst'], 'region')
     } 
+    
     dd <- cbind(d3, dd[, c(stnd, 'type', 'value'), drop = FALSE])
   }
   # For increase speed, not work for GLPK

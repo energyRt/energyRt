@@ -32,8 +32,9 @@
   obj <- obj[!is.na(obj[, parameter]), , drop = FALSE]
   if (anyDuplicated(obj[, -ncol(obj)])) {
      warning("there are duplicates in the data, use checkDuplication function to get more information")
+    obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
   }
-  obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
+  if (nrow(obj) == 0) return(NULL)
   # Check do need realy approximation 
   approxim2 <- approxim
   if (!is.null(obj$year)) {
@@ -180,6 +181,8 @@
     }
     
   }
+  
+  
   return(dd)
 }
 setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
@@ -208,14 +211,24 @@ setMethod("interpolation_bound", signature(obj = 'data.frame',
   a3 <- aa; a3[, parameter] <- obj[, gg[3]]
   d1 <- interpolation(rbind(a1, a2), parameter, 
       defVal = defVal[1], rule = rule[1], ...)
-  dd <- d1[, -ncol(d1), drop = FALSE]
-  dd[, 'type'] <- 'lo'
-  dd[, parameter] <- d1[, parameter]
+  if (!is.null(d1)) {
+    dd <- d1[, -ncol(d1), drop = FALSE]
+    dd[, 'type'] <- 'lo'
+    dd[, parameter] <- d1[, parameter]
+    }
   d2 <- interpolation(rbind(a3, a2), parameter, 
     defVal = defVal[2], rule = rule[2], ...)
-  zz <- d2[, -ncol(d2), drop = FALSE]
-  zz[, 'type'] <- 'up'
-  zz[, parameter] <- d2[, parameter]
-  rbind(dd, zz)
+  if (!is.null(d2)) {
+    zz <- d2[, -ncol(d2), drop = FALSE]
+    zz[, 'type'] <- 'up'
+    zz[, parameter] <- d2[, parameter]
+  }
+  if (!is.null(d1) && !is.null(d2)) {
+    return(rbind(dd, zz))
+  } else if (!is.null(d1)) {
+    return(dd)
+  } else if (!is.null(d2)) {
+    return(zz)
+  } else return(NULL)
 })
 
