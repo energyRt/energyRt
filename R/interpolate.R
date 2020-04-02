@@ -122,9 +122,14 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation ')
   if (arg$n.threads == 1) {
-    scen <- .add2_nthreads_1(scen, arg, approxim)
+    scen <- .add2_nthreads_1(0, 1, scen, arg, approxim)
   } else {
-    stop('have to do')
+    use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
+    require(parallel)
+    cl <- makeCluster(arg$n.threads)
+    scen_pr <- parLapply(cl, 0:(arg$n.threads - 1), .add2_nthreads_1, arg$n.threads, scen, arg, approxim)
+    stopCluster(cl)
+    scen <- .merge_scen(scen_pr, use_par)
   }
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
