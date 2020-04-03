@@ -65,6 +65,7 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   }
   scen@solver$invisible <- arg$invisible
   if (is.null(arg$run)) arg$run <- TRUE
+  if (is.null(arg$n.threads)) arg$n.threads <- 1
   
   # if (is.null(arg$onefile)) arg$onefile <- FALSE
   if (!is.null(arg$dir.result)) {

@@ -16,13 +16,35 @@
   close(zz_output)  
   zz_data_gms <- file(paste(arg$dir.result, '/data.gms', sep = ''), 'w')
   file_w <- c()
-  for (j in c('set', 'map', 'simple', 'multi')) {
-    for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-      zz_data_tmp <- file(paste(arg$dir.result, '/input/', i, '.gms', sep = ''), 'w')
-      cat(energyRt:::.toGams(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_tmp)
-      close(zz_data_tmp) 
-      cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
+  if (arg$n.threads == 1) {
+    for (j in c('set', 'map', 'simple', 'multi')) {
+      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+        zz_data_tmp <- file(paste(arg$dir.result, '/input/', i, '.gms', sep = ''), 'w')
+        cat(energyRt:::.toGams(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_tmp)
+        close(zz_data_tmp)
+        cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
+      }
     }
+  } else {
+    for (j in c('set', 'map', 'simple', 'multi')) {
+      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+        cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
+      }
+    }    
+    tlp <- lapply(0:(arg$n.threads - 1), function(y) names(scen@modInp@parameters)[
+      seq_along(scen@modInp@parameters) %% arg$n.threads == y])
+    cl <- makeCluster(arg$n.threads)
+    wrt_fun <- function(x, tlp, par, drr) {
+      require(energyRt)
+      for (i in tlp[[x + 1]]) {
+        zz_data_tmp <- file(paste(drr, '/input/', i, '.gms', sep = ''), 'w')
+        cat(.toGams(par[[i]]), sep = '\n', file = zz_data_tmp)
+        close(zz_data_tmp)
+      }
+      NULL
+    }
+    parLapply(cl, 0:(arg$n.threads - 1), wrt_fun, tlp, scen@modInp@parameters, arg$dir.result)
+    stopCluster(cl)
   }
   close(zz_data_gms)    
   ### Model code to text
