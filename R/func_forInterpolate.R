@@ -115,6 +115,14 @@
 }
 
 
+.remove_char <- function(x) {
+  if (is.character(x)) x <- nchar(x)
+  if (x == 0) return()
+  n1 <- paste0(rep('\b', x), collapse = '')
+  cat(n1, paste0(rep(' ', x), collapse = ''), n1, sep = '')
+  
+}
+  
 # Implement add0 for all parameters
 .add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim) {
   # A couple of string for progress bar
@@ -136,8 +144,10 @@
       if (k %% max.thread == n.thread) {
         tmlg <- tmlg + 1
         paste_txt <- paste0(k, ' (', num_classes_for_progrees_bar, ') ', scen@model@data[[i]]@data[[j]]@name)
-        if (arg$echo)
-          cat(paste0(rep('\b', nch), collapse = ''), paste_txt, sep = '')
+        if (arg$echo) {
+          .remove_char(nch)
+          cat(paste_txt, sep = '')
+        }
         nch <- nchar(paste_txt)
         mnch <- max(c(mnch, nch))
         p1 <- proc.time()[3]
@@ -163,7 +173,7 @@
                                    time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
   # if (arg$echo) cat(' ')
   if (arg$echo)
-    cat(paste0(rep('\b', nch), collapse = ''), paste0(rep(' ', mnch), collapse = ''), paste0(rep('\b', mnch), collapse = ''), sep = '')
+    .remove_char(nch)
   scen
 }
 
