@@ -182,16 +182,16 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
           paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
         slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
       }
-      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
-          data.frame(sup = rep(sup@name, length(sup@region)), region = sup@region))
+      mSupSpan <- data.frame(sup = rep(sup@name, length(sup@region)), region = sup@region)
+      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']], mSupSpan)
     } else {
-      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']],
-          data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region))
+      mSupSpan <- data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region)
+      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']], mSupSpan)
     }
     sup <- stayOnlyVariable(sup, approxim$region, 'region')
-    obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']],
-                                            data.frame(sup = rep(sup@name, length(approxim$slice)), slice = approxim$slice))
-  #  if (!energyRt:::.chec_correct_name(sup@name)) {
+    mSupSlice <- data.frame(sup = rep(sup@name, length(approxim$slice)), slice = approxim$slice)
+    obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']], mSupSlice)
+    #  if (!energyRt:::.chec_correct_name(sup@name)) {
   #    stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
   #  }
   #  if (isSupply(obj, sup@name)) {
@@ -205,13 +205,27 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
         simpleInterpolation(sup@availability, 'cost',
             obj@parameters[['pSupCost']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
-    obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']],
-      multiInterpolation(sup@reserve, 'res', obj@parameters[['pSupReserve']], 
-      approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
-    obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']],
-              multiInterpolation(sup@availability, 'ava',
-              obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
-    # For weather
+    pSupReserve <- multiInterpolation(sup@reserve, 'res', obj@parameters[['pSupReserve']], 
+                       approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
+    obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']], pSupReserve)
+    pSupAva <- multiInterpolation(sup@availability, 'ava',
+                       obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
+    obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']], pSupAva)
+    tmp <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', 1:5]
+    mSupAva <- merge(merge(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
+    mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp), fromLast = TRUE))[1:nrow(mSupAva)], ]
+    obj@parameters[['mSupAva']] <- addData(obj@parameters[['mSupAva']], mSupAva)
+
+    obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
+        pSupReserve[pSupReserve$type == 'up' & pSupReserve$value != Inf, c('sup', 'comm', 'region')])
+    obj@parameters[['meqSupReserveLo']] <- addData(obj@parameters[['meqSupReserveLo']], 
+                                                   pSupReserve[pSupReserve$type == 'lo' & pSupReserve$value != 0, c('sup', 'comm', 'region')])
+    
+    obj@parameters[['meqSupAvaLo']] <- addData(obj@parameters[['meqSupAvaLo']], pSupAva[pSupAva$type == 'lo' & pSupAva$value != 0, 1:5])
+    
+    
+    # Browser
+        # For weather
     # mSupWeatherLo(sup, weather)
     wth.lo <- sup@weather[!is.na(sup@weather$wava.lo) | !is.na(sup@weather$wava.fx), 'weather']
     obj@parameters[['mSupWeatherLo']] <- addData(obj@parameters[['mSupWeatherLo']],
@@ -251,8 +265,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
   approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
   exp <- .disaggregateSliceLevel(exp, approxim)
-  obj@parameters[['mExpSlice']] <- addData(obj@parameters[['mExpSlice']],
-                                             data.frame(expp = rep(exp@name, length(approxim$slice)), slice = approxim$slice))
+  mExpSlice <- data.frame(expp = rep(exp@name, length(approxim$slice)), slice = approxim$slice)
+  obj@parameters[['mExpSlice']] <- addData(obj@parameters[['mExpSlice']], mExpSlice)
   #  if (!energyRt:::.chec_correct_name(exp@name)) {
 #    stop(paste('Incorrect export name "', exp@name, '"', sep = ''))
 #  }
@@ -262,16 +276,25 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
 #    obj <- removePreviousExport(obj, exp@name)
 #  }    
 #  obj@parameters[['expp']] <- addData(obj@parameters[['expp']], exp@name)
-  obj@parameters[['mExpComm']] <- addData(obj@parameters[['mExpComm']],
-      data.frame(expp = exp@name, comm = exp@commodity))
+  mExpComm <- data.frame(expp = exp@name, comm = exp@commodity)
+  obj@parameters[['mExpComm']] <- addData(obj@parameters[['mExpComm']], mExpComm)
   obj@parameters[['pExportRowPrice']] <- addData(obj@parameters[['pExportRowPrice']],
       simpleInterpolation(exp@exp, 'price',
           obj@parameters[['pExportRowPrice']], approxim, 'expp', exp@name))
-  obj@parameters[['pExportRowRes']] <- addData(obj@parameters[['pExportRowRes']],
-      data.frame(expp = exp@name, value = exp@reserve))
-  obj@parameters[['pExportRow']] <- addData(obj@parameters[['pExportRow']],
-            multiInterpolation(exp@exp, 'exp',
-            obj@parameters[['pExportRow']], approxim, 'expp', exp@name))
+  pExportRowRes <- data.frame(expp = exp@name, value = exp@reserve)
+  obj@parameters[['pExportRowRes']] <- addData(obj@parameters[['pExportRowRes']], pExportRowRes)
+  pExportRow <- multiInterpolation(exp@exp, 'exp', obj@parameters[['pExportRow']], approxim, 'expp', exp@name)
+  obj@parameters[['pExportRow']] <- addData(obj@parameters[['pExportRow']], pExportRow)
+  
+  mExportRow <- merge(merge(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
+  mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow[pExportRow$type == 'up' & pExportRow$value == 0, 1:4]), 
+                                        fromLast = TRUE)[1:nrow(mExportRow)]), ]
+  mExportRow$comm <- exp@commodity
+  obj@parameters[['mExportRow']] <- addData(obj@parameters[['mExportRow']], mExportRow)
+  tmp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, 1:4]
+  tmp$comm <- mExpComm$comm
+  obj@parameters[['mExportRowUp']] <- addData(obj@parameters[['mExportRowUp']], tmp)
+  obj@parameters[['mExportRowAccumulatedUp']] <- addData(obj@parameters[['mExportRowAccumulatedUp']], pExportRowRes[pExportRowRes$value != Inf, 1, drop = FALSE])
   obj
 })
 
@@ -285,8 +308,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
   approxim <- .fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
   imp <- .disaggregateSliceLevel(imp, approxim)
-  obj@parameters[['mImpSlice']] <- addData(obj@parameters[['mImpSlice']],
-                                           data.frame(imp = rep(imp@name, length(approxim$slice)), slice = approxim$slice))
+  mImpSlice <- data.frame(imp = rep(imp@name, length(approxim$slice)), slice = approxim$slice)
+  obj@parameters[['mImpSlice']] <- addData(obj@parameters[['mImpSlice']],  mImpSlice)
   #  if (!energyRt:::.chec_correct_name(imp@name)) {
 #    stop(paste('Incorrect import name "', imp@name, '"', sep = ''))
 #  }
@@ -296,16 +319,36 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
 #    obj <- removePreviousImport(obj, imp@name)
 #  }    
 #  obj@parameters[['imp']] <- addData(obj@parameters[['imp']], imp@name)
-  obj@parameters[['mImpComm']] <- addData(obj@parameters[['mImpComm']],
-      data.frame(imp = imp@name, comm = imp@commodity))
-  obj@parameters[['pImportRowPrice']] <- addData(obj@parameters[['pImportRowPrice']],
-      simpleInterpolation(imp@imp, 'price',
-          obj@parameters[['pImportRowPrice']], approxim, 'imp', imp@name))
-  obj@parameters[['pImportRowRes']] <- addData(obj@parameters[['pImportRowRes']],
-      data.frame(imp = imp@name, value = imp@reserve))
-  obj@parameters[['pImportRow']] <- addData(obj@parameters[['pImportRow']],
-            multiInterpolation(imp@imp, 'imp',
-            obj@parameters[['pImportRow']], approxim, 'imp', imp@name))
+  mImpComm <- data.frame(imp = imp@name, comm = imp@commodity)
+  obj@parameters[['mImpComm']] <- addData(obj@parameters[['mImpComm']], mImpComm)
+  pImportRowPrice <- simpleInterpolation(imp@imp, 'price',
+                                         obj@parameters[['pImportRowPrice']], approxim, 'imp', imp@name)
+  obj@parameters[['pImportRowPrice']] <- addData(obj@parameters[['pImportRowPrice']], pImportRowPrice)
+  pImportRowRes <- data.frame(imp = imp@name, value = imp@reserve)
+  obj@parameters[['pImportRowRes']] <- addData(obj@parameters[['pImportRowRes']], pImportRowRes)
+  pImportRow <- multiInterpolation(imp@imp, 'imp',
+                                   obj@parameters[['pImportRow']], approxim, 'imp', imp@name)
+  obj@parameters[['pImportRow']] <- addData(obj@parameters[['pImportRow']], pImportRow)
+  mImportRow <- merge(merge(mImpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
+  mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow[pImportRow$type == 'up' & pImportRow$value == 0, 1:4]), 
+                                        fromLast = TRUE)[1:nrow(mImportRow)]), ]
+  mImportRow$comm <- imp@commodity
+  obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
+  tmp <- pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf & pImportRow$value != 0, 1:4]
+  tmp$comm <- mImpComm$comm
+  obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], tmp)
+  obj@parameters[['mImportRowAccumulatedUp']] <- addData(obj@parameters[['mImportRowAccumulatedUp']], pImportRowRes[pImportRowRes$value != Inf, 1, drop = FALSE])
+  
+  
+    # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
+  aa <- merge(tmp_map$mImpComm, merge(tmp_map$mImpSlice, tmp_nozero$pImportRow))[, c("imp", "comm", "region", "year", "slice")]
+  prec@parameters[['mImportRow']] <- addData(prec@parameters[['mImportRow']], aa)
+  # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf) 
+  prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], 
+                                               reduce.sect(merge(tmp_noinf$pImportRow, aa), c("imp", "comm", "region", "year", "slice")))
+  prec@parameters[['mImportRowAccumulatedUp']] <- addData(prec@parameters[['mImportRowAccumulatedUp']], tmp_noinf$pImportRowRes)
+  # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
+  
   obj
 })
 

@@ -9,13 +9,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
 		trd <- .disaggregateSliceLevel(trd, approxim)
 		# other flag
-		obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']],
-			data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice))
+		mTradeSlice <- data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice)
+		obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']], mTradeSlice)
 		if (length(trd@commodity) == 0) stop('There is not commodity for trade flow ', trd@name)
 		obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
 			data.frame(trade = trd@name, comm = trd@commodity))
-		obj@parameters[['mTradeRoutes']] <- addData(obj@parameters[['mTradeRoutes']],
-			cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes))
+		mTradeRoutes <- cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes)
+		obj@parameters[['mTradeRoutes']] <- addData(obj@parameters[['mTradeRoutes']], mTradeRoutes)
+			
 		# approxim <- approxim[names(approxim) != 'region']
 		approxim_srcdst <- approxim
 		approxim_srcdst$region <- paste0(trd@routes$src, '##', trd@routes$dst)
@@ -114,10 +115,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			simpleInterpolation2(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 
 			                     approxim = approxim_srcdst, 'trade', trd@name))
 		# pTradeIr
-		gg <- multiInterpolation2(trd@trade, 'ava',
+		pTradeIr <- multiInterpolation2(trd@trade, 'ava',
 			obj@parameters[['pTradeIr']], approxim = approxim, 'trade', trd@name)
-		obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], gg)
+		if (!is.null(pTradeIr) && nrow(pTradeIr) != 0) {
+		  browser()
+		}
+		obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], pTradeIr)
 		# Trade ainp
+		mTradeIrAInp <- NULL; mTradeIrAOut <- NULL;
 		if (nrow(trd@aux) != 0) {
 			if (any(is.na(trd@aux$acomm))) 
 				stop('Wrong aux commodity for trade "', trd@name, '"')
@@ -126,10 +131,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				stop('Wrong aux commodity for trade "', trd@name, '"')
 			inp_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2ainp) | !is.na(trd@aeff$cdst2ainp), 'acomm'])
 			out_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2aout) | !is.na(trd@aeff$cdst2aout), 'acomm'])
-			if (length(inp_comm) != 0) obj@parameters[['mTradeIrAInp']] <- addData(obj@parameters[['mTradeIrAInp']], 
-				data.frame(trade = rep(trd@name, length(inp_comm)), comm = inp_comm))
-			if (length(out_comm) != 0) obj@parameters[['mTradeIrAOut']] <- addData(obj@parameters[['mTradeIrAOut']], 
-				data.frame(trade = rep(trd@name, length(out_comm)), comm = out_comm))
+			if (length(inp_comm) != 0) {
+			  mTradeIrAInp <- data.frame(trade = rep(trd@name, length(inp_comm)), comm = inp_comm)
+			  obj@parameters[['mTradeIrAInp']] <- addData(obj@parameters[['mTradeIrAInp']], mTradeIrAInp)
+			} 
+			if (length(out_comm) != 0) {
+			  mTradeIrAOut <- data.frame(trade = rep(trd@name, length(out_comm)), comm = out_comm)
+			  obj@parameters[['mTradeIrAOut']] <- addData(obj@parameters[['mTradeIrAOut']], mTradeIrAOut)
+			} 
 			for (cc in inp_comm) {
 				approxim$acomm <- cc
 				obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(
@@ -192,10 +201,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			    function(x) approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]), recursive = TRUE))
 			  trade_span <- unique(c(trd@stock$year, trade_eac))
 			}
-			if (length(trade_span) > 0)
-			  obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], 
-			    data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE))
-			
+			if (length(trade_span) > 0) {
+			  mTradeSpan <- data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
+			  obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], mTradeSpan)
+			}
 			# mTradeInv
 			if (nrow(invcost) > 0) {
 				end_year <- max(approxim$year)
@@ -227,6 +236,37 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				pTradeEac <- salv_data[, c('trade', 'region', 'year', 'value')]
 				obj@parameters[['pTradeEac']] <- addData(obj@parameters[['pTradeEac']], pTradeEac)
 			}
+		}
+		########
+		mTradeIr <- merge(mTradeRoutes, mTradeSlice)
+		if (trd@capacityVariable) {
+		  mTradeIr <- merge(mTradeIr, mTradeSpan)
+		} else mTradeIr <- merge(mTradeIr, list(year = approxim$mileStoneYears))
+		if (!is.null(pTradeIr) && nrow(pTradeIr) > 0) {
+		  browser()
+		}
+		obj@parameters[['mTradeIr']] <- addData(obj@parameters[['mTradeIr']], mTradeIr)
+		
+		### To trades
+		# mvTradeIrAInp(trade, comm, region, year, slice)
+		if (!is.null(mTradeIrAInp)) {
+		  browser()
+  		# a0 <- tmp_map$mTradeIrAInp; colnames(a0)[2] <- 'acomm' 
+  		# a1 <- merge(a0, rbind(tmp_nozero$pTradeIrCsrc2Ainp, tmp_nozero$pTradeIrCdst2Ainp))
+  		# colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
+  		# prec@parameters[['mvTradeIrAInp']] <- addData(prec@parameters[['mvTradeIrAInp']], 
+  		#                                               merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
+  		#   mvTradeIrAOut
+		  # mvTradeIrAOut(trade, comm, region, year, slice)
+		  # a0 <- tmp_map$mTradeIrAOut; colnames(a0)[2] <- 'acomm' 
+		  # a1 <- merge(a0, rbind(tmp_nozero$pTradeIrCsrc2Aout, tmp_nozero$pTradeIrCdst2Aout))
+		  # colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
+		  # prec@parameters[['mvTradeIrAOut']] <- addData(prec@parameters[['mvTradeIrAOut']], 
+		  #                                               merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
+		  # # mvTradeIrAOutTot
+		  # prec@parameters[['mvTradeIrAOutTot']] <- addData(prec@parameters[['mvTradeIrAOutTot']], reduce_total_map(
+		  #   reduce.sect(getParameterData(prec@parameters$mvTradeIrAOut), c('comm', 'region', 'year', 'slice'))))
+		  # 
 		}
 		obj
 	})
