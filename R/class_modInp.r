@@ -508,7 +508,6 @@ setMethod("initialize", "modInp",
     .Object@parameters[['meqTechAfcOutUp']] <- createParameter('meqTechAfcOutUp', c('tech', 'region', 'comm', 'year', 'slice'), 'map')
     .Object@parameters[['meqTechAfcInpLo']] <- createParameter('meqTechAfcInpLo', c('tech', 'region', 'comm', 'year', 'slice'), 'map')
     .Object@parameters[['meqTechAfcInpUp']] <- createParameter('meqTechAfcInpUp', c('tech', 'region', 'comm', 'year', 'slice'), 'map')
-    .Object@parameters[['meqTechNewCap']] <- createParameter('meqTechNewCap', c('tech', 'region', 'year'), 'map')
     .Object@parameters[['meqSupAvaLo']] <- createParameter('meqSupAvaLo', c('sup', 'comm', 'region', 'year', 'slice'), 'map')
     .Object@parameters[['meqSupReserveLo']] <- createParameter('meqSupReserveLo', c('sup', 'comm', 'region'), 'map')
     .Object@parameters[['meqStorageAfLo']] <- createParameter('meqStorageAfLo', c('stg', 'comm', 'region', 'year', 'slice'), 'map')

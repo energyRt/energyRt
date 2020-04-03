@@ -460,24 +460,6 @@
 
     cat('\b\b10')
     
-    mvTechRetiredCap0 <- merge(merge(merge(tmp_map$mTechNew, tmp_map$mTechRetirement), tmp_map$mTechSpan, by = c('tech', 'region')),
-      getParameterData(prec@parameters[['pTechOlife']]), by = c('tech', 'region'))
-    mvTechRetiredCap0 <- mvTechRetiredCap0[(mvTechRetiredCap0$year.x + mvTechRetiredCap0$value > mvTechRetiredCap0$year.y &
-        mvTechRetiredCap0$year.x <= mvTechRetiredCap0$year.y), -5] 
-    colnames(mvTechRetiredCap0)[3:4] <- c('year', 'year.1')
-    prec@parameters[['mvTechRetiredCap']] <- addData(prec@parameters[['mvTechRetiredCap']], mvTechRetiredCap0)
-
-    mvTechAct <- merge(tmp_map$mTechSpan, tmp_map$mTechSlice, by = 'tech')
-    prec@parameters[['mvTechAct']] <- addData(prec@parameters[['mvTechAct']], mvTechAct)
-    
-    prec@parameters[['mvTechInp']] <- addData(prec@parameters[['mvTechInp']], 
-      merge(mvTechAct, tmp_map$mTechInpComm, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
-    prec@parameters[['mvTechOut']] <- addData(prec@parameters[['mvTechOut']], 
-      merge(mvTechAct, tmp_map$mTechOutComm, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
-    prec@parameters[['mvTechAInp']] <- addData(prec@parameters[['mvTechAInp']], 
-      merge(mvTechAct, tmp_map$mTechAInp, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
-    prec@parameters[['mvTechAOut']] <- addData(prec@parameters[['mvTechAOut']], 
-      merge(mvTechAct, tmp_map$mTechAOut, by = 'tech')[, c('tech', 'comm', 'region', 'year', 'slice')])
     prec@parameters[['mvDemInp']] <- addData(prec@parameters[['mvDemInp']], 
       merge(dregionyear, getParameterData(prec@parameters[['mDemInp']]))[,c('comm', 'region', 'year', 'slice')])
 
@@ -530,52 +512,8 @@
     
     # **** me
     
-    techSingInp <- merge(merge(getParameterData(prec@parameters[['mvTechInp']]), 
-      getParameterData(prec@parameters[['mTechOneComm']])), tmp_nozero$pTechCinp2use)
-    
-    techSingOut <- merge(merge(getParameterData(prec@parameters[['mvTechOut']]), 
-      getParameterData(prec@parameters[['mTechOneComm']])), 
-      tmp_nozero$pTechCact2cout)
-    prec@parameters[['meqTechSng2Sng']] <- addData(prec@parameters[['meqTechSng2Sng']], 
-      merge(techSingInp, techSingOut, by = c('tech', 'region', 'year', 'slice'), 
-      suffixes = c("",".1"))[, c('tech', 'region', 'comm', 'comm.1', 'year', 'slice')])
-    
-    prec@parameters[['meqTechGrp2Sng']] <- addData(prec@parameters[['meqTechGrp2Sng']], 
-      merge(getParameterData(prec@parameters[['mTechInpGroup']]), techSingOut)[, 
-        c('tech', 'region', 'group', 'comm', 'year', 'slice')])
-    
-    prec@parameters[['meqTechSng2Grp']] <- addData(prec@parameters[['meqTechSng2Grp']], 
-      merge(getParameterData(prec@parameters[['mTechOutGroup']]), techSingInp)[, 
-        c('tech', 'region', 'comm', 'group', 'year', 'slice')])
-    
     cat('\b\b13')
-    prec@parameters[['meqTechGrp2Grp']] <- addData(prec@parameters[['meqTechGrp2Grp']], 
-      merge(merge(getParameterData(prec@parameters[['mTechInpGroup']]), 
-        getParameterData(prec@parameters[['mTechOutGroup']]),
-        by =  'tech', suffix = c('', '.1')), getParameterData(prec@parameters[['mvTechAct']]))[, 
-        c('tech', 'region', 'group', 'group.1', 'year', 'slice')])
-    
-    mpTechShareLo <- generate_allval('pTechShare', type = 'lo');
-    mpTechShareLo <- mpTechShareLo[mpTechShareLo$value != 0, colnames(mpTechShareLo) != 'value']
-    mpTechShareUp <- generate_allval('pTechShare', type = 'up');
-    mpTechShareUp <- mpTechShareUp[mpTechShareUp$value < 1, colnames(mpTechShareUp) != 'value']
-    
-    techGroupInp <- merge(merge(getParameterData(prec@parameters[['mvTechInp']]), 
-          getParameterData(prec@parameters[['mTechInpGroup']])), 
-            getParameterData(prec@parameters[['mTechGroupComm']]))
-    prec@parameters[['meqTechShareInpLo']] <- addData(prec@parameters[['meqTechShareInpLo']], 
-      merge(mpTechShareLo, techGroupInp))
-    prec@parameters[['meqTechShareInpUp']] <- addData(prec@parameters[['meqTechShareInpUp']], 
-                                                      merge(mpTechShareUp, techGroupInp))
-    
-    techGroupOut <- merge(merge(getParameterData(prec@parameters[['mvTechOut']]), 
-      getParameterData(prec@parameters[['mTechOutGroup']])), 
-      getParameterData(prec@parameters[['mTechGroupComm']]))
-    prec@parameters[['meqTechShareOutLo']] <- addData(prec@parameters[['meqTechShareOutLo']], 
-                                                      merge(mpTechShareLo, techGroupOut))
-    prec@parameters[['meqTechShareOutUp']] <- addData(prec@parameters[['meqTechShareOutUp']], 
-                                                      merge(mpTechShareUp, techGroupOut))
-    
+     
     tmp_func1 <- function(x) {
       x <- generate_allval(x, type = 'lo');
       x[x$value > 0, colnames(x) != 'value']
@@ -585,45 +523,6 @@
       x[x$value < 1, colnames(x) != 'value']
     }    
     cat('\b\b14')
-    prec@parameters[['meqTechAfLo']] <- addData(prec@parameters[['meqTechAfLo']], 
-      merge(getParameterData(prec@parameters[['mvTechAct']]), tmp_func1('pTechAf')))
-    prec@parameters[['meqTechAfUp']] <- addData(prec@parameters[['meqTechAfUp']], 
-      merge(getParameterData(prec@parameters[['mvTechAct']]), 
-        tmp_func2('pTechAf')))
-    
-    prec@parameters[['meqTechAfsLo']] <- addData(prec@parameters[['meqTechAfsLo']], 
-      merge(getParameterData(prec@parameters[['mTechSpan']]), 
-        tmp_func1('pTechAfs')))
-    prec@parameters[['meqTechAfsUp']] <- addData(prec@parameters[['meqTechAfsUp']], 
-      merge(getParameterData(prec@parameters[['mTechSpan']]), 
-        tmp_func2('pTechAfs')))
-    
-    prec@parameters[['meqTechActSng']] <- addData(prec@parameters[['meqTechActSng']], techSingOut)
-    prec@parameters[['meqTechActGrp']] <- addData(prec@parameters[['meqTechActGrp']], 
-      merge(getParameterData(prec@parameters[['mvTechAct']]), 
-        getParameterData(prec@parameters[['mTechOutGroup']]))[, c('tech', 'group', 'region', 'year', 'slice')])
-    
-    tmpAfcOut <- merge(merge(getParameterData(prec@parameters[['mTechSpan']]), 
-      getParameterData(prec@parameters[['mMidMilestone']])), getParameterData(prec@parameters[['mTechSlice']]))  
-
-    prec@parameters[['meqTechAfcOutLo']] <- addData(prec@parameters[['meqTechAfcOutLo']], 
-      merge(getParameterData(prec@parameters[['mTechSpan']]), 
-        tmp_func1('pTechAfc')))
-    prec@parameters[['meqTechAfcOutUp']] <- addData(prec@parameters[['meqTechAfcOutUp']], 
-      merge(getParameterData(prec@parameters[['mTechSpan']]), 
-        tmp_func2('pTechAfc')))
-    
-    prec@parameters[['meqTechAfcInpLo']] <- addData(prec@parameters[['meqTechAfcInpLo']], 
-      merge(getParameterData(prec@parameters[['mvTechInp']]), 
-        tmp_func1('pTechAfc')))
-    prec@parameters[['meqTechAfcInpUp']] <- addData(prec@parameters[['meqTechAfcInpUp']], 
-      merge(getParameterData(prec@parameters[['mvTechInp']]), 
-        tmp_func2('pTechAfc')))
-    
-    prec@parameters[['meqTechNewCap']] <- addData(prec@parameters[['meqTechNewCap']], 
-      merge(getParameterData(prec@parameters[['mTechNew']]), 
-        getParameterData(prec@parameters[['mTechRetirement']])))
-    
     cat('\b\b15')
     prec@parameters[['meqSupAvaLo']] <- addData(prec@parameters[['meqSupAvaLo']], 
       merge(getParameterData(prec@parameters[['mSupAva']]), 
