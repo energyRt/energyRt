@@ -84,7 +84,7 @@
   #    (mCommSlice(comm, slice) and pDummyImportCost(comm, region, year, slice) <> Inf)    
   no_inf <- function(x) {
     x = getParameterData(prec@parameters[[x]])
-    x[x$value != 0, -ncol(x)]
+    x[x$value != Inf, -ncol(x)]
   }
   prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], no_inf('pDummyImportCost'))
   # mDummyExport(comm, region, year, slice)
@@ -180,10 +180,11 @@
     # mSubsCost(comm, region, year)  sum(slice$pSubsCost(comm, region, year, slice), 1)
     prec@parameters[['mSubsCost']] <- addData(prec@parameters[['mSubsCost']], reduce.sect(getParameterData(prec@parameters$pSubsCost), c('comm', 'region', 'year')))
     #    (sum(commp$pAggregateFactor(comm, commp), 1))
-    if (nrow(getParameterData(prec@parameters$pAggregateFactor)) > 0)
+    if (nrow(getParameterData(prec@parameters$pAggregateFactor)) > 0) {
       prec@parameters[['mAggOut']] <- addData(prec@parameters[['mAggOut']], reduce_total_map(reduce.duplicate(
         merge(merge(merge(reduce.sect(getParameterData(prec@parameters$pAggregateFactor), 'comm'), getParameterData(prec@parameters$region)), 
-                    getParameterData(prec@parameters$year)), getParameterData(prec@parameters$slice)))))
+                    year), getParameterData(prec@parameters$slice)))))
+    }
     
     
     cat('\b8')
