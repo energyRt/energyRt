@@ -67,10 +67,10 @@ model = Model();
 @variable(model, vExportRow[mExportRow] >= 0);
 @variable(model, vImportRowAccumulated[mImpComm] >= 0);
 @variable(model, vImportRow[mImportRow] >= 0);
-@variable(model, vTradeCap[mvTradeCap] >= 0);
+@variable(model, vTradeCap[mTradeSpan] >= 0);
 @variable(model, vTradeInv[mTradeEac] >= 0);
 @variable(model, vTradeEac[mTradeEac] >= 0);
-@variable(model, vTradeNewCap[mvTradeNewCap] >= 0);
+@variable(model, vTradeNewCap[mTradeNew] >= 0);
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 @constraint(model, [(t, r, c, cp, y, s) in meqTechSng2Sng], vTechInp[(t,c,r,y,s)]*(if haskey(pTechCinp2use, (t,c,r,y,s)); pTechCinp2use[(t,c,r,y,s)]; else pTechCinp2useDef; end)  ==  (vTechOut[(t,cp,r,y,s)]) / ((if haskey(pTechUse2cact, (t,cp,r,y,s)); pTechUse2cact[(t,cp,r,y,s)]; else pTechUse2cactDef; end)*(if haskey(pTechCact2cout, (t,cp,r,y,s)); pTechCact2cout[(t,cp,r,y,s)]; else pTechCact2coutDef; end)));
 println("eqTechSng2Sng(tech, region, comm, commp, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
@@ -134,8 +134,8 @@ println("eqTechAfcInpUp(tech, region, comm, year, slice) done ", Dates.format(no
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
 @constraint(model, [(t, r, y) in mTechSpan], vTechCap[(t,r,y)]  ==  (if haskey(pTechStock, (t,r,y)); pTechStock[(t,r,y)]; else pTechStockDef; end)+sum(vTechNewCap[(t,r,yp)]-sum(vTechRetiredCap[(t,r,yp,ye)] for ye in year if ((t,r,yp,ye) in mvTechRetiredCap && ordYear[(y)] >= ordYear[(ye)])) for yp in year if ((t,r,yp) in mTechNew && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTechOlife, (t,r)); pTechOlife[(t,r)]; else pTechOlifeDef; end)+ordYear[(yp)] || (t,r) in mTechOlifeInf))));
 println("eqTechCap(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
-# eqTechNewCap(tech, region, year)$meqTechNewCap(tech, region, year)
-@constraint(model, [(t, r, y) in meqTechNewCap], sum(vTechRetiredCap[(t,r,y,yp)] for yp in year if (t,r,y,yp) in mvTechRetiredCap) <=  vTechNewCap[(t,r,y)]);
+# eqTechNewCap(tech, region, year)$mTechNew(tech, region, year)
+@constraint(model, [(t, r, y) in mTechNew], sum(vTechRetiredCap[(t,r,y,yp)] for yp in year if (t,r,y,yp) in mvTechRetiredCap) <=  vTechNewCap[(t,r,y)]);
 println("eqTechNewCap(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 @constraint(model, [(t, r, y) in mTechEac], vTechEac[(t,r,y)]  ==  sum((if haskey(pTechEac, (t,r,yp)); pTechEac[(t,r,yp)]; else pTechEacDef; end)*(vTechNewCap[(t,r,yp)]-sum(vTechRetiredCap[(t,r,yp,ye)] for ye in year if (t,r,yp,ye) in mvTechRetiredCap)) for yp in year if ((t,r,yp) in mTechNew && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTechOlife, (t,r)); pTechOlife[(t,r)]; else pTechOlifeDef; end)+ordYear[(yp)] || (t,r) in mTechOlifeInf))));
@@ -263,14 +263,14 @@ println("eqImportRowResUp(imp, comm) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slice)
 @constraint(model, [(t1, c, y, s) in meqTradeCapFlow], (if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)*(if haskey(pTradeCap2Act, (t1)); pTradeCap2Act[(t1)]; else pTradeCap2ActDef; end)*vTradeCap[(t1,y)]  >=  sum(vTradeIr[(t1,c,src,dst,y,s)] for src in region for dst in region if (t1,c,src,dst,y,s) in mvTradeIr));
 println("eqTradeCapFlow(trade, comm, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
-# eqTradeCap(trade, year)$mvTradeCap(trade, year)
-@constraint(model, [(t1, y) in mvTradeCap], vTradeCap[(t1,y)]  ==  (if haskey(pTradeStock, (t1,y)); pTradeStock[(t1,y)]; else pTradeStockDef; end)+sum(vTradeNewCap[(t1,yp)] for yp in year if ((t1,yp) in mvTradeNewCap && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTradeOlife, (t1)); pTradeOlife[(t1)]; else pTradeOlifeDef; end)+ordYear[(yp)] || t1 in mTradeOlifeInf))));
+# eqTradeCap(trade, year)$mTradeSpan(trade, year)
+@constraint(model, [(t1, y) in mTradeSpan], vTradeCap[(t1,y)]  ==  (if haskey(pTradeStock, (t1,y)); pTradeStock[(t1,y)]; else pTradeStockDef; end)+sum(vTradeNewCap[(t1,yp)] for yp in year if ((t1,yp) in mTradeNew && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTradeOlife, (t1)); pTradeOlife[(t1)]; else pTradeOlifeDef; end)+ordYear[(yp)] || t1 in mTradeOlifeInf))));
 println("eqTradeCap(trade, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)
 @constraint(model, [(t1, r, y) in mTradeInv], vTradeInv[(t1,r,y)]  ==  (if haskey(pTradeInvcost, (t1,r,y)); pTradeInvcost[(t1,r,y)]; else pTradeInvcostDef; end)*vTradeNewCap[(t1,y)]);
 println("eqTradeInv(trade, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)
-@constraint(model, [(t1, r, y) in mTradeEac], vTradeEac[(t1,r,y)]  ==  sum((if haskey(pTradeEac, (t1,r,yp)); pTradeEac[(t1,r,yp)]; else pTradeEacDef; end)*vTradeNewCap[(t1,yp)] for yp in year if ((t1,yp) in mvTradeNewCap && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTradeOlife, (t1)); pTradeOlife[(t1)]; else pTradeOlifeDef; end)+ordYear[(yp)] || t1 in mTradeOlifeInf))));
+@constraint(model, [(t1, r, y) in mTradeEac], vTradeEac[(t1,r,y)]  ==  sum((if haskey(pTradeEac, (t1,r,yp)); pTradeEac[(t1,r,yp)]; else pTradeEacDef; end)*vTradeNewCap[(t1,yp)] for yp in year if ((t1,yp) in mTradeNew && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTradeOlife, (t1)); pTradeOlife[(t1)]; else pTradeOlifeDef; end)+ordYear[(yp)] || t1 in mTradeOlifeInf))));
 println("eqTradeEac(trade, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTradeIrAInp(trade, comm, region, year, slice)$mvTradeIrAInp(trade, comm, region, year, slice)
 @constraint(model, [(t1, c, r, y, s) in mvTradeIrAInp], vTradeIrAInp[(t1,c,r,y,s)]  ==  sum((if haskey(pTradeIrCsrc2Ainp, (t1,c,r,dst,y,s)); pTradeIrCsrc2Ainp[(t1,c,r,dst,y,s)]; else pTradeIrCsrc2AinpDef; end)*sum(vTradeIr[(t1,cp,r,dst,y,s)] for cp in comm if (t1,cp) in mTradeComm) for dst in region if (t1,r,dst,y,s) in mTradeIr)+sum((if haskey(pTradeIrCdst2Ainp, (t1,c,src,r,y,s)); pTradeIrCdst2Ainp[(t1,c,src,r,y,s)]; else pTradeIrCdst2AinpDef; end)*sum(vTradeIr[(t1,cp,src,r,y,s)] for cp in comm if (t1,cp) in mTradeComm) for src in region if (t1,src,r,y,s) in mTradeIr));

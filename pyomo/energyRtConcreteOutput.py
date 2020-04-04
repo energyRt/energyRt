@@ -399,7 +399,7 @@ f.close()
 flist.write("vTradeCap\n");
 f = open("output/vTradeCap.csv","w");
 f.write("trade,year,value\n");
-for (t1,y) in mvTradeCap:
+for (t1,y) in mTradeSpan:
     if model.vTradeCap[(t1,y)].value != 0:
         f.write(str(t1) + "," + str(y) + "," +  str(model.vTradeCap[(t1,y)].value) + "\n")
 f.close()
@@ -420,7 +420,7 @@ f.close()
 flist.write("vTradeNewCap\n");
 f = open("output/vTradeNewCap.csv","w");
 f.write("trade,year,value\n");
-for (t1,y) in mvTradeNewCap:
+for (t1,y) in mTradeNew:
     if model.vTradeNewCap[(t1,y)].value != 0:
         f.write(str(t1) + "," + str(y) + "," +  str(model.vTradeNewCap[(t1,y)].value) + "\n")
 f.close()

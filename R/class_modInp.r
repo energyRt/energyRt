@@ -484,9 +484,7 @@ setMethod("initialize", "modInp",
 
     .Object@parameters[['mvTradeCost']] <- createParameter('mvTradeCost', c('region', 'year'), 'map') 
     .Object@parameters[['mvTradeRowCost']] <- createParameter('mvTradeRowCost', c('region', 'year'), 'map') 
-    .Object@parameters[['mvTradeCap']] <- createParameter('mvTradeCap', c('trade', 'year'), 'map') 
     .Object@parameters[['mvTradeIrCost']] <- createParameter('mvTradeIrCost', c('region', 'year'), 'map') 
-    .Object@parameters[['mvTradeNewCap']] <- createParameter('mvTradeNewCap', c('trade', 'year'), 'map') 
     .Object@parameters[['mvTotalCost']] <- createParameter('mvTotalCost', c('region', 'year'), 'map') 
 
     # me*

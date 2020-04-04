@@ -79,10 +79,10 @@ model.vExportRowAccumulated = Var(mExpComm, domain = pyo.NonNegativeReals, doc =
 model.vExportRow = Var(mExportRow, domain = pyo.NonNegativeReals, doc = "Export to ROW");
 model.vImportRowAccumulated = Var(mImpComm, domain = pyo.NonNegativeReals, doc = "Accumulated import from ROW");
 model.vImportRow = Var(mImportRow, domain = pyo.NonNegativeReals, doc = "Import from ROW");
-model.vTradeCap = Var(mvTradeCap, domain = pyo.NonNegativeReals, doc = "");
+model.vTradeCap = Var(mTradeSpan, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeInv = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
-model.vTradeNewCap = Var(mvTradeNewCap, domain = pyo.NonNegativeReals, doc = "");
+model.vTradeNewCap = Var(mTradeNew, domain = pyo.NonNegativeReals, doc = "");
 exec(open("inc2.py").read())
 print("variables ", round(time.time() - seconds, 2))
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
@@ -127,8 +127,8 @@ model.eqTechAfcInpLo = Constraint(meqTechAfcInpLo, rule = lambda model, t, r, c,
 model.eqTechAfcInpUp = Constraint(meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcUp.get((t,c,r,y,s)));
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
 model.eqTechCap = Constraint(mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  pTechStock.get((t,r,y))+sum(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetiredCap and ordYear.get((y)) >= ordYear.get((ye)))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
-# eqTechNewCap(tech, region, year)$meqTechNewCap(tech, region, year)
-model.eqTechNewCap = Constraint(meqTechNewCap, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in year if (t,r,y,yp) in mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
+# eqTechNewCap(tech, region, year)$mTechNew(tech, region, year)
+model.eqTechNewCap = Constraint(mTechNew, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in year if (t,r,y,yp) in mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(pTechEac.get((t,r,yp))*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in year if (t,r,yp,ye) in mvTechRetiredCap)) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
 # eqTechInv(tech, region, year)$mTechNew(tech, region, year)
@@ -213,12 +213,12 @@ model.eqImportRowAccumulated = Constraint(mImpComm, rule = lambda model, i, c : 
 model.eqImportRowResUp = Constraint(mImportRowAccumulatedUp, rule = lambda model, i, c : model.vImportRowAccumulated[i,c] <=  pImportRowRes.get((i)));
 # eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slice)
 model.eqTradeCapFlow = Constraint(meqTradeCapFlow, rule = lambda model, t1, c, y, s : pSliceShare.get((s))*pTradeCap2Act.get((t1))*model.vTradeCap[t1,y]  >=  sum(model.vTradeIr[t1,c,src,dst,y,s] for src in region for dst in region if (t1,c,src,dst,y,s) in mvTradeIr));
-# eqTradeCap(trade, year)$mvTradeCap(trade, year)
-model.eqTradeCap = Constraint(mvTradeCap, rule = lambda model, t1, y : model.vTradeCap[t1,y]  ==  pTradeStock.get((t1,y))+sum(model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mvTradeNewCap and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
+# eqTradeCap(trade, year)$mTradeSpan(trade, year)
+model.eqTradeCap = Constraint(mTradeSpan, rule = lambda model, t1, y : model.vTradeCap[t1,y]  ==  pTradeStock.get((t1,y))+sum(model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mTradeNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
 # eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)
 model.eqTradeInv = Constraint(mTradeInv, rule = lambda model, t1, r, y : model.vTradeInv[t1,r,y]  ==  pTradeInvcost.get((t1,r,y))*model.vTradeNewCap[t1,y]);
 # eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)
-model.eqTradeEac = Constraint(mTradeEac, rule = lambda model, t1, r, y : model.vTradeEac[t1,r,y]  ==  sum(pTradeEac.get((t1,r,yp))*model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mvTradeNewCap and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
+model.eqTradeEac = Constraint(mTradeEac, rule = lambda model, t1, r, y : model.vTradeEac[t1,r,y]  ==  sum(pTradeEac.get((t1,r,yp))*model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mTradeNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
 # eqTradeIrAInp(trade, comm, region, year, slice)$mvTradeIrAInp(trade, comm, region, year, slice)
 model.eqTradeIrAInp = Constraint(mvTradeIrAInp, rule = lambda model, t1, c, r, y, s : model.vTradeIrAInp[t1,c,r,y,s]  ==  sum(pTradeIrCsrc2Ainp.get((t1,c,r,dst,y,s))*sum(model.vTradeIr[t1,cp,r,dst,y,s] for cp in comm if (t1,cp) in mTradeComm) for dst in region if (t1,r,dst,y,s) in mTradeIr)+sum(pTradeIrCdst2Ainp.get((t1,c,src,r,y,s))*sum(model.vTradeIr[t1,cp,src,r,y,s] for cp in comm if (t1,cp) in mTradeComm) for src in region if (t1,src,r,y,s) in mTradeIr));
 # eqTradeIrAOut(trade, comm, region, year, slice)$mvTradeIrAOut(trade, comm, region, year, slice)

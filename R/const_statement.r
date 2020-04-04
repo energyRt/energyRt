@@ -117,8 +117,8 @@
   vTradeCost = "vTradeCost( region , year ) $ mvTradeCost( region , year )",
   vTradeRowCost = "vTradeRowCost( region , year ) $ mvTradeRowCost( region , year )",
   vTradeIrCost = "vTradeIrCost( region , year ) $ mvTradeIrCost( region , year )",
-  vTradeCap = "vTradeCap( trade , year ) $ mvTradeCap( trade , year )",
+  vTradeCap = "vTradeCap( trade , year ) $ mTradeSpan( trade , year )",
   vTradeInv = "vTradeInv( trade , region , year ) $ mTradeEac( trade , region , year )",
   vTradeEac = "vTradeEac( trade , region , year ) $ mTradeEac( trade , region , year )",
-  vTradeNewCap = "vTradeNewCap( trade , year ) $ mvTradeNewCap( trade , year )"
+  vTradeNewCap = "vTradeNewCap( trade , year ) $ mTradeNew( trade , year )"
 );

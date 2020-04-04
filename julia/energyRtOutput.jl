@@ -579,7 +579,7 @@ close(fvImportRow);
 
 fvTradeCap = open("output/vTradeCap.csv", "w");
 println(fvTradeCap, "trade,year,value");
-for (t1,y) in mvTradeCap if JuMP.value(vTradeCap[(t1,y)]) != 0
+for (t1,y) in mTradeSpan if JuMP.value(vTradeCap[(t1,y)]) != 0
   println(fvTradeCap, t1, ",", y, ",", JuMP.value(vTradeCap[(t1,y)]));
 end;
 end;
@@ -606,7 +606,7 @@ close(fvTradeEac);
 
 fvTradeNewCap = open("output/vTradeNewCap.csv", "w");
 println(fvTradeNewCap, "trade,year,value");
-for (t1,y) in mvTradeNewCap if JuMP.value(vTradeNewCap[(t1,y)]) != 0
+for (t1,y) in mTradeNew if JuMP.value(vTradeNewCap[(t1,y)]) != 0
   println(fvTradeNewCap, t1, ",", y, ",", JuMP.value(vTradeNewCap[(t1,y)]));
 end;
 end;

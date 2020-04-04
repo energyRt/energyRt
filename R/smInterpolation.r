@@ -2,7 +2,7 @@
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, remValue = NULL) {
   there.is.year <- any(colnames(frm) == 'year')
-  if (nrow(frm) == 0) return(frm)
+  if (nrow(frm) == 0) return(NULL)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
@@ -44,6 +44,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   }
   if (!is.null(remValue))
     dd <- dd[!(dd$value %in% remValue), ]
+  if (nrow(dd) == 0) return(NULL)
   dd
 }
 
@@ -94,5 +95,6 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     dd <- dd[!(dd$value %in% remValueUp & dd$type == 'up'), ]
   if (!is.null(remValueLo))
     dd <- dd[!(dd$value %in% remValueLo & dd$type == 'lo'), ]
+  if (nrow(dd) == 0) return(NULL)
   dd
 }

@@ -78,7 +78,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			tmp
 		}
 		simpleInterpolation2 <- function(frm, ...) {
-			if (nrow(frm) == 0) return(data.frame())
+			if (nrow(frm) == 0) return(NULL)
 			frm <- imply_routes(frm)
 			frm$region <- paste0(frm$src, '##', frm$dst)
 			frm$src <- NULL; frm$dst <- NULL
@@ -91,7 +91,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
 		multiInterpolation2 <- function(frm, ...) {
-			if (nrow(frm) == 0) return(data.frame())
+			if (nrow(frm) == 0) return(NULL)
 			frm <- imply_routes(frm)
 			frm$region <- paste0(frm$src, '##', frm$dst)
 			frm$src <- NULL; frm$dst <- NULL
@@ -162,7 +162,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		if (trd@capacityVariable) {
 			obj@parameters[['pTradeCap2Act']] <- addData(obj@parameters[['pTradeCap2Act']],
 				data.frame(trade = trd@name, value = trd@cap2act))
-			obj@parameters[['mTradeCapacityVariable']] <- addData(obj@parameters[['mTradeCapacityVariable']], data.frame(trade = trd@name))
+			mTradeCapacityVariable <- data.frame(trade = trd@name)
+			obj@parameters[['mTradeCapacityVariable']] <- addData(obj@parameters[['mTradeCapacityVariable']], mTradeCapacityVariable)
 			
 			##!!! Trade 
 			if (nrow(trd@invcost) > 0) {
@@ -204,9 +205,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (length(trade_span) > 0) {
 			  mTradeSpan <- data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
 			  obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], mTradeSpan)
+			  meqTradeCapFlow <- merge(mTradeSpan, mTradeSlice)
+			  meqTradeCapFlow$comm <- mTradeComm$trade
+			  obj@parameters[['meqTradeCapFlow']] <- addData(obj@parameters[['meqTradeCapFlow']], meqTradeCapFlow)
 			}
 			# mTradeInv
-			if (nrow(invcost) > 0) {
+			if (!is.null(invcost)) {
 				end_year <- max(approxim$year)
 				obj@parameters[['pTradeInvcost']] <- addData(obj@parameters[['pTradeInvcost']], invcost)
 				obj@parameters[['mTradeInv']] <- addData(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
@@ -268,6 +272,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		  #   reduce.sect(getParameterData(prec@parameters$mvTradeIrAOut), c('comm', 'region', 'year', 'slice'))))
 		  # 
 		}
+		mvTradeIr <- mTradeIr; mvTradeIr$comm <- trd@commodity
+		obj@parameters[['mvTradeIr']] <- addData(obj@parameters[['mvTradeIr']], mvTradeIr) 
+		obj@parameters[['meqTradeFlowLo']] <- addData(obj@parameters[['meqTradeFlowLo']], 
+		    merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, colnames(mvTradeIr)]))
+		obj@parameters[['meqTradeFlowUp']] <- addData(obj@parameters[['meqTradeFlowUp']], 
+		       merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, colnames(mvTradeIr)]))
+		
 		obj
 	})
 

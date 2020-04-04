@@ -200,8 +200,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
   #    obj <- removePreviousSupply(obj, sup@name)
   #  }    
   #  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
-    obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']],
-        data.frame(sup = sup@name, comm = sup@commodity))
+    mSupComm <- data.frame(sup = sup@name, comm = sup@commodity)
+    obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']], mSupComm)
     obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']],
         simpleInterpolation(sup@availability, 'cost',
             obj@parameters[['pSupCost']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity)))
@@ -223,8 +223,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     
     obj@parameters[['meqSupAvaLo']] <- addData(obj@parameters[['meqSupAvaLo']], pSupAva[pSupAva$type == 'lo' & pSupAva$value != 0, 1:5])
     
-    
-    # Browser
+    obj@parameters[['mvSupReserve']] <- addData(obj@parameters[['mvSupReserve']], merge(mSupComm, mSupSpan))
         # For weather
     # mSupWeatherLo(sup, weather)
     wth.lo <- sup@weather[!is.na(sup@weather$wava.lo) | !is.na(sup@weather$wava.fx), 'weather']
@@ -295,6 +294,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   tmp$comm <- mExpComm$comm
   obj@parameters[['mExportRowUp']] <- addData(obj@parameters[['mExportRowUp']], tmp)
   obj@parameters[['mExportRowAccumulatedUp']] <- addData(obj@parameters[['mExportRowAccumulatedUp']], pExportRowRes[pExportRowRes$value != Inf, 1, drop = FALSE])
+
+  obj@parameters[['meqExportRowLo']] <- addData(obj@parameters[['meqExportRowLo']], 
+                                                   merge(mExportRow, pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, 1:4])) 
   obj
 })
 
@@ -346,6 +348,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf) 
   prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], 
                                                reduce.sect(merge(tmp_noinf$pImportRow, aa), c("imp", "comm", "region", "year", "slice")))
+  obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']], 
+                                                merge(mImportRow, pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, 1:4])) 
   prec@parameters[['mImportRowAccumulatedUp']] <- addData(prec@parameters[['mImportRowAccumulatedUp']], tmp_noinf$pImportRowRes)
   # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
   
@@ -354,6 +358,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
 
 
 .start_end_fix <- function(approxim, app, als, stock_exist) {
+  if (is.null(stock_exist)) stock_exist <- data.frame()
   stock_exist <- stock_exist[stock_exist$value != 0, ]
   # Start / End year
     dd <- data.frame(enable = rep(TRUE, length(approxim$region) * length(approxim$year)),

@@ -69,10 +69,10 @@ model.vExportRowAccumulated = Var(model.mExpComm, domain = pyo.NonNegativeReals,
 model.vExportRow = Var(model.mExportRow, domain = pyo.NonNegativeReals, doc = "Export to ROW");
 model.vImportRowAccumulated = Var(model.mImpComm, domain = pyo.NonNegativeReals, doc = "Accumulated import from ROW");
 model.vImportRow = Var(model.mImportRow, domain = pyo.NonNegativeReals, doc = "Import from ROW");
-model.vTradeCap = Var(model.mvTradeCap, domain = pyo.NonNegativeReals, doc = "");
+model.vTradeCap = Var(model.mTradeSpan, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeInv = Var(model.mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(model.mTradeEac, domain = pyo.NonNegativeReals, doc = "");
-model.vTradeNewCap = Var(model.mvTradeNewCap, domain = pyo.NonNegativeReals, doc = "");
+model.vTradeNewCap = Var(model.mTradeNew, domain = pyo.NonNegativeReals, doc = "");
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 model.eqTechSng2Sng = Constraint(model.meqTechSng2Sng, rule = lambda model, t, r, c, cp, y, s : model.vTechInp[t,c,r,y,s]*model.pTechCinp2use[t,c,r,y,s]  ==  (model.vTechOut[t,cp,r,y,s]) / (model.pTechUse2cact[t,cp,r,y,s]*model.pTechCact2cout[t,cp,r,y,s]));
 # eqTechGrp2Sng(tech, region, group, commp, year, slice)$meqTechGrp2Sng(tech, region, group, commp, year, slice)
@@ -115,8 +115,8 @@ model.eqTechAfcInpLo = Constraint(model.meqTechAfcInpLo, rule = lambda model, t,
 model.eqTechAfcInpUp = Constraint(model.meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  model.pTechAfcUp[t,c,r,y,s]*model.pTechCap2act[t]*model.vTechCap[t,r,y]*model.pSliceShare[s]*model.paTechWeatherAfcUp[t,c,r,y,s]);
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
 model.eqTechCap = Constraint(model.mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  model.pTechStock[t,r,y]+sum(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in model.year if ((t,r,yp,ye) in model.mvTechRetiredCap and model.ordYear[y] >= model.ordYear[ye])) for yp in model.year if ((t,r,yp) in model.mTechNew and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTechOlife[t,r]+model.ordYear[yp] or (t,r) in model.mTechOlifeInf))));
-# eqTechNewCap(tech, region, year)$meqTechNewCap(tech, region, year)
-model.eqTechNewCap = Constraint(model.meqTechNewCap, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in model.year if (t,r,y,yp) in model.mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
+# eqTechNewCap(tech, region, year)$mTechNew(tech, region, year)
+model.eqTechNewCap = Constraint(model.mTechNew, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in model.year if (t,r,y,yp) in model.mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(model.mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(model.pTechEac[t,r,yp]*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in model.year if (t,r,yp,ye) in model.mvTechRetiredCap)) for yp in model.year if ((t,r,yp) in model.mTechNew and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTechOlife[t,r]+model.ordYear[yp] or (t,r) in model.mTechOlifeInf))));
 # eqTechInv(tech, region, year)$mTechNew(tech, region, year)
@@ -201,12 +201,12 @@ model.eqImportRowAccumulated = Constraint(model.mImpComm, rule = lambda model, i
 model.eqImportRowResUp = Constraint(model.mImportRowAccumulatedUp, rule = lambda model, i, c : model.vImportRowAccumulated[i,c] <=  model.pImportRowRes[i]);
 # eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slice)
 model.eqTradeCapFlow = Constraint(model.meqTradeCapFlow, rule = lambda model, t1, c, y, s : model.pSliceShare[s]*model.pTradeCap2Act[t1]*model.vTradeCap[t1,y]  >=  sum(model.vTradeIr[t1,c,src,dst,y,s] for src in model.region for dst in model.region if (t1,c,src,dst,y,s) in model.mvTradeIr));
-# eqTradeCap(trade, year)$mvTradeCap(trade, year)
-model.eqTradeCap = Constraint(model.mvTradeCap, rule = lambda model, t1, y : model.vTradeCap[t1,y]  ==  model.pTradeStock[t1,y]+sum(model.vTradeNewCap[t1,yp] for yp in model.year if ((t1,yp) in model.mvTradeNewCap and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTradeOlife[t1]+model.ordYear[yp] or t1 in model.mTradeOlifeInf))));
+# eqTradeCap(trade, year)$mTradeSpan(trade, year)
+model.eqTradeCap = Constraint(model.mTradeSpan, rule = lambda model, t1, y : model.vTradeCap[t1,y]  ==  model.pTradeStock[t1,y]+sum(model.vTradeNewCap[t1,yp] for yp in model.year if ((t1,yp) in model.mTradeNew and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTradeOlife[t1]+model.ordYear[yp] or t1 in model.mTradeOlifeInf))));
 # eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)
 model.eqTradeInv = Constraint(model.mTradeInv, rule = lambda model, t1, r, y : model.vTradeInv[t1,r,y]  ==  model.pTradeInvcost[t1,r,y]*model.vTradeNewCap[t1,y]);
 # eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)
-model.eqTradeEac = Constraint(model.mTradeEac, rule = lambda model, t1, r, y : model.vTradeEac[t1,r,y]  ==  sum(model.pTradeEac[t1,r,yp]*model.vTradeNewCap[t1,yp] for yp in model.year if ((t1,yp) in model.mvTradeNewCap and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTradeOlife[t1]+model.ordYear[yp] or t1 in model.mTradeOlifeInf))));
+model.eqTradeEac = Constraint(model.mTradeEac, rule = lambda model, t1, r, y : model.vTradeEac[t1,r,y]  ==  sum(model.pTradeEac[t1,r,yp]*model.vTradeNewCap[t1,yp] for yp in model.year if ((t1,yp) in model.mTradeNew and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTradeOlife[t1]+model.ordYear[yp] or t1 in model.mTradeOlifeInf))));
 # eqTradeIrAInp(trade, comm, region, year, slice)$mvTradeIrAInp(trade, comm, region, year, slice)
 model.eqTradeIrAInp = Constraint(model.mvTradeIrAInp, rule = lambda model, t1, c, r, y, s : model.vTradeIrAInp[t1,c,r,y,s]  ==  sum(model.pTradeIrCsrc2Ainp[t1,c,r,dst,y,s]*sum(model.vTradeIr[t1,cp,r,dst,y,s] for cp in model.comm if (t1,cp) in model.mTradeComm) for dst in model.region if (t1,r,dst,y,s) in model.mTradeIr)+sum(model.pTradeIrCdst2Ainp[t1,c,src,r,y,s]*sum(model.vTradeIr[t1,cp,src,r,y,s] for cp in model.comm if (t1,cp) in model.mTradeComm) for src in model.region if (t1,src,r,y,s) in model.mTradeIr));
 # eqTradeIrAOut(trade, comm, region, year, slice)$mvTradeIrAOut(trade, comm, region, year, slice)

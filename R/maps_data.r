@@ -838,7 +838,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:314,] <- NA;
+    rs[1:311,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -941,8 +941,6 @@ rs
 "mvTradeCost",
 "mvTradeRowCost",
 "mvTradeIrCost",
-"mvTradeCap",
-"mvTradeNewCap",
 "mvTotalCost",
 "mTechInpTot",
 "mTechOutTot",
@@ -1000,7 +998,6 @@ rs
 "meqTechAfcOutUp",
 "meqTechAfcInpLo",
 "meqTechAfcInpUp",
-"meqTechNewCap",
 "meqSupAvaLo",
 "meqSupReserveLo",
 "meqStorageAfLo",
@@ -1221,7 +1218,7 @@ rs
     rs["mTechAOut", c("name", "description", "type")] <- c("mTechAOut", "Auxiliary output", "map");
     rs["mTechAOut", c("tech", "comm", "eqTechOutTot")] <- TRUE;
     rs["mTechNew", c("name", "description", "type")] <- c("mTechNew", "Technologies available for investment", "map");
-    rs["mTechNew", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechEac", "eqTechInv")] <- TRUE;
+    rs["mTechNew", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechNewCap", "eqTechEac", "eqTechInv")] <- TRUE;
     rs["mTechSpan", c("name", "description", "type")] <- c("mTechSpan", "Availability of each technology by regions and milestone years", "map");
     rs["mTechSpan", c("tech", "region", "year", "eqTechCap")] <- TRUE;
     rs["mTechSlice", c("name", "description", "type")] <- c("mTechSlice", "Technology to slice-level", "map");
@@ -1305,9 +1302,9 @@ rs
     rs["mStorageWeatherCout", c("name", "description", "type")] <- c("mStorageWeatherCout", "", "map");
     rs["mStorageWeatherCout", c("stg", "weather")] <- TRUE;
     rs["mTradeSpan", c("name", "description", "type")] <- c("mTradeSpan", "", "map");
-    rs["mTradeSpan", c("trade", "year")] <- TRUE;
+    rs["mTradeSpan", c("trade", "year", "eqTradeCap")] <- TRUE;
     rs["mTradeNew", c("name", "description", "type")] <- c("mTradeNew", "", "map");
-    rs["mTradeNew", c("trade", "year")] <- TRUE;
+    rs["mTradeNew", c("trade", "year", "eqTradeCap", "eqTradeEac")] <- TRUE;
     rs["mTradeOlifeInf", c("name", "description", "type")] <- c("mTradeOlifeInf", "", "map");
     rs["mTradeOlifeInf", c("trade")] <- TRUE;
     rs["mTradeEac", c("name", "description", "type")] <- c("mTradeEac", "", "map");
@@ -1356,10 +1353,6 @@ rs
     rs["mvTradeRowCost", c("region", "year", "eqCostTrade", "eqCostRowTrade")] <- TRUE;
     rs["mvTradeIrCost", c("name", "description", "type")] <- c("mvTradeIrCost", "", "map");
     rs["mvTradeIrCost", c("region", "year", "eqCostTrade", "eqCostIrTrade")] <- TRUE;
-    rs["mvTradeCap", c("name", "description", "type")] <- c("mvTradeCap", "", "map");
-    rs["mvTradeCap", c("trade", "year", "eqTradeCap")] <- TRUE;
-    rs["mvTradeNewCap", c("name", "description", "type")] <- c("mvTradeNewCap", "", "map");
-    rs["mvTradeNewCap", c("trade", "year", "eqTradeCap", "eqTradeEac")] <- TRUE;
     rs["mvTotalCost", c("name", "description", "type")] <- c("mvTotalCost", "", "map");
     rs["mvTotalCost", c("region", "year", "eqCost", "eqObjective")] <- TRUE;
     rs["mTechInpTot", c("name", "description", "type")] <- c("mTechInpTot", "Total technology input mapp", "map");
@@ -1474,8 +1467,6 @@ rs
     rs["meqTechAfcInpLo", c("tech", "comm", "region", "year", "slice", "eqTechAfcInpLo")] <- TRUE;
     rs["meqTechAfcInpUp", c("name", "description", "type")] <- c("meqTechAfcInpUp", "", "map");
     rs["meqTechAfcInpUp", c("tech", "comm", "region", "year", "slice", "eqTechAfcInpUp")] <- TRUE;
-    rs["meqTechNewCap", c("name", "description", "type")] <- c("meqTechNewCap", "", "map");
-    rs["meqTechNewCap", c("tech", "region", "year", "eqTechNewCap")] <- TRUE;
     rs["meqSupAvaLo", c("name", "description", "type")] <- c("meqSupAvaLo", "", "map");
     rs["meqSupAvaLo", c("sup", "comm", "region", "year", "slice", "eqSupAvaLo")] <- TRUE;
     rs["meqSupReserveLo", c("name", "description", "type")] <- c("meqSupReserveLo", "", "map");

@@ -348,8 +348,6 @@ mvTradeIr(trade, comm, region, region, year, slice)
 mvTradeCost(region, year)
 mvTradeRowCost(region, year)
 mvTradeIrCost(region, year)
-mvTradeCap(trade, year)
-mvTradeNewCap(trade, year)
 mvTotalCost(region, year)
 ;
 
@@ -525,13 +523,13 @@ vTradeRowCost(region, year)                          Trade with ROW costs
 vTradeIrCost(region, year)                           Interregional trade costs
 ;
 positive variable
-*@ mvTradeCap(trade, year)
+*@ mTradeSpan(trade, year)
 vTradeCap(trade, year)
 *@ mTradeEac(trade, region, year)
 vTradeInv(trade, region, year)
 *@ mTradeEac(trade, region, year)
 vTradeEac(trade, region, year)
-*@ mvTradeNewCap(trade, year)
+*@ mTradeNew(trade, year)
 vTradeNewCap(trade, year)
 ;
 
@@ -1388,11 +1386,11 @@ eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slic
                  sum((src, dst)$mvTradeIr(trade, comm, src, dst, year, slice), vTradeIr(trade, comm, src, dst, year, slice));
 
 * Capacity equation
-eqTradeCap(trade, year)$mvTradeCap(trade, year)..
+eqTradeCap(trade, year)$mTradeSpan(trade, year)..
          vTradeCap(trade, year)
          =e=
          pTradeStock(trade, year) +
-         sum(yearp$(mvTradeNewCap(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
+         sum(yearp$(mTradeNew(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
             (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))), vTradeNewCap(trade, yearp));
 
 * Investment equation
@@ -1404,7 +1402,7 @@ eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)..
 eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          vTradeEac(trade, region, year)
          =e=
-         sum(yearp$(mvTradeNewCap(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
+         sum(yearp$(mTradeNew(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
             (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))),
                 pTradeEac(trade, region, yearp) * vTradeNewCap(trade, yearp));
 

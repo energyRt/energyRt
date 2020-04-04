@@ -74,17 +74,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		approxim_comm <- approxim
 		approxim_comm[['comm']] <- rownames(ctype$comm)
 		if (length(approxim_comm[['comm']]) != 0) {
-			obj@parameters[['pTechCvarom']] <- addData(obj@parameters[['pTechCvarom']],
-				simpleInterpolation(tech@varom, 'cvarom',
-					obj@parameters[['pTechCvarom']], approxim_comm, 'tech', tech@name, remValue = 0))
-		}
+		  pTechCvarom <- simpleInterpolation(tech@varom, 'cvarom',
+		                                     obj@parameters[['pTechCvarom']], approxim_comm, 'tech', tech@name, remValue = 0)
+			obj@parameters[['pTechCvarom']] <- addData(obj@parameters[['pTechCvarom']], pTechCvarom)
+				
+		} else pTechCvarom <- NULL
 		approxim_acomm <- approxim
 		approxim_acomm[['acomm']] <- rownames(ctype$aux)
 		if (length(approxim_acomm[['acomm']]) != 0) {
-			obj@parameters[['pTechAvarom']] <- addData(obj@parameters[['pTechAvarom']],
-				simpleInterpolation(tech@varom, 'avarom',
-					obj@parameters[['pTechAvarom']], approxim_acomm, 'tech', tech@name, remValue = 0))
-		}
+		  pTechAvarom <- simpleInterpolation(tech@varom, 'avarom',
+          obj@parameters[['pTechAvarom']], approxim_acomm, 'tech', tech@name, remValue = 0)
+			obj@parameters[['pTechAvarom']] <- addData(obj@parameters[['pTechAvarom']], pTechAvarom)
+		} else pTechAvarom <- NULL
 		approxim_comm[['comm']] <- rownames(ctype$comm)
 		if (length(approxim_comm[['comm']]) != 0) {
 		  pTechAfc <- multiInterpolation(tech@ceff, 'afc',
@@ -115,7 +116,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
 		obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
 		
-		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
+		if (nrow(dd0$new) > 0 && !is.null(invcost)) {
 		  salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
 		  salv_data$value[is.na(salv_data$value)] <- 0
 		  salv_data$discount <- salv_data$value; salv_data$value <- NULL
@@ -264,15 +265,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		# simple & multi
 		obj@parameters[['pTechCap2act']] <- addData(obj@parameters[['pTechCap2act']],
 			data.frame(tech = tech@name, value = tech@cap2act))
-		dd <- data.frame(
-		  list = c('pTechFixom', 'pTechVarom'),
-			table = c('fixom', 'varom'), 
-			stringsAsFactors = FALSE)
-		for(i in 1:nrow(dd)) {
-			obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
-				simpleInterpolation(slot(tech, dd[i, 'table']),
-					dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim, 'tech', tech@name))
-		}
+		pTechFixom <- simpleInterpolation(tech@fixom, 'fixom', obj@parameters[['pTechFixom']], approxim, 'tech', tech@name)
+		obj@parameters[['pTechFixom']] <- addData(obj@parameters[['pTechFixom']], pTechFixom)
+		pTechVarom <- simpleInterpolation(tech@varom, 'varom', obj@parameters[['pTechVarom']], approxim, 'tech', tech@name)
+		obj@parameters[['pTechVarom']] <- addData(obj@parameters[['pTechVarom']], pTechVarom)
 
 		if (nrow(tech@aeff) != 0) {
 			for(i in 1:4) {
@@ -292,7 +288,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 			}
 		}
 		
-		# if (tech@name == 'CAR10_2020') browser()
 		
 		## Move from reduce 
 		
@@ -401,7 +396,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	    obj@parameters[['meqTechAfUp']] <- addData(obj@parameters[['meqTechAfUp']], outer_inf(mvTechAct, pTechAf))
 	  }
 	  if (!is.null(pTechAfs)) {
-	    obj@parameters[['meqTechAfsLo']] <- addData(obj@parameters[['meqTechAfLo']],
+	    obj@parameters[['meqTechAfsLo']] <- addData(obj@parameters[['meqTechAfsLo']],
 	              merge(mTechSpan, pTechAfs[pTechAfs$value != 0 & pTechAfs$type == 'lo', c('tech', 'region', 'year', 'slice')]))
 	    meqTechAfsUp <- merge(mTechSpan, 
 	      pTechAfs[pTechAfs$value != Inf & pTechAfs$type == 'up', obj@parameters[['meqTechAfsUp']]@dimSetNames])
@@ -471,7 +466,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		}
 		#  cat(tech@name, '\n')
 		if (all(ctype$comm$type != 'output')) 
-			stop('Techology "', tech@name, '", there is not activity commodity')   
+			stop('Techology "', tech@name, '", there is not activity commodity')  
+		# mTechOMCost(tech, region, year) 
+		# if (tech@name == 'NEWPETREF') browser()
+		mTechOMCost <- NULL
+		if (!is.null(pTechFixom)) mTechOMCost <- rbind(mTechOMCost, pTechFixom[pTechFixom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
+		if (!is.null(pTechVarom)) mTechOMCost <- rbind(mTechOMCost, pTechVarom[pTechVarom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
+		if (!is.null(pTechCvarom)) mTechOMCost <- rbind(mTechOMCost, pTechCvarom[pTechCvarom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
+		if (!is.null(pTechAvarom)) mTechOMCost <- rbind(mTechOMCost, pTechAvarom[pTechAvarom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
+		if (!is.null(mTechOMCost)) {
+  		mTechOMCost <- merge(mTechOMCost[!duplicated(mTechOMCost), ], mTechSpan)
+  		obj@parameters[['mTechOMCost']] <- addData(obj@parameters[['mTechOMCost']], mTechOMCost)
+		}
 		obj
 	})
 
