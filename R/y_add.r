@@ -340,7 +340,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
   if (!is.null(pImportRow)) {
     obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], tmp)
-    meqImportRowLo$comm <- imp$comm
+    meqImportRowLo$comm <- imp@commodity
     obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']],  merge(mImportRow, 
         pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, obj@parameters[['meqImportRowLo']]@dimSetNames])) 
     obj@parameters[['meqImportRowUp']] <- addData(obj@parameters[['meqImportRowUp']], merge(mImportRow, 
@@ -348,7 +348,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
     meqImportRowLo$comm <- NULL
   }
   if (!is.null(pImportRowRes)) {
-    pImportRowRes$comm <- imp$comm
+    pImportRowRes$comm <- imp@commodity
     obj@parameters[['mImportRowAccumulatedUp']] <- addData(obj@parameters[['mImportRowAccumulatedUp']], 
           pImportRowRes[pImportRowRes$value != Inf & pImportRowRes$type == 'up', c('imp', 'comm'), drop = FALSE])
     # obj@parameters[['mImportRowAccumulatedLo']] <- addData(obj@parameters[['mImportRowAccumulatedLo']], 
