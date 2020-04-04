@@ -392,15 +392,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	  } else meqTechShareInpUp <- NULL
 	  
 	 ####
-	  outer_inf <- function(mvTechAct, pTechAf, coln = colnames(mvTechAct)) {
+	  outer_inf <- function(mvTechAct, pTechAf) {
 	    mvTechAct[(!duplicated(rbind(mvTechAct, pTechAf[pTechAf$value == Inf & pTechAf$type == 'up',
 	                                                    colnames(mvTechAct)]), fromLast = TRUE))[1:nrow(mvTechAct)], ]
 	  }
 	  if (!is.null(pTechAf)) {
 	    obj@parameters[['meqTechAfLo']] <- addData(obj@parameters[['meqTechAfLo']],
-	                                               merge(mvTechAct, pTechAf[pTechAf$value != 0 & pTechAf$type == 'lo', c('tech', 'region', 'year', 'slice')]))
-	    obj@parameters[['meqTechAfUp']] <- addData(obj@parameters[['meqTechAfUp']], outer_inf(mvTechAct, pTechAf))
+	            merge(mvTechAct, pTechAf[pTechAf$value != 0 & pTechAf$type == 'lo', c('tech', 'region', 'year', 'slice')]))
 	  }
+    obj@parameters[['meqTechAfUp']] <- addData(obj@parameters[['meqTechAfUp']], outer_inf(mvTechAct, pTechAf))
 	  if (!is.null(pTechAfs)) {
 	    obj@parameters[['meqTechAfsLo']] <- addData(obj@parameters[['meqTechAfsLo']],
 	              merge(mTechSpan, pTechAfs[pTechAfs$value != 0 & pTechAfs$type == 'lo', c('tech', 'region', 'year', 'slice')]))

@@ -54,10 +54,8 @@
   # mSupOutTot(comm, region, slice)
   #   (sum(sup$(mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region)), 1))
   cat('\b2')
-  prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], reduce_total_map(reduce.sect(
-    getParameterData(prec@parameters$mSupAva)[, -1])))
-  prec@parameters[['mvSupCost']] <- addData(prec@parameters[['mvSupCost']], reduce.sect(
-    getParameterData(prec@parameters$mSupAva)[, c('sup', 'region', 'year')]))
+  prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], reduce.sect(
+    getParameterData(prec@parameters$mSupAva)[, -1]))
   # mDemInp(comm, slice)
   #   (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))    
   prec@parameters[['mDemInp']] <- addData(prec@parameters[['mDemInp']], 
