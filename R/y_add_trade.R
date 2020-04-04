@@ -16,7 +16,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			data.frame(trade = trd@name, comm = trd@commodity))
 		mTradeRoutes <- cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes)
 		obj@parameters[['mTradeRoutes']] <- addData(obj@parameters[['mTradeRoutes']], mTradeRoutes)
-			
+		pTradeIrCdst2Aout <- NULL; pTradeIrCsrc2Aout <- NULL; pTradeIrCdst2Ainp <- NULL; pTradeIrCsrc2Ainp <- NULL;
 		# approxim <- approxim[names(approxim) != 'region']
 		approxim_srcdst <- approxim
 		approxim_srcdst$region <- paste0(trd@routes$src, '##', trd@routes$dst)
@@ -141,21 +141,21 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			} 
 			for (cc in inp_comm) {
 				approxim$acomm <- cc
-				obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(
-					obj@parameters[['pTradeIrCsrc2Ainp']], simpleInterpolation2(trd@aeff, 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
-					                                                            approxim = approxim_srcdst, 'trade', trd@name))
-				obj@parameters[['pTradeIrCdst2Ainp']] <- addData(
-					obj@parameters[['pTradeIrCdst2Ainp']], simpleInterpolation2(trd@aeff, 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
-					                                                            approxim = approxim_srcdst, 'trade', trd@name, remove_duplicate = list('src', 'dst')))
+				pTradeIrCsrc2Ainp <- simpleInterpolation2(trd@aeff, 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
+				                                          approxim = approxim_srcdst, 'trade', trd@name)
+				obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(obj@parameters[['pTradeIrCsrc2Ainp']], pTradeIrCsrc2Ainp)
+				pTradeIrCdst2Ainp <- simpleInterpolation2(trd@aeff, 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
+				                                          approxim = approxim_srcdst, 'trade', trd@name, remove_duplicate = list('src', 'dst'))
+				obj@parameters[['pTradeIrCdst2Ainp']] <- addData(obj@parameters[['pTradeIrCdst2Ainp']], pTradeIrCdst2Ainp)
 			}
 			for (cc in out_comm) {
 				approxim$acomm <- cc
-				obj@parameters[['pTradeIrCsrc2Aout']] <- addData(
-					obj@parameters[['pTradeIrCsrc2Aout']], simpleInterpolation2(trd@aeff, 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
-					                                                            approxim = approxim_srcdst, 'trade', trd@name))
-				obj@parameters[['pTradeIrCdst2Aout']] <- addData(
-					obj@parameters[['pTradeIrCdst2Aout']], simpleInterpolation2(trd@aeff, 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
-					                                                            approxim = approxim_srcdst, 'trade', trd@name))
+				pTradeIrCsrc2Aout <- simpleInterpolation2(trd@aeff, 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
+				                     approxim = approxim_srcdst, 'trade', trd@name)
+				obj@parameters[['pTradeIrCsrc2Aout']] <- addData(obj@parameters[['pTradeIrCsrc2Aout']], pTradeIrCsrc2Aout)
+				pTradeIrCdst2Aout <- simpleInterpolation2(trd@aeff, 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
+				                     approxim = approxim_srcdst, 'trade', trd@name)
+				obj@parameters[['pTradeIrCdst2Aout']] <- addData(obj@parameters[['pTradeIrCdst2Aout']], pTradeIrCdst2Aout)
 			}
 		}
 		# Add trade data
@@ -255,23 +255,26 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		# mvTradeIrAInp(trade, comm, region, year, slice)
 		if (!is.null(mTradeIrAInp)) {
 		  browser()
-  		# a0 <- tmp_map$mTradeIrAInp; colnames(a0)[2] <- 'acomm' 
-  		# a1 <- merge(a0, rbind(tmp_nozero$pTradeIrCsrc2Ainp, tmp_nozero$pTradeIrCdst2Ainp))
-  		# colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
-  		# prec@parameters[['mvTradeIrAInp']] <- addData(prec@parameters[['mvTradeIrAInp']], 
-  		#                                               merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
-  		#   mvTradeIrAOut
-		  # mvTradeIrAOut(trade, comm, region, year, slice)
-		  # a0 <- tmp_map$mTradeIrAOut; colnames(a0)[2] <- 'acomm' 
-		  # a1 <- merge(a0, rbind(tmp_nozero$pTradeIrCsrc2Aout, tmp_nozero$pTradeIrCdst2Aout))
-		  # colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
-		  # prec@parameters[['mvTradeIrAOut']] <- addData(prec@parameters[['mvTradeIrAOut']], 
-		  #                                               merge(a1, getParameterData(prec@parameters$mTradeIr))[, c('trade', 'comm', 'region', 'year', 'slice')])
-		  # # mvTradeIrAOutTot
-		  # prec@parameters[['mvTradeIrAOutTot']] <- addData(prec@parameters[['mvTradeIrAOutTot']], reduce_total_map(
-		  #   reduce.sect(getParameterData(prec@parameters$mvTradeIrAOut), c('comm', 'region', 'year', 'slice'))))
-		  # 
+      a0 <- mTradeIrAInp; colnames(a0)[2] <- 'acomm'
+      if (!is.null(pTradeIrCsrc2Ainp))
+        a1 <- merge(a0, pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, colnames(a0)]) 
+      if (!is.null(pTradeIrCdst2Ainp))
+        a1 <- merge(a0, pTradeIrCdst2Ainp[pTradeIrCdst2Ainp$value != 0, colnames(a0)]) 
+      colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
+      obj@parameters[['mvTradeIrAInp']] <- addData(obj@parameters[['mvTradeIrAInp']],
+                                                  merge(a1, mTradeIr)[, c('trade', 'comm', 'region', 'year', 'slice')])
 		}
+		if (!is.null(mTradeIrAOut)) {
+		  a0 <- mTradeIrAOut; colnames(a0)[2] <- 'acomm'
+      if (!is.null(pTradeIrCsrc2Aout))
+        a1 <- merge(a0, pTradeIrCsrc2Aout[pTradeIrCsrc2Aout$value != 0, colnames(a0)]) 
+      if (!is.null(pTradeIrCdst2Aout))
+        a1 <- merge(a0, pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0, colnames(a0)]) 
+      colnames(a1)[2:4] <- c('comm', 'region', 'region.1')
+      obj@parameters[['mvTradeIrAOut']] <- addData(obj@parameters[['mvTradeIrAOut']],
+                                                    merge(a1, mTradeIr)[, c('trade', 'comm', 'region', 'year', 'slice')])
+		}
+
 		mvTradeIr <- mTradeIr; mvTradeIr$comm <- trd@commodity
 		obj@parameters[['mvTradeIr']] <- addData(obj@parameters[['mvTradeIr']], mvTradeIr) 
 		obj@parameters[['meqTradeFlowLo']] <- addData(obj@parameters[['meqTradeFlowLo']], 
