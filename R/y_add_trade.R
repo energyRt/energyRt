@@ -206,7 +206,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			  mTradeSpan <- data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
 			  obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], mTradeSpan)
 			  meqTradeCapFlow <- merge(mTradeSpan, mTradeSlice)
-			  meqTradeCapFlow$comm <- mTradeComm$trade
+			  meqTradeCapFlow$comm <- trd@commodity
 			  obj@parameters[['meqTradeCapFlow']] <- addData(obj@parameters[['meqTradeCapFlow']], meqTradeCapFlow)
 			}
 			# mTradeInv

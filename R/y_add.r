@@ -266,6 +266,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     exp <- energyRt:::.upper_case(app)
+    
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
   approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
   exp <- .disaggregateSliceLevel(exp, approxim)
@@ -295,13 +296,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
                                         fromLast = TRUE)[1:nrow(mExportRow)]), ]
   mExportRow$comm <- exp@commodity
   obj@parameters[['mExportRow']] <- addData(obj@parameters[['mExportRow']], mExportRow)
-  tmp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, 1:4]
-  tmp$comm <- mExpComm$comm
-  obj@parameters[['mExportRowUp']] <- addData(obj@parameters[['mExportRowUp']], tmp)
-  obj@parameters[['mExportRowAccumulatedUp']] <- addData(obj@parameters[['mExportRowAccumulatedUp']], pExportRowRes[pExportRowRes$value != Inf, 1, drop = FALSE])
-
-  obj@parameters[['meqExportRowLo']] <- addData(obj@parameters[['meqExportRowLo']], 
-                                                   merge(mExportRow, pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, 1:4])) 
+  if (!is.null(pExportRow)) {
+    tmp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, 1:4]
+    tmp$comm <- exp@commodity
+    obj@parameters[['mExportRowUp']] <- addData(obj@parameters[['mExportRowUp']], tmp)
+    obj@parameters[['meqExportRowLo']] <- addData(obj@parameters[['meqExportRowLo']], 
+                                                     merge(mExportRow, pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, 1:4])) 
+  }
+  if (!is.null(pExportRowRes)) {
+    pExportRowRes$comm <- exp@commodity
+    obj@parameters[['mExportRowAccumulatedUp']] <- addData(obj@parameters[['mExportRowAccumulatedUp']], 
+                                                         pExportRowRes[pExportRowRes$value != Inf, c('expp', 'comm'), drop = FALSE])
+  }
   obj
 })
 
@@ -317,15 +323,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   imp <- .disaggregateSliceLevel(imp, approxim)
   mImpSlice <- data.frame(imp = rep(imp@name, length(approxim$slice)), slice = approxim$slice)
   obj@parameters[['mImpSlice']] <- addData(obj@parameters[['mImpSlice']],  mImpSlice)
-  #  if (!energyRt:::.chec_correct_name(imp@name)) {
-#    stop(paste('Incorrect import name "', imp@name, '"', sep = ''))
-#  }
-#  if (isImport(obj, imp@name)) {
-#    warning(paste('There is import name "', imp@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousImport(obj, imp@name)
-#  }    
-#  obj@parameters[['imp']] <- addData(obj@parameters[['imp']], imp@name)
   mImpComm <- data.frame(imp = imp@name, comm = imp@commodity)
   obj@parameters[['mImpComm']] <- addData(obj@parameters[['mImpComm']], mImpComm)
   pImportRowPrice <- simpleInterpolation(imp@imp, 'price',
@@ -341,23 +338,23 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
                                         fromLast = TRUE)[1:nrow(mImportRow)]), ]
   mImportRow$comm <- imp@commodity
   obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
-  tmp <- pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf & pImportRow$value != 0, 1:4]
-  tmp$comm <- mImpComm$comm
-  obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], tmp)
-  obj@parameters[['mImportRowAccumulatedUp']] <- addData(obj@parameters[['mImportRowAccumulatedUp']], pImportRowRes[pImportRowRes$value != Inf, 1, drop = FALSE])
-  
-  
-    # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
-  aa <- merge(tmp_map$mImpComm, merge(tmp_map$mImpSlice, tmp_nozero$pImportRow))[, c("imp", "comm", "region", "year", "slice")]
-  prec@parameters[['mImportRow']] <- addData(prec@parameters[['mImportRow']], aa)
-  # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf) 
-  prec@parameters[['mImportRowUp']] <- addData(prec@parameters[['mImportRowUp']], 
-                                               reduce.sect(merge(tmp_noinf$pImportRow, aa), c("imp", "comm", "region", "year", "slice")))
-  obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']], 
-                                                merge(mImportRow, pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, 1:4])) 
-  prec@parameters[['mImportRowAccumulatedUp']] <- addData(prec@parameters[['mImportRowAccumulatedUp']], tmp_noinf$pImportRowRes)
-  # (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
-  
+  if (!is.null(pImportRow)) {
+    obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], tmp)
+    meqImportRowLo$comm <- imp$comm
+    obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']],  merge(mImportRow, 
+        pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, obj@parameters[['meqImportRowLo']]@dimSetNames])) 
+    obj@parameters[['meqImportRowUp']] <- addData(obj@parameters[['meqImportRowUp']], merge(mImportRow, 
+          pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf, obj@parameters[['meqImportRowUp']]@dimSetNames])) 
+    meqImportRowLo$comm <- NULL
+  }
+  if (!is.null(pImportRowRes)) {
+    pImportRowRes$comm <- imp$comm
+    obj@parameters[['mImportRowAccumulatedUp']] <- addData(obj@parameters[['mImportRowAccumulatedUp']], 
+          pImportRowRes[pImportRowRes$value != Inf & pImportRowRes$type == 'up', c('imp', 'comm'), drop = FALSE])
+    # obj@parameters[['mImportRowAccumulatedLo']] <- addData(obj@parameters[['mImportRowAccumulatedLo']], 
+    #       pImportRowRes[pImportRowRes$value != 0 & pImportRowRes$type == 'lo', c('imp', 'comm'), drop = FALSE])
+    pImportRowRes$comm <- NULL
+  }
   obj
 })
 
