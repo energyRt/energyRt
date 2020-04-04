@@ -309,7 +309,7 @@
       prec@parameters[['mAggregateFactor']] <- addData(prec@parameters[['mAggregateFactor']], tmp)
     }
     x = update_time(x)
-    cat(bacs)
+    cat(bacs, paste0(rep(' ', 50), collapse = ''), bacs)
     prec
 }
 
