@@ -3,7 +3,9 @@
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 	approxim = 'list'), function(obj, app, approxim) {
+	  pStorageCout <- NULL; pStorageCinp <- NULL;
 		stg <- energyRt:::.upper_case(app)
+		stg_slice <- approxim$slice@slice_map[[approxim$commodity_slice_map[[stg@commodity]]]]
 		approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = NULL)
 		stg <- .disaggregateSliceLevel(stg, approxim)
 		if (length(stg@region) != 0) {
@@ -39,28 +41,29 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 			simpleInterpolation(stg@seff, 'stgeff',  obj@parameters[['pStorageStgEff']], 
 				approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
 		# Cost
-		obj@parameters[['pStorageCostInp']] <- addData(obj@parameters[['pStorageCostInp']],
-			simpleInterpolation(stg@varom, 'inpcost',
-				obj@parameters[['pStorageCostInp']], approxim, 'stg', stg@name))
-		obj@parameters[['pStorageCostOut']] <- addData(obj@parameters[['pStorageCostOut']],
-			simpleInterpolation(stg@varom, 'outcost',
-				obj@parameters[['pStorageCostOut']], approxim, 'stg', stg@name))
-		obj@parameters[['pStorageCostStore']] <- addData(obj@parameters[['pStorageCostStore']],
-			simpleInterpolation(stg@varom, 'stgcost',
-				obj@parameters[['pStorageCostStore']], approxim, 'stg', stg@name))
-		obj@parameters[['pStorageFixom']] <- addData(obj@parameters[['pStorageFixom']],
-			simpleInterpolation(stg@fixom, 'fixom',
-				obj@parameters[['pStorageFixom']], approxim, 'stg', stg@name))
+		pStorageCostInp <- simpleInterpolation(stg@varom, 'inpcost',
+		                                       obj@parameters[['pStorageCostInp']], approxim, 'stg', stg@name)
+		obj@parameters[['pStorageCostInp']] <- addData(obj@parameters[['pStorageCostInp']], pStorageCostInp)
+		pStorageCostOut <- simpleInterpolation(stg@varom, 'outcost',
+		                                       obj@parameters[['pStorageCostOut']], approxim, 'stg', stg@name)
+		obj@parameters[['pStorageCostOut']] <- addData(obj@parameters[['pStorageCostOut']], pStorageCostOut)
+			
+		pStorageCostStore <- simpleInterpolation(stg@varom, 'stgcost',
+		                                         obj@parameters[['pStorageCostStore']], approxim, 'stg', stg@name)
+		obj@parameters[['pStorageCostStore']] <- addData(obj@parameters[['pStorageCostStore']], pStorageCostStore)
+			
+		pStorageFixom <- simpleInterpolation(stg@fixom, 'fixom',
+		                                     obj@parameters[['pStorageFixom']], approxim, 'stg', stg@name)
+		obj@parameters[['pStorageFixom']] <- addData(obj@parameters[['pStorageFixom']], pStorageFixom)
 		# Ava/Cap
-		obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']],
-			multiInterpolation(stg@af, 'af',
-				obj@parameters[['pStorageAf']], approxim, 'stg', stg@name))
+		pStorageAf <- multiInterpolation(stg@af, 'af', obj@parameters[['pStorageAf']], approxim, 'stg', stg@name)
+		obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']], pStorageAf)
 		obj@parameters[['pStorageCap2stg']] <- addData(obj@parameters[['pStorageCap2stg']],
 			data.frame(stg = stg@name, value = stg@cap2stg))
-		obj@parameters[['pStorageCinp']] <- addData(obj@parameters[['pStorageCinp']], multiInterpolation(stg@seff, 'cinp',
-			obj@parameters[['pStorageCinp']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
-		obj@parameters[['pStorageCout']] <- addData(obj@parameters[['pStorageCout']], multiInterpolation(stg@seff, 'cout',
-			obj@parameters[['pStorageCout']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity)))
+		pStorageCinp <-  multiInterpolation(stg@seff, 'cinp', obj@parameters[['pStorageCinp']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity))
+		obj@parameters[['pStorageCinp']] <- addData(obj@parameters[['pStorageCinp']], pStorageCinp) 
+		pStorageCout <- multiInterpolation(stg@seff, 'cout', obj@parameters[['pStorageCout']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity))
+		obj@parameters[['pStorageCout']] <- addData(obj@parameters[['pStorageCout']], pStorageCout)
 		# Aux input/output
 		if (nrow(stg@aux) != 0) {
 			if (any(!(stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]))) {
@@ -72,10 +75,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 			aout_flag <- c('stg2aout', 'inp2aout', 'out2aout', 'cap2aout', 'ncap2aout')
 			cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), 'acomm']
 			cmp_out <- stg@aeff[apply(!is.na(stg@aeff[, aout_flag]), 1, any), 'acomm']
-			obj@parameters[['mStorageAInp']] <- addData(obj@parameters[['mStorageAInp']],
-				data.frame(stg = rep(stg@name, length(cmp_inp)), comm = cmp_inp))
-			obj@parameters[['mStorageAOut']] <- addData(obj@parameters[['mStorageAOut']],
-				data.frame(stg = rep(stg@name, length(cmp_out)), comm = cmp_out))
+			mStorageAInp <- data.frame(stg = rep(stg@name, length(cmp_inp)), comm = cmp_inp)
+			obj@parameters[['mStorageAInp']] <- addData(obj@parameters[['mStorageAInp']], mStorageAInp)
+			mStorageAOut <- data.frame(stg = rep(stg@name, length(cmp_out)), comm = cmp_out)
+      obj@parameters[['mStorageAOut']] <- addData(obj@parameters[['mStorageAOut']], mStorageAOut)
 			dd <- data.frame(list = c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 'pStorageOut2AInp', 
 				'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 'pStorageNCap2AInp', 'pStorageNCap2AOut'),
 				table = c('stg2ainp', 'stg2aout', 'inp2ainp', 'inp2aout', 'out2ainp', 'out2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 
@@ -130,6 +133,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
 		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
 		obj@parameters[['mStorageNew']] <- addData(obj@parameters[['mStorageNew']], dd0$new)
+		mStorageSpan <- dd0$span
 		obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
 		obj@parameters[['mStorageEac']] <- addData(obj@parameters[['mStorageEac']], dd0$eac)
 		
@@ -198,6 +202,47 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 			obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$m)
 			obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
 		}
+		pStorageOlife <- olife
 		
+		obj@parameters[['mStorageOlifeInf']] <- addData(obj@parameters[['mStorageOlifeInf']], pStorageOlife[pStorageOlife$olife != Inf, c('stg', 'region')])
+		dsm <- obj@parameters[['mStorageOMCost']]@dimSetNames
+		mStorageOMCost <- NULL
+		if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageFixom[pStorageFixom$value != 0, dsm])
+		if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostInp[pStorageCostInp$value != 0, dsm])
+		if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostOut[pStorageCostOut$value != 0, dsm])
+		if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostStore[pStorageCostStore$value != 0, dsm])
+		if (!is.null(mStorageOMCost)) {
+  		mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
+  		obj@parameters[['mStorageOMCost']] <- addData(obj@parameters[['mStorageOMCost']], mStorageOMCost)
+		}
+		mvStorageStore <- merge(mStorageSpan, list(slice = stg_slice))
+		mvStorageStore$comm <- stg@commodity
+		obj@parameters[['mvStorageStore']] <- addData(obj@parameters[['mvStorageStore']], mvStorageStore)
+
+		if (nrow(stg@aux) != 0) {
+		  obj@parameters[['mvStorageAInp']] <- addData(obj@parameters[['mvStorageAInp']], merge(mvStorageStore, mStorageAInp))
+  		obj@parameters[['mvStorageAOut']] <- addData(obj@parameters[['mvStorageAOut']], merge(mvStorageStore, mStorageAOut))
+		}
+		rem_inf <- function(x, y) {
+		  if (is.null(x)) return(y)
+		  x <- x[x$type == 'up' & x$value == Inf, colnames(y)]
+		  y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
+		}
+		obj@parameters[['meqStorageAfLo']] <- addData(obj@parameters[['meqStorageAfLo']], merge(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0, 
+          obj@parameters[['meqStorageAfLo']]@dimSetNames], mvStorageStore))
+		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf(pStorageAf[pStorageAf$type == 'up' & pStorageAf$value != Inf, 
+		      obj@parameters[['meqStorageAfUp']]@dimSetNames], mvStorageStore))
+		if (!is.null(pStorageCinp)) {
+  		obj@parameters[['meqStorageInpLo']] <- addData(obj@parameters[['meqStorageInpLo']], merge(pStorageCinp[pStorageCinp$type == 'lo' & pStorageCinp$value != 0, 
+  		         obj@parameters[['meqStorageInpLo']]@dimSetNames], mvStorageStore))
+  		obj@parameters[['meqStorageInpUp']] <- addData(obj@parameters[['meqStorageInpUp']],rem_inf(pStorageCinp[pStorageCinp$type == 'up' & pStorageCinp$value != Inf, 
+  		          obj@parameters[['meqStorageInpUp']]@dimSetNames], mvStorageStore))
+		}
+		if (!is.null(pStorageCout)) {
+  		obj@parameters[['meqStorageOutLo']] <- addData(obj@parameters[['meqStorageOutLo']], merge(pStorageCout[pStorageCout$type == 'lo' & pStorageCout$value != 0, 
+  		                 obj@parameters[['meqStorageOutLo']]@dimSetNames], mvStorageStore))
+  		obj@parameters[['meqStorageOutUp']] <- addData(obj@parameters[['meqStorageOutUp']], rem_inf(pStorageCout[pStorageCout$type == 'up' & pStorageCout$value != Inf, 
+  		                obj@parameters[['meqStorageOutUp']]@dimSetNames], mvStorageStore))
+    }
 		obj
 	})

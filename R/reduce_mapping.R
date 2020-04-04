@@ -1,12 +1,3 @@
-# reduce_mapping
-
-#  prec0 = prec
-# .Object <- prec0;
-#if (FALSE) {
-# Add reduce mapping
-
-#prec <- .Object
-
 .reduce_mapping <- function(prec) {
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
   str_msg <- ' wait a moment reduce mapping  0'
@@ -17,8 +8,6 @@
   	x <- x[, set, drop = FALSE]
   	x[!duplicated(x),, drop = FALSE]
   }
-  # dregion <- data.frame(region = tmp_map$region, stringsAsFactors = FALSE)
-  # dregionyear <- merge(dregion, tmp_map$mMidMilestone)
   region <- getParameterData(prec@parameters$region)
   year <- getParameterData(prec@parameters$mMidMilestone)
   # Total parameter ruductions
@@ -51,20 +40,13 @@
   #    and (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1))  
   prec@parameters[['mTechOutTot']] <- addData(prec@parameters[['mTechOutTot']], reduce_total_map(reduce.sect(
     rbind(getParameterData(prec@parameters$mvTechOut)[, -1], getParameterData(prec@parameters$mvTechAOut)[, -1]))))
-  # mSupOutTot(comm, region, slice)
-  #   (sum(sup$(mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region)), 1))
   cat('\b2')
   prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], reduce.sect(
     getParameterData(prec@parameters$mSupAva)[, -1]))
-  # mDemInp(comm, slice)
-  #   (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))    
   prec@parameters[['mDemInp']] <- addData(prec@parameters[['mDemInp']], 
   	reduce.sect(merge(mCommSlice, getParameterData(prec@parameters$mDemComm), by = 'comm'), c('comm', 'slice')))
   
   
-  # mTechEmsFuel(tech, comm, region, year, slice)
-  #  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and 
-  #    (sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and pEmissionFactor(comm, commp) <> 0), 1)), 1)) 
   #### This section have to move to add (after interpolate comm first)
   tmp0 <- getParameterData(prec@parameters$pTechEmisComm)
   tmp <- merge(getParameterData(prec@parameters$mTechInpComm), tmp0[tmp0$value != 0, ], by = c('tech', 'comm'))
@@ -80,34 +62,24 @@
   # mEmsFuelTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and mTechSlice(tech, slice) and mTechEmitedComm(tech, comm)), 1))  
   prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']], reduce_total_map(
   	reduce.sect(getParameterData(prec@parameters[['mTechEmsFuel']]), c('comm', 'region', 'year', 'slice'))))
-  # mDummyImport(comm, region, year, slice)
-  #    (mCommSlice(comm, slice) and pDummyImportCost(comm, region, year, slice) <> Inf)    
   no_inf <- function(x) {
     x = getParameterData(prec@parameters[[x]])
     x[x$value != Inf, -ncol(x)]
   }
   prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], no_inf('pDummyImportCost'))
-  # mDummyExport(comm, region, year, slice)
-  #    (mCommSlice(comm, slice) and pDummyExportCost(comm, region, year, slice) <> Inf)    
   prec@parameters[['mDummyExport']] <- addData(prec@parameters[['mDummyExport']], no_inf('pDummyExportCost'))
   
-  # mDummyCost(comm, region, year)
-  #    (pDummyImportCost(comm, region, year, slice) <> Inf or pDummyExportCost(comm, region, year, slice) <> Inf)   
   prec@parameters[['mDummyCost']] <- addData(prec@parameters[['mDummyCost']], 
   	reduce.sect(rbind(getParameterData(prec@parameters[['mDummyImport']]), 
   		getParameterData(prec@parameters[['mDummyExport']])), c('comm', 'region', 'year')))
-  # mTradeIr(trade, region, region, year, slice)         Total physical trade flows between regions
-  # mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> 0 and
-  #    mTradeSrc(trade, src) and mTradeDst(trade, dst) and not(mSameRegion(src, dst))
-  cat('\b4')
-  
-  cat('\b5')
+
+    cat('\b3')
   # mvTradeIrAInpTot
   prec@parameters[['mvTradeIrAInpTot']] <- addData(prec@parameters[['mvTradeIrAInpTot']], reduce_total_map(
   	reduce.sect(getParameterData(prec@parameters$mvTradeIrAInp), c('comm', 'region', 'year', 'slice'))))
     
     
-    cat('\b6')
+    cat('\b4')
     # sum(expp$mExportRow(expp, comm, region, year, slice), 1) + sum((trade, dst)$(mTradeIr(trade, region, dst, year, slice) and mTradeComm(trade, comm)), 1) <> 0
     tmp <- merge(getParameterData(prec@parameters$mTradeComm), getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'src', 'year', 'slice')]
     colnames(tmp)[2] <- 'region'
@@ -120,61 +92,13 @@
     prec@parameters[['mImport']] <- addData(prec@parameters[['mImport']], reduce_total_map(reduce.sect(
     	rbind(zz, getParameterData(prec@parameters[['mImportRow']])[, c('comm', 'region', 'year', 'slice')]), 
     	c('comm', 'region', 'year', 'slice'))))
-    cat('\b7')
+    cat('\b5')
     
-    
-    # mStorageInpTot(comm, region, year, slice)
-    #     (sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAInp(stg, comm)))
-
-    #######    have to dooo
-    # prec@parameters[['mStorageInpTot']] <- addData(prec@parameters[['mStorageInpTot']], reduce_total_map(
-    # 	reduce.sect(merge(tmp_map$mStorageSpan, merge(merge(tmp_map$mCommSlice, tmp_map$mStorageComm, by = 'comm'),
-    # 		rbind(tmp_map$mStorageComm, tmp_map$mStorageAInp))), c('comm', 'region', 'year', 'slice'))))
-    # # mStorageOutTot(comm, region, year, slice)
-    # #     (sum(stg$(mStorageSlice(stg, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAOut(stg, comm)))
-    # prec@parameters[['mStorageOutTot']] <- addData(prec@parameters[['mStorageOutTot']], reduce_total_map(
-    # 	reduce.sect(merge(tmp_map$mStorageSpan, merge(merge(tmp_map$mCommSlice, tmp_map$mStorageComm, by = 'comm'),
-    # 		rbind(tmp_map$mStorageComm, tmp_map$mStorageAOut))), c('comm', 'region', 'year', 'slice'))))
-    # prec@parameters[['mStorageOlifeInf']] <- addData(prec@parameters[['mStorageOlifeInf']], generate_haveval('pStorageOlife', Inf))
-    # mStorageOMCost(stg, region, year) 
-    # mStorageOMCost <- rbind(tmp_nozero$pStorageFixom, tmp_nozero$pStorageCostInp[, c('stg', 'region', 'year')], 
-    #                         tmp_nozero$pStorageCostOut[, c('stg', 'region', 'year')], tmp_nozero$pStorageCostStore[, c('stg', 'region', 'year')])
-    # mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], tmp_map$mStorageSpan)
-    # prec@parameters[['mStorageOMCost']] <- addData(prec@parameters[['mStorageOMCost']], mStorageOMCost)
-    # prec@parameters[['mvStorageStore']] <- addData(prec@parameters[['mvStorageStore']], 
-    #                                                merge(tmp_map$mStorageSpan, merge(merge(tmp_map$mCommSlice, tmp_map$mStorageComm, by = 'comm'),
-    #                                                                                  tmp_map$mStorageComm))[, c('stg', 'comm', 'region', 'year', 'slice')])
-    # 
-    # prec@parameters[['mvStorageAInp']] <- addData(prec@parameters[['mvStorageAInp']], 
-    #                                               merge(getParameterData(prec@parameters[['mvStorageStore']])[, -2], 
-    #                                                     getParameterData(prec@parameters[['mStorageAInp']]))[,c('stg', 'comm', 'region', 'year', 'slice')])
-    # 
-    # prec@parameters[['mvStorageAOut']] <- addData(prec@parameters[['mvStorageAOut']], 
-    #                                               merge(getParameterData(prec@parameters[['mvStorageStore']])[, -2], 
-    #                                                     getParameterData(prec@parameters[['mStorageAOut']]))[,c('stg', 'comm', 'region', 'year', 'slice')])
-    # 
-    # prec@parameters[['meqStorageAfLo']] <- addData(prec@parameters[['meqStorageAfLo']], 
-    #                                                merge(getParameterData(prec@parameters[['mvStorageStore']]), 
-    #                                                      tmp_func1('pStorageAf')))
-    # prec@parameters[['meqStorageAfUp']] <- addData(prec@parameters[['meqStorageAfUp']], 
-    #                                                merge(getParameterData(prec@parameters[['mvStorageStore']]), 
-    #                                                      tmp_func2('pStorageAf')))
-    # 
-    # prec@parameters[['meqStorageInpLo']] <- addData(prec@parameters[['meqStorageInpLo']], 
-    #                                                 merge(getParameterData(prec@parameters[['mvStorageStore']]), 
-    #                                                       tmp_func1('pStorageCinp')))
-    # prec@parameters[['meqStorageInpUp']] <- addData(prec@parameters[['meqStorageInpUp']], 
-    #                                                 merge(getParameterData(prec@parameters[['mvStorageStore']]), 
-    #                                                       tmp_func2('pStorageCinp')))
-    # 
-    # prec@parameters[['meqStorageOutLo']] <- addData(prec@parameters[['meqStorageOutLo']], 
-    #                                                 merge(getParameterData(prec@parameters[['mvStorageStore']]), 
-    #                                                       tmp_func1('pStorageCout')))
-    # prec@parameters[['meqStorageOutUp']] <- addData(prec@parameters[['meqStorageOutUp']], 
-    #                                                 merge(getParameterData(prec@parameters[['mvStorageStore']]), 
-    #                                                       tmp_func2('pStorageCout')))
-    
-    
+    prec@parameters[['mStorageInpTot']] <- addData(prec@parameters[['mStorageInpTot']], 
+      reduce.sect(rbind(getParameterData(prec@parameters$mvStorageAInp)[, -1], getParameterData(prec@parameters$mvStorageStore)[, -1])))
+    prec@parameters[['mStorageOutTot']] <- addData(prec@parameters[['mStorageOutTot']], 
+      reduce.sect(rbind(getParameterData(prec@parameters$mvStorageAInp)[, -1], getParameterData(prec@parameters$mvStorageStore)[, -1])))
+      
     # mTaxCost(comm, region, year)  sum(slice$pTaxCost(comm, region, year, slice), 1)
     prec@parameters[['mTaxCost']] <- addData(prec@parameters[['mTaxCost']], reduce.sect(getParameterData(prec@parameters$pTaxCost), c('comm', 'region', 'year')))
     # mSubsCost(comm, region, year)  sum(slice$pSubsCost(comm, region, year, slice), 1)
@@ -190,10 +114,6 @@
     cat('\b8')
     
     
-    #sum(slicep$(mSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) and
-    #(mSupOutTot(comm, region, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
-    #  mTechOutTot(comm, region, year, slice) or mStorageOutTot(comm, region, year, slice) or mImport(comm, region, year, slice) or
-    #  mvTradeIrAOutTot(comm, region, year, slice))
     a1 <- mCommSlice; colnames(a1)[2] <- 'slicep'
     a2 <- getParameterData(prec@parameters$mSliceParentChild)
     for2Lo <- merge(a1, a2, by = 'slicep'); for2Lo$slicep <- NULL
@@ -212,9 +132,6 @@
     prec@parameters[['mOut2Lo']] <- addData(prec@parameters[['mOut2Lo']], mOut2Lo)
     
     cat('\b9')
-    # sum(slicep$(mSliceParentChild(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
-    #   and (mTechInpTot(comm, region, year, slice) or  mStorageInpTot(comm, region, year, slice) or
-    #   or mExport(comm, region, year, slice) or mvTradeIrAInpTot(comm, region, year, slice))
     
     mInp2Lo <- merge(reduce.duplicate(rbind(getParameterData(prec@parameters$mTechInpTot)[, cll], 
                                             getParameterData(prec@parameters$mStorageInpTot)[, cll], 
@@ -282,7 +199,7 @@
     cat('\b\b17')
     pWeather <- getParameterData(prec@parameters$pWeather)
     if (nrow(pWeather) > 0) {
-      pSliceShare <- generate_allval('pSliceShare')
+      pSliceShare <- getParameterData(prec@parameters$pSliceShare)
       colnames(pSliceShare)[ncol(pSliceShare)] <- 'share'
       mSliceCP <- getParameterData(prec@parameters$mSliceParentChild)
       colnames(mSliceCP) <- c('slicep', 'slice')
