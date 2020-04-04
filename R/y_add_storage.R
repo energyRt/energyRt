@@ -230,19 +230,16 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		}
 		obj@parameters[['meqStorageAfLo']] <- addData(obj@parameters[['meqStorageAfLo']], merge(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0, 
           obj@parameters[['meqStorageAfLo']]@dimSetNames], mvStorageStore))
-		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf(pStorageAf[pStorageAf$type == 'up' & pStorageAf$value != Inf, 
-		      obj@parameters[['meqStorageAfUp']]@dimSetNames], mvStorageStore))
+		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf(pStorageAf, mvStorageStore))
 		if (!is.null(pStorageCinp)) {
   		obj@parameters[['meqStorageInpLo']] <- addData(obj@parameters[['meqStorageInpLo']], merge(pStorageCinp[pStorageCinp$type == 'lo' & pStorageCinp$value != 0, 
   		         obj@parameters[['meqStorageInpLo']]@dimSetNames], mvStorageStore))
-  		obj@parameters[['meqStorageInpUp']] <- addData(obj@parameters[['meqStorageInpUp']],rem_inf(pStorageCinp[pStorageCinp$type == 'up' & pStorageCinp$value != Inf, 
-  		          obj@parameters[['meqStorageInpUp']]@dimSetNames], mvStorageStore))
+  		obj@parameters[['meqStorageInpUp']] <- addData(obj@parameters[['meqStorageInpUp']],rem_inf(pStorageCinp, mvStorageStore))
 		}
 		if (!is.null(pStorageCout)) {
   		obj@parameters[['meqStorageOutLo']] <- addData(obj@parameters[['meqStorageOutLo']], merge(pStorageCout[pStorageCout$type == 'lo' & pStorageCout$value != 0, 
   		                 obj@parameters[['meqStorageOutLo']]@dimSetNames], mvStorageStore))
-  		obj@parameters[['meqStorageOutUp']] <- addData(obj@parameters[['meqStorageOutUp']], rem_inf(pStorageCout[pStorageCout$type == 'up' & pStorageCout$value != Inf, 
-  		                obj@parameters[['meqStorageOutUp']]@dimSetNames], mvStorageStore))
+  		obj@parameters[['meqStorageOutUp']] <- addData(obj@parameters[['meqStorageOutUp']], rem_inf(pStorageCout, mvStorageStore))
     }
 		obj
 	})
