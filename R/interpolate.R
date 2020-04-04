@@ -122,7 +122,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation ')
   if (arg$n.threads == 1) {
-    scen <- .add2_nthreads_1(0, 1, scen, arg, approxim)
+    scen <- .add2_nthreads_1(0, 1, scen, arg, approxim, interpolation_time_begin = interpolation_time_begin)
   } else {
     use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
     require(parallel)
@@ -140,7 +140,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     }
   }
   # Reduce mapping
-  scen@modInp <- .reduce_mapping(scen@modInp)  
+  scen@modInp <- .write_mapping(scen@modInp, interpolation_time_begin = interpolation_time_begin)  
   
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
   for(i in names(scen@modInp@parameters)) {

@@ -124,7 +124,7 @@
 }
   
 # Implement add0 for all parameters
-.add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim) {
+.add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim, interpolation_time_begin) {
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
   # if (num_classes_for_progrees_bar < 50) {
@@ -143,7 +143,10 @@
       k <- k + 1;
       if (k %% max.thread == n.thread) {
         tmlg <- tmlg + 1
-        paste_txt <- paste0(k, ' (', num_classes_for_progrees_bar, ') ', scen@model@data[[i]]@data[[j]]@name)
+        paste_txt <- paste0(k, ' (', num_classes_for_progrees_bar, '),',
+                            paste0(rep(' ', max(c(1, 15 - (nchar(scen@model@data[[i]]@data[[j]]@name) %% 15)))), collapse = ''),
+                            scen@model@data[[i]]@data[[j]]@name,
+                            ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
         if (arg$echo) {
           .remove_char(nch)
           cat(paste_txt, sep = '')
