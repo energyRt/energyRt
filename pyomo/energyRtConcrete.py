@@ -127,8 +127,8 @@ model.eqTechAfcInpLo = Constraint(meqTechAfcInpLo, rule = lambda model, t, r, c,
 model.eqTechAfcInpUp = Constraint(meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcUp.get((t,c,r,y,s)));
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
 model.eqTechCap = Constraint(mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  pTechStock.get((t,r,y))+sum(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetiredCap and ordYear.get((y)) >= ordYear.get((ye)))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
-# eqTechNewCap(tech, region, year)$mTechNew(tech, region, year)
-model.eqTechNewCap = Constraint(mTechNew, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in year if (t,r,y,yp) in mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
+# eqTechNewCap(tech, region, year)$meqTechNewCap(tech, region, year)
+model.eqTechNewCap = Constraint(meqTechNewCap, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in year if (t,r,y,yp) in mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(pTechEac.get((t,r,yp))*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in year if (t,r,yp,ye) in mvTechRetiredCap)) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
 # eqTechInv(tech, region, year)$mTechNew(tech, region, year)

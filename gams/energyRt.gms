@@ -615,6 +615,7 @@ mInp2Lo(comm, region, year, slice)
 
 * me
 set
+meqTechNewCap(tech, region, year)
 meqTechSng2Sng(tech, region, comm, comm, year, slice)
 meqTechGrp2Sng(tech, region, group, comm, year, slice)
 meqTechSng2Grp(tech, region, comm, group, year, slice)
@@ -966,7 +967,7 @@ eqTechCap(tech, region, year)$mTechSpan(tech, region, year)..
                  ordYear(year) >= ordYear(yeare)), vTechRetiredCap(tech, region, yearp, yeare))
          );
 
-eqTechNewCap(tech, region, year)$mTechNew(tech, region, year)..
+eqTechNewCap(tech, region, year)$meqTechNewCap(tech, region, year)..
     sum(yearp$mvTechRetiredCap(tech, region, year, yearp),
                          vTechRetiredCap(tech, region, year, yearp)
          ) =l= vTechNewCap(tech, region, year);

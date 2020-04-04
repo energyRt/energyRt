@@ -146,6 +146,7 @@ set mSupAva dimen 5;
 set mSupReserveUp dimen 3;
 set mOut2Lo dimen 4;
 set mInp2Lo dimen 4;
+set meqTechNewCap dimen 3;
 set meqTechSng2Sng dimen 6;
 set meqTechGrp2Sng dimen 6;
 set meqTechSng2Grp dimen 6;
@@ -437,7 +438,7 @@ s.t.  eqTechAfcInpUp{(t, r, c, y, s) in meqTechAfcInpUp}: vTechInp[t,c,r,y,s] <=
 
 s.t.  eqTechCap{(t, r, y) in mTechSpan}: vTechCap[t,r,y]  =  pTechStock[t,r,y]+sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(vTechNewCap[t,r,yp]-sum{ye in year:(((t,r,yp,ye) in mvTechRetiredCap and ordYear[y] >= ordYear[ye]))}(vTechRetiredCap[t,r,yp,ye]));
 
-s.t.  eqTechNewCap{(t, r, y) in mTechNew}: sum{yp in year:((t,r,y,yp) in mvTechRetiredCap)}(vTechRetiredCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
+s.t.  eqTechNewCap{(t, r, y) in meqTechNewCap}: sum{yp in year:((t,r,y,yp) in mvTechRetiredCap)}(vTechRetiredCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
 
 s.t.  eqTechEac{(t, r, y) in mTechEac}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t,r,yp,ye) in mvTechRetiredCap)}(vTechRetiredCap[t,r,yp,ye])));
 

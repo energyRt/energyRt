@@ -115,8 +115,8 @@ model.eqTechAfcInpLo = Constraint(model.meqTechAfcInpLo, rule = lambda model, t,
 model.eqTechAfcInpUp = Constraint(model.meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  model.pTechAfcUp[t,c,r,y,s]*model.pTechCap2act[t]*model.vTechCap[t,r,y]*model.pSliceShare[s]*model.paTechWeatherAfcUp[t,c,r,y,s]);
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
 model.eqTechCap = Constraint(model.mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  model.pTechStock[t,r,y]+sum(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in model.year if ((t,r,yp,ye) in model.mvTechRetiredCap and model.ordYear[y] >= model.ordYear[ye])) for yp in model.year if ((t,r,yp) in model.mTechNew and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTechOlife[t,r]+model.ordYear[yp] or (t,r) in model.mTechOlifeInf))));
-# eqTechNewCap(tech, region, year)$mTechNew(tech, region, year)
-model.eqTechNewCap = Constraint(model.mTechNew, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in model.year if (t,r,y,yp) in model.mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
+# eqTechNewCap(tech, region, year)$meqTechNewCap(tech, region, year)
+model.eqTechNewCap = Constraint(model.meqTechNewCap, rule = lambda model, t, r, y : sum(model.vTechRetiredCap[t,r,y,yp] for yp in model.year if (t,r,y,yp) in model.mvTechRetiredCap) <=  model.vTechNewCap[t,r,y]);
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(model.mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(model.pTechEac[t,r,yp]*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredCap[t,r,yp,ye] for ye in model.year if (t,r,yp,ye) in model.mvTechRetiredCap)) for yp in model.year if ((t,r,yp) in model.mTechNew and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTechOlife[t,r]+model.ordYear[yp] or (t,r) in model.mTechOlifeInf))));
 # eqTechInv(tech, region, year)$mTechNew(tech, region, year)

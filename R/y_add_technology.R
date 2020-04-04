@@ -102,6 +102,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		# if (nrow(obj@parameters[['pTechStock']]@data) > 0) browser()
 		# save(list = c('approxim', 'obj', 'app', 'tech'), file = 'c:/tmp/1.rdata')
 		# stock_exist <- interpolation_dtf(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim$ry, 'tech', tech@name)
+		
+		
 		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
 		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
 		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
@@ -113,6 +115,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
 		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
 		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
+		
 		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
 		obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
 		
@@ -295,6 +298,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	  mTechSpan = dd0$span
 	  pTechOlife = olife
 	  if (nrow(dd0$new) > 0 && tech@early.retirement) {
+	    
+	    obj@parameters[['meqTechNewCap']] <- addData(obj@parameters[['meqTechNewCap']], mTechNew)
+	    
 	    mvTechRetiredCap0 <- merge(merge(mTechNew, mTechSpan, by = c('tech', 'region')), 
 	                               pTechOlife, by = c('tech', 'region'))
 	    mvTechRetiredCap0 <- mvTechRetiredCap0[(mvTechRetiredCap0$year.x + mvTechRetiredCap0$value > mvTechRetiredCap0$year.y &
@@ -322,7 +328,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	    mvTechAOut <- merge(mvTechAct, mTechAOut, by = 'tech')
 	    obj@parameters[['mvTechAOut']] <- addData(obj@parameters[['mvTechAOut']], mvTechAOut)
 	  } else mvTechAOut <- NULL
-	  
 	  if (!is.null(mTechInpGroup) && !is.null(mTechOutGroup)) {
 	    meqTechGrp2Grp <- merge(merge(mTechInpGroup, mTechOutGroup, by =  'tech', suffix = c('', '.1')), 
 	          mvTechAct)[, c('tech', 'region', 'group', 'group.1', 'year', 'slice')]
@@ -340,13 +345,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	    techGroupInp <- merge(merge(mvTechInp, mTechInpGroup), mTechGroupComm)
 	  } else techGroupInp <- NULL
 
-	  if (!is.null(mvTechInp) && !is.null(mTechOneComm) && !is.null(pTechCinp2use)) {
-	    techSingInp <- merge(merge(mvTechInp, mTechOneComm), pTechCinp2use)
-	    techSingInp$value <- NULL
+	  if (!is.null(mvTechInp) && !is.null(mTechOneComm)) {
+	    techSingInp <- merge(mvTechInp, mTechOneComm);
+	    if (!is.null(pTechCinp2use)) techSingInp <- merge(techSingInp, pTechCinp2use[pTechCinp2use$value != 0, colnames(techSingInp)])
+	    if (nrow(techSingInp) == 0) techSingInp <- NULL
 	  } else techSingInp <- NULL
-	  if (!is.null(mvTechOut) && !is.null(mTechOneComm) && !is.null(pTechCact2cout)) {
-	    techSingOut <- merge(merge(mvTechOut, mTechOneComm), pTechCact2cout)
-	    techSingOut$value <- NULL
+	  if (!is.null(mvTechOut) && !is.null(mTechOneComm)) {
+	    techSingOut <- merge(mvTechOut, mTechOneComm);
+	    if (!is.null(pTechCact2cout)) techSingOut <- merge(techSingOut, pTechCact2cout[pTechCact2cout$value != 0, colnames(techSingOut)])
+	    if (nrow(techSingOut) == 0) techSingOut <- NULL
 	  } else techSingOut <- NULL
 
 	  if (!is.null(mTechInpGroup) && !is.null(techSingOut)) {
@@ -354,15 +361,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	    obj@parameters[['meqTechGrp2Sng']] <- addData(obj@parameters[['meqTechGrp2Sng']], meqTechGrp2Sng)
 	  } else meqTechGrp2Sng <- NULL
 	  if (!is.null(mTechOutGroup) && !is.null(techSingInp)) {
-	    meqTechSng2Grp <- merge(mTechInpGroup, techSingOut)
+	    meqTechSng2Grp <- merge(mTechOutGroup, techSingInp)
 	    obj@parameters[['meqTechSng2Grp']] <- addData(obj@parameters[['meqTechSng2Grp']], meqTechSng2Grp)
 	  } else meqTechSng2Grp <- NULL
-
+    
 	  if (!is.null(techSingInp) && !is.null(techSingOut)) {
 	    meqTechSng2Sng <- merge(techSingInp, techSingOut, by = c('tech', 'region', 'year', 'slice'), suffixes = c("",".1"))
 	    obj@parameters[['meqTechSng2Sng']] <- addData(obj@parameters[['meqTechSng2Sng']], meqTechSng2Sng)
 	  } else meqTechSng2Sng <- NULL
-
 	  if (!is.null(mpTechShareLo) && !is.null(techGroupOut)) {
 	    meqTechShareOutLo <- merge(mpTechShareLo, techGroupOut)
 	    obj@parameters[['meqTechShareOutLo']] <- addData(obj@parameters[['meqTechShareOutLo']], 
