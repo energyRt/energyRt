@@ -127,7 +127,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
     require(parallel)
     cl <- makeCluster(arg$n.threads)
-    scen_pr <- parLapply(cl, 0:(arg$n.threads - 1), .add2_nthreads_1, arg$n.threads, scen, arg, approxim)
+    scen_pr <- parLapply(cl, 0:(arg$n.threads - 1), .add2_nthreads_1, arg$n.threads, scen, arg, approxim, interpolation_time_begin)
     stopCluster(cl)
     scen <- .merge_scen(scen_pr, use_par)
   }
