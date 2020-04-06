@@ -271,11 +271,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 
 		mvTradeIr <- mTradeIr; mvTradeIr$comm <- trd@commodity
 		obj@parameters[['mvTradeIr']] <- addData(obj@parameters[['mvTradeIr']], mvTradeIr) 
-		obj@parameters[['meqTradeFlowLo']] <- addData(obj@parameters[['meqTradeFlowLo']], 
-		    merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, colnames(mvTradeIr)]))
-		obj@parameters[['meqTradeFlowUp']] <- addData(obj@parameters[['meqTradeFlowUp']], 
-		       merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, colnames(mvTradeIr)]))
-		
+		if (!is.null(pTradeIr)) {
+		  pTradeIr$comm <- trd@commodity
+		  obj@parameters[['meqTradeFlowLo']] <- addData(obj@parameters[['meqTradeFlowLo']], 
+		                                                merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, colnames(mvTradeIr)]))
+		  obj@parameters[['meqTradeFlowUp']] <- addData(obj@parameters[['meqTradeFlowUp']], 
+		                                                merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, colnames(mvTradeIr)]))
+		  pTradeIr$comm <- NULL
+		}
 		obj
 	})
 
