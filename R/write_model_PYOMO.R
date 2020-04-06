@@ -60,5 +60,7 @@
   .add_five_includes(arg, scen, ".py")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'python energyRt.py'
+  scen@solver$code <- c('energyRt.py', 'output.py')
+  
   scen
 }

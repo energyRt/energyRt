@@ -140,7 +140,7 @@ model.eqSupAvaUp = Constraint(mSupAvaUp, rule = lambda model, s1, c, r, y, s : m
 # eqSupAvaLo(sup, comm, region, year, slice)$meqSupAvaLo(sup, comm, region, year, slice)
 model.eqSupAvaLo = Constraint(meqSupAvaLo, rule = lambda model, s1, c, r, y, s : model.vSupOut[s1,c,r,y,s]  >=  pSupAvaLo.get((s1,c,r,y,s))*paSupWeatherLo.get((s1,c,r,y,s)));
 # eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)
-model.eqSupTotal = Constraint(mvSupReserve, rule = lambda model, s1, c, r : model.vSupReserve[s1,c,r]  ==  sum(pPeriodLen.get((y))*model.vSupOut[s1,c,r,y,s] for y in year for s in slice if ((s1,c,r,y,s) in mSupAva and y in mMidMilestone)));
+model.eqSupTotal = Constraint(mvSupReserve, rule = lambda model, s1, c, r : model.vSupReserve[s1,c,r]  ==  sum(pPeriodLen.get((y))*model.vSupOut[s1,c,r,y,s] for y in year for s in slice if (s1,c,r,y,s) in mSupAva));
 # eqSupReserveUp(sup, comm, region)$mSupReserveUp(sup, comm, region)
 model.eqSupReserveUp = Constraint(mSupReserveUp, rule = lambda model, s1, c, r : pSupReserveUp.get((s1,c,r))  >=  model.vSupReserve[s1,c,r]);
 # eqSupReserveLo(sup, comm, region)$meqSupReserveLo(sup, comm, region)
@@ -200,7 +200,7 @@ model.eqExportRowUp = Constraint(mExportRowUp, rule = lambda model, e, c, r, y, 
 # eqExportRowLo(expp, comm, region, year, slice)$meqExportRowLo(expp, comm, region, year, slice)
 model.eqExportRowLo = Constraint(meqExportRowLo, rule = lambda model, e, c, r, y, s : model.vExportRow[e,c,r,y,s]  >=  pExportRowLo.get((e,r,y,s)));
 # eqExportRowCumulative(expp, comm)$mExpComm(expp, comm)
-model.eqExportRowCumulative = Constraint(mExpComm, rule = lambda model, e, c : model.vExportRowAccumulated[e,c]  ==  sum(pPeriodLen.get((y))*model.vExportRow[e,c,r,y,s] for r in region for y in year for s in slice if (y in mMidMilestone and (e,c,r,y,s) in mExportRow)));
+model.eqExportRowCumulative = Constraint(mExpComm, rule = lambda model, e, c : model.vExportRowAccumulated[e,c]  ==  sum(pPeriodLen.get((y))*model.vExportRow[e,c,r,y,s] for r in region for y in year for s in slice if (e,c,r,y,s) in mExportRow));
 # eqExportRowResUp(expp, comm)$mExportRowAccumulatedUp(expp, comm)
 model.eqExportRowResUp = Constraint(mExportRowAccumulatedUp, rule = lambda model, e, c : model.vExportRowAccumulated[e,c] <=  pExportRowRes.get((e)));
 # eqImportRowUp(imp, comm, region, year, slice)$mImportRowUp(imp, comm, region, year, slice)
@@ -260,7 +260,7 @@ model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTax
 # eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)
 model.eqSubsCost = Constraint(mSubsCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubsCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if (c,s) in mCommSlice));
 # eqObjective
-model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(model.vTotalCost[r,y]*sum(pDiscountFactor.get((r,yn)) for ye in year for yp in year for yn in year if ((y,yp) in mStartMilestone and (y,ye) in mEndMilestone and ordYear.get((yn)) >= ordYear.get((yp)) and ordYear.get((yn)) <= ordYear.get((ye)))) for r in region for y in year if (r,y) in mvTotalCost));
+model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(model.vTotalCost[r,y]*pDiscountFactorMileStone.get((r,y)) for r in region for y in year if (r,y) in mvTotalCost));
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)
 model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in slice if (t,s) in mTechSlice)  >=  pLECLoACT.get((r)));
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);

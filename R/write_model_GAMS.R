@@ -82,6 +82,7 @@
   .add_five_includes(arg, scen, ".gms")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'gams energyRt.gms'
+  scen@solver$code <- c('energyRt.gms', 'output.gms')
   scen
 }
 

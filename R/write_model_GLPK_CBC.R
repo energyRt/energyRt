@@ -50,5 +50,6 @@
       scen@solver$cmdline <- 'cbc energyRt.mod%energyRt.dat -solve'
     }
   }
+  scen@solver$code <- c('energyRt.mod')
   scen
 }

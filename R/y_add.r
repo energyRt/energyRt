@@ -530,6 +530,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
     ll <- rbind(ll, dd)
   }
   obj@parameters[['pDiscountFactor']] <- addData(obj@parameters[['pDiscountFactor']], ll)
+  # pDiscountFactorMileStone
+  yrr <- app@milestone$start[1]:app@milestone$end[nrow(app@milestone)]
+  tyr <- rep(NA, length(yrr))
+  names(tyr) <- yrr
+  for (yr in seq_len(nrow(app@milestone))) {
+    tyr[app@milestone$start[yr] <= yrr & yrr <= app@milestone$end[yr]] <- app@milestone$mid[yr]
+  }
+  ll$year <- tyr[as.character(ll$year)]
+  obj@parameters[['pDiscountFactorMileStone']] <- addData(obj@parameters[['pDiscountFactorMileStone']], 
+      aggregate(ll[,'value', drop = FALSE], ll[, c('region', 'year'), drop = FALSE], sum))
+  # pDiscountFactorMileStone
   hh <- gg[gg$year == as.character(max(app@year)), -2]
   hh <- hh[hh$value == 0, 'region', drop = FALSE]
   # Add mDiscountZero - zero discount rate in final period

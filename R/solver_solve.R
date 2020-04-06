@@ -119,10 +119,13 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     } else stop('Unknown solver ', scen@solver$lang) 
     
     ## Write solver parameter
-    nn <- grep('^(inc[1-5]|files)$', names(scen@solver), value = TRUE, invert = TRUE)
+    nn <- grep('^(inc[1-5]|files|code[[:digit:]]*)$', names(scen@solver), value = TRUE, invert = TRUE)
     tmp <- data.frame(name = nn, 
               value = sapply(scen@solver[nn], function(x) paste0(c(x, recursive = TRUE), collapse = ' ')),
               stringsAsFactors = FALSE)
+    tmp <- rbind(tmp, data.frame(
+      name = paste0('code', seq_along(scen@solver$code)),
+      value = scen@solver$code, stringsAsFactors = FALSE))
     write.csv(tmp, file = paste0(arg$tmp.dir, 'solver'), row.names=FALSE)
     
     if (arg$echo) { 

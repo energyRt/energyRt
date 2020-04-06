@@ -228,6 +228,7 @@ param pTechCvarom{tech, comm, region, year, slice};
 param pTechAvarom{tech, comm, region, year, slice};
 param pDiscount{region, year};
 param pDiscountFactor{region, year};
+param pDiscountFactorMileStone{region, year};
 param pSupCost{sup, comm, region, year, slice};
 param pSupAvaUp{sup, comm, region, year, slice};
 param pSupAvaLo{sup, comm, region, year, slice};
@@ -450,7 +451,7 @@ s.t.  eqSupAvaUp{(s1, c, r, y, s) in mSupAvaUp}: vSupOut[s1,c,r,y,s] <=  pSupAva
 
 s.t.  eqSupAvaLo{(s1, c, r, y, s) in meqSupAvaLo}: vSupOut[s1,c,r,y,s]  >=  pSupAvaLo[s1,c,r,y,s]*paSupWeatherLo[s1,c,r,y,s];
 
-s.t.  eqSupTotal{(s1, c, r) in mvSupReserve}: vSupReserve[s1,c,r]  =  sum{y in year,s in slice:(((s1,c,r,y,s) in mSupAva and y in mMidMilestone))}(pPeriodLen[y]*vSupOut[s1,c,r,y,s]);
+s.t.  eqSupTotal{(s1, c, r) in mvSupReserve}: vSupReserve[s1,c,r]  =  sum{y in year,s in slice:((s1,c,r,y,s) in mSupAva)}(pPeriodLen[y]*vSupOut[s1,c,r,y,s]);
 
 s.t.  eqSupReserveUp{(s1, c, r) in mSupReserveUp}: pSupReserveUp[s1,c,r]  >=  vSupReserve[s1,c,r];
 
@@ -510,7 +511,7 @@ s.t.  eqExportRowUp{(e, c, r, y, s) in mExportRowUp}: vExportRow[e,c,r,y,s] <=  
 
 s.t.  eqExportRowLo{(e, c, r, y, s) in meqExportRowLo}: vExportRow[e,c,r,y,s]  >=  pExportRowLo[e,r,y,s];
 
-s.t.  eqExportRowCumulative{(e, c) in mExpComm}: vExportRowAccumulated[e,c]  =  sum{r in region,y in year,s in slice:((y in mMidMilestone and (e,c,r,y,s) in mExportRow))}(pPeriodLen[y]*vExportRow[e,c,r,y,s]);
+s.t.  eqExportRowCumulative{(e, c) in mExpComm}: vExportRowAccumulated[e,c]  =  sum{r in region,y in year,s in slice:((e,c,r,y,s) in mExportRow)}(pPeriodLen[y]*vExportRow[e,c,r,y,s]);
 
 s.t.  eqExportRowResUp{(e, c) in mExportRowAccumulatedUp}: vExportRowAccumulated[e,c] <=  pExportRowRes[e];
 
@@ -570,7 +571,7 @@ s.t.  eqTaxCost{(c, r, y) in mTaxCost}: vTaxCost[c,r,y]  =  sum{s in slice:((c,s
 
 s.t.  eqSubsCost{(c, r, y) in mSubsCost}: vSubsCost[c,r,y]  =  sum{s in slice:((c,s) in mCommSlice)}(pSubsCost[c,r,y,s]*vOutTot[c,r,y,s]);
 
-s.t.  eqObjective: vObjective  =  sum{r in region,y in year:((r,y) in mvTotalCost)}(vTotalCost[r,y]*sum{ye in year,yp in year,yn in year:(((y,yp) in mStartMilestone and (y,ye) in mEndMilestone and ordYear[yn] >= ordYear[yp] and ordYear[yn] <= ordYear[ye]))}(pDiscountFactor[r,yn]));
+s.t.  eqObjective: vObjective  =  sum{r in region,y in year:((r,y) in mvTotalCost)}(vTotalCost[r,y]*pDiscountFactorMileStone[r,y]);
 
 s.t.  eqLECActivity{(t, r, y) in meqLECActivity}: sum{s in slice:((t,s) in mTechSlice)}(vTechAct[t,r,y,s])  >=  pLECLoACT[r];
 

@@ -383,8 +383,10 @@ setMethod("initialize", "modInp",
     .Object@parameters[['pDiscount']] <- 
     	createParameter('pDiscount', c('region', 'year'), 'simple', 
     		defVal = .1, interpolation = 'back.inter.forth', colName = 'discount', cls = 'sysInfo')    
-    # Additional for compatibility with GLPK
-    .Object@parameters[['pDiscountFactor']] <- createParameter('pDiscountFactor', c('region', 'year'), 'simple')    
+    # Additional for compatibility 
+    .Object@parameters[['pDiscountFactor']] <- createParameter('pDiscountFactor', c('region', 'year'), 'simple')
+    .Object@parameters[['pDiscountFactorMileStone']] <- createParameter('pDiscountFactorMileStone', c('region', 'year'), 'simple')
+    
     .Object@parameters[['mDiscountZero']] <- createParameter('mDiscountZero', 'region', 'map', defVal = 1) 
     ## Milestone set
     .Object@parameters[['mMidMilestone']] <- createParameter('mMidMilestone', 'year', 'map', defVal = 1) 

@@ -209,6 +209,7 @@ pTechAvarom(tech, comm, region, year, slice)        Auxilary Commodity-specific 
 * Exit stock and salvage
 pDiscount(region, year)                             Discount rate (can be region and year specific)
 pDiscountFactor(region, year)                       Discount factor (cumulative)
+pDiscountFactorMileStone(region, year)              Discount factor (cumulative) sum for MileStone
 * Supply
 pSupCost(sup, comm, region, year, slice)            Costs of supply (price per unit)
 pSupAvaUp(sup, comm, region, year, slice)           Upper bound for supply
@@ -1054,7 +1055,7 @@ eqSupAvaLo(sup, comm, region, year, slice)$meqSupAvaLo(sup, comm, region, year, 
 eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)..
          vSupReserve(sup, comm, region)
          =e=
-         sum((year, slice)$(mSupAva(sup, comm, region, year, slice) and mMidMilestone(year)),
+         sum((year, slice)$mSupAva(sup, comm, region, year, slice),
              pPeriodLen(year) * vSupOut(sup, comm, region, year, slice)
          );
 
@@ -1356,7 +1357,7 @@ eqExportRowLo(expp, comm, region, year, slice)$meqExportRowLo(expp, comm, region
   vExportRow(expp, comm, region, year, slice)  =g= pExportRowLo(expp, region, year, slice);
 
 eqExportRowCumulative(expp, comm)$mExpComm(expp, comm).. vExportRowAccumulated(expp, comm) =e=
-    sum((region, year, slice)$(mMidMilestone(year) and mExportRow(expp, comm, region, year, slice)),
+    sum((region, year, slice)$mExportRow(expp, comm, region, year, slice),
         pPeriodLen(year) * vExportRow(expp, comm, region, year, slice)
 );
 
@@ -1621,9 +1622,7 @@ eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)..
 eqObjective..
    vObjective =e=
          sum((region, year)$mvTotalCost(region, year),
-           vTotalCost(region, year) * sum((yeare, yearp, yearn)$(mStartMilestone(year, yearp) and mEndMilestone(year, yeare)
-                 and ordYear(yearn) >= ordYear(yearp) and ordYear(yearn) <= ordYear(yeare)), pDiscountFactor(region, yearn)))
-;
+           vTotalCost(region, year) * pDiscountFactorMileStone(region, year));
 
 * Latex file end
 *\end{document}

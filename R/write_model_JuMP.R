@@ -32,5 +32,6 @@
   .add_five_includes(arg, scen, ".jl")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'julia energyRt.jl'
+  scen@solver$code <- c('energyRt.jl', 'output.jl')
   scen
 }

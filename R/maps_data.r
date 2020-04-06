@@ -838,7 +838,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:312,] <- NA;
+    rs[1:313,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -1058,6 +1058,7 @@ rs
 "pTechAvarom",
 "pDiscount",
 "pDiscountFactor",
+"pDiscountFactorMileStone",
 "pSupCost",
 "pSupAvaUp",
 "pSupAvaLo",
@@ -1189,11 +1190,11 @@ rs
     rs["mMilestoneHasNext", c("name", "description", "type")] <- c("mMilestoneHasNext", "Is there next period milestone", "map");
     rs["mMilestoneHasNext", c("year")] <- TRUE;
     rs["mStartMilestone", c("name", "description", "type")] <- c("mStartMilestone", "Start of the period", "map");
-    rs["mStartMilestone", c("year", "eqObjective")] <- TRUE;
+    rs["mStartMilestone", c("year")] <- TRUE;
     rs["mEndMilestone", c("name", "description", "type")] <- c("mEndMilestone", "End of the period", "map");
     rs["mEndMilestone", c("year")] <- TRUE;
     rs["mMidMilestone", c("name", "description", "type")] <- c("mMidMilestone", "Milestone year", "map");
-    rs["mMidMilestone", c("year", "eqExportRowCumulative")] <- TRUE;
+    rs["mMidMilestone", c("year")] <- TRUE;
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
     rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
@@ -1395,7 +1396,7 @@ rs
     rs["mImportRowAccumulatedUp", c("name", "description", "type")] <- c("mImportRowAccumulatedUp", "", "map");
     rs["mImportRowAccumulatedUp", c("imp", "comm", "eqImportRowResUp")] <- TRUE;
     rs["mExportRow", c("name", "description", "type")] <- c("mExportRow", "", "map");
-    rs["mExportRow", c("expp", "comm", "region", "year", "slice", "eqExport", "eqCostRowTrade")] <- TRUE;
+    rs["mExportRow", c("expp", "comm", "region", "year", "slice", "eqExport", "eqCostRowTrade", "eqExportRowCumulative")] <- TRUE;
     rs["mExportRowUp", c("name", "description", "type")] <- c("mExportRowUp", "", "map");
     rs["mExportRowUp", c("expp", "comm", "region", "year", "slice", "eqExportRowUp")] <- TRUE;
     rs["mExportRowAccumulatedUp", c("name", "description", "type")] <- c("mExportRowAccumulatedUp", "", "map");
@@ -1509,7 +1510,7 @@ rs
     rs["mLECRegion", c("name", "description", "type")] <- c("mLECRegion", "", "map");
     rs["mLECRegion", c("region")] <- TRUE;
     rs["ordYear", c("name", "description", "type")] <- c("ordYear", "ord year for GLPK", "parameter");
-    rs["ordYear", c("year", "eqTechCap", "eqTechEac", "eqStorageCap", "eqStorageEac", "eqTradeCap", "eqTradeEac", "eqObjective")] <- TRUE;
+    rs["ordYear", c("year", "eqTechCap", "eqTechEac", "eqStorageCap", "eqStorageEac", "eqTradeCap", "eqTradeEac")] <- TRUE;
     rs["cardYear", c("name", "description", "type")] <- c("cardYear", "card year for GLPK", "parameter");
     rs["cardYear", c("year")] <- TRUE;
     rs["pPeriodLen", c("name", "description", "type")] <- c("pPeriodLen", "Length of perios for milestone year", "parameter");
@@ -1587,7 +1588,9 @@ rs
     rs["pDiscount", c("name", "description", "type")] <- c("pDiscount", "Discount rate (can be region and year specific)", "parameter");
     rs["pDiscount", c("region", "year")] <- TRUE;
     rs["pDiscountFactor", c("name", "description", "type")] <- c("pDiscountFactor", "Discount factor (cumulative)", "parameter");
-    rs["pDiscountFactor", c("region", "year", "eqObjective")] <- TRUE;
+    rs["pDiscountFactor", c("region", "year")] <- TRUE;
+    rs["pDiscountFactorMileStone", c("name", "description", "type")] <- c("pDiscountFactorMileStone", "Discount factor (cumulative) sum for MileStone", "parameter");
+    rs["pDiscountFactorMileStone", c("region", "year", "eqObjective")] <- TRUE;
     rs["pSupCost", c("name", "description", "type")] <- c("pSupCost", "Costs of supply (price per unit)", "parameter");
     rs["pSupCost", c("sup", "comm", "region", "year", "slice", "eqSupCost")] <- TRUE;
     rs["pSupAvaUp", c("name", "description", "type")] <- c("pSupAvaUp", "Upper bound for supply", "parameter");

@@ -153,7 +153,7 @@ println("eqSupAvaUp(sup, comm, region, year, slice) done ", Dates.format(now(), 
 @constraint(model, [(s1, c, r, y, s) in meqSupAvaLo], vSupOut[(s1,c,r,y,s)]  >=  (if haskey(pSupAvaLo, (s1,c,r,y,s)); pSupAvaLo[(s1,c,r,y,s)]; else pSupAvaLoDef; end)*(if haskey(paSupWeatherLo, (s1,c,r,y,s)); paSupWeatherLo[(s1,c,r,y,s)]; else paSupWeatherLoDef; end));
 println("eqSupAvaLo(sup, comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)
-@constraint(model, [(s1, c, r) in mvSupReserve], vSupReserve[(s1,c,r)]  ==  sum((if haskey(pPeriodLen, (y)); pPeriodLen[(y)]; else pPeriodLenDef; end)*vSupOut[(s1,c,r,y,s)] for y in year for s in slice if ((s1,c,r,y,s) in mSupAva && y in mMidMilestone)));
+@constraint(model, [(s1, c, r) in mvSupReserve], vSupReserve[(s1,c,r)]  ==  sum((if haskey(pPeriodLen, (y)); pPeriodLen[(y)]; else pPeriodLenDef; end)*vSupOut[(s1,c,r,y,s)] for y in year for s in slice if (s1,c,r,y,s) in mSupAva));
 println("eqSupTotal(sup, comm, region) done ", Dates.format(now(), "HH:MM:SS"))
 # eqSupReserveUp(sup, comm, region)$mSupReserveUp(sup, comm, region)
 @constraint(model, [(s1, c, r) in mSupReserveUp], (if haskey(pSupReserveUp, (s1,c,r)); pSupReserveUp[(s1,c,r)]; else pSupReserveUpDef; end)  >=  vSupReserve[(s1,c,r)]);
@@ -243,7 +243,7 @@ println("eqExportRowUp(expp, comm, region, year, slice) done ", Dates.format(now
 @constraint(model, [(e, c, r, y, s) in meqExportRowLo], vExportRow[(e,c,r,y,s)]  >=  (if haskey(pExportRowLo, (e,r,y,s)); pExportRowLo[(e,r,y,s)]; else pExportRowLoDef; end));
 println("eqExportRowLo(expp, comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqExportRowCumulative(expp, comm)$mExpComm(expp, comm)
-@constraint(model, [(e, c) in mExpComm], vExportRowAccumulated[(e,c)]  ==  sum((if haskey(pPeriodLen, (y)); pPeriodLen[(y)]; else pPeriodLenDef; end)*vExportRow[(e,c,r,y,s)] for r in region for y in year for s in slice if (y in mMidMilestone && (e,c,r,y,s) in mExportRow)));
+@constraint(model, [(e, c) in mExpComm], vExportRowAccumulated[(e,c)]  ==  sum((if haskey(pPeriodLen, (y)); pPeriodLen[(y)]; else pPeriodLenDef; end)*vExportRow[(e,c,r,y,s)] for r in region for y in year for s in slice if (e,c,r,y,s) in mExportRow));
 println("eqExportRowCumulative(expp, comm) done ", Dates.format(now(), "HH:MM:SS"))
 # eqExportRowResUp(expp, comm)$mExportRowAccumulatedUp(expp, comm)
 @constraint(model, [(e, c) in mExportRowAccumulatedUp], vExportRowAccumulated[(e,c)] <=  (if haskey(pExportRowRes, (e)); pExportRowRes[(e)]; else pExportRowResDef; end));
@@ -333,7 +333,7 @@ println("eqTaxCost(comm, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 @constraint(model, [(c, r, y) in mSubsCost], vSubsCost[(c,r,y)]  ==  sum((if haskey(pSubsCost, (c,r,y,s)); pSubsCost[(c,r,y,s)]; else pSubsCostDef; end)*vOutTot[(c,r,y,s)] for s in slice if (c,s) in mCommSlice));
 println("eqSubsCost(comm, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqObjective
-@constraint(model, vObjective  ==  sum(vTotalCost[(r,y)]*sum((if haskey(pDiscountFactor, (r,yn)); pDiscountFactor[(r,yn)]; else pDiscountFactorDef; end) for ye in year for yp in year for yn in year if ((y,yp) in mStartMilestone && (y,ye) in mEndMilestone && ordYear[(yn)] >= ordYear[(yp)] && ordYear[(yn)] <= ordYear[(ye)])) for r in region for y in year if (r,y) in mvTotalCost));
+@constraint(model, vObjective  ==  sum(vTotalCost[(r,y)]*(if haskey(pDiscountFactorMileStone, (r,y)); pDiscountFactorMileStone[(r,y)]; else pDiscountFactorMileStoneDef; end) for r in region for y in year if (r,y) in mvTotalCost));
 println("eqObjective done ", Dates.format(now(), "HH:MM:SS"))
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)
 @constraint(model, [(t, r, y) in meqLECActivity], sum(vTechAct[(t,r,y,s)] for s in slice if (t,s) in mTechSlice)  >=  (if haskey(pLECLoACT, (r)); pLECLoACT[(r)]; else pLECLoACTDef; end));

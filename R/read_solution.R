@@ -60,7 +60,11 @@ read_solution <- function(scen, ...) {
   scen@modOut <- new('modOut')
   # Read solution status
   scen@modOut@solutionLogs <- read.csv(paste(arg$dir.result, '/output/log.csv', sep = ''))
-  
+  solver_data <- read.csv(paste(arg$dir.result, '/solver', sep = ''), stringsAsFactors = FALSE)
+  codes <- solver_data[grep('^code', solver_data$name), ]
+  for (i in seq_len(nrow(codes))) {
+    scen@solver[[codes[i, 'name']]] <- readLines(paste(arg$dir.result, '/', codes[i, 'value'], sep = ''))
+  }
   if (all(scen@modOut@solutionLogs$parameter != "solution status")) {
     scen@modOut@stage <- "Scenario isn't solved"
   } else if (all(scen@modOut@solutionLogs[scen@modOut@solutionLogs$parameter == "solution status", 'value'] != 1)) {
