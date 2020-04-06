@@ -243,9 +243,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		if (trd@capacityVariable) {
 		  mTradeIr <- merge(mTradeIr, mTradeSpan)
 		} else mTradeIr <- merge(mTradeIr, list(year = approxim$mileStoneYears))
-		if (!is.null(pTradeIr) && nrow(pTradeIr) > 0) {
-		  browser()
-		}
 		obj@parameters[['mTradeIr']] <- addData(obj@parameters[['mTradeIr']], mTradeIr)
 		
 		### To trades
