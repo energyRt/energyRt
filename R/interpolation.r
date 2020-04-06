@@ -34,7 +34,7 @@
      warning("there are duplicates in the data, use checkDuplication function to get more information")
     obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
   }
-  if (nrow(obj) == 0) return(NULL)
+  if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)
   # Check do need realy approximation 
   approxim2 <- approxim
   if (!is.null(obj$year)) {

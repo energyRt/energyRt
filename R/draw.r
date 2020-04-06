@@ -82,7 +82,7 @@ draw.technology <- function(
                                 defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),
-                                approxim = approxim)[, x])
+                                approxim = approxim)[, x], all = TRUE)
         sng <- sng[sng != 0]
         ll <- tech@aeff[tech@aeff$acomm == y, , drop = FALSE]
         approxim$comm <- unique(ll[, 'comm'])
@@ -90,7 +90,7 @@ draw.technology <- function(
           hh <- interpolation(ll, x, defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),
-                                approxim = approxim)
+                                approxim = approxim, all = TRUE)
           hh[hh[, x] != 0,, drop = FALSE]
         })
         names(dbl) <- acname
@@ -125,20 +125,20 @@ draw.technology <- function(
                                   defVal = as.numeric(defVal['ginp2use']), 
                                   rule = rule['ginp2use'], 
                                   year_range = range(year),
-                                  approxim = approxim)
+                                  approxim = approxim, all = TRUE)
         gg <- c('cinp2ginp', 'cinp2use')
         cparam <- lapply(gg, function(x) {
                                   interpolation(tft, x, 
                                   defVal = as.numeric(defVal[x]), 
                                   rule = rule[x], 
                                   year_range = range(year),
-                                  approxim = approxim)})
+                                  approxim = approxim, all = TRUE)})
         names(cparam) <- gg
         share <- interpolation_bound(tft, 'share', 
                                   defVal = as.numeric(defVal[c('share.lo', 'share.up')]), 
                                   rule = as.character(rule[c('share.lo', 'share.up')]), 
                                   year_range = range(year),
-                                  approxim = approxim)
+                                  approxim = approxim, all = TRUE)
       }
       # Figure
       lcount <- nrow(ccomm) + length(ainp)
@@ -249,18 +249,18 @@ draw.technology <- function(
                                   defVal = as.numeric(defVal[x]), 
                                   rule = rule[x], 
                                   year_range = range(year),
-                                  approxim = approxim)})
+                                  approxim = approxim, all = TRUE)})
         names(cparam) <- gg
         share <- interpolation_bound(tft, 'share', 
                                   defVal = as.numeric(defVal[c('share.lo', 'share.up')]), 
                                   rule = as.character(rule[c('share.lo', 'share.up')]), 
                                   year_range = range(year),
-                                  approxim = approxim)
+                                  approxim = approxim, all = TRUE)
         afc <- interpolation_bound(tft, 'afc', 
                                   defVal = as.numeric(defVal[c('afc.lo', 'afc.up')]), 
                                   rule = as.character(rule[c('afc.lo', 'afc.up')]), 
                                   year_range = range(year),
-                                  approxim = approxim)
+                                  approxim = approxim, all = TRUE)
       }
       
        # Figure
