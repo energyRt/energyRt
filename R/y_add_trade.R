@@ -117,9 +117,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		# pTradeIr
 		pTradeIr <- multiInterpolation2(trd@trade, 'ava',
 			obj@parameters[['pTradeIr']], approxim = approxim, 'trade', trd@name)
-		if (!is.null(pTradeIr) && nrow(pTradeIr) != 0) {
-		  browser()
-		}
 		obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], pTradeIr)
 		# Trade ainp
 		mTradeIrAInp <- NULL; mTradeIrAOut <- NULL;
