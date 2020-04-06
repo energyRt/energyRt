@@ -82,7 +82,7 @@ draw.technology <- function(
                                 defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),
-                                approxim = approxim)[, x], all = TRUE)
+                                approxim = approxim, all = TRUE)[, x])
         sng <- sng[sng != 0]
         ll <- tech@aeff[tech@aeff$acomm == y, , drop = FALSE]
         approxim$comm <- unique(ll[, 'comm'])
@@ -364,5 +364,5 @@ draw.technology <- function(
     }, error = function(x) {
       par(mar = MAR)
       stop(x)
-    })    
+    })
 }
