@@ -263,7 +263,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         ret <- c(ret, '1')
         ret <- c(ret, '/;', '')
       } else {
-        return(c('set', paste(obj@name, ' /', sep = ''), obj@data[, 1], '/;', ''))
+        return(c('set', paste(obj@name, ' /', sep = ''), sort(obj@data[, 1]), '/;', ''))
       }
     } else if (obj@type == 'map') {
       add_nl <- ''
@@ -397,7 +397,7 @@ setMethod('print', 'parameter', function(x, ...) {
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0("['", paste0(obj@data[, 1], collapse = "', '"), "']")
+      tmp <- paste0("['", paste0(sort(obj@data[, 1]), collapse = "', '"), "']")
     return(c(paste0("# ", obj@name), paste0('\n', obj@name, ' = set(', tmp, ');')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
@@ -444,7 +444,7 @@ setMethod('print', 'parameter', function(x, ...) {
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0('\n  ', obj@data[, 1], collapse = '')
+      tmp <- paste0('\n  ', sort(obj@data[, 1]), collapse = '')
     return(c(paste0("# ", obj@name), paste0('\nset ', obj@name, ' := ', tmp, ';')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
@@ -499,7 +499,7 @@ setMethod('print', 'parameter', function(x, ...) {
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0('\n  (:', paste0(obj@data[, 1], collapse = '),\n  (:'), ')\n')
+      tmp <- paste0('\n  (:', paste0(sort(obj@data[, 1]), collapse = '),\n  (:'), ')\n')
     return(c(paste0("# ", obj@name), paste0(obj@name, ' = [', tmp, ']')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name)
