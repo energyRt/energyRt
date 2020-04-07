@@ -150,7 +150,7 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
 }
 
 # Begin equation declaration
-.equation.from.gams.to.pyomo.jump <- function(eqt) {
+.equation.from.gams.to.pyomo.AbstractModel <- function(eqt) {
   declaration <- gsub('[.][.].*', '', eqt)
   rs <- paste0('model.', gsub('[$.(].*', '', eqt), ' = Constraint(')
   
