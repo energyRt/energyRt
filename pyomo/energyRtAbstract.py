@@ -260,7 +260,9 @@ flog.write('"load data",,"' + str(datetime.datetime.now()) + '"\n')
 instance = model.create_instance("data.dat");
 print("model.create_instance end ", round(time.time() - seconds, 2));
 
-opt = SolverFactory('cplex');
+exec(open("inc_constraints.py").read())
+exec(open("inc_solver.py").read())
+# opt = SolverFactory('cplex');
 flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
 exec(open("inc3.py").read())
 slv = opt.solve(instance);

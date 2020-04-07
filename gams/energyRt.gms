@@ -1835,6 +1835,7 @@ eqLECActivity
 * c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f
 /;
 $offtext
+$include inc_constraints.gms
 
 model energyRt / all / ;
 
@@ -1848,13 +1849,14 @@ $include data.gms
 * ddd355e0-0023-45e9-b0d3-1ad83ba74b3a
 *$EXIT
 
-*option lp = cbc;
 
 $include inc3.gms
 
 put log_stat;
 put '"solver",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
+$include inc_solver.gms
+*option lp = cplex;
 
 Solve energyRt minimizing vObjective using LP;
 

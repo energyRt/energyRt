@@ -266,7 +266,9 @@ model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : 
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 print("equations ", round(time.time() - seconds, 2))
 exec(open("inc3.py").read())
-opt = SolverFactory('cplex');
+exec(open("inc_constraints.py").read())
+exec(open("inc_solver.py").read())
+# opt = SolverFactory('cplex');
 exec(open("inc4.py").read())
 flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
 slv = opt.solve(model)

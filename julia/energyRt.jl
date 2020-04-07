@@ -4,7 +4,6 @@ flog = open("output/log.csv", "w")
 println(flog,"parameter,value,time")
 println(flog,"\"model language\",JULIA,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
 println("start ", Dates.format(now(), "HH:MM:SS"))
-using Cbc
 using JuMP
 println(flog,"\"load data\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
 include("data.jl")
@@ -340,7 +339,10 @@ println("eqObjective done ", Dates.format(now(), "HH:MM:SS"))
 println("eqLECActivity(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 println(flog,"\"solver\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
 @objective(model, Min, vObjective)
-set_optimizer(model, Cbc.Optimizer)
+include("inc_constraints.jl")
+include("inc_solver.jl")
+# using Cbc
+# set_optimizer(model, Cbc.Optimizer)
 include("inc3.jl")
 optimize!(model)
 hh = "-100"

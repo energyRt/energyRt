@@ -11,8 +11,14 @@
     run_codeout <- scen@source[["PYOMOConcreteOutput"]]
   }
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
+  if (is.null(scen@solver$inc_solver))
+    scen@solver$inc_solver <- "opt = SolverFactory('cplex');"
+  zz <- file(paste(arg$dir.result, 'inc_solver.py', sep = ''), 'w')
+  cat(scen@solver$inc_solver, file = zz, sep = '\n')
+  close(zz)
   # Add constraint
   zz_mod <- file(paste(arg$dir.result, '/energyRt.py', sep = ''), 'w')
+  zz_constr <- file(paste(arg$dir.result, '/inc_constraints.py', sep = ''), 'w')
   npar <- grep('^##### decl par #####', run_code)[1]
   cat(run_code[1:npar], sep = '\n', file = zz_mod)
   if (AbstractModel) 
@@ -33,15 +39,15 @@
   npar2 <- (grep('^model[.]obj ', run_code)[1] - 1)
   cat(run_code[npar:npar2], sep = '\n', file = zz_mod)
   if (length(scen@modInp@gams.equation) > 0) {
-    cat('\n', file = zz_mod)
-    cat('model.fornontriv = Var(domain = pyo.NonNegativeReals)\n', file = zz_mod)
-    cat('model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)\n', file = zz_mod)
+    cat('\n', file = zz_constr)
+    cat('model.fornontriv = Var(domain = pyo.NonNegativeReals)\n', file = zz_constr)
+    cat('model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)\n', file = zz_constr)
     for (i in seq_along(scen@modInp@gams.equation)) {
       eqt <- scen@modInp@gams.equation[[i]]
       if (AbstractModel) {
-        cat(energyRt:::.equation.from.gams.to.pyomo.AbstractModel(eqt$equation), sep = '\n', file = zz_mod)
+        cat(energyRt:::.equation.from.gams.to.pyomo.AbstractModel(eqt$equation), sep = '\n', file = zz_constr)
       } else {
-        cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_mod)
+        cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_constr)
       }
     }
   }
@@ -54,13 +60,13 @@
     cat('f.close()\n', file = zz_mod)
   }
   close(zz_mod)
+  close(zz_constr)
   zz_modout <- file(paste(arg$dir.result, '/output.py', sep = ''), 'w')
   cat(run_codeout, sep = '\n', file = zz_modout)
   close(zz_modout)
   .add_five_includes(arg, scen, ".py")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'python energyRt.py'
-  scen@solver$code <- c('energyRt.py', 'output.py')
-  
+  scen@solver$code <- c('energyRt.py', 'output.py', 'inc_constraints.py', 'inc_solver.py')
   scen
 }
