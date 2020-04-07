@@ -21,8 +21,13 @@
   zz_constr <- file(paste(arg$dir.result, '/inc_constraints.py', sep = ''), 'w')
   npar <- grep('^##### decl par #####', run_code)[1]
   cat(run_code[1:npar], sep = '\n', file = zz_mod)
-  if (AbstractModel) 
-    cat(.generate.pyomo.par(scen@modInp@parameters), sep = '\n', file = zz_mod)
+  if (AbstractModel) {
+    f1 <- grep('^mCns', names(scen@modInp@parameters), invert = TRUE)
+    f2 <- grep('^mCns', names(scen@modInp@parameters))
+    cat(.generate.pyomo.par(scen@modInp@parameters[f1]), sep = '\n', file = zz_mod)
+    if (length(f2) > 0) 
+      cat(.generate.pyomo.par(scen@modInp@parameters[f2]), sep = '\n', file = zz_constr)
+  }
   if (AbstractModel)
     zz_data_pyomo <- file(paste(arg$dir.result, 'data.dat', sep = ''), 'w')
   file_w <- c()
@@ -31,7 +36,11 @@
       if (AbstractModel) {
         cat(energyRt:::.toPyomoAbstractModel(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
       } else {
-        cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
+        if (any(grep('^mCns', i))) {
+          cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
+        } else {
+          cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
+        }
       }
     }
   }

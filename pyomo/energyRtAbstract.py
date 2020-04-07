@@ -251,6 +251,7 @@ model.eqSubsCost = Constraint(model.mSubsCost, rule = lambda model, c, r, y : mo
 model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(model.vTotalCost[r,y]*model.pDiscountFactorMileStone[r,y] for r in model.region for y in model.year if (r,y) in model.mvTotalCost));
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)
 model.eqLECActivity = Constraint(model.meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in model.slice if (t,s) in model.mTechSlice)  >=  model.pLECLoACT[r]);
+exec(open("inc_constraints.py").read())
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 
 
@@ -260,7 +261,6 @@ flog.write('"load data",,"' + str(datetime.datetime.now()) + '"\n')
 instance = model.create_instance("data.dat");
 print("model.create_instance end ", round(time.time() - seconds, 2));
 
-exec(open("inc_constraints.py").read())
 exec(open("inc_solver.py").read())
 # opt = SolverFactory('cplex');
 flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')

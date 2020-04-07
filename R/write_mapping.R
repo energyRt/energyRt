@@ -4,7 +4,7 @@
   x = 1
   cat(paste0(rep(' ', 50), collapse = ''))
   update_time <- function(x) {
-    xx <- paste0(' mapping update ', x, ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
+    xx <- paste0(' Mapping ', x, ' (64), time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
     cat(paste0(bacs, xx, paste0(rep(' ', 50 - nchar(xx)), collapse = '')))
     (x + 1)
   }
@@ -76,7 +76,9 @@
   colnames(tmp)[colnames(tmp) == 'comm'] <- 'commp'
   tmp1 <- getParameterData(prec@parameters$pEmissionFactor)
   x = update_time(x)
-  tmp <- merge(tmp1[tmp1$value != 0, ], tmp, by = 'commp')[, c('tech', 'comm', 'commp')]
+  tmp1 <- tmp1[tmp1$value != 0, ]
+  tmp1 <- tmp1[!duplicated(tmp1),, drop = FALSE]
+  tmp <- merge(tmp1, tmp, by = 'commp')[, c('tech', 'comm', 'commp')]
   tmp <- tmp[!duplicated(tmp),, drop = FALSE]
   tmp <- merge(getParameterData(prec@parameters$mvTechAct), tmp, by = 'tech')[, c('tech', 'comm', 'commp', 'region', 'year', 'slice')]
   x = update_time(x)
@@ -204,7 +206,7 @@
     colnames(mvInp2Lo)[5] <- 'slice.1'
     prec@parameters[['mvInp2Lo']] <- addData(prec@parameters[['mvInp2Lo']], mvInp2Lo)
     
-    mvOut2Lo <- merge(getParameterData(prec@parameters[['mvOut2Lo']]), getParameterData(prec@parameters[['mSliceParentChild']])
+    mvOut2Lo <- merge(getParameterData(prec@parameters[['mOut2Lo']]), getParameterData(prec@parameters[['mSliceParentChild']])
     )[,c('comm', 'region', 'year', 'slice', 'slicep')]
     colnames(mvOut2Lo)[5] <- 'slice.1'
     x = update_time(x)
@@ -260,7 +262,7 @@
       pWeather <- rbind(pWeatherUp, pWeatherLo, pWeather)
       x = update_time(x)
       pWeather$mwth <- pWeather$value; pWeather$value <- NULL
-    }
+    } else x <- x + 6
     
     towth <- data.frame(par = character(), base_map = character(), map_to = character(), stringsAsFactors = FALSE)
     towth[nrow(towth) + 1, ] <- c('paTechWeatherAfUp', 'meqTechAfUp', 'mTechWeatherAf')
