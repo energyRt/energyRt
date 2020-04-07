@@ -131,6 +131,9 @@ interpolate <- function(obj, ...) { #- returns class scenario
     stopCluster(cl)
     scen <- .merge_scen(scen_pr, use_par)
   }
+  # Remove group duplication
+  scen@modInp@parameters$group <- .unique_set(scen@modInp@parameters$group)
+  
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
     scen@modInp@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)

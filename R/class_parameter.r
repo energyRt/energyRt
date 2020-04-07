@@ -526,4 +526,14 @@ setMethod('print', 'parameter', function(x, ...) {
 setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
           function(obj, data) return(obj))
 
-
+.unique_set <- function(obj) {
+  
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+    obj@data <- obj@data[!duplicated(obj@data),, drop = FALSE]
+  }
+  obj@data <- obj@data[!duplicated(obj@data),, drop = FALSE]
+  if (obj@nValues != -1) 
+    obj@nValues <- nrow(obj@data)
+  return(obj)    
+}
