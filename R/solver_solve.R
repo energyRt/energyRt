@@ -27,20 +27,17 @@ solve_model <- function(tmp.dir = NULL, scen = NULL, solver = NULL, ...) {
 solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, write = TRUE) { 
   # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
-  # solver = 'GAMS' use solver for model
   # tmp.dir - solver working directore
-  # gamsCompileParameter, glpkCompileParameter, cbcCompileParameter - parameter for compiler (to cmd/sh)
   # echo = TRUE - print working data
   # open.folder = FALSE - open folder before the run
   # show.output.on.console = FALSE & invisible = FALSE arg for command system
   # only.listing = FALSE (!depreciated?) generate only listing file (works for gams only)
   # readresult = TRUE read result
   # tmp.del delete results
-  # browser()
   arg <- list(...)
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) {
-    scen@solver <- list(lang = "GAMS")
+    scen@solver <- list(lang = "PYOMO")
   } else if (is.character(arg$solver)) {
     scen@solver <- list(lang = arg$solver)
   } else if (is.list(arg$solver)) {
