@@ -252,8 +252,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
       # sup     weather type    value
         obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], gg)
     }
-    mvSupCost <- merge(mSupAva[, c('sup', 'region', 'year')], pSupCost[pSupCost$value != 0, c('sup', 'region', 'year')])
-    mvSupCost <- mvSupCost[!duplicated(mvSupCost), ]
+    t1 <- mSupAva[, c('sup', 'region', 'year')]; t1 <- t1[!duplicated(t1), ]
+    t2 <- pSupCost[pSupCost$value != 0, c('sup', 'region', 'year')]; t2 <- t2[!duplicated(t2), ]
+    mvSupCost <- merge(t1, t2)
     obj@parameters[['mvSupCost']] <- addData(obj@parameters[['mvSupCost']], mvSupCost)
     
   obj
