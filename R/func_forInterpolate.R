@@ -115,16 +115,9 @@
 }
 
 
-.remove_char <- function(x) {
-  if (is.character(x)) x <- nchar(x)
-  if (x == 0) return()
-  n1 <- paste0(rep('\b', x), collapse = '')
-  cat(n1, paste0(rep(' ', x), collapse = ''), n1, sep = '')
-  
-}
   
 # Implement add0 for all parameters
-.add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim, interpolation_time_begin) {
+.add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim, interpolation_time_begin, interpolation_count) {
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
   # if (num_classes_for_progrees_bar < 50) {
@@ -134,7 +127,8 @@
   #   need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
   # }
   # Fill DB main data
-  paste_txt <- ''; nch <- 0; tmlg <- 0; mnch <- 0
+  tmlg <- 0; mnch <- 0
+  cat(rep(' ', 100), sep = '')
   k <- 0;
   time.log.nm <- rep(NA, num_classes_for_progrees_bar)
   time.log.tm <- rep(NA, num_classes_for_progrees_bar)
@@ -143,16 +137,10 @@
       k <- k + 1;
       if (k %% max.thread == n.thread) {
         tmlg <- tmlg + 1
-        paste_txt <- paste0(k, ' (', num_classes_for_progrees_bar, '),',
-                            paste0(rep(' ', max(c(1, 15 - (nchar(scen@model@data[[i]]@data[[j]]@name) %% 15)))), collapse = ''),
-                            scen@model@data[[i]]@data[[j]]@name,
-                            ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
         if (arg$echo) {
-          .remove_char(nch)
-          cat(paste_txt, sep = '')
+          .interpolation_message(scen@model@data[[i]]@data[[j]]@name, k, interpolation_count, 
+                                 interpolation_time_begin = interpolation_time_begin)
         }
-        nch <- nchar(paste_txt)
-        mnch <- max(c(mnch, nch))
         p1 <- proc.time()[3]
         tryCatch({
           scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
@@ -176,7 +164,7 @@
                                    time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
   # if (arg$echo) cat(' ')
   if (arg$echo)
-    .remove_char(nch)
+    .remove_char(100)
   scen
 }
 
@@ -203,3 +191,23 @@
 }
 
 
+# Implement add0 for all parameters
+.get_objects_count <- function(scen) {
+  sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
+}
+
+.interpolation_message <- function(name, num, interpolation_count, interpolation_time_begin) {
+  jj <- paste0(num, ' (', interpolation_count, '),',
+       paste0(rep(' ', max(c(1, 15 - (nchar(name) %% 15)))), collapse = ''),
+       name, ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
+  jj <- paste0(jj, paste0(rep(' ', 100 - nchar(jj)), collapse = ''))
+  cat(rep('\b', 100), rep(' ', 100), rep('\b', 100), jj, sep = '')
+}
+
+.remove_char <- function(x) {
+  if (is.character(x)) x <- nchar(x)
+  if (x == 0) return()
+  n1 <- paste0(rep('\b', x), collapse = '')
+  cat(n1, paste0(rep(' ', x), collapse = ''), n1, sep = '')
+  
+}
