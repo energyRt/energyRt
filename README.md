@@ -5,8 +5,8 @@
 **energyRt** package provides tools to formulate the main "bricks" of an energy system model in **R**, and solve the model with one of the mainstream mathematical programming languages:  
 * [GAMS](http://www.gams.com/),  
 * [GLPK/Mathprog](https://www.gnu.org/software/glpk/),  
-* [Python/Pyomo] (http://www.pyomo.org/),  
-* [Julia/JuMP] (http://www.juliaopt.org/JuMP.jl/stable/).  
+* [Python/Pyomo](http://www.pyomo.org/),  
+* [Julia/JuMP](http://www.juliaopt.org/JuMP.jl/stable/).  
 
 The RES/CEM model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies. 
 
