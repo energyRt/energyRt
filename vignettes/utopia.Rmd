@@ -43,7 +43,7 @@ knitr::opts_chunk$set(
 \pagebreak
 
 # Intoduction
-This tutorial demonstrates the application of `energyRt` package to develop a **Reference Energy System** (RES, or  **Energy system optimization**) model and conduct standard analysis, i.e. run scenarios, optimize several alternative development pathways of the simplified energy system. The initial (base-year) structure of the discussed below an example of RES is flexible. The following features can be easily adjusted:  
+This tutorial demonstrates the application of `energyRt` package to develop a **Reference Energy System** (RES, or  **Energy system optimization**) model and conduct standard analysis, i.e. run scenarios, optimize several alternative development pathways of the simplified energy system. The initial (base-year) structure of the discussed below example of RES is flexible. The following features can be easily adjusted:  
   * number of regions and the model GIS-info (the *map*),  
   * the model horizon and annual time-steps ("milestone years"),  
   * number and levels of sub-annual time-steps ("time slices"),  
@@ -51,17 +51,18 @@ This tutorial demonstrates the application of `energyRt` package to develop a **
   * interregional trade and trade with the rest of the world (ROW),  
   * constraints on the model variables.  
   
-The `energyRt` package provides a set of S4 classes, methods, and functions to design the model elements, such as technologies, commodities, supply, demand, and constraints, save them in a `model` object, process the data and save it in a format readable by solver-software (currently GAMS or GLPK/Mathprog), run the model code in the solver-software, read the results back to R, and manipulate the data to produce charts and tables.  
+The `energyRt` package provides a set of S4 classes, methods, and functions to design the model elements, such as technologies, commodities, supply, demand, and constraints, save them in a `model` object, process the data and save it in a format readable by solver-software (GAMS, GLPK/Mathprog, Python/Pyomo, or Julia/JuMP), run the model code in the solver-software, read the results back to R, and manipulate the data to produce charts and tables.  
 
-This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <https://github.com/olugovoy/energyRt/vignettes>). It can be run step-by-step or at once to reproduce the results below. Playing with parameters and data is highly recommended for learning the package and the RES-models. This is the first beta-version of the package and the tutorial. Please report bugs, issues, thoughts here: <https://github.com/olugovoy/energyRt/issues>.    
+This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <https://github.com/energyRt/energyRt/vignettes>). It can be run step-by-step or at once to reproduce the results below. Playing with parameters and data is highly recommended for learning the package and the RES-models. This is the first beta-version of the package and the tutorial. Please report bugs, issues, thoughts here: <https://github.com/energyRt/energyRt/issues>.    
 
 # Prerequisites
-We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/olugovoy/energyRt/>).   
+We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/energyRt/energyRt/>).   
 ```{r setup}
 # Choose your solver-software
-# 
-mysolver = "GAMS"
 mysolver = "GLPK"
+# mysolver = "JuMP"
+mysolver = "Pyomo"
+mysolver = "GAMS"
 
 if (T) {
   # Installation of required packages - if not installed.
@@ -75,11 +76,11 @@ if (T) {
   # GIS tools
   if (!any(mypks == "rgeos")) install.packages("rgeos")
   if (!any(mypks == "rgdal")) install.packages("rgdal")
-  if (!any(mypks == "gpclib")) install.packages("gpclib", type="source")
+  # if (!any(mypks == "gpclib")) install.packages("gpclib")
+  if (!any(mypks == "spdep")) install.packages("spdep")
   if (!any(mypks == "maptools")) install.packages("maptools")
   # Reporting
   if (!any(mypks == "scales")) install.packages("scales")
-  if (!any(mypks == "spdep")) install.packages("spdep")
   if (!any(mypks == "kableExtra")) install.packages("kableExtra")
 }
 # Load required packages
@@ -1257,13 +1258,8 @@ mdl@sysInfo@milestone
 # Scenarios
 
 ## "BASE": traditional techs, no trade
-```{r BASE, eval=T}
-mdl@data[[1]]@data$ECOA
-scen_BASE <- interpolate(mdl, name = "BASE")
-
-pTechStock <- scen_BASE@modInp@parameters$pTechStock@data
-pTechStock[pTechStock$tech == 'ECOA' & pTechStock$region == 'R1', ]
-
+```{r BASE, eval=T, echo=F}
+# Four alternative languages to solve the model
 scen_BASE <- solve(mdl, name = "BASE", 
                    # tmp.path = "C:/solwork",
                    solver = mysolver,
@@ -1273,7 +1269,108 @@ scen_BASE <- solve(mdl, name = "BASE",
                    )
 summary(scen_BASE)
 
+
 ```
+
+
+```{r, include=F, eval=F, echo=F}
+# Compare models in different languages
+scen_BASE_glpk <- solve(mdl, name = "BASE_glpk", 
+                   # tmp.path = "C:/solwork",
+                   # solver = mysolver,
+                   solver = "GLPK",
+                   tmp.name = "UTOPIA_BASE_GLPK",
+                   tmp.del = F
+                   )
+summary(scen_BASE_glpk)
+
+scen_BASE_gams <- solve(add(mdl), name = "BASE_gams", 
+                   # tmp.path = "C:/solwork",
+                   solver = "GAMS",
+                   # solver = list(lang = "GAMS"),
+                   tmp.name = "UTOPIA_BASE_GAMS",
+                   tmp.del = F
+                   # , wait = FALSE
+                   )
+summary(scen_BASE_gams)
+
+scen_BASE_py <- solve(add(mdl), name = "BASE_py", 
+                   # tmp.path = "C:/solwork",
+                   # solver = mysolver,
+                   solver = list(
+                     lang = "Pyomo",
+                     solver = "CPLEX"
+                   ),
+                   tmp.name = "UTOPIA_BASE_Python",
+                   tmp.del = F
+                   # , wait = FALSE
+                   )
+summary(scen_BASE_py)
+
+scen_BASE_jl <- solve(add(mdl), name = "BASE_jl", 
+                   # tmp.path = "C:/solwork",
+                   # solver = mysolver,
+                   # solver = "JuMP",
+                   solver = list(
+                     lang = "JuMP",
+                     solver = "Cbc"
+                   ),
+                   tmp.name = "UTOPIA_BASE_Julia",
+                   tmp.del = FALSE 
+                   # , wait = FALSE
+                   )
+summary(scen_BASE_jl)
+
+getData(list(scen_BASE,
+             scen_BASE_glpk, 
+             scen_BASE_jl, 
+             scen_BASE_py, 
+             scen_BASE_gams),
+        name = "vObjective", merge = TRUE)
+
+```
+
+
+```{r, include=F, eval=F, echo=F}
+scen_BASE_int <- interpolate(add(mdl), #, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
+                         name = "BASE")
+summary(scen_BASE_int)
+## Writing the model code and data on disk
+write_model(scen_BASE_int, solver = "GAMS", tmp.dir = "solwork/UTOPIA_BASE_GAMS")
+write_model(scen_BASE_int, solver = "PYOMO", tmp.dir = "solwork/UTOPIA_BASE_PYOMO")
+write_model(scen_BASE_int, solver = "GLPK", tmp.dir = "solwork/UTOPIA_BASE_GLPK")
+write_model(scen_BASE_int, solver = "JuMP", tmp.dir = "solwork/UTOPIA_BASE_Julia2")
+
+write_model(scen_BASE_int, solver = list(
+  lang = "PYOMO", 
+  files = list(
+    cplex.opt = "blablabla"
+  )), 
+  tmp.dir = "solwork/UTOPIA_BASE_PYOMO2")
+
+
+## Solving the model
+solve_model(tmp.dir = "solwork/UTOPIA_BASE_GAMS", 
+            solver = "GAMS", wait = FALSE, invisible = F)
+solve_model(tmp.dir = "solwork/UTOPIA_BASE_PYOMO", 
+            solver = "PYOMO", wait = FALSE, invisible = F)
+solve_model(tmp.dir = "solwork/UTOPIA_BASE_GLPK", 
+            solver = "GLPK", wait = FALSE, invisible = FALSE)
+solve_model(tmp.dir = "solwork/UTOPIA_BASE_Julia2", 
+            solver = "JULIA", wait = FALSE, invisible = FALSE)
+
+## Read solution
+scen_BASE_gms2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_GAMS")
+summary(scen_BASE_gms2)
+scen_BASE_py2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_PYOMO")
+summary(scen_BASE_py2)
+scen_BASE_glpk2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_GLPK")
+summary(scen_BASE_glpk2)
+scen_BASE_jl2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_Julia")
+summary(scen_BASE_jl2)
+
+```
+
 
 
 ## "GRID": traditional techs and interregional trade
@@ -1307,7 +1404,11 @@ scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), #
                   )
 summary(scen_RBAU)
 
+```
+
+```{r, include=F, eval=F, echo=F}
 # Alternative workflow to solve the model:
+mysolver = "GAMS"
 ## Interpolation of parameters
 scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
                          name = "RBAU2")
@@ -1338,9 +1439,8 @@ getData(scen_RBAU, name = "vTradeIr")
 scen <- scen_RBAU
 
 # Quick check
-scen@modOut@solutionStatus
 scen@modOut@variables$vObjective
-
+summary(scen)
 
 ```
 
@@ -1423,7 +1523,7 @@ ggplot(fumxr, aes(as.factor(year), PJ, fill = comm)) +
 ```
 
 ### Trade
-```{r, eval=T}
+```{r, eval=F}
 # Names of all unempty variables and parameters for trade
 names(getData(scen, name_ = "trd|trade|Trade", merge = F))
 
@@ -1586,8 +1686,6 @@ system("c:/utils/ffmpeg/bin/ffmpeg -r 4 -f image2 -s 1920x1080 -i Rplot%d.png -v
 setwd(homedir)
 
 ```
-
-
 
 
 # Scenarios with constraints
