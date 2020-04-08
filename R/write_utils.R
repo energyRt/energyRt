@@ -17,13 +17,13 @@
   NULL
 }
 
-.write_inc_solver <- function(scen, def_inc_solver, type, templ) {
+.write_inc_solver <- function(scen, arg, def_inc_solver, type, templ) {
   if (!is.null(scen@solver$inc_solver) && !is.null(scen@solver$solver))
     stop('have to define only one argument from scen@solver$inc_solver & scen@solver$solver')
   if (!is.null(scen@solver$solver))
     scen@solver$inc_solver <- gsub(templ, scen@solver$solver, def_inc_solver)
   if (is.null(scen@solver$inc_solver) && is.null(scen@solver$solver))
-    scen@solver$inc_solver <- scen@solver$solver
+    scen@solver$inc_solver <- def_inc_solver
   zz <- file(paste0(arg$dir.result, 'inc_solver', type), 'w')
   cat(scen@solver$inc_solver, file = zz, sep = '\n')
   close(zz)

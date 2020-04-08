@@ -11,7 +11,7 @@
     run_codeout <- scen@source[["PYOMOConcreteOutput"]]
   }
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
-  .write_inc_solver(scen, "opt = SolverFactory('cplex');", '.py', 'cplex')
+  .write_inc_solver(scen, arg, "opt = SolverFactory('cplex');", '.py', 'cplex')
   # Add constraint
   zz_mod <- file(paste(arg$dir.result, '/energyRt.py', sep = ''), 'w')
   zz_constr <- file(paste(arg$dir.result, '/inc_constraints.py', sep = ''), 'w')

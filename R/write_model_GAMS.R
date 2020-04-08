@@ -7,7 +7,7 @@
     rs <- try(system('gams'))
     if (rs != 0) stop('GAMS is not found')
   }
-  .write_inc_solver(scen, 'option lp = cplex;', '.gms', 'cplex')
+  .write_inc_solver(scen, arg, 'option lp = cplex;', '.gms', 'cplex')
   
   run_code <- scen@source[["GAMS"]]
   dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
