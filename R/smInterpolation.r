@@ -1,13 +1,14 @@
 #### Deprecated version due to deprecetate simple_data_frame_approximation
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, remValue = NULL) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, 
+  remValue = NULL, all.val = FALSE) {
   there.is.year <- any(colnames(frm) == 'year')
-  if (nrow(frm) == 0) return(NULL)
+  if (!all.val && nrow(frm) == 0) return(NULL)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
                     year_range = range(approxim$year),
-                    approxim   = approxim)
+                    approxim   = approxim, all = all.val)
   if (is.null(dd)) return(NULL)
   # Must fixed in the future
   colnames(dd)[[ncol(dd)]] <- 'value'

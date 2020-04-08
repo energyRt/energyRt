@@ -462,9 +462,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   # Discount
   approxim_no_mileStone_Year <- approxim
   approxim_no_mileStone_Year$mileStoneYears <- NULL
-      obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']],
-        simpleInterpolation(app@discount, 'discount',
-          obj@parameters[['pDiscount']], approxim_no_mileStone_Year))
+  pDiscount <- simpleInterpolation(app@discount, 'discount',
+                      obj@parameters[['pDiscount']], approxim_no_mileStone_Year, all.val = TRUE)
+  if (!app@discountFirstYear)
+    pDiscount[pDiscount$year == min(pDiscount$year), 'value'] <- 0
+  obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']], pDiscount)
   approxim_comm <- approxim
   approxim_comm[['comm']] <- approxim$all_comm
   obj@parameters[['pSliceShare']] <- addData(obj@parameters[['pSliceShare']], 
@@ -480,21 +482,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
       obj@parameters[['pDummyExportCost']] <- addData(obj@parameters[['pDummyExportCost']],
         simpleInterpolation(app@debug, 'dummyExport',
           obj@parameters[['pDummyExportCost']], approxim_comm))
-#    # Tax
-#      obj@parameters[['pTaxCost']] <- addData(obj@parameters[['pTaxCost']],
-#        simpleInterpolation(app@tax, 'tax',
-#          obj@parameters[['pTaxCost']], approxim_comm))
-#    # Subs
-#      obj@parameters[['pSubsCost']] <- addData(obj@parameters[['pSubsCost']],
-#        simpleInterpolation(app@subs, 'subs',
-#          obj@parameters[['pSubsCost']], approxim_comm))
   }
   if (nrow(app@milestone) == 0) {
     app <- setMilestoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
   }
 
-  #obj@parameters[['mMidMilestone']] <- addData(obj@parameters[['mMidMilestone']], 
-  #  data.frame(year = app@milestone$mid))
   obj@parameters[['mStartMilestone']] <- addData(obj@parameters[['mStartMilestone']], 
     data.frame(year = app@milestone$mid, yearp = app@milestone$start))
   obj@parameters[['mEndMilestone']] <- addData(obj@parameters[['mEndMilestone']], 
@@ -522,15 +514,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
      data.frame(year = app@milestone$mid, value = (app@milestone$end - app@milestone$start + 1), stringsAsFactors = FALSE))
   
   ####################################################
-  gg <- .getTotalParameterData(obj, 'pDiscount', need.reduce = FALSE)
-  gg <- gg[sort(gg$year, index.return = TRUE)$ix,, drop = FALSE]
-  ll <- gg[0,, drop = FALSE]
-  for(l in unique(gg$region)) {
-    dd <- gg[gg$region == l,, drop = FALSE]
+  pDiscount <- pDiscount[sort(pDiscount$year, index.return = TRUE)$ix,, drop = FALSE]
+  pDiscountFactor <- pDiscount[0,, drop = FALSE]
+  for(l in unique(pDiscount$region)) {
+    dd <- pDiscount[pDiscount$region == l,, drop = FALSE]
     dd$value <- cumprod(1 / (1 + dd$value))
-    ll <- rbind(ll, dd)
+    pDiscountFactor <- rbind(pDiscountFactor, dd)
   }
-  obj@parameters[['pDiscountFactor']] <- addData(obj@parameters[['pDiscountFactor']], ll)
+  obj@parameters[['pDiscountFactor']] <- addData(obj@parameters[['pDiscountFactor']], pDiscountFactor)
   # pDiscountFactorMileStone
   yrr <- app@milestone$start[1]:app@milestone$end[nrow(app@milestone)]
   tyr <- rep(NA, length(yrr))
@@ -538,15 +529,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   for (yr in seq_len(nrow(app@milestone))) {
     tyr[app@milestone$start[yr] <= yrr & yrr <= app@milestone$end[yr]] <- app@milestone$mid[yr]
   }
-  ll$year <- tyr[as.character(ll$year)]
-  obj@parameters[['pDiscountFactorMileStone']] <- addData(obj@parameters[['pDiscountFactorMileStone']], 
-      aggregate(ll[,'value', drop = FALSE], ll[, c('region', 'year'), drop = FALSE], sum))
+  pDiscountFactorMileStone <- pDiscountFactor
+  pDiscountFactorMileStone$year <- tyr[as.character(pDiscountFactorMileStone$year)]
+  pDiscountFactorMileStone <- aggregate(pDiscountFactorMileStone[,'value', drop = FALSE], 
+                                        pDiscountFactorMileStone[, c('region', 'year'), drop = FALSE], sum)
+  obj@parameters[['pDiscountFactorMileStone']] <- addData(obj@parameters[['pDiscountFactorMileStone']], pDiscountFactorMileStone)
   # pDiscountFactorMileStone
-  hh <- gg[gg$year == as.character(max(app@year)), -2]
-  hh <- hh[hh$value == 0, 'region', drop = FALSE]
+  mDiscountZero <- pDiscount[pDiscount$year == as.character(max(app@year)), -2]
+  mDiscountZero <- mDiscountZero[mDiscountZero$value == 0, 'region', drop = FALSE]
   # Add mDiscountZero - zero discount rate in final period
-  if (nrow(hh) != 0) {
-    obj@parameters[['mDiscountZero']] <- addData(obj@parameters[['mDiscountZero']], hh)
+  if (nrow(mDiscountZero) != 0) {
+    obj@parameters[['mDiscountZero']] <- addData(obj@parameters[['mDiscountZero']], mDiscountZero)
   } 
   obj
 })
