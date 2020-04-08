@@ -30,6 +30,44 @@
   obj <- obj[,c(prior[prior %in% colnames(obj)], 
     colnames(obj)[ncol(obj)]), drop = FALSE]
   obj <- obj[!is.na(obj[, parameter]), , drop = FALSE]
+  if (anyDuplicated(obj[, -ncol(obj)])) {
+     warning("there are duplicates in the data, use checkDuplication function to get more information")
+    obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
+  }
+  if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)
+  # Check do need realy approximation 
+  approxim2 <- approxim
+  if (!is.null(obj$year)) {
+    approxim2$year <- arg$approxim$mileStoneYears
+    if (is.null(approxim2$year))
+      approxim2$year <- arg$approxim$year
+  }
+  tmp_nona <- (!is.na(obj[, -ncol(obj), drop = FALSE]))
+  if (all(tmp_nona)) { # There is not NA column
+    possible_comb <- prod(sapply(approxim2, length))
+    if (nrow(obj) >= possible_comb) {
+      for (i in names(approxim2))
+        obj <- obj[obj[[i]] %in% approxim2[[i]],, drop = FALSE]
+      if (nrow(obj) == possible_comb)
+        return(obj)
+    }
+  } else { # There are only NA and not NA column
+    f1 <- apply(tmp_nona, 2, any)
+    f2 <- apply(tmp_nona, 2, all)
+    if (all(f1 == f2)) { # Could be small appr
+      obj2 <- obj[, c(f1, TRUE), drop = FALSE]
+      for (i in colnames(obj2)[-ncol(obj2)])
+        obj2 <- obj2[obj2[[i]] %in% approxim2[[i]],, drop = FALSE]
+      if (ncol(obj2) == 1 || nrow(obj2) == prod(sapply(approxim2[names(obj2)[-ncol(obj2)]], length))) { # Simple approximation is possible
+        for (i in names(obj)[c(!f1, FALSE)]) {
+          obj2 <- merge(obj2, approxim2[i])
+        }
+        return(obj2[, colnames(obj)])
+      }
+    }
+  }
+  
+  
   if (any(colnames(obj)[-ncol(obj)] == 'year')) {
     year_range <- arg$year_range
     yy <- range(c(year_range[1], year_range[2], 
@@ -143,6 +181,8 @@
     }
     
   }
+  
+  
   return(dd)
 }
 setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
@@ -171,14 +211,24 @@ setMethod("interpolation_bound", signature(obj = 'data.frame',
   a3 <- aa; a3[, parameter] <- obj[, gg[3]]
   d1 <- interpolation(rbind(a1, a2), parameter, 
       defVal = defVal[1], rule = rule[1], ...)
-  dd <- d1[, -ncol(d1), drop = FALSE]
-  dd[, 'type'] <- 'lo'
-  dd[, parameter] <- d1[, parameter]
+  if (!is.null(d1)) {
+    dd <- d1[, -ncol(d1), drop = FALSE]
+    dd[, 'type'] <- 'lo'
+    dd[, parameter] <- d1[, parameter]
+    }
   d2 <- interpolation(rbind(a3, a2), parameter, 
     defVal = defVal[2], rule = rule[2], ...)
-  zz <- d2[, -ncol(d2), drop = FALSE]
-  zz[, 'type'] <- 'up'
-  zz[, parameter] <- d2[, parameter]
-  rbind(dd, zz)
+  if (!is.null(d2)) {
+    zz <- d2[, -ncol(d2), drop = FALSE]
+    zz[, 'type'] <- 'up'
+    zz[, parameter] <- d2[, parameter]
+  }
+  if (!is.null(d1) && !is.null(d2)) {
+    return(rbind(dd, zz))
+  } else if (!is.null(d1)) {
+    return(dd)
+  } else if (!is.null(d2)) {
+    return(zz)
+  } else return(NULL)
 })
 

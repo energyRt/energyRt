@@ -3,7 +3,7 @@ solve.model <- function(obj, name = NULL, solver = "GAMS",
                         tmp.time = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
                         tmp.name = paste(solver, obj@name, name, tmp.time, sep = "_"), 
                         tmp.dir = file.path(tmp.path, tmp.name),
-                        tmp.del = TRUE, ...) {
+                        tmp.del = TRUE, n.threads = 1, ...) {
 
   
   arg <- list()
@@ -19,7 +19,7 @@ solve.model <- function(obj, name = NULL, solver = "GAMS",
     message("The solver working directory: ", tmp.dir)
     message("Starting time: ", Sys.time())
   }
-  scen = interpolate(obj, name = name)
+  scen = interpolate(obj, name = name, n.threads = n.threads)
   scen = solver_solve(scen, name = name, solver = solver, tmp.dir = tmp.dir, tmp.del = tmp.del, ..., readresult = TRUE)
   if (tmp.del) unlink(tmp.dir, recursive = TRUE)
   invisible(scen)

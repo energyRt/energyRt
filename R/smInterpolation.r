@@ -1,14 +1,14 @@
 #### Deprecated version due to deprecetate simple_data_frame_approximation
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE) {
-  # cat('simple_data_frame_approximation_chk:', parameter, '\n')
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, remValue = NULL) {
   there.is.year <- any(colnames(frm) == 'year')
-  #if (nrow(frm) == 0) return(frm)
+  if (nrow(frm) == 0) return(NULL)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
                     year_range = range(approxim$year),
                     approxim   = approxim)
+  if (is.null(dd)) return(NULL)
   # Must fixed in the future
   colnames(dd)[[ncol(dd)]] <- 'value'
   for(i in colnames(dd)[-ncol(dd)]) {
@@ -24,15 +24,14 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     stnd <- mtp@dimSetNames[-(1:length(d3))]
     # It was added for trading routes
-    if (sum(colnames(frm) %in% c('region', 'src', 'dst')) == 3) {
-    	stnd[stnd == 'src'] <- 'region'
-    	stnd <- stnd[stnd != 'dst']
+    if (sum(stnd %in% c('src', 'dst')) == 2) {
+    	stnd <- c(stnd[stnd != 'src' & stnd != 'dst'], 'region')
     } 
     dd <- cbind(d3, dd[, c(stnd, 'value'), drop = FALSE])
   }
   # For increase speed
-  if (removeDefault)
-  	dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
+  # if (removeDefault)
+  # 	dd <- dd[dd$value != mtp@defVal,, drop = FALSE]
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
@@ -43,17 +42,22 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
     dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
   }
+  if (!is.null(remValue))
+    dd <- dd[!(dd$value %in% remValue), ]
+  if (nrow(dd) == 0) return(NULL)
   dd
 }
 
 multiInterpolation <- function(frm, parameter, mtp, approxim,
-  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL) {
+  add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, 
+  remValueUp = NULL, remValueLo = NULL) {
   there.is.year <- any(colnames(frm) == 'year')
   dd <- interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
                     rule       = mtp@interpolation,
                     year_range = range(approxim$year),
                     approxim   = approxim)
+  if (is.null(dd)) return(NULL)
   colnames(dd)[[ncol(dd)]] <- 'value'
   for(i in colnames(dd)[-ncol(dd)]) {
       dd[[i]] <- as.character(dd[[i]])
@@ -68,14 +72,15 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     colnames(d3) <- add_set_name
     stnd <- mtp@dimSetNames[-(1:length(d3))]
     # It was added for trading routes
-    if (sum(colnames(frm) %in% c('region', 'src', 'dst')) == 3) {
-    	stnd[stnd == 'src'] <- 'region'
-    	stnd <- stnd[stnd != 'dst']
+    if (sum(stnd %in% c('src', 'dst')) == 2) {
+      stnd <- c(stnd[stnd != 'src' & stnd != 'dst'], 'region')
     } 
+    
     dd <- cbind(d3, dd[, c(stnd, 'type', 'value'), drop = FALSE])
   }
   # For increase speed, not work for GLPK
-  dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+  # dd <- dd[(dd$type == 'lo' & dd$value != mtp@defVal[1]) | (dd$type == 'up' & dd$value != mtp@defVal[2]),, drop = FALSE]
+  dd <- dd[(dd$type == 'lo') | (dd$type == 'up'),, drop = FALSE]
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
@@ -86,5 +91,10 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
     dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
   }
+  if (!is.null(remValueUp))
+    dd <- dd[!(dd$value %in% remValueUp & dd$type == 'up'), ]
+  if (!is.null(remValueLo))
+    dd <- dd[!(dd$value %in% remValueLo & dd$type == 'lo'), ]
+  if (nrow(dd) == 0) return(NULL)
   dd
 }

@@ -115,36 +115,91 @@
 }
 
 
+.remove_char <- function(x) {
+  if (is.character(x)) x <- nchar(x)
+  if (x == 0) return()
+  n1 <- paste0(rep('\b', x), collapse = '')
+  cat(n1, paste0(rep(' ', x), collapse = ''), n1, sep = '')
+  
+}
+  
 # Implement add0 for all parameters
-.add2_nthreads_1 <- function(scen, arg, approxim) {
+.add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim, interpolation_time_begin) {
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
-  if (num_classes_for_progrees_bar < 50) {
-    need.tick <- rep(TRUE, num_classes_for_progrees_bar)
-  } else {
-    need.tick <- rep(FALSE, num_classes_for_progrees_bar)
-    need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
-  }
+  # if (num_classes_for_progrees_bar < 50) {
+  #   need.tick <- rep(TRUE, num_classes_for_progrees_bar)
+  # } else {
+  #   need.tick <- rep(FALSE, num_classes_for_progrees_bar)
+  #   need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
+  # }
   # Fill DB main data
-  k <- 0
+  paste_txt <- ''; nch <- 0; tmlg <- 0; mnch <- 0
+  k <- 0;
+  time.log.nm <- rep(NA, num_classes_for_progrees_bar)
+  time.log.tm <- rep(NA, num_classes_for_progrees_bar)
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) { 
-      k <- k + 1
-      tryCatch({
-        scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
-      }, error = function(e) {
-        assign('add0_message', list(tracedata = sys.calls(),
-          add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
-          globalenv())
-        message('\nThere are error during work .add0. More information in "add0_message"\n')
-        stop(e)
-      })
-      if (need.tick[k] && arg$echo) {
-        cat('.')
-        flush.console() 
+      k <- k + 1;
+      if (k %% max.thread == n.thread) {
+        tmlg <- tmlg + 1
+        paste_txt <- paste0(k, ' (', num_classes_for_progrees_bar, '),',
+                            paste0(rep(' ', max(c(1, 15 - (nchar(scen@model@data[[i]]@data[[j]]@name) %% 15)))), collapse = ''),
+                            scen@model@data[[i]]@data[[j]]@name,
+                            ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
+        if (arg$echo) {
+          .remove_char(nch)
+          cat(paste_txt, sep = '')
+        }
+        nch <- nchar(paste_txt)
+        mnch <- max(c(mnch, nch))
+        p1 <- proc.time()[3]
+        tryCatch({
+          scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
+        }, error = function(e) {
+          assign('add0_message', list(tracedata = sys.calls(),
+            add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
+            globalenv())
+          message('\nThere are error during work .add0. More information in "add0_message"\n')
+          stop(e)
+        })
+        time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name
+        time.log.tm[tmlg] <- proc.time()[3] - p1
+        # if (need.tick[k] && arg$echo) {
+        #   cat('.')
+        #   flush.console() 
+        # }
       }
     }
   }
-  if (arg$echo) cat(' ')
+  scen@misc$time.log <- data.frame(name = time.log.nm[seq_len(tmlg)], 
+                                   time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
+  # if (arg$echo) cat(' ')
+  if (arg$echo)
+    .remove_char(nch)
   scen
 }
+
+.merge_scen <- function(scen_pr, use_par) {
+  if (scen_pr[[1]]@modInp@parameters$mCommSlice@nValues == -1)
+    stop('have to do')
+  scen <- scen_pr[[1]]
+  scen_pr <- scen_pr[-1]
+  for (nm in use_par) {
+    hh <- sapply(scen_pr, function(x) x@modInp@parameters[[nm]]@nValues)
+    if (sum(hh) != 0)
+      scen@modInp@parameters[[nm]]@data[scen@modInp@parameters[[nm]]@nValues + sum(hh), ] <- NA
+    for (i in seq_along(hh)[hh != 0])  {
+      scen@modInp@parameters[[nm]]@data[scen@modInp@parameters[[nm]]@nValues + 1:hh[i], ] <- 
+        scen_pr[[i]]@modInp@parameters[[nm]]@data[1:hh[i], ]
+      scen@modInp@parameters[[nm]]@nValues <- scen@modInp@parameters[[nm]]@nValues + hh[i]
+    }
+    
+  }
+  for (i in seq_along(scen_pr)) 
+    scen@misc$time.log <- rbind(scen@misc$time.log, scen_pr[[i]]@misc$time.log)
+  
+  scen
+}
+
+

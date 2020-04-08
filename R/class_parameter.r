@@ -105,8 +105,9 @@ setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
   function(obj, data) {
     if (nrow(data) > 0) {
       if (ncol(data) != ncol(obj@data) ||
-        any(colnames(data) != colnames(obj@data)))
+        any(sort(colnames(data)) != sort(colnames(obj@data))))
           stop('Internal error: Wrong new data 1')
+      data <- data[, colnames(obj@data), drop = FALSE]
       if (any(colnames(data) == 'type')) {
         if (any(!(data$type %in% c('lo', 'up'))))
           stop('Internal error: Wrong new data 2')
@@ -216,13 +217,13 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 
 # Generate GAMS code, return character == GAMS code 
 .toGams <- function(obj) {
-  gen_gg <- function(name, dtt) {
-  	ret <- paste0(name, '("', dtt[, 1])
-  	for (i in seq_len(ncol(dtt) - 2) + 1) {
-  		ret <- paste0(ret, '", "', dtt[, i])
-  	}
-  	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
-  }
+    gen_gg <- function(name, dtt) {
+    	ret <- paste0(name, '("', dtt[, 1])
+    	for (i in seq_len(ncol(dtt) - 2) + 1) {
+    		ret <- paste0(ret, '", "', dtt[, i])
+    	}
+    	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
+    }
     as_simple <- function(dtt, name, def) {
       add_cnd <- function(y, x) { 
         if (x == '') return(x) else return(paste(x, 'and', y))
@@ -240,15 +241,17 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
       if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
       
-      if (nrow(dtt) == 0 || all(dtt$value == def)) {
+      if (nrow(dtt) == 0 || all(dtt$value == def)) { #
         return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
       } else {
+        # if (def != 0 && def != Inf) {
         if (def != 0 && def != Inf) {
           zz <- paste0(name, '(', paste0(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';')
-          return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE])))
-        } else {
-          return(gen_gg(name, dtt))
-        }
+        } else zz <- ''
+          return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE]))) # 
+        # } else {
+          # return(gen_gg(name, dtt))
+        # }
       }  
     }
   if (obj@nValues != -1) {
@@ -260,7 +263,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         ret <- c(ret, '1')
         ret <- c(ret, '/;', '')
       } else {
-        return(c('set', paste(obj@name, ' /', sep = ''), obj@data[, 1], '/;', ''))
+        return(c('set', paste(obj@name, ' /', sep = ''), sort(obj@data[, 1]), '/;', ''))
       }
     } else if (obj@type == 'map') {
       add_nl <- ''
@@ -366,4 +369,171 @@ setMethod('print', 'parameter', function(x, ...) {
 })
 
 
+# Generate PYOMO code, return character vector
+.toPyomo <- function(obj) {
+  as_simple <- function(data, name, name2, def) {
+    if (def == Inf) def <- 0
+    if (ncol(obj@data) == 1) {
+      stop('Have to do')
+      # return(paste0("# ", name, '\n', name, ' = {}; \n')) # ', data$value, '
+    } else {
+      data <- data[data$value != Inf & data$value != def, ]
+      if (nrow(data) == 0) {
+        rtt <- paste0("# ", name, name2, '\n', name, ' = toPar(set(), ', def, ')\n')
+        return(rtt)
+      }
+      rtt <- paste0("# ", name, name2, '\ntmp = {} \n')
+      kk <- paste0("tmp[('", data[, 1])
+      for (i in seq_len(ncol(data) - 2) + 1)
+        kk <- paste0(kk, "', '", data[, i])
+      kk <- paste0(kk, "')] = ", data[, 'value'])
+      kk <- c(rtt, paste0(kk, collapse = '\n'), '\n\n', paste0(name,' = toPar(tmp, ', def, ')\n'))
+      return(kk)
+    }
+  }
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+  }
+  if (obj@type == 'set') {
+    tmp <- ''
+    if (nrow(obj@data) > 0)
+      tmp <- paste0("['", paste0(sort(obj@data[, 1]), collapse = "', '"), "']")
+    return(c(paste0("# ", obj@name), paste0('\n', obj@name, ' = set(', tmp, ');')))
+  } else if (obj@type == 'map') {
+    ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    if (nrow(obj@data) == 0) {
+      return(c(ret, paste0('\n', obj@name, ' = set();')))
+    } else {
+      return(c(ret, paste0('\n', obj@name, ' = set([', paste0(paste0("('", apply(obj@data, 1, 
+        function(x) paste(x, collapse = "', '")), "')"), collapse = ',\n'), ']);')))
+    }
+  } else if (obj@type == 'simple') {
+    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+  } else if (obj@type == 'multi') {
+    hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    return(c(
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
+    ))
+  } else stop('Must realise')
+}
 
+.toPyomoAbstractModel <- function(obj) {
+  as_simple <- function(data, name, name2, def) {
+    if (ncol(obj@data) == 1) {
+      return(paste0("# ", name, '\nparam ', name, ' := ', data$value, '\n'))
+    } else {
+      data <- data[data$value != Inf & data$value != def, ]
+      rtt <- paste0("# ", name, name2, "\nparam ", name, ' default ', def, ' := ')
+      if (nrow(data) == 0) {
+        return(paste0("# ", name, name2, " no data except default\n"))
+      }
+      kk <- paste0('  ', data[, 1])
+      for (i in seq_len(ncol(data) - 2) + 1)
+        kk <- paste0(kk, ' ', data[, i])
+      kk <- paste0(kk, ' ', data[, 'value'])
+      kk <- c(rtt, paste0(kk, collapse = '\n'), '\n;\n')
+      return(kk)
+    }
+  }
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+  }
+  if (obj@type == 'set') {
+    tmp <- ''
+    if (nrow(obj@data) > 0)
+      tmp <- paste0('\n  ', sort(obj@data[, 1]), collapse = '')
+    return(c(paste0("# ", obj@name), paste0('\nset ', obj@name, ' := ', tmp, ';')))
+  } else if (obj@type == 'map') {
+    ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    if (nrow(obj@data) == 0) {
+      return(c(ret, paste0('set ', obj@name, ' := ;')))
+    } else {
+      return(c(ret, paste0('set ', obj@name, ' := \n', paste0(paste0('  ', apply(obj@data, 1,
+        function(x) paste(x, collapse = ' ')), '\n'), collapse = ''), ';')))
+    }
+  } else if (obj@type == 'simple') {
+    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+  } else if (obj@type == 'multi') {
+    hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    return(c(
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE],
+        paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE],
+        paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
+    ))
+  } else stop('Must realise')
+}
+
+
+# Generate Julia code, return character vector
+.toJulia <- function(obj) {
+  as_simple <- function(data, name, name2, def) {
+    if (ncol(obj@data) == 1) {
+      return(c(
+        paste0("# ", name),
+        paste0(name, ' = ', data$value)))
+    } else {
+      data <- data[data$value != Inf & data$value != def, ]
+      rtt <- paste0("# ", name, name2, '\n', name, "Def = ", def, ";\n")
+      if (nrow(data) == 0) {
+        return(paste0(rtt, name, ' = Dict()'))
+      }
+      kk <- paste0('  (:', data[, 1])
+      for (i in seq_len(ncol(data) - 2) + 1)
+        kk <- paste0(kk, ', :', data[, i])
+      kk <- paste0(kk, ') => ', data[, 'value'])
+      # t1 <- ''; t2 <- ''
+      # if (ncol(data) > 2) {t1 <- 'JuMP.Containers.SparseAxisArray('; t2 <- ')'}
+      # kk <- c(paste0("# ", name, name2, '\n', name, ' = ', t1, 'Dict('), 
+      #   paste0(kk, collapse = ',\n'), t2, ');')
+      kk <- c(rtt, paste0(name, ' = Dict('), paste0(kk, collapse = ',\n'), ');')
+      return(kk)
+    }
+  }
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+  }
+  if (obj@type == 'set') {
+    tmp <- ''
+    if (nrow(obj@data) > 0)
+      tmp <- paste0('\n  (:', paste0(sort(obj@data[, 1]), collapse = '),\n  (:'), ')\n')
+    return(c(paste0("# ", obj@name), paste0(obj@name, ' = [', tmp, ']')))
+  } else if (obj@type == 'map') {
+    ret <- paste0('# ', obj@name)
+    if (ncol(obj@data) > 1) ret <- paste0(ret, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    if (nrow(obj@data) == 0) {
+      return(c(ret, paste0(obj@name, ' = []')))
+    } else {
+      return(c(ret, paste0(obj@name, ' = [\n', paste0(paste0('  (:', apply(obj@data, 1, 
+        function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), '];')))
+    }
+  } else if (obj@type == 'simple') {
+    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+  } else if (obj@type == 'multi') {
+    hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    return(c(
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
+    ))
+  } else stop('Must realise')
+}
+
+setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
+          function(obj, data) return(obj))
+
+.unique_set <- function(obj) {
+  
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+    obj@data <- obj@data[!duplicated(obj@data),, drop = FALSE]
+  }
+  obj@data <- obj@data[!duplicated(obj@data),, drop = FALSE]
+  if (obj@nValues != -1) 
+    obj@nValues <- nrow(obj@data)
+  return(obj)    
+}

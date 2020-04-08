@@ -85,6 +85,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
     mileStoneYears = scen@model@sysInfo@milestone$mid,
     mileStoneForGrowth = xx
   )
+  approxim$ry <- merge(data.frame(region = approxim$region, stringsAsFactors = FALSE), 
+    data.frame(year = approxim$mileStoneYears, stringsAsFactors = FALSE))
+  approxim$rys <- merge(approxim$ry,
+    data.frame(slice = approxim$slice@all_slice, stringsAsFactors = FALSE))
   # Fill basic parameter interplotaion from sysInfo
   approxim$all_comm <- c(lapply(scen@model@data, function(x) c(lapply(x@data, function(y) {
   	if (class(y) != 'commodity') return(NULL)
@@ -118,10 +122,18 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation ')
   if (arg$n.threads == 1) {
-    scen <- .add2_nthreads_1(scen, arg, approxim)
+    scen <- .add2_nthreads_1(0, 1, scen, arg, approxim, interpolation_time_begin = interpolation_time_begin)
   } else {
-    stop('have to do')
+    use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
+    require(parallel)
+    cl <- makeCluster(arg$n.threads)
+    scen_pr <- parLapply(cl, 0:(arg$n.threads - 1), .add2_nthreads_1, arg$n.threads, scen, arg, approxim, interpolation_time_begin)
+    stopCluster(cl)
+    scen <- .merge_scen(scen_pr, use_par)
   }
+  # Remove group duplication
+  scen@modInp@parameters$group <- .unique_set(scen@modInp@parameters$group)
+  
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
     scen@modInp@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
@@ -131,7 +143,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     }
   }
   # Reduce mapping
-  scen@modInp <- .reduce_mapping(scen@modInp)  
+  scen@modInp <- .write_mapping(scen@modInp, interpolation_time_begin = interpolation_time_begin)  
   
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
   for(i in names(scen@modInp@parameters)) {
@@ -141,8 +153,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
     }
   }
   scen@source <- energyRt:::.modelCode
+  scen@status$interpolated <- TRUE
+
   # Check parameters
   scen <- .check_scen_par(scen)
   if (arg$echo) cat(' ', round(proc.time()[3] - interpolation_time_begin, 2), 's\n')
+  
   invisible(scen)
 }
