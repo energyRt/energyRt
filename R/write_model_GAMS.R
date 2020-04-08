@@ -7,11 +7,7 @@
     rs <- try(system('gams'))
     if (rs != 0) stop('GAMS is not found')
   }
-  if (is.null(scen@solver$inc_solver))
-    scen@solver$inc_solver <- 'option lp = cplex;'
-  zz <- file(paste(arg$dir.result, 'inc_solver.gms', sep = ''), 'w')
-  cat(scen@solver$inc_solver, file = zz, sep = '\n')
-  close(zz)
+  .write_inc_solver(scen, 'option lp = cplex;', '.gms', 'cplex')
   
   run_code <- scen@source[["GAMS"]]
   dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
@@ -97,24 +93,5 @@
   scen
 }
 
-
-.write_multi_threads <- function(arg, scen, func, type) {
-  require(parallel)
-  tlp <- lapply(0:(arg$n.threads - 1), function(y) names(scen@modInp@parameters)[
-    seq_along(scen@modInp@parameters) %% arg$n.threads == y])
-  cl <- makeCluster(arg$n.threads)
-  wrt_fun <- function(x, tlp, par, drr, func, type) {
-    require(energyRt)
-    for (i in tlp[[x + 1]]) {
-      zz_data_tmp <- file(paste(drr, '/input/', i, '.', type, sep = ''), 'w')
-      cat(func(par[[i]]), sep = '\n', file = zz_data_tmp)
-      close(zz_data_tmp)
-    }
-    NULL
-  }
-  parLapply(cl, 0:(arg$n.threads - 1), wrt_fun, tlp, scen@modInp@parameters, arg$dir.result, func, type)
-  stopCluster(cl)
-  NULL
-}
 
 

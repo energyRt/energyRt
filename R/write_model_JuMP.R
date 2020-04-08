@@ -7,11 +7,8 @@
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   zz_data_julia <- file(paste(arg$dir.result, '/data.jl', sep = ''), 'w')
   zz_data_constr <- file(paste(arg$dir.result, '/inc_constraints.jl', sep = ''), 'w')
-  if (is.null(scen@solver$inc_solver))
-    scen@solver$inc_solver <- 'using Cbc\nset_optimizer(model, Cbc.Optimizer)\n'
-  zz <- file(paste(arg$dir.result, 'inc_solver.jl', sep = ''), 'w')
-  cat(scen@solver$inc_solver, file = zz, sep = '\n')
-  close(zz)
+  
+  .write_inc_solver(scen, "using Cbc\nset_optimizer(model, Cbc.Optimizer)\n", '.jl', 'Cbc')
   
   # using Cbc\nset_optimizer(model, Cbc.Optimizer)
   for (j in c('set', 'map', 'simple', 'multi')) {
