@@ -1286,20 +1286,24 @@ summary(scen_BASE_glpk)
 
 scen_BASE_gams <- solve(add(mdl), name = "BASE_gams", 
                    # tmp.path = "C:/solwork",
-                   solver = "GAMS",
-                   # solver = list(lang = "GAMS"),
+                   # solver = "GAMS",
+                   solver = list(
+                     lang = "GAMS",
+                     # solver = "ipopt"),
+                     solver = "cbc"),
                    tmp.name = "UTOPIA_BASE_GAMS",
-                   tmp.del = F
+                   tmp.del = FALSE
                    # , wait = FALSE
                    )
-summary(scen_BASE_gams)
+summary(scen_BASE_gams) 
 
 scen_BASE_py <- solve(add(mdl), name = "BASE_py", 
                    # tmp.path = "C:/solwork",
                    # solver = mysolver,
                    solver = list(
                      lang = "Pyomo",
-                     solver = "CPLEX"
+                     solver = "ipopt"
+                     # solver = "glpk"
                    ),
                    tmp.name = "UTOPIA_BASE_Python",
                    tmp.del = F
