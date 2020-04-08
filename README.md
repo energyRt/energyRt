@@ -1,13 +1,19 @@
 # energyRt: energy analysis toolbox in R
 
-**energyRt** is a package for [R](https://www.r-project.org/) to develop Reference Energy System (RES) models and analyze energy-technologies.
+**energyRt** is a package for [R](https://www.r-project.org/) to develop Reference Energy System (RES) models (also known as Capacity Expansion Models (CEM), or "Bottom-Up" technological energy models), and analyze energy-technologies.
 
-**energyRt** package provides tools to build RES ("Bottom-Up"), technological, linear cost-minimizing models, which can be solved using [GAMS](http://www.gams.com/) and [GLPK](https://www.gnu.org/software/glpk/). The RES model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies. 
+**energyRt** package provides tools to formulate the main "bricks" of an energy system model in **R**, and solve the model with one of the mainstream mathematical programming languages:  
+* [GAMS](http://www.gams.com/),  
+* [GLPK/Mathprog](https://www.gnu.org/software/glpk/),  
+* [Python/Pyomo] (http://www.pyomo.org/),  
+* [Julia/JuMP] (http://www.juliaopt.org/JuMP.jl/stable/).  
+
+The RES/CEM model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies. 
 
 **energyRt** package is a set of _classes_, _methods_, and _functions_ in [R](https://www.r-project.org/) which are designed to:  
 - handle data, assist in defining RES models,  
 - helps to analyze data, check for errors and bugs before parsing it into solver,  
-- parses your dataset to GAMS or GLPK and runs them to solve the model,  
+- parses your dataset to GAMS or GLPK or Python/Pyomo or Julia/JuMP and runs them to solve the model,  
 - reads the solution and imports results back to R,  
 - assists with an analysis of results and reporting.  
 
@@ -31,8 +37,8 @@ The current functionality allows development of multi-regional RES models from b
 #### R and RStudio
 Assuming that R is already installed (if not, please download and install from https://www.r-project.org/), we also recommend RStudio (https://www.rstudio.com/), a powerful IDE (Integrated Development Environment) for R. It simplifies usage of R, provides number of features such as reproducible research (integration with Markdown, Sweave), integration with  version control (github, svn).   
 
-#### GAMS or GLPK to solve the model   
-The cost-minimising linear programming model (the set of equation for LP problem), emboddied into *energyRt* package requires additional software to solve it. Currently *energyRt* model code  is written in *GAMS* and *GLPK*, *Julia* version is in progress, at least one of them is required to solve the model.
+#### GAMS or GLPK or Python or Julia to solve the model   
+The cost-minimising linear programming model (the set of equation for LP problem), emboddied into *energyRt* package requires additional software to solve it. Currently *energyRt* model code  is written in several languages *GAMS*, *GLPK*, *Python/Pyomo*, *Julia/Jump*. At least one of them is required to solve the model.
 
 The General Algebraic Modeling System (*GAMS*, http://gams.com/) is a powerful proprietary modeling system. Suitable LP solvers: CBC (included in the basic GAMS version, very powerful open source solver) or CPLEX. Others LP solvers have not been tested, but may work as well.
 
@@ -68,10 +74,11 @@ Response from glpsol will be an indicator of successful installation.
 Alternatively, GLPK is included in homebrew-science installer library.   
 See: http://brew.sh/ and https://github.com/Homebrew/homebrew-science for details.  
 
-#### TeX   
-Required to generate authomatic reports.  
-For Windows: http://miktex.org/ (other options are possible but not tested)   
-For Mac: http://tug.org/mactex/ (other options are possible but not tested)   
+##### Installing Pythom/Pyomo   
+Please folow one of the standard procedures to install Python, make it available in your system's terminal/cmd, install Pyomo package and LP solver(s). CPLEX or Gurobi are recommended for large scale models.  
+
+##### Installing Julia/JuMP    
+Similarly, follow the standard procedure of installing Julia and JuMP package, as well as the solvers and links to the solvers. *Currently Julia/JuMP version of energyRt is suitable for small-scale models and is recommended for testing only, the code for large-scale models is in progress.*
 
 ### energyRt
 Currently the package is hosted only on GitHub. To install the package:   
@@ -79,4 +86,4 @@ devtools::install_github("olugovoy/energyRt")
  
 # Examples
 * **UTOPIA** -- up to 11 regions model is saved in vignettes of the project `energyRt/vignettes/`.   
-* **USENSYS** -- large scale model of US energy system is in progress. First version(s) are available here (https://github.com/olugovoy/usensys).
+* **USENSYS** -- large scale model of US energy system is in progress. First version(s) are available here (https://github.com/usensys/usensys).
