@@ -464,8 +464,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   approxim_no_mileStone_Year$mileStoneYears <- NULL
   pDiscount <- simpleInterpolation(app@discount, 'discount',
                       obj@parameters[['pDiscount']], approxim_no_mileStone_Year, all.val = TRUE)
-  if (!app@discountFirstYear)
-    pDiscount[pDiscount$year == min(pDiscount$year), 'value'] <- 0
   obj@parameters[['pDiscount']] <- addData(obj@parameters[['pDiscount']], pDiscount)
   approxim_comm <- approxim
   approxim_comm[['comm']] <- approxim$all_comm
@@ -533,6 +531,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
   pDiscountFactorMileStone$year <- tyr[as.character(pDiscountFactorMileStone$year)]
   pDiscountFactorMileStone <- aggregate(pDiscountFactorMileStone[,'value', drop = FALSE], 
                                         pDiscountFactorMileStone[, c('region', 'year'), drop = FALSE], sum)
+  if (!app@discountFirstYear) {
+    dsc <- pDiscount[pDiscount$year == min(pDiscount$year), ]
+    dsc$mlt <- dsc$value + 1
+    pDiscountFactorMileStone <- merge(pDiscountFactorMileStone, dsc[, c('region', 'mlt')])
+    pDiscountFactorMileStone$value <- pDiscountFactorMileStone$value * pDiscountFactorMileStone$mlt
+    pDiscountFactorMileStone$mlt <- NULL
+  }
   obj@parameters[['pDiscountFactorMileStone']] <- addData(obj@parameters[['pDiscountFactorMileStone']], pDiscountFactorMileStone)
   # pDiscountFactorMileStone
   mDiscountZero <- pDiscount[pDiscount$year == as.character(max(app@year)), -2]
