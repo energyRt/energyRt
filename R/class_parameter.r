@@ -481,16 +481,19 @@ setMethod('print', 'parameter', function(x, ...) {
       if (nrow(data) == 0) {
         return(paste0(rtt, name, ' = Dict()'))
       }
-      kk <- paste0('  (:', data[, 1])
+      val = data[1, ncol(data)]
+      if (trunc(val) == val) val <- paste0(val, '.')
+      rtt = c(rtt, paste0(name, ' = Dict((:', paste0(data[1, -ncol(data)], collapse = ', :'), ') => ', val, ');'))
+      if (nrow(data) == 1) return(rtt)
+      kk <- paste0(name, '[(:', data[-1, 1])
       for (i in seq_len(ncol(data) - 2) + 1)
-        kk <- paste0(kk, ', :', data[, i])
-      kk <- paste0(kk, ') => ', data[, 'value'])
+        kk <- paste0(kk, ', :', data[-1, i])
+      kk <- paste0(kk, ')] = ', data[-1, 'value'])
+      return(c(rtt, kk))
       # t1 <- ''; t2 <- ''
       # if (ncol(data) > 2) {t1 <- 'JuMP.Containers.SparseAxisArray('; t2 <- ')'}
       # kk <- c(paste0("# ", name, name2, '\n', name, ' = ', t1, 'Dict('), 
       #   paste0(kk, collapse = ',\n'), t2, ');')
-      kk <- c(rtt, paste0(name, ' = Dict('), paste0(kk, collapse = ',\n'), ');')
-      return(kk)
     }
   }
   if (obj@nValues != -1) {
@@ -507,8 +510,11 @@ setMethod('print', 'parameter', function(x, ...) {
     if (nrow(obj@data) == 0) {
       return(c(ret, paste0(obj@name, ' = []')))
     } else {
-      return(c(ret, paste0(obj@name, ' = [\n', paste0(paste0('  (:', apply(obj@data, 1, 
-        function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), '];')))
+      ret = c(ret, paste0(obj@name, ' = [\n', paste0(paste0('  (:', apply(obj@data[1,, drop = FALSE], 1, 
+          function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), '];'))
+      if (nrow(obj@data) == 1) return(ret)
+      return(c(ret,  paste0('push!(', obj@name, ', ', paste0('(:', apply(obj@data[-1,, drop = FALSE], 1, 
+                   function(x) paste(x, collapse = ',:')), '))\n'), collapse = '')))
     }
   } else if (obj@type == 'simple') {
     return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
