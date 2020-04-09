@@ -201,7 +201,7 @@
        paste0(rep(' ', max(c(1, 15 - (nchar(name) %% 15)))), collapse = ''),
        name, ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
   jj <- paste0(jj, paste0(rep(' ', 100 - nchar(jj)), collapse = ''))
-  cat(rep('\b', 100), rep(' ', 100), rep('\b', 100), jj, sep = '')
+  cat(rep('\b', 100), jj, sep = '') # , rep(' ', 100), rep('\b', 100)
 }
 
 .remove_char <- function(x) {
