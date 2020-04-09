@@ -510,10 +510,7 @@ setMethod('print', 'parameter', function(x, ...) {
     if (nrow(obj@data) == 0) {
       return(c(ret, paste0(obj@name, ' = []')))
     } else {
-      ret = c(ret, paste0(obj@name, ' = Set([\n', paste0(paste0('  (:', apply(obj@data[1,, drop = FALSE], 1, 
-          function(x) paste(x, collapse = ',:')), ')\n'), collapse = ''), ']);'))
-      if (nrow(obj@data) == 1) return(ret)
-      return(c(ret,  paste0('push!(', obj@name, ', ', paste0('(:', apply(obj@data[-1,, drop = FALSE], 1, 
+      return(c(ret, paste0(obj@name, ' = Set()'), paste0('push!(', obj@name, ', ', paste0('(:', apply(obj@data, 1, 
                    function(x) paste(x, collapse = ',:')), '))\n'), collapse = '')))
     }
   } else if (obj@type == 'simple') {
