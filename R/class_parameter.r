@@ -481,8 +481,8 @@ setMethod('print', 'parameter', function(x, ...) {
       if (nrow(data) == 0) {
         return(paste0(rtt, name, ' = Dict()'))
       }
-      val = data[1, ncol(data)]
-      if (trunc(val) == val) val <- paste0(val, '.')
+      val = as.character(data[1, ncol(data)])
+      if (!any(grep('[.e]', val))) val <- paste0(val, '.')
       rtt = c(rtt, paste0(name, ' = Dict((:', paste0(data[1, -ncol(data)], collapse = ', :'), ') => ', val, ');'))
       if (nrow(data) == 1) return(rtt)
       kk <- paste0(name, '[(:', data[-1, 1])
