@@ -32,7 +32,7 @@
       if (AbstractModel) {
         cat(energyRt:::.toPyomoAbstractModel(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
       } else {
-        if (any(grep('^mCns', i))) {
+        if (any(grep('^.Cns', i))) {
           cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
         } else {
           cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
