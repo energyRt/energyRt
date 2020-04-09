@@ -37,6 +37,7 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   .fremset[x]
 }
 .generate_loop_julia <- function(set_num, set_loop) {
+  # browser()
   # Consdition split and divet by subset
   while (!is.null(set_loop) && substr(set_loop, 1, 1) == '(' && substr(set_loop, nchar(set_loop), nchar(set_loop)) == ')')
     set_loop <- substr(set_loop, 2, nchar(set_loop) - 1)
@@ -52,10 +53,28 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   set_num2 <- .aliasName(set_num1)
   names(set_num2) <- set_num1
   
-  rs <- paste0('(', paste0(set_num2, collapse =', '), ') in (', paste0(.removeEndSet(names(set_num2)), collapse = ', '), ')')
+  if (length(cnd_slice) != 0) {
+    fl <- names(cnd_slice)[sapply(cnd_slice, length) == 1]
+    if (length(fl) != 0) {
+      for (i in fl) {
+        names(set_num2)[names(set_num2) == names(cnd_slice[[i]])] <- i
+      }
+      cnd_slice <- cnd_slice[!(names(cnd_slice) %in% fl)]
+    }
+    hh <- NULL
+    for (i in names(set_num2)) {
+      if (i %in% fl) hh <- c(hh, i) else hh <- c(hh, .removeEndSet(i))
+    }
+    rs <- paste0('for ', set_num2, ' in ', hh, collapse = ' ')
+  } else rs <- paste0('for ', set_num2, ' in ', .removeEndSet(names(set_num2)), collapse = ' ')
+  
+  # rs <- paste0('(', paste0(set_num2, collapse =', '), ') in (', paste0(.removeEndSet(names(set_num2)), collapse = ', '), ')')
+  
   if (length(cnd_slice) != 0) {
     rs <- paste0(rs, ' if ', paste0(paste0('(', c(lapply(cnd_slice, paste0, collapse = ', '), 
-      recursive = TRUE), ') in ', names(cnd_slice)), collapse = ' && '))
+        recursive = TRUE), ') in ', names(cnd_slice)), collapse = ' && '))
+    # rs <- paste0(rs, ' if ', paste0(paste0('(', c(lapply(cnd_slice, paste0, collapse = ', '), 
+    #   recursive = TRUE), ') in ', names(cnd_slice)), collapse = ' && '))
   }
   list(first = NULL, end = rs)
 }
@@ -88,8 +107,10 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
     if (substr(a2, 1, 1) == '(') 
       a2 <- .get.bracket.julia(a2)$end
   }
-  paste0('(', .eqt.to.julia(substr(a2, 2, nchar(a2))), ' for ', .get_julia_loop_fast2(substr(a1, 1, nchar(a1) - nchar(a2))), ')', 
-    .eqt.to.julia(hh$end)) 
+  # paste0('(', .eqt.to.julia(substr(a2, 2, nchar(a2))), ' for ', .get_julia_loop_fast2(substr(a1, 1, nchar(a1) - nchar(a2))), ')', 
+  #        .eqt.to.julia(hh$end)) 
+  paste0('(', .eqt.to.julia(substr(a2, 2, nchar(a2))), .get_julia_loop_fast2(substr(a1, 1, nchar(a1) - nchar(a2))), ')', 
+         .eqt.to.julia(hh$end)) 
 }
 .eqt.to.julia <- function(tmp) {
   rs <- ''
@@ -107,14 +128,21 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
       vrb <- substr(tmp, 1, nchar(tmp) - nchar(a1))
       a2 <- .get.bracket.julia(a1)
       arg <- paste0('(', paste0(.aliasName(strsplit(gsub('[() ]', '', a2$beg), ',')[[1]]), collapse = ', '), ')')
+      if (nchar(arg) == 0) {
+        vrb2 <- paste0(vrb)
+      } else {
+        vrb2 <- paste0(vrb, '[', arg, ']')
+        if (substr(tmp, 1, 1) == 'p') {
+          vrb2 <- paste0('(if haskey(', vrb, ',', arg, '); ', vrb2, '; else ', vrb, 'Def; end)')
+        }
+      }
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == '$') {
         # There are condition
-        rs <- paste0(rs, '(if ', arg, ' in ', gsub('([$]|[(].*)', '', a2$end), '; ', vrb, '[', arg, ']; else 0;end)',
+        rs <- paste0(rs, '(if ', arg, ' in ', gsub('([$]|[(].*)', '', a2$end), '; ', vrb2, '; else 0;end)',
           .eqt.to.julia(gsub('^[^)]*[)]', '', a2$end)))
         tmp <- ''
       } else {
-        rs <- paste0(rs, vrb, '[', arg, ']',
-                     .eqt.to.julia(a2$end))
+        rs <- paste0(rs, vrb2, .eqt.to.julia(a2$end))
         tmp <- ''
       }
     } else if (substr(tmp, 1, 1) == '=') {
