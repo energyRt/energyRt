@@ -9,11 +9,24 @@
   zz_data_constr <- file(paste(arg$dir.result, '/inc_constraints.jl', sep = ''), 'w')
   
   .write_inc_solver(scen, arg, "using Cbc\nset_optimizer(model, Cbc.Optimizer)\n", '.jl', 'Cbc')
+  datas <- list()
+  for (i in names(scen@modInp@parameters)) {
+    tmp <- getParameterData(scen@modInp@parameters[[i]])
+    colnames(tmp) <- gsub('[.]1', 'p', colnames(tmp))
+    if (scen@modInp@parameters[[i]]@type != 'multi') {
+      datas[[i]] <- tmp
+    } else {
+      tmp <- getParameterData(scen@modInp@parameters[[i]])
+      datas[[paste0(i, 'Up')]] <- tmp[tmp$type == 'up', colnames(tmp) != 'type']
+      datas[[paste0(i, 'Lo')]] <- tmp[tmp$type == 'lo', colnames(tmp) != 'type']
+    }
+  }
+  save('datas', file = paste0(arg$dir.result, "data.RData"))
   
-  # using Cbc\nset_optimizer(model, Cbc.Optimizer)
+  cat('using RData\nusing DataFrames\ndatas = load("data.RData")\n', sep = '\n', file = zz_data_julia)
   for (j in c('set', 'map', 'simple', 'multi')) {
     for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-      cat(energyRt:::.toJulia(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_julia)
+      cat(energyRt:::.toJuliaHead(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_julia)
       cat(paste0('println("', i, ' done ", Dates.format(now(), "HH:MM:SS"))\n'), file = zz_data_julia)
     }
   }

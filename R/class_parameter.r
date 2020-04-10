@@ -540,3 +540,50 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
     obj@nValues <- nrow(obj@data)
   return(obj)    
 }
+
+
+.toJuliaHead <- function(obj) {
+  as_simple <- function(data, name, name2, def) {
+    if (ncol(obj@data) == 1) {
+      return(c(
+        paste0("# ", name),
+        paste0(name, ' = ', data$value)))
+    } else {
+      data <- data[data$value != Inf & data$value != def, ]
+      rtt <- paste0("# ", name, name2, '\n', name, "Def = ", def, ";\n")
+      if (nrow(data) == 0) {
+        return(paste0(rtt, name, ' = Dict()'))
+      }
+      colnames(data) <- gsub('[.]1', 'p', colnames(data))
+      return(c(rtt, paste0(name, ' = Dict()'), paste0('for i in 1:nrow(datas["datas"]["', name,'"])'),
+               paste0('    ', name, '[(', paste0('datas["datas"]["', name,'"][i, :', colnames(data)[-ncol(data)], ']', 
+                  collapse = ', '), ')] = datas["datas"]["', name,'"][i, :value]'), 'end'))
+    }
+  }
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+  }
+  if (obj@type == 'map' || obj@type == 'set') {
+    ret <- paste0('# ', obj@name)
+    if (ncol(obj@data) > 1) ret <- paste0(ret, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    if (nrow(obj@data) == 0) {
+      return(c(ret, paste0(obj@name, ' = []')))
+    } else {
+      colnames(obj@data) <- gsub('[.]1', 'p', colnames(obj@data))
+      return(c(ret, paste0(obj@name, ' = Set()'), paste0('for i in 1:nrow(datas["datas"]["', obj@name,'"])'),
+               paste0('    push!(', obj@name, ', (', paste0('datas["datas"]["', obj@name,'"][i, :', 
+                               colnames(obj@data), ']', collapse = ', '), '))'), 'end'))
+      
+    }
+  } else if (obj@type == 'simple') {
+    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+  } else if (obj@type == 'multi') {
+    hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    return(c(
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+                paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+                paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
+    ))
+  } else stop('Must realise')
+}
