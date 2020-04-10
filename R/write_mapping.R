@@ -193,8 +193,11 @@
     prec@parameters[['mvInp2Lo']] <- addData(prec@parameters[['mvInp2Lo']], mvInp2Lo)
     
     .interpolation_message('mInpSub', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    if (!is.null(mvInp2Lo))
-      prec@parameters[['mInpSub']] <- addData(prec@parameters[['mInpSub']], mvInp2Lo[!duplicated(mvInp2Lo[, -5]), -5])
+    if (!is.null(mvInp2Lo)) {
+      mInpSub <- mvInp2Lo[!duplicated(mvInp2Lo[, -4]), -4]
+      colnames(mInpSub)[4] <- 'slice'
+      prec@parameters[['mInpSub']] <- addData(prec@parameters[['mInpSub']], mInpSub)
+    }
 
         .interpolation_message('mvOut2Lo', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
     mvOut2Lo <- merge(getParameterData(prec@parameters[['mOut2Lo']]), getParameterData(prec@parameters[['mSliceParentChild']])
@@ -204,9 +207,11 @@
     prec@parameters[['mvOut2Lo']] <- addData(prec@parameters[['mvOut2Lo']], mvOut2Lo)
     
     .interpolation_message('mOutSub', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    if (!is.null(mvOut2Lo))
-      prec@parameters[['mOutSub']] <- addData(prec@parameters[['mOutSub']], mvOut2Lo[!duplicated(mvOut2Lo[, -5]), -5])
-    
+    if (!is.null(mvOut2Lo)) {
+      mOutSub <- mvOut2Lo[!duplicated(mvOut2Lo[, -4]), -4]
+      colnames(mOutSub)[4] <- 'slice'
+      prec@parameters[['mOutSub']] <- addData(prec@parameters[['mOutSub']], mOutSub)
+    }
     .interpolation_message('meqBalLo', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
     
     prec@parameters[['meqBalLo']] <- addData(prec@parameters[['meqBalLo']], 
