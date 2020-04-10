@@ -477,6 +477,8 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mvBalance']] <- createParameter('mvBalance', c('comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvInp2Lo']] <- createParameter('mvInp2Lo', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
     .Object@parameters[['mvOut2Lo']] <- createParameter('mvOut2Lo', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
+    .Object@parameters[['mInpSub']] <- createParameter('mInpSub', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mOutSub']] <- createParameter('mOutSub', c('comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvStorageAInp']] <- createParameter('mvStorageAInp', c('stg', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvStorageAOut']] <- createParameter('mvStorageAOut', c('stg', 'comm', 'region', 'year', 'slice'), 'map') 
 

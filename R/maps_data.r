@@ -838,7 +838,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:313,] <- NA;
+    rs[1:315,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -934,6 +934,8 @@ rs
 "mvBalance",
 "mvInp2Lo",
 "mvOut2Lo",
+"mInpSub",
+"mOutSub",
 "mvStorageAInp",
 "mvStorageAOut",
 "mvStorageStore",
@@ -1341,6 +1343,10 @@ rs
     rs["mvInp2Lo", c("comm", "region", "year", "slice")] <- TRUE;
     rs["mvOut2Lo", c("name", "description", "type")] <- c("mvOut2Lo", "", "map");
     rs["mvOut2Lo", c("comm", "region", "year", "slice")] <- TRUE;
+    rs["mInpSub", c("name", "description", "type")] <- c("mInpSub", "For increase speed eqInpTot", "map");
+    rs["mInpSub", c("comm", "region", "year", "slice", "eqInpTot")] <- TRUE;
+    rs["mOutSub", c("name", "description", "type")] <- c("mOutSub", "For increase speed eqOutTot", "map");
+    rs["mOutSub", c("comm", "region", "year", "slice", "eqOutTot")] <- TRUE;
     rs["mvStorageAInp", c("name", "description", "type")] <- c("mvStorageAInp", "", "map");
     rs["mvStorageAInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp", "eqStorageInpTot")] <- TRUE;
     rs["mvStorageAOut", c("name", "description", "type")] <- c("mvStorageAOut", "", "map");

@@ -340,6 +340,8 @@ mvDemInp(comm, region, year, slice)
 mvBalance(comm, region, year, slice)
 mvInp2Lo(comm, region, year, slice, slice)
 mvOut2Lo(comm, region, year, slice, slice)
+mInpSub(comm, region, year, slice) For increase speed eqInpTot
+mOutSub(comm, region, year, slice) For increase speed eqOutTot
 
 mvStorageAInp(stg, comm, region, year, slice)
 mvStorageAOut(stg, comm, region, year, slice)
@@ -1492,7 +1494,7 @@ eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
                   vImport(comm, region, year, slice)$mImport(comm, region, year, slice) +
                   vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice) +
          sum(slicep$(mSliceParentChild(slicep, slice) and mvOut2Lo(comm, region, year, slicep, slice)),
-                 vOut2Lo(comm, region, year, slicep, slice));
+                 vOut2Lo(comm, region, year, slicep, slice))$mOutSub(comm, region, year, slice);
 
 eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
          sum(slicep$(mSliceParentChild(slice, slicep) and mvOut2Lo(comm, region, year, slice, slicep)),
@@ -1516,7 +1518,7 @@ eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
          vExport(comm, region, year, slice)$mExport(comm, region, year, slice) +
          vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice) +
          sum(slicep$(mSliceParentChild(slicep, slice) and mvInp2Lo(comm, region, year, slicep, slice)),
-                 vInp2Lo(comm, region, year, slicep, slice));
+                 vInp2Lo(comm, region, year, slicep, slice))$mInpSub(comm, region, year, slice);
 
 eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
         sum(slicep$(mSliceParentChild(slice, slicep) and mvInp2Lo(comm, region, year, slice, slicep)),
