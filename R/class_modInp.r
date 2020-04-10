@@ -412,6 +412,11 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mvTradeIrAInpTot']] <- createParameter('mvTradeIrAInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvTradeIrAOutTot']] <- createParameter('mvTradeIrAOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
     
+    .Object@parameters[['mImportIrSub']] <- createParameter('mImportIrSub', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mImportRowSub']] <- createParameter('mImportRowSub', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mExportIrSub']] <- createParameter('mExportIrSub', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mExportRowSub']] <- createParameter('mExportRowSub', c('comm', 'region', 'year', 'slice'), 'map') 
+    
     .Object@parameters[['mImportRow']] <- createParameter('mImportRow', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mImportRowUp']] <- createParameter('mImportRowUp', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 

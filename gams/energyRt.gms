@@ -575,6 +575,10 @@ mvTradeIrAOut(trade, comm, region, year, slice)
 mvTradeIrAOutTot(comm, region, year, slice)
 * (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
 mImportRow(imp, comm, region, year, slice)
+mImportIrSub(comm, region, year, slice)
+mImportRowSub(comm, region, year, slice)
+mExportIrSub(comm, region, year, slice)
+mExportRowSub(comm, region, year, slice)
 * (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf)
 mImportRowUp(imp, comm, region, year, slice)
 * pImportRowRes <> Inf
@@ -1311,15 +1315,17 @@ eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
         sum(trade$mTradeComm(trade, comm),
              sum(src$mTradeRoutes(trade, src, dst),
                (pTradeIrEff(trade, src, dst, year, slicep) * vTradeIr(trade, comm, src, dst, year, slicep))$mvTradeIr(trade, comm, src, dst, year, slicep)
-         ))
-                  + sum(imp$mImpComm(imp, comm), vImportRow(imp, comm, dst, year, slicep)$mImportRow(imp, comm, dst, year, slicep)));
+         )))$mImportIrSub(comm, dst, year, slice)
+         +  sum(slicep$mCommSliceOrParent(comm, slice, slicep),
+                 sum(imp$mImpComm(imp, comm), vImportRow(imp, comm, dst, year, slicep)$mImportRow(imp, comm, dst, year, slicep)))$mImportRowSub(comm, dst, year, slice);
 
 eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)..
   vExport(comm, src, year, slice) =e=
    sum(slicep$mCommSliceOrParent(comm, slice, slicep),
          sum(trade$mTradeComm(trade, comm), sum(dst$mTradeRoutes(trade, src, dst),
-                 vTradeIr(trade, comm, src, dst, year, slicep)$mvTradeIr(trade, comm, src, dst, year, slicep)))
-         + sum(expp$mExpComm(expp, comm), vExportRow(expp, comm, src, year, slicep)$mExportRow(expp, comm, src, year, slicep)));
+                 vTradeIr(trade, comm, src, dst, year, slicep)$mvTradeIr(trade, comm, src, dst, year, slicep))))$mExportIrSub(comm, src, year, slice)
+    + sum(slicep$mCommSliceOrParent(comm, slice, slicep),
+        sum(expp$mExpComm(expp, comm), vExportRow(expp, comm, src, year, slicep)$mExportRow(expp, comm, src, year, slicep)))$mExportRowSub(comm, src, year, slice);
 
 
 eqTradeFlowUp(trade, comm, src, dst, year, slice)$meqTradeFlowUp(trade, comm, src, dst, year, slice)..
