@@ -297,16 +297,22 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	  mTechNew = dd0$new
 	  mTechSpan = dd0$span
 	  pTechOlife = olife
-	  if (nrow(dd0$new) > 0 && tech@early.retirement) {
+	  if (tech@early.retirement) {
+	    obj@parameters[['mvTechRetirementStock']] <- addData(obj@parameters[['mvTechRetirementStock']], 
+	                                                         stock_exist[stock_exist$value != 0, colnames(stock_exist) != 'value'])
 	    
-	    obj@parameters[['meqTechNewCap']] <- addData(obj@parameters[['meqTechNewCap']], mTechNew)
+	  }
+	  if (nrow(dd0$new) > 0 && tech@early.retirement) {
+	    obj@parameters[['meqTechRetirementNewCap']] <- addData(obj@parameters[['meqTechRetirementNewCap']], mTechNew)
+	    
 	    
 	    mvTechRetiredCap0 <- merge(merge(mTechNew, mTechSpan, by = c('tech', 'region')), 
 	                               pTechOlife, by = c('tech', 'region'))
-	    mvTechRetiredCap0 <- mvTechRetiredCap0[(mvTechRetiredCap0$year.x + mvTechRetiredCap0$value > mvTechRetiredCap0$year.y &
+	    mvTechRetiredCap0 <- mvTechRetiredCap0[(
+	      mvTechRetiredCap0$year.x + mvTechRetiredCap0$olife > mvTechRetiredCap0$year.y &
 	                                              mvTechRetiredCap0$year.x <= mvTechRetiredCap0$year.y), -5] 
 	    colnames(mvTechRetiredCap0)[3:4] <- c('year', 'year.1')
-	    obj@parameters[['mvTechRetiredCap']] <- addData(obj@parameters[['mvTechRetiredCap']], 
+	    obj@parameters[['mvTechRetirementNewCap']] <- addData(obj@parameters[['mvTechRetirementNewCap']], 
 	                                                     mvTechRetiredCap0)
 	  }
 	  mvTechAct <- merge(mTechSpan, mTechSlice, by = 'tech')

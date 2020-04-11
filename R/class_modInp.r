@@ -187,7 +187,7 @@ setMethod("initialize", "modInp",
     # For disable technology with unexceptable start year
     .Object@parameters[['mTechNew']] <- createParameter('mTechNew', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map', cls = 'technology')    
-    .Object@parameters[['meqTechNewCap']] <- createParameter('meqTechNewCap', c('tech', 'region', 'year'), 'map', cls = 'technology')    
+    .Object@parameters[['meqTechRetirementNewCap']] <- createParameter('meqTechRetirementNewCap', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechOMCost']] <- createParameter('mTechOMCost', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechEac']] <- createParameter('mTechEac', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     # simple & multi
@@ -479,7 +479,8 @@ setMethod("initialize", "modInp",
     
     # mv Mapping
     .Object@parameters[['mvSupReserve']] <- createParameter('mvSupReserve', c('sup', 'comm', 'region'), 'map') 
-    .Object@parameters[['mvTechRetiredCap']] <- createParameter('mvTechRetiredCap', c('tech', 'region', 'year', 'year'), 'map') 
+    .Object@parameters[['mvTechRetirementNewCap']] <- createParameter('mvTechRetirementNewCap', c('tech', 'region', 'year', 'year'), 'map') 
+    .Object@parameters[['mvTechRetirementStock']] <- createParameter('mvTechRetirementStock', c('tech', 'region', 'year'), 'map') 
     .Object@parameters[['mvTechAct']] <- createParameter('mvTechAct', c('tech', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvTechInp']] <- createParameter('mvTechInp', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvTechOut']] <- createParameter('mvTechOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
