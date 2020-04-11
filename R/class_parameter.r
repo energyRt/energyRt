@@ -297,7 +297,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
           as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Up', sep = ''), obj@defVal[2])
         )
       }
-    } else stop('Must realise')
+    } else stop(paste0('Error: .toGams: unknown parameter type: ', obj@type, " / ", obj@name))
     ret
 }
 
@@ -417,7 +417,7 @@ setMethod('print', 'parameter', function(x, ...) {
       as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
         paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
-  } else stop('Must realise')
+  } else stop(paste0('Error: .toPyomo: unknown parameter type: ', obj@type, " / ", obj@name))
 }
 
 .toPyomoAbstractModel <- function(obj) {
@@ -464,7 +464,7 @@ setMethod('print', 'parameter', function(x, ...) {
       as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
-  } else stop('Must realise')
+  } else stop(paste0('Error: .toPyomoAbstractModel: unknown parameter type: ', obj@type, " / ", obj@name))
 }
 
 
@@ -541,7 +541,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
   return(obj)    
 }
 
-
 .toJuliaHead <- function(obj) {
   as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
@@ -555,9 +554,9 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
         return(paste0(rtt, name, ' = Dict()'))
       }
       colnames(data) <- gsub('[.]1', 'p', colnames(data))
-      return(c(rtt, paste0(name, ' = Dict()'), paste0('for i in 1:nrow(datas["datas"]["', name,'"])'),
-               paste0('    ', name, '[(', paste0('datas["datas"]["', name,'"][i, :', colnames(data)[-ncol(data)], ']', 
-                  collapse = ', '), ')] = datas["datas"]["', name,'"][i, :value]'), 'end'))
+      return(c(rtt, paste0(name, ' = Dict()'), paste0('for i in 1:nrow(dt["', name,'"])'),
+               paste0('    ', name, '[(', paste0('dt["', name,'"][i, :', colnames(data)[-ncol(data)], ']',
+                  collapse = ', '), ')] = dt["', name,'"][i, :value]'), 'end'))
     }
   }
   if (obj@nValues != -1) {
@@ -570,20 +569,73 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
       return(c(ret, paste0(obj@name, ' = []')))
     } else {
       colnames(obj@data) <- gsub('[.]1', 'p', colnames(obj@data))
-      return(c(ret, paste0(obj@name, ' = Set()'), paste0('for i in 1:nrow(datas["datas"]["', obj@name,'"])'),
-               paste0('    push!(', obj@name, ', (', paste0('datas["datas"]["', obj@name,'"][i, :', 
+      return(c(ret, paste0(obj@name, ' = Set()'), paste0('for i in 1:nrow(dt["', obj@name,'"])'),
+               paste0('    push!(', obj@name, ', (', paste0('dt["', obj@name,'"][i, :',
                                colnames(obj@data), ']', collapse = ', '), '))'), 'end'))
-      
+
     }
   } else if (obj@type == 'simple') {
     return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
     return(c(
-      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE],
                 paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
-      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE],
                 paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
-  } else stop('Must realise')
+  } else stop(paste0('Error: .toJuliaHead: unknown parameter type: ', obj@type, " / ", obj@name))
 }
+
+# .toJuliaHead <- function(obj) {
+#   as_simple <- function(data, name, name2, def) {
+#     # browser()
+#     if (ncol(obj@data) == 0) {
+#       return(c(
+#         paste0("# ", name),
+#         paste0(name, ' = ', data$value)))
+#     } else {
+#       data <- data[data$value != Inf & data$value != def, ]
+#       rtt <- paste0("# ", name, name2, '\n', name, "Def = ", def, ";\n")
+#       # if (nrow(data) == 0) {
+#       #   return(paste0(rtt, name, ' = Dict()'))
+#       # }
+#       colnames(data) <- gsub('[.]1', 'p', colnames(data))
+#       # return(c(rtt, paste0(name, ' = Dict()'), paste0('for i in 1:nrow(dat["dat"]["', name,'"])'),
+#       #          paste0('    ', name, '[(', paste0('dat["dat"]["', name,'"][i, :', colnames(data)[-ncol(data)], ']',
+#       #                                            collapse = ', '), ')] = dat["dat"]["', name,'"][i, :value]'), 'end'))
+#       # return(c(paste0(rtt, "@time ", name," = df2dict(", 'dt["', name,'"])')))
+#       return(c(paste0(rtt, "@time ", name," = df2dict(", '"', name,'")')))
+#     }
+#   }
+#   if (obj@nValues != -1) {
+#     obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+#   }
+#   if (obj@type == 'map' || obj@type == 'set') {
+#     ret <- paste0('# ', obj@name)
+#     if (ncol(obj@data) > 1) ret <- paste0(ret, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+#     if (nrow(obj@data) == -1) {
+#       return(c(ret, paste0(obj@name, ' = []')))
+#     } else {
+#       colnames(obj@data) <- gsub('[.]1', 'p', colnames(obj@data))
+#       # return(c(ret, paste0(obj@name, ' = Set()'), paste0('for i in 1:nrow(dat["dat"]["', obj@name,'"])'),
+#       #          paste0('    push!(', obj@name, ', (', paste0('dat["dat"]["', obj@name,'"][i, :',
+#       #                                                       colnames(obj@data), ']', collapse = ', '), '))'), 'end'))
+#       return(c(ret,
+#                # paste0("@time ", obj@name, " = df2dict(", 'dt["', obj@name,'"])')
+#                paste0("@time ", obj@name, " = df2dict(", '"', obj@name,'")')
+#       ))
+# 
+#     }
+#   } else if (obj@type == 'simple') {
+#     return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+#   } else if (obj@type == 'multi') {
+#     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+#     return(c(
+#       as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE],
+#                 paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
+#       as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE],
+#                 paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
+#     ))
+#   } else stop('Must realise')
+# }
