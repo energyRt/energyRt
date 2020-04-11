@@ -130,16 +130,6 @@ set mvTradeIrAInpTot dimen 4;
 set mvTradeIrAOut dimen 5;
 set mvTradeIrAOutTot dimen 4;
 set mImportRow dimen 5;
-set mImportIrSub dimen 4;
-set mImportRowSub dimen 4;
-set mImportIrSubSlice dimen 5;
-set mImportIrSubSliceTrd dimen 6;
-set mImportRowSubSlice dimen 5;
-set mExportIrSubSlice dimen 5;
-set mExportIrSubSliceTrd dimen 6;
-set mExportRowSubSlice dimen 5;
-set mExportIrSub dimen 4;
-set mExportRowSub dimen 4;
 set mImportRowUp dimen 5;
 set mImportRowAccumulatedUp dimen 2;
 set mExportRow dimen 5;
@@ -511,9 +501,9 @@ s.t.  eqStorageEac{(st1, r, y) in mStorageEac}: vStorageEac[st1,r,y]  =  sum{yp 
 
 s.t.  eqStorageCost{(st1, r, y) in mStorageOMCost}: vStorageOMCost[st1,r,y]  =  pStorageFixom[st1,r,y]*vStorageCap[st1,r,y]+sum{c in comm:((st1,c) in mStorageComm)}(sum{s in slice:((c,s) in mCommSlice)}(pStorageCostInp[st1,r,y,s]*vStorageInp[st1,c,r,y,s]+pStorageCostOut[st1,r,y,s]*vStorageOut[st1,c,r,y,s]+pStorageCostStore[st1,r,y,s]*vStorageStore[st1,c,r,y,s]));
 
-s.t.  eqImport{(c, dst, y, s) in mImport}: vImport[c,dst,y,s]  =  sum{FORIF: (c,dst,y,s) in mImportIrSub} (sum{sp in slice:((c,dst,y,s,sp) in mImportIrSubSlice)}(sum{t1 in trade:((t1,c,dst,y,s,sp) in mImportIrSubSliceTrd)}(sum{src in region:((t1,src,dst) in mTradeRoutes)}(sum{FORIF: (t1,c,src,dst,y,sp) in mvTradeIr} ((pTradeIrEff[t1,src,dst,y,sp]*vTradeIr[t1,c,src,dst,y,sp]))))))+sum{FORIF: (c,dst,y,s) in mImportRowSub} (sum{sp in slice:((c,dst,y,s,sp) in mImportRowSubSlice)}(sum{i in imp:((i,c) in mImpComm)}(sum{FORIF: (i,c,dst,y,sp) in mImportRow} (vImportRow[i,c,dst,y,sp]))));
+s.t.  eqImport{(c, dst, y, s) in mImport}: vImport[c,dst,y,s]  =  sum{sp in slice:((c,s,sp) in mCommSliceOrParent)}(sum{t1 in trade:((t1,c) in mTradeComm)}(sum{src in region:((t1,src,dst) in mTradeRoutes)}(sum{FORIF: (t1,c,src,dst,y,sp) in mvTradeIr} ((pTradeIrEff[t1,src,dst,y,sp]*vTradeIr[t1,c,src,dst,y,sp])))))+sum{sp in slice:((c,s,sp) in mCommSliceOrParent)}(sum{i in imp:((i,c) in mImpComm)}(sum{FORIF: (i,c,dst,y,sp) in mImportRow} (vImportRow[i,c,dst,y,sp])));
 
-s.t.  eqExport{(c, src, y, s) in mExport}: vExport[c,src,y,s]  =  sum{FORIF: (c,src,y,s) in mExportIrSub} (sum{sp in slice:((c,src,y,s,sp) in mExportIrSubSlice)}(sum{t1 in trade:((t1,c,src,y,s,sp) in mExportIrSubSliceTrd)}(sum{dst in region:((t1,src,dst) in mTradeRoutes)}(sum{FORIF: (t1,c,src,dst,y,sp) in mvTradeIr} (vTradeIr[t1,c,src,dst,y,sp])))))+sum{FORIF: (c,src,y,s) in mExportRowSub} (sum{sp in slice:((c,src,y,s,sp) in mExportRowSubSlice)}(sum{e in expp:((e,c) in mExpComm)}(sum{FORIF: (e,c,src,y,sp) in mExportRow} (vExportRow[e,c,src,y,sp]))));
+s.t.  eqExport{(c, src, y, s) in mExport}: vExport[c,src,y,s]  =  sum{sp in slice:((c,s,sp) in mCommSliceOrParent)}(sum{t1 in trade:((t1,c) in mTradeComm)}(sum{dst in region:((t1,src,dst) in mTradeRoutes)}(sum{FORIF: (t1,c,src,dst,y,sp) in mvTradeIr} (vTradeIr[t1,c,src,dst,y,sp]))))+sum{sp in slice:((c,s,sp) in mCommSliceOrParent)}(sum{e in expp:((e,c) in mExpComm)}(sum{FORIF: (e,c,src,y,sp) in mExportRow} (vExportRow[e,c,src,y,sp])));
 
 s.t.  eqTradeFlowUp{(t1, c, src, dst, y, s) in meqTradeFlowUp}: vTradeIr[t1,c,src,dst,y,s] <=  pTradeIrUp[t1,src,dst,y,s];
 

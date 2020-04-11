@@ -848,7 +848,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:328,] <- NA;
+    rs[1:318,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -974,16 +974,6 @@ rs
 "mvTradeIrAOut",
 "mvTradeIrAOutTot",
 "mImportRow",
-"mImportIrSub",
-"mImportRowSub",
-"mImportIrSubSlice",
-"mImportIrSubSliceTrd",
-"mImportRowSubSlice",
-"mExportIrSubSlice",
-"mExportIrSubSliceTrd",
-"mExportRowSubSlice",
-"mExportIrSub",
-"mExportRowSub",
 "mImportRowUp",
 "mImportRowAccumulatedUp",
 "mExportRow",
@@ -1223,7 +1213,7 @@ rs
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
     rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost", "eqSubsCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
-    rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqTradeIrAInpTot", "eqTradeIrAOutTot")] <- TRUE;
+    rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqImport", "eqExport", "eqTradeIrAInpTot", "eqTradeIrAOutTot")] <- TRUE;
     rs["mTechRetirement", c("name", "description", "type")] <- c("mTechRetirement", "Early retirement option", "map");
     rs["mTechRetirement", c("tech")] <- TRUE;
     rs["mTechUpgrade", c("name", "description", "type")] <- c("mTechUpgrade", "Upgrade technology (not implemented yet)", "map");
@@ -1295,7 +1285,7 @@ rs
     rs["mTradeSlice", c("name", "description", "type")] <- c("mTradeSlice", "Trade to slice", "map");
     rs["mTradeSlice", c("trade", "slice", "eqCostIrTrade")] <- TRUE;
     rs["mTradeComm", c("name", "description", "type")] <- c("mTradeComm", "Trade commodities", "map");
-    rs["mTradeComm", c("trade", "comm", "eqCostIrTrade", "eqTradeIrAInp", "eqTradeIrAOut")] <- TRUE;
+    rs["mTradeComm", c("trade", "comm", "eqImport", "eqExport", "eqCostIrTrade", "eqTradeIrAInp", "eqTradeIrAOut")] <- TRUE;
     rs["mTradeRoutes", c("name", "description", "type")] <- c("mTradeRoutes", "", "map");
     rs["mTradeRoutes", c("trade", "region", "eqImport", "eqExport", "eqCostIrTrade")] <- TRUE;
     rs["mTradeIrAInp", c("name", "description", "type")] <- c("mTradeIrAInp", "Auxiliary input commodity in source region", "map");
@@ -1426,26 +1416,6 @@ rs
     rs["mvTradeIrAOutTot", c("comm", "region", "year", "slice", "eqTradeIrAOutTot", "eqOutTot", "eqOut2Lo")] <- TRUE;
     rs["mImportRow", c("name", "description", "type")] <- c("mImportRow", "", "map");
     rs["mImportRow", c("imp", "comm", "region", "year", "slice", "eqImport", "eqCostRowTrade", "eqImportRowAccumulated")] <- TRUE;
-    rs["mImportIrSub", c("name", "description", "type")] <- c("mImportIrSub", "", "map");
-    rs["mImportIrSub", c("comm", "region", "year", "slice", "eqImport")] <- TRUE;
-    rs["mImportRowSub", c("name", "description", "type")] <- c("mImportRowSub", "", "map");
-    rs["mImportRowSub", c("comm", "region", "year", "slice", "eqImport")] <- TRUE;
-    rs["mImportIrSubSlice", c("name", "description", "type")] <- c("mImportIrSubSlice", "", "map");
-    rs["mImportIrSubSlice", c("comm", "region", "year", "slice", "eqImport")] <- TRUE;
-    rs["mImportIrSubSliceTrd", c("name", "description", "type")] <- c("mImportIrSubSliceTrd", "", "map");
-    rs["mImportIrSubSliceTrd", c("trade", "comm", "region", "year", "slice", "eqImport")] <- TRUE;
-    rs["mImportRowSubSlice", c("name", "description", "type")] <- c("mImportRowSubSlice", "", "map");
-    rs["mImportRowSubSlice", c("comm", "region", "year", "slice", "eqImport")] <- TRUE;
-    rs["mExportIrSubSlice", c("name", "description", "type")] <- c("mExportIrSubSlice", "", "map");
-    rs["mExportIrSubSlice", c("comm", "region", "year", "slice", "eqExport")] <- TRUE;
-    rs["mExportIrSubSliceTrd", c("name", "description", "type")] <- c("mExportIrSubSliceTrd", "", "map");
-    rs["mExportIrSubSliceTrd", c("trade", "comm", "region", "year", "slice", "eqExport")] <- TRUE;
-    rs["mExportRowSubSlice", c("name", "description", "type")] <- c("mExportRowSubSlice", "", "map");
-    rs["mExportRowSubSlice", c("comm", "region", "year", "slice", "eqExport")] <- TRUE;
-    rs["mExportIrSub", c("name", "description", "type")] <- c("mExportIrSub", "", "map");
-    rs["mExportIrSub", c("comm", "region", "year", "slice", "eqExport")] <- TRUE;
-    rs["mExportRowSub", c("name", "description", "type")] <- c("mExportRowSub", "", "map");
-    rs["mExportRowSub", c("comm", "region", "year", "slice", "eqExport")] <- TRUE;
     rs["mImportRowUp", c("name", "description", "type")] <- c("mImportRowUp", "", "map");
     rs["mImportRowUp", c("imp", "comm", "region", "year", "slice", "eqImportRowUp")] <- TRUE;
     rs["mImportRowAccumulatedUp", c("name", "description", "type")] <- c("mImportRowAccumulatedUp", "", "map");
