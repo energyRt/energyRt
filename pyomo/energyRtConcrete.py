@@ -48,8 +48,8 @@ model.vTechAOut = Var(mvTechAOut, domain = pyo.NonNegativeReals, doc = "Auxiliar
 model.vSupOut = Var(mSupAva, domain = pyo.NonNegativeReals, doc = "Output of supply");
 model.vSupReserve = Var(mvSupReserve, domain = pyo.NonNegativeReals, doc = "Total supply reserve");
 model.vDemInp = Var(mvDemInp, domain = pyo.NonNegativeReals, doc = "Input to demand");
-model.vOutTot = Var(mvBalance, domain = pyo.NonNegativeReals, doc = "Total commodity output (consumption is not counted)");
-model.vInpTot = Var(mvBalance, domain = pyo.NonNegativeReals, doc = "Total commodity input");
+model.vOutTot = Var(mvOutTot, domain = pyo.NonNegativeReals, doc = "Total commodity output (consumption is not counted)");
+model.vInpTot = Var(mvInpTot, domain = pyo.NonNegativeReals, doc = "Total commodity input");
 model.vInp2Lo = Var(mvInp2Lo, domain = pyo.NonNegativeReals, doc = "Desagregation of slices for input parent to (grand)child");
 model.vOut2Lo = Var(mvOut2Lo, domain = pyo.NonNegativeReals, doc = "Desagregation of slices for output parent to (grand)child");
 model.vSupOutTot = Var(mSupOutTot, domain = pyo.NonNegativeReals, doc = "Total commodity supply");
@@ -150,7 +150,7 @@ model.eqSupCost = Constraint(mvSupCost, rule = lambda model, s1, r, y : model.vS
 # eqDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)
 model.eqDemInp = Constraint(mvDemInp, rule = lambda model, c, r, y, s : model.vDemInp[c,r,y,s]  ==  sum(pDemand.get((d,c,r,y,s)) for d in dem if (d,c) in mDemComm));
 # eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
-model.eqAggOut = Constraint(mAggOut, rule = lambda model, c, r, y, s : model.vAggOut[c,r,y,s]  ==  sum(pAggregateFactor.get((c,cp))*sum(model.vOutTot[cp,r,y,sp] for sp in slice if ((cp,r,y,sp) in mvBalance and (s,sp) in mSliceParentChildE and (cp,sp) in mCommSlice)) for cp in comm if (c,cp) in mAggregateFactor));
+model.eqAggOut = Constraint(mAggOut, rule = lambda model, c, r, y, s : model.vAggOut[c,r,y,s]  ==  sum(pAggregateFactor.get((c,cp))*sum(model.vOutTot[cp,r,y,sp] for sp in slice if ((c,r,y,sp) in mvOutTot and (s,sp) in mSliceParentChildE and (cp,sp) in mCommSlice)) for cp in comm if (c,cp) in mAggregateFactor));
 # eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
 model.eqEmsFuelTot = Constraint(mEmsFuelTot, rule = lambda model, c, r, y, s : model.vEmsFuelTot[c,r,y,s]  ==  sum(pEmissionFactor.get((c,cp))*sum(pTechEmisComm.get((t,cp))*sum((model.vTechInp[t,cp,r,y,sp] if (t,c,cp,r,y,sp) in mTechEmsFuel else 0) for sp in slice if (c,s,sp) in mCommSliceOrParent) for t in tech if (t,cp) in mTechInpComm) for cp in comm if (pEmissionFactor.get((c,cp))>0)));
 # eqStorageAInp(stg, comm, region, year, slice)$mvStorageAInp(stg, comm, region, year, slice)
@@ -234,13 +234,13 @@ model.eqBalUp = Constraint(meqBalUp, rule = lambda model, c, r, y, s : model.vBa
 # eqBalFx(comm, region, year, slice)$meqBalFx(comm, region, year, slice)
 model.eqBalFx = Constraint(meqBalFx, rule = lambda model, c, r, y, s : model.vBalance[c,r,y,s]  ==  0);
 # eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)
-model.eqBal = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vBalance[c,r,y,s]  ==  model.vOutTot[c,r,y,s]-model.vInpTot[c,r,y,s]);
-# eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)
-model.eqOutTot = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vOutTot[c,r,y,s]  ==  (model.vDummyImport[c,r,y,s] if (c,r,y,s) in mDummyImport else 0)+(model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+(model.vAggOut[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImport[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0)+(sum(model.vOut2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvOut2Lo)) if (c,r,y,s) in mOutSub else 0));
+model.eqBal = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vBalance[c,r,y,s]  ==  (model.vOutTot[c,r,y,s] if (c,r,y,s) in mvOutTot else 0)-(model.vInpTot[c,r,y,s] if (c,r,y,s) in mvInpTot else 0));
+# eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
+model.eqOutTot = Constraint(mvOutTot, rule = lambda model, c, r, y, s : model.vOutTot[c,r,y,s]  ==  (model.vDummyImport[c,r,y,s] if (c,r,y,s) in mDummyImport else 0)+(model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+(model.vAggOut[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImport[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0)+(sum(model.vOut2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvOut2Lo)) if (c,r,y,s) in mOutSub else 0));
 # eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)
 model.eqOut2Lo = Constraint(mOut2Lo, rule = lambda model, c, r, y, s : sum(model.vOut2Lo[c,r,y,s,sp] for sp in slice if (c,r,y,s,sp) in mvOut2Lo)  ==  (model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+(model.vAggOut[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImport[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0));
-# eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)
-model.eqInpTot = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vInpTot[c,r,y,s]  ==  (model.vDemInp[c,r,y,s] if (c,r,y,s) in mvDemInp else 0)+(model.vDummyExport[c,r,y,s] if (c,r,y,s) in mDummyExport else 0)+(model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExport[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0)+(sum(model.vInp2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvInp2Lo)) if (c,r,y,s) in mInpSub else 0));
+# eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)
+model.eqInpTot = Constraint(mvInpTot, rule = lambda model, c, r, y, s : model.vInpTot[c,r,y,s]  ==  (model.vDemInp[c,r,y,s] if (c,r,y,s) in mvDemInp else 0)+(model.vDummyExport[c,r,y,s] if (c,r,y,s) in mDummyExport else 0)+(model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExport[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0)+(sum(model.vInp2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvInp2Lo)) if (c,r,y,s) in mInpSub else 0));
 # eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)
 model.eqInp2Lo = Constraint(mInp2Lo, rule = lambda model, c, r, y, s : sum(model.vInp2Lo[c,r,y,s,sp] for sp in slice if (c,r,y,s,sp) in mvInp2Lo)  ==  (model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExport[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0));
 # eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
@@ -256,9 +256,9 @@ model.eqStorageOutTot = Constraint(mStorageOutTot, rule = lambda model, c, r, y,
 # eqCost(region, year)$mvTotalCost(region, year)
 model.eqCost = Constraint(mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in tech if (t,r,y) in mTechEac)+sum(model.vTechOMCost[t,r,y] for t in tech if (t,r,y) in mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in sup if (s1,r,y) in mvSupCost)+sum(pDummyImportCost.get((c,r,y,s))*model.vDummyImport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum(pDummyExportCost.get((c,r,y,s))*model.vDummyExport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(model.vTaxCost[c,r,y] for c in comm if (c,r,y) in mTaxCost)-sum(model.vSubsCost[c,r,y] for c in comm if (c,r,y) in mSubsCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in stg if (st1,r,y) in mStorageEac)+(model.vTradeCost[r,y] if (r,y) in mvTradeCost else 0));
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
-model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(pTaxCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if (c,s) in mCommSlice));
+model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(pTaxCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice)));
 # eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)
-model.eqSubsCost = Constraint(mSubsCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubsCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if (c,s) in mCommSlice));
+model.eqSubsCost = Constraint(mSubsCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubsCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,s) in mCommSlice and (c,r,y,s) in mvOutTot)));
 # eqObjective
 model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(model.vTotalCost[r,y]*pDiscountFactorMileStone.get((r,y)) for r in region for y in year if (r,y) in mvTotalCost));
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)

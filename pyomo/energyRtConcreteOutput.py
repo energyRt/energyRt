@@ -182,14 +182,14 @@ f.close()
 flist.write("vOutTot\n");
 f = open("output/vOutTot.csv","w");
 f.write("comm,region,year,slice,value\n");
-for (c,r,y,s) in mvBalance:
+for (c,r,y,s) in mvOutTot:
     if model.vOutTot[(c,r,y,s)].value != 0:
         f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vOutTot[(c,r,y,s)].value) + "\n")
 f.close()
 flist.write("vInpTot\n");
 f = open("output/vInpTot.csv","w");
 f.write("comm,region,year,slice,value\n");
-for (c,r,y,s) in mvBalance:
+for (c,r,y,s) in mvInpTot:
     if model.vInpTot[(c,r,y,s)].value != 0:
         f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vInpTot[(c,r,y,s)].value) + "\n")
 f.close()

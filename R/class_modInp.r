@@ -487,6 +487,9 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mvTechAOut']] <- createParameter('mvTechAOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvDemInp']] <- createParameter('mvDemInp', c('comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvBalance']] <- createParameter('mvBalance', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvInpTot']] <- createParameter('mvInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
+    .Object@parameters[['mvOutTot']] <- createParameter('mvOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
+    
     .Object@parameters[['mvInp2Lo']] <- createParameter('mvInp2Lo', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
     .Object@parameters[['mvOut2Lo']] <- createParameter('mvOut2Lo', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
     .Object@parameters[['mInpSub']] <- createParameter('mInpSub', c('comm', 'region', 'year', 'slice'), 'map') 

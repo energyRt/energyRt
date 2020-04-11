@@ -838,7 +838,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:325,] <- NA;
+    rs[1:327,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -932,6 +932,8 @@ rs
 "mvTechAOut",
 "mvDemInp",
 "mvBalance",
+"mvInpTot",
+"mvOutTot",
 "mvInp2Lo",
 "mvOut2Lo",
 "mInpSub",
@@ -1208,7 +1210,7 @@ rs
     rs["mMidMilestone", c("name", "description", "type")] <- c("mMidMilestone", "Milestone year", "map");
     rs["mMidMilestone", c("year")] <- TRUE;
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
-    rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost", "eqTaxCost", "eqSubsCost")] <- TRUE;
+    rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost", "eqSubsCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
     rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqTradeIrAInpTot", "eqTradeIrAOutTot")] <- TRUE;
     rs["mTechRetirement", c("name", "description", "type")] <- c("mTechRetirement", "Early retirement option", "map");
@@ -1348,7 +1350,11 @@ rs
     rs["mvDemInp", c("name", "description", "type")] <- c("mvDemInp", "", "map");
     rs["mvDemInp", c("comm", "region", "year", "slice", "eqDemInp", "eqInpTot")] <- TRUE;
     rs["mvBalance", c("name", "description", "type")] <- c("mvBalance", "", "map");
-    rs["mvBalance", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqInpTot")] <- TRUE;
+    rs["mvBalance", c("comm", "region", "year", "slice", "eqBal")] <- TRUE;
+    rs["mvInpTot", c("name", "description", "type")] <- c("mvInpTot", "", "map");
+    rs["mvInpTot", c("comm", "region", "year", "slice", "eqBal", "eqInpTot")] <- TRUE;
+    rs["mvOutTot", c("name", "description", "type")] <- c("mvOutTot", "", "map");
+    rs["mvOutTot", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqTaxCost")] <- TRUE;
     rs["mvInp2Lo", c("name", "description", "type")] <- c("mvInp2Lo", "", "map");
     rs["mvInp2Lo", c("comm", "region", "year", "slice", "eqInp2Lo")] <- TRUE;
     rs["mvOut2Lo", c("name", "description", "type")] <- c("mvOut2Lo", "", "map");

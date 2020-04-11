@@ -35,8 +35,8 @@ model = Model();
 @variable(model, vSupOut[mSupAva] >= 0);
 @variable(model, vSupReserve[mvSupReserve] >= 0);
 @variable(model, vDemInp[mvDemInp] >= 0);
-@variable(model, vOutTot[mvBalance] >= 0);
-@variable(model, vInpTot[mvBalance] >= 0);
+@variable(model, vOutTot[mvOutTot] >= 0);
+@variable(model, vInpTot[mvInpTot] >= 0);
 @variable(model, vInp2Lo[mvInp2Lo] >= 0);
 @variable(model, vOut2Lo[mvOut2Lo] >= 0);
 @variable(model, vSupOutTot[mSupOutTot] >= 0);
@@ -167,7 +167,7 @@ println("eqSupCost(sup, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 @constraint(model, [(c, r, y, s) in mvDemInp], vDemInp[(c,r,y,s)]  ==  sum((if haskey(pDemand, (d,c,r,y,s)); pDemand[(d,c,r,y,s)]; else pDemandDef; end) for d in dem if (d,c) in mDemComm));
 println("eqDemInp(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
-@constraint(model, [(c, r, y, s) in mAggOut], vAggOut[(c,r,y,s)]  ==  sum((if haskey(pAggregateFactor, (c,cp)); pAggregateFactor[(c,cp)]; else pAggregateFactorDef; end)*sum(vOutTot[(cp,r,y,sp)] for sp in slice if ((cp,r,y,sp) in mvBalance && (s,sp) in mSliceParentChildE && (cp,sp) in mCommSlice)) for cp in comm if (c,cp) in mAggregateFactor));
+@constraint(model, [(c, r, y, s) in mAggOut], vAggOut[(c,r,y,s)]  ==  sum((if haskey(pAggregateFactor, (c,cp)); pAggregateFactor[(c,cp)]; else pAggregateFactorDef; end)*sum(vOutTot[(cp,r,y,sp)] for sp in slice if ((c,r,y,sp) in mvOutTot && (s,sp) in mSliceParentChildE && (cp,sp) in mCommSlice)) for cp in comm if (c,cp) in mAggregateFactor));
 println("eqAggOut(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
 @constraint(model, [(c, r, y, s) in mEmsFuelTot], vEmsFuelTot[(c,r,y,s)]  ==  sum((if haskey(pEmissionFactor, (c,cp)); pEmissionFactor[(c,cp)]; else pEmissionFactorDef; end)*sum((if haskey(pTechEmisComm, (t,cp)); pTechEmisComm[(t,cp)]; else pTechEmisCommDef; end)*sum((if (t,c,cp,r,y,sp) in mTechEmsFuel; vTechInp[(t,cp,r,y,sp)]; else 0; end;) for sp in slice if (c,s,sp) in mCommSliceOrParent) for t in tech if (t,cp) in mTechInpComm) for cp in comm if ((if haskey(pEmissionFactor, (c,cp)); pEmissionFactor[(c,cp)]; else pEmissionFactorDef; end)>0)));
@@ -293,16 +293,16 @@ println("eqBalUp(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:S
 @constraint(model, [(c, r, y, s) in meqBalFx], vBalance[(c,r,y,s)]  ==  0);
 println("eqBalFx(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)
-@constraint(model, [(c, r, y, s) in mvBalance], vBalance[(c,r,y,s)]  ==  vOutTot[(c,r,y,s)]-vInpTot[(c,r,y,s)]);
+@constraint(model, [(c, r, y, s) in mvBalance], vBalance[(c,r,y,s)]  ==  (if (c,r,y,s) in mvOutTot; vOutTot[(c,r,y,s)]; else 0; end;)-(if (c,r,y,s) in mvInpTot; vInpTot[(c,r,y,s)]; else 0; end;));
 println("eqBal(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
-# eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)
-@constraint(model, [(c, r, y, s) in mvBalance], vOutTot[(c,r,y,s)]  ==  (if (c,r,y,s) in mDummyImport; vDummyImport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mSupOutTot; vSupOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mEmsFuelTot; vEmsFuelTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mAggOut; vAggOut[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mTechOutTot; vTechOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mStorageOutTot; vStorageOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mImport; vImport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mvTradeIrAOutTot; vTradeIrAOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mOutSub; sum(vOut2Lo[(c,r,y,sp,s)] for sp in slice if ((sp,s) in mSliceParentChild && (c,r,y,sp,s) in mvOut2Lo)); else 0; end;));
+# eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
+@constraint(model, [(c, r, y, s) in mvOutTot], vOutTot[(c,r,y,s)]  ==  (if (c,r,y,s) in mDummyImport; vDummyImport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mSupOutTot; vSupOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mEmsFuelTot; vEmsFuelTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mAggOut; vAggOut[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mTechOutTot; vTechOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mStorageOutTot; vStorageOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mImport; vImport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mvTradeIrAOutTot; vTradeIrAOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mOutSub; sum(vOut2Lo[(c,r,y,sp,s)] for sp in slice if ((sp,s) in mSliceParentChild && (c,r,y,sp,s) in mvOut2Lo)); else 0; end;));
 println("eqOutTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)
 @constraint(model, [(c, r, y, s) in mOut2Lo], sum(vOut2Lo[(c,r,y,s,sp)] for sp in slice if (c,r,y,s,sp) in mvOut2Lo)  ==  (if (c,r,y,s) in mSupOutTot; vSupOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mEmsFuelTot; vEmsFuelTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mAggOut; vAggOut[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mTechOutTot; vTechOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mStorageOutTot; vStorageOutTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mImport; vImport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mvTradeIrAOutTot; vTradeIrAOutTot[(c,r,y,s)]; else 0; end;));
 println("eqOut2Lo(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
-# eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)
-@constraint(model, [(c, r, y, s) in mvBalance], vInpTot[(c,r,y,s)]  ==  (if (c,r,y,s) in mvDemInp; vDemInp[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mDummyExport; vDummyExport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mTechInpTot; vTechInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mStorageInpTot; vStorageInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mExport; vExport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mvTradeIrAInpTot; vTradeIrAInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mInpSub; sum(vInp2Lo[(c,r,y,sp,s)] for sp in slice if ((sp,s) in mSliceParentChild && (c,r,y,sp,s) in mvInp2Lo)); else 0; end;));
+# eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)
+@constraint(model, [(c, r, y, s) in mvInpTot], vInpTot[(c,r,y,s)]  ==  (if (c,r,y,s) in mvDemInp; vDemInp[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mDummyExport; vDummyExport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mTechInpTot; vTechInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mStorageInpTot; vStorageInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mExport; vExport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mvTradeIrAInpTot; vTradeIrAInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mInpSub; sum(vInp2Lo[(c,r,y,sp,s)] for sp in slice if ((sp,s) in mSliceParentChild && (c,r,y,sp,s) in mvInp2Lo)); else 0; end;));
 println("eqInpTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)
 @constraint(model, [(c, r, y, s) in mInp2Lo], sum(vInp2Lo[(c,r,y,s,sp)] for sp in slice if (c,r,y,s,sp) in mvInp2Lo)  ==  (if (c,r,y,s) in mTechInpTot; vTechInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mStorageInpTot; vStorageInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mExport; vExport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mvTradeIrAInpTot; vTradeIrAInpTot[(c,r,y,s)]; else 0; end;));
@@ -326,10 +326,10 @@ println("eqStorageOutTot(comm, region, year, slice) done ", Dates.format(now(), 
 @constraint(model, [(r, y) in mvTotalCost], vTotalCost[(r,y)]  ==  sum(vTechEac[(t,r,y)] for t in tech if (t,r,y) in mTechEac)+sum(vTechOMCost[(t,r,y)] for t in tech if (t,r,y) in mTechOMCost)+sum(vSupCost[(s1,r,y)] for s1 in sup if (s1,r,y) in mvSupCost)+sum((if haskey(pDummyImportCost, (c,r,y,s)); pDummyImportCost[(c,r,y,s)]; else pDummyImportCostDef; end)*vDummyImport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum((if haskey(pDummyExportCost, (c,r,y,s)); pDummyExportCost[(c,r,y,s)]; else pDummyExportCostDef; end)*vDummyExport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(vTaxCost[(c,r,y)] for c in comm if (c,r,y) in mTaxCost)-sum(vSubsCost[(c,r,y)] for c in comm if (c,r,y) in mSubsCost)+sum(vStorageOMCost[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(vStorageEac[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageEac)+(if (r,y) in mvTradeCost; vTradeCost[(r,y)]; else 0; end;));
 println("eqCost(region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
-@constraint(model, [(c, r, y) in mTaxCost], vTaxCost[(c,r,y)]  ==  sum((if haskey(pTaxCost, (c,r,y,s)); pTaxCost[(c,r,y,s)]; else pTaxCostDef; end)*vOutTot[(c,r,y,s)] for s in slice if (c,s) in mCommSlice));
+@constraint(model, [(c, r, y) in mTaxCost], vTaxCost[(c,r,y)]  ==  sum((if haskey(pTaxCost, (c,r,y,s)); pTaxCost[(c,r,y,s)]; else pTaxCostDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice)));
 println("eqTaxCost(comm, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)
-@constraint(model, [(c, r, y) in mSubsCost], vSubsCost[(c,r,y)]  ==  sum((if haskey(pSubsCost, (c,r,y,s)); pSubsCost[(c,r,y,s)]; else pSubsCostDef; end)*vOutTot[(c,r,y,s)] for s in slice if (c,s) in mCommSlice));
+@constraint(model, [(c, r, y) in mSubsCost], vSubsCost[(c,r,y)]  ==  sum((if haskey(pSubsCost, (c,r,y,s)); pSubsCost[(c,r,y,s)]; else pSubsCostDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,s) in mCommSlice && (c,r,y,s) in mvOutTot)));
 println("eqSubsCost(comm, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqObjective
 @constraint(model, vObjective  ==  sum(vTotalCost[(r,y)]*(if haskey(pDiscountFactorMileStone, (r,y)); pDiscountFactorMileStone[(r,y)]; else pDiscountFactorMileStoneDef; end) for r in region for y in year if (r,y) in mvTotalCost));

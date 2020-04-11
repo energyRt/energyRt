@@ -338,6 +338,8 @@ mvTechAInp(tech, comm, region, year, slice)
 mvTechAOut(tech, comm, region, year, slice)
 mvDemInp(comm, region, year, slice)
 mvBalance(comm, region, year, slice)
+mvInpTot(comm, region, year, slice)
+mvOutTot(comm, region, year, slice)
 mvInp2Lo(comm, region, year, slice, slice)
 mvOut2Lo(comm, region, year, slice, slice)
 mInpSub(comm, region, year, slice) For increase speed eqInpTot
@@ -418,9 +420,9 @@ variable
 vBalance(comm, region, year, slice)                  Net commodity balance
 ;
 positive variable
-*@ mvBalance(comm, region, year, slice)
+*@ mvOutTot(comm, region, year, slice)
 vOutTot(comm, region, year, slice)                   Total commodity output (consumption is not counted)
-*@ mvBalance(comm, region, year, slice)
+*@ mvInpTot(comm, region, year, slice)
 vInpTot(comm, region, year, slice)                   Total commodity input
 *@ mvInp2Lo(comm, region, year, slice, slice)
 vInp2Lo(comm, region, year, slice, slice)            Desagregation of slices for input parent to (grand)child
@@ -1110,7 +1112,7 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
          vAggOut(comm, region, year, slice)
          =e=
          sum(commp$mAggregateFactor(comm, commp),
-                 pAggregateFactor(comm, commp) *  sum(slicep$(mvBalance(commp, region, year, slicep) and
+                 pAggregateFactor(comm, commp) *  sum(slicep$(mvOutTot(comm, region, year, slicep) and
                            mSliceParentChildE(slice, slicep) and mCommSlice(commp, slicep)),
                                     vOutTot(commp, region, year, slicep)
          ));
@@ -1497,9 +1499,10 @@ eqBalFx(comm, region, year, slice)$meqBalFx(comm, region, year, slice)..
          vBalance(comm, region, year, slice) =e= 0;
 
 eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
-         vBalance(comm, region, year, slice) =e= vOutTot(comm, region, year, slice) - vInpTot(comm, region, year, slice);
+         vBalance(comm, region, year, slice) =e= vOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
+                  - vInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice);
 
-eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
+eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)..
          vOutTot(comm, region, year, slice)
          =e=
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
@@ -1524,7 +1527,7 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
                   vImport(comm, region, year, slice)$mImport(comm, region, year, slice) +
                   vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice);
 
-eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
+eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)..
          vInpTot(comm, region, year, slice)
          =e=
          vDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice) +
@@ -1630,11 +1633,11 @@ eqCost(region, year)$mvTotalCost(region, year)..
 
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
          vTaxCost(comm, region, year)
-         =e= sum(slice$mCommSlice(comm, slice), pTaxCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
+         =e= sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
 
 eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)..
          vSubsCost(comm, region, year)
-         =e= sum(slice$mCommSlice(comm, slice), pSubsCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
+         =e= sum(slice$(mCommSlice(comm, slice) and mvOutTot(comm, region, year, slice)), pSubsCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
 
 eqObjective..
    vObjective =e=

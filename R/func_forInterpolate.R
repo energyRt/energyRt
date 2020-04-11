@@ -202,6 +202,8 @@
        name, ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
   jj <- paste0(jj, paste0(rep(' ', 100 - nchar(jj)), collapse = ''))
   cat(rep('\b', 100), jj, sep = '') # , rep(' ', 100), rep('\b', 100)
+  if (name == '') browser()
+  assign('num', num, globalenv())
 }
 
 .remove_char <- function(x) {

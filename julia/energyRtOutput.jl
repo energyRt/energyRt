@@ -300,7 +300,7 @@ close(fvDemInp);
 
 fvOutTot = open("output/vOutTot.csv", "w");
 println(fvOutTot, "comm,region,year,slice,value");
-for (c,r,y,s) in mvBalance if JuMP.value(vOutTot[(c,r,y,s)]) != 0
+for (c,r,y,s) in mvOutTot if JuMP.value(vOutTot[(c,r,y,s)]) != 0
   println(fvOutTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vOutTot[(c,r,y,s)]));
 end;
 end;
@@ -309,7 +309,7 @@ close(fvOutTot);
 
 fvInpTot = open("output/vInpTot.csv", "w");
 println(fvInpTot, "comm,region,year,slice,value");
-for (c,r,y,s) in mvBalance if JuMP.value(vInpTot[(c,r,y,s)]) != 0
+for (c,r,y,s) in mvInpTot if JuMP.value(vInpTot[(c,r,y,s)]) != 0
   println(fvInpTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vInpTot[(c,r,y,s)]));
 end;
 end;
