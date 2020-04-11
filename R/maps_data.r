@@ -1210,7 +1210,7 @@ rs
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
     rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
-    rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqSupOutTot")] <- TRUE;
+    rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqTradeIrAInpTot", "eqTradeIrAOutTot")] <- TRUE;
     rs["mTechRetirement", c("name", "description", "type")] <- c("mTechRetirement", "Early retirement option", "map");
     rs["mTechRetirement", c("tech")] <- TRUE;
     rs["mTechUpgrade", c("name", "description", "type")] <- c("mTechUpgrade", "Upgrade technology (not implemented yet)", "map");
@@ -1262,7 +1262,7 @@ rs
     rs["mStorageFullYear", c("name", "description", "type")] <- c("mStorageFullYear", "Mapping of storage with joint slice", "map");
     rs["mStorageFullYear", c("stg", "eqStorageStore")] <- TRUE;
     rs["mStorageComm", c("name", "description", "type")] <- c("mStorageComm", "Mapping of storage technology and respective commodity", "map");
-    rs["mStorageComm", c("stg", "comm", "eqStorageAInp", "eqStorageAOut")] <- TRUE;
+    rs["mStorageComm", c("stg", "comm", "eqStorageAInp", "eqStorageAOut", "eqStorageCost")] <- TRUE;
     rs["mStorageAInp", c("name", "description", "type")] <- c("mStorageAInp", "Aux-commodity input to storage", "map");
     rs["mStorageAInp", c("stg", "comm")] <- TRUE;
     rs["mStorageAOut", c("name", "description", "type")] <- c("mStorageAOut", "Aux-commodity output from storage", "map");
@@ -1302,7 +1302,7 @@ rs
     rs["mSliceParentChildE", c("name", "description", "type")] <- c("mSliceParentChildE", "Child slice or the same", "map");
     rs["mSliceParentChildE", c("slice", "eqTechAfsLo", "eqTechAfsUp")] <- TRUE;
     rs["mSliceParentChild", c("name", "description", "type")] <- c("mSliceParentChild", "Child slice not the same", "map");
-    rs["mSliceParentChild", c("slice", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo")] <- TRUE;
+    rs["mSliceParentChild", c("slice", "eqOutTot", "eqInpTot")] <- TRUE;
     rs["mTechWeatherAf", c("name", "description", "type")] <- c("mTechWeatherAf", "", "map");
     rs["mTechWeatherAf", c("tech", "weather")] <- TRUE;
     rs["mTechWeatherAfs", c("name", "description", "type")] <- c("mTechWeatherAfs", "", "map");
@@ -1350,9 +1350,9 @@ rs
     rs["mvBalance", c("name", "description", "type")] <- c("mvBalance", "", "map");
     rs["mvBalance", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqInpTot")] <- TRUE;
     rs["mvInp2Lo", c("name", "description", "type")] <- c("mvInp2Lo", "", "map");
-    rs["mvInp2Lo", c("comm", "region", "year", "slice")] <- TRUE;
+    rs["mvInp2Lo", c("comm", "region", "year", "slice", "eqInp2Lo")] <- TRUE;
     rs["mvOut2Lo", c("name", "description", "type")] <- c("mvOut2Lo", "", "map");
-    rs["mvOut2Lo", c("comm", "region", "year", "slice")] <- TRUE;
+    rs["mvOut2Lo", c("comm", "region", "year", "slice", "eqOut2Lo")] <- TRUE;
     rs["mInpSub", c("name", "description", "type")] <- c("mInpSub", "For increase speed eqInpTot", "map");
     rs["mInpSub", c("comm", "region", "year", "slice", "eqInpTot")] <- TRUE;
     rs["mOutSub", c("name", "description", "type")] <- c("mOutSub", "For increase speed eqOutTot", "map");

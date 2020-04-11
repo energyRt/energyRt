@@ -1283,11 +1283,12 @@ eqStorageCost(stg, region, year)$mStorageOMCost(stg, region, year)..
          vStorageOMCost(stg, region, year)
          =e=
          pStorageFixom(stg, region, year) * vStorageCap(stg, region, year) +
-         sum((comm, slice)$(mCommSlice(comm, slice) and mStorageComm(stg, comm)),
+         sum(comm$mStorageComm(stg, comm),
+         sum(slice$mCommSlice(comm, slice),
              pStorageCostInp(stg, region, year, slice) * vStorageInp(stg, comm, region, year, slice)
              + pStorageCostOut(stg, region, year, slice) * vStorageOut(stg, comm, region, year, slice)
              + pStorageCostStore(stg, region, year, slice) * vStorageStore(stg, comm, region, year, slice)
-         );
+         ));
 
 
 
@@ -1513,8 +1514,7 @@ eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
                  vOut2Lo(comm, region, year, slicep, slice))$mOutSub(comm, region, year, slice);
 
 eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
-         sum(slicep$(mSliceParentChild(slice, slicep) and mvOut2Lo(comm, region, year, slice, slicep)),
-                 vOut2Lo(comm, region, year, slice, slicep))
+         sum(slicep$mvOut2Lo(comm, region, year, slice, slicep), vOut2Lo(comm, region, year, slice, slicep))
          =e=
                   vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice) +
                   vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice) +
@@ -1537,8 +1537,7 @@ eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
                  vInp2Lo(comm, region, year, slicep, slice))$mInpSub(comm, region, year, slice);
 
 eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
-        sum(slicep$(mSliceParentChild(slice, slicep) and mvInp2Lo(comm, region, year, slice, slicep)),
-                 vInp2Lo(comm, region, year, slice, slicep))
+        sum(slicep$mvInp2Lo(comm, region, year, slice, slicep), vInp2Lo(comm, region, year, slice, slicep))
          =e=
                   vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice) +
                   vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice) +
@@ -1547,8 +1546,8 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
 
 eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)..
          vSupOutTot(comm, region, year, slice) =e=
-         sum(sup$mSupComm(sup, comm), sum(slicep$mCommSliceOrParent(comm, slice, slicep),
-                 vSupOut(sup, comm, region, year, slicep)$mSupAva(sup, comm, region, year, slicep)));
+         sum(sup$mSupComm(sup, comm), sum(slicep$mSupAva(sup, comm, region, year, slicep),
+                 vSupOut(sup, comm, region, year, slicep)));
 
 eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
          vTechInpTot(comm, region, year, slice)
