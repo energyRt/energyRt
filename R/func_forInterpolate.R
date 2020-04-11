@@ -117,7 +117,8 @@
 
   
 # Implement add0 for all parameters
-.add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim, interpolation_time_begin, interpolation_count) {
+.add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim, 
+                             interpolation_time_begin, interpolation_count, len_name) {
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
   # if (num_classes_for_progrees_bar < 50) {
@@ -128,7 +129,7 @@
   # }
   # Fill DB main data
   tmlg <- 0; mnch <- 0
-  cat(rep(' ', 100), sep = '')
+  cat(rep(' ', len_name), sep = '')
   k <- 0;
   time.log.nm <- rep(NA, num_classes_for_progrees_bar)
   time.log.tm <- rep(NA, num_classes_for_progrees_bar)
@@ -139,7 +140,7 @@
         tmlg <- tmlg + 1
         if (arg$echo) {
           .interpolation_message(scen@model@data[[i]]@data[[j]]@name, k, interpolation_count, 
-                                 interpolation_time_begin = interpolation_time_begin)
+                                 interpolation_time_begin = interpolation_time_begin, len_name)
         }
         p1 <- proc.time()[3]
         tryCatch({
@@ -164,7 +165,7 @@
                                    time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
   # if (arg$echo) cat(' ')
   if (arg$echo)
-    .remove_char(100)
+    .remove_char(len_name)
   scen
 }
 
@@ -195,15 +196,17 @@
 .get_objects_count <- function(scen) {
   sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
 }
+.get_objects_len_name <- function(scen) {
+  (25 + max(c(30, max(c(sapply(scen@model@data, function(x) 
+    max(sapply(x@data, function(y) nchar(y@name)))), recursive = TRUE)))))
+}
 
-.interpolation_message <- function(name, num, interpolation_count, interpolation_time_begin) {
+.interpolation_message <- function(name, num, interpolation_count, interpolation_time_begin, len_name) {
   jj <- paste0(num, ' (', interpolation_count, '),',
        paste0(rep(' ', max(c(1, 15 - (nchar(name) %% 15)))), collapse = ''),
        name, ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
-  jj <- paste0(jj, paste0(rep(' ', 100 - nchar(jj)), collapse = ''))
-  cat(rep('\b', 100), jj, sep = '') # , rep(' ', 100), rep('\b', 100)
-  if (name == '') browser()
-  assign('num', num, globalenv())
+  jj <- paste0(jj, paste0(rep(' ', , len_name - nchar(jj)), collapse = ''))
+  cat(rep('\b', , len_name), jj, sep = '') # , rep(' ', 100), rep('\b', 100)
 }
 
 .remove_char <- function(x) {

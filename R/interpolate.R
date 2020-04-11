@@ -121,16 +121,17 @@ interpolate <- function(obj, ...) { #- returns class scenario
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation: ')
-  interpolation_count <- .get_objects_count(scen) + 75
+  interpolation_count <- .get_objects_count(scen) + 79
+  len_name <- .get_objects_len_name(scen)
   if (arg$n.threads == 1) {
     scen <- .add2_nthreads_1(0, 1, scen, arg, approxim, interpolation_time_begin = interpolation_time_begin, 
-                             interpolation_count = interpolation_count)
+                             interpolation_count = interpolation_count, len_name = len_name)
   } else {
     use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
     require(parallel)
     cl <- makeCluster(arg$n.threads)
     scen_pr <- parLapply(cl, 0:(arg$n.threads - 1), .add2_nthreads_1, arg$n.threads, scen, arg, approxim, 
-                         interpolation_time_begin, interpolation_count)
+                         interpolation_time_begin, interpolation_count, len_name)
     stopCluster(cl)
     scen <- .merge_scen(scen_pr, use_par)
   }
@@ -147,7 +148,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }
   # Reduce mapping
   scen@modInp <- .write_mapping(scen@modInp, interpolation_count = interpolation_count,
-                                interpolation_time_begin = interpolation_time_begin)  
+                                interpolation_time_begin = interpolation_time_begin, len_name = len_name)
   
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
   for(i in names(scen@modInp@parameters)) {
