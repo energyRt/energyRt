@@ -209,6 +209,7 @@ pTechAvarom(tech, comm, region, year, slice)        Auxilary Commodity-specific 
 * Exit stock and salvage
 pDiscount(region, year)                             Discount rate (can be region and year specific)
 pDiscountFactor(region, year)                       Discount factor (cumulative)
+pDiscountFactorMileStone(region, year)              Discount factor (cumulative) sum for MileStone
 * Supply
 pSupCost(sup, comm, region, year, slice)            Costs of supply (price per unit)
 pSupAvaUp(sup, comm, region, year, slice)           Upper bound for supply
@@ -339,6 +340,8 @@ mvDemInp(comm, region, year, slice)
 mvBalance(comm, region, year, slice)
 mvInp2Lo(comm, region, year, slice, slice)
 mvOut2Lo(comm, region, year, slice, slice)
+mInpSub(comm, region, year, slice) For increase speed eqInpTot
+mOutSub(comm, region, year, slice) For increase speed eqOutTot
 
 mvStorageAInp(stg, comm, region, year, slice)
 mvStorageAOut(stg, comm, region, year, slice)
@@ -572,6 +575,18 @@ mvTradeIrAOut(trade, comm, region, year, slice)
 mvTradeIrAOutTot(comm, region, year, slice)
 * (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
 mImportRow(imp, comm, region, year, slice)
+mImportIrSub(comm, region, year, slice)
+mImportRowSub(comm, region, year, slice)
+mImportIrSubSlice(comm, region, year, slice, slice)
+mImportIrSubSliceTrd(trade, comm, region, year, slice, slice)
+mImportRowSubSlice(comm, region, year, slice, slice)
+
+mExportIrSubSlice(comm, region, year, slice, slice)
+mExportIrSubSliceTrd(trade, comm, region, year, slice, slice)
+mExportRowSubSlice(comm, region, year, slice, slice)
+
+mExportIrSub(comm, region, year, slice)
+mExportRowSub(comm, region, year, slice)
 * (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf)
 mImportRowUp(imp, comm, region, year, slice)
 * pImportRowRes <> Inf
@@ -615,6 +630,7 @@ mInp2Lo(comm, region, year, slice)
 
 * me
 set
+meqTechNewCap(tech, region, year)
 meqTechSng2Sng(tech, region, comm, comm, year, slice)
 meqTechGrp2Sng(tech, region, group, comm, year, slice)
 meqTechSng2Grp(tech, region, comm, group, year, slice)
@@ -966,7 +982,7 @@ eqTechCap(tech, region, year)$mTechSpan(tech, region, year)..
                  ordYear(year) >= ordYear(yeare)), vTechRetiredCap(tech, region, yearp, yeare))
          );
 
-eqTechNewCap(tech, region, year)$mTechNew(tech, region, year)..
+eqTechNewCap(tech, region, year)$meqTechNewCap(tech, region, year)..
     sum(yearp$mvTechRetiredCap(tech, region, year, yearp),
                          vTechRetiredCap(tech, region, year, yearp)
          ) =l= vTechNewCap(tech, region, year);
@@ -1053,7 +1069,7 @@ eqSupAvaLo(sup, comm, region, year, slice)$meqSupAvaLo(sup, comm, region, year, 
 eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)..
          vSupReserve(sup, comm, region)
          =e=
-         sum((year, slice)$(mSupAva(sup, comm, region, year, slice) and mMidMilestone(year)),
+         sum((year, slice)$mSupAva(sup, comm, region, year, slice),
              pPeriodLen(year) * vSupOut(sup, comm, region, year, slice)
          );
 
@@ -1301,21 +1317,25 @@ eqTradeEac(trade, region, year)
 eqTradeCapFlow(trade, comm, year, slice)
 ;
 
+
+
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
   vImport(comm, dst, year, slice) =e=
-    sum(slicep$mCommSliceOrParent(comm, slice, slicep),
-        sum(trade$mTradeComm(trade, comm),
+    sum(slicep$mImportIrSubSlice(comm, dst, year, slice, slicep),
+        sum(trade$mImportIrSubSliceTrd(trade, comm, dst, year, slice, slicep),
              sum(src$mTradeRoutes(trade, src, dst),
                (pTradeIrEff(trade, src, dst, year, slicep) * vTradeIr(trade, comm, src, dst, year, slicep))$mvTradeIr(trade, comm, src, dst, year, slicep)
-         ))
-                  + sum(imp$mImpComm(imp, comm), vImportRow(imp, comm, dst, year, slicep)$mImportRow(imp, comm, dst, year, slicep)));
+         )))$mImportIrSub(comm, dst, year, slice)
+         +  sum(slicep$mImportRowSubSlice(comm, dst, year, slice, slicep),
+                 sum(imp$mImpComm(imp, comm), vImportRow(imp, comm, dst, year, slicep)$mImportRow(imp, comm, dst, year, slicep)))$mImportRowSub(comm, dst, year, slice);
 
 eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)..
   vExport(comm, src, year, slice) =e=
-   sum(slicep$mCommSliceOrParent(comm, slice, slicep),
-         sum(trade$mTradeComm(trade, comm), sum(dst$mTradeRoutes(trade, src, dst),
-                 vTradeIr(trade, comm, src, dst, year, slicep)$mvTradeIr(trade, comm, src, dst, year, slicep)))
-         + sum(expp$mExpComm(expp, comm), vExportRow(expp, comm, src, year, slicep)$mExportRow(expp, comm, src, year, slicep)));
+   sum(slicep$mExportIrSubSlice(comm, src, year, slice, slicep),
+         sum(trade$mExportIrSubSliceTrd(trade, comm, src, year, slice, slicep, slicep), sum(dst$mTradeRoutes(trade, src, dst),
+                 vTradeIr(trade, comm, src, dst, year, slicep)$mvTradeIr(trade, comm, src, dst, year, slicep))))$mExportIrSub(comm, src, year, slice)
+    + sum(slicep$mExportRowSubSlice(comm, src, year, slice, slicep),
+        sum(expp$mExpComm(expp, comm), vExportRow(expp, comm, src, year, slicep)$mExportRow(expp, comm, src, year, slicep)))$mExportRowSub(comm, src, year, slice);
 
 
 eqTradeFlowUp(trade, comm, src, dst, year, slice)$meqTradeFlowUp(trade, comm, src, dst, year, slice)..
@@ -1355,7 +1375,7 @@ eqExportRowLo(expp, comm, region, year, slice)$meqExportRowLo(expp, comm, region
   vExportRow(expp, comm, region, year, slice)  =g= pExportRowLo(expp, region, year, slice);
 
 eqExportRowCumulative(expp, comm)$mExpComm(expp, comm).. vExportRowAccumulated(expp, comm) =e=
-    sum((region, year, slice)$(mMidMilestone(year) and mExportRow(expp, comm, region, year, slice)),
+    sum((region, year, slice)$mExportRow(expp, comm, region, year, slice),
         pPeriodLen(year) * vExportRow(expp, comm, region, year, slice)
 );
 
@@ -1490,7 +1510,7 @@ eqOutTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
                   vImport(comm, region, year, slice)$mImport(comm, region, year, slice) +
                   vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice) +
          sum(slicep$(mSliceParentChild(slicep, slice) and mvOut2Lo(comm, region, year, slicep, slice)),
-                 vOut2Lo(comm, region, year, slicep, slice));
+                 vOut2Lo(comm, region, year, slicep, slice))$mOutSub(comm, region, year, slice);
 
 eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
          sum(slicep$(mSliceParentChild(slice, slicep) and mvOut2Lo(comm, region, year, slice, slicep)),
@@ -1514,7 +1534,7 @@ eqInpTot(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
          vExport(comm, region, year, slice)$mExport(comm, region, year, slice) +
          vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice) +
          sum(slicep$(mSliceParentChild(slicep, slice) and mvInp2Lo(comm, region, year, slicep, slice)),
-                 vInp2Lo(comm, region, year, slicep, slice));
+                 vInp2Lo(comm, region, year, slicep, slice))$mInpSub(comm, region, year, slice);
 
 eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
         sum(slicep$(mSliceParentChild(slice, slicep) and mvInp2Lo(comm, region, year, slice, slicep)),
@@ -1620,9 +1640,7 @@ eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)..
 eqObjective..
    vObjective =e=
          sum((region, year)$mvTotalCost(region, year),
-           vTotalCost(region, year) * sum((yeare, yearp, yearn)$(mStartMilestone(year, yearp) and mEndMilestone(year, yeare)
-                 and ordYear(yearn) >= ordYear(yearp) and ordYear(yearn) <= ordYear(yeare)), pDiscountFactor(region, yearn)))
-;
+           vTotalCost(region, year) * pDiscountFactorMileStone(region, year));
 
 * Latex file end
 *\end{document}
@@ -1835,6 +1853,7 @@ eqLECActivity
 * c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f
 /;
 $offtext
+$include inc_constraints.gms
 
 model energyRt / all / ;
 
@@ -1848,13 +1867,14 @@ $include data.gms
 * ddd355e0-0023-45e9-b0d3-1ad83ba74b3a
 *$EXIT
 
-*option lp = cbc;
 
 $include inc3.gms
 
 put log_stat;
 put '"solver",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
+$include inc_solver.gms
+*option lp = cplex;
 
 Solve energyRt minimizing vObjective using LP;
 

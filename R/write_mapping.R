@@ -1,7 +1,7 @@
 .write_mapping <- function(prec, interpolation_time_begin, interpolation_count) {
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
   bacs <- paste0(rep('\b', 100), collapse = '')
-  rest = interpolation_count - 73;
+  rest = interpolation_count - 79;
   cat(paste0(rep(' ', 100), collapse = ''))
 
   # Clean previous set data if any
@@ -97,35 +97,73 @@
   .interpolation_message('mTradeComm', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
   
     
-    # sum(expp$mExportRow(expp, comm, region, year, slice), 1) + sum((trade, dst)$(mTradeIr(trade, region, dst, year, slice) and mTradeComm(trade, comm)), 1) <> 0
-    tmp <- merge(getParameterData(prec@parameters$mTradeComm), getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'src', 'year', 'slice')]
-    colnames(tmp)[2] <- 'region'
-    .interpolation_message('mExport', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    prec@parameters[['mExport']] <- addData(prec@parameters[['mExport']], reduce_total_map(reduce.sect(rbind(tmp,
-    		getParameterData(prec@parameters[['mExportRow']])[, c('comm', 'region', 'year', 'slice')]), 
-    	c('comm', 'region', 'year', 'slice'))))
+    ### Export
+    mCommSliceOrParent2 <- mCommSliceOrParent
+    colnames(mCommSliceOrParent2)[3] <- 'slice.1'
+    .interpolation_message('mExportIrSubSliceTrd', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mExportIrSubSliceTrd <- merge(getParameterData(prec@parameters$mTradeComm), getParameterData(prec@parameters[['mTradeIr']]))
+    colnames(mExportIrSubSliceTrd)[6] <- 'slice.1'
+    mExportIrSubSliceTrd$dst <- NULL
+    mExportIrSubSliceTrd <- merge(mExportIrSubSliceTrd, mCommSliceOrParent2)
+    colnames(mExportIrSubSliceTrd)[4] <- 'region'
+    mExportIrSubSliceTrd <- mExportIrSubSliceTrd[!duplicated(mExportIrSubSliceTrd), ]
+    prec@parameters[['mExportIrSubSliceTrd']] <- addData(prec@parameters[['mExportIrSubSliceTrd']], mExportIrSubSliceTrd)
+    .interpolation_message('mExportIrSubSlice', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mExportIrSubSlice <- mExportIrSubSliceTrd[, -3]
+    mExportIrSubSlice <- mExportIrSubSlice[!duplicated(mExportIrSubSlice), ]
+    prec@parameters[['mExportIrSubSlice']] <- addData(prec@parameters[['mExportIrSubSlice']], mExportIrSubSlice)
     .interpolation_message('mExportIrSub', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    prec@parameters[['mExportIrSub']] <- addData(prec@parameters[['mExportIrSub']], reduce_total_map(reduce.sect(tmp,
-                   c('comm', 'region', 'year', 'slice'))))
+    mExportIrSub <- mExportIrSubSlice[, -2]
+    mExportIrSub <- mExportIrSub[!duplicated(mExportIrSub), ]
+    prec@parameters[['mExportIrSub']] <- addData(prec@parameters[['mExportIrSub']], mExportIrSub)
+    .interpolation_message('mExportRowSubSlice', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mExportRowSubTmp <- reduce.sect(getParameterData(prec@parameters[['mExportRow']])[, c('comm', 'region', 'year', 'slice')],
+      c('comm', 'region', 'year', 'slice'))
+    .interpolation_message('mExportRowSubSlice', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    colnames(mExportRowSubTmp)[4] <- 'slice.1'
+    mExportRowSubSlice <- merge(mExportRowSubTmp, mCommSliceOrParent2)
+    prec@parameters[['mExportRowSubSlice']] <- addData(prec@parameters[['mExportRowSubSlice']], mExportRowSubSlice)
     .interpolation_message('mExportRowSub', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    prec@parameters[['mExportRowSub']] <- addData(prec@parameters[['mExportRowSub']], reduce_total_map(reduce.sect(
-      getParameterData(prec@parameters[['mExportRow']])[, c('comm', 'region', 'year', 'slice')],
-          c('comm', 'region', 'year', 'slice'))))
-    .interpolation_message('mTradeComm', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    # sum(expp$mImportRow(imp, comm, region, year, slice), 1) + sum((trade, src)$(mTradeIr(trade, src, region, year, slice) and mTradeComm(trade, comm)), 1) <> 0
-    zz <- merge(getParameterData(prec@parameters$mTradeComm), getParameterData(prec@parameters[['mTradeIr']]))[, c('comm', 'dst', 'year', 'slice')]
-    .interpolation_message('mImport', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    colnames(zz)[2] <- 'region'
-    prec@parameters[['mImport']] <- addData(prec@parameters[['mImport']], reduce_total_map(reduce.sect(
-    	rbind(zz, getParameterData(prec@parameters[['mImportRow']])[, c('comm', 'region', 'year', 'slice')]), 
-    	c('comm', 'region', 'year', 'slice'))))
+    mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != 'slice.1']
+    mExportRowSub <- mExportRowSub[!duplicated(mExportRowSub), ]
+    prec@parameters[['mExportRowSub']] <- addData(prec@parameters[['mExportRowSub']], mExportRowSub)
+    .interpolation_message('mExport', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mExport <- rbind(mExportRowSub, mExportIrSub)
+    mExport <- mExport[!duplicated(mExport), ]
+    prec@parameters[['mExport']] <- addData(prec@parameters[['mExport']], mExport)
+    
+    ### Import
+    .interpolation_message('mImportIrSubSliceTrd', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mImportIrSubSliceTrd <- merge(getParameterData(prec@parameters$mTradeComm), getParameterData(prec@parameters[['mTradeIr']]))
+    colnames(mImportIrSubSliceTrd)[6] <- 'slice.1'
+    mImportIrSubSliceTrd$src <- NULL
+    mImportIrSubSliceTrd <- merge(mImportIrSubSliceTrd, mCommSliceOrParent2)
+    colnames(mImportIrSubSliceTrd)[4] <- 'region'
+    mImportIrSubSliceTrd <- mImportIrSubSliceTrd[!duplicated(mImportIrSubSliceTrd), ]
+    prec@parameters[['mImportIrSubSliceTrd']] <- addData(prec@parameters[['mImportIrSubSliceTrd']], mImportIrSubSliceTrd)
+    .interpolation_message('mImportIrSubSlice', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mImportIrSubSlice <- mImportIrSubSliceTrd[, -3]
+    mImportIrSubSlice <- mImportIrSubSlice[!duplicated(mImportIrSubSlice), ]
+    prec@parameters[['mImportIrSubSlice']] <- addData(prec@parameters[['mImportIrSubSlice']], mImportIrSubSlice)
     .interpolation_message('mImportIrSub', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    prec@parameters[['mImportIrSub']] <- addData(prec@parameters[['mImportIrSub']], reduce_total_map(reduce.sect(zz,
-                           c('comm', 'region', 'year', 'slice'))))
+    mImportIrSub <- mImportIrSubSlice[, -2]
+    mImportIrSub <- mImportIrSub[!duplicated(mImportIrSub), ]
+    prec@parameters[['mImportIrSub']] <- addData(prec@parameters[['mImportIrSub']], mImportIrSub)
+    .interpolation_message('mImportRowSubSlice', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mImportRowSubTmp <- reduce.sect(getParameterData(prec@parameters[['mImportRow']])[, c('comm', 'region', 'year', 'slice')],
+                                    c('comm', 'region', 'year', 'slice'))
+    .interpolation_message('mImportRowSubSlice', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    colnames(mImportRowSubTmp)[4] <- 'slice.1'
+    mImportRowSubSlice <- merge(mImportRowSubTmp, mCommSliceOrParent2)
+    prec@parameters[['mImportRowSubSlice']] <- addData(prec@parameters[['mImportRowSubSlice']], mImportRowSubSlice)
     .interpolation_message('mImportRowSub', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
-    prec@parameters[['mImportRowSub']] <- addData(prec@parameters[['mImportRowSub']], reduce_total_map(reduce.sect(
-      getParameterData(prec@parameters[['mImportRow']])[, c('comm', 'region', 'year', 'slice')],
-      c('comm', 'region', 'year', 'slice'))))
+    mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != 'slice.1']
+    mImportRowSub <- mImportRowSub[!duplicated(mImportRowSub), ]
+    prec@parameters[['mImportRowSub']] <- addData(prec@parameters[['mImportRowSub']], mImportRowSub)
+    .interpolation_message('mImport', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
+    mImport <- rbind(mImportRowSub, mImportIrSub)
+    mImport <- mImport[!duplicated(mImport), ]
+    prec@parameters[['mImport']] <- addData(prec@parameters[['mImport']], mImport)
     
     #
     .interpolation_message('mStorageInpTot', rest, interpolation_count, interpolation_time_begin); rest = rest + 1
