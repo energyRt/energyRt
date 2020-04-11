@@ -345,7 +345,7 @@
       getParameterData(prec@parameters$mInpSub))
     mvInpTot <- mvInpTot[!duplicated(mvInpTot), ]
     mvInpTot <- merge(mvInpTot, mCommSlice)
-    prec@parameters[['mvInpTot']] <- addData(prec@parameters[['mvInpTot']], mvInpTot)
+    # prec@parameters[['mvInpTot']] <- addData(prec@parameters[['mvInpTot']], mvInpTot)
     .interpolation_message('mvOutTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mvOutTot <- rbind(
       getParameterData(prec@parameters$mDummyImport),
@@ -360,14 +360,14 @@
     )
     mvOutTot <- mvOutTot[!duplicated(mvOutTot), ]
     mvOutTot <- merge(mvOutTot, mCommSlice)
-    prec@parameters[['mvOutTot']] <- addData(prec@parameters[['mvOutTot']], mvOutTot)
+    # prec@parameters[['mvOutTot']] <- addData(prec@parameters[['mvOutTot']], mvOutTot)
     .interpolation_message('mvBalance', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mvBalance <- rbind(mvInpTot, mvOutTot)
     mvBalance <- mvBalance[!duplicated(mvBalance), ]
-    # mvBalance <- merge(dregionyear, mCommSlice)
+    mvBalance <- merge(dregionyear, mCommSlice)
     prec@parameters[['mvBalance']] <- addData(prec@parameters[['mvBalance']], mvBalance)
-    # prec@parameters[['mvInpTot']] <- addData(prec@parameters[['mvInpTot']], mvBalance)
-    # prec@parameters[['mvOutTot']] <- addData(prec@parameters[['mvOutTot']], mvBalance)
+    prec@parameters[['mvInpTot']] <- addData(prec@parameters[['mvInpTot']], mvBalance)
+    prec@parameters[['mvOutTot']] <- addData(prec@parameters[['mvOutTot']], mvBalance)
 
     .interpolation_message('meqBalLo', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     prec@parameters[['meqBalLo']] <- addData(prec@parameters[['meqBalLo']], 
