@@ -39,7 +39,7 @@ model.vTradeRowCost = Var(mvTradeRowCost, doc = "Trade with ROW costs");
 model.vTradeIrCost = Var(mvTradeIrCost, doc = "Interregional trade costs");
 model.vTechNewCap = Var(mTechNew, domain = pyo.NonNegativeReals, doc = "New capacity");
 model.vTechRetirementStock = Var(mvTechRetirementStock, domain = pyo.NonNegativeReals, doc = "Early retired capacity");
-model.vTechRetirementNewCap = Var(mvTechRetiredNewCap, domain = pyo.NonNegativeReals, doc = "Early retired capacity");
+model.vTechRetirementNewCap = Var(mvTechRetirementNewCap, domain = pyo.NonNegativeReals, doc = "Early retired capacity");
 model.vTechCap = Var(mTechSpan, domain = pyo.NonNegativeReals, doc = "Total capacity of the technology");
 model.vTechAct = Var(mvTechAct, domain = pyo.NonNegativeReals, doc = "Activity level of technology");
 model.vTechInp = Var(mvTechInp, domain = pyo.NonNegativeReals, doc = "Input level");

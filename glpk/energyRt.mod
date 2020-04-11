@@ -600,7 +600,7 @@ for{(t, r, y) in mvTechRetirementStock : vTechRetirementStock[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechRetirementStock[t,r,y] >> "output/vTechRetirementStock.csv";
 }
 printf "tech,region,year,yearp,value\n" > "output/vTechRetirementNewCap.csv";
-for{(t, r, y, yp) in mvTechRetiredNewCap : vTechRetirementNewCap[t,r,y,yp] <> 0} {
+for{(t, r, y, yp) in mvTechRetirementNewCap : vTechRetirementNewCap[t,r,y,yp] <> 0} {
   printf "%s,%s,%s,%s,%f\n", t,r,y,yp,vTechRetirementNewCap[t,r,y,yp] >> "output/vTechRetirementNewCap.csv";
 }
 printf "tech,region,year,value\n" > "output/vTechCap.csv";

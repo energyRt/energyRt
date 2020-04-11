@@ -367,7 +367,7 @@ positive variable
 vTechNewCap(tech, region, year)                      New capacity
 *@ mvTechRetirementStock(tech, region, year)
 vTechRetirementStock(tech, region, year)            Early retired capacity
-*@ mvTechRetiredNewCap(tech, region, year, year)
+*@ mvTechRetirementNewCap(tech, region, year, year)
 vTechRetirementNewCap(tech, region, year, year)            Early retired capacity
 *vTechRetrofitCap(tech, region, year, year)
 *vTechUpgradeCap(tech, region, year)

@@ -119,7 +119,7 @@ f.close()
 flist.write("vTechRetirementNewCap\n");
 f = open("output/vTechRetirementNewCap.csv","w");
 f.write("tech,region,year,yearp,value\n");
-for (t,r,y,yp) in mvTechRetiredNewCap:
+for (t,r,y,yp) in mvTechRetirementNewCap:
     if model.vTechRetirementNewCap[(t,r,y,yp)].value != 0:
         f.write(str(t) + "," + str(r) + "," + str(y) + "," + str(yp) + "," +  str(model.vTechRetirementNewCap[(t,r,y,yp)].value) + "\n")
 f.close()

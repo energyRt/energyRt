@@ -219,7 +219,7 @@ close(fvTechRetirementStock);
 
 fvTechRetirementNewCap = open("output/vTechRetirementNewCap.csv", "w");
 println(fvTechRetirementNewCap, "tech,region,year,yearp,value");
-for (t,r,y,yp) in mvTechRetiredNewCap if JuMP.value(vTechRetirementNewCap[(t,r,y,yp)]) != 0
+for (t,r,y,yp) in mvTechRetirementNewCap if JuMP.value(vTechRetirementNewCap[(t,r,y,yp)]) != 0
   println(fvTechRetirementNewCap, t, ",", r, ",", y, ",", yp, ",", JuMP.value(vTechRetirementNewCap[(t,r,y,yp)]));
 end;
 end;

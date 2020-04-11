@@ -26,7 +26,7 @@ model = Model();
 @variable(model, vTradeIrCost[mvTradeIrCost]);
 @variable(model, vTechNewCap[mTechNew] >= 0);
 @variable(model, vTechRetirementStock[mvTechRetirementStock] >= 0);
-@variable(model, vTechRetirementNewCap[mvTechRetiredNewCap] >= 0);
+@variable(model, vTechRetirementNewCap[mvTechRetirementNewCap] >= 0);
 @variable(model, vTechCap[mTechSpan] >= 0);
 @variable(model, vTechAct[mvTechAct] >= 0);
 @variable(model, vTechInp[mvTechInp] >= 0);
