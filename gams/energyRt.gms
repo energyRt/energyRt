@@ -997,7 +997,7 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
                          (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))),
                   pTechEac(tech, region, yearp) * (
                    vTechNewCap(tech, region, yearp) -
-                   sum(yeare$mvTechRetiredNewCap(tech, region, yearp, yeare),
+                   sum(yeare$(mvTechRetiredNewCap(tech, region, yearp, yeare) and ordYear(year) >= ordYear(yeare)),
                        vTechRetiredNewCap(tech, region, yearp, yeare)))
          );
 
@@ -1548,8 +1548,8 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
 
 eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)..
          vSupOutTot(comm, region, year, slice) =e=
-         sum(sup$mSupComm(sup, comm), sum(slicep$(mCommSliceOrParent(comm, slice, slicep) 
-			and mSupAva(sup, comm, region, year, slicep)),
+         sum(sup$mSupComm(sup, comm), sum(slicep$(mCommSliceOrParent(comm, slice, slicep)
+                        and mSupAva(sup, comm, region, year, slicep)),
                  vSupOut(sup, comm, region, year, slicep)));
 
 eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
