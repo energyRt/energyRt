@@ -141,7 +141,7 @@ println("eqTechRetiredNewCap(tech, region, year) done ", Dates.format(now(), "HH
 @constraint(model, [(t, r, y) in mvTechRetiredStock], vTechRetiredStock[(t,r,y)] <=  (if haskey(pTechStock, (t,r,y)); pTechStock[(t,r,y)]; else pTechStockDef; end));
 println("eqTechRetiredStock(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
-@constraint(model, [(t, r, y) in mTechEac], vTechEac[(t,r,y)]  ==  sum((if haskey(pTechEac, (t,r,yp)); pTechEac[(t,r,yp)]; else pTechEacDef; end)*(vTechNewCap[(t,r,yp)]-sum(vTechRetiredNewCap[(t,r,yp,ye)] for ye in year if (t,r,yp,ye) in mvTechRetiredNewCap)) for yp in year if ((t,r,yp) in mTechNew && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTechOlife, (t,r)); pTechOlife[(t,r)]; else pTechOlifeDef; end)+ordYear[(yp)] || (t,r) in mTechOlifeInf))));
+@constraint(model, [(t, r, y) in mTechEac], vTechEac[(t,r,y)]  ==  sum((if haskey(pTechEac, (t,r,yp)); pTechEac[(t,r,yp)]; else pTechEacDef; end)*(vTechNewCap[(t,r,yp)]-sum(vTechRetiredNewCap[(t,r,yp,ye)] for ye in year if ((t,r,yp,ye) in mvTechRetiredNewCap && ordYear[(y)] >= ordYear[(ye)]))) for yp in year if ((t,r,yp) in mTechNew && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTechOlife, (t,r)); pTechOlife[(t,r)]; else pTechOlifeDef; end)+ordYear[(yp)] || (t,r) in mTechOlifeInf))));
 println("eqTechEac(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechInv(tech, region, year)$mTechNew(tech, region, year)
 @constraint(model, [(t, r, y) in mTechNew], vTechInv[(t,r,y)]  ==  (if haskey(pTechInvcost, (t,r,y)); pTechInvcost[(t,r,y)]; else pTechInvcostDef; end)*vTechNewCap[(t,r,y)]);

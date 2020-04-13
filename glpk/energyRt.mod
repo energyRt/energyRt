@@ -449,7 +449,7 @@ s.t.  eqTechRetiredNewCap{(t, r, y) in meqTechRetiredNewCap}: sum{yp in year:((t
 
 s.t.  eqTechRetiredStock{(t, r, y) in mvTechRetiredStock}: vTechRetiredStock[t,r,y] <=  pTechStock[t,r,y];
 
-s.t.  eqTechEac{(t, r, y) in mTechEac}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t,r,yp,ye) in mvTechRetiredNewCap)}(vTechRetiredNewCap[t,r,yp,ye])));
+s.t.  eqTechEac{(t, r, y) in mTechEac}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:(((t,r,yp,ye) in mvTechRetiredNewCap and ordYear[y] >= ordYear[ye]))}(vTechRetiredNewCap[t,r,yp,ye])));
 
 s.t.  eqTechInv{(t, r, y) in mTechNew}: vTechInv[t,r,y]  =  pTechInvcost[t,r,y]*vTechNewCap[t,r,y];
 
