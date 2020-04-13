@@ -208,22 +208,22 @@ end;
 close(fvTechNewCap);
 
 
-fvTechRetirementStock = open("output/vTechRetirementStock.csv", "w");
-println(fvTechRetirementStock, "tech,region,year,value");
-for (t,r,y) in mvTechRetirementStock if JuMP.value(vTechRetirementStock[(t,r,y)]) != 0
-  println(fvTechRetirementStock, t, ",", r, ",", y, ",", JuMP.value(vTechRetirementStock[(t,r,y)]));
+fvTechRetiredStock = open("output/vTechRetiredStock.csv", "w");
+println(fvTechRetiredStock, "tech,region,year,value");
+for (t,r,y) in mvTechRetiredStock if JuMP.value(vTechRetiredStock[(t,r,y)]) != 0
+  println(fvTechRetiredStock, t, ",", r, ",", y, ",", JuMP.value(vTechRetiredStock[(t,r,y)]));
 end;
 end;
-close(fvTechRetirementStock);
+close(fvTechRetiredStock);
 
 
-fvTechRetirementNewCap = open("output/vTechRetirementNewCap.csv", "w");
-println(fvTechRetirementNewCap, "tech,region,year,yearp,value");
-for (t,r,y,yp) in mvTechRetirementNewCap if JuMP.value(vTechRetirementNewCap[(t,r,y,yp)]) != 0
-  println(fvTechRetirementNewCap, t, ",", r, ",", y, ",", yp, ",", JuMP.value(vTechRetirementNewCap[(t,r,y,yp)]));
+fvTechRetiredNewCap = open("output/vTechRetiredNewCap.csv", "w");
+println(fvTechRetiredNewCap, "tech,region,year,yearp,value");
+for (t,r,y,yp) in mvTechRetiredNewCap if JuMP.value(vTechRetiredNewCap[(t,r,y,yp)]) != 0
+  println(fvTechRetiredNewCap, t, ",", r, ",", y, ",", yp, ",", JuMP.value(vTechRetiredNewCap[(t,r,y,yp)]));
 end;
 end;
-close(fvTechRetirementNewCap);
+close(fvTechRetiredNewCap);
 
 
 fvTechCap = open("output/vTechCap.csv", "w");
@@ -640,8 +640,8 @@ println(vrb_list, "vTradeCost");
 println(vrb_list, "vTradeRowCost");
 println(vrb_list, "vTradeIrCost");
 println(vrb_list, "vTechNewCap");
-println(vrb_list, "vTechRetirementStock");
-println(vrb_list, "vTechRetirementNewCap");
+println(vrb_list, "vTechRetiredStock");
+println(vrb_list, "vTechRetiredNewCap");
 println(vrb_list, "vTechCap");
 println(vrb_list, "vTechAct");
 println(vrb_list, "vTechInp");

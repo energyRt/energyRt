@@ -330,9 +330,9 @@ set
 mvSupCost(sup, region, year)
 mvTechInp(tech, comm, region, year, slice)
 mvSupReserve(sup, comm, region)
-mvTechRetirementNewCap(tech, region, year, year)
+mvTechRetiredNewCap(tech, region, year, year)
 
-mvTechRetirementStock(tech, region, year)
+mvTechRetiredStock(tech, region, year)
 mvTechAct(tech, region, year, slice)
 mvTechInp(tech, comm, region, year, slice)
 mvTechOut(tech, comm, region, year, slice)
@@ -365,10 +365,10 @@ $offtext
 positive variable
 *@ mTechNew(tech, region, year)
 vTechNewCap(tech, region, year)                      New capacity
-*@ mvTechRetirementStock(tech, region, year)
-vTechRetirementStock(tech, region, year)            Early retired capacity
-*@ mvTechRetirementNewCap(tech, region, year, year)
-vTechRetirementNewCap(tech, region, year, year)            Early retired capacity
+*@ mvTechRetiredStock(tech, region, year)
+vTechRetiredStock(tech, region, year)            Early retired capacity
+*@ mvTechRetiredNewCap(tech, region, year, year)
+vTechRetiredNewCap(tech, region, year, year)            Early retired capacity
 *vTechRetrofitCap(tech, region, year, year)
 *vTechUpgradeCap(tech, region, year)
 * Activity and intput-output
@@ -625,7 +625,7 @@ mInp2Lo(comm, region, year, slice)
 
 * me
 set
-meqTechRetirementNewCap(tech, region, year)
+meqTechRetiredNewCap(tech, region, year)
 meqTechSng2Sng(tech, region, comm, comm, year, slice)
 meqTechGrp2Sng(tech, region, group, comm, year, slice)
 meqTechSng2Grp(tech, region, comm, group, year, slice)
@@ -954,10 +954,10 @@ eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, co
 Equation
 * Capacity equation
 eqTechCap(tech, region, year)       Technology capacity
-eqTechRetirementNewCap(tech, region, year)  Stock retired eqution
-eqTechRetirementStock(tech, region, year)  Stock retired eqution
+eqTechRetiredNewCap(tech, region, year)  Stock retired eqution
+eqTechRetiredStock(tech, region, year)  Stock retired eqution
 eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
-*eqTechRetirementCap(tech, region, year, year)
+*eqTechRetiredCap(tech, region, year, year)
 *eqTechRetrofitCap(tech, region, year, year)
 *eqTechUpgradeCap(tech, region, year)
 * Investment equation
@@ -970,22 +970,22 @@ eqTechOMCost(tech, region, year)    Technology O&M costs
 eqTechCap(tech, region, year)$mTechSpan(tech, region, year)..
          vTechCap(tech, region, year)
          =e=
-         pTechStock(tech, region, year) - vTechRetirementStock(tech, region, year)$mvTechRetirementStock(tech, region, year) +
+         pTechStock(tech, region, year) - vTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year) +
          sum(yearp$(mTechNew(tech, region, yearp) and ordYear(year) >= ordYear(yearp) and
                          (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))),
                  vTechNewCap(tech, region, yearp) -
-                   sum(yeare$(mvTechRetirementNewCap(tech, region, yearp, yeare) and
-                 ordYear(year) >= ordYear(yeare)), vTechRetirementNewCap(tech, region, yearp, yeare))
+                   sum(yeare$(mvTechRetiredNewCap(tech, region, yearp, yeare) and
+                 ordYear(year) >= ordYear(yeare)), vTechRetiredNewCap(tech, region, yearp, yeare))
          );
 
-eqTechRetirementNewCap(tech, region, year)$meqTechRetirementNewCap(tech, region, year)..
-    sum(yearp$mvTechRetirementNewCap(tech, region, year, yearp),
-                         vTechRetirementNewCap(tech, region, year, yearp)
+eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)..
+    sum(yearp$mvTechRetiredNewCap(tech, region, year, yearp),
+                         vTechRetiredNewCap(tech, region, year, yearp)
          ) =l= vTechNewCap(tech, region, year);
 
 * Stock retired eqution
-eqTechRetirementStock(tech, region, year)$mvTechRetirementStock(tech, region, year)..
-         vTechRetirementStock(tech, region, year) =l= pTechStock(tech, region, year);
+eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)..
+         vTechRetiredStock(tech, region, year) =l= pTechStock(tech, region, year);
 
 
 
@@ -997,11 +997,11 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
                          (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))),
                   pTechEac(tech, region, yearp) * (
                    vTechNewCap(tech, region, yearp) -
-                   sum(yeare$mvTechRetirementNewCap(tech, region, yearp, yeare),
-                       vTechRetirementNewCap(tech, region, yearp, yeare)))
+                   sum(yeare$mvTechRetiredNewCap(tech, region, yearp, yeare),
+                       vTechRetiredNewCap(tech, region, yearp, yeare)))
          );
 
-*eqTechRetirementCap(tech, region, year, yearp)$(not(mTechRetirement(tech)) or
+*eqTechRetiredCap(tech, region, year, yearp)$(not(mTechRetired(tech)) or
 *  ordYear(yearp) < ordYear(year) or ordYear(yearp) >= ordYear(year) + pTechOlife(tech, region))..
 *    vTechRetiredCap(tech, region, year, yearp) =e= 0;
 
@@ -1735,7 +1735,7 @@ eqTechAfcInpUp
 * Capacity equation
 eqTechCap
 eqTechNewCap
-*eqTechRetirementCap
+*eqTechRetiredCap
 *eqTechRetrofitCap
 *eqTechUpgradeCap
 * Investition equation

@@ -91,8 +91,8 @@ set mAggregateFactor dimen 2;
 set mvSupCost dimen 3;
 set mvTechInp dimen 5;
 set mvSupReserve dimen 3;
-set mvTechRetirementNewCap dimen 4;
-set mvTechRetirementStock dimen 3;
+set mvTechRetiredNewCap dimen 4;
+set mvTechRetiredStock dimen 3;
 set mvTechAct dimen 4;
 set mvTechOut dimen 5;
 set mvTechAInp dimen 5;
@@ -151,7 +151,7 @@ set mSupAva dimen 5;
 set mSupReserveUp dimen 3;
 set mOut2Lo dimen 4;
 set mInp2Lo dimen 4;
-set meqTechRetirementNewCap dimen 3;
+set meqTechRetiredNewCap dimen 3;
 set meqTechSng2Sng dimen 6;
 set meqTechGrp2Sng dimen 6;
 set meqTechSng2Grp dimen 6;
@@ -351,8 +351,8 @@ var vTradeIrCost{region, year};
 
 
 var vTechNewCap{tech, region, year} >= 0;
-var vTechRetirementStock{tech, region, year} >= 0;
-var vTechRetirementNewCap{tech, region, year, year} >= 0;
+var vTechRetiredStock{tech, region, year} >= 0;
+var vTechRetiredNewCap{tech, region, year, year} >= 0;
 var vTechCap{tech, region, year} >= 0;
 var vTechAct{tech, region, year, slice} >= 0;
 var vTechInp{tech, comm, region, year, slice} >= 0;
@@ -443,13 +443,13 @@ s.t.  eqTechAfcInpLo{(t, r, c, y, s) in meqTechAfcInpLo}: pTechAfcLo[t,c,r,y,s]*
 
 s.t.  eqTechAfcInpUp{(t, r, c, y, s) in meqTechAfcInpUp}: vTechInp[t,c,r,y,s] <=  pTechAfcUp[t,c,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*paTechWeatherAfcUp[t,c,r,y,s];
 
-s.t.  eqTechCap{(t, r, y) in mTechSpan}: vTechCap[t,r,y]  =  pTechStock[t,r,y]-sum{FORIF: (t,r,y) in mvTechRetirementStock} (vTechRetirementStock[t,r,y])+sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(vTechNewCap[t,r,yp]-sum{ye in year:(((t,r,yp,ye) in mvTechRetirementNewCap and ordYear[y] >= ordYear[ye]))}(vTechRetirementNewCap[t,r,yp,ye]));
+s.t.  eqTechCap{(t, r, y) in mTechSpan}: vTechCap[t,r,y]  =  pTechStock[t,r,y]-sum{FORIF: (t,r,y) in mvTechRetiredStock} (vTechRetiredStock[t,r,y])+sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(vTechNewCap[t,r,yp]-sum{ye in year:(((t,r,yp,ye) in mvTechRetiredNewCap and ordYear[y] >= ordYear[ye]))}(vTechRetiredNewCap[t,r,yp,ye]));
 
-s.t.  eqTechRetirementNewCap{(t, r, y) in meqTechRetirementNewCap}: sum{yp in year:((t,r,y,yp) in mvTechRetirementNewCap)}(vTechRetirementNewCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
+s.t.  eqTechRetiredNewCap{(t, r, y) in meqTechRetiredNewCap}: sum{yp in year:((t,r,y,yp) in mvTechRetiredNewCap)}(vTechRetiredNewCap[t,r,y,yp]) <=  vTechNewCap[t,r,y];
 
-s.t.  eqTechRetirementStock{(t, r, y) in mvTechRetirementStock}: vTechRetirementStock[t,r,y] <=  pTechStock[t,r,y];
+s.t.  eqTechRetiredStock{(t, r, y) in mvTechRetiredStock}: vTechRetiredStock[t,r,y] <=  pTechStock[t,r,y];
 
-s.t.  eqTechEac{(t, r, y) in mTechEac}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t,r,yp,ye) in mvTechRetirementNewCap)}(vTechRetirementNewCap[t,r,yp,ye])));
+s.t.  eqTechEac{(t, r, y) in mTechEac}: vTechEac[t,r,y]  =  sum{yp in year:(((t,r,yp) in mTechNew and ordYear[y] >= ordYear[yp] and (ordYear[y]<pTechOlife[t,r]+ordYear[yp] or (t,r) in mTechOlifeInf)))}(pTechEac[t,r,yp]*(vTechNewCap[t,r,yp]-sum{ye in year:((t,r,yp,ye) in mvTechRetiredNewCap)}(vTechRetiredNewCap[t,r,yp,ye])));
 
 s.t.  eqTechInv{(t, r, y) in mTechNew}: vTechInv[t,r,y]  =  pTechInvcost[t,r,y]*vTechNewCap[t,r,y];
 
@@ -595,13 +595,13 @@ printf "tech,region,year,value\n" > "output/vTechNewCap.csv";
 for{(t, r, y) in mTechNew : vTechNewCap[t,r,y] <> 0} {
   printf "%s,%s,%s,%f\n", t,r,y,vTechNewCap[t,r,y] >> "output/vTechNewCap.csv";
 }
-printf "tech,region,year,value\n" > "output/vTechRetirementStock.csv";
-for{(t, r, y) in mvTechRetirementStock : vTechRetirementStock[t,r,y] <> 0} {
-  printf "%s,%s,%s,%f\n", t,r,y,vTechRetirementStock[t,r,y] >> "output/vTechRetirementStock.csv";
+printf "tech,region,year,value\n" > "output/vTechRetiredStock.csv";
+for{(t, r, y) in mvTechRetiredStock : vTechRetiredStock[t,r,y] <> 0} {
+  printf "%s,%s,%s,%f\n", t,r,y,vTechRetiredStock[t,r,y] >> "output/vTechRetiredStock.csv";
 }
-printf "tech,region,year,yearp,value\n" > "output/vTechRetirementNewCap.csv";
-for{(t, r, y, yp) in mvTechRetirementNewCap : vTechRetirementNewCap[t,r,y,yp] <> 0} {
-  printf "%s,%s,%s,%s,%f\n", t,r,y,yp,vTechRetirementNewCap[t,r,y,yp] >> "output/vTechRetirementNewCap.csv";
+printf "tech,region,year,yearp,value\n" > "output/vTechRetiredNewCap.csv";
+for{(t, r, y, yp) in mvTechRetiredNewCap : vTechRetiredNewCap[t,r,y,yp] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", t,r,y,yp,vTechRetiredNewCap[t,r,y,yp] >> "output/vTechRetiredNewCap.csv";
 }
 printf "tech,region,year,value\n" > "output/vTechCap.csv";
 for{(t, r, y) in mTechSpan : vTechCap[t,r,y] <> 0} {
@@ -855,8 +855,8 @@ printf "value\n" > "output/variable_list.csv";
     printf "vTradeRowCost\n" >> "output/variable_list.csv";
     printf "vTradeIrCost\n" >> "output/variable_list.csv";
     printf "vTechNewCap\n" >> "output/variable_list.csv";
-    printf "vTechRetirementStock\n" >> "output/variable_list.csv";
-    printf "vTechRetirementNewCap\n" >> "output/variable_list.csv";
+    printf "vTechRetiredStock\n" >> "output/variable_list.csv";
+    printf "vTechRetiredNewCap\n" >> "output/variable_list.csv";
     printf "vTechCap\n" >> "output/variable_list.csv";
     printf "vTechAct\n" >> "output/variable_list.csv";
     printf "vTechInp\n" >> "output/variable_list.csv";

@@ -38,8 +38,8 @@ model.vTradeCost = Var(mvTradeCost, doc = "Total trade costs");
 model.vTradeRowCost = Var(mvTradeRowCost, doc = "Trade with ROW costs");
 model.vTradeIrCost = Var(mvTradeIrCost, doc = "Interregional trade costs");
 model.vTechNewCap = Var(mTechNew, domain = pyo.NonNegativeReals, doc = "New capacity");
-model.vTechRetirementStock = Var(mvTechRetirementStock, domain = pyo.NonNegativeReals, doc = "Early retired capacity");
-model.vTechRetirementNewCap = Var(mvTechRetirementNewCap, domain = pyo.NonNegativeReals, doc = "Early retired capacity");
+model.vTechRetiredStock = Var(mvTechRetiredStock, domain = pyo.NonNegativeReals, doc = "Early retired capacity");
+model.vTechRetiredNewCap = Var(mvTechRetiredNewCap, domain = pyo.NonNegativeReals, doc = "Early retired capacity");
 model.vTechCap = Var(mTechSpan, domain = pyo.NonNegativeReals, doc = "Total capacity of the technology");
 model.vTechAct = Var(mvTechAct, domain = pyo.NonNegativeReals, doc = "Activity level of technology");
 model.vTechInp = Var(mvTechInp, domain = pyo.NonNegativeReals, doc = "Input level");
@@ -127,13 +127,13 @@ model.eqTechAfcInpLo = Constraint(meqTechAfcInpLo, rule = lambda model, t, r, c,
 # eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, comm, year, slice)
 model.eqTechAfcInpUp = Constraint(meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcUp.get((t,c,r,y,s)));
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
-model.eqTechCap = Constraint(mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  pTechStock.get((t,r,y))-(model.vTechRetirementStock[t,r,y] if (t,r,y) in mvTechRetirementStock else 0)+sum(model.vTechNewCap[t,r,yp]-sum(model.vTechRetirementNewCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetirementNewCap and ordYear.get((y)) >= ordYear.get((ye)))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
-# eqTechRetirementNewCap(tech, region, year)$meqTechRetirementNewCap(tech, region, year)
-model.eqTechRetirementNewCap = Constraint(meqTechRetirementNewCap, rule = lambda model, t, r, y : sum(model.vTechRetirementNewCap[t,r,y,yp] for yp in year if (t,r,y,yp) in mvTechRetirementNewCap) <=  model.vTechNewCap[t,r,y]);
-# eqTechRetirementStock(tech, region, year)$mvTechRetirementStock(tech, region, year)
-model.eqTechRetirementStock = Constraint(mvTechRetirementStock, rule = lambda model, t, r, y : model.vTechRetirementStock[t,r,y] <=  pTechStock.get((t,r,y)));
+model.eqTechCap = Constraint(mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  pTechStock.get((t,r,y))-(model.vTechRetiredStock[t,r,y] if (t,r,y) in mvTechRetiredStock else 0)+sum(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredNewCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetiredNewCap and ordYear.get((y)) >= ordYear.get((ye)))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
+# eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
+model.eqTechRetiredNewCap = Constraint(meqTechRetiredNewCap, rule = lambda model, t, r, y : sum(model.vTechRetiredNewCap[t,r,y,yp] for yp in year if (t,r,y,yp) in mvTechRetiredNewCap) <=  model.vTechNewCap[t,r,y]);
+# eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
+model.eqTechRetiredStock = Constraint(mvTechRetiredStock, rule = lambda model, t, r, y : model.vTechRetiredStock[t,r,y] <=  pTechStock.get((t,r,y)));
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
-model.eqTechEac = Constraint(mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(pTechEac.get((t,r,yp))*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetirementNewCap[t,r,yp,ye] for ye in year if (t,r,yp,ye) in mvTechRetirementNewCap)) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
+model.eqTechEac = Constraint(mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(pTechEac.get((t,r,yp))*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredNewCap[t,r,yp,ye] for ye in year if (t,r,yp,ye) in mvTechRetiredNewCap)) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
 # eqTechInv(tech, region, year)$mTechNew(tech, region, year)
 model.eqTechInv = Constraint(mTechNew, rule = lambda model, t, r, y : model.vTechInv[t,r,y]  ==  pTechInvcost.get((t,r,y))*model.vTechNewCap[t,r,y]);
 # eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)

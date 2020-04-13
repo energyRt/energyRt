@@ -109,19 +109,19 @@ for (t,r,y) in mTechNew:
     if model.vTechNewCap[(t,r,y)].value != 0:
         f.write(str(t) + "," + str(r) + "," + str(y) + "," +  str(model.vTechNewCap[(t,r,y)].value) + "\n")
 f.close()
-flist.write("vTechRetirementStock\n");
-f = open("output/vTechRetirementStock.csv","w");
+flist.write("vTechRetiredStock\n");
+f = open("output/vTechRetiredStock.csv","w");
 f.write("tech,region,year,value\n");
-for (t,r,y) in mvTechRetirementStock:
-    if model.vTechRetirementStock[(t,r,y)].value != 0:
-        f.write(str(t) + "," + str(r) + "," + str(y) + "," +  str(model.vTechRetirementStock[(t,r,y)].value) + "\n")
+for (t,r,y) in mvTechRetiredStock:
+    if model.vTechRetiredStock[(t,r,y)].value != 0:
+        f.write(str(t) + "," + str(r) + "," + str(y) + "," +  str(model.vTechRetiredStock[(t,r,y)].value) + "\n")
 f.close()
-flist.write("vTechRetirementNewCap\n");
-f = open("output/vTechRetirementNewCap.csv","w");
+flist.write("vTechRetiredNewCap\n");
+f = open("output/vTechRetiredNewCap.csv","w");
 f.write("tech,region,year,yearp,value\n");
-for (t,r,y,yp) in mvTechRetirementNewCap:
-    if model.vTechRetirementNewCap[(t,r,y,yp)].value != 0:
-        f.write(str(t) + "," + str(r) + "," + str(y) + "," + str(yp) + "," +  str(model.vTechRetirementNewCap[(t,r,y,yp)].value) + "\n")
+for (t,r,y,yp) in mvTechRetiredNewCap:
+    if model.vTechRetiredNewCap[(t,r,y,yp)].value != 0:
+        f.write(str(t) + "," + str(r) + "," + str(y) + "," + str(yp) + "," +  str(model.vTechRetiredNewCap[(t,r,y,yp)].value) + "\n")
 f.close()
 flist.write("vTechCap\n");
 f = open("output/vTechCap.csv","w");
