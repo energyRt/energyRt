@@ -563,7 +563,7 @@ s.t.  eqInpTot{(c, r, y, s) in mvInpTot}: vInpTot[c,r,y,s]  =  sum{FORIF: (c,r,y
 
 s.t.  eqInp2Lo{(c, r, y, s) in mInp2Lo}: sum{sp in slice:((c,r,y,s,sp) in mvInp2Lo)}(vInp2Lo[c,r,y,s,sp])  =  sum{FORIF: (c,r,y,s) in mTechInpTot} (vTechInpTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mStorageInpTot} (vStorageInpTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mExport} (vExport[c,r,y,s])+sum{FORIF: (c,r,y,s) in mvTradeIrAInpTot} (vTradeIrAInpTot[c,r,y,s]);
 
-s.t.  eqSupOutTot{(c, r, y, s) in mSupOutTot}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup:((s1,c) in mSupComm)}(sum{sp in slice:((s1,c,r,y,sp) in mSupAva)}(vSupOut[s1,c,r,y,sp]));
+s.t.  eqSupOutTot{(c, r, y, s) in mSupOutTot}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup:((s1,c) in mSupComm)}(sum{sp in slice:(((c,s,sp) in mCommSliceOrParent and (s1,c,r,y,sp) in mSupAva))}(vSupOut[s1,c,r,y,sp]));
 
 s.t.  eqTechInpTot{(c, r, y, s) in mTechInpTot}: vTechInpTot[c,r,y,s]  =  sum{t in tech:((t,c) in mTechInpComm)}(sum{sp in slice:(((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent))}(sum{FORIF: (t,c,r,y,sp) in mvTechInp} (vTechInp[t,c,r,y,sp])))+sum{t in tech:((t,c) in mTechAInp)}(sum{sp in slice:(((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent))}(sum{FORIF: (t,c,r,y,sp) in mvTechAInp} (vTechAInp[t,c,r,y,sp])));
 

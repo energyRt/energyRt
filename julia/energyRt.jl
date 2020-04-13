@@ -312,7 +312,7 @@ println("eqInpTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:
 @constraint(model, [(c, r, y, s) in mInp2Lo], sum(vInp2Lo[(c,r,y,s,sp)] for sp in slice if (c,r,y,s,sp) in mvInp2Lo)  ==  (if (c,r,y,s) in mTechInpTot; vTechInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mStorageInpTot; vStorageInpTot[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mExport; vExport[(c,r,y,s)]; else 0; end;)+(if (c,r,y,s) in mvTradeIrAInpTot; vTradeIrAInpTot[(c,r,y,s)]; else 0; end;));
 println("eqInp2Lo(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
-@constraint(model, [(c, r, y, s) in mSupOutTot], vSupOutTot[(c,r,y,s)]  ==  sum(sum(vSupOut[(s1,c,r,y,sp)] for sp in slice if (s1,c,r,y,sp) in mSupAva) for s1 in sup if (s1,c) in mSupComm));
+@constraint(model, [(c, r, y, s) in mSupOutTot], vSupOutTot[(c,r,y,s)]  ==  sum(sum(vSupOut[(s1,c,r,y,sp)] for sp in slice if ((c,s,sp) in mCommSliceOrParent && (s1,c,r,y,sp) in mSupAva)) for s1 in sup if (s1,c) in mSupComm));
 println("eqSupOutTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
 @constraint(model, [(c, r, y, s) in mTechInpTot], vTechInpTot[(c,r,y,s)]  ==  sum(sum((if (t,c,r,y,sp) in mvTechInp; vTechInp[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,sp) in mTechSlice && (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechInpComm)+sum(sum((if (t,c,r,y,sp) in mvTechAInp; vTechAInp[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,sp) in mTechSlice && (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAInp));

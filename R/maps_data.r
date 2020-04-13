@@ -1213,7 +1213,7 @@ rs
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
     rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost", "eqSubsCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
-    rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqImport", "eqExport", "eqTradeIrAInpTot", "eqTradeIrAOutTot")] <- TRUE;
+    rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqImport", "eqExport", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqSupOutTot")] <- TRUE;
     rs["mTechRetirement", c("name", "description", "type")] <- c("mTechRetirement", "Early retirement option", "map");
     rs["mTechRetirement", c("tech")] <- TRUE;
     rs["mTechUpgrade", c("name", "description", "type")] <- c("mTechUpgrade", "Upgrade technology (not implemented yet)", "map");
@@ -1451,7 +1451,7 @@ rs
     rs["mSupAvaUp", c("name", "description", "type")] <- c("mSupAvaUp", "", "map");
     rs["mSupAvaUp", c("sup", "comm", "region", "year", "slice", "eqSupAvaUp")] <- TRUE;
     rs["mSupAva", c("name", "description", "type")] <- c("mSupAva", "", "map");
-    rs["mSupAva", c("sup", "comm", "region", "year", "slice", "eqSupTotal", "eqSupCost", "eqSupOutTot")] <- TRUE;
+    rs["mSupAva", c("sup", "comm", "region", "year", "slice", "eqSupTotal", "eqSupCost")] <- TRUE;
     rs["mSupReserveUp", c("name", "description", "type")] <- c("mSupReserveUp", "", "map");
     rs["mSupReserveUp", c("sup", "comm", "region", "eqSupReserveUp")] <- TRUE;
     rs["mOut2Lo", c("name", "description", "type")] <- c("mOut2Lo", "", "map");

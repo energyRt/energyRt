@@ -1548,7 +1548,8 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
 
 eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)..
          vSupOutTot(comm, region, year, slice) =e=
-         sum(sup$mSupComm(sup, comm), sum(slicep$mSupAva(sup, comm, region, year, slicep),
+         sum(sup$mSupComm(sup, comm), sum(slicep$(mCommSliceOrParent(comm, slice, slicep) 
+			and mSupAva(sup, comm, region, year, slicep)),
                  vSupOut(sup, comm, region, year, slicep)));
 
 eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
