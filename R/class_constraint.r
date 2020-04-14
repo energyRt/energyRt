@@ -98,8 +98,16 @@ newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = NULL, 
   }
   obj@eq[] <- eq
   if (is.numeric(rhs)) {
+    if (length(rhs) != 1) 
+      stop(paste0('Wrong rhs parameters '))
     defVal <- rhs
     rhs <- data.frame()
+  }
+  if (!is.data.frame(rhs) && is.list(rhs)) {
+    tmp = sapply(rhs, length)
+    if (any(tmp[1] != tmp) || is.null(names(rhs)))
+      stop(paste0('Wrong rhs parameters '))
+    rhs <- as.data.frame(rhs, stringsAsFactors = FALSE)
   }
   if (!is.data.frame(rhs) && is.list(rhs) && length(rhs) == 1 && length(rhs[[1]]) == 1) {
     defVal <- rhs[[1]]
