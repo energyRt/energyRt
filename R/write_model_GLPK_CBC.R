@@ -45,7 +45,7 @@
   
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == ''){
     if (scen@solver$lang == 'GLPK') {
-      scen@solver$cmdline <- 'glpsol.exe -m energyRt.mod -d energyRt.dat'
+      scen@solver$cmdline <- 'glpsol -m energyRt.mod -d energyRt.dat'
     } else {
       scen@solver$cmdline <- 'cbc energyRt.mod%energyRt.dat -solve'
     }
