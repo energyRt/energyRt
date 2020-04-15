@@ -1,11 +1,12 @@
 solve.model <- function(obj, name = NULL, solver = "GAMS",
-                        tmp.path = file.path(getwd(), "solwork"),
+                        tmp.path = file.path(getwd(), "/solwork"),
                         tmp.time = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
                         tmp.name = paste(solver, obj@name, name, tmp.time, sep = "_"), 
                         tmp.dir = file.path(tmp.path, tmp.name),
                         tmp.del = TRUE, n.threads = 1, ...) {
 
-  
+  tmp.path = gsub('[\\/]+', '/', tmp.path)
+  tmp.dir = gsub('[\\/]+', '/', tmp.dir)
   arg <- list()
   solve.time.begin <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
