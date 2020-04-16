@@ -287,7 +287,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   obj@parameters[['pExportRowPrice']] <- addData(obj@parameters[['pExportRowPrice']],
       simpleInterpolation(exp@exp, 'price',
           obj@parameters[['pExportRowPrice']], approxim, 'expp', exp@name))
-  pExportRowRes <- data.frame(expp = exp@name, value = exp@reserve)
+  pExportRowRes <- NULL
+  if (exp@reserve != Inf) pExportRowRes <- data.frame(expp = exp@name, value = exp@reserve)
   obj@parameters[['pExportRowRes']] <- addData(obj@parameters[['pExportRowRes']], pExportRowRes)
   pExportRow <- multiInterpolation(exp@exp, 'exp', obj@parameters[['pExportRow']], approxim, 'expp', exp@name)
   obj@parameters[['pExportRow']] <- addData(obj@parameters[['pExportRow']], pExportRow)
@@ -302,7 +303,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
     tmp$comm <- exp@commodity
     obj@parameters[['mExportRowUp']] <- addData(obj@parameters[['mExportRowUp']], tmp)
     obj@parameters[['meqExportRowLo']] <- addData(obj@parameters[['meqExportRowLo']], 
-                                                     merge(mExportRow, pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, 1:4])) 
+              merge(mExportRow, pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, 1:4])) 
   }
   if (!is.null(pExportRowRes)) {
     pExportRowRes$comm <- exp@commodity
@@ -329,7 +330,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   pImportRowPrice <- simpleInterpolation(imp@imp, 'price',
                                          obj@parameters[['pImportRowPrice']], approxim, 'imp', imp@name)
   obj@parameters[['pImportRowPrice']] <- addData(obj@parameters[['pImportRowPrice']], pImportRowPrice)
-  pImportRowRes <- data.frame(imp = imp@name, value = imp@reserve)
+  pImportRowRes <- NULL
+  if (imp@reserve != Inf) pImportRowRes <- data.frame(imp = imp@name, value = imp@reserve)
   obj@parameters[['pImportRowRes']] <- addData(obj@parameters[['pImportRowRes']], pImportRowRes)
   pImportRow <- multiInterpolation(imp@imp, 'imp',
                                    obj@parameters[['pImportRow']], approxim, 'imp', imp@name)
@@ -340,21 +342,16 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   mImportRow$comm <- imp@commodity
   obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
   if (!is.null(pImportRow)) {
+    tmp <- pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf & pImportRow$value != 0, 1:4]
+    tmp$comm <- exp@commodity
     obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], tmp)
-    meqImportRowLo$comm <- imp@commodity
-    obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']],  merge(mImportRow, 
-        pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, obj@parameters[['meqImportRowLo']]@dimSetNames])) 
-    obj@parameters[['meqImportRowUp']] <- addData(obj@parameters[['meqImportRowUp']], merge(mImportRow, 
-          pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf, obj@parameters[['meqImportRowUp']]@dimSetNames])) 
-    meqImportRowLo$comm <- NULL
+    obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']], 
+                                                  merge(mImportRow, pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, 1:4])) 
   }
   if (!is.null(pImportRowRes)) {
-    pImportRowRes$comm <- imp@commodity
+    pImportRowRes$comm <- exp@commodity
     obj@parameters[['mImportRowAccumulatedUp']] <- addData(obj@parameters[['mImportRowAccumulatedUp']], 
-          pImportRowRes[pImportRowRes$value != Inf & pImportRowRes$type == 'up', c('imp', 'comm'), drop = FALSE])
-    # obj@parameters[['mImportRowAccumulatedLo']] <- addData(obj@parameters[['mImportRowAccumulatedLo']], 
-    #       pImportRowRes[pImportRowRes$value != 0 & pImportRowRes$type == 'lo', c('imp', 'comm'), drop = FALSE])
-    pImportRowRes$comm <- NULL
+           pImportRowRes[pImportRowRes$value != Inf, c('expp', 'comm'), drop = FALSE])
   }
   obj
 })
