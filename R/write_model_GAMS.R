@@ -8,17 +8,22 @@
     if (rs != 0) stop('GAMS is not found')
   }
   .write_inc_solver(scen, arg, 'option lp = cplex;', '.gms', 'cplex')
-  if (is.null(scen@solver$fullsets) || scen@solver$fullsets) {
+  if (is.null(scen@status$fullsets)) stop('scen@status$fullsets not found')
+  if (!scen@status$fullsets) {
     .toGams <- function(x) .toGams0(x, TRUE)
   } else .toGams <- function(x) .toGams0(x, FALSE)
   run_code <- scen@source[["GAMS"]]
+  if (is.null(scen@solver$export_format))
+    scen@solver$export_format <- 'gms'
   dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
   cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
   close(zz_output)  
   zz_data_gms <- file(paste(arg$dir.result, '/data.gms', sep = ''), 'w')
-  if (!is.null(scen@solver$asgdx) && scen@solver$asgdx) {
+  if (scen@solver$export_format == 'gdx') {
+    if (!scen@status$fullsets)
+      stop('for export_format gdx during interpolation fullsets have to be TRUE')
     # Generate gdx
     dat <- list()
     to_factor_name <- function(x, name) {
@@ -40,13 +45,13 @@
         dat[[length(dat) + 1]] <- to_factor_name(tmp[tmp$type == 'lo', colnames(tmp) != 'type'], paste0(i, 'Lo'))
       }
     }
-    library(gdxrrw)
-    if (capture.output(igdx()) == "The GDX library has not been loaded") {
-      tmp <- gsub('[;].*', '', Sys.getenv('GAMSDIR'))
-      if (tmp == '') stop('ERROR: GAMS not found, use gdxrrw::igdx() to set GAMS location')
-      warning(paste0("igdx gamsSysDir isn't found. Dir '", tmp, '" was set'))
-      igdx(tmp)
-    }
+    # library(gdxrrw)
+    # if (capture.output(igdx()) == "The GDX library has not been loaded") {
+    #   tmp <- gsub('[;].*', '', Sys.getenv('GAMSDIR'))
+    #   if (tmp == '') stop('ERROR: GAMS not found, use gdxrrw::igdx() to set GAMS location')
+    #   warning(paste0("igdx gamsSysDir isn't found. Dir '", tmp, '" was set'))
+    #   igdx(tmp)
+    # }
     wgdx.lst(paste0(arg$dir.result, 'input/data.gdx'), dat)
     
     # Add gdx import
