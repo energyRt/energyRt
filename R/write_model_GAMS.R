@@ -25,33 +25,7 @@
     if (!scen@status$fullsets)
       stop('for export_format gdx during interpolation fullsets have to be TRUE')
     # Generate gdx
-    dat <- list()
-    to_factor_name <- function(x, name) {
-      for (j in colnames(x)[colnames(x) != 'value']) {
-        x[[j]] <- as.factor(x[[j]])
-      }
-      attr(x, "symName")  <- name
-      attributes(x)$domains <- colnames(x) 
-      x
-    }
-    for (i in names(scen@modInp@parameters)) {
-      tmp <- getParameterData(scen@modInp@parameters[[i]])
-      colnames(tmp) <- gsub('[.]1', 'p', colnames(tmp))
-      if (scen@modInp@parameters[[i]]@type != 'multi') {
-        dat[[length(dat) + 1]] <- to_factor_name(tmp, i)
-      } else {
-        tmp <- getParameterData(scen@modInp@parameters[[i]])
-        dat[[length(dat) + 1]] <- to_factor_name(tmp[tmp$type == 'up', colnames(tmp) != 'type'], paste0(i, 'Up'))
-        dat[[length(dat) + 1]] <- to_factor_name(tmp[tmp$type == 'lo', colnames(tmp) != 'type'], paste0(i, 'Lo'))
-      }
-    }
-    # library(gdxrrw)
-    # if (capture.output(igdx()) == "The GDX library has not been loaded") {
-    #   tmp <- gsub('[;].*', '', Sys.getenv('GAMSDIR'))
-    #   if (tmp == '') stop('ERROR: GAMS not found, use gdxrrw::igdx() to set GAMS location')
-    #   warning(paste0("igdx gamsSysDir isn't found. Dir '", tmp, '" was set'))
-    #   igdx(tmp)
-    # }
+    ############ 
     wgdx.lst(paste0(arg$dir.result, 'input/data.gdx'), dat)
     
     # Add gdx import
