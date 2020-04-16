@@ -310,19 +310,20 @@
     towth[nrow(towth) + 1, ] <- c('paSupWeatherLo', 'meqSupAvaLo', 'mSupWeatherLo')
     towth[nrow(towth) + 1, ] <- c('paSupWeatherUp', 'mSupAvaUp', 'mSupWeatherUp')
     
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfLo', 'mStorageWeatherAf', 'meqStorageAfLo')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfUp', 'mStorageWeatherAf', 'meqStorageAfUp')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpLo', 'mStorageWeatherCinp', 'meqStorageInpLo')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpUp', 'mStorageWeatherCinp', 'meqStorageInpUp')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutLo', 'mStorageWeatherCout', 'meqStorageOutLo')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutUp', 'mStorageWeatherCout', 'meqStorageOutUp')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfLo', 'meqStorageAfLo', 'mStorageWeatherAf')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfUp', 'meqStorageAfUp', 'mStorageWeatherAf')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpLo', 'meqStorageInpLo', 'mStorageWeatherCinp')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpUp', 'meqStorageInpUp', 'mStorageWeatherCinp')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutLo', 'meqStorageOutLo', 'mStorageWeatherCout')
+    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutUp', 'meqStorageOutUp', 'mStorageWeatherCout')
     
     for (i in seq_len(nrow(towth))) {
       .interpolation_message(towth[i, 3], rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
       rft <- getParameterData(prec@parameters[[towth[i, 'base_map']]])
       rdd <- getParameterData(prec@parameters[[towth[i, 'map_to']]])
+      rft <- tmp_f0(rft)
       if (nrow(rft) > 0) {
-        rft <- tmp_f0(rft)
+        rft$value <- 1
         if (nrow(rdd) > 0) {
           tmp <- merge(rdd, pWeather); tmp$weather <- NULL
           tmp <- aggregate(tmp[, 'mwth', drop = FALSE], tmp[, -ncol(tmp), drop = FALSE], prod)
