@@ -79,8 +79,9 @@ interpolate <- function(obj, ...) { #- returns class scenario
   xx <- c(obj@sysInfo@milestone$mid[-1] - obj@sysInfo@milestone$mid[-nrow(obj@sysInfo@milestone)], 1)
   names(xx) <-  obj@sysInfo@milestone$mid
   
-  if (is.null(arg$include.default)) include.default <- FALSE else
-    include.default <- arg$include.default
+  if (is.null(arg$fullsets)) fullsets <- FALSE else
+    fullsets <- arg$fullsets
+  scen@status$fullsets <- fullsets
   
   approxim <- list(
     region = scen@model@sysInfo@region,
@@ -89,7 +90,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     solver = arg$solver,
     mileStoneYears = scen@model@sysInfo@milestone$mid,
     mileStoneForGrowth = xx,
-    include.default = include.default
+    fullsets = fullsets
   )
   approxim$ry <- merge(data.frame(region = approxim$region, stringsAsFactors = FALSE), 
     data.frame(year = approxim$mileStoneYears, stringsAsFactors = FALSE))

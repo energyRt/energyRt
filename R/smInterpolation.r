@@ -3,7 +3,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, 
   remValue = NULL, all.val = FALSE) {
   there.is.year <- any(colnames(frm) == 'year')
-  if (approxim$include.default && mtp@defVal != 0 && mtp@defVal != Inf) all.val <- TRUE
+  if (approxim$fullsets && mtp@defVal != 0 && mtp@defVal != Inf) all.val <- TRUE
   if (!all.val && nrow(frm) == 0) return(NULL)
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,

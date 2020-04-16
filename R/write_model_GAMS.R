@@ -8,7 +8,7 @@
     if (rs != 0) stop('GAMS is not found')
   }
   .write_inc_solver(scen, arg, 'option lp = cplex;', '.gms', 'cplex')
-  if (is.null(scen@solver$include.default) || scen@solver$include.default) {
+  if (is.null(scen@solver$fullsets) || scen@solver$fullsets) {
     .toGams <- function(x) .toGams0(x, TRUE)
   } else .toGams <- function(x) .toGams0(x, FALSE)
   run_code <- scen@source[["GAMS"]]

@@ -78,7 +78,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			tmp
 		}
 		simpleInterpolation2 <- function(frm, approxim, ...) {
-			if (nrow(frm) == 0 && !approxim$include.default) return(NULL)
+			if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
 		  if (nrow(frm) != 0) {
   		  frm <- imply_routes(frm)
   			frm$region <- paste0(frm$src, '##', frm$dst)
@@ -95,7 +95,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
 		multiInterpolation2 <- function(frm, approxim, ...) {
-			if (nrow(frm) == 0 && !approxim$include.default) return(NULL)
+			if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
 		  if (nrow(frm) != 0) {
 		    frm <- imply_routes(frm)
 		    frm$region <- paste0(frm$src, '##', frm$dst)

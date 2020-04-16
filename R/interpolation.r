@@ -5,7 +5,7 @@
   # arg <- interpolation_message$interpolation0_arg$arg;
   # Remove not used approxim
   if (length(defVal) != 1) stop('defVal value not define')
-  if (arg$approxim$include.default && (defVal != 0 || defVal != Inf)) arg$all <- TRUE
+  if (arg$approxim$fullsets && (defVal != 0 || defVal != Inf)) arg$all <- TRUE
   
   # Get slice
   prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
