@@ -15,6 +15,12 @@
   run_code <- scen@source[["GAMS"]]
   if (is.null(scen@solver$export_format))
     scen@solver$export_format <- 'gms'
+  if (is.null(scen@solver$import_format)) {
+    scen@solver$import_format <- 'gms'
+  } else {
+    scen@solver$import_format <- 'gdx'
+    scen@source[['GAMS_output']] <- 'execute_unload "output/output.gdx"'
+  }
   dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
