@@ -77,39 +77,48 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			rownames(tmp) <- NULL
 			tmp
 		}
-		simpleInterpolation2 <- function(frm, ...) {
-			if (nrow(frm) == 0) return(NULL)
-			frm <- imply_routes(frm)
-			frm$region <- paste0(frm$src, '##', frm$dst)
-			frm$src <- NULL; frm$dst <- NULL
-			frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
-			dd <- simpleInterpolation(frm, ...)
-			if (is.null(dd)) return(NULL)
+		simpleInterpolation2 <- function(frm, approxim, ...) {
+			if (nrow(frm) == 0 && !approxim$include.default) return(NULL)
+		  if (nrow(frm) != 0) {
+  		  frm <- imply_routes(frm)
+  			frm$region <- paste0(frm$src, '##', frm$dst)
+		  } else {
+		    frm$region <- character()
+		  }
+		  frm$src <- NULL; frm$dst <- NULL
+		  frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
+		  dd <- simpleInterpolation(frm, approxim = approxim, ...)
+			if (is.null(dd) || nrow(dd) == 0) return(NULL)
 			dd$src <- gsub('##.*', '', dd$region)
 			dd$dst <- gsub('.*##', '', dd$region)
 			rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
-		multiInterpolation2 <- function(frm, ...) {
-			if (nrow(frm) == 0) return(NULL)
-			frm <- imply_routes(frm)
-			frm$region <- paste0(frm$src, '##', frm$dst)
-			frm$src <- NULL; frm$dst <- NULL
-			frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
-			dd <- multiInterpolation(frm, ...)
-			if (is.null(dd)) return(NULL)
+		multiInterpolation2 <- function(frm, approxim, ...) {
+			if (nrow(frm) == 0 && !approxim$include.default) return(NULL)
+		  if (nrow(frm) != 0) {
+		    frm <- imply_routes(frm)
+		    frm$region <- paste0(frm$src, '##', frm$dst)
+		  } else {
+		    frm$region <- character()
+		  }
+		  frm$src <- NULL; frm$dst <- NULL
+		  frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
+		  dd <- multiInterpolation(frm, approxim = approxim, ...)
+			if (is.null(dd) || nrow(dd) == 0) return(NULL)
 			dd$src <- gsub('##.*', '', dd$region)
 			dd$dst <- gsub('.*##', '', dd$region)
 			rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
+		# if (trd@name == 'nuc_trade') browser()
 		# pTradeIrCost
 		obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
 			simpleInterpolation2(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
 				approxim = approxim_srcdst, 'trade', trd@name))
-		obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']],
-			simpleInterpolation2(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
-			                     approxim = approxim_srcdst, 'trade', trd@name))
+		pTradeIrEff <- simpleInterpolation2(trd@trade, 'teff', obj@parameters[['pTradeIrEff']], 
+		                     approxim = approxim_srcdst, 'trade', trd@name)
+		obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']], pTradeIrEff)
 		# pTradeIrMarkup
 		obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
 			simpleInterpolation2(trd@trade, 'markup', obj@parameters[['pTradeIrMarkup']], 

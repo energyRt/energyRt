@@ -216,7 +216,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 })
 
 # Generate GAMS code, return character == GAMS code 
-.toGams <- function(obj) {
+.toGams0 <- function(obj, include.def) {
     gen_gg <- function(name, dtt) {
     	ret <- paste0(name, '("', dtt[, 1])
     	for (i in seq_len(ncol(dtt) - 2) + 1) {
@@ -224,41 +224,43 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
     	}
     	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
     }
-    as_simple <- function(dtt, name, def) {
-      add_cnd <- function(y, x) { 
-        if (x == '') return(x) else return(paste(x, 'and', y))
+    as_simple <- function(dtt, name, def, include.def) {
+      if (include.def) {
+        add_cnd <- function(y, x) { 
+          if (x == '') return(x) else return(paste(x, 'and', y))
+        }
+        add_cond2 <- ''	
+        if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) {	
+          add_cond2 <- '(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))'	
+          if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('not(mTechOneComm(tech, comm)) and  ', add_cond2, sep = '')	
+        }	
+        if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'slice')) 	
+          add_cond2 <- add_cnd('mTechSlice(tech, slice)', add_cond2)	
+        if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'acomm')) 	
+          add_cond2 <- add_cnd('(mTechAInp(tech, acomm) or mTechAOut(tech, acomm))', add_cond2)	
+        if (any(obj@dimSetNames == 'year')) 	
+          add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)	
+        if (name == 'pTradeIrEff') 	
+          add_cond2 <- '(sum(comm$(mTradeComm(trade, comm) and mvTradeIr(trade, comm, src, dst, year, slice)), 1))'	
+        if (name == 'pTechGinp2use') 	
+          add_cond2 <- '(sum(commp$meqTechGrp2Sng(tech, region, group, commp, year, slice), 1) + (sum(groupp$meqTechGrp2Grp(tech, region, group, groupp, year, slice), 1) <> 0))'	
+        if (name == 'pTechAfUp') 	
+          add_cond2 <- 'meqTechAfUp(tech, region, year, slice)'	
+        
+        if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
+        if (nrow(dtt) == 0 || all(dtt$value == def)) { #	
+          return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))	
+        } else {	
+          if (def != 0 && def != Inf) {	
+            zz <- paste0(name, '(', paste0(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';')	
+          } else zz <- ''	
+          return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE]))) # 	
+        }  	
       }
-      add_cond2 <- ''
-      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'comm')) {
-        add_cond2 <- '(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))'
-        if (any(obj@dimSetNames == 'group')) add_cond2 <- paste('not(mTechOneComm(tech, comm)) and  ', add_cond2, sep = '')
-      }
-      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'slice')) 
-        add_cond2 <- add_cnd('mTechSlice(tech, slice)', add_cond2)
-      if (any(obj@dimSetNames == 'tech') && any(obj@dimSetNames == 'acomm')) 
-        add_cond2 <- add_cnd('(mTechAInp(tech, acomm) or mTechAOut(tech, acomm))', add_cond2)
-      if (any(obj@dimSetNames == 'year')) 
-        add_cond2 <- add_cnd('mMidMilestone(year)', add_cond2)
-      if (name == 'pTradeIrEff') 
-        add_cond2 <- '(sum(comm$(mTradeComm(trade, comm) and mvTradeIr(trade, comm, src, dst, year, slice)), 1))'
-      if (name == 'pTechGinp2use') 
-        add_cond2 <- '(sum(commp$meqTechGrp2Sng(tech, region, group, commp, year, slice), 1) + (sum(groupp$meqTechGrp2Grp(tech, region, group, groupp, year, slice), 1) <> 0))'
-      if (name == 'pTechAfUp') 
-        add_cond2 <- 'meqTechAfUp(tech, region, year, slice)'
-  
-      if (add_cond2 != '') add_cond2 <- paste('(', add_cond2, ')', sep = '')
-      
-      if (nrow(dtt) == 0 || all(dtt$value == def)) { #
-        return(paste(name, '(', paste(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';', sep = ''))
+      if (nrow(dtt) == 0 || all(dtt$value %in% c(0, Inf))) { #
+        return(paste0(name, '(', paste0(colnames(dtt)[-ncol(dtt)], collapse = ', '), ')$0 = 0;')) 
       } else {
-        # if (def != 0 && def != Inf) {
-        if (def != 0 && def != Inf) {
-          zz <- paste0(name, '(', paste0(obj@dimSetNames, collapse = ', '), ')', '$'[add_cond2 != ''], add_cond2, ' = ', def, ';')
-        } else zz <- ''
-          return(c(zz, gen_gg(name, dtt[dtt$value != def,, drop = FALSE]))) # 
-        # } else {
-          # return(gen_gg(name, dtt))
-        # }
+          return(c(gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf,, drop = FALSE]))) # 
       }  
     }
   if (obj@nValues != -1) {
@@ -266,44 +268,26 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
       }
     if (obj@type == 'set') {                             
       if (nrow(obj@data) == 0) {                         
-        ret <- c('set', paste(obj@name, ' /', sep = ''))
-        ret <- c(ret, '1')
-        ret <- c(ret, '/;', '')
+        return(paste0('set\n', obj@name, ' / 1 /;\n'))
       } else {
         return(c('set', paste(obj@name, ' /', sep = ''), sort(obj@data[, 1]), '/;', ''))
       }
     } else if (obj@type == 'map') {
-      add_nl <- ''
-      if (obj@not_data) {
-        add_nl <-  paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ')', sep = '')
-        add_nl <-  paste(add_nl, ' = not(', add_nl, ');', sep = '')
-      }
       if (nrow(obj@data) == 0) {
-        if (obj@not_data) {
-          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = YES;', sep = '')
-        } else {
-          ret <- paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') = NO;', sep = '')
-        }
-        return(ret)
+        return(paste0(obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')$0 = NO;'))
       } else {
         ret <- c('set', paste(obj@name, '(', paste(obj@dimSetNames, collapse = ', '), ') /', sep = ''))
-        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', add_nl, ''))
+        return(c(ret, apply(obj@data, 1, function(x) paste(x, collapse = '.')), '/;', ''))
       }
     } else if (obj@type == 'simple') {
-      ret <- as_simple(obj@data, obj@name, obj@defVal)
+        return(as_simple(obj@data, obj@name, obj@defVal, include.def))
     } else if (obj@type == 'multi') {     
-       if (nrow(obj@data) == 0) {
-        ret <- c()
-        ret <- c(ret, paste(obj@name, 'Lo(', paste(obj@dimSetNames, collapse = ', '), ') = ', 
-            obj@defVal[1], ';', sep = ''))
-        ret <- c(ret, paste(obj@name, 'Up(', paste(obj@dimSetNames, collapse = ', '), ') = ', 
-            obj@defVal[2], ';', sep = ''))
-      } else {
-        ret <- c(
-          as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Lo', sep = ''), obj@defVal[1]),
-          as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], paste(obj@name, 'Up', sep = ''), obj@defVal[2])
-        )
-      }
+      return(c(
+        as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+                  paste0(obj@name, 'Lo'), obj@defVal[1], include.def),
+        as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+                  paste0(obj@name, 'Up'), obj@defVal[2], include.def)
+      ))
     } else stop(paste0('Error: .toGams: unknown parameter type: ', obj@type, " / ", obj@name))
     ret
 }
@@ -311,19 +295,12 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 # Check duplicated row in data
 setMethod('checkDuplicatedRow', signature(obj = 'parameter'),
   function(obj) {
-  check_first_column <- function(x, legend = '') {
-    if (ncol(x) == 1) {
-      if (anyDuplicated(x[, 1])) 
-        stop(paste('There is duplicated value ', sub('^[.]', '', legend), 
-            '.', anyDuplicated(x[, 1]), sep = ''))
-    } else {
-      for(i in unique(x[, 1])) {
-        check_first_column(x[x[,1] == i, -1, drop = FALSE], 
-          legend = paste(legend, '.', i, sep = ''))
-      }
-    }
+  fl <- duplicated(obj@data[, colnames(obj@data) != 'value', drop = FALSE])
+  if (any(fl)) {
+    cat('There is duplicated value\n')
+    print(obj@data[fl,, drop = FALSE])
+    stop()
   }
-  check_first_column(obj@data[, colnames(obj@data) != 'value', drop = FALSE])
 })
 
 

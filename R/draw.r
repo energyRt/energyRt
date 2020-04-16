@@ -71,7 +71,7 @@ draw.technology <- function(
     acomm <- tech@aux$acomm 
     acomm <- acomm[acomm %in% tech@aeff$acomm] 
     if (length(acomm) != 0) {
-      approxim <- list(region = region, year = year, slice = slice, comm = acomm)
+      approxim <- list(region = region, year = year, slice = slice, comm = acomm, include.default = TRUE)
       aname <- c('act2ainp', 'act2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 'ncap2aout')
       acname <- c('cinp2ainp', 'cout2ainp', 'cinp2aout', 'cout2aout')
       aparam <- lapply(acomm, function(y) {
@@ -115,7 +115,7 @@ draw.technology <- function(
     ccomm <- ctype$comm[ctype$comm$type == 'input',, drop = FALSE]
     if (nrow(ccomm) != 0 || length(ainp) != 0) {
       approxim <- list(region = region, year = year, slice = slice, 
-         comm = rownames(ccomm), group = unique(ccomm$group))
+         comm = rownames(ccomm), group = unique(ccomm$group), include.default = TRUE)
       approxim$group <- approxim$group[!is.na(approxim$group)]
       if (length(approxim$group) == 0) approxim$group <- '1'
       if (nrow(ccomm) != 0) {
@@ -237,7 +237,7 @@ draw.technology <- function(
     ccomm <- ctype$comm[ctype$comm$type == 'output',, drop = FALSE]
     if (nrow(ccomm) != 0 || length(aout) != 0) {
       approxim <- list(region = region, year = year, slice = slice, 
-         comm = rownames(ccomm), group = unique(ccomm$group))
+         comm = rownames(ccomm), group = unique(ccomm$group), include.default = TRUE)
       approxim$group <- approxim$group[!is.na(approxim$group)]
       if (length(approxim$group) == 0) approxim$group <- '1'
       # Parameter approximation

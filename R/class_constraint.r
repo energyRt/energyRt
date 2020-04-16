@@ -420,6 +420,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       for (j in seq_len(nrow(need.set2))) {
         approxim2[[need.set[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
       }
+      approxim2$include.default <- approxim$include.default
       xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
                             interpolation = 'back.inter.forth')
       prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
@@ -494,6 +495,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     for (j in seq_len(nrow(need.set))) {
       approxim2[[need.set[j, 'set']]] <- set.map[[need.set[j, 'new.map']]]
     }
+    approxim2$include.default <- approxim$include.default
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
     xx <- createParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
                           interpolation = 'back.inter.forth', colName = 'rhs')

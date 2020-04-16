@@ -5,6 +5,8 @@
   # arg <- interpolation_message$interpolation0_arg$arg;
   # Remove not used approxim
   if (length(defVal) != 1) stop('defVal value not define')
+  if (arg$approxim$include.default && (defVal != 0 || defVal != Inf)) arg$all <- TRUE
+  
   # Get slice
   prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
     'regionp', 'src', 'dst', 'slice', 'year')
@@ -179,10 +181,7 @@
       dd <- dd[rep(year_range[1] <= approxim$year & approxim$year <= year_range[2], 
         nrow(dd) / length(approxim$year)), , drop = FALSE]
     }
-    
   }
-  
-  
   return(dd)
 }
 setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',

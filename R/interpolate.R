@@ -47,6 +47,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (!is.null(arg$region)) scen@model@sysInfo@region <- arg$region
   if (!is.null(arg$discount)) scen@model@sysInfo@discount <- arg$discount
   
+    
   ### Interpolation begin
   scen@modInp <- new('modInp')
   ## Fill basic sets
@@ -77,13 +78,18 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Generate approxim list, that contain basic data for approximation
   xx <- c(obj@sysInfo@milestone$mid[-1] - obj@sysInfo@milestone$mid[-nrow(obj@sysInfo@milestone)], 1)
   names(xx) <-  obj@sysInfo@milestone$mid
+  
+  if (is.null(arg$include.default)) include.default <- FALSE else
+    include.default <- arg$include.default
+  
   approxim <- list(
     region = scen@model@sysInfo@region,
     year   = scen@model@sysInfo@year,
     slice  = scen@model@sysInfo@slice,
     solver = arg$solver,
     mileStoneYears = scen@model@sysInfo@milestone$mid,
-    mileStoneForGrowth = xx
+    mileStoneForGrowth = xx,
+    include.default = include.default
   )
   approxim$ry <- merge(data.frame(region = approxim$region, stringsAsFactors = FALSE), 
     data.frame(year = approxim$mileStoneYears, stringsAsFactors = FALSE))
