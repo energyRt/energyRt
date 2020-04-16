@@ -225,11 +225,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		}
 		rem_inf <- function(x, y) {
 		  if (is.null(x)) return(y)
-		  x <- x[x$type == 'up' & x$value == Inf, colnames(y)]
+		  x <- x[x$type == 'up' & x$value == Inf, ]
 		  y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
 		}
 		obj@parameters[['meqStorageAfLo']] <- addData(obj@parameters[['meqStorageAfLo']], merge(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0, 
-          obj@parameters[['meqStorageAfLo']]@dimSetNames], mvStorageStore))
+         ], mvStorageStore))
 		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf(pStorageAf, mvStorageStore))
 		if (!is.null(pStorageCinp)) {
   		obj@parameters[['meqStorageInpLo']] <- addData(obj@parameters[['meqStorageInpLo']], merge(pStorageCinp[pStorageCinp$type == 'lo' & pStorageCinp$value != 0, 
