@@ -1,19 +1,22 @@
 .get_scen_data <- function(scen) {
-  fl_set <- sapply(scen@modInp@parameters, function(x) ((x@type == 'set') | (x@type == 'map')))
-  set_list <- lapply(scen@modInp@parameters[fl_set], function(x) getParameterData(x))
-  params <- lapply(scen@modInp@parameters[!fl_set], function(x) {
-    gg <- getParameterData(x)
-    for (i in colnames(gg)[!(colnames(gg) %in% c('type', 'value'))]) {
-      gg[[i]] <- factor(gg[[i]]) # , levels = set_list[[i]]
-    }
-    if (!is.null(gg$type)) {
-      gg$type <- factor(gg$type, levels = c('lo', 'up'))
+  all_factor <- function(x) {
+    for (i in colnames(x)[colnames(x) != 'value'])
+      x[[i]] <- factor(x[[i]])
+    x
+  }
+  gg <- list()
+  for (i in names(scen@modInp@parameters)) {
+    if (scen@modInp@parameters[[i]]@type != 'multi') {
+      gg[[i]] <- all_factor(getParameterData(scen@modInp@parameters[[i]]))
+    } else {
+      tmp <- getParameterData(scen@modInp@parameters[[i]])
+      gg[[paste0(i, 'Lo')]] <- all_factor(tmp[tmp$type == 'lo', colnames(tmp) != 'type'])
+      gg[[paste0(i, 'Up')]] <- all_factor(tmp[tmp$type == 'up', colnames(tmp) != 'type'])
     }
     gg
-  })
-  return(c(set_list, params))
+  }
+  return(gg)
 }
-
 
 .df2uels <- function(df, name = "x", value = "value") {
   # The function takes data frame or character vector and returns

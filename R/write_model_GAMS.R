@@ -25,7 +25,8 @@
     if (!scen@status$fullsets)
       stop('for export_format gdx during interpolation fullsets have to be TRUE')
     # Generate gdx
-    .write_gdx_list(paste0(arg$dir.result, 'input/data.gdx'), .get_scen_data(scen))
+    .write_gdx_list(dat = .get_scen_data(scen), 
+                    gdxName = paste0(arg$dir.result, 'input/data.gdx'))
     
     # Add gdx import
     cat('$gdxin input/data.gdx\n', file = zz_data_gms)
