@@ -13,7 +13,8 @@
   )
     } else {
       rs <- system(paste(scen@solver$cmdline), 
-        invisible = arg$invisible, wait = arg$wait
+        # invisible = arg$invisible, 
+        wait = arg$wait
         # show.output.on.console = arg$show.output.on.console
       )
     }
