@@ -79,7 +79,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   xx <- c(obj@sysInfo@milestone$mid[-1] - obj@sysInfo@milestone$mid[-nrow(obj@sysInfo@milestone)], 1)
   names(xx) <-  obj@sysInfo@milestone$mid
   
-  if (is.null(arg$fullsets)) fullsets <- FALSE else
+  if (is.null(arg$fullsets)) fullsets <- TRUE else
     fullsets <- arg$fullsets
   scen@status$fullsets <- fullsets
   
