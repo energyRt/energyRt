@@ -38,15 +38,12 @@
     cat('$gdxin input/data.gdx\n', file = zz_data_gms)
     for (j in c('set', 'map', 'simple', 'multi')) {
       for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-        zz_data_tmp <- file(paste(arg$dir.result, '/input/', i, '.gms', sep = ''), 'w')
         if (scen@modInp@parameters[[i]]@type != 'multi') {
-          cat(paste0('$loadm ', i, '\n'), file = zz_data_tmp)
+          cat(paste0('$loadm ', i, '\n'), file = zz_data_gms)
         } else {
-          cat(paste0('$loadm ', i, 'Lo\n'), file = zz_data_tmp)
-          cat(paste0('$loadm ', i, 'Up\n'), file = zz_data_tmp)
+          cat(paste0('$loadm ', i, 'Lo\n'), file = zz_data_gms)
+          cat(paste0('$loadm ', i, 'Up\n'), file = zz_data_gms)
         }
-        close(zz_data_tmp)
-        cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
       }
     }
     cat('$gdxin\n', file = zz_data_gms)
