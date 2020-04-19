@@ -1,7 +1,7 @@
 .write_mapping <- function(prec, interpolation_time_begin, interpolation_count, len_name) {
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
   bacs <- paste0(rep('\b', len_name), collapse = '')
-  rest = interpolation_count - 79;
+  rest = interpolation_count - 77;
   cat(paste0(rep(' ', len_name), collapse = ''))
 
   # Clean previous set data if any
@@ -232,11 +232,13 @@
     
     prec@parameters[['mvTotalCost']] <- addData(prec@parameters[['mvTotalCost']], dregionyear)
     .interpolation_message('mvInp2Lo', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-    
+    mCommSlice2 <- getParameterData(prec@parameters[['mCommSlice']])
+    colnames(mCommSlice2)[2] <- 'slicep'
     mvInp2Lo <- merge(getParameterData(prec@parameters[['mInp2Lo']]), getParameterData(prec@parameters[['mSliceParentChild']])
       )[,c('comm', 'region', 'year', 'slice', 'slicep')]
-    .interpolation_message('mvInp2Lo', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-    colnames(mvInp2Lo)[5] <- 'slice.1'
+    mvInp2Lo <- merge(mvInp2Lo, mCommSlice2)
+    colnames(mvInp2Lo)[colnames(mvInp2Lo) == 'slicep'] <- 'slice.1'
+    mvInp2Lo <- mvInp2Lo[, c("comm", "region", "year", "slice", "slice.1")]
     prec@parameters[['mvInp2Lo']] <- addData(prec@parameters[['mvInp2Lo']], mvInp2Lo)
     
     .interpolation_message('mInpSub', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
@@ -246,11 +248,13 @@
       prec@parameters[['mInpSub']] <- addData(prec@parameters[['mInpSub']], mInpSub)
     }
 
-        .interpolation_message('mvOut2Lo', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
+    .interpolation_message('mvOut2Lo', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mvOut2Lo <- merge(getParameterData(prec@parameters[['mOut2Lo']]), getParameterData(prec@parameters[['mSliceParentChild']])
     )[,c('comm', 'region', 'year', 'slice', 'slicep')]
-    colnames(mvOut2Lo)[5] <- 'slice.1'
-    .interpolation_message('mvOut2Lo', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
+    mvOut2Lo <- merge(mvOut2Lo, mCommSlice2)
+    colnames(mvOut2Lo)[colnames(mvOut2Lo) == 'slicep'] <- 'slice.1'
+    mvOut2Lo <- mvOut2Lo[, c("comm", "region", "year", "slice", "slice.1")]
+    
     prec@parameters[['mvOut2Lo']] <- addData(prec@parameters[['mvOut2Lo']], mvOut2Lo)
     
     .interpolation_message('mOutSub', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
