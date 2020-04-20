@@ -106,10 +106,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		
 		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
 		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
-		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
-
-		obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], invcost[, colnames(invcost) != 'value'])
-		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
 		olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = FALSE)
 		obj@parameters[['pTechOlife']] <- addData(obj@parameters[['pTechOlife']], olife)		
 		
@@ -117,6 +113,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
 		dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
 		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
+
+		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
+		invcost <- merge(dd0$new, invcost)
+		obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], invcost[, colnames(invcost) != 'value'])
+		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
 		
 		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
 		obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
