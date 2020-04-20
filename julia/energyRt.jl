@@ -9,7 +9,7 @@ println(flog,"\"load data\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\
 include("data.jl")
 include("inc2.jl")
 model = Model();
-@variable(model, vTechInv[mTechNew]);
+@variable(model, vTechInv[mTechInv]);
 @variable(model, vTechEac[mTechEac]);
 @variable(model, vTechOMCost[mTechOMCost]);
 @variable(model, vSupCost[mvSupCost]);
@@ -143,8 +143,8 @@ println("eqTechRetiredStock(tech, region, year) done ", Dates.format(now(), "HH:
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 @constraint(model, [(t, r, y) in mTechEac], vTechEac[(t,r,y)]  ==  sum((if haskey(pTechEac, (t,r,yp)); pTechEac[(t,r,yp)]; else pTechEacDef; end)*(vTechNewCap[(t,r,yp)]-sum(vTechRetiredNewCap[(t,r,yp,ye)] for ye in year if ((t,r,yp,ye) in mvTechRetiredNewCap && ordYear[(y)] >= ordYear[(ye)]))) for yp in year if ((t,r,yp) in mTechNew && ordYear[(y)] >= ordYear[(yp)] && (ordYear[(y)]<(if haskey(pTechOlife, (t,r)); pTechOlife[(t,r)]; else pTechOlifeDef; end)+ordYear[(yp)] || (t,r) in mTechOlifeInf))));
 println("eqTechEac(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
-# eqTechInv(tech, region, year)$mTechNew(tech, region, year)
-@constraint(model, [(t, r, y) in mTechNew], vTechInv[(t,r,y)]  ==  (if haskey(pTechInvcost, (t,r,y)); pTechInvcost[(t,r,y)]; else pTechInvcostDef; end)*vTechNewCap[(t,r,y)]);
+# eqTechInv(tech, region, year)$mTechInv(tech, region, year)
+@constraint(model, [(t, r, y) in mTechInv], vTechInv[(t,r,y)]  ==  (if haskey(pTechInvcost, (t,r,y)); pTechInvcost[(t,r,y)]; else pTechInvcostDef; end)*vTechNewCap[(t,r,y)]);
 println("eqTechInv(tech, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)
 @constraint(model, [(t, r, y) in mTechOMCost], vTechOMCost[(t,r,y)]  ==  (if haskey(pTechFixom, (t,r,y)); pTechFixom[(t,r,y)]; else pTechFixomDef; end)*vTechCap[(t,r,y)]+sum((if haskey(pTechVarom, (t,r,y,s)); pTechVarom[(t,r,y,s)]; else pTechVaromDef; end)*vTechAct[(t,r,y,s)]+sum((if haskey(pTechCvarom, (t,c,r,y,s)); pTechCvarom[(t,c,r,y,s)]; else pTechCvaromDef; end)*vTechInp[(t,c,r,y,s)] for c in comm if (t,c) in mTechInpComm)+sum((if haskey(pTechCvarom, (t,c,r,y,s)); pTechCvarom[(t,c,r,y,s)]; else pTechCvaromDef; end)*vTechOut[(t,c,r,y,s)] for c in comm if (t,c) in mTechOutComm)+sum((if haskey(pTechAvarom, (t,c,r,y,s)); pTechAvarom[(t,c,r,y,s)]; else pTechAvaromDef; end)*vTechAOut[(t,c,r,y,s)] for c in comm if (t,c,r,y,s) in mvTechAOut)+sum((if haskey(pTechAvarom, (t,c,r,y,s)); pTechAvarom[(t,c,r,y,s)]; else pTechAvaromDef; end)*vTechAInp[(t,c,r,y,s)] for c in comm if (t,c,r,y,s) in mvTechAInp) for s in slice if (t,s) in mTechSlice));

@@ -3,7 +3,7 @@ flist.write("value\n");
 flist.write("vTechInv\n");
 f = open("output/vTechInv.csv","w");
 f.write("tech,region,year,value\n");
-for (t,r,y) in mTechNew:
+for (t,r,y) in mTechInv:
     if model.vTechInv[(t,r,y)].value != 0:
         f.write(str(t) + "," + str(r) + "," + str(y) + "," +  str(model.vTechInv[(t,r,y)].value) + "\n")
 f.close()

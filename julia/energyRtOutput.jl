@@ -2,7 +2,7 @@ fvTechInv = open("output/vTechInv.csv", "w");
 
 println(fvTechInv, "tech,region,year,value");
 
-for (t,r,y) in mTechNew if JuMP.value(vTechInv[(t,r,y)]) != 0
+for (t,r,y) in mTechInv if JuMP.value(vTechInv[(t,r,y)]) != 0
   println(fvTechInv, t, ",", r, ",", y, ",", JuMP.value(vTechInv[(t,r,y)]));
 end;
 end;

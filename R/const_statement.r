@@ -71,7 +71,7 @@
   vTechOut = "vTechOut( tech , comm , region , year , slice ) $ mvTechOut( tech , comm , region , year , slice )",
   vTechAInp = "vTechAInp( tech , comm , region , year , slice ) $ mvTechAInp( tech , comm , region , year , slice )",
   vTechAOut = "vTechAOut( tech , comm , region , year , slice ) $ mvTechAOut( tech , comm , region , year , slice )",
-  vTechInv = "vTechInv( tech , region , year ) $ mTechNew( tech , region , year )",
+  vTechInv = "vTechInv( tech , region , year ) $ mTechInv( tech , region , year )",
   vTechEac = "vTechEac( tech , region , year ) $ mTechEac( tech , region , year )",
   vTechOMCost = "vTechOMCost( tech , region , year ) $ mTechOMCost( tech , region , year )",
   vSupOut = "vSupOut( sup , comm , region , year , slice ) $ mSupAva( sup , comm , region , year , slice )",

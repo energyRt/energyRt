@@ -12,7 +12,7 @@ import pyomo.environ as pyo
 model = AbstractModel()
 exec(open("inc1.py").read())
 ##### decl par #####
-model.vTechInv = Var(model.mTechNew, doc = "Overnight investment costs");
+model.vTechInv = Var(model.mTechInv, doc = "Overnight investment costs");
 model.vTechEac = Var(model.mTechEac, doc = "Annualized investment costs");
 model.vTechOMCost = Var(model.mTechOMCost, doc = "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)");
 model.vSupCost = Var(model.mvSupCost, doc = "Supply costs");
@@ -122,8 +122,8 @@ model.eqTechRetiredNewCap = Constraint(model.meqTechRetiredNewCap, rule = lambda
 model.eqTechRetiredStock = Constraint(model.mvTechRetiredStock, rule = lambda model, t, r, y : model.vTechRetiredStock[t,r,y] <=  model.pTechStock[t,r,y]);
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(model.mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(model.pTechEac[t,r,yp]*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredNewCap[t,r,yp,ye] for ye in model.year if ((t,r,yp,ye) in model.mvTechRetiredNewCap and model.ordYear[y] >= model.ordYear[ye]))) for yp in model.year if ((t,r,yp) in model.mTechNew and model.ordYear[y] >= model.ordYear[yp] and (model.ordYear[y]<model.pTechOlife[t,r]+model.ordYear[yp] or (t,r) in model.mTechOlifeInf))));
-# eqTechInv(tech, region, year)$mTechNew(tech, region, year)
-model.eqTechInv = Constraint(model.mTechNew, rule = lambda model, t, r, y : model.vTechInv[t,r,y]  ==  model.pTechInvcost[t,r,y]*model.vTechNewCap[t,r,y]);
+# eqTechInv(tech, region, year)$mTechInv(tech, region, year)
+model.eqTechInv = Constraint(model.mTechInv, rule = lambda model, t, r, y : model.vTechInv[t,r,y]  ==  model.pTechInvcost[t,r,y]*model.vTechNewCap[t,r,y]);
 # eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)
 model.eqTechOMCost = Constraint(model.mTechOMCost, rule = lambda model, t, r, y : model.vTechOMCost[t,r,y]  ==  model.pTechFixom[t,r,y]*model.vTechCap[t,r,y]+sum(model.pTechVarom[t,r,y,s]*model.vTechAct[t,r,y,s]+sum(model.pTechCvarom[t,c,r,y,s]*model.vTechInp[t,c,r,y,s] for c in model.comm if (t,c) in model.mTechInpComm)+sum(model.pTechCvarom[t,c,r,y,s]*model.vTechOut[t,c,r,y,s] for c in model.comm if (t,c) in model.mTechOutComm)+sum(model.pTechAvarom[t,c,r,y,s]*model.vTechAOut[t,c,r,y,s] for c in model.comm if (t,c,r,y,s) in model.mvTechAOut)+sum(model.pTechAvarom[t,c,r,y,s]*model.vTechAInp[t,c,r,y,s] for c in model.comm if (t,c,r,y,s) in model.mvTechAInp) for s in model.slice if (t,s) in model.mTechSlice));
 # eqSupAvaUp(sup, comm, region, year, slice)$mSupAvaUp(sup, comm, region, year, slice)
