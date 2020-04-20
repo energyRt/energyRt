@@ -387,7 +387,7 @@ vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
 vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
 ;
 variable
-*@ mTechNew(tech, region, year)
+*@ mTechInv(tech, region, year)
 vTechInv(tech, region, year)                         Overnight investment costs
 *@ mTechEac(tech, region, year)
 vTechEac(tech, region, year)                         Annualized investment costs
@@ -547,6 +547,7 @@ vTradeNewCap(trade, year)
 * (especially in GLPK)
 ********************************************************************************
 set
+mTechInv(tech, region, year)
 * (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1))
 mTechInpTot(comm, region, year, slice)               Total technology input  mapp
 * (mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1))
@@ -1012,7 +1013,7 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
 *    sum((techp, yearp)$(mTechUpgrade(tech, techp)), vTechRetrofitCap(techp, region, yearp, year)) =e= vTechUpgradeCap(tech, region, year);
 
 * Investment equation
-eqTechInv(tech, region, year)$mTechNew(tech, region, year)..  vTechInv(tech, region, year) =e=
+eqTechInv(tech, region, year)$mTechInv(tech, region, year)..  vTechInv(tech, region, year) =e=
    pTechInvcost(tech, region, year) * vTechNewCap(tech, region, year);
 
 

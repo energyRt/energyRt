@@ -186,6 +186,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mTechRetirement']] <- createParameter('mTechRetirement', c('tech'), 'map', cls = 'technology')    
     # For disable technology with unexceptable start year
     .Object@parameters[['mTechNew']] <- createParameter('mTechNew', c('tech', 'region', 'year'), 'map', cls = 'technology')    
+    .Object@parameters[['mTechInv']] <- createParameter('mTechInv', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechSpan']] <- createParameter('mTechSpan', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['meqTechRetiredNewCap']] <- createParameter('meqTechRetiredNewCap', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechOMCost']] <- createParameter('mTechOMCost', c('tech', 'region', 'year'), 'map', cls = 'technology')    

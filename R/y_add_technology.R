@@ -107,6 +107,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
 		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
 		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
+
+		obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], invcost[, colnames(invcost) != 'value'])
 		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
 		olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = FALSE)
 		obj@parameters[['pTechOlife']] <- addData(obj@parameters[['pTechOlife']], olife)		
