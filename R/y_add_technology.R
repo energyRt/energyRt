@@ -115,7 +115,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
 
 		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
-		invcost <- merge(dd0$new, invcost)
+		if (!is.null(invcost)) invcost <- merge(dd0$new, invcost)
 		obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], invcost[, colnames(invcost) != 'value'])
 		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
 		
