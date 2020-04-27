@@ -84,13 +84,14 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @param scen Object scenario or list with scenarios.
 #' @param ... filters for various sets (setname = c(val1, val2) or setname_ = "matching pattern"), see details.
 #' @param name character vector with names of parameters and/or variables.
+#' @param merge if TRUE, the search results will be merged in one dataframe; the named list will be returned if FALSE.
+#' @param process if TRUE, dimensions "tech", "stg", "trade", "imp", "expp", "dem", and "sup" will be renamed with "process".
 #' @param parameters if TRUE, parameters will be included in the search and returned if found.
 #' @param variables if TRUE, variables will be included in the search and returned if found.
 #' @param na.rm if TRUE, NA values will be dropped.
 #' @param drop if TRUE, the sets with only one unique value will be dropped (not implemented)
 #' @param asTibble logical, if the data.frames should be converted into tibbles.
 #' @param newNames renaming sets, named character vector or list with new names as values, and old names as names - the input parameter to renameSets function. The operation is performed before merging the data (merge parameter).
-#' @param merge if TRUE, the search results will be merged in one dataframe; the named list will be returned if FALSE.
 #' @param newValues revalue sets, named character vector or list with new values as values, and old values as names - the input parameter to revalueSets function. The operation is performed after merging the data (merge parameter).
 #' @param ignore.case grepl parameter if regular expressions are used in '...' or 'name_'.
 #' @param stringsAsFactors logical, should the sets values be converted to factors?
@@ -107,7 +108,8 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'   names(elc2050)
 #'   elc2050$vBalance
 #'}
-getData <- function(scen, name = NULL, ..., merge = FALSE, parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
+getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
+                    parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
                     newNames = NULL, newValues = NULL, na.rm = FALSE, drop = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
                     asTibble = TRUE, stringsAsFactors = FALSE, yearsAsFactors = FALSE, 
@@ -116,6 +118,20 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, parameters = TRUE, va
   arg <- list(...)
   argnam <- names(arg)
   stopifnot(!any(duplicated(argnam)))
+  if (process) {
+    stopifnot(length(newNames) == length(unique(newNames)))
+    newNamesDefault = c(tech = "process", stg = "process", 
+                 trade = "process", impp = "process",
+                 imp = "process", expp = "process", 
+                 dem = "process", sup = "process")
+    if (!is.null(newNames)) {
+      ii <- names(newNamesDefault) %in% names(newNames)
+      newNames <- c(newNames, newNamesDefault[!ii])
+    } else {
+      newNames <- newNamesDefault
+    }
+    
+  }
   # browser()
   # Select scenarios, check and add names if not provided
   if(!is.list(scen)) {
