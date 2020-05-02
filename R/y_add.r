@@ -343,7 +343,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
   if (!is.null(pImportRow)) {
     tmp <- pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf & pImportRow$value != 0, 1:4]
-    tmp$comm <- exp@commodity
+    tmp$comm <- imp@commodity
     obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], tmp)
     obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']], 
                                                   merge(mImportRow, pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, 1:4])) 
