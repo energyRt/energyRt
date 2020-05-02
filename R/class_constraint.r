@@ -417,8 +417,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       }
       need.set <- lhs.set2[lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), 'set']
       need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set  %in% colnames(stm@lhs[[i]]@mult), ]
+      
       for (j in seq_len(nrow(need.set2))) {
-        approxim2[[need.set[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
+        approxim2[[need.set[j]]] <- set.map[[need.set2[j, 'new.map']]]
       }
       approxim2$fullsets <- approxim$fullsets
       xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
