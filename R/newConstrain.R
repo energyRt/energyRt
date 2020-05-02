@@ -5,7 +5,6 @@ newConstraintS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   stop.newconstr <- function(x) 
     stop(paste0('Constraint "', name, '" error: ', x))
   
-  
   if (type == 'tax') stop.newconstr('Tax have to do')
   if (type == 'subs') stop.newconstr('Subs have to do')
   #if (any(grep('(share|growth)', type))) stop.newconstr(paste(type, 'have to do'))
@@ -59,7 +58,7 @@ newConstraintS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   if (any(grep('share', type))) {
     if (length(c(rhs, recursive = TRUE)) == 0) {
       rhs <- defVal
-    } else {
+    } else if (is.list(rhs)) {
       rhs$value <- (rhs$rhs)
       rhs$rhs <- NULL
     }
