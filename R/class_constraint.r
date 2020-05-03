@@ -510,6 +510,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   } else {
     res$equation <- paste0(res$equation, stm@defVal)
   }
+  res$equation <- gsub('[+][[:blank:]]*[-]', '-', res$equation)
   res$equation <- paste0(res$equation, ';')
   prec@gams.equation[[stm@name]] <- res
   prec
