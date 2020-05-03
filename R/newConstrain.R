@@ -61,15 +61,15 @@ newConstraintS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
   # To share 
   if (any(grep('share', type))) {
     if (length(c(rhs, recursive = TRUE)) == 0) {
-      rhs <- defVal
+      rhs <- (-defVal)
     } else if (is.list(rhs)) {
-      rhs$value <- (rhs$rhs)
+      rhs$value <- (-rhs$rhs)
       rhs$rhs <- NULL
-    }
-    for (i in seq_along(arg)) {
-      arg[[i]]$mult <- rhs
-    }
-    term = list(for.sum = for.sum[!(names(for.sum) %in% psb.vec)], variable =paste0('v', inpout,'Tot'), mult = -1)
+    } else rhs <- (-rhs)
+    # for (i in seq_along(arg)) {
+    #   arg[[i]]$mult <- rhs
+    # }
+    term = list(for.sum = for.sum[!(names(for.sum) %in% psb.vec)], variable =paste0('v', inpout,'Tot'), mult = rhs)
     rhs <- 0
     defVal <- 0
     arg[[length(arg) + 1]] <- term
