@@ -358,7 +358,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   res$equation <- res$equationDeclaration
   if (any(is.na(stm@for.each))) {
     tmp_fe <- stm@for.each
-    fl_na <- colnames(stm@for.each)[sapply(is.na(stm@for.each), any)]
+    fl_na <- colnames(stm@for.each)[apply(is.na(stm@for.each), 2, any)]
     for (i in fl_na) {
       tmg <- prec@parameters[[i]]@data
       if (i == 'year') {
