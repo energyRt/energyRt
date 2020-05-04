@@ -1735,16 +1735,13 @@ eqTechAfcInpUp
 ********************************************************************************
 * Capacity equation
 eqTechCap
-eqTechNewCap
-*eqTechRetiredCap
-*eqTechRetrofitCap
-*eqTechUpgradeCap
-* Investition equation
-eqTechInv
+eqTechRetiredNewCap
+eqTechRetiredStock
 eqTechEac
 * FIX O & M equation
 * Commodity Varom O & M and Varom O & M aggregate by year equation
 * Aggregated annual costs
+eqTechInv
 eqTechOMCost
 * Disable new capacity
 *eqTechNewCapDisable
@@ -1753,9 +1750,9 @@ eqTechOMCost
 **************************************
 eqSupAvaUp
 eqSupAvaLo
+eqSupTotal
 eqSupReserveUp
 eqSupReserveLo
-eqSupTotal
 eqSupCost
 **************************************
 * Demand equation
@@ -1778,19 +1775,19 @@ eqStorageStore
 eqStorageCap
 * Investition equation
 eqStorageInv
-eqStorageEac
 * Salvage value
 * Constrain capacity
 eqStorageCost
 eqStorageAfLo
 eqStorageAfUp
 eqStorageClean
+eqStorageAInp
+eqStorageAOut
 eqStorageInpUp
 eqStorageInpLo
 eqStorageOutUp
 eqStorageOutLo
-eqStorageAInp
-eqStorageAOut
+eqStorageEac
 **************************************
 * Trade and Row equation
 **************************************
@@ -1814,9 +1811,9 @@ eqImportRowLo
 eqImportRowAccumulated
 eqImportRowResUp
 eqTradeCap
-eqTradeCapFlow
 eqTradeInv
 eqTradeEac
+eqTradeCapFlow
 **************************************
 * Ballance equation & dummy
 **************************************
