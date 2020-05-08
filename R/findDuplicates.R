@@ -1,5 +1,5 @@
-checkDuplication <- function(x) {
-  checkDuplication0 <- function(x) {
+findDuplicates <- function(x) {
+  findDuplicates0 <- function(x) {
     check_by_slots <- function(x, slt_name) {
       rs <- NULL
       for (i in slt_name) {
@@ -19,18 +19,18 @@ checkDuplication <- function(x) {
       return(rs)
     }
     if (class(x) == 'scenario') 
-      return(checkDuplication0(x@model))
+      return(findDuplicates0(x@model))
     res <- data.frame(repository = character(), object = character(), slot = character(), parameter = character(), stringsAsFactors = FALSE)
     if (class(x) == 'model') {
       rs <- NULL
       for (i in seq_along(x@data)) {
-        tmp <- checkDuplication0(x@data[[i]])
+        tmp <- findDuplicates0(x@data[[i]])
         if (!is.null(tmp)) {
           tmp$repository <- x@data[[i]]@name
           rs <- rbind(rs, tmp)
         }
       }
-      tmp <- checkDuplication0(x@sysInfo)
+      tmp <- findDuplicates0(x@sysInfo)
       if (!is.null(tmp)) {
         tmp$repository <- '-'
         tmp$object <- 'sysInfo'
@@ -42,7 +42,7 @@ checkDuplication <- function(x) {
     if (class(x) == 'repository') {
       rs <- NULL
       for (i in seq_along(x@data)) {
-        tmp <- checkDuplication0(x@data[[i]])
+        tmp <- findDuplicates0(x@data[[i]])
         if (!is.null(tmp)) {
           tmp$object <- x@data[[i]]@name
           rs <- rbind(rs, tmp)
@@ -59,9 +59,9 @@ checkDuplication <- function(x) {
     } else if (class(x) %in% c('sysInfo')) {
       return(check_by_slots(x, c('debug', 'discount')))
     } else warning(paste0('Unknown class "', class(x), '"'))
-NULL
+    NULL
   }
-  rs <- checkDuplication0(x)
+  rs <- findDuplicates0(x)
   if (!is.null(rs)) {
     cat(paste0("There are ", nrow(rs), " duplication, total duplication ", sum(rs$value), "\n"))
     return(invisible(rs))

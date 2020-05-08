@@ -37,7 +37,7 @@
 #   
 #   if (anyDuplicated(slt[, -ncol(slt)])) {
 #     slt <- slt[!duplicated(slt[, -ncol(slt)]),, drop = FALSE]
-#     warning("there are duplicates in the data, use checkDuplication function to get more information")
+#     warning("there are duplicates in the data, use findDuplicates function to get more information")
 #   }
 #   na_val <- is.na(slt[, -ncol(slt)])
 #   # Check if ther is not data
