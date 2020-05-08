@@ -256,19 +256,22 @@ get_labpt <- function(scen) {
 #' get_labpt_spdf(spdf)
 #' }
 #' 
-getCenters <- function(spdf, regionsAsCharacters = TRUE, asTibble = TRUE) {
+getCenters <- function(spdf, region = "region", 
+                       regionsAsCharacters = TRUE, asTibble = TRUE) {
+  # browser()
   labpt <- sapply(1:length(spdf@data[,1]), function(x) {
     spdf@polygons[[x]]@labpt
   })
   labpt <- cbind(
-    spdf@data$region,
+    spdf@data[[region]],
     as.data.frame(t(labpt))
   )
   names(labpt) <- c("region", "x", "y")
   if (regionsAsCharacters) labpt <- fact2char(labpt)
-  if (asTibble & !is.tibble(labpt)) labpt <- tibble::as_tibble(labpt)
+  if (asTibble & !is_tibble(labpt)) labpt <- tibble::as_tibble(labpt)
   return(labpt)
 }
+
 
 get_labpt_spdf <- getCenters
 
