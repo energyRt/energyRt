@@ -78,8 +78,8 @@
   # the function exports names list of sets and parameters 
   # to GDX file
   stopifnot("gdxrrw" %in% rownames(installed.packages()))
-  #!!! need to check of `gdxrrw` is initialized
-  cat("Writing to ", gdxName)
+  # cat("Writing to ", gdxName)
+  cat(" data.gdx ")
   nms <- names(dat)
   x <- list()
   for(i in nms) {
@@ -88,4 +88,27 @@
   gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
 }
 
-
+.write_sqlite_list <- function(dat, sqlFile = "data.db") {
+  tStart <- Sys.time()
+  if (file.exists(sqlFile)) file.remove(sqlFile)
+  con <- DBI::dbConnect(RSQLite::SQLite(), sqlFile)
+  DBI::dbListTables(con)
+  (nms <- names(dat))
+  con <- DBI::dbConnect(RSQLite::SQLite(), sqlFile)
+  # DBI::dbListTables(con)
+  nms <- names(dat)
+  wipe <- ""
+  for(i in nms) {
+    cat(wipe, i, rep(" ", 10), sep = "")
+    wipe <- paste0(rep("\b", nchar(i) + 10), collapse = "")
+    DBI::dbWriteTable(con, i, dat[[i]], overwrite = TRUE)
+  }
+  # DBI::dbListTables(con)
+  # DBI::dbReadTable(con, "region")
+  # DBI::dbReadTable(con, "pTechCinp2use") %>% as_tibble()
+  DBI::dbDisconnect(con)
+  finf <- file.info("tmp/data.db")
+  format(finf["size"])
+  cat(", ", utils:::format.object_size(file.size(sqlFile), "auto"), ", ", sep = "")
+  cat(format(Sys.time() - tStart))
+}
