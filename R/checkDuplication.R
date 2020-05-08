@@ -51,7 +51,7 @@ checkDuplication <- function(x) {
       if (is.null(rs)) return(NULL)
       return(rs[, c(ncol(rs), 1:(ncol(rs) - 1))])
     } else
-    if (class(x) %in% c('tax', 'sub', 'weather', 'supply', 'import', 'export', 'trade', 'technology', 'demand')) {
+    if (class(x) %in% c('tax', 'sub', 'weather', 'supply', 'import', 'export', 'trade', 'technology', 'demand', 'storage')) {
       slt_name <- getSlots(class(x))
       slt_name <- names(slt_name)[slt_name == 'data.frame' & !(names(slt_name) %in% c('input', 'output', 'aux'))]
       return(check_by_slots(x, slt_name))
@@ -59,7 +59,7 @@ checkDuplication <- function(x) {
     } else if (class(x) %in% c('sysInfo')) {
       return(check_by_slots(x, c('debug', 'discount')))
     } else warning(paste0('Unknown class "', class(x), '"'))
-    NULL
+NULL
   }
   rs <- checkDuplication0(x)
   if (!is.null(rs)) {
