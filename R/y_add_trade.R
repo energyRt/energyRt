@@ -111,7 +111,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
-		# if (trd@name == 'nuc_trade') browser()
 		# pTradeIrCost
 		obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
 			simpleInterpolation2(trd@trade, 'cost', obj@parameters[['pTradeIrCost']], 
@@ -185,6 +184,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			}
 			invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
 			invcost <- invcost[invcost$value != 0 & trd@start <= invcost$year & invcost$year < trd@end,, drop = FALSE]
+			if (nrow(invcost) == 0) invcost <- NULL
 			stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
 			obj@parameters[['pTradeStock']] <- addData(obj@parameters[['pTradeStock']], stock_exist)
 			obj@parameters[['pTradeOlife']] <- addData(obj@parameters[['pTradeOlife']], 
@@ -257,7 +257,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		### To trades
 		# mvTradeIrAInp(trade, comm, region, year, slice)
 		if (!is.null(mTradeIrAInp)) {
-		  browser()
       a0 <- mTradeIrAInp; colnames(a0)[2] <- 'acomm'
       if (!is.null(pTradeIrCsrc2Ainp))
         a1 <- merge(a0, pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, colnames(a0)]) 
