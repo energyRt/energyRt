@@ -101,7 +101,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		    frm$region <- paste0(frm$src, '##', frm$dst)
 		  } else {
 		    frm$region <- character()
-		  }
+		  } 
 		  frm$src <- NULL; frm$dst <- NULL
 		  frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
 		  dd <- multiInterpolation(frm, approxim = approxim, ...)
@@ -150,7 +150,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				                                          approxim = approxim_srcdst, 'trade', trd@name)
 				obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(obj@parameters[['pTradeIrCsrc2Ainp']], pTradeIrCsrc2Ainp)
 				pTradeIrCdst2Ainp <- simpleInterpolation2(trd@aeff, 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
-				                                          approxim = approxim_srcdst, 'trade', trd@name, remove_duplicate = list('src', 'dst'))
+				                                          approxim = approxim_srcdst, 'trade', trd@name)
 				obj@parameters[['pTradeIrCdst2Ainp']] <- addData(obj@parameters[['pTradeIrCdst2Ainp']], pTradeIrCdst2Ainp)
 			}
 			for (cc in out_comm) {
