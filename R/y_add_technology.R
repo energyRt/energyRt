@@ -323,7 +323,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	  
 	  if (!is.null(mTechInpComm)) {
 	    mvTechInp <- merge(mvTechAct, mTechInpComm, by = 'tech')
-		  obj@parameters[['mvTechInp']]  <- addData(obj@parameters[['mvTechInp']], mvTechInp)
+	    mvTechInp <- rbind(mvTechInp, 
+	          pTechCinp2use[pTechCinp2use$value != 0 & pTechCinp2use$value != Inf, c('tech', 'comm', 'region', 'year', 'slice')], 
+	          pTechCinp2ginp[pTechCinp2ginp$value != 0 & pTechCinp2ginp$value != Inf, c('tech', 'comm', 'region', 'year', 'slice')])
+	    mvTechInp <- mvTechInp[duplicated(mvTechInp, fromLast = TRUE), ]
+	    obj@parameters[['mvTechInp']]  <- addData(obj@parameters[['mvTechInp']], mvTechInp)
 	  } else mvTechInp <- NULL
 	  if (!is.null(mTechOutComm)) {
 	    mvTechOut <-  merge(mvTechAct, mTechOutComm, by = 'tech')
