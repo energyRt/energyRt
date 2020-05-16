@@ -146,7 +146,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			} 
 			for (cc in inp_comm) {
 			  approxim_srcdst$acomm <- cc
-				pTradeIrCsrc2Ainp <- simpleInterpolation2(trd@aeff, 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
+			  pTradeIrCsrc2Ainp <- simpleInterpolation2(trd@aeff, 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
 				                                          approxim = approxim_srcdst, 'trade', trd@name)
 				obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(obj@parameters[['pTradeIrCsrc2Ainp']], pTradeIrCsrc2Ainp)
 				pTradeIrCdst2Ainp <- simpleInterpolation2(trd@aeff, 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
@@ -266,7 +266,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		    a2 <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, c('trade', 'acomm', 'dst', 'year', 'slice')]
 		    colnames(a2)[2:3] <- c('comm', 'region')
 		  } else a2 <- NULL
-		  obj@parameters[['mvTradeIrAInp']] <- addData(obj@parameters[['mvTradeIrAInp']], merge(mTradeIrAInp, rbind(a1, a2)))
+		  obj@parameters[['mvTradeIrAInp']] <- addData(obj@parameters[['mvTradeIrAInp']], merge(mTradeIrAInp, unique(rbind(a1, a2))))
 		}
 		if (!is.null(mTradeIrAOut)) {
 		  if (!is.null(pTradeIrCsrc2Aout)) {
@@ -277,7 +277,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		    a2 <- pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0, c('trade', 'acomm', 'dst', 'year', 'slice')]
 		    colnames(a2)[2:3] <- c('comm', 'region')
 		  } else a2 <- NULL
-		  obj@parameters[['mvTradeIrAOut']] <- addData(obj@parameters[['mvTradeIrAOut']], merge(mTradeIrAOut, rbind(a1, a2)))
+		  obj@parameters[['mvTradeIrAOut']] <- addData(obj@parameters[['mvTradeIrAOut']], merge(mTradeIrAOut, unique(rbind(a1, a2))))
 		}
 
 		mvTradeIr <- mTradeIr; mvTradeIr$comm <- trd@commodity
