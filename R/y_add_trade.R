@@ -96,6 +96,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
 		multiInterpolation2 <- function(frm, approxim, parameter, ...) {
+		  frm <- frm[apply(!is.na(frm[, paste0(parameter, c('.lo', '.up', '.fx'))]), 1, any), ]
 		  if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
 		  if (nrow(frm) != 0) {
 		    clo <- frm[, paste0(parameter, '.lo')]
