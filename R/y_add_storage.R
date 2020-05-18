@@ -137,7 +137,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		obj@parameters[['mStorageSpan']] <- addData(obj@parameters[['mStorageSpan']], dd0$span)
 		obj@parameters[['mStorageEac']] <- addData(obj@parameters[['mStorageEac']], dd0$eac)
 		
-		if (nrow(dd0$new) > 0 && nrow(invcost) > 0) {
+		if (nrow(dd0$new) > 0  && !is.null(invcost) && nrow(invcost) > 0) {
 		  salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
   		salv_data$value[is.na(salv_data$value)] <- 0
   		salv_data$discount <- salv_data$value; salv_data$value <- NULL
