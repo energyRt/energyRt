@@ -20,6 +20,7 @@ summary.scenario <- function(scen) {
       cat("Solution status: not solved\n")
     }
   }
+  cat("Size:", size(scen),"\n")
 }
 
 

@@ -149,7 +149,7 @@
           assign('add0_message', list(tracedata = sys.calls(),
             add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
             globalenv())
-          message('\nThere are error during work .add0. More information in "add0_message"\n')
+          message('\nError in .add0 function, additional info in "add0_message" object\n')
           stop(e)
         })
         time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name
@@ -191,7 +191,6 @@
   scen
 }
 
-
 # Implement add0 for all parameters
 .get_objects_count <- function(scen) {
   sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
@@ -205,8 +204,14 @@
   jj <- paste0(num, ' (', interpolation_count, '),',
        paste0(rep(' ', max(c(1, 15 - (nchar(name) %% 15)))), collapse = ''),
        name, ', time: ', round(proc.time()[3] - interpolation_time_begin, 2), 's')
-  jj <- paste0(jj, paste0(rep(' ', , len_name - nchar(jj)), collapse = ''))
-  cat(rep('\b', , len_name), jj, sep = '') # , rep(' ', 100), rep('\b', 100)
+  # bug "invalid langth.out element - workaround
+  length_out <- len_name - nchar(jj)
+   if (length_out < 0) {
+     len_name <- len_name + abs(length_out)
+     length_out <- 0
+   }
+  jj <- paste0(jj, paste0(rep(' ', , length_out), collapse = ''))
+  cat(rep_len('\b', len_name), jj, sep = '') # , rep(' ', 100), rep('\b', 100)
 }
 
 .remove_char <- function(x) {

@@ -63,7 +63,8 @@ findDuplicates <- function(x) {
   }
   rs <- findDuplicates0(x)
   if (!is.null(rs)) {
-    cat(paste0("There are ", nrow(rs), " duplication, total duplication ", sum(rs$value), "\n"))
+    # cat(paste0("There are ", nrow(rs), " duplicates, sum of values: ", sum(rs$value), "\n"))
+    cat(paste0("Found ", nrow(rs), " tables with duplicates,", sum(rs$value), "duplicated rows in total\n"))
     return(invisible(rs))
   }
     

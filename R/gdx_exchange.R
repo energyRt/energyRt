@@ -75,14 +75,16 @@
 }
 
 .write_gdx_list <- function(dat, gdxName = "data.gdx") {
-  # the function exports names list of sets and parameters 
-  # to GDX file
+  # the function exports names list of sets and parameters to GDX file
   stopifnot("gdxrrw" %in% rownames(installed.packages()))
-  # cat("Writing to ", gdxName)
   cat(" data.gdx ")
   nms <- names(dat)
+  max_length <- max(nchar(nms))
   x <- list()
+  wipe <- ""
   for(i in nms) {
+    cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
+    wipe <- paste0(rep("\b", max_length + 3), collapse = "")
     x <- c(x, list(.df2uels(dat[[i]], i)))
   }
   gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)

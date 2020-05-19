@@ -33,7 +33,7 @@
     colnames(obj)[ncol(obj)]), drop = FALSE]
   obj <- obj[!is.na(obj[, parameter]), , drop = FALSE]
   if (anyDuplicated(obj[, -ncol(obj)])) {
-     warning("there are duplicates in the data, use findDuplicates function to get more information")
+     warning("Duplicated values found and dropped. Use findDuplicates() function for the identification.")
     obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
   }
   if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)
@@ -192,7 +192,7 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
     }, error = function(cond) {
       assign('interpolation_message', list(tracedata = sys.calls(), 
         interpolation0_arg = list(obj = obj, parameter = parameter, defVal = defVal, arg = arg)), globalenv())
-      message('\nThere are error during interpolation function, more information in "interpolation_message"\n')
+      message('\nInterpolation error, more information in "interpolation_message" object\n')
       stop(cond)
     })
 })
