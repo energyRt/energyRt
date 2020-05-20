@@ -297,7 +297,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         # check if the same set in lhs exist
         fl <- FALSE
         if (all(!c(all.set[nn[need.set == j], c('lead.year', 'lag.year')], recursive = TRUE))) {
-          fl <- (!all.set$for.each & all.set$set == j & !is.na(all.set$new.map))
+          fl <- nn[(!all.set$for.each[nn] & all.set$set[nn] == j & !is.na(all.set$new.map[nn]))]
         }
         add.new <- TRUE
         if (any(fl)) {
