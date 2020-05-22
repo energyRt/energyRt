@@ -11,6 +11,9 @@
     run_codeout <- scen@source[["PYOMOConcreteOutput"]]
   }
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
+  if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+    ### Generate SQLight file
+  }
   .write_inc_solver(scen, arg, "opt = SolverFactory('cplex');", '.py', 'cplex')
   # Add constraint
   zz_mod <- file(paste(arg$dir.result, '/energyRt.py', sep = ''), 'w')
