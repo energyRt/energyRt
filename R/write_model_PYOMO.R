@@ -33,9 +33,15 @@
         cat(energyRt:::.toPyomoAbstractModel(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
       } else {
         if (any(grep('^.Cns', i))) {
-          cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
+          if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+            cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
+            ## SQLight import
+          } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
         } else {
-          cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
+          if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+            cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
+            ## SQLight import
+          } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
         }
       }
     }

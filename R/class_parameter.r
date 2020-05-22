@@ -571,6 +571,58 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
   } else stop(paste0('Error: .toJuliaHead: unknown parameter type: ', obj@type, " / ", obj@name))
 }
 
+
+.toPyomSQLight  <- function(obj) {
+  as_simple <- function(data, name, name2, def) {
+    if (def == Inf) def <- 0
+    if (ncol(obj@data) == 1) {
+      stop('Have to do')
+      # return(paste0("# ", name, '\n', name, ' = {}; \n')) # ', data$value, '
+    } else {
+      data <- data[data$value != Inf & data$value != def, ]
+      if (nrow(data) == 0) {
+        rtt <- paste0("# ", name, name2, '\n', name, ' = toPar(set(), ', def, ')\n')
+        return(rtt)
+      }
+      rtt <- paste0("# ", name, name2, '\ntmp = {} \n')
+      kk <- paste0("tmp[('", data[, 1])
+      for (i in seq_len(ncol(data) - 2) + 1)
+        kk <- paste0(kk, "', '", data[, i])
+      kk <- paste0(kk, "')] = ", data[, 'value'])
+      kk <- c(rtt, paste0(kk, collapse = '\n'), '\n\n', paste0(name,' = toPar(tmp, ', def, ')\n'))
+      return(kk)
+    }
+  }
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+  }
+  if (obj@type == 'set') {
+    tmp <- ''
+    if (nrow(obj@data) > 0)
+      tmp <- paste0("['", paste0(sort(obj@data[, 1]), collapse = "', '"), "']")
+    return(c(paste0("# ", obj@name), paste0('\n', obj@name, ' = set(', tmp, ');')))
+  } else if (obj@type == 'map') {
+    ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    if (nrow(obj@data) == 0) {
+      return(c(ret, paste0('\n', obj@name, ' = set();')))
+    } else {
+      return(c(ret, paste0('\n', obj@name, ' = set([', paste0(paste0("('", apply(obj@data, 1, 
+        function(x) paste(x, collapse = "', '")), "')"), collapse = ',\n'), ']);')))
+    }
+  } else if (obj@type == 'simple') {
+    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+  } else if (obj@type == 'multi') {
+    hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    return(c(
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+        paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
+    ))
+  } else stop(paste0('Error: .toPyomo: unknown parameter type: ', obj@type, " / ", obj@name))
+}
+
+
 # .toJuliaHead <- function(obj) {
 #   as_simple <- function(data, name, name2, def) {
 #     # browser()
