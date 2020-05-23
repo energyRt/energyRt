@@ -18,6 +18,25 @@ class toPar:
         if key in self.val:
             return (self.val[key])
         return (self.default)
+        
+import pandas as pd
+import sqlite3
+con = sqlite3.connect("input/data.db")
+
+def read_set(name):
+    tbl = pd.read_sql_query("SELECT * from " + name, con)
+    if tbl.shape[1] > 1:
+        return tbl.to_records(index=False).tolist()
+    else:
+        return list(tbl.iloc[:,0])
+
+def read_dict(name):
+    tbl = pd.read_sql_query("SELECT * from " + name, con)
+    # if tbl.shape[1] > 0
+    idx = pd.MultiIndex.from_frame(tbl.drop(columns = "value"))
+    tbl = pd.DataFrame(tbl.value.ravel(), index = idx, columns = ["value"])
+    return tbl.to_dict()["value"]
+
 exec(open("inc1.py").read())
 model = ConcreteModel()
 ##### decl par #####
@@ -268,6 +287,7 @@ model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(m
 model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in slice if (t,s) in mTechSlice)  >=  pLECLoACT.get((r)));
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 print("equations ", round(time.time() - seconds, 2))
+con.close()
 exec(open("inc3.py").read())
 exec(open("inc_constraints.py").read())
 exec(open("inc_solver.py").read())

@@ -109,8 +109,8 @@
   # DBI::dbReadTable(con, "region")
   # DBI::dbReadTable(con, "pTechCinp2use") %>% as_tibble()
   DBI::dbDisconnect(con)
-  finf <- file.info("tmp/data.db")
-  format(finf["size"])
+  finf <- file.info(sqlFile)
+  # format(finf["size"])
   cat(", ", utils:::format.object_size(file.size(sqlFile), "auto"), ", ", sep = "")
-  cat(format(Sys.time() - tStart))
+  # cat(format(round(Sys.time() - tStart), 1))
 }

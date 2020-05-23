@@ -7,7 +7,7 @@
 #'
 #' @return Returns either TRUE if the objects are identical, or a bested list with the objects (x) structure and differences with object y.
 #' 
-lcompare <- function(x, y, depth = 0, showDiff = TRUE) {
+lcompare <- function(x, y, depth = 0, showDiff = TRUE, allowAll = TRUE, round = 7) { #
   # similar to base::all.equal(), testthat::compare(), but returns list with differences.
   if (class(x) != class(y)) {
     return(list(x = x, y = y))
@@ -30,7 +30,9 @@ lcompare <- function(x, y, depth = 0, showDiff = TRUE) {
     fDepth <- function(ob, obj_depth = 0){
       if(!is.list(ob)){
         return(obj_depth)
-      }else{
+      }else if (is.data.frame(ob)){
+        return(obj_depth)
+      } else {
         return(max(sapply(ob, fDepth, obj_depth = obj_depth + 1)))
       }
     }
@@ -46,6 +48,20 @@ lcompare <- function(x, y, depth = 0, showDiff = TRUE) {
       names(val) <- nm
       if (showDiff) {ii <- sapply(val, is.null); val <- val[!ii]}
       return(val)
+    } else if (is.data.frame(x) & is.data.frame(y)) {
+      z <- compare::compare(x, y, allowAll = allowAll)
+      if (z$result) return()
+      if (nrow(x) == 0 | nrow(y) == 0) return(list(x = x, y = y))
+      # for (j in colnames(x)) {
+      #   if (is.numeric(x[[j]]) & !is.integer(x[[j]])) round(x[[j]], round)
+      # }
+      # for (j in colnames(y)) {
+      #   if (is.numeric(y[[j]]) & !is.integer(y[[j]])) round(y[[j]], round)
+      # }
+      # dx <- dplyr::setdiff(x, y)
+      # dy <- dplyr::setdiff(y, x)
+      # return(list(x = dx, y = dy))
+      return(z)
     } else {
       return(list(x = x, y = y))
     }

@@ -29,7 +29,7 @@
   zz_data_gms <- file(paste(arg$dir.result, '/data.gms', sep = ''), 'w')
   if (scen@solver$export_format == 'gdx') {
     if (!scen@status$fullsets)
-      stop('for export_format gdx during interpolation fullsets have to be TRUE')
+      stop('for export_format = "gdx", interpolation parameter fullsets must be TRUE')
     # Generate gdx
     .write_gdx_list(dat = .get_scen_data(scen), 
                     gdxName = paste0(arg$dir.result, 'input/data.gdx'))

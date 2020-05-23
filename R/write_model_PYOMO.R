@@ -10,9 +10,19 @@
     run_code <- scen@source[["PYOMOConcrete"]]
     run_codeout <- scen@source[["PYOMOConcreteOutput"]]
   }
+  dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
-  if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+  # if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+  if (is.null(scen@solver$export_format)) {
+    SQLight <- FALSE
+  } else {
+    SQLight <- tolower(scen@solver$export_format) == 'sqlite'
+  }
+  if (is.null(SQLight)) SQLight <- FALSE
+  if (SQLight) {
     ### Generate SQLight file
+    .write_sqlite_list(dat = .get_scen_data(scen), 
+                    sqlFile = paste0(arg$dir.result, 'input/data.db'))
   }
   .write_inc_solver(scen, arg, "opt = SolverFactory('cplex');", '.py', 'cplex')
   # Add constraint
@@ -36,12 +46,13 @@
         cat(energyRt:::.toPyomoAbstractModel(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
       } else {
         if (any(grep('^.Cns', i))) {
-          if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
-            cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
+          # if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+          if (SQLight) {
+              cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
             ## SQLight import
           } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
         } else {
-          if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+          if (SQLight) {
             cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
             ## SQLight import
           } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
