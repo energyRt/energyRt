@@ -88,29 +88,34 @@
     x <- c(x, list(.df2uels(dat[[i]], i)))
   }
   gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
+  cat(wipe, sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(wipe, wipe, "\b, ", utils:::format.object_size(file.size(gdxName), "auto"), ", ", sep = "")
 }
 
 .write_sqlite_list <- function(dat, sqlFile = "data.db") {
+  cat(basename(sqlFile), " ", sep = "")
   tStart <- Sys.time()
   if (file.exists(sqlFile)) file.remove(sqlFile)
   con <- DBI::dbConnect(RSQLite::SQLite(), sqlFile)
-  DBI::dbListTables(con)
-  (nms <- names(dat))
-  con <- DBI::dbConnect(RSQLite::SQLite(), sqlFile)
   # DBI::dbListTables(con)
   nms <- names(dat)
+  max_length <- max(nchar(nms))
   wipe <- ""
   for(i in nms) {
-    cat(wipe, i, rep(" ", 10), sep = "")
-    wipe <- paste0(rep("\b", nchar(i) + 10), collapse = "")
+    cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
+    wipe <- paste0(rep("\b", max_length + 3), collapse = "")
+    # cat(wipe, i, rep(" ", 10), sep = "")
+    # wipe <- paste0(rep("\b", nchar(i) + 10), collapse = "")
     DBI::dbWriteTable(con, i, dat[[i]], overwrite = TRUE)
   }
-  # DBI::dbListTables(con)
-  # DBI::dbReadTable(con, "region")
-  # DBI::dbReadTable(con, "pTechCinp2use") %>% as_tibble()
   DBI::dbDisconnect(con)
-  finf <- file.info(sqlFile)
+  # finf <- file.info(sqlFile)
   # format(finf["size"])
-  cat(", ", utils:::format.object_size(file.size(sqlFile), "auto"), ", ", sep = "")
+  cat(wipe, sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(wipe, wipe, "\b, ", utils:::format.object_size(file.size(sqlFile), "auto"), ", ", sep = "")
   # cat(format(round(Sys.time() - tStart), 1))
 }

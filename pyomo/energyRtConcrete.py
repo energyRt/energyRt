@@ -32,15 +32,19 @@ def read_set(name):
 
 def read_dict(name):
     tbl = pd.read_sql_query("SELECT * from " + name, con)
-    # if tbl.shape[1] > 0
-    idx = pd.MultiIndex.from_frame(tbl.drop(columns = "value"))
-    tbl = pd.DataFrame(tbl.value.ravel(), index = idx, columns = ["value"])
+    if tbl.shape[1] > 2:
+        idx = pd.MultiIndex.from_frame(tbl.drop(columns = "value"))
+    else:
+        idx = tbl.iloc[:,0].tolist()
+    tbl = pd.DataFrame(tbl.value.tolist(), index = idx, columns = ["value"])
     return tbl.to_dict()["value"]
 
 exec(open("inc1.py").read())
 model = ConcreteModel()
+print("loading data... ", end='')
 ##### decl par #####
-print("load data ", round(time.time() - seconds, 2))
+print(round(time.time() - seconds, 2))
+print("variables... ", end='')
 model.vTechInv = Var(mTechInv, doc = "Overnight investment costs");
 model.vTechEac = Var(mTechEac, doc = "Annualized investment costs");
 model.vTechOMCost = Var(mTechOMCost, doc = "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)");
@@ -104,7 +108,8 @@ model.vTradeInv = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeNewCap = Var(mTradeNew, domain = pyo.NonNegativeReals, doc = "");
 exec(open("inc2.py").read())
-print("variables ", round(time.time() - seconds, 2))
+print(round(time.time() - seconds, 2))
+print("equations: ")
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 model.eqTechSng2Sng = Constraint(meqTechSng2Sng, rule = lambda model, t, r, c, cp, y, s : model.vTechInp[t,c,r,y,s]*pTechCinp2use.get((t,c,r,y,s))  ==  (model.vTechOut[t,cp,r,y,s]) / (pTechUse2cact.get((t,cp,r,y,s))*pTechCact2cout.get((t,cp,r,y,s))));
 # eqTechGrp2Sng(tech, region, group, commp, year, slice)$meqTechGrp2Sng(tech, region, group, commp, year, slice)
@@ -142,7 +147,9 @@ model.eqTechAfcOutLo = Constraint(meqTechAfcOutLo, rule = lambda model, t, r, c,
 # eqTechAfcOutUp(tech, region, comm, year, slice)$meqTechAfcOutUp(tech, region, comm, year, slice)
 model.eqTechAfcOutUp = Constraint(meqTechAfcOutUp, rule = lambda model, t, r, c, y, s : model.vTechOut[t,c,r,y,s] <=  pTechCact2cout.get((t,c,r,y,s))*pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcUp.get((t,c,r,y,s)));
 # eqTechAfcInpLo(tech, region, comm, year, slice)$meqTechAfcInpLo(tech, region, comm, year, slice)
+print("eqTechAfcInpLo...", round(time.time() - seconds, 2))
 model.eqTechAfcInpLo = Constraint(meqTechAfcInpLo, rule = lambda model, t, r, c, y, s : pTechAfcLo.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcLo.get((t,c,r,y,s)) <=  model.vTechInp[t,c,r,y,s]);
+#print(round(time.time() - seconds, 2))
 # eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, comm, year, slice)
 model.eqTechAfcInpUp = Constraint(meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcUp.get((t,c,r,y,s)));
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
@@ -168,6 +175,7 @@ model.eqSupReserveUp = Constraint(mSupReserveUp, rule = lambda model, s1, c, r :
 # eqSupReserveLo(sup, comm, region)$meqSupReserveLo(sup, comm, region)
 model.eqSupReserveLo = Constraint(meqSupReserveLo, rule = lambda model, s1, c, r : model.vSupReserve[s1,c,r]  >=  pSupReserveLo.get((s1,c,r)));
 # eqSupCost(sup, region, year)$mvSupCost(sup, region, year)
+print("eqSupCost...", round(time.time() - seconds, 2))
 model.eqSupCost = Constraint(mvSupCost, rule = lambda model, s1, r, y : model.vSupCost[s1,r,y]  ==  sum(pSupCost.get((s1,c,r,y,s))*model.vSupOut[s1,c,r,y,s] for c in comm for s in slice if (s1,c,r,y,s) in mSupAva));
 # eqDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)
 model.eqDemInp = Constraint(mvDemInp, rule = lambda model, c, r, y, s : model.vDemInp[c,r,y,s]  ==  sum(pDemand.get((d,c,r,y,s)) for d in dem if (d,c) in mDemComm));
@@ -214,6 +222,7 @@ model.eqTradeFlowLo = Constraint(meqTradeFlowLo, rule = lambda model, t1, c, src
 # eqCostTrade(region, year)$mvTradeCost(region, year)
 model.eqCostTrade = Constraint(mvTradeCost, rule = lambda model, r, y : model.vTradeCost[r,y]  ==  (model.vTradeRowCost[r,y] if (r,y) in mvTradeRowCost else 0)+(model.vTradeIrCost[r,y] if (r,y) in mvTradeIrCost else 0));
 # eqCostRowTrade(region, year)$mvTradeRowCost(region, year)
+print("eqCostRowTrade...", round(time.time() - seconds, 2))
 model.eqCostRowTrade = Constraint(mvTradeRowCost, rule = lambda model, r, y : model.vTradeRowCost[r,y]  ==  sum(pImportRowPrice.get((i,r,y,s))*model.vImportRow[i,c,r,y,s] for i in imp for c in comm for s in slice if (i,c,r,y,s) in mImportRow)-sum(pExportRowPrice.get((e,r,y,s))*model.vExportRow[e,c,r,y,s] for e in expp for c in comm for s in slice if (e,c,r,y,s) in mExportRow));
 # eqCostIrTrade(region, year)$mvTradeIrCost(region, year)
 model.eqCostIrTrade = Constraint(mvTradeIrCost, rule = lambda model, r, y : model.vTradeIrCost[r,y]  ==  sum(model.vTradeEac[t1,r,y] for t1 in trade if (t1,r,y) in mTradeEac)+sum(sum(sum(((((pTradeIrCost.get((t1,src,r,y,s))+pTradeIrMarkup.get((t1,src,r,y,s)))*model.vTradeIr[t1,c,src,r,y,s])) if (t1,c,src,r,y,s) in mvTradeIr else 0) for s in slice if (t1,s) in mTradeSlice) for c in comm if (t1,c) in mTradeComm) for t1 in trade for src in region if (t1,src,r) in mTradeRoutes)-sum(sum(sum((((pTradeIrMarkup.get((t1,r,dst,y,s))*model.vTradeIr[t1,c,r,dst,y,s])) if (t1,c,r,dst,y,s) in mvTradeIr else 0) for s in slice if (t1,s) in mTradeSlice) for c in comm if (t1,c) in mTradeComm) for t1 in trade for dst in region if (t1,r,dst) in mTradeRoutes));
@@ -250,6 +259,7 @@ model.eqTradeIrAInpTot = Constraint(mvTradeIrAInpTot, rule = lambda model, c, r,
 # eqTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice)
 model.eqTradeIrAOutTot = Constraint(mvTradeIrAOutTot, rule = lambda model, c, r, y, s : model.vTradeIrAOutTot[c,r,y,s]  ==  sum(model.vTradeIrAOut[t1,c,r,y,sp] for t1 in trade for sp in slice if ((c,s,sp) in mCommSliceOrParent and (t1,c,r,y,sp) in mvTradeIrAOut)));
 # eqBalLo(comm, region, year, slice)$meqBalLo(comm, region, year, slice)
+print("eqBalLo...", round(time.time() - seconds, 2))
 model.eqBalLo = Constraint(meqBalLo, rule = lambda model, c, r, y, s : model.vBalance[c,r,y,s]  >=  0);
 # eqBalUp(comm, region, year, slice)$meqBalUp(comm, region, year, slice)
 model.eqBalUp = Constraint(meqBalUp, rule = lambda model, c, r, y, s : model.vBalance[c,r,y,s] <=  0);
@@ -260,6 +270,7 @@ model.eqBal = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vBal
 # eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
 model.eqOutTot = Constraint(mvOutTot, rule = lambda model, c, r, y, s : model.vOutTot[c,r,y,s]  ==  (model.vDummyImport[c,r,y,s] if (c,r,y,s) in mDummyImport else 0)+(model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+(model.vAggOut[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImport[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0)+(sum(model.vOut2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvOut2Lo)) if (c,r,y,s) in mOutSub else 0));
 # eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)
+print("eqOut2Lo...", round(time.time() - seconds, 2))
 model.eqOut2Lo = Constraint(mOut2Lo, rule = lambda model, c, r, y, s : sum(model.vOut2Lo[c,r,y,s,sp] for sp in slice if (c,r,y,s,sp) in mvOut2Lo)  ==  (model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+(model.vAggOut[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImport[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0));
 # eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)
 model.eqInpTot = Constraint(mvInpTot, rule = lambda model, c, r, y, s : model.vInpTot[c,r,y,s]  ==  (model.vDemInp[c,r,y,s] if (c,r,y,s) in mvDemInp else 0)+(model.vDummyExport[c,r,y,s] if (c,r,y,s) in mDummyExport else 0)+(model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExport[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0)+(sum(model.vInp2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvInp2Lo)) if (c,r,y,s) in mInpSub else 0));
@@ -268,39 +279,44 @@ model.eqInp2Lo = Constraint(mInp2Lo, rule = lambda model, c, r, y, s : sum(model
 # eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
 model.eqSupOutTot = Constraint(mSupOutTot, rule = lambda model, c, r, y, s : model.vSupOutTot[c,r,y,s]  ==  sum(sum(model.vSupOut[s1,c,r,y,sp] for sp in slice if ((c,s,sp) in mCommSliceOrParent and (s1,c,r,y,sp) in mSupAva)) for s1 in sup if (s1,c) in mSupComm));
 # eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
+print("eqTechInpTot...", round(time.time() - seconds, 2))
 model.eqTechInpTot = Constraint(mTechInpTot, rule = lambda model, c, r, y, s : model.vTechInpTot[c,r,y,s]  ==  sum(sum((model.vTechInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechInp else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechInpComm)+sum(sum((model.vTechAInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAInp else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAInp));
 # eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
 model.eqTechOutTot = Constraint(mTechOutTot, rule = lambda model, c, r, y, s : model.vTechOutTot[c,r,y,s]  ==  sum(sum((model.vTechOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechOut else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechOutComm)+sum(sum((model.vTechAOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAOut else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAOut));
 # eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
 model.eqStorageInpTot = Constraint(mStorageInpTot, rule = lambda model, c, r, y, s : model.vStorageInpTot[c,r,y,s]  ==  sum(model.vStorageInp[st1,c,r,y,s] for st1 in stg if (st1,c,r,y,s) in mvStorageStore)+sum(model.vStorageAInp[st1,c,r,y,s] for st1 in stg if (st1,c,r,y,s) in mvStorageAInp));
 # eqStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)
+print("eqStorageOutTot...", round(time.time() - seconds, 2))
 model.eqStorageOutTot = Constraint(mStorageOutTot, rule = lambda model, c, r, y, s : model.vStorageOutTot[c,r,y,s]  ==  sum(model.vStorageOut[st1,c,r,y,s] for st1 in stg if (st1,c,r,y,s) in mvStorageStore)+sum(model.vStorageAOut[st1,c,r,y,s] for st1 in stg if (st1,c,r,y,s) in mvStorageAOut));
 # eqCost(region, year)$mvTotalCost(region, year)
 model.eqCost = Constraint(mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in tech if (t,r,y) in mTechEac)+sum(model.vTechOMCost[t,r,y] for t in tech if (t,r,y) in mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in sup if (s1,r,y) in mvSupCost)+sum(pDummyImportCost.get((c,r,y,s))*model.vDummyImport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum(pDummyExportCost.get((c,r,y,s))*model.vDummyExport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(model.vTaxCost[c,r,y] for c in comm if (c,r,y) in mTaxCost)-sum(model.vSubsCost[c,r,y] for c in comm if (c,r,y) in mSubsCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in stg if (st1,r,y) in mStorageEac)+(model.vTradeCost[r,y] if (r,y) in mvTradeCost else 0));
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
+print("eqCost...", round(time.time() - seconds, 2))
 model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(pTaxCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice)));
 # eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)
 model.eqSubsCost = Constraint(mSubsCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubsCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,s) in mCommSlice and (c,r,y,s) in mvOutTot)));
 # eqObjective
+print("eqObjective...", round(time.time() - seconds, 2))
 model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(model.vTotalCost[r,y]*pDiscountFactorMileStone.get((r,y)) for r in region for y in year if (r,y) in mvTotalCost));
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)
 model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in slice if (t,s) in mTechSlice)  >=  pLECLoACT.get((r)));
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
-print("equations ", round(time.time() - seconds, 2))
-con.close()
+print("equations: ", round(time.time() - seconds, 2))
 exec(open("inc3.py").read())
 exec(open("inc_constraints.py").read())
 exec(open("inc_solver.py").read())
 # opt = SolverFactory('cplex');
 exec(open("inc4.py").read())
 flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
-slv = opt.solve(model)
-print("solving ", round(time.time() - seconds, 2));
-slv = opt.solve(model)
+# slv = opt.solve(model)
+print("solving ...");
+slv = opt.solve(model, tee = True)
 print("done ", round(time.time() - seconds, 2));
 flog.write('"solution status",' + str((slv.solver.status == SolverStatus.ok) *1) + ',"' + str(datetime.datetime.now()) + '"\n')
 flog.write('"export results",,"' + str(datetime.datetime.now()) + '"\n')
 exec(open("inc5.py").read())
 exec(open("output.py").read())
+# print("vObjective: " + str( model.vObjective.value ) + "\n")  
 flog.write('"done",,"' + str(datetime.datetime.now()) + '"\n')
 flog.close();
+con.close()
