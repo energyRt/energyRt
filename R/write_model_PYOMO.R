@@ -30,6 +30,10 @@
   zz_constr <- file(paste(arg$dir.result, '/inc_constraints.py', sep = ''), 'w')
   npar <- grep('^##### decl par #####', run_code)[1]
   cat(run_code[1:npar], sep = '\n', file = zz_mod)
+  if (!AbstractModel && !SQLight) {
+    cat('cat(\'exec(open("input.py").read())\n\', file = out_file)\n', file = zz_mod)
+    zz_inp_file <- paste0(arg$dir.result, 'input.py')
+  }
   if (AbstractModel) {
     f1 <- grep('^mCns', names(scen@modInp@parameters), invert = TRUE)
     f2 <- grep('^mCns', names(scen@modInp@parameters))
@@ -55,12 +59,19 @@
           if (SQLight) {
             cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
             ## SQLight import
-          } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
+          } else {
+            tfl <- paste0('input/', scen@modInp@parameters[[i]]@name, '.py')
+            cat(paste0('cat(\'exec(open("', tfl, '").read())\n\', file = out_file)\n'), file = zz_inp_file)
+            zz_tfl <- file(paste0(arg$dir.result, tfl), 'w')
+            cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_tfl)
+            close(zz_tfl)
+          }
         }
       }
     }
   }
   if (AbstractModel) close(zz_data_pyomo)    
+  if (!AbstractModel && !SQLight) close(zz_inp_file)
   npar2 <- (grep('^model[.]obj ', run_code)[1] - 1)
   cat(run_code[npar:npar2], sep = '\n', file = zz_mod)
   if (length(scen@modInp@gams.equation) > 0) {
