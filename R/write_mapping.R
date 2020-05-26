@@ -54,17 +54,17 @@
   
   .interpolation_message('pEmissionFactor', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   #### This section have to move to add (after interpolate comm first)
+  
   tmp0 <- getParameterData(prec@parameters$pTechEmisComm)
-  tmp <- merge(getParameterData(prec@parameters$mTechInpComm), tmp0[tmp0$value != 0, ], by = c('tech', 'comm'))
+  tmp <- merge(getParameterData(prec@parameters$mvTechInp), tmp0[tmp0$value != 0, ], by = c('tech', 'comm'))
   .interpolation_message('mvTechAct', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   colnames(tmp)[colnames(tmp) == 'comm'] <- 'commp'
   tmp1 <- getParameterData(prec@parameters$pEmissionFactor)
   .interpolation_message('mvTechAct', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   tmp1 <- tmp1[tmp1$value != 0, ]
   tmp1 <- tmp1[!duplicated(tmp1),, drop = FALSE]
-  tmp <- merge(tmp1, tmp, by = 'commp')[, c('tech', 'comm', 'commp')]
+  tmp <- merge(tmp1, tmp, by = 'commp')[, c('tech', 'comm', 'commp', 'region', 'year', 'slice')]
   tmp <- tmp[!duplicated(tmp),, drop = FALSE]
-  tmp <- merge(getParameterData(prec@parameters$mvTechAct), tmp, by = 'tech')[, c('tech', 'comm', 'commp', 'region', 'year', 'slice')]
   .interpolation_message('mTechEmsFuel', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   colnames(tmp)[3] <- 'comm.1'
   prec@parameters[['mTechEmsFuel']] <- addData(prec@parameters[['mTechEmsFuel']], tmp)
