@@ -6,6 +6,15 @@ add.model <- function(obj, ..., overwrite = FALSE, repos.name = NULL) {
            'stock', 'supply', 'weather', 'demand', 'reserve', 'trade', 'export', 'import', 'storage', 'tax', 'sub')
   if (class(obj) != "model") stop('Wrong argument')
   app <- list(...)
+  while (any(sapply(app, class) == 'list')) {
+    fl <- seq_along(app)[sapply(app, class) == 'list']
+    for (i in fl) {
+      for (j in seq_along(app[[i]])) {
+        app[[length(app) + 1]] <- app[[i]][[j]]
+      }
+    }
+    app <- app[-fl]
+  }
   if (any(!(sapply(app, class) %in% c(cls, 'repository')))) {
     stop(paste('Unknown class "', paste(unique(sapply(app, class)[
       !(sapply(app, class) %in% c(cls, 'repository'))]), collapse = '", "'), '"', sep = ''))
