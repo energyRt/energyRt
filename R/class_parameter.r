@@ -572,11 +572,11 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
 }
 
 
-.toPyomSQLight  <- function(obj) {
+.toPyomSQLite  <- function(obj) {
   as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
-      stop('.toPyomSQLight: check @data in ', obj@name)
+      stop('.toPyomSQLite: check @data in ', obj@name)
       # return(paste0("# ", name, '\n', name, ' = {}; \n')) # ', data$value, '
     } else {
       data <- data[data$value != Inf & data$value != def, ]

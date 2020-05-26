@@ -12,15 +12,15 @@
   }
   dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
-  # if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
+  # if (!is.null(scen@solver$SQLite) && scen@solver$SQLite) {
   if (is.null(scen@solver$export_format)) {
-    SQLight <- FALSE
+    SQLite <- FALSE
   } else {
-    SQLight <- tolower(scen@solver$export_format) == 'sqlite'
+    SQLite <- tolower(scen@solver$export_format) == 'sqlite'
   }
-  if (is.null(SQLight)) SQLight <- FALSE
-  if (SQLight) {
-    ### Generate SQLight file
+  if (is.null(SQLite)) SQLite <- FALSE
+  if (SQLite) {
+    ### Generate SQLite file
     .write_sqlite_list(dat = .get_scen_data(scen), 
                     sqlFile = paste0(arg$dir.result, 'input/data.db'))
   }
@@ -30,9 +30,9 @@
   zz_constr <- file(paste(arg$dir.result, '/inc_constraints.py', sep = ''), 'w')
   npar <- grep('^##### decl par #####', run_code)[1]
   cat(run_code[1:npar], sep = '\n', file = zz_mod)
-  if (!AbstractModel && !SQLight) {
-    cat('exec(open("input.py").read())\n', file = zz_mod)
-    zz_inp_file <- file(paste0(arg$dir.result, 'input.py'), 'w')
+  if (!AbstractModel) {
+    cat('exec(open("data.py").read())\n', file = zz_mod)
+    zz_inp_file <- file(paste0(arg$dir.result, 'data.py'), 'w')
   }
   if (AbstractModel) {
     f1 <- grep('^mCns', names(scen@modInp@parameters), invert = TRUE)
@@ -50,15 +50,15 @@
         cat(energyRt:::.toPyomoAbstractModel(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_pyomo)
       } else {
         if (any(grep('^.Cns', i))) {
-          # if (!is.null(scen@solver$SQLight) && scen@solver$SQLight) {
-          if (SQLight) {
-              cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
-            ## SQLight import
+          # if (!is.null(scen@solver$SQLite) && scen@solver$SQLite) {
+          if (SQLite) {
+              cat(.toPyomSQLite(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
+            ## SQLite import
           } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
         } else {
-          if (SQLight) {
-            cat(.toPyomSQLight(scen@modInp@parameters[[i]]), sep = '\n', file = zz_mod)
-            ## SQLight import
+          if (SQLite) {
+            cat(.toPyomSQLite(scen@modInp@parameters[[i]]), sep = '\n', file = zz_inp_file)
+            ## SQLite import
           } else {
             tfl <- paste0('input/', scen@modInp@parameters[[i]]@name, '.py')
             cat(paste0('exec(open("', tfl, '").read())\n'), file = zz_inp_file)
@@ -71,7 +71,7 @@
     }
   }
   if (AbstractModel) close(zz_data_pyomo)    
-  if (!AbstractModel && !SQLight) close(zz_inp_file)
+  if (!AbstractModel && !SQLite) close(zz_inp_file)
   npar2 <- (grep('^model[.]obj ', run_code)[1] - 1)
   cat(run_code[npar:npar2], sep = '\n', file = zz_mod)
   if (length(scen@modInp@gams.equation) > 0) {

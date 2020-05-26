@@ -472,9 +472,8 @@ exec(open("inc_solver.py").read())
 # opt = SolverFactory('cplex');
 exec(open("inc4.py").read())
 flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
-slv = opt.solve(model)
-print("solving ", round(time.time() - seconds, 2));
-slv = opt.solve(model)
+print("solving... ", round(time.time() - seconds, 2));
+slv = opt.solve(model, tee = True)
 print("done ", round(time.time() - seconds, 2));
 flog.write('"solution status",' + str((slv.solver.status == SolverStatus.ok) *1) + ',"' + str(datetime.datetime.now()) + '"\n')
 flog.write('"export results",,"' + str(datetime.datetime.now()) + '"\n')
