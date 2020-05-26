@@ -465,14 +465,13 @@ if verbose: print("eqLECActivity ", end = "")
 model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in slice if (t,s) in mTechSlice)  >=  pLECLoACT.get((r)));
 if verbose: print(datetime.datetime.now(), " (", round(time.time() - seconds, 2), " s)", sep = "")
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
-print("equations ", round(time.time() - seconds, 2))
 exec(open("inc3.py").read())
 exec(open("inc_constraints.py").read())
 exec(open("inc_solver.py").read())
 # opt = SolverFactory('cplex');
 exec(open("inc4.py").read())
 flog.write('"solver",,"' + str(datetime.datetime.now()) + '"\n')
-print("solving... ", round(time.time() - seconds, 2));
+print("solving... ");
 slv = opt.solve(model, tee = True)
 print("done ", round(time.time() - seconds, 2));
 flog.write('"solution status",' + str((slv.solver.status == SolverStatus.ok) *1) + ',"' + str(datetime.datetime.now()) + '"\n')
