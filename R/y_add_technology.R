@@ -30,7 +30,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 			use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
 			tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]
 		}
-		
 		# Disaggregated AFS, if there is a slice level
 		if (nrow(tech@afs) != 0 && any(tech@afs$slice %in% names(approxim$slice@slice_map))) {
 		  chk <- seq_len(nrow(tech@afs))[tech@afs$slice %in% names(approxim$slice@slice_map)]
@@ -103,7 +102,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		# save(list = c('approxim', 'obj', 'app', 'tech'), file = 'c:/tmp/1.rdata')
 		# stock_exist <- interpolation_dtf(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim$ry, 'tech', tech@name)
 		
-		
 		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
 		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
 		olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = FALSE)
@@ -162,7 +160,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		#    obj@parameters[['ndefpTechAfUp']] <- addData(obj@parameters[['ndefpTechAfUp']],
 		#          gg[, obj@parameters[['ndefpTechAfUp']]@dimSetNames])
 		
-		approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input']
+		approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input' & is.na(ctype$comm[, 'group'])]
 		if (length(approxim_comm[['comm']]) != 0) {
 		  pTechCinp2use <- simpleInterpolation(tech@ceff, 'cinp2use',
 		                                       obj@parameters[['pTechCinp2use']], approxim_comm, 'tech', tech@name)
