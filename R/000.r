@@ -43,7 +43,7 @@ setGeneric("addLEC", function(obj, app, price, discount,
         standardGeneric("addLEC"))
 #setGeneric("glpkCompile", function(obj) standardGeneric("glpkCompile"))
 add <- function (...) UseMethod("add")
-report <- function (...) UseMethod("report")
+# report <- function (...) UseMethod("report")
 getData <- function (...) UseMethod("getData")
 
 setGeneric("milestoneYears", function(start, interval) standardGeneric("milestoneYears"))

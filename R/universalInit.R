@@ -99,11 +99,11 @@ setGeneric("newTechnology", function(name, ...) standardGeneric("newTechnology")
 setMethod('newTechnology', signature(name = 'character'), function(name, ...) 
   universalInit('technology', name, ...))
 
-setGeneric("update", function(obj, ...) standardGeneric("update"))
+# setGeneric("update", function(obj, ...) standardGeneric("update"))
 #' Update an object
 #'
-setMethod('update', signature(obj = 'technology'), function(obj, ...) 
-  universalInit('technology', name = obj, ...))
+# setMethod('update', signature(obj = 'technology'), function(obj, ...) 
+update.technology <- function(obj, ...) universalInit('technology', name = obj, ...)
 
 setGeneric("newCommodity", function(name, ...) standardGeneric("newCommodity"))
 #' Create new commodity object
@@ -113,8 +113,8 @@ setGeneric("newCommodity", function(name, ...) standardGeneric("newCommodity"))
 setMethod('newCommodity', signature(name = 'character'), function(name, ...) 
   universalInit('commodity', name, ...))
 
-setMethod('update', signature(obj = 'commodity'), function(obj, ...) 
-  universalInit('commodity', name = obj, ...))
+# setMethod('update', signature(obj = 'commodity'), function(obj, ...) 
+update.commodity <- function(obj, ...) universalInit('commodity', name = obj, ...)
 
 setGeneric("newDemand", function(name, ...) standardGeneric("newDemand"))
 #' Create new demand object
@@ -124,8 +124,9 @@ setGeneric("newDemand", function(name, ...) standardGeneric("newDemand"))
 setMethod('newDemand', signature(name = 'character'), function(name, ...) 
   universalInit('demand', name, ...))
 
-setMethod('update', signature(obj = 'demand'), function(obj, ...) 
-  universalInit('demand', name = obj, ...))
+# setMethod('update', signature(obj = 'demand'), function(obj, ...) 
+update.demand <- function(obj, ...) 
+  universalInit('demand', name = obj, ...)
 
 setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
 #' Create new supply object
@@ -135,8 +136,9 @@ setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
 setMethod('newSupply', signature(name = 'character'), function(name, ...) 
   universalInit('supply', name, ...))
 
-setMethod('update', signature(obj = 'supply'), function(obj, ...) 
-  universalInit('supply', name = obj, ...))
+# setMethod('update', signature(obj = 'supply'), function(obj, ...) 
+update.supply <- function(obj, ...) 
+    universalInit('supply', name = obj, ...)
 
 setGeneric("newExport", function(name, ...) standardGeneric("newExport"))
 #' Create new export object
@@ -146,8 +148,9 @@ setGeneric("newExport", function(name, ...) standardGeneric("newExport"))
 setMethod('newExport', signature(name = 'character'), function(name, ...) 
   universalInit('export', name, ...))
 
-setMethod('update', signature(obj = 'export'), function(obj, ...) 
-  universalInit('export', name = obj, ...))
+# setMethod('update', signature(obj = 'export'), function(obj, ...) 
+update.export <- function(obj, ...) 
+  universalInit('export', name = obj, ...)
 
 setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
 #' Create new import object
@@ -157,8 +160,9 @@ setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
 setMethod('newImport', signature(name = 'character'), function(name, ...) 
   universalInit('import', name, ...))
 
-setMethod('update', signature(obj = 'import'), function(obj, ...) 
-  universalInit('import', name = obj, ...))
+# setMethod('update', signature(obj = 'import'), function(obj, ...) 
+update.import <- function(obj, ...) 
+  universalInit('import', name = obj, ...)
 
 setGeneric("newRepository", function(name, ...) standardGeneric("newRepository"))
 #' Create new repository object
@@ -233,8 +237,9 @@ setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
 setMethod('newStorage', signature(name = 'character'), function(name, ...) 
   universalInit('storage', name, ...))
 
-setMethod('update', signature(obj = 'storage'), function(obj, ...) 
-  universalInit('storage', name = obj, ...))
+# setMethod('update', signature(obj = 'storage'), function(obj, ...) 
+update.storage <- function(obj, ...) 
+  universalInit('storage', name = obj, ...)
 
   
 setGeneric("newWeather", function(name, ...) standardGeneric("newWeather"))
@@ -245,8 +250,9 @@ setGeneric("newWeather", function(name, ...) standardGeneric("newWeather"))
 setMethod('newWeather', signature(name = 'character'), function(name, ...) 
   universalInit('weather', name, ...))
 
-setMethod('update', signature(obj = 'weather'), function(obj, ...) 
-  universalInit('weather', name = obj, ...))
+# setMethod('update', signature(obj = 'weather'), function(obj, ...) 
+update.weather <- function(obj, ...) 
+  universalInit('weather', name = obj, ...)
 
 setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
 setMethod('newTax', signature(name = 'character'), function(name, ..., value = NULL) {
