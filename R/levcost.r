@@ -210,9 +210,10 @@ summary.levcost <- function(x) x$total
   #if (!is.null(subs)) mdl@sysInfo@subs <- subs
   #, tmp.dir = tmp.dir
   rr <- solve(mdl, name = 'LEC', echo = echo, n.threads = n.threads, ...)
-  if (!(rr@modOut@solutionStatus == 1 && 
-            rr@modOut@compilationStatus == 2 && 
-            all(rr@modOut@data$vDummyImport == 0))) stop('Error in solution')
+  solutionLogs <- rr@modOut@solutionLogs
+  if (!(solutionLogs[solutionLogs$parameter == 'solution status', 'value'] == 1 && 
+            any(solutionLogs$parameter == 'done') && 
+            nrow(rr@modOut@variables$vDummyImport) == 0)) stop('Error in solution')
     dsc <- rr@modInp@parameters[['pDiscountFactor']]@data
     dsc <- dsc[, 2:3, drop = FALSE]
     colnames(dsc)[2] <- 'discount.factor'
