@@ -1,6 +1,6 @@
 
-universalInit <- function(class_name, name, exclude = NULL, exclude_class = NULL, 
-                          update = !is.character(name), ...) {
+universalInit <- function(class_name, name, ..., exclude = NULL, exclude_class = NULL, 
+                          update = !is.character(name)) {
   # !!! newObject
   if(update) {
     if (attr(class(name),"package") != "energyRt") stop("Unknown type of the object")
@@ -169,8 +169,14 @@ setGeneric("newRepository", function(name, ...) standardGeneric("newRepository")
 #' 
 #' @name newRepository
 #' 
-setMethod('newRepository', signature(name = 'character'), function(name, ...) 
-  universalInit('repository', name, ...))
+setMethod('newRepository', signature(name = 'character'), function(name, ...) {
+	in_rep <- c('commodity', 'technology', 'supply', 'demand', 'trade', 'import', 'export', 'trade', 'storage')
+  rps <- universalInit('repository', name, exclude_class = in_rep, ...)
+  arg <- list(...)
+  arg <- arg[sapply(arg, class) %in% in_rep]
+  if (length(arg) > 0) rps <- add(rps, arg)
+  rps
+})
 
 setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #' Create new model object
