@@ -57,10 +57,10 @@
         sets <- merge(sets, tmp)
       }
     }
-    if (prec@parameters[[name]]@type == 'simple' && nrow(sets) != 0) {
+    if (prec@parameters[[name]]@type == 'simple' && (is.null(sets) || nrow(sets) != 0)) {
       sets$value <- prec@parameters[[name]]@defVal
     } 
-    if (prec@parameters[[name]]@type == 'multi' && nrow(sets) != 0) {
+    if (prec@parameters[[name]]@type == 'multi' && (is.null(sets) || nrow(sets) != 0)) {
       sets$type <- 'lo'
       sets$value <- prec@parameters[[name]]@defVal[1]
       sets2 <- sets

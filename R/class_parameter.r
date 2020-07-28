@@ -218,8 +218,6 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 # Generate GAMS code, return character == GAMS code 
 .toGams0 <- function(obj, include.def) {
     gen_gg <- function(name, dtt) {
-      # gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf,, drop = FALSE])
-      # dtt <- dtt[dtt$value != 0 & dtt$value != Inf,, drop = FALSE]
       if (ncol(dtt) == 1) {
       	ret <- paste0(name, ' = ', dtt[1, 1], ';')
       } else {
@@ -231,8 +229,6 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
       }
     }
     as_simple <- function(dtt, name, def, include.def) {
-      # as_simple(obj@data, obj@name, obj@defVal, include.def)
-      # dtt <- obj@data; name <- obj@name; def <- obj@defVal; 
       if (include.def) {
         add_cnd <- function(y, x) { 
           if (x == '') return(x) else return(paste(x, 'and', y))
@@ -266,7 +262,8 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
         }  	
       }
       if (nrow(dtt) == 0 || all(dtt$value %in% c(0, Inf))) { #
-        return(paste0(name, '(', paste0(colnames(dtt)[-ncol(dtt)], collapse = ', '), ')$0 = 0;')) 
+        if (ncol(dtt) > 1) return(paste0(name, '(', paste0(colnames(dtt)[-ncol(dtt)], collapse = ', '), ')$0 = 0;')) 
+        return(paste0(name, '$0 = 0;')) 
       } else {
           return(c(gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf,, drop = FALSE]))) # 
       }  
