@@ -136,23 +136,23 @@ setMethod("initialize", "modInp",
     	createParameter('mDemComm', c('dem', 'comm'), 'map', cls = 'demand')    
     .Object@parameters[['pDemand']] <- 
     	createParameter('pDemand', c('dem', 'comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'back.inter.forth', colName = 'dem', cls = 'demand')
+    		defVal = 0, interpolation = 'back.inter.forth', colName = 'dem', cls = 'demand', slot = 'dem')
     # Dummy import
     .Object@parameters[['pDummyImportCost']] <- 
     	createParameter('pDummyImportCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyImport', cls = 'sysInfo')    
+    		defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyImport', cls = 'sysInfo', slot = 'debug')    
     # Dummy export
     .Object@parameters[['pDummyExportCost']] <- 
     	createParameter('pDummyExportCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyExport', cls = 'sysInfo')    
+    		defVal = Inf, interpolation = 'back.inter.forth', colName = 'dummyExport', cls = 'sysInfo', slot = 'debug')    
     # Tax
     .Object@parameters[['pTaxCost']] <- 
     	createParameter('pTaxCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'tax')    
+    		defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'tax', slot = 'tax')    
     # Subs
     .Object@parameters[['pSubsCost']] <- 
     	createParameter('pSubsCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'sub')    
+    		defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'sub', slot = 'subs')    
     # Supply
     # Map
     .Object@parameters[['mSupComm']] <- 
@@ -162,7 +162,7 @@ setMethod("initialize", "modInp",
     # simple
     .Object@parameters[['pSupCost']] <- 
     	createParameter('pSupCost', c('sup', 'comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'back.inter.forth', colName = 'cost', cls = 'supply')    
+    		defVal = 0, interpolation = 'back.inter.forth', colName = 'cost', cls = 'supply', slot = 'availability')    
     .Object@parameters[['pSupReserve']] <- 
     	createParameter('pSupReserve', c('sup', 'comm', 'region'), 'multi', 
     		defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'supply', slot = 'reserve', 
@@ -171,7 +171,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['pSupAva']] <- 
     	createParameter('pSupAva', c('sup', 'comm', 'region', 'year', 'slice'), 'multi', 
     		defVal = c(0, Inf), interpolation = 'back.inter.forth', 
-    		colName = c('ava.lo', 'ava.up'), cls = 'supply')    
+    		colName = c('ava.lo', 'ava.up'), cls = 'supply', slot = 'availability')    
     # Technology
     # Map
     for(i in c('mTechInpComm', 'mTechOutComm', 'mTechOneComm', 
@@ -202,7 +202,7 @@ setMethod("initialize", "modInp",
     	defVal = 1, cls = 'technology', colName = 'combustion')    
     .Object@parameters[['pTechOlife']] <- 
     	createParameter('pTechOlife', c('tech', 'region'), 'simple', 
-    		defVal = 1, interpolation = 'back.inter.forth', colName = 'olife', cls = 'technology')          
+    		defVal = 1, interpolation = 'back.inter.forth', colName = 'olife', cls = 'technology', slot = 'cap2act')          
     .Object@parameters[['pTechFixom']] <- createParameter('pTechFixom', 
     	c('tech', 'region', 'year'), 'simple', 
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'fixom', cls = 'technology')    
