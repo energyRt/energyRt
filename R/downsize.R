@@ -1,5 +1,5 @@
 downsize <- function(scen) {
-	for (pr in grep('^p', names(scen@modInp@parameters), value = TRUE)) {
+	for (pr in grep('^pa', grep('^p', names(scen@modInp@parameters), value = TRUE), value = TRUE, invert = TRUE)) {
 		if ((scen@modInp@parameters[[pr]]@nValues == -1 && nrow(scen@modInp@parameters[[pr]]@data) > 0) ||
 				scen@modInp@parameters[[pr]]@nValues > 0) {
 			if (scen@modInp@parameters[[pr]]@nValues != -1)

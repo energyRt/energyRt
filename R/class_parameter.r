@@ -232,7 +232,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
     }
     as_simple <- function(dtt, name, def, include.def) {
       # as_simple(obj@data, obj@name, obj@defVal, include.def)
-      dtt <- obj@data; name <- obj@name; def <- obj@defVal; 
+      # dtt <- obj@data; name <- obj@name; def <- obj@defVal; 
       if (include.def) {
         add_cnd <- function(y, x) { 
           if (x == '') return(x) else return(paste(x, 'and', y))
