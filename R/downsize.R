@@ -1,5 +1,5 @@
 downsize <- function(scen) {
-	for (pr in grep('^pa', grep('^p', names(scen@modInp@parameters), value = TRUE), value = TRUE, invert = TRUE)) {
+	for (pr in grep('^pa', grep('^p', names(scen@modInp@parameters), value = TRUE), value = TRUE, invert = TRUE)[20]) {
 		if ((scen@modInp@parameters[[pr]]@nValues == -1 && nrow(scen@modInp@parameters[[pr]]@data) > 0) ||
 				scen@modInp@parameters[[pr]]@nValues > 0) {
 			if (scen@modInp@parameters[[pr]]@nValues != -1)
@@ -8,7 +8,7 @@ downsize <- function(scen) {
 			tmp <- tmp[order(tmp$value), ]
 			if (all(tmp$value == tmp$value[1])) { # only one possible value
 				if (!is.null(tmp$type)) {
-					tmp <- tmp[!duplicated(tmp$type), 'value', drop = FALSE]
+					tmp <- tmp[!duplicated(tmp$type), c('type', 'value'), drop = FALSE]
 				} else tmp <- tmp[1, 'value', drop = FALSE]
 			} else {
 				# remove col with single value 
