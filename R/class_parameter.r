@@ -218,13 +218,21 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 # Generate GAMS code, return character == GAMS code 
 .toGams0 <- function(obj, include.def) {
     gen_gg <- function(name, dtt) {
-    	ret <- paste0(name, '("', dtt[, 1])
-    	for (i in seq_len(ncol(dtt) - 2) + 1) {
-    		ret <- paste0(ret, '", "', dtt[, i])
-    	}
-    	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
+      # gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf,, drop = FALSE])
+      # dtt <- dtt[dtt$value != 0 & dtt$value != Inf,, drop = FALSE]
+      if (ncol(dtt) == 1) {
+      	ret <- paste0(name, ' = ', dtt[1, 1], ';')
+      } else {
+      	ret <- paste0(name, '("', dtt[, 1])
+      	for (i in seq_len(ncol(dtt) - 2) + 1) {
+      		ret <- paste0(ret, '", "', dtt[, i])
+      	}
+      	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
+      }
     }
     as_simple <- function(dtt, name, def, include.def) {
+      # as_simple(obj@data, obj@name, obj@defVal, include.def)
+      dtt <- obj@data; name <- obj@name; def <- obj@defVal; 
       if (include.def) {
         add_cnd <- function(y, x) { 
           if (x == '') return(x) else return(paste(x, 'and', y))

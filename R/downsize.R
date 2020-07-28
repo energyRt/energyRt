@@ -23,8 +23,13 @@ downsize <- function(scen) {
 					}
 				}
 			}
-			scen@modInp@parameters[[pr]]@data <- tmp
-			if (scen@modInp@parameters[[pr]]@nValues != -1) scen@modInp@parameters[[pr]]@nValues <- nrow(tmp)
+			if (ncol(scen@modInp@parameters[[pr]]@data) != ncol(tmp)) {
+				rem_col <- seq_len(ncol(scen@modInp@parameters[[pr]]@data))[!(colnames(scen@modInp@parameters[[pr]]@data) %in% colnames(tmp))]
+				scen@modInp@parameters[[pr]]@misc$rem_col <- rem_col
+				scen@modInp@parameters[[pr]]@data <- tmp
+				if (scen@modInp@parameters[[pr]]@nValues != -1) scen@modInp@parameters[[pr]]@nValues <- nrow(tmp)
+				scen@modInp@parameters[[pr]]@dimSetNames <- scen@modInp@parameters[[pr]]@dimSetNames[-rem_col]
+			}
 		}
 	}
 	scen
