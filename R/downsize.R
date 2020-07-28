@@ -1,14 +1,33 @@
 downsize <- function(scen) {
-  rs <- find_null_column(scen)
-  if (nrow(rs) == 0) return(scen)
-  par_name <- grep('^pa', grep('^p', names(scen@modInp@parameters), value = TRUE), value = TRUE, invert = TRUE)
-  rs$class <- gsub('technology', 'tech', rs$class)
-  rs$class <- gsub('supply', 'sup', rs$class)
-  # pDummyImportCost pDummyExportCost 
-	for (i in seq_len(nrow(rs))) {
-		grep(paste0('p', rs[i, 'class']), par_name, ignore.case = TRUE, value = TRUE)
-		scen@modInp@parameters$pTechCvarom
+	for (pr in grep('^p', names(scen@modInp@parameters), value = TRUE)) {
+		if ((scen@modInp@parameters[[pr]]@nValues == -1 && nrow(scen@modInp@parameters[[pr]]@data) > 0) ||
+				scen@modInp@parameters[[pr]]@nValues > 0) {
+			if (scen@modInp@parameters[[pr]]@nValues != -1)
+				scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[1:scen@modInp@parameters[[pr]]@nValues,, drop = FALSE]
+			tmp <- scen@modInp@parameters[[pr]]@data
+			tmp <- tmp[order(tmp$value), ]
+			if (all(tmp$value == tmp$value[1])) { # only one possible value
+				if (!is.null(tmp$type)) {
+					tmp <- tmp[!duplicated(tmp$type), 'value', drop = FALSE]
+				} else tmp <- tmp[1, 'value', drop = FALSE]
+			} else {
+				# remove col with single value 
+				unv <- sapply(tmp, function(x) length(unique(x)))
+				tmp <- tmp[, unv != 1 | names(unv) %in% c('type', 'value')]
+				unv <- unv[unv != 1] 
+				# remove other 
+				cand <- colnames(tmp)[!(colnames(tmp) %in% c('type', 'value')) & nrow(tmp) / unv >= unv['value']]
+				for (cc in cand) {
+					if (all(aggregate(tmp$value, tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE], function(x) all(x == x[1]))$x)) {
+						tmp <- tmp[!duplicated(tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE]), colnames(tmp) != cc, drop = FALSE]
+					}
+				}
+			}
+			scen@modInp@parameters[[pr]]@data <- tmp
+			if (scen@modInp@parameters[[pr]]@nValues != -1) scen@modInp@parameters[[pr]]@nValues <- nrow(tmp)
+		}
 	}
+	scen
 }
 
 
