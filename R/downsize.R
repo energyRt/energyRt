@@ -12,7 +12,7 @@ downsize <- function(scen) {
 }
 
 
-find_null_column <- function(scen) {
+.find_null_column <- function(scen) {
 	# Collect all class names
 	# scn_class <- unique(c(sapply(scen@model@data, function(x) unique(sapply(x@data, class))), recursive = TRUE))
 	scn_class <- c('supply', 'demand', 'export', 'import', 'trade', 'technology', 'tax', 'subs')
