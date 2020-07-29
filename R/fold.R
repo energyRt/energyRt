@@ -18,7 +18,7 @@ fold <- function(scen) {
 				tmp <- tmp[, unv != 1 | names(unv) %in% c('type', 'value')]
 				unv <- unv[unv != 1] 
 				# remove other 
-				cand <- colnames(tmp)[!(colnames(tmp) %in% c('type', 'value')) & nrow(tmp) / unv >= unv['value']]  
+				cand <- names(unv)[!(names(unv) %in% c('type', 'value')) & nrow(tmp) / unv >= unv['value']]  
 				for (cc in cand) {
 					if (all(aggregate(tmp$value, tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE], function(x) all(x == x[1]))$x)) {
 						tmp <- tmp[!duplicated(tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE]), colnames(tmp) != cc, drop = FALSE]
