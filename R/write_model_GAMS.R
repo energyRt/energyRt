@@ -1,12 +1,13 @@
 ##################################################################################################################################    
 # GAMS part
 ##################################################################################################################################    
-.write_model_GAMS <- function(arg, scen) {
+.write_model_GAMS <- function(arg, scen, trim = FALSE) {
   # Check if gams (if it use) is available
   # if (arg$run) {
   #   rs <- try(system('gams'))
   #   if (rs != 0) stop('GAMS is not found')
   # }
+  if (trim) scen <- fold(scen)
   .write_inc_solver(scen, arg, 'option lp = cplex;', '.gms', 'cplex')
   if (is.null(scen@status$fullsets)) stop('scen@status$fullsets not found')
   if (!scen@status$fullsets) {

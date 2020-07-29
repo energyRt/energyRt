@@ -106,7 +106,8 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
     if (arg$echo) cat('Writing files: ')
     solver_solver_time <- proc.time()[3]
     if (any(grep("^gams$", scen@solver$lang, ignore.case = TRUE))) {
-      scen <- .write_model_GAMS(arg, scen)
+      if (is.null(arg$trim)) arg$trim <- FALSE
+      scen <- .write_model_GAMS(arg, scen, trim = arg$trim)
     } else if (any(grep("^(glpk|cbcb)$", scen@solver$lang, ignore.case = TRUE))) { 
       scen <- .write_model_GLPK_CBC(arg, scen)
     } else if (any(grep("^pyomo", scen@solver$lang, ignore.case = TRUE))) {

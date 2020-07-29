@@ -1,5 +1,5 @@
-downsize <- function(scen) {
-	for (pr in grep('^pa', grep('^p', names(scen@modInp@parameters), value = TRUE), value = TRUE, invert = TRUE)[20]) {
+fold <- function(scen) {
+	for (pr in grep('^pa', grep('^p', names(scen@modInp@parameters), value = TRUE), value = TRUE, invert = TRUE)) {
 		if ((scen@modInp@parameters[[pr]]@nValues == -1 && nrow(scen@modInp@parameters[[pr]]@data) > 0) ||
 				scen@modInp@parameters[[pr]]@nValues > 0) {
 			if (scen@modInp@parameters[[pr]]@nValues != -1)
@@ -16,7 +16,7 @@ downsize <- function(scen) {
 				tmp <- tmp[, unv != 1 | names(unv) %in% c('type', 'value')]
 				unv <- unv[unv != 1] 
 				# remove other 
-				cand <- colnames(tmp)[!(colnames(tmp) %in% c('type', 'value')) & nrow(tmp) / unv >= unv['value']]
+				cand <- colnames(tmp)[!(colnames(tmp) %in% c('type', 'value')) & nrow(tmp) / unv >= unv['value']]  
 				for (cc in cand) {
 					if (all(aggregate(tmp$value, tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE], function(x) all(x == x[1]))$x)) {
 						tmp <- tmp[!duplicated(tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE]), colnames(tmp) != cc, drop = FALSE]
