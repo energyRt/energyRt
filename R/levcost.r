@@ -293,7 +293,7 @@ summary.levcost <- function(x) x$total
     dsc$total.cost <- apply(dsc[, c('fuel.total', 'invcost', 'fixom', 'varom')], 1, sum)
     dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
   dd <- sum(dsc[, 'discount.factor'])
-  structure(list(total = (rr@modOut@variables$vObjective[1, 1] / sum(dd)), 
+  structure(list(total = (sum(dsc[, 'total.discount.cost'] ) / sum(dd)), 
     invcost = sum(dsc[, 'invcost'] * dsc[, 'discount.factor']) / dd,
     fixom = sum(dsc[, 'fixom'] * dsc[, 'discount.factor']) / dd, 
     varom = sum(dsc[, 'varom'] * dsc[, 'discount.factor']) / dd,
