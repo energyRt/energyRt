@@ -123,7 +123,7 @@ read_solution <- function(scen, ...) {
     tmp$comm2 <- tmp$commp; tmp$commp <- tmp$comm; tmp$comm <- tmp$comm2; tmp$comm2 <- NULL
     pTechEmisComm <- energyRt:::getParameterData(scen@modInp@parameters$pTechEmisComm)
     vTechEmsFuel <- merge(merge(pTechEmisComm, 
-      scen@modOut@variables$vTechInp, by = c('tech', 'comm')[c('tech', 'comm') %in% colnames(pTechEmisComm)]), tmp, by = 'comm')
+      scen@modOut@variables$vTechInp, by = c('tech', 'comm')), tmp, by = 'comm')
     vTechEmsFuel$comm <- vTechEmsFuel$commp
     if (nrow(vTechEmsFuel) > 0) {
       vTechEmsFuel <- aggregate(vTechEmsFuel$value.x * vTechEmsFuel$value.y * vTechEmsFuel$value, 
