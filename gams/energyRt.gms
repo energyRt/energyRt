@@ -57,7 +57,6 @@ comm   commodity
 region region
 year   year
 slice  time slice
-weather  weather
 ;
 
 Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
@@ -102,10 +101,6 @@ mTechSlice(tech, slice)          Technology to slice-level
 mSupSlice(sup, slice)             Supply to slices-level
 mSupComm(sup, comm)               Supplied commodities
 mSupSpan(sup, region)             Supply in regions
-mSupWeatherLo(sup, weather)       Use weather to supply ava.lo
-mSupWeatherUp(sup, weather)       Use weather to supply ava.up
-mWeatherSlice(weather, slice)     Weather slice
-mWeatherRegion(weather, region)   Weather region
 * Demand
 mDemComm(dem, comm)               Demand commodities
 * Ballance
@@ -138,13 +133,6 @@ mDiscountZero(region)
 mSliceParentChildE(slice, slice) Child slice or the same
 mSliceParentChild(slice, slice)        Child slice not the same
 *
-mTechWeatherAf(tech, weather)
-mTechWeatherAfs(tech, weather)
-mTechWeatherAfc(tech, weather, comm)
-*
-mStorageWeatherAf(stg, weather)
-mStorageWeatherCinp(stg, weather)
-mStorageWeatherCout(stg, weather)
 
 
 mTradeRoutes(trade, region, region)
@@ -227,25 +215,6 @@ pDummyExportCost(comm, region, year, slice)         Dummy costs parameters (for 
 pTaxCost(comm, region, year, slice)                 Commodity taxes
 pSubsCost(comm, region, year, slice)                Commodity subsidies
 *
-pWeather(weather, region, year, slice)              Weather factor (class weather)
-pSupWeatherLo(sup, weather)                         Weather multiplier for supply ava.lo
-pSupWeatherUp(sup, weather)                         Weather multiplier for supply ava.up
-*
-pTechWeatherAfLo(tech, weather)                     Weather multiplier for tech af.lo
-pTechWeatherAfUp(tech, weather)                     Weather multiplier for tech af.up
-*
-pTechWeatherAfsLo(tech, weather)                    Weather multiplier for tech afs.lo
-pTechWeatherAfsUp(tech, weather)                    Weather multiplier for tech afs.up
-
-pTechWeatherAfcLo(tech, weather, comm)              Weather multiplier for tech afc.lo
-pTechWeatherAfcUp(tech, weather, comm)              Weather multiplier for tech afc.up
-
-pStorageWeatherAfUp(stg, weather)                   Weather multiplier for storages af.up
-pStorageWeatherAfLo(stg, weather)                   Weather multiplier for storages af.lo
-pStorageWeatherCinpUp(stg, weather)                 Weather multiplier for storages cinp.up
-pStorageWeatherCinpLo(stg, weather)                 Weather multiplier for storages cinp.lo
-pStorageWeatherCoutUp(stg, weather)                 Weather multiplier for storages cout.up
-pStorageWeatherCoutLo(stg, weather)                 Weather multiplier for storages cout.lo
 ;
 
 * Storage technology parameters

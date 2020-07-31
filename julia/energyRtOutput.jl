@@ -726,8 +726,5 @@ end
 for rr = slice
     println(raw_data, "slice,",rr)
 end
-for rr = weather
-    println(raw_data, "weather,",rr)
-end
 
 close(raw_data);

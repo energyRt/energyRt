@@ -13,7 +13,6 @@ set comm;
 set region;
 set year;
 set slice;
-set weather;
 set FORIF;
 
 
@@ -45,10 +44,6 @@ set mTechSlice dimen 2;
 set mSupSlice dimen 2;
 set mSupComm dimen 2;
 set mSupSpan dimen 2;
-set mSupWeatherLo dimen 2;
-set mSupWeatherUp dimen 2;
-set mWeatherSlice dimen 2;
-set mWeatherRegion dimen 2;
 set mDemComm dimen 2;
 set mUpComm dimen 1;
 set mLoComm dimen 1;
@@ -75,12 +70,6 @@ set mImpSlice dimen 2;
 set mDiscountZero dimen 1;
 set mSliceParentChildE dimen 2;
 set mSliceParentChild dimen 2;
-set mTechWeatherAf dimen 2;
-set mTechWeatherAfs dimen 2;
-set mTechWeatherAfc dimen 3;
-set mStorageWeatherAf dimen 2;
-set mStorageWeatherCinp dimen 2;
-set mStorageWeatherCout dimen 2;
 set mTradeSpan dimen 2;
 set mTradeNew dimen 2;
 set mTradeOlifeInf dimen 1;
@@ -246,21 +235,6 @@ param pDummyImportCost{comm, region, year, slice};
 param pDummyExportCost{comm, region, year, slice};
 param pTaxCost{comm, region, year, slice};
 param pSubsCost{comm, region, year, slice};
-param pWeather{weather, region, year, slice};
-param pSupWeatherLo{sup, weather};
-param pSupWeatherUp{sup, weather};
-param pTechWeatherAfLo{tech, weather};
-param pTechWeatherAfUp{tech, weather};
-param pTechWeatherAfsLo{tech, weather};
-param pTechWeatherAfsUp{tech, weather};
-param pTechWeatherAfcLo{tech, weather, comm};
-param pTechWeatherAfcUp{tech, weather, comm};
-param pStorageWeatherAfUp{stg, weather};
-param pStorageWeatherAfLo{stg, weather};
-param pStorageWeatherCinpUp{stg, weather};
-param pStorageWeatherCinpLo{stg, weather};
-param pStorageWeatherCoutUp{stg, weather};
-param pStorageWeatherCoutLo{stg, weather};
 param pStorageInpEff{stg, comm, region, year, slice};
 param pStorageOutEff{stg, comm, region, year, slice};
 param pStorageStgEff{stg, comm, region, year, slice};
@@ -940,9 +914,6 @@ for {y in mMidMilestone} {
 }
 for {s in slice} {
     printf "slice,%s\n", s >> "output/raw_data_set.csv";
-}
-for {wth1 in weather} {
-    printf "weather,%s\n", wth1 >> "output/raw_data_set.csv";
 }
 printf  '"done",,"%s"\n', time2str(gmtime(), "%Y-%m-%d %M:%H:S %TZ") >> "output/log.csv";
 end;

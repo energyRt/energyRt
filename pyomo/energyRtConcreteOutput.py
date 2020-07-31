@@ -457,7 +457,5 @@ for i in year:
     f.write('year,' + str(i) + '\n')
 for i in slice:
     f.write('slice,' + str(i) + '\n')
-for i in weather:
-    f.write('weather,' + str(i) + '\n')
 f.close()
 flist.close();

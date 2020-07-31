@@ -638,5 +638,4 @@ loop(comm, put "comm,"comm.tl:0/;);
 loop(region, put "region,"region.tl:0/;);
 loop(year$mMidMilestone(year), put "year,"year.tl:0/;);
 loop(slice, put "slice,"slice.tl:0/;);
-loop(weather, put "weather,"weather.tl:0/;);
 putclose;

@@ -168,7 +168,6 @@
    region  = logical(),
    year  = logical(),
    slice  = logical(),
-   weather  = logical(),
    vTechInv  = logical(),
    vTechEac  = logical(),
    vTechOMCost  = logical(),
@@ -520,7 +519,6 @@ rs
    region  = logical(),
    year  = logical(),
    slice  = logical(),
-   weather  = logical(),
    eqTechSng2Sng  = logical(),
    eqTechGrp2Sng  = logical(),
    eqTechSng2Grp  = logical(),
@@ -756,7 +754,6 @@ rs
    region  = logical(),
    year  = logical(),
    slice  = logical(),
-   weather  = logical(),
    eqTechSng2Sng  = logical(),
    eqTechGrp2Sng  = logical(),
    eqTechSng2Grp  = logical(),
@@ -848,7 +845,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:319,] <- NA;
+    rs[1:293,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -861,7 +858,6 @@ rs
 "region",
 "year",
 "slice",
-"weather",
 "mSameRegion",
 "mSameSlice",
 "mMilestoneFirst",
@@ -889,10 +885,6 @@ rs
 "mSupSlice",
 "mSupComm",
 "mSupSpan",
-"mSupWeatherLo",
-"mSupWeatherUp",
-"mWeatherSlice",
-"mWeatherRegion",
 "mDemComm",
 "mUpComm",
 "mLoComm",
@@ -919,12 +911,6 @@ rs
 "mDiscountZero",
 "mSliceParentChildE",
 "mSliceParentChild",
-"mTechWeatherAf",
-"mTechWeatherAfs",
-"mTechWeatherAfc",
-"mStorageWeatherAf",
-"mStorageWeatherCinp",
-"mStorageWeatherCout",
 "mTradeSpan",
 "mTradeNew",
 "mTradeOlifeInf",
@@ -1086,21 +1072,6 @@ rs
 "pDummyExportCost",
 "pTaxCost",
 "pSubsCost",
-"pWeather",
-"pSupWeatherLo",
-"pSupWeatherUp",
-"pTechWeatherAfLo",
-"pTechWeatherAfUp",
-"pTechWeatherAfsLo",
-"pTechWeatherAfsUp",
-"pTechWeatherAfcLo",
-"pTechWeatherAfcUp",
-"pStorageWeatherAfUp",
-"pStorageWeatherAfLo",
-"pStorageWeatherCinpUp",
-"pStorageWeatherCinpLo",
-"pStorageWeatherCoutUp",
-"pStorageWeatherCoutLo",
 "pStorageInpEff",
 "pStorageOutEff",
 "pStorageStgEff",
@@ -1192,7 +1163,6 @@ rs
     rs["year", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechCap", "eqTechRetiredNewCap", "eqTechRetiredStock", "eqTechEac", "eqTechInv", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCap", "eqStorageInv", "eqStorageEac", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostTrade", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqTradeCap", "eqTradeInv", "eqTradeEac", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqObjective", "eqLECActivity")] <- TRUE;
     rs["slice", c("name", "description", "type")] <- c("slice", "time slice", "set");
     rs["slice", c("eqTechSng2Sng", "eqTechGrp2Sng", "eqTechSng2Grp", "eqTechGrp2Grp", "eqTechShareInpLo", "eqTechShareInpUp", "eqTechShareOutLo", "eqTechShareOutUp", "eqTechAInp", "eqTechAOut", "eqTechAfLo", "eqTechAfUp", "eqTechAfsLo", "eqTechAfsUp", "eqTechActSng", "eqTechActGrp", "eqTechAfcOutLo", "eqTechAfcOutUp", "eqTechAfcInpLo", "eqTechAfcInpUp", "eqTechOMCost", "eqSupAvaUp", "eqSupAvaLo", "eqSupTotal", "eqSupCost", "eqDemInp", "eqAggOut", "eqEmsFuelTot", "eqStorageStore", "eqStorageAfLo", "eqStorageAfUp", "eqStorageClean", "eqStorageAInp", "eqStorageAOut", "eqStorageInpUp", "eqStorageInpLo", "eqStorageOutUp", "eqStorageOutLo", "eqStorageCost", "eqImport", "eqExport", "eqTradeFlowUp", "eqTradeFlowLo", "eqCostRowTrade", "eqCostIrTrade", "eqExportRowUp", "eqExportRowLo", "eqExportRowCumulative", "eqImportRowUp", "eqImportRowLo", "eqImportRowAccumulated", "eqTradeCapFlow", "eqTradeIrAInp", "eqTradeIrAOut", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqOutTot", "eqInpTot", "eqInp2Lo", "eqOut2Lo", "eqSupOutTot", "eqTechInpTot", "eqTechOutTot", "eqStorageInpTot", "eqStorageOutTot", "eqCost", "eqTaxCost", "eqSubsCost", "eqLECActivity")] <- TRUE;
-    rs["weather", c("name", "description", "type")] <- c("weather", "weather", "set");
     rs["mSameRegion", c("name", "description", "type")] <- c("mSameRegion", "The same region (used in GLPK)", "map");
     rs["mSameRegion", c("region")] <- TRUE;
     rs["mSameSlice", c("name", "description", "type")] <- c("mSameSlice", "The same slice (used in GLPK)", "map");
@@ -1247,14 +1217,6 @@ rs
     rs["mSupComm", c("sup", "comm", "eqSupOutTot")] <- TRUE;
     rs["mSupSpan", c("name", "description", "type")] <- c("mSupSpan", "Supply in regions", "map");
     rs["mSupSpan", c("sup", "region")] <- TRUE;
-    rs["mSupWeatherLo", c("name", "description", "type")] <- c("mSupWeatherLo", "Use weather to supply ava.lo", "map");
-    rs["mSupWeatherLo", c("sup", "weather")] <- TRUE;
-    rs["mSupWeatherUp", c("name", "description", "type")] <- c("mSupWeatherUp", "Use weather to supply ava.up", "map");
-    rs["mSupWeatherUp", c("sup", "weather")] <- TRUE;
-    rs["mWeatherSlice", c("name", "description", "type")] <- c("mWeatherSlice", "Weather slice", "map");
-    rs["mWeatherSlice", c("slice", "weather")] <- TRUE;
-    rs["mWeatherRegion", c("name", "description", "type")] <- c("mWeatherRegion", "Weather region", "map");
-    rs["mWeatherRegion", c("region", "weather")] <- TRUE;
     rs["mDemComm", c("name", "description", "type")] <- c("mDemComm", "Demand commodities", "map");
     rs["mDemComm", c("dem", "comm", "eqDemInp")] <- TRUE;
     rs["mUpComm", c("name", "description", "type")] <- c("mUpComm", "Commodity balance type PRODUCTION <= CONSUMPTION", "map");
@@ -1307,18 +1269,6 @@ rs
     rs["mSliceParentChildE", c("slice", "eqTechAfsLo", "eqTechAfsUp")] <- TRUE;
     rs["mSliceParentChild", c("name", "description", "type")] <- c("mSliceParentChild", "Child slice not the same", "map");
     rs["mSliceParentChild", c("slice", "eqOutTot", "eqInpTot")] <- TRUE;
-    rs["mTechWeatherAf", c("name", "description", "type")] <- c("mTechWeatherAf", "", "map");
-    rs["mTechWeatherAf", c("tech", "weather")] <- TRUE;
-    rs["mTechWeatherAfs", c("name", "description", "type")] <- c("mTechWeatherAfs", "", "map");
-    rs["mTechWeatherAfs", c("tech", "weather")] <- TRUE;
-    rs["mTechWeatherAfc", c("name", "description", "type")] <- c("mTechWeatherAfc", "", "map");
-    rs["mTechWeatherAfc", c("tech", "comm", "weather")] <- TRUE;
-    rs["mStorageWeatherAf", c("name", "description", "type")] <- c("mStorageWeatherAf", "", "map");
-    rs["mStorageWeatherAf", c("stg", "weather")] <- TRUE;
-    rs["mStorageWeatherCinp", c("name", "description", "type")] <- c("mStorageWeatherCinp", "", "map");
-    rs["mStorageWeatherCinp", c("stg", "weather")] <- TRUE;
-    rs["mStorageWeatherCout", c("name", "description", "type")] <- c("mStorageWeatherCout", "", "map");
-    rs["mStorageWeatherCout", c("stg", "weather")] <- TRUE;
     rs["mTradeSpan", c("name", "description", "type")] <- c("mTradeSpan", "", "map");
     rs["mTradeSpan", c("trade", "year", "eqTradeCap")] <- TRUE;
     rs["mTradeNew", c("name", "description", "type")] <- c("mTradeNew", "", "map");
@@ -1641,36 +1591,6 @@ rs
     rs["pTaxCost", c("comm", "region", "year", "slice", "eqTaxCost")] <- TRUE;
     rs["pSubsCost", c("name", "description", "type")] <- c("pSubsCost", "Commodity subsidies", "parameter");
     rs["pSubsCost", c("comm", "region", "year", "slice", "eqSubsCost")] <- TRUE;
-    rs["pWeather", c("name", "description", "type")] <- c("pWeather", "Weather factor (class weather)", "parameter");
-    rs["pWeather", c("region", "year", "slice", "weather")] <- TRUE;
-    rs["pSupWeatherLo", c("name", "description", "type")] <- c("pSupWeatherLo", "Weather multiplier for supply ava.lo", "parameter");
-    rs["pSupWeatherLo", c("sup", "weather")] <- TRUE;
-    rs["pSupWeatherUp", c("name", "description", "type")] <- c("pSupWeatherUp", "Weather multiplier for supply ava.up", "parameter");
-    rs["pSupWeatherUp", c("sup", "weather")] <- TRUE;
-    rs["pTechWeatherAfLo", c("name", "description", "type")] <- c("pTechWeatherAfLo", "Weather multiplier for tech af.lo", "parameter");
-    rs["pTechWeatherAfLo", c("tech", "weather")] <- TRUE;
-    rs["pTechWeatherAfUp", c("name", "description", "type")] <- c("pTechWeatherAfUp", "Weather multiplier for tech af.up", "parameter");
-    rs["pTechWeatherAfUp", c("tech", "weather")] <- TRUE;
-    rs["pTechWeatherAfsLo", c("name", "description", "type")] <- c("pTechWeatherAfsLo", "Weather multiplier for tech afs.lo", "parameter");
-    rs["pTechWeatherAfsLo", c("tech", "weather")] <- TRUE;
-    rs["pTechWeatherAfsUp", c("name", "description", "type")] <- c("pTechWeatherAfsUp", "Weather multiplier for tech afs.up", "parameter");
-    rs["pTechWeatherAfsUp", c("tech", "weather")] <- TRUE;
-    rs["pTechWeatherAfcLo", c("name", "description", "type")] <- c("pTechWeatherAfcLo", "Weather multiplier for tech afc.lo", "parameter");
-    rs["pTechWeatherAfcLo", c("tech", "comm", "weather")] <- TRUE;
-    rs["pTechWeatherAfcUp", c("name", "description", "type")] <- c("pTechWeatherAfcUp", "Weather multiplier for tech afc.up", "parameter");
-    rs["pTechWeatherAfcUp", c("tech", "comm", "weather")] <- TRUE;
-    rs["pStorageWeatherAfUp", c("name", "description", "type")] <- c("pStorageWeatherAfUp", "Weather multiplier for storages af.up", "parameter");
-    rs["pStorageWeatherAfUp", c("stg", "weather")] <- TRUE;
-    rs["pStorageWeatherAfLo", c("name", "description", "type")] <- c("pStorageWeatherAfLo", "Weather multiplier for storages af.lo", "parameter");
-    rs["pStorageWeatherAfLo", c("stg", "weather")] <- TRUE;
-    rs["pStorageWeatherCinpUp", c("name", "description", "type")] <- c("pStorageWeatherCinpUp", "Weather multiplier for storages cinp.up", "parameter");
-    rs["pStorageWeatherCinpUp", c("stg", "weather")] <- TRUE;
-    rs["pStorageWeatherCinpLo", c("name", "description", "type")] <- c("pStorageWeatherCinpLo", "Weather multiplier for storages cinp.lo", "parameter");
-    rs["pStorageWeatherCinpLo", c("stg", "weather")] <- TRUE;
-    rs["pStorageWeatherCoutUp", c("name", "description", "type")] <- c("pStorageWeatherCoutUp", "Weather multiplier for storages cout.up", "parameter");
-    rs["pStorageWeatherCoutUp", c("stg", "weather")] <- TRUE;
-    rs["pStorageWeatherCoutLo", c("name", "description", "type")] <- c("pStorageWeatherCoutLo", "Weather multiplier for storages cout.lo", "parameter");
-    rs["pStorageWeatherCoutLo", c("stg", "weather")] <- TRUE;
     rs["pStorageInpEff", c("name", "description", "type")] <- c("pStorageInpEff", "Storage input efficiency", "parameter");
     rs["pStorageInpEff", c("stg", "comm", "region", "year", "slice", "eqStorageStore")] <- TRUE;
     rs["pStorageOutEff", c("name", "description", "type")] <- c("pStorageOutEff", "Storage output efficiency", "parameter");
@@ -1813,7 +1733,7 @@ rs
      getParameters <- function(parameter = TRUE, set = FALSE, map = FALSE, equation = FALSE, all = NULL) {
 if (!is.null(all) && all) {parameter = TRUE; set = TRUE; map = TRUE;}
      gg <- energyRt:::.getParameters
-     if (!equation) gg <- gg[,c("name", "description", "type", "tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice", "weather"), drop = FALSE]
+     if (!equation) gg <- gg[,c("name", "description", "type", "tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice"), drop = FALSE]
      if (!set) gg <- gg[gg$type != "set",, drop = FALSE]
      if (!parameter) gg <- gg[gg$type != "parameter",, drop = FALSE]
      if (!map) gg <- gg[gg$type != "map",, drop = FALSE]
@@ -1823,7 +1743,7 @@ if (!is.null(all) && all) {parameter = TRUE; set = TRUE; map = TRUE;}
      getVariables <- function(equation = FALSE, row.names = TRUE) {
      gg <- energyRt:::.getVariables
      if (!row.names) rownames(gg) <- NULL
-     if (equation) gg else gg[,c("name", "description", "tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice", "weather"), drop = FALSE]}
+     if (equation) gg else gg[,c("name", "description", "tech", "sup", "dem", "stg", "expp", "imp", "trade", "group", "comm", "region", "year", "slice"), drop = FALSE]}
     .getEquations <- ..getEquations()
      getEquations <- function() {energyRt:::.getEquations}
     .getVariablesDim <- ..getVariablesDim()

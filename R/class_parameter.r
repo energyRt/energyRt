@@ -217,6 +217,7 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 
 # Generate GAMS code, return character == GAMS code 
 .toGams0 <- function(obj, include.def) {
+  if (!is.null(obj@data$weather)) return(NULL)
     gen_gg <- function(name, dtt) {
       if (ncol(dtt) == 1) {
       	ret <- paste0(name, ' = ', dtt[1, 1], ';')
@@ -360,7 +361,8 @@ setMethod('print', 'parameter', function(x, ...) {
 
 # Generate PYOMO code, return character vector
 .toPyomo <- function(obj) {
-  as_simple <- function(data, name, name2, def) {
+  if (!is.null(obj@data$weather)) return(NULL)
+ as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       stop('.toPyomo: error in ', obj@name, "@data")
@@ -410,6 +412,7 @@ setMethod('print', 'parameter', function(x, ...) {
 }
 
 .toPyomoAbstractModel <- function(obj) {
+  if (!is.null(obj@data$weather)) return(NULL)
   as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(paste0("# ", name, '\nparam ', name, ' := ', data$value, '\n'))
@@ -459,6 +462,7 @@ setMethod('print', 'parameter', function(x, ...) {
 
 # Generate Julia code, return character vector
 .toJulia <- function(obj) {
+  if (!is.null(obj@data$weather)) return(NULL)
   as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
@@ -531,6 +535,7 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
 }
 
 .toJuliaHead <- function(obj) {
+  if (!is.null(obj@data$weather)) return(NULL)
   as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
@@ -578,6 +583,7 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
 
 
 .toPyomSQLite  <- function(obj) {
+  if (!is.null(obj@data$weather)) return(NULL)
   as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
