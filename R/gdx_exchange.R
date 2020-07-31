@@ -103,7 +103,7 @@
   nms <- names(dat)
   max_length <- max(nchar(nms))
   wipe <- ""
-  for(i in nms) {
+  for(i in nms) if (is.null(dat[[i]])) {
     cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
     wipe <- paste0(rep("\b", max_length + 3), collapse = "")
     # cat(wipe, i, rep(" ", 10), sep = "")
