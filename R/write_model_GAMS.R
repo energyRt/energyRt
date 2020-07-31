@@ -65,7 +65,7 @@
     # Add gdx import
     cat('$gdxin input/data.gdx\n', file = zz_data_gms)
     for (j in c('set', 'map', 'simple', 'multi')) {
-      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
+      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j && is.null(scen@modInp@parameters[[i]]@data$weather)) {
         if (scen@modInp@parameters[[i]]@type != 'multi') {
           cat(paste0('$loadm ', i, '\n'), file = zz_data_gms)
         } else {
