@@ -184,11 +184,12 @@ timeSlices <- function(x, asTibble = T, stringsAsFactors = FALSE) {
   slev <- mm@sysInfo@slice@levels
   nlev <- length(mm@sysInfo@slice@slice_map)
   if (nlev == 1)  slev$slice <- slev$ANNUAL else
-    slev$slice <- apply(slev[, 2:nlev], 1, paste0, collapse = '_')
+    slev$slice <- apply(slev[, 2:nlev, drop = FALSE], 1, paste0, collapse = '_')
   if (!stringsAsFactors) slev <- fact2char(slev)
   if (asTibble) slev <- tibble::as_tibble(slev)
   slev
 }
+
 #! 1
 # .setTimeSlices("SEASON" = c("WINTER", "SUMMER"))
 # .setTimeSlices("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
