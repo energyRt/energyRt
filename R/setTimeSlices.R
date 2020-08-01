@@ -183,8 +183,8 @@ timeSlices <- function(x, asTibble = T, stringsAsFactors = FALSE) {
   mm <- newModel("dummymod", slice = x)
   slev <- mm@sysInfo@slice@levels
   nlev <- length(mm@sysInfo@slice@slice_map)
-  slev$slice <- mm@sysInfo@slice@slice_map[[nlev]]
-  # dd <- data.frame(slice = snam, share = ssha, stringsAsFactors = sliceAsFactors)
+  if (nlev == 1)  slev$slice <- slev$ANNUAL else
+    slev$slice <- apply(slev[, 2:nlev], 1, paste0, collapse = '_')
   if (!stringsAsFactors) slev <- fact2char(slev)
   if (asTibble) slev <- tibble::as_tibble(slev)
   slev
