@@ -35,9 +35,7 @@
     } else uuu <- nn
     for (yy in uuu) {
       mmm <- grep(paste0('(^|[^[:alnum:]])', yy, '[(]'), run_code)
-      # if (nn == "pSupAva") browser()
-      # print(nn)
-      run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), rem_col, yy, rmm)
+      if (any(mm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), rem_col, yy, rmm)
     }
   }
   
