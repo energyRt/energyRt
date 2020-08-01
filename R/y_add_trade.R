@@ -202,7 +202,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			obj@parameters[['pTradeStock']] <- addData(obj@parameters[['pTradeStock']], stock_exist)
 			obj@parameters[['pTradeOlife']] <- addData(obj@parameters[['pTradeOlife']], 
 				data.frame(trade = trd@name, value = trd@olife, stringsAsFactors=FALSE))
-			possible_invest_year <- approxim$year
+			possible_invest_year <- approxim$mileStoneYears
 			possible_invest_year <- possible_invest_year[trd@start <= possible_invest_year & possible_invest_year <= trd@end]
 			if (length(possible_invest_year) > 0)
 				obj@parameters[['mTradeNew']] <- addData(obj@parameters[['mTradeNew']], 
@@ -221,6 +221,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			    function(x) approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]), recursive = TRUE))
 			  trade_span <- unique(c(trd@stock$year, trade_eac))
 			}
+			trade_eac <- trade_eac[trade_eac %in% approxim$mileStoneYears]
+			trade_span <- trade_span[trade_span %in% approxim$mileStoneYears]
 			if (length(trade_span) > 0) {
 			  mTradeSpan <- data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
 			  obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], mTradeSpan)
