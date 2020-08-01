@@ -5,13 +5,13 @@
     x
   }
   gg <- list()
-  for (i in names(scen@modInp@parameters)) {
+  for (i in names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) is.null(x@misc$weather) || !x@misc$weather)]) {
     if (scen@modInp@parameters[[i]]@type != 'multi') {
       gg[[i]] <- all_factor(getParameterData(scen@modInp@parameters[[i]]))
     } else {
       tmp <- getParameterData(scen@modInp@parameters[[i]])
-      gg[[paste0(i, 'Lo')]] <- all_factor(tmp[tmp$type == 'lo', colnames(tmp) != 'type'])
-      gg[[paste0(i, 'Up')]] <- all_factor(tmp[tmp$type == 'up', colnames(tmp) != 'type'])
+      gg[[paste0(i, 'Lo')]] <- all_factor(tmp[tmp$type == 'lo', colnames(tmp) != 'type', drop = FALSE])
+      gg[[paste0(i, 'Up')]] <- all_factor(tmp[tmp$type == 'up', colnames(tmp) != 'type', drop = FALSE])
     }
     gg
   }
@@ -82,7 +82,7 @@
   max_length <- max(nchar(nms))
   x <- list()
   wipe <- ""
-  for(i in nms) if (is.null(dat[[i]]$weather)) {
+  for(i in nms){
     cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
     wipe <- paste0(rep("\b", max_length + 3), collapse = "")
     x <- c(x, list(.df2uels(dat[[i]], i)))
