@@ -74,5 +74,6 @@
   tmp <- getAllDefVal(prec, name)
   dtt <- getParameterData(prec@parameters[[name]])
   gg <- rbind(dtt, tmp)
+  if (ncol(gg) == 1) return(dtt)
   gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
 }
