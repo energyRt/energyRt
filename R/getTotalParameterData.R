@@ -59,6 +59,7 @@
     }
     if (prec@parameters[[name]]@type == 'simple' && (is.null(sets) || nrow(sets) != 0)) {
       sets$value <- prec@parameters[[name]]@defVal
+      if (!is.data.frame(sets)) sets <- as.data.frame(sets)
     } 
     if (prec@parameters[[name]]@type == 'multi' && (is.null(sets) || nrow(sets) != 0)) {
       sets$type <- 'lo'
