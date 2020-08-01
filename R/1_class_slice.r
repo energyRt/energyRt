@@ -77,19 +77,21 @@ setClass("slice",
         i <- i + 1
       }
       # all parent child realtion fill
-      sl@all_parent_child[sum(sapply(seq(along = sl@misc$nlevel), function(x) prod(sl@misc$nlevel[1:x]) * (x - 1))), ] <- NA
-      l2 <- unique(c(sl@parent_child$parent, sl@parent_child$child))
-      l2 <- l2[l2 != sl@levels[1, 1]]      
-      sl@all_parent_child[1:length(l2), 'parent'] <- sl@levels[1, 1]
-      sl@all_parent_child[1:length(l2), 'child'] <- l2
-      tt <- sl@parent_child[sl@parent_child$parent != sl@levels[1, 1],, drop = FALSE]
-      k <- length(l2)
-      for (i in l2) {
-        kk <- grep(paste('^', i, '_', sep = ''), sl@parent_child$child)
-        sl@all_parent_child[k + seq(along = kk), 'parent'] <- i
-        sl@all_parent_child[k + seq(along = kk), 'child'] <- sl@parent_child[kk, 'child']
-        k <- (length(kk) + k)
-      }  
+      tmp <- sl@parent_child
+      tmp$nlev <- NA
+      for (i in seq_along(sl@slice_map)) {
+        tmp[tmp$parent %in% sl@slice_map[[i]], 'nlev'] <- i
+      }
+      ll <- tmp[tmp$nlev  + 1 == length(sl@slice_map), -3]
+      for (i in rev(seq_along(sl@slice_map))[-(1:2)]) {
+        gg <- tmp[tmp$nlev == i, -3]; g3 <- gg;
+        colnames(gg)[2] <- 'sht'
+        l2 <- ll
+        colnames(l2)[1] <- 'sht'
+        g2 <- merge(gg, l2); g2$sht <- NULL
+        ll <- rbind(ll, g2, g3)  
+      }
+      sl@all_parent_child <- ll
     }
   # slice_map  
   tmp <- nchar(sl@slice_share$slice) - nchar(gsub('[_]', '', sl@slice_share$slice)) + 2
