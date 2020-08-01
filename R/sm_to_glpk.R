@@ -1,6 +1,6 @@
 
 .sm_to_glpk <-  function(obj) {
-  if (!is.null(obj@data$weather)) return(NULL)
+  if (!is.null(obj@misc$weather) && obj@misc$weather) return(NULL)
   if (obj@nValues != -1) {
     obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
   }

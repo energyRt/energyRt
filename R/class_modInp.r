@@ -563,6 +563,9 @@ setMethod("initialize", "modInp",
     .Object@parameters[['paStorageWeatherCoutUp']] <- createParameter('paStorageWeatherCoutUp', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
     .Object@parameters[['paStorageWeatherCoutLo']] <- createParameter('paStorageWeatherCoutLo', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
     
+    for (i in names(.Object@parameters)) 
+      .Object@parameters[[i]]@misc$weather <- !is.null(.Object@parameters[[i]]@data$weather)
+    
     .Object
   })
 
