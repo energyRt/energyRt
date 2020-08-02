@@ -34,8 +34,18 @@
       uuu <- paste0(nn, c('Lo', 'Up'))
     } else uuu <- nn
     for (yy in uuu) {
-      mmm <- grep(paste0('(^|[^[:alnum:]])', yy, '[(]'), run_code)
-      if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), rem_col, yy, rmm)
+      templ <- paste0('(^|[^[:alnum:]])', yy, '[(]')
+      if (any(grep('^pCns', nn))) {
+        for (www in seq_along(scen@modInp@gams.equation)) {
+          mmm <- grep(templ, scen@modInp@gams.equation[[www]]$equation)
+          if (any(mmm)) {
+            scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), rem_col, yy, rmm)
+          }
+        }
+      } else {
+        mmm <- grep(templ, run_code)
+        if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), rem_col, yy, rmm)
+      }
     }
   }
   
@@ -105,6 +115,7 @@
     pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
     pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
                                                                  function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    pps_name_def <- gsub('[(][)]', '', pps_name_def)
     if (length(mps_name) != 0) {
       cat(mps_name_def, sep = '\n', file = zz_constrains)
       cat('\n', sep = '\n', file = zz_constrains)

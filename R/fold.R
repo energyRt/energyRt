@@ -1,5 +1,5 @@
 fold <- function(scen) {
-	par_nm <- grep('^pa', grep('^p', names(scen@modInp@parameters), value = TRUE), value = TRUE, invert = TRUE)
+	par_nm <- grep('^p', names(scen@modInp@parameters), value = TRUE)
 	par_nm <- par_nm[!(par_nm %in% c('pEmissionFactor', 'pTechEmisComm', 'pDiscount'))]
 	for (pr in par_nm) {
 		if ((scen@modInp@parameters[[pr]]@nValues == -1 && nrow(scen@modInp@parameters[[pr]]@data) > 0) ||
