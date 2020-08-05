@@ -90,7 +90,7 @@ setClass('summand',
 #' @return Object of class `constraint`.
 #'
 #'    
-newConstraint <- function(name, eq = '==', rhs = data.frame(), for.each = NULL, defVal = 0, ..., arg = NULL) {
+newConstraint <- function(name, ..., eq = '==', rhs = data.frame(), for.each = NULL, defVal = 0, arg = NULL) {
   obj <- new('constraint')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq)))   {
