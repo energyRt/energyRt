@@ -6,6 +6,8 @@
   # Remove not used approxim
   if (length(defVal) != 1) stop('defVal value not define')
   if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
+  if (ncol(obj) == 1) return(obj)
+    
   
   # Get slice
   prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 

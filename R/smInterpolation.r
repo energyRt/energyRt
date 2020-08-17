@@ -5,12 +5,25 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   there.is.year <- any(colnames(frm) == 'year')
   if (approxim$fullsets && mtp@defVal != 0 && mtp@defVal != Inf) all.val <- TRUE
   if (!all.val && nrow(frm) == 0) return(NULL)
+  
+  if (!is.null(mtp@misc$not_need_interpolate)) {
+    approxim <- approxim[!(names(approxim) %in% mtp@misc$not_need_interpolate)]
+    frm <- frm[, !(colnames(frm) %in% mtp@misc$not_need_interpolate), drop = FALSE]
+    add_set_value
+    fl <- add_set_name %in% mtp@misc$not_need_interpolate
+    if (any(fl)) {
+      add_set_name <- add_set_name[!fl]
+      add_set_value <- add_set_value[!fl]
+    }
+  }
+
   dd <- interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
                     year_range = range(approxim$year),
                     approxim   = approxim, all = all.val)
   if (is.null(dd)) return(NULL)
+
   # Must fixed in the future
   colnames(dd)[[ncol(dd)]] <- 'value'
   for(i in colnames(dd)[-ncol(dd)]) {
@@ -29,6 +42,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     if (sum(stnd %in% c('src', 'dst')) == 2) {
     	stnd <- c(stnd[stnd != 'src' & stnd != 'dst'], 'region')
     } 
+    stnd <- stnd[!(stnd %in% mtp@misc$not_need_interpolate)]
     dd <- cbind(d3, dd[, c(stnd, 'value'), drop = FALSE])
   }
   # For increase speed
