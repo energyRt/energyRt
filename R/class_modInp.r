@@ -197,7 +197,7 @@ setMethod("initialize", "modInp",
     		defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2act', slot = 'cap2act')    
     .Object@parameters[['pTechEac']] <- 
       createParameter('pTechEac', c('tech', 'region', 'year'), 'simple', 
-        defVal = 0, interpolation = 'back.inter.forth', cls = 'technology')    
+        defVal = 0, interpolation = 'back.inter.forth', cls = 'technology', colName = 'invcost')
     .Object@parameters[['pTechEmisComm']] <- createParameter('pTechEmisComm', c('tech', 'comm'), 'simple', 
     	defVal = 1, cls = 'technology', colName = 'combustion')    
     .Object@parameters[['pTechOlife']] <- 
@@ -291,21 +291,33 @@ setMethod("initialize", "modInp",
     # simple & multi
     .Object@parameters[['pStorageOlife']] <- createParameter('pStorageOlife', 
     	c('stg', 'region'), 'simple', 
-    	defVal = 1, interpolation = 'back.inter.forth', colName = 'olife')    
-    for(i in c('pStorageStock', 'pStorageFixom', 'pStorageInvcost', 'pStorageEac'))
-    	.Object@parameters[[i]] <- createParameter(i, c('stg', 'region', 'year'), 'simple', 
-    		defVal = 0, interpolation = 'back.inter.forth')    
-    for(i in c('pStorageInpEff', 'pStorageOutEff', 'pStorageStgEff'))
-    	.Object@parameters[[i]] <- createParameter(i, 
-    		c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 1, interpolation = 'back.inter.forth')    
-    for(i in c('pStorageCostStore', 'pStorageCostInp', 'pStorageCostOut'))
-    	.Object@parameters[[i]] <- createParameter(i, 
-    		c('stg', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'back.inter.forth')    
-    .Object@parameters[['pStorageAf']] <- createParameter('pStorageAf', 
-    	c('stg', 'region', 'year', 'slice'), 'multi', 
-    	defVal = c(0, 1), interpolation = 'back.inter.forth')
+    	defVal = 1, interpolation = 'back.inter.forth', colName = 'olife', cls = 'storage')    
+    .Object@parameters[[i]] <- createParameter('pStorageStock', c('stg', 'region', 'year'), 'simple', 
+    		defVal = 0, interpolation = 'back.inter.forth', colName = 'stock', cls = 'storage')    
+    .Object@parameters[[i]] <- createParameter('pStorageFixom', c('stg', 'region', 'year'), 'simple', 
+    		defVal = 0, interpolation = 'back.inter.forth', colName = 'fixom', cls = 'storage')    
+    .Object@parameters[[i]] <- createParameter('pStorageInvcost', c('stg', 'region', 'year'), 'simple', 
+    		defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'storage')    
+    .Object@parameters[[i]] <- createParameter('pStorageEac', c('stg', 'region', 'year'), 'simple', 
+    		defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'storage')    
+    
+  	.Object@parameters[[i]] <- createParameter('pStorageInpEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
+  		defVal = 1, interpolation = 'back.inter.forth', colName = 'inpeff', cls = 'storage')    
+  	.Object@parameters[[i]] <- createParameter('pStorageOutEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
+  		defVal = 1, interpolation = 'back.inter.forth', colName = 'outeff', cls = 'storage')    
+  	.Object@parameters[[i]] <- createParameter('pStorageStgEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
+  		defVal = 1, interpolation = 'back.inter.forth', colName = 'stgeff', cls = 'storage')    
+ 
+    .Object@parameters[[i]] <- createParameter('pStorageCostStore', c('stg', 'region', 'year', 'slice'), 'simple', 
+  		defVal = 0, interpolation = 'back.inter.forth', colName = 'stgcost', cls = 'storage')    
+    .Object@parameters[[i]] <- createParameter('pStorageCostInp', c('stg', 'region', 'year', 'slice'), 'simple', 
+  		defVal = 0, interpolation = 'back.inter.forth', colName = 'inpcost', cls = 'storage')    
+    .Object@parameters[[i]] <- createParameter('pStorageCostOut', c('stg', 'region', 'year', 'slice'), 'simple', 
+  		defVal = 0, interpolation = 'back.inter.forth', colName = 'outcost', cls = 'storage')    
+  	   	
+    .Object@parameters[['pStorageAf']] <- createParameter('pStorageAf', c('stg', 'region', 'year', 'slice'), 'multi', 
+    	defVal = c(0, 1), interpolation = 'back.inter.forth', colName = 'af', cls = 'storage')
+    
     .Object@parameters[['pStorageCap2stg']] <- createParameter('pStorageCap2stg', 'stg', 'simple', 
     	defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2stg', slot = 'cap2stg')    
     .Object@parameters[['pStorageCinp']] <- createParameter('pStorageCinp', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
