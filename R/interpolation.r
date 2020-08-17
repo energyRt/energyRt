@@ -6,9 +6,7 @@
   # Remove not used approxim
   if (length(defVal) != 1) stop('defVal value not define')
   if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
-  if (ncol(obj) == 1) return(obj)
     
-  
   # Get slice
   prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
     'regionp', 'src', 'dst', 'slice', 'year')
@@ -39,6 +37,10 @@
     obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
   }
   if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)
+  if (ncol(obj) == 1) {
+    if (nrow(obj) == 0) obj[1, 1] <- defVal
+    return(obj)
+  }
   # Check do need realy approximation 
   approxim2 <- approxim
   if (!is.null(obj$year)) {

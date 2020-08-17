@@ -126,7 +126,8 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   if (!is.null(arg$trim) && arg$trim) {
     ## Trim before   interpolation
-
+    # assign('scen', scen, globalenv())
+    # stop()
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
     par_name <- par_name[par_name != 'pEmissionFactor']
     # Get repository / class structure
@@ -145,7 +146,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
         # Get prototype
         prot <- new(tmp@misc$class)
         psb_slot <- getSlots(tmp@misc$class)
-        psb_slot <- names(psb_slot)[psb_slot == 'data.frame']  
+        psb_slot <- names(psb_slot)[psb_slot == 'data.frame']
         psb_slot <- psb_slot[!(psb_slot %in% c('defVal', 'interpolation'))]
         fl <- sapply(psb_slot, function(x) any(colnames(slot(prot, x)) %in% tmp@colName))
         if (sum(fl) != 1) stop('Internal error')
@@ -164,12 +165,15 @@ interpolate <- function(obj, ...) { #- returns class scenario
         }
         if (length(need_col) > 0) {
           scen@modInp@parameters[[pr]]@misc$not_need_interpolate <- need_col
+          scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSetNames
+          scen@modInp@parameters[[pr]]@dimSetNames <- tmp@dimSetNames[!(tmp@dimSetNames %in% need_col)]
+          scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
           # cat(pr, paste(need_col, collapse = ', '), '\n')
         }
       }
     }
   }
-
+  
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation: ')

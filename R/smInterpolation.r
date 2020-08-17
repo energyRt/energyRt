@@ -2,14 +2,15 @@
 simpleInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, removeDefault = TRUE, 
   remValue = NULL, all.val = FALSE) {
+
   there.is.year <- any(colnames(frm) == 'year')
   if (approxim$fullsets && mtp@defVal != 0 && mtp@defVal != Inf) all.val <- TRUE
   if (!all.val && nrow(frm) == 0) return(NULL)
   
   if (!is.null(mtp@misc$not_need_interpolate)) {
-    approxim <- approxim[!(names(approxim) %in% mtp@misc$not_need_interpolate)]
+    # approxim <- approxim[!(names(approxim) %in% mtp@misc$not_need_interpolate)]
     frm <- frm[, !(colnames(frm) %in% mtp@misc$not_need_interpolate), drop = FALSE]
-    add_set_value
+    if (any(mtp@misc$not_need_interpolate == 'year')) there.is.year <- FALSE
     fl <- add_set_name %in% mtp@misc$not_need_interpolate
     if (any(fl)) {
       add_set_name <- add_set_name[!fl]
