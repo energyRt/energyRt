@@ -126,14 +126,16 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   if (!is.null(arg$trim) && arg$trim) {
     ## Trim before   interpolation
-   
+
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
     par_name <- par_name[par_name != 'pEmissionFactor']
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
       rep_class <- rbind(rep_class, data.frame(repos = rep(i, length(scen@model@data[[i]]@data)), 
-        class = sapply(scen@model@data[[i]]@data, class), stringsAsFactors = FALSE))
+        class = sapply(scen@model@data[[i]]@data, class), 
+        name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
+        stringsAsFactors = FALSE))
     }
     # Trim data
     for (pr in par_name) {
@@ -145,12 +147,27 @@ interpolate <- function(obj, ...) { #- returns class scenario
         psb_slot <- getSlots(tmp@misc$class)
         psb_slot <- names(psb_slot)[psb_slot == 'data.frame']  
         psb_slot <- psb_slot[!(psb_slot %in% c('defVal', 'interpolation'))]
-        stopifnot(sum(sapply(psb_slot, function(x) any(colnames(slot(prot, x)) %in% tmp@colName))) == 1)
-        
-        
+        fl <- sapply(psb_slot, function(x) any(colnames(slot(prot, x)) %in% tmp@colName))
+        if (sum(fl) != 1) stop('Internal error')
+        slt <- psb_slot[fl]
+        need_col <- tmp@dimSetNames[tmp@dimSetNames %in% colnames(slot(prot, slt))]
+        if (tmp@type == 'simple') val_col <- tmp@colName else 
+          val_col <- c(tmp@colName, gsub('[.].*', '.fx', tmp@colName[1]))
+        # Try find reduce column
+        rep_class2 <- rep_class[rep_class$class == tmp@misc$class, ]
+        i <- 0
+        while (i < nrow(rep_class2) && length(need_col) != 0) {
+          i <- i + 1
+          tbl <- slot(scen@model@data[[rep_class2[i, 'repos']]]@data[[rep_class2[i, 'name']]], slt)
+          if (nrow(tbl) > 0)
+            need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
+        }
+        if (length(need_col) > 0) {
+          scen@modInp@parameters[[pr]]@misc$not_need_interpolate <- need_col
+          # cat(pr, paste(need_col, collapse = ', '), '\n')
+        }
       }
     }
-    
   }
 
   ## Begin interpolate data   by year, slice, ...
