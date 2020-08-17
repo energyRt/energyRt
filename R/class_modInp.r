@@ -57,7 +57,7 @@ setMethod("initialize", "modInp",
                       defVal = 1, interpolation = 'back.inter.forth', colName = 'wval', cls = 'weather')    
     .Object@parameters[['pSupWeather']] <- 
       createParameter('pSupWeather', c('sup', 'weather'), 'multi', 
-                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wava.lo', 'wava.up'), cls = 'weather')    
+                      defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('wava.lo', 'wava.up'), cls = 'weather')    
     
     .Object@parameters[['mTechWeatherAf']] <- createParameter('mTechWeatherAf', c('tech', 'weather'), 'map')    
     .Object@parameters[['mTechWeatherAfs']] <- createParameter('mTechWeatherAfs', c('tech', 'weather'), 'map')    
@@ -65,28 +65,28 @@ setMethod("initialize", "modInp",
     
     .Object@parameters[['pTechWeatherAf']] <- 
       createParameter('pTechWeatherAf', c('tech', 'weather'), 'multi', 
-                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('waf.lo', 'waf.up'), cls = 'weather')    
+                      defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('waf.lo', 'waf.up'), cls = 'weather')    
     .Object@parameters[['pTechWeatherAfs']] <- 
       createParameter('pTechWeatherAfs', c('tech', 'weather'), 'multi', 
-                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wafs.lo', 'wafs.up'), cls = 'weather')    
+                      defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('wafs.lo', 'wafs.up'), cls = 'weather')    
     .Object@parameters[['pTechWeatherAfc']] <- 
       createParameter('pTechWeatherAfc', c('tech', 'weather', 'comm'), 'multi', 
-                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wafc.lo', 'wafc.up'), cls = 'weather')    
+                      defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('wafc.lo', 'wafc.up'), cls = 'weather')    
     
     .Object@parameters[['mStorageWeatherAf']] <- createParameter('mStorageWeatherAf', c('stg', 'weather'), 'map')    
     .Object@parameters[['pStorageWeatherAf']] <- 
       createParameter('pStorageWeatherAf', c('stg', 'weather'), 'multi', 
-                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('waf.lo', 'waf.up'), cls = 'weather')    
+                      defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('waf.lo', 'waf.up'), cls = 'weather')    
     
     .Object@parameters[['mStorageWeatherCinp']] <- createParameter('mStorageWeatherCinp', c('stg', 'weather'), 'map')    
     .Object@parameters[['pStorageWeatherCinp']] <- 
       createParameter('pStorageWeatherCinp', c('stg', 'weather'), 'multi', 
-                      defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wcinp.lo', 'wcinp.up'), cls = 'weather')    
+                      defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('wcinp.lo', 'wcinp.up'), cls = 'weather')    
     
     .Object@parameters[['mStorageWeatherCout']] <- createParameter('mStorageWeatherCout', c('stg', 'weather'), 'map')    
     .Object@parameters[['pStorageWeatherCout']] <- 
     	createParameter('pStorageWeatherCout', c('stg', 'weather'), 'multi', 
-    		defVal = c(1, 1), interpolation = 'back.inter.forth', colName = c('wcout.lo', 'wcout.up'), cls = 'weather')    
+    		defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('wcout.lo', 'wcout.up'), cls = 'weather')    
     
     #
     
@@ -148,11 +148,11 @@ setMethod("initialize", "modInp",
     # Tax
     .Object@parameters[['pTaxCost']] <- 
     	createParameter('pTaxCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'tax', slot = 'tax')    
+    		defVal = 0, interpolation = 'inter.forth', colName = 'value') #, cls = 'tax', slot = 'tax')    
     # Subs
     .Object@parameters[['pSubsCost']] <- 
     	createParameter('pSubsCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'inter.forth', colName = 'value', cls = 'sub', slot = 'subs')    
+    		defVal = 0, interpolation = 'inter.forth', colName = 'value') #, cls = 'sub', slot = 'subs')    
     # Supply
     # Map
     .Object@parameters[['mSupComm']] <- 
@@ -194,7 +194,7 @@ setMethod("initialize", "modInp",
     # simple & multi
     .Object@parameters[['pTechCap2act']] <- 
     	createParameter('pTechCap2act', 'tech', 'simple', 
-    		defVal = 1, interpolation = 'back.inter.forth', cls = 'technology', colName = 'cap2act', slot = 'cap2act')    
+    		defVal = 1, interpolation = 'back.inter.forth', cls = 'technology')#, colName = 'cap2act', slot = 'cap2act')    
     .Object@parameters[['pTechEac']] <- 
       createParameter('pTechEac', c('tech', 'region', 'year'), 'simple', 
         defVal = 0, interpolation = 'back.inter.forth', cls = 'technology', colName = 'invcost')
@@ -316,10 +316,10 @@ setMethod("initialize", "modInp",
   		defVal = 0, interpolation = 'back.inter.forth', colName = 'outcost', cls = 'storage')    
   	   	
     .Object@parameters[['pStorageAf']] <- createParameter('pStorageAf', c('stg', 'region', 'year', 'slice'), 'multi', 
-    	defVal = c(0, 1), interpolation = 'back.inter.forth', colName = 'af', cls = 'storage')
+    	defVal = c(0, 1), interpolation = 'back.inter.forth', colName = c('af.lo', 'af.up'), cls = 'storage')
     
     .Object@parameters[['pStorageCap2stg']] <- createParameter('pStorageCap2stg', 'stg', 'simple', 
-    	defVal = 1, interpolation = 'back.inter.forth', cls = 'storage', colName = 'cap2stg', slot = 'cap2stg')    
+    	defVal = 1, interpolation = 'back.inter.forth', cls = 'storage')#, colName = 'cap2stg', slot = 'cap2stg')    
     .Object@parameters[['pStorageCinp']] <- createParameter('pStorageCinp', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
     	defVal = c(0, -1), interpolation = rep('back.inter.forth', 2), cls = 'storage', colName = c('cinp.lo', 'cinp.up'), slot = 'seff')
     .Object@parameters[['pStorageCout']] <- createParameter('pStorageCout', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
@@ -383,10 +383,8 @@ setMethod("initialize", "modInp",
     	c('imp', 'region', 'year', 'slice'), 'multi', 
     	defVal = c(0, Inf), interpolation = 'back.inter.forth', cls = 'import', colName = c('imp.lo', 'imp.up'))
     .Object@parameters[['pExportRowRes']] <- createParameter('pExportRowRes', 
-    	'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'export', 
-    	slot = 'reserve', colName = 'reserve')
-    .Object@parameters[['pImportRowRes']] <- createParameter('pImportRowRes', 
-    	'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth', cls = 'import', slot = 'reserve', colName = 'reserve')
+    	'expp', 'simple',  defVal = 0, interpolation = 'back.inter.forth')#, cls = 'export', slot = 'reserve', colName = 'reserve')
+    .Object@parameters[['pImportRowRes']] <- createParameter('pImportRowRes', 'imp', 'simple',  defVal = 0, interpolation = 'back.inter.forth') #, cls = 'import', slot = 'reserve', colName = 'reserve')
     # For LEC
     .Object@parameters[['mLECRegion']] <- createParameter('mLECRegion', 'region', 'map')    
     .Object@parameters[['pLECLoACT']] <- 

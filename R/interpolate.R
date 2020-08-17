@@ -126,13 +126,28 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   if (!is.null(arg$trim) && arg$trim) {
     ## Trim before   interpolation
-    
+   
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
-
+    par_name <- par_name[par_name != 'pEmissionFactor']
+    # Get repository / class structure
+    rep_class <- NULL
+    for (i in seq_along(scen@model@data)) {
+      rep_class <- rbind(rep_class, data.frame(repos = rep(i, length(scen@model@data[[i]]@data)), 
+        class = sapply(scen@model@data[[i]]@data, class), stringsAsFactors = FALSE))
+    }
+    # Trim data
     for (pr in par_name) {
       tmp <- scen@modInp@parameters[[pr]]
-      if (!is.null(tmp@misc$class) && (length(tmp@colName) != 1 || tmp@colName != '')) {
-        cat(pr, tmp@misc$class, tmp@colName, '\n')
+      if (!is.null(tmp@misc$class) && (length(tmp@colName) != 1 || tmp@colName != '') && length(tmp@dimSetNames) > 1) {
+        # cat(pr, tmp@misc$class, tmp@colName, '\n')
+        # Get prototype
+        prot <- new(tmp@misc$class)
+        psb_slot <- getSlots(tmp@misc$class)
+        psb_slot <- names(psb_slot)[psb_slot == 'data.frame']  
+        psb_slot <- psb_slot[!(psb_slot %in% c('defVal', 'interpolation'))]
+        stopifnot(sum(sapply(psb_slot, function(x) any(colnames(slot(prot, x)) %in% tmp@colName))) == 1)
+        
+        
       }
     }
     
