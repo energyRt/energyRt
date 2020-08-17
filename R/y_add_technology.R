@@ -370,9 +370,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	    if (!is.null(pTechCact2cout)) techSingOut <- merge(techSingOut, pTechCact2cout[pTechCact2cout$value != 0, colnames(pTechCact2cout) %in% colnames(techSingOut), drop = FALSE])
 	    if (nrow(techSingOut) == 0) techSingOut <- NULL
 	  } else techSingOut <- NULL
-
-cat('++++')
-
 	  if (!is.null(mTechInpGroup) && !is.null(techSingOut)) {
 	    meqTechGrp2Sng <- merge(mTechInpGroup, techSingOut)
 	    obj@parameters[['meqTechGrp2Sng']] <- addData(obj@parameters[['meqTechGrp2Sng']], meqTechGrp2Sng)
@@ -381,13 +378,11 @@ cat('++++')
 	    meqTechSng2Grp <- merge(mTechOutGroup, techSingInp)
 	    obj@parameters[['meqTechSng2Grp']] <- addData(obj@parameters[['meqTechSng2Grp']], meqTechSng2Grp)
 	  } else meqTechSng2Grp <- NULL
-  cat('====')
   
 	  if (!is.null(techSingInp) && !is.null(techSingOut)) {
 	    meqTechSng2Sng <- merge(techSingInp, techSingOut, by = c('tech', 'region', 'year', 'slice'), suffixes = c("",".1"))
 	    obj@parameters[['meqTechSng2Sng']] <- addData(obj@parameters[['meqTechSng2Sng']], meqTechSng2Sng)
 	  } else meqTechSng2Sng <- NULL
-cat('----')
 	  if (!is.null(mpTechShareLo) && !is.null(techGroupOut)) {
 	    meqTechShareOutLo <- merge(mpTechShareLo, techGroupOut)
 	    obj@parameters[['meqTechShareOutLo']] <- addData(obj@parameters[['meqTechShareOutLo']], 
@@ -398,7 +393,6 @@ cat('----')
 	    obj@parameters[['meqTechShareOutUp']] <- addData(obj@parameters[['meqTechShareOutUp']], 
 	                                                     meqTechShareOutUp[, obj@parameters[['meqTechShareOutUp']]@dimSetNames])
 	  } else meqTechShareOutUp <- NULL
-
 	  
 	  if (!is.null(mpTechShareLo) && !is.null(techGroupInp)) {
 	    meqTechShareInpLo <- merge(mpTechShareLo, techGroupInp)
@@ -411,7 +405,7 @@ cat('----')
 	                                                     meqTechShareInpUp[, obj@parameters[['meqTechShareInpUp']]@dimSetNames])
 	  } else meqTechShareInpUp <- NULL
 	  
-	 ####
+ 	 ####
 	  outer_inf <- function(mvTechAct, pTechAf) {
 	    mvTechAct[(!duplicated(rbind(mvTechAct, pTechAf[pTechAf$value == Inf & pTechAf$type == 'up',
 	                                                    colnames(mvTechAct)]), fromLast = TRUE))[1:nrow(mvTechAct)], ]
@@ -428,7 +422,7 @@ cat('----')
 	      pTechAfs[pTechAfs$value != Inf & pTechAfs$type == 'up', obj@parameters[['meqTechAfsUp']]@dimSetNames])
 	    obj@parameters[['meqTechAfsUp']] <- addData(obj@parameters[['meqTechAfsUp']], meqTechAfsUp)
 	  }
-	  if (!is.null(techSingOut)) {
+  if (!is.null(techSingOut)) {
 	    obj@parameters[['meqTechActSng']] <- addData(obj@parameters[['meqTechActSng']], techSingOut)
 	  } else meqTechActSng <- NULL
 	  if (!is.null(mTechOutGroup)) {
@@ -445,8 +439,6 @@ cat('----')
 	    obj@parameters[['meqTechAfcInpUp']] <- addData(obj@parameters[['meqTechAfcInpUp']],
 	                     merge(mvTechInp, pTechAfc[pTechAfc$value != Inf & pTechAfc$type == 'up', obj@parameters[['meqTechAfcOutLo']]@dimSetNames]))
 	  }
-
-	  
 		# Weather part
 		merge.weather <- function(tech, nm, add = NULL) {
 			waf <- tech@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
@@ -494,12 +486,16 @@ cat('----')
 		if (all(ctype$comm$type != 'output')) 
 			stop('Techology "', tech@name, '", there is not activity commodity')  
 		# mTechOMCost(tech, region, year) 
-		# if (tech@name == 'NEWPETREF') browser()
-		mTechOMCost <- NULL
-		if (!is.null(pTechFixom)) mTechOMCost <- rbind(mTechOMCost, pTechFixom[pTechFixom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
-		if (!is.null(pTechVarom)) mTechOMCost <- rbind(mTechOMCost, pTechVarom[pTechVarom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
-		if (!is.null(pTechCvarom)) mTechOMCost <- rbind(mTechOMCost, pTechCvarom[pTechCvarom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
-		if (!is.null(pTechAvarom)) mTechOMCost <- rbind(mTechOMCost, pTechAvarom[pTechAvarom$value != 0, obj@parameters[['mTechOMCost']]@dimSetNames])
+		
+	mTechOMCost <- NULL
+		add_omcost <- function(mTechOMCost, pTechFixom) {
+			if (is.null(pTechFixom)) return(mTechOMCost) 
+			return(rbind(mTechOMCost, merge(mvTechAct, pTechFixom[pTechFixom$value != 0, colnames(pTechFixom) %in% colnames(pTechFixom), drop = FALSE])))
+		}
+		mTechOMCost <- add_omcost(mTechOMCost, pTechFixom)
+		mTechOMCost <- add_omcost(mTechOMCost, pTechVarom)
+		mTechOMCost <- add_omcost(pTechAvarom, pTechCvarom)
+		
 		if (!is.null(mTechOMCost)) {
   		mTechOMCost <- merge(mTechOMCost[!duplicated(mTechOMCost), ], mTechSpan)
   		obj@parameters[['mTechOMCost']] <- addData(obj@parameters[['mTechOMCost']], mTechOMCost)
