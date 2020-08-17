@@ -124,7 +124,20 @@ interpolate <- function(obj, ...) { #- returns class scenario
   scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
 
 
-  
+  if (!is.null(arg$trim) && arg$trim) {
+    ## Trim before   interpolation
+    
+    par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
+
+    for (pr in par_name) {
+      tmp <- scen@modInp@parameters[[pr]]
+      if (!is.null(tmp@misc$class) && (length(tmp@colName) != 1 || tmp@colName != '')) {
+        cat(pr, tmp@misc$class, tmp@colName, '\n')
+      }
+    }
+    
+  }
+
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation: ')

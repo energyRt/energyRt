@@ -331,15 +331,17 @@ setMethod("initialize", "modInp",
     
     .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
     .Object@parameters[['mStorageAOut']] <- createParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    
+    stg_tmp <- c('pStorageStg2AInp' = 'stg2ainp', 'pStorageStg2AOut' = 'stg2aout', 'pStorageInp2AInp' = 'inp2ainp', 'pStorageInp2AOut' = 'inp2aout', 'pStorageOut2AInp' = 'out2ainp', 
+				'pStorageOut2AOut' = 'out2aout', 'pStorageCap2AInp' = 'cap2ainp', 'pStorageCap2AOut' = 'cap2aout', 'pStorageNCap2AInp' = 'ncap2ainp', 'pStorageNCap2AOut' = 'ncap2aout')
     for(i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 
     	'pStorageOut2AInp', 'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
     	'pStorageNCap2AInp', 'pStorageNCap2AOut'))
       .Object@parameters[[i]] <- createParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 
-                                                 defVal = 0, interpolation = 'back.inter.forth')    
+                                                 defVal = 0, interpolation = 'back.inter.forth', cls = 'storage', colName = stg_tmp[i])    
     .Object@parameters[['pStorageNCap2Stg']] <- createParameter('pStorageNCap2Stg', 
-                 c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '')    
+                 c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '', cls = 'storage', colName = 'ncap2stg')    
     .Object@parameters[['pStorageCharge']] <- createParameter('pStorageCharge', 
-              c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '')    
+              c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '', cls = 'storage', colName = 'charge')    
     # Trade
     # Map
     .Object@parameters[['mTradeIrAInp']] <- createParameter('mTradeIrAInp', c('trade', 'comm'), 'map', cls = 'trade')   
@@ -485,7 +487,7 @@ setMethod("initialize", "modInp",
     	defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'trade')    
     .Object@parameters[['pTradeEac']] <- createParameter('pTradeEac', 
     	c('trade', 'region', 'year'), 'simple', 
-    	defVal = 0, interpolation = 'back.inter.forth', colName = '', cls = 'trade')    
+    	defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'trade')    
     
     .Object@parameters[['pTradeCap2Act']] <- createParameter('pTradeCap2Act', 'trade', 'simple', 
     	defVal = 1, interpolation = 'back.inter.forth', cls = 'trade', colName = 'cap2act', slot = 'cap2act')    
