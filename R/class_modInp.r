@@ -292,27 +292,27 @@ setMethod("initialize", "modInp",
     .Object@parameters[['pStorageOlife']] <- createParameter('pStorageOlife', 
     	c('stg', 'region'), 'simple', 
     	defVal = 1, interpolation = 'back.inter.forth', colName = 'olife', cls = 'storage')    
-    .Object@parameters[[i]] <- createParameter('pStorageStock', c('stg', 'region', 'year'), 'simple', 
+    .Object@parameters[['pStorageStock']] <- createParameter('pStorageStock', c('stg', 'region', 'year'), 'simple', 
     		defVal = 0, interpolation = 'back.inter.forth', colName = 'stock', cls = 'storage')    
-    .Object@parameters[[i]] <- createParameter('pStorageFixom', c('stg', 'region', 'year'), 'simple', 
+    .Object@parameters[['pStorageFixom']] <- createParameter('pStorageFixom', c('stg', 'region', 'year'), 'simple', 
     		defVal = 0, interpolation = 'back.inter.forth', colName = 'fixom', cls = 'storage')    
-    .Object@parameters[[i]] <- createParameter('pStorageInvcost', c('stg', 'region', 'year'), 'simple', 
+    .Object@parameters[['pStorageInvcost']] <- createParameter('pStorageInvcost', c('stg', 'region', 'year'), 'simple', 
     		defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'storage')    
-    .Object@parameters[[i]] <- createParameter('pStorageEac', c('stg', 'region', 'year'), 'simple', 
+    .Object@parameters[['pStorageEac']] <- createParameter('pStorageEac', c('stg', 'region', 'year'), 'simple', 
     		defVal = 0, interpolation = 'back.inter.forth', colName = 'invcost', cls = 'storage')    
     
-  	.Object@parameters[[i]] <- createParameter('pStorageInpEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
+  	.Object@parameters[['pStorageInpEff']] <- createParameter('pStorageInpEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
   		defVal = 1, interpolation = 'back.inter.forth', colName = 'inpeff', cls = 'storage')    
-  	.Object@parameters[[i]] <- createParameter('pStorageOutEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
+  	.Object@parameters[['pStorageOutEff']] <- createParameter('pStorageOutEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
   		defVal = 1, interpolation = 'back.inter.forth', colName = 'outeff', cls = 'storage')    
-  	.Object@parameters[[i]] <- createParameter('pStorageStgEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
+  	.Object@parameters[['pStorageStgEff']] <- createParameter('pStorageStgEff',  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', 
   		defVal = 1, interpolation = 'back.inter.forth', colName = 'stgeff', cls = 'storage')    
  
-    .Object@parameters[[i]] <- createParameter('pStorageCostStore', c('stg', 'region', 'year', 'slice'), 'simple', 
+    .Object@parameters[['pStorageCostStore']] <- createParameter('pStorageCostStore', c('stg', 'region', 'year', 'slice'), 'simple', 
   		defVal = 0, interpolation = 'back.inter.forth', colName = 'stgcost', cls = 'storage')    
-    .Object@parameters[[i]] <- createParameter('pStorageCostInp', c('stg', 'region', 'year', 'slice'), 'simple', 
+    .Object@parameters[['pStorageCostInp']] <- createParameter('pStorageCostInp', c('stg', 'region', 'year', 'slice'), 'simple', 
   		defVal = 0, interpolation = 'back.inter.forth', colName = 'inpcost', cls = 'storage')    
-    .Object@parameters[[i]] <- createParameter('pStorageCostOut', c('stg', 'region', 'year', 'slice'), 'simple', 
+    .Object@parameters[['pStorageCostOut']] <- createParameter('pStorageCostOut', c('stg', 'region', 'year', 'slice'), 'simple', 
   		defVal = 0, interpolation = 'back.inter.forth', colName = 'outcost', cls = 'storage')    
   	   	
     .Object@parameters[['pStorageAf']] <- createParameter('pStorageAf', c('stg', 'region', 'year', 'slice'), 'multi', 
@@ -390,6 +390,7 @@ setMethod("initialize", "modInp",
     .Object@parameters[['pLECLoACT']] <- 
     	createParameter('pLECLoACT', 'region', 'simple', 
     		defVal = 0, interpolation = 'back.inter.forth')    
+    
     
     # Other
     # Discount
@@ -578,6 +579,7 @@ setMethod("initialize", "modInp",
     for (i in names(.Object@parameters)) 
       .Object@parameters[[i]]@misc$weather <- !is.null(.Object@parameters[[i]]@data$weather)
     
+
     .Object
   })
 
