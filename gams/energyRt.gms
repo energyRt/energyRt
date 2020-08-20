@@ -1,7 +1,7 @@
 $ontext
 #!onLatex
 \documentclass{article}
-\usepackage[a4paper,landscape,margin=1in]{geometry}
+\usepackage[a4paper,landscape,margin=1eqTechAInpeqTechAInpin]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{breqn}
 \usepackage{longtable}
@@ -632,6 +632,17 @@ meqBalLo(comm, region, year, slice)
 meqBalUp(comm, region, year, slice)
 meqBalFx(comm, region, year, slice)
 meqLECActivity(tech, region, year)
+
+mpTechAct2AInp(tech, comm, region, year, slice)
+mpTechCap2AInp(tech, comm, region, year, slice)
+mpTechNCap2AInp(tech, comm, region, year, slice)
+mpTechCinp2AInp(tech, comm, comm, region, year, slice)
+mpTechCout2AInp(tech, comm, comm, region, year, slice)
+mpTechAct2AOut(tech, comm, region, year, slice)
+mpTechCap2AOut(tech, comm, region, year, slice)
+mpTechNCap2AOut(tech, comm, region, year, slice)
+mpTechCinp2AOut(tech, comm, comm, region, year, slice)
+mpTechCout2AOut(tech, comm, comm, region, year, slice)
 ;
 
 $include inc2.gms
@@ -767,30 +778,30 @@ eqTechAOut(tech, comm, region, year, slice) Technology auxiliary commodity outpu
 eqTechAInp(tech, comm, region, year, slice)$mvTechAInp(tech, comm, region, year, slice)..
   vTechAInp(tech, comm, region, year, slice) =e=
   (vTechAct(tech, region, year, slice) *
-    pTechAct2AInp(tech, comm, region, year, slice)) +
+    pTechAct2AInp(tech, comm, region, year, slice))$mpTechAct2AInp(tech, comm, region, year, slice) +
   (vTechCap(tech, region, year) *
-    pTechCap2AInp(tech, comm, region, year, slice)) +
+    pTechCap2AInp(tech, comm, region, year, slice))$mpTechCap2AInp(tech, comm, region, year, slice) +
   (vTechNewCap(tech, region, year) *
-    pTechNCap2AInp(tech, comm, region, year, slice))$mTechNew(tech, region, year) +
-  sum(commp$(pTechCinp2AInp(tech, comm, commp, region, year, slice) > 0),
+    pTechNCap2AInp(tech, comm, region, year, slice))$mpTechNCap2AInp(tech, comm, region, year, slice) +
+  sum(commp$mpTechCinp2AInp(tech, comm, commp, region, year, slice),
       pTechCinp2AInp(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$(pTechCout2AInp(tech, comm, commp, region, year, slice) > 0),
+  sum(commp$mpTechCout2AInp(tech, comm, commp, region, year, slice),
       pTechCout2AInp(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 
 eqTechAOut(tech, comm, region, year, slice)$mvTechAOut(tech, comm, region, year, slice)..
   vTechAOut(tech, comm, region, year, slice) =e=
   (vTechAct(tech, region, year, slice) *
-    pTechAct2AOut(tech, comm, region, year, slice)) +
+    pTechAct2AOut(tech, comm, region, year, slice))$mpTechAct2AOut(tech, comm, region, year, slice) +
   (vTechCap(tech, region, year) *
-    pTechCap2AOut(tech, comm, region, year, slice)) +
+    pTechCap2AOut(tech, comm, region, year, slice))$mpTechCap2AOut(tech, comm, region, year, slice) +
   (vTechNewCap(tech, region, year) *
-    pTechNCap2AOut(tech, comm, region, year, slice))$mTechNew(tech, region, year) +
-  sum(commp$(pTechCinp2AOut(tech, comm, commp, region, year, slice) > 0),
+    pTechNCap2AOut(tech, comm, region, year, slice))$mpTechNCap2AOut(tech, comm, region, year, slice) +
+  sum(commp$mpTechCinp2AOut(tech, comm, commp, region, year, slice),
       pTechCinp2AOut(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$(pTechCout2AOut(tech, comm, commp, region, year, slice) > 0),
+  sum(commp$mpTechCout2AOut(tech, comm, commp, region, year, slice),
       pTechCout2AOut(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 

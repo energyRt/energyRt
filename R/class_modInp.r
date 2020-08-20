@@ -191,6 +191,20 @@ setMethod("initialize", "modInp",
     .Object@parameters[['meqTechRetiredNewCap']] <- createParameter('meqTechRetiredNewCap', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechOMCost']] <- createParameter('mTechOMCost', c('tech', 'region', 'year'), 'map', cls = 'technology')    
     .Object@parameters[['mTechEac']] <- createParameter('mTechEac', c('tech', 'region', 'year'), 'map', cls = 'technology')    
+    
+
+  .Object@parameters[['mpTechAct2AInp']] <- createParameter('mpTechAct2AInp', c('tech, comm, region, year, slice'), 'map', cls = 'technology')    
+	.Object@parameters[['mpTechAct2AInp']] <- createParameter('mpTechAct2AInp', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechCap2AInp']] <- createParameter('mpTechCap2AInp', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechNCap2AInp']] <- createParameter('mpTechNCap2AInp', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechCinp2AInp']] <- createParameter('mpTechCinp2AInp', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechCout2AInp']] <- createParameter('mpTechCout2AInp', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechAct2AOut']] <- createParameter('mpTechAct2AOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechCap2AOut']] <- createParameter('mpTechCap2AOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechNCap2AOut']] <- createParameter('mpTechNCap2AOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechCinp2AOut']] <- createParameter('mpTechCinp2AOut', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mpTechCout2AOut']] <- createParameter('mpTechCout2AOut', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+
     # simple & multi
     .Object@parameters[['pTechCap2act']] <- 
     	createParameter('pTechCap2act', 'tech', 'simple', 

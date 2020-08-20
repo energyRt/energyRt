@@ -92,8 +92,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (is.null(dd) || nrow(dd) == 0) return(NULL)
 			if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
 			if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
-			# rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
-			# dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
+		  dd$region <- NULL
 		  dd
 		}
 		multiInterpolation2 <- function(frm, approxim, parameter, ...) {
@@ -121,8 +120,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (is.null(dd) || nrow(dd) == 0) return(NULL)
 			if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
 			if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
-			# rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
-			# dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
+		  dd$region <- NULL
 		  dd
 		}
 		# pTradeIrCost
