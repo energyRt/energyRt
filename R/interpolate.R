@@ -106,11 +106,9 @@ interpolate <- function(obj, ...) { #- returns class scenario
   
     if (!is.null(arg$trim) && arg$trim) {
     ## Trim before   interpolation
-    # assign('scen', scen, globalenv())
-    # stop()
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
-    par_name <- par_name[sapply(scen@modInp@parameters[par_name], function(x) any(x@dimSetNames %in% c('slice', 'year')))]
-    par_name <- par_name[!(par_name %in% c('pDiscount'))]
+    # par_name <- par_name[sapply(scen@modInp@parameters[par_name], function(x) any(x@dimSetNames %in% c('slice', 'year')))]
+    par_name <- par_name[!(par_name %in% c(c('pEmissionFactor', 'pTechEmisComm', 'pDiscount')))]
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
@@ -145,6 +143,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
             need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
         }
         if (length(need_col) > 0) {
+          scen@modInp@parameters[[pr]]@misc$rem_col <- seq_along(tmp@dimSetNames)[tmp@dimSetNames %in% need_col]
           scen@modInp@parameters[[pr]]@misc$not_need_interpolate <- need_col
           scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSetNames
           scen@modInp@parameters[[pr]]@dimSetNames <- tmp@dimSetNames[!(tmp@dimSetNames %in% need_col)]
