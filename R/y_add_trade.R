@@ -94,6 +94,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
 			# rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
 			# dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
+		  dd
 		}
 		multiInterpolation2 <- function(frm, approxim, parameter, ...) {
 		  frm <- frm[apply(!is.na(frm[, paste0(parameter, c('.lo', '.up', '.fx'))]), 1, any), ]
@@ -122,6 +123,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
 			# rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
 			# dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
+		  dd
 		}
 		# pTradeIrCost
 		obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
