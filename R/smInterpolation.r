@@ -70,6 +70,18 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
   add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL, 
   remValueUp = NULL, remValueLo = NULL) {
   there.is.year <- any(colnames(frm) == 'year')
+  # if (parameter == 'af' && frm$af.up[1] == .6) browser()
+  if (!is.null(mtp@misc$not_need_interpolate)) {
+    # approxim <- approxim[!(names(approxim) %in% mtp@misc$not_need_interpolate)]
+    frm <- frm[, !(colnames(frm) %in% mtp@misc$not_need_interpolate), drop = FALSE]
+    if (any(mtp@misc$not_need_interpolate == 'year')) there.is.year <- FALSE
+    fl <- add_set_name %in% mtp@misc$not_need_interpolate
+    if (any(fl)) {
+      add_set_name <- add_set_name[!fl]
+      add_set_value <- add_set_value[!fl]
+    }
+  }
+  
   dd <- interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
                     rule       = mtp@interpolation,
@@ -93,7 +105,8 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     if (sum(stnd %in% c('src', 'dst')) == 2) {
       stnd <- c(stnd[stnd != 'src' & stnd != 'dst'], 'region')
     } 
-    
+    stnd <- stnd[!(stnd %in% mtp@misc$not_need_interpolate)]
+
     dd <- cbind(d3, dd[, c(stnd, 'type', 'value'), drop = FALSE])
   }
   # For increase speed, not work for GLPK

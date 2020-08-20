@@ -221,9 +221,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
                                                    pSupReserve[pSupReserve$type == 'lo' & pSupReserve$value != 0, c('sup', 'comm', 'region')])
     
     obj@parameters[['meqSupAvaLo']] <- addData(obj@parameters[['meqSupAvaLo']], 
-                                               merge(mSupAva, pSupAva[pSupAva$type == 'lo' & pSupAva$value != 0, 1:5]))
+                                               merge(mSupAva, pSupAva[pSupAva$type == 'lo' & pSupAva$value != 0, colnames(pSupAva) %in% colnames(mSupAva)]))
     obj@parameters[['mSupAvaUp']] <- addData(obj@parameters[['mSupAvaUp']], 
-                                             merge(mSupAva, pSupAva[pSupAva$type == 'up' & pSupAva$value != Inf, 1:5]))
+                                             merge(mSupAva, pSupAva[pSupAva$type == 'up' & pSupAva$value != Inf, colnames(pSupAva) %in% colnames(mSupAva)]))
     
     obj@parameters[['mvSupReserve']] <- addData(obj@parameters[['mvSupReserve']], merge(mSupComm, mSupSpan))
         # For weather

@@ -98,9 +98,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		} else pTechAfc <- NULL
 		
 		# Stock & Capacity
-		# if (nrow(obj@parameters[['pTechStock']]@data) > 0) browser()
-		# save(list = c('approxim', 'obj', 'app', 'tech'), file = 'c:/tmp/1.rdata')
-		# stock_exist <- interpolation_dtf(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim$ry, 'tech', tech@name)
 		stock_exist <- simpleInterpolation(tech@stock, 'stock', obj@parameters[['pTechStock']], approxim, 'tech', tech@name)
 		obj@parameters[['pTechStock']] <- addData(obj@parameters[['pTechStock']], stock_exist)
 		olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = FALSE)
@@ -140,8 +137,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		  pTechEac <- salv_data[, c('tech', 'region', 'year', 'value')]
 		  obj@parameters[['pTechEac']] <- addData(obj@parameters[['pTechEac']], pTechEac)
 		}
-		
-		
 		pTechAf <- multiInterpolation(tech@af, 'af',
 			obj@parameters[['pTechAf']], approxim, 'tech', tech@name, remValueUp = Inf, remValueLo = 0)
 		obj@parameters[['pTechAf']] <- addData(obj@parameters[['pTechAf']], pTechAf)
@@ -255,6 +250,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 			'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp', 'pTechNCap2AOut'),
 			table = c('act2aout', 'cap2aout', 'act2ainp', 'cap2ainp', 'ncap2ainp', 'ncap2aout'),
 			stringsAsFactors = FALSE)
+
 		for(i in 1:nrow(dd)) {
 			approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
 			approxim_comm[['acomm']] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, 'table']]), 'acomm'])
@@ -273,24 +269,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		pTechVarom <- simpleInterpolation(tech@varom, 'varom', obj@parameters[['pTechVarom']], approxim, 'tech', tech@name)
 		obj@parameters[['pTechVarom']] <- addData(obj@parameters[['pTechVarom']], pTechVarom)
 
-		if (nrow(tech@aeff) != 0) {
-			for(i in 1:4) {
-			tech@aeff <- tech@aeff[!is.na(tech@aeff$acomm),]
-				ll <- c('cinp2ainp', 'cinp2aout', 'cout2ainp', 'cout2aout')[i]
-				tbl <- c('pTechCinp2AInp', 'pTechCinp2AOut', 'pTechCout2AInp', 'pTechCout2AOut')[i]          
-				tbl2 <- c('mTechCinpAInp', 'mTechCinpAOut', 'mTechCoutAInp', 'mTechCoutAOut')[i]     
-				yy <- tech@aeff[!is.na(tech@aeff[, ll]), ]
-				if (nrow(yy) != 0) {
-					approxim_commp <- approxim
-					approxim_commp$acomm <- unique(yy$acomm); 
-					approxim_commp$comm <- unique(yy$comm)
-					obj@parameters[[tbl]] <- addData(obj@parameters[[tbl]],
-						simpleInterpolation(yy, ll, obj@parameters[[tbl]], 
-							approxim_commp, 'tech', tech@name))
-				}
-			}
-		}
-		
 	
 		## Move from reduce 
 		
@@ -344,6 +322,37 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	    obj@parameters[['mvTechAOut']] <- addData(obj@parameters[['mvTechAOut']], mvTechAOut)
 	  } else mvTechAOut <- NULL
 
+	 #### aeff begin
+		if (nrow(tech@aeff) != 0) {
+			if (any(is.na(tech@aeff$acomm)))
+				stop(paste0('NA value in column acomm is forbidden in the slot aeff ', tech@name))
+			if (any(is.na(tech@aeff[apply(!is.na(tech@aeff[, c('cinp2ainp', 'cinp2aout', 'cout2ainp', 'cout2aout'), drop = FALSE]), 1, any), 'comm'])))
+				stop(paste0('NA value in column  comm is forbidden in the slot aeff ', tech@name))
+			for(i in 1:4) {
+				tech@aeff <- tech@aeff[!is.na(tech@aeff$acomm),]
+				ll <- c('cinp2ainp', 'cinp2aout', 'cout2ainp', 'cout2aout')[i]
+				tbl <- c('pTechCinp2AInp', 'pTechCinp2AOut', 'pTechCout2AInp', 'pTechCout2AOut')[i]
+				tbl2 <- c('mTechCinp2AInp', 'mTechCinp2AOut', 'mTechCout2AInp', 'mTechCout2AOut')[i]
+				yy <- tech@aeff[!is.na(tech@aeff[, ll]), ]
+				if (nrow(yy) != 0) {
+					approxim_commp <- approxim
+					approxim_commp$acomm <- unique(yy$acomm);
+					approxim_commp$comm <- unique(yy$comm)
+					tmp <- simpleInterpolation(yy, ll, obj@parameters[[tbl]], approxim_commp, 'tech', tech@name);
+					tmp <- tmp[tmp$value != 0, ]
+					if (nrow(tmp) > 0) {
+						obj@parameters[[tbl]] <- addData(obj@parameters[[tbl]], tmp)
+						tmp$value <- NULL
+						if (!all(c("tech", "acomm", "comm", "region") %in% colnames(tmp))) {
+							if (i %in% c(1, 3)) tmp <- merge(tmp, mvTechInp) else tmp <- merge(tmp, mvTechOut)
+							tmp$comm.1 <- tmp$comm; tmp$comm <- tmp$acomm; tmp$acomm <- NULL;
+							obj@parameters[[tbl2]] <- addData(obj@parameters[[tbl2]], tmp)
+						}
+					}
+				}
+			}
+		}
+	 #### aeff end
 	  if (!is.null(mTechInpGroup) && !is.null(mTechOutGroup)) {
 	    meqTechGrp2Grp <- merge(merge(mTechInpGroup, mTechOutGroup, by =  'tech', suffix = c('', '.1')), 
 	          mvTechAct)[, c('tech', 'region', 'group', 'group.1', 'year', 'slice')]
@@ -407,22 +416,23 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	  
  	 ####
 	  outer_inf <- function(mvTechAct, pTechAf) {
-	    mvTechAct[(!duplicated(rbind(mvTechAct, pTechAf[pTechAf$value == Inf & pTechAf$type == 'up',
-	                                                    colnames(mvTechAct)]), fromLast = TRUE))[1:nrow(mvTechAct)], ]
+	  	merge(mvTechAct, pTechAf[pTechAf$value == Inf & pTechAf$type == 'up',
+	                                                    colnames(pTechAf) %in% colnames(mvTechAct)])
 	  }
-	  if (!is.null(pTechAf)) {
+	  if (!is.null(pTechAf) && any(pTechAf$value != 0 & pTechAf$type == 'lo')) {
 	    obj@parameters[['meqTechAfLo']] <- addData(obj@parameters[['meqTechAfLo']],
-	            merge(mvTechAct, pTechAf[pTechAf$value != 0 & pTechAf$type == 'lo', c('tech', 'region', 'year', 'slice')]))
+	            merge(mvTechAct, pTechAf[pTechAf$value != 0 & pTechAf$type == 'lo', colnames(pTechAf)[colnames(pTechAf) %in% colnames(mvTechAct)]]))
 	  }
     obj@parameters[['meqTechAfUp']] <- addData(obj@parameters[['meqTechAfUp']], outer_inf(mvTechAct, pTechAf))
 	  if (!is.null(pTechAfs)) {
 	    obj@parameters[['meqTechAfsLo']] <- addData(obj@parameters[['meqTechAfsLo']],
-	              merge(mTechSpan, pTechAfs[pTechAfs$value != 0 & pTechAfs$type == 'lo', c('tech', 'region', 'year', 'slice')]))
+	              merge(mTechSpan, pTechAfs[pTechAfs$value != 0 & pTechAfs$type == 'lo', 
+	              	colnames(pTechAfs)[colnames(pTechAfs) %in% colnames(mTechSpan)]]))
 	    meqTechAfsUp <- merge(mTechSpan, 
 	      pTechAfs[pTechAfs$value != Inf & pTechAfs$type == 'up', obj@parameters[['meqTechAfsUp']]@dimSetNames])
 	    obj@parameters[['meqTechAfsUp']] <- addData(obj@parameters[['meqTechAfsUp']], meqTechAfsUp)
 	  }
-  if (!is.null(techSingOut)) {
+	if (!is.null(techSingOut)) {
 	    obj@parameters[['meqTechActSng']] <- addData(obj@parameters[['meqTechActSng']], techSingOut)
 	  } else meqTechActSng <- NULL
 	  if (!is.null(mTechOutGroup)) {
