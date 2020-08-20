@@ -330,7 +330,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 					if (nrow(tmp) > 0) {
 						obj@parameters[[tbl]] <- addData(obj@parameters[[tbl]], tmp)
 						tmp$value <- NULL
-						if (!all(c("tech", "acomm", "comm", "region") %in% colnames(tmp))) {
+						if (!all(c("tech", "acomm", "comm", "region", "year", "slice") %in% colnames(tmp))) {
 							if (i %in% c(1, 3)) tmp <- merge(tmp, mvTechInp) else tmp <- merge(tmp, mvTechOut)
 						}
 						tmp$comm.1 <- tmp$comm; tmp$comm <- tmp$acomm; tmp$acomm <- NULL;
@@ -339,18 +339,25 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 				}
 			}
 		}
-	 	dd <- data.frame(list = c('pTechAct2AOut', 'pTechCap2AOut', 
-			'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp', 'pTechNCap2AOut'),
-			table = c('act2aout', 'cap2aout', 'act2ainp', 'cap2ainp', 'ncap2ainp', 'ncap2aout'),
+	 	dd <- data.frame(list = c('pTechAct2AOut', 'pTechCap2AOut', 'pTechNCap2AOut', 
+			'pTechAct2AInp', 'pTechCap2AInp', 'pTechNCap2AInp'),
+			table = c('act2aout', 'cap2aout', 'ncap2aout', 'act2ainp', 'cap2ainp', 'ncap2ainp'),
+			tab2 = c('mTechAct2AOut', 'mTechCap2AOut', 'mTechNCap2AOut', 'mTechAct2AInp', 'mTechCap2AInp', 'mTechNCap2AInp'),
 			stringsAsFactors = FALSE)
 
 		for(i in 1:nrow(dd)) {
 			approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
 			approxim_comm[['acomm']] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, 'table']]), 'acomm'])
 			if (length(approxim_comm[['acomm']]) != 0) {
-				obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
-					simpleInterpolation(tech@aeff, dd[i, 'table'], 
-						obj@parameters[[dd[i, 'list']]], approxim_comm, 'tech', tech@name))
+				tmp <- simpleInterpolation(tech@aeff, dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim_comm, 'tech', tech@name)		
+				obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]], tmp)
+				if (!all(c("tech", "acomm", "region", "year", "slice") %in% colnames(tmp))) {
+					if (i <= 3) ll <- mvTechInp else ll <- mvTechOut;
+					ll$comm <- NULL
+					tmp <- merge(tmp, ll)
+				}
+				tmp$comm <- tmp$acomm; tmp$acomm <- NULL;
+				obj@parameters[[dd[i, 'tab2']]] <- addData(obj@parameters[[dd[i, 'tab2']]], tmp)
 			}
 		}  
 	 #### aeff end
