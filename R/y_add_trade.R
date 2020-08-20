@@ -90,10 +90,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		  frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
 		  dd <- simpleInterpolation(frm, approxim = approxim, parameter = parameter, ...)
 			if (is.null(dd) || nrow(dd) == 0) return(NULL)
-			dd$src <- gsub('##.*', '', dd$region)
-			dd$dst <- gsub('.*##', '', dd$region)
-			rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
-			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
+			if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
+			if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
+			# rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
+			# dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
 		multiInterpolation2 <- function(frm, approxim, parameter, ...) {
 		  frm <- frm[apply(!is.na(frm[, paste0(parameter, c('.lo', '.up', '.fx'))]), 1, any), ]
@@ -118,10 +118,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		  frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
 		  dd <- multiInterpolation(frm, approxim = approxim, parameter = parameter, ...)
 			if (is.null(dd) || nrow(dd) == 0) return(NULL)
-			dd$src <- gsub('##.*', '', dd$region)
-			dd$dst <- gsub('.*##', '', dd$region)
-			rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
-			dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
+			if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
+			if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
+			# rd <- seq_len(ncol(dd))[colnames(dd) == 'region']
+			# dd[, c(colnames(dd)[2:rd - 1], 'src', 'dst', colnames(dd)[(rd + 1):(ncol(dd) - 2)])]
 		}
 		# pTradeIrCost
 		obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
