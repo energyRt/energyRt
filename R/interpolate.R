@@ -103,33 +103,14 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }), recursive = TRUE)), recursive = TRUE)
   names(approxim$all_comm) <- NULL
   scen@modInp <- .read_default_data(scen@modInp, scen@model@sysInfo)
-  scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
   
-  # Add discount data to approxim
-  approxim <- .add_discount_approxim(scen, approxim)
-  
-  # Remove early retirement if not need
-  if (!scen@model@early.retirement) {
-    scen <- .remove_early_retirment(scen)
-  }
-  
-  # Fill slice level for commodity if not defined
-  scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
-  # Add commodity slice_level map to approxim
-  approxim$commodity_slice_map <- .get_map_commodity_slice_map(scen)
-  scen@misc$approxim <- approxim
-  
-  # Fill set list for interpolation and os one  
-  scen <- .add_name_for_basic_set(scen, approxim)
-  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
-
-
-  if (!is.null(arg$trim) && arg$trim) {
+    if (!is.null(arg$trim) && arg$trim) {
     ## Trim before   interpolation
     # assign('scen', scen, globalenv())
     # stop()
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
-    par_name <- par_name[par_name != 'pEmissionFactor']
+    par_name <- par_name[sapply(scen@modInp@parameters[par_name], function(x) any(x@dimSetNames %in% c('slice', 'year')))]
+    # par_name <- par_name[!(par_name %in% c('pDiscount', 'pEmissionFactor'))]
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
@@ -173,6 +154,29 @@ interpolate <- function(obj, ...) { #- returns class scenario
       }
     }
   }
+  
+  scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
+  
+  # Add discount data to approxim
+  approxim <- .add_discount_approxim(scen, approxim)
+  
+  # Remove early retirement if not need
+  if (!scen@model@early.retirement) {
+    scen <- .remove_early_retirment(scen)
+  }
+  
+  # Fill slice level for commodity if not defined
+  scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
+  # Add commodity slice_level map to approxim
+  approxim$commodity_slice_map <- .get_map_commodity_slice_map(scen)
+  scen@misc$approxim <- approxim
+  
+  # Fill set list for interpolation and os one  
+  scen <- .add_name_for_basic_set(scen, approxim)
+  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
+
+
+
   
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
