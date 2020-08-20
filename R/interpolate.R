@@ -110,7 +110,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     # stop()
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
     par_name <- par_name[sapply(scen@modInp@parameters[par_name], function(x) any(x@dimSetNames %in% c('slice', 'year')))]
-    # par_name <- par_name[!(par_name %in% c('pDiscount', 'pEmissionFactor'))]
+    par_name <- par_name[!(par_name %in% c('pDiscount'))]
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
