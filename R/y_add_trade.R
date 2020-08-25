@@ -267,6 +267,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		if (trd@capacityVariable) {
 		  mTradeIr <- merge(mTradeIr, mTradeSpan)
 		} else mTradeIr <- merge(mTradeIr, list(year = approxim$mileStoneYears))
+		
 		obj@parameters[['mTradeIr']] <- addData(obj@parameters[['mTradeIr']], mTradeIr)
 		
 		### To trades
@@ -298,10 +299,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		obj@parameters[['mvTradeIr']] <- addData(obj@parameters[['mvTradeIr']], mvTradeIr) 
 		if (!is.null(pTradeIr)) {
 		  pTradeIr$comm <- trd@commodity
-		  obj@parameters[['meqTradeFlowLo']] <- addData(obj@parameters[['meqTradeFlowLo']], 
-		                                                merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, colnames(mvTradeIr)]))
-		  obj@parameters[['meqTradeFlowUp']] <- addData(obj@parameters[['meqTradeFlowUp']], 
-		                                                merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, colnames(mvTradeIr)]))
+		  obj@parameters[['meqTradeFlowLo']] <- addData(obj@parameters[['meqTradeFlowLo']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, 
+		  	colnames(pTradeIr) %in% colnames(mvTradeIr), drop = FALSE]))
+		  obj@parameters[['meqTradeFlowUp']] <- addData(obj@parameters[['meqTradeFlowUp']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, 
+		  	colnames(pTradeIr) %in% colnames(mvTradeIr), drop = FALSE]))
 		  pTradeIr$comm <- NULL
 		}
 		obj
