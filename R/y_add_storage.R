@@ -122,7 +122,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		  obj@parameters[['pStorageCharge']] <- addData(obj@parameters[['pStorageCharge']], tmp)
 		}
 		# Some slice
-		
 		stock_exist <- simpleInterpolation(stg@stock[, colnames(stg@stock) != 'slice'], 'stock', 
 		                                   obj@parameters[['pStorageStock']], approxim, 'stg', stg@name)
 		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']], stock_exist)
@@ -203,8 +202,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 			obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
 		}
 		pStorageOlife <- olife
-		
-		obj@parameters[['mStorageOlifeInf']] <- addData(obj@parameters[['mStorageOlifeInf']], pStorageOlife[pStorageOlife$olife != Inf, c('stg', 'region')])
+		if (any(pStorageOlife$olife != Inf)) {
+			mStorageOlifeInf <- pStorageOlife[pStorageOlife$olife != Inf, colnames(pStorageOlife) %in% 
+					obj@parameters[['mStorageOlifeInf']]@dimSetNames, drop = FALSE]
+			if (ncol(mStorageOlifeInf) != ncol(obj@parameters[['mStorageOlifeInf']]@data))
+				mStorageOlifeInf <- merge(mStorageOlifeInf, mStorageSpan[, colnames(mStorageSpan) %in% 
+					obj@parameters[['mStorageOlifeInf']]@dimSetNames, drop = FALSE])
+			obj@parameters[['mStorageOlifeInf']] <- addData(obj@parameters[['mStorageOlifeInf']], mStorageOlifeInf)
+		}
 		dsm <- obj@parameters[['mStorageOMCost']]@dimSetNames
 		mStorageOMCost <- NULL
 		if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageFixom[pStorageFixom$value != 0, dsm])
