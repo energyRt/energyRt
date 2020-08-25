@@ -337,7 +337,7 @@
         if (nrow(rdd) > 0) {
           tmp <- merge(rdd, pWeather); tmp$weather <- NULL
           tmp <- aggregate(tmp[, 'mwth', drop = FALSE], tmp[, -ncol(tmp), drop = FALSE], prod)
-          tmp <- merge(rft, tmp, all = TRUE)
+          tmp <- merge(rft, tmp, all.x = TRUE)
           tmp[is.na(tmp)] <- 1
           tmp$value <- tmp$value * tmp$mwth; tmp$mwth <- NULL
           prec@parameters[[towth[i, 'par']]] <- addData(prec@parameters[[towth[i, 'par']]], tmp)
