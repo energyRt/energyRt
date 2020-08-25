@@ -269,28 +269,47 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		} else mTradeIr <- merge(mTradeIr, list(year = approxim$mileStoneYears))
 		
 		obj@parameters[['mTradeIr']] <- addData(obj@parameters[['mTradeIr']], mTradeIr)
-		
 		### To trades
-		# mvTradeIrAInp(trade, comm, region, year, slice)
-		if (!is.null(mTradeIrAInp)) {
-		  if (!is.null(pTradeIrCsrc2Ainp)) {
-		    a1 <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, c('trade', 'acomm', 'src', 'year', 'slice')]
-		    colnames(a1)[2:3] <- c('comm', 'region')
+	if (!is.null(mTradeIrAInp)) {
+		if (!is.null(pTradeIrCsrc2Ainp) && any(pTradeIrCsrc2Ainp$value != 0)) {
+		    mTradeIrCsrc2Ainp <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, colnames(pTradeIrCsrc2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
+		    if (is.null(mTradeIrCsrc2Ainp$acomm)) mTradeIrCsrc2Ainp <- merge(mTradeIrCsrc2Ainp, mTradeIrAInp)
+		    mTradeIrCsrc2Ainp$comm <- mTradeIrCsrc2Ainp$acomm; mTradeIrCsrc2Ainp$acomm <- NULL
+		    if (ncol(mTradeIrCsrc2Ainp) != 6) mTradeIrCsrc2Ainp <- merge(mTradeIrCsrc2Ainp, mTradeIr)
+				obj@parameters[['mTradeIrCsrc2Ainp']] <- addData(obj@parameters[['mTradeIrCsrc2Ainp']], mTradeIrCsrc2Ainp)
+				a1 <-  mTradeIrCsrc2Ainp[, c('comm', 'src')]
+				colnames(a1)[2] <- 'region'
 		  }  else a1 <- NULL
-		  if (!is.null(pTradeIrCdst2Ainp)) {
-		    a2 <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, c('trade', 'acomm', 'dst', 'year', 'slice')]
-		    colnames(a2)[2:3] <- c('comm', 'region')
+		  if (!is.null(pTradeIrCdst2Ainp) && any(pTradeIrCdst2Ainp$value != 0)) {
+		    mTradeIrCdst2Ainp <- pTradeIrCdst2Ainp[pTradeIrCdst2Ainp$value != 0, colnames(pTradeIrCdst2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
+		    if (is.null(mTradeIrCdst2Ainp$acomm)) mTradeIrCdst2Ainp <- merge(mTradeIrCdst2Ainp, mTradeIrAInp)
+		    mTradeIrCdst2Ainp$comm <- mTradeIrCdst2Ainp$acomm; mTradeIrCdst2Ainp$acomm <- NULL
+		    if (ncol(mTradeIrCdst2Ainp) != 6) mTradeIrCdst2Ainp <- merge(mTradeIrCdst2Ainp, mTradeIr)
+				obj@parameters[['mTradeIrCdst2Ainp']] <- addData(obj@parameters[['mTradeIrCdst2Ainp']], mTradeIrCdst2Ainp)
+				a2 <-  mTradeIrCdst2Ainp[, c('comm', 'dst')]
+				colnames(a2)[2] <- 'region'
 		  } else a2 <- NULL
 		  obj@parameters[['mvTradeIrAInp']] <- addData(obj@parameters[['mvTradeIrAInp']], merge(mTradeIrAInp, unique(rbind(a1, a2))))
-		}
+	}
+	
 		if (!is.null(mTradeIrAOut)) {
-		  if (!is.null(pTradeIrCsrc2Aout)) {
-		    a1 <- pTradeIrCsrc2Aout[pTradeIrCsrc2Aout$value != 0, c('trade', 'acomm', 'src', 'year', 'slice')]
-		    colnames(a1)[2:3] <- c('comm', 'region')
+		  if (!is.null(pTradeIrCsrc2Aout) && any(pTradeIrCsrc2Aout$value != 0)) {
+		  	mTradeIrCsrc2Aout <- pTradeIrCsrc2Aout[pTradeIrCsrc2Aout$value != 0, colnames(pTradeIrCsrc2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
+		    if (is.null(mTradeIrCsrc2Aout$acomm)) mTradeIrCsrc2Aout <- merge(mTradeIrCsrc2Aout, mTradeIrAOut)
+		    mTradeIrCsrc2Aout$comm <- mTradeIrCsrc2Aout$acomm; mTradeIrCsrc2Aout$acomm <- NULL
+		    if (ncol(mTradeIrCsrc2Aout) != 6) mTradeIrCsrc2Aout <- merge(mTradeIrCsrc2Aout, mTradeIr)
+				obj@parameters[['mTradeIrCsrc2Aout']] <- addData(obj@parameters[['mTradeIrCsrc2Aout']], mTradeIrCsrc2Aout)
+				a1 <-  mTradeIrCsrc2Aout[, c('comm', 'src')]
+				colnames(a1)[2] <- 'region'
 		  }  else a1 <- NULL
-		  if (!is.null(pTradeIrCdst2Aout)) {
-		    a2 <- pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0, c('trade', 'acomm', 'dst', 'year', 'slice')]
-		    colnames(a2)[2:3] <- c('comm', 'region')
+		  if (!is.null(pTradeIrCdst2Aout) && any(pTradeIrCdst2Aout$value != 0)) {
+		  	mTradeIrCdst2Aout <- pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0, colnames(pTradeIrCdst2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
+		    if (is.null(mTradeIrCdst2Aout$acomm)) mTradeIrCdst2Aout <- merge(mTradeIrCdst2Aout, mTradeIrAOut)
+		    mTradeIrCdst2Aout$comm <- mTradeIrCdst2Aout$acomm; mTradeIrCdst2Aout$acomm <- NULL
+		    if (ncol(mTradeIrCdst2Aout) != 6) mTradeIrCdst2Aout <- merge(mTradeIrCdst2Aout, mTradeIr)
+				obj@parameters[['mTradeIrCdst2Aout']] <- addData(obj@parameters[['mTradeIrCdst2Aout']], mTradeIrCdst2Aout)
+				a2 <-  mTradeIrCdst2Aout[, c('comm', 'dst')]
+				colnames(a2)[2] <- 'region'
 		  } else a2 <- NULL
 		  obj@parameters[['mvTradeIrAOut']] <- addData(obj@parameters[['mvTradeIrAOut']], merge(mTradeIrAOut, unique(rbind(a1, a2))))
 		}
