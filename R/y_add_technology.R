@@ -109,13 +109,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
 
 		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
-		if (!is.null(invcost)) minvcost <- merge(dd0$new, invcost)
-		obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], minvcost[, colnames(minvcost) != 'value'])
-
-		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
+		if (!is.null(invcost)) {
+			minvcost <- merge(dd0$new, invcost) 
+			obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], minvcost[, colnames(minvcost) != 'value'])
+			obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
+			obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
+		}
 		
 		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
-		obj@parameters[['mTechEac']] <- addData(obj@parameters[['mTechEac']], dd0$eac)
 	
 		if (nrow(dd0$new) > 0 && !is.null(invcost)) {
 		  salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
