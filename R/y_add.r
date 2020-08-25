@@ -210,7 +210,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     pSupAva <- multiInterpolation(sup@availability, 'ava',
                        obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']], pSupAva)
-    tmp <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', 1:5]
+    tmp <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', drop = FALSE]
     mSupAva <- merge(merge(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
     mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp), fromLast = TRUE))[1:nrow(mSupAva)], ]
     obj@parameters[['mSupAva']] <- addData(obj@parameters[['mSupAva']], mSupAva)
