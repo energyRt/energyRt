@@ -85,13 +85,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 					'ncap2aout'),
 				stringsAsFactors = FALSE)
 			approxim_comm <- approxim
+			aout_tmp <- list()
 			for(i in 1:nrow(dd)) {
 				approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
 				approxim_comm[['acomm']] <- unique(stg@aeff[!is.na(stg@aeff[, dd[i, 'table']]), 'acomm'])
 				if (length(approxim_comm[['acomm']]) != 0) {
-					obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]],
-						simpleInterpolation(stg@aeff, dd[i, 'table'], 
-							obj@parameters[[dd[i, 'list']]], approxim_comm, 'stg', stg@name))
+					aout_tmp[[dd[i, 'list']]] <- simpleInterpolation(stg@aeff, dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim_comm, 'stg', stg@name)
+					obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]], aout_tmp[[dd[i, 'list']]])
 				}
 			}                
 		} else {
@@ -225,8 +225,22 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		obj@parameters[['mvStorageStore']] <- addData(obj@parameters[['mvStorageStore']], mvStorageStore)
 
 		if (nrow(stg@aux) != 0) {
-		  obj@parameters[['mvStorageAInp']] <- addData(obj@parameters[['mvStorageAInp']], merge(mvStorageStore, mStorageAInp))
-  		obj@parameters[['mvStorageAOut']] <- addData(obj@parameters[['mvStorageAOut']], merge(mvStorageStore, mStorageAOut))
+			mvStorageAInp <- merge(mvStorageStore, mStorageAInp)
+		  obj@parameters[['mvStorageAInp']] <- addData(obj@parameters[['mvStorageAInp']], mvStorageAInp)
+			mvStorageAOut <- merge(mvStorageStore, mStorageAOut)
+  		obj@parameters[['mvStorageAOut']] <- addData(obj@parameters[['mvStorageAOut']], mvStorageAOut)
+  		for (i in c('mStorageStg2AOut', 'mStorageInp2AOut', 'mStorageOut2AOut', 'mStorageCap2AOut', 'mStorageNCap2AOut', 
+  			'mStorageStg2AInp', 'mStorageInp2AInp', 'mStorageOut2AInp', 'mStorageCap2AInp', 'mStorageNCap2AInp')) {
+  			atmp <- aout_tmp[[gsub('^m', 'p', i)]]
+  			if (any(grep('Out$', i))) {
+	  			atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAOut), drop = FALSE]
+	  			if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAOut)
+  			} else {
+	  			atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAInp), drop = FALSE]
+	  			if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAInp)
+  			}
+  			obj@parameters[[i]] <- addData(obj@parameters[[i]], atmp)
+  		}
 		}
 		rem_inf <- function(x, y) {
 		  if (is.null(x)) return(y)

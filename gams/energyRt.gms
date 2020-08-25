@@ -320,6 +320,17 @@ mvStorageAInp(stg, comm, region, year, slice)
 mvStorageAOut(stg, comm, region, year, slice)
 mvStorageStore(stg, comm, region, year, slice)
 mvStorageStore(stg, comm, region, year, slice)
+mStorageStg2AOut(stg, comm, region, year, slice)
+mStorageInp2AOut(stg, comm, region, year, slice)
+mStorageOut2AOut(stg, comm, region, year, slice)
+mStorageCap2AOut(stg, comm, region, year, slice)
+mStorageNCap2AOut(stg, comm, region, year, slice)
+mStorageStg2AInp(stg, comm, region, year, slice)
+mStorageInp2AInp(stg, comm, region, year, slice)
+mStorageOut2AInp(stg, comm, region, year, slice)
+mStorageCap2AInp(stg, comm, region, year, slice)
+mStorageNCap2AInp(stg, comm, region, year, slice)
+
 mvTradeIr(trade, comm, region, region, year, slice)
 mvTradeCost(region, year)
 mvTradeRowCost(region, year)
@@ -1147,21 +1158,21 @@ eqStorageOutLo(stg, comm, region, year, slice)
 eqStorageAInp(stg, comm, region, year, slice)$mvStorageAInp(stg, comm, region, year, slice)..
   vStorageAInp(stg, comm, region, year, slice) =e=
          sum(commp$mStorageComm(stg, commp),
-         pStorageStg2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
-         pStorageInp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
-         pStorageOut2AInp(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
-         pStorageCap2AInp(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
-         (pStorageNCap2AInp(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year)
+         (pStorageStg2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice))$mStorageStg2AInp(stg, comm, region, year, slice) +
+         (pStorageInp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice))$mStorageInp2AInp(stg, comm, region, year, slice) +
+         (pStorageOut2AInp(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice))$mStorageOut2AInp(stg, comm, region, year, slice) +
+         (pStorageCap2AInp(stg, comm, region, year, slice) * vStorageCap(stg, region, year))$mStorageCap2AInp(stg, comm, region, year, slice) +
+         (pStorageNCap2AInp(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNCap2AInp(stg, comm, region, year, slice)
 );
 
 
 eqStorageAOut(stg, comm, region, year, slice)$mvStorageAOut(stg, comm, region, year, slice)..
   vStorageAOut(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
-         pStorageStg2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
-         pStorageInp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
-         pStorageOut2AOut(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
-         pStorageCap2AOut(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
-         (pStorageNCap2AOut(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year)
+         (pStorageStg2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice))$mStorageStg2AOut(stg, comm, region, year, slice) +
+         (pStorageInp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice))$mStorageInp2AOut(stg, comm, region, year, slice) +
+         (pStorageOut2AOut(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice))$mStorageOut2AOut(stg, comm, region, year, slice) +
+         (pStorageCap2AOut(stg, comm, region, year, slice) * vStorageCap(stg, region, year))$mStorageCap2AOut(stg, comm, region, year, slice) +
+         (pStorageNCap2AOut(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNCap2AOut(stg, comm, region, year, slice)
 );
 
 

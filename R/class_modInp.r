@@ -354,6 +354,11 @@ setMethod("initialize", "modInp",
                  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '', cls = 'storage', colName = 'ncap2stg')    
     .Object@parameters[['pStorageCharge']] <- createParameter('pStorageCharge', 
               c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '', cls = 'storage', colName = 'charge')    
+    for (i in c('mStorageStg2AOut', 'mStorageInp2AOut', 'mStorageOut2AOut', 'mStorageCap2AOut', 'mStorageNCap2AOut', 'mStorageStg2AInp', 'mStorageInp2AInp', 
+    	'mStorageOut2AInp', 'mStorageCap2AInp', 'mStorageNCap2AInp'))
+    		.Object@parameters[[i]] <- createParameter(i, c('stg', 'comm', 'region', 'year', 'slice'), 'map', cls = 'storage')    
+
+
     # Trade
     # Map
     .Object@parameters[['mTradeIrAInp']] <- createParameter('mTradeIrAInp', c('trade', 'comm'), 'map', cls = 'trade')   

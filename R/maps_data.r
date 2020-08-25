@@ -845,7 +845,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:293,] <- NA;
+    rs[1:313,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -938,6 +938,16 @@ rs
 "mvStorageAInp",
 "mvStorageAOut",
 "mvStorageStore",
+"mStorageStg2AOut",
+"mStorageInp2AOut",
+"mStorageOut2AOut",
+"mStorageCap2AOut",
+"mStorageNCap2AOut",
+"mStorageStg2AInp",
+"mStorageInp2AInp",
+"mStorageOut2AInp",
+"mStorageCap2AInp",
+"mStorageNCap2AInp",
 "mvTradeIr",
 "mvTradeCost",
 "mvTradeRowCost",
@@ -1019,6 +1029,16 @@ rs
 "meqBalUp",
 "meqBalFx",
 "meqLECActivity",
+"mTechAct2AInp",
+"mTechCap2AInp",
+"mTechNCap2AInp",
+"mTechCinp2AInp",
+"mTechCout2AInp",
+"mTechAct2AOut",
+"mTechCap2AOut",
+"mTechNCap2AOut",
+"mTechCinp2AOut",
+"mTechCout2AOut",
 "mLECRegion",
 "ordYear",
 "cardYear",
@@ -1206,7 +1226,7 @@ rs
     rs["mTechAOut", c("name", "description", "type")] <- c("mTechAOut", "Auxiliary output", "map");
     rs["mTechAOut", c("tech", "comm", "eqTechOutTot")] <- TRUE;
     rs["mTechNew", c("name", "description", "type")] <- c("mTechNew", "Technologies available for investment", "map");
-    rs["mTechNew", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechEac")] <- TRUE;
+    rs["mTechNew", c("tech", "region", "year", "eqTechCap", "eqTechEac")] <- TRUE;
     rs["mTechSpan", c("name", "description", "type")] <- c("mTechSpan", "Availability of each technology by regions and milestone years", "map");
     rs["mTechSpan", c("tech", "region", "year", "eqTechCap")] <- TRUE;
     rs["mTechSlice", c("name", "description", "type")] <- c("mTechSlice", "Technology to slice-level", "map");
@@ -1234,7 +1254,7 @@ rs
     rs["mStorageAOut", c("name", "description", "type")] <- c("mStorageAOut", "Aux-commodity output from storage", "map");
     rs["mStorageAOut", c("stg", "comm")] <- TRUE;
     rs["mStorageNew", c("name", "description", "type")] <- c("mStorageNew", "Storage available for investment", "map");
-    rs["mStorageNew", c("stg", "region", "year", "eqStorageStore", "eqStorageAInp", "eqStorageAOut", "eqStorageInv", "eqStorageEac")] <- TRUE;
+    rs["mStorageNew", c("stg", "region", "year", "eqStorageStore", "eqStorageInv", "eqStorageEac")] <- TRUE;
     rs["mStorageSpan", c("name", "description", "type")] <- c("mStorageSpan", "Storage set showing if the storage may exist in the year and region", "map");
     rs["mStorageSpan", c("stg", "region", "year", "eqStorageCap")] <- TRUE;
     rs["mStorageOMCost", c("name", "description", "type")] <- c("mStorageOMCost", "", "map");
@@ -1323,6 +1343,26 @@ rs
     rs["mvStorageAOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut", "eqStorageOutTot")] <- TRUE;
     rs["mvStorageStore", c("name", "description", "type")] <- c("mvStorageStore", "", "map");
     rs["mvStorageStore", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageClean", "eqStorageInpTot", "eqStorageOutTot")] <- TRUE;
+    rs["mStorageStg2AOut", c("name", "description", "type")] <- c("mStorageStg2AOut", "", "map");
+    rs["mStorageStg2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageInp2AOut", c("name", "description", "type")] <- c("mStorageInp2AOut", "", "map");
+    rs["mStorageInp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageOut2AOut", c("name", "description", "type")] <- c("mStorageOut2AOut", "", "map");
+    rs["mStorageOut2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageCap2AOut", c("name", "description", "type")] <- c("mStorageCap2AOut", "", "map");
+    rs["mStorageCap2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageNCap2AOut", c("name", "description", "type")] <- c("mStorageNCap2AOut", "", "map");
+    rs["mStorageNCap2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageStg2AInp", c("name", "description", "type")] <- c("mStorageStg2AInp", "", "map");
+    rs["mStorageStg2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageInp2AInp", c("name", "description", "type")] <- c("mStorageInp2AInp", "", "map");
+    rs["mStorageInp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageOut2AInp", c("name", "description", "type")] <- c("mStorageOut2AInp", "", "map");
+    rs["mStorageOut2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageCap2AInp", c("name", "description", "type")] <- c("mStorageCap2AInp", "", "map");
+    rs["mStorageCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageNCap2AInp", c("name", "description", "type")] <- c("mStorageNCap2AInp", "", "map");
+    rs["mStorageNCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["mvTradeIr", c("name", "description", "type")] <- c("mvTradeIr", "", "map");
     rs["mvTradeIr", c("trade", "comm", "region", "year", "slice", "eqImport", "eqExport", "eqCostIrTrade", "eqTradeCapFlow")] <- TRUE;
     rs["mvTradeCost", c("name", "description", "type")] <- c("mvTradeCost", "", "map");
@@ -1485,6 +1525,26 @@ rs
     rs["meqBalFx", c("comm", "region", "year", "slice", "eqBalFx")] <- TRUE;
     rs["meqLECActivity", c("name", "description", "type")] <- c("meqLECActivity", "", "map");
     rs["meqLECActivity", c("tech", "region", "year", "eqLECActivity")] <- TRUE;
+    rs["mTechAct2AInp", c("name", "description", "type")] <- c("mTechAct2AInp", "", "map");
+    rs["mTechAct2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechCap2AInp", c("name", "description", "type")] <- c("mTechCap2AInp", "", "map");
+    rs["mTechCap2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechNCap2AInp", c("name", "description", "type")] <- c("mTechNCap2AInp", "", "map");
+    rs["mTechNCap2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechCinp2AInp", c("name", "description", "type")] <- c("mTechCinp2AInp", "", "map");
+    rs["mTechCinp2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechCout2AInp", c("name", "description", "type")] <- c("mTechCout2AInp", "", "map");
+    rs["mTechCout2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechAct2AOut", c("name", "description", "type")] <- c("mTechAct2AOut", "", "map");
+    rs["mTechAct2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechCap2AOut", c("name", "description", "type")] <- c("mTechCap2AOut", "", "map");
+    rs["mTechCap2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechNCap2AOut", c("name", "description", "type")] <- c("mTechNCap2AOut", "", "map");
+    rs["mTechNCap2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechCinp2AOut", c("name", "description", "type")] <- c("mTechCinp2AOut", "", "map");
+    rs["mTechCinp2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechCout2AOut", c("name", "description", "type")] <- c("mTechCout2AOut", "", "map");
+    rs["mTechCout2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
     rs["mLECRegion", c("name", "description", "type")] <- c("mLECRegion", "", "map");
     rs["mLECRegion", c("region")] <- TRUE;
     rs["ordYear", c("name", "description", "type")] <- c("ordYear", "ord year for GLPK", "parameter");
