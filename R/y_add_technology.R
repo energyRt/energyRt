@@ -429,7 +429,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	  }
 	  if (!is.null(pTechAf) && any(pTechAf$value != 0 & pTechAf$type == 'lo')) {
 	    obj@parameters[['meqTechAfLo']] <- addData(obj@parameters[['meqTechAfLo']],
-	            merge(mvTechAct, pTechAf[pTechAf$value != 0 & pTechAf$type == 'lo', colnames(pTechAf)[colnames(pTechAf) %in% colnames(mvTechAct)]]))
+	            merge(mvTechAct, pTechAf[pTechAf$value != 0 & pTechAf$type == 'lo', colnames(pTechAf)[colnames(pTechAf) %in% colnames(mvTechAct)], drop = FALSE]))
 	  }
     obj@parameters[['meqTechAfUp']] <- addData(obj@parameters[['meqTechAfUp']], outer_inf(mvTechAct, pTechAf))
 	  if (!is.null(pTechAfs)) {
@@ -437,7 +437,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	              merge(mTechSpan, pTechAfs[pTechAfs$value != 0 & pTechAfs$type == 'lo', 
 	              	colnames(pTechAfs)[colnames(pTechAfs) %in% colnames(mTechSpan)]]))
 	    meqTechAfsUp <- merge(mTechSpan, 
-	      pTechAfs[pTechAfs$value != Inf & pTechAfs$type == 'up', obj@parameters[['meqTechAfsUp']]@dimSetNames])
+	      pTechAfs[pTechAfs$value != Inf & pTechAfs$type == 'up', colnames(pTechAfs) %in% obj@parameters[['meqTechAfsUp']]@dimSetNames, drop = FALSE])
 	    obj@parameters[['meqTechAfsUp']] <- addData(obj@parameters[['meqTechAfsUp']], meqTechAfsUp)
 	  }
 	if (!is.null(techSingOut)) {
