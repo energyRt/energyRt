@@ -154,7 +154,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   		salv_data$tech <- stg@name
   		salv_data$value <- salv_data$eac
   		pStorageEac <- salv_data[, c('stg', 'region', 'year', 'value')]
-  		obj@parameters[['pStorageEac']] <- addData(obj@parameters[['pStorageEac']], pStorageEac)
+  		obj@parameters[['pStorageEac']] <- addData(obj@parameters[['pStorageEac']], unique(pStorageEac[, colnames(pStorageEac) %in% c(obj@parameters[['pStorageEac']]@dimSetNames, 'value'), drop = FALSE]))
     }
 				
 		# Weather part

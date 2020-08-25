@@ -109,8 +109,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		obj@parameters[['mTechNew']] <- addData(obj@parameters[['mTechNew']], dd0$new)
 
 		invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
-		if (!is.null(invcost)) invcost <- merge(dd0$new, invcost)
-		obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], invcost[, colnames(invcost) != 'value'])
+		if (!is.null(invcost)) minvcost <- merge(dd0$new, invcost)
+		obj@parameters[['mTechInv']] <- addData(obj@parameters[['mTechInv']], minvcost[, colnames(minvcost) != 'value'])
+
 		obj@parameters[['pTechInvcost']] <- addData(obj@parameters[['pTechInvcost']], invcost)
 		
 		obj@parameters[['mTechSpan']] <- addData(obj@parameters[['mTechSpan']], dd0$span)
@@ -135,7 +136,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		  salv_data$tech <- tech@name
 		  salv_data$value <- salv_data$eac
 		  pTechEac <- salv_data[, c('tech', 'region', 'year', 'value')]
-		  obj@parameters[['pTechEac']] <- addData(obj@parameters[['pTechEac']], pTechEac)
+		  obj@parameters[['pTechEac']] <- addData(obj@parameters[['pTechEac']], unique(pTechEac[, c(obj@parameters[['pTechEac']]@dimSetNames, 'value')]))
 		}
 		pTechAf <- multiInterpolation(tech@af, 'af',
 			obj@parameters[['pTechAf']], approxim, 'tech', tech@name, remValueUp = Inf, remValueLo = 0)
@@ -285,7 +286,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	 # Stay only variable with non zero output
 	 merge_table <- function(mvTechInp, pTechCinp2use) {
 	    if (is.null(pTechCinp2use) || nrow(pTechCinp2use) == 0) return(NULL)
-	    return(merge(mvTechInp, pTechCinp2use[pTechCinp2use$value != 0 & pTechCinp2use$value != Inf, colnames(pTechCinp2use) != 'value']))
+	    return(merge(mvTechInp, pTechCinp2use[pTechCinp2use$value != 0 & pTechCinp2use$value != Inf, colnames(pTechCinp2use) != 'value', drop = FALSE]))
 	 }
 	 merge_table2 <- function(mvTechInp, pTechCinp2use, pTechCinp2ginp) {
 	    tmp <- rbind(merge_table(mvTechInp, pTechCinp2use), merge_table(mvTechInp, pTechCinp2ginp))

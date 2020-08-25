@@ -259,7 +259,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				salv_data$trade <- trd@name
 				salv_data$value <- salv_data$eac
 				pTradeEac <- salv_data[, c('trade', 'region', 'year', 'value')]
-				obj@parameters[['pTradeEac']] <- addData(obj@parameters[['pTradeEac']], pTradeEac)
+  			obj@parameters[['pTradeEac']] <- addData(obj@parameters[['pTradeEac']], unique(pTradeEac[, colnames(pTradeEac) %in% c(obj@parameters[['pTradeEac']]@dimSetNames, 'value'), drop = FALSE]))
 			}
 		}
 		########
