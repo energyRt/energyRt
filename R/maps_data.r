@@ -845,7 +845,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:313,] <- NA;
+    rs[1:317,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -949,6 +949,10 @@ rs
 "mStorageCap2AInp",
 "mStorageNCap2AInp",
 "mvTradeIr",
+"mTradeIrCsrc2Ainp",
+"mTradeIrCdst2Ainp",
+"mTradeIrCsrc2Aout",
+"mTradeIrCdst2Aout",
 "mvTradeCost",
 "mvTradeRowCost",
 "mvTradeIrCost",
@@ -1365,6 +1369,14 @@ rs
     rs["mStorageNCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["mvTradeIr", c("name", "description", "type")] <- c("mvTradeIr", "", "map");
     rs["mvTradeIr", c("trade", "comm", "region", "year", "slice", "eqImport", "eqExport", "eqCostIrTrade", "eqTradeCapFlow")] <- TRUE;
+    rs["mTradeIrCsrc2Ainp", c("name", "description", "type")] <- c("mTradeIrCsrc2Ainp", "", "map");
+    rs["mTradeIrCsrc2Ainp", c("trade", "comm", "region", "year", "slice", "eqTradeIrAInp")] <- TRUE;
+    rs["mTradeIrCdst2Ainp", c("name", "description", "type")] <- c("mTradeIrCdst2Ainp", "", "map");
+    rs["mTradeIrCdst2Ainp", c("trade", "comm", "region", "year", "slice", "eqTradeIrAInp")] <- TRUE;
+    rs["mTradeIrCsrc2Aout", c("name", "description", "type")] <- c("mTradeIrCsrc2Aout", "", "map");
+    rs["mTradeIrCsrc2Aout", c("trade", "comm", "region", "year", "slice", "eqTradeIrAOut")] <- TRUE;
+    rs["mTradeIrCdst2Aout", c("name", "description", "type")] <- c("mTradeIrCdst2Aout", "", "map");
+    rs["mTradeIrCdst2Aout", c("trade", "comm", "region", "year", "slice", "eqTradeIrAOut")] <- TRUE;
     rs["mvTradeCost", c("name", "description", "type")] <- c("mvTradeCost", "", "map");
     rs["mvTradeCost", c("region", "year", "eqCostTrade", "eqCost")] <- TRUE;
     rs["mvTradeRowCost", c("name", "description", "type")] <- c("mvTradeRowCost", "", "map");
@@ -1398,7 +1410,7 @@ rs
     rs["mDummyCost", c("name", "description", "type")] <- c("mDummyCost", "", "map");
     rs["mDummyCost", c("comm", "region", "year")] <- TRUE;
     rs["mTradeIr", c("name", "description", "type")] <- c("mTradeIr", "", "map");
-    rs["mTradeIr", c("trade", "region", "year", "slice", "eqTradeIrAInp", "eqTradeIrAOut")] <- TRUE;
+    rs["mTradeIr", c("trade", "region", "year", "slice")] <- TRUE;
     rs["mvTradeIrAInp", c("name", "description", "type")] <- c("mvTradeIrAInp", "", "map");
     rs["mvTradeIrAInp", c("trade", "comm", "region", "year", "slice", "eqTradeIrAInp")] <- TRUE;
     rs["mvTradeIrAInpTot", c("name", "description", "type")] <- c("mvTradeIrAInpTot", "", "map");

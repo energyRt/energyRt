@@ -332,6 +332,10 @@ mStorageCap2AInp(stg, comm, region, year, slice)
 mStorageNCap2AInp(stg, comm, region, year, slice)
 
 mvTradeIr(trade, comm, region, region, year, slice)
+mTradeIrCsrc2Ainp(trade, comm, region, region, year, slice)
+mTradeIrCdst2Ainp(trade, comm, region, region, year, slice)
+mTradeIrCsrc2Aout(trade, comm, region, region, year, slice)
+mTradeIrCdst2Aout(trade, comm, region, region, year, slice)
 mvTradeCost(region, year)
 mvTradeRowCost(region, year)
 mvTradeIrCost(region, year)
@@ -1436,16 +1440,16 @@ eqTradeIrAOutTot(comm, region, year, slice) Trade auxiliary commodity output
 
 eqTradeIrAInp(trade, comm, region, year, slice)$mvTradeIrAInp(trade, comm, region, year, slice)..
   vTradeIrAInp(trade, comm, region, year, slice) =e=
-    sum(dst$mTradeIr(trade, region, dst, year, slice),
+    sum(dst$mTradeIrCsrc2Ainp(trade, comm, region, dst, year, slice),
       pTradeIrCsrc2Ainp(trade, comm, region, dst, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, region, dst, year, slice)))
-    + sum(src$mTradeIr(trade, src, region, year, slice),
+    + sum(src$mTradeIrCdst2Ainp(trade, comm, src, region, year, slice),
       pTradeIrCdst2Ainp(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
 eqTradeIrAOut(trade, comm, region, year, slice)$mvTradeIrAOut(trade, comm, region, year, slice)..
   vTradeIrAOut(trade, comm, region, year, slice) =e=
-    sum(dst$mTradeIr(trade, region, dst, year, slice),
+    sum(dst$mTradeIrCsrc2Aout(trade, comm, region, dst, year, slice),
       pTradeIrCsrc2Aout(trade, comm, region, dst, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, region, dst, year, slice)))
-    + sum(src$mTradeIr(trade, src, region, year, slice),
+    + sum(src$mTradeIrCdst2Aout(trade, comm, src, region, year, slice),
       pTradeIrCdst2Aout(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
 eqTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)..

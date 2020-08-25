@@ -443,6 +443,11 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mvTradeIrAInpTot']] <- createParameter('mvTradeIrAInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mvTradeIrAOutTot']] <- createParameter('mvTradeIrAOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
     
+    .Object@parameters[['mTradeIrCsrc2Ainp']] <- createParameter('mTradeIrCsrc2Ainp', c('trade', 'comm', 'src', 'dst', 'year', 'slice'), 'map') 
+    .Object@parameters[['mTradeIrCdst2Ainp']] <- createParameter('mTradeIrCdst2Ainp', c('trade', 'comm', 'src', 'dst', 'year', 'slice'), 'map') 
+    .Object@parameters[['mTradeIrCsrc2Aout']] <- createParameter('mTradeIrCsrc2Aout', c('trade', 'comm', 'src', 'dst', 'year', 'slice'), 'map') 
+    .Object@parameters[['mTradeIrCdst2Aout']] <- createParameter('mTradeIrCdst2Aout', c('trade', 'comm', 'src', 'dst', 'year', 'slice'), 'map') 
+
     # .Object@parameters[['mImportIrSub']] <- createParameter('mImportIrSub', c('comm', 'region', 'year', 'slice'), 'map') 
     # .Object@parameters[['mImportIrSubSlice']] <- createParameter('mImportIrSubSlice', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
     # .Object@parameters[['mImportIrSubSliceTrd']] <- createParameter('mImportIrSubSliceTrd', c('trade', 'comm', 'region', 'year', 'slice', 'slice'), 'map') 
