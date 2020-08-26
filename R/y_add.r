@@ -302,11 +302,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   mExportRow$comm <- exp@commodity
   obj@parameters[['mExportRow']] <- addData(obj@parameters[['mExportRow']], mExportRow)
   if (!is.null(pExportRow)) {
-    tmp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, 1:4]
-    tmp$comm <- exp@commodity
-    obj@parameters[['mExportRowUp']] <- addData(obj@parameters[['mExportRowUp']], tmp)
+    mExportRowUp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, colnames(pExportRow) %in% obj@parameters[['mExportRowUp']]@dimSetNames, drop = FALSE]
+    mExportRowUp$comm <- exp@commodity
+    if (!all(obj@parameters[['mExportRowUp']]@dimSetNames %in% mExportRowUp)) 
+      mExportRowUp <- merge(mExportRow, mExportRowUp)
+    obj@parameters[['mExportRowUp']] <- addData(obj@parameters[['mExportRowUp']], mExportRowUp)
+    meqExportRowLo <- pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, colnames(pExportRow) %in% obj@parameters[['meqExportRowLo']]@dimSetNames, drop = FALSE]
+    meqExportRowLo$comm <- exp@commodity
+    if (!all(obj@parameters[['meqExportRowLo']]@dimSetNames %in% meqExportRowLo)) 
+      meqExportRowLo <- merge(mExportRow, meqExportRowLo)
     obj@parameters[['meqExportRowLo']] <- addData(obj@parameters[['meqExportRowLo']], 
-              merge(mExportRow, pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, 1:4])) 
+              merge(mExportRow, meqExportRowLo)) 
   }
   if (!is.null(pExportRowRes)) {
     pExportRowRes$comm <- exp@commodity
@@ -344,13 +350,19 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
                                         fromLast = TRUE)[1:nrow(mImportRow)]), ]
   mImportRow$comm <- imp@commodity
   obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
-  if (!is.null(pImportRow)) {
-    tmp <- pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf & pImportRow$value != 0, 1:4]
-    tmp$comm <- imp@commodity
-    obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], tmp)
+   if (!is.null(pImportRow)) {
+    mImportRowUp <- pImportRow[pImportRow$type == 'up' & pImportRow$value != Inf & pImportRow$value != 0, colnames(pImportRow) %in% obj@parameters[['mImportRowUp']]@dimSetNames, drop = FALSE]
+    mImportRowUp$comm <- imp@commodity
+    if (!all(obj@parameters[['mImportRowUp']]@dimSetNames %in% mImportRowUp)) 
+      mImportRowUp <- merge(mImportRow, mImportRowUp)
+    obj@parameters[['mImportRowUp']] <- addData(obj@parameters[['mImportRowUp']], mImportRowUp)
+    meqImportRowLo <- pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, colnames(pImportRow) %in% obj@parameters[['meqImportRowLo']]@dimSetNames, drop = FALSE]
+    meqImportRowLo$comm <- imp@commodity
+    if (!all(obj@parameters[['meqImportRowLo']]@dimSetNames %in% meqImportRowLo)) 
+      meqImportRowLo <- merge(mImportRow, meqImportRowLo)
     obj@parameters[['meqImportRowLo']] <- addData(obj@parameters[['meqImportRowLo']], 
-                                                  merge(mImportRow, pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, 1:4])) 
-  }
+              merge(mImportRow, meqImportRowLo)) 
+   }
   if (!is.null(pImportRowRes)) {
     pImportRowRes$comm <- exp@commodity
     obj@parameters[['mImportRowAccumulatedUp']] <- addData(obj@parameters[['mImportRowAccumulatedUp']], 
