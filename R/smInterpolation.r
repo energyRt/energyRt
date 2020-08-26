@@ -16,6 +16,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
       add_set_name <- add_set_name[!fl]
       add_set_value <- add_set_value[!fl]
     }
+    frm <- frm[!duplicated(frm),, drop = FALSE]
   }
 
   dd <- interpolation(frm, parameter,
@@ -80,6 +81,7 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
       add_set_name <- add_set_name[!fl]
       add_set_value <- add_set_value[!fl]
     }
+    frm <- frm[!duplicated(frm),, drop = FALSE]
   }
   
   dd <- interpolation_bound(frm, parameter,
