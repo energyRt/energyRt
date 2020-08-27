@@ -110,6 +110,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		  tmp <- tmp[, c('stg', 'comm', 'region', 'year', 'slice', 'value')]
 		  obj@parameters[['pStorageNCap2Stg']] <- addData(obj@parameters[['pStorageNCap2Stg']], tmp)
 		}
+
 		if (any(!is.na(stg@stock$charge) & stg@stock$charge != 0)) {
 		  fl <- (!is.na(stg@stock$charge) & stg@stock$charge != 0)
 		  if (any(is.na(stg@stock[fl, c('region', 'year', 'slice')])))
@@ -186,6 +187,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 			waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
 			list(m = m, p = waf20)
 		}
+
 		tmp <- merge.weather(stg, 'waf')
 		if (length(tmp) != 0) {
 			obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$m)
@@ -220,6 +222,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   		mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
   		obj@parameters[['mStorageOMCost']] <- addData(obj@parameters[['mStorageOMCost']], mStorageOMCost)
 		}
+
 		mvStorageStore <- merge(mStorageSpan, list(slice = stg_slice))
 		mvStorageStore$comm <- stg@commodity
 		obj@parameters[['mvStorageStore']] <- addData(obj@parameters[['mvStorageStore']], mvStorageStore)
@@ -249,6 +252,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		  x <- x[x$type == 'up' & x$value == Inf, ]
 		  y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
 		}
+
 		obj@parameters[['meqStorageAfLo']] <- addData(obj@parameters[['meqStorageAfLo']], merge(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0, 
          ], mvStorageStore))
 		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf(pStorageAf, mvStorageStore))
@@ -258,8 +262,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   		obj@parameters[['meqStorageInpUp']] <- addData(obj@parameters[['meqStorageInpUp']],rem_inf(pStorageCinp, mvStorageStore))
 		}
 		if (!is.null(pStorageCout)) {
-  		obj@parameters[['meqStorageOutLo']] <- addData(obj@parameters[['meqStorageOutLo']], merge(pStorageCout[pStorageCout$type == 'lo' & pStorageCout$value != 0, 
-  		                 obj@parameters[['meqStorageOutLo']]@dimSetNames], mvStorageStore))
+  		obj@parameters[['meqStorageOutLo']] <- addData(obj@parameters[['meqStorageOutLo']], 
+  			merge(pStorageCout[pStorageCout$type == 'lo' & pStorageCout$value != 0, 
+  		                 colnames(pStorageCout) %in% obj@parameters[['meqStorageOutLo']]@dimSetNames, drop = FALSE], mvStorageStore))
   		obj@parameters[['meqStorageOutUp']] <- addData(obj@parameters[['meqStorageOutUp']], rem_inf(pStorageCout, mvStorageStore))
     }
 		obj
