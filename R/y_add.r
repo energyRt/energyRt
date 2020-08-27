@@ -203,7 +203,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']], pSupAva)
     tmp <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', drop = FALSE]
     mSupAva <- merge(merge(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
-    mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
+    if (nrow(tmp) != 0) {
+      if (all(colnames(mSupAva) %in% colnames(tmp))) {
+        mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
+      } else {
+        mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, merge(mSupAva, tmp[, colnames(tmp) %in% colnames(mSupAva), drop = FALSE])[, colnames(mSupAva)]
+          ), fromLast = TRUE))[1:nrow(mSupAva)], ]
+      }
+    }
     obj@parameters[['mSupAva']] <- addData(obj@parameters[['mSupAva']], mSupAva)
 
     obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
