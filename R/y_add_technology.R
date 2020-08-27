@@ -324,6 +324,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		for(i in 1:nrow(dd)) {
 			approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
 			approxim_comm[['acomm']] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, 'table']]), 'acomm'])
+			if (dd[i, 'tab2'] == 'mTechAct2AOut') browser()
 			if (length(approxim_comm[['acomm']]) != 0) {
 				tmp <- simpleInterpolation(tech@aeff, dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim_comm, 'tech', tech@name)		
 				obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]], tmp)
