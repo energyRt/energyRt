@@ -310,7 +310,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 							if (i %in% c(1, 3)) tmp <- merge(tmp, mvTechInp) else tmp <- merge(tmp, mvTechOut)
 						}
 						tmp$comm.1 <- tmp$comm; tmp$comm <- tmp$acomm; tmp$acomm <- NULL;
-						obj@parameters[[tbl2]] <- addData(obj@parameters[[tbl2]], tmp)
+						obj@parameters[[tbl2]] <- addData(obj@parameters[[tbl2]], tmp[!duplicated(tmp), ])
 					}
 				}
 			}
