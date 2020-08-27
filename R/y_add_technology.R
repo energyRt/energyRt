@@ -402,7 +402,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
  	 ####
 	  outer_inf <- function(mvTechAct, pTechAf) {
 	  	merge(mvTechAct, pTechAf[pTechAf$value != Inf & pTechAf$type == 'up',
-	                                                    colnames(pTechAf) %in% colnames(mvTechAct)])
+	                                                    colnames(pTechAf) %in% colnames(mvTechAct), drop = FALSE])
 	  }
 	  if (!is.null(pTechAf) && any(pTechAf$value != 0 & pTechAf$type == 'lo')) {
 	    obj@parameters[['meqTechAfLo']] <- addData(obj@parameters[['meqTechAfLo']],
