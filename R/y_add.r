@@ -203,7 +203,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']], pSupAva)
     tmp <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', drop = FALSE]
     mSupAva <- merge(merge(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
-    if (nrow(tmp) != 0) {
+    if (!is.null(tmp) && nrow(tmp) != 0) {
       if (all(colnames(mSupAva) %in% colnames(tmp))) {
         mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
       } else {
