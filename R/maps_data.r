@@ -939,13 +939,13 @@ rs
 "mvStorageAOut",
 "mvStorageStore",
 "mStorageStg2AOut",
-"mStorageInp2AOut",
-"mStorageOut2AOut",
+"mStorageCinp2AOut",
+"mStorageCout2AOut",
 "mStorageCap2AOut",
 "mStorageNCap2AOut",
 "mStorageStg2AInp",
-"mStorageInp2AInp",
-"mStorageOut2AInp",
+"mStorageCinp2AInp",
+"mStorageCout2AInp",
 "mStorageCap2AInp",
 "mStorageNCap2AInp",
 "mvTradeIr",
@@ -1118,10 +1118,10 @@ rs
 "pStorageCharge",
 "pStorageStg2AInp",
 "pStorageStg2AOut",
-"pStorageInp2AInp",
-"pStorageInp2AOut",
-"pStorageOut2AInp",
-"pStorageOut2AOut",
+"pStorageCinp2AInp",
+"pStorageCinp2AOut",
+"pStorageCout2AInp",
+"pStorageCout2AOut",
 "pStorageCap2AInp",
 "pStorageCap2AOut",
 "pStorageNCap2AInp",
@@ -1349,20 +1349,20 @@ rs
     rs["mvStorageStore", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageClean", "eqStorageInpTot", "eqStorageOutTot")] <- TRUE;
     rs["mStorageStg2AOut", c("name", "description", "type")] <- c("mStorageStg2AOut", "", "map");
     rs["mStorageStg2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
-    rs["mStorageInp2AOut", c("name", "description", "type")] <- c("mStorageInp2AOut", "", "map");
-    rs["mStorageInp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
-    rs["mStorageOut2AOut", c("name", "description", "type")] <- c("mStorageOut2AOut", "", "map");
-    rs["mStorageOut2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageCinp2AOut", c("name", "description", "type")] <- c("mStorageCinp2AOut", "", "map");
+    rs["mStorageCinp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageCout2AOut", c("name", "description", "type")] <- c("mStorageCout2AOut", "", "map");
+    rs["mStorageCout2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
     rs["mStorageCap2AOut", c("name", "description", "type")] <- c("mStorageCap2AOut", "", "map");
     rs["mStorageCap2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
     rs["mStorageNCap2AOut", c("name", "description", "type")] <- c("mStorageNCap2AOut", "", "map");
     rs["mStorageNCap2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
     rs["mStorageStg2AInp", c("name", "description", "type")] <- c("mStorageStg2AInp", "", "map");
     rs["mStorageStg2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
-    rs["mStorageInp2AInp", c("name", "description", "type")] <- c("mStorageInp2AInp", "", "map");
-    rs["mStorageInp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
-    rs["mStorageOut2AInp", c("name", "description", "type")] <- c("mStorageOut2AInp", "", "map");
-    rs["mStorageOut2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageCinp2AInp", c("name", "description", "type")] <- c("mStorageCinp2AInp", "", "map");
+    rs["mStorageCinp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageCout2AInp", c("name", "description", "type")] <- c("mStorageCout2AInp", "", "map");
+    rs["mStorageCout2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["mStorageCap2AInp", c("name", "description", "type")] <- c("mStorageCap2AInp", "", "map");
     rs["mStorageCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["mStorageNCap2AInp", c("name", "description", "type")] <- c("mStorageNCap2AInp", "", "map");
@@ -1707,14 +1707,14 @@ rs
     rs["pStorageStg2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["pStorageStg2AOut", c("name", "description", "type")] <- c("pStorageStg2AOut", "Storage accumulated volume output", "parameter");
     rs["pStorageStg2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
-    rs["pStorageInp2AInp", c("name", "description", "type")] <- c("pStorageInp2AInp", "Storage input to auxilary input coefficient", "parameter");
-    rs["pStorageInp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
-    rs["pStorageInp2AOut", c("name", "description", "type")] <- c("pStorageInp2AOut", "Storage input to auxilary output coefficient", "parameter");
-    rs["pStorageInp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
-    rs["pStorageOut2AInp", c("name", "description", "type")] <- c("pStorageOut2AInp", "Storage output to auxilary input coefficient", "parameter");
-    rs["pStorageOut2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
-    rs["pStorageOut2AOut", c("name", "description", "type")] <- c("pStorageOut2AOut", "Storage output to auxilary output coefficient", "parameter");
-    rs["pStorageOut2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["pStorageCinp2AInp", c("name", "description", "type")] <- c("pStorageCinp2AInp", "Storage input to auxilary input coefficient", "parameter");
+    rs["pStorageCinp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["pStorageCinp2AOut", c("name", "description", "type")] <- c("pStorageCinp2AOut", "Storage input to auxilary output coefficient", "parameter");
+    rs["pStorageCinp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["pStorageCout2AInp", c("name", "description", "type")] <- c("pStorageCout2AInp", "Storage output to auxilary input coefficient", "parameter");
+    rs["pStorageCout2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["pStorageCout2AOut", c("name", "description", "type")] <- c("pStorageCout2AOut", "Storage output to auxilary output coefficient", "parameter");
+    rs["pStorageCout2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
     rs["pStorageCap2AInp", c("name", "description", "type")] <- c("pStorageCap2AInp", "Storage capacity to auxilary input coefficient", "parameter");
     rs["pStorageCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["pStorageCap2AOut", c("name", "description", "type")] <- c("pStorageCap2AOut", "Storage capacity to auxilary output coefficient", "parameter");

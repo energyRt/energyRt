@@ -398,7 +398,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 
  	 ####
 	  outer_inf <- function(mvTechAct, pTechAf) {
-	  	merge(mvTechAct, pTechAf[pTechAf$value == Inf & pTechAf$type == 'up',
+	  	merge(mvTechAct, pTechAf[pTechAf$value != Inf & pTechAf$type == 'up',
 	                                                    colnames(pTechAf) %in% colnames(mvTechAct)])
 	  }
 	  if (!is.null(pTechAf) && any(pTechAf$value != 0 & pTechAf$type == 'lo')) {

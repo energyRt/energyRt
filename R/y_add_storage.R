@@ -71,17 +71,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 				stop(paste0('Unknown aux commodity "', paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
 			}
 			stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),, drop = FALSE]
-			ainp_flag <- c('stg2ainp', 'inp2ainp', 'out2ainp', 'cap2ainp', 'ncap2ainp')
-			aout_flag <- c('stg2aout', 'inp2aout', 'out2aout', 'cap2aout', 'ncap2aout')
+			ainp_flag <- c('stg2ainp', 'cinp2ainp', 'cout2ainp', 'cap2ainp', 'ncap2ainp')
+			aout_flag <- c('stg2aout', 'cinp2aout', 'cout2aout', 'cap2aout', 'ncap2aout')
 			cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), 'acomm']
 			cmp_out <- stg@aeff[apply(!is.na(stg@aeff[, aout_flag]), 1, any), 'acomm']
 			mStorageAInp <- data.frame(stg = rep(stg@name, length(cmp_inp)), comm = cmp_inp)
 			obj@parameters[['mStorageAInp']] <- addData(obj@parameters[['mStorageAInp']], mStorageAInp)
 			mStorageAOut <- data.frame(stg = rep(stg@name, length(cmp_out)), comm = cmp_out)
       obj@parameters[['mStorageAOut']] <- addData(obj@parameters[['mStorageAOut']], mStorageAOut)
-			dd <- data.frame(list = c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 'pStorageOut2AInp', 
-				'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 'pStorageNCap2AInp', 'pStorageNCap2AOut'),
-				table = c('stg2ainp', 'stg2aout', 'inp2ainp', 'inp2aout', 'out2ainp', 'out2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 
+			dd <- data.frame(list = c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageCinp2AInp', 'pStorageCinp2AOut', 'pStorageCout2AInp', 
+				'pStorageCout2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 'pStorageNCap2AInp', 'pStorageNCap2AOut'),
+				table = c('stg2ainp', 'stg2aout', 'cinp2ainp', 'cinp2aout', 'cout2ainp', 'cout2aout', 'cap2ainp', 'cap2aout', 'ncap2ainp', 
 					'ncap2aout'),
 				stringsAsFactors = FALSE)
 			approxim_comm <- approxim
@@ -225,22 +225,24 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		obj@parameters[['mvStorageStore']] <- addData(obj@parameters[['mvStorageStore']], mvStorageStore)
 
 		if (nrow(stg@aux) != 0) {
-			mvStorageAInp <- merge(mvStorageStore, mStorageAInp)
+			mvStorageStore2 <- mvStorageStore; mvStorageStore2$comm <- NULL
+			mvStorageAInp <- merge(mvStorageStore2, mStorageAInp)
 		  obj@parameters[['mvStorageAInp']] <- addData(obj@parameters[['mvStorageAInp']], mvStorageAInp)
-			mvStorageAOut <- merge(mvStorageStore, mStorageAOut)
+			mvStorageAOut <- merge(mvStorageStore2, mStorageAOut)
   		obj@parameters[['mvStorageAOut']] <- addData(obj@parameters[['mvStorageAOut']], mvStorageAOut)
-  		for (i in c('mStorageStg2AOut', 'mStorageInp2AOut', 'mStorageOut2AOut', 'mStorageCap2AOut', 'mStorageNCap2AOut', 
-  			'mStorageStg2AInp', 'mStorageInp2AInp', 'mStorageOut2AInp', 'mStorageCap2AInp', 'mStorageNCap2AInp')) {
-  			atmp <- aout_tmp[[gsub('^m', 'p', i)]]
-  			if (any(grep('Out$', i))) {
-	  			atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAOut), drop = FALSE]
-	  			if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAOut)
-  			} else {
-	  			atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAInp), drop = FALSE]
-	  			if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAInp)
-  			}
-  			obj@parameters[[i]] <- addData(obj@parameters[[i]], atmp)
-  		}
+  		for (i in c('mStorageStg2AOut', 'mStorageCinp2AOut', 'mStorageCout2AOut', 'mStorageCap2AOut', 'mStorageNCap2AOut', 
+  			'mStorageStg2AInp', 'mStorageCinp2AInp', 'mStorageCout2AInp', 'mStorageCap2AInp', 'mStorageNCap2AInp')) 
+  			if (!is.null(aout_tmp[[gsub('^m', 'p', i)]])) {
+	  			atmp <- aout_tmp[[gsub('^m', 'p', i)]]
+	  			if (any(grep('Out$', i))) {
+		  			atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAOut), drop = FALSE]
+		  			if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAOut)
+	  			} else {
+		  			atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAInp), drop = FALSE]
+		  			if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAInp)
+	  			}
+	  			obj@parameters[[i]] <- addData(obj@parameters[[i]], atmp)
+	  		}
 		}
 		rem_inf <- function(x, y) {
 		  if (is.null(x)) return(y)

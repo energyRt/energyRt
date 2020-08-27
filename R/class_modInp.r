@@ -343,10 +343,11 @@ setMethod("initialize", "modInp",
     
     .Object@parameters[['mStorageAInp']] <- createParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
     .Object@parameters[['mStorageAOut']] <- createParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    
-    stg_tmp <- c('pStorageStg2AInp' = 'stg2ainp', 'pStorageStg2AOut' = 'stg2aout', 'pStorageInp2AInp' = 'inp2ainp', 'pStorageInp2AOut' = 'inp2aout', 'pStorageOut2AInp' = 'out2ainp', 
-				'pStorageOut2AOut' = 'out2aout', 'pStorageCap2AInp' = 'cap2ainp', 'pStorageCap2AOut' = 'cap2aout', 'pStorageNCap2AInp' = 'ncap2ainp', 'pStorageNCap2AOut' = 'ncap2aout')
-    for(i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 
-    	'pStorageOut2AInp', 'pStorageOut2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
+    stg_tmp <- c('pStorageStg2AInp' = 'stg2ainp', 'pStorageStg2AOut' = 'stg2aout', 'pStorageCinp2AInp' = 'cinp2ainp', 'pStorageCinp2AOut' = 'cinp2aout', 
+    	'pStorageCout2AInp' = 'cout2ainp', 
+				'pStorageCout2AOut' = 'cout2aout', 'pStorageCap2AInp' = 'cap2ainp', 'pStorageCap2AOut' = 'cap2aout', 'pStorageNCap2AInp' = 'ncap2ainp', 'pStorageNCap2AOut' = 'ncap2aout')
+    for(i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageCinp2AInp', 'pStorageCinp2AOut', 
+    	'pStorageCout2AInp', 'pStorageCout2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
     	'pStorageNCap2AInp', 'pStorageNCap2AOut'))
       .Object@parameters[[i]] <- createParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 
                                                  defVal = 0, interpolation = 'back.inter.forth', cls = 'storage', colName = stg_tmp[i])    
@@ -354,8 +355,8 @@ setMethod("initialize", "modInp",
                  c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '', cls = 'storage', colName = 'ncap2stg')    
     .Object@parameters[['pStorageCharge']] <- createParameter('pStorageCharge', 
               c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 0, interpolation = '', cls = 'storage', colName = 'charge')    
-    for (i in c('mStorageStg2AOut', 'mStorageInp2AOut', 'mStorageOut2AOut', 'mStorageCap2AOut', 'mStorageNCap2AOut', 'mStorageStg2AInp', 'mStorageInp2AInp', 
-    	'mStorageOut2AInp', 'mStorageCap2AInp', 'mStorageNCap2AInp'))
+    for (i in c('mStorageStg2AOut', 'mStorageCinp2AOut', 'mStorageCout2AOut', 'mStorageCap2AOut', 'mStorageNCap2AOut', 'mStorageStg2AInp', 'mStorageCinp2AInp', 
+    	'mStorageCout2AInp', 'mStorageCap2AInp', 'mStorageNCap2AInp'))
     		.Object@parameters[[i]] <- createParameter(i, c('stg', 'comm', 'region', 'year', 'slice'), 'map', cls = 'storage')    
 
 

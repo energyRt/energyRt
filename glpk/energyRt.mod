@@ -98,13 +98,13 @@ set mvStorageAInp dimen 5;
 set mvStorageAOut dimen 5;
 set mvStorageStore dimen 5;
 set mStorageStg2AOut dimen 5;
-set mStorageInp2AOut dimen 5;
-set mStorageOut2AOut dimen 5;
+set mStorageCinp2AOut dimen 5;
+set mStorageCout2AOut dimen 5;
 set mStorageCap2AOut dimen 5;
 set mStorageNCap2AOut dimen 5;
 set mStorageStg2AInp dimen 5;
-set mStorageInp2AInp dimen 5;
-set mStorageOut2AInp dimen 5;
+set mStorageCinp2AInp dimen 5;
+set mStorageCout2AInp dimen 5;
 set mStorageCap2AInp dimen 5;
 set mStorageNCap2AInp dimen 5;
 set mvTradeIr dimen 6;
@@ -281,10 +281,10 @@ param pStorageNCap2Stg{stg, comm, region, year, slice};
 param pStorageCharge{stg, comm, region, year, slice};
 param pStorageStg2AInp{stg, comm, region, year, slice};
 param pStorageStg2AOut{stg, comm, region, year, slice};
-param pStorageInp2AInp{stg, comm, region, year, slice};
-param pStorageInp2AOut{stg, comm, region, year, slice};
-param pStorageOut2AInp{stg, comm, region, year, slice};
-param pStorageOut2AOut{stg, comm, region, year, slice};
+param pStorageCinp2AInp{stg, comm, region, year, slice};
+param pStorageCinp2AOut{stg, comm, region, year, slice};
+param pStorageCout2AInp{stg, comm, region, year, slice};
+param pStorageCout2AOut{stg, comm, region, year, slice};
 param pStorageCap2AInp{stg, comm, region, year, slice};
 param pStorageCap2AOut{stg, comm, region, year, slice};
 param pStorageNCap2AInp{stg, comm, region, year, slice};
@@ -472,9 +472,9 @@ s.t.  eqAggOut{(c, r, y, s) in mAggOut}: vAggOut[c,r,y,s]  =  sum{cp in comm:((c
 
 s.t.  eqEmsFuelTot{(c, r, y, s) in mEmsFuelTot}: vEmsFuelTot[c,r,y,s]  =  sum{cp in comm:((pEmissionFactor[c,cp]>0))}(pEmissionFactor[c,cp]*sum{t in tech:((t,cp) in mTechInpComm)}(pTechEmisComm[t,cp]*sum{sp in slice:((c,s,sp) in mCommSliceOrParent)}(sum{FORIF: (t,c,cp,r,y,sp) in mTechEmsFuel} (vTechInp[t,cp,r,y,sp]))));
 
-s.t.  eqStorageAInp{(st1, c, r, y, s) in mvStorageAInp}: vStorageAInp[st1,c,r,y,s]  =  sum{cp in comm:((st1,cp) in mStorageComm)}(sum{FORIF: (st1,c,r,y,s) in mStorageStg2AInp} ((pStorageStg2AInp[st1,c,r,y,s]*vStorageStore[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageInp2AInp} ((pStorageInp2AInp[st1,c,r,y,s]*vStorageInp[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageOut2AInp} ((pStorageOut2AInp[st1,c,r,y,s]*vStorageOut[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCap2AInp} ((pStorageCap2AInp[st1,c,r,y,s]*vStorageCap[st1,r,y]))+sum{FORIF: (st1,c,r,y,s) in mStorageNCap2AInp} ((pStorageNCap2AInp[st1,c,r,y,s]*vStorageNewCap[st1,r,y])));
+s.t.  eqStorageAInp{(st1, c, r, y, s) in mvStorageAInp}: vStorageAInp[st1,c,r,y,s]  =  sum{cp in comm:((st1,cp) in mStorageComm)}(sum{FORIF: (st1,c,r,y,s) in mStorageStg2AInp} ((pStorageStg2AInp[st1,c,r,y,s]*vStorageStore[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCinp2AInp} ((pStorageCinp2AInp[st1,c,r,y,s]*vStorageInp[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCout2AInp} ((pStorageCout2AInp[st1,c,r,y,s]*vStorageOut[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCap2AInp} ((pStorageCap2AInp[st1,c,r,y,s]*vStorageCap[st1,r,y]))+sum{FORIF: (st1,c,r,y,s) in mStorageNCap2AInp} ((pStorageNCap2AInp[st1,c,r,y,s]*vStorageNewCap[st1,r,y])));
 
-s.t.  eqStorageAOut{(st1, c, r, y, s) in mvStorageAOut}: vStorageAOut[st1,c,r,y,s]  =  sum{cp in comm:((st1,cp) in mStorageComm)}(sum{FORIF: (st1,c,r,y,s) in mStorageStg2AOut} ((pStorageStg2AOut[st1,c,r,y,s]*vStorageStore[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageInp2AOut} ((pStorageInp2AOut[st1,c,r,y,s]*vStorageInp[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageOut2AOut} ((pStorageOut2AOut[st1,c,r,y,s]*vStorageOut[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCap2AOut} ((pStorageCap2AOut[st1,c,r,y,s]*vStorageCap[st1,r,y]))+sum{FORIF: (st1,c,r,y,s) in mStorageNCap2AOut} ((pStorageNCap2AOut[st1,c,r,y,s]*vStorageNewCap[st1,r,y])));
+s.t.  eqStorageAOut{(st1, c, r, y, s) in mvStorageAOut}: vStorageAOut[st1,c,r,y,s]  =  sum{cp in comm:((st1,cp) in mStorageComm)}(sum{FORIF: (st1,c,r,y,s) in mStorageStg2AOut} ((pStorageStg2AOut[st1,c,r,y,s]*vStorageStore[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCinp2AOut} ((pStorageCinp2AOut[st1,c,r,y,s]*vStorageInp[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCout2AOut} ((pStorageCout2AOut[st1,c,r,y,s]*vStorageOut[st1,cp,r,y,s]))+sum{FORIF: (st1,c,r,y,s) in mStorageCap2AOut} ((pStorageCap2AOut[st1,c,r,y,s]*vStorageCap[st1,r,y]))+sum{FORIF: (st1,c,r,y,s) in mStorageNCap2AOut} ((pStorageNCap2AOut[st1,c,r,y,s]*vStorageNewCap[st1,r,y])));
 
 s.t.  eqStorageStore{(st1, c, r, y, s) in mvStorageStore}: vStorageStore[st1,c,r,y,s]  =  pStorageCharge[st1,c,r,y,s]+sum{FORIF: (st1,r,y) in mStorageNew} ((pStorageNCap2Stg[st1,c,r,y,s]*vStorageNewCap[st1,r,y]))+sum{sp in slice:(((c,sp) in mCommSlice and ((not((st1 in mStorageFullYear)) and (sp,s) in mSliceNext) or (st1 in mStorageFullYear and (sp,s) in mSliceFYearNext))))}(pStorageInpEff[st1,c,r,y,sp]*vStorageInp[st1,c,r,y,sp]+((pStorageStgEff[st1,c,r,y,s])^(pSliceShare[s]))*vStorageStore[st1,c,r,y,sp]-(vStorageOut[st1,c,r,y,sp]) / (pStorageOutEff[st1,c,r,y,sp]));
 
