@@ -199,7 +199,7 @@ setMethod("initialize", "modInp",
 	.Object@parameters[['mTechCout2AInp']] <- createParameter('mTechCout2AInp', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
 	.Object@parameters[['mTechAct2AOut']] <- createParameter('mTechAct2AOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
 	.Object@parameters[['mTechCap2AOut']] <- createParameter('mTechCap2AOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
-	.Object@parameters[['mpTechNCap2AOut']] <- createParameter('mTechNCap2AOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
+	.Object@parameters[['mTechNCap2AOut']] <- createParameter('mTechNCap2AOut', c('tech', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
 	.Object@parameters[['mTechCinp2AOut']] <- createParameter('mTechCinp2AOut', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
 	.Object@parameters[['mTechCout2AOut']] <- createParameter('mTechCout2AOut', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map', cls = 'technology')     
 

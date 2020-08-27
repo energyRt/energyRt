@@ -332,7 +332,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 					ll$comm <- NULL
 					tmp <- merge(tmp, ll)
 				}
-				tmp$comm <- tmp$acomm; tmp$acomm <- NULL;
+				tmp$comm <- tmp$acomm; tmp$acomm <- NULL; tmp$value <- NULL
+				if (ncol(tmp) != ncol(mvTechAct) + 1) {
+					tmp <- merge(tmp, mvTechAct)
+				}
 				obj@parameters[[dd[i, 'tab2']]] <- addData(obj@parameters[[dd[i, 'tab2']]], tmp)
 			}
 		}  
@@ -485,7 +488,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	mTechOMCost <- NULL
 		add_omcost <- function(mTechOMCost, pTechFixom) {
 			if (is.null(pTechFixom)) return(mTechOMCost) 
-			return(rbind(mTechOMCost, merge(mvTechAct, pTechFixom[pTechFixom$value != 0, colnames(pTechFixom) %in% colnames(pTechFixom), drop = FALSE])))
+			return(rbind(mTechOMCost, merge(mTechSpan, pTechFixom[pTechFixom$value != 0, colnames(pTechFixom) %in% colnames(mTechSpan), drop = FALSE])))
 		}
 		mTechOMCost <- add_omcost(mTechOMCost, pTechFixom)
 		mTechOMCost <- add_omcost(mTechOMCost, pTechVarom)
