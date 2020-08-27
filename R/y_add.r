@@ -191,15 +191,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     sup <- stayOnlyVariable(sup, approxim$region, 'region')
     mSupSlice <- data.frame(sup = rep(sup@name, length(approxim$slice)), slice = approxim$slice)
     obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']], mSupSlice)
-    #  if (!energyRt:::.chec_correct_name(sup@name)) {
-  #    stop(paste('Incorrect supply name "', sup@name, '"', sep = ''))
-  #  }
-  #  if (isSupply(obj, sup@name)) {
-  #    warning(paste('There is supply name "', sup@name,
-  #        '" now, all previous information will be removed', sep = ''))
-  #    obj <- removePreviousSupply(obj, sup@name)
-  #  }    
-  #  obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
     mSupComm <- data.frame(sup = sup@name, comm = sup@commodity)
     obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']], mSupComm)
     pSupCost <- simpleInterpolation(sup@availability, 'cost', obj@parameters[['pSupCost']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
@@ -212,14 +203,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']], pSupAva)
     tmp <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', drop = FALSE]
     mSupAva <- merge(merge(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
-    mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp), fromLast = TRUE))[1:nrow(mSupAva)], ]
+    mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
     obj@parameters[['mSupAva']] <- addData(obj@parameters[['mSupAva']], mSupAva)
 
     obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
         pSupReserve[pSupReserve$type == 'up' & pSupReserve$value != Inf, c('sup', 'comm', 'region')])
     obj@parameters[['meqSupReserveLo']] <- addData(obj@parameters[['meqSupReserveLo']], 
                                                    pSupReserve[pSupReserve$type == 'lo' & pSupReserve$value != 0, c('sup', 'comm', 'region')])
-    
     obj@parameters[['meqSupAvaLo']] <- addData(obj@parameters[['meqSupAvaLo']], 
                                                merge(mSupAva, pSupAva[pSupAva$type == 'lo' & pSupAva$value != 0, colnames(pSupAva) %in% colnames(mSupAva)]))
     obj@parameters[['mSupAvaUp']] <- addData(obj@parameters[['mSupAvaUp']], 
