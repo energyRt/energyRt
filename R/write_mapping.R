@@ -77,13 +77,14 @@
   no_inf <- function(y) {
     x = getParameterData(prec@parameters[[y]])
     if (!is.null(prec@parameters[[y]]@misc$not_need_interpolate)) {
-      for(i in rev(prec@parameters[[y]]@misc$not_need_interpolate)) {
+      nn <- rev(prec@parameters[[y]]@misc$not_need_interpolate)
+      nn[nn == 'slice'] <- 'mCommSlice'
+      nn[nn == 'year'] <- 'mMidMilestone'
+      for(i in nn)
         x <- merge(getParameterData(prec@parameters[[i]]), x)
-      }
     }
     x[x$value != Inf, -ncol(x)]
   }
-
   prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], no_inf('pDummyImportCost'))
   .interpolation_message('mDummyExport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   prec@parameters[['mDummyExport']] <- addData(prec@parameters[['mDummyExport']], no_inf('pDummyExportCost'))
