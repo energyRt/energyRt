@@ -324,14 +324,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		for(i in 1:nrow(dd)) {
 			approxim_comm <- approxim_comm[names(approxim_comm) != 'comm']
 			approxim_comm[['acomm']] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, 'table']]), 'acomm'])
-			if (dd[i, 'tab2'] == 'mTechAct2AOut') browser()
 			if (length(approxim_comm[['acomm']]) != 0) {
 				tmp <- simpleInterpolation(tech@aeff, dd[i, 'table'], obj@parameters[[dd[i, 'list']]], approxim_comm, 'tech', tech@name)		
 				obj@parameters[[dd[i, 'list']]] <- addData(obj@parameters[[dd[i, 'list']]], tmp)
 				if (!all(c("tech", "acomm", "region", "year", "slice") %in% colnames(tmp))) {
 					if (i <= 3) ll <- mvTechInp else ll <- mvTechOut;
 					ll$comm <- NULL
-					tmp <- merge(tmp, ll)
+					tmp <- merge(tmp, unique(ll))
 				}
 				tmp$comm <- tmp$acomm; tmp$acomm <- NULL; tmp$value <- NULL
 				if (ncol(tmp) != ncol(mvTechAct) + 1) {
