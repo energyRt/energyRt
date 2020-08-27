@@ -131,6 +131,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
         if (sum(fl) != 1) stop('Internal error')
         slt <- psb_slot[fl]
         need_col <- tmp@dimSetNames[tmp@dimSetNames %in% colnames(slot(prot, slt))]
+        if (any(pr == c('pDummyImportCost', 'pDummyExportCost'))) need_col <- need_col[need_col != 'comm']
         if (tmp@type == 'simple') val_col <- tmp@colName else 
           val_col <- c(tmp@colName, gsub('[.].*', '.fx', tmp@colName[1]))
         # Try find reduce column
