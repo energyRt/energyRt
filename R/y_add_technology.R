@@ -487,12 +487,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 		# mTechOMCost(tech, region, year) 
 	mTechOMCost <- NULL
 		add_omcost <- function(mTechOMCost, pTechFixom) {
-			if (is.null(pTechFixom)) return(mTechOMCost) 
+			if (is.null(pTechFixom) || all(pTechFixom$value == 0)) return(mTechOMCost) 
 			return(rbind(mTechOMCost, merge(mTechSpan, pTechFixom[pTechFixom$value != 0, colnames(pTechFixom) %in% colnames(mTechSpan), drop = FALSE])))
 		}
 		mTechOMCost <- add_omcost(mTechOMCost, pTechFixom)
 		mTechOMCost <- add_omcost(mTechOMCost, pTechVarom)
-		mTechOMCost <- add_omcost(pTechAvarom, pTechCvarom)
+		mTechOMCost <- add_omcost(mTechOMCost, pTechCvarom)
+		mTechOMCost <- add_omcost(mTechOMCost, pTechAvarom)
 
 		if (!is.null(mTechOMCost)) {
   		mTechOMCost <- merge(mTechOMCost[!duplicated(mTechOMCost), ], mTechSpan)
