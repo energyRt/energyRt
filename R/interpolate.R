@@ -164,7 +164,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (!scen@model@early.retirement) {
     scen <- .remove_early_retirment(scen)
   }
-  
+  approxim$debug <- scen@model@sysInfo@debug
   # Fill slice level for commodity if not defined
   scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
   # Add commodity slice_level map to approxim

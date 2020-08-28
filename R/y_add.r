@@ -89,6 +89,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   obj@parameters[['mCommSlice']] <- addData(obj@parameters[['mCommSlice']], 
                                             data.frame(comm = rep(cmd@name, length(approxim$commodity_slice_map[[cmd@name]])), 
                                                        slice = approxim$slice))
+    
+  if (any(approxim$debug$comm == cmd@name)) {
+    dbg <- approxim$debug[!is.na(approxim$debug$comm) & approxim$debug$comm == cmd@name,, drop = FALSE]
+    approxim$comm <-cmd@name
+    obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],
+        simpleInterpolation(dbg, 'dummyImport', obj@parameters[['pDummyImportCost']], approxim))   
+    obj@parameters[['pDummyExportCost']] <- addData(obj@parameters[['pDummyExportCost']],
+        simpleInterpolation(dbg, 'dummyExport', obj@parameters[['pDummyExportCost']], approxim))   
+  }
   obj
 })
 
@@ -480,16 +489,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
                                              data.frame(slice = approxim$slice@slice_share$slice, 
                                                         value = approxim$slice@slice_share$share))
   approxim_comm$slice <- approxim$slice@all_slice
-  if (length(approxim_comm[['comm']]) != 0) {
-    # Dummy import
-      obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],
-        simpleInterpolation(app@debug, 'dummyImport',
-          obj@parameters[['pDummyImportCost']], approxim_comm))
-    # Dummy export
-      obj@parameters[['pDummyExportCost']] <- addData(obj@parameters[['pDummyExportCost']],
-        simpleInterpolation(app@debug, 'dummyExport',
-          obj@parameters[['pDummyExportCost']], approxim_comm))
-  }
+
   if (nrow(app@milestone) == 0) {
     app <- setMilestoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
   }
