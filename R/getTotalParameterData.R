@@ -73,7 +73,8 @@
   }
   tmp <- getAllDefVal(prec, name)
   dtt <- getParameterData(prec@parameters[[name]])
-  gg <- rbind(dtt, tmp)
+  if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else 
+    gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
   if (ncol(gg) == 1) return(dtt)
   gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
 }
