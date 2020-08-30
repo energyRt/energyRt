@@ -8,6 +8,7 @@
       if (any(i == c('src', 'dst'))) j <- 'region'
       tmp <- getParameterData(prec@parameters[[j]])
       colnames(tmp) <- i
+      if (nrow(tmp) == 0) return(NULL)
       if (need.reduce) {
         if (i == 'slice' && any(colnames(sets) == 'comm')) {
           tmp <- merge(getParameterData(prec@parameters$mCommSlice), tmp)
@@ -73,8 +74,10 @@
   }
   tmp <- getAllDefVal(prec, name)
   dtt <- getParameterData(prec@parameters[[name]])
-  if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else 
-    gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
-  if (ncol(gg) == 1) return(dtt)
+  if (!is.null(tmp)) {
+    if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else 
+      gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
+    if (ncol(gg) == 1) return(dtt)
+  } else gg <- dtt
   gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
 }
