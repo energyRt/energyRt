@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy technology modeling R-toolbox, alpha-version, for testing only
-Version: 0.01.11.9000
-Date: 2020-08-05
+Version: 0.01.12.9000
+Date: 2020-08-30
 Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com", 
                     role = c("aut", "cre"), comment = ""), 
              person("Vladimir", "Potashnikov", email = "potashnikov.vu@gmail.com", 
