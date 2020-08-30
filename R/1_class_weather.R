@@ -8,6 +8,7 @@ setClass("weather",
            unit          = "character",
            region        = "character",
            slice         = "character",
+           defVal        = "numeric",
            weather       = "data.frame", # weather factor (availability multiplier)
            color         = "data.frame",      #
            misc = "list"
