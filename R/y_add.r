@@ -161,6 +161,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'weather',
                               wth@region <- approxim$region
                               wth <- stayOnlyVariable(wth, approxim$region, 'region')
                               wth <- .disaggregateSliceLevel(wth, approxim)
+    obj@parameters[['pWeather']]@defVal <- wth@defVal
     obj@parameters[['pWeather']] <- addData(obj@parameters[['pWeather']], simpleInterpolation(wth@weather, 'wval',
        obj@parameters[['pWeather']], approxim, 'weather', wth@name, all.val = TRUE))
     obj@parameters[['mWeatherSlice']] <- addData(obj@parameters[['mWeatherSlice']],
