@@ -103,6 +103,58 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }), recursive = TRUE)), recursive = TRUE)
   names(approxim$all_comm) <- NULL
   scen@modInp <- .read_default_data(scen@modInp, scen@model@sysInfo)
+  
+    if (!is.null(arg$trim) && arg$trim) {
+    ## Trim before   interpolation
+    par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
+    # par_name <- par_name[sapply(scen@modInp@parameters[par_name], function(x) any(x@dimSetNames %in% c('slice', 'year')))]
+    par_name <- par_name[!(par_name %in% c(c('pEmissionFactor', 'pTechEmisComm', 'pDiscount')))]
+    # Get repository / class structure
+    rep_class <- NULL
+    for (i in seq_along(scen@model@data)) {
+      rep_class <- rbind(rep_class, data.frame(repos = rep(i, length(scen@model@data[[i]]@data)), 
+        class = sapply(scen@model@data[[i]]@data, class), 
+        name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
+        stringsAsFactors = FALSE))
+    }
+    # Trim data
+    for (pr in par_name) {
+      tmp <- scen@modInp@parameters[[pr]]
+      if (!is.null(tmp@misc$class) && (length(tmp@colName) != 1 || tmp@colName != '') && length(tmp@dimSetNames) > 1) {
+        # cat(pr, tmp@misc$class, tmp@colName, '\n')
+        # Get prototype
+        prot <- new(tmp@misc$class)
+        psb_slot <- getSlots(tmp@misc$class)
+        psb_slot <- names(psb_slot)[psb_slot == 'data.frame']
+        psb_slot <- psb_slot[!(psb_slot %in% c('defVal', 'interpolation'))]
+        fl <- sapply(psb_slot, function(x) any(colnames(slot(prot, x)) %in% tmp@colName))
+        if (sum(fl) != 1) stop('Internal error')
+        slt <- psb_slot[fl]
+        need_col <- tmp@dimSetNames[tmp@dimSetNames %in% colnames(slot(prot, slt))]
+        if (any(pr == c('pDummyImportCost', 'pDummyExportCost'))) need_col <- need_col[need_col != 'comm']
+        if (tmp@type == 'simple') val_col <- tmp@colName else 
+          val_col <- c(tmp@colName, gsub('[.].*', '.fx', tmp@colName[1]))
+        # Try find reduce column
+        rep_class2 <- rep_class[rep_class$class == tmp@misc$class, ]
+        i <- 0
+        while (i < nrow(rep_class2) && length(need_col) != 0) {
+          i <- i + 1
+          tbl <- slot(scen@model@data[[rep_class2[i, 'repos']]]@data[[rep_class2[i, 'name']]], slt)
+          if (nrow(tbl) > 0)
+            need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
+        }
+        if (length(need_col) > 0) {
+          scen@modInp@parameters[[pr]]@misc$rem_col <- seq_along(tmp@dimSetNames)[tmp@dimSetNames %in% need_col]
+          scen@modInp@parameters[[pr]]@misc$not_need_interpolate <- need_col
+          scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSetNames
+          scen@modInp@parameters[[pr]]@dimSetNames <- tmp@dimSetNames[!(tmp@dimSetNames %in% need_col)]
+          scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
+          # cat(pr, paste(need_col, collapse = ', '), '\n')
+        }
+      }
+    }
+  }
+  
   scen@modInp <- .add0(scen@modInp, scen@model@sysInfo, approxim = approxim) 
   
   # Add discount data to approxim
@@ -112,7 +164,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (!scen@model@early.retirement) {
     scen <- .remove_early_retirment(scen)
   }
-  
+  approxim$debug <- scen@model@sysInfo@debug
   # Fill slice level for commodity if not defined
   scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
   # Add commodity slice_level map to approxim
@@ -122,6 +174,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Fill set list for interpolation and os one  
   scen <- .add_name_for_basic_set(scen, approxim)
   scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
+
 
 
   

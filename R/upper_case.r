@@ -1,3 +1,4 @@
+# Obsolete?
 .upper_case <- function(x) {
   UseMethod(".upper_case")
 }

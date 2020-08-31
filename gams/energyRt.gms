@@ -1,7 +1,7 @@
 $ontext
 #!onLatex
 \documentclass{article}
-\usepackage[a4paper,landscape,margin=1in]{geometry}
+\usepackage[a4paper,landscape,margin=1eqTechAInpeqTechAInpin]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{breqn}
 \usepackage{longtable}
@@ -241,10 +241,10 @@ pStorageNCap2Stg(stg, comm, region, year, slice)   Initial storage charging for 
 pStorageCharge(stg, comm, region, year, slice)    Initial storage charging for stock
 pStorageStg2AInp(stg, comm, region, year, slice)    Storage accumulated volume to auxilary input
 pStorageStg2AOut(stg, comm, region, year, slice)    Storage accumulated volume output
-pStorageInp2AInp(stg, comm, region, year, slice)    Storage input to auxilary input coefficient
-pStorageInp2AOut(stg, comm, region, year, slice)    Storage input to auxilary output coefficient
-pStorageOut2AInp(stg, comm, region, year, slice)    Storage output to auxilary input coefficient
-pStorageOut2AOut(stg, comm, region, year, slice)    Storage output to auxilary output coefficient
+pStorageCinp2AInp(stg, comm, region, year, slice)    Storage input to auxilary input coefficient
+pStorageCinp2AOut(stg, comm, region, year, slice)    Storage input to auxilary output coefficient
+pStorageCout2AInp(stg, comm, region, year, slice)    Storage output to auxilary input coefficient
+pStorageCout2AOut(stg, comm, region, year, slice)    Storage output to auxilary output coefficient
 pStorageCap2AInp(stg, comm, region, year, slice)    Storage capacity to auxilary input coefficient
 pStorageCap2AOut(stg, comm, region, year, slice)    Storage capacity to auxilary output coefficient
 pStorageNCap2AInp(stg, comm, region, year, slice)   Storage new capacity to auxilary input coefficient
@@ -320,7 +320,22 @@ mvStorageAInp(stg, comm, region, year, slice)
 mvStorageAOut(stg, comm, region, year, slice)
 mvStorageStore(stg, comm, region, year, slice)
 mvStorageStore(stg, comm, region, year, slice)
+mStorageStg2AOut(stg, comm, region, year, slice)
+mStorageCinp2AOut(stg, comm, region, year, slice)
+mStorageCout2AOut(stg, comm, region, year, slice)
+mStorageCap2AOut(stg, comm, region, year, slice)
+mStorageNCap2AOut(stg, comm, region, year, slice)
+mStorageStg2AInp(stg, comm, region, year, slice)
+mStorageCinp2AInp(stg, comm, region, year, slice)
+mStorageCout2AInp(stg, comm, region, year, slice)
+mStorageCap2AInp(stg, comm, region, year, slice)
+mStorageNCap2AInp(stg, comm, region, year, slice)
+
 mvTradeIr(trade, comm, region, region, year, slice)
+mTradeIrCsrc2Ainp(trade, comm, region, region, year, slice)
+mTradeIrCdst2Ainp(trade, comm, region, region, year, slice)
+mTradeIrCsrc2Aout(trade, comm, region, region, year, slice)
+mTradeIrCdst2Aout(trade, comm, region, region, year, slice)
 mvTradeCost(region, year)
 mvTradeRowCost(region, year)
 mvTradeIrCost(region, year)
@@ -632,6 +647,17 @@ meqBalLo(comm, region, year, slice)
 meqBalUp(comm, region, year, slice)
 meqBalFx(comm, region, year, slice)
 meqLECActivity(tech, region, year)
+
+mTechAct2AInp(tech, comm, region, year, slice)
+mTechCap2AInp(tech, comm, region, year, slice)
+mTechNCap2AInp(tech, comm, region, year, slice)
+mTechCinp2AInp(tech, comm, comm, region, year, slice)
+mTechCout2AInp(tech, comm, comm, region, year, slice)
+mTechAct2AOut(tech, comm, region, year, slice)
+mTechCap2AOut(tech, comm, region, year, slice)
+mTechNCap2AOut(tech, comm, region, year, slice)
+mTechCinp2AOut(tech, comm, comm, region, year, slice)
+mTechCout2AOut(tech, comm, comm, region, year, slice)
 ;
 
 $include inc2.gms
@@ -767,30 +793,30 @@ eqTechAOut(tech, comm, region, year, slice) Technology auxiliary commodity outpu
 eqTechAInp(tech, comm, region, year, slice)$mvTechAInp(tech, comm, region, year, slice)..
   vTechAInp(tech, comm, region, year, slice) =e=
   (vTechAct(tech, region, year, slice) *
-    pTechAct2AInp(tech, comm, region, year, slice)) +
+    pTechAct2AInp(tech, comm, region, year, slice))$mTechAct2AInp(tech, comm, region, year, slice) +
   (vTechCap(tech, region, year) *
-    pTechCap2AInp(tech, comm, region, year, slice)) +
+    pTechCap2AInp(tech, comm, region, year, slice))$mTechCap2AInp(tech, comm, region, year, slice) +
   (vTechNewCap(tech, region, year) *
-    pTechNCap2AInp(tech, comm, region, year, slice))$mTechNew(tech, region, year) +
-  sum(commp$(pTechCinp2AInp(tech, comm, commp, region, year, slice) > 0),
+    pTechNCap2AInp(tech, comm, region, year, slice))$mTechNCap2AInp(tech, comm, region, year, slice) +
+  sum(commp$mTechCinp2AInp(tech, comm, commp, region, year, slice),
       pTechCinp2AInp(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$(pTechCout2AInp(tech, comm, commp, region, year, slice) > 0),
+  sum(commp$mTechCout2AInp(tech, comm, commp, region, year, slice),
       pTechCout2AInp(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 
 eqTechAOut(tech, comm, region, year, slice)$mvTechAOut(tech, comm, region, year, slice)..
   vTechAOut(tech, comm, region, year, slice) =e=
   (vTechAct(tech, region, year, slice) *
-    pTechAct2AOut(tech, comm, region, year, slice)) +
+    pTechAct2AOut(tech, comm, region, year, slice))$mTechAct2AOut(tech, comm, region, year, slice) +
   (vTechCap(tech, region, year) *
-    pTechCap2AOut(tech, comm, region, year, slice)) +
+    pTechCap2AOut(tech, comm, region, year, slice))$mTechCap2AOut(tech, comm, region, year, slice) +
   (vTechNewCap(tech, region, year) *
-    pTechNCap2AOut(tech, comm, region, year, slice))$mTechNew(tech, region, year) +
-  sum(commp$(pTechCinp2AOut(tech, comm, commp, region, year, slice) > 0),
+    pTechNCap2AOut(tech, comm, region, year, slice))$mTechNCap2AOut(tech, comm, region, year, slice) +
+  sum(commp$mTechCinp2AOut(tech, comm, commp, region, year, slice),
       pTechCinp2AOut(tech, comm, commp, region, year, slice) *
          vTechInp(tech, commp, region, year, slice)) +
-  sum(commp$(pTechCout2AOut(tech, comm, commp, region, year, slice) > 0),
+  sum(commp$mTechCout2AOut(tech, comm, commp, region, year, slice),
       pTechCout2AOut(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 
@@ -1136,21 +1162,21 @@ eqStorageOutLo(stg, comm, region, year, slice)
 eqStorageAInp(stg, comm, region, year, slice)$mvStorageAInp(stg, comm, region, year, slice)..
   vStorageAInp(stg, comm, region, year, slice) =e=
          sum(commp$mStorageComm(stg, commp),
-         pStorageStg2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
-         pStorageInp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
-         pStorageOut2AInp(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
-         pStorageCap2AInp(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
-         (pStorageNCap2AInp(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year)
+         (pStorageStg2AInp(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice))$mStorageStg2AInp(stg, comm, region, year, slice) +
+         (pStorageCinp2AInp(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice))$mStorageCinp2AInp(stg, comm, region, year, slice) +
+         (pStorageCout2AInp(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice))$mStorageCout2AInp(stg, comm, region, year, slice) +
+         (pStorageCap2AInp(stg, comm, region, year, slice) * vStorageCap(stg, region, year))$mStorageCap2AInp(stg, comm, region, year, slice) +
+         (pStorageNCap2AInp(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNCap2AInp(stg, comm, region, year, slice)
 );
 
 
 eqStorageAOut(stg, comm, region, year, slice)$mvStorageAOut(stg, comm, region, year, slice)..
   vStorageAOut(stg, comm, region, year, slice) =e= sum(commp$mStorageComm(stg, commp),
-         pStorageStg2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice) +
-         pStorageInp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice) +
-         pStorageOut2AOut(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice) +
-         pStorageCap2AOut(stg, comm, region, year, slice) * vStorageCap(stg, region, year) +
-         (pStorageNCap2AOut(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNew(stg, region, year)
+         (pStorageStg2AOut(stg, comm, region, year, slice) * vStorageStore(stg, commp, region, year, slice))$mStorageStg2AOut(stg, comm, region, year, slice) +
+         (pStorageCinp2AOut(stg, comm, region, year, slice) * vStorageInp(stg, commp, region, year, slice))$mStorageCinp2AOut(stg, comm, region, year, slice) +
+         (pStorageCout2AOut(stg, comm, region, year, slice) * vStorageOut(stg, commp, region, year, slice))$mStorageCout2AOut(stg, comm, region, year, slice) +
+         (pStorageCap2AOut(stg, comm, region, year, slice) * vStorageCap(stg, region, year))$mStorageCap2AOut(stg, comm, region, year, slice) +
+         (pStorageNCap2AOut(stg, comm, region, year, slice) * vStorageNewCap(stg, region, year))$mStorageNCap2AOut(stg, comm, region, year, slice)
 );
 
 
@@ -1414,16 +1440,16 @@ eqTradeIrAOutTot(comm, region, year, slice) Trade auxiliary commodity output
 
 eqTradeIrAInp(trade, comm, region, year, slice)$mvTradeIrAInp(trade, comm, region, year, slice)..
   vTradeIrAInp(trade, comm, region, year, slice) =e=
-    sum(dst$mTradeIr(trade, region, dst, year, slice),
+    sum(dst$mTradeIrCsrc2Ainp(trade, comm, region, dst, year, slice),
       pTradeIrCsrc2Ainp(trade, comm, region, dst, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, region, dst, year, slice)))
-    + sum(src$mTradeIr(trade, src, region, year, slice),
+    + sum(src$mTradeIrCdst2Ainp(trade, comm, src, region, year, slice),
       pTradeIrCdst2Ainp(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
 eqTradeIrAOut(trade, comm, region, year, slice)$mvTradeIrAOut(trade, comm, region, year, slice)..
   vTradeIrAOut(trade, comm, region, year, slice) =e=
-    sum(dst$mTradeIr(trade, region, dst, year, slice),
+    sum(dst$mTradeIrCsrc2Aout(trade, comm, region, dst, year, slice),
       pTradeIrCsrc2Aout(trade, comm, region, dst, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, region, dst, year, slice)))
-    + sum(src$mTradeIr(trade, src, region, year, slice),
+    + sum(src$mTradeIrCdst2Aout(trade, comm, src, region, year, slice),
       pTradeIrCdst2Aout(trade, comm, src, region, year, slice) * sum(commp$mTradeComm(trade, commp), vTradeIr(trade, commp, src, region, year, slice)));
 
 eqTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)..

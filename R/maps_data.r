@@ -845,7 +845,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:293,] <- NA;
+    rs[1:317,] <- NA;
     rownames(rs) <- c("tech",
 "sup",
 "dem",
@@ -938,7 +938,21 @@ rs
 "mvStorageAInp",
 "mvStorageAOut",
 "mvStorageStore",
+"mStorageStg2AOut",
+"mStorageCinp2AOut",
+"mStorageCout2AOut",
+"mStorageCap2AOut",
+"mStorageNCap2AOut",
+"mStorageStg2AInp",
+"mStorageCinp2AInp",
+"mStorageCout2AInp",
+"mStorageCap2AInp",
+"mStorageNCap2AInp",
 "mvTradeIr",
+"mTradeIrCsrc2Ainp",
+"mTradeIrCdst2Ainp",
+"mTradeIrCsrc2Aout",
+"mTradeIrCdst2Aout",
 "mvTradeCost",
 "mvTradeRowCost",
 "mvTradeIrCost",
@@ -1019,6 +1033,16 @@ rs
 "meqBalUp",
 "meqBalFx",
 "meqLECActivity",
+"mTechAct2AInp",
+"mTechCap2AInp",
+"mTechNCap2AInp",
+"mTechCinp2AInp",
+"mTechCout2AInp",
+"mTechAct2AOut",
+"mTechCap2AOut",
+"mTechNCap2AOut",
+"mTechCinp2AOut",
+"mTechCout2AOut",
 "mLECRegion",
 "ordYear",
 "cardYear",
@@ -1094,10 +1118,10 @@ rs
 "pStorageCharge",
 "pStorageStg2AInp",
 "pStorageStg2AOut",
-"pStorageInp2AInp",
-"pStorageInp2AOut",
-"pStorageOut2AInp",
-"pStorageOut2AOut",
+"pStorageCinp2AInp",
+"pStorageCinp2AOut",
+"pStorageCout2AInp",
+"pStorageCout2AOut",
 "pStorageCap2AInp",
 "pStorageCap2AOut",
 "pStorageNCap2AInp",
@@ -1206,7 +1230,7 @@ rs
     rs["mTechAOut", c("name", "description", "type")] <- c("mTechAOut", "Auxiliary output", "map");
     rs["mTechAOut", c("tech", "comm", "eqTechOutTot")] <- TRUE;
     rs["mTechNew", c("name", "description", "type")] <- c("mTechNew", "Technologies available for investment", "map");
-    rs["mTechNew", c("tech", "region", "year", "eqTechAInp", "eqTechAOut", "eqTechCap", "eqTechEac")] <- TRUE;
+    rs["mTechNew", c("tech", "region", "year", "eqTechCap", "eqTechEac")] <- TRUE;
     rs["mTechSpan", c("name", "description", "type")] <- c("mTechSpan", "Availability of each technology by regions and milestone years", "map");
     rs["mTechSpan", c("tech", "region", "year", "eqTechCap")] <- TRUE;
     rs["mTechSlice", c("name", "description", "type")] <- c("mTechSlice", "Technology to slice-level", "map");
@@ -1234,7 +1258,7 @@ rs
     rs["mStorageAOut", c("name", "description", "type")] <- c("mStorageAOut", "Aux-commodity output from storage", "map");
     rs["mStorageAOut", c("stg", "comm")] <- TRUE;
     rs["mStorageNew", c("name", "description", "type")] <- c("mStorageNew", "Storage available for investment", "map");
-    rs["mStorageNew", c("stg", "region", "year", "eqStorageStore", "eqStorageAInp", "eqStorageAOut", "eqStorageInv", "eqStorageEac")] <- TRUE;
+    rs["mStorageNew", c("stg", "region", "year", "eqStorageStore", "eqStorageInv", "eqStorageEac")] <- TRUE;
     rs["mStorageSpan", c("name", "description", "type")] <- c("mStorageSpan", "Storage set showing if the storage may exist in the year and region", "map");
     rs["mStorageSpan", c("stg", "region", "year", "eqStorageCap")] <- TRUE;
     rs["mStorageOMCost", c("name", "description", "type")] <- c("mStorageOMCost", "", "map");
@@ -1323,8 +1347,36 @@ rs
     rs["mvStorageAOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut", "eqStorageOutTot")] <- TRUE;
     rs["mvStorageStore", c("name", "description", "type")] <- c("mvStorageStore", "", "map");
     rs["mvStorageStore", c("stg", "comm", "region", "year", "slice", "eqStorageStore", "eqStorageClean", "eqStorageInpTot", "eqStorageOutTot")] <- TRUE;
+    rs["mStorageStg2AOut", c("name", "description", "type")] <- c("mStorageStg2AOut", "", "map");
+    rs["mStorageStg2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageCinp2AOut", c("name", "description", "type")] <- c("mStorageCinp2AOut", "", "map");
+    rs["mStorageCinp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageCout2AOut", c("name", "description", "type")] <- c("mStorageCout2AOut", "", "map");
+    rs["mStorageCout2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageCap2AOut", c("name", "description", "type")] <- c("mStorageCap2AOut", "", "map");
+    rs["mStorageCap2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageNCap2AOut", c("name", "description", "type")] <- c("mStorageNCap2AOut", "", "map");
+    rs["mStorageNCap2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["mStorageStg2AInp", c("name", "description", "type")] <- c("mStorageStg2AInp", "", "map");
+    rs["mStorageStg2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageCinp2AInp", c("name", "description", "type")] <- c("mStorageCinp2AInp", "", "map");
+    rs["mStorageCinp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageCout2AInp", c("name", "description", "type")] <- c("mStorageCout2AInp", "", "map");
+    rs["mStorageCout2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageCap2AInp", c("name", "description", "type")] <- c("mStorageCap2AInp", "", "map");
+    rs["mStorageCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["mStorageNCap2AInp", c("name", "description", "type")] <- c("mStorageNCap2AInp", "", "map");
+    rs["mStorageNCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["mvTradeIr", c("name", "description", "type")] <- c("mvTradeIr", "", "map");
     rs["mvTradeIr", c("trade", "comm", "region", "year", "slice", "eqImport", "eqExport", "eqCostIrTrade", "eqTradeCapFlow")] <- TRUE;
+    rs["mTradeIrCsrc2Ainp", c("name", "description", "type")] <- c("mTradeIrCsrc2Ainp", "", "map");
+    rs["mTradeIrCsrc2Ainp", c("trade", "comm", "region", "year", "slice", "eqTradeIrAInp")] <- TRUE;
+    rs["mTradeIrCdst2Ainp", c("name", "description", "type")] <- c("mTradeIrCdst2Ainp", "", "map");
+    rs["mTradeIrCdst2Ainp", c("trade", "comm", "region", "year", "slice", "eqTradeIrAInp")] <- TRUE;
+    rs["mTradeIrCsrc2Aout", c("name", "description", "type")] <- c("mTradeIrCsrc2Aout", "", "map");
+    rs["mTradeIrCsrc2Aout", c("trade", "comm", "region", "year", "slice", "eqTradeIrAOut")] <- TRUE;
+    rs["mTradeIrCdst2Aout", c("name", "description", "type")] <- c("mTradeIrCdst2Aout", "", "map");
+    rs["mTradeIrCdst2Aout", c("trade", "comm", "region", "year", "slice", "eqTradeIrAOut")] <- TRUE;
     rs["mvTradeCost", c("name", "description", "type")] <- c("mvTradeCost", "", "map");
     rs["mvTradeCost", c("region", "year", "eqCostTrade", "eqCost")] <- TRUE;
     rs["mvTradeRowCost", c("name", "description", "type")] <- c("mvTradeRowCost", "", "map");
@@ -1358,7 +1410,7 @@ rs
     rs["mDummyCost", c("name", "description", "type")] <- c("mDummyCost", "", "map");
     rs["mDummyCost", c("comm", "region", "year")] <- TRUE;
     rs["mTradeIr", c("name", "description", "type")] <- c("mTradeIr", "", "map");
-    rs["mTradeIr", c("trade", "region", "year", "slice", "eqTradeIrAInp", "eqTradeIrAOut")] <- TRUE;
+    rs["mTradeIr", c("trade", "region", "year", "slice")] <- TRUE;
     rs["mvTradeIrAInp", c("name", "description", "type")] <- c("mvTradeIrAInp", "", "map");
     rs["mvTradeIrAInp", c("trade", "comm", "region", "year", "slice", "eqTradeIrAInp")] <- TRUE;
     rs["mvTradeIrAInpTot", c("name", "description", "type")] <- c("mvTradeIrAInpTot", "", "map");
@@ -1485,6 +1537,26 @@ rs
     rs["meqBalFx", c("comm", "region", "year", "slice", "eqBalFx")] <- TRUE;
     rs["meqLECActivity", c("name", "description", "type")] <- c("meqLECActivity", "", "map");
     rs["meqLECActivity", c("tech", "region", "year", "eqLECActivity")] <- TRUE;
+    rs["mTechAct2AInp", c("name", "description", "type")] <- c("mTechAct2AInp", "", "map");
+    rs["mTechAct2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechCap2AInp", c("name", "description", "type")] <- c("mTechCap2AInp", "", "map");
+    rs["mTechCap2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechNCap2AInp", c("name", "description", "type")] <- c("mTechNCap2AInp", "", "map");
+    rs["mTechNCap2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechCinp2AInp", c("name", "description", "type")] <- c("mTechCinp2AInp", "", "map");
+    rs["mTechCinp2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechCout2AInp", c("name", "description", "type")] <- c("mTechCout2AInp", "", "map");
+    rs["mTechCout2AInp", c("tech", "comm", "region", "year", "slice", "eqTechAInp")] <- TRUE;
+    rs["mTechAct2AOut", c("name", "description", "type")] <- c("mTechAct2AOut", "", "map");
+    rs["mTechAct2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechCap2AOut", c("name", "description", "type")] <- c("mTechCap2AOut", "", "map");
+    rs["mTechCap2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechNCap2AOut", c("name", "description", "type")] <- c("mTechNCap2AOut", "", "map");
+    rs["mTechNCap2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechCinp2AOut", c("name", "description", "type")] <- c("mTechCinp2AOut", "", "map");
+    rs["mTechCinp2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
+    rs["mTechCout2AOut", c("name", "description", "type")] <- c("mTechCout2AOut", "", "map");
+    rs["mTechCout2AOut", c("tech", "comm", "region", "year", "slice", "eqTechAOut")] <- TRUE;
     rs["mLECRegion", c("name", "description", "type")] <- c("mLECRegion", "", "map");
     rs["mLECRegion", c("region")] <- TRUE;
     rs["ordYear", c("name", "description", "type")] <- c("ordYear", "ord year for GLPK", "parameter");
@@ -1635,14 +1707,14 @@ rs
     rs["pStorageStg2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["pStorageStg2AOut", c("name", "description", "type")] <- c("pStorageStg2AOut", "Storage accumulated volume output", "parameter");
     rs["pStorageStg2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
-    rs["pStorageInp2AInp", c("name", "description", "type")] <- c("pStorageInp2AInp", "Storage input to auxilary input coefficient", "parameter");
-    rs["pStorageInp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
-    rs["pStorageInp2AOut", c("name", "description", "type")] <- c("pStorageInp2AOut", "Storage input to auxilary output coefficient", "parameter");
-    rs["pStorageInp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
-    rs["pStorageOut2AInp", c("name", "description", "type")] <- c("pStorageOut2AInp", "Storage output to auxilary input coefficient", "parameter");
-    rs["pStorageOut2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
-    rs["pStorageOut2AOut", c("name", "description", "type")] <- c("pStorageOut2AOut", "Storage output to auxilary output coefficient", "parameter");
-    rs["pStorageOut2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["pStorageCinp2AInp", c("name", "description", "type")] <- c("pStorageCinp2AInp", "Storage input to auxilary input coefficient", "parameter");
+    rs["pStorageCinp2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["pStorageCinp2AOut", c("name", "description", "type")] <- c("pStorageCinp2AOut", "Storage input to auxilary output coefficient", "parameter");
+    rs["pStorageCinp2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
+    rs["pStorageCout2AInp", c("name", "description", "type")] <- c("pStorageCout2AInp", "Storage output to auxilary input coefficient", "parameter");
+    rs["pStorageCout2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
+    rs["pStorageCout2AOut", c("name", "description", "type")] <- c("pStorageCout2AOut", "Storage output to auxilary output coefficient", "parameter");
+    rs["pStorageCout2AOut", c("stg", "comm", "region", "year", "slice", "eqStorageAOut")] <- TRUE;
     rs["pStorageCap2AInp", c("name", "description", "type")] <- c("pStorageCap2AInp", "Storage capacity to auxilary input coefficient", "parameter");
     rs["pStorageCap2AInp", c("stg", "comm", "region", "year", "slice", "eqStorageAInp")] <- TRUE;
     rs["pStorageCap2AOut", c("name", "description", "type")] <- c("pStorageCap2AOut", "Storage capacity to auxilary output coefficient", "parameter");

@@ -10,7 +10,7 @@
 		'pTechWeatherAfc', 'pTechWeatherAfc', 'pStorageWeatherAf', 'pStorageWeatherAf', 'pStorageWeatherCinp', 'pStorageWeatherCinp', 'pStorageWeatherCout', 
 		'pStorageWeatherCout', 'pStorageInpEff', 'pStorageOutEff', 'pStorageStgEff', 'pStorageStock', 'pStorageOlife', 'pStorageCostStore', 'pStorageCostInp', 
 		'pStorageCostOut', 'pStorageFixom', 'pStorageInvcost', 'pStorageCap2stg', 'pStorageAf', 'pStorageAf', 'pStorageCinp', 'pStorageCinp', 'pStorageCout', 
-		'pStorageCout', 'pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageInp2AInp', 'pStorageInp2AOut', 'pStorageOut2AInp', 'pStorageOut2AOut', 'pStorageCap2AInp', 
+		'pStorageCout', 'pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageCinp2AInp', 'pStorageCinp2AOut', 'pStorageCout2AInp', 'pStorageCout2AOut', 'pStorageCap2AInp', 
 		'pStorageCap2AOut', 'pStorageNCap2AInp', 'pStorageNCap2AOut', 'pTradeIrEff', 'pTradeIr', 'pTradeIr', 'pTradeIrCost', 'pTradeIrMarkup', 'pTradeIrCsrc2Ainp', 
 		'pTradeIrCsrc2Aout', 'pTradeIrCdst2Ainp', 'pTradeIrCdst2Aout', 'pExportRowRes', 'pExportRow', 'pExportRow', 'pExportRowPrice', 'pImportRowRes', 'pImportRow', 
 		'pImportRow', 'pImportRowPrice'))

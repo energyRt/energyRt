@@ -74,8 +74,15 @@
   prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']], reduce_total_map(
   	reduce.sect(getParameterData(prec@parameters[['mTechEmsFuel']]), c('comm', 'region', 'year', 'slice'))))
   .interpolation_message('mDummyImport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-  no_inf <- function(x) {
-    x = getParameterData(prec@parameters[[x]])
+  no_inf <- function(y) {
+    x = getParameterData(prec@parameters[[y]])
+    if (!is.null(prec@parameters[[y]]@misc$not_need_interpolate)) {
+      nn <- rev(prec@parameters[[y]]@misc$not_need_interpolate)
+      nn[nn == 'slice'] <- 'mCommSlice'
+      nn[nn == 'year'] <- 'mMidMilestone'
+      for(i in nn)
+        x <- merge(getParameterData(prec@parameters[[i]]), x)
+    }
     x[x$value != Inf, -ncol(x)]
   }
   prec@parameters[['mDummyImport']] <- addData(prec@parameters[['mDummyImport']], no_inf('pDummyImportCost'))
@@ -331,7 +338,7 @@
         if (nrow(rdd) > 0) {
           tmp <- merge(rdd, pWeather); tmp$weather <- NULL
           tmp <- aggregate(tmp[, 'mwth', drop = FALSE], tmp[, -ncol(tmp), drop = FALSE], prod)
-          tmp <- merge(rft, tmp, all = TRUE)
+          tmp <- merge(rft, tmp, all.x = TRUE)
           tmp[is.na(tmp)] <- 1
           tmp$value <- tmp$value * tmp$mwth; tmp$mwth <- NULL
           prec@parameters[[towth[i, 'par']]] <- addData(prec@parameters[[towth[i, 'par']]], tmp)

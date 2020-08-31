@@ -6,7 +6,7 @@
   # Remove not used approxim
   if (length(defVal) != 1) stop('defVal value not define')
   if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
-  
+    
   # Get slice
   prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
     'regionp', 'src', 'dst', 'slice', 'year')
@@ -37,6 +37,10 @@
     obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
   }
   if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)
+  if (ncol(obj) == 1) {
+    if (nrow(obj) == 0) obj[1, 1] <- defVal
+    return(obj)
+  }
   # Check do need realy approximation 
   approxim2 <- approxim
   if (!is.null(obj$year)) {
@@ -68,8 +72,7 @@
       }
     }
   }
-  
-  
+   
   if (any(colnames(obj)[-ncol(obj)] == 'year')) {
     year_range <- arg$year_range
     yy <- range(c(year_range[1], year_range[2], 
@@ -85,37 +88,38 @@
       dimnames = approxim), stringsAsFactors = FALSE, responseName = parameter)
   }
   if (nrow(obj) != 0) {  
-    ii <- 2 ^ (seq(length.out = ncol(obj) - 1) - 1)
-    KK <- colSums(ii * t(is.na(obj[, true_prior[true_prior %in% prior], drop = FALSE])))
-    dobj <- as.matrix(obj[, -ncol(obj), drop = FALSE])
-    ddd <- t(as.matrix(dd[, -ncol(dd), drop = FALSE]))
-    dff <- dd[, -ncol(dd), drop = FALSE]
-    for(i in 1:ncol(dff)) dff[, i] <- as.factor(as.character(dff[, i]))
-    for(i in 1:ncol(dff)) obj[, i] <- factor(as.character(obj[[i]]), levels = levels(dff[, i]))
-    for(i in 1:ncol(dff)) obj[, i] <- as.numeric(obj[[i]])
-    for(i in 1:ncol(dff)) dff[, i] <- as.numeric(dff[, i])
-    hh <- sapply(dff, max)
-    #kk <- t(c(1, cumprod(hh[-length(hh)])) * t(dff))
-    hh <- c(1, cumprod(hh[-length(hh)]))
-    dff <- as.matrix(dff)
-    obj <- as.matrix(obj)
-    for(i in 1:ncol(dff)) {
-      dff[, i] <- hh[i] * (dff[, i] - 1)
-      obj[, i] <- hh[i] * (obj[, i] - 1)
-    }
-    # check all(sort(rowSums(dff)) == 0:max(rowSums(dff)))
-    for(i in rev(sort(unique(KK)))) {
-      fl <- seq(along = KK)[KK == i]
-      #dff <- dd[fl, -ncol(dd), drop = FALSE]
-      zz <- !is.na(obj[fl[1], -ncol(obj)])
-      # gg <- rowSums(obj[fl, -ncol(obj), drop = FALSE])
-      r1 <- rowSums(dff[, zz, drop = FALSE])
-      r2 <- rowSums(obj[fl, c(zz, FALSE), drop = FALSE])
-      ll <- obj[fl, ncol(obj)]
-      names(ll) <- r2
-      nn <- (r1 %in% r2)
-      dd[nn, ncol(dd)] <- ll[as.character(r1[nn])]
-    }
+      ii <- 2 ^ (seq(length.out = ncol(obj) - 1) - 1)
+      KK <- colSums(ii * t(is.na(obj[, true_prior[true_prior %in% prior], drop = FALSE])))
+      dobj <- as.matrix(obj[, -ncol(obj), drop = FALSE])
+      ddd <- t(as.matrix(dd[, -ncol(dd), drop = FALSE]))
+      dff <- dd[, -ncol(dd), drop = FALSE]
+      obj <- obj[, c(colnames(dff), parameter), drop = FALSE]
+      for(i in 1:ncol(dff)) dff[, i] <- as.factor(as.character(dff[, i]))
+      for(i in 1:ncol(dff)) obj[, i] <- factor(as.character(obj[[i]]), levels = levels(dff[, i]))
+      for(i in 1:ncol(dff)) obj[, i] <- as.numeric(obj[[i]])
+      for(i in 1:ncol(dff)) dff[, i] <- as.numeric(dff[, i])
+     hh <- sapply(dff, max)
+      #kk <- t(c(1, cumprod(hh[-length(hh)])) * t(dff))
+      hh <- c(1, cumprod(hh[-length(hh)]))
+      dff <- as.matrix(dff)
+      obj <- as.matrix(obj)
+      for (i in 1:ncol(dff)) {
+        dff[, i] <- hh[i] * (dff[, i] - 1)
+        obj[, i] <- hh[i] * (obj[, i] - 1)
+      }
+      # check all(sort(rowSums(dff)) == 0:max(rowSums(dff)))
+      for(i in rev(sort(unique(KK)))) {
+        fl <- seq(along = KK)[KK == i]
+        #dff <- dd[fl, -ncol(dd), drop = FALSE]
+        zz <- !is.na(obj[fl[1], -ncol(obj)])
+        # gg <- rowSums(obj[fl, -ncol(obj), drop = FALSE])
+        r1 <- rowSums(dff[, zz, drop = FALSE])
+        r2 <- rowSums(obj[fl, c(zz, FALSE), drop = FALSE])
+        ll <- obj[fl, ncol(obj)]
+        names(ll) <- r2
+        nn <- (r1 %in% r2)
+        dd[nn, ncol(dd)] <- ll[as.character(r1[nn])]
+      }
   }  
   # Interpolation
   if (all(colnames(obj)[-ncol(obj)] != 'year')) {
