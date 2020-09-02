@@ -159,7 +159,7 @@ names(.alias_set) <- .set_al
   declaration <- gsub('[.][.].*', '', eqt)
   rs <- paste0('s.t. ', gsub('[($].*', '', declaration))
   if (nchar(declaration) != nchar(gsub('[($].*', '', declaration))) {
-    rs <- paste0(rs, .get_glpk_loop_fast2(gsub('^[[:alnum:]]*', '', declaration)))
+    rs <- paste0(rs, .get_glpk_loop_fast2(gsub('^[[:alnum:]_]*', '', declaration)))
   }
   rs <- paste0(rs, ': ', .eqt.to.glpk(gsub('.*[.][.][ ]*', '', eqt)))
   rs
