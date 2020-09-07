@@ -2,11 +2,6 @@
 # GAMS part
 ##################################################################################################################################    
 .write_model_GAMS <- function(arg, scen, trim = FALSE) {
-  # Check if gams (if it use) is available
-  # if (arg$run) {
-  #   rs <- try(system('gams'))
-  #   if (rs != 0) stop('GAMS is not found')
-  # }
   if (trim) scen <- fold(scen)
   .write_inc_solver(scen, arg, 'option lp = cplex;', '.gms', 'cplex')
   if (is.null(scen@status$fullsets)) stop('scen@status$fullsets not found')
@@ -106,7 +101,7 @@
   .generate_gpr_gams_file(arg$dir.result)
   zz <- file(paste(arg$dir.result, '/energyRt.gms', sep = ''), 'w')
   zz_constrains <- file(paste(arg$dir.result, '/inc_constraints.gms', sep = ''), 'w')
-  cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
+  cat(run_code[1:grep('[$]include[[:space:]]*data.gms', run_code)], sep = '\n', file = zz)
   # Add parameter constraint declaration
   if (length(scen@modInp@gams.equation) > 0) {
     mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
@@ -135,24 +130,12 @@
   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
     cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz_constrains)
   }
-  cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
-                 (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+  cat(run_code[(grep('[$]include[[:space:]]*data.gms', run_code) + 1):length(run_code)], sep = '\n', file = zz)
   
   # Add constraint equation to model declaration
-  # if (length(scen@modInp@gams.equation) > 0) {
-  #   cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz_constrains) 
-  # }
-  
   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
     cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz_constrains)
   }
-  
-  cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):length(run_code)], sep = '\n', file = zz)
-  
-  # if (!is.null(scen@model@misc$includeBeforeSolve))
-  #   warning('includeBeforeSolve deprecated, use solver inc4')
-  # if (!is.null(scen@model@misc$includeAfterSolve))
-  #   warning('includeAfterSolve now not use, use solver inc5')
   close(zz)
   close(zz_constrains)
   .add_five_includes(arg, scen, ".gms")

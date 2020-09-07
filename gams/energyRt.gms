@@ -242,6 +242,8 @@ pTradeCap2Act(trade)
 
 * Weather map
 set
+mWeatherSlice(weather, slice)
+mWeatherRegion(weather, region)
 mSupWeatherLo(weather, sup)
 mSupWeatherUp(weather, sup)
 mTechWeatherAfLo(weather, tech)
