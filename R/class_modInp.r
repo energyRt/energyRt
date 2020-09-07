@@ -601,10 +601,6 @@ setMethod("initialize", "modInp",
     .Object@parameters[['meqLECActivity']] <- createParameter('meqLECActivity', c('tech', 'region', 'year'), 'map')
         
     
-    for (i in names(.Object@parameters)) 
-      .Object@parameters[[i]]@misc$weather <- !is.null(.Object@parameters[[i]]@data$weather)
-    
-
     .Object
   })
 
