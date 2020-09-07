@@ -1564,7 +1564,7 @@ model energyRt / all / ;
 put log_stat;
 put '"load data",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
-$exit
+
 $include data.gms
 
 
