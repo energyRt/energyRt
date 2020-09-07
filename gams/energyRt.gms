@@ -1,29 +1,3 @@
-$ontext
-#!onLatex
-\documentclass{article}
-\usepackage[a4paper,landscape,margin=1eqTechAInpeqTechAInpin]{geometry}
-\usepackage[utf8]{inputenc}
-\usepackage{breqn}
-\usepackage{longtable}
-\usepackage{graphicx}
-\title{Implementation of energyRt Reference Energy System model in GAMS}
-\date{May 12, 2019}
-\author{Oleg Lugovoy \and Vladimir Potashnikov}
-\begin{document}
-\maketitle
-   \begin{abstract}
-         The model is a part of \textbf{energyRt} package for energy systems modeling in \textbf{R}
-         (\url{https://github.com/olugovoy/energyRt}), developed by Oleg Lugovoy and Vladimir Potashnikov,
-         and implemented in GAMS and GLPK/MathProg by Vladimir Potashnikov.
-         The package and the code of the model is dessiminated under GNU Affero General Public License (AGPL-3)
-         free public license (see \url{https://www.gnu.org/licenses/agpl.html} for details).
-   \end{abstract}
-\end{document}
-#!offLatex
-=======
-\end{abstract}
-$offtext
-
 $include inc1.gms
 
 OPTION RESLIM=50000, PROFILE=0, SOLVEOPT=REPLACE;
@@ -38,11 +12,6 @@ put "parameter,value,time"/;
 put '"model language",gams,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 put '"model definition",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
-********************************************************************************
-$ontext
-\section{Declarations}
-$offtext
-********************************************************************************
 * Main sets
 set
 tech   technology
@@ -62,9 +31,6 @@ slice  time slice
 Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
 Alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
 alias (region, src), (region, dst);
-* Alias for statment
-*Alias (year, year_cns), (tech, tech_cns), (dem, dem_cns), (sup, sup_cns), (stg, stg_cns);
-*Alias (slice_cns, slice), (trade, trade_cns), (imp, imp_cns), (expp, expp_cns);
 
 * Mapping sets
 set
@@ -141,14 +107,10 @@ mTradeNew(trade, year)
 mTradeOlifeInf(trade)
 mTradeEac(trade, region, year)
 mTradeCapacityVariable(trade)
-* mTradeNew(trade, year) and pTradeInvcost(trade, region, year) <> 0
 mTradeInv(trade, region, year)
 mAggregateFactor(comm, comm)
 ;
 
-* Set priority
-* t, sup, g, c, r, y, s
-* tech, sup, group, comm, region, year, slice
 * Parameter
 parameter
 ordYear(year)           ord year for GLPK
@@ -342,10 +304,9 @@ mvTradeIrCost(region, year)
 mvTotalCost(region, year)
 ;
 
-$ontext
+
 * Endogenous variables
-** Technology
-$offtext
+
 positive variable
 *@ mTechNew(tech, region, year)
 vTechNewCap(tech, region, year)                      New capacity
@@ -353,8 +314,6 @@ vTechNewCap(tech, region, year)                      New capacity
 vTechRetiredStock(tech, region, year)            Early retired capacity
 *@ mvTechRetiredNewCap(tech, region, year, year)
 vTechRetiredNewCap(tech, region, year, year)            Early retired capacity
-*vTechRetrofitCap(tech, region, year, year)
-*vTechUpgradeCap(tech, region, year)
 * Activity and intput-output
 *@ mTechSpan(tech, region, year)
 vTechCap(tech, region, year)                         Total capacity of the technology
@@ -380,7 +339,6 @@ vTechOMCost(tech, region, year)                      Sum of all operational cost
 ;
 positive variable
 * Supply
-* (mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region))
 *@ mSupAva(sup, comm, region, year, slice)
 vSupOut(sup, comm, region, year, slice)              Output of supply
 *@ mvSupReserve(sup, comm, region)
@@ -399,8 +357,6 @@ variable
 * Emission
 *@ mEmsFuelTot(comm, region, year, slice)
 vEmsFuelTot(comm, region, year, slice)                   Total fuel emissions
-** mTechEmsFuel(tech, comm, region, year, slice)
-*vTechEmsFuel(tech, comm, region, year, slice)            Emissions from commodity input to tech (like fuel combustion)
 ;
 variable
 * Ballance
@@ -443,8 +399,6 @@ positive variable
 vDummyImport(comm, region, year, slice)               Dummy import (for debugging)
 *@ mDummyExport(comm, region, year, slice)
 vDummyExport(comm, region, year, slice)               Dummy export (for debugging)
-** mDummyCost(comm, region, year)
-*vDummyCost(comm, region, year)                        Dummy import & export costs  (for debugging)
 ;
 variable
 * Tax
@@ -532,62 +486,34 @@ vTradeNewCap(trade, year)
 ********************************************************************************
 set
 mTechInv(tech, region, year)
-* (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (mTechInpComm(tech, comm) or mTechAInp(tech, comm))), 1))
 mTechInpTot(comm, region, year, slice)               Total technology input  mapp
-* (mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (mTechOutComm(tech, comm) or mTechAOut(tech, comm))), 1))
 mTechOutTot(comm, region, year, slice)               Total technology output mapp
 mTechEac(tech, region, year)
 mTechOMCost(tech, region, year)
-* (sum(sup$(mSupSlice(sup, slice) and mSupComm(sup, comm) and mSupSpan(sup, region)), 1))
 mSupOutTot(comm, region, year, slice)
-* (sum(dem$mDemComm(dem, comm), 1) and mCommSlice(comm, slice))
 mDemInp(comm, slice)
-*  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and (sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and pEmissionFactor(comm, commp) <> 0), 1)), 1))
 mEmsFuelTot(comm, region, year, slice)
-*  (sum(tech$(mTechSlice(tech, slice) and mTechSpan(tech, region, year) and mTechEmitedComm(tech, comm)), 1))
 mTechEmsFuel(tech, comm, comm, region, year, slice)
-*  (mCommSlice(comm, slice) and pDummyImportCost(comm, region, year, slice) <> Inf)
 mDummyImport(comm, region, year, slice)
-*  (mCommSlice(comm, slice) and pDummyExportCost(comm, region, year, slice) <> Inf)
 mDummyExport(comm, region, year, slice)
-* mDummyExport(comm, region, year, slice) or mDummyImport(comm, region, year, slice)
 mDummyCost(comm, region, year)
-* mTradeSlice(trade, slice) and pTradeIrUp(trade, src, dst, year, slice) <> 0 and mTradeRoutes(trade, src, dst))
 mTradeIr(trade, region, region, year, slice)
-* ((sum(dst$(mTradeIr(trade, region, dst, year, slice) and sum(comm$pTradeIrCdst2Ainp(trade, comm, region, dst, year, slice), 1) <> 0), 1) <> 0) or
-*  (sum(src$(mTradeIr(trade, src, region, year, slice) and sum(comm$pTradeIrCsrc2Ainp(trade, comm, src, region, year, slice), 1) <> 0), 1) <> 0))
 mvTradeIrAInp(trade, comm, region, year, slice)
-* (sum(trade$mvTradeIrAInp(trade, comm, region, year, slice), 1) <> 0)
 mvTradeIrAInpTot(comm, region, year, slice)
-* ((sum(dst$(mTradeIr(trade, region, dst, year, slice) and sum(comm$pTradeIrCdst2Aout(trade, comm, region, dst, year, slice), 1) <> 0), 1) <> 0) or
-*  (sum(src$(mTradeIr(trade, src, region, year, slice) and sum(comm$pTradeIrCsrc2Aout(trade, comm, src, region, year, slice), 1) <> 0), 1) <> 0))
 mvTradeIrAOut(trade, comm, region, year, slice)
-* (sum(trade$mvTradeIrAOut(trade, comm, region, year, slice), 1) <> 0)
 mvTradeIrAOutTot(comm, region, year, slice)
-* (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0)
 mImportRow(imp, comm, region, year, slice)
-
-* (mImpSlice(imp, slice) and mImpComm(imp, comm) and pImportRowUp(imp, region, year, slice) <> 0 and pImportRowUp(imp, region, year, slice) <> Inf)
 mImportRowUp(imp, comm, region, year, slice)
-* pImportRowRes <> Inf
 mImportRowAccumulatedUp(imp, comm)
-
 mExportRow(expp, comm, region, year, slice)
 mExportRowUp(expp, comm, region, year, slice)
 mExportRowAccumulatedUp(expp, comm)
-* sum(expp$mExportRow(expp, comm, region, year, slice), 1) + sum((trade, dst)$(mTradeIr(trade, region, dst, year, slice) and mTradeComm(trade, comm)), 1) <> 0
 mExport(comm, region, year, slice)
-* sum(imp$mImportRow(imp, comm, region, year, slice), 1) + sum((trade, src)$(mTradeIr(trade, src, region, year, slice) and mTradeComm(trade, comm)), 1) <> 0
 mImport(comm, region, year, slice)
-* (sum(stg$(mCommSlice(comm, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAInp(stg, comm)))
 mStorageInpTot(comm, region, year, slice)
-* (sum(stg$(mCommSlice(comm, slice) and mStorageComm(stg, comm) and mStorageSpan(stg, region, year)), 1) and (mStorageComm(stg, comm) or mStorageAOut(stg, comm)))
 mStorageOutTot(comm, region, year, slice)
-*   sum(slice$pTaxCost(comm, region, year, slice), 1)
 mTaxCost(comm, region, year)
-* sum(slice$pSubsCost(comm, region, year, slice), 1)
 mSubsCost(comm, region, year)
-* (sum(commp$pAggregateFactor(comm, commp), 1))
 mAggOut(comm, region, year, slice)
 mTechAfUp(tech, region, year, slice)
 mTechAfUp(tech, region, year, slice)
@@ -597,18 +523,10 @@ mTechAfcUp(tech, comm, region, year, slice)
 mSupAvaUp(sup, comm, region, year, slice)
 mSupAva(sup, comm, region, year, slice)
 mSupReserveUp(sup, comm, region)
-* sum(slicep$(mSliceParentChildE(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0 and
-*(mSupOutTot(comm, region, year, slice) or mEmsFuelTot(comm, region, year, slice) or mAggOut(comm, region, year, slice) or
-*mTechOutTot(comm, region, year, slice) or mStorageOutTot(comm, region, year, slice) or mImport(comm, region, year, slice) or
-*mvTradeIrAOutTot(comm, region, year, slice))
-mOut2Lo(comm, region, year, slice)
-* sum(slicep$(mSliceParentChildE(slice, slicep) and mCommSlice(comm, slicep)), 1) <> 0
-* and (mTechInpTot(comm, region, year, slice) or  mStorageInpTot(comm, region, year, slice) or
-*  or mExport(comm, region, year, slice) or mTradeIrAInpTot(comm, region, year, slice))
+Out2Lo(comm, region, year, slice)
 mInp2Lo(comm, region, year, slice)
 ;
 
-* me
 set
 meqTechRetiredNewCap(tech, region, year)
 meqTechSng2Sng(tech, region, comm, comm, year, slice)
@@ -647,7 +565,6 @@ meqBalLo(comm, region, year, slice)
 meqBalUp(comm, region, year, slice)
 meqBalFx(comm, region, year, slice)
 meqLECActivity(tech, region, year)
-
 mTechAct2AInp(tech, comm, region, year, slice)
 mTechCap2AInp(tech, comm, region, year, slice)
 mTechNCap2AInp(tech, comm, region, year, slice)
@@ -672,10 +589,6 @@ $include inc2.gms
 ********************************************************************************
 *** Activity Input & Output equations
 ********************************************************************************
-
-* pTechUse2cact(tech, comm, region, year, slice) * pTechCact2cout(tech, comm, region, year, slice)
-
-
 Equations
 * Input & Output of ungrouped (single) commodities
 eqTechSng2Sng(tech, region, comm, commp, year, slice)      Technology input to output
@@ -953,9 +866,6 @@ eqTechCap(tech, region, year)       Technology capacity
 eqTechRetiredNewCap(tech, region, year)  Stock retired eqution
 eqTechRetiredStock(tech, region, year)  Stock retired eqution
 eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
-*eqTechRetiredCap(tech, region, year, year)
-*eqTechRetrofitCap(tech, region, year, year)
-*eqTechUpgradeCap(tech, region, year)
 * Investment equation
 eqTechInv(tech, region, year)       Technology investment costs
 * Aggregated annual costs
@@ -996,16 +906,6 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
                    sum(yeare$(mvTechRetiredNewCap(tech, region, yearp, yeare) and ordYear(year) >= ordYear(yeare)),
                        vTechRetiredNewCap(tech, region, yearp, yeare)))
          );
-
-*eqTechRetiredCap(tech, region, year, yearp)$(not(mTechRetired(tech)) or
-*  ordYear(yearp) < ordYear(year) or ordYear(yearp) >= ordYear(year) + pTechOlife(tech, region))..
-*    vTechRetiredCap(tech, region, year, yearp) =e= 0;
-
-*eqTechRetrofitCap(tech, region, year, yearp)$(ordYear(yearp) < ordYear(year) or ordYear(yearp) >= ordYear(year) + pTechOlife(tech, region))..
-*    vTechRetrofitCap(tech, region, year, yearp) =e= 0;
-
-*eqTechUpgradeCap(tech, region, year)..
-*    sum((techp, yearp)$(mTechUpgrade(tech, techp)), vTechRetrofitCap(techp, region, yearp, year)) =e= vTechUpgradeCap(tech, region, year);
 
 * Investment equation
 eqTechInv(tech, region, year)$mTechInv(tech, region, year)..  vTechInv(tech, region, year) =e=
@@ -1100,7 +1000,6 @@ eqDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)..
 Equation
 eqAggOut(comm, region, year, slice)            Aggregating commodity output
 eqEmsFuelTot(comm, region, year, slice)         Emissions from commodity consumption (i.e. fuels combustion)
-*eqTechEmsFuel(tech, comm, region, year, slice)  Emissions from commodity consumption by technologies
 ;
 
 eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
@@ -1113,19 +1012,6 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
          ));
 
 
-
-*eqTechEmsFuel(tech, comm, region, year, slice)$mTechEmsFuel(tech, comm, region, year, slice)..
-*         vTechEmsFuel(tech, comm, region, year, slice)
-*         =e=
-*         sum(commp$(mTechInpComm(tech, commp) and pTechEmisComm(tech, commp) <> 0 and
-*                         pEmissionFactor(comm, commp) <> 0
-*                 ),
-*                   pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) *
-*                   vTechInp(tech, commp, region, year, slice)
-*         );
-
-
-
 eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
      vEmsFuelTot(comm, region, year, slice)
          =e= sum(commp$(pEmissionFactor(comm, commp) > 0),
@@ -1133,15 +1019,6 @@ eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
                          pTechEmisComm(tech, commp) * sum(slicep$mCommSliceOrParent(comm, slice, slicep),
                  vTechInp(tech, commp, region, year, slicep)$mTechEmsFuel(tech, comm, commp, region, year, slicep)
          )));
-
-
-*eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
-*     vEmsFuelTot(comm, region, year, slice)
-*         =e= sum(commp$(pEmissionFactor(comm, commp) > 0),
-*                 sum(slicep$mCommSliceOrParent(comm, slice, slicep),
-*                         sum(tech$mTechEmsFuel(tech, comm, commp, region, year, slicep),
-*                 pTechEmisComm(tech, commp) * pEmissionFactor(comm, commp) * vTechInp(tech, commp, region, year, slicep)
-*         )));
 
 ********************************************************************************
 * Storage equations
@@ -1297,7 +1174,6 @@ eqImport(comm, region, year, slice)     Import equation
 eqExport(comm, region, year, slice)     Export equation
 eqTradeFlowUp(trade, comm, region, region, year, slice)   Trade upper bound
 eqTradeFlowLo(trade, comm, region, region, year, slice)   Trade lower bound
-*eqCostTrade(region, year, slice)
 eqCostTrade(region, year)       Total trade costs
 eqCostRowTrade(region, year)    Costs of trade with the Rest of the World (ROW)
 eqCostIrTrade(region, year)     Costs of import
@@ -1433,10 +1309,6 @@ eqTradeIrAOut(trade, comm, region, year, slice) Trade auxiliary commodity output
 eqTradeIrAInpTot(comm, region, year, slice) Trade auxiliary commodity input
 eqTradeIrAOutTot(comm, region, year, slice) Trade auxiliary commodity output
 ;
-
-* ((sum(dst$(mTradeIr(trade, region, dst, year, slice) and sum(comm$pTradeIrCdst2Ainp(trade, comm, region, dst, year, slice), 1) <> 0), 1) <> 0) or
-*  (sum(src$(mTradeIr(trade, src, region, year, slice) and sum(comm$pTradeIrCsrc2Ainp(trade, comm, src, region, year, slice), 1) <> 0), 1) <> 0))
-
 
 eqTradeIrAInp(trade, comm, region, year, slice)$mvTradeIrAInp(trade, comm, region, year, slice)..
   vTradeIrAInp(trade, comm, region, year, slice) =e=
@@ -1597,17 +1469,8 @@ Equation
 eqCost(region, year)                Total costs
 eqTaxCost(comm, region, year)       Commodity taxes
 eqSubsCost(comm, region, year)      Commodity subsidy
-*eqDummyCost(comm, region, year)     Dummy import and export costs
 eqObjective                         Objective equation
 ;
-
-*eqDummyCost(comm, region, year)$(mMidMilestone(year) and  mDummyCost(comm, region, year))..
-*         vDummyCost(comm, region, year)
-*         =e=
-*         sum(slice$mDummyImport(comm, region, year, slice),
-*           pDummyImportCost(comm, region, year, slice) * vDummyImport(comm, region, year, slice)) +
-*         sum(slice$mDummyExport(comm, region, year, slice),
-*           pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice));
 
 eqCost(region, year)$mvTotalCost(region, year)..
          vTotalCost(region, year)
@@ -1640,13 +1503,6 @@ eqObjective..
          sum((region, year)$mvTotalCost(region, year),
            vTotalCost(region, year) * pDiscountFactorMileStone(region, year));
 
-* Latex file end
-*\end{document}
-* 39aa2518-d4e0-44a6-a7c7-a44fb70f9a1e
-
-* ------------------------------------------------------------------------------
-* Standart constrain: end
-* ------------------------------------------------------------------------------
 **************************************
 * LEC set & parameter & variable
 **************************************
@@ -1668,199 +1524,14 @@ eqLECActivity(tech, region, year)
 eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)..
          sum(slice$mTechSlice(tech, slice), vTechAct(tech, region, year, slice)) =g= pLECLoACT(region);
 
-*$INCLUDE data.inc
-* e0fc7d1e-fd81-4745-a0eb-2a142f837d1c
-
-$ontext
-model energyRt /
-********************************************************************************
-* Activity Input & Output equations
-********************************************************************************
-* Equation Input fix activity & Output fix no activity
-eqTechSng2Sng
-eqTechGrp2Sng
-eqTechSng2Grp
-eqTechGrp2Grp
-********************************************************************************
-* Share equations
-********************************************************************************
-* Input Share LO equation
-eqTechShareInpLo
-* Input Share UP equation
-eqTechShareInpUp
-* Output Share LO equation
-eqTechShareOutLo
-* Output Share UP equation
-eqTechShareOutUp
-********************************************************************************
-* Aux input & output equations
-********************************************************************************
-eqTechAInp
-eqTechAOut
-********************************************************************************
-* Availability factor equations
-********************************************************************************
-* Availability factor LO
-eqTechAfLo
-* Availability factor UP
-eqTechAfUp
-* Availability factor for sum Lo
-eqTechAfsLo
-* Availability factor for sum UP
-eqTechAfsUp
-********************************************************************************
-* Connect activity with output equations
-********************************************************************************
-* Connect activity with output
-eqTechActSng
-eqTechActGrp
-********************************************************************************
-* Availability commodity factor equations
-********************************************************************************
-* Availability commodity factor LO output equations
-eqTechAfcOutLo
-* Availability commodity factor UP output equations
-eqTechAfcOutUp
-* Availability commodity factor LO input equations
-eqTechAfcInpLo
-* Availability commodity factor UP input equations
-eqTechAfcInpUp
-********************************************************************************
-* Capacity and costs equations
-********************************************************************************
-* Capacity equation
-eqTechCap
-eqTechRetiredNewCap
-eqTechRetiredStock
-eqTechEac
-* FIX O & M equation
-* Commodity Varom O & M and Varom O & M aggregate by year equation
-* Aggregated annual costs
-eqTechInv
-eqTechOMCost
-* Disable new capacity
-*eqTechNewCapDisable
-**************************************
-* Supply equation
-**************************************
-eqSupAvaUp
-eqSupAvaLo
-eqSupTotal
-eqSupReserveUp
-eqSupReserveLo
-eqSupCost
-**************************************
-* Demand equation
-**************************************
-eqDemInp
-**************************************
-* Emission & Aggregate equation
-**************************************
-eqAggOut
-eqEmsFuelTot
-*eqTechEmsFuel
-********************************************************************************
-* Store equations for reserve
-********************************************************************************
-eqStorageStore
-********************************************************************************
-* Capacity and costs equations for reserve
-********************************************************************************
-* Capacity equation
-eqStorageCap
-* Investition equation
-eqStorageInv
-* Salvage value
-* Constrain capacity
-eqStorageCost
-eqStorageAfLo
-eqStorageAfUp
-eqStorageClean
-eqStorageAInp
-eqStorageAOut
-eqStorageInpUp
-eqStorageInpLo
-eqStorageOutUp
-eqStorageOutLo
-eqStorageEac
-**************************************
-* Trade and Row equation
-**************************************
-eqImport
-eqExport
-eqTradeFlowUp
-eqTradeFlowLo
-eqCostTrade
-eqTradeIrAInp
-eqTradeIrAInpTot
-eqTradeIrAOut
-eqTradeIrAOutTot
-eqCostRowTrade
-eqCostIrTrade
-eqExportRowUp
-eqExportRowLo
-eqExportRowCumulative
-eqExportRowResUp
-eqImportRowUp
-eqImportRowLo
-eqImportRowAccumulated
-eqImportRowResUp
-eqTradeCap
-eqTradeInv
-eqTradeEac
-eqTradeCapFlow
-**************************************
-* Ballance equation & dummy
-**************************************
-eqBalUp
-eqBalLo
-eqBalFx
-eqBal
-eqOutTot
-eqOut2Lo
-eqInpTot
-eqInp2Lo
-eqSupOutTot
-eqTechInpTot
-eqTechOutTot
-eqStorageInpTot
-eqStorageOutTot
-**************************************
-* Costs' equations
-**************************************
-*eqDummyCost
-eqCost
-eqObjective
-* Tax
-eqTaxCost
-* Subs
-eqSubsCost
-* c4524d56-feab-4fcb-9500-5f5bad8f694d
-**************************************
-* Fix to previous value
-**************************************
-* 542b24cb-368e-4635-b52e-00c791d5a3b3
-**************************************
-* LEC equation
-**************************************
-eqLECActivity
-* Additional equation (e.g. Constrain)
-* c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f
-/;
-$offtext
 $include inc_constraints.gms
 
 model energyRt / all / ;
-
-*$EXIT
 
 put log_stat;
 put '"load data",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
 $include data.gms
-
-* ddd355e0-0023-45e9-b0d3-1ad83ba74b3a
-*$EXIT
 
 
 $include inc3.gms
@@ -1869,7 +1540,6 @@ put log_stat;
 put '"solver",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
 $include inc_solver.gms
-*option lp = cplex;
 
 Solve energyRt minimizing vObjective using LP;
 
