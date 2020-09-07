@@ -61,30 +61,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     
     obj@parameters[['mvSupReserve']] <- addData(obj@parameters[['mvSupReserve']], merge(mSupComm, mSupSpan))
     # For weather
-    # mSupWeatherLo(sup, weather)
-    wth.lo <- unique(sup@weather[!is.na(sup@weather$wava.lo) | !is.na(sup@weather$wava.fx), 'weather'])
-    obj@parameters[['mSupWeatherLo']] <- addData(obj@parameters[['mSupWeatherLo']],
-                                            data.frame(sup = rep(sup@name, length(wth.lo)), weather = wth.lo))
-    # mSupWeatherUp(sup, weather)
-    wth.up <- unique(sup@weather[!is.na(sup@weather$wava.up) | !is.na(sup@weather$wava.fx), 'weather'])
-    obj@parameters[['mSupWeatherUp']] <- addData(obj@parameters[['mSupWeatherUp']],
-                                                 data.frame(sup = rep(sup@name, length(wth.up)), weather = wth.up))
     if (nrow(sup@weather) > 0) {
-      gg <- sup@weather
-      gg$sup <- sup@name
-      gg$type <- 'lo'
-      a1 <- gg[, c('sup', 'weather', 'type', 'wava.lo'), drop = FALSE]; 
-      colnames(a1)[ncol(a1)] <- 'value'
-      a2 <- gg[, c('sup', 'weather', 'type', 'wava.fx'), drop = FALSE]; 
-      colnames(a2)[ncol(a2)] <- 'value'
-      a3 <- gg[, c('sup', 'weather', 'type', 'wava.up'), drop = FALSE]; 
-      colnames(a3)[ncol(a3)] <- 'value'
-      g1 <- rbind(a1, a2); g1$type <- 'lo'
-      g2 <- rbind(a3, a2); g1$type <- 'up'
-      gg <- rbind(g1, g2)
-      gg <- gg[!is.na(gg$value),, drop = FALSE]
-      # sup     weather type    value
-        obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], gg)
+      tmp <- .toWeatherImply(sup@weather, 'wava', 'sup', sup@name)
+      obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], tmp$par)
+      obj@parameters[['mSupWeatherUp']] <- addData(obj@parameters[['mSupWeatherUp']], tmp$mapup)
+      obj@parameters[['mSupWeatherLo']] <- addData(obj@parameters[['mSupWeatherLo']], tmp$maplo)
     }
     t1 <- mSupAva[, c('sup', 'region', 'year')]; t1 <- t1[!duplicated(t1), ]
     t2 <- pSupCost[pSupCost$value != 0, colnames(pSupCost)[colnames(pSupCost) %in% c('sup', 'region', 'year')], drop = FALSE]; t2 <- t2[!duplicated(t2),, drop = FALSE]
@@ -96,3 +77,25 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     obj@parameters[['mvSupCost']] <- addData(obj@parameters[['mvSupCost']], mvSupCost)
   obj
 })
+
+.toWeatherImply <- function(frm, val, add_set, add_val, sets = NULL) {
+  f1 <- frm[!is.na(frm[, paste0(val, '.up')]), c(paste0(val, '.up'), 'weather', sets), drop = FALSE]; colnames(f1)[1] <- 'value'
+  f2 <- frm[!is.na(frm[, paste0(val, '.fx')]), c(paste0(val, '.fx'), 'weather', sets), drop = FALSE]; colnames(f2)[1] <- 'value'
+  f3 <- frm[!is.na(frm[, paste0(val, '.lo')]), c(paste0(val, '.lo'), 'weather', sets), drop = FALSE]; colnames(f3)[1] <- 'value'
+  rs <- list(par = NULL)
+  if (nrow(f1) + nrow(f2) != 0) {
+    tmp <- rbind(f1, f2)
+    tmp[, add_set] <- add_val
+    rs$mapup <- tmp[, -1, drop = FALSE]
+    tmp$type <- 'up'
+    rs$par <- tmp
+  }
+  if (nrow(f3) + nrow(f2) != 0) {
+    tmp <- rbind(f3, f2)
+    tmp[, add_set] <- add_val
+    rs$maplo <- tmp[, -1, drop = FALSE]
+    tmp$type <- 'lo'
+    rs$par <- rbind(rs$par, tmp)
+  }
+  rs
+}

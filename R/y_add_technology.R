@@ -438,49 +438,25 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	    obj@parameters[['meqTechAfcInpUp']] <- merge_afc(obj@parameters[['meqTechAfcInpUp']], mvTechInp, pTechAfc, 'up')
 	  }
 
-		# Weather part
-		merge.weather <- function(tech, nm, add = NULL) {
-			waf <- tech@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
-			waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
-			if (nrow(waf) == 0) return(NULL)
-			# Map parts
-			if (length(add) == 0) {
-				m <- unique(waf$weather)
-				m <- data.frame(tech = rep(tech@name, length(m)), weather = m)
-			} else {
-				m <- waf[, c('weather', add), drop = FALSE]
-				m <- m[(!duplicated(apply(m, 1, paste0, collapse = '#'))),, drop = FALSE]
-				m$tech <- tech@name
-				m <- m[, c(ncol(m), 1:(ncol(m) - 1)), drop = FALSE]
-			}
-			waf20 <- data.frame(
-				tech = rep(tech@name, 4 * nrow(waf)),
-				weather = rep(waf$weather, 4),
-				stringsAsFactors = FALSE)
-			for (i in add) {
-				waf20[, i] <- rep(waf[, i], 4)
-			}
-			waf20$type <- c(rep('lo', 2 * nrow(waf)), rep('up', 2 * nrow(waf)))
-			waf20$value <- c(waf[, paste0(nm, '.lo')], waf[, paste0(nm, '.fx')], 
-				waf[, paste0(nm, '.up')], waf[, paste0(nm, '.fx')])
-			waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
-			list(m = m, p = waf20)
-		}
-		tmp <- merge.weather(tech, 'waf')
-		if (length(tmp) != 0) {
-			obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$m)
-			obj@parameters[['pTechWeatherAf']] <- addData(obj@parameters[['pTechWeatherAf']], tmp$p)
-		}
-		tmp <- merge.weather(tech, 'wafs')
-		if (length(tmp) != 0) {
-			obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$m)
-			obj@parameters[['pTechWeatherAfs']] <- addData(obj@parameters[['pTechWeatherAfs']], tmp$p)
-		}
-		tmp <- merge.weather(tech, 'wafc', 'comm')
-		if (length(tmp) != 0) {
-			obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$m)
-			obj@parameters[['pTechWeatherAfc']] <- addData(obj@parameters[['pTechWeatherAfc']], tmp$p)
-		}
+		if (nrow(tech@weather) > 0) {
+      tmp <- .toWeatherImply(tech@weather, 'waf', 'tech', tech@name)
+      obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$par)
+      obj@parameters[['pTechWeatherAfUp']] <- addData(obj@parameters[['pTechWeatherAfUp']], tmp$mapup)
+      obj@parameters[['pTechWeatherAfLo']] <- addData(obj@parameters[['pTechWeatherAfLo']], tmp$maplo)
+
+      tmp <- .toWeatherImply(tech@weather, 'wafs', 'tech', tech@name)
+      obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$par)
+      obj@parameters[['pTechWeatherAfsUp']] <- addData(obj@parameters[['pTechWeatherAfsUp']], tmp$mapup)
+      obj@parameters[['pTechWeatherAfsLo']] <- addData(obj@parameters[['pTechWeatherAfsLo']], tmp$maplo)
+
+      if (!any(is.na(tech@weather$comm)[apply(tech@weather[, c('wafc.up', 'wafc.fx', 'wafc.lo'), drop = FALSE], 1, any)]))
+      	stop('For wafc.* have to define comm')
+      tmp <- .toWeatherImply(tech@weather, 'wafc', 'tech', tech@name, 'comm')
+      obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$par)
+      obj@parameters[['pTechWeatherAfcUp']] <- addData(obj@parameters[['pTechWeatherAfcUp']], tmp$mapup)
+      obj@parameters[['pTechWeatherAfcLo']] <- addData(obj@parameters[['pTechWeatherAfcLo']], tmp$maplo)
+    }
+
 
 		if (all(ctype$comm$type != 'output')) 
 			stop('Techology "', tech@name, '", there is not activity commodity')  

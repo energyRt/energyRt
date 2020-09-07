@@ -157,52 +157,35 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   		pStorageEac <- salv_data[, c('stg', 'region', 'year', 'value')]
   		obj@parameters[['pStorageEac']] <- addData(obj@parameters[['pStorageEac']], unique(pStorageEac[, colnames(pStorageEac) %in% c(obj@parameters[['pStorageEac']]@dimSetNames, 'value'), drop = FALSE]))
     }
-				
-		# Weather part
-		# Weather part
-		merge.weather <- function(stg, nm, add = NULL) {
-			waf <- stg@weather[, c('weather', add, paste0(nm, c('.lo', '.fx', '.up'))), drop = FALSE]
-			waf <- waf[rowSums(!is.na(waf)) > length(add) + 1,, drop = FALSE]
-			if (nrow(waf) == 0) return(NULL)
-			# Map parts
-			if (length(add) == 0) {
-				m <- unique(waf$weather)
-				m <- data.frame(stg = rep(stg@name, length(m)), weather = m)
-			} else {
-				m <- waf[, c('weather', add), drop = FALSE]
-				m <- m[(!duplicated(apply(m, 1, paste0, collapse = '#'))),, drop = FALSE]
-				m$stg <- stg@name
-				m <- m[, c(ncol(m), 1:(ncol(m) - 1)), drop = FALSE]
-			}
-			waf20 <- data.frame(
-				stg = rep(stg@name, 4 * nrow(waf)),
-				weather = rep(waf$weather, 4),
-				stringsAsFactors = FALSE)
-			for (i in add) {
-				waf20[, i] <- rep(waf[, i], 4)
-			}
-			waf20$type <- c(rep('lo', 2 * nrow(waf)), rep('up', 2 * nrow(waf)))
-			waf20$value <- c(waf[, paste0(nm, '.lo')], waf[, paste0(nm, '.fx')], 
-				waf[, paste0(nm, '.up')], waf[, paste0(nm, '.fx')])
-			waf20 <- waf20[!is.na(waf20$value),, drop = FALSE]
-			list(m = m, p = waf20)
+			
+		
+waf.lo    = numeric(),
+waf.up    = numeric(),
+wcinp.lo   = numeric(),
+wcinp.up   = numeric(),
+wcout.lo   = numeric(),
+wcout.up   = numeric(),
+		if (nrow(stg@weather) > 0) {
+      tmp <- .toWeatherImply(stg@weather, 'waf', 'stg', stg@name)
+      obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$par)
+      obj@parameters[['pStorageWeatherAfUp']] <- addData(obj@parameters[['pStorageWeatherAfUp']], tmp$mapup)
+      obj@parameters[['pStorageWeatherAfLo']] <- addData(obj@parameters[['pStorageWeatherAfLo']], tmp$maplo)
+
+      if (!any(is.na(stg@weather$comm)[apply(stg@weather[, c('wcinp.up', 'wcinp.fx', 'wcinp.lo'), drop = FALSE], 1, any)]))
+      	stop('For wafc.* have to define comm')
+	    tmp <- .toWeatherImply(stg@weather, 'wcinp', 'stg', stg@name, 'comm')
+      obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$par)
+      obj@parameters[['pStorageWeatherCinpUp']] <- addData(obj@parameters[['pStorageWeatherCinpUp']], tmp$mapup)
+      obj@parameters[['pStorageWeatherCinpLo']] <- addData(obj@parameters[['pStorageWeatherCinpLo']], tmp$maplo)
+
+      if (!any(is.na(stg@weather$comm)[apply(stg@weather[, c('wcout.up', 'wcout.fx', 'wcout.lo'), drop = FALSE], 1, any)]))
+      	stop('For wafc.* have to define comm')
+	    tmp <- .toWeatherImply(stg@weather, 'wcout', 'stg', stg@name, 'comm')
+      obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$par)
+      obj@parameters[['pStorageWeatherCoutUp']] <- addData(obj@parameters[['pStorageWeatherCoutUp']], tmp$mapup)
+      obj@parameters[['pStorageWeatherCoutLo']] <- addData(obj@parameters[['pStorageWeatherCoutLo']], tmp$maplo)
 		}
 
-		tmp <- merge.weather(stg, 'waf')
-		if (length(tmp) != 0) {
-			obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$m)
-			obj@parameters[['pStorageWeatherAf']] <- addData(obj@parameters[['pStorageWeatherAf']], tmp$p)
-		}
-		tmp <- merge.weather(stg, 'wcinp')
-		if (length(tmp) != 0) {
-			obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$m)
-			obj@parameters[['pStorageWeatherCinp']] <- addData(obj@parameters[['pStorageWeatherCinp']], tmp$p)
-		}
-		tmp <- merge.weather(stg, 'wcout')
-		if (length(tmp) != 0) {
-			obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$m)
-			obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$p)
-		}
 		pStorageOlife <- olife
 		if (any(pStorageOlife$olife != Inf)) {
 			mStorageOlifeInf <- pStorageOlife[pStorageOlife$olife != Inf, colnames(pStorageOlife) %in% 
