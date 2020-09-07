@@ -848,7 +848,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:333,] <- NA;
+    rs[1:335,] <- NA;
     rownames(rs) <- c("weather",
 "tech",
 "sup",
@@ -922,6 +922,8 @@ rs
 "mTradeCapacityVariable",
 "mTradeInv",
 "mAggregateFactor",
+"mWeatherSlice",
+"mWeatherRegion",
 "mSupWeatherLo",
 "mSupWeatherUp",
 "mTechWeatherAfLo",
@@ -1328,6 +1330,10 @@ rs
     rs["mTradeInv", c("trade", "region", "year", "eqTradeInv")] <- TRUE;
     rs["mAggregateFactor", c("name", "description", "type")] <- c("mAggregateFactor", "", "map");
     rs["mAggregateFactor", c("comm", "eqAggOut")] <- TRUE;
+    rs["mWeatherSlice", c("name", "description", "type")] <- c("mWeatherSlice", "", "map");
+    rs["mWeatherSlice", c("weather", "slice")] <- TRUE;
+    rs["mWeatherRegion", c("name", "description", "type")] <- c("mWeatherRegion", "", "map");
+    rs["mWeatherRegion", c("weather", "region")] <- TRUE;
     rs["mSupWeatherLo", c("name", "description", "type")] <- c("mSupWeatherLo", "", "map");
     rs["mSupWeatherLo", c("weather", "sup", "eqSupAvaLo")] <- TRUE;
     rs["mSupWeatherUp", c("name", "description", "type")] <- c("mSupWeatherUp", "", "map");
@@ -1349,13 +1355,13 @@ rs
     rs["mStorageWeatherAfUp", c("name", "description", "type")] <- c("mStorageWeatherAfUp", "", "map");
     rs["mStorageWeatherAfUp", c("weather", "stg", "eqStorageAfUp")] <- TRUE;
     rs["mStorageWeatherCinpUp", c("name", "description", "type")] <- c("mStorageWeatherCinpUp", "", "map");
-    rs["mStorageWeatherCinpUp", c("weather", "stg", "comm", "eqStorageInpUp")] <- TRUE;
+    rs["mStorageWeatherCinpUp", c("weather", "stg", "eqStorageInpUp")] <- TRUE;
     rs["mStorageWeatherCinpLo", c("name", "description", "type")] <- c("mStorageWeatherCinpLo", "", "map");
-    rs["mStorageWeatherCinpLo", c("weather", "stg", "comm", "eqStorageInpLo")] <- TRUE;
+    rs["mStorageWeatherCinpLo", c("weather", "stg", "eqStorageInpLo")] <- TRUE;
     rs["mStorageWeatherCoutUp", c("name", "description", "type")] <- c("mStorageWeatherCoutUp", "", "map");
-    rs["mStorageWeatherCoutUp", c("weather", "stg", "comm", "eqStorageOutUp")] <- TRUE;
+    rs["mStorageWeatherCoutUp", c("weather", "stg", "eqStorageOutUp")] <- TRUE;
     rs["mStorageWeatherCoutLo", c("name", "description", "type")] <- c("mStorageWeatherCoutLo", "", "map");
-    rs["mStorageWeatherCoutLo", c("weather", "stg", "comm", "eqStorageOutLo")] <- TRUE;
+    rs["mStorageWeatherCoutLo", c("weather", "stg", "eqStorageOutLo")] <- TRUE;
     rs["mvSupCost", c("name", "description", "type")] <- c("mvSupCost", "", "map");
     rs["mvSupCost", c("sup", "region", "year", "eqSupCost", "eqCost")] <- TRUE;
     rs["mvTechInp", c("name", "description", "type")] <- c("mvTechInp", "", "map");
@@ -1839,13 +1845,13 @@ rs
     rs["pStorageWeatherAfUp", c("name", "description", "type")] <- c("pStorageWeatherAfUp", "", "parameter");
     rs["pStorageWeatherAfUp", c("weather", "stg", "eqStorageAfUp")] <- TRUE;
     rs["pStorageWeatherCinpUp", c("name", "description", "type")] <- c("pStorageWeatherCinpUp", "", "parameter");
-    rs["pStorageWeatherCinpUp", c("weather", "stg", "comm", "eqStorageInpUp")] <- TRUE;
+    rs["pStorageWeatherCinpUp", c("weather", "stg", "eqStorageInpUp")] <- TRUE;
     rs["pStorageWeatherCinpLo", c("name", "description", "type")] <- c("pStorageWeatherCinpLo", "", "parameter");
-    rs["pStorageWeatherCinpLo", c("weather", "stg", "comm", "eqStorageInpLo")] <- TRUE;
+    rs["pStorageWeatherCinpLo", c("weather", "stg", "eqStorageInpLo")] <- TRUE;
     rs["pStorageWeatherCoutUp", c("name", "description", "type")] <- c("pStorageWeatherCoutUp", "", "parameter");
-    rs["pStorageWeatherCoutUp", c("weather", "stg", "comm", "eqStorageOutUp")] <- TRUE;
+    rs["pStorageWeatherCoutUp", c("weather", "stg", "eqStorageOutUp")] <- TRUE;
     rs["pStorageWeatherCoutLo", c("name", "description", "type")] <- c("pStorageWeatherCoutLo", "", "parameter");
-    rs["pStorageWeatherCoutLo", c("weather", "stg", "comm", "eqStorageOutLo")] <- TRUE;
+    rs["pStorageWeatherCoutLo", c("weather", "stg", "eqStorageOutLo")] <- TRUE;
     rs["pLECLoACT", c("name", "description", "type")] <- c("pLECLoACT", "", "parameter");
     rs["pLECLoACT", c("region", "eqLECActivity")] <- TRUE;
     rs$type <- factor(rs$type, levels = c("set", "map", "parameter"))

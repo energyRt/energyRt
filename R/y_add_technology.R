@@ -440,21 +440,21 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 
 		if (nrow(tech@weather) > 0) {
       tmp <- .toWeatherImply(tech@weather, 'waf', 'tech', tech@name)
-      obj@parameters[['mTechWeatherAf']] <- addData(obj@parameters[['mTechWeatherAf']], tmp$par)
-      obj@parameters[['pTechWeatherAfUp']] <- addData(obj@parameters[['pTechWeatherAfUp']], tmp$mapup)
-      obj@parameters[['pTechWeatherAfLo']] <- addData(obj@parameters[['pTechWeatherAfLo']], tmp$maplo)
+      obj@parameters[['pTechWeatherAf']] <- addData(obj@parameters[['pTechWeatherAf']], tmp$par)
+      obj@parameters[['mTechWeatherAfUp']] <- addData(obj@parameters[['mTechWeatherAfUp']], tmp$mapup)
+      obj@parameters[['mTechWeatherAfLo']] <- addData(obj@parameters[['mTechWeatherAfLo']], tmp$maplo)
 
       tmp <- .toWeatherImply(tech@weather, 'wafs', 'tech', tech@name)
-      obj@parameters[['mTechWeatherAfs']] <- addData(obj@parameters[['mTechWeatherAfs']], tmp$par)
-      obj@parameters[['pTechWeatherAfsUp']] <- addData(obj@parameters[['pTechWeatherAfsUp']], tmp$mapup)
-      obj@parameters[['pTechWeatherAfsLo']] <- addData(obj@parameters[['pTechWeatherAfsLo']], tmp$maplo)
+      obj@parameters[['pTechWeatherAfs']] <- addData(obj@parameters[['pTechWeatherAfs']], tmp$par)
+      obj@parameters[['mTechWeatherAfsUp']] <- addData(obj@parameters[['mTechWeatherAfsUp']], tmp$mapup)
+      obj@parameters[['mTechWeatherAfsLo']] <- addData(obj@parameters[['mTechWeatherAfsLo']], tmp$maplo)
 
-      if (!any(is.na(tech@weather$comm)[apply(tech@weather[, c('wafc.up', 'wafc.fx', 'wafc.lo'), drop = FALSE], 1, any)]))
+   if (any(is.na(tech@weather$comm)[apply(!is.na(tech@weather[, c('wafc.lo', 'wafc.up', 'wafc.fx'), drop = FALSE]), 1, any)]))
       	stop('For wafc.* have to define comm')
-      tmp <- .toWeatherImply(tech@weather, 'wafc', 'tech', tech@name, 'comm')
-      obj@parameters[['mTechWeatherAfc']] <- addData(obj@parameters[['mTechWeatherAfc']], tmp$par)
-      obj@parameters[['pTechWeatherAfcUp']] <- addData(obj@parameters[['pTechWeatherAfcUp']], tmp$mapup)
-      obj@parameters[['pTechWeatherAfcLo']] <- addData(obj@parameters[['pTechWeatherAfcLo']], tmp$maplo)
+       tmp <- .toWeatherImply(tech@weather, 'wafc', 'tech', tech@name, 'comm')
+      obj@parameters[['pTechWeatherAfc']] <- addData(obj@parameters[['pTechWeatherAfc']], tmp$par)
+      obj@parameters[['mTechWeatherAfcUp']] <- addData(obj@parameters[['mTechWeatherAfcUp']], tmp$mapup)
+      obj@parameters[['mTechWeatherAfcLo']] <- addData(obj@parameters[['mTechWeatherAfcLo']], tmp$maplo)
     }
 
 

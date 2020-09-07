@@ -158,32 +158,22 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   		obj@parameters[['pStorageEac']] <- addData(obj@parameters[['pStorageEac']], unique(pStorageEac[, colnames(pStorageEac) %in% c(obj@parameters[['pStorageEac']]@dimSetNames, 'value'), drop = FALSE]))
     }
 			
-		
-waf.lo    = numeric(),
-waf.up    = numeric(),
-wcinp.lo   = numeric(),
-wcinp.up   = numeric(),
-wcout.lo   = numeric(),
-wcout.up   = numeric(),
+
 		if (nrow(stg@weather) > 0) {
       tmp <- .toWeatherImply(stg@weather, 'waf', 'stg', stg@name)
-      obj@parameters[['mStorageWeatherAf']] <- addData(obj@parameters[['mStorageWeatherAf']], tmp$par)
-      obj@parameters[['pStorageWeatherAfUp']] <- addData(obj@parameters[['pStorageWeatherAfUp']], tmp$mapup)
-      obj@parameters[['pStorageWeatherAfLo']] <- addData(obj@parameters[['pStorageWeatherAfLo']], tmp$maplo)
+      obj@parameters[['pStorageWeatherAf']] <- addData(obj@parameters[['pStorageWeatherAf']], tmp$par)
+      obj@parameters[['mStorageWeatherAfUp']] <- addData(obj@parameters[['mStorageWeatherAfUp']], tmp$mapup)
+      obj@parameters[['mStorageWeatherAfLo']] <- addData(obj@parameters[['mStorageWeatherAfLo']], tmp$maplo)
 
-      if (!any(is.na(stg@weather$comm)[apply(stg@weather[, c('wcinp.up', 'wcinp.fx', 'wcinp.lo'), drop = FALSE], 1, any)]))
-      	stop('For wafc.* have to define comm')
-	    tmp <- .toWeatherImply(stg@weather, 'wcinp', 'stg', stg@name, 'comm')
-      obj@parameters[['mStorageWeatherCinp']] <- addData(obj@parameters[['mStorageWeatherCinp']], tmp$par)
-      obj@parameters[['pStorageWeatherCinpUp']] <- addData(obj@parameters[['pStorageWeatherCinpUp']], tmp$mapup)
-      obj@parameters[['pStorageWeatherCinpLo']] <- addData(obj@parameters[['pStorageWeatherCinpLo']], tmp$maplo)
+	    tmp <- .toWeatherImply(stg@weather, 'wcinp', 'stg', stg@name)
+      obj@parameters[['pStorageWeatherCinp']] <- addData(obj@parameters[['pStorageWeatherCinp']], tmp$par)
+      obj@parameters[['mStorageWeatherCinpUp']] <- addData(obj@parameters[['mStorageWeatherCinpUp']], tmp$mapup)
+      obj@parameters[['mStorageWeatherCinpLo']] <- addData(obj@parameters[['mStorageWeatherCinpLo']], tmp$maplo)
 
-      if (!any(is.na(stg@weather$comm)[apply(stg@weather[, c('wcout.up', 'wcout.fx', 'wcout.lo'), drop = FALSE], 1, any)]))
-      	stop('For wafc.* have to define comm')
-	    tmp <- .toWeatherImply(stg@weather, 'wcout', 'stg', stg@name, 'comm')
-      obj@parameters[['mStorageWeatherCout']] <- addData(obj@parameters[['mStorageWeatherCout']], tmp$par)
-      obj@parameters[['pStorageWeatherCoutUp']] <- addData(obj@parameters[['pStorageWeatherCoutUp']], tmp$mapup)
-      obj@parameters[['pStorageWeatherCoutLo']] <- addData(obj@parameters[['pStorageWeatherCoutLo']], tmp$maplo)
+	    tmp <- .toWeatherImply(stg@weather, 'wcout', 'stg', stg@name)
+      obj@parameters[['pStorageWeatherCout']] <- addData(obj@parameters[['pStorageWeatherCout']], tmp$par)
+      obj@parameters[['mStorageWeatherCoutUp']] <- addData(obj@parameters[['mStorageWeatherCoutUp']], tmp$mapup)
+      obj@parameters[['mStorageWeatherCoutLo']] <- addData(obj@parameters[['mStorageWeatherCoutLo']], tmp$maplo)
 		}
 
 		pStorageOlife <- olife
@@ -230,25 +220,28 @@ wcout.up   = numeric(),
 	  			obj@parameters[[i]] <- addData(obj@parameters[[i]], atmp)
 	  		}
 		}
-		rem_inf <- function(x, y) {
+		rem_inf_def1 <- function(x, y) {
 		  if (is.null(x)) return(y)
 		  x <- x[x$type == 'up' & x$value == Inf, ]
 		  y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
 		}
+		rem_inf_def_inf <- function(x, y) {
+		 merge(x[x$type == 'up' & x$value != Inf, colnames(x) %in% colnames(y), drop = FALSE], y)
+		}
 
 		obj@parameters[['meqStorageAfLo']] <- addData(obj@parameters[['meqStorageAfLo']], merge(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0, 
          ], mvStorageStore))
-		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf(pStorageAf, mvStorageStore))
+		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf_def1(pStorageAf, mvStorageStore))
 		if (!is.null(pStorageCinp)) {
   		obj@parameters[['meqStorageInpLo']] <- addData(obj@parameters[['meqStorageInpLo']], merge(pStorageCinp[pStorageCinp$type == 'lo' & pStorageCinp$value != 0, 
   		         obj@parameters[['meqStorageInpLo']]@dimSetNames], mvStorageStore))
-  		obj@parameters[['meqStorageInpUp']] <- addData(obj@parameters[['meqStorageInpUp']],rem_inf(pStorageCinp, mvStorageStore))
+  		obj@parameters[['meqStorageInpUp']] <- addData(obj@parameters[['meqStorageInpUp']], rem_inf_def_inf(pStorageCinp, mvStorageStore))
 		}
 		if (!is.null(pStorageCout)) {
   		obj@parameters[['meqStorageOutLo']] <- addData(obj@parameters[['meqStorageOutLo']], 
   			merge(pStorageCout[pStorageCout$type == 'lo' & pStorageCout$value != 0, 
   		                 colnames(pStorageCout) %in% obj@parameters[['meqStorageOutLo']]@dimSetNames, drop = FALSE], mvStorageStore))
-  		obj@parameters[['meqStorageOutUp']] <- addData(obj@parameters[['meqStorageOutUp']], rem_inf(pStorageCout, mvStorageStore))
+  		obj@parameters[['meqStorageOutUp']] <- addData(obj@parameters[['meqStorageOutUp']], rem_inf_def_inf(pStorageCout, mvStorageStore))
     }
 		obj
 	})

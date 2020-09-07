@@ -254,10 +254,10 @@ mTechWeatherAfcLo(weather, tech, comm)
 mTechWeatherAfcUp(weather, tech, comm)
 mStorageWeatherAfLo(weather, stg)
 mStorageWeatherAfUp(weather, stg)
-mStorageWeatherCinpUp(weather, stg, comm)
-mStorageWeatherCinpLo(weather, stg, comm)
-mStorageWeatherCoutUp(weather, stg, comm)
-mStorageWeatherCoutLo(weather, stg, comm)
+mStorageWeatherCinpUp(weather, stg)
+mStorageWeatherCinpLo(weather, stg)
+mStorageWeatherCoutUp(weather, stg)
+mStorageWeatherCoutLo(weather, stg)
 ;
 * Weather parameter
 parameter
@@ -272,10 +272,10 @@ pTechWeatherAfcLo(weather, tech, comm)
 pTechWeatherAfcUp(weather, tech, comm)
 pStorageWeatherAfLo(weather, stg)
 pStorageWeatherAfUp(weather, stg)
-pStorageWeatherCinpUp(weather, stg, comm)
-pStorageWeatherCinpLo(weather, stg, comm)
-pStorageWeatherCoutUp(weather, stg, comm)
-pStorageWeatherCoutLo(weather, stg, comm)
+pStorageWeatherCinpUp(weather, stg)
+pStorageWeatherCinpLo(weather, stg)
+pStorageWeatherCoutUp(weather, stg)
+pStorageWeatherCoutLo(weather, stg)
 ;
 
 set
@@ -1118,27 +1118,27 @@ eqStorageInpUp(stg, comm, region, year, slice)$meqStorageInpUp(stg, comm, region
   vStorageInp(stg, comm, region, year, slice) =l=
     pStorageCap2stg(stg) * vStorageCap(stg, region, year) *
          pStorageCinpUp(stg, comm, region, year, slice) * pSliceShare(slice) *
-         prod(weather$mStorageWeatherCinpUp(weather, stg, comm),
-            pStorageWeatherCinpUp(weather, stg, comm) * pWeather(weather, region, year, slice));
+         prod(weather$mStorageWeatherCinpUp(weather, stg),
+            pStorageWeatherCinpUp(weather, stg) * pWeather(weather, region, year, slice));
 
 eqStorageInpLo(stg, comm, region, year, slice)$meqStorageInpLo(stg, comm, region, year, slice)..
   vStorageInp(stg, comm, region, year, slice) =g=
     pStorageCap2stg(stg) * vStorageCap(stg, region, year) * pStorageCinpLo(stg, comm, region, year, slice) *
-    pSliceShare(slice) * prod(weather$mStorageWeatherCinpLo(weather, stg, comm),
-       pStorageWeatherCinpLo(weather, stg, comm) * pWeather(weather, region, year, slice));
+    pSliceShare(slice) * prod(weather$mStorageWeatherCinpLo(weather, stg),
+       pStorageWeatherCinpLo(weather, stg) * pWeather(weather, region, year, slice));
 
 *
 eqStorageOutUp(stg, comm, region, year, slice)$meqStorageOutUp(stg, comm, region, year, slice)..
   vStorageOut(stg, comm, region, year, slice) =l=
     pStorageCap2stg(stg) * vStorageCap(stg, region, year) * pStorageCoutUp(stg, comm, region, year, slice) *
-    pSliceShare(slice)  * prod(weather$mStorageWeatherCoutUp(weather, stg, comm),
-       pStorageWeatherCoutUp(weather, stg, comm) * pWeather(weather, region, year, slice));
+    pSliceShare(slice)  * prod(weather$mStorageWeatherCoutUp(weather, stg),
+       pStorageWeatherCoutUp(weather, stg) * pWeather(weather, region, year, slice));
 
 eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region, year, slice)..
   vStorageOut(stg, comm, region, year, slice)  =g=
     pStorageCap2stg(stg) * vStorageCap(stg, region, year) * pStorageCoutLo(stg, comm, region, year, slice) *
-    pSliceShare(slice) * prod(weather$mStorageWeatherCoutLo(weather, stg, comm),
-       pStorageWeatherCoutLo(weather, stg, comm) * pWeather(weather, region, year, slice));
+    pSliceShare(slice) * prod(weather$mStorageWeatherCoutLo(weather, stg),
+       pStorageWeatherCoutLo(weather, stg) * pWeather(weather, region, year, slice));
 
 
 ********************************************************************************

@@ -270,19 +270,19 @@ model.eqStorageClean = Constraint(mvStorageStore, rule = lambda model, st1, c, r
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageInpUp ", end = "")
 # eqStorageInpUp(stg, comm, region, year, slice)$meqStorageInpUp(stg, comm, region, year, slice)
-model.eqStorageInpUp = Constraint(meqStorageInpUp, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpUp.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCinpUp.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCinpUp));
+model.eqStorageInpUp = Constraint(meqStorageInpUp, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpUp.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCinpUp.get((wth1,st1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1) in mStorageWeatherCinpUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageInpLo ", end = "")
 # eqStorageInpLo(stg, comm, region, year, slice)$meqStorageInpLo(stg, comm, region, year, slice)
-model.eqStorageInpLo = Constraint(meqStorageInpLo, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpLo.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCinpLo.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCinpLo));
+model.eqStorageInpLo = Constraint(meqStorageInpLo, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpLo.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCinpLo.get((wth1,st1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1) in mStorageWeatherCinpLo));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageOutUp ", end = "")
 # eqStorageOutUp(stg, comm, region, year, slice)$meqStorageOutUp(stg, comm, region, year, slice)
-model.eqStorageOutUp = Constraint(meqStorageOutUp, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutUp.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCoutUp.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCoutUp));
+model.eqStorageOutUp = Constraint(meqStorageOutUp, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutUp.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCoutUp.get((wth1,st1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1) in mStorageWeatherCoutUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageOutLo ", end = "")
 # eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region, year, slice)
-model.eqStorageOutLo = Constraint(meqStorageOutLo, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutLo.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCoutLo.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCoutLo));
+model.eqStorageOutLo = Constraint(meqStorageOutLo, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutLo.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCoutLo.get((wth1,st1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1) in mStorageWeatherCoutLo));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageCap ", end = "")
 # eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)

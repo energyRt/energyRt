@@ -78,6 +78,8 @@ set mTradeEac dimen 3;
 set mTradeCapacityVariable dimen 1;
 set mTradeInv dimen 3;
 set mAggregateFactor dimen 2;
+set mWeatherSlice dimen 2;
+set mWeatherRegion dimen 2;
 set mSupWeatherLo dimen 2;
 set mSupWeatherUp dimen 2;
 set mTechWeatherAfLo dimen 2;
@@ -88,10 +90,10 @@ set mTechWeatherAfcLo dimen 3;
 set mTechWeatherAfcUp dimen 3;
 set mStorageWeatherAfLo dimen 2;
 set mStorageWeatherAfUp dimen 2;
-set mStorageWeatherCinpUp dimen 3;
-set mStorageWeatherCinpLo dimen 3;
-set mStorageWeatherCoutUp dimen 3;
-set mStorageWeatherCoutLo dimen 3;
+set mStorageWeatherCinpUp dimen 2;
+set mStorageWeatherCinpLo dimen 2;
+set mStorageWeatherCoutUp dimen 2;
+set mStorageWeatherCoutLo dimen 2;
 set mvSupCost dimen 3;
 set mvTechInp dimen 5;
 set mvSupReserve dimen 3;
@@ -337,10 +339,10 @@ param pTechWeatherAfcLo{weather, tech, comm};
 param pTechWeatherAfcUp{weather, tech, comm};
 param pStorageWeatherAfLo{weather, stg};
 param pStorageWeatherAfUp{weather, stg};
-param pStorageWeatherCinpUp{weather, stg, comm};
-param pStorageWeatherCinpLo{weather, stg, comm};
-param pStorageWeatherCoutUp{weather, stg, comm};
-param pStorageWeatherCoutLo{weather, stg, comm};
+param pStorageWeatherCinpUp{weather, stg};
+param pStorageWeatherCinpLo{weather, stg};
+param pStorageWeatherCoutUp{weather, stg};
+param pStorageWeatherCoutLo{weather, stg};
 param pLECLoACT{region};
 param ORD{year};
 
@@ -500,13 +502,13 @@ s.t.  eqStorageAfUp{(st1, c, r, y, s) in meqStorageAfUp}: vStorageStore[st1,c,r,
 
 s.t.  eqStorageClean{(st1, c, r, y, s) in mvStorageStore}: (vStorageOut[st1,c,r,y,s]) / (pStorageOutEff[st1,c,r,y,s]) <=  vStorageStore[st1,c,r,y,s];
 
-s.t.  eqStorageInpUp{(st1, c, r, y, s) in meqStorageInpUp}: vStorageInp[st1,c,r,y,s] <=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCinpUp[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1,c) in mStorageWeatherCinpUp)}(pStorageWeatherCinpUp[wth1,st1,c]*pWeather[wth1,r,y,s]);
+s.t.  eqStorageInpUp{(st1, c, r, y, s) in meqStorageInpUp}: vStorageInp[st1,c,r,y,s] <=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCinpUp[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1) in mStorageWeatherCinpUp)}(pStorageWeatherCinpUp[wth1,st1]*pWeather[wth1,r,y,s]);
 
-s.t.  eqStorageInpLo{(st1, c, r, y, s) in meqStorageInpLo}: vStorageInp[st1,c,r,y,s]  >=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCinpLo[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1,c) in mStorageWeatherCinpLo)}(pStorageWeatherCinpLo[wth1,st1,c]*pWeather[wth1,r,y,s]);
+s.t.  eqStorageInpLo{(st1, c, r, y, s) in meqStorageInpLo}: vStorageInp[st1,c,r,y,s]  >=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCinpLo[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1) in mStorageWeatherCinpLo)}(pStorageWeatherCinpLo[wth1,st1]*pWeather[wth1,r,y,s]);
 
-s.t.  eqStorageOutUp{(st1, c, r, y, s) in meqStorageOutUp}: vStorageOut[st1,c,r,y,s] <=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCoutUp[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1,c) in mStorageWeatherCoutUp)}(pStorageWeatherCoutUp[wth1,st1,c]*pWeather[wth1,r,y,s]);
+s.t.  eqStorageOutUp{(st1, c, r, y, s) in meqStorageOutUp}: vStorageOut[st1,c,r,y,s] <=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCoutUp[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1) in mStorageWeatherCoutUp)}(pStorageWeatherCoutUp[wth1,st1]*pWeather[wth1,r,y,s]);
 
-s.t.  eqStorageOutLo{(st1, c, r, y, s) in meqStorageOutLo}: vStorageOut[st1,c,r,y,s]  >=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCoutLo[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1,c) in mStorageWeatherCoutLo)}(pStorageWeatherCoutLo[wth1,st1,c]*pWeather[wth1,r,y,s]);
+s.t.  eqStorageOutLo{(st1, c, r, y, s) in meqStorageOutLo}: vStorageOut[st1,c,r,y,s]  >=  pStorageCap2stg[st1]*vStorageCap[st1,r,y]*pStorageCoutLo[st1,c,r,y,s]*pSliceShare[s]*prod{wth1 in weather:((wth1,st1) in mStorageWeatherCoutLo)}(pStorageWeatherCoutLo[wth1,st1]*pWeather[wth1,r,y,s]);
 
 s.t.  eqStorageCap{(st1, r, y) in mStorageSpan}: vStorageCap[st1,r,y]  =  pStorageStock[st1,r,y]+sum{yp in year:((ordYear[y] >= ordYear[yp] and ((st1,r) in mStorageOlifeInf or ordYear[y]<pStorageOlife[st1,r]+ordYear[yp]) and (st1,r,yp) in mStorageNew))}(vStorageNewCap[st1,r,yp]);
 

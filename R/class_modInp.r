@@ -65,18 +65,18 @@ setMethod("initialize", "modInp",
   .Object@parameters[['mTechWeatherAfcUp']] <- createParameter('mTechWeatherAfcUp', c('weather', 'tech', 'comm'), 'map')
   .Object@parameters[['mStorageWeatherAfLo']] <- createParameter('mStorageWeatherAfLo', c('weather', 'stg'), 'map')
   .Object@parameters[['mStorageWeatherAfUp']] <- createParameter('mStorageWeatherAfUp', c('weather', 'stg'), 'map')
-  .Object@parameters[['mStorageWeatherCinpUp']] <- createParameter('mStorageWeatherCinpUp', c('weather', 'stg', 'comm'), 'map')
-  .Object@parameters[['mStorageWeatherCinpLo']] <- createParameter('mStorageWeatherCinpLo', c('weather', 'stg', 'comm'), 'map')
-  .Object@parameters[['mStorageWeatherCoutUp']] <- createParameter('mStorageWeatherCoutUp', c('weather', 'stg', 'comm'), 'map')
-  .Object@parameters[['mStorageWeatherCoutLo']] <- createParameter('mStorageWeatherCoutLo', c('weather', 'stg', 'comm'), 'map')
+  .Object@parameters[['mStorageWeatherCinpUp']] <- createParameter('mStorageWeatherCinpUp', c('weather', 'stg'), 'map')
+  .Object@parameters[['mStorageWeatherCinpLo']] <- createParameter('mStorageWeatherCinpLo', c('weather', 'stg'), 'map')
+  .Object@parameters[['mStorageWeatherCoutUp']] <- createParameter('mStorageWeatherCoutUp', c('weather', 'stg'), 'map')
+  .Object@parameters[['mStorageWeatherCoutLo']] <- createParameter('mStorageWeatherCoutLo', c('weather', 'stg'), 'map')
   
   .Object@parameters[['pSupWeather']] <- createParameter('pSupWeather', c('weather', 'sup'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
   .Object@parameters[['pTechWeatherAf']] <- createParameter('pTechWeatherAf', c('weather', 'tech'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
   .Object@parameters[['pTechWeatherAfs']] <- createParameter('pTechWeatherAfs', c('weather', 'tech'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
   .Object@parameters[['pTechWeatherAfc']] <- createParameter('pTechWeatherAfc', c('weather', 'tech', 'comm'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
   .Object@parameters[['pStorageWeatherAf']] <- createParameter('pStorageWeatherAf', c('weather', 'stg'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
-  .Object@parameters[['pStorageWeatherCinp']] <- createParameter('pStorageWeatherCinp', c('weather', 'stg', 'comm'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
-  .Object@parameters[['pStorageWeatherCout']] <- createParameter('pStorageWeatherCout', c('weather', 'stg', 'comm'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherCinp']] <- createParameter('pStorageWeatherCinp', c('weather', 'stg'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherCout']] <- createParameter('pStorageWeatherCout', c('weather', 'stg'), 'multi', defVal = 1, interpolation = 'back.inter.forth')
 
 
     
