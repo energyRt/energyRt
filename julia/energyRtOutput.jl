@@ -690,6 +690,9 @@ println(vrb_list, "vTradeNewCap");
 close(vrb_list);
 raw_data = open("output/raw_data_set.csv", "w");
 println(raw_data, "set,value");
+for rr = weather
+    println(raw_data, "weather,",rr)
+end
 for rr = tech
     println(raw_data, "tech,",rr)
 end

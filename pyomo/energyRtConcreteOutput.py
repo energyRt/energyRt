@@ -433,6 +433,8 @@ for (t1,y) in mTradeNew:
 f.close()
 f = open("output/raw_data_set.csv","w");
 f.write('set,value\n')
+for i in weather:
+    f.write('weather,' + str(i) + '\n')
 for i in tech:
     f.write('tech,' + str(i) + '\n')
 for i in sup:

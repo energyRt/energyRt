@@ -146,19 +146,19 @@ model.eqTechAOut = Constraint(mvTechAOut, rule = lambda model, t, c, r, y, s : m
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfLo ", end = "")
 # eqTechAfLo(tech, region, year, slice)$meqTechAfLo(tech, region, year, slice)
-model.eqTechAfLo = Constraint(meqTechAfLo, rule = lambda model, t, r, y, s : pTechAfLo.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfLo.get((t,r,y,s)) <=  model.vTechAct[t,r,y,s]);
+model.eqTechAfLo = Constraint(meqTechAfLo, rule = lambda model, t, r, y, s : pTechAfLo.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfLo.get((wth1,t))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t) in mTechWeatherAfLo) <=  model.vTechAct[t,r,y,s]);
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfUp ", end = "")
 # eqTechAfUp(tech, region, year, slice)$meqTechAfUp(tech, region, year, slice)
-model.eqTechAfUp = Constraint(meqTechAfUp, rule = lambda model, t, r, y, s : model.vTechAct[t,r,y,s] <=  pTechAfUp.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfUp.get((t,r,y,s)));
+model.eqTechAfUp = Constraint(meqTechAfUp, rule = lambda model, t, r, y, s : model.vTechAct[t,r,y,s] <=  pTechAfUp.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfUp.get((wth1,t))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t) in mTechWeatherAfUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfsLo ", end = "")
 # eqTechAfsLo(tech, region, year, slice)$meqTechAfsLo(tech, region, year, slice)
-model.eqTechAfsLo = Constraint(meqTechAfsLo, rule = lambda model, t, r, y, s : pTechAfsLo.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfsLo.get((t,r,y,s)) <=  sum((model.vTechAct[t,r,y,sp] if (t,r,y,sp) in mvTechAct else 0) for sp in slice if (s,sp) in mSliceParentChildE));
+model.eqTechAfsLo = Constraint(meqTechAfsLo, rule = lambda model, t, r, y, s : pTechAfsLo.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfsLo.get((wth1,t))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t) in mTechWeatherAfsLo) <=  sum((model.vTechAct[t,r,y,sp] if (t,r,y,sp) in mvTechAct else 0) for sp in slice if (s,sp) in mSliceParentChildE));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfsUp ", end = "")
 # eqTechAfsUp(tech, region, year, slice)$meqTechAfsUp(tech, region, year, slice)
-model.eqTechAfsUp = Constraint(meqTechAfsUp, rule = lambda model, t, r, y, s : sum((model.vTechAct[t,r,y,sp] if (t,r,y,sp) in mvTechAct else 0) for sp in slice if (s,sp) in mSliceParentChildE) <=  pTechAfsUp.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfsUp.get((t,r,y,s)));
+model.eqTechAfsUp = Constraint(meqTechAfsUp, rule = lambda model, t, r, y, s : sum((model.vTechAct[t,r,y,sp] if (t,r,y,sp) in mvTechAct else 0) for sp in slice if (s,sp) in mSliceParentChildE) <=  pTechAfsUp.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfsUp.get((wth1,t))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t) in mTechWeatherAfsUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechActSng ", end = "")
 # eqTechActSng(tech, comm, region, year, slice)$meqTechActSng(tech, comm, region, year, slice)
@@ -170,19 +170,19 @@ model.eqTechActGrp = Constraint(meqTechActGrp, rule = lambda model, t, g, r, y, 
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfcOutLo ", end = "")
 # eqTechAfcOutLo(tech, region, comm, year, slice)$meqTechAfcOutLo(tech, region, comm, year, slice)
-model.eqTechAfcOutLo = Constraint(meqTechAfcOutLo, rule = lambda model, t, r, c, y, s : pTechCact2cout.get((t,c,r,y,s))*pTechAfcLo.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcLo.get((t,c,r,y,s)) <=  model.vTechOut[t,c,r,y,s]);
+model.eqTechAfcOutLo = Constraint(meqTechAfcOutLo, rule = lambda model, t, r, c, y, s : pTechCact2cout.get((t,c,r,y,s))*pTechAfcLo.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfcLo.get((wth1,t,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t,c) in mTechWeatherAfcLo) <=  model.vTechOut[t,c,r,y,s]);
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfcOutUp ", end = "")
 # eqTechAfcOutUp(tech, region, comm, year, slice)$meqTechAfcOutUp(tech, region, comm, year, slice)
-model.eqTechAfcOutUp = Constraint(meqTechAfcOutUp, rule = lambda model, t, r, c, y, s : model.vTechOut[t,c,r,y,s] <=  pTechCact2cout.get((t,c,r,y,s))*pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcUp.get((t,c,r,y,s)));
+model.eqTechAfcOutUp = Constraint(meqTechAfcOutUp, rule = lambda model, t, r, c, y, s : model.vTechOut[t,c,r,y,s] <=  pTechCact2cout.get((t,c,r,y,s))*pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*prod(pTechWeatherAfcUp.get((wth1,t,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t,c) in mTechWeatherAfcUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfcInpLo ", end = "")
 # eqTechAfcInpLo(tech, region, comm, year, slice)$meqTechAfcInpLo(tech, region, comm, year, slice)
-model.eqTechAfcInpLo = Constraint(meqTechAfcInpLo, rule = lambda model, t, r, c, y, s : pTechAfcLo.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcLo.get((t,c,r,y,s)) <=  model.vTechInp[t,c,r,y,s]);
+model.eqTechAfcInpLo = Constraint(meqTechAfcInpLo, rule = lambda model, t, r, c, y, s : pTechAfcLo.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfcLo.get((wth1,t,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t,c) in mTechWeatherAfcLo) <=  model.vTechInp[t,c,r,y,s]);
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechAfcInpUp ", end = "")
 # eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, comm, year, slice)
-model.eqTechAfcInpUp = Constraint(meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*paTechWeatherAfcUp.get((t,c,r,y,s)));
+model.eqTechAfcInpUp = Constraint(meqTechAfcInpUp, rule = lambda model, t, r, c, y, s : model.vTechInp[t,c,r,y,s] <=  pTechAfcUp.get((t,c,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfcUp.get((wth1,t,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t,c) in mTechWeatherAfcUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechCap ", end = "")
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
@@ -210,11 +210,11 @@ model.eqTechOMCost = Constraint(mTechOMCost, rule = lambda model, t, r, y : mode
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqSupAvaUp ", end = "")
 # eqSupAvaUp(sup, comm, region, year, slice)$mSupAvaUp(sup, comm, region, year, slice)
-model.eqSupAvaUp = Constraint(mSupAvaUp, rule = lambda model, s1, c, r, y, s : model.vSupOut[s1,c,r,y,s] <=  pSupAvaUp.get((s1,c,r,y,s))*paSupWeatherUp.get((s1,c,r,y,s)));
+model.eqSupAvaUp = Constraint(mSupAvaUp, rule = lambda model, s1, c, r, y, s : model.vSupOut[s1,c,r,y,s] <=  pSupAvaUp.get((s1,c,r,y,s))*prod(pSupWeatherUp.get((wth1,s1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,s1) in mSupWeatherUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqSupAvaLo ", end = "")
 # eqSupAvaLo(sup, comm, region, year, slice)$meqSupAvaLo(sup, comm, region, year, slice)
-model.eqSupAvaLo = Constraint(meqSupAvaLo, rule = lambda model, s1, c, r, y, s : model.vSupOut[s1,c,r,y,s]  >=  pSupAvaLo.get((s1,c,r,y,s))*paSupWeatherLo.get((s1,c,r,y,s)));
+model.eqSupAvaLo = Constraint(meqSupAvaLo, rule = lambda model, s1, c, r, y, s : model.vSupOut[s1,c,r,y,s]  >=  pSupAvaLo.get((s1,c,r,y,s))*prod(pSupWeatherLo.get((wth1,s1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,s1) in mSupWeatherLo));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqSupTotal ", end = "")
 # eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)
@@ -258,11 +258,11 @@ model.eqStorageStore = Constraint(mvStorageStore, rule = lambda model, st1, c, r
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageAfLo ", end = "")
 # eqStorageAfLo(stg, comm, region, year, slice)$meqStorageAfLo(stg, comm, region, year, slice)
-model.eqStorageAfLo = Constraint(meqStorageAfLo, rule = lambda model, st1, c, r, y, s : model.vStorageStore[st1,c,r,y,s]  >=  pStorageAfLo.get((st1,r,y,s))*pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*paStorageWeatherAfLo.get((st1,c,r,y,s)));
+model.eqStorageAfLo = Constraint(meqStorageAfLo, rule = lambda model, st1, c, r, y, s : model.vStorageStore[st1,c,r,y,s]  >=  pStorageAfLo.get((st1,r,y,s))*pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*prod(pStorageWeatherAfLo.get((wth1,st1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1) in mStorageWeatherAfLo));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageAfUp ", end = "")
 # eqStorageAfUp(stg, comm, region, year, slice)$meqStorageAfUp(stg, comm, region, year, slice)
-model.eqStorageAfUp = Constraint(meqStorageAfUp, rule = lambda model, st1, c, r, y, s : model.vStorageStore[st1,c,r,y,s] <=  pStorageAfUp.get((st1,r,y,s))*pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*paStorageWeatherAfUp.get((st1,c,r,y,s)));
+model.eqStorageAfUp = Constraint(meqStorageAfUp, rule = lambda model, st1, c, r, y, s : model.vStorageStore[st1,c,r,y,s] <=  pStorageAfUp.get((st1,r,y,s))*pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*prod(pStorageWeatherAfUp.get((wth1,st1))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1) in mStorageWeatherAfUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageClean ", end = "")
 # eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
@@ -270,19 +270,19 @@ model.eqStorageClean = Constraint(mvStorageStore, rule = lambda model, st1, c, r
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageInpUp ", end = "")
 # eqStorageInpUp(stg, comm, region, year, slice)$meqStorageInpUp(stg, comm, region, year, slice)
-model.eqStorageInpUp = Constraint(meqStorageInpUp, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpUp.get((st1,c,r,y,s))*pSliceShare.get((s))*paStorageWeatherCinpUp.get((st1,c,r,y,s)));
+model.eqStorageInpUp = Constraint(meqStorageInpUp, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpUp.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCinpUp.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCinpUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageInpLo ", end = "")
 # eqStorageInpLo(stg, comm, region, year, slice)$meqStorageInpLo(stg, comm, region, year, slice)
-model.eqStorageInpLo = Constraint(meqStorageInpLo, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpLo.get((st1,c,r,y,s))*pSliceShare.get((s))*paStorageWeatherCinpLo.get((st1,c,r,y,s)));
+model.eqStorageInpLo = Constraint(meqStorageInpLo, rule = lambda model, st1, c, r, y, s : model.vStorageInp[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCinpLo.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCinpLo.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCinpLo));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageOutUp ", end = "")
 # eqStorageOutUp(stg, comm, region, year, slice)$meqStorageOutUp(stg, comm, region, year, slice)
-model.eqStorageOutUp = Constraint(meqStorageOutUp, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutUp.get((st1,c,r,y,s))*pSliceShare.get((s))*paStorageWeatherCoutUp.get((st1,c,r,y,s)));
+model.eqStorageOutUp = Constraint(meqStorageOutUp, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s] <=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutUp.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCoutUp.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCoutUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageOutLo ", end = "")
 # eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region, year, slice)
-model.eqStorageOutLo = Constraint(meqStorageOutLo, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutLo.get((st1,c,r,y,s))*pSliceShare.get((s))*paStorageWeatherCoutLo.get((st1,c,r,y,s)));
+model.eqStorageOutLo = Constraint(meqStorageOutLo, rule = lambda model, st1, c, r, y, s : model.vStorageOut[st1,c,r,y,s]  >=  pStorageCap2stg.get((st1))*model.vStorageCap[st1,r,y]*pStorageCoutLo.get((st1,c,r,y,s))*pSliceShare.get((s))*prod(pStorageWeatherCoutLo.get((wth1,st1,c))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,st1,c) in mStorageWeatherCoutLo));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageCap ", end = "")
 # eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)

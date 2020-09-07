@@ -626,6 +626,7 @@ file raw_data_set_csv / 'output/raw_data_set.csv'/;
 raw_data_set_csv.lp = 1;
 put raw_data_set_csv;
 put "set,value"/;
+loop(weather, put "weather,"weather.tl:0/;);
 loop(tech, put "tech,"tech.tl:0/;);
 loop(sup, put "sup,"sup.tl:0/;);
 loop(dem, put "dem,"dem.tl:0/;);
