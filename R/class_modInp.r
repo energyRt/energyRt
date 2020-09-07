@@ -45,16 +45,48 @@ setMethod("initialize", "modInp",
     .Object@parameters[['expp']]    <- createSet('expp')    
     .Object@parameters[['imp']]    <- createSet('imp')    
     .Object@parameters[['trade']]    <- createSet('trade')    
-    .Object@parameters[['weather']] <- createSet('weather')    
 
     # weather
+   .Object@parameters[['weather']] <- createSet('weather')    
+    .Object@parameters[['pWeather']] <- 
+      createParameter('pWeather', c('weather', 'region', 'year', 'slice'), 'simple', 
+                      defVal = 1, interpolation = 'back.inter.forth') #, colName = 'wval', cls = 'weather')    
+ 
+  .Object@parameters[['mSupWeatherLo']] <- createParameter('mSupWeatherLo', c('weather", "sup'), 'map')
+  .Object@parameters[['mSupWeatherUp']] <- createParameter('mSupWeatherUp', c('weather", "sup'), 'map')
+  .Object@parameters[['mTechWeatherAfLo']] <- createParameter('mTechWeatherAfLo', c('weather", "tech'), 'map')
+  .Object@parameters[['mTechWeatherAfUp']] <- createParameter('mTechWeatherAfUp', c('weather", "tech'), 'map')
+  .Object@parameters[['mTechWeatherAfsLo']] <- createParameter('mTechWeatherAfsLo', c('weather", "tech'), 'map')
+  .Object@parameters[['mTechWeatherAfsUp']] <- createParameter('mTechWeatherAfsUp', c('weather", "tech'), 'map')
+  .Object@parameters[['mTechWeatherAfcLo']] <- createParameter('mTechWeatherAfcLo', c('weather", "tech", "comm'), 'map')
+  .Object@parameters[['mTechWeatherAfcUp']] <- createParameter('mTechWeatherAfcUp', c('weather", "tech", "comm'), 'map')
+  .Object@parameters[['mStorageWeatherAfLo']] <- createParameter('mStorageWeatherAfLo', c('weather", "stg'), 'map')
+  .Object@parameters[['mStorageWeatherAfUp']] <- createParameter('mStorageWeatherAfUp', c('weather", "stg'), 'map')
+  .Object@parameters[['mStorageWeatherCinpUp']] <- createParameter('mStorageWeatherCinpUp', c('weather", "stg", "comm'), 'map')
+  .Object@parameters[['mStorageWeatherCinpLo']] <- createParameter('mStorageWeatherCinpLo', c('weather", "stg", "comm'), 'map')
+  .Object@parameters[['mStorageWeatherCoutUp']] <- createParameter('mStorageWeatherCoutUp', c('weather", "stg", "comm'), 'map')
+  .Object@parameters[['mStorageWeatherCoutLo']] <- createParameter('mStorageWeatherCoutLo', c('weather", "stg", "comm'), 'map')
+  
+  .Object@parameters[['pSupWeatherUp']] <- createParameter('pSupWeatherUp', c('weather", "sup'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pSupWeatherLo']] <- createParameter('pSupWeatherLo', c('weather", "sup'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pTechWeatherAfLo']] <- createParameter('pTechWeatherAfLo', c('weather", "tech'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pTechWeatherAfUp']] <- createParameter('pTechWeatherAfUp', c('weather", "tech'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pTechWeatherAfsLo']] <- createParameter('pTechWeatherAfsLo', c('weather", "tech'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pTechWeatherAfsUp']] <- createParameter('pTechWeatherAfsUp', c('weather", "tech'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pTechWeatherAfcLo']] <- createParameter('pTechWeatherAfcLo', c('weather", "tech", "comm'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pTechWeatherAfcUp']] <- createParameter('pTechWeatherAfcUp', c('weather", "tech", "comm'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherAfLo']] <- createParameter('pStorageWeatherAfLo', c('weather", "stg'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherAfUp']] <- createParameter('pStorageWeatherAfUp', c('weather", "stg'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherCinpUp']] <- createParameter('pStorageWeatherCinpUp', c('weather", "stg", "comm'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherCinpLo']] <- createParameter('pStorageWeatherCinpLo', c('weather", "stg", "comm'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherCoutUp']] <- createParameter('pStorageWeatherCoutUp', c('weather", "stg", "comm'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+  .Object@parameters[['pStorageWeatherCoutLo']] <- createParameter('pStorageWeatherCoutLo', c('weather", "stg", "comm'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
+
+
     .Object@parameters[['mSupWeatherLo']] <- createParameter('mSupWeatherLo', c('sup', 'weather'), 'map')    
     .Object@parameters[['mSupWeatherUp']] <- createParameter('mSupWeatherUp', c('sup', 'weather'), 'map')    
     .Object@parameters[['mWeatherSlice']] <- createParameter('mWeatherSlice', c('weather', 'slice'), 'map')
     .Object@parameters[['mWeatherRegion']] <- createParameter('mWeatherRegion', c('weather', 'region'), 'map')
-    .Object@parameters[['pWeather']] <- 
-      createParameter('pWeather', c('weather', 'region', 'year', 'slice'), 'simple', 
-                      defVal = 1, interpolation = 'back.inter.forth') #, colName = 'wval', cls = 'weather')    
     .Object@parameters[['pSupWeather']] <- 
       createParameter('pSupWeather', c('sup', 'weather'), 'multi', 
                       defVal = c(1, 1), interpolation = 'back.inter.forth')#, colName = c('wava.lo', 'wava.up'), cls = 'weather')    
@@ -105,8 +137,6 @@ setMethod("initialize", "modInp",
     
     # Commodity
     # Map
-    #.Object@parameters[['ems_from']] <- 
-    #    createParameter('ems_from', c('comm', 'commp'), 'map')    
     .Object@parameters[['mUpComm']] <- createParameter('mUpComm', 'comm', 'map')    
     .Object@parameters[['mLoComm']] <- createParameter('mLoComm', 'comm', 'map')    
     .Object@parameters[['mFxComm']] <- createParameter('mFxComm', 'comm', 'map')    
@@ -449,18 +479,6 @@ setMethod("initialize", "modInp",
     .Object@parameters[['mTradeIrCsrc2Aout']] <- createParameter('mTradeIrCsrc2Aout', c('trade', 'comm', 'src', 'dst', 'year', 'slice'), 'map') 
     .Object@parameters[['mTradeIrCdst2Aout']] <- createParameter('mTradeIrCdst2Aout', c('trade', 'comm', 'src', 'dst', 'year', 'slice'), 'map') 
 
-    # .Object@parameters[['mImportIrSub']] <- createParameter('mImportIrSub', c('comm', 'region', 'year', 'slice'), 'map') 
-    # .Object@parameters[['mImportIrSubSlice']] <- createParameter('mImportIrSubSlice', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
-    # .Object@parameters[['mImportIrSubSliceTrd']] <- createParameter('mImportIrSubSliceTrd', c('trade', 'comm', 'region', 'year', 'slice', 'slice'), 'map') 
-    # .Object@parameters[['mImportRowSubSlice']] <- createParameter('mImportRowSubSlice', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
-    # .Object@parameters[['mImportRowSub']] <- createParameter('mImportRowSub', c('comm', 'region', 'year', 'slice'), 'map') 
-    
-    # .Object@parameters[['mExportIrSub']] <- createParameter('mExportIrSub', c('comm', 'region', 'year', 'slice'), 'map') 
-    # .Object@parameters[['mExportIrSubSlice']] <- createParameter('mExportIrSubSlice', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
-    # .Object@parameters[['mExportIrSubSliceTrd']] <- createParameter('mExportIrSubSliceTrd', c('trade', 'comm', 'region', 'year', 'slice', 'slice'), 'map') 
-    # .Object@parameters[['mExportRowSubSlice']] <- createParameter('mExportRowSubSlice', c('comm', 'region', 'year', 'slice', 'slice'), 'map') 
-    # .Object@parameters[['mExportRowSub']] <- createParameter('mExportRowSub', c('comm', 'region', 'year', 'slice'), 'map') 
-    
     .Object@parameters[['mImportRow']] <- createParameter('mImportRow', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mExportRow']] <- createParameter('mExportRow', c('expp', 'comm', 'region', 'year', 'slice'), 'map') 
     .Object@parameters[['mImportRowUp']] <- createParameter('mImportRowUp', c('imp', 'comm', 'region', 'year', 'slice'), 'map') 
@@ -582,22 +600,6 @@ setMethod("initialize", "modInp",
     .Object@parameters[['meqBalFx']] <- createParameter('meqBalFx', c('comm', 'region', 'year', 'slice'), 'map')
     .Object@parameters[['meqLECActivity']] <- createParameter('meqLECActivity', c('tech', 'region', 'year'), 'map')
         
-    
-    ## Weather parts
-    .Object@parameters[['paTechWeatherAfLo']] <- createParameter('paTechWeatherAfLo', c('tech', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paTechWeatherAfUp']] <- createParameter('paTechWeatherAfUp', c('tech', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paTechWeatherAfsLo']] <- createParameter('paTechWeatherAfsLo', c('tech', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paTechWeatherAfsUp']] <- createParameter('paTechWeatherAfsUp', c('tech', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paTechWeatherAfcLo']] <- createParameter('paTechWeatherAfcLo', c('tech', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paTechWeatherAfcUp']] <- createParameter('paTechWeatherAfcUp', c('tech', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paSupWeatherUp']] <- createParameter('paSupWeatherUp', c('sup', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paSupWeatherLo']] <- createParameter('paSupWeatherLo', c('sup', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paStorageWeatherAfLo']] <- createParameter('paStorageWeatherAfLo', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paStorageWeatherAfUp']] <- createParameter('paStorageWeatherAfUp', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paStorageWeatherCinpUp']] <- createParameter('paStorageWeatherCinpUp', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paStorageWeatherCinpLo']] <- createParameter('paStorageWeatherCinpLo', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paStorageWeatherCoutUp']] <- createParameter('paStorageWeatherCoutUp', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
-    .Object@parameters[['paStorageWeatherCoutLo']] <- createParameter('paStorageWeatherCoutLo', c('stg', 'comm', 'region', 'year', 'slice'), 'simple', defVal = 1, interpolation = 'back.inter.forth')
     
     for (i in names(.Object@parameters)) 
       .Object@parameters[[i]]@misc$weather <- !is.null(.Object@parameters[[i]]@data$weather)
