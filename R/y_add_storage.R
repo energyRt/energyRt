@@ -60,9 +60,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		obj@parameters[['pStorageAf']] <- addData(obj@parameters[['pStorageAf']], pStorageAf)
 		obj@parameters[['pStorageCap2stg']] <- addData(obj@parameters[['pStorageCap2stg']],
 			data.frame(stg = stg@name, value = stg@cap2stg))
-		pStorageCinp <-  multiInterpolation(stg@seff, 'cinp', obj@parameters[['pStorageCinp']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity))
+		pStorageCinp <-  multiInterpolation(stg@af, 'cinp', obj@parameters[['pStorageCinp']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity))
 		obj@parameters[['pStorageCinp']] <- addData(obj@parameters[['pStorageCinp']], pStorageCinp) 
-		pStorageCout <- multiInterpolation(stg@seff, 'cout', obj@parameters[['pStorageCout']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity))
+		pStorageCout <- multiInterpolation(stg@af, 'cout', obj@parameters[['pStorageCout']], approxim, c('stg', 'comm'), c(stg@name, stg@commodity))
 		obj@parameters[['pStorageCout']] <- addData(obj@parameters[['pStorageCout']], pStorageCout)
 		# Aux input/output
 		if (nrow(stg@aux) != 0) {
