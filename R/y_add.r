@@ -169,7 +169,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     exp <- energyRt:::.upper_case(app)
-    
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
   approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
   exp <- .disaggregateSliceLevel(exp, approxim)
@@ -186,16 +185,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   pExportRow <- multiInterpolation(exp@exp, 'exp', obj@parameters[['pExportRow']], approxim, 'expp', exp@name)
   obj@parameters[['pExportRow']] <- addData(obj@parameters[['pExportRow']], pExportRow)
   
-  mExportRow <- merge(merge(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
-  pExportRow2 <- pExportRow[pExportRow$type == 'up' & pExportRow$value == 0, colnames(pExportRow) %in% colnames(mExportRow), drop = FALSE]
-  if (nrow(pExportRow2) != 0) {
-    pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
-    if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge(mExportRow, pExportRow2)
-    mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),, drop = FALSE]
+ mExportRow <- merge(merge(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
+  if (!is.null(pExportRow) && nrow(pExportRow) != 0) {
+    pExportRow2 <- pExportRow[pExportRow$type == 'up' & pExportRow$value == 0, colnames(pExportRow) %in% colnames(mExportRow), drop = FALSE]
+    if (nrow(pExportRow2) != 0) {
+      pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
+      if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge(mExportRow, pExportRow2)
+      mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),, drop = FALSE]
+    }
   }
   mExportRow$comm <- exp@commodity
   obj@parameters[['mExportRow']] <- addData(obj@parameters[['mExportRow']], mExportRow)
-  if (!is.null(pExportRow)) {
+  if (!is.null(pExportRow) && any(pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0)) {
     mExportRowUp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, colnames(pExportRow) %in% obj@parameters[['mExportRowUp']]@dimSetNames, drop = FALSE]
     mExportRowUp$comm <- exp@commodity
     if (!all(obj@parameters[['mExportRowUp']]@dimSetNames %in% mExportRowUp)) 
@@ -240,11 +241,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
                                    obj@parameters[['pImportRow']], approxim, 'imp', imp@name)
   obj@parameters[['pImportRow']] <- addData(obj@parameters[['pImportRow']], pImportRow)
   mImportRow <- merge(merge(mImpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
-  pImportRow2 <- pImportRow[pImportRow$type == 'up' & pImportRow$value == 0, colnames(pImportRow) %in% colnames(mImportRow), drop = FALSE]
-  if (nrow(pImportRow2) != 0) {
-    pImportRow2 <- mImportRow[1, 1:2, drop = FALSE]
-    if (ncol(pImportRow2) != ncol(mImportRow)) pImportRow2 <- merge(mImportRow, pImportRow2)
-    mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow2), fromLast = TRUE)[1:nrow(mImportRow)]),, drop = FALSE]
+  if (!is.null(pImportRow) && nrow(pImportRow) != 0) {
+    pImportRow2 <- pImportRow[pImportRow$type == 'up' & pImportRow$value == 0, colnames(pImportRow) %in% colnames(mImportRow), drop = FALSE]
+    if (nrow(pImportRow2) != 0) {
+      pImportRow2 <- mImportRow[1, 1:2, drop = FALSE]
+      if (ncol(pImportRow2) != ncol(mImportRow)) pImportRow2 <- merge(mImportRow, pImportRow2)
+      mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow2), fromLast = TRUE)[1:nrow(mImportRow)]),, drop = FALSE]
+    }
   }
   mImportRow$comm <- imp@commodity
   obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
