@@ -125,15 +125,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'demand',
                               dem <- stayOnlyVariable(dem, approxim$region, 'region')
                               approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
                               dem <- .disaggregateSliceLevel(dem, approxim)
-                              #  if (!energyRt:::.chec_correct_name(dem@name)) {
-                              #    stop(paste('Incorrect demand name "', dem@name, '"', sep = ''))
-                              #  }
-                              #  if (isDemand(obj, dem@name)) {
-                              #    warning(paste('There is demand name "', dem@name,
-                              #        '" now, all previous information will be removed', sep = ''))
-                              #    obj <- removePreviousDemand(obj, dem@name)
-                              #  }
-                              #  obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
                               obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
                                                                       data.frame(dem = dem@name, comm = dem@commodity)) 
                               obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
@@ -184,15 +175,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   exp <- .disaggregateSliceLevel(exp, approxim)
   mExpSlice <- data.frame(expp = rep(exp@name, length(approxim$slice)), slice = approxim$slice)
   obj@parameters[['mExpSlice']] <- addData(obj@parameters[['mExpSlice']], mExpSlice)
-  #  if (!energyRt:::.chec_correct_name(exp@name)) {
-#    stop(paste('Incorrect export name "', exp@name, '"', sep = ''))
-#  }
-#  if (isExport(obj, exp@name)) {
-#    warning(paste('There is export name "', exp@name,
-#        '" now, all previous information will be removed', sep = ''))
-#    obj <- removePreviousExport(obj, exp@name)
-#  }    
-#  obj@parameters[['expp']] <- addData(obj@parameters[['expp']], exp@name)
   mExpComm <- data.frame(expp = exp@name, comm = exp@commodity)
   obj@parameters[['mExpComm']] <- addData(obj@parameters[['mExpComm']], mExpComm)
   obj@parameters[['pExportRowPrice']] <- addData(obj@parameters[['pExportRowPrice']],
@@ -205,8 +187,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   obj@parameters[['pExportRow']] <- addData(obj@parameters[['pExportRow']], pExportRow)
   
   mExportRow <- merge(merge(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
-  mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow[pExportRow$type == 'up' & pExportRow$value == 0, 1:4]), 
-                                        fromLast = TRUE)[1:nrow(mExportRow)]), ]
+  pExportRow2 <- pExportRow[pExportRow$type == 'up' & pExportRow$value == 0, colnames(pExportRow) %in% colnames(mExportRow), drop = FALSE]
+  if (nrow(pExportRow2) != 0) {
+    pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
+    if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge(mExportRow, pExportRow2)
+    mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),, drop = FALSE]
+  }
   mExportRow$comm <- exp@commodity
   obj@parameters[['mExportRow']] <- addData(obj@parameters[['mExportRow']], mExportRow)
   if (!is.null(pExportRow)) {
@@ -254,8 +240,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
                                    obj@parameters[['pImportRow']], approxim, 'imp', imp@name)
   obj@parameters[['pImportRow']] <- addData(obj@parameters[['pImportRow']], pImportRow)
   mImportRow <- merge(merge(mImpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
-  mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow[pImportRow$type == 'up' & pImportRow$value == 0, 1:4]), 
-                                        fromLast = TRUE)[1:nrow(mImportRow)]), ]
+  pImportRow2 <- pImportRow[pImportRow$type == 'up' & pImportRow$value == 0, colnames(pImportRow) %in% colnames(mImportRow), drop = FALSE]
+  if (nrow(pImportRow2) != 0) {
+    pImportRow2 <- mImportRow[1, 1:2, drop = FALSE]
+    if (ncol(pImportRow2) != ncol(mImportRow)) pImportRow2 <- merge(mImportRow, pImportRow2)
+    mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow2), fromLast = TRUE)[1:nrow(mImportRow)]),, drop = FALSE]
+  }
   mImportRow$comm <- imp@commodity
   obj@parameters[['mImportRow']] <- addData(obj@parameters[['mImportRow']], mImportRow)
    if (!is.null(pImportRow)) {
@@ -363,9 +353,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
       'mMilestoneHasNext', 'mSameSlice', 'mSameRegion', 'ordYear', 'cardYear', 'pPeriodLen', 'pDiscountFactor', 'mDiscountZero')
     for (i in clean_list)
       obj@parameters[[i]] <- .clearParameter(obj@parameters[[i]])
-    #  assign('obj', obj, globalenv())
-  #  assign('app', app, globalenv())
-  #  assign('approxim', approxim, globalenv())
   obj <- removePreviousSysInfo(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
   obj@parameters[['mSliceParentChild']] <- addData(obj@parameters[['mSliceParentChild']],

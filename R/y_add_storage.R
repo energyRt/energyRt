@@ -175,7 +175,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
       obj@parameters[['mStorageWeatherCoutUp']] <- addData(obj@parameters[['mStorageWeatherCoutUp']], tmp$mapup)
       obj@parameters[['mStorageWeatherCoutLo']] <- addData(obj@parameters[['mStorageWeatherCoutLo']], tmp$maplo)
 		}
-
 		pStorageOlife <- olife
 		if (any(pStorageOlife$olife != Inf)) {
 			mStorageOlifeInf <- pStorageOlife[pStorageOlife$olife != Inf, colnames(pStorageOlife) %in% 
@@ -195,7 +194,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
   		mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
   		obj@parameters[['mStorageOMCost']] <- addData(obj@parameters[['mStorageOMCost']], mStorageOMCost)
 		}
-
 		mvStorageStore <- merge(mStorageSpan, list(slice = stg_slice))
 		mvStorageStore$comm <- stg@commodity
 		obj@parameters[['mvStorageStore']] <- addData(obj@parameters[['mvStorageStore']], mvStorageStore)
@@ -228,13 +226,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		rem_inf_def_inf <- function(x, y) {
 		 merge(x[x$type == 'up' & x$value != Inf, colnames(x) %in% colnames(y), drop = FALSE], y)
 		}
-
 		obj@parameters[['meqStorageAfLo']] <- addData(obj@parameters[['meqStorageAfLo']], merge(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0, 
          ], mvStorageStore))
 		obj@parameters[['meqStorageAfUp']] <- addData(obj@parameters[['meqStorageAfUp']], rem_inf_def1(pStorageAf, mvStorageStore))
 		if (!is.null(pStorageCinp)) {
   		obj@parameters[['meqStorageInpLo']] <- addData(obj@parameters[['meqStorageInpLo']], merge(pStorageCinp[pStorageCinp$type == 'lo' & pStorageCinp$value != 0, 
-  		         obj@parameters[['meqStorageInpLo']]@dimSetNames], mvStorageStore))
+  		         colnames(pStorageCinp) %in% obj@parameters[['meqStorageInpLo']]@dimSetNames], mvStorageStore))
   		obj@parameters[['meqStorageInpUp']] <- addData(obj@parameters[['meqStorageInpUp']], rem_inf_def_inf(pStorageCinp, mvStorageStore))
 		}
 		if (!is.null(pStorageCout)) {
