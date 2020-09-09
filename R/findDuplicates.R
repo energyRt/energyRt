@@ -58,7 +58,11 @@ findDuplicates <- function(x) {
     } else if (class(x) %in% c('constraint')) {
       tmp <- check_by_slots(x, c('rhs', 'for.each'))
       for (y in seq_along(x@lhs)) {
-        tmp <- rbind(tmp, check_by_slots(x@lhs[[y]], 'mult'))
+        nn <- check_by_slots(x@lhs[[y]], 'mult') 
+        if (!is.null(nn)) {
+          nn$slot <- paste('lhs', y, nn$slot)
+          tmp <- rbind(tmp, nn)
+        }
       }
       return(tmp)
    } else if (class(x) %in% c('slice', 'commodity')) {
