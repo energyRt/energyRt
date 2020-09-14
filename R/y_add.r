@@ -87,7 +87,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   # For slice
   approxim <- .fix_approximation_list(approxim, comm = cmd@name)
   obj@parameters[['mCommSlice']] <- addData(obj@parameters[['mCommSlice']], 
-                                            data.frame(comm = rep(cmd@name, length(approxim$commodity_slice_map[[cmd@name]])), 
+                          data.frame(comm = rep(cmd@name, length(approxim$commodity_slice_map[[cmd@name]])), 
                                                        slice = approxim$slice))
     
   if (any(approxim$debug$comm == cmd@name)) {
@@ -120,18 +120,36 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
 # Add demand
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'demand',
-                            approxim = 'list'), function(obj, app, approxim) {     
-                              dem <- energyRt:::.upper_case(app)
-                              dem <- stayOnlyVariable(dem, approxim$region, 'region')
-                              approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
-                              dem <- .disaggregateSliceLevel(dem, approxim)
-                              obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
-                                                                      data.frame(dem = dem@name, comm = dem@commodity)) 
-                              obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']],
-                                                                     simpleInterpolation(dem@dem, 'dem',
-                                                                                         obj@parameters[['pDemand']], approxim, c('dem', 'comm'), c(dem@name, dem@commodity)))
-                              obj
-                            })
+                            approxim = 'list'), function(obj, app, approxim) {  
+      dem <- energyRt:::.upper_case(app)
+      dem <- stayOnlyVariable(dem, approxim$region, 'region')
+      approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
+      dem <- .disaggregateSliceLevel(dem, approxim)
+      obj@parameters[['mDemComm']] <- addData(obj@parameters[['mDemComm']],
+        data.frame(dem = dem@name, comm = dem@commodity)) 
+      # Region
+      if (obj@parameters[['pDemand']]@defVal == 0 & all(!is.na(dem@dem)) && length(dem@region) != 0) {
+        dem@region <- dem@region[dem@region %in% unique(dem@dem$region)]
+      }
+      if (length(dem@region) != 0)
+        dem@dem <- dem@dem[is.na(dem@dem) | dem@dem$region %in% dem@region,, drop = FALSE]
+      region <- unique(c(dem@dem[!is.na(dem@dem$region) & dem@dem$region %in% dem@region, 'region'], dem@region))
+      approxim$region <- region
+      dem@dem <- dem@dem[is.na(dem@dem) | dem@dem$region %in% region,, drop = FALSE]
+      # Slice
+      mDemInp <- data.frame(comm = rep(dem@commodity, length(approxim$slice)),
+          slice = approxim$slice, stringsAsFactors = FALSE)
+      obj@parameters[['mDemInp']] <- addData(obj@parameters[['mDemInp']], mDemInp)
+      mvDemInp <- merge(merge(mDemInp, list(year = approxim$mileStoneYears)), list(region = region))
+      
+      obj@parameters[['mvDemInp']] <- addData(obj@parameters[['mvDemInp']], mvDemInp)
+       pDemand <- simpleInterpolation(dem@dem, 'dem', obj@parameters[['pDemand']], approxim, c('dem', 'comm'), 
+          c(dem@name, dem@commodity))
+      obj@parameters[['pDemand']] <- addData(obj@parameters[['pDemand']], pDemand)
+      
+      
+      obj
+})
 
 
 ################################################################################

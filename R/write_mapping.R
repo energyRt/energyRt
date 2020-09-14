@@ -48,9 +48,6 @@
   .interpolation_message('mSupOutTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], reduce.sect(
     getParameterData(prec@parameters$mSupAva)[, -1]))
-  .interpolation_message('mDemInp', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-  prec@parameters[['mDemInp']] <- addData(prec@parameters[['mDemInp']], 
-  	reduce.sect(merge(mCommSlice, getParameterData(prec@parameters$mDemComm), by = 'comm'), c('comm', 'slice')))
   
   .interpolation_message('pEmissionFactor', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   #### This section have to move to add (after interpolate comm first)
@@ -207,10 +204,7 @@
     prec@parameters[['mvTradeRowCost']] <- addData(prec@parameters[['mvTradeRowCost']], dregionyear)
     .interpolation_message('mvTradeIrCost', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     prec@parameters[['mvTradeIrCost']] <- addData(prec@parameters[['mvTradeIrCost']], dregionyear)
-    .interpolation_message('mvDemInp', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-    
-    prec@parameters[['mvDemInp']] <- addData(prec@parameters[['mvDemInp']], 
-      merge(dregionyear, getParameterData(prec@parameters[['mDemInp']]))[,c('comm', 'region', 'year', 'slice')])
+
     .interpolation_message('mvTotalCost', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     
     prec@parameters[['mvTotalCost']] <- addData(prec@parameters[['mvTotalCost']], dregionyear)
