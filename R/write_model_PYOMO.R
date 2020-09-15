@@ -26,9 +26,6 @@
         } else {
           mmm <- grep(templ, run_code)
           if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col_sq, yy, rmm)
-          # mmm <- grep(paste0('^model[.]', yy), run_code)
-          # if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col_sq, yy, rmm)
-          # browser()
         }
       }
     }

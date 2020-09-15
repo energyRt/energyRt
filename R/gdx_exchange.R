@@ -5,7 +5,7 @@
     x
   }
   gg <- list()
-  for (i in names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) is.null(x@misc$weather) || !x@misc$weather)]) {
+  for (i in names(scen@modInp@parameters)) {
     if (scen@modInp@parameters[[i]]@type != 'multi') {
       gg[[i]] <- all_factor(getParameterData(scen@modInp@parameters[[i]]))
     } else {
@@ -103,7 +103,7 @@
   nms <- names(dat)
   max_length <- max(nchar(nms))
   wipe <- ""
-  for(i in nms) if (is.null(dat[[i]]$weather)) {
+  for(i in nms) {
     cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
     wipe <- paste0(rep("\b", max_length + 3), collapse = "")
     # cat(wipe, i, rep(" ", 10), sep = "")
