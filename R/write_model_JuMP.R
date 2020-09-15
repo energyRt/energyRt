@@ -13,10 +13,21 @@
       if (substr(xxx, 1, 1) == '(') k <- k + 1 else k <- k - 1
       xxx <- gsub('^[)(]', '', xxx)
     }
-    run_code[i] <- paste0(gsub('[*][ ]*prod[(].*', '', run_code[i]), xxx)
+    run_code[i] <- paste0(gsub('[*][ ]*prod[(]', '*(1 + sum(-1 + ', 
+      substr(run_code[i], 1, nchar(run_code[i]) - nchar(xxx))), ')', xxx)
   }
-  
-
+  # Check for complicated weather
+  for (pr in c('mTechWeatherAfLo', 'mTechWeatherAfUp', 'mTechWeatherAfsLo', 'mTechWeatherAfsUp', 'mTechWeatherAfcLo', 
+        'mTechWeatherAfcUp', 'mTechWeatherAfcLo', 'mTechWeatherAfcUp', 'mSupWeatherUp', 'mSupWeatherLo', 'mStorageWeatherAfLo', 
+    'mStorageWeatherAfUp', 'mStorageWeatherCinpUp', 'mStorageWeatherCinpLo', 'mStorageWeatherCoutUp', 'mStorageWeatherCoutLo')) {
+    tmp <- getParameterData(scen@modInp@parameters[[pr]])
+    tmp$weather <- NULL
+    if (anyDuplicated(tmp)) {
+      assign('error_msg', tmp[duplicated(tmp),, drop = FALSE], globalenv())
+      stop(paste0('It is forbidden to determine more than one weather for Julia, since the prod is not a allowed. ', 
+        'List of duplicated weather for map "', pr, '"assign to error_msg.'))
+    }
+  }
       # For downsize
   fdownsize <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
   for (nn in fdownsize) {
