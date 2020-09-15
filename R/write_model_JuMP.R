@@ -4,6 +4,47 @@
 .write_model_JuMP <- function(arg, scen) {
   run_code <- scen@source[["JuMP"]]
   run_codeout <- scen@source[["JuMPOutput"]]
+  # There is not prod in jump julia. Remove it, until jump will be better
+  for (i in grep('^[@].*prod[(]', run_code)) {
+    xxx <- gsub('^[@].*prod[(]', '', run_code[i])
+    k <- 1
+    while (k != 0) {
+      xxx <- gsub('^[^)(]*', '', xxx)
+      if (substr(xxx, 1, 1) == '(') k <- k + 1 else k <- k - 1
+      xxx <- gsub('^[)(]', '', xxx)
+    }
+    run_code[i] <- paste0(gsub('[*][ ]*prod[(].*', '', run_code[i]), xxx)
+  }
+  
+
+      # For downsize
+  fdownsize <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
+  for (nn in fdownsize) {
+    rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
+    if (scen@modInp@parameters[[nn]]@type == 'multi') {
+      uuu <- paste0(nn, c('Lo', 'Up'))
+    } else uuu <- nn
+    for (yy in uuu) {
+      templ <- paste0('[(]if haskey[(]', yy, '[,]')
+      if (any(grep('^pCns', nn))) {
+        for (www in seq_along(scen@modInp@gams.equation)) {
+          mmm <- grep(templ, scen@modInp@gams.equation[[www]]$equation)
+          if (any(mmm)) {
+            scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_jump, yy, rmm)
+          }
+        }
+      } else {
+        mmm <- grep(templ, run_code)
+        if (any(mmm)) {
+          xx = run_code[mmm]
+          ww <- strsplit(xx, templ)[[1]]
+          dd = ww[2]
+          gsub('; end[)].*', '', dd)
+          run_code[mmm] <- sapply(strsplit(run_code[mmm], templ), .rem_jump, yy, rmm)
+        }
+      }
+    }
+  }
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
   zz_data_julia <- file(paste(arg$dir.result, '/data.jl', sep = ''), 'w')
   zz_data_constr <- file(paste(arg$dir.result, '/inc_constraints.jl', sep = ''), 'w')
@@ -65,3 +106,15 @@
   scen
 }
 
+.rem_jump <- function(x, nn, rmm) {
+  for (i in 2:length(x)) {
+    # Split for end
+    hdd <- gsub('; end[)].*', '', x[i])
+    tll <- gsub(paste0('.* ', nn, 'Def; end[)]'), '', x[i])
+    argsss <- gsub('(^[ ][(]|[)].*)', '', hdd)
+    x[i] <- paste0('(if haskey(', nn, ',', paste0(strsplit(hdd, argsss)[[1]], 
+      collapse = paste0(strsplit(argsss, ',')[[1]][-rmm], collapse = ',')),
+      '; end)', tll)
+  }
+  return(paste0(x, collapse = ''))
+}
