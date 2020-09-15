@@ -10,6 +10,31 @@
       file_w <- c(file_w, energyRt:::.sm_to_glpk(scen@modInp@parameters[[i]]))
     }
   }
+    # For downsize
+  fdownsize <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
+  for (nn in fdownsize) {
+    rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
+    if (scen@modInp@parameters[[nn]]@type == 'multi') {
+      uuu <- paste0(nn, c('Lo', 'Up'))
+    } else uuu <- nn
+    for (yy in uuu) {
+      templ <- paste0('(^|[^[:alnum:]])', yy, '[[]')
+      templ2 <- paste0('(^|[^[:alnum:]])', yy, '[{]')
+      if (any(grep('^pCns', nn))) {
+        for (www in seq_along(scen@modInp@gams.equation)) {
+          mmm <- grep(templ, scen@modInp@gams.equation[[www]]$equation)
+          if (any(mmm)) {
+            scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_col_sq, yy, rmm)
+          }
+        }
+      } else {
+        mmm <- grep(templ, run_code)
+        if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col_sq, yy, rmm)
+        mmm <- grep(templ2, run_code)
+        if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col_fg, yy, rmm)
+      }
+    }
+  }
   
   # Add constraint
   if (length(scen@modInp@gams.equation) > 0) {
@@ -19,6 +44,7 @@
     mps_name_def <- paste0('set ', mps_name, ' dimen ', sapply(scen@modInp@parameters[mps_name], function(x) length(x@dimSetNames)), ';')
     pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
     pps_name_def <- paste0('param ', pps_name, ' {', sapply(scen@modInp@parameters[pps_name], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
+    if (length(pps_name) == 0) pps_name_def <- character()
   }
   
   ### FUNC GLPK 

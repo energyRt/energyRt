@@ -6,9 +6,62 @@
   if (AbstractModel) {
     run_code <- scen@source[["PYOMOAbstract"]]
     run_codeout <- scen@source[["PYOMOAbstractOutput"]]
+    
+    # For downsize
+    fdownsize <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
+    for (nn in fdownsize) {
+      rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
+      if (scen@modInp@parameters[[nn]]@type == 'multi') {
+        uuu <- paste0(nn, c('Lo', 'Up'))
+      } else uuu <- nn
+      for (yy in uuu) {
+        templ <- paste0('(^|[^[:alnum:]])', yy, '[[]')
+        if (any(grep('^pCns', nn))) {
+          for (www in seq_along(scen@modInp@gams.equation)) {
+            mmm <- grep(templ, scen@modInp@gams.equation[[www]]$equation)
+            if (any(mmm)) {
+              scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_col_sq, yy, rmm)
+            }
+          }
+        } else {
+          mmm <- grep(templ, run_code)
+          if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col_sq, yy, rmm)
+          # mmm <- grep(paste0('^model[.]', yy), run_code)
+          # if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col_sq, yy, rmm)
+          # browser()
+        }
+      }
+    }
+      
   } else {
     run_code <- scen@source[["PYOMOConcrete"]]
     run_codeout <- scen@source[["PYOMOConcreteOutput"]]
+      # For downsize
+      fdownsize <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
+      for (nn in fdownsize) {
+        rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
+        if (scen@modInp@parameters[[nn]]@type == 'multi') {
+          uuu <- paste0(nn, c('Lo', 'Up'))
+        } else uuu <- nn
+        for (yy in uuu) {
+          templ <- paste0('(^|[^[:alnum:]])', yy, '[.]get[(][(]')
+          if (any(grep('^pCns', nn))) {
+            for (www in seq_along(scen@modInp@gams.equation)) {
+              mmm <- grep(templ, scen@modInp@gams.equation[[www]]$equation)
+              if (any(mmm)) {
+                scen@modInp@gams.equation[[www]]$equation[mmm] <- 
+                  sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], paste0(yy, '[.]get[(][(]')), 
+                .rem_col_pyomo_concrete, yy, rmm)
+              }
+            }
+          } else {
+            mmm <- grep(templ, run_code)
+            if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], paste0(yy, '[.]get[(][(]')), 
+                                                  .rem_col_pyomo_concrete, yy, rmm)
+          }
+        }
+      }
+    
   }
   dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
   dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
@@ -106,3 +159,18 @@
   scen@solver$code <- c('energyRt.py', 'output.py', 'inc_constraints.py', 'inc_solver.py')
   scen
 }
+
+
+.rem_col_pyomo_concrete <- function(x, nn, rmm) {
+  for (i in 2:length(x)) {
+    tt <- gsub('[)][)].*', '', x[i])  
+    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
+    mm <- strsplit(tt, '[,]')[[1]][-rmm]
+    if (length(mm) == 0) x[i] <- paste0(nn, til) else {
+      x[i] <- paste0(nn, '.get((', paste0(mm, collapse = ', '), '))', til)
+    }
+  }
+  return(paste0(x, collapse = ''))
+}
+
+
