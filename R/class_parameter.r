@@ -10,11 +10,7 @@ setClass('parameter', # @parameter
     interpolation   = "character",   # interpolation 'back.inter.forth'
     data            = "data.frame",  # @data Data for export
     not_data        = "logical",  # @data NO flag for map 
-    #use_now         = "numeric",     # For fast
-    #use_all         = "numeric",     # For fast
-    # check           = "function",     # ?delete? function for checking map
     colName     = 'character',   # @colName Column name in slot 
-# misc$nval 
     nValues     = 'numeric',     # @nValues Number of non-NA values in 'data' (to speed-up processing) 
     misc = "list"
   ),
@@ -26,9 +22,6 @@ setClass('parameter', # @parameter
     interpolation   = NULL,
     data            = data.frame(),
     not_data        = FALSE,
-    #use_now         = 0,     
-    #use_all         = 0,
-    #check           = function(obj) TRUE,
     colName     = NULL,
     nValues     = 0,
       #! Misc
@@ -36,7 +29,6 @@ setClass('parameter', # @parameter
         class = NULL,
         slot = NULL
       ))#,
-#  validity          = function(object) object@check(object)
 );
 
 setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type, 
@@ -118,14 +110,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
       class2 <- function(x) if (class(x) == 'integer') 'numeric' else class(x)
       if (any(sapply(data, class2) != sapply(obj@data, class)))
           stop('Internal error: Wrong new data 3')
-        #nn <- obj@use_now + 1:nrow(data)
-        #obj@use_now <- obj@use_now + nrow(data)
-        #if (obj@use_now >= obj@use_all) {
-        #  obj@use_all <- obj@use_now + 1e3
-        #  obj@data[obj@use_all, ] <- NA
-        #}
-        #apply(data, 1, function(x) all(!is.na(x)))
-        #f (!all(apply(data, 1, function(x) all(!is.na(x))))) print(data)
         data <- data[apply(data, 1, function(x) all(!is.na(x))), , drop = FALSE]
         if (nrow(data) != 0) {
           if (obj@nValues != -1) {
@@ -134,7 +118,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
             }
             nn <- obj@nValues + 1:nrow(data)
             obj@nValues <- obj@nValues + nrow(data)
-            #obj@data[nn, ] <- NA
             obj@data[nn, ] <- data
           } else {
             nn <- nrow(obj@data) + 1:nrow(data)
@@ -142,7 +125,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
             obj@data[nn, ] <- data
           }
         }
-        #obj@data <- rbind(obj@data, data)
     }
     obj
 })
@@ -153,12 +135,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'character'),
     if (obj@type != 'set' || length(data) == 0 || !all(is.character(data))) {
           stop('Internal error: Wrong new data')
     }
-    #    nn <- obj@use_now + 1:length(data)
-    #    obj@use_now <- obj@use_now + length(data)
-    #    if (obj@use_now >= obj@use_all) {
-    #      obj@use_all <- obj@use_now + 1e3
-    #      obj@data[obj@use_all, ] <- NA
-    #    }
     nn <- nrow(obj@data) + 1:length(data)
     obj@data[nn, ] <- data
     obj@nValues <- obj@nValues + length(data)
@@ -171,12 +147,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'numeric'),
     if (obj@type != 'set' || length(data) == 0 || !all(is.numeric(data))) {
           stop('Internal error: Wrong new data')
     }
-    #    nn <- obj@use_now + 1:length(data)
-    #    obj@use_now <- obj@use_now + length(data)
-    #    if (obj@use_now >= obj@use_all) {
-    #      obj@use_all <- obj@use_now + 1e3
-    #      obj@data[obj@use_all, ] <- NA
-    #    }
     nn <- nrow(obj@data) + 1:length(data)
     obj@data[nn, ] <- data
     obj@nValues <- obj@nValues + length(data)
@@ -195,8 +165,6 @@ setMethod('getSet', signature(obj = 'parameter', dimSetNames = "character"),
   function(obj, dimSetNames) {
     if (length(dimSetNames) != 1 || all(dimSetNames != obj@dimSetNames))
           stop('Internal error: Wrong dimSetNames request')
-    # zz <- unique(obj@data[, dimSetNames])
-    # zz[!is.na(zz)]
     if (obj@nValues != -1) unique(obj@data[seq(length.out = obj@nValues), dimSetNames]) else 
         unique(obj@data[, dimSetNames])
 })
@@ -217,7 +185,6 @@ setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character",
 
 # Generate GAMS code, return character == GAMS code 
 .toGams0 <- function(obj, include.def) {
-  if (!is.null(obj@misc$weather) && obj@misc$weather) return(NULL)
     gen_gg <- function(name, dtt) {
       if (ncol(dtt) == 1) {
       	ret <- paste0(name, ' = ', dtt[1, 1], ';')
@@ -361,12 +328,10 @@ setMethod('print', 'parameter', function(x, ...) {
 
 # Generate PYOMO code, return character vector
 .toPyomo <- function(obj) {
-  if (!is.null(obj@misc$weather) && obj@misc$weather) return(NULL)
  as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       stop('.toPyomo: error in ', obj@name, "@data")
-      # return(paste0("# ", name, '\n', name, ' = {}; \n')) # ', data$value, '
     } else {
       data <- data[data$value != Inf & data$value != def, ]
       if (nrow(data) == 0) {
@@ -412,7 +377,6 @@ setMethod('print', 'parameter', function(x, ...) {
 }
 
 .toPyomoAbstractModel <- function(obj) {
-  if (!is.null(obj@misc$weather) && obj@misc$weather) return(NULL)
    as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(paste0("# ", name, '\nparam ', name, ' := ', data$value, '\n'))
@@ -462,7 +426,6 @@ setMethod('print', 'parameter', function(x, ...) {
 
 # Generate Julia code, return character vector
 .toJulia <- function(obj) {
-  if (!is.null(obj@misc$weather) && obj@misc$weather) return(NULL)
   as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
@@ -483,10 +446,6 @@ setMethod('print', 'parameter', function(x, ...) {
         kk <- paste0(kk, ', :', data[-1, i])
       kk <- paste0(kk, ')] = ', data[-1, 'value'])
       return(c(rtt, kk))
-      # t1 <- ''; t2 <- ''
-      # if (ncol(data) > 2) {t1 <- 'JuMP.Containers.SparseAxisArray('; t2 <- ')'}
-      # kk <- c(paste0("# ", name, name2, '\n', name, ' = ', t1, 'Dict('), 
-      #   paste0(kk, collapse = ',\n'), t2, ');')
     }
   }
   if (obj@nValues != -1) {
@@ -523,7 +482,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
           function(obj, data) return(obj))
 
 .unique_set <- function(obj) {
-  
   if (obj@nValues != -1) {
     obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
     obj@data <- obj@data[!duplicated(obj@data),, drop = FALSE]
@@ -535,7 +493,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
 }
 
 .toJuliaHead <- function(obj) {
-  if (!is.null(obj@misc$weather) && obj@misc$weather) return(NULL)
   as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
@@ -583,25 +540,17 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
 
 
 .toPyomSQLite  <- function(obj) {
-  if (!is.null(obj@misc$weather) && obj@misc$weather) return(NULL)
   as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       stop('.toPyomSQLite: check @data in ', obj@name)
-      # return(paste0("# ", name, '\n', name, ' = {}; \n')) # ', data$value, '
     } else {
       data <- data[data$value != Inf & data$value != def, ]
       if (nrow(data) == 0) {
         rtt <- paste0("# ", name, name2, '\n', name, ' = toPar(set(), ', def, ')\n')
         return(rtt)
       }
-      # rtt <- paste0("# ", name, name2, '\ntmp = {} \n')
       rtt <- paste0("# ", name, name2, '\n')
-      # kk <- paste0("tmp[('", data[, 1])
-      # for (i in seq_len(ncol(data) - 2) + 1)
-      #   kk <- paste0(kk, "', '", data[, i])
-      # kk <- paste0(kk, "')] = ", data[, 'value'])
-      # kk <- c(rtt, paste0(kk, collapse = '\n'), '\n\n', paste0(name,' = toPar(tmp, ', def, ')\n'))
       kk <- paste0(name,' = toPar(read_dict("', name, '"), ', def, ')\n')
       return(kk)
     }
@@ -612,7 +561,6 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0) {
-      # tmp <- paste0("['", paste0(sort(obj@data[, 1]), collapse = "', '"), "']")
       tmp = paste0("read_set('", obj@name,"')")
     }
     return(c(paste0("# ", obj@name), paste0('\n', obj@name, ' = set(', tmp, ')')))
@@ -621,13 +569,10 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
     if (nrow(obj@data) == 0) {
       return(c(ret, paste0('\n', obj@name, ' = set();')))
     } else {
-      # return(c(ret, paste0('\n', obj@name, ' = set([', paste0(paste0("('", apply(obj@data, 1, 
-      #   function(x) paste(x, collapse = "', '")), "')"), collapse = ',\n'), ']);')))
       tmp = paste0("read_set('", obj@name,"')")
       return(c(ret, paste0('\n', obj@name, ' = set(', tmp, ')')))
     }
   } else if (obj@type == 'simple') {
-    # return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
     return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
@@ -641,55 +586,3 @@ setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
 }
 
 
-# .toJuliaHead <- function(obj) {
-#   as_simple <- function(data, name, name2, def) {
-#     # browser()
-#     if (ncol(obj@data) == 0) {
-#       return(c(
-#         paste0("# ", name),
-#         paste0(name, ' = ', data$value)))
-#     } else {
-#       data <- data[data$value != Inf & data$value != def, ]
-#       rtt <- paste0("# ", name, name2, '\n', name, "Def = ", def, ";\n")
-#       # if (nrow(data) == 0) {
-#       #   return(paste0(rtt, name, ' = Dict()'))
-#       # }
-#       colnames(data) <- gsub('[.]1', 'p', colnames(data))
-#       # return(c(rtt, paste0(name, ' = Dict()'), paste0('for i in 1:nrow(dat["dat"]["', name,'"])'),
-#       #          paste0('    ', name, '[(', paste0('dat["dat"]["', name,'"][i, :', colnames(data)[-ncol(data)], ']',
-#       #                                            collapse = ', '), ')] = dat["dat"]["', name,'"][i, :value]'), 'end'))
-#       # return(c(paste0(rtt, "@time ", name," = df2dict(", 'dt["', name,'"])')))
-#       return(c(paste0(rtt, "@time ", name," = df2dict(", '"', name,'")')))
-#     }
-#   }
-#   if (obj@nValues != -1) {
-#     obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
-#   }
-#   if (obj@type == 'map' || obj@type == 'set') {
-#     ret <- paste0('# ', obj@name)
-#     if (ncol(obj@data) > 1) ret <- paste0(ret, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
-#     if (nrow(obj@data) == -1) {
-#       return(c(ret, paste0(obj@name, ' = []')))
-#     } else {
-#       colnames(obj@data) <- gsub('[.]1', 'p', colnames(obj@data))
-#       # return(c(ret, paste0(obj@name, ' = Set()'), paste0('for i in 1:nrow(dat["dat"]["', obj@name,'"])'),
-#       #          paste0('    push!(', obj@name, ', (', paste0('dat["dat"]["', obj@name,'"][i, :',
-#       #                                                       colnames(obj@data), ']', collapse = ', '), '))'), 'end'))
-#       return(c(ret,
-#                # paste0("@time ", obj@name, " = df2dict(", 'dt["', obj@name,'"])')
-#                paste0("@time ", obj@name, " = df2dict(", '"', obj@name,'")')
-#       ))
-# 
-#     }
-#   } else if (obj@type == 'simple') {
-#     return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
-#   } else if (obj@type == 'multi') {
-#     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
-#     return(c(
-#       as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE],
-#                 paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
-#       as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE],
-#                 paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
-#     ))
-#   } else stop('Must realise')
-# }

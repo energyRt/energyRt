@@ -55,7 +55,17 @@ findDuplicates <- function(x) {
       slt_name <- getSlots(class(x))
       slt_name <- names(slt_name)[slt_name == 'data.frame' & !(names(slt_name) %in% c('input', 'output', 'aux'))]
       return(check_by_slots(x, slt_name))
-    } else if (class(x) %in% c('slice', 'constraint', 'commodity')) {
+    } else if (class(x) %in% c('constraint')) {
+      tmp <- check_by_slots(x, c('rhs', 'for.each'))
+      for (y in seq_along(x@lhs)) {
+        nn <- check_by_slots(x@lhs[[y]], 'mult') 
+        if (!is.null(nn)) {
+          nn$slot <- paste('lhs', y, nn$slot)
+          tmp <- rbind(tmp, nn)
+        }
+      }
+      return(tmp)
+   } else if (class(x) %in% c('slice', 'commodity')) {
     } else if (class(x) %in% c('sysInfo')) {
       return(check_by_slots(x, c('debug', 'discount')))
     } else warning(paste0('Unknown class "', class(x), '"'))

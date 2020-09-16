@@ -48,13 +48,9 @@
   .interpolation_message('mSupOutTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   prec@parameters[['mSupOutTot']] <- addData(prec@parameters[['mSupOutTot']], reduce.sect(
     getParameterData(prec@parameters$mSupAva)[, -1]))
-  .interpolation_message('mDemInp', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-  prec@parameters[['mDemInp']] <- addData(prec@parameters[['mDemInp']], 
-  	reduce.sect(merge(mCommSlice, getParameterData(prec@parameters$mDemComm), by = 'comm'), c('comm', 'slice')))
   
   .interpolation_message('pEmissionFactor', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   #### This section have to move to add (after interpolate comm first)
-  
   tmp0 <- getParameterData(prec@parameters$pTechEmisComm)
   tmp <- merge(getParameterData(prec@parameters$mvTechInp), tmp0[tmp0$value != 0, ], by = c('tech', 'comm'))
   .interpolation_message('mvTechAct', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
@@ -70,7 +66,6 @@
   prec@parameters[['mTechEmsFuel']] <- addData(prec@parameters[['mTechEmsFuel']], tmp)
   .interpolation_message('mEmsFuelTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   
-  # mEmsFuelTot(comm, region, year, slice)$(sum(tech$(mTechSpan(tech, region, year) and mTechSlice(tech, slice) and mTechEmitedComm(tech, comm)), 1))  
   prec@parameters[['mEmsFuelTot']] <- addData(prec@parameters[['mEmsFuelTot']], reduce_total_map(
   	reduce.sect(getParameterData(prec@parameters[['mTechEmsFuel']]), c('comm', 'region', 'year', 'slice'))))
   .interpolation_message('mDummyImport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
@@ -107,66 +102,44 @@
     ### Export
     mCommSliceOrParent2 <- mCommSliceOrParent
     colnames(mCommSliceOrParent2)[3] <- 'slice.1'
-    # .interpolation_message('mExportIrSubSliceTrd', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mExportIrSubSliceTrd <- merge(getParameterData(prec@parameters$mTradeComm), getParameterData(prec@parameters[['mTradeIr']]))
     colnames(mExportIrSubSliceTrd)[6] <- 'slice.1'
     mExportIrSubSliceTrd$dst <- NULL
     mExportIrSubSliceTrd <- merge(mExportIrSubSliceTrd, mCommSliceOrParent2)
     colnames(mExportIrSubSliceTrd)[4] <- 'region'
     mExportIrSubSliceTrd <- mExportIrSubSliceTrd[!duplicated(mExportIrSubSliceTrd), ]
-    # prec@parameters[['mExportIrSubSliceTrd']] <- addData(prec@parameters[['mExportIrSubSliceTrd']], mExportIrSubSliceTrd)
-    # .interpolation_message('mExportIrSubSlice', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mExportIrSubSlice <- mExportIrSubSliceTrd[, -3]
     mExportIrSubSlice <- mExportIrSubSlice[!duplicated(mExportIrSubSlice), ]
-    # prec@parameters[['mExportIrSubSlice']] <- addData(prec@parameters[['mExportIrSubSlice']], mExportIrSubSlice)
-    # .interpolation_message('mExportIrSub', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mExportIrSub <- mExportIrSubSlice[, -2]
     mExportIrSub <- mExportIrSub[!duplicated(mExportIrSub), ]
-    # prec@parameters[['mExportIrSub']c] <-С addData(prec@parameters[['mExportIrSub']], mExportIrSub)
-    # .interpolation_message('mExportRowSubSlice', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mExportRowSubTmp <- reduce.sect(getParameterData(prec@parameters[['mExportRow']])[, c('comm', 'region', 'year', 'slice')],
       c('comm', 'region', 'year', 'slice'))
-    # .interpolation_message('mExportRowSubSlice', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     colnames(mExportRowSubTmp)[4] <- 'slice.1'
     mExportRowSubSlice <- merge(mExportRowSubTmp, mCommSliceOrParent2)
-    # prec@parameters[['mExportRowSubSlice']] <- addData(prec@parameters[['mExportRowSubSlice']], mExportRowSubSlice)
-    # .interpolation_message('mExportRowSub', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != 'slice.1']
     mExportRowSub <- mExportRowSub[!duplicated(mExportRowSub), ]
-    # prec@parameters[['mExportRowSub']] <- addData(prec@parameters[['mExportRowSub']], mExportRowSub)
     .interpolation_message('mExport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mExport <- rbind(mExportRowSub, mExportIrSub)
     mExport <- mExport[!duplicated(mExport), ]
     prec@parameters[['mExport']] <- addData(prec@parameters[['mExport']], mExport)
     
     ### Import
-    # .interpolation_message('mImportIrSubSliceTrd', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mImportIrSubSliceTrd <- merge(getParameterData(prec@parameters$mTradeComm), getParameterData(prec@parameters[['mTradeIr']]))
     colnames(mImportIrSubSliceTrd)[6] <- 'slice.1'
     mImportIrSubSliceTrd$src <- NULL
     mImportIrSubSliceTrd <- merge(mImportIrSubSliceTrd, mCommSliceOrParent2)
     colnames(mImportIrSubSliceTrd)[4] <- 'region'
     mImportIrSubSliceTrd <- mImportIrSubSliceTrd[!duplicated(mImportIrSubSliceTrd), ]
-    # prec@parameters[['mImportIrSubSliceTrd']] <- addData(prec@parameters[['mImportIrSubSliceTrd']], mImportIrSubSliceTrd)
-    # .interpolation_message('mImportIrSubSlice', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mImportIrSubSlice <- mImportIrSubSliceTrd[, -3]
     mImportIrSubSlice <- mImportIrSubSlice[!duplicated(mImportIrSubSlice), ]
-    # prec@parameters[['mImportIrSubSlice']] <- addData(prec@parameters[['mImportIrSubSlice']], mImportIrSubSlice)
-    # .interpolation_message('mImportIrSub', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mImportIrSub <- mImportIrSubSlice[, -2]
     mImportIrSub <- mImportIrSub[!duplicated(mImportIrSub), ]
-    # prec@parameters[['mImportIrSub']] <- addData(prec@parameters[['mImportIrSub']], mImportIrSub)
-    # .interpolation_message('mImportRowSubSlice', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mImportRowSubTmp <- reduce.sect(getParameterData(prec@parameters[['mImportRow']])[, c('comm', 'region', 'year', 'slice')],
     c('comm', 'region', 'year', 'slice'))
-    # .interpolation_message('mImportRowSubSlice', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     colnames(mImportRowSubTmp)[4] <- 'slice.1'
     mImportRowSubSlice <- merge(mImportRowSubTmp, mCommSliceOrParent2)
-    # prec@parameters[['mImportRowSubSlice']] <- addData(prec@parameters[['mImportRowSubSlice']], mImportRowSubSlice)
-    # .interpolation_message('mImportRowSub', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != 'slice.1']
     mImportRowSub <- mImportRowSub[!duplicated(mImportRowSub), ]
-    # prec@parameters[['mImportRowSub']] <- addData(prec@parameters[['mImportRowSub']], mImportRowSub)
     .interpolation_message('mImport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mImport <- rbind(mImportRowSub, mImportIrSub)
     mImport <- mImport[!duplicated(mImport), ]
@@ -231,10 +204,7 @@
     prec@parameters[['mvTradeRowCost']] <- addData(prec@parameters[['mvTradeRowCost']], dregionyear)
     .interpolation_message('mvTradeIrCost', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     prec@parameters[['mvTradeIrCost']] <- addData(prec@parameters[['mvTradeIrCost']], dregionyear)
-    .interpolation_message('mvDemInp', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-    
-    prec@parameters[['mvDemInp']] <- addData(prec@parameters[['mvDemInp']], 
-      merge(dregionyear, getParameterData(prec@parameters[['mDemInp']]))[,c('comm', 'region', 'year', 'slice')])
+
     .interpolation_message('mvTotalCost', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     
     prec@parameters[['mvTotalCost']] <- addData(prec@parameters[['mvTotalCost']], dregionyear)
@@ -308,45 +278,6 @@
       pWeather$mwth <- pWeather$value; pWeather$value <- NULL
     } else rest <- rest + 2
     
-    towth <- data.frame(par = character(), base_map = character(), map_to = character(), stringsAsFactors = FALSE)
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfUp', 'meqTechAfUp', 'mTechWeatherAf')
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfLo', 'meqTechAfLo', 'mTechWeatherAf')
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfsLo', 'meqTechAfsLo', 'mTechWeatherAfs')
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfsUp', 'meqTechAfsUp', 'mTechWeatherAfs')
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcLo', 'meqTechAfcOutLo', 'mTechWeatherAfc')
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcLo', 'meqTechAfcInpLo', 'mTechWeatherAfc')
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcUp', 'meqTechAfcOutUp', 'mTechWeatherAfc')
-    towth[nrow(towth) + 1, ] <- c('paTechWeatherAfcUp', 'meqTechAfcInpUp', 'mTechWeatherAfc')
-
-    towth[nrow(towth) + 1, ] <- c('paSupWeatherLo', 'meqSupAvaLo', 'mSupWeatherLo')
-    towth[nrow(towth) + 1, ] <- c('paSupWeatherUp', 'mSupAvaUp', 'mSupWeatherUp')
-    
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfLo', 'meqStorageAfLo', 'mStorageWeatherAf')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherAfUp', 'meqStorageAfUp', 'mStorageWeatherAf')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpLo', 'meqStorageInpLo', 'mStorageWeatherCinp')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCinpUp', 'meqStorageInpUp', 'mStorageWeatherCinp')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutLo', 'meqStorageOutLo', 'mStorageWeatherCout')
-    towth[nrow(towth) + 1, ] <- c('paStorageWeatherCoutUp', 'meqStorageOutUp', 'mStorageWeatherCout')
-    
-    for (i in seq_len(nrow(towth))) {
-      .interpolation_message(towth[i, 3], rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-      rft <- getParameterData(prec@parameters[[towth[i, 'base_map']]])
-      rdd <- getParameterData(prec@parameters[[towth[i, 'map_to']]])
-      rft <- tmp_f0(rft)
-      if (nrow(rft) > 0) {
-        rft$value <- 1
-        if (nrow(rdd) > 0) {
-          tmp <- merge(rdd, pWeather); tmp$weather <- NULL
-          tmp <- aggregate(tmp[, 'mwth', drop = FALSE], tmp[, -ncol(tmp), drop = FALSE], prod)
-          tmp <- merge(rft, tmp, all.x = TRUE)
-          tmp[is.na(tmp)] <- 1
-          tmp$value <- tmp$value * tmp$mwth; tmp$mwth <- NULL
-          prec@parameters[[towth[i, 'par']]] <- addData(prec@parameters[[towth[i, 'par']]], tmp)
-        } else {
-          prec@parameters[[towth[i, 'par']]] <- addData(prec@parameters[[towth[i, 'par']]], rft)
-        }
-      }
-    }
     .interpolation_message('mvInpTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mvInpTot <- rbind(
       getParameterData(prec@parameters$mvDemInp),
@@ -358,7 +289,6 @@
       getParameterData(prec@parameters$mInpSub))
     mvInpTot <- mvInpTot[!duplicated(mvInpTot), ]
     mvInpTot <- merge(mvInpTot, mCommSlice)
-    # prec@parameters[['mvInpTot']] <- addData(prec@parameters[['mvInpTot']], mvInpTot)
     .interpolation_message('mvOutTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mvOutTot <- rbind(
       getParameterData(prec@parameters$mDummyImport),
@@ -373,7 +303,6 @@
     )
     mvOutTot <- mvOutTot[!duplicated(mvOutTot), ]
     mvOutTot <- merge(mvOutTot, mCommSlice)
-    # prec@parameters[['mvOutTot']] <- addData(prec@parameters[['mvOutTot']], mvOutTot)
     .interpolation_message('mvBalance', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mvBalance <- rbind(mvInpTot, mvOutTot)
     mvBalance <- mvBalance[!duplicated(mvBalance), ]

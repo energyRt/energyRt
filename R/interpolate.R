@@ -107,8 +107,8 @@ interpolate <- function(obj, ...) { #- returns class scenario
     if (!is.null(arg$trim) && arg$trim) {
     ## Trim before   interpolation
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
-    # par_name <- par_name[sapply(scen@modInp@parameters[par_name], function(x) any(x@dimSetNames %in% c('slice', 'year')))]
     par_name <- par_name[!(par_name %in% c(c('pEmissionFactor', 'pTechEmisComm', 'pDiscount')))]
+    par_name <- grep('^p.+Weather', par_name, value = TRUE, invert = TRUE) 
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
@@ -121,7 +121,6 @@ interpolate <- function(obj, ...) { #- returns class scenario
     for (pr in par_name) {
       tmp <- scen@modInp@parameters[[pr]]
       if (!is.null(tmp@misc$class) && (length(tmp@colName) != 1 || tmp@colName != '') && length(tmp@dimSetNames) > 1) {
-        # cat(pr, tmp@misc$class, tmp@colName, '\n')
         # Get prototype
         prot <- new(tmp@misc$class)
         psb_slot <- getSlots(tmp@misc$class)
@@ -149,7 +148,6 @@ interpolate <- function(obj, ...) { #- returns class scenario
           scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSetNames
           scen@modInp@parameters[[pr]]@dimSetNames <- tmp@dimSetNames[!(tmp@dimSetNames %in% need_col)]
           scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
-          # cat(pr, paste(need_col, collapse = ', '), '\n')
         }
       }
     }
@@ -181,7 +179,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation: ')
-  interpolation_count <- .get_objects_count(scen) + 77
+  interpolation_count <- .get_objects_count(scen) + 59
   len_name <- .get_objects_len_name(scen)
   if (arg$n.threads == 1) {
     scen <- .add2_nthreads_1(0, 1, scen, arg, approxim, interpolation_time_begin = interpolation_time_begin, 

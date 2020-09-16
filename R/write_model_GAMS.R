@@ -2,11 +2,6 @@
 # GAMS part
 ##################################################################################################################################    
 .write_model_GAMS <- function(arg, scen, trim = FALSE) {
-  # Check if gams (if it use) is available
-  # if (arg$run) {
-  #   rs <- try(system('gams'))
-  #   if (rs != 0) stop('GAMS is not found')
-  # }
   if (trim) scen <- fold(scen)
   .write_inc_solver(scen, arg, 'option lp = cplex;', '.gms', 'cplex')
   if (is.null(scen@status$fullsets)) stop('scen@status$fullsets not found')
@@ -15,17 +10,7 @@
   } else .toGams <- function(x) .toGams0(x, FALSE)
   run_code <- scen@source[["GAMS"]]
   
-  rem_col <- function(x, nn, rmm) {
-    for (i in 2:length(x)) {
-      tt <- gsub('(^.|[)].*)', '', x[i])  
-      til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
-      mm <- strsplit(tt, '[,]')[[1]][-rmm]
-      if (length(mm) == 0) x[i] <- paste0(nn, til) else {
-        x[i] <- paste0(nn, '(', paste0(mm, collapse = ', '), ')', til)
-      }
-    }
-    return(paste0(x, collapse = ''))
-  }
+
   # For downsize
   fdownsize <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
   for (nn in fdownsize) {
@@ -39,12 +24,12 @@
         for (www in seq_along(scen@modInp@gams.equation)) {
           mmm <- grep(templ, scen@modInp@gams.equation[[www]]$equation)
           if (any(mmm)) {
-            scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), rem_col, yy, rmm)
+            scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_col, yy, rmm)
           }
         }
       } else {
         mmm <- grep(templ, run_code)
-        if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), rem_col, yy, rmm)
+        if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col, yy, rmm)
       }
     }
   }
@@ -106,7 +91,7 @@
   .generate_gpr_gams_file(arg$dir.result)
   zz <- file(paste(arg$dir.result, '/energyRt.gms', sep = ''), 'w')
   zz_constrains <- file(paste(arg$dir.result, '/inc_constraints.gms', sep = ''), 'w')
-  cat(run_code[1:(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) - 1)], sep = '\n', file = zz)
+  cat(run_code[1:grep('[$]include[[:space:]]*data.gms', run_code)], sep = '\n', file = zz)
   # Add parameter constraint declaration
   if (length(scen@modInp@gams.equation) > 0) {
     mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
@@ -135,24 +120,12 @@
   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
     cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz_constrains)
   }
-  cat(run_code[(grep('e0fc7d1e-fd81-4745-a0eb-2a142f837d1c', run_code) + 1):
-                 (grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) - 1)], sep = '\n', file = zz)
+  cat(run_code[(grep('[$]include[[:space:]]*data.gms', run_code) + 1):length(run_code)], sep = '\n', file = zz)
   
   # Add constraint equation to model declaration
-  # if (length(scen@modInp@gams.equation) > 0) {
-  #   cat(sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration2Model), sep = '\n', file = zz_constrains) 
-  # }
-  
   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
     cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz_constrains)
   }
-  
-  cat(run_code[(grep('c7a5e905-1d09-4a38-bf1a-b1ac1551ba4f', run_code) + 1):length(run_code)], sep = '\n', file = zz)
-  
-  # if (!is.null(scen@model@misc$includeBeforeSolve))
-  #   warning('includeBeforeSolve deprecated, use solver inc4')
-  # if (!is.null(scen@model@misc$includeAfterSolve))
-  #   warning('includeAfterSolve now not use, use solver inc5')
   close(zz)
   close(zz_constrains)
   .add_five_includes(arg, scen, ".gms")
@@ -162,5 +135,41 @@
   scen
 }
 
+.rem_col <- function(x, nn, rmm) {
+  for (i in 2:length(x)) {
+    tt <- gsub('(^.|[)].*)', '', x[i])  
+    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
+    mm <- strsplit(tt, '[,]')[[1]][-rmm]
+    if (length(mm) == 0) x[i] <- paste0(nn, til) else {
+      x[i] <- paste0(nn, '(', paste0(mm, collapse = ', '), ')', til)
+    }
+  }
+  return(paste0(x, collapse = ''))
+}
 
+
+
+.rem_col_sq <- function(x, nn, rmm) {
+  for (i in 2:length(x)) {
+    tt <- gsub('(^.|[]].*)', '', x[i])  
+    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
+    mm <- strsplit(tt, '[,]')[[1]][-rmm]
+    if (length(mm) == 0) x[i] <- paste0(nn, til) else {
+      x[i] <- paste0(nn, '[', paste0(mm, collapse = ', '), ']', til)
+    }
+  }
+  return(paste0(x, collapse = ''))
+}
+
+.rem_col_fg <- function(x, nn, rmm) {
+  for (i in 2:length(x)) {
+    tt <- gsub('(^.|[}].*)', '', x[i])  
+    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
+    mm <- strsplit(tt, '[,]')[[1]][-rmm]
+    if (length(mm) == 0) x[i] <- paste0(nn, til) else {
+      x[i] <- paste0(nn, '{', paste0(mm, collapse = ', '), '}', til)
+    }
+  }
+  return(paste0(x, collapse = ''))
+}
 

@@ -20,7 +20,8 @@
       approxim[[i]] <- arg[[i]]
   }
   approxim <- approxim[names(approxim) %in% prior]
-  if (any(colnames(obj) == 'year') && any(names(arg) == 'year_range') && 
+  there.are.year <- any(colnames(obj) == 'year')
+  if (there.are.year && any(names(arg) == 'year_range') && 
       all(names(approxim) != 'year')) approxim$year <- arg$year_range
   prior <- prior[prior %in% names(approxim)]
   prior <- prior[prior %in% colnames(obj)[-ncol(obj)]]
@@ -52,10 +53,11 @@
   if (all(tmp_nona)) { # There is not NA column
     possible_comb <- prod(sapply(approxim2, length))
     if (nrow(obj) >= possible_comb) {
-      for (i in names(approxim2))
-        obj <- obj[obj[[i]] %in% approxim2[[i]],, drop = FALSE]
-      if (nrow(obj) == possible_comb)
-        return(obj)
+     obj3 <- obj
+     for (i in names(approxim2))
+        obj3 <- obj3[obj3[[i]] %in% approxim2[[i]],, drop = FALSE]
+      if (nrow(obj3) == possible_comb)
+        return(obj3)
     }
   } else { # There are only NA and not NA column
     f1 <- apply(tmp_nona, 2, any)
@@ -72,8 +74,8 @@
       }
     }
   }
-   
-  if (any(colnames(obj)[-ncol(obj)] == 'year')) {
+  # Real interpolation
+  if (there.are.year) {
     year_range <- arg$year_range
     yy <- range(c(year_range[1], year_range[2], 
       obj$year), na.rm = TRUE) 
@@ -87,7 +89,7 @@
     dd <- as.data.frame.table(array(NA, dim = sapply(approxim, length), 
       dimnames = approxim), stringsAsFactors = FALSE, responseName = parameter)
   }
-  if (nrow(obj) != 0) {  
+  if (nrow(obj) != 0) {
       ii <- 2 ^ (seq(length.out = ncol(obj) - 1) - 1)
       KK <- colSums(ii * t(is.na(obj[, true_prior[true_prior %in% prior], drop = FALSE])))
       dobj <- as.matrix(obj[, -ncol(obj), drop = FALSE])
@@ -98,8 +100,7 @@
       for(i in 1:ncol(dff)) obj[, i] <- factor(as.character(obj[[i]]), levels = levels(dff[, i]))
       for(i in 1:ncol(dff)) obj[, i] <- as.numeric(obj[[i]])
       for(i in 1:ncol(dff)) dff[, i] <- as.numeric(dff[, i])
-     hh <- sapply(dff, max)
-      #kk <- t(c(1, cumprod(hh[-length(hh)])) * t(dff))
+      hh <- sapply(dff, max)
       hh <- c(1, cumprod(hh[-length(hh)]))
       dff <- as.matrix(dff)
       obj <- as.matrix(obj)
@@ -120,33 +121,29 @@
         nn <- (r1 %in% r2)
         dd[nn, ncol(dd)] <- ll[as.character(r1[nn])]
       }
-  }  
+  } 
   # Interpolation
-  if (all(colnames(obj)[-ncol(obj)] != 'year')) {
+  if (!there.are.year) {
     dd[is.na(dd[, parameter]), parameter] <- defVal
   } else {
     if (all(is.na(dd[, parameter]))) {
       dd[is.na(dd[, parameter]), parameter] <- defVal
     } else if (any(is.na(dd[, parameter]))) {
       zz <- matrix(dd[, parameter], length(approxim$year))
-      f1 <- apply(zz, 2, function(x) all(!is.na(x)))
+      f1 <- apply(!is.na(zz), 2, all)
       if (any(!f1)) {
         gg <- seq(along =f1)[!f1][apply(is.na(zz[, !f1, drop = FALSE]), 2, all)]
         zz[, gg] <- defVal
         f1[gg] <- TRUE
       }
       if (any(!f1)) {
-        FF <- is.na(zz)
         nr <- nrow(zz)   
         back <- any(grep('back', rule))
         forth <- any(grep('forth', rule))
         inter <- any(grep('inter', rule))
-        while(any(!f1)) {
-          ee <- seq(along = f1)[!f1]
-          if (length(ee) == 1) ll <- ee else {
-            ll <- ee[apply(is.na(zz[, ee[1]]) == is.na(zz[, ee]) & 
-                (is.na(zz[, ee[1]]) | zz[, ee[1]] == zz[, ee]), 2, all)]
-          }
+        ## Group by similiarity
+        for (ee in seq(along = f1)[!f1]) {
+          ll <- ee
           # Approximate
           hh <- zz[, ee[1]]
           # Back

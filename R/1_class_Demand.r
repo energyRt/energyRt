@@ -9,6 +9,7 @@ setClass("demand",
           commodity     = "character",
           unit          = "character",
           dem           = "data.frame",      # Availability of the resource with prices 
+          region         = "character",      # Availability of the resource with prices 
           GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
@@ -20,6 +21,7 @@ setClass("demand",
                                      stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
+          region         = character(),      # Availability of the resource with prices 
           dem           = data.frame(region   = character(),
                                      year     = integer(),
                                      slice    = character(),
