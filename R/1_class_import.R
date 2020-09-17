@@ -41,4 +41,3 @@ setClass("import",
 setMethod("initialize", "import", function(.Object, ...) {
   .Object
 })
-                                              

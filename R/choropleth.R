@@ -299,7 +299,7 @@ addCenters <- function(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = 
   dat <- merge(dat, labpt, by = ID)
 }
 
-add_labpt <- addCenters
+  add_labpt <- addCenters
 
 getSPDF <- function(scen, ...) {
   SPDF <- scen@model@sysInfo@GIS

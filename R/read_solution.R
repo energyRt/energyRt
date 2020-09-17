@@ -153,6 +153,3 @@ read_solution <- function(scen, ...) {
 			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
   scen	
 }
-
-
-# 

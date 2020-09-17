@@ -63,5 +63,3 @@ pivot <- function(scen = NULL,
     return(dft)
   }
 }
-
- 
