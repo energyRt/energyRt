@@ -366,7 +366,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
   }
 }
 
-if (FALSE) {# test
+if (F) {# test
   load("energyRt_tutorial/data/utopia_scen_BAU.RData")
   (dem <- getData(scen, name = "pDemand", year = 2015, merge = T))
   (vTechOut <- getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015))
@@ -395,6 +395,20 @@ if (FALSE) {# test
   x
 }
 
+#' Rename names of data.frame columns of list of data.frames.
+#'
+#' @param x a data.frame or a list with data frames.
+#' @param newNames named character vector or list with new names as values, and old names as names.
+#'
+#' @return depending on input, the renamed data.frame or the list with renamed data.frames.
+#' @export renameSets
+#' @examples
+#' \dontrun{
+#'   x <- data.frame(a = letters, n = 1:length(letters))
+#'   x
+#'   renameSets(x[1:3,], c(a = "A", n = "N"))
+#'   renameSets(x[1:3,], list(a = "B", n = "M"))
+#'}
 renameSets <- function(x, newNames = NULL) {
   if(any(class(x) == "list")) {
     returnList <- TRUE
@@ -420,6 +434,24 @@ renameSets <- function(x, newNames = NULL) {
 }
 
 
+#' Replace specified values with new values, in factor or character columns of a data.frame.
+#' 
+#' @param x vector
+#' @param newValues a names list with named vectors. The names of the list should be equal to the names of the data.frame columns in wich values will be replaced. The named vector should have new names as values and old values as names.
+#'
+#' @return the x data.frame with revalued variables.
+#' @export revalueSets
+#' @examples
+#' \dontrun{
+#'   x <- data.frame(a = letters, n = 1:length(letters))
+#'   nw1 <- LETTERS[1:10]
+#'   names(nw1) <- letters[1:10]
+#'   nw2 <- formatC(1:9, width = 3, flag = "0")
+#'   names(nw2) <- 1:9
+#'   newValues <- list(a = nw1, n = nw2)
+#'   newValues
+#'   revalueSets(x, newValues)
+#'}
 revalueSets <- function(x, newValues = NULL) {
   stopifnot(any(class(newValues) == "list"))
   stopifnot(any(class(x) == "data.frame"))
@@ -433,7 +465,7 @@ revalueSets <- function(x, newValues = NULL) {
   x
 }
 
-if (FALSE) { # Check
+if (F) { # Check
   library(tidyverse)
   # renameSets
   x <- tibble(a = letters, n = as.character(1:length(letters)))
@@ -456,3 +488,31 @@ if (FALSE) { # Check
 }
 
 
+# .addComm2pDemand <- function(scen) { # temporary
+#   dms <- unique(scen@modInp@parameters$pDemand@data$dem)
+#   scen@modInp@parameters$pDemand@data$comm <- NA
+#   for(demName in dms) {
+#     demComm <- scen@model@data$repository@data[[demName]]@commodity
+#     ii <- scen@modInp@parameters$pDemand@data$dem == demName
+#     scen@modInp@parameters$pDemand@data$comm[ii] <- demComm
+#   }
+#   sup <- unique(scen@modInp@parameters$sup@data$sup)
+#   # browser()
+#   scen@modInp@parameters$pSupAva@data$comm <- NA
+#   scen@modInp@parameters$pSupCost@data$comm <- NA
+#   scen@modInp@parameters$pSupReserve@data$comm <- NA
+#   for(supName in sup) {
+#     supComm <- scen@model@data$repository@data[[supName]]@commodity
+#     ii <- scen@modInp@parameters$pSupAva@data$sup == supName
+#     scen@modInp@parameters$pSupAva@data$comm[ii] <- supComm
+#     ii <- scen@modInp@parameters$pSupCost@data$sup == supName
+#     scen@modInp@parameters$pSupCost@data$comm[ii] <- supComm
+#     ii <- scen@modInp@parameters$pSupReserve@data$sup == supName
+#     scen@modInp@parameters$pSupReserve@data$comm[ii] <- supComm
+#   }
+#   
+#   return(scen)
+# }
+# 
+
+ 
