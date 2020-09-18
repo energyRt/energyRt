@@ -4,6 +4,8 @@
 setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 	approxim = 'list'), function(obj, app, approxim) {
 		trd <- energyRt:::.upper_case(app)
+		if (length(trd@commodity) != 1 || is.na(trd@commodity) || all(trd@commodity != approxim$all_comm))
+			stop(paste0('Wrong commodity in trade "', trd@name, '"'))
 		trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
 		remove_duplicate <- list(c('src', 'dst'))
 		approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
@@ -196,7 +198,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				}
 			}
 			invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
-			invcost <- invcost[invcost$value != 0 & trd@start <= invcost$year & invcost$year <= trd@end,, drop = FALSE]
+			invcost <- invcost[invcost$value != 0,, drop = FALSE]
+			if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,, drop = FALSE]
 			if (nrow(invcost) == 0) invcost <- NULL
 			stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
 			obj@parameters[['pTradeStock']] <- addData(obj@parameters[['pTradeStock']], stock_exist)
@@ -234,6 +237,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (!is.null(invcost)) {
 				end_year <- max(approxim$year)
 				obj@parameters[['pTradeInvcost']] <- addData(obj@parameters[['pTradeInvcost']], invcost)
+				if (any(!(obj@parameters[['mTradeInv']]@dimSetNames %in% colnames(invcost)))) {
+					if (is.null(invcost$year)) {
+						invcost <- merge(invcost, list(year = possible_invest_year))
+					}
+					if (is.null(invcost$region)) {
+						invcost <- merge(invcost, approxim['region'])
+					}
+				}
 				obj@parameters[['mTradeInv']] <- addData(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
 				invcost$invcost <- invcost$value; invcost$value <- NULL
 				if (length(trade_eac) > 0) {
