@@ -1259,7 +1259,6 @@ mdl@sysInfo@milestone
 
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T, echo=F}
-mdl@sysInfo@debug$comm <- 'ELC'  
 
 # Four alternative languages to solve the model
 scen_BASE <- solve(mdl, name = "BASE", 
