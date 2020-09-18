@@ -1260,8 +1260,6 @@ mdl@sysInfo@milestone
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T, echo=F}
 mdl@sysInfo@debug$comm <- 'ELC'  
-save('mdl', file = 'c:/tmp/rr.RData')
-mdl@data[[1]]@data$EHYD
 
 # Four alternative languages to solve the model
 scen_BASE <- solve(mdl, name = "BASE", 
