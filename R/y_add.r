@@ -123,6 +123,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
 setMethod('.add0', signature(obj = 'modInp', app = 'demand',
                             approxim = 'list'), function(obj, app, approxim) {  
       dem <- energyRt:::.upper_case(app)
+    if (length(dem@commodity) != 1 || is.na(dem@commodity) || all(dem@commodity != approxim$all_comm))
+			stop(paste0('Wrong commodity in demand "', dem@name, '"'))
+
       dem <- stayOnlyVariable(dem, approxim$region, 'region')
       approxim <- .fix_approximation_list(approxim, comm = dem@commodity)
       dem <- .disaggregateSliceLevel(dem, approxim)
@@ -188,6 +191,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     exp <- energyRt:::.upper_case(app)
+  if (length(exp@commodity) != 1 || is.na(exp@commodity) || all(exp@commodity != approxim$all_comm))
+			stop(paste0('Wrong commodity in export "', exp@name, '"'))
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
   approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
   exp <- .disaggregateSliceLevel(exp, approxim)
@@ -243,6 +248,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     imp <- energyRt:::.upper_case(app)
+  if (length(imp@commodity) != 1 || is.na(imp@commodity) || all(imp@commodity != approxim$all_comm))
+			stop(paste0('Wrong commodity in import "', imp@name, '"'))
   imp <- stayOnlyVariable(imp, approxim$region, 'region')
   approxim <- .fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
   imp <- .disaggregateSliceLevel(imp, approxim)

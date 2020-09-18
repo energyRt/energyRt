@@ -260,7 +260,7 @@
 			}
 		}
 	}
-	if (nrow(err_msg) != 0) {
+	if (!is.null(err_msg)) {
 		nn <- capture.output(err_msg)
 		stop(paste0('There unknow sets in constrint(s)\n', paste0(nn, collapse = '\n')))
 	}

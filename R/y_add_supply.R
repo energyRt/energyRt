@@ -5,6 +5,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     sup <- energyRt:::.upper_case(app)
+    if (length(sup@commodity) != 1 || is.na(sup@commodity) || all(sup@commodity != approxim$all_comm))
+			stop(paste0('Wrong commodity in supply "', sup@name, '"'))
+
     approxim <- .fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
     sup <- .disaggregateSliceLevel(sup, approxim)
     if (length(sup@region) != 0) {
