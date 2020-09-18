@@ -221,3 +221,47 @@
   cat(n1, paste0(rep(' ', x), collapse = ''), n1, sep = '')
   
 }
+
+
+.check_constraint <- function(scen) {
+	# Collect sets data
+	sets <- list()
+	for (ss in c('tech', 'sup', 'dem', 'stg', 'expp', 'imp', 'trade', 
+							 'group', 'comm', 'region', 'year', 'slice')) {
+		sets[[ss]] <- getParameterData(scen@modInp@parameters[[ss]])[[ss]]
+	}
+	add_to_err <- function(err_msg, cns, slt, have, psb) {
+		if (!all(have %in% psb)) {
+			have <- unique(have[!(have %in% psb)])
+			tmp <- data.frame(value = have, stringsAsFactors = FALSE)
+			tmp$slot <- slt
+			tmp$constraint <- cns
+			return(rbind(err_msg, tmp[, c('constraint', 'slot', 'value'), drop = FALSE]))			
+		}
+		return(err_msg)
+	}
+	sets$lag.year <- sets$year
+	sets$lead.year <- sets$year
+	err_msg <- NULL
+	# Check sets in constraints
+	for (i in seq_along(scen@model@data)) {
+		for (j in seq_along(scen@model@data[[i]]@data)[sapply(scen@model@data[[i]]@data, class) == 'constraint']) {
+			tmp <- scen@model@data[[i]]@data[[j]]
+			for (k in colnames(tmp@rhs)) if (k != 'value') {
+				err_msg <- add_to_err(err_msg, cns = tmp@name, slt = 'rhs', have = tmp@for.each[[k]], psb = sets[[k]])
+			}
+			for (u in seq_along(tmp@lhs)) {
+				for (k in colnames(tmp@lhs[[u]]@mult)) if (k != 'value') {
+					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') mult'), have = tmp@lhs[[u]]@mult[[k]], psb = sets[[k]])
+				}
+				for (k in names(tmp@lhs[[u]]@for.sum)) if (k != 'value' && !is.null(tmp@lhs[[u]]@for.sum[[k]])) {
+					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') for.sum'), have = tmp@lhs[[u]]@for.sum[[k]], psb = sets[[k]])
+				}
+			}
+		}
+	}
+	if (nrow(err_msg) != 0) {
+		nn <- capture.output(err_msg)
+		stop(paste0('There unknow sets in constrint(s)\n', paste0(nn, collapse = '\n')))
+	}
+}
