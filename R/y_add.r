@@ -90,7 +90,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
                           data.frame(comm = rep(cmd@name, length(approxim$commodity_slice_map[[cmd@name]])), 
                                                        slice = approxim$slice))
     
-  if (any(approxim$debug$comm == cmd@name)) {
+  if (any(is.na(approxim$debug$comm) | approxim$debug$comm == cmd@name)) {
+    approxim$debug$comm[is.na(approxim$debug$comm)] <- cmd@name
     dbg <- approxim$debug[!is.na(approxim$debug$comm) & approxim$debug$comm == cmd@name,, drop = FALSE]
     approxim$comm <-cmd@name
     obj@parameters[['pDummyImportCost']] <- addData(obj@parameters[['pDummyImportCost']],
