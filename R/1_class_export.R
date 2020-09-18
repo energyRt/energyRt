@@ -41,4 +41,3 @@ setClass("export",
 setMethod("initialize", "export", function(.Object, ...) {
   .Object
 })
-             

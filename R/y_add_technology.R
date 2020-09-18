@@ -412,7 +412,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	  if (!is.null(pTechAfs)) {
 	    obj@parameters[['meqTechAfsLo']] <- addData(obj@parameters[['meqTechAfsLo']],
 	              merge(mTechSpan, pTechAfs[pTechAfs$value != 0 & pTechAfs$type == 'lo', 
-	              	colnames(pTechAfs)[colnames(pTechAfs) %in% colnames(mTechSpan)]]))
+	              	colnames(pTechAfs)[colnames(pTechAfs) %in% obj@parameters[['meqTechAfsLo']]@dimSetNames]]))
 	    meqTechAfsUp <- merge(mTechSpan, 
 	      pTechAfs[pTechAfs$value != Inf & pTechAfs$type == 'up', colnames(pTechAfs) %in% obj@parameters[['meqTechAfsUp']]@dimSetNames, drop = FALSE])
 	    obj@parameters[['meqTechAfsUp']] <- addData(obj@parameters[['meqTechAfsUp']], meqTechAfsUp)

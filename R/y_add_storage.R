@@ -5,6 +5,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 	approxim = 'list'), function(obj, app, approxim) {
 	  pStorageCout <- NULL; pStorageCinp <- NULL;
 		stg <- energyRt:::.upper_case(app)
+		
+		if (length(stg@commodity) != 1 || is.na(stg@commodity) || all(stg@commodity != approxim$all_comm))
+			stop(paste0('Wrong commodity in storage "', stg@name, '"'))
+		
 		stg_slice <- approxim$slice@slice_map[[approxim$commodity_slice_map[[stg@commodity]]]]
 		approxim <- .fix_approximation_list(approxim, comm = stg@commodity, lev = NULL)
 		stg <- .disaggregateSliceLevel(stg, approxim)

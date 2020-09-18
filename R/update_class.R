@@ -140,5 +140,3 @@
   cat(round(proc.time()[3] - p1, 2), 's\n', sep = '')
   scen
 }
-
-# scen = BAU; arg = list(Build_250_2030)

@@ -52,5 +52,3 @@ write2xls <- function(scen,
                      FreezeCol = 3, 
                      ...)
 }
-
-#write2xls(scen.BAU)

@@ -101,6 +101,10 @@ read_solution <- function(scen, ...) {
     
     salvage$value <- salvage$newcap * salvage$invcost * ((1 + salvage$discount)^(salvage$olife) - 
         (1 + salvage$discount)^(end_year - salvage$start + 1)) / ((1 + salvage$discount)^salvage$olife - 1) 
+     
+    fl <- (salvage$discount == 0)
+    salvage$value[fl] <- (salvage$newcap * salvage$invcost * (salvage$olife - (end_year - salvage$start + 1)) / salvage$olife)[fl] 
+    
     salvage[, c(3, 2, 1, 9)]
   }
   if (scen@modOut@stage == 'solved') {
@@ -153,6 +157,3 @@ read_solution <- function(scen, ...) {
 			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
   scen	
 }
-
-
-# 

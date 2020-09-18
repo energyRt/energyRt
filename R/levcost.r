@@ -369,5 +369,3 @@ setMethod('levcost', signature(obj = 'scenario'), function(obj, commodity) {
     * apply(obj@modOut@data$vDemInp[commodity,,,, drop  = FALSE], 2:3, sum)
   ))
 })
-
- 

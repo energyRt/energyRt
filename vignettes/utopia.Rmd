@@ -490,7 +490,7 @@ RES_HYD <- newSupply(
 
 RES_SOL <- newSupply(
   name = "RES_SOL",
-  commodity = "SOL",
+  commodity = "SOL"
   # availability will be defined by weather factors (see below)
 )
 
@@ -1259,6 +1259,7 @@ mdl@sysInfo@milestone
 
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T, echo=F}
+
 # Four alternative languages to solve the model
 scen_BASE <- solve(mdl, name = "BASE", 
                    # tmp.path = "C:/solwork",

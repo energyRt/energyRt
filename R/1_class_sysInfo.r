@@ -227,4 +227,3 @@ setClass("sysInfo",
 setMethod("initialize", "sysInfo", function(.Object, ...) {
   .Object
 })
-                                                             

@@ -53,4 +53,3 @@ setClass("supply",
 setMethod("initialize", "supply", function(.Object, ...) {
   .Object
 })
-                                              

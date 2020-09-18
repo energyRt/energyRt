@@ -196,6 +196,9 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Remove group duplication
   scen@modInp@parameters$group <- .unique_set(scen@modInp@parameters$group)
   
+  # Check for unknown set in constraints
+  .check_constraint(scen)
+  
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
     scen@modInp@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
