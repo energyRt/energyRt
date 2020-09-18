@@ -196,7 +196,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				}
 			}
 			invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
-			invcost <- invcost[invcost$value != 0 & trd@start <= invcost$year & invcost$year < trd@end,, drop = FALSE]
+			invcost <- invcost[invcost$value != 0 & trd@start <= invcost$year & invcost$year <= trd@end,, drop = FALSE]
 			if (nrow(invcost) == 0) invcost <- NULL
 			stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
 			obj@parameters[['pTradeStock']] <- addData(obj@parameters[['pTradeStock']], stock_exist)
