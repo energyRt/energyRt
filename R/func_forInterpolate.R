@@ -254,7 +254,7 @@
 				for (k in colnames(tmp@lhs[[u]]@mult)) if (k != 'value') {
 					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') mult'), have = tmp@lhs[[u]]@mult[[k]], psb = sets[[k]])
 				}
-				for (k in names(tmp@lhs[[u]]@for.sum)) if (k != 'value' && !is.null(tmp@lhs[[u]]@for.sum[[k]])) {
+				for (k in names(tmp@lhs[[u]]@for.sum)) if (k != 'value' && !all(is.na(tmp@lhs[[u]]@for.sum[[k]]))) {
 					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') for.sum'), have = tmp@lhs[[u]]@for.sum[[k]], psb = sets[[k]])
 				}
 			}
