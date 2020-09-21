@@ -330,7 +330,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
     new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
     for (i in seq_along(set.map)) 
-      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), set.map[[i]])
+      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), c(set.map[[i]]))
     
     # copy new.map for lhs set that define in for each
     fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
