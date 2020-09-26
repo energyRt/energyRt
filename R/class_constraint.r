@@ -198,8 +198,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   need.set <- .vrb_map[[variable]];
   need.set <- need.set[!(need.set %in% c(names(eqt@for.each), names(st@for.sum)))];
   for (i in need.set) {
-    st@for.sum[i] <- list(NULL)
+    st@for.sum[i] <- list(NA)
   }
+  st@for.sum[sapply(st@for.sum, is.null)] <- NA
   if (!all(names(st@mult) %in% c(names(eqt@for.each), names(st@for.sum), 'value')))
     stop(paste0('Wrong mult parameter, excessive set: "', paste0(names(st@mult)[!(names(st@mult) %in% names(st@for.sum))], collapse = '", "'), '"'))
   names(st@defVal) <- NULL
@@ -289,8 +290,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     all.set[nn[need.set %in% names(stm@lhs[[i]]@for.sum)], 'def.lhs'] <- TRUE
     all.set[nn[!(need.set %in% for.each.set)], 'def.lhs'] <- TRUE
     # Add to set map
-    st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & !sapply(stm@lhs[[i]]@for.sum, is.null)]
-    # Fill add.map for for.lhs
+    st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & !sapply(is.na(stm@lhs[[i]]@for.sum), all)]
+   # Fill add.map for for.lhs
     for (j in st) {
       if (!all(prec@set[[j]] %in% stm@lhs[[i]]@for.sum[[j]]) && (j != 'slice' || 
                 !all(prec@set[[j]] %in% get.all.child(stm@lhs[[i]]@for.sum[[j]])))) {
@@ -330,7 +331,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
     new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
     for (i in seq_along(set.map)) 
-      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), set.map[[i]])
+      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), c(set.map[[i]]))
     
     # copy new.map for lhs set that define in for each
     fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
@@ -354,7 +355,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   } else {
     res$equationDeclaration <- paste0(res$equationDeclaration2Model, '(', paste0(names(old_for_each), collapse = ', '), ')')
   }
-  # Equation before ..
+ # Equation before ..
   res$equation <- res$equationDeclaration
   if (any(is.na(stm@for.each))) {
     tmp_fe <- stm@for.each
@@ -481,7 +482,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       }
     }
   }
-  # Add eq
+ # Add eq
   res$equation <- paste0(res$equation, ' ', c('==' = '=e=', '>=' = '=g=', '<=' = '=l=')[as.character(stm@eq)], ' ')
   # Add rhs
   if (nrow(stm@rhs) != 0) {
