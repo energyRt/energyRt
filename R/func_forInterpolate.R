@@ -247,14 +247,14 @@
 	for (i in seq_along(scen@model@data)) {
 		for (j in seq_along(scen@model@data[[i]]@data)[sapply(scen@model@data[[i]]@data, class) == 'constraint']) {
 			tmp <- scen@model@data[[i]]@data[[j]]
-			for (k in colnames(tmp@rhs)) if (k != 'value') {
+			for (k in colnames(tmp@rhs)) if (k != 'value' && k != 'year') {
 				err_msg <- add_to_err(err_msg, cns = tmp@name, slt = 'rhs', have = tmp@for.each[[k]], psb = sets[[k]])
 			}
 			for (u in seq_along(tmp@lhs)) {
-				for (k in colnames(tmp@lhs[[u]]@mult)) if (k != 'value') {
+				for (k in colnames(tmp@lhs[[u]]@mult)) if (k != 'value' && k != 'year') {
 					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') mult'), have = tmp@lhs[[u]]@mult[[k]], psb = sets[[k]])
 				}
-				for (k in names(tmp@lhs[[u]]@for.sum)) if (k != 'value' && !all(is.na(tmp@lhs[[u]]@for.sum[[k]]))) {
+				for (k in names(tmp@lhs[[u]]@for.sum)) if (k != 'value' && k != 'year' && !all(is.na(tmp@lhs[[u]]@for.sum[[k]]))) {
 					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') for.sum'), have = tmp@lhs[[u]]@for.sum[[k]], psb = sets[[k]])
 				}
 			}
@@ -263,5 +263,23 @@
 	if (!is.null(err_msg)) {
 		nn <- capture.output(err_msg)
 		stop(paste0('There unknow sets in constrint(s)\n', paste0(nn, collapse = '\n')))
+	}
+}
+
+
+
+.check_weather <- function(scen) {
+	weather <- scen@modInp@parameters$weather@data$weather
+	err_msg <- list()
+	pars <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) !is.null(x@data$weather) && 
+																					nrow(x@data) != 0)]
+	for (pr in pars) {
+		tmp <- scen@modInp@parameters[[pr]]@data
+		tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather),, drop = FALSE]
+		if (nrow(tmp) != 0) err_msg[[pr]] <- tmp
+	}
+	if (length(err_msg) != 0) {
+		nn <- capture.output(err_msg)
+		stop(paste0('There unknow weather in parameters\n', paste0(nn, collapse = '\n')))
 	}
 }
