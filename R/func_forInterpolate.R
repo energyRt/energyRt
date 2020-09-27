@@ -247,14 +247,14 @@
 	for (i in seq_along(scen@model@data)) {
 		for (j in seq_along(scen@model@data[[i]]@data)[sapply(scen@model@data[[i]]@data, class) == 'constraint']) {
 			tmp <- scen@model@data[[i]]@data[[j]]
-			for (k in colnames(tmp@rhs)) if (k != 'value') {
+			for (k in colnames(tmp@rhs)) if (k != 'value' && k != 'year') {
 				err_msg <- add_to_err(err_msg, cns = tmp@name, slt = 'rhs', have = tmp@for.each[[k]], psb = sets[[k]])
 			}
 			for (u in seq_along(tmp@lhs)) {
-				for (k in colnames(tmp@lhs[[u]]@mult)) if (k != 'value') {
+				for (k in colnames(tmp@lhs[[u]]@mult)) if (k != 'value' && k != 'year') {
 					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') mult'), have = tmp@lhs[[u]]@mult[[k]], psb = sets[[k]])
 				}
-				for (k in names(tmp@lhs[[u]]@for.sum)) if (k != 'value' && !all(is.na(tmp@lhs[[u]]@for.sum[[k]]))) {
+				for (k in names(tmp@lhs[[u]]@for.sum)) if (k != 'value' && k != 'year' && !all(is.na(tmp@lhs[[u]]@for.sum[[k]]))) {
 					err_msg <- add_to_err(err_msg, cns = tmp@name, slt = paste0('lhs (', u, ') for.sum'), have = tmp@lhs[[u]]@for.sum[[k]], psb = sets[[k]])
 				}
 			}
