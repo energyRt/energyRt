@@ -265,3 +265,22 @@
 		stop(paste0('There unknow sets in constrint(s)\n', paste0(nn, collapse = '\n')))
 	}
 }
+
+
+
+.check_weather <- function(scen) {
+	weather <- scen@modInp@parameters$weather@data$weather
+	err_msg <- list()
+	# Check sets in constraints
+	pars <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) !is.null(x@data$weather) && 
+																					nrow(x@data) != 0)]
+	for (pr in pars) {
+		tmp <- scen@modInp@parameters[[pr]]@data
+		if (!all(tmp$weather %in% weather))
+				err_msg[[pr]] <- tmp[!(tmp$weather %in% weather),, drop = FALSE]
+	}
+	if (length(err_msg) != 0) {
+		nn <- capture.output(err_msg)
+		stop(paste0('There unknow weather in parameters\n', paste0(nn, collapse = '\n')))
+	}
+}
