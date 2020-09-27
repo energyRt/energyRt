@@ -199,7 +199,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Check for unknown set in constraints
   .check_constraint(scen)
   # Check for unknown weather
-  .check_constraint(scen)
+  .check_weather(scen)
   
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {

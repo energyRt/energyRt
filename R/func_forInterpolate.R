@@ -271,7 +271,6 @@
 .check_weather <- function(scen) {
 	weather <- scen@modInp@parameters$weather@data$weather
 	err_msg <- list()
-	# Check sets in constraints
 	pars <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) !is.null(x@data$weather) && 
 																					nrow(x@data) != 0)]
 	for (pr in pars) {
