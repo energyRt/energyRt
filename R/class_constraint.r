@@ -200,7 +200,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   for (i in need.set) {
     st@for.sum[i] <- list(NA)
   }
-  st@for.sum[sapply(st@for.sum, is.null)] <- NA
+  if (length(st@for.sum) != 0)
+    st@for.sum[sapply(st@for.sum, is.null)] <- NA
   if (!all(names(st@mult) %in% c(names(eqt@for.each), names(st@for.sum), 'value')))
     stop(paste0('Wrong mult parameter, excessive set: "', paste0(names(st@mult)[!(names(st@mult) %in% names(st@for.sum))], collapse = '", "'), '"'))
   names(st@defVal) <- NULL
