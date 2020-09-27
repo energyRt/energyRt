@@ -275,8 +275,8 @@
 																					nrow(x@data) != 0)]
 	for (pr in pars) {
 		tmp <- scen@modInp@parameters[[pr]]@data
-		if (!all(tmp$weather %in% weather))
-				err_msg[[pr]] <- tmp[!(tmp$weather %in% weather),, drop = FALSE]
+		tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather),, drop = FALSE]
+		if (nrow(tmp) != 0) err_msg[[pr]] <- tmp
 	}
 	if (length(err_msg) != 0) {
 		nn <- capture.output(err_msg)
