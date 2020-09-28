@@ -244,7 +244,6 @@
     
     prec@parameters[['meqLECActivity']] <- addData(prec@parameters[['meqLECActivity']], 
       merge(getParameterData(prec@parameters[['mTechSpan']]), getParameterData(prec@parameters[['mLECRegion']])))
-    .interpolation_message('pWeather', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     
     tmp_f0 <- function(x) {
       if (nrow(x) == 0) {
@@ -254,29 +253,6 @@
       x$value <- 1
       x
     }
-    
-    # Generate pWeather for all slice, including parent & child 
-    pWeather <- getParameterData(prec@parameters$pWeather)
-    if (nrow(pWeather) > 0) {
-      pSliceShare <- getParameterData(prec@parameters$pSliceShare)
-      colnames(pSliceShare)[ncol(pSliceShare)] <- 'share'
-      mSliceCP <- getParameterData(prec@parameters$mSliceParentChild)
-      colnames(mSliceCP) <- c('slicep', 'slice')
-      .interpolation_message('pWeatherUp', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-      pWeatherUp <- merge(merge(pWeather, pSliceShare, by = 'slice'), mSliceCP, by = 'slice')
-      pWeatherUp$slice <- pWeatherUp$slicep; pWeatherUp$slicep <- NULL 
-      pWeatherUp <- aggregate(data.frame(tot = pWeatherUp$value * pWeatherUp$share, share = pWeatherUp$share), 
-        pWeatherUp[, c('weather', 'region', 'year', 'slice')], sum)
-      pWeatherUp$value <- pWeatherUp$tot / pWeatherUp$share
-      pWeatherUp <- pWeatherUp[, c('weather', 'region', 'year', 'slice', 'value')]
-      
-      .interpolation_message('pWeatherLo', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-      pWeatherLo <- merge(pWeather, getParameterData(prec@parameters$mSliceParentChild), by = 'slice')
-      pWeatherLo$slice <- pWeatherLo$slicep;
-      pWeatherLo <- pWeatherLo[, c('weather', 'region', 'year', 'slice', 'value')]
-      pWeather <- rbind(pWeatherUp, pWeatherLo, pWeather)
-      pWeather$mwth <- pWeather$value; pWeather$value <- NULL
-    } else rest <- rest + 2
     
     .interpolation_message('mvInpTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
     mvInpTot <- rbind(
