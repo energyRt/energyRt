@@ -161,22 +161,22 @@ setMethod('.add0', signature(obj = 'modInp', app = 'demand',
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'weather',
                             approxim = 'list'), function(obj, app, approxim) {    
-                              wth <- energyRt:::.upper_case(app)
-                              if (length(wth@slice) == 0&& length(approxim$slice@misc$nlevel) > 1) {
-                                stop('For weather slice level have to be define, if more than one slice level')
-                              }
-                              if (length(wth@slice) == 0) wth@slice <- names(approxim$slice@misc$nlevel)[1]
-                              approxim <- .fix_approximation_list(approxim, lev = wth@slice)
-                              # region fix
-                              if (length(wth@region) != 0) {
-                                approxim$region <- approxim$region[approxim$region %in% wth@region]
-                              }
-                              wth@region <- approxim$region
-                              wth <- stayOnlyVariable(wth, approxim$region, 'region')
-                              wth <- .disaggregateSliceLevel(wth, approxim)
+    wth <- energyRt:::.upper_case(app)
+    if (length(wth@slice) == 0 && length(approxim$slice@misc$nlevel) > 1) {
+      stop('For weather slice level have to be define, if more than one slice level')
+    }
+    if (length(wth@slice) == 0) wth@slice <- names(approxim$slice@misc$nlevel)[1]
+    approxim <- .fix_approximation_list(approxim, lev = wth@slice)
+    # region fix
+    if (length(wth@region) != 0) {
+      approxim$region <- approxim$region[approxim$region %in% wth@region]
+    }
+    wth@region <- approxim$region
+    wth <- stayOnlyVariable(wth, approxim$region, 'region')
+    wth <- .disaggregateSliceLevel(wth, approxim)
     obj@parameters[['pWeather']]@defVal <- wth@defVal
     obj@parameters[['pWeather']] <- addData(obj@parameters[['pWeather']], simpleInterpolation(wth@weather, 'wval',
-       obj@parameters[['pWeather']], approxim, 'weather', wth@name, all.val = TRUE))
+       obj@parameters[['pWeather']], approxim, 'weather', wth@name))
     obj@parameters[['mWeatherSlice']] <- addData(obj@parameters[['mWeatherSlice']],
                                                  data.frame(weather = rep(wth@name, length(approxim$slice)), slice = approxim$slice))
     obj@parameters[['mWeatherRegion']] <- addData(obj@parameters[['mWeatherRegion']],
