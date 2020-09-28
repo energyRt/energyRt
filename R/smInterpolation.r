@@ -25,7 +25,9 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
                     year_range = range(approxim$year),
                     approxim   = approxim, all = all.val)
   if (is.null(dd)) return(NULL)
-
+  if (!all.val) {
+    dd <- dd[dd[[ncol(dd)]] != 0,, drop = FALSE]
+  }
   # Must fixed in the future
   colnames(dd)[[ncol(dd)]] <- 'value'
   for(i in colnames(dd)[-ncol(dd)]) {
@@ -90,6 +92,8 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
                     year_range = range(approxim$year),
                     approxim   = approxim)
   if (is.null(dd)) return(NULL)
+  dd <- dd[dd[[ncol(dd)]] != 0,, drop = FALSE]
+
   colnames(dd)[[ncol(dd)]] <- 'value'
   for(i in colnames(dd)[-ncol(dd)]) {
       dd[[i]] <- as.character(dd[[i]])
