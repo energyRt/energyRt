@@ -46,6 +46,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (!is.null(arg$repository)) scen@model <- .add_repository(scen@model, arg$repository)
   if (!is.null(arg$region)) scen@model@sysInfo@region <- arg$region
   if (!is.null(arg$discount)) scen@model@sysInfo@discount <- arg$discount
+  if (is.null(arg$verbose)) arg$verbose <- 0
   
     
   ### Interpolation begin
@@ -147,6 +148,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
           scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSetNames
           scen@modInp@parameters[[pr]]@dimSetNames <- tmp@dimSetNames[!(tmp@dimSetNames %in% need_col)]
           scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
+          if (arg$verbose >= 1) {
+            scen@misc$trimDroppedDimensions <- rbind(scen@misc$trimDroppedDimensions, 
+                data.frame(parameter = rep(pr, length(need_col)), dimname = need_col, stringsAsFactors = FALSE))
+            warning(paste0('Dropping dimension "', paste0(need_col, collapse = '", "'), '" from parameter "', pr, '"'))
+          }
         }
       }
     }
