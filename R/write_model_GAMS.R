@@ -135,7 +135,18 @@
   scen
 }
 
+.check_miss_rem_col <- function(x, nn) {
+  kll <- rev(grep('[[:alnum:]]$', x))
+  kll <- kll[kll != length(x)]
+  if (length(kll) != 0) {
+    for (i in kll)
+      x[i] <- paste0(x[i], nn, x[i + 1])
+    x <- x[-(kll + 1)]
+  }
+  x
+}
 .rem_col <- function(x, nn, rmm) {
+  x <- .check_miss_rem_col(x, nn)
   for (i in 2:length(x)) {
     tt <- gsub('(^.|[)].*)', '', x[i])  
     til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
@@ -150,6 +161,7 @@
 
 
 .rem_col_sq <- function(x, nn, rmm) {
+  x <- .check_miss_rem_col(x, nn)
   for (i in 2:length(x)) {
     tt <- gsub('(^.|[]].*)', '', x[i])  
     til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
@@ -162,6 +174,7 @@
 }
 
 .rem_col_fg <- function(x, nn, rmm) {
+  x <- .check_miss_rem_col(x, nn)
   for (i in 2:length(x)) {
     tt <- gsub('(^.|[}].*)', '', x[i])  
     til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
