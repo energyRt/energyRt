@@ -1294,7 +1294,6 @@ scen_BASE_gams <- solve(add(mdl), name = "BASE_gams",
                      solver = "cbc"),
                    tmp.name = "UTOPIA_BASE_GAMS",
                    tmp.del = FALSE
-                   # , wait = FALSE
                    )
 summary(scen_BASE_gams) 
 
@@ -1303,7 +1302,8 @@ scen_BASE_py <- solve(add(mdl), name = "BASE_py",
                    # solver = mysolver,
                    solver = list(
                      lang = "Pyomo",
-                     solver = "ipopt"
+                     export_format = "SQLite",
+                     solver = "cplex"
                      # solver = "glpk"
                    ),
                    tmp.name = "UTOPIA_BASE_Python",
