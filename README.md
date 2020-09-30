@@ -1,4 +1,4 @@
-# energyRt: energy analysis toolbox in R
+# energyRt: energy systems modeling toolbox in R
 
 **energyRt** is a package for [R](https://www.r-project.org/) to develop Reference Energy System (RES) models (also known as Capacity Expansion Models (CEM), or "Bottom-Up" technological energy models), and analyze energy-technologies.
 
