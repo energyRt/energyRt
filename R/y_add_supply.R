@@ -7,7 +7,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     sup <- energyRt:::.upper_case(app)
     if (length(sup@commodity) != 1 || is.na(sup@commodity) || all(sup@commodity != approxim$all_comm))
 			stop(paste0('Wrong commodity in supply "', sup@name, '"'))
-
     approxim <- .fix_approximation_list(approxim, comm = sup@commodity, lev = sup@slice)
     sup <- .disaggregateSliceLevel(sup, approxim)
     if (length(sup@region) != 0) {
@@ -52,17 +51,26 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
       }
     }
     obj@parameters[['mSupAva']] <- addData(obj@parameters[['mSupAva']], mSupAva)
-
-    obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
-        pSupReserve[pSupReserve$type == 'up' & pSupReserve$value != Inf, c('sup', 'comm', 'region')])
-    obj@parameters[['meqSupReserveLo']] <- addData(obj@parameters[['meqSupReserveLo']], 
+    mvSupReserve <- merge(mSupComm, mSupSpan)
+    obj@parameters[['mvSupReserve']] <- addData(obj@parameters[['mvSupReserve']], mvSupReserve)
+    if (all(c('sup', 'comm', 'region') %in% colnames(pSupReserve))) {
+      obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
+          pSupReserve[pSupReserve$type == 'up' & pSupReserve$value != Inf, c('sup', 'comm', 'region')])
+      obj@parameters[['meqSupReserveLo']] <- addData(obj@parameters[['meqSupReserveLo']], 
                                                    pSupReserve[pSupReserve$type == 'lo' & pSupReserve$value != 0, c('sup', 'comm', 'region')])
+    } else {
+      obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
+          merge(mvSupReserve, pSupReserve[pSupReserve$type == 'up' & pSupReserve$value != Inf, 
+                                          colnames(pSupReserve) %in% c('sup', 'comm', 'region'), drop = FALSE]))
+      obj@parameters[['meqSupReserveLo']] <- addData(obj@parameters[['meqSupReserveLo']], 
+          merge(mvSupReserve, pSupReserve[pSupReserve$type == 'lo' & pSupReserve$value != 0, 
+                                    colnames(pSupReserve) %in% c('sup', 'comm', 'region'), drop = FALSE]))
+    }
     obj@parameters[['meqSupAvaLo']] <- addData(obj@parameters[['meqSupAvaLo']], 
                                                merge(mSupAva, pSupAva[pSupAva$type == 'lo' & pSupAva$value != 0, colnames(pSupAva) %in% colnames(mSupAva)]))
     obj@parameters[['mSupAvaUp']] <- addData(obj@parameters[['mSupAvaUp']], 
                                              merge(mSupAva, pSupAva[pSupAva$type == 'up' & pSupAva$value != Inf, colnames(pSupAva) %in% colnames(mSupAva)]))
     
-    obj@parameters[['mvSupReserve']] <- addData(obj@parameters[['mvSupReserve']], merge(mSupComm, mSupSpan))
     # For weather
     if (nrow(sup@weather) > 0) {
       tmp <- .toWeatherImply(sup@weather, 'wava', 'sup', sup@name)
