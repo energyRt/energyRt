@@ -127,7 +127,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		  obj@parameters[['pStorageCharge']] <- addData(obj@parameters[['pStorageCharge']], tmp)
 		}
 		# Some slice
-		stock_exist <- simpleInterpolation(stg@stock[, colnames(stg@stock) != 'slice'], 'stock', 
+		stock_exist <- simpleInterpolation(stg@stock, 'stock', 
 		                                   obj@parameters[['pStorageStock']], approxim, 'stg', stg@name)
 		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']], stock_exist)
 		invcost <- simpleInterpolation(stg@invcost, 'invcost', obj@parameters[['pStorageInvcost']], approxim, 'stg', stg@name)
