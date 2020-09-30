@@ -1,17 +1,17 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development version
-Version: 0.01.14.9000
-Date: 2020-09-18
+Version: 0.01.15.9000
+Date: 2020-09-29
 Authors@R: c(person("Oleg", "Lugovoy", email = "olugovoy@gmail.com", 
                     role = c("aut", "cre"), comment = ""), 
              person("Vladimir", "Potashnikov", email = "potashnikov.vu@gmail.com", 
                     role = c("aut")))
-URL: https://github.com/olugovoy/energyRt
-BugReports: https://github.com/olugovoy/energyRt/issues
+URL: https://github.com/energyRt/energyRt
+BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy Technology Modeling Toolbox
-Depends: R (>= 3.6), sp, parallel, ggplot2
-Imports: rpivotTable, data.table, tidyverse, DBI, RSQLite
+Depends: R (>= 3.6), parallel, tidyverse, sp
+Imports: rpivotTable, data.table, DBI, RSQLite
 Suggests: 
     knitr,
     rmarkdown

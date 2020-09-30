@@ -115,11 +115,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		  obj@parameters[['pStorageNCap2Stg']] <- addData(obj@parameters[['pStorageNCap2Stg']], tmp)
 		}
 
-		if (any(!is.na(stg@stock$charge) & stg@stock$charge != 0)) {
-		  fl <- (!is.na(stg@stock$charge) & stg@stock$charge != 0)
-		  if (any(is.na(stg@stock[fl, c('region', 'year', 'slice')])))
+		if (any(!is.na(stg@charge$charge) & stg@charge$charge != 0)) {
+		  fl <- (!is.na(stg@charge$charge) & stg@charge$charge != 0)
+		  if (any(is.na(stg@charge[fl, c('region', 'year', 'slice')])))
 		    stop(paste0('Approximation is not allowed for storage "', stg@name, '" parameter charge'))
-		  tmp <- stg@stock[fl, c('region', 'year', 'slice', 'charge')]
+		  tmp <- stg@charge[fl, c('region', 'year', 'slice', 'charge')]
 		  tmp$stg <- stg@name
 		  tmp$comm <- stg@commodity
 		  tmp$value <- tmp$charge
@@ -127,7 +127,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 		  obj@parameters[['pStorageCharge']] <- addData(obj@parameters[['pStorageCharge']], tmp)
 		}
 		# Some slice
-		stock_exist <- simpleInterpolation(stg@stock[, colnames(stg@stock) != 'slice'], 'stock', 
+		stock_exist <- simpleInterpolation(stg@stock, 'stock', 
 		                                   obj@parameters[['pStorageStock']], approxim, 'stg', stg@name)
 		obj@parameters[['pStorageStock']] <- addData(obj@parameters[['pStorageStock']], stock_exist)
 		invcost <- simpleInterpolation(stg@invcost, 'invcost', obj@parameters[['pStorageInvcost']], approxim, 'stg', stg@name)

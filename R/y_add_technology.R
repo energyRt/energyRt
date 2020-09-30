@@ -4,27 +4,6 @@
 setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	approxim = 'list'), function(obj, app, approxim) {
 		energyRt:::.checkSliceLevel(app, approxim)
-		#  mTechInpComm(tech, comm)       Input commodity
-		#  mTechOutComm(tech, comm)       Output commodity
-		#  mTechCapComm(tech, comm)       Capacity fix commodity
-		#  mTechActComm(tech, comm)       Activity fix commodity
-		#  mTechUseComm(tech, comm)       Activity fix commodity
-		#  mTechOneComm(tech, comm)    Single commodity
-		#  mTechGroupComm(tech, group, comm)  Share (group) commodity connect to group
-		#  mTechCapGroup(tech, group)         Group connect with capacity
-		#  mTechUseGroup(tech, group)         Group connect with use
-		#  mTechActGroup(tech, group)         Group connect with use
-		#  mTechInpGroup(tech, group)         Group use for input
-		#  mTechOutGroup(tech, group)         Group use for output
-		#  mTechStartYear(tech, region, year) Start year
-		#  mTechEndYear(tech, region, year)   End year
-		#  mTechDisable(tech, region)     Disable new technology
-		#  * Emissions
-		#  mTechEmisComm(tech, comm)
-		#  mTechEmitedComm(tech, comm)
-		#  mUpComm(comm)  PRODUCTION <= CONSUMPTION
-		#  mLoComm(comm)  PRODUCTION >= CONSUMPTION
-		#  mFxComm(comm)  PRODUCTION = CONSUMPTION
 		tech <- energyRt:::.upper_case(app)
 		if (length(tech@slice) == 0) {
 			use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))

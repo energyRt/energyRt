@@ -11,9 +11,10 @@ setClass("storage",
           aux           = "data.frame",      #
           olife         = "data.frame",    #
           stock         = "data.frame",    #
+          charge        = "data.frame",    #
           seff          = "data.frame",    #
-          af           = "data.frame",     # Availability of the resource with prices
-          aeff         = "data.frame",    #  Commodity efficiency
+          af            = "data.frame",     # Availability of the resource with prices
+          aeff          = "data.frame",    #  Commodity efficiency
           # Costs
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
@@ -38,11 +39,15 @@ setClass("storage",
           olife         = data.frame(region = character(),
                                             olife = numeric(),
                                             stringsAsFactors = FALSE),
+          charge         = data.frame(region = character(),
+                                     year  = numeric(),
+                                     slice  = numeric(),
+                                     charge = numeric(),
+                                     stringsAsFactors = FALSE),
           stock         = data.frame(region = character(),
                                      year  = numeric(),
                                      slice  = numeric(),
                                      stock = numeric(),
-                                     charge = numeric(),
                                      stringsAsFactors = FALSE),
           seff         = data.frame(region     = character(),
                                      year       = numeric(),

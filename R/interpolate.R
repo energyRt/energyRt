@@ -46,6 +46,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (!is.null(arg$repository)) scen@model <- .add_repository(scen@model, arg$repository)
   if (!is.null(arg$region)) scen@model@sysInfo@region <- arg$region
   if (!is.null(arg$discount)) scen@model@sysInfo@discount <- arg$discount
+  if (is.null(arg$verbose)) arg$verbose <- 0
   
     
   ### Interpolation begin
@@ -108,7 +109,6 @@ interpolate <- function(obj, ...) { #- returns class scenario
     ## Trim before   interpolation
     par_name <- grep('^p', names(scen@modInp@parameters), value = TRUE)
     par_name <- par_name[!(par_name %in% c(c('pEmissionFactor', 'pTechEmisComm', 'pDiscount')))]
-    par_name <- grep('^p.+Weather', par_name, value = TRUE, invert = TRUE) 
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
@@ -148,6 +148,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
           scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSetNames
           scen@modInp@parameters[[pr]]@dimSetNames <- tmp@dimSetNames[!(tmp@dimSetNames %in% need_col)]
           scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
+          if (arg$verbose >= 1) {
+            scen@misc$trimDroppedDimensions <- rbind(scen@misc$trimDroppedDimensions, 
+                data.frame(parameter = rep(pr, length(need_col)), dimname = need_col, stringsAsFactors = FALSE))
+            warning(paste0('Dropping dimension "', paste0(need_col, collapse = '", "'), '" from parameter "', pr, '"'))
+          }
         }
       }
     }
@@ -179,7 +184,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation: ')
-  interpolation_count <- .get_objects_count(scen) + 59
+  interpolation_count <- .get_objects_count(scen) + 56
   len_name <- .get_objects_len_name(scen)
   if (arg$n.threads == 1) {
     scen <- .add2_nthreads_1(0, 1, scen, arg, approxim, interpolation_time_begin = interpolation_time_begin, 
@@ -198,6 +203,8 @@ interpolate <- function(obj, ...) { #- returns class scenario
   
   # Check for unknown set in constraints
   .check_constraint(scen)
+  # Check for unknown weather
+  .check_weather(scen)
   
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {

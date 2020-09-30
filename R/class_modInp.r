@@ -50,7 +50,7 @@ setMethod("initialize", "modInp",
    .Object@parameters[['weather']] <- createSet('weather')    
     .Object@parameters[['pWeather']] <- 
       createParameter('pWeather', c('weather', 'region', 'year', 'slice'), 'simple', 
-                      defVal = 1, interpolation = 'back.inter.forth') #, colName = 'wval', cls = 'weather')    
+                      defVal = 1, interpolation = 'back.inter.forth', colName = 'wval', cls = 'weather')    
  
    .Object@parameters[['mWeatherSlice']] <- createParameter('mWeatherSlice', c('weather', 'slice'), 'map')
    .Object@parameters[['mWeatherRegion']] <- createParameter('mWeatherRegion', c('weather', 'region'), 'map')
