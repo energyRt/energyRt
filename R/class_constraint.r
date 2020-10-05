@@ -486,7 +486,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
  # Add eq
   res$equation <- paste0(res$equation, ' ', c('==' = '=e=', '>=' = '=g=', '<=' = '=l=')[as.character(stm@eq)], ' ')
   # Add rhs
-  if (nrow(stm@rhs) != 0) {
+  if (nrow(stm@rhs) != 0 && (any(stm@rhs$rhs != 0) || (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
     # Complicated rhs
     # Generate approxim
     approxim2 <- approxim[unique(c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)], 'solver', 'year'))]
