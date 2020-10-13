@@ -1,4 +1,22 @@
 findDuplicates <- function(x) {
+  if (class(x) == 'scenario') {
+    rs <- NULL
+    for (pr in names(x@modInp@parameters)) if (x@modInp@parameters[[pr]]@type %in% c('simple', 'multi')) {
+      tmp <- x@modInp@parameters[[pr]]@data
+      tmp <- tmp[, -ncol(tmp), drop = FALSE]
+      fl <- duplicated(tmp)
+      if (any(fl)) {
+        tmp <- tmp[fl,, drop = FALSE]
+        tmp$parameter <- pr
+        tmp <- tmp[, c(ncol(tmp), 1:(ncol(tmp) - 1)), drop = FALSE]
+        rs <- rbind(rs, tmp)
+      }
+    }
+    if (!is.null(rs)) {
+      cat(paste0("Found ", length(unique(rs$parameter)), " tables with duplicates, ", nrow(rs), " duplicated rows in total\n"))
+      return(invisible(rs))
+    }
+  }
   findDuplicates0 <- function(x) {
     check_by_slots <- function(x, slt_name) {
       rs <- NULL
@@ -18,8 +36,6 @@ findDuplicates <- function(x) {
       }
       return(rs)
     }
-    if (class(x) == 'scenario') 
-      return(findDuplicates0(x@model))
     res <- data.frame(repository = character(), object = character(), slot = character(), parameter = character(), stringsAsFactors = FALSE)
     if (class(x) == 'model') {
       rs <- NULL
