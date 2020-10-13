@@ -42,18 +42,18 @@
     scen@solver$import_format <- 'gdx'
     scen@source[['GAMS_output']] <- 'execute_unload "output/output.gdx"'
   }
-  dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
-  dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
-  zz_output <- file(paste(arg$dir.result, '/output.gms', sep = ''), 'w')
+  dir.create(paste(arg$tmp.dir, '/input', sep = ''), showWarnings = FALSE)
+  dir.create(paste(arg$tmp.dir, '/output', sep = ''), showWarnings = FALSE)
+  zz_output <- file(paste(arg$tmp.dir, '/output.gms', sep = ''), 'w')
   cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
   close(zz_output)  
-  zz_data_gms <- file(paste(arg$dir.result, '/data.gms', sep = ''), 'w')
+  zz_data_gms <- file(paste(arg$tmp.dir, '/data.gms', sep = ''), 'w')
   if (scen@solver$export_format == 'gdx') {
     if (!scen@status$fullsets)
       stop('for export_format = "gdx", interpolation parameter fullsets must be TRUE')
     # Generate gdx
     .write_gdx_list(dat = .get_scen_data(scen), 
-                    gdxName = paste0(arg$dir.result, 'input/data.gdx'))
+                    gdxName = paste0(arg$tmp.dir, 'input/data.gdx'))
     
     # Add gdx import
     cat('$gdxin input/data.gdx\n', file = zz_data_gms)
@@ -72,7 +72,7 @@
   } else if (arg$n.threads == 1) {
     for (j in c('set', 'map', 'simple', 'multi')) {
       for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-        zz_data_tmp <- file(paste(arg$dir.result, '/input/', i, '.gms', sep = ''), 'w')
+        zz_data_tmp <- file(paste(arg$tmp.dir, '/input/', i, '.gms', sep = ''), 'w')
         cat(.toGams(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_tmp)
         close(zz_data_tmp)
         cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
@@ -88,9 +88,9 @@
   }
   close(zz_data_gms)    
   ### Model code to text
-  .generate_gpr_gams_file(arg$dir.result)
-  zz <- file(paste(arg$dir.result, '/energyRt.gms', sep = ''), 'w')
-  zz_constrains <- file(paste(arg$dir.result, '/inc_constraints.gms', sep = ''), 'w')
+  .generate_gpr_gams_file(arg$tmp.dir)
+  zz <- file(paste(arg$tmp.dir, '/energyRt.gms', sep = ''), 'w')
+  zz_constrains <- file(paste(arg$tmp.dir, '/inc_constraints.gms', sep = ''), 'w')
   cat(run_code[1:grep('[$]include[[:space:]]*data.gms', run_code)], sep = '\n', file = zz)
   # Add parameter constraint declaration
   if (length(scen@modInp@gams.equation) > 0) {

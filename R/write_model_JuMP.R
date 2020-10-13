@@ -56,9 +56,9 @@
       }
     }
   }
-  dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
-  zz_data_julia <- file(paste(arg$dir.result, '/data.jl', sep = ''), 'w')
-  zz_data_constr <- file(paste(arg$dir.result, '/inc_constraints.jl', sep = ''), 'w')
+  dir.create(paste(arg$tmp.dir, '/output', sep = ''), showWarnings = FALSE)
+  zz_data_julia <- file(paste(arg$tmp.dir, '/data.jl', sep = ''), 'w')
+  zz_data_constr <- file(paste(arg$tmp.dir, '/inc_constraints.jl', sep = ''), 'w')
 
   .write_inc_solver(scen, arg, "using Cbc\nset_optimizer(model, Cbc.Optimizer)\n", '.jl', 'Cbc')
   dat <- list()
@@ -82,7 +82,7 @@
     }
   }
   
-  save('dat', file = paste0(arg$dir.result, "data.RData"))
+  save('dat', file = paste0(arg$tmp.dir, "data.RData"))
 
   cat('using RData\nusing DataFrames\ndt = load("data.RData")["dat"]\n', sep = '\n', file = zz_data_julia)
   for (j in c('set', 'map', 'simple', 'multi')) {
@@ -93,7 +93,7 @@
   }
   close(zz_data_julia)
   # Add constraint
-  zz_mod <- file(paste(arg$dir.result, '/energyRt.jl', sep = ''), 'w')
+  zz_mod <- file(paste(arg$tmp.dir, '/energyRt.jl', sep = ''), 'w')
   nobj <- grep('^[@]objective', run_code)[1] - 1
   cat(run_code[1:nobj], sep = '\n', file = zz_mod)
   if (length(scen@modInp@gams.equation) > 0) {
@@ -106,7 +106,7 @@
   close(zz_data_constr)
   cat(run_code[-(1:nobj)], sep = '\n', file = zz_mod)
   close(zz_mod)
-  zz_modout <- file(paste(arg$dir.result, '/output.jl', sep = ''), 'w')
+  zz_modout <- file(paste(arg$tmp.dir, '/output.jl', sep = ''), 'w')
   cat(run_codeout, sep = '\n', file = zz_modout)
   close(zz_modout)
   .add_five_includes(arg, scen, ".jl")

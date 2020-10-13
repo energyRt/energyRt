@@ -12,12 +12,12 @@
     }
   } 
   for (i in 1:5) {
-    zz <- file(paste0(arg$dir.result, 'inc', i, type), 'w')
+    zz <- file(paste0(arg$tmp.dir, 'inc', i, type), 'w')
     cat(scen@solver[[paste0('inc', i)]], sep = '\n', file = zz)
     close(zz)
   }
   for (i in names(scen@solver$files)) {
-    zz <- file(paste0(arg$dir.result, i), 'w')
+    zz <- file(paste0(arg$tmp.dir, i), 'w')
     cat(scen@solver$files[[i]], sep = '\n', file = zz)
     close(zz)
   }

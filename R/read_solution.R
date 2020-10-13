@@ -2,28 +2,28 @@ read_solution <- function(scen, ...) {
   ## arguments
   # scen
   # readOutputFunction = read.csv (may use data.table::fread)
-  # dir.result dir from wich read results, by default in scen@misc$dir.result 
+  # tmp.dir dir from wich read results, by default in scen@misc$tmp.dir 
   # echo = TRUE - print working data
   arg <- list(...)
   
   read_result_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
-  if (is.null(arg$dir.result)) {
-    arg$dir.result <- scen@misc$dir.result 
-    if (is.null(arg$dir.result))
-      stop('There is not define dir.result, including scen@misc$dir.result')
+  if (is.null(arg$tmp.dir)) {
+    arg$tmp.dir <- scen@misc$tmp.dir 
+    if (is.null(arg$tmp.dir))
+      stop('Directory "tmp.dir" not specified')
   }
   
 
   
   # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
-  vrb_list <- arg$readOutputFunction(paste(arg$dir.result, '/output/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
-  if (file.exists(paste(arg$dir.result, '/output/variable_list2.csv', sep = ''))) {
-    vrb_list2 <- arg$readOutputFunction(paste(arg$dir.result, '/output/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
+  vrb_list <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
+  if (file.exists(paste(arg$tmp.dir, '/output/variable_list2.csv', sep = ''))) {
+    vrb_list2 <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
   } else vrb_list2 <- character()
   rr <- list(variables = list(), 
-             set = arg$readOutputFunction(paste(arg$dir.result, '/output/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
+             set = arg$readOutputFunction(paste(arg$tmp.dir, '/output/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
   # Read set and alias
   ss <- list()
   for(k in unique(rr$set$set)) {
@@ -41,7 +41,7 @@ read_solution <- function(scen, ...) {
 
   # Read variable data
   for(i in c(vrb_list, vrb_list2)) {
-    jj <- arg$readOutputFunction(paste(arg$dir.result, '/output/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
+    jj <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
     if (ncol(jj) == 1) {
       rr$variables[[i]] <- data.frame(value = jj[1, 1])
     } else {
@@ -59,19 +59,19 @@ read_solution <- function(scen, ...) {
   
   scen@modOut <- new('modOut')
   # Read solution status
-  scen@modOut@solutionLogs <- read.csv(paste(arg$dir.result, '/output/log.csv', sep = ''))
-  solver_data <- read.csv(paste(arg$dir.result, '/solver', sep = ''), stringsAsFactors = FALSE)
+  scen@modOut@solutionLogs <- read.csv(paste(arg$tmp.dir, '/output/log.csv', sep = ''))
+  solver_data <- read.csv(paste(arg$tmp.dir, '/solver', sep = ''), stringsAsFactors = FALSE)
   codes <- solver_data[grep('^code', solver_data$name), ]
   for (i in seq_len(nrow(codes))) {
-    scen@solver[[codes[i, 'name']]] <- readLines(paste(arg$dir.result, '/', codes[i, 'value'], sep = ''))
+    scen@solver[[codes[i, 'name']]] <- readLines(paste(arg$tmp.dir, '/', codes[i, 'value'], sep = ''))
   }
   if (all(scen@modOut@solutionLogs$parameter != "solution status")) {
-    scen@modOut@stage <- "Scenario isn't solved"
+    scen@modOut@stage <- "Scenario is not solved"
   } else if (all(scen@modOut@solutionLogs[scen@modOut@solutionLogs$parameter == "solution status", 'value'] != 1)) {
-    scen@modOut@stage <- paste0('The solution code is not correct (', 
+    scen@modOut@stage <- paste0('The solution status is not optimal (', 
         scen@modOut@solutionLogs[scen@modOut@solutionLogs$parameter == "solution status", 'value'], ')')
   } else if (all(scen@modOut@solutionLogs$parameter != "done")) {
-    scen@modOut@stage <- "Unexpected end"
+    scen@modOut@stage <- "Unexpected termination"
   } else scen@modOut@stage <- 'solved'
  
   if (scen@modOut@stage != 'solved')
