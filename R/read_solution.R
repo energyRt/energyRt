@@ -15,8 +15,9 @@ read_solution <- function(scen, ...) {
       stop('Directory "tmp.dir" not specified')
   }
   
+# read.scenario <- function(scen, ...) read_solution(scen, ...)
+.S3method("read", "scenario", read_solution)
 
-  
   # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
   vrb_list <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
   if (file.exists(paste(arg$tmp.dir, '/output/variable_list2.csv', sep = ''))) {

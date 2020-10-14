@@ -4,8 +4,14 @@ write_model <- function(scen, tmp.dir = NULL, ...) {
   } else {
     scen@misc$tmp.dir <- tmp.dir
   }
-  solver_solve(scen, ..., run = FALSE, tmp.dir = tmp.dir, write = TRUE)
+  .solver_solve(scen, ..., run = FALSE, tmp.dir = tmp.dir, write = TRUE)
 }
+.S3method("write", "scenario", write_model)
+
+
+# solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
+#   solve_model(scen = scen, tmp.dir = tmp.dir, solver = solver, ...)
+# }
 
 solve_model <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
   if (is.null(tmp.dir)) {
@@ -33,12 +39,13 @@ solve_model <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
   if (is.null(scen)) {
     scen = new('scenario')
   }
-  solver_solve(scen = scen, run = TRUE, solver = solver0, tmp.dir = tmp.dir, write = FALSE, ...)
+  .solver_solve(scen = scen, run = TRUE, solver = solver0, tmp.dir = tmp.dir, write = FALSE, ...)
 }
+.S3method("solve", "scenario", solve_model)
 
 .fix_path <- function(x) gsub('[\\/]+', '/', paste0(x, '/'))
 
-solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, write = TRUE) { 
+.solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, write = TRUE) { 
   # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # tmp.dir - solver working directory

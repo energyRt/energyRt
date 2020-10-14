@@ -45,6 +45,9 @@ setGeneric("addLEC", function(obj, app, price, discount,
 add <- function (...) UseMethod("add")
 # report <- function (...) UseMethod("report")
 getData <- function (...) UseMethod("getData")
+solve <- function(...) UseMethod("solve")
+read <- function(...) UseMethod("read")
+write <- function(...) UseMethod("write")
 
 setGeneric("milestoneYears", function(start, interval) standardGeneric("milestoneYears"))
 setGeneric("setMilestoneYears", function(obj, start, interval) standardGeneric("setMilestoneYears"))

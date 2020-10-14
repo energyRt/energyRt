@@ -1,4 +1,4 @@
-# Add all include files to tmp.dir (for solver_solve, type = file type for five include files)
+# Add all include files to tmp.dir (for .solver_solve, type = file type for five include files)
 .add_five_includes <- function(arg, scen, type) {
   if (is.null(type)) {
     fl <- c(names(scen@solver$files))
