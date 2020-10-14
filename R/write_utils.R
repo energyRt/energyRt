@@ -12,7 +12,7 @@
     }
     NULL
   }
-  parLapply(cl, 0:(arg$n.threads - 1), wrt_fun, tlp, scen@modInp@parameters, arg$dir.result, func, type)
+  parLapply(cl, 0:(arg$n.threads - 1), wrt_fun, tlp, scen@modInp@parameters, arg$tmp.dir, func, type)
   stopCluster(cl)
   NULL
 }
@@ -24,7 +24,7 @@
     scen@solver$inc_solver <- gsub(templ, scen@solver$solver, def_inc_solver)
   if (is.null(scen@solver$inc_solver) && is.null(scen@solver$solver))
     scen@solver$inc_solver <- def_inc_solver
-  zz <- file(paste0(arg$dir.result, 'inc_solver', type), 'w')
+  zz <- file(paste0(arg$tmp.dir, 'inc_solver', type), 'w')
   cat(scen@solver$inc_solver, file = zz, sep = '\n')
   close(zz)
 }

@@ -34,7 +34,16 @@
     colnames(obj)[ncol(obj)]), drop = FALSE]
   obj <- obj[!is.na(obj[, parameter]), , drop = FALSE]
   if (anyDuplicated(obj[, -ncol(obj)])) {
-     warning("Duplicated values found and dropped. Use findDuplicates() function for the identification.")
+    jjj <- sys.status()
+    kkk <- sapply(jjj$sys.calls, function(x) any(grep('.add0', x[1])))
+    if (sum(kkk) == 0) {
+      warning("Duplicated values found and dropped. Use findDuplicates() function for the identification.")
+    } else {
+      tst_env <- jjj$sys.frames[[max(seq_along(kkk)[kkk])]]
+      tst_exm <- get('app', tst_env)
+      warning(paste0('"Duplicated values found (class "', class(tst_exm), '", name "', tst_exm@name, 
+                     '", parameter: "', parameter, '") and dropped.'))
+    }
     obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
   }
   if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)

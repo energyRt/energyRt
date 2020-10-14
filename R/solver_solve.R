@@ -1,8 +1,28 @@
-write_model <- function(..., tmp.dir = NULL) {
-  solver_solve(..., run = FALSE, tmp.dir = tmp.dir, write = TRUE)
+write_model <- function(scen, tmp.dir = NULL, ...) {
+  if (is.null(tmp.dir)) {
+    if (!is.null(scen@misc$tmp.dir)) tmp.dir <- scen@misc$tmp.dir
+  } else {
+    scen@misc$tmp.dir <- tmp.dir
+  }
+  .solver_solve(scen, ..., run = FALSE, tmp.dir = tmp.dir, write = TRUE)
 }
+.S3method("write", "scenario", write_model)
 
-solve_model <- function(tmp.dir = NULL, scen = NULL, solver = NULL, ...) {
+
+# solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
+#   solve_model(scen = scen, tmp.dir = tmp.dir, solver = solver, ...)
+# }
+
+solve_model <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
+  if (is.null(tmp.dir)) {
+    if (is.null(scen)) {
+      stop("At least one of two parameters ('scen' or 'tmp.dir') should be specified")
+    } else {
+      tmp.dir <- scen@misc$tmp.dir
+    }
+  } else {
+    if(!is.null(scen)) scen@misc$tmp.dir <- tmp.dir
+  }
   if (is.character(solver)) solver <- list(lang = solver)
   solv_par <- read.csv(paste0(.fix_path(tmp.dir), 'solver'), stringsAsFactors = FALSE)
   solver0 <- list()
@@ -19,15 +39,16 @@ solve_model <- function(tmp.dir = NULL, scen = NULL, solver = NULL, ...) {
   if (is.null(scen)) {
     scen = new('scenario')
   }
-  solver_solve(scen = scen, run = TRUE, solver = solver0, tmp.dir = tmp.dir, write = FALSE, ...)
+  .solver_solve(scen = scen, run = TRUE, solver = solver0, tmp.dir = tmp.dir, write = FALSE, ...)
 }
+.S3method("solve", "scenario", solve_model)
 
 .fix_path <- function(x) gsub('[\\/]+', '/', paste0(x, '/'))
 
-solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, write = TRUE) { 
+.solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, write = TRUE) { 
   # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
-  # tmp.dir - solver working directore
+  # tmp.dir - solver working directory
   # echo = TRUE - print working data
   # open.folder = FALSE - open folder before the run
   # show.output.on.console = FALSE & invisible = FALSE arg for command system
@@ -35,6 +56,9 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   # readresult = TRUE read result
   # tmp.del delete results
   arg <- list(...)
+  if (is.null(arg$tmp.dir)) {
+    
+  }
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) {
     scen@solver <- list(lang = "PYOMO")
@@ -65,42 +89,42 @@ solver_solve <- function(scen, ..., interpolate = FALSE, readresult = FALSE, wri
   if (is.null(arg$n.threads)) arg$n.threads <- 1
   
   # if (is.null(arg$onefile)) arg$onefile <- FALSE
-  if (!is.null(arg$dir.result)) {
-    warning("solve_model: parameter `dir.result` is depreciated, use `tmp.dir` instead")
-    if (is.null(arg$tmp.dir)) {
-      arg$tmp.dir <- arg$dir.result
-    } else {
-      stop("check `dir.result` and `tmp.dir` - only one should be used")
-    }
-  } else {
-    # temporary - will be depreciated
-    arg$dir.result <- arg$tmp.dir
-  }
+  # if (!is.null(arg$dir.result)) {
+  #   warning("solve_model: parameter `dir.result` is depreciated, use `tmp.dir` instead")
+  #   if (is.null(arg$tmp.dir)) {
+  #     arg$tmp.dir <- arg$dir.result
+  #   } else {
+  #     stop("check `dir.result` and `tmp.dir` - only one should be used")
+  #   }
+  # } else {
+  #   # temporary - will be depreciated
+  #   arg$dir.result <- arg$tmp.dir
+  # }
   
   if (is.null(scen)) {
     if (interpolate | arg$write) {
       stop("scenario object is not found")
     }
   } else {
-    scen@misc$dir.result <- arg$dir.result
+    scen@misc$tmp.dir <- arg$tmp.dir
     tmp_name <- scen@name
   }
-  arg$dir.result <- .fix_path(arg$dir.result)
+  # arg$dir.result <- .fix_path(arg$dir.result)
   arg$tmp.dir <- .fix_path(arg$tmp.dir)
-  if (!is.null(scen)) scen@misc$dir.result <- .fix_path(scen@misc$dir.result)
+  if (!is.null(scen)) scen@misc$tmp.dir <- .fix_path(scen@misc$tmp.dir)
   
   if (is.null(arg$tmp.dir)) {
     arg$tmp.dir <- .file.path(file.path(getwd(), "solwork"), paste(arg$solver$lang, tmp_name, #scen@name, 
           format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()), sep = "_"))
   }
-  arg$dir.result <- arg$tmp.dir
+  # arg$dir.result <- arg$tmp.dir
   
   # interpolate 
   if (interpolate) scen <- energyRt::interpolate(scen, ...)
   
   # Important miscs
-  dir.create(arg$dir.result, recursive = TRUE, showWarnings = FALSE)
-  if (arg$open.folder) shell.exec(arg$dir.result)
+  dir.create(arg$tmp.dir, recursive = TRUE, showWarnings = FALSE)
+  if (arg$open.folder) shell.exec(arg$tmp.dir)
 
   if (arg$write) { 
     if (arg$echo) cat('Writing files: ')
