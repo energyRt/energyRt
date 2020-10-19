@@ -60,8 +60,8 @@
       }
     
   }
-  dir.create(paste(arg$dir.result, '/input', sep = ''), showWarnings = FALSE)
-  dir.create(paste(arg$dir.result, '/output', sep = ''), showWarnings = FALSE)
+  dir.create(paste(arg$tmp.dir, '/input', sep = ''), showWarnings = FALSE)
+  dir.create(paste(arg$tmp.dir, '/output', sep = ''), showWarnings = FALSE)
   # if (!is.null(scen@solver$SQLite) && scen@solver$SQLite) {
   if (is.null(scen@solver$export_format)) {
     SQLite <- FALSE
@@ -72,17 +72,17 @@
   if (SQLite) {
     ### Generate SQLite file
     .write_sqlite_list(dat = .get_scen_data(scen), 
-                    sqlFile = paste0(arg$dir.result, 'input/data.db'))
+                    sqlFile = paste0(arg$tmp.dir, 'input/data.db'))
   }
   .write_inc_solver(scen, arg, "opt = SolverFactory('cplex');", '.py', 'cplex')
   # Add constraint
-  zz_mod <- file(paste(arg$dir.result, '/energyRt.py', sep = ''), 'w')
-  zz_constr <- file(paste(arg$dir.result, '/inc_constraints.py', sep = ''), 'w')
+  zz_mod <- file(paste(arg$tmp.dir, '/energyRt.py', sep = ''), 'w')
+  zz_constr <- file(paste(arg$tmp.dir, '/inc_constraints.py', sep = ''), 'w')
   npar <- grep('^##### decl par #####', run_code)[1]
   cat(run_code[1:npar], sep = '\n', file = zz_mod)
   if (!AbstractModel) {
     cat('exec(open("data.py").read())\n', file = zz_mod)
-    zz_inp_file <- file(paste0(arg$dir.result, 'data.py'), 'w')
+    zz_inp_file <- file(paste0(arg$tmp.dir, 'data.py'), 'w')
   }
   if (AbstractModel) {
     f1 <- grep('^mCns', names(scen@modInp@parameters), invert = TRUE)
@@ -92,7 +92,7 @@
       cat(.generate.pyomo.par(scen@modInp@parameters[f2]), sep = '\n', file = zz_constr)
   }
   if (AbstractModel)
-    zz_data_pyomo <- file(paste(arg$dir.result, 'data.dat', sep = ''), 'w')
+    zz_data_pyomo <- file(paste(arg$tmp.dir, 'data.dat', sep = ''), 'w')
   file_w <- c()
   for (j in c('set', 'map', 'simple', 'multi')) {
     for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
@@ -112,7 +112,7 @@
           } else {
             tfl <- paste0('input/', scen@modInp@parameters[[i]]@name, '.py')
             cat(paste0('exec(open("', tfl, '").read())\n'), file = zz_inp_file)
-            zz_tfl <- file(paste0(arg$dir.result, tfl), 'w')
+            zz_tfl <- file(paste0(arg$tmp.dir, tfl), 'w')
             cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_tfl)
             close(zz_tfl)
           }
@@ -147,7 +147,7 @@
   }
   close(zz_mod)
   close(zz_constr)
-  zz_modout <- file(paste(arg$dir.result, '/output.py', sep = ''), 'w')
+  zz_modout <- file(paste(arg$tmp.dir, '/output.py', sep = ''), 'w')
   cat(run_codeout, sep = '\n', file = zz_modout)
   close(zz_modout)
   .add_five_includes(arg, scen, ".py")

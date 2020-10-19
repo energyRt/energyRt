@@ -10,7 +10,7 @@ S3method(add, model)
 S3method(summary, scenario)
 S3method(summary, model)
 ## solve
-S3method(solve, model)
+#S3method(solve, model)
 ## update
 S3method(update, technology)
 S3method(update, commodity)

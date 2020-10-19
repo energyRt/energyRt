@@ -4,7 +4,7 @@
   if(arg$echo) cat(scen@solver$lang, ' time: ')
   gams_run_time <- proc.time()[3]
   tryCatch({
-    setwd(arg$dir.result)
+    setwd(arg$tmp.dir)
     if (.Platform$OS.type == "windows") {
       if (arg$invisible) {cmd <- ""} else {cmd <- "cmd /k"}
       rs <- system(paste(cmd, scen@solver$cmdline), #'gams energyRt.gms', arg$gamsCompileParameter), 
@@ -20,11 +20,11 @@
     }
     setwd(BEGINDR)  
   }, interrupt = function(x) {
-    if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+    if (arg$tmp.del) unlink(arg$tmp.dir, recursive = TRUE)
     setwd(BEGINDR)
     stop('Solver has been interrupted')
   }, error = function(x) {
-    if (arg$tmp.del) unlink(arg$dir.result, recursive = TRUE)
+    if (arg$tmp.del) unlink(arg$tmp.dir, recursive = TRUE)
     setwd(BEGINDR)
     stop(x)
   })    
