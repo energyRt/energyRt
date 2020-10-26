@@ -88,7 +88,7 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
                     year_range = range(approxim$year),
                     approxim   = approxim)
   if (is.null(dd)) return(NULL)
-  dd <- dd[dd[[ncol(dd)]] != 0,, drop = FALSE]
+  dd <- dd[dd[[ncol(dd)]] != 0 | dd$type == 'up',, drop = FALSE]
   if (nrow(dd) == 0) return(NULL)
   
   colnames(dd)[[ncol(dd)]] <- 'value'

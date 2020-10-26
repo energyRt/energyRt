@@ -604,11 +604,11 @@ $include inc2.gms
 * Equations
 ********************************************************************************
 ********************************************************************************
-** Technology equations
+** Technology
 ********************************************************************************
 
 ********************************************************************************
-*** Activity Input & Output equations
+*** Activity Input & Output
 ********************************************************************************
 Equations
 * Input & Output of ungrouped (single) commodities
@@ -666,7 +666,7 @@ eqTechGrp2Grp(tech, region, group, groupp, year, slice)$meqTechGrp2Grp(tech, reg
 
 
 ********************************************************************************
-* Shares equations for grouped commodities
+*** Shares for grouped commodities
 ********************************************************************************
 Equations
 * Input Share LO
@@ -716,7 +716,7 @@ eqTechShareOutUp(tech, region, group, comm, year, slice)$meqTechShareOutUp(tech,
                   );
 
 ********************************************************************************
-* Auxiliary input & output equations
+*** Auxiliary input & output
 ********************************************************************************
 equation
 eqTechAInp(tech, comm, region, year, slice) Technology auxiliary commodity input
@@ -756,7 +756,7 @@ eqTechAOut(tech, comm, region, year, slice)$mvTechAOut(tech, comm, region, year,
 
 
 ********************************************************************************
-* Availability factor equations
+*** Availability
 ********************************************************************************
 Equation
 * Availability factor LO
@@ -811,7 +811,7 @@ eqTechAfsUp(tech, region, year, slice)$meqTechAfsUp(tech, region, year, slice)..
             pTechWeatherAfsUp(weather, tech) * pWeather(weather, region, year, slice));
 
 ********************************************************************************
-* Connect activity with output equations
+*** Connect activity with output
 ********************************************************************************
 Equation
 * Connect activity with output
@@ -831,7 +831,7 @@ eqTechActGrp(tech, group, region, year, slice)$meqTechActGrp(tech, group, region
          );
 
 ********************************************************************************
-* Availability commodity factor equations
+*** Availability commodity factor
 ********************************************************************************
 Equation
 * Availability commodity factor LO output equations
@@ -886,7 +886,7 @@ eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, co
             pTechWeatherAfcUp(weather, tech, comm) * pWeather(weather, region, year, slice));
 
 ********************************************************************************
-* Capacity and costs equations
+*** Capacity and costs equations
 ********************************************************************************
 Equation
 * Capacity equation
@@ -970,7 +970,7 @@ eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)..
          );
 
 **************************************
-* Supply equations
+** Supply
 **************************************
 Equation
 eqSupAvaUp(sup, comm, region, year, slice)  Supply availability upper bound
@@ -1014,7 +1014,7 @@ eqSupCost(sup, region, year)$mvSupCost(sup, region, year)..
           pSupCost(sup, comm, region, year, slice) * vSupOut(sup, comm, region, year, slice));
 
 **************************************
-* Demand equation
+** Demand
 **************************************
 Equation
 eqDemInp(comm, region, year, slice)  Demand equation
@@ -1025,7 +1025,7 @@ eqDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)..
          sum(dem$mDemComm(dem, comm), pDemand(dem, comm, region, year, slice));
 
 ********************************************************************************
-* Emission & Aggregating commodity equation
+** Emission & Aggregating commodity equation
 ********************************************************************************
 Equation
 eqAggOut(comm, region, year, slice)            Aggregating commodity output
@@ -1051,7 +1051,10 @@ eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
          )));
 
 ********************************************************************************
-* Storage equations
+** Storage
+********************************************************************************
+********************************************************************************
+*** Input & Output
 ********************************************************************************
 Equation
 eqStorageStore(stg, comm, region, year, slice)  Storage equation
@@ -1142,7 +1145,7 @@ eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region
 
 
 ********************************************************************************
-* Capacity and costs equations for storage
+*** Capacity and costs for storage
 ********************************************************************************
 Equation
 * Capacity equation
@@ -1203,7 +1206,10 @@ eqStorageCost(stg, region, year)$mStorageOMCost(stg, region, year)..
 
 
 ********************************************************************************
-* Interregional and ROW Trade equations
+** Interregional and ROW Trade equations
+********************************************************************************
+********************************************************************************
+*** Flow
 ********************************************************************************
 equation
 eqImport(comm, region, year, slice)     Import equation
@@ -1307,7 +1313,7 @@ eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccum
 
 
 ********************************************************************************
-* Trade IR capacity equations
+*** Trade IR capacity equations
 ********************************************************************************
 
 * Capacity equation
@@ -1337,7 +1343,7 @@ eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
                 pTradeEac(trade, region, yearp) * vTradeNewCap(trade, yearp));
 
 ********************************************************************************
-* Auxiliary input & output equations
+*** Auxiliary input & output equations
 ********************************************************************************
 equation
 eqTradeIrAInp(trade, comm, region, year, slice) Trade auxiliary commodity input
@@ -1374,7 +1380,7 @@ eqTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year,
 
 
 ********************************************************************************
-* Balance equations & dummy import & export
+*** Balance equations & dummy import & export
 ********************************************************************************
 Equation
 eqBalUp(comm, region, year, slice)   PRODUCTION <= CONSUMPTION commodity balance
@@ -1499,7 +1505,7 @@ eqStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, sl
 
 
 **********************************************
-* Objective and aggregated costs equations
+** Objective and aggregated costs equations
 **********************************************
 Equation
 eqCost(region, year)                Total costs
@@ -1538,9 +1544,7 @@ eqObjective..
          sum((region, year)$mvTotalCost(region, year),
            vTotalCost(region, year) * pDiscountFactorMileStone(region, year));
 
-**************************************
-* LEC set & parameter & variable
-**************************************
+
 set
 mLECRegion(region)
 ;
@@ -1550,7 +1554,7 @@ pLECLoACT(region)
 ;
 
 **************************************
-* LEC equation
+** LEC equation
 **************************************
 Equation
 eqLECActivity(tech, region, year)

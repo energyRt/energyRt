@@ -40,13 +40,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     pSupAva <- multiInterpolation(sup@availability, 'ava',
                        obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
     obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']], pSupAva)
-    tmp <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', drop = FALSE]
+    zero_ava_up <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', drop = FALSE]
     mSupAva <- merge(merge(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
-    if (!is.null(tmp) && nrow(tmp) != 0) {
-      if (all(colnames(mSupAva) %in% colnames(tmp))) {
-        mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, tmp[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
+    
+    if (!is.null(zero_ava_up) && nrow(zero_ava_up) != 0) {
+      if (all(colnames(mSupAva) %in% colnames(zero_ava_up))) {
+        mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, zero_ava_up[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
       } else {
-        mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, merge(mSupAva, tmp[, colnames(tmp) %in% colnames(mSupAva), drop = FALSE])[, colnames(mSupAva)]
+        mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, merge(mSupAva, zero_ava_up[, colnames(zero_ava_up) %in% colnames(mSupAva), drop = FALSE])[, colnames(mSupAva)]
           ), fromLast = TRUE))[1:nrow(mSupAva)], ]
       }
     }
