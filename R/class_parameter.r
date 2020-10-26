@@ -38,7 +38,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'weather', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
                  'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade')
-  if (!is.character(name) || length(name) != 1 || !energyRt:::.chec_correct_name(name)) 
+  if (!is.character(name) || length(name) != 1 || !energyRt:::check_name(name)) 
     stop(paste('Wrong name: "', name, '"', sep = ''))
   if (length(dimSetNames) == 0 || any(!is.character(dimSetNames)) || 
     any(!(dimSetNames %in% acceptable_set))) {

@@ -3,7 +3,7 @@ summary.levcost <- function(x) x$total
 .sm_levcost <- function(obj, echo = TRUE, n.threads = 1, 
                         subs = NULL, tax = NULL, discount = NULL, region = NULL, start_year = NULL, 
                         comm = NULL, ignore.years = NULL, slice = NULL, price = NULL, ...) {
-  tech <- energyRt:::.upper_case(obj)
+  # tech <- energyRt:::.upper_case(obj)
   price0 <- price
   arg <- list(...)
   # prepare model

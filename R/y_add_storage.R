@@ -4,7 +4,7 @@
 setMethod('.add0', signature(obj = 'modInp', app = 'storage',
 	approxim = 'list'), function(obj, app, approxim) {
 	  pStorageCout <- NULL; pStorageCinp <- NULL;
-		stg <- energyRt:::.upper_case(app)
+		# stg <- energyRt:::.upper_case(app)
 		
 		if (length(stg@commodity) != 1 || is.na(stg@commodity) || all(stg@commodity != approxim$all_comm))
 			stop(paste0('Wrong commodity in storage "', stg@name, '"'))

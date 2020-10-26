@@ -4,7 +4,7 @@
 setMethod('.add0', signature(obj = 'modInp', app = 'technology',
 	approxim = 'list'), function(obj, app, approxim) {
 		energyRt:::.checkSliceLevel(app, approxim)
-		tech <- energyRt:::.upper_case(app)
+		# tech <- energyRt:::.upper_case(app)
 		if (length(tech@slice) == 0) {
 			use_cmd <- unique(sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm), function(x) approxim$commodity_slice_map[x]))
 			tech@slice <- colnames(approxim$slice@levels)[max(c(approxim$slice@misc$deep[c(use_cmd, recursive = TRUE)], recursive = TRUE))]

@@ -3,7 +3,7 @@
 ################################################################################
 setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 	approxim = 'list'), function(obj, app, approxim) {
-		trd <- energyRt:::.upper_case(app)
+		# trd <- energyRt:::.upper_case(app)
 		if (length(trd@commodity) != 1 || is.na(trd@commodity) || all(trd@commodity != approxim$all_comm))
 			stop(paste0('Wrong commodity in trade "', trd@name, '"'))
 		trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
