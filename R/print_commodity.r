@@ -14,7 +14,7 @@ print.commodity <- function(x) {
     if (x@type != '') cat('type: ', x@type, '\n')
     if (x@description != '') cat('description: ', x@description, '\n')
     if (x@origin != '') cat('Region of origin: ',x@origin, '\n')
-    if (x@color != '') cat('color: ', x@color, '\n')
+    if (!is.null(x@misc$color)) cat('color: ', x@misc$color, '\n')
     if (length(x@source) != 0) {
       cat('source:\n')
       print(x@source)

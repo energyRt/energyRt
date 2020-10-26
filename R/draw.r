@@ -18,6 +18,7 @@ draw.technology <- function(
               defVal = new('sysInfo')@defVal,
               show_all = TRUE
   ) {
+  tech_color <- as.data.frame(tech@misc$color)
   get_set <- function(x, att) {
     # Finds and returns full set of parameter 'att' in slots of technology 'x'
     #
@@ -50,11 +51,11 @@ draw.technology <- function(
     }
     year <- as.numeric(year[1])
     plot.new()
-    if (nrow(tech@color) == 0) cll <- rgb(220/255,230/255,242/255) else {
-      fl <- !is.na(tech@color$region) & tech@color$region == region & !is.na(tech@color$color)
-      if (any(fl)) cll <- tech@color$color[fl][1]
-      fl <- is.na(tech@color$region) & !is.na(tech@color$color)
-      if (any(fl)) cll <- tech@color$color[fl][1]
+    if (nrow(tech_color) == 0) cll <- rgb(220/255,230/255,242/255) else {
+      fl <- !is.na(tech_color$region) & tech_color$region == region & !is.na(tech_color$color)
+      if (any(fl)) cll <- tech_color$color[fl][1]
+      fl <- is.na(tech_color$region) & !is.na(tech_color$color)
+      if (any(fl)) cll <- tech_color$color[fl][1]
     }
     ar_shift <- .04
     lo_border <- .025

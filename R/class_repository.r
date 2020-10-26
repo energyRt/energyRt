@@ -6,17 +6,16 @@ setClass("repository",
           name          = "character",
           description   = "character",       # Details
           data          = "list",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
           name          = "default_repository",
           description   = "",       # Details
           data          = list(),
-      GIS           = NULL,
+      # GIS           = NULL,
       #! Misc
-      misc = list(
-      )),
+      misc = list()),
       S3methods = TRUE
 );
 setMethod("initialize", "repository", function(.Object, ...) {

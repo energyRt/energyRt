@@ -13,17 +13,17 @@ setClass("commodity",
           LHV           = "data.frame",
           HHV           = "data.frame",
       # Content
-          content       = "data.frame",     # Content of various mater
+          content       = "data.frame",     # 
       # Emission Factor
-          emis          = "data.frame",     # Other emission factors
-          agg           = "data.frame",     # Aggregate factor
+          emis          = "data.frame",     # Emission factors
+          agg           = "data.frame",     # Aggregation parameter
       # Miscelaneous
-          color         = "character",      #
-          source        = "list",
-          other         = "list",           #
+          # color         = "character",      #
+          # source        = "list",
+          # other         = "list",           #
           limtype       = "factor",
           slice         = "character",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
@@ -85,12 +85,12 @@ setClass("commodity",
                                      unit     = numeric(),
                                      agg     = numeric(),
                                      stringsAsFactors = FALSE),
-          color         = "",
-          source        = list(),
-          other         = list(),
+          # color         = "",
+          # source        = list(),
+          # other         = list(),
           limtype       = factor('LO', levels = c('FX', 'UP', 'LO')),
           slice         = character(),
-          GIS           = NULL,
+          # GIS           = NULL,
       #! Misc
       misc = list(
       )),

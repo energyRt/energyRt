@@ -5,21 +5,21 @@ setClass("import",
       representation(
           name          = "character",
           description   = "character",
-          color         = "data.frame",      #
+          # color         = "data.frame",      #
           commodity     = "character",
           unit          = "character",
           reserve       = "numeric",
           imp           = "data.frame",
           slice         = "character",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           misc = "list"
       ),
       prototype(
           name          = "",
           description   = "",
-          color         = data.frame(region   = character(),
-                                     color    = character(),
-                                     stringsAsFactors = FALSE),
+          # color         = data.frame(region   = character(),
+          #                            color    = character(),
+          #                            stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
           reserve       = Inf,
@@ -32,7 +32,7 @@ setClass("import",
                                      price     = numeric(),
                                      stringsAsFactors = FALSE),
       slice         = character(),
-      GIS           = NULL,
+      # GIS           = NULL,
       #! Misc
       misc = list(
       )),

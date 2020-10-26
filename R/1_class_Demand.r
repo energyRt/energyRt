@@ -10,7 +10,7 @@ setClass("demand",
           unit          = "character",
           dem           = "data.frame",      # Availability of the resource with prices 
           region         = "character",      # Availability of the resource with prices 
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # 
           misc = "list"
       ),
       prototype(
@@ -28,9 +28,8 @@ setClass("demand",
                                      dem      = numeric(),
                                      stringsAsFactors = FALSE),
       #! Misc
-      GIS           = NULL,
-      misc = list(
-      )),
+      # GIS           = NULL,
+      misc = list()),
       S3methods = TRUE
 );
 setMethod("initialize", "demand", function(.Object, ...) {

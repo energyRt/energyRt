@@ -59,5 +59,5 @@ setGeneric("setMilestoneYears", function(obj, start, interval) standardGeneric("
 setGeneric("getMilestone", function(obj) standardGeneric("getMilestone"))
 setGeneric("setTimeSlices", function(obj, ...) standardGeneric("setTimeSlices"))
 
-setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+# setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
 

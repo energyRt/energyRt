@@ -60,6 +60,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   approxim = 'list'), function(obj, app, approxim) {
   .checkSliceLevel(app, approxim)
   # cmd <- energyRt:::.upper_case(app)
+  cmd <- app
   cmd <- stayOnlyVariable(cmd, approxim$region, 'region')
   # Add ems_from & pEmissionFactor
   dd <- cmd@emis[, c('comm', 'comm', 'mean'), drop = FALSE]
@@ -123,6 +124,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
 setMethod('.add0', signature(obj = 'modInp', app = 'demand',
                             approxim = 'list'), function(obj, app, approxim) {  
       # dem <- energyRt:::.upper_case(app)
+    dem <- app
     if (length(dem@commodity) != 1 || is.na(dem@commodity) || all(dem@commodity != approxim$all_comm))
 			stop(paste0('Wrong commodity in demand "', dem@name, '"'))
 
@@ -162,6 +164,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'demand',
 setMethod('.add0', signature(obj = 'modInp', app = 'weather',
                             approxim = 'list'), function(obj, app, approxim) {    
     # wth <- energyRt:::.upper_case(app)
+    wth <- app
     if (length(wth@slice) == 0 && length(approxim$slice@misc$nlevel) > 1) {
       stop('For weather slice level have to be define, if more than one slice level')
     }
@@ -191,6 +194,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     # exp <- energyRt:::.upper_case(app)
+  exp <- app
   if (length(exp@commodity) != 1 || is.na(exp@commodity) || all(exp@commodity != approxim$all_comm))
 			stop(paste0('Wrong commodity in export "', exp@name, '"'))
   exp <- stayOnlyVariable(exp, approxim$region, 'region')
@@ -248,6 +252,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   approxim = 'list'), function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     # imp <- energyRt:::.upper_case(app)
+  imp <- app
   if (length(imp@commodity) != 1 || is.na(imp@commodity) || all(imp@commodity != approxim$all_comm))
 			stop(paste0('Wrong commodity in import "', imp@name, '"'))
   imp <- stayOnlyVariable(imp, approxim$region, 'region')

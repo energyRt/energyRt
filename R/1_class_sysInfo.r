@@ -6,14 +6,14 @@ setClass("sysInfo",
           debug              = "data.frame",
           discount           = "data.frame",
           region             = "character",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           year               = "numeric",
           milestone          = "data.frame",
           slice              = "slice",
-		  discountFirstYear  = "logical",
+		      discountFirstYear  = "logical",
           interpolation      = "data.frame",
-          defVal            = "data.frame",
-          misc = "list"
+          defVal             = "data.frame",
+          misc               = "list"
       ),
       prototype(
           debug   = data.frame(
@@ -25,7 +25,7 @@ setClass("sysInfo",
                                      dummyImport      = numeric(),
                                      dummyExport      = numeric(),
                                      stringsAsFactors = FALSE),
-          GIS           = NULL,
+          # GIS           = NULL,
           discount      = data.frame(region     = character(),
                                      year       = numeric(),
                                      discount    = numeric(),
@@ -220,8 +220,7 @@ setClass("sysInfo",
           	outcost  = as.character('back.inter.forth'),
           	stringsAsFactors = FALSE),
       #! Misc
-      misc = list(
-      )),
+      misc = list()),
       S3methods = TRUE
 );
 setMethod("initialize", "sysInfo", function(.Object, ...) {

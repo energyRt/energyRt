@@ -5,23 +5,23 @@ setClass("supply",
       representation(
           name          = "character",
           description   = "character",
-          color         = "data.frame",      #
+          # color         = "data.frame",      #
           commodity     = "character",
           unit          = "character",
           weather       = "data.frame", # weather factor (availability multiplier)
           reserve       = "data.frame",         # Total available resource
           availability  = "data.frame",     # Availability of the resource with prices
           region        = "character",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           slice         = "character",
           misc = "list"
       ),
       prototype(
           name          = "",
           description   = "",
-          color         = data.frame(region   = character(),
-                                     color    = character(),
-                                     stringsAsFactors = FALSE),
+          # color         = data.frame(region   = character(),
+          #                            color    = character(),
+          #                            stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
           weather       = data.frame(weather = character(), # name of the weather object
@@ -43,11 +43,10 @@ setClass("supply",
                                      cost     = numeric(),
                                      stringsAsFactors = FALSE),
         region = character(),
-        GIS           = NULL,
+        # GIS           = NULL,
         slice         = character(),
         #! Misc
-        misc = list(
-        )),
+        misc = list()),
       S3methods = TRUE
 );
 setMethod("initialize", "supply", function(.Object, ...) {

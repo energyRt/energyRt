@@ -10,7 +10,7 @@ setClass("weather",
            slice         = "character",
            defVal        = "numeric",
            weather       = "data.frame", # weather factor (availability multiplier)
-           color         = "data.frame",      #
+           # color         = "data.frame",      #
            misc = "list"
          ),
          prototype(
@@ -25,13 +25,12 @@ setClass("weather",
                                       slice    = character(),
                                       wval     = numeric(),
                                       stringsAsFactors = FALSE),
-           color         = data.frame(region   = character(),
-                                      slice    = character(),
-                                      color    = character(),
-                                      stringsAsFactors = FALSE),
+           # color         = data.frame(region   = character(),
+           #                            slice    = character(),
+           #                            color    = character(),
+           #                            stringsAsFactors = FALSE),
            #! Misc
-           misc = list(
-           )),
+           misc = list()),
          S3methods = TRUE
 );
 setMethod("initialize", "weather", function(.Object, ...) {

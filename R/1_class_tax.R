@@ -51,8 +51,7 @@ setClass("sub",
            defVal        = 0,      # 
            value        = data.frame(stringsAsFactors = FALSE),
            #! Misc
-           misc = list(
-           )),           #! Misc
+           misc = list()),           #! Misc
          S3methods = TRUE
 )
 

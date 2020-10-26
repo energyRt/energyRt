@@ -1,25 +1,26 @@
 #---------------------------------------------------------------------------------------------------------
 # export
 #---------------------------------------------------------------------------------------------------------
+# !!!check names - `exp`???
 setClass("export",
       representation(
           name          = "character",
           description   = "character",
-          color         = "data.frame",      #
+          # color         = "data.frame",      #
           commodity     = "character",
           unit          = "character",
           reserve       = "numeric",
           exp           = "data.frame",
           slice         = "character",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # 
           misc = "list"
       ),
       prototype(
           name          = "",
           description   = "",
-          color         = data.frame(region   = character(),
-                                     color    = character(),
-                                     stringsAsFactors = FALSE),
+          # color         = data.frame(region   = character(),
+          #                            color    = character(),
+          #                            stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
           reserve       = Inf,
@@ -31,7 +32,7 @@ setClass("export",
                                      exp.fx   = numeric(),
                                      price     = numeric(),
                                      stringsAsFactors = FALSE),
-      GIS           = NULL,
+      # GIS           = NULL,
       slice         = character(),
       #! Misc
       misc = list(

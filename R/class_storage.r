@@ -19,7 +19,7 @@ setClass("storage",
           fixom         = "data.frame",    #
           varom         = "data.frame",    #
           invcost       = "data.frame",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           fullYear         = "logical",
           region        = "character",
           cap2stg       = "numeric", # cap2stg cinp
@@ -105,7 +105,7 @@ setClass("storage",
                                      invcost  = numeric(),
                                      stringsAsFactors = FALSE),
       cap2stg       = 1,
-      GIS           = NULL,
+      # GIS           = NULL,
       fullYear      = TRUE,
       region        = character(),
       weather      = data.frame(weather  = character(),

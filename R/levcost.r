@@ -4,6 +4,7 @@ summary.levcost <- function(x) x$total
                         subs = NULL, tax = NULL, discount = NULL, region = NULL, start_year = NULL, 
                         comm = NULL, ignore.years = NULL, slice = NULL, price = NULL, ...) {
   # tech <- energyRt:::.upper_case(obj)
+  tech <- obj
   price0 <- price
   arg <- list(...)
   # prepare model

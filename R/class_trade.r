@@ -1,21 +1,21 @@
 setClass("trade",
       representation(
-      # General information
-          name          = "character",       # Short name
-          description   = "character",       # Details
-          commodity     = "character",       # Vector if NULL that
-          routes        = "data.frame",       
-      # Performance parameters
-          trade         = "data.frame",
-          aux           = "data.frame",      #
-          aeff         = "data.frame",    #  Commodity efficiency
+    # General information
+        name          = "character",       # Short name
+        description   = "character",       # Details
+        commodity     = "character",       # Vector if NULL that
+        routes        = "data.frame",       
+    # Performance parameters
+        trade         = "data.frame",
+        aux           = "data.frame",      #
+        aeff         = "data.frame",    #  Commodity efficiency
       	invcost = "data.frame",
       	olife = "numeric",
       	start = "numeric",
       	end = "numeric",
       	stock = "data.frame",
       	capacityVariable = "logical",
-      	GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+      	# GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
       	cap2act       = "numeric",         #
       	misc = "list"
       ),
@@ -54,7 +54,8 @@ setClass("trade",
 			stock = numeric(),
 			stringsAsFactors = FALSE),
 		capacityVariable = FALSE,
-		aux           = data.frame(acomm     = character(),
+		aux           = data.frame(
+		  acomm     = character(),
 			unit     = character(),
 			stringsAsFactors = FALSE),
 		# Auxilary parameter
@@ -70,7 +71,7 @@ setClass("trade",
 			cdst2ainp  = numeric(),
 			stringsAsFactors = FALSE),
 		cap2act       = 1,         #
-		GIS           = NULL,
+		# GIS           = NULL,
 		#! Misc
 		misc = list(
 		)),

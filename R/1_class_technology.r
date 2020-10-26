@@ -12,13 +12,13 @@
 setClass("technology",
       representation(
       # General information
-          name          = "character",       # Short name
-          description   = "character",       # description
-          type	        = "character",       # Optional
-      	sector	      = "character",       # Sector or Technology group - optional
-      	enbal         = "character",       # Which part of energy balance - (export, import, ...,
+        name          = "character",       # Short name
+        description   = "character",       # description
+        # type	        = "character",       # Optional
+      	# sector	      = "character",       # Sector or Technology group - optional
+      	# enbal         = "character",       # Which part of energy balance - (export, import, ...,
       	# transformation, consumption, ...
-      	color         = "data.frame",      #
+      	# color         = "data.frame",      #
       	input         = "data.frame",      #
       	output        = "data.frame",      #
       	aux           = "data.frame",      #
@@ -42,26 +42,26 @@ setClass("technology",
       	start         = "data.frame",    #
       	end           = "data.frame",    #
       	olife         = "data.frame",    #
-      	ucap          = "data.frame",    # Capacity of one unit (for integer programming)
+      	# ucap          = "data.frame",    # Capacity of one unit (for integer programming)
       	stock         = "data.frame", #
       	early.retirement = "logical",
       	upgrade.technology = "character",
       	slice         = "character",
       	region        = "character",
-        GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+        # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
       	misc = "list"
       ), #
 	# Default values and structure of slots
 	prototype(
 		name          = "",
 		description   = "",
-		type	        = "",
-		sector	      = "",       # Sector or Technology group - optional
-		enbal         = "",       # Which part of energy balance - (export, import, ...,
+		# type	        = "",
+		# sector	      = "",       # Sector or Technology group - optional
+		# enbal         = "",       # Which part of energy balance - (export, import, ...,
 		#region        = "",
-		color         = data.frame(region   = character(),
-			color    = character(),
-			stringsAsFactors = FALSE),
+		# color         = data.frame(region   = character(),
+			# color    = character(),
+			# stringsAsFactors = FALSE),
 		input         = data.frame(comm     = character(),
 			unit     = character(),
 			group    = character(),  # may be factor or character?
@@ -199,10 +199,10 @@ setClass("technology",
 		olife         = data.frame(region = character(),
 			olife = numeric(),
 			stringsAsFactors = FALSE),
-		ucap          = data.frame(region = character(),
-			year  = integer(),
-			ucap = numeric(),
-			stringsAsFactors = FALSE),
+		# ucap          = data.frame(region = character(),
+		# 	year  = integer(),
+		# 	ucap = numeric(),
+		# 	stringsAsFactors = FALSE),
 		stock         = data.frame(region = character(),
 			year  = integer(),
 			stock = numeric(),
@@ -211,7 +211,7 @@ setClass("technology",
 		upgrade.technology = character(),
 		region        = character(),
 		slice         = character(),
-	  GIS           = NULL,
+	  # GIS           = NULL,
 		#! Misc
 		misc = list(
 		)),
@@ -222,3 +222,24 @@ setMethod("initialize", "technology", function(.Object, ...) {
 	.Object
 })
 
+#---------------------------------------------------------------------------------------------------------
+#! check_technology_data_frame <- function(x) : Check structure technology class (only data.frame)
+#---------------------------------------------------------------------------------------------------------
+# .check_technology_data_frame <- function(object) {
+#   # check technology data.frame
+#   g <- getClass('technology')
+#   tec <- new('technology')
+#   fl <- FALSE
+#   for(z in names(g@slots)) {
+#     if (g@slots[[z]] == 'data.frame') {
+#       u <- slot(tec, z)
+#       b <- slot(object, z)
+#       if (ncol(u) != ncol(b) || any(colnames(u) != colnames(b))) {
+#         cat(z,'\n')
+#         fl <- TRUE
+#       }
+#     }
+#   }
+#   if (fl) stop('Invalid technology object: Wrong data.frame')
+#   return(NULL)
+# }
