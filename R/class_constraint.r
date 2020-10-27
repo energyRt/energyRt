@@ -391,7 +391,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   }
   if (nrow(stm@for.each) > 0) {
     nmn <- paste0('mCnsForEach', stm@name)
-    prec@parameters[[nmn]] <- addData(createParameter(nmn, colnames(stm@for.each), 'map'),
+    prec@parameters[[nmn]] <- .add_data(createParameter(nmn, colnames(stm@for.each), 'map'),
       stm@for.each)
     res$equation <- paste0(res$equation, '$', nmn, '(', paste0(colnames(stm@for.each), collapse = ', '), ')')
   }
@@ -428,13 +428,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       approxim2$fullsets <- approxim$fullsets
       xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
                             interpolation = 'back.inter.forth')
-      prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
+      prec@parameters[[xx@name]] <- .add_data(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
         yy <- energyRt:::.getTotalParameterData(prec, xx@name)
         nn <- approxim$mileStoneForGrowth[as.character(yy$year)]
         if (any(lhs.set2$lag.year)) nn <- (-nn)
         yy$value <- (sign(yy$value) * abs(yy$value) ^ nn)
-        prec@parameters[[xx@name]] <- addData(xx, yy)
+        prec@parameters[[xx@name]] <- .add_data(xx, yy)
       }
       # Add mult
       vrb.lhs <- paste0(xx@name, '(', paste0(need.set, collapse = ', '), ') * ', vrb.lhs)
@@ -508,7 +508,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     n1 <- colnames(yy)[colnames(yy) != 'value']
     yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 
       apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, drop = FALSE]
-    prec@parameters[[xx@name]] <- addData(xx, yy)
+    prec@parameters[[xx@name]] <- .add_data(xx, yy)
     # Add mult
     res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')
   } else {

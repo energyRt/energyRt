@@ -91,7 +91,7 @@
     }
   }
   # mMilestoneFirst
-  scen@modInp@parameters[['mMilestoneFirst']] <- addData(scen@modInp@parameters[['mMilestoneFirst']], 
+  scen@modInp@parameters[['mMilestoneFirst']] <- .add_data(scen@modInp@parameters[['mMilestoneFirst']], 
   	data.frame(year = min(mile.stone.after)))
   # assign('prec.after.startYear', prec, globalenv())
   scen
@@ -223,7 +223,7 @@
 								NEW_PAR <- NEW_PAR + 1
 								xx <- createParameter(paste0('pCnsMult', new_cns, '_', NEW_PAR), colnames(tpr)[-ncol(tpr)], 'simple', defVal = 0, 
 									interpolation = 'back.inter.forth')
-								scen@modInp@parameters[[xx@name]] <- addData(xx, tpr)
+								scen@modInp@parameters[[xx@name]] <- .add_data(xx, tpr)
 								eqt2 <- sub('pCnsMult[[:alnum:]_]*[(][^)]*[)]', paste0(xx@name, '(', paste0(xx@dimSetNames, collapse = ' , '), ')'), eqt2)
 							}
 						}
@@ -267,7 +267,7 @@
 					}
 					forMrg <- gsub('[(].*$', '', strsplit(cond2, 'and ')[[1]])
 					for (fr in forMrg) {
-						tmp <- getParameterData(scen@modInp@parameters[[fr]])
+						tmp <- .get_parameter_data(scen@modInp@parameters[[fr]])
 						#tmp <- energyRt:::.getTotalParameterData(scen@modInp, fr)
 						tpr <- merge(tpr, tmp, by = colnames(tmp)[colnames(tmp) != 'value'])
 					}
@@ -280,7 +280,7 @@
 						NEW_PAR <- NEW_PAR + 1
 						xx <- createParameter(paste0('pCnsMult', new_cns, '_', NEW_PAR), colnames(tpr)[-ncol(tpr)], 'simple', defVal = 0, 
 							interpolation = 'back.inter.forth')
-						scen@modInp@parameters[[xx@name]] <- addData(xx, tpr)
+						scen@modInp@parameters[[xx@name]] <- .add_data(xx, tpr)
 						eqt_en <- paste0(eqt_en, xx@name, '(', paste0(xx@dimSetNames, collapse = ', '), ')')
 					} else {
 						tpr <- sum(tpr$value)

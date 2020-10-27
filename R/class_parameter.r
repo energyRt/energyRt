@@ -94,7 +94,7 @@ createParameter <- function(...) new('parameter', ...)
   x
 } 
 # Add data to Map Table with check new data
-setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
+setMethod('.add_data', signature(obj = 'parameter', data = 'data.frame'),
   function(obj, data) {
     if (nrow(data) > 0) {
       if (ncol(data) != ncol(obj@data) ||
@@ -131,7 +131,7 @@ setMethod('addData', signature(obj = 'parameter', data = 'data.frame'),
 })
 
 # Add data to Set
-setMethod('addData', signature(obj = 'parameter', data = 'character'),
+setMethod('.add_data', signature(obj = 'parameter', data = 'character'),
   function(obj, data) {
     if (obj@type != 'set' || length(data) == 0 || !all(is.character(data))) {
           stop('Internal error: Wrong new data')
@@ -143,7 +143,7 @@ setMethod('addData', signature(obj = 'parameter', data = 'character'),
 })
 
 # Add data to Set
-setMethod('addData', signature(obj = 'parameter', data = 'numeric'),
+setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
   function(obj, data) {
     if (obj@type != 'set' || length(data) == 0 || !all(is.numeric(data))) {
           stop('Internal error: Wrong new data')
@@ -170,10 +170,10 @@ setMethod('addData', signature(obj = 'parameter', data = 'numeric'),
 #         unique(obj@data[, dimSetNames])
 # })
 
-setMethod('getParameterData', signature(obj = 'parameter'), # getParameterTable
-  function(obj) {
-    if (obj@nValues != -1) obj@data[seq(length.out = obj@nValues),, drop = FALSE] else obj@data
-})
+# setMethod('.get_parameter_data', signature(obj = 'parameter'), # getParameterTable
+.get_parameter_data <-  function(obj) {
+    if (obj@nValues != -1) obj@data[1:obj@nValues,, drop = FALSE] else obj@data
+}
 
 # Remove all data by all set
 # setMethod('.drop_set_value', signature(obj = 'parameter', dimSetNames = "character", value = "character"),
@@ -268,15 +268,15 @@ setMethod('getParameterData', signature(obj = 'parameter'), # getParameterTable
 }
 
 # Check duplicated row in data
-setMethod('checkDuplicatedRow', signature(obj = 'parameter'),
-  function(obj) {
-  fl <- duplicated(obj@data[, colnames(obj@data) != 'value', drop = FALSE])
-  if (any(fl)) {
-    cat('There is duplicated value\n')
-    print(obj@data[fl,, drop = FALSE])
-    stop()
-  }
-})
+# setMethod('.check_duplicates_in_parameter', signature(obj = 'parameter'),
+# .check_duplicates_in_parameter <- function(obj) {
+#   fl <- duplicated(obj@data[, colnames(obj@data) != 'value', drop = FALSE])
+#   if (any(fl)) {
+#     message('Duplicated rows found in parameter ', obj@name)
+#     print(obj@data[fl,, drop = FALSE])
+#     stop()
+#   }
+# }
 
 
 # Create Set
@@ -290,7 +290,7 @@ createSet <- function(dimSetNames) {
 #     gg <- data.frame(dimSetNames)
 #     colnames(gg) <- obj@dimSetNames
 #     if (any(dimSetNames == obj@data[, 1])) stop('Internal error: There is multiple dimSetNames')
-#     addData(obj, gg)
+#     .add_data(obj, gg)
 # })
 # Add Set
 setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'character'),
@@ -301,7 +301,7 @@ setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'characte
     } else {
       gg <- data.frame(dimSetNames)
       colnames(gg) <- obj@dimSetNames
-      addData(obj, gg)
+      .add_data(obj, gg)
     }
 })
 # Add Set
@@ -313,7 +313,7 @@ setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'numeric'
             } else {
               gg <- data.frame(dimSetNames)
               colnames(gg) <- obj@dimSetNames
-              addData(obj, gg)
+              .add_data(obj, gg)
             }
           })
 
@@ -480,7 +480,7 @@ setMethod('print', 'parameter', function(x, ...) {
   } else stop('Must realise')
 }
 
-setMethod('addData', signature(obj = 'parameter', data = 'NULL'),
+setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
           function(obj, data) return(obj))
 
 .unique_set <- function(obj) {

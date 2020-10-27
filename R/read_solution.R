@@ -95,8 +95,8 @@ read_solution <- function(scen, ...) {
     newcap$newcap <- newcap$value; newcap$value <- NULL
     
     salvage <- merge(merge(newcap, merge(olife, invcost)), discount, all.x = TRUE)
-    end_year <- max(energyRt::getParameterData(scen@modInp@parameters$mEndMilestone)$yearp)
-    salvage <- merge(salvage, energyRt::getParameterData(scen@modInp@parameters$mStartMilestone))
+    end_year <- max(.get_parameter_data(scen@modInp@parameters$mEndMilestone)$yearp)
+    salvage <- merge(salvage, .get_parameter_data(scen@modInp@parameters$mStartMilestone))
     salvage$start <- salvage$yearp; salvage$yearp <- NULL
     salvage <- salvage[salvage$start + salvage$olife > end_year, ]
     
@@ -113,20 +113,20 @@ read_solution <- function(scen, ...) {
     scen@modOut@variables$vTechSalv <- salvage_cost0(scen, 'Tech')
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, 'Storage')
     scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, 'Trade')
-    pDummyImportCost <- energyRt:::getParameterData(scen@modInp@parameters$pDummyImportCost)
+    pDummyImportCost <- .get_parameter_data(scen@modInp@parameters$pDummyImportCost)
     vDummyImportCost <- merge(pDummyImportCost, scen@modOut@variables$vDummyImport, by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyImportCost)])
     vDummyImportCost$value <- vDummyImportCost$value.x * vDummyImportCost$value.y;
     vDummyImportCost$value.x <- NULL; vDummyImportCost$value.y <- NULL;
     scen@modOut@variables$vDummyImportCost <- vDummyImportCost
-    pDummyExportCost <- energyRt:::getParameterData(scen@modInp@parameters$pDummyExportCost)
+    pDummyExportCost <- .get_parameter_data(scen@modInp@parameters$pDummyExportCost)
     vDummyExportCost <- merge(pDummyExportCost, scen@modOut@variables$vDummyExport, 
       by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyExportCost)])
     vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y;
     vDummyExportCost$value.x <- NULL; vDummyExportCost$value.y <- NULL;
     scen@modOut@variables$vDummyExportCost <- vDummyExportCost
-    tmp <- energyRt:::getParameterData(scen@modInp@parameters$pEmissionFactor)
+    tmp <- .get_parameter_data(scen@modInp@parameters$pEmissionFactor)
     tmp$comm2 <- tmp$commp; tmp$commp <- tmp$comm; tmp$comm <- tmp$comm2; tmp$comm2 <- NULL
-    pTechEmisComm <- energyRt:::getParameterData(scen@modInp@parameters$pTechEmisComm)
+    pTechEmisComm <- .get_parameter_data(scen@modInp@parameters$pTechEmisComm)
     vTechEmsFuel <- merge(merge(pTechEmisComm, 
       scen@modOut@variables$vTechInp, by = c('tech', 'comm')), tmp, by = 'comm')
     vTechEmsFuel$comm <- vTechEmsFuel$commp

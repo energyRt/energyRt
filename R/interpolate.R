@@ -65,15 +65,15 @@ interpolate <- function(obj, ...) { #- returns class scenario
     scen@model <- setMilestoneYears(scen@model, start = scen@model@sysInfo@year[1], 
                              interval = rep(1, length(scen@model@sysInfo@year)))
   }
-  scen@modInp@parameters[['year']] <- addData(scen@modInp@parameters[['year']], scen@model@sysInfo@year)
-  scen@modInp@parameters[['mMidMilestone']] <- addData(scen@modInp@parameters[['mMidMilestone']], 
+  scen@modInp@parameters[['year']] <- .add_data(scen@modInp@parameters[['year']], scen@model@sysInfo@year)
+  scen@modInp@parameters[['mMidMilestone']] <- .add_data(scen@modInp@parameters[['mMidMilestone']], 
                                                        data.frame(year = scen@model@sysInfo@milestone$mid))
   # Fill slice
   scen@model@sysInfo@slice <- energyRt:::.init_slice(scen@model@sysInfo@slice)
-  scen@modInp@parameters[['slice']] <- addData(scen@modInp@parameters[['slice']], 
+  scen@modInp@parameters[['slice']] <- .add_data(scen@modInp@parameters[['slice']], 
                                                scen@model@sysInfo@slice@all_slice)
   # Fill region
-  scen@modInp@parameters[['region']] <- addData(scen@modInp@parameters[['region']], scen@model@sysInfo@region)
+  scen@modInp@parameters[['region']] <- .add_data(scen@modInp@parameters[['region']], scen@model@sysInfo@region)
   
   # List for approximation
   # Generate approxim list, that contain basic data for approximation
@@ -176,7 +176,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   
   # Fill set list for interpolation and os one  
   scen <- .add_name_for_basic_set(scen, approxim)
-  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) getParameterData(x)[, 1])
+  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) .get_parameter_data(x)[, 1])
 
 
 
@@ -210,7 +210,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (length(scen@model@LECdata) != 0) {
     scen@modInp@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
     if (length(obj@LECdata$pLECLoACT) == 1) {
-      scen@modInp@parameters$pLECLoACT <- addData(scen@modInp@parameters$pLECLoACT, 
+      scen@modInp@parameters$pLECLoACT <- .add_data(scen@modInp@parameters$pLECLoACT, 
                                            data.frame(region = scen@model@LECdata$region, value = scen@model@LECdata$pLECLoACT))
     }
   }

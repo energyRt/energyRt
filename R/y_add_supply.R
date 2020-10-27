@@ -23,24 +23,24 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
         slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
       }
       mSupSpan <- data.frame(sup = rep(sup@name, length(sup@region)), region = sup@region)
-      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']], mSupSpan)
+      obj@parameters[['mSupSpan']] <- .add_data(obj@parameters[['mSupSpan']], mSupSpan)
     } else {
       mSupSpan <- data.frame(sup = rep(sup@name, length(approxim$region)), region = approxim$region)
-      obj@parameters[['mSupSpan']] <- addData(obj@parameters[['mSupSpan']], mSupSpan)
+      obj@parameters[['mSupSpan']] <- .add_data(obj@parameters[['mSupSpan']], mSupSpan)
     }
     sup <- stayOnlyVariable(sup, approxim$region, 'region')
     mSupSlice <- data.frame(sup = rep(sup@name, length(approxim$slice)), slice = approxim$slice)
-    obj@parameters[['mSupSlice']] <- addData(obj@parameters[['mSupSlice']], mSupSlice)
+    obj@parameters[['mSupSlice']] <- .add_data(obj@parameters[['mSupSlice']], mSupSlice)
     mSupComm <- data.frame(sup = sup@name, comm = sup@commodity)
-    obj@parameters[['mSupComm']] <- addData(obj@parameters[['mSupComm']], mSupComm)
+    obj@parameters[['mSupComm']] <- .add_data(obj@parameters[['mSupComm']], mSupComm)
     pSupCost <- simpleInterpolation(sup@availability, 'cost', obj@parameters[['pSupCost']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
-    obj@parameters[['pSupCost']] <- addData(obj@parameters[['pSupCost']], pSupCost)
+    obj@parameters[['pSupCost']] <- .add_data(obj@parameters[['pSupCost']], pSupCost)
     pSupReserve <- multiInterpolation(sup@reserve, 'res', obj@parameters[['pSupReserve']], 
                        approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
-    obj@parameters[['pSupReserve']] <- addData(obj@parameters[['pSupReserve']], pSupReserve)
+    obj@parameters[['pSupReserve']] <- .add_data(obj@parameters[['pSupReserve']], pSupReserve)
     pSupAva <- multiInterpolation(sup@availability, 'ava',
                        obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
-    obj@parameters[['pSupAva']] <- addData(obj@parameters[['pSupAva']], pSupAva)
+    obj@parameters[['pSupAva']] <- .add_data(obj@parameters[['pSupAva']], pSupAva)
     zero_ava_up <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', drop = FALSE]
     mSupAva <- merge(merge(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
     
@@ -52,33 +52,33 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
           ), fromLast = TRUE))[1:nrow(mSupAva)], ]
       }
     }
-    obj@parameters[['mSupAva']] <- addData(obj@parameters[['mSupAva']], mSupAva)
+    obj@parameters[['mSupAva']] <- .add_data(obj@parameters[['mSupAva']], mSupAva)
     mvSupReserve <- merge(mSupComm, mSupSpan)
-    obj@parameters[['mvSupReserve']] <- addData(obj@parameters[['mvSupReserve']], mvSupReserve)
+    obj@parameters[['mvSupReserve']] <- .add_data(obj@parameters[['mvSupReserve']], mvSupReserve)
     if (all(c('sup', 'comm', 'region') %in% colnames(pSupReserve))) {
-      obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
+      obj@parameters[['mSupReserveUp']] <- .add_data(obj@parameters[['mSupReserveUp']], 
           pSupReserve[pSupReserve$type == 'up' & pSupReserve$value != Inf, c('sup', 'comm', 'region')])
-      obj@parameters[['meqSupReserveLo']] <- addData(obj@parameters[['meqSupReserveLo']], 
+      obj@parameters[['meqSupReserveLo']] <- .add_data(obj@parameters[['meqSupReserveLo']], 
                                                    pSupReserve[pSupReserve$type == 'lo' & pSupReserve$value != 0, c('sup', 'comm', 'region')])
     } else {
-      obj@parameters[['mSupReserveUp']] <- addData(obj@parameters[['mSupReserveUp']], 
+      obj@parameters[['mSupReserveUp']] <- .add_data(obj@parameters[['mSupReserveUp']], 
           merge(mvSupReserve, pSupReserve[pSupReserve$type == 'up' & pSupReserve$value != Inf, 
                                           colnames(pSupReserve) %in% c('sup', 'comm', 'region'), drop = FALSE]))
-      obj@parameters[['meqSupReserveLo']] <- addData(obj@parameters[['meqSupReserveLo']], 
+      obj@parameters[['meqSupReserveLo']] <- .add_data(obj@parameters[['meqSupReserveLo']], 
           merge(mvSupReserve, pSupReserve[pSupReserve$type == 'lo' & pSupReserve$value != 0, 
                                     colnames(pSupReserve) %in% c('sup', 'comm', 'region'), drop = FALSE]))
     }
-    obj@parameters[['meqSupAvaLo']] <- addData(obj@parameters[['meqSupAvaLo']], 
+    obj@parameters[['meqSupAvaLo']] <- .add_data(obj@parameters[['meqSupAvaLo']], 
                                                merge(mSupAva, pSupAva[pSupAva$type == 'lo' & pSupAva$value != 0, colnames(pSupAva) %in% colnames(mSupAva)]))
-    obj@parameters[['mSupAvaUp']] <- addData(obj@parameters[['mSupAvaUp']], 
+    obj@parameters[['mSupAvaUp']] <- .add_data(obj@parameters[['mSupAvaUp']], 
                                              merge(mSupAva, pSupAva[pSupAva$type == 'up' & pSupAva$value != Inf, colnames(pSupAva) %in% colnames(mSupAva)]))
     
     # For weather
     if (nrow(sup@weather) > 0) {
       tmp <- .toWeatherImply(sup@weather, 'wava', 'sup', sup@name)
-      obj@parameters[['pSupWeather']] <- addData(obj@parameters[['pSupWeather']], tmp$par)
-      obj@parameters[['mSupWeatherUp']] <- addData(obj@parameters[['mSupWeatherUp']], tmp$mapup)
-      obj@parameters[['mSupWeatherLo']] <- addData(obj@parameters[['mSupWeatherLo']], tmp$maplo)
+      obj@parameters[['pSupWeather']] <- .add_data(obj@parameters[['pSupWeather']], tmp$par)
+      obj@parameters[['mSupWeatherUp']] <- .add_data(obj@parameters[['mSupWeatherUp']], tmp$mapup)
+      obj@parameters[['mSupWeatherLo']] <- .add_data(obj@parameters[['mSupWeatherLo']], tmp$maplo)
     }
     t1 <- mSupAva[, c('sup', 'region', 'year')]; t1 <- t1[!duplicated(t1), ]
     t2 <- pSupCost[pSupCost$value != 0, colnames(pSupCost)[colnames(pSupCost) %in% c('sup', 'region', 'year')], drop = FALSE]; t2 <- t2[!duplicated(t2),, drop = FALSE]
@@ -87,7 +87,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     }
     mvSupCost <- merge(t1, t2)
     mvSupCost <- mvSupCost[!duplicated(mvSupCost), ]
-    obj@parameters[['mvSupCost']] <- addData(obj@parameters[['mvSupCost']], mvSupCost)
+    obj@parameters[['mvSupCost']] <- .add_data(obj@parameters[['mvSupCost']], mvSupCost)
   obj
 })
 

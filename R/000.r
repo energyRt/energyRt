@@ -1,36 +1,11 @@
-# setGeneric(".find_commodity", function(obj, name) standardGeneric(".find_commodity"))
-# setGeneric(".find_storage", function(obj, name) standardGeneric(".find_storage"))
-# setGeneric(".find_demand", function(obj, name) standardGeneric(".find_demand"))
-# setGeneric(".find_supply", function(obj, name) standardGeneric(".find_supply"))
-# setGeneric(".find_export", function(obj, name) standardGeneric(".find_export"))
-# setGeneric(".find_import", function(obj, name) standardGeneric(".find_import"))
-# setGeneric(".find_technology", function(obj, name) standardGeneric(".find_technology"))
-# setGeneric(".find_constraint", function(obj, name) standardGeneric(".find_constraint"))
-# setGeneric(".find_trade", function(obj, name) standardGeneric(".find_trade"))
-
-
 # Internal functions/methods
-# setGeneric(".drop_commodity", function(obj, name) standardGeneric(".drop_commodity"))
-# setGeneric(".drop_storage", function(obj, name) standardGeneric(".drop_storage"))
-# setGeneric(".drop_demand", function(obj, name) standardGeneric(".drop_demand"))
-# setGeneric(".drop_supply", function(obj, name) standardGeneric(".drop_supply"))
-# setGeneric(".drop_export", function(obj, name) standardGeneric(".drop_export"))
-# setGeneric(".drop_import", function(obj, name) standardGeneric(".drop_import"))
-# setGeneric(".drop_technology", function(obj, name) standardGeneric(".drop_technology"))
-# setGeneric(".drop_sysinfo_param", function(obj) standardGeneric(".drop_sysinfo_param"))
-# setGeneric(".drop_trade", function(obj, name) standardGeneric(".drop_trade"))
-# setGeneric(".drop_weather", function(obj, name) standardGeneric(".drop_weather"))
-# setGeneric(".find_weather", function(obj, name) standardGeneric(".find_weather"))
-
-
-setGeneric('addData', function(obj, data) standardGeneric("addData"))
-
+setGeneric('.add_data', function(obj, data) standardGeneric(".add_data"))
 # setGeneric('clear', function(obj) standardGeneric("clear")) -> .reset
 # setGeneric('getSet', function(obj, dimSetNames) standardGeneric("getSet"))
-setGeneric('getParameterData', function(obj, set) standardGeneric("getParameterData"))
+# setGeneric('.get_parameter_data', function(obj, set) standardGeneric(".get_parameter_data"))
 
 # setGeneric('.drop_set_value', function(obj, dimSetNames, value) standardGeneric(".drop_set_value"))
-setGeneric('checkDuplicatedRow', function(obj) standardGeneric("checkDuplicatedRow"))
+# setGeneric('.check_duplicates_in_parameter', function(obj) standardGeneric(".check_duplicates_in_parameter"))
 # setGeneric('addSet', function(obj, dimSetNames) standardGeneric("addSet"))
 setGeneric('addMultipleSet', function(obj, dimSetNames) standardGeneric("addMultipleSet"))
 #setGeneric('solve', function(obj, ...) standardGeneric("solve"))

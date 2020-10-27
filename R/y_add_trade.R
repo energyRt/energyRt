@@ -13,12 +13,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		trd <- .disaggregateSliceLevel(trd, approxim)
 		# other flag
 		mTradeSlice <- data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice)
-		obj@parameters[['mTradeSlice']] <- addData(obj@parameters[['mTradeSlice']], mTradeSlice)
+		obj@parameters[['mTradeSlice']] <- .add_data(obj@parameters[['mTradeSlice']], mTradeSlice)
 		if (length(trd@commodity) == 0) stop('There is not commodity for trade flow ', trd@name)
-		obj@parameters[['mTradeComm']] <- addData(obj@parameters[['mTradeComm']],
+		obj@parameters[['mTradeComm']] <- .add_data(obj@parameters[['mTradeComm']],
 			data.frame(trade = trd@name, comm = trd@commodity))
 		mTradeRoutes <- cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes)
-		obj@parameters[['mTradeRoutes']] <- addData(obj@parameters[['mTradeRoutes']], mTradeRoutes)
+		obj@parameters[['mTradeRoutes']] <- .add_data(obj@parameters[['mTradeRoutes']], mTradeRoutes)
 		pTradeIrCdst2Aout <- NULL; pTradeIrCsrc2Aout <- NULL; pTradeIrCdst2Ainp <- NULL; pTradeIrCsrc2Ainp <- NULL;
 		# approxim <- approxim[names(approxim) != 'region']
 		approxim_srcdst <- approxim
@@ -127,20 +127,20 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		  dd
 		}
 		# pTradeIrCost
-		obj@parameters[['pTradeIrCost']] <- addData(obj@parameters[['pTradeIrCost']],
+		obj@parameters[['pTradeIrCost']] <- .add_data(obj@parameters[['pTradeIrCost']],
 			simpleInterpolation2(trd@trade, parameter = 'cost', obj@parameters[['pTradeIrCost']], 
 				approxim = approxim_srcdst, 'trade', trd@name))
 		pTradeIrEff <- simpleInterpolation2(trd@trade, parameter = 'teff', obj@parameters[['pTradeIrEff']], 
 		                     approxim = approxim_srcdst, 'trade', trd@name)
-		obj@parameters[['pTradeIrEff']] <- addData(obj@parameters[['pTradeIrEff']], pTradeIrEff)
+		obj@parameters[['pTradeIrEff']] <- .add_data(obj@parameters[['pTradeIrEff']], pTradeIrEff)
 		# pTradeIrMarkup
-		obj@parameters[['pTradeIrMarkup']] <- addData(obj@parameters[['pTradeIrMarkup']],
+		obj@parameters[['pTradeIrMarkup']] <- .add_data(obj@parameters[['pTradeIrMarkup']],
 			simpleInterpolation2(trd@trade, parameter = 'markup', obj@parameters[['pTradeIrMarkup']], 
 			                     approxim = approxim_srcdst, 'trade', trd@name))
 		# pTradeIr
 		pTradeIr <- multiInterpolation2(trd@trade, parameter = 'ava',
 			obj@parameters[['pTradeIr']], approxim = approxim_srcdst, 'trade', trd@name)
-		obj@parameters[['pTradeIr']] <- addData(obj@parameters[['pTradeIr']], pTradeIr)
+		obj@parameters[['pTradeIr']] <- .add_data(obj@parameters[['pTradeIr']], pTradeIr)
 		# Trade ainp
 		mTradeIrAInp <- NULL; mTradeIrAOut <- NULL;
 		if (nrow(trd@aux) != 0) {
@@ -153,38 +153,38 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			out_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2aout) | !is.na(trd@aeff$cdst2aout), 'acomm'])
 			if (length(inp_comm) != 0) {
 			  mTradeIrAInp <- data.frame(trade = rep(trd@name, length(inp_comm)), comm = inp_comm)
-			  obj@parameters[['mTradeIrAInp']] <- addData(obj@parameters[['mTradeIrAInp']], mTradeIrAInp)
+			  obj@parameters[['mTradeIrAInp']] <- .add_data(obj@parameters[['mTradeIrAInp']], mTradeIrAInp)
 			} 
 			if (length(out_comm) != 0) {
 			  mTradeIrAOut <- data.frame(trade = rep(trd@name, length(out_comm)), comm = out_comm)
-			  obj@parameters[['mTradeIrAOut']] <- addData(obj@parameters[['mTradeIrAOut']], mTradeIrAOut)
+			  obj@parameters[['mTradeIrAOut']] <- .add_data(obj@parameters[['mTradeIrAOut']], mTradeIrAOut)
 			} 
 			for (cc in inp_comm) {
 			  approxim_srcdst$acomm <- cc
 			  pTradeIrCsrc2Ainp <- simpleInterpolation2(trd@aeff, parameter = 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
 				                                          approxim = approxim_srcdst, 'trade', trd@name)
-				obj@parameters[['pTradeIrCsrc2Ainp']] <- addData(obj@parameters[['pTradeIrCsrc2Ainp']], pTradeIrCsrc2Ainp)
+				obj@parameters[['pTradeIrCsrc2Ainp']] <- .add_data(obj@parameters[['pTradeIrCsrc2Ainp']], pTradeIrCsrc2Ainp)
 				pTradeIrCdst2Ainp <- simpleInterpolation2(trd@aeff, parameter = 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
 				                                          approxim = approxim_srcdst, 'trade', trd@name)
-				obj@parameters[['pTradeIrCdst2Ainp']] <- addData(obj@parameters[['pTradeIrCdst2Ainp']], pTradeIrCdst2Ainp)
+				obj@parameters[['pTradeIrCdst2Ainp']] <- .add_data(obj@parameters[['pTradeIrCdst2Ainp']], pTradeIrCdst2Ainp)
 			}
 			for (cc in out_comm) {
 			  approxim_srcdst$acomm <- cc
 				pTradeIrCsrc2Aout <- simpleInterpolation2(trd@aeff, parameter = 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
 				                     approxim = approxim_srcdst, 'trade', trd@name)
-				obj@parameters[['pTradeIrCsrc2Aout']] <- addData(obj@parameters[['pTradeIrCsrc2Aout']], pTradeIrCsrc2Aout)
+				obj@parameters[['pTradeIrCsrc2Aout']] <- .add_data(obj@parameters[['pTradeIrCsrc2Aout']], pTradeIrCsrc2Aout)
 				pTradeIrCdst2Aout <- simpleInterpolation2(trd@aeff, parameter = 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
 				                     approxim = approxim_srcdst, 'trade', trd@name)
-				obj@parameters[['pTradeIrCdst2Aout']] <- addData(obj@parameters[['pTradeIrCdst2Aout']], pTradeIrCdst2Aout)
+				obj@parameters[['pTradeIrCdst2Aout']] <- .add_data(obj@parameters[['pTradeIrCdst2Aout']], pTradeIrCdst2Aout)
 			}
 			approxim_srcdst$acomm <- NULL
 		}
 		# Add trade data
 		if (trd@capacityVariable) {
-			obj@parameters[['pTradeCap2Act']] <- addData(obj@parameters[['pTradeCap2Act']],
+			obj@parameters[['pTradeCap2Act']] <- .add_data(obj@parameters[['pTradeCap2Act']],
 				data.frame(trade = trd@name, value = trd@cap2act))
 			mTradeCapacityVariable <- data.frame(trade = trd@name)
-			obj@parameters[['mTradeCapacityVariable']] <- addData(obj@parameters[['mTradeCapacityVariable']], mTradeCapacityVariable)
+			obj@parameters[['mTradeCapacityVariable']] <- .add_data(obj@parameters[['mTradeCapacityVariable']], mTradeCapacityVariable)
 			
 			##!!! Trade 
 			if (nrow(trd@invcost) > 0) {
@@ -203,13 +203,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,, drop = FALSE]
 			if (nrow(invcost) == 0) invcost <- NULL
 			stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
-			obj@parameters[['pTradeStock']] <- addData(obj@parameters[['pTradeStock']], stock_exist)
-			obj@parameters[['pTradeOlife']] <- addData(obj@parameters[['pTradeOlife']], 
+			obj@parameters[['pTradeStock']] <- .add_data(obj@parameters[['pTradeStock']], stock_exist)
+			obj@parameters[['pTradeOlife']] <- .add_data(obj@parameters[['pTradeOlife']], 
 				data.frame(trade = trd@name, value = trd@olife, stringsAsFactors=FALSE))
 			possible_invest_year <- approxim$mileStoneYears
 			possible_invest_year <- possible_invest_year[trd@start <= possible_invest_year & possible_invest_year <= trd@end]
 			if (length(possible_invest_year) > 0)
-				obj@parameters[['mTradeNew']] <- addData(obj@parameters[['mTradeNew']], 
+				obj@parameters[['mTradeNew']] <- .add_data(obj@parameters[['mTradeNew']], 
 					data.frame(trade = rep(trd@name, length(possible_invest_year)), year = possible_invest_year, stringsAsFactors=FALSE))
 			
 			min0 <- function(x) {
@@ -219,7 +219,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			if (trd@olife == Inf) {
 			  trade_eac <- unique(approxim$year[min0(possible_invest_year) <= approxim$year])
 			  trade_span <- unique(c(trd@stock$year, trade_eac))
-				obj@parameters[['mTradeOlifeInf']] <- addData(obj@parameters[['mTradeOlifeInf']], data.frame(trade = trd@name))
+				obj@parameters[['mTradeOlifeInf']] <- .add_data(obj@parameters[['mTradeOlifeInf']], data.frame(trade = trd@name))
 			} else {
 			  trade_eac <- unique(c(sapply(possible_invest_year, 
 			    function(x) approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]), recursive = TRUE))
@@ -229,15 +229,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 			trade_span <- trade_span[trade_span %in% approxim$mileStoneYears]
 			if (length(trade_span) > 0) {
 			  mTradeSpan <- data.frame(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
-			  obj@parameters[['mTradeSpan']] <- addData(obj@parameters[['mTradeSpan']], mTradeSpan)
+			  obj@parameters[['mTradeSpan']] <- .add_data(obj@parameters[['mTradeSpan']], mTradeSpan)
 			  meqTradeCapFlow <- merge(mTradeSpan, mTradeSlice)
 			  meqTradeCapFlow$comm <- trd@commodity
-			  obj@parameters[['meqTradeCapFlow']] <- addData(obj@parameters[['meqTradeCapFlow']], meqTradeCapFlow)
+			  obj@parameters[['meqTradeCapFlow']] <- .add_data(obj@parameters[['meqTradeCapFlow']], meqTradeCapFlow)
 			}
 			# mTradeInv
 			if (!is.null(invcost)) {
 				end_year <- max(approxim$year)
-				obj@parameters[['pTradeInvcost']] <- addData(obj@parameters[['pTradeInvcost']], invcost)
+				obj@parameters[['pTradeInvcost']] <- .add_data(obj@parameters[['pTradeInvcost']], invcost)
 				if (any(!(obj@parameters[['mTradeInv']]@dimSetNames %in% colnames(invcost)))) {
 					if (is.null(invcost$year)) {
 						invcost <- merge(invcost, list(year = possible_invest_year))
@@ -246,7 +246,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 						invcost <- merge(invcost, approxim['region'])
 					}
 				}
-				obj@parameters[['mTradeInv']] <- addData(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
+				obj@parameters[['mTradeInv']] <- .add_data(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
 				invcost$invcost <- invcost$value; invcost$value <- NULL
 				if (length(trade_eac) > 0) {
 				  mTradeEac <- merge(unique(invcost$region), trade_eac)
@@ -254,7 +254,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				  mTradeEac$region <- as.character(mTradeEac$x)
 				  mTradeEac$year <- mTradeEac$y
 				  mTradeEac$x <- NULL; mTradeEac$y <- NULL
-				  obj@parameters[['mTradeEac']] <- addData(obj@parameters[['mTradeEac']], mTradeEac)
+				  obj@parameters[['mTradeEac']] <- .add_data(obj@parameters[['mTradeEac']], mTradeEac)
 				}
 
 				salv_data <- merge(invcost, approxim$discount, all.x = TRUE)
@@ -271,7 +271,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 				salv_data$trade <- trd@name
 				salv_data$value <- salv_data$eac
 				pTradeEac <- salv_data[, c('trade', 'region', 'year', 'value')]
-  			obj@parameters[['pTradeEac']] <- addData(obj@parameters[['pTradeEac']], unique(pTradeEac[, colnames(pTradeEac) %in% c(obj@parameters[['pTradeEac']]@dimSetNames, 'value'), drop = FALSE]))
+  			obj@parameters[['pTradeEac']] <- .add_data(obj@parameters[['pTradeEac']], unique(pTradeEac[, colnames(pTradeEac) %in% c(obj@parameters[['pTradeEac']]@dimSetNames, 'value'), drop = FALSE]))
 			}
 		}
 		########
@@ -280,7 +280,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		  mTradeIr <- merge(mTradeIr, mTradeSpan)
 		} else mTradeIr <- merge(mTradeIr, list(year = approxim$mileStoneYears))
 		
-		obj@parameters[['mTradeIr']] <- addData(obj@parameters[['mTradeIr']], mTradeIr)
+		obj@parameters[['mTradeIr']] <- .add_data(obj@parameters[['mTradeIr']], mTradeIr)
 		### To trades
 	if (!is.null(mTradeIrAInp)) {
 		if (!is.null(pTradeIrCsrc2Ainp) && any(pTradeIrCsrc2Ainp$value != 0)) {
@@ -288,7 +288,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		    if (is.null(mTradeIrCsrc2Ainp$acomm)) mTradeIrCsrc2Ainp <- merge(mTradeIrCsrc2Ainp, mTradeIrAInp)
 		    mTradeIrCsrc2Ainp$comm <- mTradeIrCsrc2Ainp$acomm; mTradeIrCsrc2Ainp$acomm <- NULL
 		    if (ncol(mTradeIrCsrc2Ainp) != 6) mTradeIrCsrc2Ainp <- merge(mTradeIrCsrc2Ainp, mTradeIr)
-				obj@parameters[['mTradeIrCsrc2Ainp']] <- addData(obj@parameters[['mTradeIrCsrc2Ainp']], mTradeIrCsrc2Ainp)
+				obj@parameters[['mTradeIrCsrc2Ainp']] <- .add_data(obj@parameters[['mTradeIrCsrc2Ainp']], mTradeIrCsrc2Ainp)
 				a1 <-  unique(mTradeIrCsrc2Ainp[, c('trade', 'comm', 'src', 'year', 'slice')])
 				colnames(a1)[3] <- 'region'
 		  }  else a1 <- NULL
@@ -297,11 +297,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		    if (is.null(mTradeIrCdst2Ainp$acomm)) mTradeIrCdst2Ainp <- merge(mTradeIrCdst2Ainp, mTradeIrAInp)
 		    mTradeIrCdst2Ainp$comm <- mTradeIrCdst2Ainp$acomm; mTradeIrCdst2Ainp$acomm <- NULL
 		    if (ncol(mTradeIrCdst2Ainp) != 6) mTradeIrCdst2Ainp <- merge(mTradeIrCdst2Ainp, mTradeIr)
-				obj@parameters[['mTradeIrCdst2Ainp']] <- addData(obj@parameters[['mTradeIrCdst2Ainp']], mTradeIrCdst2Ainp)
+				obj@parameters[['mTradeIrCdst2Ainp']] <- .add_data(obj@parameters[['mTradeIrCdst2Ainp']], mTradeIrCdst2Ainp)
 				a2 <-  unique(mTradeIrCdst2Ainp[, c('trade', 'comm', 'dst', 'year', 'slice')])
 				colnames(a2)[3] <- 'region'
 		  } else a2 <- NULL
-		  obj@parameters[['mvTradeIrAInp']] <- addData(obj@parameters[['mvTradeIrAInp']], unique(rbind(a1, a2)))
+		  obj@parameters[['mvTradeIrAInp']] <- .add_data(obj@parameters[['mvTradeIrAInp']], unique(rbind(a1, a2)))
 	}
 	
 		if (!is.null(mTradeIrAOut)) {
@@ -310,7 +310,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		    if (is.null(mTradeIrCsrc2Aout$acomm)) mTradeIrCsrc2Aout <- merge(mTradeIrCsrc2Aout, mTradeIrAOut)
 		    mTradeIrCsrc2Aout$comm <- mTradeIrCsrc2Aout$acomm; mTradeIrCsrc2Aout$acomm <- NULL
 		    if (ncol(mTradeIrCsrc2Aout) != 6) mTradeIrCsrc2Aout <- merge(mTradeIrCsrc2Aout, mTradeIr)
-				obj@parameters[['mTradeIrCsrc2Aout']] <- addData(obj@parameters[['mTradeIrCsrc2Aout']], mTradeIrCsrc2Aout)
+				obj@parameters[['mTradeIrCsrc2Aout']] <- .add_data(obj@parameters[['mTradeIrCsrc2Aout']], mTradeIrCsrc2Aout)
 				a1 <-  unique(mTradeIrCsrc2Aout[, c('trade', 'comm', 'src', 'year', 'slice')])
 				colnames(a1)[3] <- 'region'
 		  }  else a1 <- NULL
@@ -319,19 +319,19 @@ setMethod('.add0', signature(obj = 'modInp', app = 'trade',
 		    if (is.null(mTradeIrCdst2Aout$acomm)) mTradeIrCdst2Aout <- merge(mTradeIrCdst2Aout, mTradeIrAOut)
 		    mTradeIrCdst2Aout$comm <- mTradeIrCdst2Aout$acomm; mTradeIrCdst2Aout$acomm <- NULL
 		    if (ncol(mTradeIrCdst2Aout) != 6) mTradeIrCdst2Aout <- merge(mTradeIrCdst2Aout, mTradeIr)
-				obj@parameters[['mTradeIrCdst2Aout']] <- addData(obj@parameters[['mTradeIrCdst2Aout']], mTradeIrCdst2Aout)
+				obj@parameters[['mTradeIrCdst2Aout']] <- .add_data(obj@parameters[['mTradeIrCdst2Aout']], mTradeIrCdst2Aout)
 				a2 <-  unique(mTradeIrCdst2Aout[, c('trade', 'comm', 'dst', 'year', 'slice')])
 				colnames(a2)[3] <- 'region'
 		  } else a2 <- NULL
-		  obj@parameters[['mvTradeIrAOut']] <- addData(obj@parameters[['mvTradeIrAOut']], unique(rbind(a1, a2)))
+		  obj@parameters[['mvTradeIrAOut']] <- .add_data(obj@parameters[['mvTradeIrAOut']], unique(rbind(a1, a2)))
 		}
 		mvTradeIr <- mTradeIr; mvTradeIr$comm <- trd@commodity
-		obj@parameters[['mvTradeIr']] <- addData(obj@parameters[['mvTradeIr']], mvTradeIr) 
+		obj@parameters[['mvTradeIr']] <- .add_data(obj@parameters[['mvTradeIr']], mvTradeIr) 
 		if (!is.null(pTradeIr)) {
 		  pTradeIr$comm <- trd@commodity
-		  obj@parameters[['meqTradeFlowLo']] <- addData(obj@parameters[['meqTradeFlowLo']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, 
+		  obj@parameters[['meqTradeFlowLo']] <- .add_data(obj@parameters[['meqTradeFlowLo']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, 
 		  	colnames(pTradeIr) %in% colnames(mvTradeIr), drop = FALSE]))
-		  obj@parameters[['meqTradeFlowUp']] <- addData(obj@parameters[['meqTradeFlowUp']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, 
+		  obj@parameters[['meqTradeFlowUp']] <- .add_data(obj@parameters[['meqTradeFlowUp']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, 
 		  	colnames(pTradeIr) %in% colnames(mvTradeIr), drop = FALSE]))
 		  pTradeIr$comm <- NULL
 		}

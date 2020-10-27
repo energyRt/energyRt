@@ -228,7 +228,7 @@
 	sets <- list()
 	for (ss in c('tech', 'sup', 'dem', 'stg', 'expp', 'imp', 'trade', 
 							 'group', 'comm', 'region', 'year', 'slice')) {
-		sets[[ss]] <- getParameterData(scen@modInp@parameters[[ss]])[[ss]]
+		sets[[ss]] <- .get_parameter_data(scen@modInp@parameters[[ss]])[[ss]]
 	}
 	add_to_err <- function(err_msg, cns, slt, have, psb) {
 		if (!all(have %in% psb)) {

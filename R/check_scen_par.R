@@ -38,12 +38,12 @@
 		paste0(msg_small_err, collapse = '", "'), '". Assigned as zerro.'))
 	# Check share 
 	if (nrow(scen@modInp@parameters$pTechShare@data) > 0) {
-		mTechGroupComm <- energyRt:::getParameterData(scen@modInp@parameters$mTechGroupComm)
+		mTechGroupComm <- .get_parameter_data(scen@modInp@parameters$mTechGroupComm)
   	#scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
   	#if (scen@modInp@parameters$pTechShare@nValues != - 1)
     #		scen@modInp@parameters$pTechShare@nValues <- nrow(scen@modInp@parameters$pTechShare@data)
 		tmp <- energyRt:::.getTotalParameterData(scen@modInp, 'pTechShare')
-		mTechSpan <- energyRt:::getParameterData(scen@modInp@parameters$mTechSpan)
+		mTechSpan <- .get_parameter_data(scen@modInp@parameters$mTechSpan)
 		tmp <- merge(tmp, mTechSpan)
 		tmp_lo <- merge(tmp[tmp$type == 'lo',, drop = FALSE], mTechGroupComm)
 		tmp_up <- merge(tmp[tmp$type == 'up',, drop = FALSE], mTechGroupComm)

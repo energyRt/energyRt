@@ -34,7 +34,7 @@ setMethod('.add_set_element',
                     '" now, all previous information will be removed', sep = ''))
       obj <- .drop_commodity(obj, cmd@name)
     }
-    obj@parameters[['comm']] <- addData(obj@parameters[['comm']], cmd@name)
+    obj@parameters[['comm']] <- .add_data(obj@parameters[['comm']], cmd@name)
     obj
   })
 
@@ -54,7 +54,7 @@ setMethod('.add_set_element',
                     '" now, all previous information will be removed', sep = ''))
       obj <- .drop_demand(obj, dem@name)
     }
-    obj@parameters[['dem']] <- addData(obj@parameters[['dem']], dem@name)
+    obj@parameters[['dem']] <- .add_data(obj@parameters[['dem']], dem@name)
     obj
   })
 
@@ -75,7 +75,7 @@ setMethod(
                     '" now, all previous information will be removed', sep = ''))
       obj <- .drop_weather(obj, wth@name)
     }
-    obj@parameters[['weather']] <- addData(obj@parameters[['weather']], wth@name)
+    obj@parameters[['weather']] <- .add_data(obj@parameters[['weather']], wth@name)
     obj
   })
 
@@ -103,7 +103,7 @@ setMethod(
                     '" now, all previous information will be removed', sep = ''))
       obj <- .drop_supply(obj, sup@name)
     }    
-    obj@parameters[['sup']] <- addData(obj@parameters[['sup']], sup@name)
+    obj@parameters[['sup']] <- .add_data(obj@parameters[['sup']], sup@name)
     obj
   })
 
@@ -124,7 +124,7 @@ setMethod(
                     '" now, all previous information will be removed', sep = ''))
       obj <- .drop_storage(obj, stg@name)
     }    
-    obj@parameters[['stg']] <- addData(obj@parameters[['stg']], stg@name)
+    obj@parameters[['stg']] <- .add_data(obj@parameters[['stg']], stg@name)
     obj
   })
 
@@ -145,7 +145,7 @@ setMethod(
           '" now, all previous information will be removed', sep = ''))
       obj <- .drop_export(obj, exp@name)
     }    
-    obj@parameters[['expp']] <- addData(obj@parameters[['expp']], exp@name)
+    obj@parameters[['expp']] <- .add_data(obj@parameters[['expp']], exp@name)
     obj
   })
 
@@ -166,7 +166,7 @@ setMethod(
           '" now, all previous information will be removed', sep = ''))
       obj <- .drop_import(obj, imp@name)
     }    
-    obj@parameters[['imp']] <- addData(obj@parameters[['imp']], imp@name)
+    obj@parameters[['imp']] <- .add_data(obj@parameters[['imp']], imp@name)
     obj
   })
 
@@ -192,7 +192,7 @@ setMethod(
           '" now, all previous information will be removed', sep = ''))
       obj <- .drop_technology(obj, tech@name)
     }
-    obj@parameters[['tech']] <- addData(obj@parameters[['tech']], tech@name)
+    obj@parameters[['tech']] <- .add_data(obj@parameters[['tech']], tech@name)
     obj
   })
 
@@ -212,7 +212,7 @@ setMethod('.add_set_element',
           '" now, all previous information will be removed', sep = ''))
       obj <- .drop_trade(obj, trd@name)
     }
-    obj@parameters[['trade']] <- addData(obj@parameters[['trade']], trd@name)
+    obj@parameters[['trade']] <- .add_data(obj@parameters[['trade']], trd@name)
     obj
   })
 
