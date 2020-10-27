@@ -194,8 +194,11 @@
   }
   return(dd)
 }
-setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character',
-  defVal = 'numeric'), function(obj, parameter, defVal, ...) {
+
+
+# setMethod(".interpolation", signature(obj = 'data.frame', parameter = 'character',
+#   defVal = 'numeric'), 
+.interpolation <- function(obj, parameter, defVal, ...) {
     arg <- list(...)
     tryCatch({
       .interpolation0(obj, parameter, defVal, arg)
@@ -205,27 +208,27 @@ setMethod("interpolation", signature(obj = 'data.frame', parameter = 'character'
       message('\nInterpolation error, more information in "interpolation_message" object\n')
       stop(cond)
     })
-})
+}
 
 # 
 
 
-setMethod("interpolation_bound", signature(obj = 'data.frame', 
-  parameter = 'character', defVal = 'numeric', rule = 'character'), 
-      function(obj, parameter, defVal, rule, ...) {
+# setMethod(".interpolation_bound", signature(obj = 'data.frame', 
+#   parameter = 'character', defVal = 'numeric', rule = 'character'), 
+.interpolation_bound <-  function(obj, parameter, defVal, rule, ...) {
   gg <- paste(parameter, c('.lo', '.fx', '.up'), sep = '')
   aa <- obj[, !(colnames(obj) %in% gg), drop = FALSE]; aa[, parameter] <- rep(NA, nrow(aa))
   a1 <- aa; a1[, parameter] <- obj[, gg[1]]
   a2 <- aa; a2[, parameter] <- obj[, gg[2]]
   a3 <- aa; a3[, parameter] <- obj[, gg[3]]
-  d1 <- interpolation(rbind(a1, a2), parameter, 
+  d1 <- .interpolation(rbind(a1, a2), parameter, 
       defVal = defVal[1], rule = rule[1], ...)
   if (!is.null(d1)) {
     dd <- d1[, -ncol(d1), drop = FALSE]
     dd[, 'type'] <- 'lo'
     dd[, parameter] <- d1[, parameter]
     }
-  d2 <- interpolation(rbind(a3, a2), parameter, 
+  d2 <- .interpolation(rbind(a3, a2), parameter, 
     defVal = defVal[2], rule = rule[2], ...)
   if (!is.null(d2)) {
     zz <- d2[, -ncol(d2), drop = FALSE]
@@ -239,5 +242,5 @@ setMethod("interpolation_bound", signature(obj = 'data.frame',
   } else if (!is.null(d2)) {
     return(zz)
   } else return(NULL)
-})
+}
 

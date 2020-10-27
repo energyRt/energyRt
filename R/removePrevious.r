@@ -9,9 +9,9 @@
 
 .drop_commodity <- function(modInp, name) {
   for(i in c('comm', 'mUpComm', 'mLoComm', 'mFxComm'))
-    modInp@parameters[[i]] <- removeBySet(modInp@parameters[[i]], 'comm', name)
+    modInp@parameters[[i]] <- .drop_set_value(modInp@parameters[[i]], 'comm', name)
   for(i in c('pEmissionFactor')) # 'ems_from', 
-    modInp@parameters[[i]] <- removeBySet(modInp@parameters[[i]], 'commp', name)
+    modInp@parameters[[i]] <- .drop_set_value(modInp@parameters[[i]], 'commp', name)
   modInp
 }
 
@@ -24,7 +24,7 @@
 
 .drop_demand <- function(modInp, name) {
   for(i in c('pDemand')) 
-    modInp@parameters[[i]] <- removeBySet(modInp@parameters[[i]], 'comm', name)
+    modInp@parameters[[i]] <- .drop_set_value(modInp@parameters[[i]], 'comm', name)
   modInp
 }
 
@@ -49,7 +49,7 @@
 
 .drop_supply <- function(modInp, name) {
   for(i in c('sup', 'mSupComm', 'pSupCost', 'pSupAva', 'pSupReserve')) 
-    modInp@parameters[[i]] <- removeBySet(modInp@parameters[[i]], 'sup', name)
+    modInp@parameters[[i]] <- .drop_set_value(modInp@parameters[[i]], 'sup', name)
   modInp
 }
 
@@ -62,7 +62,7 @@
 
 .drop_export <- function(modInp, name) {
   for(i in c('expp', 'mExpComm', 'pRowExportPrice', 'pRowExportRes', 'pRowExport')) 
-    modInp@parameters[[i]] <- removeBySet(modInp@parameters[[i]], 'expp', name)
+    modInp@parameters[[i]] <- .drop_set_value(modInp@parameters[[i]], 'expp', name)
   modInp
 }
 
@@ -77,7 +77,7 @@
 .drop_import <- function(modInp, name) {
   for(i in c('imp', 'mImpComm', 'pImportRowPrice', 'pImportRowRes', 
      'pImportRow')) 
-    modInp@parameters[[i]] <- removeBySet(modInp@parameters[[i]], 'imp', name)
+    modInp@parameters[[i]] <- .drop_set_value(modInp@parameters[[i]], 'imp', name)
   modInp
 }
 
@@ -105,7 +105,7 @@
 
 .drop_sysinfo_param <- function(modInp) {
   for(i in c('pDiscount', 'pDummyImportCost', 'pDummyExportCost')) 
-    modInp@parameters[[i]] <- clear(modInp@parameters[[i]])
+    modInp@parameters[[i]] <- .reset(modInp@parameters[[i]])
   modInp
 }
 
@@ -129,7 +129,7 @@
 
 .drop_storage <- function(obj, name) {
   for(i in .get_stg_prm_lst()) 
-    obj@parameters[[i]] <- removeBySet(obj@parameters[[i]], 'stg', name)
+    obj@parameters[[i]] <- .drop_set_value(obj@parameters[[i]], 'stg', name)
   obj
 }
 

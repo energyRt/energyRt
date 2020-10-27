@@ -1,4 +1,4 @@
-#interpolation_bound(MIN_BIO01@availability, 'ava',
+#.interpolation_bound(MIN_BIO01@availability, 'ava',
 #   defVal = dfl, rule = rl, year_range = c(2005, 2100),
 #   approxim = list(region = 'R1', slice = 'ANNUAL')
 #)
@@ -47,7 +47,7 @@
             approxim2 <- approxim; 
             if (!is.null(obj@data[[i]]@data[[j]])) 
               approxim2$region <- obj@data[[i]]@data[[j]]@region
-            bnd <- interpolation_bound(obj@data[[i]]@data[[j]]@availability,
+            bnd <- .interpolation_bound(obj@data[[i]]@data[[j]]@availability,
                'ava', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim2)
             gg <- gg + tapply(bnd$ava, bnd[, c('year', 'type')], sum)[cyear, , drop = FALSE]
@@ -145,7 +145,7 @@
           if (class(obj@data[[i]]@data[[j]]) == 'export' 
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(export) || obj@data[[i]]@data[[j]]@name %in% export)) {
-            bnd <- interpolation_bound(obj@data[[i]]@data[[j]]@exp,
+            bnd <- .interpolation_bound(obj@data[[i]]@data[[j]]@exp,
                'exp', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim)
             gg <- gg + tapply(bnd$exp, bnd[, c('year', 'type')], sum)[cyear, , drop = FALSE]
@@ -243,7 +243,7 @@
           if (class(obj@data[[i]]@data[[j]]) == 'import' 
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(import) || obj@data[[i]]@data[[j]]@name %in% import)) {
-            bnd <- interpolation_bound(obj@data[[i]]@data[[j]]@imp,
+            bnd <- .interpolation_bound(obj@data[[i]]@data[[j]]@imp,
                'imp', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim)
             gg <- gg + tapply(bnd$imp, bnd[, c('year', 'type')], sum)[cyear, , drop = FALSE]
@@ -341,7 +341,7 @@
           if (class(obj@data[[i]]@data[[j]]) == 'demand' 
               && commodity == obj@data[[i]]@data[[j]]@commodity &&
               (is.null(demand) || obj@data[[i]]@data[[j]]@name %in% demand)) {
-            bnd <- interpolation(obj@data[[i]]@data[[j]]@dem,
+            bnd <- .interpolation(obj@data[[i]]@data[[j]]@dem,
                'dem', defVal = dfl, rule = rl, year_range = year_range,
                approxim = approxim)
             gg <- gg + tapply(bnd$dem, bnd$year, sum)[cyear, drop = FALSE]

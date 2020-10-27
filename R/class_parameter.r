@@ -86,7 +86,8 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
 })
 
 createParameter <- function(...) new('parameter', ...)
-.clearParameter <- function(x) {
+
+.resetParameter <- function(x) {
   x@data <- x@data[0,, drop = FALSE]
   if (x@nValues > 0)
     x@nValues <- 0
@@ -154,20 +155,20 @@ setMethod('addData', signature(obj = 'parameter', data = 'numeric'),
 })
 
 # Clear Map Table
-setMethod('clear', signature(obj = 'parameter'),
-  function(obj) {
+# setMethod('clear', signature(obj = 'parameter'),
+.reset <- function(obj) {
     obj@data <- obj@data[0, , drop = FALSE]
     obj
-})
+}
 
 # Get all unique set Map Table
-setMethod('getSet', signature(obj = 'parameter', dimSetNames = "character"),
-  function(obj, dimSetNames) {
-    if (length(dimSetNames) != 1 || all(dimSetNames != obj@dimSetNames))
-          stop('Internal error: Wrong dimSetNames request')
-    if (obj@nValues != -1) unique(obj@data[seq(length.out = obj@nValues), dimSetNames]) else 
-        unique(obj@data[, dimSetNames])
-})
+# setMethod('getSet', signature(obj = 'parameter', dimSetNames = "character"),
+#   function(obj, dimSetNames) {
+#     if (length(dimSetNames) != 1 || all(dimSetNames != obj@dimSetNames))
+#           stop('Internal error: Wrong dimSetNames request')
+#     if (obj@nValues != -1) unique(obj@data[seq(length.out = obj@nValues), dimSetNames]) else 
+#         unique(obj@data[, dimSetNames])
+# })
 
 setMethod('getParameterData', signature(obj = 'parameter'), # getParameterTable
   function(obj) {
@@ -175,13 +176,14 @@ setMethod('getParameterData', signature(obj = 'parameter'), # getParameterTable
 })
 
 # Remove all data by all set
-setMethod('removeBySet', signature(obj = 'parameter', dimSetNames = "character", value = "character"),
-  function(obj, dimSetNames, value) {
+# setMethod('.drop_set_value', signature(obj = 'parameter', dimSetNames = "character", value = "character"),
+.drop_set_value <- function(obj, dimSetNames, value) {
     if (length(dimSetNames) != 1 || all(dimSetNames != obj@dimSetNames))
-          stop('Internal error: Wrong dimSetNames request')
+          stop('(internal function) check dimSetNames')
     obj@data <- obj@data[!(obj@data[, dimSetNames] %in% value),, drop = FALSE]
     obj
-})
+}
+
 
 # Generate GAMS code, return character == GAMS code 
 .toGams0 <- function(obj, include.def) {
@@ -283,13 +285,13 @@ createSet <- function(dimSetNames) {
   createParameter(dimSetNames, dimSetNames, 'set')  
 }
 # Add Set
-setMethod('addSet', signature(obj = 'parameter', dimSetNames = 'character'),
-  function(obj, dimSetNames) {
-    gg <- data.frame(dimSetNames)
-    colnames(gg) <- obj@dimSetNames
-    if (any(dimSetNames == obj@data[, 1])) stop('Internal error: There is multiple dimSetNames')
-    addData(obj, gg)
-})
+# setMethod('addSet', signature(obj = 'parameter', dimSetNames = 'character'),
+#   function(obj, dimSetNames) {
+#     gg <- data.frame(dimSetNames)
+#     colnames(gg) <- obj@dimSetNames
+#     if (any(dimSetNames == obj@data[, 1])) stop('Internal error: There is multiple dimSetNames')
+#     addData(obj, gg)
+# })
 # Add Set
 setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'character'),
   function(obj, dimSetNames) {
