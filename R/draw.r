@@ -79,7 +79,7 @@ draw.technology <- function(
         approxim$acomm <- y
         approxim$comm <- NULL
         tech@aeff <- tech@aeff[tech@aeff$acomm == y,, drop = FALSE]
-        sng <- sapply(aname, function(x) interpolation(tech@aeff, x, 
+        sng <- sapply(aname, function(x) .interpolation(tech@aeff, x, 
                                 defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),

@@ -386,7 +386,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo',
       'pDummyExportCost', 'mStartMilestone', 'mEndMilestone', 'mMilestoneLast', 'mMilestoneFirst', 'mMilestoneNext', 
       'mMilestoneHasNext', 'mSameSlice', 'mSameRegion', 'ordYear', 'cardYear', 'pPeriodLen', 'pDiscountFactor', 'mDiscountZero')
     for (i in clean_list)
-      obj@parameters[[i]] <- .clearParameter(obj@parameters[[i]])
+      obj@parameters[[i]] <- .resetParameter(obj@parameters[[i]])
   obj <- .drop_sysinfo_param(obj)
   app <- stayOnlyVariable(app, approxim$region, 'region')
   obj@parameters[['mSliceParentChild']] <- addData(obj@parameters[['mSliceParentChild']],
