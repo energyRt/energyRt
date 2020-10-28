@@ -1,16 +1,25 @@
 exportPattern("^[[:alpha:]]+")
 
 # S3 methods
-## draw
-S3method(draw, technology)
 ## add
 S3method(add, repository)
 S3method(add, model)
+
 ## summary
 S3method(summary, scenario)
 S3method(summary, model)
+
+## write # S4
+#S3method(write, scenario) # S4
+#exportMethods(write)
+
+## read
+S3method(read, scenario)
+
 ## solve
-#S3method(solve, model)
+S3method(solve, scenario)
+S3method(solve, model)
+
 ## update
 S3method(update, technology)
 S3method(update, commodity)
@@ -20,3 +29,6 @@ S3method(update, export)
 S3method(update, import)
 S3method(update, storage)
 S3method(update, weather)
+
+## draw
+S3method(draw, technology)

@@ -7,9 +7,9 @@
   gg <- list()
   for (i in names(scen@modInp@parameters)) {
     if (scen@modInp@parameters[[i]]@type != 'multi') {
-      gg[[i]] <- all_factor(.get_parameter_data(scen@modInp@parameters[[i]]))
+      gg[[i]] <- all_factor(.get_data_slot(scen@modInp@parameters[[i]]))
     } else {
-      tmp <- .get_parameter_data(scen@modInp@parameters[[i]])
+      tmp <- .get_data_slot(scen@modInp@parameters[[i]])
       gg[[paste0(i, 'Lo')]] <- all_factor(tmp[tmp$type == 'lo', colnames(tmp) != 'type', drop = FALSE])
       gg[[paste0(i, 'Up')]] <- all_factor(tmp[tmp$type == 'up', colnames(tmp) != 'type', drop = FALSE])
     }

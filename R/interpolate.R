@@ -176,7 +176,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   
   # Fill set list for interpolation and os one  
   scen <- .add_name_for_basic_set(scen, approxim)
-  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) .get_parameter_data(x)[, 1])
+  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) .get_data_slot(x)[, 1])
 
 
 

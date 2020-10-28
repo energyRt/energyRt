@@ -20,7 +20,7 @@
   for (pr in c('mTechWeatherAfLo', 'mTechWeatherAfUp', 'mTechWeatherAfsLo', 'mTechWeatherAfsUp', 'mTechWeatherAfcLo', 
         'mTechWeatherAfcUp', 'mTechWeatherAfcLo', 'mTechWeatherAfcUp', 'mSupWeatherUp', 'mSupWeatherLo', 'mStorageWeatherAfLo', 
     'mStorageWeatherAfUp', 'mStorageWeatherCinpUp', 'mStorageWeatherCinpLo', 'mStorageWeatherCoutUp', 'mStorageWeatherCoutLo')) {
-    tmp <- .get_parameter_data(scen@modInp@parameters[[pr]])
+    tmp <- .get_data_slot(scen@modInp@parameters[[pr]])
     tmp$weather <- NULL
     if (anyDuplicated(tmp)) {
       assign('error_msg', tmp[duplicated(tmp),, drop = FALSE], globalenv())
@@ -63,7 +63,7 @@
   .write_inc_solver(scen, arg, "using Cbc\nset_optimizer(model, Cbc.Optimizer)\n", '.jl', 'Cbc')
   dat <- list()
   for (i in names(scen@modInp@parameters)) {
-    tmp <- .get_parameter_data(scen@modInp@parameters[[i]])
+    tmp <- .get_data_slot(scen@modInp@parameters[[i]])
     colnames(tmp) <- gsub('[.]1', 'p', colnames(tmp))
     # if (!is.null(scen@modInp@parameters[[i]]@data$year)) {
     #   scen@modInp@parameters[[i]]@data$year <- 
@@ -76,7 +76,7 @@
     if (scen@modInp@parameters[[i]]@type != 'multi') {
       dat[[i]] <- tmp
     } else {
-      tmp <- .get_parameter_data(scen@modInp@parameters[[i]])
+      tmp <- .get_data_slot(scen@modInp@parameters[[i]])
       dat[[paste0(i, 'Up')]] <- tmp[tmp$type == 'up', colnames(tmp) != 'type']
       dat[[paste0(i, 'Lo')]] <- tmp[tmp$type == 'lo', colnames(tmp) != 'type']
     }

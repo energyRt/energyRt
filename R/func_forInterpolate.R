@@ -24,8 +24,8 @@
 }
 
 .add_discount_approxim <- function(scen, approxim) {
-	approxim$discountFactor <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscountFactor', FALSE)
-	approxim$discount <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscount', FALSE)
+	approxim$discountFactor <- .get_parameter_values(scen@modInp, 'pDiscountFactor', FALSE)
+	approxim$discount <- .get_parameter_values(scen@modInp, 'pDiscount', FALSE)
 	yy <- approxim$discountFactor
 	# ll <- NULL
 	# for (rg in unique(yy$region)) {
@@ -228,7 +228,7 @@
 	sets <- list()
 	for (ss in c('tech', 'sup', 'dem', 'stg', 'expp', 'imp', 'trade', 
 							 'group', 'comm', 'region', 'year', 'slice')) {
-		sets[[ss]] <- .get_parameter_data(scen@modInp@parameters[[ss]])[[ss]]
+		sets[[ss]] <- .get_data_slot(scen@modInp@parameters[[ss]])[[ss]]
 	}
 	add_to_err <- function(err_msg, cns, slt, have, psb) {
 		if (!all(have %in% psb)) {

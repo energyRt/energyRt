@@ -265,8 +265,8 @@ COA <- newCommodity(
     mean = 100 # i.e. 100 kt of CO2 emmitted per one unit of energy (1 PJ)
     ),
   type = "fossil fuel", # reserved for filtering, optional
-  slice = "ANNUAL", # 'ANNUAL' means no sub-annual granularity for the commodity
-  color = "brown" # reserved for output figures, optional
+  slice = "ANNUAL" # 'ANNUAL' means no sub-annual granularity for the commodity
+  # color = "brown" # reserved for output figures, optional
 )
 
 OIL <- newCommodity(
@@ -1234,7 +1234,7 @@ mdl <- newModel('UTOPIA',
                 slice = timeslices,
                 # slice = unlist(timeslices2),
                 repository = reps,
-                GIS = gis,
+                # GIS = gis,
                 early.retirement = F)
 
 
@@ -1259,7 +1259,6 @@ mdl@sysInfo@milestone
 
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T, echo=F}
-
 # Four alternative languages to solve the model
 scen_BASE <- solve(mdl, name = "BASE", 
                    # tmp.path = "C:/solwork",
@@ -1279,7 +1278,7 @@ summary(scen_BASE)
 scen_BASE_glpk <- solve(mdl, name = "BASE_glpk", 
                    # tmp.path = "C:/solwork",
                    # solver = mysolver,
-                   solver = "GLPK",
+                   solver = "glpk",
                    tmp.name = "UTOPIA_BASE_GLPK",
                    tmp.del = F
                    )
@@ -1294,6 +1293,7 @@ scen_BASE_gams <- solve(add(mdl), name = "BASE_gams",
                      solver = "cbc"),
                    tmp.name = "UTOPIA_BASE_GAMS",
                    tmp.del = FALSE
+                   # , wait = FALSE
                    )
 summary(scen_BASE_gams) 
 
@@ -1302,9 +1302,8 @@ scen_BASE_py <- solve(add(mdl), name = "BASE_py",
                    # solver = mysolver,
                    solver = list(
                      lang = "Pyomo",
-                     export_format = "SQLite",
-                     solver = "cplex"
-                     # solver = "glpk"
+                     # solver = "ipopt"
+                     solver = "cbc"
                    ),
                    tmp.name = "UTOPIA_BASE_Python",
                    tmp.del = F
@@ -1337,57 +1336,80 @@ getData(list(scen_BASE,
 
 
 ```{r, include=F, eval=F, echo=F}
-scen_BASE_int <- interpolate(add(mdl), #, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
-                         name = "BASE")
+
+scen_BASE_int <- interpolate(
+  add(mdl), #, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
+  name = "BASE", trim = T)
+
 summary(scen_BASE_int)
+scen_BASE_int@misc$tmp.dir
+
 ## Writing the model code and data on disk
-write_model(scen_BASE_int, solver = "GAMS", tmp.dir = "solwork/UTOPIA_BASE_GAMS")
-write_model(scen_BASE_int, solver = "PYOMO", tmp.dir = "solwork/UTOPIA_BASE_PYOMO")
-write_model(scen_BASE_int, solver = "GLPK", tmp.dir = "solwork/UTOPIA_BASE_GLPK")
-write_model(scen_BASE_int, solver = "JuMP", tmp.dir = "solwork/UTOPIA_BASE_Julia2")
+scen_BASE_gams <- write_model(
+  scen_BASE_int, solver = "GAMS", 
+  tmp.dir = "solwork/UTOPIA_BASE_GAMS")
+scen_BASE_gams@misc$tmp.dir # directory
 
-write_model(scen_BASE_int, solver = list(
-  lang = "PYOMO", 
-  files = list(
-    cplex.opt = "blablabla"
-  )), 
-  tmp.dir = "solwork/UTOPIA_BASE_PYOMO2")
+scen_BASE_py <- write(scen_BASE_int, solver = "PYOMO", 
+                      tmp.dir = "solwork/UTOPIA_BASE_PYOMO")
+scen_BASE_py@misc$tmp.dir
 
+scen_BASE_glpk <- write(scen_BASE_int, solver = "GLPK", 
+                        tmp.dir = "solwork/UTOPIA_BASE_GLPK")
+
+scen_BASE_jl <- write(scen_BASE_int, solver = "JuMP", 
+                      tmp.dir = "solwork/UTOPIA_BASE_Julia")
+
+# write_model(scen_BASE_int, solver = list(
+#   lang = "PYOMO", 
+#   files = list(
+#     cplex.opt = "blablabla"
+#   )) 
+#   # tmp.dir = "solwork/UTOPIA_BASE_PYOMO2"
+#   )
 
 ## Solving the model
-solve_model(tmp.dir = "solwork/UTOPIA_BASE_GAMS", 
-            solver = "GAMS", wait = FALSE, invisible = F)
-solve_model(tmp.dir = "solwork/UTOPIA_BASE_PYOMO", 
-            solver = "PYOMO", wait = FALSE, invisible = F)
-solve_model(tmp.dir = "solwork/UTOPIA_BASE_GLPK", 
-            solver = "GLPK", wait = FALSE, invisible = FALSE)
-solve_model(tmp.dir = "solwork/UTOPIA_BASE_Julia2", 
-            solver = "JULIA", wait = FALSE, invisible = FALSE)
+solve(scen_BASE_gams, wait = FALSE)
+solve(scen_BASE_py, wait = FALSE)
+solve(scen_BASE_glpk, wait = FALSE)
+solve(scen_BASE_jl, wait = FALSE)
 
 ## Read solution
-scen_BASE_gms2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_GAMS")
-summary(scen_BASE_gms2)
-scen_BASE_py2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_PYOMO")
-summary(scen_BASE_py2)
-scen_BASE_glpk2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_GLPK")
-summary(scen_BASE_glpk2)
-scen_BASE_jl2 <- read_solution(scen_BASE_int, dir.result = "solwork/UTOPIA_BASE_Julia")
-summary(scen_BASE_jl2)
+scen_BASE_gams <- read(scen_BASE_gams)
+summary(scen_BASE_gams)
+
+scen_BASE_py <- read(scen_BASE_py)
+summary(scen_BASE_py)
+
+scen_BASE_glpk <- read(scen_BASE_glpk)
+summary(scen_BASE_glpk)
+
+scen_BASE_jl <- read(scen_BASE_jl)
+summary(scen_BASE_jl)
+
+getData(list(GAMS1 = scen_BASE,
+             # GAMS2 = scen_BASE_gams,
+             GLPK = scen_BASE_glpk, 
+             Julia = scen_BASE_jl, 
+             Python = scen_BASE_py, 
+             GAMS0 = scen_BASE_gams),
+        name = "vObjective", merge = TRUE)
+
 
 ```
 
 
 
 ## "GRID": traditional techs and interregional trade
-```{r GRID, eval=T}
+```{r GRID, eval=F}
 
 scen_GRID <- solve(add(mdl, TRBD_ELC_ALL), # Adding trade routes
                    name = "GRID", 
                   # tmp.path = "C:/solwork",
                    solver = mysolver,
                    tmp.name = "UTOPIA_GRID",
-                   tmp.del = F
-                   # n.threads = 1
+                   tmp.del = F,
+                   trim = T
                   )
 summary(scen_GRID)
 
@@ -1395,7 +1417,7 @@ summary(scen_GRID)
 
 
 ## "RBAU": traditional techs and interregional trade
-```{r REN, eval=T}
+```{r REN, eval=F}
 
 scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), #
                    name = "RBAU", 
@@ -1418,13 +1440,13 @@ mysolver = "GAMS"
 scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
                          name = "RBAU2")
 ## Writing the model code and data on disk
-write_model(scen_RBAU2, solver = mysolver, tmp.dir = "solwork/UTOPIA_REN")
+scen_RBAU2 <- write(scen_RBAU2, solver = mysolver, tmp.dir = "solwork/UTOPIA_REN")
 
 ## Solving the model
-solve_model(tmp.dir = "solwork/UTOPIA_REN", solver = mysolver, wait = TRUE)
+solve_model(tmp.dir = "solwork/UTOPIA_REN", wait = TRUE)
 
 ## Read solution
-scen_RBAU2 <- read_solution(scen_RBAU2, dir.result = "solwork/UTOPIA_REN")
+scen_RBAU2 <- read(scen_RBAU2)
 summary(scen_RBAU2)
 size(scen_RBAU)
 size(scen_RBAU2)
@@ -1439,7 +1461,7 @@ getData(scen_RBAU, name = "vTradeIr")
 
 # Quick look at the results
 
-```{r solution_status}
+```{r solution_status, eval=F}
 # scen <- scen_BASE
 scen <- scen_RBAU
 
@@ -1451,7 +1473,7 @@ summary(scen)
 
 
 ## `getData` function
-```{r}
+```{r, eval=F}
 sns <- list(scen_BASE, scen_GRID, scen_RBAU)
 
 getData(sns, name = "vObjective", merge = T)
@@ -1470,7 +1492,7 @@ pivot(sns, comm = "ELC", name = "vTechOut")
 
 
 ## Some figures
-```{r, eval=T, results="markup"}
+```{r, eval=F, results="markup"}
 elc_out <- getData(sns, name = "vTechOutTot", comm = "ELC", merge = T)
 elc_out
 elc_out <- elc_out %>% 
@@ -1695,7 +1717,7 @@ setwd(homedir)
 
 # Scenarios with constraints
 
-```{r}
+```{r, eval=F}
 ## NXSX: NOX and SO2 control
 NOXSO2control <- newConstraint(
   'NOXSO2control', 
@@ -1734,7 +1756,7 @@ NOXSO2controlCum <- newConstraint(
 
 ## GHG50: Cap and trade
 
-```{r}
+```{r, eval=F}
 
 GHG50tax <- newTax('HGtax', comm = 'HG', value = 100)
 
@@ -1796,4 +1818,3 @@ kableExtra::kable(pp, row.names = F, longtable = T, booktabs = T,
   kableExtra::column_spec(2, width = "5cm") #%>%
 
 ```
-

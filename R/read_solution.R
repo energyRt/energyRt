@@ -1,4 +1,4 @@
-read_solution <- function(scen, ...) {
+read.scenario <- function(scen, ...) {
   ## arguments
   # scen
   # readOutputFunction = read.csv (may use data.table::fread)
@@ -13,12 +13,8 @@ read_solution <- function(scen, ...) {
     arg$tmp.dir <- scen@misc$tmp.dir 
     if (is.null(arg$tmp.dir))
       stop('Directory "tmp.dir" not specified')
-  }
-  
-# read.scenario <- function(scen, ...) read_solution(scen, ...)
-.S3method("read", "scenario", read_solution)
-
-  # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
+}
+ # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
   vrb_list <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
   if (file.exists(paste(arg$tmp.dir, '/output/variable_list2.csv', sep = ''))) {
     vrb_list2 <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/variable_list2.csv', sep = ''), stringsAsFactors = FALSE)$value
@@ -85,9 +81,9 @@ read_solution <- function(scen, ...) {
   }
   ## Salvage cost calculation
   salvage_cost0 <- function(scen, par) {
-    invcost <- energyRt:::.getTotalParameterData(scen@modInp, paste0('p', par, 'Invcost'))
-    olife <- energyRt:::.getTotalParameterData(scen@modInp, paste0('p', par, 'Olife'))
-    discount <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscount')
+    invcost <- .get_parameter_values(scen@modInp, paste0('p', par, 'Invcost'))
+    olife <- .get_parameter_values(scen@modInp, paste0('p', par, 'Olife'))
+    discount <- .get_parameter_values(scen@modInp, 'pDiscount')
     newcap <- scen@modOut@variables[[paste0('v', par, 'NewCap')]]
     invcost$invcost <- invcost$value; invcost$value <- NULL
     olife$olife <- olife$value; olife$value <- NULL
@@ -95,8 +91,8 @@ read_solution <- function(scen, ...) {
     newcap$newcap <- newcap$value; newcap$value <- NULL
     
     salvage <- merge(merge(newcap, merge(olife, invcost)), discount, all.x = TRUE)
-    end_year <- max(.get_parameter_data(scen@modInp@parameters$mEndMilestone)$yearp)
-    salvage <- merge(salvage, .get_parameter_data(scen@modInp@parameters$mStartMilestone))
+    end_year <- max(.get_data_slot(scen@modInp@parameters$mEndMilestone)$yearp)
+    salvage <- merge(salvage, .get_data_slot(scen@modInp@parameters$mStartMilestone))
     salvage$start <- salvage$yearp; salvage$yearp <- NULL
     salvage <- salvage[salvage$start + salvage$olife > end_year, ]
     
@@ -113,20 +109,20 @@ read_solution <- function(scen, ...) {
     scen@modOut@variables$vTechSalv <- salvage_cost0(scen, 'Tech')
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, 'Storage')
     scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, 'Trade')
-    pDummyImportCost <- .get_parameter_data(scen@modInp@parameters$pDummyImportCost)
+    pDummyImportCost <- .get_data_slot(scen@modInp@parameters$pDummyImportCost)
     vDummyImportCost <- merge(pDummyImportCost, scen@modOut@variables$vDummyImport, by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyImportCost)])
     vDummyImportCost$value <- vDummyImportCost$value.x * vDummyImportCost$value.y;
     vDummyImportCost$value.x <- NULL; vDummyImportCost$value.y <- NULL;
     scen@modOut@variables$vDummyImportCost <- vDummyImportCost
-    pDummyExportCost <- .get_parameter_data(scen@modInp@parameters$pDummyExportCost)
+    pDummyExportCost <- .get_data_slot(scen@modInp@parameters$pDummyExportCost)
     vDummyExportCost <- merge(pDummyExportCost, scen@modOut@variables$vDummyExport, 
       by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyExportCost)])
     vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y;
     vDummyExportCost$value.x <- NULL; vDummyExportCost$value.y <- NULL;
     scen@modOut@variables$vDummyExportCost <- vDummyExportCost
-    tmp <- .get_parameter_data(scen@modInp@parameters$pEmissionFactor)
+    tmp <- .get_data_slot(scen@modInp@parameters$pEmissionFactor)
     tmp$comm2 <- tmp$commp; tmp$commp <- tmp$comm; tmp$comm <- tmp$comm2; tmp$comm2 <- NULL
-    pTechEmisComm <- .get_parameter_data(scen@modInp@parameters$pTechEmisComm)
+    pTechEmisComm <- .get_data_slot(scen@modInp@parameters$pTechEmisComm)
     vTechEmsFuel <- merge(merge(pTechEmisComm, 
       scen@modOut@variables$vTechInp, by = c('tech', 'comm')), tmp, by = 'comm')
     vTechEmsFuel$comm <- vTechEmsFuel$commp
@@ -144,6 +140,11 @@ read_solution <- function(scen, ...) {
   scen@status$optimial <- TRUE
   invisible(scen)
 }
+
+read_solution <- read.scenario
+# read.scenario <- function(scen, ...) read_solution(scen, ...)
+# .S3method("read", "scenario", read_solution)
+
 .paste_base_result2new <- function(scen) {
 	# Have to recalculate vObjective (need recalculate salvage before and so on, draft in Github/Misc/package/temp/interpolate_after_for_rest.R)
 	for (i in names(scen@misc$data.before)) {
@@ -158,3 +159,5 @@ read_solution <- function(scen, ...) {
 			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
   scen	
 }
+
+# 

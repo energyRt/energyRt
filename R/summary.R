@@ -23,5 +23,5 @@ summary.scenario <- function(scen) {
   cat("Size:", size(scen),"\n")
 }
 
+summary.levcost <- function(x) x$total
 
- 

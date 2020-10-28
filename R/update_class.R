@@ -19,7 +19,7 @@
   for(i in seq_along(tec_name)) {
     scen@modInp <- .add_set_element(scen@modInp, lst[[i]], scen@misc$approxim)
   }
-  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) .get_parameter_data(x)[, 1])
+  scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) .get_data_slot(x)[, 1])
   for(i in seq_along(tec_name)) {
     scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)
   }
@@ -34,7 +34,7 @@
 		scen@modInp <- .add_set_element(scen@modInp, lst[[i]], scen@misc$approxim)
 	}
 	scen@misc$approxim$commodity_slice_map <- .get_map_commodity_slice_map(scen)
-	scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) .get_parameter_data(x)[, 1])
+	scen@modInp@set <- lapply(scen@modInp@parameters[sapply(scen@modInp@parameters, function(x) x@type == 'set')], function(x) .get_data_slot(x)[, 1])
 	for(i in seq_along(lst)) {
 		scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)
 	}

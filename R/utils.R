@@ -10,7 +10,8 @@
 #' size(1)
 #' size(rep(1, 1e3))
 #' size(rep(1L, 1e3))
-size <- function(x, level1 = FALSE, units = "auto", sort = TRUE, decreasing = FALSE, byteTol = 0, asNumeric = FALSE) {
+size <- function(x, level1 = FALSE, units = "auto", sort = TRUE, 
+                 decreasing = FALSE, byteTol = 0, asNumeric = FALSE) {
   # browser()
   if (!level1) {
     format(object.size(x), units = units)
@@ -45,7 +46,7 @@ size <- function(x, level1 = FALSE, units = "auto", sort = TRUE, decreasing = FA
   }
 }
 
-if (F) {
+if (F) { # Check
   size(scen, 1, "Mb", byteTol = 1024)
   size(scen@modInp, 1, "Mb", byteTol = 1024)
   size(scen@modInp@parameters, 1, "Mb", byteTol = 1024*1000)
@@ -53,3 +54,9 @@ if (F) {
   size(scen@modInp@parameters$pTradeIrEff@data, 1, "Mb", byteTol = 0, asNumeric = T)
   head(scen@modInp@parameters$pTradeIrEff@data)
 }
+
+######### Internal utils ###########
+.fix_path <- function(x) gsub('[\\/]+', '/', paste0(x, '/'))
+
+###################################
+

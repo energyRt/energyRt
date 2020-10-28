@@ -31,10 +31,10 @@ setClass('parameter', # @parameter
       ))#,
 );
 
-setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type, 
-      check = NULL, defVal = 0, interpolation = 'back.inter.forth', 
-      colName = '', cls = NULL, slot = NULL
-  ) {
+setMethod("initialize", "parameter", 
+          function(.Object, name, dimSetNames, type, 
+                   check = NULL, defVal = 0, interpolation = 'back.inter.forth', 
+                   colName = '', cls = NULL, slot = NULL) {
   acceptable_set <- c('tech', 'techp', 'dem', 'sup', 'weather', 'acomm', 'comm', 'commp', 
                 'group', 'region', 'regionp', 'src', 'dst', 
                  'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade')
@@ -85,7 +85,7 @@ setMethod("initialize", "parameter", function(.Object, name, dimSetNames, type,
   .Object
 })
 
-createParameter <- function(...) new('parameter', ...)
+newParameter <- function(...) new('parameter', ...)
 
 .resetParameter <- function(x) {
   x@data <- x@data[0,, drop = FALSE]
@@ -170,8 +170,8 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 #         unique(obj@data[, dimSetNames])
 # })
 
-# setMethod('.get_parameter_data', signature(obj = 'parameter'), # getParameterTable
-.get_parameter_data <-  function(obj) {
+# setMethod('.get_data_slot', signature(obj = 'parameter'), # getParameterTable
+.get_data_slot <-  function(obj) {
     if (obj@nValues != -1) obj@data[1:obj@nValues,, drop = FALSE] else obj@data
 }
 
@@ -280,9 +280,9 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 
 
 # Create Set
-createSet <- function(dimSetNames) {
+newSet <- function(dimSetNames) {
   if (length(dimSetNames) != 1) stop('Internal error: Wrong dimSetNames')
-  createParameter(dimSetNames, dimSetNames, 'set')  
+  newParameter(dimSetNames, dimSetNames, 'set')  
 }
 # Add Set
 # setMethod('addSet', signature(obj = 'parameter', dimSetNames = 'character'),

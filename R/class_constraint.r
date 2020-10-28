@@ -334,7 +334,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
     new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
     for (i in seq_along(set.map)) 
-      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), c(set.map[[i]]))
+      prec@parameters[[new.map.name[i]]] <- addMultipleSet(newParameter(new.map.name[i], set.map.name[i], 'map'), c(set.map[[i]]))
     
     # copy new.map for lhs set that define in for each
     fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
@@ -391,7 +391,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   }
   if (nrow(stm@for.each) > 0) {
     nmn <- paste0('mCnsForEach', stm@name)
-    prec@parameters[[nmn]] <- .add_data(createParameter(nmn, colnames(stm@for.each), 'map'),
+    prec@parameters[[nmn]] <- .add_data(newParameter(nmn, colnames(stm@for.each), 'map'),
       stm@for.each)
     res$equation <- paste0(res$equation, '$', nmn, '(', paste0(colnames(stm@for.each), collapse = ', '), ')')
   }
@@ -426,11 +426,11 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         approxim2[[need.set2[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
       }
       approxim2$fullsets <- approxim$fullsets
-      xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
+      xx <- newParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
                             interpolation = 'back.inter.forth')
       prec@parameters[[xx@name]] <- .add_data(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
-        yy <- energyRt:::.getTotalParameterData(prec, xx@name)
+        yy <- .get_parameter_values(prec, xx@name)
         nn <- approxim$mileStoneForGrowth[as.character(yy$year)]
         if (any(lhs.set2$lag.year)) nn <- (-nn)
         yy$value <- (sign(yy$value) * abs(yy$value) ^ nn)
@@ -502,7 +502,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     }
     approxim2$fullsets <- approxim$fullsets
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
-    xx <- createParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
+    xx <- newParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
                           interpolation = 'back.inter.forth', colName = 'rhs')
     yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != 'value']
