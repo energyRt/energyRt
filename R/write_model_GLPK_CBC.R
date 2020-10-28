@@ -70,7 +70,7 @@
   .add_five_includes(arg, scen, NULL)
   
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == ''){
-    if (scen@solver$lang == 'GLPK') {
+    if (toupper(scen@solver$lang) == 'GLPK') {
       scen@solver$cmdline <- 'glpsol -m energyRt.mod -d energyRt.dat'
     } else {
       scen@solver$cmdline <- 'cbc energyRt.mod%energyRt.dat -solve'

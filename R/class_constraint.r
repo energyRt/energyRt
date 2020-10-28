@@ -430,7 +430,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
                             interpolation = 'back.inter.forth')
       prec@parameters[[xx@name]] <- .add_data(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
-        yy <- .get_parameter_values(prec, xx@name)
+        yy <- .add_dropped_zeros(prec, xx@name)
         nn <- approxim$mileStoneForGrowth[as.character(yy$year)]
         if (any(lhs.set2$lag.year)) nn <- (-nn)
         yy$value <- (sign(yy$value) * abs(yy$value) ^ nn)

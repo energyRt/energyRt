@@ -701,19 +701,27 @@ setMethod('print', 'modInp', function(x, ...) {
   sets
 }
 
-.get_parameter_values <- function(modInp, name, drop.unused.values = TRUE) {
-  # Returns data.frame filled the parameter ("name") data (incl. default values)
-  # drop_duplicates <- function(x) x[!duplicated(x),, drop = FALSE]
+.add_dropped_zeros <- function(modInp, name, drop.unused.values = TRUE, use.dplyr = TRUE) {
+  # Returns data.frame filled the parameter ("name") data with added, previous dropped zeros (if any)
+  # rare use - currently reserved for "fix to scenario" routines (and some excessive/double-checking use)
   tmp <- .get_default_values(modInp, name, drop.unused.values)
+  tmp$value <- 0
   dtt <- .get_data_slot(modInp@parameters[[name]])
-  # browser()
   if (!is.null(tmp)) {
-    # if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else 
-    #   gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
-    # if (ncol(gg) == 1) return(dtt)
-    gg <- suppressMessages(dplyr::left_join(dtt, tmp))
-  } else gg <- dtt
-  # gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
+    if (use.dplyr) {
+      cols <- colnames(dtt)
+      gg <- suppressMessages(dplyr::anti_join(tmp, dtt[,cols], by = cols[cols != 'value']))
+      gg <- suppressMessages(dplyr::left_join(dtt, gg))
+    } else {
+      if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else
+        gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
+      if (ncol(gg) == 1) return(dtt)
+      gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
+    }
+  } else {
+    gg <- dtt
+    # gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
+  }
   gg
 }
 

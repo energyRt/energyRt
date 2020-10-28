@@ -9,8 +9,9 @@ S3method(add, model)
 S3method(summary, scenario)
 S3method(summary, model)
 
-## write # S4
-#S3method(write, scenario) # S4
+## write #
+S3method(write, scenario) 
+S3method(write, default) 
 #exportMethods(write)
 
 ## read

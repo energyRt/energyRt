@@ -1345,7 +1345,7 @@ summary(scen_BASE_int)
 scen_BASE_int@misc$tmp.dir
 
 ## Writing the model code and data on disk
-scen_BASE_gams <- write_model(
+scen_BASE_gams <- write(
   scen_BASE_int, solver = "GAMS", 
   tmp.dir = "solwork/UTOPIA_BASE_GAMS")
 scen_BASE_gams@misc$tmp.dir # directory

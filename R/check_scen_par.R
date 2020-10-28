@@ -42,7 +42,7 @@
   	#scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
   	#if (scen@modInp@parameters$pTechShare@nValues != - 1)
     #		scen@modInp@parameters$pTechShare@nValues <- nrow(scen@modInp@parameters$pTechShare@data)
-		tmp <- .get_parameter_values(scen@modInp, 'pTechShare')
+		tmp <- .add_dropped_zeros(scen@modInp, 'pTechShare')
 		mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
 		tmp <- merge(tmp, mTechSpan)
 		tmp_lo <- merge(tmp[tmp$type == 'lo',, drop = FALSE], mTechGroupComm)

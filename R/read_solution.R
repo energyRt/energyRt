@@ -36,9 +36,10 @@ read.scenario <- function(scen, ...) {
   ss$slicep <- ss$slice
   rr$set_vec <- ss
 
-  # Read variable data
+  # Read variables
   for(i in c(vrb_list, vrb_list2)) {
-    jj <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), stringsAsFactors = FALSE)
+    jj <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), 
+                                 stringsAsFactors = FALSE)
     if (ncol(jj) == 1) {
       rr$variables[[i]] <- data.frame(value = jj[1, 1])
     } else {
@@ -81,9 +82,9 @@ read.scenario <- function(scen, ...) {
   }
   ## Salvage cost calculation
   salvage_cost0 <- function(scen, par) {
-    invcost <- .get_parameter_values(scen@modInp, paste0('p', par, 'Invcost'))
-    olife <- .get_parameter_values(scen@modInp, paste0('p', par, 'Olife'))
-    discount <- .get_parameter_values(scen@modInp, 'pDiscount')
+    invcost <- .add_dropped_zeros(scen@modInp, paste0('p', par, 'Invcost'))
+    olife <- .add_dropped_zeros(scen@modInp, paste0('p', par, 'Olife'))
+    discount <- .add_dropped_zeros(scen@modInp, 'pDiscount')
     newcap <- scen@modOut@variables[[paste0('v', par, 'NewCap')]]
     invcost$invcost <- invcost$value; invcost$value <- NULL
     olife$olife <- olife$value; olife$value <- NULL

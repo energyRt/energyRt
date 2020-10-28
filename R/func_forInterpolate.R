@@ -24,8 +24,8 @@
 }
 
 .add_discount_approxim <- function(scen, approxim) {
-	approxim$discountFactor <- .get_parameter_values(scen@modInp, 'pDiscountFactor', FALSE)
-	approxim$discount <- .get_parameter_values(scen@modInp, 'pDiscount', FALSE)
+	approxim$discountFactor <- .add_dropped_zeros(scen@modInp, 'pDiscountFactor', FALSE)
+	approxim$discount <- .add_dropped_zeros(scen@modInp, 'pDiscount', FALSE)
 	yy <- approxim$discountFactor
 	# ll <- NULL
 	# for (rg in unique(yy$region)) {

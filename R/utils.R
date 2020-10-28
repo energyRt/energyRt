@@ -60,3 +60,8 @@ if (F) { # Check
 
 ###################################
 
+
+check_name <- function(x) {
+  (length(x) != 1 || !is.character(x) || 
+     sub('^[[:alpha:]][[:alnum:]_]*$', '', x) == '')
+}

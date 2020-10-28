@@ -187,6 +187,7 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
 }
 
 .run_solve_model <- function(arg, scen) {
+  # browser()
   HOMEDIR <- getwd()
   if (!arg$run) return()
   if(arg$echo) cat(scen@solver$lang, ' time: ')
@@ -219,3 +220,17 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
   if (rs != 0) stop(paste('Solution error code', rs))
   if(arg$echo) cat('', round(proc.time()[3] - gams_run_time, 2), 's\n', sep = '')
 }
+
+.generate_gpr_gams_file <- function(tmp.dir) {
+# Generates GAMS-project file
+  zz <- file(paste(tmp.dir, '/energyRt_project.gpr', sep = ''), 'w')
+  cat(c('[RP:MDL]', '1=', '', '[OPENWINDOW_1]', 
+        'FILE0=energyRt.gms',
+        'FILE1=energyRt.lst',
+        # gsub('[/][/]*', '\\\\', paste('FILE0=', tmp.dir, '/energyRt.gms', sep = '')),
+        # gsub('[/][/]*', '\\\\', paste('FILE1=', tmp.dir, '/energyRt.lst', sep = '')), 
+        '', 'MAXIM=1', 
+        'TOP=50', 'LEFT=50', 'HEIGHT=400', 'WIDTH=400', ''), sep = '\n', file = zz)
+  close(zz)
+}
+

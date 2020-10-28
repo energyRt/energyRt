@@ -15,9 +15,9 @@
   # Move new capacity before startYear to to stock (technology)
   if (length(scen@modInp@set$tech) > 0) {
 	  tech.new.cap <- src@modOut@variables$vTechNewCap
-	  tech.stock <- .get_parameter_values(scen@modInp, 'pTechStock')
+	  tech.stock <- .add_dropped_zeros(scen@modInp, 'pTechStock')
 	  tech.new.cap <- tech.new.cap[tech.new.cap$year <= startYear,, drop = FALSE]
-	  tech.life <- .get_parameter_values(scen@modInp, 'pTechOlife')
+	  tech.life <- .add_dropped_zeros(scen@modInp, 'pTechOlife')
 	  olife.tmp <- tech.life$value
 	  names(olife.tmp) <- paste0(tech.life$tech, '#', tech.life$region)
 	  tech.new.cap$olife <- olife.tmp[paste0(tech.new.cap$tech, '#', tech.new.cap$region)]
@@ -38,9 +38,9 @@
   # Move new capacity before startYear to to stock (technology)
   if (length(scen@modInp@set$stg) > 0) {
 	  stg.new.cap <- src@modOut@variables$vStorageNewCap
-	  stg.stock <- .get_parameter_values(scen@modInp, 'pStorageStock')
+	  stg.stock <- .add_dropped_zeros(scen@modInp, 'pStorageStock')
 	  stg.new.cap <- stg.new.cap[stg.new.cap$year <= startYear,, drop = FALSE]
-	  stg.life <- .get_parameter_values(scen@modInp, 'pStorageOlife')
+	  stg.life <- .add_dropped_zeros(scen@modInp, 'pStorageOlife')
 	  olife.tmp <- stg.life$value
 	  names(olife.tmp) <- paste0(stg.life$stg, '#', stg.life$region)
 	  stg.new.cap$olife <- olife.tmp[paste0(stg.new.cap$stg, '#', stg.new.cap$region)]
@@ -101,7 +101,7 @@
 .fix.couple.cummulitive.uplo <- function(scen, src, startYear, var.name, var.par, mile.stone.length) {
 	# Chage supply reserve startYear (remove use in base period)
 	sup.res.use0 <- src@modOut@variables[[var.name]]
-	sup.res.par <- .get_parameter_values(scen@modInp, var.par)
+	sup.res.par <- .add_dropped_zeros(scen@modInp, var.par)
 	sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
 	sup.res.use0$type <- 'lo'
 	sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
@@ -121,7 +121,7 @@
 .fix.couple.cummulitive <- function(scen, src, startYear, var.name, var.par, mile.stone.length) {
 		# Chage supply reserve startYear (remove use in base period)
 		sup.res.use0 <- src@modOut@variables[[var.name]]
-		sup.res.par <- .get_parameter_values(scen@modInp, var.par)
+		sup.res.par <- .add_dropped_zeros(scen@modInp, var.par)
 		sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
 		sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
 															sup.res.use0[, colnames(sup.res.par)[colnames(sup.res.par) != 'value'], drop = FALSE], sum)
@@ -214,7 +214,7 @@
 						nn <- strsplit(eqt2, 'pCnsMult[[:alnum:]_]*')[[1]]
 						if (any(strsplit(gsub('([[:blank:]]*|[(]|[)].*)', '', nn[2]), ',')[[1]] == 'year')) {
 							prm <- gsub('(^[[:blank:]]*|[(].*)', '', substr(eqt2, nchar(nn[1]), nchar(eqt2)))
-							tpr <- .get_parameter_values(scen@modInp, prm)
+							tpr <- .add_dropped_zeros(scen@modInp, prm)
 							tpr <- tpr[tpr$year == last_noinc_mile, colnames(tpr) != 'year', drop = FALSE]
 							# Replace
 							if (ncol(tpr) == 1) {
@@ -251,7 +251,7 @@
 					if (param == '') param <- 1
 					tpr <- src@modOut@variables[[sub('[(].*', '', vrb)]]
 					if (any(grep('pCnsMult', param))) {
-						const <- .get_parameter_values(scen@modInp, gsub('([[:blank:]]*|[+-]|[(].*)', '', param))
+						const <- .add_dropped_zeros(scen@modInp, gsub('([[:blank:]]*|[+-]|[(].*)', '', param))
 						tpr <- merge(tpr, const, by = colnames(const)[colnames(const) != 'value'])
 						tpr$value <- tpr$value.x * tpr$value.y
 						if (any(grep('[-]', param))) tpr$value <- (-tpr$value)
@@ -268,7 +268,7 @@
 					forMrg <- gsub('[(].*$', '', strsplit(cond2, 'and ')[[1]])
 					for (fr in forMrg) {
 						tmp <- .get_data_slot(scen@modInp@parameters[[fr]])
-						#tmp <- .get_parameter_values(scen@modInp, fr)
+						#tmp <- .add_dropped_zeros(scen@modInp, fr)
 						tpr <- merge(tpr, tmp, by = colnames(tmp)[colnames(tmp) != 'value'])
 					}
 					# Summing sum set & year
