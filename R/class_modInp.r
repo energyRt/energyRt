@@ -701,28 +701,28 @@ setMethod('print', 'modInp', function(x, ...) {
   sets
 }
 
-.add_dropped_zeros <- function(modInp, name, drop.unused.values = TRUE, use.dplyr = TRUE) {
+.add_dropped_zeros <- function(modInp, name, drop.unused.values = TRUE, use.dplyr = FALSE) {
   # Returns data.frame filled the parameter ("name") data with added, previous dropped zeros (if any)
   # rare use - currently reserved for "fix to scenario" routines (and some excessive/double-checking use)
   tmp <- .get_default_values(modInp, name, drop.unused.values)
-  tmp$value <- 0
+  # tmp$value <- 0
   dtt <- .get_data_slot(modInp@parameters[[name]])
+  # browser()
   if (!is.null(tmp)) {
     if (use.dplyr) {
       cols <- colnames(dtt)
       gg <- suppressMessages(dplyr::anti_join(tmp, dtt[,cols], by = cols[cols != 'value']))
       gg <- suppressMessages(dplyr::left_join(dtt, gg))
+      return(gg)
     } else {
       if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else
         gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
       if (ncol(gg) == 1) return(dtt)
-      gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
-    }
+     }
   } else {
     gg <- dtt
-    # gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
   }
-  gg
+  gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
 }
 
 #### <end> ####

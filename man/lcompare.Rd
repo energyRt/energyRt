@@ -4,7 +4,7 @@
 \alias{lcompare}
 \title{Comparison of two objects.}
 \usage{
-lcompare(x, y, depth = 0, showDiff = TRUE)
+lcompare(x, y, depth = 0, showDiff = TRUE, allowAll = TRUE, round = 7)
 }
 \arguments{
 \item{x}{object to compare}

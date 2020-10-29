@@ -5,7 +5,12 @@
 \alias{get_labpt_spdf}
 \title{Get coordinates of region centers (labpt)}
 \usage{
-getCenters(spdf, regionsAsCharacters = TRUE, asTibble = TRUE)
+getCenters(
+  spdf,
+  region = "region",
+  regionsAsCharacters = TRUE,
+  asTibble = TRUE
+)
 }
 \arguments{
 \item{spdf}{SpatialPolygonDataFrame object}

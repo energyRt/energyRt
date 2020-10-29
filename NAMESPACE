@@ -33,3 +33,4 @@ S3method(update, weather)
 
 ## draw
 S3method(draw, technology)
+

@@ -1258,7 +1258,7 @@ mdl@sysInfo@milestone
 # Scenarios
 
 ## "BASE": traditional techs, no trade
-```{r BASE, eval=T, echo=F}
+```{r BASE, eval=F, echo=F}
 # Four alternative languages to solve the model
 scen_BASE <- solve(mdl, name = "BASE", 
                    # tmp.path = "C:/solwork",
@@ -1355,7 +1355,7 @@ scen_BASE_py <- write(scen_BASE_int, solver = "PYOMO",
 scen_BASE_py@misc$tmp.dir
 
 scen_BASE_glpk <- write(scen_BASE_int, solver = "GLPK", 
-                        tmp.dir = "solwork/UTOPIA_BASE_GLPK")
+                        tmp.dir = "solwork/UTOPIA_BASE_GLPK2")
 
 scen_BASE_jl <- write(scen_BASE_int, solver = "JuMP", 
                       tmp.dir = "solwork/UTOPIA_BASE_Julia")
@@ -1443,7 +1443,7 @@ scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC)
 scen_RBAU2 <- write(scen_RBAU2, solver = mysolver, tmp.dir = "solwork/UTOPIA_REN")
 
 ## Solving the model
-solve_model(tmp.dir = "solwork/UTOPIA_REN", wait = TRUE)
+solve(scen_RBAU2, tmp.dir = "solwork/UTOPIA_REN", wait = TRUE)
 
 ## Read solution
 scen_RBAU2 <- read(scen_RBAU2)

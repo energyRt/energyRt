@@ -4,8 +4,7 @@
 \alias{addCenters}
 \title{Adding region centers coordinate to a data frame}
 \usage{
-addCenters(dat, labpt, ID = "region", pref = paste0(ID, "."),
-  sfx = NULL)
+addCenters(dat, labpt, ID = "region", pref = paste0(ID, "."), sfx = NULL)
 }
 \arguments{
 \item{dat}{data.frame, should have a column with regions' IDs}
