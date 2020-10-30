@@ -1,3 +1,5 @@
+# !!! Auto-generated? Rewrite/optimize using arrays or data.frames
+# make rownames optional
 ..getEquationsDim <- function() {
   list(
     eqTechSng2Sng = c("tech", "region", "comm", "comm", "year", "slice"), 
