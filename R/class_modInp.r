@@ -26,8 +26,8 @@ setClass("modInp",
 #### Constructor ####
 # !!! optimize - rewrite using array
 setMethod("initialize", "modInp",
-  function(modInp) {
-    x <- modInp@parameters
+  function(.Object) {
+    x <- .Object@parameters
     # sets ####
     x[['region']] <- newSet('region')    
     x[['year']]   <- newSet('year')    
@@ -579,8 +579,8 @@ setMethod("initialize", "modInp",
     x[['meqBalFx']] <- newParameter('meqBalFx', c('comm', 'region', 'year', 'slice'), 'map')
     x[['meqLECActivity']] <- newParameter('meqLECActivity', c('tech', 'region', 'year'), 'map')
 
-    modInp@parameters <- x
-    modInp
+    .Object@parameters <- x
+    .Object
   })
 
 
