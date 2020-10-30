@@ -6,8 +6,9 @@ S3method(add, repository)
 S3method(add, model)
 
 ## summary
-S3method(summary, scenario)
 S3method(summary, model)
+S3method(summary, scenario)
+# S3method(summary, technology)
 
 ## write #
 S3method(write, scenario) 
@@ -33,4 +34,24 @@ S3method(update, weather)
 
 ## draw
 S3method(draw, technology)
+
+## plot
+S3method(plot, levcost)
+
+## barplot
+S3method(barplot, levcost)
+
+## print
+S3method(print, commodity)
+S3method(print, demand)
+S3method(print, equation)
+S3method(print, model)
+S3method(print, region)
+S3method(print, repository)
+S3method(print, scenario)
+S3method(print, set)
+S3method(print, summand)
+S3method(print, supply)
+S3method(print, sysInfo)
+S3method(print, technology)
 

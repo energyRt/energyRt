@@ -607,19 +607,8 @@ setMethod("initialize", "modInp",
     .Object
   })
 
-# Print ####
-setMethod('print', 'modInp', function(x, ...) {
-	if (length(x@parameters) == 0) {
-		cat('There is no data\n')
-	} else {
-		for(i in 1:length(x@parameters)) {
-			print(x@parameters[[i]])
-    }
-  }
-})
 
 #### Internal functions ####
-
 .get_default_values <- function(modInp, name, drop.unused.values) {
   # Returns data.frame with default values of parameters on 
   #       expanded grid of all (or used only, like milestone-years) 

@@ -150,7 +150,7 @@
   zz_modout <- file(paste(arg$tmp.dir, '/output.py', sep = ''), 'w')
   cat(run_codeout, sep = '\n', file = zz_modout)
   close(zz_modout)
-  .add_five_includes(arg, scen, ".py")
+  .write_inc_files(arg, scen, ".py")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'python energyRt.py'
   scen@solver$code <- c('energyRt.py', 'output.py', 'inc_constraints.py', 'inc_solver.py')

@@ -67,7 +67,7 @@
   cat(file_w, sep = '\n', file = zz) 
   cat('end;', '', sep = '\n', file = zz) 
   close(zz)
-  .add_five_includes(arg, scen, NULL)
+  .write_inc_files(arg, scen, NULL)
   
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == ''){
     if (toupper(scen@solver$lang) == 'GLPK') {

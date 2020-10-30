@@ -109,7 +109,7 @@
   zz_modout <- file(paste(arg$tmp.dir, '/output.jl', sep = ''), 'w')
   cat(run_codeout, sep = '\n', file = zz_modout)
   close(zz_modout)
-  .add_five_includes(arg, scen, ".jl")
+  .write_inc_files(arg, scen, ".jl")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'julia energyRt.jl'
   scen@solver$code <- c('energyRt.jl', 'output.jl', 'inc_constraints.jl', 'inc_solver.jl')
