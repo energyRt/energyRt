@@ -124,7 +124,7 @@ setMethod("initialize", "modInp",
     x[['pEmissionFactor']] <- 
     	newParameter('pEmissionFactor', c('comm', 'commp'), 'simple',  #PPP
     		defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity', 
-    		colName = 'mean', slot = 'emis')    
+    		colName = 'emis', slot = 'emis')    
     x[['pAggregateFactor']] <- 
     	newParameter('pAggregateFactor', c('comm', 'commp'), 'simple', #PPP
     		defVal = 0, interpolation = 'back.inter.forth', cls = 'commodity') #, colName = 'agg', slot = 'agg')    

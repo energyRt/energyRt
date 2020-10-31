@@ -1,7 +1,18 @@
-#---------------------------------------------------------------------------------------------------------
-# export
-#---------------------------------------------------------------------------------------------------------
-# !!!check names - `exp`???
+#' Title
+#'
+#' @slot name character. 
+#' @slot description character. 
+#' @slot commodity character. 
+#' @slot unit character. 
+#' @slot reserve numeric. 
+#' @slot exp data.frame. 
+#' @slot slice character. 
+#' @slot misc list. 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 setClass("export",
       representation(
           name          = "character",
@@ -38,7 +49,6 @@ setClass("export",
       misc = list(
       )),
       S3methods = TRUE
-);
-setMethod("initialize", "export", function(.Object, ...) {
-  .Object
-})
+)
+
+setMethod("initialize", "export", function(.Object, ...) {.Object})

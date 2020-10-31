@@ -1,103 +1,44 @@
-# Commodity
+#' An S4 class to represent a commodity
+#'
+#' @slot name short name, used in sets, no white spaces and special characters allowed
+#' @slot description (optional) description of 
+#' @slot limtype limit type of the commodity in balance equation ("LO" by default)
+#' @slot slice the level of time-slice the commodity operates in the model 
+#'             (the lowest slice-level used by default)
+#' @slot unit the main unit of the commodity used in the model, character string
+#' @slot emis data.frame with emissions factors, see details
+#' @slot agg data.frame with aggregation parameters of several commodities into one
+#' @slot misc list with miscellaneous information to store
+#' 
 setClass("commodity",
       representation(
-      # General information
           name          = "character",      # Short name
           description   = "character",      # Details
-          type	        = "character",      # energy, electricity, material, (fuel?)
-          origin        = "character",      # Region of origin
-      # Physical Property
-          weight        = "data.frame",
-          density       = "data.frame",
-      # Energy
-          LHV           = "data.frame",
-          HHV           = "data.frame",
-      # Content
-          content       = "data.frame",     # 
-      # Emission Factor
-          emis          = "data.frame",     # Emission factors
-          agg           = "data.frame",     # Aggregation parameter
-      # Miscelaneous
-          # color         = "character",      #
-          # source        = "list",
-          # other         = "list",           #
           limtype       = "factor",
           slice         = "character",
-          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-          misc = "list"
+          unit          = "character",
+          emis          = "data.frame",     # Emission factors
+          agg           = "data.frame",     # Aggregation parameter
+          misc          = "list"
       ),
       prototype(
-          name          = "",
-          description   = "",
-          type	        = "",
-          origin        = "",
-          weight        = data.frame(unit     = character(),
-                                     mean     = numeric(),
-                                     sd       = numeric(),
-                                     median   = numeric(),
-                                     min      = numeric(),
-                                     max      = numeric(),
-                                     PDF      = character(), # Probability Density Function
-                                     stringsAsFactors = FALSE),
-          density       = data.frame(unit     = character(),
-                                     mean     = numeric(),
-                                     sd       = numeric(),
-                                     median   = numeric(),
-                                     min      = numeric(),
-                                     max      = numeric(),
-                                     PDF      = character(), # Probability Density Function
-                                     stringsAsFactors = FALSE),
-          LHV           = data.frame(unit     = character(),
-                                     mean     = numeric(),
-                                     sd       = numeric(),
-                                     median   = numeric(),
-                                     min      = numeric(),
-                                     max      = numeric(),
-                                     PDF      = character(), # Probability Density Function
-                                     stringsAsFactors = FALSE),
-          HHV           = data.frame(unit     = character(),
-                                     mean     = numeric(),
-                                     sd       = numeric(),
-                                     median   = numeric(),
-                                     min      = numeric(),
-                                     max      = numeric(),
-                                     PDF      = character(), # Probability Density Function
-                                     stringsAsFactors = FALSE),
-          content       = data.frame(name     = character(),
-                                     unit     = character(),
-                                     mean     = numeric(),
-                                     sd       = numeric(),
-                                     median   = numeric(),
-                                     min      = numeric(),
-                                     max      = numeric(),
-                                     PDF      = character(), # Probability Density Function
+          name          = character(),
+          description   = character(),
+          limtype       = factor('LO', levels = c('FX', 'UP', 'LO')),
+          slice         = character(),
+          unit          = character(),
+          agg           = data.frame(comm     = character(),
+                                     unit     = numeric(),
+                                     agg      = numeric(),
                                      stringsAsFactors = FALSE),
           emis          = data.frame(comm     = character(),
                                      unit     = character(),
-                                     mean     = numeric(),
-                                     sd       = numeric(),
-                                     median   = numeric(),
-                                     min      = numeric(),
-                                     max      = numeric(),
-                                     PDF      = character(), # Probability Density Function
+                                     emis     = numeric(),
                                      stringsAsFactors = FALSE),
-          agg          = data.frame(comm     = character(),
-                                     unit     = numeric(),
-                                     agg     = numeric(),
-                                     stringsAsFactors = FALSE),
-          # color         = "",
-          # source        = list(),
-          # other         = list(),
-          limtype       = factor('LO', levels = c('FX', 'UP', 'LO')),
-          slice         = character(),
-          # GIS           = NULL,
-      #! Misc
-      misc = list(
-      )),
+          misc          = list()),
       S3methods = TRUE
-)
-setMethod("initialize", "commodity", function(.Object, ...) {
-  .Object
-})
+      )
+
+setMethod("initialize", "commodity", function(.Object, ...) {.Object})
 
 

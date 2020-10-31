@@ -8,7 +8,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   cmd <- app
   cmd <- stayOnlyVariable(cmd, approxim$region, 'region')
   # Add ems_from & pEmissionFactor
-  dd <- cmd@emis[, c('comm', 'comm', 'mean'), drop = FALSE]
+  dd <- cmd@emis[, c('comm', 'comm', 'emis'), drop = FALSE]
   if (nrow(dd) > 0) {
     colnames(dd) <- c('comm', 'commp', 'value')
     dd[, 'commp'] <- cmd@name

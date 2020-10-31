@@ -1,6 +1,19 @@
-#---------------------------------------------------------------------------------------------------------
-# import
-#---------------------------------------------------------------------------------------------------------
+#' Title
+#'
+#' @slot name character. 
+#' @slot description character. 
+#' @slot commodity character. 
+#' @slot unit character. 
+#' @slot reserve numeric. 
+#' @slot imp data.frame. 
+#' @slot slice character. 
+#' @slot misc list. 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' 
 setClass("import",
       representation(
           name          = "character",
@@ -11,7 +24,7 @@ setClass("import",
           reserve       = "numeric",
           imp           = "data.frame",
           slice         = "character",
-          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", 
           misc = "list"
       ),
       prototype(
@@ -33,11 +46,7 @@ setClass("import",
                                      stringsAsFactors = FALSE),
       slice         = character(),
       # GIS           = NULL,
-      #! Misc
-      misc = list(
-      )),
+      misc = list()),
       S3methods = TRUE
 );
-setMethod("initialize", "import", function(.Object, ...) {
-  .Object
-})
+setMethod("initialize", "import", function(.Object, ...) {.Object})
