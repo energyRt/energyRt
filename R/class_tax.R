@@ -22,8 +22,7 @@ setClass("tax",
            defVal        = 0,      # 
            value        = data.frame(stringsAsFactors = FALSE),
            #! Misc
-           misc = list(
-           )),
+           misc = list()),
          S3methods = TRUE
 )
 
