@@ -1,5 +1,17 @@
-#### modInp-class ####
-
+#' An S4 class to represent model input
+#'
+#' @slot set list. 
+#' @slot parameters list. 
+#' @slot modelVersion character. 
+#' @slot solver character. 
+#' @slot gams.equation list. 
+#' @slot misc list. 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' 
 setClass("modInp", 
   representation(
     set = "list", # @sets List with set : tech, sup, group, comm, region, year, slice
@@ -10,12 +22,10 @@ setClass("modInp",
     misc = "list"
   ),
   prototype(
-    set = list(tech = c(), sup = c(), group = c(),
-                comm = c(), region = c(), year = c(), slice = c()
-    ),
-    parameters = list(), # List with techology parameter
-    modelVersion        = "",
-    solver              = "",
+    set = list(),
+    parameters     = list(),
+    modelVersion   = "",
+    solver         = "",
     gams.equation  = list(),
     #! Misc
     misc = list(
@@ -38,9 +48,9 @@ setMethod("initialize", "modInp",
     x[['tech']]   <- newSet('tech')    
     x[['group']]  <- newSet('group')    
     x[['stg']]    <- newSet('stg')    
-    x[['expp']]    <- newSet('expp')    
+    x[['expp']]   <- newSet('expp')    
     x[['imp']]    <- newSet('imp')    
-    x[['trade']]    <- newSet('trade')    
+    x[['trade']]  <- newSet('trade')    
 
     # weather ####
     x[['weather']] <- newSet('weather')

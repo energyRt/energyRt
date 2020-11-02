@@ -1,6 +1,6 @@
 #' An S4 class to represent a commodity
 #'
-#' @slot name short name, used in sets, no white spaces and special characters allowed
+#' @slot name short name, used in sets, no white spaces or special characters
 #' @slot description (optional) description of 
 #' @slot limtype limit type of the commodity in balance equation ("LO" by default)
 #' @slot slice the level of time-slice the commodity operates in the model 

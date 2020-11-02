@@ -1,6 +1,20 @@
-#---------------------------------------------------------------------------------------------------------
-# supply
-#---------------------------------------------------------------------------------------------------------
+#' An S4 class to represent a supply of a commodity
+#'
+#' @slot name character. 
+#' @slot description character. 
+#' @slot commodity character. 
+#' @slot unit character. 
+#' @slot weather data.frame. 
+#' @slot reserve data.frame. 
+#' @slot availability data.frame. 
+#' @slot region character. 
+#' @slot slice character. 
+#' @slot misc list. 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 setClass("supply",
       representation(
           name          = "character",
@@ -48,7 +62,6 @@ setClass("supply",
         #! Misc
         misc = list()),
       S3methods = TRUE
-);
-setMethod("initialize", "supply", function(.Object, ...) {
-  .Object
-})
+)
+
+setMethod("initialize", "supply", function(.Object, ...) {.Object})
