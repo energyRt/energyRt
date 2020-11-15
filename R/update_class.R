@@ -44,19 +44,21 @@
 
 .replace_taxsub <- function(scen, lst) {
   cls <- class(lst[[1]])
-  if (cls == 'tax') prm <- 'pTaxCost' else prm <- 'pSubsCost' 
+  if (cls == 'tax') prm2 <- 'pTaxCost' else prm <- 'pSubCost' 
+  prm2 <- paste0(prm2, c('Bal', 'Inp', 'Out'))
   comm_out <- sapply(lst, function(x) x@comm)
-  
-  if (scen@modInp@parameters[[prm]]@nValues != -1) {
-    scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[seq_len(scen@modInp@parameters[[prm]]@nValues),, drop = FALSE]
-  }
-  scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[!(scen@modInp@parameters[[prm]]@data[, 'comm'] %in% comm_out),, drop = FALSE]
-  if (scen@modInp@parameters[[prm]]@nValues != -1) {
-    scen@modInp@parameters[[prm]]@nValues <- nrow(scen@modInp@parameters[[prm]]@data)
-  }
-  # Add data
-  for (i in seq_along(lst))
-    scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)
+  for (prm in prm2) {
+	  if (scen@modInp@parameters[[prm]]@nValues != -1) {
+	    scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[seq_len(scen@modInp@parameters[[prm]]@nValues),, drop = FALSE]
+	  }
+	  scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[!(scen@modInp@parameters[[prm]]@data[, 'comm'] %in% comm_out),, drop = FALSE]
+	  if (scen@modInp@parameters[[prm]]@nValues != -1) {
+	    scen@modInp@parameters[[prm]]@nValues <- nrow(scen@modInp@parameters[[prm]]@data)
+	  }
+	  # Add data
+	  for (i in seq_along(lst))
+	    scen@modInp <- energyRt:::.add0(scen@modInp, lst[[i]], approxim = scen@misc$approxim)
+	}
   scen
 }
 
@@ -121,7 +123,7 @@
   reduce_map <- c('mTechInpTot',  'mTechOutTot',  'mSupOutTot',  'mDemInp',  'mTechEmsFuel',  'mEmsFuelTot',  
                    'mDummyImport',  'mDummyExport',  'mDummyCost',  'mTradeIr',  'mTradeIrUp',  'mvTradeIrAInp',  'mvTradeIrAInpTot',  
                    'mvTradeIrAOut',  'mvTradeIrAOutTot',  'mImportRow',  'mImportRowUp',  'mImportRowAccumulatedUp',  'mExportRow',  'mExportRowUp',  
-                   'mExportRowAccumulatedUp',  'mExport',  'mImport',  'mStorageInpTot',  'mStorageOutTot',  'mTaxCost',  'mSubsCost',  'mAggOut',  'mSupAva',  
+                   'mExportRowAccumulatedUp',  'mExport',  'mImport',  'mStorageInpTot',  'mStorageOutTot',  'mTaxCost',  'mSubCost',  'mAggOut',  'mSupAva',  
                    'mSupAvaUp',  'mSupReserveUp',  'mTechAfUp',  'mTechAfcUp',  'mTechOlifeInf',  'mStorageOlifeInf',  'mOut2Lo',  'mInp2Lo')
   for (i in c(sys_info_par, reduce_map)) {
     scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[0,, drop = FALSE]

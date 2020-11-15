@@ -156,14 +156,16 @@ setMethod("initialize", "modInp",
     	newParameter('pDummyExportCost', c('comm', 'region', 'year', 'slice'), 
     	             'simple', defVal = Inf, interpolation = 'back.inter.forth', 
     	             colName = 'dummyExport', cls = 'sysInfo', slot = 'debug')    
-    # tax ####
-    x[['pTaxCost']] <- 
-    	newParameter('pTaxCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'inter.forth', colName = 'value') #, cls = 'tax', slot = 'tax')    
-    # subsidy ####
-    x[['pSubsCost']] <- 
-    	newParameter('pSubsCost', c('comm', 'region', 'year', 'slice'), 'simple', 
-    		defVal = 0, interpolation = 'inter.forth', colName = 'value') #, cls = 'sub', slot = 'subs')    
+    for (ii in c('Inp', 'Out', 'Bal')) {
+	    # tax ####
+	    x[[paste0('pTaxCost', ii)]] <- 
+	    	newParameter(paste0('pTaxCost', ii), c('comm', 'region', 'year', 'slice'), 'simple', 
+	    		defVal = 0, interpolation = 'inter.forth', colName = 'value') #, cls = 'tax', slot = 'tax')    
+	    # subsidy ####
+	    x[[paste0('pSubCost', ii)]] <- 
+	    	newParameter(paste0('pSubCost', ii), c('comm', 'region', 'year', 'slice'), 'simple', 
+	    		defVal = 0, interpolation = 'inter.forth', colName = 'value') #, cls = 'sub', slot = 'subs')    
+    }
     # supply ####
     # mapping
     x[['mSupComm']] <- 
@@ -482,7 +484,7 @@ setMethod("initialize", "modInp",
     x[['mStorageOutTot']] <- newParameter('mStorageOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
     
     x[['mTaxCost']] <- newParameter('mTaxCost', c('comm', 'region', 'year'), 'map') 
-    x[['mSubsCost']] <- newParameter('mSubsCost', c('comm', 'region', 'year'), 'map') 
+    x[['mSubCost']] <- newParameter('mSubCost', c('comm', 'region', 'year'), 'map') 
     x[['mAggOut']] <- newParameter('mAggOut', c('comm', 'region', 'year', 'slice'), 'map') 
     
     x[['mSupOutTot']] <- newParameter('mSupOutTot', c('comm', 'region', 'year', 'slice'), 'map') 

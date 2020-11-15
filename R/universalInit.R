@@ -261,29 +261,11 @@ update.weather <- function(obj, ...)
   .new_object('weather', name = obj, ...)
 
 setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
-setMethod('newTax', signature(name = 'character'), function(name, ..., value = NULL) {
-  if (is.numeric(value)) {
-    defVal <- value
-    value <- NULL
-  } else defVal <- NULL
-  tt <- .new_object('tax', name, ..., defVal = defVal)
-  if (!is.null(value)) {
-  	if (!is.data.frame(value) && is.list(value)) 
-  		value <- as.data.frame(value)
-  	for (i in c('region', 'year', 'slice')) 
-  		if (all(colnames(value) != i))
-  			value[, i] <- rep(NA, nrow(value))
-  	value <- value[, c('region', 'year', 'slice', 'value')]
-  	tt@value <- value
-  }
-  tt	
+setMethod('newTax', signature(name = 'character'), function(name, ...) {
+ .new_object('tax', name = name, ...)
 })
 setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
 
 setMethod('newSub', signature(name = 'character'), function(name, ..., value = NULL) {
-  if (is.numeric(value)) {
-    defVal <- value
-    value <- NULL
-  } else defVal <- NULL
-  .new_object('sub', name, ..., value = value, defVal = defVal)
+ .new_object('sub', name = name, ...)
 })

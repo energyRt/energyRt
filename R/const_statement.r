@@ -95,7 +95,7 @@
   vDummyImport = "vDummyImport( comm , region , year , slice ) $ mDummyImport( comm , region , year , slice )",
   vDummyExport = "vDummyExport( comm , region , year , slice ) $ mDummyExport( comm , region , year , slice )",
   vTaxCost = "vTaxCost( comm , region , year ) $ mTaxCost( comm , region , year )",
-  vSubsCost = "vSubsCost( comm , region , year ) $ mSubsCost( comm , region , year )",
+  vSubsCost = "vSubsCost( comm , region , year ) $ mSubCost( comm , region , year )",
   vAggOut = "vAggOut( comm , region , year , slice ) $ mAggOut( comm , region , year , slice )",
   vStorageInp = "vStorageInp( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",
   vStorageOut = "vStorageOut( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",

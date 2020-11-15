@@ -112,6 +112,13 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
     x <- x[, set, drop = FALSE]
     x[!duplicated(x),, drop = FALSE]
   }
+  reduce.sect.merge.unique <- function(xxx, set) {
+    gg <- NULL
+    for (x in xxx)
+      gg <- rbind(gg, reduce.sect(x, set))
+    unique(gg)
+  }
+  
   .interpolation_message('region', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   region <- .get_data_slot(prec@parameters$region)
   .interpolation_message('mMidMilestone', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
@@ -259,10 +266,20 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   .interpolation_message('mTaxCost', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   
   # mTaxCost(comm, region, year)  sum(slice$pTaxCost(comm, region, year, slice), 1)
-  prec@parameters[['mTaxCost']] <- .add_data(prec@parameters[['mTaxCost']], reduce.sect(.get_data_slot(prec@parameters$pTaxCost), c('comm', 'region', 'year')))
-  # mSubsCost(comm, region, year)  sum(slice$pSubsCost(comm, region, year, slice), 1)
-  .interpolation_message('mSubsCost', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-  prec@parameters[['mSubsCost']] <- .add_data(prec@parameters[['mSubsCost']], reduce.sect(.get_data_slot(prec@parameters$pSubsCost), c('comm', 'region', 'year')))
+  prec@parameters[['mTaxCost']] <- .add_data(prec@parameters[['mTaxCost']], 
+      reduce.sect.merge.unique(list(
+        .get_data_slot(prec@parameters$pTaxCostInp),
+        .get_data_slot(prec@parameters$pTaxCostOut),
+        .get_data_slot(prec@parameters$pTaxCostBal)
+        ), c('comm', 'region', 'year')))
+  # mSubCost(comm, region, year)  sum(slice$pSubCost(comm, region, year, slice), 1)
+  .interpolation_message('mSubCost', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
+  prec@parameters[['mSubCost']] <- .add_data(prec@parameters[['mSubCost']], 
+      reduce.sect.merge.unique(list(
+        .get_data_slot(prec@parameters$pSubCostInp),
+        .get_data_slot(prec@parameters$pSubCostOut),
+        .get_data_slot(prec@parameters$pSubCostBal)
+        ), c('comm', 'region', 'year')))
   #    (sum(commp$pAggregateFactor(comm, commp), 1))
   .interpolation_message('mAggOut', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   if (nrow(.get_data_slot(prec@parameters$pAggregateFactor)) > 0) {

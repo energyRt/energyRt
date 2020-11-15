@@ -496,9 +496,9 @@
     rs["eqCost", c("name", "description")] <- c("eqCost", "Total costs");
     rs["eqCost", c("tech", "sup", "stg", "comm", "region", "year", "slice", "vTechEac", "vTechOMCost", "vSupCost", "vTotalCost", "vTaxCost", "vSubsCost", "vStorageOMCost", "vTradeCost", "vDummyImport", "vDummyExport", "vStorageEac")] <- TRUE;
     rs["eqTaxCost", c("name", "description")] <- c("eqTaxCost", "Commodity taxes");
-    rs["eqTaxCost", c("comm", "region", "year", "slice", "vTaxCost", "vOutTot")] <- TRUE;
+    rs["eqTaxCost", c("comm", "region", "year", "slice", "vBalance", "vTaxCost", "vOutTot", "vInpTot")] <- TRUE;
     rs["eqSubsCost", c("name", "description")] <- c("eqSubsCost", "Commodity subsidy");
-    rs["eqSubsCost", c("comm", "region", "year", "slice", "vSubsCost", "vOutTot")] <- TRUE;
+    rs["eqSubsCost", c("comm", "region", "year", "slice", "vBalance", "vSubsCost", "vOutTot", "vInpTot")] <- TRUE;
     rs["eqObjective", c("name", "description")] <- c("eqObjective", "Objective equation");
     rs["eqObjective", c("region", "year", "vTotalCost", "vObjective")] <- TRUE;
     rs["eqLECActivity", c("name", "description")] <- c("eqLECActivity", "");
@@ -625,7 +625,7 @@ rs
     rs["vEmsFuelTot", c("name", "description")] <- c("vEmsFuelTot", "Total fuel emissions");
     rs["vEmsFuelTot", c("comm", "region", "year", "slice", "eqEmsFuelTot", "eqOutTot", "eqOut2Lo")] <- TRUE;
     rs["vBalance", c("name", "description")] <- c("vBalance", "Net commodity balance");
-    rs["vBalance", c("comm", "region", "year", "slice", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal")] <- TRUE;
+    rs["vBalance", c("comm", "region", "year", "slice", "eqBalUp", "eqBalLo", "eqBalFx", "eqBal", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["vTotalCost", c("name", "description")] <- c("vTotalCost", "Regional annual total costs");
     rs["vTotalCost", c("region", "year", "eqCost", "eqObjective")] <- TRUE;
     rs["vObjective", c("name", "description")] <- c("vObjective", "Objective costs");
@@ -671,7 +671,7 @@ rs
     rs["vOutTot", c("name", "description")] <- c("vOutTot", "Total commodity output (consumption is not counted)");
     rs["vOutTot", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["vInpTot", c("name", "description")] <- c("vInpTot", "Total commodity input");
-    rs["vInpTot", c("comm", "region", "year", "slice", "eqBal", "eqInpTot")] <- TRUE;
+    rs["vInpTot", c("comm", "region", "year", "slice", "eqBal", "eqInpTot", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["vInp2Lo", c("name", "description")] <- c("vInp2Lo", "Desagregation of slices for input parent to (grand)child");
     rs["vInp2Lo", c("comm", "region", "year", "slice", "eqInpTot", "eqInp2Lo")] <- TRUE;
     rs["vOut2Lo", c("name", "description")] <- c("vOut2Lo", "Desagregation of slices for output parent to (grand)child");
@@ -848,7 +848,7 @@ rs
    eqObjective  = logical(),
    eqLECActivity  = logical(),
       stringsAsFactors = FALSE);
-    rs[1:335,] <- NA;
+    rs[1:339,] <- NA;
     rownames(rs) <- c("weather",
 "tech",
 "sup",
@@ -1005,7 +1005,7 @@ rs
 "mStorageInpTot",
 "mStorageOutTot",
 "mTaxCost",
-"mSubsCost",
+"mSubCost",
 "mAggOut",
 "mTechAfUp",
 "mTechOlifeInf",
@@ -1114,8 +1114,12 @@ rs
 "pEmissionFactor",
 "pDummyImportCost",
 "pDummyExportCost",
-"pTaxCost",
-"pSubsCost",
+"pTaxCostInp",
+"pTaxCostOut",
+"pTaxCostBal",
+"pSubCostInp",
+"pSubCostOut",
+"pSubCostBal",
 "pStorageInpEff",
 "pStorageOutEff",
 "pStorageStgEff",
@@ -1229,7 +1233,7 @@ rs
     rs["mMidMilestone", c("name", "description", "type")] <- c("mMidMilestone", "Milestone year", "map");
     rs["mMidMilestone", c("year")] <- TRUE;
     rs["mCommSlice", c("name", "description", "type")] <- c("mCommSlice", "Commodity to slice", "map");
-    rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost", "eqSubsCost")] <- TRUE;
+    rs["mCommSlice", c("comm", "slice", "eqStorageStore", "eqStorageCost")] <- TRUE;
     rs["mCommSliceOrParent", c("name", "description", "type")] <- c("mCommSliceOrParent", "", "map");
     rs["mCommSliceOrParent", c("comm", "slice", "eqEmsFuelTot", "eqImport", "eqExport", "eqTradeIrAInpTot", "eqTradeIrAOutTot", "eqSupOutTot")] <- TRUE;
     rs["mTechRetirement", c("name", "description", "type")] <- c("mTechRetirement", "Early retirement option", "map");
@@ -1383,11 +1387,11 @@ rs
     rs["mvDemInp", c("name", "description", "type")] <- c("mvDemInp", "", "map");
     rs["mvDemInp", c("comm", "region", "year", "slice", "eqDemInp", "eqInpTot")] <- TRUE;
     rs["mvBalance", c("name", "description", "type")] <- c("mvBalance", "", "map");
-    rs["mvBalance", c("comm", "region", "year", "slice", "eqBal")] <- TRUE;
+    rs["mvBalance", c("comm", "region", "year", "slice", "eqBal", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mvInpTot", c("name", "description", "type")] <- c("mvInpTot", "", "map");
-    rs["mvInpTot", c("comm", "region", "year", "slice", "eqBal", "eqInpTot")] <- TRUE;
+    rs["mvInpTot", c("comm", "region", "year", "slice", "eqBal", "eqInpTot", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mvOutTot", c("name", "description", "type")] <- c("mvOutTot", "", "map");
-    rs["mvOutTot", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqTaxCost")] <- TRUE;
+    rs["mvOutTot", c("comm", "region", "year", "slice", "eqAggOut", "eqBal", "eqOutTot", "eqTaxCost", "eqSubsCost")] <- TRUE;
     rs["mvInp2Lo", c("name", "description", "type")] <- c("mvInp2Lo", "", "map");
     rs["mvInp2Lo", c("comm", "region", "year", "slice", "eqInp2Lo")] <- TRUE;
     rs["mvOut2Lo", c("name", "description", "type")] <- c("mvOut2Lo", "", "map");
@@ -1496,8 +1500,8 @@ rs
     rs["mStorageOutTot", c("comm", "region", "year", "slice", "eqOutTot", "eqOut2Lo", "eqStorageOutTot")] <- TRUE;
     rs["mTaxCost", c("name", "description", "type")] <- c("mTaxCost", "", "map");
     rs["mTaxCost", c("comm", "region", "year", "eqCost", "eqTaxCost")] <- TRUE;
-    rs["mSubsCost", c("name", "description", "type")] <- c("mSubsCost", "", "map");
-    rs["mSubsCost", c("comm", "region", "year", "eqCost", "eqSubsCost")] <- TRUE;
+    rs["mSubCost", c("name", "description", "type")] <- c("mSubCost", "", "map");
+    rs["mSubCost", c("comm", "region", "year", "eqCost", "eqSubsCost")] <- TRUE;
     rs["mAggOut", c("name", "description", "type")] <- c("mAggOut", "", "map");
     rs["mAggOut", c("comm", "region", "year", "slice", "eqAggOut", "eqOutTot", "eqOut2Lo")] <- TRUE;
     rs["mTechAfUp", c("name", "description", "type")] <- c("mTechAfUp", "", "map");
@@ -1714,10 +1718,18 @@ rs
     rs["pDummyImportCost", c("comm", "region", "year", "slice", "eqCost")] <- TRUE;
     rs["pDummyExportCost", c("name", "description", "type")] <- c("pDummyExportCost", "Dummy costs parameters (for debuging)", "parameter");
     rs["pDummyExportCost", c("comm", "region", "year", "slice", "eqCost")] <- TRUE;
-    rs["pTaxCost", c("name", "description", "type")] <- c("pTaxCost", "Commodity taxes", "parameter");
-    rs["pTaxCost", c("comm", "region", "year", "slice", "eqTaxCost")] <- TRUE;
-    rs["pSubsCost", c("name", "description", "type")] <- c("pSubsCost", "Commodity subsidies", "parameter");
-    rs["pSubsCost", c("comm", "region", "year", "slice", "eqSubsCost")] <- TRUE;
+    rs["pTaxCostInp", c("name", "description", "type")] <- c("pTaxCostInp", "Commodity taxes for input", "parameter");
+    rs["pTaxCostInp", c("comm", "region", "year", "slice", "eqTaxCost")] <- TRUE;
+    rs["pTaxCostOut", c("name", "description", "type")] <- c("pTaxCostOut", "Commodity taxes for output", "parameter");
+    rs["pTaxCostOut", c("comm", "region", "year", "slice", "eqTaxCost")] <- TRUE;
+    rs["pTaxCostBal", c("name", "description", "type")] <- c("pTaxCostBal", "Commodity taxes for balance", "parameter");
+    rs["pTaxCostBal", c("comm", "region", "year", "slice", "eqTaxCost")] <- TRUE;
+    rs["pSubCostInp", c("name", "description", "type")] <- c("pSubCostInp", "Commodity subsidies for input", "parameter");
+    rs["pSubCostInp", c("comm", "region", "year", "slice", "eqSubsCost")] <- TRUE;
+    rs["pSubCostOut", c("name", "description", "type")] <- c("pSubCostOut", "Commodity subsidies for output", "parameter");
+    rs["pSubCostOut", c("comm", "region", "year", "slice", "eqSubsCost")] <- TRUE;
+    rs["pSubCostBal", c("name", "description", "type")] <- c("pSubCostBal", "Commodity subsidies for balance", "parameter");
+    rs["pSubCostBal", c("comm", "region", "year", "slice", "eqSubsCost")] <- TRUE;
     rs["pStorageInpEff", c("name", "description", "type")] <- c("pStorageInpEff", "Storage input efficiency", "parameter");
     rs["pStorageInpEff", c("stg", "comm", "region", "year", "slice", "eqStorageStore")] <- TRUE;
     rs["pStorageOutEff", c("name", "description", "type")] <- c("pStorageOutEff", "Storage output efficiency", "parameter");

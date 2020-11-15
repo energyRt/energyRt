@@ -24,10 +24,8 @@ setClass("tax",
            description   = "character",      # Details
            comm          = "character",      # 
            region        = "character",      #
-           year          = "numeric",      #
-           slice         = "character",      #
            defVal        = "numeric",      # 
-           value         = "data.frame",      # 
+           tax           = "data.frame",      # 
            misc          = "list"
          ),
          prototype(
@@ -35,10 +33,15 @@ setClass("tax",
            comm          = "",
            description   = "",
            region        = character(),      #
-           year          = numeric(),      #
-           slice         = character(),      #
            defVal        = 0,      # 
-           value        = data.frame(stringsAsFactors = FALSE),
+           tax = data.frame(
+           	region = character(), 
+           	year = numeric(), 
+           	slice = character(), 
+           	inp = numeric(), 
+           	out = numeric(), 
+           	bal = numeric(),
+           	stringsAsFactors = FALSE),
            #! Misc
            misc = list()),
          S3methods = TRUE
@@ -50,8 +53,6 @@ setClass("tax",
 #' @slot description character. 
 #' @slot comm character. 
 #' @slot region character. 
-#' @slot year numeric. 
-#' @slot slice character. 
 #' @slot defVal numeric. 
 #' @slot value data.frame. 
 #' @slot misc list. 
@@ -71,23 +72,28 @@ setClass("sub",
            description   = "character",      # Details
            comm          = "character",      # 
            region        = "character",      #
-           year          = "numeric",        #
-           slice         = "character",      #
-           defVal        = "numeric",        # 
-           value         = "data.frame",     # 
+           defVal        = "numeric",      # 
+           sub          = "data.frame",      # 
            misc          = "list"
          ),
          prototype(
            name          = "",      # Short name
-           description   = "",
            comm          = "",
+           description   = "",
            region        = character(),      #
-           year          = numeric(),        #
-           slice         = character(),      #
            defVal        = 0,      # 
-           value         = data.frame(stringsAsFactors = FALSE),
-           misc          = list()),       
-           S3methods     = TRUE
+           sub = data.frame(
+           	region = character(), 
+           	year = numeric(), 
+           	slice = character(), 
+           	inp = numeric(), 
+           	out = numeric(), 
+           	bal = numeric(),
+           	stringsAsFactors = FALSE),
+           #! Misc
+           misc = list()),
+         S3methods = TRUE
+
 )
 
 

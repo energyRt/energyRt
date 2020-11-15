@@ -63,7 +63,7 @@ f.close()
 flist.write("vSubsCost\n");
 f = open("output/vSubsCost.csv","w");
 f.write("comm,region,year,value\n");
-for (c,r,y) in mSubsCost:
+for (c,r,y) in mSubCost:
     if model.vSubsCost[(c,r,y)].value != 0:
         f.write(str(c) + "," + str(r) + "," + str(y) + "," +  str(model.vSubsCost[(c,r,y)].value) + "\n")
 f.close()

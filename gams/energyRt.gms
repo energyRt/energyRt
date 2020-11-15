@@ -175,8 +175,12 @@ pEmissionFactor(comm, comm)                         Emission factor
 pDummyImportCost(comm, region, year, slice)         Dummy costs parameters (for debugging)
 pDummyExportCost(comm, region, year, slice)         Dummy costs parameters (for debuging)
 * Taxes and subsidies
-pTaxCost(comm, region, year, slice)                 Commodity taxes
-pSubsCost(comm, region, year, slice)                Commodity subsidies
+pTaxCostInp(comm, region, year, slice)                 Commodity taxes for input
+pTaxCostOut(comm, region, year, slice)                 Commodity taxes for output
+pTaxCostBal(comm, region, year, slice)                 Commodity taxes for balance
+pSubCostInp(comm, region, year, slice)                Commodity subsidies for input
+pSubCostOut(comm, region, year, slice)                Commodity subsidies for output
+pSubCostBal(comm, region, year, slice)                Commodity subsidies for balance
 *
 ;
 
@@ -425,8 +429,8 @@ variable
 * Tax
 *@ mTaxCost(comm, region, year)
 vTaxCost(comm, region, year)                         Total tax levies (tax costs)
-* Subs
-*@ mSubsCost(comm, region, year)
+* Sub
+*@ mSubCost(comm, region, year)
 vSubsCost(comm, region, year)                        Total subsidies (for substraction from costs)
 ;
 
@@ -534,7 +538,7 @@ mImport(comm, region, year, slice)
 mStorageInpTot(comm, region, year, slice)
 mStorageOutTot(comm, region, year, slice)
 mTaxCost(comm, region, year)
-mSubsCost(comm, region, year)
+mSubCost(comm, region, year)
 mAggOut(comm, region, year, slice)
 mTechAfUp(tech, region, year, slice)
 mTechAfUp(tech, region, year, slice)
@@ -1525,7 +1529,7 @@ eqCost(region, year)$mvTotalCost(region, year)..
          + sum((comm, slice)$mDummyExport(comm, region, year, slice),
                    pDummyExportCost(comm, region, year, slice) * vDummyExport(comm, region, year, slice))
          + sum(comm$mTaxCost(comm, region, year), vTaxCost(comm, region, year))
-         - sum(comm$mSubsCost(comm, region, year), vSubsCost(comm, region, year))
+         - sum(comm$mSubCost(comm, region, year), vSubsCost(comm, region, year))
          + sum(stg$mStorageOMCost(stg, region, year), vStorageOMCost(stg, region, year))
          + sum(stg$mStorageEac(stg, region, year), vStorageEac(stg, region, year))
          + vTradeCost(region, year)$mvTradeCost(region, year);
@@ -1533,11 +1537,18 @@ eqCost(region, year)$mvTotalCost(region, year)..
 
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
          vTaxCost(comm, region, year)
-         =e= sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
+         =e=
+         sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCostOut(comm, region, year, slice) * vOutTot(comm, region, year, slice))
+         + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCostInp(comm, region, year, slice) * vInpTot(comm, region, year, slice))
+         + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCostBal(comm, region, year, slice) * vBalance(comm, region, year, slice))
+         ;
 
-eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)..
-         vSubsCost(comm, region, year)
-         =e= sum(slice$(mCommSlice(comm, slice) and mvOutTot(comm, region, year, slice)), pSubsCost(comm, region, year, slice) * vOutTot(comm, region, year, slice));
+eqSubsCost(comm, region, year)$mSubCost(comm, region, year)..
+         vSubsCost(comm, region, year) =e=
+         sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)), pSubCostOut(comm, region, year, slice) * vOutTot(comm, region, year, slice))
+         + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)), pSubCostInp(comm, region, year, slice) * vInpTot(comm, region, year, slice))
+         + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)), pSubCostBal(comm, region, year, slice) * vBalance(comm, region, year, slice))
+         ;
 
 eqObjective..
    vObjective =e=

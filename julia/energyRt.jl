@@ -18,7 +18,7 @@ model = Model();
 @variable(model, vTotalCost[mvTotalCost]);
 @variable(model, vObjective);
 @variable(model, vTaxCost[mTaxCost]);
-@variable(model, vSubsCost[mSubsCost]);
+@variable(model, vSubsCost[mSubCost]);
 @variable(model, vAggOut[mAggOut]);
 @variable(model, vStorageOMCost[mStorageOMCost]);
 @variable(model, vTradeCost[mvTradeCost]);
@@ -327,13 +327,13 @@ println("eqStorageInpTot(comm, region, year, slice) done ", Dates.format(now(), 
 @constraint(model, [(c, r, y, s) in mStorageOutTot], vStorageOutTot[(c,r,y,s)]  ==  sum(vStorageOut[(st1,c,r,y,s)] for st1 in stg if (st1,c,r,y,s) in mvStorageStore)+sum(vStorageAOut[(st1,c,r,y,s)] for st1 in stg if (st1,c,r,y,s) in mvStorageAOut));
 println("eqStorageOutTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqCost(region, year)$mvTotalCost(region, year)
-@constraint(model, [(r, y) in mvTotalCost], vTotalCost[(r,y)]  ==  sum(vTechEac[(t,r,y)] for t in tech if (t,r,y) in mTechEac)+sum(vTechOMCost[(t,r,y)] for t in tech if (t,r,y) in mTechOMCost)+sum(vSupCost[(s1,r,y)] for s1 in sup if (s1,r,y) in mvSupCost)+sum((if haskey(pDummyImportCost, (c,r,y,s)); pDummyImportCost[(c,r,y,s)]; else pDummyImportCostDef; end)*vDummyImport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum((if haskey(pDummyExportCost, (c,r,y,s)); pDummyExportCost[(c,r,y,s)]; else pDummyExportCostDef; end)*vDummyExport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(vTaxCost[(c,r,y)] for c in comm if (c,r,y) in mTaxCost)-sum(vSubsCost[(c,r,y)] for c in comm if (c,r,y) in mSubsCost)+sum(vStorageOMCost[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(vStorageEac[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageEac)+(if (r,y) in mvTradeCost; vTradeCost[(r,y)]; else 0; end;));
+@constraint(model, [(r, y) in mvTotalCost], vTotalCost[(r,y)]  ==  sum(vTechEac[(t,r,y)] for t in tech if (t,r,y) in mTechEac)+sum(vTechOMCost[(t,r,y)] for t in tech if (t,r,y) in mTechOMCost)+sum(vSupCost[(s1,r,y)] for s1 in sup if (s1,r,y) in mvSupCost)+sum((if haskey(pDummyImportCost, (c,r,y,s)); pDummyImportCost[(c,r,y,s)]; else pDummyImportCostDef; end)*vDummyImport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum((if haskey(pDummyExportCost, (c,r,y,s)); pDummyExportCost[(c,r,y,s)]; else pDummyExportCostDef; end)*vDummyExport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(vTaxCost[(c,r,y)] for c in comm if (c,r,y) in mTaxCost)-sum(vSubsCost[(c,r,y)] for c in comm if (c,r,y) in mSubCost)+sum(vStorageOMCost[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(vStorageEac[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageEac)+(if (r,y) in mvTradeCost; vTradeCost[(r,y)]; else 0; end;));
 println("eqCost(region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
-@constraint(model, [(c, r, y) in mTaxCost], vTaxCost[(c,r,y)]  ==  sum((if haskey(pTaxCost, (c,r,y,s)); pTaxCost[(c,r,y,s)]; else pTaxCostDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice)));
+@constraint(model, [(c, r, y) in mTaxCost], vTaxCost[(c,r,y)]  ==  sum((if haskey(pTaxCostOut, (c,r,y,s)); pTaxCostOut[(c,r,y,s)]; else pTaxCostOutDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostInp, (c,r,y,s)); pTaxCostInp[(c,r,y,s)]; else pTaxCostInpDef; end)*vInpTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvInpTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostBal, (c,r,y,s)); pTaxCostBal[(c,r,y,s)]; else pTaxCostBalDef; end)*vBalance[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvBalance && (c,s) in mCommSlice)));
 println("eqTaxCost(comm, region, year) done ", Dates.format(now(), "HH:MM:SS"))
-# eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)
-@constraint(model, [(c, r, y) in mSubsCost], vSubsCost[(c,r,y)]  ==  sum((if haskey(pSubsCost, (c,r,y,s)); pSubsCost[(c,r,y,s)]; else pSubsCostDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,s) in mCommSlice && (c,r,y,s) in mvOutTot)));
+# eqSubsCost(comm, region, year)$mSubCost(comm, region, year)
+@constraint(model, [(c, r, y) in mSubCost], vSubsCost[(c,r,y)]  ==  sum((if haskey(pSubCostOut, (c,r,y,s)); pSubCostOut[(c,r,y,s)]; else pSubCostOutDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice))+sum((if haskey(pSubCostInp, (c,r,y,s)); pSubCostInp[(c,r,y,s)]; else pSubCostInpDef; end)*vInpTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvInpTot && (c,s) in mCommSlice))+sum((if haskey(pSubCostBal, (c,r,y,s)); pSubCostBal[(c,r,y,s)]; else pSubCostBalDef; end)*vBalance[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvBalance && (c,s) in mCommSlice)));
 println("eqSubsCost(comm, region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqObjective
 @constraint(model, vObjective  ==  sum(vTotalCost[(r,y)]*(if haskey(pDiscountFactorMileStone, (r,y)); pDiscountFactorMileStone[(r,y)]; else pDiscountFactorMileStoneDef; end) for r in region for y in year if (r,y) in mvTotalCost));
