@@ -193,9 +193,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     st@mult <- mult
   } else st@defVal <- mult
   st@for.sum <- for.sum
-  if (all(names(.vrb_map) != variable)) 
+  if (all(names(.variable_set) != variable)) 
     stop(paste0('Unknown variables "', variable, '"in summands "', eqt@name, '"'))
-  need.set <- .vrb_map[[variable]];
+  need.set <- .variable_set[[variable]];
   need.set <- need.set[!(need.set %in% c(names(eqt@for.each), names(st@for.sum)))];
   for (i in need.set) {
     st@for.sum[i] <- list(NA)
@@ -210,8 +210,6 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   eqt  
 }
 
-# .vrb_map <- energyRt:::.vrb_map
-# .vrb_mapping <- energyRt:::.vrb_mapping
 # prec <- add0_message$add0_arg$obj
 # stm <- add0_message$add0_arg$app
 # approxim <- add0_message$add0_arg$approxim
@@ -247,7 +245,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     return (unique(x))
   })
   names(old_for_each) <- colnames(stm@for.each)
-  nn <- seq_len(length(old_for_each) + sum(sapply(stm@lhs, function(x) length(.vrb_map[[x@variable]]))))
+  nn <- seq_len(length(old_for_each) + sum(sapply(stm@lhs, function(x) length(.variable_set[[x@variable]]))))
   all.set[seq_along(nn), ] <- NA
   for (i in (1:ncol(all.set))[sapply(all.set, class) == 'logical']) 
     all.set[, i] <- FALSE
@@ -273,7 +271,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   } else for.each.set <- NULL
   # lhs
   for (i in seq_along(stm@lhs)) {
-    need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
+    need.set <- .variable_set[[stm@lhs[[i]]@variable]]
     nn <- (nn[length(nn)] + seq_along(need.set))
     all.set[nn, 'set'] <- need.set
     all.set[nn, 'alias'] <- need.set
@@ -401,7 +399,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   for (i in seq_along(stm@lhs)) {
     vrb <- stm@lhs[[i]]@variable
     lhs.set2 <- lhs.set[lhs.set$lhs.num == i, ]
-    vrb.lhs <- .vrb_mapping[[vrb]]
+    vrb.lhs <- .variable_mapping[[vrb]]
     # Add multiple to vrb
     # Add to year multiplier if lag.year | lead.year
     if ((any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) && (nrow(stm@lhs[[i]]@mult) == 0 ||  all(colnames(stm@lhs[[i]]@mult) != 'year'))) {
