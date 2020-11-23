@@ -1,3 +1,6 @@
+#########################
+# equation map
+#########################
 .variable_mapping = list(
   vTechNewCap = "vTechNewCap( tech , region , year ) $ mTechNew( tech , region , year )",
   vTechRetiredStock = "vTechRetiredStock( tech , region , year ) $ mvTechRetiredStock( tech , region , year )",
@@ -571,6 +574,101 @@
   pStorageWeatherCoutUp = c("weather", "stg"),
   pStorageWeatherCoutLo = c("weather", "stg"),
   pLECLoACT = c("region"));
+#########################
+# equation map
+#########################
+.equation_mapping = list(
+  eqTechSng2Sng = "meqTechSng2Sng(tech, region, comm, commp, year, slice)",
+  eqTechGrp2Sng = "meqTechGrp2Sng(tech, region, group, commp, year, slice)",
+  eqTechSng2Grp = "meqTechSng2Grp(tech, region, comm, groupp, year, slice)",
+  eqTechGrp2Grp = "meqTechGrp2Grp(tech, region, group, groupp, year, slice)",
+  eqTechShareInpLo = "meqTechShareInpLo(tech, region, group, comm, year, slice)",
+  eqTechShareInpUp = "meqTechShareInpUp(tech, region, group, comm, year, slice)",
+  eqTechShareOutLo = "meqTechShareOutLo(tech, region, group, comm, year, slice)",
+  eqTechShareOutUp = "meqTechShareOutUp(tech, region, group, comm, year, slice)",
+  eqTechAInp = "mvTechAInp(tech, comm, region, year, slice)",
+  eqTechAOut = "mvTechAOut(tech, comm, region, year, slice)",
+  eqTechAfLo = "meqTechAfLo(tech, region, year, slice)",
+  eqTechAfUp = "meqTechAfUp(tech, region, year, slice)",
+  eqTechAfsLo = "meqTechAfsLo(tech, region, year, slice)",
+  eqTechAfsUp = "meqTechAfsUp(tech, region, year, slice)",
+  eqTechActSng = "meqTechActSng(tech, comm, region, year, slice)",
+  eqTechActGrp = "meqTechActGrp(tech, group, region, year, slice)",
+  eqTechAfcOutLo = "meqTechAfcOutLo(tech, region, comm, year, slice)",
+  eqTechAfcOutUp = "meqTechAfcOutUp(tech, region, comm, year, slice)",
+  eqTechAfcInpLo = "meqTechAfcInpLo(tech, region, comm, year, slice)",
+  eqTechAfcInpUp = "meqTechAfcInpUp(tech, region, comm, year, slice)",
+  eqTechCap = "mTechSpan(tech, region, year)",
+  eqTechRetiredNewCap = "meqTechRetiredNewCap(tech, region, year)",
+  eqTechRetiredStock = "mvTechRetiredStock(tech, region, year)",
+  eqTechEac = "mTechEac(tech, region, year)",
+  eqTechInv = "mTechInv(tech, region, year)  vTechInv(tech, region, year) =e=",
+  eqTechOMCost = "mTechOMCost(tech, region, year)",
+  eqSupAvaUp = "mSupAvaUp(sup, comm, region, year, slice)",
+  eqSupAvaLo = "meqSupAvaLo(sup, comm, region, year, slice)",
+  eqSupTotal = "mvSupReserve(sup, comm, region)",
+  eqSupReserveUp = "mSupReserveUp(sup, comm, region)",
+  eqSupReserveLo = "meqSupReserveLo(sup, comm, region)",
+  eqSupCost = "mvSupCost(sup, region, year)",
+  eqDemInp = "mvDemInp(comm, region, year, slice)",
+  eqAggOut = "mAggOut(comm, region, year, slice)",
+  eqEmsFuelTot = "mEmsFuelTot(comm, region, year, slice)",
+  eqStorageStore = "mvStorageStore(stg, comm, region, year, slice)",
+  eqStorageAfLo = "meqStorageAfLo(stg, comm, region, year, slice)",
+  eqStorageAfUp = "meqStorageAfUp(stg, comm, region, year, slice)",
+  eqStorageClean = "mvStorageStore(stg, comm, region, year, slice)",
+  eqStorageAInp = "mvStorageAInp(stg, comm, region, year, slice)",
+  eqStorageAOut = "mvStorageAOut(stg, comm, region, year, slice)",
+  eqStorageInpUp = "meqStorageInpUp(stg, comm, region, year, slice)",
+  eqStorageInpLo = "meqStorageInpLo(stg, comm, region, year, slice)",
+  eqStorageOutUp = "meqStorageOutUp(stg, comm, region, year, slice)",
+  eqStorageOutLo = "meqStorageOutLo(stg, comm, region, year, slice)",
+  eqStorageCap = "mStorageSpan(stg, region, year)",
+  eqStorageInv = "mStorageNew(stg, region, year)",
+  eqStorageEac = "mStorageEac(stg, region, year)",
+  eqStorageCost = "mStorageOMCost(stg, region, year)",
+  eqImport = "mImport(comm, dst, year, slice)",
+  eqExport = "mExport(comm, src, year, slice)",
+  eqTradeFlowUp = "meqTradeFlowUp(trade, comm, src, dst, year, slice)",
+  eqTradeFlowLo = "meqTradeFlowLo(trade, comm, src, dst, year, slice)",
+  eqCostTrade = "mvTradeCost(region, year)",
+  eqCostRowTrade = "mvTradeRowCost(region, year) vTradeRowCost(region, year) =e=",
+  eqCostIrTrade = "mvTradeIrCost(region, year) vTradeIrCost(region, year) =e=",
+  eqExportRowUp = "mExportRowUp(expp, comm, region, year, slice)",
+  eqExportRowLo = "meqExportRowLo(expp, comm, region, year, slice)",
+  eqExportRowCumulative = "mExpComm(expp, comm) vExportRowAccumulated(expp, comm) =e=",
+  eqExportRowResUp = "mExportRowAccumulatedUp(expp, comm)",
+  eqImportRowUp = "mImportRowUp(imp, comm, region, year, slice)",
+  eqImportRowLo = "meqImportRowLo(imp, comm, region, year, slice)",
+  eqImportRowAccumulated = "mImpComm(imp, comm) vImportRowAccumulated(imp, comm) =e=",
+  eqImportRowResUp = "mImportRowAccumulatedUp(imp, comm) vImportRowAccumulated(imp, comm) =l= pImportRowRes(imp);",
+  eqTradeCap = "mTradeSpan(trade, year)",
+  eqTradeInv = "mTradeInv(trade, region, year)",
+  eqTradeEac = "mTradeEac(trade, region, year)",
+  eqTradeCapFlow = "meqTradeCapFlow(trade, comm, year, slice)",
+  eqTradeIrAInp = "mvTradeIrAInp(trade, comm, region, year, slice)",
+  eqTradeIrAOut = "mvTradeIrAOut(trade, comm, region, year, slice)",
+  eqTradeIrAInpTot = "mvTradeIrAInpTot(comm, region, year, slice)",
+  eqTradeIrAOutTot = "mvTradeIrAOutTot(comm, region, year, slice)",
+  eqBalUp = "meqBalUp(comm, region, year, slice)",
+  eqBalLo = "meqBalLo(comm, region, year, slice)",
+  eqBalFx = "meqBalFx(comm, region, year, slice)",
+  eqBal = "mvBalance(comm, region, year, slice)",
+  eqOutTot = "mvOutTot(comm, region, year, slice)",
+  eqInpTot = "mvInpTot(comm, region, year, slice)",
+  eqInp2Lo = "mInp2Lo(comm, region, year, slice)",
+  eqOut2Lo = "mOut2Lo(comm, region, year, slice)",
+  eqSupOutTot = "mSupOutTot(comm, region, year, slice)",
+  eqTechInpTot = "mTechInpTot(comm, region, year, slice)",
+  eqTechOutTot = "mTechOutTot(comm, region, year, slice)",
+  eqStorageInpTot = "mStorageInpTot(comm, region, year, slice)",
+  eqStorageOutTot = "mStorageOutTot(comm, region, year, slice)",
+  eqCost = "mvTotalCost(region, year)",
+  eqTaxCost = "mTaxCost(comm, region, year)",
+  eqSubsCost = "mSubCost(comm, region, year)",
+  eqObjective = "",
+  eqLECActivity = "meqLECActivity(tech, region, year)"
+);
 #########################
 # set description
 #########################
@@ -1237,6 +1335,7 @@
 getVariablesSet <- function() energyRt:::.variable_set
 getVariablesDescription <- function() energyRt:::.variable_description
 getVariablesMapping <- function() energyRt:::.variable_mapping
+getEquationMapping <- function() energyRt:::.equation_mapping
 getEquationsSet <- function() energyRt:::.equation_set
 getEquationsDescription <- function() energyRt:::.equation_description
 getEquationsVariables <- function() energyRt:::.equation_variable
