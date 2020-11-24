@@ -262,9 +262,8 @@ COA <- newCommodity(
   emis = list( # emissions, associated with fuels combustion (see the flags in technologies)
     comm = "CO2", # this commodity (CO2) is emmited when the fuel (COA) is used
     unit = "kt/PJ", # the unit of emissions for refference
-    mean = 100 # i.e. 100 kt of CO2 emmitted per one unit of energy (1 PJ)
+    emis = 100 # i.e. 100 kt of CO2 emmitted per one unit of energy (1 PJ)
     ),
-  type = "fossil fuel", # reserved for filtering, optional
   slice = "ANNUAL" # 'ANNUAL' means no sub-annual granularity for the commodity
   # color = "brown" # reserved for output figures, optional
 )
@@ -274,7 +273,7 @@ OIL <- newCommodity(
   description = "Oil and oil products",    
   emis = list(
     comm = "CO2",
-    mean = 80
+    emis = 80
   ),
   slice = "ANNUAL"
 )
@@ -285,11 +284,7 @@ GAS <- newCommodity(
   emis = list(
     comm = "CO2", 
     unit = "kt/PJ",
-    mean = 70
-  ),
-  LHV = list( # Low heating value
-    unit = "kt/PJ", # == kg/GJ
-    mean = 50 # energy content
+    emis = 70
   ),
   slice = "MONTH" # This commodity will appear in month-level equations
 )
@@ -303,7 +298,6 @@ CH4 <- newCommodity(
 BIO <- newCommodity(
   name = "BIO",
   description = "Generic biomass, all types",
-  type = "renewable fuel", # reserved for filtering, optional
   slice = "ANNUAL"
 )
 
@@ -843,15 +837,15 @@ if(F) { # test
 
 set.seed(1111)
 WWIN <- newWeather("WWIN",
-                    description = "Wind availability factor",
-                    slice = "HOUR",
-                    weather = data.frame(
-                      region = rep(reg_names, each = nslc),
-                      year = 2015,
-                      slice = rep(slc$slice, nreg),
-                      wval = rwind(nreg * nslc)
-                    ))
-
+  description = "Wind availability factor",
+  slice = "HOUR",
+  weather = data.frame(
+    region = rep(reg_names, each = nslc),
+    year = 2015,
+    slice = rep(slc$slice, nreg),
+    wval = rwind(nreg * nslc)
+  )
+)
 
 WSOL <- newWeather("WSOL",
                     description = "Solar radiation index",
@@ -1355,18 +1349,10 @@ scen_BASE_py <- write(scen_BASE_int, solver = "PYOMO",
 scen_BASE_py@misc$tmp.dir
 
 scen_BASE_glpk <- write(scen_BASE_int, solver = "GLPK", 
-                        tmp.dir = "solwork/UTOPIA_BASE_GLPK2")
+                        tmp.dir = "solwork/UTOPIA_BASE_GLPK")
 
 scen_BASE_jl <- write(scen_BASE_int, solver = "JuMP", 
                       tmp.dir = "solwork/UTOPIA_BASE_Julia")
-
-# write_model(scen_BASE_int, solver = list(
-#   lang = "PYOMO", 
-#   files = list(
-#     cplex.opt = "blablabla"
-#   )) 
-#   # tmp.dir = "solwork/UTOPIA_BASE_PYOMO2"
-#   )
 
 ## Solving the model
 solve(scen_BASE_gams, wait = FALSE)
@@ -1374,7 +1360,7 @@ solve(scen_BASE_py, wait = FALSE)
 solve(scen_BASE_glpk, wait = FALSE)
 solve(scen_BASE_jl, wait = FALSE)
 
-## Read solution
+## Read solution (wait until solved)
 scen_BASE_gams <- read(scen_BASE_gams)
 summary(scen_BASE_gams)
 
@@ -1707,7 +1693,6 @@ for (y in mdl@sysInfo@milestone$mid) {
 
 # Download and unpack ffmpeg (https://www.ffmpeg.org/) on your computer
 # correct the path below
-
 system("c:/utils/ffmpeg/bin/ffmpeg -r 4 -f image2 -s 1920x1080 -i Rplot%d.png -vcodec libx264 -crf 25 -pix_fmt yuv420p -y utopia_example_trade.mp4")
 
 setwd(homedir)
@@ -1758,20 +1743,20 @@ NOXSO2controlCum <- newConstraint(
 
 ```{r, eval=F}
 
-GHG50tax <- newTax('HGtax', comm = 'HG', value = 100)
+GHG50tax <- newTax('GHGtax', comm = 'GHG', tax = list( bal = 100))
 
 # GHG50tax <- newTax('HGtax', comm = 'HG', year = 2025:2035, value = data.frame(year = c(2025, 2030), value = c(1, 100)))
 
 GHG50CapTrade <- add(newRepository('GHG50CapTrade'),
   # Aggregate HG
-  newCommodity('HGtrade'), # Commodity to take to account trade
+  newCommodity('GHGtrade'), # Commodity to take to account trade
   # Equation that provide quote mechanisme
-  newConstraint('HGcap', eq = '<=', rhs = list(year = c(2015, 2055), rhs = c(1e8, 1e3)), 
+  newConstraint('GHGcap', eq = '<=', rhs = list(year = c(2015, 2055), rhs = c(1e8, 1e3)), 
   for.each = list(year = NULL), # Cap total emission
   variable = list(variable = 'vOutTot', for.sum = list(comm = "HG")),
   variable = list(variable = 'vOutTot', for.sum = list(comm = "HGtrade"), mult = -1)
   ),
-  newTax('HGtax', comm = 'HGtrade', value = 100) # Cost of quote
+  newTax('GHGtax', comm = 'HGtrade', tax = list( bal = 100)) # Cost of quote
 )
 ```
 
@@ -1786,13 +1771,27 @@ tbc...
 
 ```{r, results="markup", echo=FALSE, eval=T}
 # library()
-vr <- getVariables() # All variables
-dm <- dim(vr)
-sets <- names(vr)[3:dm[2]]
-cdim <- apply(vr[3:dm[2]], 1, function(x) paste0("(", paste0(sets[x], collapse = ","), ")"))
-vv <- cbind(vr[,1:2], "dimension (sets)" = cdim)
+vr_dsc <- getVariablesDescription() # All variables
+vr <- names(vr_dsc)
+# dm <- dim(vr)
+# sets <- names(vr)[3:dm[2]]
+sets <- getVariablesSet() %>% sapply(paste, collapse = ", ")
+sets <- tibble(
+  variable = names(sets),
+  sets = sets
+)
+# cdim <- apply(vr[3:dm[2]], 1, function(x) paste0("(", paste0(sets[x], collapse = ","), ")"))
+# vv <- cbind(vr[,1:2], "dimension (sets)" = cdim)
 # rownames(vv) <- NULL
 # head(vv)
+vv <- tibble(
+  variable = vr,
+  description = vr_dsc
+) %>%
+  full_join(sets)
+
+
+
 kableExtra::kable(vv, row.names = F, longtable = T, booktabs = T,
                   caption = "List of `energyRt` model variables.") %>%
   kableExtra::kable_styling(latex_options = c("striped", "scale_down", "repeat_header")) %>%
@@ -1802,19 +1801,20 @@ kableExtra::kable(vv, row.names = F, longtable = T, booktabs = T,
 ```
   
   
-```{r, results="markup", echo=FALSE, eval=T}
+```{r, results="markup", echo=FALSE, eval=F, include=F}
+# tbc..
 # kableExtra::kable(getParameters()[,1:2], row.names = F)
-pr <- getParameters() # All variables
-dm <- dim(pr)
-sets <- names(pr)[4:dm[2]]
-pdim <- apply(pr[4:dm[2]], 1, function(x) paste0("(", paste0(sets[x], collapse = ","), ")"))
-# names(pdim) <- 
-pp <- cbind(pr[,1:3], "dimension (sets)" = pdim)
-# rownames(pp) <- NULL
-# head(pp)
-kableExtra::kable(pp, row.names = F, longtable = T, booktabs = T,
-                  caption = "List of `energyRt` model parameters.") %>%
-  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "repeat_header")) %>%
-  kableExtra::column_spec(2, width = "5cm") #%>%
+# pr <- getParameters() # All variables
+# dm <- dim(pr)
+# sets <- names(pr)[4:dm[2]]
+# pdim <- apply(pr[4:dm[2]], 1, function(x) paste0("(", paste0(sets[x], collapse = ","), ")"))
+# # names(pdim) <- 
+# pp <- cbind(pr[,1:3], "dimension (sets)" = pdim)
+# # rownames(pp) <- NULL
+# # head(pp)
+# kableExtra::kable(pp, row.names = F, longtable = T, booktabs = T,
+#                   caption = "List of `energyRt` model parameters.") %>%
+#   kableExtra::kable_styling(latex_options = c("striped", "scale_down", "repeat_header")) %>%
+#   kableExtra::column_spec(2, width = "5cm") #%>%
 
 ```
