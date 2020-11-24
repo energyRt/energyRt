@@ -4,10 +4,21 @@
 \alias{size}
 \title{Size of an object}
 \usage{
-size(x)
+size(
+  x,
+  level1 = FALSE,
+  units = "auto",
+  sort = TRUE,
+  decreasing = FALSE,
+  byteTol = 0,
+  asNumeric = FALSE
+)
 }
 \arguments{
 \item{x}{- any R object}
+}
+\value{
+
 }
 \description{
 Size of an object

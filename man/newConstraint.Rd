@@ -4,11 +4,20 @@
 \alias{newConstraint}
 \title{Create (equality or inequality) constraint object}
 \usage{
-newConstraint(name, eq = "==", rhs = data.frame(), for.each = list(),
-  defVal = 0, ..., arg = NULL)
+newConstraint(
+  name,
+  ...,
+  eq = "==",
+  rhs = data.frame(),
+  for.each = NULL,
+  defVal = 0,
+  arg = NULL
+)
 }
 \arguments{
 \item{name}{Name of the constrain object (will be used in GAMS or GLPK as an element in sets)}
+
+\item{...}{Left-hand side (LHS) terms of the statement - list objects with}
 
 \item{eq}{Type of the relation ('==' default, '<=', '>=')}
 
@@ -17,8 +26,6 @@ newConstraint(name, eq = "==", rhs = data.frame(), for.each = list(),
 \item{for.each}{list with sets for which constraint will be created.}
 
 \item{defVal}{the default value for the rhs.}
-
-\item{...}{Left-hand side (LHS) terms of the statement - list objects with}
 
 \item{arg}{tbc}
 }

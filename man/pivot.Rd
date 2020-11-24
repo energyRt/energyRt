@@ -4,12 +4,25 @@
 \alias{pivot}
 \title{Title Pivot table for scenario objects, using _rpivotTable_ package}
 \usage{
-pivot(scen = NULL, name = NULL, get_data = FALSE, ...,
-  aggregatorName = "Sum", rendererName = "Stacked Bar Chart",
-  cols = "year", rows = c("tech", "comm", "sup", "dem"),
-  vals = "value", sorter = NULL, exclusions = NULL,
-  inclusions = NULL, locale = "en", subtotals = FALSE, width = 800,
-  height = 600, elementId = NULL)
+pivot(
+  scen = NULL,
+  name = NULL,
+  get_data = FALSE,
+  ...,
+  aggregatorName = "Sum",
+  rendererName = "Stacked Bar Chart",
+  cols = "year",
+  rows = c("tech", "comm", "sup", "dem"),
+  vals = "value",
+  sorter = NULL,
+  exclusions = NULL,
+  inclusions = NULL,
+  locale = "en",
+  subtotals = FALSE,
+  width = 800,
+  height = 600,
+  elementId = NULL
+)
 }
 \arguments{
 \item{scen}{tbd

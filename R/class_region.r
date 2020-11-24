@@ -5,19 +5,18 @@ setClass("region",
           name          = "character",      # Short name
           description   = "character",      # Details
           type	        = "character",      # energy, electricity, material, (fuel?)
-          color         = "character",      #
-          sp            = "SpatialPolygonsDataFrame",              # Spatial 
+          # color         = "character",      #
+          # sp            = "SpatialPolygonsDataFrame",              # Spatial 
           misc = "list"
       ),
       prototype(
           name          = "",
           description   = "",
           type	        = "",
-          color         = "",
-          sp            = NULL,
+          # color         = "",
+          # sp            = NULL,
       #! Misc
-      misc = list(
-      )),
+      misc = list()),
       S3methods = TRUE
 )
 setMethod("initialize", "region", function(.Object, ...) {

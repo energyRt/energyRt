@@ -6,14 +6,14 @@ setClass("sysInfo",
           debug              = "data.frame",
           discount           = "data.frame",
           region             = "character",
-          GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
+          # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           year               = "numeric",
           milestone          = "data.frame",
           slice              = "slice",
-		  discountFirstYear  = "logical",
+		      discountFirstYear  = "logical",
           interpolation      = "data.frame",
-          defVal            = "data.frame",
-          misc = "list"
+          defVal             = "data.frame",
+          misc               = "list"
       ),
       prototype(
           debug   = data.frame(
@@ -25,7 +25,7 @@ setClass("sysInfo",
                                      dummyImport      = numeric(),
                                      dummyExport      = numeric(),
                                      stringsAsFactors = FALSE),
-          GIS           = NULL,
+          # GIS           = NULL,
           discount      = data.frame(region     = character(),
                                      year       = numeric(),
                                      discount    = numeric(),
@@ -99,7 +99,7 @@ setClass("sysInfo",
                         ncap2ainp   = as.numeric(0),
 						          	ncap2stg   = as.numeric(0),
 						          	charge      = as.numeric(0),
-						          	mean        = as.numeric(0),
+						          	emis        = as.numeric(0),
                         reserve     = as.numeric(Inf),
                         res.up     = as.numeric(Inf),
                         res.lo     = as.numeric(0),
@@ -191,7 +191,7 @@ setClass("sysInfo",
                         ncap2ainp    = as.character('back.inter.forth'),
 						          	ncap2stg   = as.character(''),
 						          	charge      = as.character(''),
-						          	mean        = as.character('back.inter.forth'),
+						          	emis        = as.character('back.inter.forth'),
                         reserve     = as.character('back.inter.forth'),
                         res.up     = as.character('back.inter.forth'),
                         res.lo     = as.character('back.inter.forth'),
@@ -220,8 +220,7 @@ setClass("sysInfo",
           	outcost  = as.character('back.inter.forth'),
           	stringsAsFactors = FALSE),
       #! Misc
-      misc = list(
-      )),
+      misc = list()),
       S3methods = TRUE
 );
 setMethod("initialize", "sysInfo", function(.Object, ...) {

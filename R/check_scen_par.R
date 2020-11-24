@@ -6,7 +6,8 @@
 		'pTechAct2AOut', 'pTechCap2AOut', 'pTechNCap2AOut', 'pTechCinp2AOut', 'pTechCout2AOut', 'pTechFixom', 'pTechShare', 
 		'pTechShare', 'pTechAf', 'pTechAf', 'pTechAfs', 'pTechAfs', 'pTechAfc', 'pTechAfc', 'pTechStock', 'pTechCap2act', 'pDiscount', 
 		'pDiscountFactor', 'pSupCost', 'pSupAva', 'pSupAva', 'pSupReserve', 'pSupReserve', 'pDemand', 'pEmissionFactor', 'pDummyImportCost', 'pDummyExportCost', 
-		'pTaxCost', 'pSubsCost', 'pWeather', 'pSupWeather', 'pSupWeather', 'pTechWeatherAf', 'pTechWeatherAf', 'pTechWeatherAfs', 'pTechWeatherAfs', 
+		'pTaxCostInp', 'pSubCostInp', 'pTaxCostOut', 'pSubCostOut', 'pTaxCostBal', 'pSubCostBal', 
+		'pWeather', 'pSupWeather', 'pSupWeather', 'pTechWeatherAf', 'pTechWeatherAf', 'pTechWeatherAfs', 'pTechWeatherAfs', 
 		'pTechWeatherAfc', 'pTechWeatherAfc', 'pStorageWeatherAf', 'pStorageWeatherAf', 'pStorageWeatherCinp', 'pStorageWeatherCinp', 'pStorageWeatherCout', 
 		'pStorageWeatherCout', 'pStorageInpEff', 'pStorageOutEff', 'pStorageStgEff', 'pStorageStock', 'pStorageOlife', 'pStorageCostStore', 'pStorageCostInp', 
 		'pStorageCostOut', 'pStorageFixom', 'pStorageInvcost', 'pStorageCap2stg', 'pStorageAf', 'pStorageAf', 'pStorageCinp', 'pStorageCinp', 'pStorageCout', 
@@ -38,12 +39,12 @@
 		paste0(msg_small_err, collapse = '", "'), '". Assigned as zerro.'))
 	# Check share 
 	if (nrow(scen@modInp@parameters$pTechShare@data) > 0) {
-		mTechGroupComm <- energyRt:::getParameterData(scen@modInp@parameters$mTechGroupComm)
+		mTechGroupComm <- .get_data_slot(scen@modInp@parameters$mTechGroupComm)
   	#scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
   	#if (scen@modInp@parameters$pTechShare@nValues != - 1)
     #		scen@modInp@parameters$pTechShare@nValues <- nrow(scen@modInp@parameters$pTechShare@data)
-		tmp <- energyRt:::.getTotalParameterData(scen@modInp, 'pTechShare')
-		mTechSpan <- energyRt:::getParameterData(scen@modInp@parameters$mTechSpan)
+		tmp <- .add_dropped_zeros(scen@modInp, 'pTechShare')
+		mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
 		tmp <- merge(tmp, mTechSpan)
 		tmp_lo <- merge(tmp[tmp$type == 'lo',, drop = FALSE], mTechGroupComm)
 		tmp_up <- merge(tmp[tmp$type == 'up',, drop = FALSE], mTechGroupComm)

@@ -49,7 +49,7 @@ model.vBalance = Var(mvBalance, doc = "Net commodity balance");
 model.vTotalCost = Var(mvTotalCost, doc = "Regional annual total costs");
 model.vObjective = Var(doc = "Objective costs");
 model.vTaxCost = Var(mTaxCost, doc = "Total tax levies (tax costs)");
-model.vSubsCost = Var(mSubsCost, doc = "Total subsidies (for substraction from costs)");
+model.vSubsCost = Var(mSubCost, doc = "Total subsidies (for substraction from costs)");
 model.vAggOut = Var(mAggOut, doc = "Aggregated commodity output");
 model.vStorageOMCost = Var(mStorageOMCost, doc = "Storage O&M costs");
 model.vTradeCost = Var(mvTradeCost, doc = "Total trade costs");
@@ -446,15 +446,15 @@ model.eqStorageOutTot = Constraint(mStorageOutTot, rule = lambda model, c, r, y,
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqCost ", end = "")
 # eqCost(region, year)$mvTotalCost(region, year)
-model.eqCost = Constraint(mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in tech if (t,r,y) in mTechEac)+sum(model.vTechOMCost[t,r,y] for t in tech if (t,r,y) in mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in sup if (s1,r,y) in mvSupCost)+sum(pDummyImportCost.get((c,r,y,s))*model.vDummyImport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum(pDummyExportCost.get((c,r,y,s))*model.vDummyExport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(model.vTaxCost[c,r,y] for c in comm if (c,r,y) in mTaxCost)-sum(model.vSubsCost[c,r,y] for c in comm if (c,r,y) in mSubsCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in stg if (st1,r,y) in mStorageEac)+(model.vTradeCost[r,y] if (r,y) in mvTradeCost else 0));
+model.eqCost = Constraint(mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in tech if (t,r,y) in mTechEac)+sum(model.vTechOMCost[t,r,y] for t in tech if (t,r,y) in mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in sup if (s1,r,y) in mvSupCost)+sum(pDummyImportCost.get((c,r,y,s))*model.vDummyImport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum(pDummyExportCost.get((c,r,y,s))*model.vDummyExport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(model.vTaxCost[c,r,y] for c in comm if (c,r,y) in mTaxCost)-sum(model.vSubsCost[c,r,y] for c in comm if (c,r,y) in mSubCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in stg if (st1,r,y) in mStorageEac)+(model.vTradeCost[r,y] if (r,y) in mvTradeCost else 0));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTaxCost ", end = "")
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
-model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(pTaxCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice)));
+model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(pTaxCostOut.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))+sum(pTaxCostInp.get((c,r,y,s))*model.vInpTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))+sum(pTaxCostBal.get((c,r,y,s))*model.vBalance[c,r,y,s] for s in slice if ((c,r,y,s) in mvBalance and (c,s) in mCommSlice)));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqSubsCost ", end = "")
-# eqSubsCost(comm, region, year)$mSubsCost(comm, region, year)
-model.eqSubsCost = Constraint(mSubsCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubsCost.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,s) in mCommSlice and (c,r,y,s) in mvOutTot)));
+# eqSubsCost(comm, region, year)$mSubCost(comm, region, year)
+model.eqSubsCost = Constraint(mSubCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubCostOut.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))+sum(pSubCostInp.get((c,r,y,s))*model.vInpTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))+sum(pSubCostBal.get((c,r,y,s))*model.vBalance[c,r,y,s] for s in slice if ((c,r,y,s) in mvBalance and (c,s) in mCommSlice)));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqObjective ", end = "")
 # eqObjective

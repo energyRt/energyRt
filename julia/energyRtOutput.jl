@@ -119,7 +119,7 @@ fvSubsCost = open("output/vSubsCost.csv", "w");
 
 println(fvSubsCost, "comm,region,year,value");
 
-for (c,r,y) in mSubsCost if JuMP.value(vSubsCost[(c,r,y)]) != 0
+for (c,r,y) in mSubCost if JuMP.value(vSubsCost[(c,r,y)]) != 0
   println(fvSubsCost, c, ",", r, ",", y, ",", JuMP.value(vSubsCost[(c,r,y)]));
 end;
 end;
