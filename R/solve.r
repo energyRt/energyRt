@@ -15,7 +15,7 @@ solve.model <- function(obj, name = NULL, solver = "GAMS",
     warning('Scenario name is not specified, using "DEFAULT" name')
     name = "DEFAULT"
   }
-  if(is.null(tmp.dir) || tmp.dir == "") stop("Incorrect directory tmp.dir: ", tmp.del)
+  if (is.null(tmp.dir) || tmp.dir == "") stop("Incorrect directory tmp.dir: ", tmp.del)
   if (is.null(arg$echo)) {
     message("The solver working directory: ", tmp.dir)
     message("Starting time: ", Sys.time())
@@ -37,7 +37,7 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
       tmp.dir <- scen@misc$tmp.dir
     }
   } else {
-    if(!is.null(scen)) scen@misc$tmp.dir <- tmp.dir
+    if (!is.null(scen)) scen@misc$tmp.dir <- tmp.dir
   }
   if (is.character(solver)) solver <- list(lang = solver)
   solv_par <- read.csv(paste0(.fix_path(tmp.dir), 'solver'), stringsAsFactors = FALSE)

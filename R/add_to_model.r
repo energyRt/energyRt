@@ -36,7 +36,7 @@ add.model <- function(obj, ..., overwrite = FALSE, repos.name = NULL) {
     }
     ff <- c(sapply(obj@data, function(z) z@name), recursive = TRUE)
     fl <- seq(alon = ff)[ff ==  repos.name]
-    for(i in seq(along = app)) {
+    for (i in seq(along = app)) {
       obj@data[[fl]] <- add(obj@data[[fl]], app[[i]], overwrite = overwrite)
     }
   }
@@ -46,7 +46,7 @@ add.model <- function(obj, ..., overwrite = FALSE, repos.name = NULL) {
     #      stop('You can not mix class repository and other for command add')
     app <- app[sapply(app, class) == 'repository']
     ff <- c(sapply(obj@data, function(z) z@name), recursive = TRUE)
-    for(i in seq(along = app)) {
+    for (i in seq(along = app)) {
       if (app[[i]]@name == "" || any(ff == app[[i]]@name)) stop('Wrong repository name')
       obj@data[[app[[i]]@name]] <- app[[i]]
     }
