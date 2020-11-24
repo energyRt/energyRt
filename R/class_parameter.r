@@ -172,7 +172,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 
 # setMethod('.get_data_slot', signature(obj = 'parameter'), # getParameterTable
 .get_data_slot <-  function(obj) {
-    if (obj@nValues != -1) obj@data[1:obj@nValues,, drop = FALSE] else obj@data
+    if (obj@nValues != -1) obj@data[seq(length.out = obj@nValues),, drop = FALSE] else obj@data
 }
 
 # Remove all data by all set
