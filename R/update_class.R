@@ -120,7 +120,7 @@
                     'mSliceParentChildE', 'mSliceNext', 'pDiscount', 'pSliceShare', 'pDummyImportCost', 'pDummyExportCost', 
                     'mStartMilestone', 'mEndMilestone', 'mMilestoneLast', 'mMilestoneFirst', 'mMilestoneNext', 'mMilestoneHasNext', 
                     'mSameSlice', 'mSameRegion', 'ordYear', 'cardYear', 'pPeriodLen', 'pDiscountFactor', 'mDiscountZero')
-  reduce_map <- c('mTechInpTot',  'mTechOutTot',  'mSupOutTot',  'mDemInp',  'mTechEmsFuel',  'mEmsFuelTot',  
+  reduce_map <- c('mTechInpTot',  'mTechOutTot',  'mSupOutTot',  'mTechEmsFuel',  'mEmsFuelTot',  
                    'mDummyImport',  'mDummyExport',  'mDummyCost',  'mTradeIr',  'mTradeIrUp',  'mvTradeIrAInp',  'mvTradeIrAInpTot',  
                    'mvTradeIrAOut',  'mvTradeIrAOutTot',  'mImportRow',  'mImportRowUp',  'mImportRowAccumulatedUp',  'mExportRow',  'mExportRowUp',  
                    'mExportRowAccumulatedUp',  'mExport',  'mImport',  'mStorageInpTot',  'mStorageOutTot',  'mTaxCost',  'mSubCost',  'mAggOut',  'mSupAva',  

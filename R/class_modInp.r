@@ -452,7 +452,6 @@ setMethod("initialize", "modInp",
     ## mapping ####
     x[['mTechInpTot']] <- newParameter('mTechInpTot', c('comm', 'region', 'year', 'slice'), 'map') 
     x[['mTechOutTot']] <- newParameter('mTechOutTot', c('comm', 'region', 'year', 'slice'), 'map') 
-    x[['mDemInp']] <- newParameter('mDemInp', c('comm', 'slice'), 'map') 
     x[['mEmsFuelTot']] <- newParameter('mEmsFuelTot', c('comm', 'region', 'year', 'slice'), 'map') 
     x[['mTechEmsFuel']] <- newParameter('mTechEmsFuel', c('tech', 'comm', 'comm', 'region', 'year', 'slice'), 'map') 
     x[['mAggregateFactor']] <- newParameter('mAggregateFactor', c('comm', 'comm'), 'map') 

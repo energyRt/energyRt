@@ -139,7 +139,6 @@ set mTechOutTot dimen 4;
 set mTechEac dimen 3;
 set mTechOMCost dimen 3;
 set mSupOutTot dimen 4;
-set mDemInp dimen 2;
 set mEmsFuelTot dimen 4;
 set mTechEmsFuel dimen 6;
 set mDummyImport dimen 4;

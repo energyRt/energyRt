@@ -92,7 +92,6 @@ setMethod('.add0', signature(obj = 'modInp', app = 'demand',
       # Slice
       mDemInp <- data.frame(comm = rep(dem@commodity, length(approxim$slice)),
           slice = approxim$slice, stringsAsFactors = FALSE)
-      obj@parameters[['mDemInp']] <- .add_data(obj@parameters[['mDemInp']], mDemInp)
       mvDemInp <- merge(merge(mDemInp, list(year = approxim$mileStoneYears)), list(region = approxim$region))
     obj@parameters[['mvDemInp']] <- .add_data(obj@parameters[['mvDemInp']], mvDemInp)
        pDemand <- simpleInterpolation(dem@dem, 'dem', obj@parameters[['pDemand']], approxim, c('dem', 'comm'), 

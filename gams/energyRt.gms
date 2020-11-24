@@ -516,7 +516,6 @@ mTechOutTot(comm, region, year, slice)               Total technology output map
 mTechEac(tech, region, year)
 mTechOMCost(tech, region, year)
 mSupOutTot(comm, region, year, slice)
-mDemInp(comm, slice)
 mEmsFuelTot(comm, region, year, slice)
 mTechEmsFuel(tech, comm, comm, region, year, slice)
 mDummyImport(comm, region, year, slice)
