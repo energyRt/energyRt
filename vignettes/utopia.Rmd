@@ -31,14 +31,13 @@ editor_options:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  echo = TRUE, 
+  echo = TRUE,
   message = FALSE,
   warning = FALSE,
   results = "hide",
   fig.width = 7, fig.height = 5, fig.retina = TRUE,
-  fig.fullwidth=TRUE
+  fig.fullwidth = TRUE
 )
-
 ```
 \pagebreak
 
@@ -59,19 +58,19 @@ This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <
 We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/energyRt/energyRt/>).   
 ```{r setup}
 # Choose your solver-software
-mysolver = "GLPK"
+mysolver <- "GLPK"
 # mysolver = "JuMP"
-mysolver = "Pyomo"
-mysolver = "GAMS"
+mysolver <- "Pyomo"
+mysolver <- "GAMS"
 
 if (T) {
   # Installation of required packages - if not installed.
   mypks <- rownames(installed.packages())
   # General tools, data handling, visualisation
-  if (!any(mypks == "devtools")) install.packages("devtools") 
+  if (!any(mypks == "devtools")) install.packages("devtools")
   if (!any(mypks == "tidyverse")) install.packages("tidyverse")
   if (!any(mypks == "lubridate")) install.packages("lubridate")
-  # energyRt 
+  # energyRt
   if (!any(mypks == "energyRt")) devtools::install_github("olugovoy/energyRt")
   # GIS tools
   if (!any(mypks == "rgeos")) install.packages("rgeos")
@@ -92,7 +91,6 @@ library(lubridate)
 # Set color palette for figures
 # palette(RColorBrewer::brewer.pal(11, "Paired"))
 palette(RColorBrewer::brewer.pal(11, "Set3"))
-
 ```
 
 # Utopia map  
@@ -105,20 +103,20 @@ par(mfrow = c(2, 2), mar = seq(0.1, 4))
 maps <- c("utopia_island", "utopia_continent", "utopia_squares", "utopia_honeycomb")
 for (i in 1:4) {
   gis <- get(data(list = maps[i])) # load map
-  plot(gis, col = 1:length(gis), main = maps[i], bg = "aliceblue") 
+  plot(gis, col = 1:length(gis), main = maps[i], bg = "aliceblue")
   cn <- get_labpt_spdf(gis) # get coordinates of the regions' centers
   text(cn$x, cn$y)
 }
 rm(gis, list = ls(pattern = "utopia_")) # clean-up
 dev.off() # reset graphical parameters
-
 ```
 
 Certainly, any other map in `SpatialPolygonsDataFrame` (spdf) format and with saved names of regions in `@data$region` column of the spdf object can be used instead. For this particular example lets pick `utopia_honeycomb` map and keep the `7` first regions for the simulation.
 ```{r Utopia_map, fig.cap="The selected map for the Utopia model."}
-data("utopia_honeycomb") #, package = "energyRt")
-gis <- utopia_honeycomb; rm(utopia_honeycomb)
-gis <- gis[1:7,]
+data("utopia_honeycomb") # , package = "energyRt")
+gis <- utopia_honeycomb
+rm(utopia_honeycomb)
+gis <- gis[1:7, ]
 # gis <- gis[-c(8:9),]
 
 # Often used parameters
@@ -130,8 +128,10 @@ reg_centers <- getCenters(gis) # Coordinates of the regions' centers
 if (F) {
   # Basic map - skipped
   par(mfrow = c(1, 1), mar = seq(0.1, 4))
-  plot(gis, col = 1:length(gis), main = paste("Utopia", length(gis), "regions"),
-       bg = "aliceblue")
+  plot(gis,
+    col = 1:length(gis), main = paste("Utopia", length(gis), "regions"),
+    bg = "aliceblue"
+  )
   text(reg_centers$x, reg_centers$y, labels = reg_names)
   class(gis)
 }
@@ -146,16 +146,16 @@ ggis <- gis %>%
   fortify(region = "region") %>%
   as_tibble()
 
-ggplot(ggis, aes(long,lat, group = group)) + 
-  geom_polygon(aes(fill = id), colour = rgb(1,1,1,0.5)) +
-  # geom_polygon(aes(fill = id), colour = "white", size = 1) + 
-  theme(legend.position="none") +
+ggplot(ggis, aes(long, lat, group = group)) +
+  geom_polygon(aes(fill = id), colour = rgb(1, 1, 1, 0.5)) +
+  # geom_polygon(aes(fill = id), colour = "white", size = 1) +
+  theme(legend.position = "none") +
   coord_quickmap() +
-  theme_void() + theme(plot.title = element_text(hjust = .5)) +
+  theme_void() +
+  theme(plot.title = element_text(hjust = .5)) +
   scale_fill_brewer(palette = "Set3") +
   labs(fill = "Region", title = paste("Utopia", length(gis), "regions")) +
   geom_text(data = reg_centers, aes(x, y, label = region), inherit.aes = FALSE)
-
 ```
  
 
@@ -177,33 +177,39 @@ We can add more levels - seasons or months, weeks, and hours. They should be sav
 # 4x3 = 24 slices
 timeslices2 <- list(
   ANNUAL = "ANNUAL", # required
-  # SEASON = c(W = list(1/4, 
+  # SEASON = c(W = list(1/4,
   # For consistency with other structures, lets rename SEASON to MONTH
   MONTH = list(
-    W = list(1/4, # share of the Winter season in the year
-             HOUR = list(
-               D = 9/24, # share of day-hours in Winter
-               N = 12/24, # share of night-hours in Winter
-               P = 3/24)), # share of peak hours in Winter
-    R = list(1/4, # share of the spRing season in the year
-             HOUR = list(
-               D = 11/24, # share of day-hours in spRing
-               N = 11/24, # share of night-hours in spRing
-               P = 2/24)), # share of peak hours in spRing
-    S = list(1/4, # share of the Summer season in the year
-             HOUR = list(
-               D = 12/24, # share of day-hours in Summer
-               N = 9/24, # share of night-hours in Summer
-               P = 3/24)), # share of peak hours in Summer)
-    A = list(1/4, # share of the Autumn season in the year
-             HOUR = list(
-               D = 11/24, # share of day-hours in Autumn
-               N = 11/24, # share of night-hours in Autumn
-               P = 2/24)) # share of peak hours in Autumn)
-    )
+    W = list(1 / 4, # share of the Winter season in the year
+      HOUR = list(
+        D = 9 / 24, # share of day-hours in Winter
+        N = 12 / 24, # share of night-hours in Winter
+        P = 3 / 24
+      )
+    ), # share of peak hours in Winter
+    R = list(1 / 4, # share of the spRing season in the year
+      HOUR = list(
+        D = 11 / 24, # share of day-hours in spRing
+        N = 11 / 24, # share of night-hours in spRing
+        P = 2 / 24
+      )
+    ), # share of peak hours in spRing
+    S = list(1 / 4, # share of the Summer season in the year
+      HOUR = list(
+        D = 12 / 24, # share of day-hours in Summer
+        N = 9 / 24, # share of night-hours in Summer
+        P = 3 / 24
+      )
+    ), # share of peak hours in Summer)
+    A = list(1 / 4, # share of the Autumn season in the year
+      HOUR = list(
+        D = 11 / 24, # share of day-hours in Autumn
+        N = 11 / 24, # share of night-hours in Autumn
+        P = 2 / 24
+      )
+    ) # share of peak hours in Autumn)
   )
-
-
+)
 ```
 Four seasons and the three groups of hours will result in 12 sub-annual time-slices. If the spring and fall have similar parameters and can be aggregated into one season, reducing the total number of slices to 9. Though there might be reasons to separate them if, for example, the final demand is significantly different in the seasons, or some resources (like hydro-power) have a different profile in autumn and spring.
 
@@ -224,7 +230,7 @@ We have defined 3 different options of sub-annual time steps. The first option h
 
 ```{r}
 # Now let's create names for the slices, the elements of the time-slices set
-# They will be auto-generated in the model, but we may need them in definition of 
+# They will be auto-generated in the model, but we may need them in definition of
 # technologies and other objects.
 
 # timeslices1 <- list(
@@ -242,9 +248,7 @@ timeslices <- timeslices2
 slc <- timeSlices(timeslices)
 (nslc <- length(slc$slice))
 (nmon <- length(timeslices$MONTH))
-(nhou <- nslc/nmon)
-
-
+(nhou <- nslc / nmon)
 ```
 We will assign the time slices to the model-object later, but may also need the structure and/or names of the slices in the definition of other objects, such as technologies, demand, and supply, therefore useful to have them ready.
 
@@ -263,14 +267,14 @@ COA <- newCommodity(
     comm = "CO2", # this commodity (CO2) is emmited when the fuel (COA) is used
     unit = "kt/PJ", # the unit of emissions for refference
     emis = 100 # i.e. 100 kt of CO2 emmitted per one unit of energy (1 PJ)
-    ),
+  ),
   slice = "ANNUAL" # 'ANNUAL' means no sub-annual granularity for the commodity
   # color = "brown" # reserved for output figures, optional
 )
 
 OIL <- newCommodity(
   name = "OIL",
-  description = "Oil and oil products",    
+  description = "Oil and oil products",
   emis = list(
     comm = "CO2",
     emis = 80
@@ -280,9 +284,9 @@ OIL <- newCommodity(
 
 GAS <- newCommodity(
   name = "GAS",
-  description = "Natural gas",   
+  description = "Natural gas",
   emis = list(
-    comm = "CO2", 
+    comm = "CO2",
     unit = "kt/PJ",
     emis = 70
   ),
@@ -291,7 +295,7 @@ GAS <- newCommodity(
 
 CH4 <- newCommodity(
   name = "CH4",
-  description = "Methan emmisions",   
+  description = "Methan emmisions",
   slice = "HOUR"
 )
 
@@ -302,21 +306,20 @@ BIO <- newCommodity(
 )
 
 # More energy commodities with less details
-ELC <- newCommodity('ELC', description = "Electricity", slice = "HOUR")
-HVE <- newCommodity('HVE', description = "High voltage electricity", slice = "HOUR")
-UHV <- newCommodity('UHV', description = "Ultra high voltage electricity", slice = "HOUR")
+ELC <- newCommodity("ELC", description = "Electricity", slice = "HOUR")
+HVE <- newCommodity("HVE", description = "High voltage electricity", slice = "HOUR")
+UHV <- newCommodity("UHV", description = "Ultra high voltage electricity", slice = "HOUR")
 NUC <- newCommodity("NUC", description = "Nuclear fuel", slice = "ANNUAL")
 HYD <- newCommodity("HYD", description = "Hydro energy", slice = "HOUR")
-SOL <- newCommodity('SOL', description = "Solar energy", slice = "HOUR")
-WIN <- newCommodity('WIN', description = "Wind energy", slice = "HOUR")
+SOL <- newCommodity("SOL", description = "Solar energy", slice = "HOUR")
+WIN <- newCommodity("WIN", description = "Wind energy", slice = "HOUR")
 
 # Emissions
-CO2 <- newCommodity('CO2', description = "Carbon dioxide emissions", slice = "HOUR")
-NOX <- newCommodity('NOX', description = "Nitrogen oxide emissions", slice = "HOUR")
-SO2 <- newCommodity('SO2', description = "Sulfur dioxide emissions", slice = "HOUR")
-HG <- newCommodity('HG', description = "Mercury emissions", slice = "HOUR")
-PM <- newCommodity('PM', description = "Particulate matter emissions", slice = "HOUR")
-
+CO2 <- newCommodity("CO2", description = "Carbon dioxide emissions", slice = "HOUR")
+NOX <- newCommodity("NOX", description = "Nitrogen oxide emissions", slice = "HOUR")
+SO2 <- newCommodity("SO2", description = "Sulfur dioxide emissions", slice = "HOUR")
+HG <- newCommodity("HG", description = "Mercury emissions", slice = "HOUR")
+PM <- newCommodity("PM", description = "Particulate matter emissions", slice = "HOUR")
 ```
 
 ## The final demand
@@ -326,20 +329,22 @@ Now let's specify annual, monthly, and hourly demand for electricity, assuming t
 
 ```{r demand_MH_baseYear}
 # Annual demand in 2015
-elc_dem_a <- tibble(region = reg_names, 
-                    year = 2015,
-                    GWh = seq(5000, by = 500, length.out = nreg))
+elc_dem_a <- tibble(
+  region = reg_names,
+  year = 2015,
+  GWh = seq(5000, by = 500, length.out = nreg)
+)
 elc_dem_a
 
-fLoadCurve <- function(n = 24, seed = NULL, delt = 24/n/20) {
+fLoadCurve <- function(n = 24, seed = NULL, delt = 24 / n / 20) {
   # a function to generate an arbitrary load curve
   if (!is.null(seed)) set.seed(seed)
   iter <- TRUE
   lc <- 1.
-    for (i in 2:n) {
-      # ARMA
-      lc[i] <- 1 * lc[i-1] + -.1*(lc[i-1] - 1) + runif(1, -delt, delt)
-    }
+  for (i in 2:n) {
+    # ARMA
+    lc[i] <- 1 * lc[i - 1] + -.1 * (lc[i - 1] - 1) + runif(1, -delt, delt)
+  }
   (0 + lc) * n / sum(lc + 0)
 }
 
@@ -349,8 +354,9 @@ dem <- tibble(
   region = rep(reg_names, each = nslc),
   year = 2015,
   slice = rep(slc$slice, nreg),
-  GWh = c(sapply(elc_dem_a$GWh, function(x) { 
-    (x * fLoadCurve(nmon)) %x% fLoadCurve(nhou)}))/nslc
+  GWh = c(sapply(elc_dem_a$GWh, function(x) {
+    (x * fLoadCurve(nmon)) %x% fLoadCurve(nhou)
+  })) / nslc
 )
 head(dem)
 sum(dem$GWh)
@@ -369,12 +375,12 @@ dem <- left_join(dem, select(slc, MONTH, HOUR, slice, share), by = "slice") %>%
 dem$hour <- as.numeric(as.factor(dem$HOUR))
 
 ggplot(dem, aes(hour, GWh)) +
-  geom_line(aes(color = region)) + ylim(c(0,NA)) +
-  facet_wrap(.~month) +
+  geom_line(aes(color = region)) +
+  ylim(c(0, NA)) +
+  facet_wrap(. ~ month) +
   theme_bw() +
-  labs(title = "(Assumed) Electricity consumption by hours in the base year") + 
+  labs(title = "(Assumed) Electricity consumption by hours in the base year") +
   theme(plot.title = element_text(hjust = 0.5))
-
 ```
 
 The demand for 2015 is done, now we need to provide projections of the demand up to the last year of the model horizon, and with the same level of granularity (regions * slices) as the base year, and the commodity (ELC) itself. We can specify the demand for every (milestone) year of the model horizon, or some of them. The values between specified years will be interpolated If the model horizon goes beyond the last year, the final values will be used for interpolation forward.     
@@ -401,17 +407,16 @@ DEM_ELC <- newDemand(
   description = "Final demand for electricity",
   commodity = "ELC",
   dem = list(
-    year = elc_dem$year, 
+    year = elc_dem$year,
     region = elc_dem$region,
-    slice = elc_dem$slice, 
+    slice = elc_dem$slice,
     dem = elc_dem$PJ
-    )
+  )
 )
 dim(DEM_ELC@dem)
 unique(DEM_ELC@dem$year)
 length(unique(DEM_ELC@dem$region))
 length(unique(DEM_ELC@dem$slice))
-
 ```
 
 
@@ -429,13 +434,12 @@ SUP_COA <- newSupply(
   reserve = list(res.up = 1e6), # total limit of the resource (i.e. deposits)
   region = reg_names[1],
   availability = list(
-    year = c(2015, 2030, 2050), 
+    year = c(2015, 2030, 2050),
     ava.up = c(1000, 2000, 1000), # the upper bound on availability of the commodity
     cost = c(convert("USD/tce", "MUSD/PJ", c(50, 60, 70) * .7)) # assumed price per 1PJ
   ),
   slice = "ANNUAL"
 )
-
 ```
 
 The saved parameter can be checked in `SUP_COA@availability` slot:
@@ -454,7 +458,7 @@ SUP_GAS <- newSupply(
   description = "Supply of natural gas",
   commodity = "GAS",
   unit = "PJ",
-  reserve = list(res.up = runif(1, 1e3, 1e6)), # 
+  reserve = list(res.up = runif(1, 1e3, 1e6)), #
   region = reg_names[min(2, nreg)], # only those regions will have the supply
   availability = list(
     year = c(2015, 2030, 2050),
@@ -493,7 +497,6 @@ RES_WIN <- newSupply(
   commodity = "WIN"
   # availability will be defined by weather factors (see below)
 )
-
 ```
 
 
@@ -507,7 +510,7 @@ all the comm...
 ### Coal power plant
 ```{r techs_ECOA, fig.cap="Coal-fired power plant."}
 # Coal-fired power plants ####
-ECOA <- newTechnology( 
+ECOA <- newTechnology(
   name = "ECOA",
   description = "Generic Coal Power Plant",
   input = list(
@@ -525,7 +528,7 @@ ECOA <- newTechnology(
   ),
   cap2act = 31.536,
   ceff = list(
-    #region = "R1",
+    # region = "R1",
     # year = c(2015),
     comm = c("COA"),
     cinp2use = c(.4)
@@ -555,7 +558,7 @@ ECOA <- newTechnology(
   olife = list(
     olife = 30
   ),
-  slice = 'HOUR'
+  slice = "HOUR"
 )
 draw(ECOA)
 ```
@@ -564,7 +567,7 @@ draw(ECOA)
 ```{r techs_EGAS, fig.cap="Gas-fired power plant."}
 # Gas-fired power plant ####
 set.seed(1e3)
-EGAS <- newTechnology( 
+EGAS <- newTechnology(
   name = "EGAS",
   description = "Generic gas Power Plant",
   input = list(
@@ -582,7 +585,7 @@ EGAS <- newTechnology(
   ),
   cap2act = 31.536,
   ceff = list(
-    #region = "R1",
+    # region = "R1",
     # year = c(2015),
     comm = c("GAS"),
     cinp2use = c(.5)
@@ -612,7 +615,7 @@ EGAS <- newTechnology(
   olife = list(
     olife = 30
   ),
-  slice = 'HOUR'
+  slice = "HOUR"
 )
 draw(EGAS)
 ```
@@ -620,7 +623,7 @@ draw(EGAS)
 ### Biomass-to-power plant  
 ```{r techs_EBIO, fig.cap="Biomass-to-power technology."}
 # Biomass-cofired power plants ####
-EBIO <- newTechnology( 
+EBIO <- newTechnology(
   name = "EBIO",
   description = "Generic Biomass-fired power plant",
   region = reg_names[min(7, nreg)],
@@ -649,7 +652,7 @@ EBIO <- newTechnology(
   afs = list(
     # activity level bounds per sum of listed slices ('ANNUAL')
     slice = "ANNUAL",
-    afs.up = .5 
+    afs.up = .5
   ),
   fixom = list(
     fixom = 50
@@ -672,7 +675,7 @@ EBIO <- newTechnology(
   olife = list(
     olife = 30
   ),
-  slice = 'HOUR'
+  slice = "HOUR"
 )
 draw(EBIO)
 ```
@@ -680,7 +683,7 @@ draw(EBIO)
 ### Nuclear power
 ```{r techs_Nuclear, fig.cap="Nuclear power technology."}
 # Nuclear power plant #
-ENUC <- newTechnology( 
+ENUC <- newTechnology(
   name = "ENUC",
   description = "Nuclear power plants",
   region = reg_names[1],
@@ -699,7 +702,7 @@ ENUC <- newTechnology(
   ),
   af = list(
     af.lo = .8
- ),
+  ),
   fixom = list(
     fixom = 30
   ),
@@ -720,14 +723,14 @@ ENUC <- newTechnology(
   olife = list(
     olife = 60
   ),
-  slice = 'HOUR'
+  slice = "HOUR"
 )
 draw(ENUC)
 ```
 
 ### Hydro power
 ```{r techs_Hydro, fig.cap="Hydro power technology."}
-EHYD <- newTechnology( 
+EHYD <- newTechnology(
   name = "EHYD",
   description = "Hydro power plants",
   input = list(
@@ -770,10 +773,9 @@ EHYD <- newTechnology(
   olife = list(
     olife = 80
   ),
-  slice = 'HOUR'
+  slice = "HOUR"
 )
 draw(EHYD)
-
 ```
 
 ### Weather factors
@@ -781,11 +783,11 @@ draw(EHYD)
 # The weather information can be obtained from Utopia'a weather agency.
 # Here we just randomly generate solar and wind availability factors (AF).
 # For wind we can target, say, 25% annual AF, which can be achieved with
-# around 35% of the time when the wind is available, and the mean speed of wind 
-# tending to 80% of maximum output capacity of wind plants. 
-# For simplicity, let's disregard seasonal components, spatial 
+# around 35% of the time when the wind is available, and the mean speed of wind
+# tending to 80% of maximum output capacity of wind plants.
+# For simplicity, let's disregard seasonal components, spatial
 # and temporal autocorrelation.
-# 
+#
 
 # Wind availability function
 rwind <- function(n, sh1 = 5, sh2 = 2, pwind = .35) {
@@ -795,7 +797,7 @@ rwind <- function(n, sh1 = 5, sh2 = 2, pwind = .35) {
 # Check
 mean(rwind(1e5))
 
-# We can use similar approach for clouds, assuming that expected value for 
+# We can use similar approach for clouds, assuming that expected value for
 # sky transparency is 70%, applying it to solar radiation profile by hours.
 rclouds <- function(n, sh1 = 3.5, sh2 = 1.5) rbeta(n, sh1, sh2)
 mean(rclouds(1e5))
@@ -812,10 +814,10 @@ solrad <- function(slice) {
   if (any(if_h)) {
     # propose function of solar radiation by hours
     fsun <- function(h) {
-      rad <- -cos(2 * pi * (h)/23)
+      rad <- -cos(2 * pi * (h) / 23)
       rad[rad < 0] <- 0
       rad
-      }
+    }
     # extract hours as numbers from slices of type "m**_h**"
     h <- as.integer(substr(slice[if_h], 6, 7))
     idx[if_h] <- fsun(h)
@@ -823,16 +825,16 @@ solrad <- function(slice) {
     idx[if_D] <- 1
     # assign some sun for Peak hours
     if_P <- grepl("_P$", slice)
-    idx[if_P] <- .5 
+    idx[if_P] <- .5
   } else {
     stop("unknown slices: ", head(paste(slice, collapse = ", ")))
   }
   idx
 }
 
-if(F) { # test
+if (F) { # test
   rad <- rbind(slc$slice, solrad(slc$slice))
-  plot(rad[2,], type = "l", col = "red")
+  plot(rad[2, ], type = "l", col = "red")
 }
 
 set.seed(1111)
@@ -848,21 +850,21 @@ WWIN <- newWeather("WWIN",
 )
 
 WSOL <- newWeather("WSOL",
-                    description = "Solar radiation index",
-                    slice = "HOUR",
-                    weather = data.frame(
-                      region = rep(reg_names, each = nslc),
-                      year = 2015, 
-                      slice = rep(slc$slice, nreg),
-                      wval = 0 # assign later
-                    ))
-WSOL@weather$wval <- rclouds(nreg*nslc) * solrad(WSOL@weather$slice)
+  description = "Solar radiation index",
+  slice = "HOUR",
+  weather = data.frame(
+    region = rep(reg_names, each = nslc),
+    year = 2015,
+    slice = rep(slc$slice, nreg),
+    wval = 0 # assign later
+  )
+)
+WSOL@weather$wval <- rclouds(nreg * nslc) * solrad(WSOL@weather$slice)
 sum(WSOL@weather$wval) / length(WSOL@weather$wval)
 
 if (F) {
   plot(WSOL@weather$wval, type = "l", col = "red")
 }
-
 ```
 
 ### Solar arrays
@@ -902,8 +904,6 @@ ESOL <- newTechnology(
   )
 )
 draw(ESOL)
-
-
 ```
 
 ### Wind farms
@@ -928,7 +928,7 @@ EWIN <- newTechnology(
   weather = list(
     weather = "WWIN",
     comm = "WIN",
-    waf.up = 1 # 
+    waf.up = 1 #
   ),
   fixom = list(
     fixom = 3
@@ -949,28 +949,26 @@ EWIN <- newTechnology(
   )
 )
 draw(EWIN)
-
 ```
 
 ### Energy storage systems
 ```{r storage}
 
 STGELC <- newStorage(
-  name = 'STGELC',
-  commodity = 'ELC',
+  name = "STGELC",
+  commodity = "ELC",
   description = "Energy storage systems",
-  cap2stg = 1, 
-  olife = list(olife = 10), 
+  cap2stg = 1,
+  olife = list(olife = 10),
   invcost = list(
     invcost = convert("USD/kWh", "MUSD/PJ", 200)
-    ),
+  ),
   seff = data.frame(
-    stgeff = .99, 
+    stgeff = .99,
     inpeff = .9,
     outeff = .95
-    )
+  )
 )
-
 ```
 
 ## Interregional trade
@@ -981,9 +979,10 @@ nbr <- spdep::poly2nb(gis, snap = .001)
 names(nbr) <- gis@data$region
 
 # Trade matrix
-trd_nbr <- matrix(rep(NA, nreg*nreg), 
-                  nrow = nreg, 
-                  dimnames = list(reg_names, reg_names))
+trd_nbr <- matrix(rep(NA, nreg * nreg),
+  nrow = nreg,
+  dimnames = list(reg_names, reg_names)
+)
 
 for (i in 1:length(reg_names)) {
   trd_nbr[i, nbr[[i]]] <- 1
@@ -999,7 +998,7 @@ We can visualize the open trade routes over the map.
 ```{r trade_map, fig.cap="Trade routes."}
 # Data frame of trade routes
 trd_dt <- as.data.frame.table(trd_nbr, stringsAsFactors = F)
-trd_dt <- trd_dt[!is.na(trd_dt$Freq),] # drop NAs
+trd_dt <- trd_dt[!is.na(trd_dt$Freq), ] # drop NAs
 head(trd_dt)
 dim(trd_dt)
 trd_dt <- dplyr::distinct(trd_dt) # drop duplicates
@@ -1008,36 +1007,45 @@ names(trd_dt) <- c("src", "dst", "trd")
 head(trd_dt)
 
 # Map inter-region trade routes
-trd_rou <- left_join(trd_dt, reg_centers[,1:3], by = c("src" = "region"))
-trd_rou <- left_join(trd_rou, reg_centers[,1:3], by = c("dst" = "region"))
-trd_rou <- trd_rou %>% 
-  rename(xsrc = x.x, ysrc = y.x,
-         xdst = x.y, ydst = y.y)
+trd_rou <- left_join(trd_dt, reg_centers[, 1:3], by = c("src" = "region"))
+trd_rou <- left_join(trd_rou, reg_centers[, 1:3], by = c("dst" = "region"))
+trd_rou <- trd_rou %>%
+  rename(
+    xsrc = x.x, ysrc = y.x,
+    xdst = x.y, ydst = y.y
+  )
 trd_rou <- as_tibble(trd_rou)
 
 # a <- value
 trd_flows_map <-
-  ggplot(data = ggis) + 
-    geom_polygon(aes(x = long, y = lat, group = group), fill = "wheat", 
-                 colour = "white", alpha = 1, size = .5) + # aes fill = id, 
-    coord_fixed(1.) +
-    guides(fill=FALSE) +  # do this to leave off the color legend
-    theme_void() + 
-    labs(title = "Open interregional electricity trade routes")  + 
-    theme(plot.title = element_text(hjust = 0.5), 
-          plot.subtitle = element_text(hjust = 0.5)) +
-    geom_segment(aes(x=xsrc, y=ysrc, xend=xdst, yend=ydst), 
-                 data = trd_rou, inherit.aes = FALSE, size = 5, 
-                 alpha = 1, colour = "dodgerblue", lineend = "round", show.legend = T) +
-    geom_point(data = reg_centers, aes(x, y), colour = "red") +
-    geom_segment(aes(x=xsrc, y=ysrc, xend=xdst, yend=ydst), 
-                 data = trd_rou, inherit.aes = FALSE, size = .1, 
-             arrow = arrow(type = "closed", angle = 15, 
-                           length = unit(0.15, "inches")),
-             colour = "white", alpha = 0.75, 
-             lineend = "butt", linejoin = "mitre", show.legend = T) # , name = "Trade, PJ"
+  ggplot(data = ggis) +
+  geom_polygon(aes(x = long, y = lat, group = group),
+    fill = "wheat",
+    colour = "white", alpha = 1, size = .5
+  ) + # aes fill = id,
+  coord_fixed(1.) +
+  guides(fill = FALSE) + # do this to leave off the color legend
+  theme_void() +
+  labs(title = "Open interregional electricity trade routes") +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
+  geom_segment(aes(x = xsrc, y = ysrc, xend = xdst, yend = ydst),
+    data = trd_rou, inherit.aes = FALSE, size = 5,
+    alpha = 1, colour = "dodgerblue", lineend = "round", show.legend = T
+  ) +
+  geom_point(data = reg_centers, aes(x, y), colour = "red") +
+  geom_segment(aes(x = xsrc, y = ysrc, xend = xdst, yend = ydst),
+    data = trd_rou, inherit.aes = FALSE, size = .1,
+    arrow = arrow(
+      type = "closed", angle = 15,
+      length = unit(0.15, "inches")
+    ),
+    colour = "white", alpha = 0.75,
+    lineend = "butt", linejoin = "mitre", show.legend = T
+  ) # , name = "Trade, PJ"
 trd_flows_map
-
 ```
 
 For every trade-route, direction, and every traded commodity we have to define an object of class `trade` to open the trades in the model. To simplify the process, we can group the trades by source regions. Therefore we will have up to `r nreg` trade objects.  
@@ -1054,53 +1062,54 @@ for (i in 1:dim(trd_dt)[1]) {
   rg_src <- trd_dt$src[i]
   # lab_dst <- reg_centers[rg_dst, 2:3]
   # lab_src <- reg_centers[rg_src, 2:3]
-  lab_dst <- reg_centers[reg_centers$region == rg_dst, c("x","y")]
-  lab_src <- reg_centers[reg_centers$region == rg_src, c("x","y")]
+  lab_dst <- reg_centers[reg_centers$region == rg_dst, c("x", "y")]
+  lab_src <- reg_centers[reg_centers$region == rg_src, c("x", "y")]
   trd_dt$distance_km[i] <- raster::pointDistance(
-    lab_src, lab_dst, T)/1e3
+    lab_src, lab_dst, T
+  ) / 1e3
 }
 
 # Assume losses 1% per 1000 km
 trd_dt$losses <- round(trd_dt$distance_km / 1e3 * 0.01, 4)
 trd_dt$teff <- 1 - trd_dt$losses
 # Assuming 0.1 US cents per kWh per 1000 km for the transmission
-trd_dt$cost <- round(trd_dt$distance_km / 1e3 * 
-                       convert("USD/kWh", "MUSD/GWh", .001), 5) 
+trd_dt$cost <- round(trd_dt$distance_km / 1e3 *
+  convert("USD/kWh", "MUSD/GWh", .001), 5)
 trd_dt <- as_tibble(trd_dt)
 
 # A repository for trades, related technologies and commodities
 TRD_ELC_ALL <- newRepository(name = "TRD_ELC_ALL")
 # Define trade object for each route
 for (src_nm in unique(trd_dt$src)) {
-# The loop creates trade-objects for every region with neighbors, 
+  # The loop creates trade-objects for every region with neighbors,
   ii <- trd_dt$src %in% src_nm # select routes for the source region
   dst_nms <- trd_dt$dst[ii] # all destinations from the region
-  trd_nm <- paste0("TRD_ELC_", src_nm)  # Trade object name
+  trd_nm <- paste0("TRD_ELC_", src_nm) # Trade object name
   cmd_nm <- "ELC"
   cmd_nm_nbr <- "ELC"
-  
+
   # Trade class for every route
-  trd <- newTrade(trd_nm, 
-                  commodity = cmd_nm,
-                  source = src_nm,
-                  destination = dst_nms,
-                  trade = data.frame(
-                    src = src_nm,
-                    dst = dst_nms,
-                    ava.up = convert("GWh", "PJ", 100), # Maximum capacity per route in GW
-                    teff = trd_dt$teff[ii], # trade losses
-                    cost = trd_dt$cost[ii]  # trade costs
-                    # markup = trd_dt$cost[ii] # and/or markup
-                    ),
-                  #!!! New stuff - testing
-                  capacityVariable = TRUE, # endogenous trade capacity & investments
-                  #bidirectional = TRUE, # oppenes reverse direction of the trade
-                  invcost = data.frame(
-                    region = src_nm,
-                    #dst = dst_nms,
-                    invcost = trd_dt$distance_km[ii] / 1e3 * 250 # Assuming $250 MUSD/1000km
-                  )
-                  )
+  trd <- newTrade(trd_nm,
+    commodity = cmd_nm,
+    source = src_nm,
+    destination = dst_nms,
+    trade = data.frame(
+      src = src_nm,
+      dst = dst_nms,
+      ava.up = convert("GWh", "PJ", 100), # Maximum capacity per route in GW
+      teff = trd_dt$teff[ii], # trade losses
+      cost = trd_dt$cost[ii] # trade costs
+      # markup = trd_dt$cost[ii] # and/or markup
+    ),
+    # !!! New stuff - testing
+    capacityVariable = TRUE, # endogenous trade capacity & investments
+    # bidirectional = TRUE, # oppenes reverse direction of the trade
+    invcost = data.frame(
+      region = src_nm,
+      # dst = dst_nms,
+      invcost = trd_dt$distance_km[ii] / 1e3 * 250 # Assuming $250 MUSD/1000km
+    )
+  )
   TRD_ELC_ALL <- add(TRD_ELC_ALL, trd)
 }
 
@@ -1111,7 +1120,7 @@ trd_dt2$src <- trd_dt$dst
 trd_dt2$dst <- trd_dt$src
 trd_dt3 <- bind_rows(trd_dt, trd_dt2)
 trd_dt <- unique(trd_dt3)
-trd_dt <- trd_dt[order(trd_dt$src),]
+trd_dt <- trd_dt[order(trd_dt$src), ]
 rm(trd_dt2, trd_dt3)
 
 TRBD_ELC_ALL <- newRepository(name = "TRBD_ELC_ALL")
@@ -1119,42 +1128,41 @@ TRBD_ELC_ALL <- newRepository(name = "TRBD_ELC_ALL")
 for (i in 1:dim(trd_dt)[1]) {
   src <- trd_dt$src[i]
   dst <- trd_dt$dst[i]
-  trd_nm <- paste0("TRBD_ELC_", src, "_", dst)  # Trade object name
+  trd_nm <- paste0("TRBD_ELC_", src, "_", dst) # Trade object name
   cmd_nm <- "ELC"
   # Trade class for every route
   trd <- newTrade(trd_nm,
-                  commodity = cmd_nm,
-                  source = c(src, dst),
-                  destination = c(src, dst),
-                  trade = data.frame(
-                    src = src,
-                    dst = dst,
-                    ava.up = convert("GWh", "PJ", 1000), # Maximum capacity per route in GW
-                    teff = trd_dt$teff[i] # trade losses
-                    # cost = trd_dt$cost[i]  # trade costs
-                    # markup = trd_dt$cost[ii] # and/or markup
-                    ),
-                  #!!! New stuff - testing
-                  capacityVariable = TRUE, # The trade route has capacity (not just flow) and can be endogenous
-                  #bidirectional = TRUE, #
-                  invcost = data.frame(
-                    region = src,
-                    #dst = dst,
-                    year = 2010,
-                    invcost = trd_dt$distance_km[i] / 1e3 * 250 # Assuming $250 MUSD/1000km
-                  ),
-                  # olife = data.frame(
-                    olife = 80,
-                  # ),
-                  cap2act = convert("GWh", "PJ", 24*365)
-                  )
+    commodity = cmd_nm,
+    source = c(src, dst),
+    destination = c(src, dst),
+    trade = data.frame(
+      src = src,
+      dst = dst,
+      ava.up = convert("GWh", "PJ", 1000), # Maximum capacity per route in GW
+      teff = trd_dt$teff[i] # trade losses
+      # cost = trd_dt$cost[i]  # trade costs
+      # markup = trd_dt$cost[ii] # and/or markup
+    ),
+    # !!! New stuff - testing
+    capacityVariable = TRUE, # The trade route has capacity (not just flow) and can be endogenous
+    # bidirectional = TRUE, #
+    invcost = data.frame(
+      region = src,
+      # dst = dst,
+      year = 2010,
+      invcost = trd_dt$distance_km[i] / 1e3 * 250 # Assuming $250 MUSD/1000km
+    ),
+    # olife = data.frame(
+    olife = 80,
+    # ),
+    cap2act = convert("GWh", "PJ", 24 * 365)
+  )
 
   TRBD_ELC_ALL <- add(TRBD_ELC_ALL, trd)
 }
-  
+
 names(TRBD_ELC_ALL@data)
 TRBD_ELC_ALL@data[[1]]
-
 ```
 
 ## Global trade
@@ -1166,7 +1174,7 @@ COAIMP <- newImport(
   imp = list(
     # Let's make it a bit more expensive than domestic coal
     year = SUP_COA@availability$year,
-    price = SUP_COA@availability$cost * 1.2 
+    price = SUP_COA@availability$cost * 1.2
   )
 )
 
@@ -1177,7 +1185,7 @@ GASIMP <- newImport(
   imp = list(
     # Let's make it a bit more expensive than domestic coal
     year = SUP_GAS@availability$year,
-    price = SUP_GAS@availability$cost * 1.2 
+    price = SUP_GAS@availability$cost * 1.2
   )
 )
 
@@ -1188,56 +1196,54 @@ GASIMP <- newImport(
 #   imp = list(
 #     # Let's make it a bit more expensive than domestic coal
 #     year = SUP_OIL@availability$year,
-#     price = SUP_OIL@availability$cost * 1.2 
+#     price = SUP_OIL@availability$cost * 1.2
 #   )
 # )
-
-
 ```
 
 ## The model
 ```{r UTOPIA_model}
-reps <- add(newRepository('utopia_repository'), 
-            # Commodities
-            ELC, # electricity
-            COA, GAS, NUC, HYD, BIO, # energy
-            WIN, SOL, # renewables
-            CO2, PM, NOX, SO2, HG, CH4, # emissions
-            # Supply
-            SUP_NUC, SUP_COA, SUP_GAS, RES_HYD, 
-            RES_SOL, RES_WIN,
-            # Import from ROW
-            COAIMP, GASIMP,
-            # Technologies
-            ECOA, EGAS, ENUC, EHYD,
-            # EWIN, ESOL,
-            # Electricity trade
-            # TRD_ELC_ALL, # repository with electricity trade routes
-            DEM_ELC # ELC demand with load curve (24 hours x 12 months)
-            )
+reps <- add(
+  newRepository("utopia_repository"),
+  # Commodities
+  ELC, # electricity
+  COA, GAS, NUC, HYD, BIO, # energy
+  WIN, SOL, # renewables
+  CO2, PM, NOX, SO2, HG, CH4, # emissions
+  # Supply
+  SUP_NUC, SUP_COA, SUP_GAS, RES_HYD,
+  RES_SOL, RES_WIN,
+  # Import from ROW
+  COAIMP, GASIMP,
+  # Technologies
+  ECOA, EGAS, ENUC, EHYD,
+  # EWIN, ESOL,
+  # Electricity trade
+  # TRD_ELC_ALL, # repository with electricity trade routes
+  DEM_ELC # ELC demand with load curve (24 hours x 12 months)
+)
 
 length(reps@data)
 names(reps@data)
 
-mdl <- newModel('UTOPIA', 
-                debug = data.frame(#comm = "ELC",
-                                   dummyImport = 1e6,
-                                   dummyExport = 1e6),
-                region = reg_names,
-                discount = 0.05,
-                slice = timeslices,
-                # slice = unlist(timeslices2),
-                repository = reps,
-                # GIS = gis,
-                early.retirement = F)
-
-
+mdl <- newModel("UTOPIA",
+  debug = data.frame( # comm = "ELC",
+    dummyImport = 1e6,
+    dummyExport = 1e6
+  ),
+  region = reg_names,
+  discount = 0.05,
+  slice = timeslices,
+  # slice = unlist(timeslices2),
+  repository = reps,
+  # GIS = gis,
+  early.retirement = F
+)
 ```
 
 We can check the shares of the time-slices which are auto-calculated assuming that all slices have the same weights. This works for 24 hours, but the weights for every month can be specified to take the difference in months length.
 ```{r show_timeslices_length, results='asis', echo=FALSE}
 knitr::kable(rbind(head(mdl@sysInfo@slice@levels), tail(mdl@sysInfo@slice@levels)))
-
 ```
 
 ### The model horizon and annual time-steps (`milesone years`)
@@ -1245,7 +1251,6 @@ If we don't need year-by-year steps, milestone years (MSY) can be specifyed to r
 ```{r}
 mdl <- setMilestoneYears(mdl, start = 2015, interval = c(1, 2, rep(5, 8)))
 mdl@sysInfo@milestone
-
 ```
 
 
@@ -1254,105 +1259,120 @@ mdl@sysInfo@milestone
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=F, echo=F}
 # Four alternative languages to solve the model
-scen_BASE <- solve(mdl, name = "BASE", 
-                   # tmp.path = "C:/solwork",
-                   solver = mysolver,
-                   # solver = "GLPK",
-                   tmp.name = "UTOPIA_BASE",
-                   tmp.del = F
-                   )
+scen_BASE <- solve(mdl,
+  name = "BASE",
+  # tmp.path = "C:/solwork",
+  solver = mysolver,
+  # solver = "GLPK",
+  tmp.name = "UTOPIA_BASE",
+  tmp.del = F
+)
 summary(scen_BASE)
-
-
 ```
 
 
 ```{r, include=F, eval=F, echo=F}
 # Compare models in different languages
-scen_BASE_glpk <- solve(mdl, name = "BASE_glpk", 
-                   # tmp.path = "C:/solwork",
-                   # solver = mysolver,
-                   solver = "glpk",
-                   tmp.name = "UTOPIA_BASE_GLPK",
-                   tmp.del = F
-                   )
+scen_BASE_glpk <- solve(mdl,
+  name = "BASE_glpk",
+  # tmp.path = "C:/solwork",
+  # solver = mysolver,
+  solver = "glpk",
+  tmp.name = "UTOPIA_BASE_GLPK",
+  tmp.del = F
+)
 summary(scen_BASE_glpk)
 
-scen_BASE_gams <- solve(add(mdl), name = "BASE_gams", 
-                   # tmp.path = "C:/solwork",
-                   # solver = "GAMS",
-                   solver = list(
-                     lang = "GAMS",
-                     # solver = "ipopt"),
-                     solver = "cbc"),
-                   tmp.name = "UTOPIA_BASE_GAMS",
-                   tmp.del = FALSE
-                   # , wait = FALSE
-                   )
-summary(scen_BASE_gams) 
+scen_BASE_gams <- solve(add(mdl),
+  name = "BASE_gams",
+  # tmp.path = "C:/solwork",
+  # solver = "GAMS",
+  solver = list(
+    lang = "GAMS",
+    # solver = "ipopt"),
+    solver = "cbc"
+  ),
+  tmp.name = "UTOPIA_BASE_GAMS",
+  tmp.del = FALSE
+  # , wait = FALSE
+)
+summary(scen_BASE_gams)
 
-scen_BASE_py <- solve(add(mdl), name = "BASE_py", 
-                   # tmp.path = "C:/solwork",
-                   # solver = mysolver,
-                   solver = list(
-                     lang = "Pyomo",
-                     # solver = "ipopt"
-                     solver = "cbc"
-                   ),
-                   tmp.name = "UTOPIA_BASE_Python",
-                   tmp.del = F
-                   # , wait = FALSE
-                   )
+scen_BASE_py <- solve(add(mdl),
+  name = "BASE_py",
+  # tmp.path = "C:/solwork",
+  # solver = mysolver,
+  solver = list(
+    lang = "Pyomo",
+    # solver = "ipopt"
+    solver = "cbc"
+  ),
+  tmp.name = "UTOPIA_BASE_Python",
+  tmp.del = F
+  # , wait = FALSE
+)
 summary(scen_BASE_py)
 
-scen_BASE_jl <- solve(add(mdl), name = "BASE_jl", 
-                   # tmp.path = "C:/solwork",
-                   # solver = mysolver,
-                   # solver = "JuMP",
-                   solver = list(
-                     lang = "JuMP",
-                     solver = "Cbc"
-                   ),
-                   tmp.name = "UTOPIA_BASE_Julia",
-                   tmp.del = FALSE 
-                   # , wait = FALSE
-                   )
+scen_BASE_jl <- solve(add(mdl),
+  name = "BASE_jl",
+  # tmp.path = "C:/solwork",
+  # solver = mysolver,
+  # solver = "JuMP",
+  solver = list(
+    lang = "JuMP",
+    solver = "Cbc"
+  ),
+  tmp.name = "UTOPIA_BASE_Julia",
+  tmp.del = FALSE
+  # , wait = FALSE
+)
 summary(scen_BASE_jl)
 
-getData(list(scen_BASE,
-             scen_BASE_glpk, 
-             scen_BASE_jl, 
-             scen_BASE_py, 
-             scen_BASE_gams),
-        name = "vObjective", merge = TRUE)
-
+getData(list(
+  scen_BASE,
+  scen_BASE_glpk,
+  scen_BASE_jl,
+  scen_BASE_py,
+  scen_BASE_gams
+),
+name = "vObjective", merge = TRUE
+)
 ```
 
 
 ```{r, include=F, eval=F, echo=F}
 
 scen_BASE_int <- interpolate(
-  add(mdl), #, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
-  name = "BASE", trim = T)
+  add(mdl), # , TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC),
+  name = "BASE", trim = T
+)
 
 summary(scen_BASE_int)
 scen_BASE_int@misc$tmp.dir
 
 ## Writing the model code and data on disk
 scen_BASE_gams <- write(
-  scen_BASE_int, solver = "GAMS", 
-  tmp.dir = "solwork/UTOPIA_BASE_GAMS")
+  scen_BASE_int,
+  solver = "GAMS",
+  tmp.dir = "solwork/UTOPIA_BASE_GAMS"
+)
 scen_BASE_gams@misc$tmp.dir # directory
 
-scen_BASE_py <- write(scen_BASE_int, solver = "PYOMO", 
-                      tmp.dir = "solwork/UTOPIA_BASE_PYOMO")
+scen_BASE_py <- write(scen_BASE_int,
+  solver = "PYOMO",
+  tmp.dir = "solwork/UTOPIA_BASE_PYOMO"
+)
 scen_BASE_py@misc$tmp.dir
 
-scen_BASE_glpk <- write(scen_BASE_int, solver = "GLPK", 
-                        tmp.dir = "solwork/UTOPIA_BASE_GLPK")
+scen_BASE_glpk <- write(scen_BASE_int,
+  solver = "GLPK",
+  tmp.dir = "solwork/UTOPIA_BASE_GLPK"
+)
 
-scen_BASE_jl <- write(scen_BASE_int, solver = "JuMP", 
-                      tmp.dir = "solwork/UTOPIA_BASE_Julia")
+scen_BASE_jl <- write(scen_BASE_int,
+  solver = "JuMP",
+  tmp.dir = "solwork/UTOPIA_BASE_Julia"
+)
 
 ## Solving the model
 solve(scen_BASE_gams, wait = FALSE)
@@ -1373,15 +1393,16 @@ summary(scen_BASE_glpk)
 scen_BASE_jl <- read(scen_BASE_jl)
 summary(scen_BASE_jl)
 
-getData(list(GAMS1 = scen_BASE,
-             # GAMS2 = scen_BASE_gams,
-             GLPK = scen_BASE_glpk, 
-             Julia = scen_BASE_jl, 
-             Python = scen_BASE_py, 
-             GAMS0 = scen_BASE_gams),
-        name = "vObjective", merge = TRUE)
-
-
+getData(list(
+  GAMS1 = scen_BASE,
+  # GAMS2 = scen_BASE_gams,
+  GLPK = scen_BASE_glpk,
+  Julia = scen_BASE_jl,
+  Python = scen_BASE_py,
+  GAMS0 = scen_BASE_gams
+),
+name = "vObjective", merge = TRUE
+)
 ```
 
 
@@ -1390,15 +1411,14 @@ getData(list(GAMS1 = scen_BASE,
 ```{r GRID, eval=F}
 
 scen_GRID <- solve(add(mdl, TRBD_ELC_ALL), # Adding trade routes
-                   name = "GRID", 
-                  # tmp.path = "C:/solwork",
-                   solver = mysolver,
-                   tmp.name = "UTOPIA_GRID",
-                   tmp.del = F,
-                   trim = T
-                  )
+  name = "GRID",
+  # tmp.path = "C:/solwork",
+  solver = mysolver,
+  tmp.name = "UTOPIA_GRID",
+  tmp.del = F,
+  trim = T
+)
 summary(scen_GRID)
-
 ```
 
 
@@ -1406,25 +1426,25 @@ summary(scen_GRID)
 ```{r REN, eval=F}
 
 scen_RBAU <- solve(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), #
-                   name = "RBAU", 
-                   description = "Adding renewables",
-                  # tmp.path = "C:/solwork",
-                   solver = mysolver,
-                  # solver = "GLPK",
-                  # solver = "GAMS",
-                   tmp.name = "UTOPIA_REN",
-                   tmp.del = F
-                  )
+  name = "RBAU",
+  description = "Adding renewables",
+  # tmp.path = "C:/solwork",
+  solver = mysolver,
+  # solver = "GLPK",
+  # solver = "GAMS",
+  tmp.name = "UTOPIA_REN",
+  tmp.del = F
+)
 summary(scen_RBAU)
-
 ```
 
 ```{r, include=F, eval=F, echo=F}
 # Alternative workflow to solve the model:
-mysolver = "GAMS"
+mysolver <- "GAMS"
 ## Interpolation of parameters
-scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC), 
-                         name = "RBAU2")
+scen_RBAU2 <- interpolate(add(mdl, TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC),
+  name = "RBAU2"
+)
 ## Writing the model code and data on disk
 scen_RBAU2 <- write(scen_RBAU2, solver = mysolver, tmp.dir = "solwork/UTOPIA_REN")
 
@@ -1441,7 +1461,6 @@ getData(list(scen_RBAU, scen_RBAU2), name = "vObjective", merge = T)
 
 getData(scen_RBAU2, name = "vTradeCap")
 getData(scen_RBAU, name = "vTradeIr")
-
 ```
 
 
@@ -1454,7 +1473,6 @@ scen <- scen_RBAU
 # Quick check
 scen@modOut@variables$vObjective
 summary(scen)
-
 ```
 
 
@@ -1465,15 +1483,12 @@ sns <- list(scen_BASE, scen_GRID, scen_RBAU)
 getData(sns, name = "vObjective", merge = T)
 getData(scen_BASE, name = "vTechOutTot", comm = "ELC", merge = F)
 getData(sns, name = "vTechOutTot", comm = "ELC", merge = F)
-
-
 ```
 
 ## Pivot tables
 ```{r, eval=F}
 # getData format
 pivot(sns, comm = "ELC", name = "vTechOut")
-
 ```
 
 
@@ -1481,30 +1496,35 @@ pivot(sns, comm = "ELC", name = "vTechOut")
 ```{r, eval=F, results="markup"}
 elc_out <- getData(sns, name = "vTechOutTot", comm = "ELC", merge = T)
 elc_out
-elc_out <- elc_out %>% 
+elc_out <- elc_out %>%
   group_by(comm, year, region, scenario) %>%
   summarise(GWh = sum(convert("PJ", "GWh", value)))
 
-ggplot(elc_out, aes(year, GWh, colour = scenario)) + geom_line(size = 1) + 
+ggplot(elc_out, aes(year, GWh, colour = scenario)) +
+  geom_line(size = 1) +
   theme_bw() +
-  facet_wrap(.~region)
+  facet_wrap(. ~ region)
 
-ggplot(elc_out, aes(year, GWh, colour = region)) + geom_line(size = 1) + 
+ggplot(elc_out, aes(year, GWh, colour = region)) +
+  geom_line(size = 1) +
   theme_bw() +
-  facet_wrap(.~scenario)
+  facet_wrap(. ~ scenario)
 
-emis <- 
-  getData(sns, name = "vBalance", merge = T, 
-          comm = c("NOX", "SO2", "PM", "HG", "CO2")) %>%
-    group_by(scenario, comm, year) %>%
-    summarise(value = sum(value))
-ggplot(emis, aes(year, value, colour = scenario)) + geom_line() + 
-  facet_wrap(.~comm, scales = "free")
+emis <-
+  getData(sns,
+    name = "vBalance", merge = T,
+    comm = c("NOX", "SO2", "PM", "HG", "CO2")
+  ) %>%
+  group_by(scenario, comm, year) %>%
+  summarise(value = sum(value))
+ggplot(emis, aes(year, value, colour = scenario)) +
+  geom_line() +
+  facet_wrap(. ~ comm, scales = "free")
 
 
 # Fuel Mix
 
-vTechInp <- getData(sns, name = "vTechInp", tech_ = "^E", merge = T, yearsAsFactors = T) 
+vTechInp <- getData(sns, name = "vTechInp", tech_ = "^E", merge = T, yearsAsFactors = T)
 unique(vTechInp$tech)
 unique(vTechInp$comm)
 unique(vTechInp$scenario)
@@ -1515,10 +1535,10 @@ fumx <- vTechInp %>%
 fumx
 
 ggplot(fumx, aes(as.factor(year), PJ, fill = comm)) +
-  geom_bar(stat = "identity") + 
+  geom_bar(stat = "identity") +
   theme_bw() +
   labs(x = "Year", fill = "Fuel") +
-  facet_wrap(.~scenario)
+  facet_wrap(. ~ scenario)
 
 # The same by regions
 fumxr <- vTechInp %>%
@@ -1527,12 +1547,10 @@ fumxr <- vTechInp %>%
 head(fumxr)
 
 ggplot(fumxr, aes(as.factor(year), PJ, fill = comm)) +
-  geom_bar(stat = "identity") + 
+  geom_bar(stat = "identity") +
   theme_bw() +
   labs(x = "Year", fill = "Fuel") +
   facet_grid(region ~ scenario)
-
-
 ```
 
 ### Trade
@@ -1541,19 +1559,21 @@ ggplot(fumxr, aes(as.factor(year), PJ, fill = comm)) +
 names(getData(scen, name_ = "trd|trade|Trade", merge = F))
 
 # Capacity of the trade routes (the Grid)
-trd_cap <- getData(scen, name = "vTradeCap", merge = T,
-                   newNames = c("value" = "GW"))
+trd_cap <- getData(scen,
+  name = "vTradeCap", merge = T,
+  newNames = c("value" = "GW")
+)
 trd_cap
 
-trd_cap$src <- sapply(strsplit(trd_cap$trade, '_'), function(x) x[3])
-trd_cap$dst <- sapply(strsplit(trd_cap$trade, '_'), function(x) x[4])
+trd_cap$src <- sapply(strsplit(trd_cap$trade, "_"), function(x) x[3])
+trd_cap$dst <- sapply(strsplit(trd_cap$trade, "_"), function(x) x[4])
 
 # Adding location information for regions' centers
 trd_cap <- trd_cap %>%
-  left_join(reg_centers[,1:3], by = c("src" = "region")) %>%
-  left_join(reg_centers[,1:3], by = c("dst" = "region")) %>%
-  rename(xsrc = x.x, ysrc = y.x, xdst = x.y, ydst = y.y)  
-  # mutate(GWh = convert("PJ", "GWh", value))
+  left_join(reg_centers[, 1:3], by = c("src" = "region")) %>%
+  left_join(reg_centers[, 1:3], by = c("dst" = "region")) %>%
+  rename(xsrc = x.x, ysrc = y.x, xdst = x.y, ydst = y.y)
+# mutate(GWh = convert("PJ", "GWh", value))
 trd_cap
 
 ftrd_cap_map <- function(trd_cap, year = sample(unique(trd_cap$year), 1)) {
@@ -1562,19 +1582,24 @@ ftrd_cap_map <- function(trd_cap, year = sample(unique(trd_cap$year), 1)) {
   # browser()
   trd_cap_map <-
     ggplot(data = ggis) +
-      geom_polygon(aes(x = long, y = lat, group = group), fill = "wheat",
-                   colour = "white", alpha = 1, size = .5) + # aes fill = id,
-      coord_fixed(1.) +
-      guides(fill=FALSE) +  # do this to leave off the color legend
-      theme_void() +
-      labs(title = paste0("Interregional electricity grid, year = ", year)) +
-      theme(plot.title = element_text(hjust = 0.5),
-            plot.subtitle = element_text(hjust = 0.5)) +
-      geom_segment(aes(x=xsrc, y=ysrc, xend=xdst, yend=ydst, size = GW), 
-                   data = trd_cap[ii,], inherit.aes = FALSE,  
-                   alpha = 1, colour = "dodgerblue", lineend = "round", show.legend = T) +
-      scale_size_area(limits = range(trd_cap$GW), max_size = 8) +
-      geom_point(data = reg_centers, aes(x, y), colour = "red")
+    geom_polygon(aes(x = long, y = lat, group = group),
+      fill = "wheat",
+      colour = "white", alpha = 1, size = .5
+    ) + # aes fill = id,
+    coord_fixed(1.) +
+    guides(fill = FALSE) + # do this to leave off the color legend
+    theme_void() +
+    labs(title = paste0("Interregional electricity grid, year = ", year)) +
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      plot.subtitle = element_text(hjust = 0.5)
+    ) +
+    geom_segment(aes(x = xsrc, y = ysrc, xend = xdst, yend = ydst, size = GW),
+      data = trd_cap[ii, ], inherit.aes = FALSE,
+      alpha = 1, colour = "dodgerblue", lineend = "round", show.legend = T
+    ) +
+    scale_size_area(limits = range(trd_cap$GW), max_size = 8) +
+    geom_point(data = reg_centers, aes(x, y), colour = "red")
   trd_cap_map
 }
 yrs <- sort(unique(trd_cap$year)) # all years
@@ -1587,8 +1612,8 @@ trd <- getData(scen_RBAU, name = "vTradeIr", comm = "ELC", merge = T)
 head(trd)
 
 trd_flo <- trd %>%
-  left_join(reg_centers[,1:3], by = c("src" = "region")) %>%
-  left_join(reg_centers[,1:3], by = c("dst" = "region")) %>%
+  left_join(reg_centers[, 1:3], by = c("src" = "region")) %>%
+  left_join(reg_centers[, 1:3], by = c("dst" = "region")) %>%
   rename(xsrc = x.x, ysrc = y.x, xdst = x.y, ydst = y.y) %>%
   mutate(GWh = convert("PJ", "GWh", value))
 
@@ -1606,33 +1631,42 @@ ftrd_flo_map <- function(slice = sample(unique(trd_flo$slice), 1),
   ii <- ii & trd_flo$year == year
   trd_flo_map <-
     ggplot(data = ggis) +
-      geom_polygon(aes(x = long, y = lat, group = group), fill = "wheat",
-                   colour = "white", alpha = 1, size = .5) + # aes fill = id,
-      coord_fixed(1.) +
-      guides(fill=FALSE) +  # do this to leave off the color legend
-      theme_void() +
-      labs(title = paste0("Interregional electricity trade flows, year = ", 
-                          year, ", slice = ", slice))  +
-      theme(plot.title = element_text(hjust = 0.5),
-            plot.subtitle = element_text(hjust = 0.5)) +
-      geom_segment(aes(x=xsrc, y=ysrc, xend=xdst, yend=ydst, size = GWh), 
-                   data = trd_flo[ii,], inherit.aes = FALSE,  
-                   alpha = 1, colour = "dodgerblue", lineend = "round", show.legend = T) +
-      scale_size_area(limits = range(trd_flo$GWh), max_size = 8) +
-      geom_point(data = reg_centers, aes(x, y), colour = "red") +
-      geom_segment(aes(x=xsrc, y=ysrc, xend=xdst, yend=ydst), 
-                   data = trd_flo[ii,], inherit.aes = FALSE, size = .1, 
-               arrow = arrow(type = "closed", angle = 15, 
-                             length = unit(0.15, "inches")),
-               colour = "white", alpha = 0.75, 
-               lineend = "butt", linejoin = "mitre", show.legend = T) # , name = "Trade, PJ"
+    geom_polygon(aes(x = long, y = lat, group = group),
+      fill = "wheat",
+      colour = "white", alpha = 1, size = .5
+    ) + # aes fill = id,
+    coord_fixed(1.) +
+    guides(fill = FALSE) + # do this to leave off the color legend
+    theme_void() +
+    labs(title = paste0(
+      "Interregional electricity trade flows, year = ",
+      year, ", slice = ", slice
+    )) +
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      plot.subtitle = element_text(hjust = 0.5)
+    ) +
+    geom_segment(aes(x = xsrc, y = ysrc, xend = xdst, yend = ydst, size = GWh),
+      data = trd_flo[ii, ], inherit.aes = FALSE,
+      alpha = 1, colour = "dodgerblue", lineend = "round", show.legend = T
+    ) +
+    scale_size_area(limits = range(trd_flo$GWh), max_size = 8) +
+    geom_point(data = reg_centers, aes(x, y), colour = "red") +
+    geom_segment(aes(x = xsrc, y = ysrc, xend = xdst, yend = ydst),
+      data = trd_flo[ii, ], inherit.aes = FALSE, size = .1,
+      arrow = arrow(
+        type = "closed", angle = 15,
+        length = unit(0.15, "inches")
+      ),
+      colour = "white", alpha = 0.75,
+      lineend = "butt", linejoin = "mitre", show.legend = T
+    ) # , name = "Trade, PJ"
   trd_flo_map
 }
 ftrd_flo_map()
 ftrd_flo_map()
 
 if (!exists("homedir")) homedir <- getwd()
-
 ```
 
 ```{r aminated_pdf, eval=FALSE}
@@ -1646,26 +1680,30 @@ if (!dir.exists(figpath)) dir.create(figpath, recursive = T, showWarnings = F)
 if (!exists("homedir")) homedir <- getwd()
 
 setwd(figpath)
-  saveLatex({
-  n <- 1
-  for (s in slc$slice) {
-    pp <- ftrd_flo_map(s, year = 2055)
-    ggsave(paste0("Rplot", n, ".pdf"), device = "pdf")
-    n <- n + 1
-  }}, 
+saveLatex(
+  {
+    n <- 1
+    for (s in slc$slice) {
+      pp <- ftrd_flo_map(s, year = 2055)
+      ggsave(paste0("Rplot", n, ".pdf"), device = "pdf")
+      n <- n + 1
+    }
+  },
   use.dev = FALSE,
   caption = "Electricity generation and inter-regional trade.",
   # label = "blablabla",
-  ani.dev = "pdf", ani.type = "pdf", img.fmt = "Rplot%d.pdf",
-  ani.width = 8, ani.height = 10.5,
+  ani.dev = "pdf",
+  ani.type = "pdf",
+  img.fmt = "Rplot%d.pdf",
+  ani.width = 8,
+  ani.height = 10.5,
   # documentclass = docclass,
-  verbose = T 
-  # latex.filename = fname #label = h, 
+  verbose = T
+  # latex.filename = fname #label = h,
   # pdflatex = NULL
-  #caption = tsdh2datetime(h)
+  # caption = tsdh2datetime(h)
 )
 setwd(homedir)
-
 ```
 
 
@@ -1678,15 +1716,17 @@ setwd(figpath2)
 
 # Figures output parameters
 scl1 <- 1
-dpi <- 160*scl1
+dpi <- 160 * scl1
 n <- 1
 for (y in mdl@sysInfo@milestone$mid) {
   for (s in slc$slice) {
     fname <- paste0("Rplot", n, ".png")
-    cat(y, " ", s, " ",  fname, "\n")
+    cat(y, " ", s, " ", fname, "\n")
     pp <- ftrd_flo_map(s, year = y)
-    ggsave(fname, pp, device = "png",
-           dpi = dpi, width = scl1*1920/dpi, height = scl1*1080/dpi)
+    ggsave(fname, pp,
+      device = "png",
+      dpi = dpi, width = scl1 * 1920 / dpi, height = scl1 * 1080 / dpi
+    )
     n <- n + 1
   }
 }
@@ -1696,7 +1736,6 @@ for (y in mdl@sysInfo@milestone$mid) {
 system("c:/utils/ffmpeg/bin/ffmpeg -r 4 -f image2 -s 1920x1080 -i Rplot%d.png -vcodec libx264 -crf 25 -pix_fmt yuv420p -y utopia_example_trade.mp4")
 
 setwd(homedir)
-
 ```
 
 
@@ -1705,37 +1744,45 @@ setwd(homedir)
 ```{r, eval=F}
 ## NXSX: NOX and SO2 control
 NOXSO2control <- newConstraint(
-  'NOXSO2control', 
-  eq = '<=', 
-  rhs = 1e6, 
-  for.each = list(year = NULL), 
-  variable = list(variable = 'vOutTot', 
-                  for.sum = list(comm = c("NOX", "SO2"))))
+  "NOXSO2control",
+  eq = "<=",
+  rhs = 1e6,
+  for.each = list(year = NULL),
+  variable = list(
+    variable = "vOutTot",
+    for.sum = list(comm = c("NOX", "SO2"))
+  )
+)
 
 NOXSO2controlMult <- newConstraint(
-  'NOXSO2control', 
-  eq = '<=', 
-  rhs = 1e6, 
-  for.each = list(year = NULL), 
+  "NOXSO2control",
+  eq = "<=",
+  rhs = 1e6,
+  for.each = list(year = NULL),
   variable = list(
-    variable = 'vOutTot', 
-    for.sum = list(comm ="NOX"),
-    mult = 1.5), 
+    variable = "vOutTot",
+    for.sum = list(comm = "NOX"),
+    mult = 1.5
+  ),
   # for the case of different multipliers
-  variable = list(variable = 'vOutTot', 
-                  for.sum = list(comm = "SO2"), 
-                  mult = 1.25) 
+  variable = list(
+    variable = "vOutTot",
+    for.sum = list(comm = "SO2"),
+    mult = 1.25
+  )
 )
 
 NOXSO2controlCum <- newConstraint(
-  'NOXSO2control', 
-  eq = '<=', 
-  rhs = 1e8, 
+  "NOXSO2control",
+  eq = "<=",
+  rhs = 1e8,
   variable = list(
-    variable = 'vOutTot', 
+    variable = "vOutTot",
     for.sum = list(
-      comm =c("NOX", "SO2"))))
-
+      comm = c("NOX", "SO2")
+    )
+  )
+)
 ```
 
 
@@ -1743,20 +1790,22 @@ NOXSO2controlCum <- newConstraint(
 
 ```{r, eval=F}
 
-GHG50tax <- newTax('GHGtax', comm = 'GHG', tax = list( bal = 100))
+GHG50tax <- newTax("GHGtax", comm = "GHG", tax = list(bal = 100))
 
 # GHG50tax <- newTax('HGtax', comm = 'HG', year = 2025:2035, value = data.frame(year = c(2025, 2030), value = c(1, 100)))
 
-GHG50CapTrade <- add(newRepository('GHG50CapTrade'),
+GHG50CapTrade <- add(
+  newRepository("GHG50CapTrade"),
   # Aggregate HG
-  newCommodity('GHGtrade'), # Commodity to take to account trade
+  newCommodity("GHGtrade"), # Commodity to take to account trade
   # Equation that provide quote mechanisme
-  newConstraint('GHGcap', eq = '<=', rhs = list(year = c(2015, 2055), rhs = c(1e8, 1e3)), 
-  for.each = list(year = NULL), # Cap total emission
-  variable = list(variable = 'vOutTot', for.sum = list(comm = "HG")),
-  variable = list(variable = 'vOutTot', for.sum = list(comm = "HGtrade"), mult = -1)
+  newConstraint("GHGcap",
+    eq = "<=", rhs = list(year = c(2015, 2055), rhs = c(1e8, 1e3)),
+    for.each = list(year = NULL), # Cap total emission
+    variable = list(variable = "vOutTot", for.sum = list(comm = "HG")),
+    variable = list(variable = "vOutTot", for.sum = list(comm = "HGtrade"), mult = -1)
   ),
-  newTax('GHGtax', comm = 'HGtrade', tax = list( bal = 100)) # Cost of quote
+  newTax("GHGtax", comm = "HGtrade", tax = list(bal = 100)) # Cost of quote
 )
 ```
 
@@ -1792,12 +1841,13 @@ vv <- tibble(
 
 
 
-kableExtra::kable(vv, row.names = F, longtable = T, booktabs = T,
-                  caption = "List of `energyRt` model variables.") %>%
+kableExtra::kable(vv,
+  row.names = F, longtable = T, booktabs = T,
+  caption = "List of `energyRt` model variables."
+) %>%
   kableExtra::kable_styling(latex_options = c("striped", "scale_down", "repeat_header")) %>%
-  kableExtra::column_spec(2, width = "5cm") #%>%
-  # kableExtra::landscape()
-
+  kableExtra::column_spec(2, width = "5cm") # %>%
+# kableExtra::landscape()
 ```
   
   
@@ -1808,7 +1858,7 @@ kableExtra::kable(vv, row.names = F, longtable = T, booktabs = T,
 # dm <- dim(pr)
 # sets <- names(pr)[4:dm[2]]
 # pdim <- apply(pr[4:dm[2]], 1, function(x) paste0("(", paste0(sets[x], collapse = ","), ")"))
-# # names(pdim) <- 
+# # names(pdim) <-
 # pp <- cbind(pr[,1:3], "dimension (sets)" = pdim)
 # # rownames(pp) <- NULL
 # # head(pp)
@@ -1816,5 +1866,4 @@ kableExtra::kable(vv, row.names = F, longtable = T, booktabs = T,
 #                   caption = "List of `energyRt` model parameters.") %>%
 #   kableExtra::kable_styling(latex_options = c("striped", "scale_down", "repeat_header")) %>%
 #   kableExtra::column_spec(2, width = "5cm") #%>%
-
 ```
