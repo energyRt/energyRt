@@ -1330,6 +1330,10 @@
 .equation_variable[231, ] <- c("eqObjective", "vTotalCost")
 .equation_variable[232, ] <- c("eqObjective", "vObjective")
 .equation_variable[233, ] <- c("eqLECActivity", "vTechAct")
+getSetsSet <- function() energyRt:::.set_set
+getSetsDescription <- function() energyRt:::.set_description
+getParametersSet <- function() energyRt:::.parameter_set
+getParametersDescription <- function() energyRt:::.parameter_description
 getVariablesSet <- function() energyRt:::.variable_set
 getVariablesDescription <- function() energyRt:::.variable_description
 getVariablesMapping <- function() energyRt:::.variable_mapping
