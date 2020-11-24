@@ -4,7 +4,7 @@
 \alias{newModel}
 \title{Create new model object}
 \usage{
-newRepository(name, ...)
+\S4method{newModel}{character}(name, ...)
 
 newTrade(name, ...)
 }

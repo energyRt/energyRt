@@ -19,7 +19,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     frm <- frm[!duplicated(frm),, drop = FALSE]
   }
 
-  dd <- interpolation(frm, parameter,
+  dd <- .interpolation(frm, parameter,
                     rule       = mtp@interpolation,
                     defVal    = mtp@defVal,
                     year_range = range(approxim$year),
@@ -82,13 +82,13 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     frm <- frm[!duplicated(frm),, drop = FALSE]
   }
   
-  dd <- interpolation_bound(frm, parameter,
+  dd <- .interpolation_bound(frm, parameter,
                     defVal    = mtp@defVal,
                     rule       = mtp@interpolation,
                     year_range = range(approxim$year),
                     approxim   = approxim)
   if (is.null(dd)) return(NULL)
-  dd <- dd[dd[[ncol(dd)]] != 0,, drop = FALSE]
+  dd <- dd[dd[[ncol(dd)]] != 0 | dd$type == 'up',, drop = FALSE]
   if (nrow(dd) == 0) return(NULL)
   
   colnames(dd)[[ncol(dd)]] <- 'value'

@@ -4,18 +4,36 @@
 \alias{getData}
 \title{Extracts information from scenario objects, based on filters.}
 \usage{
-getData(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
-  ignore.case = FALSE, newNames = NULL, merge = FALSE,
-  newValues = NULL, na.rm = FALSE, drop = FALSE, asTibble = TRUE,
-  stringsAsFactors = FALSE, yearsAsFactors = FALSE,
-  scenNameInList = as.logical(length(scen) - 1), verbose = FALSE)
+getData(
+  scen,
+  name = NULL,
+  ...,
+  merge = FALSE,
+  process = FALSE,
+  parameters = TRUE,
+  variables = TRUE,
+  ignore.case = FALSE,
+  newNames = NULL,
+  newValues = NULL,
+  na.rm = FALSE,
+  drop = FALSE,
+  asTibble = TRUE,
+  stringsAsFactors = FALSE,
+  yearsAsFactors = FALSE,
+  scenNameInList = as.logical(length(scen) - 1),
+  verbose = FALSE
+)
 }
 \arguments{
 \item{scen}{Object scenario or list with scenarios.}
 
+\item{name}{character vector with names of parameters and/or variables.}
+
 \item{...}{filters for various sets (setname = c(val1, val2) or setname_ = "matching pattern"), see details.}
 
-\item{name}{character vector with names of parameters and/or variables.}
+\item{merge}{if TRUE, the search results will be merged in one dataframe; the named list will be returned if FALSE.}
+
+\item{process}{if TRUE, dimensions "tech", "stg", "trade", "imp", "expp", "dem", and "sup" will be renamed with "process".}
 
 \item{parameters}{if TRUE, parameters will be included in the search and returned if found.}
 
@@ -24,8 +42,6 @@ getData(scen, ..., name = NULL, parameters = TRUE, variables = TRUE,
 \item{ignore.case}{grepl parameter if regular expressions are used in '...' or 'name_'.}
 
 \item{newNames}{renaming sets, named character vector or list with new names as values, and old names as names - the input parameter to renameSets function. The operation is performed before merging the data (merge parameter).}
-
-\item{merge}{if TRUE, the search results will be merged in one dataframe; the named list will be returned if FALSE.}
 
 \item{newValues}{revalue sets, named character vector or list with new values as values, and old values as names - the input parameter to revalueSets function. The operation is performed after merging the data (merge parameter).}
 

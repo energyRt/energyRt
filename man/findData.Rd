@@ -4,10 +4,18 @@
 \alias{findData}
 \title{Performes search for available data in _scenario_ object.}
 \usage{
-findData(scen, dataType = c("parameters", "variables"),
-  setsNames_ = NULL, valueColumn = TRUE, allSets = TRUE,
-  ignore.case = FALSE, dropEmpty = TRUE, dfDim = TRUE,
-  dfNames = TRUE, asMatrix = FALSE)
+findData(
+  scen,
+  dataType = c("parameters", "variables"),
+  setsNames_ = NULL,
+  valueColumn = TRUE,
+  allSets = TRUE,
+  ignore.case = FALSE,
+  dropEmpty = TRUE,
+  dfDim = TRUE,
+  dfNames = TRUE,
+  asMatrix = FALSE
+)
 }
 \arguments{
 \item{scen}{object _scenario_ with model solution.}

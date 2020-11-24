@@ -193,9 +193,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     st@mult <- mult
   } else st@defVal <- mult
   st@for.sum <- for.sum
-  if (all(names(.vrb_map) != variable)) 
+  if (all(names(.variable_set) != variable)) 
     stop(paste0('Unknown variables "', variable, '"in summands "', eqt@name, '"'))
-  need.set <- .vrb_map[[variable]];
+  need.set <- .variable_set[[variable]];
   need.set <- need.set[!(need.set %in% c(names(eqt@for.each), names(st@for.sum)))];
   for (i in need.set) {
     st@for.sum[i] <- list(NA)
@@ -210,8 +210,6 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   eqt  
 }
 
-# .vrb_map <- energyRt:::.vrb_map
-# .vrb_mapping <- energyRt:::.vrb_mapping
 # prec <- add0_message$add0_arg$obj
 # stm <- add0_message$add0_arg$app
 # approxim <- add0_message$add0_arg$approxim
@@ -247,7 +245,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     return (unique(x))
   })
   names(old_for_each) <- colnames(stm@for.each)
-  nn <- seq_len(length(old_for_each) + sum(sapply(stm@lhs, function(x) length(.vrb_map[[x@variable]]))))
+  nn <- seq_len(length(old_for_each) + sum(sapply(stm@lhs, function(x) length(.variable_set[[x@variable]]))))
   all.set[seq_along(nn), ] <- NA
   for (i in (1:ncol(all.set))[sapply(all.set, class) == 'logical']) 
     all.set[, i] <- FALSE
@@ -273,7 +271,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   } else for.each.set <- NULL
   # lhs
   for (i in seq_along(stm@lhs)) {
-    need.set <- .vrb_map[[stm@lhs[[i]]@variable]]
+    need.set <- .variable_set[[stm@lhs[[i]]@variable]]
     nn <- (nn[length(nn)] + seq_along(need.set))
     all.set[nn, 'set'] <- need.set
     all.set[nn, 'alias'] <- need.set
@@ -291,10 +289,12 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     all.set[nn[need.set %in% names(stm@lhs[[i]]@for.sum)], 'def.lhs'] <- TRUE
     all.set[nn[!(need.set %in% for.each.set)], 'def.lhs'] <- TRUE
     # Add to set map
-    st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & !sapply(is.na(stm@lhs[[i]]@for.sum), all)]
+    st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & 
+                                        !sapply(is.na(stm@lhs[[i]]@for.sum), all)]
    # Fill add.map for for.lhs
     for (j in st) {
-      if (!all(prec@set[[j]] %in% stm@lhs[[i]]@for.sum[[j]]) && (j != 'slice' || 
+      if (!is.null(stm@lhs[[i]]@for.sum[[j]]) && 
+          !all(prec@set[[j]] %in% stm@lhs[[i]]@for.sum[[j]]) && (j != 'slice' || 
                 !all(prec@set[[j]] %in% get.all.child(stm@lhs[[i]]@for.sum[[j]])))) {
         # check if the same set in lhs exist
         fl <- FALSE
@@ -332,7 +332,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
     new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
     for (i in seq_along(set.map)) 
-      prec@parameters[[new.map.name[i]]] <- addMultipleSet(createParameter(new.map.name[i], set.map.name[i], 'map'), c(set.map[[i]]))
+      prec@parameters[[new.map.name[i]]] <- addMultipleSet(newParameter(new.map.name[i], set.map.name[i], 'map'), c(set.map[[i]]))
     
     # copy new.map for lhs set that define in for each
     fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
@@ -389,7 +389,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   }
   if (nrow(stm@for.each) > 0) {
     nmn <- paste0('mCnsForEach', stm@name)
-    prec@parameters[[nmn]] <- addData(createParameter(nmn, colnames(stm@for.each), 'map'),
+    prec@parameters[[nmn]] <- .add_data(newParameter(nmn, colnames(stm@for.each), 'map'),
       stm@for.each)
     res$equation <- paste0(res$equation, '$', nmn, '(', paste0(colnames(stm@for.each), collapse = ', '), ')')
   }
@@ -399,7 +399,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   for (i in seq_along(stm@lhs)) {
     vrb <- stm@lhs[[i]]@variable
     lhs.set2 <- lhs.set[lhs.set$lhs.num == i, ]
-    vrb.lhs <- .vrb_mapping[[vrb]]
+    vrb.lhs <- .variable_mapping[[vrb]]
     # Add multiple to vrb
     # Add to year multiplier if lag.year | lead.year
     if ((any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) && (nrow(stm@lhs[[i]]@mult) == 0 ||  all(colnames(stm@lhs[[i]]@mult) != 'year'))) {
@@ -424,15 +424,15 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         approxim2[[need.set2[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
       }
       approxim2$fullsets <- approxim$fullsets
-      xx <- createParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
+      xx <- newParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
                             interpolation = 'back.inter.forth')
-      prec@parameters[[xx@name]] <- addData(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
+      prec@parameters[[xx@name]] <- .add_data(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
-        yy <- energyRt:::.getTotalParameterData(prec, xx@name)
+        yy <- .add_dropped_zeros(prec, xx@name)
         nn <- approxim$mileStoneForGrowth[as.character(yy$year)]
         if (any(lhs.set2$lag.year)) nn <- (-nn)
         yy$value <- (sign(yy$value) * abs(yy$value) ^ nn)
-        prec@parameters[[xx@name]] <- addData(xx, yy)
+        prec@parameters[[xx@name]] <- .add_data(xx, yy)
       }
       # Add mult
       vrb.lhs <- paste0(xx@name, '(', paste0(need.set, collapse = ', '), ') * ', vrb.lhs)
@@ -500,13 +500,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     }
     approxim2$fullsets <- approxim$fullsets
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
-    xx <- createParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
+    xx <- newParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
                           interpolation = 'back.inter.forth', colName = 'rhs')
     yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != 'value']
     yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 
       apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, drop = FALSE]
-    prec@parameters[[xx@name]] <- addData(xx, yy)
+    prec@parameters[[xx@name]] <- .add_data(xx, yy)
     # Add mult
     res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')
   } else {

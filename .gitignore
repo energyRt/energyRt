@@ -1,0 +1,9 @@
+*.Rproj
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+solwork
+
+doc
+Meta

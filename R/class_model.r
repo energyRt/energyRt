@@ -22,10 +22,7 @@ setClass("model",
           LECdata        = list(),
           early.retirement = FALSE,
       #! Misc
-      misc = list(
-      	includeBeforeSolve = "",        # move 2 misc
-      	includeAfterSolve = ""   # move 2 misc
-      )),                           
+      misc = list()),                           
       S3methods = TRUE
 )
 setMethod("initialize", "model", function(.Object, ...) {

@@ -15,8 +15,8 @@ get.listing.file <- function(mdl, ...) {
   feqt <- data.frame(bg = grep('[.][.]', kk), en = grep('[;]', kk))
   feqt <- apply(feqt, 1, function(x) gsub('[[:space:]]*', '', gsub('[;].*', '', 
     paste(kk[x[1]:x[2]], collapse = ''))))
-  vb_map <- getVariablesDim()
-  eq_map <- getEquationsDim()
+  vb_map <- energyRt::variables_dim
+  eq_map <- energyRt::equations_dim
   splt.by.variable <- function(eq)  {
     arg <- gsub('[.][.].*', '', eq)
     if (any(grep('[(]', arg))) {
@@ -45,8 +45,8 @@ get.listing.file <- function(mdl, ...) {
 }
 
 parseListing <- function(mdl, ...) {
-  eq_map <- getEquations()
-  vr_map <- getVariables()
+  eq_map <- energyRt::equations
+  vr_map <- energyRt::variables
   ss <- c(colnames(eq_map)[-(1:2)], rownames(eq_map), 'variables', 'equations')
   gg <- get.listing.file(mdl, ..., exclude = ss)
   arg <- list(...)

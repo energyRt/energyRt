@@ -1,5 +1,5 @@
 
-universalInit <- function(class_name, name, ..., exclude = NULL, exclude_class = NULL, 
+.new_object <- function(class_name, name, ..., exclude = NULL, exclude_class = NULL, 
                           update = !is.character(name)) {
   # !!! newObject
   if(update) {
@@ -87,7 +87,7 @@ universalInit <- function(class_name, name, ..., exclude = NULL, exclude_class =
   obj
 }
 
-#universalInit('technology')
+#.new_object('technology')
 #print(newTechnology('technology', 'd3', description = 'jk', cap2act = 4, 
 #  units = data.frame(capacity = 'MV', fixom = 'j', stringsAsFactors = FALSE)))
 
@@ -97,13 +97,13 @@ setGeneric("newTechnology", function(name, ...) standardGeneric("newTechnology")
 #' @name newTechnology
 #' 
 setMethod('newTechnology', signature(name = 'character'), function(name, ...) 
-  universalInit('technology', name, ...))
+  .new_object('technology', name, ...))
 
 # setGeneric("update", function(obj, ...) standardGeneric("update"))
 #' Update an object
 #'
 # setMethod('update', signature(obj = 'technology'), function(obj, ...) 
-update.technology <- function(obj, ...) universalInit('technology', name = obj, ...)
+update.technology <- function(obj, ...) .new_object('technology', name = obj, ...)
 
 setGeneric("newCommodity", function(name, ...) standardGeneric("newCommodity"))
 #' Create new commodity object
@@ -111,10 +111,10 @@ setGeneric("newCommodity", function(name, ...) standardGeneric("newCommodity"))
 #' @name newCommodity
 #' 
 setMethod('newCommodity', signature(name = 'character'), function(name, ...) 
-  universalInit('commodity', name, ...))
+  .new_object('commodity', name, ...))
 
 # setMethod('update', signature(obj = 'commodity'), function(obj, ...) 
-update.commodity <- function(obj, ...) universalInit('commodity', name = obj, ...)
+update.commodity <- function(obj, ...) .new_object('commodity', name = obj, ...)
 
 setGeneric("newDemand", function(name, ...) standardGeneric("newDemand"))
 #' Create new demand object
@@ -122,11 +122,11 @@ setGeneric("newDemand", function(name, ...) standardGeneric("newDemand"))
 #' @name newDemand
 #' 
 setMethod('newDemand', signature(name = 'character'), function(name, ...) 
-  universalInit('demand', name, ...))
+  .new_object('demand', name, ...))
 
 # setMethod('update', signature(obj = 'demand'), function(obj, ...) 
 update.demand <- function(obj, ...) 
-  universalInit('demand', name = obj, ...)
+  .new_object('demand', name = obj, ...)
 
 setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
 #' Create new supply object
@@ -134,11 +134,11 @@ setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
 #' @name newSupply
 #' 
 setMethod('newSupply', signature(name = 'character'), function(name, ...) 
-  universalInit('supply', name, ...))
+  .new_object('supply', name, ...))
 
 # setMethod('update', signature(obj = 'supply'), function(obj, ...) 
 update.supply <- function(obj, ...) 
-    universalInit('supply', name = obj, ...)
+    .new_object('supply', name = obj, ...)
 
 setGeneric("newExport", function(name, ...) standardGeneric("newExport"))
 #' Create new export object
@@ -146,11 +146,11 @@ setGeneric("newExport", function(name, ...) standardGeneric("newExport"))
 #' @name newExport
 #' 
 setMethod('newExport', signature(name = 'character'), function(name, ...) 
-  universalInit('export', name, ...))
+  .new_object('export', name, ...))
 
 # setMethod('update', signature(obj = 'export'), function(obj, ...) 
 update.export <- function(obj, ...) 
-  universalInit('export', name = obj, ...)
+  .new_object('export', name = obj, ...)
 
 setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
 #' Create new import object
@@ -158,11 +158,11 @@ setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
 #' @name newImport
 #' 
 setMethod('newImport', signature(name = 'character'), function(name, ...) 
-  universalInit('import', name, ...))
+  .new_object('import', name, ...))
 
 # setMethod('update', signature(obj = 'import'), function(obj, ...) 
 update.import <- function(obj, ...) 
-  universalInit('import', name = obj, ...)
+  .new_object('import', name = obj, ...)
 
 setGeneric("newRepository", function(name, ...) standardGeneric("newRepository"))
 #' Create new repository object
@@ -171,7 +171,7 @@ setGeneric("newRepository", function(name, ...) standardGeneric("newRepository")
 #' 
 setMethod('newRepository', signature(name = 'character'), function(name, ...) {
 	in_rep <- c('commodity', 'technology', 'supply', 'demand', 'trade', 'import', 'export', 'trade', 'storage')
-  rps <- universalInit('repository', name, exclude_class = in_rep, ...)
+  rps <- .new_object('repository', name, exclude_class = in_rep, ...)
   arg <- list(...)
   arg <- arg[sapply(arg, class) %in% in_rep]
   if (length(arg) > 0) rps <- add(rps, arg)
@@ -189,14 +189,14 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
     sysInfVec <- sysInfVec[sysInfVec != ".S3Class"]        
 #    mlst_vec <- c('start', 'interval')
     args <- list(...)
-    mdl <- universalInit('model', name, exclude = c(sysInfVec), exclude_class = 'repository', ...)
-#    mdl <- universalInit('model', name, exclude = c(mlst_vec, sysInfVec), exclude_class = 'repository', ...)
+    mdl <- .new_object('model', name, exclude = c(sysInfVec), exclude_class = 'repository', ...)
+#    mdl <- .new_object('model', name, exclude = c(mlst_vec, sysInfVec), exclude_class = 'repository', ...)
     if (any(sapply(args, class) == 'repository'))  {
       fl <- seq(along = args)[sapply(args, class) == 'repository']
       for(j in fl) mdl <- add(mdl, args[[j]])
     }
     sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
-    mdl@sysInfo <- universalInit('sysInfo', '', exclude_class = 'repository',
+    mdl@sysInfo <- .new_object('sysInfo', '', exclude_class = 'repository',
 #      exclude = c(names(args)[!(names(args) %in% sysInfVec)], mlst_vec), ...)
       exclude = c('slice', names(args)[!(names(args) %in% sysInfVec)]), ...)
     if (any(names(args) == 'slice')) {
@@ -217,7 +217,7 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
 
 setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
 setMethod('newTrade', signature(name = 'character'), function(name, ..., source = NULL, destination = NULL, avaUpDef = Inf) {
-  trd <-  universalInit('trade', name, ...)
+  trd <-  .new_object('trade', name, ...)
 	if (avaUpDef != Inf) {
 		trd@trade[nrow(trd@trade) + 1, ] <- NA
 		trd@trade[nrow(trd@trade), 'ava.up'] <- avaUpDef
@@ -241,11 +241,11 @@ setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
 #' @name newStorage
 #' 
 setMethod('newStorage', signature(name = 'character'), function(name, ...) 
-  universalInit('storage', name, ...))
+  .new_object('storage', name, ...))
 
 # setMethod('update', signature(obj = 'storage'), function(obj, ...) 
 update.storage <- function(obj, ...) 
-  universalInit('storage', name = obj, ...)
+  .new_object('storage', name = obj, ...)
 
   
 setGeneric("newWeather", function(name, ...) standardGeneric("newWeather"))
@@ -254,36 +254,18 @@ setGeneric("newWeather", function(name, ...) standardGeneric("newWeather"))
 #' @name newWeather
 #' 
 setMethod('newWeather', signature(name = 'character'), function(name, ...) 
-  universalInit('weather', name, ...))
+  .new_object('weather', name, ...))
 
 # setMethod('update', signature(obj = 'weather'), function(obj, ...) 
 update.weather <- function(obj, ...) 
-  universalInit('weather', name = obj, ...)
+  .new_object('weather', name = obj, ...)
 
 setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
-setMethod('newTax', signature(name = 'character'), function(name, ..., value = NULL) {
-  if (is.numeric(value)) {
-    defVal <- value
-    value <- NULL
-  } else defVal <- NULL
-  tt <- universalInit('tax', name, ..., defVal = defVal)
-  if (!is.null(value)) {
-  	if (!is.data.frame(value) && is.list(value)) 
-  		value <- as.data.frame(value)
-  	for (i in c('region', 'year', 'slice')) 
-  		if (all(colnames(value) != i))
-  			value[, i] <- rep(NA, nrow(value))
-  	value <- value[, c('region', 'year', 'slice', 'value')]
-  	tt@value <- value
-  }
-  tt	
+setMethod('newTax', signature(name = 'character'), function(name, ...) {
+ .new_object('tax', name = name, ...)
 })
 setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
 
 setMethod('newSub', signature(name = 'character'), function(name, ..., value = NULL) {
-  if (is.numeric(value)) {
-    defVal <- value
-    value <- NULL
-  } else defVal <- NULL
-  universalInit('sub', name, ..., value = value, defVal = defVal)
+ .new_object('sub', name = name, ...)
 })

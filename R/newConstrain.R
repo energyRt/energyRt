@@ -6,10 +6,10 @@ newConstraintS <- function(name, type, eq = '==', rhs = 0, for.sum = list(),
     stop(paste0('Constraint "', name, '" error: ', x))
   
   if (type == 'tax') {
-    return(newTax(name, value = rhs, comm = comm, region = for.each$region, year = for.each$year, slice = for.each$slice))
+    return(newTax(name, tax = rhs, comm = comm, region = for.each$region, year = for.each$year, slice = for.each$slice))
   }
   if (type == 'subs') {
-    return(newSub(name, value = rhs, comm = comm, region = for.each$region, year = for.each$year, slice = for.each$slice))
+    return(newSub(name, subs = rhs, comm = comm, region = for.each$region, year = for.each$year, slice = for.each$slice))
   }
   #if (any(grep('(share|growth)', type))) stop.newconstr(paste(type, 'have to do'))
   # For wich kind of variables (capacity, newcapacity, input or output)

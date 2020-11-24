@@ -15,9 +15,9 @@
   # Move new capacity before startYear to to stock (technology)
   if (length(scen@modInp@set$tech) > 0) {
 	  tech.new.cap <- src@modOut@variables$vTechNewCap
-	  tech.stock <- energyRt:::.getTotalParameterData(scen@modInp, 'pTechStock')
+	  tech.stock <- .add_dropped_zeros(scen@modInp, 'pTechStock')
 	  tech.new.cap <- tech.new.cap[tech.new.cap$year <= startYear,, drop = FALSE]
-	  tech.life <- energyRt:::.getTotalParameterData(scen@modInp, 'pTechOlife')
+	  tech.life <- .add_dropped_zeros(scen@modInp, 'pTechOlife')
 	  olife.tmp <- tech.life$value
 	  names(olife.tmp) <- paste0(tech.life$tech, '#', tech.life$region)
 	  tech.new.cap$olife <- olife.tmp[paste0(tech.new.cap$tech, '#', tech.new.cap$region)]
@@ -38,9 +38,9 @@
   # Move new capacity before startYear to to stock (technology)
   if (length(scen@modInp@set$stg) > 0) {
 	  stg.new.cap <- src@modOut@variables$vStorageNewCap
-	  stg.stock <- energyRt:::.getTotalParameterData(scen@modInp, 'pStorageStock')
+	  stg.stock <- .add_dropped_zeros(scen@modInp, 'pStorageStock')
 	  stg.new.cap <- stg.new.cap[stg.new.cap$year <= startYear,, drop = FALSE]
-	  stg.life <- energyRt:::.getTotalParameterData(scen@modInp, 'pStorageOlife')
+	  stg.life <- .add_dropped_zeros(scen@modInp, 'pStorageOlife')
 	  olife.tmp <- stg.life$value
 	  names(olife.tmp) <- paste0(stg.life$stg, '#', stg.life$region)
 	  stg.new.cap$olife <- olife.tmp[paste0(stg.new.cap$stg, '#', stg.new.cap$region)]
@@ -91,7 +91,7 @@
     }
   }
   # mMilestoneFirst
-  scen@modInp@parameters[['mMilestoneFirst']] <- addData(scen@modInp@parameters[['mMilestoneFirst']], 
+  scen@modInp@parameters[['mMilestoneFirst']] <- .add_data(scen@modInp@parameters[['mMilestoneFirst']], 
   	data.frame(year = min(mile.stone.after)))
   # assign('prec.after.startYear', prec, globalenv())
   scen
@@ -101,7 +101,7 @@
 .fix.couple.cummulitive.uplo <- function(scen, src, startYear, var.name, var.par, mile.stone.length) {
 	# Chage supply reserve startYear (remove use in base period)
 	sup.res.use0 <- src@modOut@variables[[var.name]]
-	sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, var.par)
+	sup.res.par <- .add_dropped_zeros(scen@modInp, var.par)
 	sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
 	sup.res.use0$type <- 'lo'
 	sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
@@ -121,7 +121,7 @@
 .fix.couple.cummulitive <- function(scen, src, startYear, var.name, var.par, mile.stone.length) {
 		# Chage supply reserve startYear (remove use in base period)
 		sup.res.use0 <- src@modOut@variables[[var.name]]
-		sup.res.par <- energyRt:::.getTotalParameterData(scen@modInp, var.par)
+		sup.res.par <- .add_dropped_zeros(scen@modInp, var.par)
 		sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
 		sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
 															sup.res.use0[, colnames(sup.res.par)[colnames(sup.res.par) != 'value'], drop = FALSE], sum)
@@ -214,16 +214,16 @@
 						nn <- strsplit(eqt2, 'pCnsMult[[:alnum:]_]*')[[1]]
 						if (any(strsplit(gsub('([[:blank:]]*|[(]|[)].*)', '', nn[2]), ',')[[1]] == 'year')) {
 							prm <- gsub('(^[[:blank:]]*|[(].*)', '', substr(eqt2, nchar(nn[1]), nchar(eqt2)))
-							tpr <- energyRt:::.getTotalParameterData(scen@modInp, prm)
+							tpr <- .add_dropped_zeros(scen@modInp, prm)
 							tpr <- tpr[tpr$year == last_noinc_mile, colnames(tpr) != 'year', drop = FALSE]
 							# Replace
 							if (ncol(tpr) == 1) {
 								eqt2 <- sub('pCnsMult[[:alnum:]_]*[(][^)]*[)]', tpr$value, eqt2)
 							} else {
 								NEW_PAR <- NEW_PAR + 1
-								xx <- createParameter(paste0('pCnsMult', new_cns, '_', NEW_PAR), colnames(tpr)[-ncol(tpr)], 'simple', defVal = 0, 
+								xx <- newParameter(paste0('pCnsMult', new_cns, '_', NEW_PAR), colnames(tpr)[-ncol(tpr)], 'simple', defVal = 0, 
 									interpolation = 'back.inter.forth')
-								scen@modInp@parameters[[xx@name]] <- addData(xx, tpr)
+								scen@modInp@parameters[[xx@name]] <- .add_data(xx, tpr)
 								eqt2 <- sub('pCnsMult[[:alnum:]_]*[(][^)]*[)]', paste0(xx@name, '(', paste0(xx@dimSetNames, collapse = ' , '), ')'), eqt2)
 							}
 						}
@@ -251,7 +251,7 @@
 					if (param == '') param <- 1
 					tpr <- src@modOut@variables[[sub('[(].*', '', vrb)]]
 					if (any(grep('pCnsMult', param))) {
-						const <- energyRt:::.getTotalParameterData(scen@modInp, gsub('([[:blank:]]*|[+-]|[(].*)', '', param))
+						const <- .add_dropped_zeros(scen@modInp, gsub('([[:blank:]]*|[+-]|[(].*)', '', param))
 						tpr <- merge(tpr, const, by = colnames(const)[colnames(const) != 'value'])
 						tpr$value <- tpr$value.x * tpr$value.y
 						if (any(grep('[-]', param))) tpr$value <- (-tpr$value)
@@ -267,8 +267,8 @@
 					}
 					forMrg <- gsub('[(].*$', '', strsplit(cond2, 'and ')[[1]])
 					for (fr in forMrg) {
-						tmp <- getParameterData(scen@modInp@parameters[[fr]])
-						#tmp <- energyRt:::.getTotalParameterData(scen@modInp, fr)
+						tmp <- .get_data_slot(scen@modInp@parameters[[fr]])
+						#tmp <- .add_dropped_zeros(scen@modInp, fr)
 						tpr <- merge(tpr, tmp, by = colnames(tmp)[colnames(tmp) != 'value'])
 					}
 					# Summing sum set & year
@@ -278,9 +278,9 @@
 					if (ncol(tpr) > 1) {
 						tpr <- aggregate(tpr[, 'value', drop = FALSE], tpr[, colnames(tpr) != 'value', drop = FALSE], sum)
 						NEW_PAR <- NEW_PAR + 1
-						xx <- createParameter(paste0('pCnsMult', new_cns, '_', NEW_PAR), colnames(tpr)[-ncol(tpr)], 'simple', defVal = 0, 
+						xx <- newParameter(paste0('pCnsMult', new_cns, '_', NEW_PAR), colnames(tpr)[-ncol(tpr)], 'simple', defVal = 0, 
 							interpolation = 'back.inter.forth')
-						scen@modInp@parameters[[xx@name]] <- addData(xx, tpr)
+						scen@modInp@parameters[[xx@name]] <- .add_data(xx, tpr)
 						eqt_en <- paste0(eqt_en, xx@name, '(', paste0(xx@dimSetNames, collapse = ', '), ')')
 					} else {
 						tpr <- sum(tpr$value)

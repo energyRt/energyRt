@@ -24,8 +24,8 @@
 }
 
 .add_discount_approxim <- function(scen, approxim) {
-	approxim$discountFactor <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscountFactor', FALSE)
-	approxim$discount <- energyRt:::.getTotalParameterData(scen@modInp, 'pDiscount', FALSE)
+	approxim$discountFactor <- .add_dropped_zeros(scen@modInp, 'pDiscountFactor', FALSE)
+	approxim$discount <- .add_dropped_zeros(scen@modInp, 'pDiscount', FALSE)
 	yy <- approxim$discountFactor
 	# ll <- NULL
 	# for (rg in unique(yy$region)) {
@@ -41,7 +41,7 @@
   xx <- list()
   for(i in seq(along = obj@data)) {
     for(j in seq(along = obj@data[[i]]@data)) { #
-      prec <- add_name(prec, obj@data[[i]]@data[[j]], approxim = approxim)
+      prec <- .add_set_element(prec, obj@data[[i]]@data[[j]], approxim = approxim)
       if (class(obj@data[[i]]@data[[j]]) == 'commodity') {
         if (length(obj@data[[i]]@data[[j]]@slice) == 0) 
           obj@data[[i]]@data[[j]]@slice <- approxim$slice@default_slice_level
@@ -93,7 +93,7 @@
 .add_name_for_basic_set <- function(scen, approxim) {
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) {
-        scen@modInp <- add_name(scen@modInp, scen@model@data[[i]]@data[[j]], approxim)
+        scen@modInp <- .add_set_element(scen@modInp, scen@model@data[[i]]@data[[j]], approxim)
     }
   }
   scen
@@ -228,7 +228,7 @@
 	sets <- list()
 	for (ss in c('tech', 'sup', 'dem', 'stg', 'expp', 'imp', 'trade', 
 							 'group', 'comm', 'region', 'year', 'slice')) {
-		sets[[ss]] <- getParameterData(scen@modInp@parameters[[ss]])[[ss]]
+		sets[[ss]] <- .get_data_slot(scen@modInp@parameters[[ss]])[[ss]]
 	}
 	add_to_err <- function(err_msg, cns, slt, have, psb) {
 		if (!all(have %in% psb)) {
