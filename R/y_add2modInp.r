@@ -442,6 +442,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'constraint',
                              })
 
 #==============================================================================#
+# Add cost ####
+#==============================================================================#
+setMethod('.add0', signature(obj = 'modInp', app = 'cost',
+                             approxim = 'list'), function(obj, app, approxim) {
+                               .getCostEquation(obj, app, approxim)
+                             })
+
+#==============================================================================#
 # Add tax & sub ####
 #==============================================================================#
 .subtax_approxim <- function(obj, app, tax, whr, approxim) {

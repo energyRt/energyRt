@@ -2,7 +2,7 @@
 #! add_to_model <- function(x, y) : Add to model
 #---------------------------------------------------------------------------------------------------------
 add.model <- function(obj, ..., overwrite = FALSE, repos.name = NULL) {
-  cls <- c('technology', 'commodity', 'region', 'commodity', 'constraint', 
+  cls <- c('technology', 'commodity', 'region', 'commodity', 'constraint', 'cost', 
            'stock', 'supply', 'weather', 'demand', 'reserve', 'trade', 'export', 'import', 'storage', 'tax', 'sub')
   if (class(obj) != "model") stop('Wrong argument')
   app <- list(...)
