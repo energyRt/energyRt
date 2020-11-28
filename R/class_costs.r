@@ -114,14 +114,14 @@ newCosts <- function(name, variable, description = '', mult = NULL, for.each = N
         stop(paste0('There duplcated value in mult (cost "', name, '").'))
    if (ncol(mult) == 1) obj@defVal <- mult$value else obj@mult <- mult
   }
-   obj
+  obj
 }
     
     
 # Calculate do equation need additional set, and add it
 .getCostEquation <- function(prec, stm, approxim) {
   stop.constr <- function(x) 
-    stop(paste0('Constraint "', stm@name, '" error: ', x))
+    stop(paste0('Cost "', stm@name, '" error: ', x))
   get.all.child <- function(x)  {
     unique(c(x, c(approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% x, 'child'])))
   }
@@ -130,17 +130,17 @@ newCosts <- function(name, variable, description = '', mult = NULL, for.each = N
   }
   # is_need_set
   # is_need_sum
-  # mvTotalUserCost
+  # mvTotalUserCosts
   # Need mapping for.each, if need it
   if (have.all.set(stm@for.each$region, 'region') && have.all.set(stm@for.each$region, 'year')) {
-    if (!prec@parameters$mvTotalUserCost@misc$total_set) {
-      prec@parameters$mvTotalUserCost <- add(.reset(prec@parameters$mvTotalUserCost),
-        merge(approxim['region'], approxim['year']))
-      prec@parameters$mvTotalUserCost@misc$total_set <- TRUE
+    if (!prec@parameters$mvTotalUserCosts@misc$total_set) {
+      prec@parameters$mvTotalUserCosts <- .add_data(.reset(prec@parameters$mvTotalUserCosts), 
+          merge(approxim['region'], approxim['year']))
+      prec@parameters$mvTotalUserCosts@misc$total_set <- TRUE
     }
   }
  #  browser()
- #  if (!prec@parameters$mvTotalUserCost@misc$total_set) {
+ #  if (!prec@parameters$mvTotalUserCosts@misc$total_set) {
  #  }
  #  # if (stm@for.each )
  #  
@@ -453,7 +453,7 @@ newCosts <- function(name, variable, description = '', mult = NULL, for.each = N
  #  res$equation <- gsub('[+][[:blank:]]*[-]', '-', res$equation)
  #  res$equation <- paste0(res$equation, ';')
  #  prec@gams.equation[[stm@name]] <- res
- #  prec
+  prec
 }
 
 #  .getSetEquation(prec, stm, approxim)@gams.equation

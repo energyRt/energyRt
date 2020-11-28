@@ -89,8 +89,7 @@ newParameter <- function(...) new('parameter', ...)
 
 .resetParameter <- function(x) {
   x@data <- x@data[0,, drop = FALSE]
-  if (x@nValues > 0)
-    x@nValues <- 0
+  if (x@nValues > 0) x@nValues <- 0
   x
 } 
 # Add data to Map Table with check new data
@@ -136,6 +135,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'character'),
     if (obj@type != 'set' || length(data) == 0 || !all(is.character(data))) {
           stop('Internal error: Wrong new data')
     }
+    if (length(data) == 0) return(obj)
     nn <- nrow(obj@data) + 1:length(data)
     obj@data[nn, ] <- data
     obj@nValues <- obj@nValues + length(data)
