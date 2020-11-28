@@ -442,9 +442,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'constraint',
                              })
 
 #==============================================================================#
-# Add cost ####
+# Add costs ####
 #==============================================================================#
-setMethod('.add0', signature(obj = 'modInp', app = 'cost',
+setMethod('.add0', signature(obj = 'modInp', app = 'costs',
                              approxim = 'list'), function(obj, app, approxim) {
                                .getCostEquation(obj, app, approxim)
                              })

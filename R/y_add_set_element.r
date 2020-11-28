@@ -67,10 +67,10 @@ setMethod('.add_set_element',
           function(obj, app, approxim) {obj})
 
 #==============================================================================#
-# Add cost ####
+# Add costs ####
 #==============================================================================#
 setMethod('.add_set_element',
-          signature(obj = 'modInp', app = 'cost', approxim = 'list'),
+          signature(obj = 'modInp', app = 'costs', approxim = 'list'),
           function(obj, app, approxim) {obj})
 
 #==============================================================================#

@@ -19,7 +19,7 @@ setClass("modInp",
     modelVersion        = "character",
     solver              = "character",
     gams.equation  = 'list',
-    cost.equation  = 'character',
+    costs.equation = 'character',
     misc = "list"
   ),
   prototype(
@@ -28,7 +28,7 @@ setClass("modInp",
     modelVersion   = "",
     solver         = "",
     gams.equation  = list(),
-    cost.equation  = "",
+    costs.equation = character(),
     #! Misc
     misc = list(
     )
@@ -554,8 +554,9 @@ setMethod("initialize", "modInp",
     x[['mvTradeRowCost']] <- newParameter('mvTradeRowCost', c('region', 'year'), 'map')
     x[['mvTradeIrCost']] <- newParameter('mvTradeIrCost', c('region', 'year'), 'map') 
     x[['mvTotalCost']] <- newParameter('mvTotalCost', c('region', 'year'), 'map') 
-    x[['mvTotalUserCost']] <- newParameter('mvTotalUserCost', c('region', 'year'), 'map') 
-
+    x[['mvTotalUserCosts']] <- newParameter('mvTotalUserCosts', c('region', 'year'), 'map') 
+		x[['mvTotalUserCosts']]@misc$total_set <- FALSE
+		
     # me - mapping for equations ####
     x[['meqTechSng2Sng']] <- newParameter('meqTechSng2Sng', c('tech', 'region', 'comm', 'comm', 'year', 'slice'), 'map')
     x[['meqTechGrp2Sng']] <- newParameter('meqTechGrp2Sng', c('tech', 'region', 'group', 'comm', 'year', 'slice'), 'map')

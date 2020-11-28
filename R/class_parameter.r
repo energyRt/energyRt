@@ -158,6 +158,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 # setMethod('clear', signature(obj = 'parameter'),
 .reset <- function(obj) {
     obj@data <- obj@data[0, , drop = FALSE]
+    if (obj@nValues != -1) obj@nValues <- 0
     obj
 }
 
