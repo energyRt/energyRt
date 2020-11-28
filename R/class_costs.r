@@ -41,7 +41,7 @@ setMethod("initialize", "costs", function(.Object, ...) {
 
 
  
-newCost <- function(name, variable, description = '', mult = NULL, for.each = NULL, for.sum = NULL) {
+newCosts <- function(name, variable, description = '', mult = NULL, for.each = NULL, for.sum = NULL) {
   obj <- new('costs')
   obj@name <- name
   obj@description <- description
