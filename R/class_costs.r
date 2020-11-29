@@ -128,17 +128,36 @@ newCosts <- function(name, variable, description = '', mult = NULL, for.each = N
   have.all.set <- function(x, name)  {
     return (any(is.na(x)) || (name != 'slice' && all(approxim[[name]] %in% x)))
   }
-  # is_need_set
-  # is_need_sum
-  # mvTotalUserCosts
-  # Need mapping for.each, if need it
+  # Generate mapping for.each
+  if (is.null(stm@for.each$region)) stm@for.each$region <- NA 
+  if (is.null(stm@for.each$year)) stm@for.each$year <- NA 
   if (have.all.set(stm@for.each$region, 'region') && have.all.set(stm@for.each$region, 'year')) {
-    if (!prec@parameters$mvTotalUserCosts@misc$total_set) {
-      prec@parameters$mvTotalUserCosts <- .add_data(.reset(prec@parameters$mvTotalUserCosts), 
-          merge(approxim['region'], approxim['year']))
-      prec@parameters$mvTotalUserCosts@misc$total_set <- TRUE
+    if (!prec@parameters$for_mvTotalUserCosts@misc$total_set) {
+      for_mvTotalUserCosts <- merge(approxim['region'], approxim['year'])
+      total_set <- TRUE
     }
+  } else {
+    fr <- is.na(stm@for.each$region)
+    fy <- is.na(stm@for.each$year)
+    for_mvTotalUserCosts <- stm@for.each[!fr & !fy,, drop = FALSE]
+     if (any(fr & !fy))
+      for_mvTotalUserCosts <- rbind(for_mvTotalUserCosts, merge(stm@for.each[fr & !fy,, ], 'year', drop = FALSE], approxim['region']))
+     if (any(!fr & fy))
+      for_mvTotalUserCosts <- rbind(for_mvTotalUserCosts, merge(stm@for.each[!fr & fy,, ], 'region', drop = FALSE], approxim['year']))
+    for_mvTotalUserCosts <- unique(for_mvTotalUserCosts)
+    approxim['year'] <- unique(for_mvTotalUserCosts$year)
+    approxim['region'] <- unique(for_mvTotalUserCosts$region)
+    total_set <- (nrow(for_mvTotalUserCosts) == length(approxim['year']) * length(approxim['region']))
   }
+  # Make for.sum
+  if (any(is.na(stm@for.sum$region))) {
+      
+  }
+  for (ss in names(stm@for.sum)) {
+
+  }
+  
+  
  #  browser()
  #  if (!prec@parameters$mvTotalUserCosts@misc$total_set) {
  #  }
