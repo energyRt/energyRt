@@ -102,6 +102,7 @@ model.vTradeCap = Var(mTradeSpan, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeInv = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeNewCap = Var(mTradeNew, domain = pyo.NonNegativeReals, doc = "");
+model.vTotalUserCosts = Var(mvTotalUserCosts, domain = pyo.NonNegativeReals, doc = "");
 exec(open("inc2.py").read())
 print("equations... " + str(datetime.datetime.now().strftime("%H:%M:%S")) + " (" + str(round(time.time() - seconds, 2)) + " s)")
 if verbose: print("eqTechSng2Sng ", end = "")

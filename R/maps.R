@@ -62,7 +62,8 @@
   vTradeCap = "vTradeCap( trade , year ) $ mTradeSpan( trade , year )",
   vTradeInv = "vTradeInv( trade , region , year ) $ mTradeEac( trade , region , year )",
   vTradeEac = "vTradeEac( trade , region , year ) $ mTradeEac( trade , region , year )",
-  vTradeNewCap = "vTradeNewCap( trade , year ) $ mTradeNew( trade , year )"
+  vTradeNewCap = "vTradeNewCap( trade , year ) $ mTradeNew( trade , year )",
+  vTotalUserCosts = "vTotalUserCosts( region , year ) $ mvTotalUserCosts( region , year )"
 );
  .variable_set = lapply(.variable_mapping, function(x) strsplit(gsub('[ ]*[)].*$', '', gsub('^[^(]*[(][ ]*', '', x)), '[ ]*[,][ ]*')[[1]])
 #########################
@@ -130,7 +131,8 @@
   vTradeCap = "",
   vTradeInv = "",
   vTradeEac = "",
-  vTradeNewCap = "");
+  vTradeNewCap = "",
+  vTotalUserCosts = "");
 #########################
 # equation description
 #########################
@@ -801,6 +803,7 @@
   mvTradeRowCost = "",
   mvTradeIrCost = "",
   mvTotalCost = "",
+  mvTotalUserCosts = "",
   mTechInv = "",
   mTechInpTot = "Total technology input mapp",
   mTechOutTot = "Total technology output mapp",
@@ -1006,6 +1009,7 @@
   mvTradeRowCost = c("region", "year"),
   mvTradeIrCost = c("region", "year"),
   mvTotalCost = c("region", "year"),
+  mvTotalUserCosts = c("region", "year"),
   mTechInv = c("tech", "region", "year"),
   mTechInpTot = c("comm", "region", "year", "slice"),
   mTechOutTot = c("comm", "region", "year", "slice"),
@@ -1330,6 +1334,10 @@
 .equation_variable[231, ] <- c("eqObjective", "vTotalCost")
 .equation_variable[232, ] <- c("eqObjective", "vObjective")
 .equation_variable[233, ] <- c("eqLECActivity", "vTechAct")
+getSetsSet <- function() energyRt:::.set_set
+getSetsDescription <- function() energyRt:::.set_description
+getParametersSet <- function() energyRt:::.parameter_set
+getParametersDescription <- function() energyRt:::.parameter_description
 getVariablesSet <- function() energyRt:::.variable_set
 getVariablesDescription <- function() energyRt:::.variable_description
 getVariablesMapping <- function() energyRt:::.variable_mapping

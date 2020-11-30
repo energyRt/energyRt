@@ -133,6 +133,7 @@ set mvTradeCost dimen 2;
 set mvTradeRowCost dimen 2;
 set mvTradeIrCost dimen 2;
 set mvTotalCost dimen 2;
+set mvTotalUserCosts dimen 2;
 set mTechInv dimen 3;
 set mTechInpTot dimen 4;
 set mTechOutTot dimen 4;
@@ -417,6 +418,7 @@ var vTradeCap{trade, year} >= 0;
 var vTradeInv{trade, region, year} >= 0;
 var vTradeEac{trade, region, year} >= 0;
 var vTradeNewCap{trade, year} >= 0;
+var vTotalUserCosts{region, year} >= 0;
 
 
 
@@ -855,6 +857,10 @@ printf "trade,year,value\n" > "output/vTradeNewCap.csv";
 for{(t1, y) in mTradeNew : vTradeNewCap[t1,y] <> 0} {
   printf "%s,%s,%f\n", t1,y,vTradeNewCap[t1,y] >> "output/vTradeNewCap.csv";
 }
+printf "region,year,value\n" > "output/vTotalUserCosts.csv";
+for{(r, y) in mvTotalUserCosts : vTotalUserCosts[r,y] <> 0} {
+  printf "%s,%s,%f\n", r,y,vTotalUserCosts[r,y] >> "output/vTotalUserCosts.csv";
+}
 printf "value\n%s\n",vObjective > "output/vObjective.csv";
 
 
@@ -921,6 +927,7 @@ printf "value\n" > "output/variable_list.csv";
     printf "vTradeInv\n" >> "output/variable_list.csv";
     printf "vTradeEac\n" >> "output/variable_list.csv";
     printf "vTradeNewCap\n" >> "output/variable_list.csv";
+    printf "vTotalUserCosts\n" >> "output/variable_list.csv";
 
 
 printf "set,value\n" > "output/raw_data_set.csv";

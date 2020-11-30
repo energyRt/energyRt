@@ -131,6 +131,8 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
         approxim2[[ss]] <- unique(stm@subset[[ss]][!is.na(stm@subset[[ss]])])
     }
     mult_sets <- colnames(stm@mult)[colnames(stm@mult) != 'value']
+    for (ss in mult_sets)
+      stm@mult <- stm@mult[stm@mult[[ss]] %in% approxim2[[ss]],, drop = FALSE]
     xx <- newParameter(paste0('pCosts', stm@name), mult_sets, 'simple', defVal = 0, 
                           interpolation = 'back.inter.forth', colName = 'value')
     yy <- simpleInterpolation(stm@mult, 'value', xx, approxim2)
@@ -142,10 +144,10 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   if (nrow(stm@subset) != 0) {
     fl <- apply(!is.na(stm@subset), 1, all)
     subset <- stm@subset[fl,, drop = FALSE]
+    approxim2 <- approxim[colnames(stm@subset)]
+    if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$slice@all_slice
     if (any(!fl)) {
       subset_na <- stm@subset[!fl,, drop = FALSE]
-      approxim2 <- approxim[colnames(stm@subset)]
-      if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$slice@all_slice
         for (i in seq_len(ncol(subset_na))[apply(is.na(subset_na), 2, any)]) {
           f2 <- is.na(subset_na[[i]])
           subset_na2 <- subset_na[fl,, drop = FALSE]
@@ -159,6 +161,9 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
         }
       subset <- rbind(subset, subset_na)
     }
+    for (ss in colnames(subset))
+      subset <- subset[subset[[ss]] %in% approxim2[[ss]],, drop = FALSE]
+    
     xnm <- paste0('mCosts', stm@name)
     prec@parameters[[xnm]] <- .add_data(newParameter(xnm, colnames(subset), 'map'), subset)
     subset_txt <- paste0(xnm, '(', paste0(colnames(subset), collapse = ', '), ')')

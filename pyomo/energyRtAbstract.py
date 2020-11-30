@@ -74,6 +74,7 @@ model.vTradeCap = Var(model.mTradeSpan, domain = pyo.NonNegativeReals, doc = "")
 model.vTradeInv = Var(model.mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(model.mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeNewCap = Var(model.mTradeNew, domain = pyo.NonNegativeReals, doc = "");
+model.vTotalUserCosts = Var(model.mvTotalUserCosts, domain = pyo.NonNegativeReals, doc = "");
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 model.eqTechSng2Sng = Constraint(model.meqTechSng2Sng, rule = lambda model, t, r, c, cp, y, s : model.vTechInp[t,c,r,y,s]*model.pTechCinp2use[t,c,r,y,s]  ==  (model.vTechOut[t,cp,r,y,s]) / (model.pTechUse2cact[t,cp,r,y,s]*model.pTechCact2cout[t,cp,r,y,s]));
 # eqTechGrp2Sng(tech, region, group, commp, year, slice)$meqTechGrp2Sng(tech, region, group, commp, year, slice)

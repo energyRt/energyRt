@@ -327,6 +327,7 @@ mvTradeCost(region, year)
 mvTradeRowCost(region, year)
 mvTradeIrCost(region, year)
 mvTotalCost(region, year)
+mvTotalUserCosts(region, year)
 ;
 
 
@@ -503,6 +504,8 @@ vTradeInv(trade, region, year)
 vTradeEac(trade, region, year)
 *@ mTradeNew(trade, year)
 vTradeNewCap(trade, year)
+*@ mvTotalUserCosts(region, year)
+vTotalUserCosts(region, year)
 ;
 
 ********************************************************************************
@@ -1574,6 +1577,8 @@ eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)..
          sum(slice$mTechSlice(tech, slice), vTechAct(tech, region, year, slice)) =g= pLECLoACT(region);
 
 $include inc_constraints.gms
+
+$include inc_costs.gms
 
 model energyRt / all / ;
 

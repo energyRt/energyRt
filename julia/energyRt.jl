@@ -71,6 +71,7 @@ model = Model();
 @variable(model, vTradeInv[mTradeEac] >= 0);
 @variable(model, vTradeEac[mTradeEac] >= 0);
 @variable(model, vTradeNewCap[mTradeNew] >= 0);
+@variable(model, vTotalUserCosts[mvTotalUserCosts] >= 0);
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 @constraint(model, [(t, r, c, cp, y, s) in meqTechSng2Sng], vTechInp[(t,c,r,y,s)]*(if haskey(pTechCinp2use, (t,c,r,y,s)); pTechCinp2use[(t,c,r,y,s)]; else pTechCinp2useDef; end)  ==  (vTechOut[(t,cp,r,y,s)]) / ((if haskey(pTechUse2cact, (t,cp,r,y,s)); pTechUse2cact[(t,cp,r,y,s)]; else pTechUse2cactDef; end)*(if haskey(pTechCact2cout, (t,cp,r,y,s)); pTechCact2cout[(t,cp,r,y,s)]; else pTechCact2coutDef; end)));
 println("eqTechSng2Sng(tech, region, comm, commp, year, slice) done ", Dates.format(now(), "HH:MM:SS"))

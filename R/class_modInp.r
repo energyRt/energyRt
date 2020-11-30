@@ -555,7 +555,6 @@ setMethod("initialize", "modInp",
     x[['mvTradeIrCost']] <- newParameter('mvTradeIrCost', c('region', 'year'), 'map') 
     x[['mvTotalCost']] <- newParameter('mvTotalCost', c('region', 'year'), 'map') 
     x[['mvTotalUserCosts']] <- newParameter('mvTotalUserCosts', c('region', 'year'), 'map') 
-		x[['mvTotalUserCosts']]@misc$total_set <- FALSE
 		
     # me - mapping for equations ####
     x[['meqTechSng2Sng']] <- newParameter('meqTechSng2Sng', c('tech', 'region', 'comm', 'comm', 'year', 'slice'), 'map')

@@ -365,6 +365,24 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   prec@parameters[['meqLECActivity']] <- .add_data(prec@parameters[['meqLECActivity']], 
                                                    merge(.get_data_slot(prec@parameters[['mTechSpan']]), .get_data_slot(prec@parameters[['mLECRegion']])))
   
+  .interpolation_message('mvTotalUserCosts', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
+  
+  mCosts <- lapply(grep('^mCosts', names(prec@parameters), value = TRUE), function(x) {
+    xx <- .get_data_slot(prec@parameters[[x]])
+    xx <- unique(xx[, colnames(xx) %in% c('region', 'year'), drop = FALSE])
+    if (nrow(xx) == nrow(dregionyear) || ncol(xx) == 0) return(dregionyear)
+    if (is.null(xx$region)) return(dregionyear[dregionyear$year %in% unique(xx$year),, drop = FALSE]) else
+    if (is.null(xx$year)) return(dregionyear[dregionyear$region %in% unique(xx$region),, drop = FALSE]) else 
+      return(xx)
+  })
+  if (any(sapply(mCosts, nrow) == nrow(dregionyear))) {
+    prec@parameters[['mvTotalUserCosts']] <- .add_data(prec@parameters[['mvTotalUserCosts']], dregionyear)
+  } else {
+    require(data.table)
+    prec@parameters[['mvTotalUserCosts']] <- .add_data(prec@parameters[['mvTotalUserCosts']], 
+                                                        unique(rbindlist(mCosts)))
+  }
+  
   tmp_f0 <- function(x) {
     if (nrow(x) == 0) {
       x$value <- numeric()
