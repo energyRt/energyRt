@@ -118,6 +118,25 @@
   
   # Add parameter costs declaration
   {
+    mps_name <- grep('^[m]Costs', names(scen@modInp@parameters), value = TRUE)
+    mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
+                                                           function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    pps_name <- grep('^[p]Costs', names(scen@modInp@parameters), value = TRUE)
+    pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
+                                                                 function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    pps_name_def <- gsub('[(][)]', '', pps_name_def)
+    if (length(mps_name) != 0) {
+      cat(mps_name_def, sep = '\n', file = zz_constrains)
+      cat('\n', sep = '\n', file = zz_constrains)
+    }
+    if (length(pps_name) != 0) {
+      cat(pps_name_def, sep = '\n', file = zz_constrains)
+      cat('\n', sep = '\n', file = zz_constrains)
+    }
+  }
+  
+  # Add parameter costs declaration
+  {
     zz_costs <- file(paste(arg$tmp.dir, '/inc_costs.gms', sep = ''), 'w')
     mps_name <- grep('^[m]Costs', names(scen@modInp@parameters), value = TRUE)
     mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 

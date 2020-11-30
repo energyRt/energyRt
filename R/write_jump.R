@@ -44,6 +44,11 @@
             scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_jump, yy, rmm)
           }
         }
+      } else if (any(grep('^pCosts', nn))) {
+          mmm <- grep(templ, scen@modInp@costs.equation)
+          if (any(mmm)) {
+            scen@modInp@costs.equation[mmm] <- sapply(strsplit(scen@modInp@costs.equation[mmm], yy), .rem_jump, yy, rmm)
+          }
       } else {
         mmm <- grep(templ, run_code)
         if (any(mmm)) {
@@ -59,6 +64,7 @@
   dir.create(paste(arg$tmp.dir, '/output', sep = ''), showWarnings = FALSE)
   zz_data_julia <- file(paste(arg$tmp.dir, '/data.jl', sep = ''), 'w')
   zz_data_constr <- file(paste(arg$tmp.dir, '/inc_constraints.jl', sep = ''), 'w')
+  zz_data_costs <- file(paste(arg$tmp.dir, '/inc_costs.jl', sep = ''), 'w')
 
   .write_inc_solver(scen, arg, "using Cbc\nset_optimizer(model, Cbc.Optimizer)\n", '.jl', 'Cbc')
   dat <- list()
@@ -92,10 +98,11 @@
     }
   }
   close(zz_data_julia)
-  # Add constraint
+  # Mod begin
   zz_mod <- file(paste(arg$tmp.dir, '/energyRt.jl', sep = ''), 'w')
   nobj <- grep('^[@]objective', run_code)[1] - 1
   cat(run_code[1:nobj], sep = '\n', file = zz_mod)
+  # Add constraint
   if (length(scen@modInp@gams.equation) > 0) {
     for (i in seq_along(scen@modInp@gams.equation)) {
       eqt <- scen@modInp@gams.equation[[i]]
@@ -104,6 +111,12 @@
     }
   }
   close(zz_data_constr)
+  # Add costs
+  {
+      cat(energyRt:::.equation.from.gams.to.julia(scen@modInp@costs.equation), sep = '\n', file = zz_data_costs)
+      cat(paste0('println("Costs declaration done ", Dates.format(now(), "HH:MM:SS"))\n'), file = zz_data_costs)
+  }
+  close(zz_data_costs)
   cat(run_code[-(1:nobj)], sep = '\n', file = zz_mod)
   close(zz_mod)
   zz_modout <- file(paste(arg$tmp.dir, '/output.jl', sep = ''), 'w')
@@ -112,7 +125,7 @@
   .write_inc_files(arg, scen, ".jl")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'julia energyRt.jl'
-  scen@solver$code <- c('energyRt.jl', 'output.jl', 'inc_constraints.jl', 'inc_solver.jl')
+  scen@solver$code <- c('energyRt.jl', 'output.jl', 'inc_constraints.jl', 'inc_costs.jl', 'inc_solver.jl')
 
   scen
 }
