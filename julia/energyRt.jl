@@ -345,6 +345,7 @@ println("eqLECActivity(tech, region, year) done ", Dates.format(now(), "HH:MM:SS
 println(flog,"\"solver\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
 @objective(model, Min, vObjective)
 include("inc_constraints.jl")
+include("inc_consts.jl")
 include("inc_solver.jl")
 # using Cbc
 # set_optimizer(model, Cbc.Optimizer)
