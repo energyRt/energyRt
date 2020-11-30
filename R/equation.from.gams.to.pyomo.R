@@ -54,7 +54,7 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   set_num2 <- .aliasName(set_num1)
   names(set_num2) <- set_num1
   rs <- paste0('(', paste0(set_num2, collapse =', '), ') in ', 'itertools.product'[length(set_num2) > 1], 
-    '(', paste0('', .removeEndSet(names(set_num2)), collapse = '*'), ')')
+    '(', paste0('', .removeEndSet(names(set_num2)), collapse = ','), ')')
   if (length(cnd_slice) != 0) {
     fl <- (sapply(cnd_slice, length) == 1)
     if (any(fl)) {

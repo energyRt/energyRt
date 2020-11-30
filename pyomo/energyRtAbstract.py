@@ -255,7 +255,10 @@ model.eqSubsCost = Constraint(model.mSubCost, rule = lambda model, c, r, y : mod
 model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(model.vTotalCost[r,y]*model.pDiscountFactorMileStone[r,y] for r in model.region for y in model.year if (r,y) in model.mvTotalCost));
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)
 model.eqLECActivity = Constraint(model.meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in model.slice if (t,s) in model.mTechSlice)  >=  model.pLECLoACT[r]);
+model.fornontriv = Var(domain = pyo.NonNegativeReals)
+model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)
 exec(open("inc_constraints.py").read())
+exec(open("inc_costs.py").read())
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 
 

@@ -467,7 +467,10 @@ model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : 
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 exec(open("inc3.py").read())
+model.fornontriv = Var(domain = pyo.NonNegativeReals)
+model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)
 exec(open("inc_constraints.py").read())
+exec(open("inc_costs.py").read())
 exec(open("inc_solver.py").read())
 # opt = SolverFactory('cplex');
 exec(open("inc4.py").read())

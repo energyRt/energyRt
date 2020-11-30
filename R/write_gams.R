@@ -28,12 +28,10 @@
           }
         }
       } else if (any(grep('^pCosts', nn))) {
-        for (www in seq_along(scen@modInp@costs.equation)) {
-          mmm <- grep(templ, scen@modInp@costs.equation[www])
+          mmm <- grep(templ, scen@modInp@costs.equation)
           if (any(mmm)) {
-            scen@modInp@costs.equation[www][mmm] <- sapply(strsplit(scen@modInp@costs.equation[www][mmm], yy), .rem_col, yy, rmm)
+            scen@modInp@costs.equation[mmm] <- sapply(strsplit(scen@modInp@costs.equation[mmm], yy), .rem_col, yy, rmm)
           }
-        }
       } else {
         mmm <- grep(templ, run_code)
         if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col, yy, rmm)
