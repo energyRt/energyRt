@@ -622,6 +622,15 @@ end;
 close(fvTradeNewCap);
 
 
+fvTotalUserCosts = open("output/vTotalUserCosts.csv", "w");
+println(fvTotalUserCosts, "region,year,value");
+for (r,y) in mvTotalUserCosts if JuMP.value(vTotalUserCosts[(r,y)]) != 0
+  println(fvTotalUserCosts, r, ",", y, ",", JuMP.value(vTotalUserCosts[(r,y)]));
+end;
+end;
+close(fvTotalUserCosts);
+
+
 vrb_list = open("output/variable_list.csv", "w");
 println(vrb_list, "value");
 println(vrb_list, "vTechInv");
@@ -686,6 +695,7 @@ println(vrb_list, "vTradeCap");
 println(vrb_list, "vTradeInv");
 println(vrb_list, "vTradeEac");
 println(vrb_list, "vTradeNewCap");
+println(vrb_list, "vTotalUserCosts");
 
 close(vrb_list);
 raw_data = open("output/raw_data_set.csv", "w");

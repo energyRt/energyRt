@@ -71,6 +71,7 @@ model = Model();
 @variable(model, vTradeInv[mTradeEac] >= 0);
 @variable(model, vTradeEac[mTradeEac] >= 0);
 @variable(model, vTradeNewCap[mTradeNew] >= 0);
+@variable(model, vTotalUserCosts[mvTotalUserCosts] >= 0);
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 @constraint(model, [(t, r, c, cp, y, s) in meqTechSng2Sng], vTechInp[(t,c,r,y,s)]*(if haskey(pTechCinp2use, (t,c,r,y,s)); pTechCinp2use[(t,c,r,y,s)]; else pTechCinp2useDef; end)  ==  (vTechOut[(t,cp,r,y,s)]) / ((if haskey(pTechUse2cact, (t,cp,r,y,s)); pTechUse2cact[(t,cp,r,y,s)]; else pTechUse2cactDef; end)*(if haskey(pTechCact2cout, (t,cp,r,y,s)); pTechCact2cout[(t,cp,r,y,s)]; else pTechCact2coutDef; end)));
 println("eqTechSng2Sng(tech, region, comm, commp, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
@@ -327,7 +328,7 @@ println("eqStorageInpTot(comm, region, year, slice) done ", Dates.format(now(), 
 @constraint(model, [(c, r, y, s) in mStorageOutTot], vStorageOutTot[(c,r,y,s)]  ==  sum(vStorageOut[(st1,c,r,y,s)] for st1 in stg if (st1,c,r,y,s) in mvStorageStore)+sum(vStorageAOut[(st1,c,r,y,s)] for st1 in stg if (st1,c,r,y,s) in mvStorageAOut));
 println("eqStorageOutTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqCost(region, year)$mvTotalCost(region, year)
-@constraint(model, [(r, y) in mvTotalCost], vTotalCost[(r,y)]  ==  sum(vTechEac[(t,r,y)] for t in tech if (t,r,y) in mTechEac)+sum(vTechOMCost[(t,r,y)] for t in tech if (t,r,y) in mTechOMCost)+sum(vSupCost[(s1,r,y)] for s1 in sup if (s1,r,y) in mvSupCost)+sum((if haskey(pDummyImportCost, (c,r,y,s)); pDummyImportCost[(c,r,y,s)]; else pDummyImportCostDef; end)*vDummyImport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum((if haskey(pDummyExportCost, (c,r,y,s)); pDummyExportCost[(c,r,y,s)]; else pDummyExportCostDef; end)*vDummyExport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(vTaxCost[(c,r,y)] for c in comm if (c,r,y) in mTaxCost)-sum(vSubsCost[(c,r,y)] for c in comm if (c,r,y) in mSubCost)+sum(vStorageOMCost[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(vStorageEac[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageEac)+(if (r,y) in mvTradeCost; vTradeCost[(r,y)]; else 0; end;));
+@constraint(model, [(r, y) in mvTotalCost], vTotalCost[(r,y)]  ==  sum(vTechEac[(t,r,y)] for t in tech if (t,r,y) in mTechEac)+sum(vTechOMCost[(t,r,y)] for t in tech if (t,r,y) in mTechOMCost)+sum(vSupCost[(s1,r,y)] for s1 in sup if (s1,r,y) in mvSupCost)+sum((if haskey(pDummyImportCost, (c,r,y,s)); pDummyImportCost[(c,r,y,s)]; else pDummyImportCostDef; end)*vDummyImport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum((if haskey(pDummyExportCost, (c,r,y,s)); pDummyExportCost[(c,r,y,s)]; else pDummyExportCostDef; end)*vDummyExport[(c,r,y,s)] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(vTaxCost[(c,r,y)] for c in comm if (c,r,y) in mTaxCost)-sum(vSubsCost[(c,r,y)] for c in comm if (c,r,y) in mSubCost)+sum(vStorageOMCost[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(vStorageEac[(st1,r,y)] for st1 in stg if (st1,r,y) in mStorageEac)+(if (r,y) in mvTradeCost; vTradeCost[(r,y)]; else 0; end;)+(if (r,y) in mvTotalUserCosts; vTotalUserCosts[(r,y)]; else 0; end;));
 println("eqCost(region, year) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
 @constraint(model, [(c, r, y) in mTaxCost], vTaxCost[(c,r,y)]  ==  sum((if haskey(pTaxCostOut, (c,r,y,s)); pTaxCostOut[(c,r,y,s)]; else pTaxCostOutDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostInp, (c,r,y,s)); pTaxCostInp[(c,r,y,s)]; else pTaxCostInpDef; end)*vInpTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvInpTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostBal, (c,r,y,s)); pTaxCostBal[(c,r,y,s)]; else pTaxCostBalDef; end)*vBalance[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvBalance && (c,s) in mCommSlice)));
@@ -344,6 +345,7 @@ println("eqLECActivity(tech, region, year) done ", Dates.format(now(), "HH:MM:SS
 println(flog,"\"solver\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
 @objective(model, Min, vObjective)
 include("inc_constraints.jl")
+include("inc_costs.jl")
 include("inc_solver.jl")
 # using Cbc
 # set_optimizer(model, Cbc.Optimizer)

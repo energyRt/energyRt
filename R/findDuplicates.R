@@ -81,6 +81,9 @@ findDuplicates <- function(x) {
         }
       }
       return(tmp)
+   } else if (class(x) %in% c('costs')) {
+      tmp <- check_by_slots(x, c('for.sum', 'for.each', 'mult'))
+      return(tmp)
    } else if (class(x) %in% c('slice', 'commodity')) {
     } else if (class(x) %in% c('sysInfo')) {
       return(check_by_slots(x, c('debug', 'discount')))

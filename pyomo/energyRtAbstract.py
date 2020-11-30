@@ -74,6 +74,7 @@ model.vTradeCap = Var(model.mTradeSpan, domain = pyo.NonNegativeReals, doc = "")
 model.vTradeInv = Var(model.mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(model.mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeNewCap = Var(model.mTradeNew, domain = pyo.NonNegativeReals, doc = "");
+model.vTotalUserCosts = Var(model.mvTotalUserCosts, domain = pyo.NonNegativeReals, doc = "");
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 model.eqTechSng2Sng = Constraint(model.meqTechSng2Sng, rule = lambda model, t, r, c, cp, y, s : model.vTechInp[t,c,r,y,s]*model.pTechCinp2use[t,c,r,y,s]  ==  (model.vTechOut[t,cp,r,y,s]) / (model.pTechUse2cact[t,cp,r,y,s]*model.pTechCact2cout[t,cp,r,y,s]));
 # eqTechGrp2Sng(tech, region, group, commp, year, slice)$meqTechGrp2Sng(tech, region, group, commp, year, slice)
@@ -245,7 +246,7 @@ model.eqStorageInpTot = Constraint(model.mStorageInpTot, rule = lambda model, c,
 # eqStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)
 model.eqStorageOutTot = Constraint(model.mStorageOutTot, rule = lambda model, c, r, y, s : model.vStorageOutTot[c,r,y,s]  ==  sum(model.vStorageOut[st1,c,r,y,s] for st1 in model.stg if (st1,c,r,y,s) in model.mvStorageStore)+sum(model.vStorageAOut[st1,c,r,y,s] for st1 in model.stg if (st1,c,r,y,s) in model.mvStorageAOut));
 # eqCost(region, year)$mvTotalCost(region, year)
-model.eqCost = Constraint(model.mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in model.tech if (t,r,y) in model.mTechEac)+sum(model.vTechOMCost[t,r,y] for t in model.tech if (t,r,y) in model.mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in model.sup if (s1,r,y) in model.mvSupCost)+sum(model.pDummyImportCost[c,r,y,s]*model.vDummyImport[c,r,y,s] for c in model.comm for s in model.slice if (c,r,y,s) in model.mDummyImport)+sum(model.pDummyExportCost[c,r,y,s]*model.vDummyExport[c,r,y,s] for c in model.comm for s in model.slice if (c,r,y,s) in model.mDummyExport)+sum(model.vTaxCost[c,r,y] for c in model.comm if (c,r,y) in model.mTaxCost)-sum(model.vSubsCost[c,r,y] for c in model.comm if (c,r,y) in model.mSubCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in model.stg if (st1,r,y) in model.mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in model.stg if (st1,r,y) in model.mStorageEac)+(model.vTradeCost[r,y] if (r,y) in model.mvTradeCost else 0));
+model.eqCost = Constraint(model.mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in model.tech if (t,r,y) in model.mTechEac)+sum(model.vTechOMCost[t,r,y] for t in model.tech if (t,r,y) in model.mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in model.sup if (s1,r,y) in model.mvSupCost)+sum(model.pDummyImportCost[c,r,y,s]*model.vDummyImport[c,r,y,s] for c in model.comm for s in model.slice if (c,r,y,s) in model.mDummyImport)+sum(model.pDummyExportCost[c,r,y,s]*model.vDummyExport[c,r,y,s] for c in model.comm for s in model.slice if (c,r,y,s) in model.mDummyExport)+sum(model.vTaxCost[c,r,y] for c in model.comm if (c,r,y) in model.mTaxCost)-sum(model.vSubsCost[c,r,y] for c in model.comm if (c,r,y) in model.mSubCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in model.stg if (st1,r,y) in model.mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in model.stg if (st1,r,y) in model.mStorageEac)+(model.vTradeCost[r,y] if (r,y) in model.mvTradeCost else 0)+(model.vTotalUserCosts[r,y] if (r,y) in model.mvTotalUserCosts else 0));
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
 model.eqTaxCost = Constraint(model.mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(model.pTaxCostOut[c,r,y,s]*model.vOutTot[c,r,y,s] for s in model.slice if ((c,r,y,s) in model.mvOutTot and (c,s) in model.mCommSlice))+sum(model.pTaxCostInp[c,r,y,s]*model.vInpTot[c,r,y,s] for s in model.slice if ((c,r,y,s) in model.mvInpTot and (c,s) in model.mCommSlice))+sum(model.pTaxCostBal[c,r,y,s]*model.vBalance[c,r,y,s] for s in model.slice if ((c,r,y,s) in model.mvBalance and (c,s) in model.mCommSlice)));
 # eqSubsCost(comm, region, year)$mSubCost(comm, region, year)
@@ -254,7 +255,10 @@ model.eqSubsCost = Constraint(model.mSubCost, rule = lambda model, c, r, y : mod
 model.eqObjective = Constraint(rule = lambda model : model.vObjective  ==  sum(model.vTotalCost[r,y]*model.pDiscountFactorMileStone[r,y] for r in model.region for y in model.year if (r,y) in model.mvTotalCost));
 # eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)
 model.eqLECActivity = Constraint(model.meqLECActivity, rule = lambda model, t, r, y : sum(model.vTechAct[t,r,y,s] for s in model.slice if (t,s) in model.mTechSlice)  >=  model.pLECLoACT[r]);
+model.fornontriv = Var(domain = pyo.NonNegativeReals)
+model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)
 exec(open("inc_constraints.py").read())
+exec(open("inc_costs.py").read())
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 
 

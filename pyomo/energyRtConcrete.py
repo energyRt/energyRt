@@ -102,6 +102,7 @@ model.vTradeCap = Var(mTradeSpan, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeInv = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeEac = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "");
 model.vTradeNewCap = Var(mTradeNew, domain = pyo.NonNegativeReals, doc = "");
+model.vTotalUserCosts = Var(mvTotalUserCosts, domain = pyo.NonNegativeReals, doc = "");
 exec(open("inc2.py").read())
 print("equations... " + str(datetime.datetime.now().strftime("%H:%M:%S")) + " (" + str(round(time.time() - seconds, 2)) + " s)")
 if verbose: print("eqTechSng2Sng ", end = "")
@@ -446,7 +447,7 @@ model.eqStorageOutTot = Constraint(mStorageOutTot, rule = lambda model, c, r, y,
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqCost ", end = "")
 # eqCost(region, year)$mvTotalCost(region, year)
-model.eqCost = Constraint(mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in tech if (t,r,y) in mTechEac)+sum(model.vTechOMCost[t,r,y] for t in tech if (t,r,y) in mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in sup if (s1,r,y) in mvSupCost)+sum(pDummyImportCost.get((c,r,y,s))*model.vDummyImport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum(pDummyExportCost.get((c,r,y,s))*model.vDummyExport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(model.vTaxCost[c,r,y] for c in comm if (c,r,y) in mTaxCost)-sum(model.vSubsCost[c,r,y] for c in comm if (c,r,y) in mSubCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in stg if (st1,r,y) in mStorageEac)+(model.vTradeCost[r,y] if (r,y) in mvTradeCost else 0));
+model.eqCost = Constraint(mvTotalCost, rule = lambda model, r, y : model.vTotalCost[r,y]  ==  sum(model.vTechEac[t,r,y] for t in tech if (t,r,y) in mTechEac)+sum(model.vTechOMCost[t,r,y] for t in tech if (t,r,y) in mTechOMCost)+sum(model.vSupCost[s1,r,y] for s1 in sup if (s1,r,y) in mvSupCost)+sum(pDummyImportCost.get((c,r,y,s))*model.vDummyImport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyImport)+sum(pDummyExportCost.get((c,r,y,s))*model.vDummyExport[c,r,y,s] for c in comm for s in slice if (c,r,y,s) in mDummyExport)+sum(model.vTaxCost[c,r,y] for c in comm if (c,r,y) in mTaxCost)-sum(model.vSubsCost[c,r,y] for c in comm if (c,r,y) in mSubCost)+sum(model.vStorageOMCost[st1,r,y] for st1 in stg if (st1,r,y) in mStorageOMCost)+sum(model.vStorageEac[st1,r,y] for st1 in stg if (st1,r,y) in mStorageEac)+(model.vTradeCost[r,y] if (r,y) in mvTradeCost else 0)+(model.vTotalUserCosts[r,y] if (r,y) in mvTotalUserCosts else 0));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTaxCost ", end = "")
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
@@ -466,7 +467,10 @@ model.eqLECActivity = Constraint(meqLECActivity, rule = lambda model, t, r, y : 
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 model.obj = Objective(rule = lambda model: model.vObjective, sense = minimize);
 exec(open("inc3.py").read())
+model.fornontriv = Var(domain = pyo.NonNegativeReals)
+model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)
 exec(open("inc_constraints.py").read())
+exec(open("inc_costs.py").read())
 exec(open("inc_solver.py").read())
 # opt = SolverFactory('cplex');
 exec(open("inc4.py").read())

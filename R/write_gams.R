@@ -27,6 +27,11 @@
             scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_col, yy, rmm)
           }
         }
+      } else if (any(grep('^pCosts', nn))) {
+          mmm <- grep(templ, scen@modInp@costs.equation)
+          if (any(mmm)) {
+            scen@modInp@costs.equation[mmm] <- sapply(strsplit(scen@modInp@costs.equation[mmm], yy), .rem_col, yy, rmm)
+          }
       } else {
         mmm <- grep(templ, run_code)
         if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col, yy, rmm)
@@ -109,7 +114,48 @@
       cat(pps_name_def, sep = '\n', file = zz_constrains)
       cat('\n', sep = '\n', file = zz_constrains)
     }
-}
+  }
+  
+  # Add parameter costs declaration
+  {
+    mps_name <- grep('^[m]Costs', names(scen@modInp@parameters), value = TRUE)
+    mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
+                                                           function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    pps_name <- grep('^[p]Costs', names(scen@modInp@parameters), value = TRUE)
+    pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
+                                                                 function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    pps_name_def <- gsub('[(][)]', '', pps_name_def)
+    if (length(mps_name) != 0) {
+      cat(mps_name_def, sep = '\n', file = zz_constrains)
+      cat('\n', sep = '\n', file = zz_constrains)
+    }
+    if (length(pps_name) != 0) {
+      cat(pps_name_def, sep = '\n', file = zz_constrains)
+      cat('\n', sep = '\n', file = zz_constrains)
+    }
+  }
+  
+  # Add parameter costs declaration
+  {
+    zz_costs <- file(paste(arg$tmp.dir, '/inc_costs.gms', sep = ''), 'w')
+    mps_name <- grep('^[m]Costs', names(scen@modInp@parameters), value = TRUE)
+    mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
+                         function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    pps_name <- grep('^[p]Costs', names(scen@modInp@parameters), value = TRUE)
+    pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
+                      function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
+    pps_name_def <- gsub('[(][)]', '', pps_name_def)
+    if (length(mps_name) != 0) {
+      cat(mps_name_def, sep = '\n', file = zz_costs)
+      cat('\n', sep = '\n', file = zz_costs)
+    }
+    if (length(pps_name) != 0) {
+      cat(pps_name_def, sep = '\n', file = zz_costs)
+      cat('\n', sep = '\n', file = zz_costs)
+    }
+    cat(c('Equation\neqTotalUserCosts(region, year)\n;\n', scen@modInp@costs.equation), file = zz_costs)
+  }
+  
   # Add constraint equation 
   if (length(scen@modInp@gams.equation) > 0) {
     # Declaration
@@ -128,6 +174,7 @@
   }
   close(zz)
   close(zz_constrains)
+  close(zz_costs)
   .write_inc_files(arg, scen, ".gms")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'gams energyRt.gms'

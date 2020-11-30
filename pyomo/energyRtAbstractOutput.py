@@ -59,7 +59,8 @@ head_val =  { "vTechInv": "tech,region,year,value",
   "vTradeCap": "trade,year,value",
   "vTradeInv": "trade,region,year,value",
   "vTradeEac": "trade,region,year,value",
-  "vTradeNewCap": "trade,year,value" };
+  "vTradeNewCap": "trade,year,value",
+  "vTotalUserCosts": "region,year,value" };
 flist = open("output/variable_list.csv","w");
 flist.write("value\n");
 for v in instance.component_objects(Var):
