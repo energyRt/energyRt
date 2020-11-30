@@ -136,14 +136,7 @@
       cat(pps_name_def, sep = '\n', file = zz_costs)
       cat('\n', sep = '\n', file = zz_costs)
     }
-    cat('Equation\neqTotalUserCosts(region, year)\n;\n', file = zz_costs)
-    
-    if (length(scen@modInp@costs.equation) == 0) {
-      cat('eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. vTotalUserCosts(region, year) =e= 0;\n', file = zz_costs)
-    } else {
-      cat('eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. vTotalUserCosts(region, year) =e= ', 
-          gsub('[+][ ]*[-]', '-', paste0(scen@modInp@costs.equation, collapse = ' + ')), ';\n', file = zz_costs)
-    }
+    cat(c('Equation\neqTotalUserCosts(region, year)\n;\n', scen@modInp@costs.equation), file = zz_costs)
   }
   
   # Add constraint equation 

@@ -47,6 +47,19 @@
     if (length(pps_name) == 0) pps_name_def <- character()
   }
   
+  
+  ### Costs
+  {
+    add_eq_costs <- .equation.from.gams.to.glpk(scen@modInp@costs.equation)
+    # Add additional maps
+    mps_name_costs <- grep('^[m]Costs', names(scen@modInp@parameters), value = TRUE)
+    mps_name_def_costs <- paste0('set ', mps_name_costs, ' dimen ', sapply(scen@modInp@parameters[mps_name_costs], function(x) length(x@dimSetNames)), ';')
+    pps_name_costs <- grep('^[p]Costs', names(scen@modInp@parameters), value = TRUE)
+    pps_name_def_costs <- paste0('param ', pps_name_costs, ' {', sapply(scen@modInp@parameters[pps_name_costs], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
+    if (length(mps_name_def_costs) == 0) mps_name_def_costs <- character()
+    if (length(pps_name_costs) == 0) pps_name_def_costs <- character()
+  }
+
   ### FUNC GLPK 
   zz <- file(paste(arg$tmp.dir, '/energyRt.mod', sep = ''), 'w')
   if (length(grep('^minimize', run_code)) != 1) stop('Errors in GLPK model')
@@ -57,6 +70,12 @@
     cat(pps_name_def, sep = '\n', file = zz)
     cat(add_eq, sep = '\n', file = zz)
   }
+  ### Costs  
+  cat(mps_name_def_costs, sep = '\n', file = zz)
+  cat(pps_name_def_costs, sep = '\n', file = zz)
+  cat(add_eq_costs, sep = '\n', file = zz)
+
+  
   cat(run_code[grep('22b584bd-a17a-4fa0-9cd9-f603ab684e47', run_code):(grep('^minimize', run_code) - 1)], sep = '\n', file = zz)
   cat(run_code[grep('^minimize', run_code):(grep('^end[;]', run_code) - 1)], 
       sep = '\n', file = zz)

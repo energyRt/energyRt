@@ -382,7 +382,15 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
     prec@parameters[['mvTotalUserCosts']] <- .add_data(prec@parameters[['mvTotalUserCosts']], 
                                                         unique(rbindlist(mCosts)))
   }
-  
+     if (length(prec@costs.equation) == 0) {
+      prec@costs.equation <- 
+        'eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. vTotalUserCosts(region, year) =e= 0;\n'
+    } else {
+      prec@costs.equation <- paste0('eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. ', 
+          'vTotalUserCosts(region, year) =e= ', 
+          gsub('[+][ ]*[-]', '-', paste0(prec@costs.equation, collapse = ' + ')), ';')
+    }
+
   tmp_f0 <- function(x) {
     if (nrow(x) == 0) {
       x$value <- numeric()
