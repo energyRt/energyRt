@@ -831,7 +831,7 @@ eqTechRampUp(tech, region, year, slice)$mTechRampUp(tech, region, year, slice)..
          - sum(slicep$(((mTechFullYear(tech) and mSliceNext(slicep, slice)) or (not(mTechFullYear(tech)) and mSliceFYearNext(slicep, slice)))
                           and mvTechAct(tech, region, year, slicep)), vTechAct(tech, region, year, slicep) / pSliceShare(slicep))
          =l=
-         pTechRampUp(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
+         pSliceShare(slice) * 365 * 24 / pTechRampUp(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
 
 * Ramp Down factor
 eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slice)..
@@ -839,7 +839,7 @@ eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slic
                           and mvTechAct(tech, region, year, slicep)), vTechAct(tech, region, year, slicep) / pSliceShare(slicep))
                  - vTechAct(tech, region, year, slice) / pSliceShare(slice)
          =l=
-         pTechRampDown(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
+         pSliceShare(slice) * 365 * 24 / pTechRampDown(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
 
 ********************************************************************************
 *** Connect activity with output
