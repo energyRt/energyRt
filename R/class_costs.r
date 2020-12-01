@@ -45,7 +45,7 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   obj@description <- description
   
   # Add variable
-  sets <- getVariablesSet()[[variable]]
+  sets <- energyRt:::.variable_set[[variable]]
   if (is.null(sets))
         stop(paste0('There are unknown variable "', variable, '" in cost "', name, '".'))
   if (anyDuplicated(sets))
@@ -170,8 +170,8 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   } else subset_txt <- NULL
   
   # Generate equation text
-  mps <- getVariablesMapping()[[stm@variable]]
-  sets <- getVariablesSet()[[stm@variable]]
+  mps <- energyRt:::.variable_mapping[[stm@variable]]
+  sets <- energyRt:::.variable_set[[stm@variable]]
   if (length(sets) == 2) {
     if (is.null(subset_txt)) costs <- paste0(mult_txt, mps) else 
     if (any(grep('[$]', mps))) {

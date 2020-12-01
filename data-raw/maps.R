@@ -32,6 +32,7 @@
   vStorageAInp = "vStorageAInp( stg , comm , region , year , slice ) $ mvStorageAInp( stg , comm , region , year , slice )",
   vStorageAOut = "vStorageAOut( stg , comm , region , year , slice ) $ mvStorageAOut( stg , comm , region , year , slice )",
   vTotalCost = "vTotalCost( region , year ) $ mvTotalCost( region , year )",
+  vObjective = "vObjective",
   vDummyImport = "vDummyImport( comm , region , year , slice ) $ mDummyImport( comm , region , year , slice )",
   vDummyExport = "vDummyExport( comm , region , year , slice ) $ mDummyExport( comm , region , year , slice )",
   vTaxCost = "vTaxCost( comm , region , year ) $ mTaxCost( comm , region , year )",
@@ -323,6 +324,7 @@
   eqCost = c("region", "year"),
   eqTaxCost = c("comm", "region", "year"),
   eqSubsCost = c("comm", "region", "year"),
+  eqObjective = NULL,
   eqLECActivity = c("tech", "region", "year"));
 #########################
 # parameter description
@@ -907,6 +909,19 @@
 # set set
 #########################
 .set_set = list(
+  weather = NULL,
+  tech = NULL,
+  sup = NULL,
+  dem = NULL,
+  stg = NULL,
+  expp = NULL,
+  imp = NULL,
+  trade = NULL,
+  group = NULL,
+  comm = NULL,
+  region = NULL,
+  year = NULL,
+  slice = NULL,
   mSameRegion = c("region", "region"),
   mSameSlice = c("slice", "slice"),
   mMilestoneFirst = c("year"),
@@ -1355,14 +1370,17 @@
 .equation_variable[236, ] <- c("eqObjective", "vTotalCost")
 .equation_variable[237, ] <- c("eqObjective", "vObjective")
 .equation_variable[238, ] <- c("eqLECActivity", "vTechAct")
-getSetsSet <- function() energyRt:::.set_set
-getSetsDescription <- function() energyRt:::.set_description
-getParametersSet <- function() energyRt:::.parameter_set
-getParametersDescription <- function() energyRt:::.parameter_description
-getVariablesSet <- function() energyRt:::.variable_set
-getVariablesDescription <- function() energyRt:::.variable_description
-getVariablesMapping <- function() energyRt:::.variable_mapping
-getEquationMapping <- function() energyRt:::.equation_mapping
-getEquationsSet <- function() energyRt:::.equation_set
-getEquationsDescription <- function() energyRt:::.equation_description
-getEquationsVariables <- function() energyRt:::.equation_variable
+model_structure <- rbind(
+	data.frame(name = names(.set_description), description = .set_description, 
+						 type = 'set', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .set_set), map = ''),
+	data.frame(name = names(.parameter_description), description = .parameter_description,
+						 type = 'parameter', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .parameter_set), map = ''),
+	data.frame(name = names(.variable_description), description = .variable_description, 
+						 type = 'variable', dim = gsub('(["]|[)].*|^[^(]*[(])', '', .variable_set), 
+	    map = gsub('[,]', ', ', gsub('(.*[$]|[ ])', '', sapply(.variable_mapping, 
+			function(x) if (any(grep('[$]', x))) x else '')))))
+save(list = "model_structure", 
+file = "../data/model_structure.RData")
+save(list = c(".set_set", ".set_description", ".parameter_set", ".parameter_description", ".variable_set", 
+".variable_description", ".variable_mapping", ".equation_mapping", ".equation_set", ".equation_description", ".equation_variable"), 
+file = "../R/sysdata.rda")
