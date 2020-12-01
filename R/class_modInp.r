@@ -255,6 +255,13 @@ setMethod("initialize", "modInp",
     	newParameter('pTechAf', c('tech', 'region', 'year', 'slice'), 'multi', defVal = c(0, 1), 
     		interpolation = 'back.inter.forth', colName = c('af.lo', 'af.up'), cls = 'technology')    
     #
+    x[['pTechRampUp']] <- 
+    	newParameter('pTechRampUp', c('tech', 'region', 'year', 'slice'), 'simple', defVal = Inf, 
+    		interpolation = 'back.inter.forth', colName = 'rampup', cls = 'technology')    
+    x[['pTechRampDown']] <- 
+    	newParameter('pTechRampDown', c('tech', 'region', 'year', 'slice'), 'simple', defVal = Inf, 
+    		interpolation = 'back.inter.forth', colName = 'rampdown', cls = 'technology')    
+    #
     x[['pTechAfs']] <- 
     	newParameter('pTechAfs', c('tech', 'region', 'year', 'slice'), 'multi', defVal = c(0, 0), 
     		interpolation = 'back.inter.forth', colName = c('afs.lo', 'afs.up'), cls = 'technology')    
@@ -501,6 +508,10 @@ setMethod("initialize", "modInp",
     x[['mInp2Lo']] <- newParameter('mInp2Lo', c('comm', 'region', 'year', 'slice'), 'map') 
     x[['mOut2Lo']] <- newParameter('mOut2Lo', c('comm', 'region', 'year', 'slice'), 'map') 
     
+    x[['mTechRampUp']] <- newParameter('mTechRampUp', c('tech', 'region', 'year', 'slice'), 'map') 
+    x[['mTechRampDown']] <- newParameter('mTechRampDown', c('tech', 'region', 'year', 'slice'), 'map') 
+  	x[['mTechFullYear']] <- newParameter('mTechFullYear', c('tech'), 'map', cls = 'technology')   
+
     # trade capacity data ####
     # To start year 
     x[['mTradeSpan']] <- newParameter('mTradeSpan', c('trade', 'year'), 'map', cls = 'trade')    
