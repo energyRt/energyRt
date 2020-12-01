@@ -978,6 +978,25 @@ setMethod(
                                      tech@name, remValueUp = Inf, remValueLo = 0)
       obj@parameters[['pTechAfs']] <- .add_data(obj@parameters[['pTechAfs']], pTechAfs)
     } else pTechAfs <- NULL
+    ### Ramp
+    if (tech@fullYear)
+    	obj@parameters[['mTechFullYear']] <- .add_data(obj@parameters[['mTechFullYear']],
+                                                                data.frame(tech = tech@name))
+    # if (any(!is.na(tech@af$rampup))) {
+    # 	rampup <- tech@af[!is.na(tech@af$rampup), ]
+    # 	approxim2 <- approxim
+    # 	if (all(!is.na(rampup$slice)))
+    # 		approxim2$slice <- approxim2$slice[approxim2$slice %in% unique(rampup$slice)]
+    #   pTechRampUp <- simpleInterpolation(rampup, 'rampup',
+    #             obj@parameters[['pTechRampUp']], approxim2, 'tech', tech@name)
+    # 
+    # 	browser()
+    # 	# mTechFullYear
+    #   pTechRampUp <- multiInterpolation(tech@afs, 'afs', obj@parameters[['pTechAfs']], approxim.afs, 'tech', 
+    #                                  tech@name, remValueUp = Inf, remValueLo = 0)
+    #   obj@parameters[['pTechAfs']] <- .add_data(obj@parameters[['pTechAfs']], pTechAfs)
+    # } else pTechRampUp <- NULL
+    
     approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input' & is.na(ctype$comm[, 'group'])]
     if (length(approxim_comm[['comm']]) != 0) {
       pTechCinp2use <- simpleInterpolation(tech@ceff, 'cinp2use',

@@ -161,6 +161,14 @@ if verbose: print("eqTechAfsUp ", end = "")
 # eqTechAfsUp(tech, region, year, slice)$meqTechAfsUp(tech, region, year, slice)
 model.eqTechAfsUp = Constraint(meqTechAfsUp, rule = lambda model, t, r, y, s : sum((model.vTechAct[t,r,y,sp] if (t,r,y,sp) in mvTechAct else 0) for sp in slice if (s,sp) in mSliceParentChildE) <=  pTechAfsUp.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfsUp.get((wth1,t))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t) in mTechWeatherAfsUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
+if verbose: print("eqTechRampUp ", end = "")
+# eqTechRampUp(tech, region, year, slice)$mTechRampUp(tech, region, year, slice)
+model.eqTechRampUp = Constraint(mTechRampUp, rule = lambda model, t, r, y, s : (model.vTechAct[t,r,y,s]) / (pSliceShare.get((s)))-sum((model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp))) for sp in slice if ((sp,s) in mSliceNext and (t,r,y,sp) in mvTechAct)) <=  pTechRampUp.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]);
+if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
+if verbose: print("eqTechRampDown ", end = "")
+# eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slice)
+model.eqTechRampDown = Constraint(mTechRampDown, rule = lambda model, t, r, y, s : sum((model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp))) for sp in slice if ((sp,s) in mSliceNext and (t,r,y,sp) in mvTechAct))-(model.vTechAct[t,r,y,s]) / (pSliceShare.get((s))) <=  pTechRampDown.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]);
+if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechActSng ", end = "")
 # eqTechActSng(tech, comm, region, year, slice)$meqTechActSng(tech, comm, region, year, slice)
 model.eqTechActSng = Constraint(meqTechActSng, rule = lambda model, t, c, r, y, s : model.vTechAct[t,r,y,s]  ==  (model.vTechOut[t,c,r,y,s]) / (pTechCact2cout.get((t,c,r,y,s))));
