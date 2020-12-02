@@ -1818,7 +1818,7 @@ tbc...
 \pagebreak
 # Appendix: **energyRt** variables and parameters.
 
-```{r, results="markup", echo=FALSE, eval=T}
+```{r, results="markup", echo=FALSE, eval=F}
 # library()
 vr_dsc <- getVariablesDescription() # All variables
 vr <- names(vr_dsc)

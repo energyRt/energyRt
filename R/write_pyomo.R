@@ -23,7 +23,12 @@
               scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_col_sq, yy, rmm)
             }
           }
-        } else {
+        }  else if (any(grep('^pCosts', nn))) {
+          mmm <- grep(templ, scen@modInp@costs.equation)
+          if (any(mmm)) {
+            scen@modInp@costs.equation[mmm] <- sapply(strsplit(scen@modInp@costs.equation[mmm], yy), .rem_col_sq, yy, rmm)
+          }
+      } else {
           mmm <- grep(templ, run_code)
           if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col_sq, yy, rmm)
         }
@@ -51,6 +56,11 @@
                 .rem_col_pyomo_concrete, yy, rmm)
               }
             }
+          }  else if (any(grep('^pCosts', nn))) {
+              mmm <- grep(templ, scen@modInp@costs.equation)
+              if (any(mmm)) {
+                scen@modInp@costs.equation[mmm] <- sapply(strsplit(scen@modInp@costs.equation[mmm], yy), .rem_col, yy, rmm)
+              }
           } else {
             mmm <- grep(templ, run_code)
             if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], paste0(yy, '[.]get[(][(]')), 
@@ -78,6 +88,7 @@
   # Add constraint
   zz_mod <- file(paste(arg$tmp.dir, '/energyRt.py', sep = ''), 'w')
   zz_constr <- file(paste(arg$tmp.dir, '/inc_constraints.py', sep = ''), 'w')
+  zz_costs <- file(paste(arg$tmp.dir, '/inc_costs.py', sep = ''), 'w')
   npar <- grep('^##### decl par #####', run_code)[1]
   cat(run_code[1:npar], sep = '\n', file = zz_mod)
   if (!AbstractModel) {
@@ -85,11 +96,14 @@
     zz_inp_file <- file(paste0(arg$tmp.dir, 'data.py'), 'w')
   }
   if (AbstractModel) {
-    f1 <- grep('^mCns', names(scen@modInp@parameters), invert = TRUE)
+    f1 <- grep('^m(Costs|Cns)', names(scen@modInp@parameters), invert = TRUE)
     f2 <- grep('^mCns', names(scen@modInp@parameters))
+    f3 <- grep('^mCosts', names(scen@modInp@parameters))
     cat(.generate.pyomo.par(scen@modInp@parameters[f1]), sep = '\n', file = zz_mod)
     if (length(f2) > 0) 
       cat(.generate.pyomo.par(scen@modInp@parameters[f2]), sep = '\n', file = zz_constr)
+    if (length(f3) > 0) 
+      cat(.generate.pyomo.par(scen@modInp@parameters[f3]), sep = '\n', file = zz_costs)
   }
   if (AbstractModel)
     zz_data_pyomo <- file(paste(arg$tmp.dir, 'data.dat', sep = ''), 'w')
@@ -105,6 +119,12 @@
               cat(.toPyomSQLite(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
             ## SQLite import
           } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_constr)
+        } else if (any(grep('^.Costs', i))) {
+          # if (!is.null(scen@solver$SQLite) && scen@solver$SQLite) {
+          if (SQLite) {
+              cat(.toPyomSQLite(scen@modInp@parameters[[i]]), sep = '\n', file = zz_costs)
+            ## SQLite import
+          } else cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]), sep = '\n', file = zz_costs)
         } else {
           if (SQLite) {
             cat(.toPyomSQLite(scen@modInp@parameters[[i]]), sep = '\n', file = zz_inp_file)
@@ -124,10 +144,9 @@
   if (!AbstractModel && !SQLite) close(zz_inp_file)
   npar2 <- (grep('^model[.]obj ', run_code)[1] - 1)
   cat(run_code[npar:npar2], sep = '\n', file = zz_mod)
+  ## Add constraint equation
   if (length(scen@modInp@gams.equation) > 0) {
     cat('\n', file = zz_constr)
-    cat('model.fornontriv = Var(domain = pyo.NonNegativeReals)\n', file = zz_constr)
-    cat('model.eqnontriv = Constraint(rule = lambda model: model.fornontriv == 0)\n', file = zz_constr)
     for (i in seq_along(scen@modInp@gams.equation)) {
       eqt <- scen@modInp@gams.equation[[i]]
       if (AbstractModel) {
@@ -135,6 +154,15 @@
       } else {
         cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation), sep = '\n', file = zz_constr)
       }
+    }
+  }
+  ## Add costs equation
+  {
+    cat('\n', file = zz_costs)
+    if (AbstractModel) {
+      cat(energyRt:::.equation.from.gams.to.pyomo.AbstractModel(scen@modInp@costs.equation), sep = '\n', file = zz_costs)
+    } else {
+      cat(energyRt:::.equation.from.gams.to.pyomo(scen@modInp@costs.equation), sep = '\n', file = zz_costs)
     }
   }
   cat(run_code[-(1:npar2)], sep = '\n', file = zz_mod)
@@ -147,13 +175,14 @@
   }
   close(zz_mod)
   close(zz_constr)
+  close(zz_costs)
   zz_modout <- file(paste(arg$tmp.dir, '/output.py', sep = ''), 'w')
   cat(run_codeout, sep = '\n', file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".py")
   if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
     scen@solver$cmdline <- 'python energyRt.py'
-  scen@solver$code <- c('energyRt.py', 'output.py', 'inc_constraints.py', 'inc_solver.py')
+  scen@solver$code <- c('energyRt.py', 'output.py', 'inc_constraints.py', 'inc_costs.py', 'inc_solver.py')
   scen
 }
 

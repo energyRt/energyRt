@@ -19,6 +19,7 @@ setClass("modInp",
     modelVersion        = "character",
     solver              = "character",
     gams.equation  = 'list',
+    costs.equation = 'character',
     misc = "list"
   ),
   prototype(
@@ -27,6 +28,7 @@ setClass("modInp",
     modelVersion   = "",
     solver         = "",
     gams.equation  = list(),
+    costs.equation = character(),
     #! Misc
     misc = list(
     )
@@ -252,6 +254,13 @@ setMethod("initialize", "modInp",
     x[['pTechAf']] <- 
     	newParameter('pTechAf', c('tech', 'region', 'year', 'slice'), 'multi', defVal = c(0, 1), 
     		interpolation = 'back.inter.forth', colName = c('af.lo', 'af.up'), cls = 'technology')    
+    #
+    x[['pTechRampUp']] <- 
+    	newParameter('pTechRampUp', c('tech', 'region', 'year', 'slice'), 'simple', defVal = Inf, 
+    		interpolation = 'back.inter.forth', colName = 'rampup', cls = 'technology')    
+    x[['pTechRampDown']] <- 
+    	newParameter('pTechRampDown', c('tech', 'region', 'year', 'slice'), 'simple', defVal = Inf, 
+    		interpolation = 'back.inter.forth', colName = 'rampdown', cls = 'technology')    
     #
     x[['pTechAfs']] <- 
     	newParameter('pTechAfs', c('tech', 'region', 'year', 'slice'), 'multi', defVal = c(0, 0), 
@@ -499,6 +508,10 @@ setMethod("initialize", "modInp",
     x[['mInp2Lo']] <- newParameter('mInp2Lo', c('comm', 'region', 'year', 'slice'), 'map') 
     x[['mOut2Lo']] <- newParameter('mOut2Lo', c('comm', 'region', 'year', 'slice'), 'map') 
     
+    x[['mTechRampUp']] <- newParameter('mTechRampUp', c('tech', 'region', 'year', 'slice'), 'map') 
+    x[['mTechRampDown']] <- newParameter('mTechRampDown', c('tech', 'region', 'year', 'slice'), 'map') 
+  	x[['mTechFullYear']] <- newParameter('mTechFullYear', c('tech'), 'map', cls = 'technology')   
+
     # trade capacity data ####
     # To start year 
     x[['mTradeSpan']] <- newParameter('mTradeSpan', c('trade', 'year'), 'map', cls = 'trade')    
@@ -552,7 +565,8 @@ setMethod("initialize", "modInp",
     x[['mvTradeRowCost']] <- newParameter('mvTradeRowCost', c('region', 'year'), 'map')
     x[['mvTradeIrCost']] <- newParameter('mvTradeIrCost', c('region', 'year'), 'map') 
     x[['mvTotalCost']] <- newParameter('mvTotalCost', c('region', 'year'), 'map') 
-
+    x[['mvTotalUserCosts']] <- newParameter('mvTotalUserCosts', c('region', 'year'), 'map') 
+		
     # me - mapping for equations ####
     x[['meqTechSng2Sng']] <- newParameter('meqTechSng2Sng', c('tech', 'region', 'comm', 'comm', 'year', 'slice'), 'map')
     x[['meqTechGrp2Sng']] <- newParameter('meqTechGrp2Sng', c('tech', 'region', 'group', 'comm', 'year', 'slice'), 'map')

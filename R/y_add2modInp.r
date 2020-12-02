@@ -442,6 +442,14 @@ setMethod('.add0', signature(obj = 'modInp', app = 'constraint',
                              })
 
 #==============================================================================#
+# Add costs ####
+#==============================================================================#
+setMethod('.add0', signature(obj = 'modInp', app = 'costs',
+                             approxim = 'list'), function(obj, app, approxim) {
+                               .getCostEquation(obj, app, approxim)
+                             })
+
+#==============================================================================#
 # Add tax & sub ####
 #==============================================================================#
 .subtax_approxim <- function(obj, app, tax, whr, approxim) {
@@ -731,14 +739,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
                                                                                   colnames(pStorageCout) %in% obj@parameters[['meqStorageOutLo']]@dimSetNames, drop = FALSE], mvStorageStore))
               obj@parameters[['meqStorageOutUp']] <- .add_data(obj@parameters[['meqStorageOutUp']], rem_inf_def_inf(pStorageCout, mvStorageStore))
             }
+            
             obj
           })
+
 
 #==============================================================================#
 # Add supply ####
 #==============================================================================#
-setMethod(
-  '.add0', signature(obj = 'modInp', app = 'supply',
+setMethod('.add0', signature(obj = 'modInp', app = 'supply',
                      approxim = 'list'), 
   function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
@@ -849,6 +858,29 @@ setMethod(
     rs$par <- rbind(rs$par, tmp)
   }
   rs
+}
+
+
+.add_ramp0 <- function(obj, name, tech, mact, approxim) {
+  if (any(!is.na(tech@af[[name]]))) {
+  	pname <- paste0('p', c('technology' = 'Tech', 'storage' = 'Storage')[class(tech)], 
+  									c('rampup' = 'RampUp', 'rampdown' = 'RampDown', name)[name])
+  	set_name <- c('technology' = 'tech', 'storage' = 'stg')[class(tech)]
+  	mname <- sub('^p', 'm', pname)
+  	rampup <- tech@af[!is.na(tech@af[[name]]), ]
+  	approxim2 <- approxim
+  	if (all(!is.na(rampup$slice)))
+  		approxim2$slice <- approxim2$slice[approxim2$slice %in% unique(rampup$slice)]
+    pTechRampUp <- simpleInterpolation(rampup, name,
+              obj@parameters[[pname]], approxim2, set_name, tech@name)
+		mTechRampUp <- pTechRampUp[, colnames(pTechRampUp) != 'value', drop = FALSE]
+    if (ncol(mTechRampUp) != ncol(obj@parameters[[mname]]@data)) {
+    	mTechRampUp <- merge(mTechRampUp, mact)
+    }
+		obj@parameters[[pname]] <- .add_data(obj@parameters[[pname]], pTechRampUp)
+		obj@parameters[[mname]] <- .add_data(obj@parameters[[mname]], mTechRampUp)
+  }
+	obj
 }
 
 #==============================================================================#
@@ -970,6 +1002,8 @@ setMethod(
                                      tech@name, remValueUp = Inf, remValueLo = 0)
       obj@parameters[['pTechAfs']] <- .add_data(obj@parameters[['pTechAfs']], pTechAfs)
     } else pTechAfs <- NULL
+
+    
     approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input' & is.na(ctype$comm[, 'group'])]
     if (length(approxim_comm[['comm']]) != 0) {
       pTechCinp2use <- simpleInterpolation(tech@ceff, 'cinp2use',
@@ -1309,6 +1343,14 @@ setMethod(
       mTechOMCost <- merge(mTechOMCost[!duplicated(mTechOMCost), ], mTechSpan)
       obj@parameters[['mTechOMCost']] <- .add_data(obj@parameters[['mTechOMCost']], mTechOMCost)
     }
+    
+    ### Ramp
+    if (tech@fullYear)
+    	obj@parameters[['mTechFullYear']] <- .add_data(obj@parameters[['mTechFullYear']],
+                                                                data.frame(tech = tech@name))
+
+    obj <- .add_ramp0(obj, 'rampup', tech, mvTechAct, approxim)
+    obj <- .add_ramp0(obj, 'rampdown', tech, mvTechAct, approxim)
     obj
   })
 

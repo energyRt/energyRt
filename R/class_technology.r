@@ -25,8 +25,6 @@ setClass("technology",
       	units         = "data.frame",      #
       	group         = "data.frame",      # groups units
       	cap2act       = "numeric",         #
-      	cap2stg       = "numeric",         # Technology capacity to storage 
-      	seff          = "data.frame",      # storage efficiency          
       	# Performance parameters
       	geff          = "data.frame",    #  Group efficiency
       	ceff          = "data.frame",    #  Commodity efficiency
@@ -46,6 +44,7 @@ setClass("technology",
       	stock         = "data.frame", #
       	early.retirement = "logical",
       	upgrade.technology = "character",
+        fullYear         = "logical",
       	slice         = "character",
       	region        = "character",
         # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
@@ -89,13 +88,6 @@ setClass("technology",
 			#                                    inout     = factor(NULL, c('input', 'output')),
 			stringsAsFactors = FALSE),
 		cap2act       = 1,
-		seff         = data.frame(region    = character(),
-			year      = integer(),
-			slice     = character(),
-			stgeff    = numeric(),  
-			stg2use   = numeric(),  
-			use2stg   = numeric(),  
-			stringsAsFactors = FALSE),
 		# group efficiency 
 		geff         = data.frame(region     = character(),
 			year       = integer(),
@@ -147,12 +139,15 @@ setClass("technology",
 			sinp2aout  = numeric(),
 			sout2aout  = numeric(),
 			stringsAsFactors = FALSE),
-		af           = data.frame(region   = character(),
+		af           = data.frame(
+			region   = character(),
 			year     = integer(),
 			slice    = character(),
 			af.lo    = numeric(),
 			af.up    = numeric(),
 			af.fx    = numeric(),
+			rampup    = numeric(),
+			rampdown    = numeric(),
 			stringsAsFactors = FALSE),
 		afs          = data.frame(region   = character(),
 			year     = integer(),
@@ -211,6 +206,7 @@ setClass("technology",
 		upgrade.technology = character(),
 		region        = character(),
 		slice         = character(),
+    fullYear      = TRUE,
 	  # GIS           = NULL,
 		#! Misc
 		misc = list(

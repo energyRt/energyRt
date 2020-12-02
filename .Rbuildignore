@@ -1,5 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
 solwork/
 tmp/
 .gpr

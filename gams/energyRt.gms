@@ -149,6 +149,8 @@ pTechShareLo(tech, comm, region, year, slice)       Lower bound for share of the
 pTechShareUp(tech, comm, region, year, slice)       Upper bound for share of the commodity in total group input or output
 pTechAfLo(tech, region, year, slice)                Lower bound for activity for each slice
 pTechAfUp(tech, region, year, slice)                Upper bound for activity for each slice
+pTechRampUp(tech, region, year, slice)              Ramp Up for activity for each slice
+pTechRampDown(tech, region, year, slice)            Ramp Down for activity for each slice
 pTechAfsLo(tech, region, year, slice)               Lower bound for activity for sum over slices
 pTechAfsUp(tech, region, year, slice)               Upper bound for activity for sum over slices
 pTechAfcLo(tech, comm, region, year, slice)         Lower bound for commodity output
@@ -327,6 +329,7 @@ mvTradeCost(region, year)
 mvTradeRowCost(region, year)
 mvTradeIrCost(region, year)
 mvTotalCost(region, year)
+mvTotalUserCosts(region, year)
 ;
 
 
@@ -503,6 +506,8 @@ vTradeInv(trade, region, year)
 vTradeEac(trade, region, year)
 *@ mTradeNew(trade, year)
 vTradeNewCap(trade, year)
+*@ mvTotalUserCosts(region, year)
+vTotalUserCosts(region, year)
 ;
 
 ********************************************************************************
@@ -540,7 +545,9 @@ mTaxCost(comm, region, year)
 mSubCost(comm, region, year)
 mAggOut(comm, region, year, slice)
 mTechAfUp(tech, region, year, slice)
-mTechAfUp(tech, region, year, slice)
+mTechFullYear(tech)
+mTechRampUp(tech, region, year, slice)
+mTechRampDown(tech, region, year, slice)
 mTechOlifeInf(tech, region)
 mStorageOlifeInf(stg, region)
 mTechAfcUp(tech, comm, region, year, slice)
@@ -770,6 +777,10 @@ eqTechAfUp(tech, region, year, slice) Technology availability factor upper bound
 eqTechAfsLo(tech, region, year, slice) Technology availability factor for sum lower bound
 * Availability sum factor UP
 eqTechAfsUp(tech, region, year, slice) Technology availability factor for sum upper bound
+* Ramp Up factor
+eqTechRampUp(tech, region, year, slice) Technology ramp up factor
+* Ramp Down factor
+eqTechRampDown(tech, region, year, slice) Technology ramp down factor
 ;
 
 * Availability factor LO
@@ -812,6 +823,23 @@ eqTechAfsUp(tech, region, year, slice)$meqTechAfsUp(tech, region, year, slice)..
          vTechCap(tech, region, year) *
          pSliceShare(slice) *  prod(weather$mTechWeatherAfsUp(weather, tech),
             pTechWeatherAfsUp(weather, tech) * pWeather(weather, region, year, slice));
+
+
+* Ramp Up factor
+eqTechRampUp(tech, region, year, slice)$mTechRampUp(tech, region, year, slice)..
+         vTechAct(tech, region, year, slice) / pSliceShare(slice)
+         - sum(slicep$(((mTechFullYear(tech) and mSliceNext(slicep, slice)) or (not(mTechFullYear(tech)) and mSliceFYearNext(slicep, slice)))
+                          and mvTechAct(tech, region, year, slicep)), vTechAct(tech, region, year, slicep) / pSliceShare(slicep))
+         =l=
+         pSliceShare(slice) * 365 * 24 / pTechRampUp(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
+
+* Ramp Down factor
+eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slice)..
+         sum(slicep$(((mTechFullYear(tech) and mSliceNext(slicep, slice)) or (not(mTechFullYear(tech)) and mSliceFYearNext(slicep, slice)))
+                          and mvTechAct(tech, region, year, slicep)), vTechAct(tech, region, year, slicep) / pSliceShare(slicep))
+                 - vTechAct(tech, region, year, slice) / pSliceShare(slice)
+         =l=
+         pSliceShare(slice) * 365 * 24 / pTechRampDown(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
 
 ********************************************************************************
 *** Connect activity with output
@@ -1531,7 +1559,8 @@ eqCost(region, year)$mvTotalCost(region, year)..
          - sum(comm$mSubCost(comm, region, year), vSubsCost(comm, region, year))
          + sum(stg$mStorageOMCost(stg, region, year), vStorageOMCost(stg, region, year))
          + sum(stg$mStorageEac(stg, region, year), vStorageEac(stg, region, year))
-         + vTradeCost(region, year)$mvTradeCost(region, year);
+         + vTradeCost(region, year)$mvTradeCost(region, year)
+         + vTotalUserCosts(region, year)$mvTotalUserCosts(region, year);
 
 
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
@@ -1574,6 +1603,8 @@ eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)..
          sum(slice$mTechSlice(tech, slice), vTechAct(tech, region, year, slice)) =g= pLECLoACT(region);
 
 $include inc_constraints.gms
+
+$include inc_costs.gms
 
 model energyRt / all / ;
 

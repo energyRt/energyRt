@@ -431,6 +431,13 @@ for (t1,y) in mTradeNew:
     if model.vTradeNewCap[(t1,y)].value != 0:
         f.write(str(t1) + "," + str(y) + "," +  str(model.vTradeNewCap[(t1,y)].value) + "\n")
 f.close()
+flist.write("vTotalUserCosts\n");
+f = open("output/vTotalUserCosts.csv","w");
+f.write("region,year,value\n");
+for (r,y) in mvTotalUserCosts:
+    if model.vTotalUserCosts[(r,y)].value != 0:
+        f.write(str(r) + "," + str(y) + "," +  str(model.vTotalUserCosts[(r,y)].value) + "\n")
+f.close()
 f = open("output/raw_data_set.csv","w");
 f.write('set,value\n')
 for i in weather:
