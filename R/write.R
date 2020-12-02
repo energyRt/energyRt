@@ -384,7 +384,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   }
      if (length(prec@costs.equation) == 0) {
       prec@costs.equation <- 
-        'eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. vTotalUserCosts(region, year) =e= 0;\n'
+        'eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. vTotalUserCosts(region, year) =e= 0;'
     } else {
       prec@costs.equation <- paste0('eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. ', 
           'vTotalUserCosts(region, year) =e= ', 
