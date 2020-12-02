@@ -3,6 +3,11 @@
 .Rhistory
 .RData
 .Ruserdata
+tmp/
+solwork/
+*.gpr
+*.ini
+*.Rproj
 solwork
 
 doc

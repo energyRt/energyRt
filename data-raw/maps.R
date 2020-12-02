@@ -66,7 +66,7 @@
   vTradeNewCap = "vTradeNewCap( trade , year ) $ mTradeNew( trade , year )",
   vTotalUserCosts = "vTotalUserCosts( region , year ) $ mvTotalUserCosts( region , year )"
 );
- .variable_set = lapply(.variable_mapping, function(x) strsplit(gsub('[ ]*[)].*$', '', gsub('^[^(]*[(][ ]*', '', x)), '[ ]*[,][ ]*')[[1]])
+.variable_set = lapply(.variable_mapping, function(x) strsplit(gsub('[ ]*[)].*$', '', gsub('^[^(]*[(][ ]*', '', x)), '[ ]*[,][ ]*')[[1]])
 #########################
 # variable description
 #########################
@@ -1371,16 +1371,16 @@
 .equation_variable[237, ] <- c("eqObjective", "vObjective")
 .equation_variable[238, ] <- c("eqLECActivity", "vTechAct")
 model_structure <- rbind(
-	data.frame(name = names(.set_description), description = .set_description, 
-						 type = 'set', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .set_set), map = ''),
-	data.frame(name = names(.parameter_description), description = .parameter_description,
-						 type = 'parameter', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .parameter_set), map = ''),
-	data.frame(name = names(.variable_description), description = .variable_description, 
-						 type = 'variable', dim = gsub('(["]|[)].*|^[^(]*[(])', '', .variable_set), 
-	    map = gsub('[,]', ', ', gsub('(.*[$]|[ ])', '', sapply(.variable_mapping, 
-			function(x) if (any(grep('[$]', x))) x else '')))))
+  data.frame(name = names(.set_description), description = .set_description, 
+             type = 'set', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .set_set), map = ''),
+  data.frame(name = names(.parameter_description), description = .parameter_description,
+             type = 'parameter', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .parameter_set), map = ''),
+  data.frame(name = names(.variable_description), description = .variable_description, 
+             type = 'variable', dim = gsub('(["]|[)].*|^[^(]*[(])', '', .variable_set), 
+             map = gsub('[,]', ', ', gsub('(.*[$]|[ ])', '', sapply(.variable_mapping, 
+                                                                    function(x) if (any(grep('[$]', x))) x else '')))))
 save(list = "model_structure", 
-file = "../data/model_structure.RData")
+     file = "../data/model_structure.RData")
 save(list = c(".set_set", ".set_description", ".parameter_set", ".parameter_description", ".variable_set", 
-".variable_description", ".variable_mapping", ".equation_mapping", ".equation_set", ".equation_description", ".equation_variable"), 
-file = "../R/sysdata.rda")
+              ".variable_description", ".variable_mapping", ".equation_mapping", ".equation_set", ".equation_description", ".equation_variable"), 
+     file = "../R/sysdata.rda")
