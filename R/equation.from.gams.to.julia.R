@@ -133,7 +133,7 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
       } else {
         vrb2 <- paste0(vrb, '[', arg, ']')
         if (substr(tmp, 1, 1) == 'p') {
-          vrb2 <- paste0('(if haskey(', vrb, ',', arg, '); ', vrb2, '; else ', vrb, 'Def; end)')
+          if (arg == '()') vrb2 <- vrb else vrb2 <- paste0('(if haskey(', vrb, ',', arg, '); ', vrb2, '; else ', vrb, 'Def; end)')
         }
       }
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == '$') {
