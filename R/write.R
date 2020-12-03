@@ -378,9 +378,18 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   if (any(sapply(mCosts, nrow) == nrow(dregionyear))) {
     prec@parameters[['mvTotalUserCosts']] <- .add_data(prec@parameters[['mvTotalUserCosts']], dregionyear)
   } else {
-    require(data.table)
-    prec@parameters[['mvTotalUserCosts']] <- .add_data(prec@parameters[['mvTotalUserCosts']], 
-                                                        unique(rbindlist(mCosts)))
+    if (length(mCosts) != 0) {
+      mCosts2 <- mCosts[[1]][0, ]
+      mCosts2[prod(sapply(mCosts2, nrow)), ] <- NA
+      nnn <- 0
+      for (qqq in seq_along(mCosts2)) {
+        mCosts2[seq_len(nrow(mCosts[[qqq]])) + nnn, ] <- mCosts[[qqq]]
+        nnn <- nnn + nrow(mCosts[[qqq]])
+      }
+      mCosts <- mCosts2
+      prec@parameters[['mvTotalUserCosts']] <- .add_data(prec@parameters[['mvTotalUserCosts']], 
+                                                        unique(mCosts))
+    }
   }
      if (length(prec@costs.equation) == 0) {
       prec@costs.equation <- 
