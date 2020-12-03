@@ -40,7 +40,7 @@ setMethod("initialize", "parameter",
                  'year', 'yearp', 'slice', 'slicep', 'stg', 'expp', 'imp', 'trade')
   if (!is.character(name) || length(name) != 1 || !energyRt:::check_name(name)) 
     stop(paste('Wrong name: "', name, '"', sep = ''))
-  if (length(dimSetNames) == 0 || any(!is.character(dimSetNames)) || 
+  if (any(!is.character(dimSetNames)) || #length(dimSetNames) == 0 || 
     any(!(dimSetNames %in% acceptable_set))) {
       stop('Wrong dimSetNames')
   }
@@ -334,7 +334,8 @@ setMethod('print', 'parameter', function(x, ...) {
  as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
-      stop('.toPyomo: error in ', obj@name, "@data")
+      if (nrow(obj@data) == 1) def <- obj@data[[1]]
+      return(paste0("# ", name, name2, '\n', name, ' = toPar(set(), ', def, ')\n'))
     } else {
       data <- data[data$value != Inf & data$value != def, ]
       if (nrow(data) == 0) {
@@ -367,9 +368,10 @@ setMethod('print', 'parameter', function(x, ...) {
         function(x) paste(x, collapse = "', '")), "')"), collapse = ',\n'), ']);')))
     }
   } else if (obj@type == 'simple') {
-    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+    return(as_simple(obj@data, obj@name, gsub('[(][)]', '', paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')), 
+                     obj@defVal))
   } else if (obj@type == 'multi') {
-    hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
+    hh = gsub('[(][)]', '', paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'))
     return(c(
       as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
         paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
@@ -382,7 +384,8 @@ setMethod('print', 'parameter', function(x, ...) {
 .toPyomoAbstractModel <- function(obj) {
    as_simple <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
-      return(paste0("# ", name, '\nparam ', name, ' := ', data$value, '\n'))
+      if (nrow(data) != 0) def <- data$value
+      return(paste0("# ", name, '\nparam ', name, ' := ', def, ';\n'))
     } else {
       data <- data[data$value != Inf & data$value != def, ]
       rtt <- paste0("# ", name, name2, "\nparam ", name, ' default ', def, ' := ')

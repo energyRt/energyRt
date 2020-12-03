@@ -27,5 +27,6 @@
       paste0('model.', tmp@name, 'Up = Param(', paste0('model.', energyRt:::.removeEndSet(tmp@dimSetNames), collapse = '*'), ', default = ', 
              value_or_zero(tmp@defVal[2]), ');'))
   }
+  decl <- gsub('[(]model.,', '(', decl)
   decl
 }

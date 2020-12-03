@@ -17,7 +17,6 @@ setClass('costs',
            variable      = "character",
            subset        = "data.frame",
            mult          = "data.frame",
-           defVal        = "numeric",
            misc = "list"
            # parameter= list() # For the future
          ),
@@ -27,7 +26,6 @@ setClass('costs',
            variable      = character(),
            subset        = data.frame(),
            mult          = data.frame(),
-           defVal        = 0,
            #! Misc
            misc = list(
            )),
@@ -81,7 +79,7 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
     if (!is.data.frame(mult) && !is.numeric(mult))
       stop(paste0('Mult have to be numeric or data.frame (cost "', name, '").'))
     if (is.numeric(mult)) {
-      obj@defVal <- mult
+      obj@mult <- data.frame(value = mult)
     } else {
       if (!all(colnames(mult) %in% c('value', sets))) {
         bug <- colnames(mult)[!(colnames(mult) %in% c('value', sets))]
@@ -122,6 +120,7 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   }
   # Generate mult
   if (nrow(stm@mult) != 0) {
+    # browser()
     approxim2 <- approxim[unique(c(colnames(stm@mult)[colnames(stm@mult) %in% names(approxim)], 'fullsets', 'solver', 'year'))]
     if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$slice@all_slice
     if (nrow(stm@subset) != 0) {
@@ -137,7 +136,9 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
                           interpolation = 'back.inter.forth', colName = 'value')
     yy <- simpleInterpolation(stm@mult, 'value', xx, approxim2)
     prec@parameters[[xx@name]] <- .add_data(xx, yy)
-    mult_txt <- paste0(xx@name, '(', paste0(mult_sets, collapse = '", "'), ') * ')
+    sss <- ''
+    if (length(mult_sets) != 0) sss <- paste0('(', paste0(mult_sets, collapse = '", "'), ')')
+    mult_txt <- paste0(xx@name, sss,' * ')
   } else mult_txt <- paste0(stm@defVal, ' * ')
 
   # Generate subset

@@ -161,7 +161,7 @@ names(.fremset) <-   c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "s
   } else {
     rs <- paste0(rs, 'rule = lambda model : ')
   }
-  rs <- paste0(rs, 'model.fornontriv + ', .eqt.to.pyomo.jump(gsub('.*[.][.][ ]*', '', eqt)))
+  rs <- paste0(rs, 'model.fornontriv + ', gsub('[[][]]', '', .eqt.to.pyomo.jump(gsub('.*[.][.][ ]*', '', eqt))))
   rs
 }
 

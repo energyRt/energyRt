@@ -31,6 +31,7 @@
         ret <- c(ret, paste('[', apply(obj@data[fl, -ncol(obj@data), drop = FALSE], 1, 
                                        function(x) paste(x, collapse = ',')), '] ', obj@data[fl, 'value'], sep = ''))
       }
+      if (ncol(obj@data) == 1) ret <- gsub('[[][ ]*[]]', '', ret)
       ret <- c(ret, ';', '')
     }
   } else if (obj@type == 'multi') {
@@ -50,6 +51,7 @@
         ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
                                        function(x) paste(x, collapse = ',')), '] ', gg[fl, 'value'], sep = ''))
       }
+      if (ncol(gg) == 1) ret <- gsub('[[][ ]*[]]', '', ret)
       ret <- c(ret, ';', '')
     }
     gg <- obj@data
@@ -68,6 +70,7 @@
         ret <- c(ret, paste('[', apply(gg[fl, -ncol(gg), drop = FALSE], 1, 
                                        function(x) paste(x, collapse = ',')), '] ', gg[fl, 'value'], sep = ''))
       }
+      if (ncol(gg) == 1) ret <- gsub('[[][ ]*[]]', '', ret)
       ret <- c(ret, ';', '')
     }
   } else stop('Must realise')

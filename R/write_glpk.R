@@ -56,6 +56,7 @@
     mps_name_def_costs <- paste0('set ', mps_name_costs, ' dimen ', sapply(scen@modInp@parameters[mps_name_costs], function(x) length(x@dimSetNames)), ';')
     pps_name_costs <- grep('^[p]Costs', names(scen@modInp@parameters), value = TRUE)
     pps_name_def_costs <- paste0('param ', pps_name_costs, ' {', sapply(scen@modInp@parameters[pps_name_costs], function(x) paste0(x@dimSetNames, collapse = ', ')), '};')
+    pps_name_def_costs <- gsub('[{][ ]*[}]', '', pps_name_def_costs)
     if (length(mps_name_def_costs) == 0) mps_name_def_costs <- character()
     if (length(pps_name_costs) == 0) pps_name_def_costs <- character()
   }
