@@ -46,13 +46,15 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   sets <- energyRt:::.variable_set[[variable]]
   if (is.null(sets))
         stop(paste0('There are unknown variable "', variable, '" in cost "', name, '".'))
+  # if (anyDuplicated(sets))
+  #       stop(paste0('Add cost to variable with duplicated sets is not allowed now (cost "', name, '").'))
   if (anyDuplicated(sets))
-        stop(paste0('Add cost to variable with duplicated sets is not allowed now (cost "', name, '").'))
+    sets[duplicated(sets)] <- paste0(sets[duplicated(sets)], 2)
   if (sum(sets %in% c('region', 'year')) != 2)
         stop(paste0('Add cost to variable without sets region & year is not allowed (cost "', name, '").'))
   obj@variable <- variable
 
-  # Add subset
+   # Add subset
   if (!is.null(subset)) {
     if (is.list(subset) && !is.data.frame(subset)) {
       subset2 <- data.frame(stringsAsFactors = FALSE)
@@ -118,11 +120,18 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   have.all.set <- function(x, name)  {
     return (any(is.na(x)) || (name != 'slice' && all(approxim[[name]] %in% x)))
   }
+  if (anyDuplicated(energyRt:::.variable_set[[stm@variable]])) {
+    sets <- energyRt:::.variable_set[[stm@variable]]
+    dsets <- sets[duplicated(sets)]
+    for (dst in dsets)
+      approxim[[paste0(dst, 2)]] <- approxim[[dst]]
+  }
   # Generate mult
   if (nrow(stm@mult) != 0) {
     # browser()
     approxim2 <- approxim[unique(c(colnames(stm@mult)[colnames(stm@mult) %in% names(approxim)], 'fullsets', 'solver', 'year'))]
     if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$slice@all_slice
+    if (!is.null(approxim2$slice2)) approxim2$slice2 <- approxim2$slice@all_slice2
     if (nrow(stm@subset) != 0) {
       same <- colnames(stm@subset)[colnames(stm@subset) %in% colnames(stm@mult)]
       same <- same[!apply(is.na(stm@subset[, same, drop = FALSE]), 2, any)]

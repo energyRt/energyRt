@@ -140,12 +140,18 @@ read.scenario <- function(scen, ...) {
     # Estimate Costs
     if (length(getNames(scen, 'costs')) != 0) {
     	cst <- getObjects(scen, 'costs')
-    	costs_tot <- NULL
+    	costs_tot <- data.frame(costs = character(), region = character(), year = numeric(), 
+    													value = numeric(), stringsAsFactors = FALSE)
     	for (tmp in cst) {
 	    	in_dat <- scen@modOut@variables[[tmp@variable]]
-	    	if (!is.null(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
+	    	if (anyDuplicated(energyRt:::.variable_set[[tmp@variable]])) {
+			    sets <- energyRt:::.variable_set[[tmp@variable]]
+			    sets[duplicated(sets)] <- paste0(sets[duplicated(sets)], 2)
+			    colnames(in_dat) <- c(sets, 'value')
+			  }
+	    	if (nrow(in_dat) != 0 && !is.null(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
 	    		in_dat <- merge(in_dat, .get_data_slot(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
-	    	if (!is.null(scen@modInp@parameters[[paste0('pCosts', tmp@name)]])) {
+	    	if (nrow(in_dat) != 0 && !is.null(scen@modInp@parameters[[paste0('pCosts', tmp@name)]])) {
 	    		prm <- .get_data_slot(scen@modInp@parameters[[paste0('pCosts', tmp@name)]])
 	    		if (ncol(prm) == 1) in_dat$value <- in_dat$value * prm$value else {
 	    			colnames(prm)[ncol(prm)] <- 'par'
@@ -154,9 +160,11 @@ read.scenario <- function(scen, ...) {
 	    			in_dat$par <- NULL
 	    		}
 	    	}
-	    	in_dat <- aggregate(in_dat[, 'value', drop = FALSE], in_dat[, c('region', 'year'), drop = FALSE], sum)
-	    	in_dat$costs <- tmp@name
-	    	costs_tot <- rbind(costs_tot, in_dat[, c('costs', 'region', 'year', 'value'), drop = FALSE])
+	    	if (nrow(in_dat) != 0) {
+		    	in_dat <- aggregate(in_dat[, 'value', drop = FALSE], in_dat[, c('region', 'year'), drop = FALSE], sum)
+		    	in_dat$costs <- tmp@name
+	    		costs_tot <- rbind(costs_tot, in_dat[, c('costs', 'region', 'year', 'value'), drop = FALSE])
+	    	}
     	}
    		scen@modOut@variables$vUserCosts <- costs_tot
   	}
