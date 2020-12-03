@@ -31,7 +31,7 @@ slice  time slice
 
 Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
 Alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
-alias (region, src), (region, dst);
+alias (region, src), (region, dst), (region, region2), (year, year2), (slice, slice2);
 
 * Mapping sets
 set

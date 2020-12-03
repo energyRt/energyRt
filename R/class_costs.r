@@ -120,11 +120,12 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   have.all.set <- function(x, name)  {
     return (any(is.na(x)) || (name != 'slice' && all(approxim[[name]] %in% x)))
   }
+  sets <- energyRt:::.variable_set[[stm@variable]]
   if (anyDuplicated(energyRt:::.variable_set[[stm@variable]])) {
-    sets <- energyRt:::.variable_set[[stm@variable]]
     dsets <- sets[duplicated(sets)]
     for (dst in dsets)
       approxim[[paste0(dst, 2)]] <- approxim[[dst]]
+    sets[duplicated(sets)] <- paste0(sets[duplicated(sets)], 2)
   }
   # Generate mult
   if (nrow(stm@mult) != 0) {
@@ -181,7 +182,6 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   
   # Generate equation text
   mps <- energyRt:::.variable_mapping[[stm@variable]]
-  sets <- energyRt:::.variable_set[[stm@variable]]
   if (length(sets) == 2) {
     if (is.null(subset_txt)) costs <- paste0(mult_txt, mps) else 
     if (any(grep('[$]', mps))) {
@@ -191,11 +191,12 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
   } else {
     nset <- sets[!(sets %in% c('region', 'year'))]
     if (length(nset) != 1) nset <- paste0('(', paste0(nset, collapse = ', '), ')')
+    mps <- gsub('[(][^(]*[)]', paste0('( ', paste0(sets, collapse = ' , '), ' )'), mps)
     nkk <- c(gsub('.*[$]', '', mps), subset_txt)
     if (length(nkk) != 1) nkk <- paste0('(', paste0(nkk, collapse = ' and '), ')')
     costs <- paste0('sum(', nset, '$', nkk, ', ', mult_txt, gsub('[$].*', '', mps), ')')
   }
-  costs <- gsub('[ ]9[*][ ]*', ' * ',  gsub('[)]and', ') and',  gsub('[ ]*[,][ ]*', ', ', gsub('[ ]*[)][ ]*', ')', 
+  costs <- gsub('[ ]*[*][ ]*', ' * ',  gsub('[)]and', ') and',  gsub('[ ]*[,][ ]*', ', ', gsub('[ ]*[)][ ]*', ')', 
       gsub('[ ]*[(][ ]*', '(', gsub('[+][ ]*[-]', '-', gsub('[ ]*[$][ ]*', '$', costs)))))))
   prec@costs.equation <- c(prec@costs.equation, costs)
   prec
