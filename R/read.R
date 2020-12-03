@@ -136,6 +136,30 @@ read.scenario <- function(scen, ...) {
         year = numeric(), value = numeric(), stringsAsFactors=FALSE)
     }
     scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
+    
+    # Estimate Costs
+    if (length(getNames(scen, 'costs')) != 0) {
+    	cst <- getObjects(scen, 'costs')
+    	costs_tot <- NULL
+    	for (tmp in cst) {
+	    	in_dat <- scen@modOut@variables[[tmp@variable]]
+	    	if (!is.null(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
+	    		in_dat <- merge(in_dat, .get_data_slot(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
+	    	if (!is.null(scen@modInp@parameters[[paste0('pCosts', tmp@name)]])) {
+	    		prm <- .get_data_slot(scen@modInp@parameters[[paste0('pCosts', tmp@name)]])
+	    		if (ncol(prm) == 1) in_dat$value <- in_dat$value * prm$value else {
+	    			colnames(prm)[ncol(prm)] <- 'par'
+	    			in_dat <- merge(in_dat, prm)
+	    			in_dat$value <- in_dat$value * in_dat$par
+	    			in_dat$par <- NULL
+	    		}
+	    	}
+	    	in_dat <- aggregate(in_dat[, 'value', drop = FALSE], in_dat[, c('region', 'year'), drop = FALSE], sum)
+	    	in_dat$costs <- tmp@name
+	    	costs_tot <- rbind(costs_tot, in_dat[, c('costs', 'region', 'year', 'value'), drop = FALSE])
+    	}
+   		scen@modOut@variables$vUserCosts <- costs_tot
+  	}
   }
   if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
   scen@status$optimial <- TRUE
