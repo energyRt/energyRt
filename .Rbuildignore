@@ -6,3 +6,4 @@
 solwork/
 tmp/
 .gpr
+^\.github$

@@ -10,6 +10,6 @@ solwork/
 *.Rproj
 solwork
 
-doc
+#doc
 Meta
-docs
+#docs
