@@ -8,7 +8,7 @@
 	if (is.null(cmdline)) {
 		if (lang == 'GAMS') cmdline <- 'gams check.gms' else
 		if (lang == 'PYOMO') cmdline <- 'python check.py' else
-		if (lang == 'JUMP') cmdline <- 'julia check.jl' else
+		if (lang == 'JULIA') cmdline <- 'julia check.jl' else
 		if (lang == 'GLPK') cmdline <- 'glpsol -m check.mod'
 	}
 	HOMEDIR <- getwd()
@@ -35,5 +35,5 @@
 check_gams <- function(...) .check_gams(lang = 'GAMS', ...) 
 check_python <- function(...) .check_gams(lang = 'PYOMO', ...) 
 check_glpk <- function(...) .check_gams(lang = 'GLPK', ...) 
-check_julia <- function(...) .check_gams(lang = 'JUMP', ...) 
+check_julia <- function(...) .check_gams(lang = 'JULIA', ...) 
 

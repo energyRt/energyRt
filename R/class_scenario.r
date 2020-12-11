@@ -44,7 +44,7 @@ setMethod("initialize", "scenario", function(.Object, ...) {
   GLPK = readLines('glpk/energyRt.mod'),
   GAMS_output = readLines('gams/output.gms'),
   checkGAMS = readLines('gams/check.gms'),
-  checkJUMP = readLines('julia/check.jl'),
+  checkJULIA = readLines('julia/check.jl'),
   checkPYOMO = readLines('pyomo/check.py'),
   checkGLPK = readLines('glpk/check.mod')
   )
