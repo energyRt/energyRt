@@ -14,10 +14,6 @@ set comm;
 set region;
 set year;
 set slice;
-set FORIF;
-
-
-
 set mSameRegion dimen 2;
 set mSameSlice dimen 2;
 set mMilestoneFirst dimen 1;
@@ -227,6 +223,10 @@ set mLECRegion dimen 1;
 
 
 
+param ORD{year};
+
+
+
 param ordYear{year};
 param cardYear{year};
 param pPeriodLen{year};
@@ -353,7 +353,7 @@ param pStorageWeatherCinpLo{weather, stg};
 param pStorageWeatherCoutUp{weather, stg};
 param pStorageWeatherCoutLo{weather, stg};
 param pLECLoACT{region};
-param ORD{year};
+set FORIF;
 
 
 

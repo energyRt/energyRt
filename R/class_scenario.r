@@ -42,6 +42,11 @@ setMethod("initialize", "scenario", function(.Object, ...) {
   PYOMOAbstract = readLines('pyomo/energyRtAbstract.py'),
   PYOMOAbstractOutput = readLines('pyomo/energyRtAbstractOutput.py'),
   GLPK = readLines('glpk/energyRt.mod'),
-  GAMS_output = readLines('gams/output.gms'))
+  GAMS_output = readLines('gams/output.gms'),
+  checkGAMS = readLines('gams/check.gms'),
+  checkJUMP = readLines('julia/check.jl'),
+  checkPYOMO = readLines('pyomo/check.py'),
+  checkGLPK = readLines('glpk/check.mod')
+  )
 
 
