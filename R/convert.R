@@ -9,19 +9,23 @@
 #' @export convert
 #'
 #' 
-convert <- function (from, to, value = 1, database = "user") 
+setGeneric("convert", function(from, to, ...) standardGeneric("convert"))
+setMethod('convert', signature(from = 'character', to = 'character'),
+          function (from, to, value = 1, database = "user") 
 {
-    h_from <- .find_unit(from, database = "user")
-    h_to <- .find_unit(to, database = "user")
+    h_from <- .find_unit(from, database = database)
+    h_to <- .find_unit(to, database = database)
     if (h_from$type != h_to$type)
         stop("Different unit type")
     conval <- value * (h_from$coef/h_to$coef)
     names(conval) <- NULL
     conval
-}
+})
+setGeneric("add_to_convert", function(type, unit, convert_coefficient, ...) standardGeneric("add_to_convert"))
 
 
-add_to_convert <- function (type, unit, convert_coefficient, alias = "", database = "user", 
+setMethod('add_to_convert', signature(type = 'character', unit = 'character', convert_coefficient = 'numeric'),
+ function(type, unit, convert_coefficient, alias = "", database = "user", 
                             simple = TRUE, update = TRUE) 
 {
     # convert_data <- get("convert_data", globalenv())
@@ -70,7 +74,7 @@ add_to_convert <- function (type, unit, convert_coefficient, alias = "", databas
                                                                                           unit)))
     }
     assign("convert_data", convert_data, globalenv())
-}
+})
 
 .split_to_unit <- function (st, database = "user") 
 {
@@ -91,12 +95,12 @@ add_to_convert <- function (type, unit, convert_coefficient, alias = "", databas
 
 .find_unit <- function (unit, database = "user") 
 {
-    g <- .simple_.find_unit(unit, database = "user", FALSE)
+    g <- .simple_.find_unit(unit, database = database, FALSE)
     if (!is.null(g)) 
         return(g)
     else {
-        g <- .split_to_unit(unit, database = "user")
-        g2 <- .simple_.find_unit(g$type, database = "user", FALSE)
+        g <- .split_to_unit(unit, database = database)
+        g2 <- .simple_.find_unit(g$type, database = database, FALSE)
         if (!is.null(g2)) {
             g2$coef <- g2$coef * g$coef
             return(g2)
@@ -107,7 +111,6 @@ add_to_convert <- function (type, unit, convert_coefficient, alias = "", databas
 
 .simple_.find_unit <- function (unit, database = "user", need_error = TRUE) 
 {
-    # convert_data <- get("convert_data", globalenv())
     data("convert_data")
     i <- 1
     fl <- FALSE
