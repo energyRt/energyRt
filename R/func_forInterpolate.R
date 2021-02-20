@@ -283,3 +283,47 @@
 		stop(paste0('There unknow weather in parameters\n', paste0(nn, collapse = '\n')))
 	}
 }
+
+
+# Check for unknown sets
+.check_sets <- function(scen) {
+	lsets <- lapply(scen@modInp@parameters, function(x) if (x@type == 'set') .get_data_slot(x)[[1]])
+	lsets <- lsets[!sapply(lsets, is.null)]
+	# Add alias for set
+	lsets$src <- lsets$region
+	lsets$dst <- lsets$region
+	dset <- unique(c(lapply(scen@modInp@parameters, function(x) x@dimSetNames), recursive = TRUE))
+	dset <- dset[!(dset %in% names(lsets))]
+	for (ss in dset) {
+		i <- 1
+		while (i <= length(lsets) && length(grep(names(lsets)[i], ss)) != 1) i <- i + 1
+		if (i > length(lsets)) stop('Internal error. Alias problem')
+			lsets[[ss]] <- lsets[[i]]
+	}
+	
+	err_dtf <- NULL
+	int_err <- NULL
+	for (prm in scen@modInp@parameters) {
+		if (!all(prm@dimSetNames %in% names(lsets))) {
+			int_err = unique(c(int_err, prm@dimSetNames[!(prm@dimSetNames %in% names(lsets))]))
+		} else {
+			tmp <- .get_data_slot(prm)[, prm@dimSetNames, drop = FALSE]
+			for (ss in prm@dimSetNames) {
+				unq <- unique(tmp[[ss]])
+				fl <- !(unq %in% lsets[[ss]])
+				if (any(fl))
+					err_dtf <- rbind(err_dtf, data.frame(name = prm@name, set = ss, value = unq[fl]))
+			}
+		}
+	}
+	if (length(int_err) != 0)
+		stop(paste0('Internal error. Unknown set "', paste0(int_err, collapse = '", "'), '"'))
+	if (!is.null(err_dtf)) {
+		assign('unknown_sets', err_dtf, globalenv())
+		err_msg <- c('There is (are) unknown sets (see unknown_sets in globalenv)\n', 
+			paste0(capture.output(print(head(err_dtf))), collapse = '\n'))
+		if (nrow(head(err_dtf)) != nrow(err_dtf)) 
+			err_msg <- c(err_msg, paste0('\n', nrow(err_dtf) - nrow(head(err_dtf)), ' row(s) was ommited'))
+		stop(err_msg)
+	}
+}

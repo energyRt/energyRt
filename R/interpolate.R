@@ -214,6 +214,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
                                            data.frame(region = scen@model@LECdata$region, value = scen@model@LECdata$pLECLoACT))
     }
   }
+  
+  # Check for unknown sets
+  .check_sets(scen)
+  
   # Reduce mapping
   scen@modInp <- .write_mapping(scen@modInp, interpolation_count = interpolation_count,
                                 interpolation_time_begin = interpolation_time_begin, len_name = len_name)
