@@ -44,10 +44,10 @@
             nn <- 1:nrow(ww)
             slot(obj, w)[nn, ] <- NA
             for(i in names(ww)) {
-              if (is.factor(slot(obj, w)[, i, drop = FALSE]) || is.factor(ww[, i])) {
-                slot(obj, w)[nn, i] <- as.character(ww[, i])
+              if (is.factor(slot(obj, w)[, i, with = FALSE]) || is.factor(ww[[i]])) {
+                slot(obj, w)[[i]][nn] <- as.character(ww[[i]])
               } else {
-                slot(obj, w)[nn, i] <- ww[, i]
+                slot(obj, w)[[i]][nn] <- ww[[i]]
               }
             }
           }
@@ -65,13 +65,13 @@
              nn <- 1:gg[1]
              slot(obj, w)[nn, ] <- NA
              for(i in names(ww)) {
-              slot(obj, w)[nn, i] <- ww[[i]]
+              slot(obj, w)[[i]][nn] <- ww[[i]]
             }
           }
         } else if (any(colnames(slot(obj, w)) == w) && length(ww) == 1) { 
         # for use start = 2000 rather than start = list(start = 2000)
              slot(obj, w)[1, ] <- NA
-             slot(obj, w)[1, w] <- ww
+             slot(obj, w)[[w]][1] <- ww
         } else stop('Check argument ', w)
       # Other argument
       } else if (slt[w] == 'factor') {
@@ -220,7 +220,7 @@ setMethod('newTrade', signature(name = 'character'), function(name, ..., source 
   trd <-  .new_object('trade', name, ...)
 	if (avaUpDef != Inf) {
 		trd@trade[nrow(trd@trade) + 1, ] <- NA
-		trd@trade[nrow(trd@trade), 'ava.up'] <- avaUpDef
+		trd@trade$ava.up[nrow(trd@trade)] <- avaUpDef
 	}
   if (is.null(source) != is.null(destination))
     stop('Inconsistency of source/destination data "', trd@name, '"')
@@ -229,7 +229,7 @@ setMethod('newTrade', signature(name = 'character'), function(name, ..., source 
   if (!is.null(source)) {
     trd@routes <- merge(data.table(src = source, stringsAsFactors = FALSE), 
                         data.table(dst = destination, stringsAsFactors = FALSE))
-    trd@routes <- trd@routes[trd@routes$src != trd@routes$dst,, drop = FALSE]
+    trd@routes <- trd@routes[trd@routes$src != trd@routes$dst,, with = FALSE]
   }
   trd
 })

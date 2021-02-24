@@ -169,7 +169,7 @@ setMethod(
     # Temporary solution for infinite-olife technology
     if (nrow(tech@olife) == 0) {
       tech@olife[1, ] <- NA;
-      tech@olife[1, 'olife'] <- 1e3;
+      tech@olife$olife[1] <- 1e3;
     }
     if (!energyRt:::check_name(tech@name)) {
       stop(paste('Incorrect technology name "', tech@name, '"', sep = ''))

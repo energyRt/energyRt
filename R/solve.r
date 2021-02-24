@@ -43,9 +43,9 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
   solv_par <- read.csv(paste0(.fix_path(tmp.dir), 'solver'), stringsAsFactors = FALSE)
   solver_list <- list()
   for (i in seq_len(nrow(solv_par))) {
-    tmp <- solv_par[i, 'value']
+    tmp <- solv_par$value[i]
     if (tmp %in% c('TRUE', 'FALSE')) tmp <- (tmp == 'TRUE')
-    solver_list[[solv_par[i, 'name']]] <- tmp
+    solver_list[[solv_par$name[i]]] <- tmp
   }
   if (!is.null(scen) && !is.null(scen@solver))
     for (i in grep('^(inc[1-5]|files)$', names(scen@solver), value = TRUE, invert = TRUE)) 

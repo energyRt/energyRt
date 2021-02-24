@@ -49,7 +49,7 @@ read.scenario <- function(scen, ...) {
           colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
         # Save all data with all levels
         if (colnames(jj)[j] != 'year')
-        	jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+        	jj[[j]] <- factor(jj[[j]], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
       }
       rr$variables[[i]] <- jj
     }
@@ -65,9 +65,9 @@ read.scenario <- function(scen, ...) {
   }
   if (all(scen@modOut@solutionLogs$parameter != "solution status")) {
     scen@modOut@stage <- "Scenario is not solved"
-  } else if (all(scen@modOut@solutionLogs[scen@modOut@solutionLogs$parameter == "solution status", 'value'] != 1)) {
+  } else if (all(scen@modOut@solutionLogs$value[scen@modOut@solutionLogs$parameter == "solution status"] != 1)) {
     scen@modOut@stage <- paste0('The solution status is not optimal (', 
-        scen@modOut@solutionLogs[scen@modOut@solutionLogs$parameter == "solution status", 'value'], ')')
+        scen@modOut@solutionLogs$value[scen@modOut@solutionLogs$parameter == "solution status"], ')')
   } else if (all(scen@modOut@solutionLogs$parameter != "done")) {
     scen@modOut@stage <- "Unexpected termination"
   } else scen@modOut@stage <- 'solved'

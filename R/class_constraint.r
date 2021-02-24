@@ -128,7 +128,7 @@ newConstraint <- function(name, ..., eq = '==', rhs = data.table(), for.each = N
     if (xx[1] >= 1) {
       xx <- data.table()
       xx[seq_len(length(rhs[[1]])), ] <- NA
-      for (i in names(rhs)) xx[, i] <- rhs[[i]]
+      for (i in names(rhs)) xx[[i]] <- rhs[[i]]
       rhs <- xx
     }
   }
@@ -185,7 +185,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
     if (xx[1] >= 1) {
       xx <- data.table()
       xx[seq_len(length(mult[[1]])), ] <- NA
-      for (i in names(mult)) xx[, i] <- mult[[i]]
+      for (i in names(mult)) xx[[i]] <- mult[[i]]
       mult <- xx
     }
   }
@@ -219,7 +219,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
   stop.constr <- function(x) 
     stop(paste0('Constraint "', stm@name, '" error: ', x))
   get.all.child <- function(x)  {
-    unique(c(x, c(approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% x, 'child'])))
+    unique(c(x, c(approxim$slice@all_parent_child$child[approxim$slice@all_parent_child$parent %in% x])))
   }
   # all.set contain all set for for.each & lhs
   # Estimate is need sum for for.each
@@ -248,13 +248,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
   nn <- seq_len(length(old_for_each) + sum(sapply(stm@lhs, function(x) length(.variable_set[[x@variable]]))))
   all.set[seq_along(nn), ] <- NA
   for (i in (1:ncol(all.set))[sapply(all.set, class) == 'logical']) 
-    all.set[, i] <- FALSE
+    all.set[[i]] <- FALSE
   nn <- 0
   if (length(old_for_each) > 0) {
     nn <- seq_along(old_for_each)
-    all.set[nn, 'set'] <- names(old_for_each)
-    all.set[nn, 'alias'] <- names(old_for_each)
-    all.set[nn, 'for.each'] <- TRUE
+    all.set$set[nn] <- names(old_for_each)
+    all.set$alias[nn] <- names(old_for_each)
+    all.set$for.each[nn] <- TRUE
     for.each.set <- names(old_for_each)
     # Fill add.map for for.each
     for (j in for.each.set) {
@@ -265,7 +265,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
         }
         set.map.name <- c(set.map.name, j)
         set.map[[length(set.map.name)]] <- old_for_each[[j]]
-        all.set[nn[names(old_for_each) == j], 'new.map'] <- length(set.map.name)
+        all.set$new.map[nn[names(old_for_each) == j]] <- length(set.map.name)
       }
     }
   } else for.each.set <- NULL
@@ -273,21 +273,23 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
   for (i in seq_along(stm@lhs)) {
     need.set <- .variable_set[[stm@lhs[[i]]@variable]]
     nn <- (nn[length(nn)] + seq_along(need.set))
-    all.set[nn, 'set'] <- need.set
-    all.set[nn, 'alias'] <- need.set
-    all.set[nn, 'lhs.num'] <- i
+    all.set$set[nn] <- need.set
+    all.set$alias[nn] <- need.set
+    all.set$lhs.num[nn] <- i
     if (any(names(stm@lhs[[i]]@for.sum) == 'lag.year')) {
       if (all(need.set != 'year'))
         stop.constr('For lag.year have to define use variable with year')
-      all.set[nn[need.set == 'year'], c('lag.year', 'def.lhs')] <- TRUE
+      all.set$lag.year[nn[need.set == 'year']] <- TRUE
+      all.set$def.lhs[nn[need.set == 'year']] <- TRUE
     }
     if (any(names(stm@lhs[[i]]@for.sum) == 'lead.year')) {
       if (all(need.set != 'year'))
         stop.constr('For lead.year have to define use variable with year')
-      all.set[nn[need.set == 'year'], c('lead.year', 'def.lhs')] <- TRUE
+      all.set$lead.year[nn[need.set == 'year']] <- TRUE
+      all.set$def.lhs[nn[need.set == 'year']] <- TRUE
     }
-    all.set[nn[need.set %in% names(stm@lhs[[i]]@for.sum)], 'def.lhs'] <- TRUE
-    all.set[nn[!(need.set %in% for.each.set)], 'def.lhs'] <- TRUE
+    all.set$def.lhs[nn[need.set %in% names(stm@lhs[[i]]@for.sum)]] <- TRUE
+    all.set$def.lhs[nn[!(need.set %in% for.each.set)]] <- TRUE
     # Add to set map
     st <- names(stm@lhs[[i]]@for.sum)[names(stm@lhs[[i]]@for.sum) %in% need.set & 
                                         !sapply(is.na(stm@lhs[[i]]@for.sum), all)]
@@ -298,15 +300,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
                 !all(prec@set[[j]] %in% get.all.child(stm@lhs[[i]]@for.sum[[j]])))) {
         # check if the same set in lhs exist
         fl <- FALSE
-        if (all(!c(all.set[nn[need.set == j], c('lead.year', 'lag.year')], recursive = TRUE))) {
+        ntmp <- nn[need.set == j]
+        if (all(!all.set$lead.year[ntmp]) || all(!all.set$lag.year[ntmp])) {
           fl <- nn[(!all.set$for.each[nn] & all.set$set[nn] == j & !is.na(all.set$new.map[nn]))]
         }
         add.new <- TRUE
         if (any(fl)) {
-          for (k in all.set[fl, 'new.map']) {
+          for (k in all.set$new.map[fl]) {
             if (length(stm@lhs[[i]]@for.sum[[j]]) == length(set.map[[k]]) && 
                 all(stm@lhs[[i]]@for.sum[[j]] %in% set.map[[k]])  && all(set.map[[k]] %in% stm@lhs[[i]]@for.sum[[j]])) {
-              all.set[nn[need.set == j], 'new.map'] <- k
+              all.set$new.map[nn[need.set == j]] <- k
               add.new <- FALSE
             }
           }
@@ -314,7 +317,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
         if (add.new) {
           set.map.name <- c(set.map.name, j)
           set.map[[length(set.map.name)]] <- stm@lhs[[i]]@for.sum[[j]]
-          all.set[nn[need.set == j], 'new.map'] <- length(set.map.name)
+          all.set$new.map[nn[need.set == j]] <- length(set.map.name)
         }
       }
     }
@@ -322,7 +325,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
   # Add alias
   fl <- (!all.set$for.each & all.set$def.lhs & all.set$set %in% for.each.set)
   if (any(fl)) 
-    all.set[fl, 'alias'] <- paste0(all.set[fl, 'set'], 'p')
+    all.set$alias[fl] <- paste0(all.set$alias[fl], 'p')
   # Need add code to reduce additional mapping
   # Maaping
   if (length(set.map) > 0) {
@@ -337,7 +340,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
     # copy new.map for lhs set that define in for each
     fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
     for (i in fl) {
-      all.set[!all.set$for.each & !all.set$def.lhs & all.set$set == all.set$set[i], 'new.map'] <- i
+      all.set$new.map[!all.set$for.each & !all.set$def.lhs & all.set$set == all.set$set[i]] <- i
     }
   }
   if (nrow(all.set) > 0) {
@@ -366,25 +369,25 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
       if (i == 'year') {
         tmg <- prec@parameters[['mMidMilestone']]@data
         if (any(all.set$lag.year)) { 
-          tmg <- tmg[!(tmg$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, drop = FALSE]
+          tmg <- tmg[!(tmg$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, with = FALSE]
         }
         if (any(all.set$lead.year)) { 
-          tmg <- tmg[tmg$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, drop = FALSE]
+          tmg <- tmg[tmg$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, with = FALSE]
         }
       }
-      tmp_fe <- rbind(merge(tmp_fe[, colnames(tmp_fe) != i, drop = FALSE], tmg),
-        tmp_fe[!is.na(tmp_fe[[i]]),, drop = FALSE])
-      tmp_fe <- tmp_fe[!duplicated(tmp_fe),, drop = FALSE]
+      tmp_fe <- rbind(merge(tmp_fe[, colnames(tmp_fe) != i, with = FALSE], tmg),
+        tmp_fe[!is.na(tmp_fe[[i]]),, with = FALSE])
+      tmp_fe <- tmp_fe[!duplicated(tmp_fe),, with = FALSE]
     }
     stm@for.each <- tmp_fe
   }
   if (!is.null(stm@for.each$year)) {
-    stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMidMilestone']]@data$year,, drop = FALSE]
+    stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMidMilestone']]@data$year,, with = FALSE]
     if (any(all.set$lag.year)) { 
-      stm@for.each <- stm@for.each[!(stm@for.each$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, drop = FALSE]
+      stm@for.each <- stm@for.each[!(stm@for.each$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, with = FALSE]
     }
     if (any(all.set$lead.year)) { 
-      stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, drop = FALSE]
+      stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, with = FALSE]
     }
   }
   if (nrow(stm@for.each) > 0) {
@@ -395,10 +398,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
   }
   res$equation <- paste0(res$equation, '.. ')
   # Add lhs to equation
-  lhs.set <- all.set[!all.set$for.each,, drop = FALSE]
+  lhs.set <- all.set[!all.set$for.each,, with = FALSE]
   for (i in seq_along(stm@lhs)) {
     vrb <- stm@lhs[[i]]@variable
-    lhs.set2 <- lhs.set[lhs.set$lhs.num == i, ]
+    lhs.set2 <- lhs.set[lhs.set$lhs.num == i, with = FALSE]
     vrb.lhs <- .variable_mapping[[vrb]]
     # Add multiple to vrb
     # Add to year multiplier if lag.year | lead.year
@@ -417,8 +420,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
       if (any(names(approxim2) == 'slice')) {
         approxim2$slice <- approxim2$slice@all_slice
       }
-      need.set <- lhs.set2[lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), 'set']
-      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), ]
+      need.set <- lhs.set2$set[lhs.set2$set %in% colnames(stm@lhs[[i]]@mult)]
+      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set %in% colnames(stm@lhs[[i]]@mult),, with = FALSE]
       
       for (j in seq_len(nrow(need.set2))) {
         approxim2[[need.set2[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
@@ -449,7 +452,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
     if (all(!lhs.set2$def.lhs)) {
       res$equation <- paste0(res$equation, vrb.lhs)
     } else {
-      lhs.set3 <- lhs.set2[lhs.set2$def.lhs,, drop = FALSE]
+      lhs.set3 <- lhs.set2[lhs.set2$def.lhs,, with = FALSE]
       cnd <- NULL
       if (any(!is.na(lhs.set3$new.map))) { 
         cnd <- c(cnd, new.map.name.full[lhs.set3$new.map[!is.na(lhs.set3$new.map)]])
@@ -494,9 +497,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
       approxim2$slice <- approxim2$slice@all_slice
     }
     fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
-    need.set <- all.set[fl,, drop = FALSE]
+    need.set <- all.set[fl,, with = FALSE]
     for (j in seq_len(nrow(need.set))) {
-      approxim2[[need.set[j, 'set']]] <- set.map[[need.set[j, 'new.map']]]
+      approxim2[[need.set$set[j]]] <- set.map[[need.set$new.map[j]]]
     }
     approxim2$fullsets <- approxim$fullsets
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
@@ -505,7 +508,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
     yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != 'value']
     yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 
-      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, drop = FALSE]
+      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, with = FALSE]
     prec@parameters[[xx@name]] <- .add_data(xx, yy)
     # Add mult
     res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')

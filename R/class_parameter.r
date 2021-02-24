@@ -106,7 +106,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'data.table'),
           data$type <- factor(data$type, levels = c('lo', 'up'))
       }
       for(i in colnames(data)[sapply(data, class) == 'factor'])
-        if (i != 'type') data[, i] <- as.character(data[, i])
+        if (i != 'type') data[[i]] <- as.character(data[[i]])
       class2 <- function(x) if (class(x) == 'integer') 'numeric' else class(x)
       if (any(sapply(data, class2) != sapply(obj@data, class)))
           stop('Internal error: Wrong new data 3')
@@ -196,7 +196,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
       	for (i in seq_len(ncol(dtt) - 2) + 1) {
       		ret <- paste0(ret, '", "', dtt[, i])
       	}
-      	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
+      	paste0(ret, '") = ', dtt[[ncol(dtt)]], ';')
       }
     }
     as_simple <- function(dtt, name, def, include.def) {
@@ -246,7 +246,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
       if (nrow(obj@data) == 0) {                         
         return(paste0('set\n', obj@name, ' / 1 /;\n'))
       } else {
-        return(c('set', paste(obj@name, ' /', sep = ''), sort(obj@data[, 1]), '/;', ''))
+        return(c('set', paste(obj@name, ' /', sep = ''), sort(obj@data[[1]]), '/;', ''))
       }
     } else if (obj@type == 'map') {
       if (nrow(obj@data) == 0) {
@@ -271,7 +271,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 # Check duplicated row in data
 # setMethod('.check_duplicates_in_parameter', signature(obj = 'parameter'),
 # .check_duplicates_in_parameter <- function(obj) {
-#   fl <- duplicated(obj@data[, colnames(obj@data) != 'value', drop = FALSE])
+#   fl <- duplicated(obj@data[, colnames(obj@data) != 'value', with = FALSE])
 #   if (any(fl)) {
 #     message('Duplicated rows found in parameter ', obj@name)
 #     print(obj@data[fl,, drop = FALSE])
@@ -290,7 +290,7 @@ newSet <- function(dimSetNames) {
 #   function(obj, dimSetNames) {
 #     gg <- data.table(dimSetNames)
 #     colnames(gg) <- obj@dimSetNames
-#     if (any(dimSetNames == obj@data[, 1])) stop('Internal error: There is multiple dimSetNames')
+#     if (any(dimSetNames == obj@data[[1]])) stop('Internal error: There is multiple dimSetNames')
 #     .add_data(obj, gg)
 # })
 # Add Set
@@ -343,10 +343,10 @@ setMethod('print', 'parameter', function(x, ...) {
         return(rtt)
       }
       rtt <- paste0("# ", name, name2, '\ntmp = {} \n')
-      kk <- paste0("tmp[('", data[, 1])
+      kk <- paste0("tmp[('", data[[1]])
       for (i in seq_len(ncol(data) - 2) + 1)
-        kk <- paste0(kk, "', '", data[, i])
-      kk <- paste0(kk, "')] = ", data[, 'value'])
+        kk <- paste0(kk, "', '", data[[i]])
+      kk <- paste0(kk, "')] = ", data[['value']])
       kk <- c(rtt, paste0(kk, collapse = '\n'), '\n\n', paste0(name,' = toPar(tmp, ', def, ')\n'))
       return(kk)
     }
@@ -357,7 +357,7 @@ setMethod('print', 'parameter', function(x, ...) {
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0("['", paste0(sort(obj@data[, 1]), collapse = "', '"), "']")
+      tmp <- paste0("['", paste0(sort(obj@data[[1]]), collapse = "', '"), "']")
     return(c(paste0("# ", obj@name), paste0('\n', obj@name, ' = set(', tmp, ');')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
@@ -392,10 +392,10 @@ setMethod('print', 'parameter', function(x, ...) {
       if (nrow(data) == 0) {
         return(paste0("# ", name, name2, " no data except default\n"))
       }
-      kk <- paste0('  ', data[, 1])
+      kk <- paste0('  ', data[[1]])
       for (i in seq_len(ncol(data) - 2) + 1)
-        kk <- paste0(kk, ' ', data[, i])
-      kk <- paste0(kk, ' ', data[, 'value'])
+        kk <- paste0(kk, ' ', data[[i]])
+      kk <- paste0(kk, ' ', data[['value']])
       kk <- c(rtt, paste0(kk, collapse = '\n'), '\n;\n')
       return(kk)
     }
@@ -406,7 +406,7 @@ setMethod('print', 'parameter', function(x, ...) {
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0('\n  ', sort(obj@data[, 1]), collapse = '')
+      tmp <- paste0('\n  ', sort(obj@data[[1]]), collapse = '')
     return(c(paste0("# ", obj@name), paste0('\nset ', obj@name, ' := ', tmp, ';')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
@@ -460,7 +460,7 @@ setMethod('print', 'parameter', function(x, ...) {
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0('\n  (:', paste0(sort(obj@data[, 1]), collapse = '),\n  (:'), ')\n')
+      tmp <- paste0('\n  (:', paste0(sort(obj@data[[1]]), collapse = '),\n  (:'), ')\n')
     return(c(paste0("# ", obj@name), paste0(obj@name, ' = [', tmp, ']')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name)
