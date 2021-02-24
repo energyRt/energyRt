@@ -4,16 +4,16 @@ setClass("trade",
         name          = "character",       # Short name
         description   = "character",       # Details
         commodity     = "character",       # Vector if NULL that
-        routes        = "data.frame",       
+        routes        = "data.table",       
     # Performance parameters
-        trade         = "data.frame",
-        aux           = "data.frame",      #
-        aeff         = "data.frame",    #  Commodity efficiency
-      	invcost = "data.frame",
+        trade         = "data.table",
+        aux           = "data.table",      #
+        aeff         = "data.table",    #  Commodity efficiency
+      	invcost = "data.table",
       	olife = "numeric",
       	start = "numeric",
       	end = "numeric",
-      	stock = "data.frame",
+      	stock = "data.table",
       	capacityVariable = "logical",
       	# GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
       	cap2act       = "numeric",         #
@@ -25,11 +25,11 @@ setClass("trade",
 		name           = "default_trade",       # Short name
 		description    = "",
 		commodity      = NULL,       #
-		routes       = data.frame(
+		routes       = data.table(
 		  src        = character(),
 		  dst        = character(),
 		  stringsAsFactors = FALSE),
-		trade          = data.frame(
+		trade          = data.table(
 			src        = character(),
 			dst        = character(),
 			year       = numeric(),
@@ -41,7 +41,7 @@ setClass("trade",
 			markup     = numeric(),
 			teff        = numeric(),
 			stringsAsFactors = FALSE),
-		invcost = data.frame(
+		invcost = data.table(
 			region        = character(),
 			year       = numeric(),
 			invcost    = numeric(),
@@ -49,17 +49,17 @@ setClass("trade",
 		olife = Inf,
 		start = -Inf,
 		end = Inf,
-		stock         = data.frame(
+		stock         = data.table(
 			year  = integer(),
 			stock = numeric(),
 			stringsAsFactors = FALSE),
 		capacityVariable = FALSE,
-		aux           = data.frame(
+		aux           = data.table(
 		  acomm     = character(),
 			unit     = character(),
 			stringsAsFactors = FALSE),
 		# Auxilary parameter
-		aeff          = data.frame(
+		aeff          = data.table(
 			acomm      = character(),
 			src     = character(),
 			dst     = character(),

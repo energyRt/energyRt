@@ -12,7 +12,7 @@ get.listing.file <- function(mdl, ...) {
   kk <- grep('^[[:space:]]*$', kk, invert = TRUE, value = TRUE)
   kk <- grep('(^---|[[:space:]]*NONE$)', kk, invert = TRUE, value = TRUE)
   kk <- grep('(^Equation Listing|GAMS|G e n e r a l   A l g e b r a i c)', kk, invert = TRUE, value = TRUE)
-  feqt <- data.frame(bg = grep('[.][.]', kk), en = grep('[;]', kk))
+  feqt <- data.table(bg = grep('[.][.]', kk), en = grep('[;]', kk))
   feqt <- apply(feqt, 1, function(x) gsub('[[:space:]]*', '', gsub('[;].*', '', 
     paste(kk[x[1]:x[2]], collapse = ''))))
   vb_map <- energyRt::variables_dim

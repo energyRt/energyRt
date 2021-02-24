@@ -13,14 +13,14 @@
  # tech <- tec
  # arg <- list(discount = .1) #, comm = 'ELC') # For test
   if (!is.null(discount)) {
-    if (is.numeric(discount)) discount <- data.frame(discount = discount, stringsAsFactors = TRUE)
+    if (is.numeric(discount)) discount <- data.table(discount = discount, stringsAsFactors = TRUE)
     if (all(colnames(discount) != 'region')) discount <- cbind(discount, region = rep(NA, nrow(discount)))
     if (all(colnames(discount) != 'year')) discount <- cbind(discount, year = rep(NA, nrow(discount)))
     discount <- discount[, c('region', 'year', 'discount'), drop = FALSE]
     discount$region <- as.character(discount$region)
     discount$year <- as.numeric(discount$year)
   } else {
-    discount <- data.frame(region     = character(),
+    discount <- data.table(region     = character(),
                                      year       = numeric(),
                                      discount    = numeric(),
                                      stringsAsFactors = FALSE)
@@ -28,12 +28,12 @@
     warning('Discount is not specified, default value 10%')
   }
   if (!is.null(tax)) {
-    if (!is.data.frame(tax) && is.list(tax)) {
+    if (!is.data.table(tax) && is.list(tax)) {
       gg <- sapply(tax, length)
       if (any(gg[1] != gg)) stop('Error subs argument')
-      tax <- as.data.frame(tax)
+      tax <- as.data.table(tax)
     }
-    stopifnot(is.data.frame(tax))
+    stopifnot(is.data.table(tax))
     if (all(colnames(tax) != 'region')) tax <- cbind(tax, region = rep(NA, nrow(tax)))
     if (all(colnames(tax) != 'year')) tax <- cbind(tax, year = rep(NA, nrow(tax)))
     if (all(colnames(tax) != 'slice')) tax <- cbind(tax, slice = rep(NA, nrow(tax)))
@@ -49,12 +49,12 @@
     }
   } 
   if (!is.null(subs)) {
-    if (!is.data.frame(subs) && is.list(subs)) {
+    if (!is.data.table(subs) && is.list(subs)) {
       gg <- sapply(sunbs, length)
       if (any(gg[1] != gg)) stop('Error subs argument')
-      subs <- as.data.frame(subs)
+      subs <- as.data.table(subs)
     }
-    stopifnot(is.data.frame(subs))
+    stopifnot(is.data.table(subs))
     if (all(colnames(subs) != 'region')) subs <- cbind(subs, region = rep(NA, nrow(subs)))
     if (all(colnames(subs) != 'year')) subs <- cbind(subs, year = rep(NA, nrow(subs)))
     if (all(colnames(subs) != 'slice')) subs <- cbind(subs, slice = rep(NA, nrow(subs)))
@@ -101,11 +101,11 @@
   if (!any(fl)) fl <- is.na(tech@end$region)
   if (any(fl) && any(tech@end[fl, 'end'] <= start_year)) 
     stop('Start year belong to unacceptable time region (see end year)')
-  price <- data.frame(comm = character(), region = character(),
+  price <- data.table(comm = character(), region = character(),
             year = numeric(), slice = character(), price = numeric(),
               stringsAsFactors = FALSE)
   if (!is.null(price0)) {
-    stopifnot(is.data.frame(price0) && all(colnames(price0) %in% c('comm', 'region', 
+    stopifnot(is.data.table(price0) && all(colnames(price0) %in% c('comm', 'region', 
       'year', 'slice', 'price')))
     price[1:nrow(price0), ] <- NA
     for(i in colnames(price0)) price[, i] <- price0[,i]

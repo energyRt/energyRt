@@ -12,7 +12,7 @@
     }
   }
   nms <- names(getSlots(class(obj)))
-  nms <- nms[sapply(nms, function(x) (class(slot(obj, x)) == 'data.frame' 
+  nms <- nms[sapply(nms, function(x) (class(slot(obj, x)) == 'data.table' 
                                       && any(colnames(slot(obj, x)) == 'slice')) && nrow(slot(obj, x)) > 0)]
   # Replace NA to slice
   if (!is.null(na.like)) {
@@ -113,7 +113,7 @@
 #==============================================================================#
 .disaggregateSliceLevel <- function(app, approxim) {
   slt <- getSlots(class(app)) 
-  slt <- names(slt)[slt == 'data.frame']
+  slt <- names(slt)[slt == 'data.table']
   if (class(app) == 'technology') slt <- slt[slt != 'afs']
   for (ss in slt) if (any(colnames(slot(app, ss)) == 'slice')) {
     tmp <- slot(app, ss)

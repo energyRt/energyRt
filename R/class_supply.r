@@ -4,9 +4,9 @@
 #' @slot description character. 
 #' @slot commodity character. 
 #' @slot unit character. 
-#' @slot weather data.frame. 
-#' @slot reserve data.frame. 
-#' @slot availability data.frame. 
+#' @slot weather data.table. 
+#' @slot reserve data.table. 
+#' @slot availability data.table. 
 #' @slot region character. 
 #' @slot slice character. 
 #' @slot misc list. 
@@ -19,12 +19,12 @@ setClass("supply",
       representation(
           name          = "character",
           description   = "character",
-          # color         = "data.frame",      #
+          # color         = "data.table",      #
           commodity     = "character",
           unit          = "character",
-          weather       = "data.frame", # weather factor (availability multiplier)
-          reserve       = "data.frame",         # Total available resource
-          availability  = "data.frame",     # Availability of the resource with prices
+          weather       = "data.table", # weather factor (availability multiplier)
+          reserve       = "data.table",         # Total available resource
+          availability  = "data.table",     # Availability of the resource with prices
           region        = "character",
           # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           slice         = "character",
@@ -33,22 +33,22 @@ setClass("supply",
       prototype(
           name          = "",
           description   = "",
-          # color         = data.frame(region   = character(),
+          # color         = data.table(region   = character(),
           #                            color    = character(),
           #                            stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
-          weather       = data.frame(weather = character(), # name of the weather object
+          weather       = data.table(weather = character(), # name of the weather object
                                      wava.lo   = numeric(), # multipliers for ava.*, 1 by default
                                      wava.up   = numeric(),
                                      wava.fx   = numeric(),
                                      stringsAsFactors = FALSE),
-          reserve       = data.frame(region   = character(), # Total available resource by region
+          reserve       = data.table(region   = character(), # Total available resource by region
                                      res.lo   = numeric(),
                                      res.up   = numeric(),
                                      res.fx   = numeric(),
                                      stringsAsFactors = FALSE),
-          availability  = data.frame(region   = character(),
+          availability  = data.table(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
                                      ava.lo   = numeric(),

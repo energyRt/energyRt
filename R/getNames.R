@@ -31,7 +31,7 @@
     }                                                         
     lst
   } else {
-    rst <- data.frame(rp = numeric(), ob = numeric(), use = logical())
+    rst <- data.table(rp = numeric(), ob = numeric(), use = logical())
     for(i in seq(along = obj@data)) {
       jj <- seq(along = obj@data[[i]]@data)[sapply(obj@data[[i]]@data, class) == cls]
       if (length(jj) != 0) {
@@ -107,8 +107,8 @@
                 rst[i, 'use'] <- any(cnd['ne'] != slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm), na.rm = TRUE)
                 rst <- rst[rst$use,, drop = FALSE]
             }
-        } else if (s1[nm] == "data.frame") {
-        # data.frame
+        } else if (s1[nm] == "data.table") {
+        # data.table
           FL2 <- rep(FALSE, length(cnd))
           FL2[grep('[_]$', names(cnd))] <- TRUE
           names(cnd) <- gsub('[_]$', '', names(cnd))

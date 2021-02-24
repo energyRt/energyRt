@@ -29,14 +29,14 @@ findDuplicates <- function(x) {
           for (j in value_slot[apply(fl, 2, any)]) {
             f2 <- duplicated(slt[fl[, j], set_slot, drop = FALSE])
             if (any(f2)) {
-              rs <- rbind(rs, data.frame(slot = i, parameter = j, value = sum(f2), stringsAsFactors = FALSE))
+              rs <- rbind(rs, data.table(slot = i, parameter = j, value = sum(f2), stringsAsFactors = FALSE))
             }
           }
         }
       }
       return(rs)
     }
-    res <- data.frame(repository = character(), object = character(), slot = character(), parameter = character(), stringsAsFactors = FALSE)
+    res <- data.table(repository = character(), object = character(), slot = character(), parameter = character(), stringsAsFactors = FALSE)
     if (class(x) == 'model') {
       rs <- NULL
       for (i in seq_along(x@data)) {
@@ -69,7 +69,7 @@ findDuplicates <- function(x) {
     } else
     if (class(x) %in% c('tax', 'sub', 'weather', 'supply', 'import', 'export', 'trade', 'technology', 'demand', 'storage')) {
       slt_name <- getSlots(class(x))
-      slt_name <- names(slt_name)[slt_name == 'data.frame' & !(names(slt_name) %in% c('input', 'output', 'aux'))]
+      slt_name <- names(slt_name)[slt_name == 'data.table' & !(names(slt_name) %in% c('input', 'output', 'aux'))]
       return(check_by_slots(x, slt_name))
     } else if (class(x) %in% c('constraint')) {
       tmp <- check_by_slots(x, c('rhs', 'for.each'))

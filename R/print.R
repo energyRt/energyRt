@@ -35,7 +35,7 @@ print.commodity <- function(x) {
   g <- getClass("commodity")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
     g@slots[[z]] ==
-      "data.frame"
+      "data.table"
   })]
   for (i in zz) if_print_data_frame(x, i)
 }
@@ -55,7 +55,7 @@ print.demand <- function(x) {
   g <- getClass("demand")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
     g@slots[[z]] ==
-      "data.frame"
+      "data.table"
   })]
   for (i in zz) if_print_data_frame(x, i)
 }
@@ -76,7 +76,7 @@ print.equation <- function(x) {
   g <- getClass("equation")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
     g@slots[[z]] ==
-      "data.frame"
+      "data.table"
   })]
   for (i in zz) if_print_data_frame(x, i)
   for (i in seq_along(x@lhs)) {
@@ -99,7 +99,7 @@ print.summand <- function(x) {
   g <- getClass("summand")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
     g@slots[[z]] ==
-      "data.frame"
+      "data.table"
   })]
   for (i in zz) if_print_data_frame(x, i)
   if (length(x@for.sum) != 0) {
@@ -192,7 +192,7 @@ print.supply <- function(x) {
   g <- getClass("supply")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
     g@slots[[z]] ==
-      "data.frame"
+      "data.table"
   })]
   for (i in zz) if_print_data_frame(x, i)
 }

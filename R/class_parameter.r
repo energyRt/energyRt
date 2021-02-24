@@ -8,7 +8,7 @@ setClass('parameter', # @parameter
     defVal         = "numeric",     # @defVal Default value : zero value  for map,
                                      # one for single, two for multi
     interpolation   = "character",   # interpolation 'back.inter.forth'
-    data            = "data.frame",  # @data Data for export
+    data            = "data.table",  # @data Data for export
     not_data        = "logical",  # @data NO flag for map 
     colName     = 'character',   # @colName Column name in slot 
     nValues     = 'numeric',     # @nValues Number of non-NA values in 'data' (to speed-up processing) 
@@ -20,7 +20,7 @@ setClass('parameter', # @parameter
     type            = factor(NA, c('set', 'map', 'simple', 'multi')),
     defVal         = NULL,
     interpolation   = NULL,
-    data            = data.frame(),
+    data            = data.table(),
     not_data        = FALSE,
     colName     = NULL,
     nValues     = 0,
@@ -69,7 +69,7 @@ setMethod("initialize", "parameter",
   .Object@misc$class <- cls
   .Object@misc$slot <- slot
   # Create data
-  data <- data.frame(tech = character(), techp = character(), sup = character(), weather = character(), dem = character(), 
+  data <- data.table(tech = character(), techp = character(), sup = character(), weather = character(), dem = character(), 
       acomm = character(), comm = character(), commp = character(), group = character(),  
       region = character(), regionp = character(), src = character(), dst = character(), 
       year = numeric(), yearp = numeric(), slicep = character(), 
@@ -93,7 +93,7 @@ newParameter <- function(...) new('parameter', ...)
   x
 } 
 # Add data to Map Table with check new data
-setMethod('.add_data', signature(obj = 'parameter', data = 'data.frame'),
+setMethod('.add_data', signature(obj = 'parameter', data = 'data.table'),
   function(obj, data) {
     if (nrow(data) > 0) {
       if (ncol(data) != ncol(obj@data) ||
@@ -288,7 +288,7 @@ newSet <- function(dimSetNames) {
 # Add Set
 # setMethod('addSet', signature(obj = 'parameter', dimSetNames = 'character'),
 #   function(obj, dimSetNames) {
-#     gg <- data.frame(dimSetNames)
+#     gg <- data.table(dimSetNames)
 #     colnames(gg) <- obj@dimSetNames
 #     if (any(dimSetNames == obj@data[, 1])) stop('Internal error: There is multiple dimSetNames')
 #     .add_data(obj, gg)
@@ -300,7 +300,7 @@ setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'characte
     if (length(dimSetNames) == 0) {
       obj
     } else {
-      gg <- data.frame(dimSetNames)
+      gg <- data.table(dimSetNames)
       colnames(gg) <- obj@dimSetNames
       .add_data(obj, gg)
     }
@@ -312,7 +312,7 @@ setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'numeric'
             if (length(dimSetNames) == 0) {
               obj
             } else {
-              gg <- data.frame(dimSetNames)
+              gg <- data.table(dimSetNames)
               colnames(gg) <- obj@dimSetNames
               .add_data(obj, gg)
             }

@@ -6,8 +6,8 @@
 #' @slot slice the level of time-slice the commodity operates in the model 
 #'             (the lowest slice-level used by default)
 #' @slot unit the main unit of the commodity used in the model, character string
-#' @slot emis data.frame with emissions factors, see details
-#' @slot agg data.frame with aggregation parameters of several commodities into one
+#' @slot emis data.table with emissions factors, see details
+#' @slot agg data.table with aggregation parameters of several commodities into one
 #' @slot misc list with miscellaneous information to store
 #' 
 setClass("commodity",
@@ -17,8 +17,8 @@ setClass("commodity",
           limtype       = "factor",
           slice         = "character",
           unit          = "character",
-          emis          = "data.frame",     # Emission factors
-          agg           = "data.frame",     # Aggregation parameter
+          emis          = "data.table",     # Emission factors
+          agg           = "data.table",     # Aggregation parameter
           misc          = "list"
       ),
       prototype(
@@ -27,11 +27,11 @@ setClass("commodity",
           limtype       = factor('LO', levels = c('FX', 'UP', 'LO')),
           slice         = character(),
           unit          = character(),
-          agg           = data.frame(comm     = character(),
+          agg           = data.table(comm     = character(),
                                      unit     = numeric(),
                                      agg      = numeric(),
                                      stringsAsFactors = FALSE),
-          emis          = data.frame(comm     = character(),
+          emis          = data.table(comm     = character(),
                                      unit     = character(),
                                      emis     = numeric(),
                                      stringsAsFactors = FALSE),

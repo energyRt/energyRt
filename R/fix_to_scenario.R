@@ -79,7 +79,7 @@
   for (nn in names(scen@modInp@parameters)) {
     if (any(scen@modInp@parameters[[nn]]@dimSetNames %in% als_year)) {
       clmn <- als_year[als_year %in% scen@modInp@parameters[[nn]]@dimSetNames]
-      # Shrink data.frame if need
+      # Shrink data.table if need
       if (scen@modInp@parameters[[nn]]@nValues != -1) {
         scen@modInp@parameters[[nn]]@data <- scen@modInp@parameters[[nn]]@data[seq_len(scen@modInp@parameters[[nn]]@nValues),, drop = FALSE]
       }
@@ -92,7 +92,7 @@
   }
   # mMilestoneFirst
   scen@modInp@parameters[['mMilestoneFirst']] <- .add_data(scen@modInp@parameters[['mMilestoneFirst']], 
-  	data.frame(year = min(mile.stone.after)))
+  	data.table(year = min(mile.stone.after)))
   # assign('prec.after.startYear', prec, globalenv())
   scen
 }

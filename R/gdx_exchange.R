@@ -21,8 +21,8 @@
 .df2uels <- function(df, name = "x", value = "value") {
   # The function takes data frame or character vector and returns
   # named list for exporting to GDX-file using gdxrrw
-  if (!is.data.frame(df)) {
-    df <- data.frame(df)
+  if (!is.data.table(df)) {
+    df <- data.table(df)
     colnames(df) <- name
   }
   domains <- names(df)

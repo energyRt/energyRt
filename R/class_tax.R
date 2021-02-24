@@ -7,7 +7,7 @@
 #' @slot year numeric. 
 #' @slot slice character. 
 #' @slot defVal numeric. 
-#' @slot value data.frame. 
+#' @slot value data.table. 
 #' @slot misc list. 
 #'
 #' @return
@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' 
-# !!! add slot "tax" = data.frame(comm, year, slice, tax)
+# !!! add slot "tax" = data.table(comm, year, slice, tax)
 # !!! add slot @variable = factor("output", "balance")
 setClass("tax",
          representation(
@@ -25,7 +25,7 @@ setClass("tax",
            comm          = "character",      # 
            region        = "character",      #
            defVal        = "numeric",      # 
-           tax           = "data.frame",      # 
+           tax           = "data.table",      # 
            misc          = "list"
          ),
          prototype(
@@ -34,7 +34,7 @@ setClass("tax",
            description   = "",
            region        = character(),      #
            defVal        = 0,      # 
-           tax = data.frame(
+           tax = data.table(
            	region = character(), 
            	year = numeric(), 
            	slice = character(), 
@@ -54,7 +54,7 @@ setClass("tax",
 #' @slot comm character. 
 #' @slot region character. 
 #' @slot defVal numeric. 
-#' @slot value data.frame. 
+#' @slot value data.table. 
 #' @slot misc list. 
 #'
 #' @return
@@ -62,7 +62,7 @@ setClass("tax",
 #'
 #' @examples
 #' 
-# !!! add slot "sub" = data.frame(comm, year, slice, sub)
+# !!! add slot "sub" = data.table(comm, year, slice, sub)
 # !!! rename sub -> subsidy
 # !!! add slot @variable = factor("output", "balance")
 setClass("sub",
@@ -73,7 +73,7 @@ setClass("sub",
            comm          = "character",      # 
            region        = "character",      #
            defVal        = "numeric",      # 
-           sub          = "data.frame",      # 
+           sub          = "data.table",      # 
            misc          = "list"
          ),
          prototype(
@@ -82,7 +82,7 @@ setClass("sub",
            description   = "",
            region        = character(),      #
            defVal        = 0,      # 
-           sub = data.frame(
+           sub = data.table(
            	region = character(), 
            	year = numeric(), 
            	slice = character(), 

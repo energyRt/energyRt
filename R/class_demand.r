@@ -4,7 +4,7 @@
 #' @slot description optional description, comment (character). 
 #' @slot commodity character. 
 #' @slot unit character. 
-#' @slot dem data.frame. 
+#' @slot dem data.table. 
 #' @slot region character. 
 #' @slot misc list. 
 #'
@@ -17,10 +17,10 @@ setClass("demand",
       representation(
           name          = "character",
           description   = "character",
-          # color         = "data.frame",     
+          # color         = "data.table",     
           commodity     = "character",
           unit          = "character",
-          dem           = "data.frame",     
+          dem           = "data.table",     
           region        = "character",     
           # GIS         = "GIS", # 
           misc = "list"
@@ -28,13 +28,13 @@ setClass("demand",
       prototype(
           name          = "",
           description   = "",
-          # color         = data.frame(region   = character(),
+          # color         = data.table(region   = character(),
           #                            color    = character(),
           #                            stringsAsFactors = FALSE),
           # commodity     = "",
           unit          = "",
           region        = character(),       
-          dem           = data.frame(region   = character(),
+          dem           = data.table(region   = character(),
                                      year     = integer(),
                                      slice    = character(),
                                      dem      = numeric(),

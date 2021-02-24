@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------------------------------------------
 # Fill table commodity_type and check for conflict type definition
 checkInpOut <- function(tech) {
-  ctype <- data.frame(type      = factor(NULL, c('input', 'output', 'aux')),
+  ctype <- data.table(type      = factor(NULL, c('input', 'output', 'aux')),
                       group     = character(),
                       comb      = numeric(),
                       unit      = character(),
@@ -21,7 +21,7 @@ checkInpOut <- function(tech) {
   ctype[, 'comb'] <- 0  
   tech@input$combustion[is.na(tech@input$combustion)] <- 1
   ctype[tech@input$comm, 'comb'] <- tech@input$combustion
-  aux <- data.frame(input   = logical(),
+  aux <- data.table(input   = logical(),
                     output  = logical(),
                     stringsAsFactors = FALSE)
   if (length(acomm)) {
@@ -67,7 +67,7 @@ checkInpOut <- function(tech) {
     aux[i, 'output'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2aout', 'cap2aout', 'ncap2aout')])) || 
         any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2aout', 'cout2aout')]))) 
   }
-  gtype <- data.frame(type      = factor(NULL, c('input', 'output')),
+  gtype <- data.table(type      = factor(NULL, c('input', 'output')),
                       stringsAsFactors = FALSE)
                       
   # Define type group

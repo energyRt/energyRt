@@ -45,7 +45,7 @@ fold <- function(scen) {
 	rs <- NULL
 	# Handle with class 
 	for(cls in scn_class) {
-		dtf <- getSlots(cls)[getSlots(cls) == 'data.frame']
+		dtf <- getSlots(cls)[getSlots(cls) == 'data.table']
 		tmp <- new(cls)
 		# Handle with class/slot
 		for (jj in names(dtf)) {
@@ -63,7 +63,7 @@ fold <- function(scen) {
 					i <- i + 1
 				}
 				if (length(fl) != 0)
-					rs <- rbind(rs, data.frame(class = rep(cls, length(fl)), slot = rep(jj, length(fl)), col = fl))
+					rs <- rbind(rs, data.table(class = rep(cls, length(fl)), slot = rep(jj, length(fl)), col = fl))
 		}
 	}
 	rs	

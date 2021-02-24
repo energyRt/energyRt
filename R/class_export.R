@@ -5,7 +5,7 @@
 #' @slot commodity character. 
 #' @slot unit character. 
 #' @slot reserve numeric. 
-#' @slot exp data.frame. 
+#' @slot exp data.table. 
 #' @slot slice character. 
 #' @slot misc list. 
 #'
@@ -17,11 +17,11 @@ setClass("export",
       representation(
           name          = "character",
           description   = "character",
-          # color         = "data.frame",      #
+          # color         = "data.table",      #
           commodity     = "character",
           unit          = "character",
           reserve       = "numeric",
-          exp           = "data.frame",
+          exp           = "data.table",
           slice         = "character",
           # GIS                = "GIS", # 
           misc = "list"
@@ -29,13 +29,13 @@ setClass("export",
       prototype(
           name          = "",
           description   = "",
-          # color         = data.frame(region   = character(),
+          # color         = data.table(region   = character(),
           #                            color    = character(),
           #                            stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
           reserve       = Inf,
-          exp           = data.frame(region   = character(),
+          exp           = data.table(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
                                      exp.lo   = numeric(),

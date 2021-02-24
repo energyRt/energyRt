@@ -6,8 +6,8 @@
 #' @slot name character. 
 #' @slot description character. 
 #' @slot variable character. 
-#' @slot subset data.frame. 
-#' @slot mult data.frame. 
+#' @slot subset data.table. 
+#' @slot mult data.table. 
 #' @slot misc list. 
 #'
 setClass('costs', 
@@ -15,8 +15,8 @@ setClass('costs',
            name          = "character",
            description   = "character",       # description
            variable      = "character",
-           subset        = "data.frame",
-           mult          = "data.frame",
+           subset        = "data.table",
+           mult          = "data.table",
            misc = "list"
            # parameter= list() # For the future
          ),
@@ -24,8 +24,8 @@ setClass('costs',
            name          = NULL,
            description   = '',       # description
            variable      = character(),
-           subset        = data.frame(),
-           mult          = data.frame(),
+           subset        = data.table(),
+           mult          = data.table(),
            #! Misc
            misc = list(
            )),
@@ -56,8 +56,8 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
 
    # Add subset
   if (!is.null(subset)) {
-    if (is.list(subset) && !is.data.frame(subset)) {
-      subset2 <- data.frame(stringsAsFactors = FALSE)
+    if (is.list(subset) && !is.data.table(subset)) {
+      subset2 <- data.table()
       for (i in names(subset)) if (!is.null(subset[[i]])) {
         subset2[[i]] <- subset[[i]]
       }
@@ -68,8 +68,8 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
       stop(paste0('There ', c('is', 'are')[1 + length(bug) != 1], ' unnecessary column', 
           's'[length(bug) != 1], ' "', paste0(bug, collapse = '", "'), '" in subset (cost "', name, '").'))
     }
-    if (!is.data.frame(subset)) 
-      stop(paste0('Subset have to be list or data.frame (cost "', name, '").'))
+    if (!is.data.table(subset)) 
+      stop(paste0('Subset have to be list or data.table (cost "', name, '").'))
     if (anyDuplicated(subset)) 
       stop(paste0('There are duplicated row(s) in subset (cost "', name, '").'))
     subset <- subset[, !apply(is.na(subset), 2, all), drop = FALSE]
@@ -78,10 +78,10 @@ newCosts <- function(name, variable, description = '', mult = NULL, subset = NUL
 
  # Add mult
   if (!is.null(mult)) {
-    if (!is.data.frame(mult) && !is.numeric(mult))
-      stop(paste0('Mult have to be numeric or data.frame (cost "', name, '").'))
+    if (!is.data.table(mult) && !is.numeric(mult))
+      stop(paste0('Mult have to be numeric or data.table (cost "', name, '").'))
     if (is.numeric(mult)) {
-      obj@mult <- data.frame(value = mult)
+      obj@mult <- data.table(value = mult)
     } else {
       if (!all(colnames(mult) %in% c('value', sets))) {
         bug <- colnames(mult)[!(colnames(mult) %in% c('value', sets))]

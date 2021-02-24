@@ -67,7 +67,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }
   scen@modInp@parameters[['year']] <- .add_data(scen@modInp@parameters[['year']], scen@model@sysInfo@year)
   scen@modInp@parameters[['mMidMilestone']] <- .add_data(scen@modInp@parameters[['mMidMilestone']], 
-                                                       data.frame(year = scen@model@sysInfo@milestone$mid))
+                                                       data.table(year = scen@model@sysInfo@milestone$mid))
   # Fill slice
   scen@model@sysInfo@slice <- energyRt:::.init_slice(scen@model@sysInfo@slice)
   scen@modInp@parameters[['slice']] <- .add_data(scen@modInp@parameters[['slice']], 
@@ -93,10 +93,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
     mileStoneForGrowth = xx,
     fullsets = fullsets
   )
-  approxim$ry <- merge(data.frame(region = approxim$region, stringsAsFactors = FALSE), 
-    data.frame(year = approxim$mileStoneYears, stringsAsFactors = FALSE))
+  approxim$ry <- merge(data.table(region = approxim$region, stringsAsFactors = FALSE), 
+    data.table(year = approxim$mileStoneYears, stringsAsFactors = FALSE))
   approxim$rys <- merge(approxim$ry,
-    data.frame(slice = approxim$slice@all_slice, stringsAsFactors = FALSE))
+    data.table(slice = approxim$slice@all_slice, stringsAsFactors = FALSE))
   # Fill basic parameter interplotaion from sysInfo
   approxim$all_comm <- c(lapply(scen@model@data, function(x) c(lapply(x@data, function(y) {
   	if (class(y) != 'commodity') return(NULL)
@@ -112,7 +112,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
-      rep_class <- rbind(rep_class, data.frame(repos = rep(i, length(scen@model@data[[i]]@data)), 
+      rep_class <- rbind(rep_class, data.table(repos = rep(i, length(scen@model@data[[i]]@data)), 
         class = sapply(scen@model@data[[i]]@data, class), 
         name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
         stringsAsFactors = FALSE))
@@ -124,7 +124,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
         # Get prototype
         prot <- new(tmp@misc$class)
         psb_slot <- getSlots(tmp@misc$class)
-        psb_slot <- names(psb_slot)[psb_slot == 'data.frame']
+        psb_slot <- names(psb_slot)[psb_slot == 'data.table']
         psb_slot <- psb_slot[!(psb_slot %in% c('defVal', 'interpolation'))]
         fl <- sapply(psb_slot, function(x) any(colnames(slot(prot, x)) %in% tmp@colName))
         if (sum(fl) != 1) stop('Internal error')
@@ -150,7 +150,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
           scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
           if (arg$verbose >= 1) {
             scen@misc$trimDroppedDimensions <- rbind(scen@misc$trimDroppedDimensions, 
-                data.frame(parameter = rep(pr, length(need_col)), dimname = need_col, stringsAsFactors = FALSE))
+                data.table(parameter = rep(pr, length(need_col)), dimname = need_col, stringsAsFactors = FALSE))
             warning(paste0('Dropping dimension "', paste0(need_col, collapse = '", "'), '" from parameter "', pr, '"'))
           }
         }
@@ -211,7 +211,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     scen@modInp@parameters$mLECRegion <- addMultipleSet(scen@modInp@parameters$mLECRegion, scen@model@LECdata$region)
     if (length(obj@LECdata$pLECLoACT) == 1) {
       scen@modInp@parameters$pLECLoACT <- .add_data(scen@modInp@parameters$pLECLoACT, 
-                                           data.frame(region = scen@model@LECdata$region, value = scen@model@LECdata$pLECLoACT))
+                                           data.table(region = scen@model@LECdata$region, value = scen@model@LECdata$pLECLoACT))
     }
   }
   

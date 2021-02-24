@@ -611,7 +611,7 @@ setMethod("initialize", "modInp",
 
 #### Internal functions ####
 .get_default_values <- function(modInp, name, drop.unused.values) {
-  # Returns data.frame with default values of parameters on 
+  # Returns data.table with default values of parameters on 
   #       expanded grid of all (or used only, like milestone-years) 
   #       values of the parameter dimension (e.g. sets)
   # name - "character", name of the parameter
@@ -678,7 +678,7 @@ setMethod("initialize", "modInp",
   }
   if (modInp@parameters[[name]]@type == 'simple' && (is.null(sets) || nrow(sets) != 0)) {
     sets$value <- modInp@parameters[[name]]@defVal
-    if (!is.data.frame(sets)) sets <- as.data.frame(sets)
+    if (!is.data.table(sets)) sets <- as.data.table(sets)
   } 
   if (modInp@parameters[[name]]@type == 'multi' && (is.null(sets) || nrow(sets) != 0)) {
     sets$type <- 'lo'
@@ -692,7 +692,7 @@ setMethod("initialize", "modInp",
 }
 
 .add_dropped_zeros <- function(modInp, name, drop.unused.values = TRUE, use.dplyr = FALSE) {
-  # Returns data.frame filled the parameter ("name") data with added, previous dropped zeros (if any)
+  # Returns data.table filled the parameter ("name") data with added, previous dropped zeros (if any)
   # rare use - currently reserved for "fix to scenario" routines (and some excessive/double-checking use)
   tmp <- .get_default_values(modInp, name, drop.unused.values)
   # tmp$value <- 0

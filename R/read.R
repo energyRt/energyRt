@@ -41,7 +41,7 @@ read.scenario <- function(scen, ...) {
     jj <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), 
                                  stringsAsFactors = FALSE)
     if (ncol(jj) == 1) {
-      rr$variables[[i]] <- data.frame(value = jj[1, 1])
+      rr$variables[[i]] <- data.table(value = jj[1, 1])
     } else {
       for(j in seq_len(ncol(jj))[colnames(jj) != 'value']) {
         # Remove [.][:digit:] if any
@@ -132,7 +132,7 @@ read.scenario <- function(scen, ...) {
         vTechEmsFuel[, c('tech', 'comm', 'region', 'year', 'slice')], sum)
       vTechEmsFuel$value <- vTechEmsFuel$x; vTechEmsFuel$x <- NULL
     } else {
-      vTechEmsFuel <- data.frame(tech = character(), comm = character(), region = character(), 
+      vTechEmsFuel <- data.table(tech = character(), comm = character(), region = character(), 
         year = numeric(), value = numeric(), stringsAsFactors=FALSE)
     }
     scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
@@ -140,7 +140,7 @@ read.scenario <- function(scen, ...) {
     # Estimate Costs
     if (length(getNames(scen, 'costs')) != 0) {
     	cst <- getObjects(scen, 'costs')
-    	costs_tot <- data.frame(costs = character(), region = character(), year = numeric(), 
+    	costs_tot <- data.table(costs = character(), region = character(), year = numeric(), 
     													value = numeric(), stringsAsFactors = FALSE)
     	for (tmp in cst) {
 	    	in_dat <- scen@modOut@variables[[tmp@variable]]

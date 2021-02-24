@@ -23,7 +23,7 @@
 #        interval <- c(1, rep(arg$by, (arg$end - start) %/% arg$by))
 #      } else stop('setMileStoneYears: Wrong argument')
 #    }
-#    mlst <- data.frame(start = start + cumsum(c(0, interval[-length(interval)])), 
+#    mlst <- data.table(start = start + cumsum(c(0, interval[-length(interval)])), 
 #      mid = rep(NA, length(interval)), end = start + cumsum(interval) - 1)
 #    mlst[, 'mid'] <- trunc(.5 * (mlst[, 'start'] + mlst[, 'end']))
 #    obj@milestone <- mlst
@@ -52,7 +52,7 @@ setMethod('setMilestoneYears', signature(obj = 'scenario', start = 'numeric', in
 
 setMethod('milestoneYears', signature(start = 'numeric', interval = 'numeric'), function(start, interval) {
       if (interval[1] != 1)  stop('setMileStoneYears: first interval have to be 1')
-    mlst <- data.frame(start = start + cumsum(c(0, interval[-length(interval)])), 
+    mlst <- data.table(start = start + cumsum(c(0, interval[-length(interval)])), 
       mid = rep(NA, length(interval)), end = start + cumsum(interval) - 1)
     mlst[, 'mid'] <- trunc(.5 * (mlst[, 'start'] + mlst[, 'end']))
     mlst

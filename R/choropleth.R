@@ -234,7 +234,7 @@ get_labpt <- function(scen) {
   })
   labpt <- cbind(
     scen@model@sysInfo@GIS@data$region,
-    as.data.frame(t(labpt))
+    as.data.table(t(labpt))
   )
   names(labpt) <- c("region", "x", "y")
   return(labpt)
@@ -264,7 +264,7 @@ getCenters <- function(spdf, region = "region",
   })
   labpt <- cbind(
     spdf@data[[region]],
-    as.data.frame(t(labpt))
+    as.data.table(t(labpt))
   )
   names(labpt) <- c("region", "x", "y")
   if (regionsAsCharacters) labpt <- fact2char(labpt)
@@ -276,7 +276,7 @@ getCenters <- function(spdf, region = "region",
 get_labpt_spdf <- getCenters
 
 fact2char <- function(df, asTibble = TRUE) {
-  stopifnot(is.data.frame(df))
+  stopifnot(is.data.table(df))
   jj <- sapply(df, is.factor)
   for (j in names(df)[jj]) {
     df[[j]] <- as.character(df[[j]])
@@ -287,8 +287,8 @@ fact2char <- function(df, asTibble = TRUE) {
 
 #' Adding region centers coordinate to a data frame
 #'
-#' @param dat data.frame, should have a column with regions' IDs
-#' @param labpt data.frame with regions' coordinates
+#' @param dat data.table, should have a column with regions' IDs
+#' @param labpt data.table with regions' coordinates
 #' @param ID character, name of the column with region IDs (default = "region")
 #' @param pref tbd
 #' @param sfx tbd

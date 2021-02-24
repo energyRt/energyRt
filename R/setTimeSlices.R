@@ -140,14 +140,14 @@
     }
     dtf
   }
-  dtf <- data.frame(share = numeric(), stringsAsFactors = FALSE)
+  dtf <- data.table(share = numeric(), stringsAsFactors = FALSE)
   if (length(arg) == 1 && is.character(arg[[1]]) && length(arg[[1]]) == 1) {
-    dtf <- data.frame(share = 1, ANNUAL = arg[[1]], stringsAsFactors = FALSE)
+    dtf <- data.table(share = 1, ANNUAL = arg[[1]], stringsAsFactors = FALSE)
     if (!is.null(names(arg))) colnames(dtf)[2] <- names(arg)[1] 
   } else {
     dtf <- slice_def(dtf, arg)
   }
-  dtf <- dtf[, c(2:ncol(dtf), 1), drop = FALSE]
+  dtf <- setcolorder(dtf, c(2:ncol(dtf), 1))
   if (length(unique(dtf[, 1])) != 1) {
     warning('.setTimeSlices: first slice have to consist only one slice, add "ANNUAL"')
     if (any(colnames(dtf) == 'ANNUAL') || any(c(dtf == "ANNUAL", recursive = TRUE)))

@@ -30,9 +30,9 @@
       # List argument
       if (slt[w] == 'list') {
         slot(obj, w) <- ww
-        # data.frame argument
-      } else if (slt[w] == 'data.frame') {
-        if (is.data.frame(ww)) {
+        # data.table argument
+      } else if (slt[w] == 'data.table') {
+        if (is.data.table(ww)) {
           # Check: There is no additional column
           if (any(!(colnames(ww) %in% colnames(slot(obj, w))))) {
             stop(paste('Unknown column "', w, '"in the slot: "', 
@@ -89,7 +89,7 @@
 
 #.new_object('technology')
 #print(newTechnology('technology', 'd3', description = 'jk', cap2act = 4, 
-#  units = data.frame(capacity = 'MV', fixom = 'j', stringsAsFactors = FALSE)))
+#  units = data.table(capacity = 'MV', fixom = 'j', stringsAsFactors = FALSE)))
 
 setGeneric("newTechnology", function(name, ...) standardGeneric("newTechnology"))
 #' Create new technology object
@@ -227,8 +227,8 @@ setMethod('newTrade', signature(name = 'character'), function(name, ..., source 
   if (!is.null(source) && !is.null(list(...)$routes))
     stop('Inconsistency of source/destination with routes data "', trd@name, '"')
   if (!is.null(source)) {
-    trd@routes <- merge(data.frame(src = source, stringsAsFactors = FALSE), 
-                        data.frame(dst = destination, stringsAsFactors = FALSE))
+    trd@routes <- merge(data.table(src = source, stringsAsFactors = FALSE), 
+                        data.table(dst = destination, stringsAsFactors = FALSE))
     trd@routes <- trd@routes[trd@routes$src != trd@routes$dst,, drop = FALSE]
   }
   trd

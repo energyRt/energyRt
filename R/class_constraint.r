@@ -7,7 +7,7 @@
 #' @slot description character. 
 #' @slot eq factor. 
 #' @slot for.each list. 
-#' @slot rhs data.frame. 
+#' @slot rhs data.table. 
 #' @slot defVal numeric. 
 #' @slot lhs list. 
 #' @slot misc list. 
@@ -17,8 +17,8 @@ setClass('constraint',
            name          = "character",
            description   = "character",       # description
            eq            = "factor",
-           for.each      = "data.frame",
-           rhs           = "data.frame",
+           for.each      = "data.table",
+           rhs           = "data.table",
            defVal        = "numeric",
            lhs           = "list",
            misc = "list"
@@ -28,8 +28,8 @@ setClass('constraint',
            name          = NULL,
            description   = '',       # description
            eq            = factor('==', levels = c('>=', '<=', '==')),
-           for.each      = data.frame(),
-           rhs           = data.frame(),
+           for.each      = data.table(),
+           rhs           = data.table(),
            defVal        = 0,
            lhs           = list(),
            #! Misc
@@ -50,7 +50,7 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 #' @slot description character. 
 #' @slot variable character. 
 #' @slot for.sum list. 
-#' @slot mult data.frame. 
+#' @slot mult data.table. 
 #' @slot defVal numeric. 
 #' @slot misc list. 
 #' 
@@ -59,7 +59,7 @@ setClass('summand',
            description   = "character",       # description
            variable      = "character",
            for.sum       = "list",
-           mult          = "data.frame",
+           mult          = "data.table",
            defVal        = "numeric",
            misc = "list"
            # parameter= list() # For the future
@@ -68,7 +68,7 @@ setClass('summand',
            description   = NULL,       # description
            variable      = NULL,
            for.sum       = list(),
-           mult          = data.frame(),
+           mult          = data.table(),
            defVal        = 1,
            #! Misc
            misc = list(
@@ -90,7 +90,7 @@ setClass('summand',
 #' @return Object of class `constraint`.
 #'
 #'    
-newConstraint <- function(name, ..., eq = '==', rhs = data.frame(), for.each = NULL, defVal = 0, arg = NULL) {
+newConstraint <- function(name, ..., eq = '==', rhs = data.table(), for.each = NULL, defVal = 0, arg = NULL) {
   obj <- new('constraint')
   #stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq)))   {
@@ -101,32 +101,32 @@ newConstraint <- function(name, ..., eq = '==', rhs = data.frame(), for.each = N
     if (length(rhs) != 1) 
       stop(paste0('Wrong rhs parameters '))
     defVal <- rhs
-    rhs <- data.frame()
+    rhs <- data.table()
   }
-  if (!is.data.frame(rhs) && is.list(rhs)) {
+  if (!is.data.table(rhs) && is.list(rhs)) {
     tmp = sapply(rhs, length)
     if (any(tmp[1] != tmp) || is.null(names(rhs)))
       stop(paste0('Wrong rhs parameters '))
-    rhs <- as.data.frame(rhs, stringsAsFactors = FALSE)
+    rhs <- as.data.table(rhs, stringsAsFactors = FALSE)
   }
-  if (!is.data.frame(rhs) && is.list(rhs) && length(rhs) == 1 && length(rhs[[1]]) == 1) {
+  if (!is.data.table(rhs) && is.list(rhs) && length(rhs) == 1 && length(rhs[[1]]) == 1) {
     defVal <- rhs[[1]]
-    rhs <- data.frame()
+    rhs <- data.table()
   }
-  if (is.data.frame(rhs) && ncol(rhs) == 1 && nrow(rhs) == 1) {
+  if (is.data.table(rhs) && ncol(rhs) == 1 && nrow(rhs) == 1) {
     defVal <- rhs[1, 1]
-    rhs <- data.frame()
+    rhs <- data.table()
   }
   if (is.numeric(rhs)) {
     defVal <- rhs
-    rhs <- data.frame()
+    rhs <- data.table()
   }
-  if (!is.data.frame(rhs) && is.list(rhs)) {
+  if (!is.data.table(rhs) && is.list(rhs)) {
     xx <- sapply(rhs, length)
     if (any(xx[1] != xx))
       stop(paste0('Wrong rhs parameters '))
     if (xx[1] >= 1) {
-      xx <- data.frame(stringsAsFactors = FALSE)
+      xx <- data.table()
       xx[seq_len(length(rhs[[1]])), ] <- NA
       for (i in names(rhs)) xx[, i] <- rhs[[i]]
       rhs <- xx
@@ -137,14 +137,14 @@ newConstraint <- function(name, ..., eq = '==', rhs = data.frame(), for.each = N
   obj@defVal    <- defVal
   obj@name      <- name
   if (!is.null(for.each)) {
-    if (!is.data.frame(for.each) && is.list(for.each)) {
-      tmp <- data.frame(stringsAsFactors = FALSE)
+    if (!is.data.table(for.each) && is.list(for.each)) {
+      tmp <- data.table()
       fl_null <- sapply(for.each, is.null)
       for (i in names(for.each)[fl_null]) {
         for.each[[i]] <- NA
       }     
       for (i in names(for.each)) {
-        t2 <- data.frame(for.each[[i]], stringsAsFactors = FALSE)
+        t2 <- data.table(for.each[[i]], stringsAsFactors = FALSE)
         colnames(t2) <- i
         if (ncol(tmp) == 0) {
           tmp <- t2
@@ -153,7 +153,7 @@ newConstraint <- function(name, ..., eq = '==', rhs = data.frame(), for.each = N
         }
       }
       obj@for.each  <- tmp
-    } else if (is.data.frame(for.each)) {
+    } else if (is.data.table(for.each)) {
       obj@for.each  <- for.each
     } else stop("Unknown argument 'for.each'")
   }
@@ -168,7 +168,7 @@ newConstraint <- function(name, ..., eq = '==', rhs = data.frame(), for.each = N
 }
 
 
-addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list(), arg) {
+addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list(), arg) {
   if (!is.null(names(arg))) {
     if (any(names(arg) == 'variable')) variable <- arg$variable
     if (any(names(arg) == 'mult')) mult <- arg$mult
@@ -178,18 +178,18 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   # eqt, variable, mult, for.sum, arg
   st <- new('summand')
   st@variable <- variable
-  if (!is.data.frame(mult) && is.list(mult)) {
+  if (!is.data.table(mult) && is.list(mult)) {
     xx <- sapply(mult, length)
     if (any(xx[1] != xx))
       stop(paste0('Wrong mult parameters '))
     if (xx[1] >= 1) {
-      xx <- data.frame(stringsAsFactors = FALSE)
+      xx <- data.table()
       xx[seq_len(length(mult[[1]])), ] <- NA
       for (i in names(mult)) xx[, i] <- mult[[i]]
       mult <- xx
     }
   }
-  if (is.data.frame(mult)) {
+  if (is.data.table(mult)) {
     st@mult <- mult
   } else st@defVal <- mult
   st@for.sum <- for.sum
@@ -224,7 +224,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   # all.set contain all set for for.each & lhs
   # Estimate is need sum for for.each
   # set.map need special mapping or consist all set
-  all.set <- data.frame(
+  all.set <- data.table(
     alias = character(), # name in equation
     set = character(),  # original set 
     for.each = logical(), # for.each, lhs
@@ -404,7 +404,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     # Add to year multiplier if lag.year | lead.year
     if ((any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) && (nrow(stm@lhs[[i]]@mult) == 0 ||  all(colnames(stm@lhs[[i]]@mult) != 'year'))) {
       if (nrow(stm@lhs[[i]]@mult) == 0) {
-        stm@lhs[[i]]@mult <- data.frame(year = NA, value = stm@lhs[[i]]@defVal, stringsAsFactors = FALSE)
+        stm@lhs[[i]]@mult <- data.table(year = NA, value = stm@lhs[[i]]@defVal, stringsAsFactors = FALSE)
       } else {
         stm@lhs[[i]]@mult$year <- NA
       }

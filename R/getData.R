@@ -90,7 +90,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @param variables if TRUE, variables will be included in the search and returned if found.
 #' @param na.rm if TRUE, NA values will be dropped.
 #' @param drop if TRUE, the sets with only one unique value will be dropped (not implemented)
-#' @param asTibble logical, if the data.frames should be converted into tibbles.
+#' @param asTibble logical, if the data.tables should be converted into tibbles.
 #' @param newNames renaming sets, named character vector or list with new names as values, and old names as names - the input parameter to renameSets function. The operation is performed before merging the data (merge parameter).
 #' @param newValues revalue sets, named character vector or list with new values as values, and old values as names - the input parameter to revalueSets function. The operation is performed after merging the data (merge parameter).
 #' @param ignore.case grepl parameter if regular expressions are used in '...' or 'name_'.
@@ -262,7 +262,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
           # browser()
           if (!is.null(dat[kk,, drop = FALSE]) && nrow(dat[kk,, drop = FALSE]) > 0) {
             nkk <- sum(kk)
-            dat <- dplyr::bind_cols(data.frame(
+            dat <- dplyr::bind_cols(data.table(
               scenario = rep(sc, nkk), 
               name = rep(pv, nkk)), dat[kk,, drop = FALSE])
             le <- length(ll) + 1
@@ -395,16 +395,16 @@ if (F) {# test
   x
 }
 
-#' Rename names of data.frame columns of list of data.frames.
+#' Rename names of data.table columns of list of data.tables.
 #'
-#' @param x a data.frame or a list with data frames.
+#' @param x a data.table or a list with data frames.
 #' @param newNames named character vector or list with new names as values, and old names as names.
 #'
-#' @return depending on input, the renamed data.frame or the list with renamed data.frames.
+#' @return depending on input, the renamed data.table or the list with renamed data.tables.
 #' @export renameSets
 #' @examples
 #' \dontrun{
-#'   x <- data.frame(a = letters, n = 1:length(letters))
+#'   x <- data.table(a = letters, n = 1:length(letters))
 #'   x
 #'   renameSets(x[1:3,], c(a = "A", n = "N"))
 #'   renameSets(x[1:3,], list(a = "B", n = "M"))
@@ -434,16 +434,16 @@ renameSets <- function(x, newNames = NULL) {
 }
 
 
-#' Replace specified values with new values, in factor or character columns of a data.frame.
+#' Replace specified values with new values, in factor or character columns of a data.table.
 #' 
 #' @param x vector
-#' @param newValues a names list with named vectors. The names of the list should be equal to the names of the data.frame columns in wich values will be replaced. The named vector should have new names as values and old values as names.
+#' @param newValues a names list with named vectors. The names of the list should be equal to the names of the data.table columns in wich values will be replaced. The named vector should have new names as values and old values as names.
 #'
-#' @return the x data.frame with revalued variables.
+#' @return the x data.table with revalued variables.
 #' @export revalueSets
 #' @examples
 #' \dontrun{
-#'   x <- data.frame(a = letters, n = 1:length(letters))
+#'   x <- data.table(a = letters, n = 1:length(letters))
 #'   nw1 <- LETTERS[1:10]
 #'   names(nw1) <- letters[1:10]
 #'   nw2 <- formatC(1:9, width = 3, flag = "0")
@@ -454,7 +454,7 @@ renameSets <- function(x, newNames = NULL) {
 #'}
 revalueSets <- function(x, newValues = NULL) {
   stopifnot(any(class(newValues) == "list"))
-  stopifnot(any(class(x) == "data.frame"))
+  stopifnot(any(class(x) == "data.table"))
   nnms <- names(newValues)
   xnms <- names(x)
   # browser()
@@ -472,7 +472,7 @@ if (F) { # Check
   x
   renameSets(x, c(a = "A", n = "N"))
   
-  d <- as.data.frame(x)
+  d <- as.data.table(x)
   renameSets(d, c(a = "A", n = "N"))
   
   # revalueSets

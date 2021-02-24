@@ -39,7 +39,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   if (is.null(add_set_name)) {
     dd <- dd[, c(mtp@dimSetNames, 'value'), drop = FALSE]
   } else {
-    d3 <- data.frame(stringsAsFactors = FALSE)
+    d3 <- data.table()
     for(i in 1:length(add_set_value))
         d3[1:nrow(dd), i] <- rep(add_set_value[i])
     colnames(d3) <- add_set_name
@@ -99,7 +99,7 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
   if (is.null(add_set_name)) {
     dd <- dd[, c(mtp@dimSetNames, 'type', 'value'), drop = FALSE]
   } else {
-    d3 <- data.frame(stringsAsFactors = FALSE)
+    d3 <- data.table()
     for(i in 1:length(add_set_value))
         d3[1:nrow(dd), i] <- rep(add_set_value[i])
     colnames(d3) <- add_set_name

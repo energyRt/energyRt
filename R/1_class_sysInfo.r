@@ -3,20 +3,20 @@
 #---------------------------------------------------------------------------------------------------------
 setClass("sysInfo",
       representation(
-          debug              = "data.frame",
-          discount           = "data.frame",
+          debug              = "data.table",
+          discount           = "data.table",
           region             = "character",
           # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
           year               = "numeric",
-          milestone          = "data.frame",
+          milestone          = "data.table",
           slice              = "slice",
 		      discountFirstYear  = "logical",
-          interpolation      = "data.frame",
-          defVal             = "data.frame",
+          interpolation      = "data.table",
+          defVal             = "data.table",
           misc               = "list"
       ),
       prototype(
-          debug   = data.frame(
+          debug   = data.table(
                                      comm       = character(),
                                      region     = character(),
                                      sp         = NULL,
@@ -26,16 +26,16 @@ setClass("sysInfo",
                                      dummyExport      = numeric(),
                                      stringsAsFactors = FALSE),
           # GIS           = NULL,
-          discount      = data.frame(region     = character(),
+          discount      = data.table(region     = character(),
                                      year       = numeric(),
                                      discount    = numeric(),
                                      stringsAsFactors = FALSE),
           region             = NULL,
           year               = as.numeric(2005:2050),
-          milestone          = data.frame(start = numeric(), mid = numeric(), end = numeric()),
+          milestone          = data.table(start = numeric(), mid = numeric(), end = numeric()),
           slice              = new('slice'),
 		      discountFirstYear  = FALSE,
-          defVal      = data.frame( # !!! distinguish interpolation for different objects and slots
+          defVal      = data.table( # !!! distinguish interpolation for different objects and slots
 						          	teff    = as.numeric(1),
 						          	cap2cat    = as.numeric(1),
 						          	wcinp.lo    = as.numeric(0),
@@ -129,7 +129,7 @@ setClass("sysInfo",
             rampup      = as.numeric(Inf),
             rampdown      = as.numeric(Inf),
           	stringsAsFactors = FALSE),
-          interpolation            = data.frame(
+          interpolation            = data.table(
 						          	teff        = as.character('back.inter.forth'),
 						          	cap2cat    = as.character('back.inter.forth'),
 						          	wcinp.lo   = as.character('back.inter.forth'),

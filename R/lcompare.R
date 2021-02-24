@@ -30,7 +30,7 @@ lcompare <- function(x, y, depth = 0, showDiff = TRUE, allowAll = TRUE, round = 
     fDepth <- function(ob, obj_depth = 0){
       if(!is.list(ob)){
         return(obj_depth)
-      }else if (is.data.frame(ob)){
+      }else if (is.data.table(ob)){
         return(obj_depth)
       } else {
         return(max(sapply(ob, fDepth, obj_depth = obj_depth + 1)))
@@ -48,7 +48,7 @@ lcompare <- function(x, y, depth = 0, showDiff = TRUE, allowAll = TRUE, round = 
       names(val) <- nm
       if (showDiff) {ii <- sapply(val, is.null); val <- val[!ii]}
       return(val)
-    } else if (is.data.frame(x) & is.data.frame(y)) {
+    } else if (is.data.table(x) & is.data.table(y)) {
       z <- compare::compare(x, y, allowAll = allowAll)
       if (z$result) return()
       if (nrow(x) == 0 | nrow(y) == 0) return(list(x = x, y = y))

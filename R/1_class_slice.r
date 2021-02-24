@@ -6,20 +6,20 @@
 # all_parent_child -> ???
 setClass("slice",
       representation(
-          levels           = "data.frame",
-          slice_share      = "data.frame", # Slice that after all, e.g.: ANNUAL, WINTER, WINTER_DAY, and so on with share
-          parent_child     = "data.frame", # Stright relation parent-child
-          all_parent_child = "data.frame", # All relation parent-child
+          levels           = "data.table",
+          slice_share      = "data.table", # Slice that after all, e.g.: ANNUAL, WINTER, WINTER_DAY, and so on with share
+          parent_child     = "data.table", # Stright relation parent-child
+          all_parent_child = "data.table", # All relation parent-child
           slice_map        = "list", # Slices set by level
           default_slice_level = "character", # Default slice map
           all_slice        = "character", 
           misc             = "list"
       ),
       prototype(
-        levels           = data.frame(stringsAsFactors = FALSE),
-        slice_share      = data.frame(slice = character(), share = numeric(), stringsAsFactors = FALSE),
-        parent_child     = data.frame(parent = character(), child = character(), stringsAsFactors = FALSE),
-        all_parent_child = data.frame(parent = character(), child = character(), stringsAsFactors = FALSE),
+        levels           = data.table(),
+        slice_share      = data.table(slice = character(), share = numeric(), stringsAsFactors = FALSE),
+        parent_child     = data.table(parent = character(), child = character(), stringsAsFactors = FALSE),
+        all_parent_child = data.table(parent = character(), child = character(), stringsAsFactors = FALSE),
         slice_map        = list(), # Slices set by level
         default_slice_level      = character(), # Default slice map
         all_slice        = character(),
@@ -122,11 +122,11 @@ setClass("slice",
       }
     }
     tmp[i + 1, 'next_slice'] <- tmp[j, 'child']
-    sl@misc$next_slice <- data.frame(slice = tmp$child, slicep = tmp$next_slice, stringsAsFactors = FALSE)
+    sl@misc$next_slice <- data.table(slice = tmp$child, slicep = tmp$next_slice, stringsAsFactors = FALSE)
     n1 <- c(lapply(sl@slice_map[-1], function(x) x), recursive = TRUE); names(n1) <- NULL
     n2 <- c(lapply(sl@slice_map[-1], function(x) c(x[-1], x[1])), recursive = TRUE); 
     names(n2) <- NULL
-    sl@misc$fyear_next_slice <- data.frame(slice = n1, slicep = n2, stringsAsFactors = FALSE)
+    sl@misc$fyear_next_slice <- data.table(slice = n1, slicep = n2, stringsAsFactors = FALSE)
   }
   sl
 }

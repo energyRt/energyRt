@@ -14,7 +14,7 @@
   }
   out_buf <- NULL
   for (i in nms) {
-    if (any(class(slot(tmp, i)) == 'data.frame')) {
+    if (any(class(slot(tmp, i)) == 'data.table')) {
       if (nrow(slot(tmp, i)) > 0 && any(!is.na(slot(tmp, i)))) {
         slt <- slot(tmp, i)[apply(!is.na(slot(tmp, i)), 1, any), apply(!is.na(slot(tmp, i)), 2, any), drop = FALSE]
         out_buf2 <- NULL

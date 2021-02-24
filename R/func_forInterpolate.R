@@ -161,7 +161,7 @@
       }
     }
   }
-  scen@misc$time.log <- data.frame(name = time.log.nm[seq_len(tmlg)], 
+  scen@misc$time.log <- data.table(name = time.log.nm[seq_len(tmlg)], 
                                    time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
   # if (arg$echo) cat(' ')
   if (arg$echo)
@@ -233,7 +233,7 @@
 	add_to_err <- function(err_msg, cns, slt, have, psb) {
 		if (!all(have %in% psb)) {
 			have <- unique(have[!(have %in% psb)])
-			tmp <- data.frame(value = have, stringsAsFactors = FALSE)
+			tmp <- data.table(value = have, stringsAsFactors = FALSE)
 			tmp$slot <- slt
 			tmp$constraint <- cns
 			return(rbind(err_msg, tmp[, c('constraint', 'slot', 'value'), drop = FALSE]))			
@@ -312,7 +312,7 @@
 				unq <- unique(tmp[[ss]])
 				fl <- !(unq %in% lsets[[ss]])
 				if (any(fl))
-					err_dtf <- rbind(err_dtf, data.frame(name = prm@name, set = ss, value = unq[fl]))
+					err_dtf <- rbind(err_dtf, data.table(name = prm@name, set = ss, value = unq[fl]))
 			}
 		}
 	}

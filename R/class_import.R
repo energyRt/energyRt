@@ -5,7 +5,7 @@
 #' @slot commodity character. 
 #' @slot unit character. 
 #' @slot reserve numeric. 
-#' @slot imp data.frame. 
+#' @slot imp data.table. 
 #' @slot slice character. 
 #' @slot misc list. 
 #'
@@ -18,11 +18,11 @@ setClass("import",
       representation(
           name          = "character",
           description   = "character",
-          # color         = "data.frame",      #
+          # color         = "data.table",      #
           commodity     = "character",
           unit          = "character",
           reserve       = "numeric",
-          imp           = "data.frame",
+          imp           = "data.table",
           slice         = "character",
           # GIS                = "GIS", 
           misc = "list"
@@ -30,13 +30,13 @@ setClass("import",
       prototype(
           name          = "",
           description   = "",
-          # color         = data.frame(region   = character(),
+          # color         = data.table(region   = character(),
           #                            color    = character(),
           #                            stringsAsFactors = FALSE),
           commodity     = "",
           unit          = "",
           reserve       = Inf,
-          imp           = data.frame(region   = character(),
+          imp           = data.table(region   = character(),
                                      year     = numeric(),
                                      slice    = character(),
                                      imp.lo   = numeric(),

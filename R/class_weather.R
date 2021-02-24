@@ -9,8 +9,8 @@ setClass("weather",
            region        = "character",
            slice         = "character",
            defVal        = "numeric",
-           weather       = "data.frame", # weather factor (availability multiplier)
-           # color         = "data.frame",      #
+           weather       = "data.table", # weather factor (availability multiplier)
+           # color         = "data.table",      #
            misc = "list"
          ),
          prototype(
@@ -20,12 +20,12 @@ setClass("weather",
            region        = character(),
            slice         = character(),
            defVal        = 0.,
-           weather       = data.frame(region   = character(), # 
+           weather       = data.table(region   = character(), # 
                                       year     = numeric(),
                                       slice    = character(),
                                       wval     = numeric(),
                                       stringsAsFactors = FALSE),
-           # color         = data.frame(region   = character(),
+           # color         = data.table(region   = character(),
            #                            slice    = character(),
            #                            color    = character(),
            #                            stringsAsFactors = FALSE),

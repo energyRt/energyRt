@@ -18,30 +18,30 @@ setClass("technology",
       	# sector	      = "character",       # Sector or Technology group - optional
       	# enbal         = "character",       # Which part of energy balance - (export, import, ...,
       	# transformation, consumption, ...
-      	# color         = "data.frame",      #
-      	input         = "data.frame",      #
-      	output        = "data.frame",      #
-      	aux           = "data.frame",      #
-      	units         = "data.frame",      #
-      	group         = "data.frame",      # groups units
+      	# color         = "data.table",      #
+      	input         = "data.table",      #
+      	output        = "data.table",      #
+      	aux           = "data.table",      #
+      	units         = "data.table",      #
+      	group         = "data.table",      # groups units
       	cap2act       = "numeric",         #
       	# Performance parameters
-      	geff          = "data.frame",    #  Group efficiency
-      	ceff          = "data.frame",    #  Commodity efficiency
-      	aeff          = "data.frame",    #  Commodity efficiency
-      	af            = "data.frame",    #
-      	afs           = "data.frame",    #
-      	weather       = "data.frame",    # weather condisions multiplier
+      	geff          = "data.table",    #  Group efficiency
+      	ceff          = "data.table",    #  Commodity efficiency
+      	aeff          = "data.table",    #  Commodity efficiency
+      	af            = "data.table",    #
+      	afs           = "data.table",    #
+      	weather       = "data.table",    # weather condisions multiplier
       	# Costs
-      	fixom         = "data.frame",    #
-      	varom         = "data.frame",    #
-      	invcost       = "data.frame",    #
+      	fixom         = "data.table",    #
+      	varom         = "data.table",    #
+      	invcost       = "data.table",    #
       	# Market
-      	start         = "data.frame",    #
-      	end           = "data.frame",    #
-      	olife         = "data.frame",    #
-      	# ucap          = "data.frame",    # Capacity of one unit (for integer programming)
-      	stock         = "data.frame", #
+      	start         = "data.table",    #
+      	end           = "data.table",    #
+      	olife         = "data.table",    #
+      	# ucap          = "data.table",    # Capacity of one unit (for integer programming)
+      	stock         = "data.table", #
       	early.retirement = "logical",
       	upgrade.technology = "character",
         fullYear         = "logical",
@@ -58,22 +58,22 @@ setClass("technology",
 		# sector	      = "",       # Sector or Technology group - optional
 		# enbal         = "",       # Which part of energy balance - (export, import, ...,
 		#region        = "",
-		# color         = data.frame(region   = character(),
+		# color         = data.table(region   = character(),
 			# color    = character(),
 			# stringsAsFactors = FALSE),
-		input         = data.frame(comm     = character(),
+		input         = data.table(comm     = character(),
 			unit     = character(),
 			group    = character(),  # may be factor or character?
 			combustion = numeric(),
 			stringsAsFactors = FALSE),
-		output        = data.frame(comm     = character(),
+		output        = data.table(comm     = character(),
 			unit     = character(),
 			group    = character(),
 			stringsAsFactors = FALSE),
-		aux           = data.frame(acomm     = character(),
+		aux           = data.table(acomm     = character(),
 			unit     = character(),
 			stringsAsFactors = FALSE),
-		units         = data.frame(capacity = character(),
+		units         = data.table(capacity = character(),
 			use      = character(),
 			activity = character(),
 			costs    = character(),
@@ -81,7 +81,7 @@ setClass("technology",
 			# fixom    = character(),
 			# invcost  = character(),
 			stringsAsFactors = FALSE),
-		group        = data.frame(
+		group        = data.table(
 			group    = character(),
 			description  = character(),  
 			unit     = character(),
@@ -89,14 +89,14 @@ setClass("technology",
 			stringsAsFactors = FALSE),
 		cap2act       = 1,
 		# group efficiency 
-		geff         = data.frame(region     = character(),
+		geff         = data.table(region     = character(),
 			year       = integer(),
 			slice      = character(),
 			group      = character(),
 			ginp2use    = numeric(),  
 			stringsAsFactors = FALSE),
 		# commodity efficiency 
-		ceff          = data.frame(region     = character(),
+		ceff          = data.table(region     = character(),
 			year       = integer(),
 			slice      = character(),
 			comm       = character(),
@@ -115,7 +115,7 @@ setClass("technology",
 			afc.fx    = numeric(),
 			stringsAsFactors = FALSE),
 		# Auxilary parameter
-		aeff          = data.frame(
+		aeff          = data.table(
 			acomm      = character(),
 			comm       = character(),
 			region     = character(),
@@ -139,7 +139,7 @@ setClass("technology",
 			sinp2aout  = numeric(),
 			sout2aout  = numeric(),
 			stringsAsFactors = FALSE),
-		af           = data.frame(
+		af           = data.table(
 			region   = character(),
 			year     = integer(),
 			slice    = character(),
@@ -149,14 +149,14 @@ setClass("technology",
 			rampup    = numeric(),
 			rampdown    = numeric(),
 			stringsAsFactors = FALSE),
-		afs          = data.frame(region   = character(),
+		afs          = data.table(region   = character(),
 			year     = integer(),
 			slice    = character(),
 			afs.lo   = numeric(),
 			afs.up   = numeric(),
 			afs.fx   = numeric(),
 			stringsAsFactors = FALSE),
-		weather      = data.frame(weather  = character(),
+		weather      = data.table(weather  = character(),
 			comm     = character(),
 			wafc.lo   = numeric(),
 			wafc.up   = numeric(),
@@ -168,11 +168,11 @@ setClass("technology",
 			wafs.up   = numeric(),
 			wafs.fx   = numeric(),
 			stringsAsFactors = FALSE),
-		fixom         = data.frame(region   = character(),
+		fixom         = data.table(region   = character(),
 			year     = integer(),
 			fixom    = numeric(),
 			stringsAsFactors = FALSE),
-		varom         = data.frame(region   = character(),
+		varom         = data.table(region   = character(),
 			year     = integer(),
 			slice    = character(),
 			comm     = character(),
@@ -181,24 +181,24 @@ setClass("technology",
 			cvarom   = numeric(),
 			avarom   = numeric(),
 			stringsAsFactors = FALSE),
-		invcost       = data.frame(region   = character(),
+		invcost       = data.table(region   = character(),
 			year     = integer(),
 			invcost  = numeric(),
 			stringsAsFactors = FALSE),
-		start         = data.frame(region   = character(),
+		start         = data.table(region   = character(),
 			start    = numeric(),
 			stringsAsFactors = FALSE),
-		end           = data.frame(region   = character(),
+		end           = data.table(region   = character(),
 			end      = numeric(),
 			stringsAsFactors = FALSE),
-		olife         = data.frame(region = character(),
+		olife         = data.table(region = character(),
 			olife = numeric(),
 			stringsAsFactors = FALSE),
-		# ucap          = data.frame(region = character(),
+		# ucap          = data.table(region = character(),
 		# 	year  = integer(),
 		# 	ucap = numeric(),
 		# 	stringsAsFactors = FALSE),
-		stock         = data.frame(region = character(),
+		stock         = data.table(region = character(),
 			year  = integer(),
 			stock = numeric(),
 			stringsAsFactors = FALSE),
@@ -219,15 +219,15 @@ setMethod("initialize", "technology", function(.Object, ...) {
 })
 
 #---------------------------------------------------------------------------------------------------------
-#! check_technology_data_frame <- function(x) : Check structure technology class (only data.frame)
+#! check_technology_data_frame <- function(x) : Check structure technology class (only data.table)
 #---------------------------------------------------------------------------------------------------------
 # .check_technology_data_frame <- function(object) {
-#   # check technology data.frame
+#   # check technology data.table
 #   g <- getClass('technology')
 #   tec <- new('technology')
 #   fl <- FALSE
 #   for(z in names(g@slots)) {
-#     if (g@slots[[z]] == 'data.frame') {
+#     if (g@slots[[z]] == 'data.table') {
 #       u <- slot(tec, z)
 #       b <- slot(object, z)
 #       if (ncol(u) != ncol(b) || any(colnames(u) != colnames(b))) {
@@ -236,6 +236,6 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #       }
 #     }
 #   }
-#   if (fl) stop('Invalid technology object: Wrong data.frame')
+#   if (fl) stop('Invalid technology object: Wrong data.table')
 #   return(NULL)
 # }

@@ -91,11 +91,11 @@
     approxim$year <- yy[1]:yy[2]
     apr <- approxim[c('year', true_prior[true_prior != 'year'])]
     if (any(sapply(apr, length) == 0)) return(NULL)
-    dd <- as.data.frame.table(array(NA, dim = sapply(apr, length), 
+    dd <- as.data.table.table(array(NA, dim = sapply(apr, length), 
       dimnames = apr), stringsAsFactors = FALSE, responseName = parameter)
     dd <- dd[, c(prior, parameter), drop = FALSE]
   } else {
-    dd <- as.data.frame.table(array(NA, dim = sapply(approxim, length), 
+    dd <- as.data.table.table(array(NA, dim = sapply(approxim, length), 
       dimnames = approxim), stringsAsFactors = FALSE, responseName = parameter)
   }
   if (nrow(obj) != 0) {
@@ -196,7 +196,7 @@
 }
 
 
-# setMethod(".interpolation", signature(obj = 'data.frame', parameter = 'character',
+# setMethod(".interpolation", signature(obj = 'data.table', parameter = 'character',
 #   defVal = 'numeric'), 
 .interpolation <- function(obj, parameter, defVal, ...) {
     arg <- list(...)
@@ -213,7 +213,7 @@
 # 
 
 
-# setMethod(".interpolation_bound", signature(obj = 'data.frame', 
+# setMethod(".interpolation_bound", signature(obj = 'data.table', 
 #   parameter = 'character', defVal = 'numeric', rule = 'character'), 
 .interpolation_bound <-  function(obj, parameter, defVal, rule, ...) {
   gg <- paste(parameter, c('.lo', '.fx', '.up'), sep = '')

@@ -16,8 +16,8 @@ Authors@R:
 URL: https://github.com/energyRt/energyRt
 BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy Technology Modeling Toolbox
-Depends: R (>= 3.6), tidyverse, parallel, sp
-Imports: rpivotTable, data.table, DBI, RSQLite
+Depends: R (>= 3.6), data.table, tidyverse, parallel, sp
+Imports: rpivotTable, DBI, RSQLite
 Suggests: knitr, rmarkdown
 License: AGLP-3.0
 RoxygenNote: 7.1.1
