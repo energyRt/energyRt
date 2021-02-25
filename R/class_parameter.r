@@ -80,15 +80,20 @@ setMethod("initialize", "parameter",
   dimSetNames <- .Object@dimSetNames
   if (type == 'multi') dimSetNames <- c(dimSetNames, 'type')
   if (any(type == c('simple', 'multi'))) dimSetNames <- c(dimSetNames, 'value')
-  .Object@data <- data[, dimSetNames, drop = FALSE]
+  .Object@data <- data[, dimSetNames, with = FALSE]
   .Object@colName  <- colName
   .Object
 })
 
+
+setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
+          function(obj, data) return(obj))
+
+
 newParameter <- function(...) new('parameter', ...)
 
 .resetParameter <- function(x) {
-  x@data <- x@data[0,, drop = FALSE]
+  x@data <- x@data[0,]
   if (x@nValues > 0) x@nValues <- 0
   x
 } 
@@ -99,30 +104,30 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'data.table'),
       if (ncol(data) != ncol(obj@data) ||
         any(sort(colnames(data)) != sort(colnames(obj@data))))
           stop('Internal error: Wrong new data 1')
-      data <- data[, colnames(obj@data), drop = FALSE]
+      data <- data[, colnames(obj@data), with = FALSE]
       if (any(colnames(data) == 'type')) {
         if (any(!(data$type %in% c('lo', 'up'))))
           stop('Internal error: Wrong new data 2')
           data$type <- factor(data$type, levels = c('lo', 'up'))
       }
       for(i in colnames(data)[sapply(data, class) == 'factor'])
-        if (i != 'type') data[, i] <- as.character(data[, i])
+        if (i != 'type') data[[i]] <- as.character(data[[i]])
       class2 <- function(x) if (class(x) == 'integer') 'numeric' else class(x)
       if (any(sapply(data, class2) != sapply(obj@data, class)))
           stop('Internal error: Wrong new data 3')
-        data <- data[apply(data, 1, function(x) all(!is.na(x))), , drop = FALSE]
+        data <- data[apply(data, 1, function(x) all(!is.na(x))), ]
         if (nrow(data) != 0) {
           if (obj@nValues != -1) {
             if (obj@nValues + nrow(data) > nrow(obj@data)) {
-              obj@data[nrow(obj@data) + 1:(nrow(data) + nrow(obj@data)), ] <- NA
+              ttmp <- obj@data
+              ttmp[] <- NA
+              obj@data <- obj@data %>% add_row(data) %>% add_row(ttmp)
+            } else {
+              obj@data[obj@nValues + 1:nrow(data), ] <- data
             }
-            nn <- obj@nValues + 1:nrow(data)
             obj@nValues <- obj@nValues + nrow(data)
-            obj@data[nn, ] <- data
           } else {
-            nn <- nrow(obj@data) + 1:nrow(data)
-            obj@data[nn, ] <- NA
-            obj@data[nn, ] <- data
+            obj@data <- obj@data %>% add_row(data)
           }
         }
     }
@@ -136,9 +141,18 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'character'),
           stop('Internal error: Wrong new data')
     }
     if (length(data) == 0) return(obj)
-    nn <- nrow(obj@data) + 1:length(data)
-    obj@data[nn, ] <- data
-    obj@nValues <- obj@nValues + length(data)
+    if (obj@nValues != -1) {
+      if (obj@nValues + length(data) > nrow(obj@data)) {
+        ttmp <- obj@data
+        ttmp[] <- NA
+        obj@data <- obj@data %>% add_row(value = data) %>% add_row(value =ttmp)
+      } else {
+        obj@data[obj@nValues + 1:length(data), ] <- data
+      }
+      obj@nValues <- obj@nValues + length(data)
+    } else {
+      obj@data <- obj@data %>% add_row(value = data)
+    }
     obj
 })
 
@@ -148,9 +162,18 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
     if (obj@type != 'set' || length(data) == 0 || !all(is.numeric(data))) {
           stop('Internal error: Wrong new data')
     }
-    nn <- nrow(obj@data) + 1:length(data)
-    obj@data[nn, ] <- data
-    obj@nValues <- obj@nValues + length(data)
+    if (obj@nValues != -1) {
+      if (obj@nValues + length(data) > nrow(obj@data)) {
+        ttmp <- obj@data
+        ttmp[] <- NA
+        obj@data <- obj@data %>% add_row(value = data) %>% add_row(value =ttmp)
+      } else {
+        obj@data[obj@nValues + 1:length(data), ] <- data
+      }
+      obj@nValues <- obj@nValues + length(data)
+    } else {
+      obj@data <- obj@data %>% add_row(value = data)
+    }
     obj
 })
 
@@ -173,7 +196,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 
 # setMethod('.get_data_slot', signature(obj = 'parameter'), # getParameterTable
 .get_data_slot <-  function(obj) {
-    if (obj@nValues != -1) obj@data[seq(length.out = obj@nValues),, drop = FALSE] else obj@data
+    if (obj@nValues != -1) obj@data[seq(length.out = obj@nValues),] else obj@data
 }
 
 # Remove all data by all set
@@ -181,7 +204,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 .drop_set_value <- function(obj, dimSetNames, value) {
     if (length(dimSetNames) != 1 || all(dimSetNames != obj@dimSetNames))
           stop('(internal function) check dimSetNames')
-    obj@data <- obj@data[!(obj@data[, dimSetNames] %in% value),, drop = FALSE]
+    obj@data <- obj@data[!(obj@data[[dimSetNames]] %in% value),]
     obj
 }
 
@@ -190,13 +213,13 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
 .toGams0 <- function(obj, include.def) {
     gen_gg <- function(name, dtt) {
       if (ncol(dtt) == 1) {
-      	ret <- paste0(name, ' = ', dtt[1, 1], ';')
+      	ret <- paste0(name, ' = ', dtt[[1]][1], ';')
       } else {
-      	ret <- paste0(name, '("', dtt[, 1])
+      	ret <- paste0(name, '("', dtt[[1]])
       	for (i in seq_len(ncol(dtt) - 2) + 1) {
-      		ret <- paste0(ret, '", "', dtt[, i])
+      		ret <- paste0(ret, '", "', dtt[[i]])
       	}
-      	paste0(ret, '") = ', dtt[, ncol(dtt)], ';')
+      	paste0(ret, '") = ', dtt[[ncol(dtt)]], ';')
       }
     }
     as_simple <- function(dtt, name, def, include.def) {
@@ -236,17 +259,17 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
         if (ncol(dtt) > 1) return(paste0(name, '(', paste0(colnames(dtt)[-ncol(dtt)], collapse = ', '), ')$0 = 0;')) 
         return(paste0(name, '$0 = 0;')) 
       } else {
-          return(c(gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf,, drop = FALSE]))) # 
+          return(c(gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf,]))) # 
       }  
     }
   if (obj@nValues != -1) {
-        obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+        obj@data <- obj@data[seq(length.out = obj@nValues),]
       }
     if (obj@type == 'set') {                             
       if (nrow(obj@data) == 0) {                         
         return(paste0('set\n', obj@name, ' / 1 /;\n'))
       } else {
-        return(c('set', paste(obj@name, ' /', sep = ''), sort(obj@data[, 1]), '/;', ''))
+        return(c('set', paste(obj@name, ' /', sep = ''), sort(obj@data[[1]]), '/;', ''))
       }
     } else if (obj@type == 'map') {
       if (nrow(obj@data) == 0) {
@@ -259,9 +282,9 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
         return(as_simple(obj@data, obj@name, obj@defVal, include.def))
     } else if (obj@type == 'multi') {     
       return(c(
-        as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+        as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data)], 
                   paste0(obj@name, 'Lo'), obj@defVal[1], include.def),
-        as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+        as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data)], 
                   paste0(obj@name, 'Up'), obj@defVal[2], include.def)
       ))
     } else stop(paste0('Error: .toGams: unknown parameter type: ', obj@type, " / ", obj@name))
@@ -296,7 +319,7 @@ newSet <- function(dimSetNames) {
 # Add Set
 setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'character'),
   function(obj, dimSetNames) {
-    dimSetNames <- dimSetNames[!(dimSetNames %in% obj@data[,1])]
+    dimSetNames <- dimSetNames[!(dimSetNames %in% obj@data[[1]])]
     if (length(dimSetNames) == 0) {
       obj
     } else {
@@ -308,7 +331,7 @@ setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'characte
 # Add Set
 setMethod('addMultipleSet', signature(obj = 'parameter', dimSetNames = 'numeric'),
           function(obj, dimSetNames) {
-            dimSetNames <- dimSetNames[!(dimSetNames %in% obj@data[,1])]
+            dimSetNames <- dimSetNames[!(dimSetNames %in% obj@data[[1]])]
             if (length(dimSetNames) == 0) {
               obj
             } else {
@@ -331,7 +354,7 @@ setMethod('print', 'parameter', function(x, ...) {
 
 # Generate PYOMO code, return character vector
 .toPyomo <- function(obj) {
- as_simple <- function(data, name, name2, def) {
+  as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       if (nrow(obj@data) == 1) def <- obj@data[[1]]
@@ -343,21 +366,21 @@ setMethod('print', 'parameter', function(x, ...) {
         return(rtt)
       }
       rtt <- paste0("# ", name, name2, '\ntmp = {} \n')
-      kk <- paste0("tmp[('", data[, 1])
+      kk <- paste0("tmp[('", data[[1]])
       for (i in seq_len(ncol(data) - 2) + 1)
-        kk <- paste0(kk, "', '", data[, i])
-      kk <- paste0(kk, "')] = ", data[, 'value'])
+        kk <- paste0(kk, "', '", data[[i]])
+      kk <- paste0(kk, "')] = ", data[['value']])
       kk <- c(rtt, paste0(kk, collapse = '\n'), '\n\n', paste0(name,' = toPar(tmp, ', def, ')\n'))
       return(kk)
     }
   }
   if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+    obj@data <- obj@data[seq(length.out = obj@nValues), ]
   }
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0("['", paste0(sort(obj@data[, 1]), collapse = "', '"), "']")
+      tmp <- paste0("['", paste0(sort(obj@data[[1]]), collapse = "', '"), "']")
     return(c(paste0("# ", obj@name), paste0('\n', obj@name, ' = set(', tmp, ');')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
@@ -373,9 +396,9 @@ setMethod('print', 'parameter', function(x, ...) {
   } else if (obj@type == 'multi') {
     hh = gsub('[(][)]', '', paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'))
     return(c(
-      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data)], 
         paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
-      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data)], 
         paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
   } else stop(paste0('Error: .toPyomo: unknown parameter type: ', obj@type, " / ", obj@name))
@@ -392,21 +415,21 @@ setMethod('print', 'parameter', function(x, ...) {
       if (nrow(data) == 0) {
         return(paste0("# ", name, name2, " no data except default\n"))
       }
-      kk <- paste0('  ', data[, 1])
+      kk <- paste0('  ', data[[1]])
       for (i in seq_len(ncol(data) - 2) + 1)
-        kk <- paste0(kk, ' ', data[, i])
-      kk <- paste0(kk, ' ', data[, 'value'])
+        kk <- paste0(kk, ' ', data[[i]])
+      kk <- paste0(kk, ' ', data[['value']])
       kk <- c(rtt, paste0(kk, collapse = '\n'), '\n;\n')
       return(kk)
     }
   }
   if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+    obj@data <- obj@data[seq(length.out = obj@nValues),]
   }
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0('\n  ', sort(obj@data[, 1]), collapse = '')
+      tmp <- paste0('\n  ', sort(obj@data[[1]]), collapse = '')
     return(c(paste0("# ", obj@name), paste0('\nset ', obj@name, ' := ', tmp, ';')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name, '(', paste0(obj@dimSetNames, collapse = ', '), ')')
@@ -421,9 +444,9 @@ setMethod('print', 'parameter', function(x, ...) {
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
     return(c(
-      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE],
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data)],
         paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
-      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE],
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data)],
         paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
   } else stop(paste0('Error: .toPyomoAbstractModel: unknown parameter type: ', obj@type, " / ", obj@name))
@@ -443,24 +466,24 @@ setMethod('print', 'parameter', function(x, ...) {
       if (nrow(data) == 0) {
         return(paste0(rtt, name, ' = Dict()'))
       }
-      val = as.character(data[1, ncol(data)])
+      val = as.character(data[[ncol(data)]][1])
       if (!any(grep('[.e]', val))) val <- paste0(val, '.')
       rtt = c(rtt, paste0(name, ' = Dict((:', paste0(data[1, -ncol(data)], collapse = ', :'), ') => ', val, ');'))
       if (nrow(data) == 1) return(rtt)
-      kk <- paste0(name, '[(:', data[-1, 1])
+      kk <- paste0(name, '[(:', data[[1]][-1])
       for (i in seq_len(ncol(data) - 2) + 1)
-        kk <- paste0(kk, ', :', data[-1, i])
-      kk <- paste0(kk, ')] = ', data[-1, 'value'])
+        kk <- paste0(kk, ', :', data[[i]][-1])
+      kk <- paste0(kk, ')] = ', data$value[-1])
       return(c(rtt, kk))
     }
   }
   if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+    obj@data <- obj@data[seq(length.out = obj@nValues),]
   }
   if (obj@type == 'set') {
     tmp <- ''
     if (nrow(obj@data) > 0)
-      tmp <- paste0('\n  (:', paste0(sort(obj@data[, 1]), collapse = '),\n  (:'), ')\n')
+      tmp <- paste0('\n  (:', paste0(sort(obj@data[[1]]), collapse = '),\n  (:'), ')\n')
     return(c(paste0("# ", obj@name), paste0(obj@name, ' = [', tmp, ']')))
   } else if (obj@type == 'map') {
     ret <- paste0('# ', obj@name)
@@ -476,23 +499,22 @@ setMethod('print', 'parameter', function(x, ...) {
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
     return(c(
-      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data)], 
         paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
-      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data)], 
         paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
   } else stop('Must realise')
 }
 
-setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
-          function(obj, data) return(obj))
+
 
 .unique_set <- function(obj) {
   if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
-    obj@data <- obj@data[!duplicated(obj@data),, drop = FALSE]
+    obj@data <- obj@data[seq(length.out = obj@nValues),]
+    obj@data <- obj@data[!duplicated(obj@data),]
   }
-  obj@data <- obj@data[!duplicated(obj@data),, drop = FALSE]
+  obj@data <- obj@data[!duplicated(obj@data),]
   if (obj@nValues != -1) 
     obj@nValues <- nrow(obj@data)
   return(obj)    
@@ -517,7 +539,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
     }
   }
   if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+    obj@data <- obj@data[seq(length.out = obj@nValues),]
   }
   if (obj@type == 'map' || obj@type == 'set') {
     ret <- paste0('# ', obj@name)
@@ -562,7 +584,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
     }
   }
   if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues),, drop = FALSE]
+    obj@data <- obj@data[seq(length.out = obj@nValues),]
   }
   if (obj@type == 'set') {
     tmp <- ''
@@ -583,9 +605,9 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
     return(c(
-      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data)], 
         paste(obj@name, 'Lo', sep = ''), hh, obj@defVal[1]),
-      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), drop = FALSE], 
+      as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data)], 
         paste(obj@name, 'Up', sep = ''), hh, obj@defVal[2])
     ))
   } else stop(paste0('Error: .toPyomo: unknown parameter type: ', obj@type, " / ", obj@name))
