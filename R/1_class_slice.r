@@ -45,7 +45,7 @@ setClass("slice",
     sl@misc$nlevel <- sapply(dtf[, -ncol(dtf), with = FALSE], function(x) length(unique(x)))
     names(sl@misc$nlevel) <- colnames(dtf)[-ncol(dtf)]
     
-    sl@slice_share[1:sum(sapply(seq(along = sl@misc$nlevel), function(x) prod(sl@misc$nlevel[1:x]))), ] <- NA
+    sl@slice_share <- sl@slice_share[0, ] %>% add_row(slice = rep(NA, sum(sapply(seq(along = sl@misc$nlevel), function(x) prod(sl@misc$nlevel[1:x])))))
     #   
     sl@slice_share$slice[1] <- dtf[[1]][1]
     sl@slice_share$share[1] <- 1

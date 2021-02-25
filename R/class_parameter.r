@@ -134,26 +134,33 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'data.table'),
     obj
 })
 
+
+.add_data_vector <- function(obj, data) {
+  if (length(data) == 0) return(obj)
+  stmp <- data.table(data)
+  colnames(stmp) <- obj@dimSetNames
+  if (obj@nValues != -1) {
+    if (obj@nValues + length(data) > nrow(obj@data)) {
+      ttmp <- obj@data
+      ttmp[] <- NA
+      obj@data <- obj@data %>% add_row(stmp) %>% add_row(ttmp)
+    } else {
+      obj@data[obj@nValues + 1:length(data), ] <- data
+    }
+    obj@nValues <- obj@nValues + length(data)
+  } else {
+    obj@data <- obj@data %>% add_row(stmp)
+  }
+  obj
+}
+
 # Add data to Set
 setMethod('.add_data', signature(obj = 'parameter', data = 'character'),
   function(obj, data) {
     if (obj@type != 'set' || length(data) == 0 || !all(is.character(data))) {
           stop('Internal error: Wrong new data')
     }
-    if (length(data) == 0) return(obj)
-    if (obj@nValues != -1) {
-      if (obj@nValues + length(data) > nrow(obj@data)) {
-        ttmp <- obj@data
-        ttmp[] <- NA
-        obj@data <- obj@data %>% add_row(value = data) %>% add_row(value =ttmp)
-      } else {
-        obj@data[obj@nValues + 1:length(data), ] <- data
-      }
-      obj@nValues <- obj@nValues + length(data)
-    } else {
-      obj@data <- obj@data %>% add_row(value = data)
-    }
-    obj
+  .add_data_vector(obj, data)
 })
 
 # Add data to Set
@@ -162,19 +169,7 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
     if (obj@type != 'set' || length(data) == 0 || !all(is.numeric(data))) {
           stop('Internal error: Wrong new data')
     }
-    if (obj@nValues != -1) {
-      if (obj@nValues + length(data) > nrow(obj@data)) {
-        ttmp <- obj@data
-        ttmp[] <- NA
-        obj@data <- obj@data %>% add_row(value = data) %>% add_row(value =ttmp)
-      } else {
-        obj@data[obj@nValues + 1:length(data), ] <- data
-      }
-      obj@nValues <- obj@nValues + length(data)
-    } else {
-      obj@data <- obj@data %>% add_row(value = data)
-    }
-    obj
+  .add_data_vector(obj, data)
 })
 
 # Clear Map Table

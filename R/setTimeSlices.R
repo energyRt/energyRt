@@ -16,7 +16,7 @@
   if (any(fl)) 
     stop(paste('.setTimeSlices: all slice except first, have to consist from more than one slice, incorrect levels: "', 
                paste(colnames(dtf)[c(FALSE, fl, FALSE)], collapse = '", "'), '"', sep = ''))
-  if (length(unique(dtf[, 1])) != 1)
+  if (length(unique(dtf[[1]])) != 1)
     stop(".setTimeSlices: first slice have to consist only one slice")
   rcs <- c(apply(dtf[, -ncol(dtf), with = FALSE], 2, function(x) unique(x)), recursive = TRUE)
   if (anyDuplicated(rcs))

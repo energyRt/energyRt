@@ -1,12 +1,11 @@
 # Read default parameter from sysInfo
 .read_default_data <- function(prec, ss) {
   for(i in seq(along = prec@parameters)) {
-    # assign('test', prec@parameters[[i]], globalenv())
     if (any(prec@parameters[[i]]@colName != '')) {
       prec@parameters[[i]]@defVal <-
-        as.numeric(ss@defVal[1, prec@parameters[[i]]@colName])
+        as.numeric(sapply(prec@parameters[[i]]@colName, function(x) ss@defVal[[x]][1]))
       prec@parameters[[i]]@interpolation <-
-        as.character(ss@interpolation[1, prec@parameters[[i]]@colName])
+        as.character(sapply(prec@parameters[[i]]@colName, function(x) ss@interpolation[[x]][1]))
     }
   }
   prec
@@ -27,13 +26,6 @@
 	approxim$discountFactor <- .add_dropped_zeros(scen@modInp, 'pDiscountFactor', FALSE)
 	approxim$discount <- .add_dropped_zeros(scen@modInp, 'pDiscount', FALSE)
 	yy <- approxim$discountFactor
-	# ll <- NULL
-	# for (rg in unique(yy$region)) {
-	# 	l1 <- yy[yy$region == rg, ]
-	# 	l1$value <- cumsum(l1$value)
-	# 	if (is.null(ll)) ll <- l1 else ll <- rbind(ll, l1)
-	# }
-	# approxim$discountCum <- ll
 	approxim
 }
 # Get commodity slice map for interpolate
@@ -121,12 +113,6 @@
                              interpolation_time_begin, interpolation_count, len_name) {
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data, function(x) length(x@data)), recursive = TRUE))
-  # if (num_classes_for_progrees_bar < 50) {
-  #   need.tick <- rep(TRUE, num_classes_for_progrees_bar)
-  # } else {
-  #   need.tick <- rep(FALSE, num_classes_for_progrees_bar)
-  #   need.tick[trunc(seq(1, num_classes_for_progrees_bar, length.out = 50))] <- TRUE
-  # }
   # Fill DB main data
   tmlg <- 0; mnch <- 0
   cat(rep(' ', len_name), sep = '')
@@ -154,16 +140,11 @@
         })
         time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name
         time.log.tm[tmlg] <- proc.time()[3] - p1
-        # if (need.tick[k] && arg$echo) {
-        #   cat('.')
-        #   flush.console() 
-        # }
       }
     }
   }
   scen@misc$time.log <- data.table(name = time.log.nm[seq_len(tmlg)], 
                                    time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
-  # if (arg$echo) cat(' ')
   if (arg$echo)
     .remove_char(len_name)
   scen
@@ -233,10 +214,10 @@
 	add_to_err <- function(err_msg, cns, slt, have, psb) {
 		if (!all(have %in% psb)) {
 			have <- unique(have[!(have %in% psb)])
-			tmp <- data.table(value = have, stringsAsFactors = FALSE)
+			tmp <- data.table(value = have)
 			tmp$slot <- slt
 			tmp$constraint <- cns
-			return(rbind(err_msg, tmp[, c('constraint', 'slot', 'value'), drop = FALSE]))			
+			return(rbind(err_msg, tmp[, c('constraint', 'slot', 'value'), with = FALSE]))			
 		}
 		return(err_msg)
 	}
@@ -275,7 +256,7 @@
 																					nrow(x@data) != 0)]
 	for (pr in pars) {
 		tmp <- scen@modInp@parameters[[pr]]@data
-		tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather),, drop = FALSE]
+		tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather),]
 		if (nrow(tmp) != 0) err_msg[[pr]] <- tmp
 	}
 	if (length(err_msg) != 0) {
@@ -307,7 +288,7 @@
 		if (!all(prm@dimSetNames %in% names(lsets))) {
 			int_err = unique(c(int_err, prm@dimSetNames[!(prm@dimSetNames %in% names(lsets))]))
 		} else {
-			tmp <- .get_data_slot(prm)[, prm@dimSetNames, drop = FALSE]
+			tmp <- .get_data_slot(prm)[, prm@dimSetNames, with = FALSE]
 			for (ss in prm@dimSetNames) {
 				unq <- unique(tmp[[ss]])
 				fl <- !(unq %in% lsets[[ss]])
