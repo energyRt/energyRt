@@ -17,9 +17,9 @@ setClass("slice",
       ),
       prototype(
         levels           = data.table(),
-        slice_share      = data.table(slice = character(), share = numeric(), stringsAsFactors = FALSE),
-        parent_child     = data.table(parent = character(), child = character(), stringsAsFactors = FALSE),
-        all_parent_child = data.table(parent = character(), child = character(), stringsAsFactors = FALSE),
+        slice_share      = data.table(slice = character(), share = numeric()),
+        parent_child     = data.table(parent = character(), child = character()),
+        all_parent_child = data.table(parent = character(), child = character()),
         slice_map        = list(), # Slices set by level
         default_slice_level      = character(), # Default slice map
         all_slice        = character(),
@@ -42,18 +42,18 @@ setClass("slice",
     sl@misc$deep <- (2:ncol(dtf) - 1)
     names(sl@misc$deep) <- colnames(dtf)[-ncol(dtf)]
     # count level slice 
-    sl@misc$nlevel <- sapply(dtf[, -ncol(dtf), drop = FALSE], function(x) length(unique(x)))
+    sl@misc$nlevel <- sapply(dtf[, -ncol(dtf), with = FALSE], function(x) length(unique(x)))
     names(sl@misc$nlevel) <- colnames(dtf)[-ncol(dtf)]
     
     sl@slice_share[1:sum(sapply(seq(along = sl@misc$nlevel), function(x) prod(sl@misc$nlevel[1:x]))), ] <- NA
     #   
-    sl@slice_share[1, 'slice'] <- dtf[1, 1]
-    sl@slice_share[1, 'share'] <- 1
+    sl@slice_share$slice[1] <- dtf[[1]][1]
+    sl@slice_share$share[1] <- 1
     k <- 1
     if (ncol(dtf) > 2) {
       for (i in 2:(ncol(dtf) - 1)) {
-        tmp <- apply(dtf[, 2:i, drop = FALSE], 1, paste, collapse = '_')
-        tmp <- tapply(dtf[, ncol(dtf)], tmp, sum)
+        tmp <- apply(dtf[, 2:i, with = FALSE], 1, paste, collapse = '_')
+        tmp <- tapply(dtf[[ncol(dtf)]], tmp, sum)
         sl@slice_share[k + seq(along = tmp), 'slice'] <- names(tmp)
         sl@slice_share[k + seq(along = tmp), 'share'] <- tmp
         k <- (k + length(tmp))
@@ -62,7 +62,7 @@ setClass("slice",
       # slice_map & all_slice
       tmp <- nchar(sl@slice_share$slice) - nchar(gsub('[_]', '', sl@slice_share$slice)) + 2
       names(tmp) <- sl@slice_share$slice
-      tmp[sl@levels[1, 1]] <- 1
+      tmp[sl@levels[[1]][1]] <- 1
       sl@slice_map <- lapply(1:(ncol(sl@levels) - 1), function(x) names(tmp)[tmp == x])
       names(sl@slice_map) <- colnames(sl@levels)[-ncol(sl@levels)]
       sl@default_slice_level <- colnames(sl@levels)[ncol(sl@levels) - 1]
@@ -71,12 +71,10 @@ setClass("slice",
     
     # parent_child
     if (nrow(sl@levels) == 1) {
-      sl@parent_child <- sl@parent_child[0,, drop = FALSE]
-      sl@all_parent_child <- sl@all_parent_child[0,, drop = FALSE]
-    } else {
       sl@parent_child <- sl@parent_child[0,]
-      #sl@parent_child$lev <- numeric()
-      sl@parent_child[1:(nrow(sl@slice_share) - 1), ] <- NA
+      sl@all_parent_child <- sl@all_parent_child[0,]
+    } else {
+      sl@parent_child <- sl@parent_child[0,] %>% add_row(parent = rep(NA, (nrow(sl@slice_share) - 1)))
       i <- 1; k <- 0; z <- 1
       while (i != ncol(dtf) - 1) {
         l <- sl@misc$nlevel[i + 1]

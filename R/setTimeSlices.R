@@ -12,26 +12,26 @@
   if (anyDuplicated(rcs))
     stop(paste('.setTimeSlices: there are duplicated slice levels: "', 
                paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
-  fl <- apply(dtf[, -c(1, ncol(dtf)), drop = FALSE], 2, function(x) length(unique(x)) == 1)
+  fl <- apply(dtf[, -c(1, ncol(dtf)), with = FALSE], 2, function(x) length(unique(x)) == 1)
   if (any(fl)) 
     stop(paste('.setTimeSlices: all slice except first, have to consist from more than one slice, incorrect levels: "', 
                paste(colnames(dtf)[c(FALSE, fl, FALSE)], collapse = '", "'), '"', sep = ''))
   if (length(unique(dtf[, 1])) != 1)
     stop(".setTimeSlices: first slice have to consist only one slice")
-  rcs <- c(apply(dtf[, -ncol(dtf), drop = FALSE], 2, function(x) unique(x)), recursive = TRUE)
+  rcs <- c(apply(dtf[, -ncol(dtf), with = FALSE], 2, function(x) unique(x)), recursive = TRUE)
   if (anyDuplicated(rcs))
     stop(paste('.setTimeSlices: there are duplicated slice in different levels: "', 
                paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"', sep = ''))
   # Check
   if (round(sum(dtf$share), 5) != 1) stop('.setTimeSlices: Sum of share have to be equal one, not: ', sum(dtf$share))
-  ll <- apply(dtf[, -ncol(dtf), drop = FALSE], 1, paste, collapse = '.')
+  ll <- apply(dtf[, -ncol(dtf), with = FALSE], 1, paste, collapse = '.')
   if (anyDuplicated(ll))
     stop(paste('.setTimeSlices: There are duplicate set of slice. ("',  paste(ll[duplicated(ll)], collapse = '", "'), '").', sep = ''))
-  if (length(ll) != prod(sapply(dtf[, -ncol(dtf), drop = FALSE], function(x) length(unique(x))))) {
-    dtf2 <- unique(dtf[, 1])
+  if (length(ll) != prod(sapply(dtf[, -ncol(dtf), with = FALSE], function(x) length(unique(x))))) {
+    dtf2 <- unique(dtf[[1]])
     for (i in seq(length = ncol(dtf) - 2) + 1) {
-      ln <- length(unique(dtf[, i]))
-      dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), '.', unique(dtf[, i]), sep = '')
+      ln <- length(unique(dtf[[i]]))
+      dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), '.', unique(dtf[[i]]), sep = '')
     }
     stop(paste('.setTimeSlices: There are uncovered set of slice. ("',  paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").', sep = ''))
   }
@@ -66,32 +66,28 @@
       stop(ms)
     }
   }
-  # Check full of slice sample
-  check_full_slice <- function (dtf) {
-    stop('check_full_slice')
-  }
+
   slice_def <- function(dtf, arg) {
     if (is.null(names(arg)) || any(names(arg) == ""))
       stop(paste('.setTimeSlices: Un named arguments: ', paste(capture.output(print(arg)), collapse = '\n'), sep = '\n'))
-    add_val <- function(dtf, val_sh, val_nm) {
+    add_val <- function(dtf, val_sh, val_nm, lv) {
       dtf0 <- dtf; 
-      dtf <- dtf[0,, drop = FALSE];
-      dtf[, lv] <- character()
+      dtf <- dtf[0,];
+      dtf[[lv]] <- character()
       if (nrow(dtf0) != 0) {
         dtf[1:(nrow(dtf0) * length(val_sh)), ] <- NA
-        for (i in 2:ncol(dtf0)) dtf[, i] <- dtf0[, i]
-        dtf[, lv] <- c(t(matrix(val_nm, length(val_sh), nrow(dtf0))))
-        dtf[, 'share'] <- (dtf0[, 'share'] * c(t(matrix(val_sh, length(val_sh), nrow(dtf0)))))
+        dtf <- dtf %>% add_row(share = (dtf0[['share']] * c(t(matrix(val_sh, length(val_sh), nrow(dtf0))))))
+        for (i in 2:ncol(dtf0)) dtf[[i]] <- dtf0[[i]]
+        dtf[[lv]] <- c(t(matrix(val_nm, length(val_sh), nrow(dtf0))))
       } else {
-        dtf[1:length(val_sh), ] <- NA
-        dtf[, lv] <- val_nm
-        dtf[, 'share'] <- val_sh
+        dtf <- dtf %>% add_row(share = val_sh)
+        dtf[[lv]] <- val_nm
       }
       dtf
     }
     while (length(arg) != 0) {
       lv <- names(arg)[1]
-      dtf[, lv] <- rep(character(), nrow(dtf))
+      dtf[[lv]] <- rep(character(), nrow(dtf))
       if (is.character(arg[[1]]) || (!is.null(names(arg[[1]])) && is.numeric(arg[[1]]))) {
         if (is.character(arg[[1]])) {
           val_sh <- rep(1 / length(arg[[1]]), length(arg[[1]]))
@@ -105,7 +101,7 @@
           stop(paste(paste('.setTimeSlices: There are wrong slice data for level "', lv, '"\n', 
                            sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
         arg <- arg[-1]
-        dtf <- add_val(dtf, val_sh, val_nm)
+        dtf <- add_val(dtf, val_sh, val_nm, lv)
       } else if (is.list(arg[[1]])) {
         arg2 <- arg[[1]]; #arg <- arg[-1]
         if (is.null(names(arg2)) || any(names(arg2) == ''))
@@ -115,7 +111,7 @@
           if (!all(sapply(arg2, is.numeric)))
             stop(paste(paste('.setTimeSlices: There are wrong slice data for level "', lv, '"\n', 
                              sep = ''), paste(capture.output(print(arg[[1]])), collapse = '\n'), sep = '\n'))
-          dtf <- add_val(dtf, c(arg2, recursive = TRUE), names(arg2))
+          dtf <- add_val(dtf, c(arg2, recursive = TRUE), names(arg2), lv)
           arg <- arg[-1]
         } else {
           if (!all(sapply(arg2, is.list)))
@@ -125,7 +121,7 @@
           dtf <- NULL
           arg2 <- arg[[1]]; 
           for (i in seq(length.out = length(arg2))) { 
-            dtf1 <- slice_def(add_val(dtf0, arg2[[i]][[1]], names(arg2)[i]), arg2[[i]][-1])
+            dtf1 <- slice_def(add_val(dtf0, arg2[[i]][[1]], names(arg2)[i]), arg2[[i]][-1], lv)
             if (i == 1) {
               dtf <- dtf1
             } else {
@@ -162,6 +158,8 @@
   sl <- .init_slice(sl)
   sl
 }
+
+setGeneric("setTimeSlices", function(obj, ...) standardGeneric("setTimeSlices"))
 
 setMethod('setTimeSlices', signature(obj = 'model'), function(obj, ...) {
   obj@sysInfo@slice <- .setTimeSlices(...)

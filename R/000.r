@@ -17,7 +17,6 @@ prepare <- function(x, ...) UseMethod("prepare")
 setGeneric("milestoneYears", function(start, interval) standardGeneric("milestoneYears"))
 setGeneric("setMilestoneYears", function(obj, start, interval) standardGeneric("setMilestoneYears"))
 setGeneric("getMilestone", function(obj) standardGeneric("getMilestone"))
-setGeneric("setTimeSlices", function(obj, ...) standardGeneric("setTimeSlices"))
 setGeneric('addMultipleSet', function(obj, dimSetNames) standardGeneric("addMultipleSet"))
 setGeneric('levcost', function(obj, ...) standardGeneric("levcost"))
 
