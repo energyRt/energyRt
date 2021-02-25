@@ -40,19 +40,10 @@
                  collapse = '", "'), '"\n', sep = ''))
           }
           slot(obj, w) <- slot(obj, w)[0,, drop = FALSE]
-          if (nrow(ww) != 0) {
-            nn <- 1:nrow(ww)
-            slot(obj, w)[nn, ] <- NA
-            for(i in names(ww)) {
-              if (is.factor(slot(obj, w)[, i, drop = FALSE]) || is.factor(ww[, i])) {
-                slot(obj, w)[nn, i] <- as.character(ww[, i])
-              } else {
-                slot(obj, w)[nn, i] <- ww[, i]
-              }
-            }
-          }
+          if (nrow(ww) != 0)
+            slot(obj, w) <-  slot(obj, w) %>% add_row(ww)
         } else if (is.list(ww)) {
-         gg <- sapply(ww, length)
+          gg <- sapply(ww, length)
           slot(obj, w) <- slot(obj, w)[0,, drop = FALSE]
           # Check: Equal length
           if (any(gg[1] != gg)) stop('Check argument ', w)
@@ -61,17 +52,14 @@
              anyDuplicated(names(ww)) != 0) stop('Duplicated parameter ', w)
           # Check: There is no additional column
           if (any(!(names(ww) %in% colnames(slot(obj, w))))) stop('Check argument ', w)
-          if (gg[1] != 0) {
-             nn <- 1:gg[1]
-             slot(obj, w)[nn, ] <- NA
-             for(i in names(ww)) {
-              slot(obj, w)[nn, i] <- ww[[i]]
-            }
-          }
-        } else if (any(colnames(slot(obj, w)) == w) && length(ww) == 1) { 
+          # is any data
+          if (gg[1] != 0)
+          	slot(obj, w) <-  slot(obj, w) %>% add_row(as.data.table(ww))
+        } else if (any(colnames(slot(obj, w)) == w) && length(ww) == 1) {
         # for use start = 2000 rather than start = list(start = 2000)
-             slot(obj, w)[1, ] <- NA
-             slot(obj, w)[1, w] <- ww
+        	wtmp <- list(ww)
+        	names(wtmp) <- w
+        	slot(obj, w) <-  slot(obj, w) %>% add_row(as.data.table(wtmp))
         } else stop('Check argument ', w)
       # Other argument
       } else if (slt[w] == 'factor') {
@@ -219,8 +207,7 @@ setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
 setMethod('newTrade', signature(name = 'character'), function(name, ..., source = NULL, destination = NULL, avaUpDef = Inf) {
   trd <-  .new_object('trade', name, ...)
 	if (avaUpDef != Inf) {
-		trd@trade[nrow(trd@trade) + 1, ] <- NA
-		trd@trade[nrow(trd@trade), 'ava.up'] <- avaUpDef
+		trd@trade <- add_row(ava.up = avaUpDef)
 	}
   if (is.null(source) != is.null(destination))
     stop('Inconsistency of source/destination data "', trd@name, '"')
@@ -229,7 +216,7 @@ setMethod('newTrade', signature(name = 'character'), function(name, ..., source 
   if (!is.null(source)) {
     trd@routes <- merge(data.table(src = source, stringsAsFactors = FALSE), 
                         data.table(dst = destination, stringsAsFactors = FALSE))
-    trd@routes <- trd@routes[trd@routes$src != trd@routes$dst,, drop = FALSE]
+    trd@routes <- trd@routes[src != dst,]
   }
   trd
 })
