@@ -28,15 +28,15 @@
 #     for (i in seq_along(add_set_name)) {
 #       dtf[[add_set_name[i]]] <- add_set_value[[i]]
 #     }
-#     return(dtf[, true_col, with = FALSE])
+#     return(dtf[, true_col, drop = FALSE])
 #   }
 #   defVal = res@defVal
 #   rule = res@interpolation
 #   # Function
-#   slt <- slt[!is.na(slt[, par]), c(colnames(dtf), par), with = FALSE]
+#   slt <- slt[!is.na(slt[, par]), c(colnames(dtf), par), drop = FALSE]
 #   
 #   if (anyDuplicated(slt[, -ncol(slt)])) {
-#     slt <- slt[!duplicated(slt[, -ncol(slt)]),]
+#     slt <- slt[!duplicated(slt[, -ncol(slt)]),, drop = FALSE]
 #     warning("there are duplicates in the data, use findDuplicates function to get more information")
 #   }
 #   na_val <- is.na(slt[, -ncol(slt)])
@@ -54,13 +54,13 @@
 #   f1 <- apply(na_val, 2, all)
 #   f2 <- apply(na_val, 2, any)
 #   if (all(f1 == f2)) { # There are only NA and not NA column & Could be small appr
-#     slt2 <- merge(dtf, slt[, c(!f1, TRUE), with = FALSE], by = colnames(dtf)[!f1])
+#     slt2 <- merge(dtf, slt[, c(!f1, TRUE), drop = FALSE], by = colnames(dtf)[!f1])
 #     if (nrow(slt2) == nrow(dtf))
 #       return(add_col(slt2))
 #     # Add dop NA columns, and increase speed
 #     slt[c(f1, FALSE)] <- NULL
-#     dtf2 <- dtf[, !f1, with = FALSE]
-#     dtf2 <- dtf2[!duplicated(dtf2),] 
+#     dtf2 <- dtf[, !f1, drop = FALSE]
+#     dtf2 <- dtf2[!duplicated(dtf2),, drop = FALSE] 
 #   } else dtf2 <- dtf
 #   
 #   prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region',
@@ -69,17 +69,17 @@
 #   true_prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region',
 #     'regionp', 'src', 'dst', 'year', 'slice')
 #   true_prior <- true_prior[true_prior %in% colnames(dtf2)]
-#   dtf2 <- dtf2[, prior, with = FALSE]
-#   slt <- slt[, c(prior, par), with = FALSE]
+#   dtf2 <- dtf2[, prior, drop = FALSE]
+#   slt <- slt[, c(prior, par), drop = FALSE]
 #   dtf2[[par]] <- NA
 #   
-#   for_order <- is.na(slt[, prior, with = FALSE]) * 1
+#   for_order <- is.na(slt[, prior, drop = FALSE]) * 1
 #   for_order <- rowSums(t(t(for_order) * 2 ^ (seq_len(ncol(for_order)) - 1)))
 #   browser()
 #   for (i in sort(unique(for_order), decreasing = TRUE)) {
-#     tapr <- slt[for_order == i,]
-#     tapr <- tapr[, c(!is.na(tapr[1, prior]), TRUE), with = FALSE]
-#     nn1 <- dtf2[, c(!is.na(tapr[1, prior]), FALSE), with = FALSE]
+#     tapr <- slt[for_order == i,, drop = FALSE]
+#     tapr <- tapr[, c(!is.na(tapr[1, prior]), TRUE), drop = FALSE]
+#     nn1 <- dtf2[, c(!is.na(tapr[1, prior]), FALSE), drop = FALSE]
 #     nn2 <- nn1[, 1]
 #     
 #     tapr

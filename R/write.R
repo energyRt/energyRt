@@ -102,15 +102,15 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
 }
 
 .write_mapping <- function(prec, interpolation_time_begin, interpolation_count, len_name) {
-  reduce.duplicate <- function(x) x[!duplicated(x),]
+  reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
   bacs <- paste0(rep('\b', len_name), collapse = '')
   rest = interpolation_count - 77;
   cat(paste0(rep(' ', len_name), collapse = ''))
   
   # Clean previous set data if any
   reduce.sect <- function(x, set) {
-    x <- x[, set, with = FALSE]
-    x <- x[!duplicated(x),]
+    x <- x[, set, drop = FALSE]
+    x[!duplicated(x),, drop = FALSE]
   }
   reduce.sect.merge.unique <- function(xxx, set) {
     gg <- NULL
@@ -132,7 +132,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   colnames(uu) <- c('slicep', 'slice')
   map_for_comm <- merge(mCommSlice, uu)[, c('comm', 'slicep')]
   colnames(map_for_comm) <- c('comm', 'slice')
-  map_for_comm <- map_for_comm[!duplicated(map_for_comm),]
+  map_for_comm <- map_for_comm[!duplicated(map_for_comm), ]
   .interpolation_message('mCommSliceOrParent', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   # mCommSliceOrParent
   l1 <- merge(.get_data_slot(prec@parameters$comm), .get_data_slot(prec@parameters$slice))
@@ -140,7 +140,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   l3 <- l2[!duplicated(l2[, c('comm', 'slicep')]), c('comm', 'slicep')]
   colnames(l3)[2] <- 'slice'
   l3 <- rbind(l1, l3)
-  l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast=TRUE),]
+  l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast=TRUE), ]
   l3$slicep <- l3$slice
   mCommSliceOrParent <- rbind(l2, l3)
   prec@parameters[['mCommSliceOrParent']] <- .add_data(prec@parameters[['mCommSliceOrParent']], mCommSliceOrParent)
@@ -151,7 +151,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
     reduce.duplicate(merge(yy, mCommSliceOrParent, by = c('comm', 'slicep'))[, -2])
   }
   prec@parameters[['mTechInpTot']] <- .add_data(prec@parameters[['mTechInpTot']], reduce_total_map(reduce.sect(
-    rbind(.get_data_slot(prec@parameters$mvTechInp)[, -1, with = FALSE], .get_data_slot(prec@parameters$mvTechAInp)[, -1]))))
+    rbind(.get_data_slot(prec@parameters$mvTechInp)[, -1], .get_data_slot(prec@parameters$mvTechAInp)[, -1]))))
   .interpolation_message('mTechOutTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   prec@parameters[['mTechOutTot']] <- .add_data(prec@parameters[['mTechOutTot']], reduce_total_map(reduce.sect(
     rbind(.get_data_slot(prec@parameters$mvTechOut)[, -1], .get_data_slot(prec@parameters$mvTechAOut)[, -1]))))
@@ -162,15 +162,15 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   .interpolation_message('pEmissionFactor', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   #### This section have to move to add (after interpolate comm first)
   tmp0 <- .get_data_slot(prec@parameters$pTechEmisComm)
-  tmp <- merge(.get_data_slot(prec@parameters$mvTechInp), tmp0[value != 0, ], by = c('tech', 'comm'))
+  tmp <- merge(.get_data_slot(prec@parameters$mvTechInp), tmp0[tmp0$value != 0, ], by = c('tech', 'comm'))
   .interpolation_message('mvTechAct', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   colnames(tmp)[colnames(tmp) == 'comm'] <- 'commp'
   tmp1 <- .get_data_slot(prec@parameters$pEmissionFactor)
   .interpolation_message('mvTechAct', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-  tmp1 <- tmp1[value != 0, ]
-  tmp1 <- tmp1[!duplicated(tmp1),]
+  tmp1 <- tmp1[tmp1$value != 0, ]
+  tmp1 <- tmp1[!duplicated(tmp1),, drop = FALSE]
   tmp <- merge(tmp1, tmp, by = 'commp')[, c('tech', 'comm', 'commp', 'region', 'year', 'slice')]
-  tmp <- tmp[!duplicated(tmp),]
+  tmp <- tmp[!duplicated(tmp),, drop = FALSE]
   .interpolation_message('mTechEmsFuel', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   colnames(tmp)[3] <- 'comm.1'
   prec@parameters[['mTechEmsFuel']] <- .add_data(prec@parameters[['mTechEmsFuel']], tmp)
@@ -188,7 +188,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
       for(i in nn)
         x <- merge(.get_data_slot(prec@parameters[[i]]), x)
     }
-    x[x$value != Inf, -ncol(x), with = FALSE]
+    x[x$value != Inf, -ncol(x)]
   }
   prec@parameters[['mDummyImport']] <- .add_data(prec@parameters[['mDummyImport']], no_inf('pDummyImportCost'))
   .interpolation_message('mDummyExport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
@@ -226,7 +226,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
                                   c('comm', 'region', 'year', 'slice'))
   colnames(mExportRowSubTmp)[4] <- 'slice.1'
   mExportRowSubSlice <- merge(mExportRowSubTmp, mCommSliceOrParent2)
-  mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != 'slice.1', with = FALSE]
+  mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != 'slice.1']
   mExportRowSub <- mExportRowSub[!duplicated(mExportRowSub), ]
   .interpolation_message('mExport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   mExport <- rbind(mExportRowSub, mExportIrSub)
@@ -248,7 +248,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
                                   c('comm', 'region', 'year', 'slice'))
   colnames(mImportRowSubTmp)[4] <- 'slice.1'
   mImportRowSubSlice <- merge(mImportRowSubTmp, mCommSliceOrParent2)
-  mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != 'slice.1', with = FALSE]
+  mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != 'slice.1']
   mImportRowSub <- mImportRowSub[!duplicated(mImportRowSub), ]
   .interpolation_message('mImport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   mImport <- rbind(mImportRowSub, mImportIrSub)
@@ -369,10 +369,10 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   
   mCosts <- lapply(grep('^mCosts', names(prec@parameters), value = TRUE), function(x) {
     xx <- .get_data_slot(prec@parameters[[x]])
-    xx <- unique(xx[, colnames(xx) %in% c('region', 'year'), with = FALSE])
+    xx <- unique(xx[, colnames(xx) %in% c('region', 'year'), drop = FALSE])
     if (nrow(xx) == nrow(dregionyear) || ncol(xx) == 0) return(dregionyear)
-    if (is.null(xx$region)) return(dregionyear[year %in% unique(xx$year),]) else
-    if (is.null(xx$year)) return(dregionyear[region %in% unique(xx$region),]) else 
+    if (is.null(xx$region)) return(dregionyear[dregionyear$year %in% unique(xx$year),, drop = FALSE]) else
+    if (is.null(xx$year)) return(dregionyear[dregionyear$region %in% unique(xx$region),, drop = FALSE]) else 
       return(xx)
   })
   if (any(sapply(mCosts, nrow) == nrow(dregionyear))) {
@@ -454,7 +454,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   
   .interpolation_message('mAggregateFactor', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   tmp <- .get_data_slot(prec@parameters[['pAggregateFactor']])
-  tmp <- tmp[value != 0, ]
+  tmp <- tmp[tmp$value != 0, ]
   if (nrow(tmp)) {
     tmp$value <- NULL
     colnames(tmp)[2] <- 'comm.1'

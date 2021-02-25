@@ -110,7 +110,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'}
 getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                     parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
-                    newNames = NULL, newValues = NULL, na.rm = FALSE, with = FALSE,
+                    newNames = NULL, newValues = NULL, na.rm = FALSE, drop = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
                     asTibble = TRUE, stringsAsFactors = FALSE, yearsAsFactors = FALSE, 
                     scenNameInList = as.logical(length(scen)-1), verbose = FALSE) {
@@ -260,11 +260,11 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
             }
           }
           # browser()
-          if (!is.null(dat[kk,]) && nrow(dat[kk,]) > 0) {
+          if (!is.null(dat[kk,, drop = FALSE]) && nrow(dat[kk,, drop = FALSE]) > 0) {
             nkk <- sum(kk)
             dat <- dplyr::bind_cols(data.table(
               scenario = rep(sc, nkk), 
-              name = rep(pv, nkk)), dat[kk,])
+              name = rep(pv, nkk)), dat[kk,, drop = FALSE])
             le <- length(ll) + 1
             nm_ll <- names(ll)
             if (scenNameInList) nm_le <- paste(sc, pv, sep = ".") else nm_le <- pv

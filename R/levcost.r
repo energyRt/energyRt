@@ -16,7 +16,7 @@
     if (is.numeric(discount)) discount <- data.table(discount = discount, stringsAsFactors = TRUE)
     if (all(colnames(discount) != 'region')) discount <- cbind(discount, region = rep(NA, nrow(discount)))
     if (all(colnames(discount) != 'year')) discount <- cbind(discount, year = rep(NA, nrow(discount)))
-    discount <- discount[, c('region', 'year', 'discount'), with = FALSE]
+    discount <- discount[, c('region', 'year', 'discount'), drop = FALSE]
     discount$region <- as.character(discount$region)
     discount$year <- as.numeric(discount$year)
   } else {
@@ -37,7 +37,7 @@
     if (all(colnames(tax) != 'region')) tax <- cbind(tax, region = rep(NA, nrow(tax)))
     if (all(colnames(tax) != 'year')) tax <- cbind(tax, year = rep(NA, nrow(tax)))
     if (all(colnames(tax) != 'slice')) tax <- cbind(tax, slice = rep(NA, nrow(tax)))
-    tax <- tax[, c('comm', 'region', 'year', 'slice', 'tax'), with = FALSE]
+    tax <- tax[, c('comm', 'region', 'year', 'slice', 'tax'), drop = FALSE]
     tax$comm <- as.character(tax$comm)
     tax$region <- as.character(tax$region)
     tax$year <- as.numeric(tax$year)
@@ -58,7 +58,7 @@
     if (all(colnames(subs) != 'region')) subs <- cbind(subs, region = rep(NA, nrow(subs)))
     if (all(colnames(subs) != 'year')) subs <- cbind(subs, year = rep(NA, nrow(subs)))
     if (all(colnames(subs) != 'slice')) subs <- cbind(subs, slice = rep(NA, nrow(subs)))
-    subs <- subs[, c('comm', 'region', 'year', 'slice', 'subs'), with = FALSE]
+    subs <- subs[, c('comm', 'region', 'year', 'slice', 'subs'), drop = FALSE]
     subs$comm <- as.character(subs$comm)
     subs$region <- as.character(subs$region)
     subs$year <- as.numeric(subs$year)
@@ -71,7 +71,7 @@
   }
   if (!is.null(region)) {
     stopifnot(is.character(region) && length(region) == 1)
-    arg <- arg[names(arg) != 'region', with = FALSE]
+    arg <- arg[names(arg) != 'region', drop = FALSE]
   } else if (length(obj@region) != 0) {
     region <- obj@region[1]
   } else region <- 'DEF'
@@ -86,12 +86,12 @@
   } else comm <- NULL
   if (!is.null(ignore.years)) {
     if (ignore.years) {
-      tech@start <- tech@start[0,]
-      tech@end   <-   tech@end[0,]
+      tech@start <- tech@start[0,, drop = FALSE]
+      tech@end   <-   tech@end[0,, drop = FALSE]
     }
   }
-  tech@end <- tech@end[!is.na(tech@end$end),]
-  tech@start <- tech@start[!is.na(tech@start$start),]
+  tech@end <- tech@end[!is.na(tech@end$end),, drop = FALSE]
+  tech@start <- tech@start[!is.na(tech@start$start),, drop = FALSE]
   # Check start & end year possibility
   fl <- (!is.na(tech@start$region) & tech@start$region == region)
   if (!any(fl)) fl <- is.na(tech@start$region)
@@ -123,7 +123,7 @@
     }
   }
   if (nrow(tech@stock)) {
-     tech@stock <- tech@stock[0,]
+     tech@stock <- tech@stock[0,, drop = FALSE]
      warnings('There is stock in technology, remove all stock')
   }
 
@@ -216,7 +216,7 @@
             any(solutionLogs$parameter == 'done') && 
             nrow(rr@modOut@variables$vDummyImport) == 0)) stop('Error in solution')
     dsc <- rr@modInp@parameters[['pDiscountFactor']]@data
-    dsc <- dsc[, 2:3, with = FALSE]
+    dsc <- dsc[, 2:3, drop = FALSE]
     colnames(dsc)[2] <- 'discount.factor'
     rownames(dsc) <- dsc$year
     ff <- c(
@@ -261,7 +261,7 @@
     if (any(grep('^subs[.]', colnames(dsc)))) {
       dsc[, 'fuel.subs'] <- dsc[, grep('^subs[.]', colnames(dsc))]
     } else dsc$fuel.subs <- 0
-    dsc[, 'fuel.total'] <- rowSums(dsc[, c('fuel.subs', 'fuel.tax', 'fuel.cost'), with = FALSE])
+    dsc[, 'fuel.total'] <- rowSums(dsc[, c('fuel.subs', 'fuel.tax', 'fuel.cost'), drop = FALSE])
     gfix <- merge(
       rr@modInp@parameters[['pTechFixom']]@data,
       rr@modOut@variables$vTechCap, by = c('tech', 'region', 'year'))

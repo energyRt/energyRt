@@ -68,7 +68,7 @@ draw.technology <- function(
     ctype$comm <- ctype$comm[rev(c(seq(length.out = nrow(ctype$comm))[
        !is.na(ctype$comm$group)][sort(ctype$comm$group[!is.na(ctype$comm$group)], 
       index.return = TRUE)$ix], 
-        seq(length.out = nrow(ctype$comm))[is.na(ctype$comm$group)])),]
+        seq(length.out = nrow(ctype$comm))[is.na(ctype$comm$group)])),, drop = FALSE]
     acomm <- tech@aux$acomm 
     acomm <- acomm[acomm %in% tech@aeff$acomm] 
     if (length(acomm) != 0) {
@@ -78,21 +78,21 @@ draw.technology <- function(
       aparam <- lapply(acomm, function(y) {
         approxim$acomm <- y
         approxim$comm <- NULL
-        tech@aeff <- tech@aeff[tech@aeff$acomm == y,]
+        tech@aeff <- tech@aeff[tech@aeff$acomm == y,, drop = FALSE]
         sng <- sapply(aname, function(x) .interpolation(tech@aeff, x, 
                                 defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),
                                 approxim = approxim, all = TRUE)[, x])
         sng <- sng[sng != 0]
-        ll <- tech@aeff[tech@aeff$acomm == y,]
+        ll <- tech@aeff[tech@aeff$acomm == y, , drop = FALSE]
         approxim$comm <- unique(ll[, 'comm'])
         dbl <- lapply(acname, function(x) {
           hh <- .interpolation(ll, x, defVal = as.numeric(defVal[x]), 
                                 rule = rule[x], 
                                 year_range = range(year),
                                 approxim = approxim, all = TRUE)
-          hh[hh[, x] != 0,]
+          hh[hh[, x] != 0,, drop = FALSE]
         })
         names(dbl) <- acname
         dbl <- dbl[sapply(dbl, nrow) != 0]
@@ -113,7 +113,7 @@ draw.technology <- function(
         !(tech@geff$group %in% tech@input$group)]), collapse = '", "'), sep = ''))
     }
     # LHS
-    ccomm <- ctype$comm[ctype$comm$type == 'input',]
+    ccomm <- ctype$comm[ctype$comm$type == 'input',, drop = FALSE]
     if (nrow(ccomm) != 0 || length(ainp) != 0) {
       approxim <- list(region = region, year = year, slice = slice, 
          comm = rownames(ccomm), group = unique(ccomm$group), fullsets = TRUE)
@@ -121,7 +121,7 @@ draw.technology <- function(
       if (length(approxim$group) == 0) approxim$group <- '1'
       if (nrow(ccomm) != 0) {
         # Parameter approximation
-        tft <- tech@ceff[tech@ceff$comm %in% approxim$comm,]
+        tft <- tech@ceff[tech@ceff$comm %in% approxim$comm,, drop = FALSE]
         gparam <- .interpolation(tech@geff, 'ginp2use', 
                                   defVal = as.numeric(defVal['ginp2use']), 
                                   rule = rule['ginp2use'], 
@@ -235,7 +235,7 @@ draw.technology <- function(
       }  
     }
     # RHS
-    ccomm <- ctype$comm[ctype$comm$type == 'output',]
+    ccomm <- ctype$comm[ctype$comm$type == 'output',, drop = FALSE]
     if (nrow(ccomm) != 0 || length(aout) != 0) {
       approxim <- list(region = region, year = year, slice = slice, 
          comm = rownames(ccomm), group = unique(ccomm$group), fullsets = TRUE)
@@ -243,7 +243,7 @@ draw.technology <- function(
       if (length(approxim$group) == 0) approxim$group <- '1'
       # Parameter approximation
       if (nrow(ccomm) != 0) {
-        tft <- tech@ceff[tech@ceff$comm %in% approxim$comm,]
+        tft <- tech@ceff[tech@ceff$comm %in% approxim$comm,, drop = FALSE]
         gg <- c('use2cact', 'cact2cout')
         cparam <- lapply(gg, function(x) {
                                   .interpolation(tft, x, 

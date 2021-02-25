@@ -5,23 +5,23 @@ fold <- function(scen) {
 		if ((scen@modInp@parameters[[pr]]@nValues == -1 && nrow(scen@modInp@parameters[[pr]]@data) > 0) ||
 				scen@modInp@parameters[[pr]]@nValues > 0) {
 			if (scen@modInp@parameters[[pr]]@nValues != -1)
-				scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[1:scen@modInp@parameters[[pr]]@nValues,]
+				scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[1:scen@modInp@parameters[[pr]]@nValues,, drop = FALSE]
 			tmp <- scen@modInp@parameters[[pr]]@data
 			tmp <- tmp[order(tmp$value), ]
 			if (all(tmp$value == tmp$value[1])) { # only one possible value
 				if (!is.null(tmp$type)) {
-					tmp <- tmp[!duplicated(tmp$type), c('type', 'value'), with = FALSE]
-				} else tmp <- tmp[1, 'value', with = FALSE]
+					tmp <- tmp[!duplicated(tmp$type), c('type', 'value'), drop = FALSE]
+				} else tmp <- tmp[1, 'value', drop = FALSE]
 			} else {
 				# remove col with single value 
 				unv <- sapply(tmp, function(x) length(unique(x)))
-				tmp <- tmp[, unv != 1 | names(unv) %in% c('type', 'value'), with = FALSE]
+				tmp <- tmp[, unv != 1 | names(unv) %in% c('type', 'value')]
 				unv <- unv[unv != 1] 
 				# remove other 
 				cand <- names(unv)[!(names(unv) %in% c('type', 'value')) & nrow(tmp) / unv >= unv['value']]  
 				for (cc in cand) {
-					if (all(aggregate(tmp$value, tmp[, !(colnames(tmp) %in% c(cc, 'value')), with = FALSE], function(x) all(x == x[1]))$x)) {
-						tmp <- tmp[!duplicated(tmp[, !(colnames(tmp) %in% c(cc, 'value')), with = FALSE]), colnames(tmp) != cc, with = FALSE]
+					if (all(aggregate(tmp$value, tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE], function(x) all(x == x[1]))$x)) {
+						tmp <- tmp[!duplicated(tmp[, !(colnames(tmp) %in% c(cc, 'value')), drop = FALSE]), colnames(tmp) != cc, drop = FALSE]
 					}
 				}
 			}
@@ -56,7 +56,7 @@ fold <- function(scen) {
 					j <- 1
 					while (length(fl) != 0 && j <= length(scen@model@data[[i]]@data)) {
 						if (class(scen@model@data[[i]]@data) == cls) {
-							#fl <- fl[apply(is.na(slot(scen@model@data[[i]]@data, jj)[, fl, with = FALSE]), 2, all)]
+							#fl <- fl[apply(is.na(slot(scen@model@data[[i]]@data, jj)[, fl, drop = FALSE]), 2, all)]
 						}
 						j <- j + 1
 					}

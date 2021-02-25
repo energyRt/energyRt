@@ -10,8 +10,8 @@
       gg[[i]] <- all_factor(.get_data_slot(scen@modInp@parameters[[i]]))
     } else {
       tmp <- .get_data_slot(scen@modInp@parameters[[i]])
-      gg[[paste0(i, 'Lo')]] <- all_factor(tmp[tmp$type == 'lo', colnames(tmp) != 'type', with = FALSE])
-      gg[[paste0(i, 'Up')]] <- all_factor(tmp[tmp$type == 'up', colnames(tmp) != 'type', with = FALSE])
+      gg[[paste0(i, 'Lo')]] <- all_factor(tmp[tmp$type == 'lo', colnames(tmp) != 'type', drop = FALSE])
+      gg[[paste0(i, 'Up')]] <- all_factor(tmp[tmp$type == 'up', colnames(tmp) != 'type', drop = FALSE])
     }
     gg
   }

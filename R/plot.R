@@ -2,10 +2,10 @@ plot.levcost <- function(obj, xlab = '',
            ylab = '', main = 'Discounted cash flow', ...) {
     year <- obj$table$year
     tbl <-  t(obj$table[, c("fuel.subs", "fuel.tax", "fuel.cost", 
-      "fixom", "varom", "invcost"), with = FALSE] * obj$table[,"discount.factor"] / 
+      "fixom", "varom", "invcost"), drop = FALSE] * obj$table[,"discount.factor"] / 
       sum(obj$table[,"discount.factor"]))
 #    tbl <-  t(obj$table[, c("fuel.subs", "fuel.tax", "fuel.cost", 
-#      "fixom", "varom", "invcost"), with = FALSE])
+#      "fixom", "varom", "invcost"), drop = FALSE])
     tbl <- rbind(-tbl['fuel.subs', ], tbl)
     colnames(tbl) <- year
     cll <- c('cornflowerblue', 'darkgray', 'aquamarine', 
@@ -23,7 +23,7 @@ barplot.levcost <- function(obj, xlab = '',
            ylab = '', main = 'Levelized cost', ...) {
     year <- obj$table$year
     tbl <-  colSums(obj$table[, c("fuel.subs", "fuel.tax", "fuel.cost", 
-      "fixom", "varom", "invcost"), with = FALSE] * obj$table[,"discount.factor"] / 
+      "fixom", "varom", "invcost"), drop = FALSE] * obj$table[,"discount.factor"] / 
       sum(obj$table[,"discount.factor"]))
     tbl <- c(-tbl[1], tbl)
     cll <- c('cornflowerblue', 'darkgray', 'aquamarine', 

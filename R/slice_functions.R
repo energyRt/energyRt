@@ -19,8 +19,8 @@
     slc <- unique(slice@levels[, na.like])
     for (nn in nms) if (any(is.na(slot(obj, nn)$slice))) {
       dtf <- slot(obj, nn)
-      df1 <- dtf[is.na(dtf$slice),]
-      df2 <- dtf[!is.na(dtf$slice),]
+      df1 <- dtf[is.na(dtf$slice),, drop = FALSE]
+      df2 <- dtf[!is.na(dtf$slice),, drop = FALSE]
       df1[, 'slice'] <- slc[1]
       for (ss in slc[-1]) {
         tmp <- df1; tmp[, 'slice'] <- ss;
@@ -37,8 +37,8 @@
       dtf <- slot(obj, nn)
       ft <- (!(sapply(dtf, class) %in% c('character', 'factor')) & !(substr(colnames(dtf), 1, 4) %in% c('pric', 'cost', 'year')))
       fl <- (!is.na(dtf$slice) & dtf$slice %in% sup)
-      df1 <- dtf[ fl,]
-      df2 <- dtf[!fl,]
+      df1 <- dtf[ fl,, drop = FALSE]
+      df2 <- dtf[!fl,, drop = FALSE]
       tt <- slice@all_parent_child[slice@all_parent_child$child %in% lev, ]
       hh <- slice@slice_share$share; names(hh) <- slice@slice_share$slice
       tt[, 'share'] <- hh[tt$child] / hh[tt$parent]
@@ -55,8 +55,8 @@
           } else gg <- rbind(gg, tm2)
         }
       }
-      gg <- gg[!(apply(gg[, !ft, with = FALSE], 1, paste, collapse = "#") %in% 
-                   apply(df1[, !ft, with = FALSE], 1, paste, collapse = "#")),]
+      gg <- gg[!(apply(gg[, !ft, drop = FALSE], 1, paste, collapse = "#") %in% 
+                   apply(df1[, !ft, drop = FALSE], 1, paste, collapse = "#")),, drop = FALSE]
       slot(obj, nn) <- rbind(df2, gg)
     }
   }
@@ -67,8 +67,8 @@
       dtf <- slot(obj, nn)
       ft <- (!(sapply(dtf, class) %in% c('character', 'factor')) & substr(colnames(dtf), 1, 4) != 'year')
       fl <- (!is.na(dtf$slice) & dtf$slice %in% sup)
-      df1 <- dtf[ fl,]
-      df2 <- dtf[!fl,]
+      df1 <- dtf[ fl,, drop = FALSE]
+      df2 <- dtf[!fl,, drop = FALSE]
       tt <- slice@all_parent_child[slice@all_parent_child$parent %in% lev, ]
       hh <- slice@slice_share$share; names(hh) <- slice@slice_share$slice
       tt[, 'share'] <-hh[tt$child]
@@ -76,7 +76,7 @@
       for (ss in unique(tt$parent)) {
         kk <- tt[tt$parent == ss, ]
         tmp <- df1[df1$slice %in% kk$child, ];
-        ll <- apply(tmp[, (!ft & colnames(tmp) != 'slice'), with = FALSE], 1, paste, collapse = "#")
+        ll <- apply(tmp[, (!ft & colnames(tmp) != 'slice'), drop = FALSE], 1, paste, collapse = "#")
         ee <- seq(along = ll)[!duplicated(ll)]
         for (uu in ee) {
           tm2 <- tmp[ll[uu] == ll, ]; 
@@ -92,8 +92,8 @@
           } else gg <- rbind(gg, gh)
         }
       }
-      gg <- gg[!(apply(gg[, !ft, with = FALSE], 1, paste, collapse = "#") %in% 
-                   apply(df1[, !ft, with = FALSE], 1, paste, collapse = "#")),]
+      gg <- gg[!(apply(gg[, !ft, drop = FALSE], 1, paste, collapse = "#") %in% 
+                   apply(df1[, !ft, drop = FALSE], 1, paste, collapse = "#")),, drop = FALSE]
       slot(obj, nn) <- rbind(df2, gg)
     }
   }
@@ -121,8 +121,8 @@
     if (any(fl)) {
       mark_col <- (sapply(tmp, is.character) | colnames(tmp) == 'year')
       mark_coli <- colnames(tmp)[mark_col]
-      t1 <- tmp[fl,]
-      t2 <- tmp[!fl,]
+      t1 <- tmp[fl,, drop = FALSE]
+      t2 <- tmp[!fl,, drop = FALSE]
       # Sort from lowest level to largest
       ff <- approxim$parent_child$parent[!duplicated(approxim$parent_child$parent)]
       f1 <- seq_along(ff)
@@ -130,15 +130,15 @@
       if (!all(t1$slice %in% ff))
         stop(paste0('Unknown slice or slice is not parrent slice, for "', app@name, '" (class ', class(app), '), slot: "',
                     ss, '", slice: "', paste0(t1$slice[!(t1$slice %in% ff)], collapse = '", "'), '"'))      
-      t1 <- t1[sort(f1[t1$slice], index.return = TRUE, decreasing = TRUE)$ix,]
+      t1 <- t1[sort(f1[t1$slice], index.return = TRUE, decreasing = TRUE)$ix,, drop = FALSE]
       # Add child desaggregation 
       for (i in seq_len(nrow(t1))) {
         ll <- approxim$parent_child[approxim$parent_child$parent == t1[i, 'slice'], 'child']
-        t0 <- t1[rep(i, length(ll)),]
+        t0 <- t1[rep(i, length(ll)),, drop = FALSE]
         t0$slice <- ll
-        tes <- t0[, mark_coli, with = FALSE]; tes[is.na(tes)] <- '-'
+        tes <- t0[, mark_coli, drop = FALSE]; tes[is.na(tes)] <- '-'
         z1 <- apply(tes, 1, paste0, collapse = '##')
-        tes <- t2[, mark_coli, with = FALSE]; tes[is.na(tes)] <- '-'
+        tes <- t2[, mark_coli, drop = FALSE]; tes[is.na(tes)] <- '-'
         z2 <- apply(tes, 1, paste0, collapse = '##')
         # If there are the same row, after splititng
         if (any(z1 %in% z2)) {

@@ -23,7 +23,7 @@
     tmp <- .get_data_slot(scen@modInp@parameters[[pr]])
     tmp$weather <- NULL
     if (anyDuplicated(tmp)) {
-      assign('error_msg', tmp[duplicated(tmp),], globalenv())
+      assign('error_msg', tmp[duplicated(tmp),, drop = FALSE], globalenv())
       stop(paste0('It is forbidden to determine more than one weather for Julia, since the prod is not a allowed. ', 
         'List of duplicated weather for map "', pr, '"assign to error_msg.'))
     }

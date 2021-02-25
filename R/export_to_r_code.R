@@ -16,7 +16,7 @@
   for (i in nms) {
     if (any(class(slot(tmp, i)) == 'data.table')) {
       if (nrow(slot(tmp, i)) > 0 && any(!is.na(slot(tmp, i)))) {
-        slt <- slot(tmp, i)[apply(!is.na(slot(tmp, i)), 1, any), apply(!is.na(slot(tmp, i)), 2, any), with = FALSE]
+        slt <- slot(tmp, i)[apply(!is.na(slot(tmp, i)), 1, any), apply(!is.na(slot(tmp, i)), 2, any), drop = FALSE]
         out_buf2 <- NULL
         for (j in colnames(slt)) {
           out_buf2 <- c(out_buf2, paste0(j, ' = ', vector_to_string(slt[[j]])))

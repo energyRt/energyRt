@@ -9,14 +9,14 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   
   if (!is.null(mtp@misc$not_need_interpolate)) {
     # approxim <- approxim[!(names(approxim) %in% mtp@misc$not_need_interpolate)]
-    frm <- frm[, !(colnames(frm) %in% mtp@misc$not_need_interpolate), with = FALSE]
+    frm <- frm[, !(colnames(frm) %in% mtp@misc$not_need_interpolate), drop = FALSE]
     if (any(mtp@misc$not_need_interpolate == 'year')) there.is.year <- FALSE
     fl <- add_set_name %in% mtp@misc$not_need_interpolate
     if (any(fl)) {
       add_set_name <- add_set_name[!fl]
       add_set_value <- add_set_value[!fl]
     }
-    frm <- frm[!duplicated(frm),]
+    frm <- frm[!duplicated(frm),, drop = FALSE]
   }
 
   dd <- .interpolation(frm, parameter,
@@ -27,7 +27,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
 
   if (is.null(dd)) return(NULL)
   if (!all.val) {
-    dd <- dd[dd[[ncol(dd)]] != 0,]
+    dd <- dd[dd[[ncol(dd)]] != 0,, drop = FALSE]
     if (nrow(dd) == 0) return(NULL)
   }
   # Must fixed in the future
@@ -37,7 +37,7 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
   }
   if (there.is.year) dd[['year']] <- as.numeric(dd[['year']])
   if (is.null(add_set_name)) {
-    dd <- dd[, c(mtp@dimSetNames, 'value'), with = FALSE]
+    dd <- dd[, c(mtp@dimSetNames, 'value'), drop = FALSE]
   } else {
     d3 <- data.table()
     for(i in 1:length(add_set_value))
@@ -50,17 +50,17 @@ simpleInterpolation <- function(frm, parameter, mtp, approxim,
     } 
     stnd <- stnd[!(stnd %in% mtp@misc$not_need_interpolate)]
     if (any(ls(globalenv()) == 'KKK')) browser()
-    dd <- cbind(d3, dd[, c(stnd, 'value'), with = FALSE])
+    dd <- cbind(d3, dd[, c(stnd, 'value'), drop = FALSE])
   }
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
       fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
     }
-    dd <- dd[fl,]
+    dd <- dd[fl,, drop = FALSE]
   }
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
-    dd <- dd[dd$year %in% approxim$mileStoneYears,]
+    dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
   }
   if (nrow(dd) == 0) return(NULL)
   
@@ -72,14 +72,14 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
   remValueUp = NULL, remValueLo = NULL) {
   there.is.year <- any(colnames(frm) == 'year')
   if (!is.null(mtp@misc$not_need_interpolate)) {
-    frm <- frm[, !(colnames(frm) %in% mtp@misc$not_need_interpolate), with = FALSE]
+    frm <- frm[, !(colnames(frm) %in% mtp@misc$not_need_interpolate), drop = FALSE]
     if (any(mtp@misc$not_need_interpolate == 'year')) there.is.year <- FALSE
     fl <- add_set_name %in% mtp@misc$not_need_interpolate
     if (any(fl)) {
       add_set_name <- add_set_name[!fl]
       add_set_value <- add_set_value[!fl]
     }
-    frm <- frm[!duplicated(frm),]
+    frm <- frm[!duplicated(frm),, drop = FALSE]
   }
   
   dd <- .interpolation_bound(frm, parameter,
@@ -88,7 +88,7 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
                     year_range = range(approxim$year),
                     approxim   = approxim)
   if (is.null(dd)) return(NULL)
-  dd <- dd[dd[[ncol(dd)]] != 0 | dd$type == 'up',]
+  dd <- dd[dd[[ncol(dd)]] != 0 | dd$type == 'up',, drop = FALSE]
   if (nrow(dd) == 0) return(NULL)
   
   colnames(dd)[[ncol(dd)]] <- 'value'
@@ -97,7 +97,7 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
   }
   if (there.is.year) dd[['year']] <- as.numeric(dd[['year']])
   if (is.null(add_set_name)) {
-    dd <- dd[, c(mtp@dimSetNames, 'type', 'value'), with = FALSE]
+    dd <- dd[, c(mtp@dimSetNames, 'type', 'value'), drop = FALSE]
   } else {
     d3 <- data.table()
     for(i in 1:length(add_set_value))
@@ -110,18 +110,18 @@ multiInterpolation <- function(frm, parameter, mtp, approxim,
     } 
     stnd <- stnd[!(stnd %in% mtp@misc$not_need_interpolate)]
 
-    dd <- cbind(d3, dd[, c(stnd, 'type', 'value'), with = FALSE])
+    dd <- cbind(d3, dd[, c(stnd, 'type', 'value'), drop = FALSE])
   }
-  dd <- dd[(dd$type == 'lo') | (dd$type == 'up'),]
+  dd <- dd[(dd$type == 'lo') | (dd$type == 'up'),, drop = FALSE]
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
       fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
     }
-    dd <- dd[fl,]
+    dd <- dd[fl,, drop = FALSE]
   }
   if (there.is.year && !is.null(approxim$mileStoneYears)) {
-    dd <- dd[dd$year %in% approxim$mileStoneYears,]
+    dd <- dd[dd$year %in% approxim$mileStoneYears,, drop = FALSE]
   }
   if (nrow(dd) == 0) return(NULL)
   dd

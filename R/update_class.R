@@ -7,9 +7,9 @@
   for (i in all_par) {
     if (any(scen@modInp@parameters[[i]]@dimSetNames == slc)) {
       if (scen@modInp@parameters[[i]]@nValues != -1) {
-        scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[seq_len(scen@modInp@parameters[[i]]@nValues),]
+        scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[seq_len(scen@modInp@parameters[[i]]@nValues),, drop = FALSE]
       }
-      scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[!(scen@modInp@parameters[[i]]@data[, slc] %in% tec_name),]
+      scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[!(scen@modInp@parameters[[i]]@data[, slc] %in% tec_name),, drop = FALSE]
       if (scen@modInp@parameters[[i]]@nValues != -1) {
         scen@modInp@parameters[[i]]@nValues <- nrow(scen@modInp@parameters[[i]]@data)
       }
@@ -49,9 +49,9 @@
   comm_out <- sapply(lst, function(x) x@comm)
   for (prm in prm2) {
 	  if (scen@modInp@parameters[[prm]]@nValues != -1) {
-	    scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[seq_len(scen@modInp@parameters[[prm]]@nValues),]
+	    scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[seq_len(scen@modInp@parameters[[prm]]@nValues),, drop = FALSE]
 	  }
-	  scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[!(scen@modInp@parameters[[prm]]@data[, 'comm'] %in% comm_out),]
+	  scen@modInp@parameters[[prm]]@data <- scen@modInp@parameters[[prm]]@data[!(scen@modInp@parameters[[prm]]@data[, 'comm'] %in% comm_out),, drop = FALSE]
 	  if (scen@modInp@parameters[[prm]]@nValues != -1) {
 	    scen@modInp@parameters[[prm]]@nValues <- nrow(scen@modInp@parameters[[prm]]@data)
 	  }
@@ -126,7 +126,7 @@
                    'mExportRowAccumulatedUp',  'mExport',  'mImport',  'mStorageInpTot',  'mStorageOutTot',  'mTaxCost',  'mSubCost',  'mAggOut',  'mSupAva',  
                    'mSupAvaUp',  'mSupReserveUp',  'mTechAfUp',  'mTechAfcUp',  'mTechOlifeInf',  'mStorageOlifeInf',  'mOut2Lo',  'mInp2Lo')
   for (i in c(sys_info_par, reduce_map)) {
-    scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[0,]
+    scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[0,, drop = FALSE]
     if (scen@modInp@parameters[[i]]@nValues != -1) 
       scen@modInp@parameters[[i]]@nValues <- 0
   }
@@ -136,7 +136,7 @@
   for(i in names(scen@modInp@parameters)) {
     if (scen@modInp@parameters[[i]]@nValues != -1) {
       scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
-        seq(length.out = scen@modInp@parameters[[i]]@nValues),]
+        seq(length.out = scen@modInp@parameters[[i]]@nValues),, drop = FALSE]
     }
   }
   cat(round(proc.time()[3] - p1, 2), 's\n', sep = '')

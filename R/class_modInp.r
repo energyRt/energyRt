@@ -615,7 +615,7 @@ setMethod("initialize", "modInp",
   #       expanded grid of all (or used only, like milestone-years) 
   #       values of the parameter dimension (e.g. sets)
   # name - "character", name of the parameter
-  drop_duplicates <- function(x) x[!duplicated(x),]
+  drop_duplicates <- function(x) x[!duplicated(x),, drop = FALSE]
   sets0 <- modInp@parameters[[name]]@dimSetNames
   sets <- NULL
   for (i in sets0) {
@@ -706,13 +706,13 @@ setMethod("initialize", "modInp",
       return(gg)
     } else {
       if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else
-        gg <- rbind(dtt, unique(tmp[, colnames(dtt), with = FALSE]))
+        gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
       if (ncol(gg) == 1) return(dtt)
      }
   } else {
     gg <- dtt
   }
-  gg[!duplicated(gg[, colnames(gg) != 'value']),]
+  gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
 }
 
 # !!! use methods instead?
