@@ -1,12 +1,11 @@
 # Read default parameter from sysInfo
 .read_default_data <- function(prec, ss) {
   for(i in seq(along = prec@parameters)) {
-    # assign('test', prec@parameters[[i]], globalenv())
     if (any(prec@parameters[[i]]@colName != '')) {
       prec@parameters[[i]]@defVal <-
-        as.numeric(ss@defVal[1, prec@parameters[[i]]@colName])
+        sapply(prec@parameters[[i]]@colName, function(x) as.numeric(ss@defVal[[x]][1]))
       prec@parameters[[i]]@interpolation <-
-        as.character(ss@interpolation[1, prec@parameters[[i]]@colName])
+        sapply(prec@parameters[[i]]@colName, function(x) as.character(ss@interpolation[[x]][1]))
     }
   }
   prec
@@ -236,7 +235,7 @@
 			tmp <- data.table(value = have, stringsAsFactors = FALSE)
 			tmp$slot <- slt
 			tmp$constraint <- cns
-			return(rbind(err_msg, tmp[, c('constraint', 'slot', 'value'), drop = FALSE]))			
+			return(rbind(err_msg, tmp[, c('constraint', 'slot', 'value'), with = FALSE]))			
 		}
 		return(err_msg)
 	}
@@ -275,7 +274,7 @@
 																					nrow(x@data) != 0)]
 	for (pr in pars) {
 		tmp <- scen@modInp@parameters[[pr]]@data
-		tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather),, drop = FALSE]
+		tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather),]
 		if (nrow(tmp) != 0) err_msg[[pr]] <- tmp
 	}
 	if (length(err_msg) != 0) {
@@ -307,7 +306,7 @@
 		if (!all(prm@dimSetNames %in% names(lsets))) {
 			int_err = unique(c(int_err, prm@dimSetNames[!(prm@dimSetNames %in% names(lsets))]))
 		} else {
-			tmp <- .get_data_slot(prm)[, prm@dimSetNames, drop = FALSE]
+			tmp <- .get_data_slot(prm)[, prm@dimSetNames, with = FALSE]
 			for (ss in prm@dimSetNames) {
 				unq <- unique(tmp[[ss]])
 				fl <- !(unq %in% lsets[[ss]])

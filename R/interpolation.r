@@ -6,7 +6,7 @@
   # Remove not used approxim
   if (length(defVal) != 1) stop('defVal value not define')
   if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
-    
+  
   # Get slice
   prior <- c('stg', 'trade', 'tech', 'sup', 'group', 'acomm', 'comm', 'commp', 'region', 
     'regionp', 'src', 'dst', 'slice', 'year')
@@ -27,12 +27,13 @@
   prior <- prior[prior %in% colnames(obj)[-ncol(obj)]]
   true_prior <- true_prior[true_prior %in% prior]
   approxim <- approxim[names(approxim) %in% prior]
-  # Remove excess column
+   # Remove excess column
   obj <- obj[,colnames(obj) %in% c(prior, parameter), with = FALSE]
   # Sort column
   obj <- obj[,c(prior[prior %in% colnames(obj)], 
     colnames(obj)[ncol(obj)]), with = FALSE]
-  obj <- obj[!is.na(obj[, parameter]), , with = FALSE]
+  if (nrow(obj) > 0)
+    obj <- obj[!is.na(obj[, parameter, with = FALSE]),]
   if (anyDuplicated(obj[, -ncol(obj)])) {
     jjj <- sys.status()
     kkk <- sapply(jjj$sys.calls, function(x) any(grep('.add0', x[1])))
@@ -48,7 +49,7 @@
   }
   if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)
   if (ncol(obj) == 1) {
-    if (nrow(obj) == 0) obj[1, 1] <- defVal
+    if (nrow(obj) == 0) obj[[1]][1] <- defVal
     return(obj)
   }
   # Check do need realy approximation 
@@ -64,7 +65,7 @@
     if (nrow(obj) >= possible_comb) {
      obj3 <- obj
      for (i in names(approxim2))
-        obj3 <- obj3[obj3[[i]] %in% approxim2[[i]],, with = FALSE]
+        obj3 <- obj3[obj3[[i]] %in% approxim2[[i]],]
       if (nrow(obj3) == possible_comb)
         return(obj3)
     }
@@ -77,12 +78,14 @@
         obj2 <- obj2[obj2[[i]] %in% approxim2[[i]],, with = FALSE]
       if (ncol(obj2) == 1 || nrow(obj2) == prod(sapply(approxim2[names(obj2)[-ncol(obj2)]], length))) { # Simple approximation is possible
         for (i in names(obj)[c(!f1, FALSE)]) {
-          obj2 <- merge(obj2, approxim2[i])
+          browser()
+          obj2 <- merge(obj2, approxim2[i]) #####--------------
         }
-        return(obj2[, colnames(obj)])
+        return(obj2[, colnames(obj), with = FALSE])
       }
     }
   }
+
   # Real interpolation
   if (there.are.year) {
     year_range <- arg$year_range
@@ -91,8 +94,8 @@
     approxim$year <- yy[1]:yy[2]
     apr <- approxim[c('year', true_prior[true_prior != 'year'])]
     if (any(sapply(apr, length) == 0)) return(NULL)
-    dd <- as.data.table.table(array(NA, dim = sapply(apr, length), 
-      dimnames = apr), stringsAsFactors = FALSE, responseName = parameter)
+    dd <- data.table(as.data.frame.table(array(NA, dim = sapply(apr, length), 
+      dimnames = apr), stringsAsFactors = FALSE, responseName = parameter))
     dd <- dd[, c(prior, parameter), with = FALSE]
   } else {
     dd <- as.data.table.table(array(NA, dim = sapply(approxim, length), 
@@ -123,7 +126,7 @@
         #dff <- dd[fl, -ncol(dd), with = FALSE]
         zz <- !is.na(obj[fl[1], -ncol(obj)])
         # gg <- rowSums(obj[fl, -ncol(obj), with = FALSE])
-        r1 <- rowSums(dff[, zz, drop = FALSE])
+        r1 <- rowSums(dff[, zz, with = FALSE])
         r2 <- rowSums(obj[fl, c(zz, FALSE), with = FALSE])
         ll <- obj[fl, ncol(obj)]
         names(ll) <- r2
@@ -133,16 +136,16 @@
   } 
   # Interpolation
   if (!there.are.year) {
-    dd[is.na(dd[, parameter]), parameter] <- defVal
+    dd[is.na(dd[, parameter, with = FALSE]), parameter, with = FALSE] <- defVal
   } else {
-    if (all(is.na(dd[, parameter]))) {
-      dd[is.na(dd[, parameter]), parameter] <- defVal
-    } else if (any(is.na(dd[, parameter]))) {
+    if (all(is.na(dd[, parameter, with = FALSE]))) {
+      dd[[parameter]][is.na(dd[[parameter]])] <- defVal
+    } else if (any(is.na(dd[, parameter, with = FALSE]))) {
       zz <- matrix(dd[, parameter], length(approxim$year))
       f1 <- apply(!is.na(zz), 2, all)
       if (any(!f1)) {
         gg <- seq(along =f1)[!f1][apply(is.na(zz[, !f1, with = FALSE]), 2, all)]
-        zz[, gg] <- defVal
+        zz[, gg, with = FALSE] <- defVal
         f1[gg] <- TRUE
       }
       if (any(!f1)) {
@@ -154,7 +157,7 @@
         for (ee in seq(along = f1)[!f1]) {
           ll <- ee
           # Approximate
-          hh <- zz[, ee[1]]
+          hh <- zz[, ee[1], with = FALSE]
           # Back
           if (is.na(hh[1])) {  
             hm <- (1:nr)[!is.na(hh)][1]   
@@ -178,18 +181,18 @@
             }
           }
           # Assign
-          zz[, ll] <- hh
+          zz[, ll, with = FALSE] <- hh
           f1[ll] <- TRUE
         }
       } 
-      dd[, parameter] <- c(zz)  
+      dd[, parameter, with = FALSE] <- c(zz)  
     }
     if (any(colnames(obj)[-ncol(obj)] == 'slice')) {
       dd <- dd[, c(true_prior, parameter), with = FALSE]
     }
     if (length(approxim$year) != year_range[2] - year_range[1] + 1) {
       dd <- dd[rep(year_range[1] <= approxim$year & approxim$year <= year_range[2], 
-        nrow(dd) / length(approxim$year)), , with = FALSE]
+        nrow(dd) / length(approxim$year)),]
     }
   }
   return(dd)

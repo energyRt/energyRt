@@ -39,7 +39,7 @@
                paste(colnames(ww)[!(colnames(ww) %in% colnames(slot(obj, w)))], 
                  collapse = '", "'), '"\n', sep = ''))
           }
-          slot(obj, w) <- slot(obj, w)[0,, drop = FALSE]
+          slot(obj, w) <- slot(obj, w)[0,]
           if (nrow(ww) != 0) {
             nn <- 1:nrow(ww)
             slot(obj, w)[nn, ] <- NA
@@ -52,8 +52,8 @@
             }
           }
         } else if (is.list(ww)) {
-         gg <- sapply(ww, length)
-          slot(obj, w) <- slot(obj, w)[0,, drop = FALSE]
+          gg <- sapply(ww, length)
+          slot(obj, w) <- slot(obj, w)[0,]
           # Check: Equal length
           if (any(gg[1] != gg)) stop('Check argument ', w)
           # Check: All column has correct name
@@ -61,17 +61,13 @@
              anyDuplicated(names(ww)) != 0) stop('Duplicated parameter ', w)
           # Check: There is no additional column
           if (any(!(names(ww) %in% colnames(slot(obj, w))))) stop('Check argument ', w)
-          if (gg[1] != 0) {
-             nn <- 1:gg[1]
-             slot(obj, w)[nn, ] <- NA
-             for(i in names(ww)) {
-              slot(obj, w)[[i]][nn] <- ww[[i]]
-            }
-          }
+          if (gg[1] != 0)
+						slot(obj, w) <- as.data.table(ww)
         } else if (any(colnames(slot(obj, w)) == w) && length(ww) == 1) { 
         # for use start = 2000 rather than start = list(start = 2000)
-             slot(obj, w)[1, ] <- NA
-             slot(obj, w)[[w]][1] <- ww
+        	tmp <- list(ww)
+        	names(tmp) <- w
+					slot(obj, w) <- slot(obj, w) %>% add_row(as.data.table(tmp))
         } else stop('Check argument ', w)
       # Other argument
       } else if (slt[w] == 'factor') {
@@ -229,7 +225,7 @@ setMethod('newTrade', signature(name = 'character'), function(name, ..., source 
   if (!is.null(source)) {
     trd@routes <- merge(data.table(src = source, stringsAsFactors = FALSE), 
                         data.table(dst = destination, stringsAsFactors = FALSE))
-    trd@routes <- trd@routes[trd@routes$src != trd@routes$dst,, with = FALSE]
+    trd@routes <- trd@routes[trd@routes$src != trd@routes$dst,]
   }
   trd
 })

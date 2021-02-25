@@ -16,7 +16,7 @@
   if (length(scen@modInp@set$tech) > 0) {
 	  tech.new.cap <- src@modOut@variables$vTechNewCap
 	  tech.stock <- .add_dropped_zeros(scen@modInp, 'pTechStock')
-	  tech.new.cap <- tech.new.cap[tech.new.cap$year <= startYear,, drop = FALSE]
+	  tech.new.cap <- tech.new.cap[tech.new.cap$year <= startYear,]
 	  tech.life <- .add_dropped_zeros(scen@modInp, 'pTechOlife')
 	  olife.tmp <- tech.life$value
 	  names(olife.tmp) <- paste0(tech.life$tech, '#', tech.life$region)
@@ -31,7 +31,7 @@
 	    } 
 	  }
 	  fl <-  tech.stock$year >= startYear
-	  tech.stock2 <- aggregate(tech.stock[fl, 'value', drop = FALSE], tech.stock[fl, c('tech', 'region', 'year')], sum)
+	  tech.stock2 <- aggregate(tech.stock[fl, 'value', with = FALSE], tech.stock[fl, c('tech', 'region', 'year')], sum)
 	  # have to replace tech.stock2 -> pTechStock
 	  scen@modInp <- energyRt:::.setParameterData(scen@modInp, 'pTechStock', tech.stock2)
   }
@@ -39,7 +39,7 @@
   if (length(scen@modInp@set$stg) > 0) {
 	  stg.new.cap <- src@modOut@variables$vStorageNewCap
 	  stg.stock <- .add_dropped_zeros(scen@modInp, 'pStorageStock')
-	  stg.new.cap <- stg.new.cap[stg.new.cap$year <= startYear,, drop = FALSE]
+	  stg.new.cap <- stg.new.cap[stg.new.cap$year <= startYear,]
 	  stg.life <- .add_dropped_zeros(scen@modInp, 'pStorageOlife')
 	  olife.tmp <- stg.life$value
 	  names(olife.tmp) <- paste0(stg.life$stg, '#', stg.life$region)
@@ -54,7 +54,7 @@
 	  	} 
 	  }
 	  fl <-  stg.stock$year >= startYear
-	  stg.stock2 <- aggregate(stg.stock[fl, 'value', drop = FALSE], stg.stock[fl, c('stg', 'region', 'year')], sum)
+	  stg.stock2 <- aggregate(stg.stock[fl, 'value', with = FALSE], stg.stock[fl, c('stg', 'region', 'year')], sum)
 	  # have to replace stg.stock2 -> pStorageStock
 	  scen@modInp <- energyRt:::.setParameterData(scen@modInp, 'pStorageStock', stg.stock2)
   }
@@ -81,10 +81,10 @@
       clmn <- als_year[als_year %in% scen@modInp@parameters[[nn]]@dimSetNames]
       # Shrink data.table if need
       if (scen@modInp@parameters[[nn]]@nValues != -1) {
-        scen@modInp@parameters[[nn]]@data <- scen@modInp@parameters[[nn]]@data[seq_len(scen@modInp@parameters[[nn]]@nValues),, drop = FALSE]
+        scen@modInp@parameters[[nn]]@data <- scen@modInp@parameters[[nn]]@data[seq_len(scen@modInp@parameters[[nn]]@nValues),]
       }
       for (cc in clmn)
-        scen@modInp@parameters[[nn]]@data <- scen@modInp@parameters[[nn]]@data[scen@modInp@parameters[[nn]]@data[, cc] >= stay.year.begin,, drop = FALSE]
+        scen@modInp@parameters[[nn]]@data <- scen@modInp@parameters[[nn]]@data[scen@modInp@parameters[[nn]]@data[, cc] >= stay.year.begin,]
       if (scen@modInp@parameters[[nn]]@nValues != -1) {
         scen@modInp@parameters[[nn]]@nValues <- nrow(scen@modInp@parameters[[nn]]@data)
       }
@@ -104,14 +104,14 @@
 	sup.res.par <- .add_dropped_zeros(scen@modInp, var.par)
 	sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
 	sup.res.use0$type <- 'lo'
-	sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
+	sup.res.use0 <- aggregate(sup.res.use0[, 'value', with = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
 														sup.res.use0[, colnames(sup.res.par)[colnames(sup.res.par) != 'value']], sum)
 	
 	sup.res.use0$value <- (-sup.res.use0$value)
 	sup.res.par <- rbind(sup.res.par, sup.res.use0)
 	sup.res.use0$type <- 'up'
 	sup.res.par <- rbind(sup.res.par, sup.res.use0)
-	sup.res.par <- aggregate(sup.res.par[, 'value', drop = FALSE], sup.res.par[, -ncol(sup.res.par)], sum) 
+	sup.res.par <- aggregate(sup.res.par[, 'value', with = FALSE], sup.res.par[, -ncol(sup.res.par)], sum) 
 	sup.res.par <- sup.res.par[!(sup.res.par$type == 'lo' & sup.res.par$value <= 0), ]
 	sup.res.par[sup.res.par$value < 0, 'value'] <- 0
 	scen@modInp <- energyRt:::.setParameterData(scen@modInp, var.par, sup.res.par)
@@ -123,12 +123,12 @@
 		sup.res.use0 <- src@modOut@variables[[var.name]]
 		sup.res.par <- .add_dropped_zeros(scen@modInp, var.par)
 		sup.res.use0 <- sup.res.use0[sup.res.use0$year < startYear, ]
-		sup.res.use0 <- aggregate(sup.res.use0[, 'value', drop = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
-															sup.res.use0[, colnames(sup.res.par)[colnames(sup.res.par) != 'value'], drop = FALSE], sum)
+		sup.res.use0 <- aggregate(sup.res.use0[, 'value', with = FALSE] * mile.stone.length[as.character(sup.res.use0$year)], 
+															sup.res.use0[, colnames(sup.res.par)[colnames(sup.res.par) != 'value'], with = FALSE], sum)
 		
 		sup.res.use0$value <- (-sup.res.use0$value)
 		sup.res.par <- rbind(sup.res.par, sup.res.use0)
-		sup.res.par <- aggregate(sup.res.par[, 'value', drop = FALSE], sup.res.par[, -ncol(sup.res.par), drop = FALSE], sum) 
+		sup.res.par <- aggregate(sup.res.par[, 'value', with = FALSE], sup.res.par[, -ncol(sup.res.par), with = FALSE], sum) 
 		sup.res.par[sup.res.par$value < 0, 'value'] <- 0
 		scen@modInp <- energyRt:::.setParameterData(scen@modInp, var.par, sup.res.par)
 		scen
@@ -215,7 +215,7 @@
 						if (any(strsplit(gsub('([[:blank:]]*|[(]|[)].*)', '', nn[2]), ',')[[1]] == 'year')) {
 							prm <- gsub('(^[[:blank:]]*|[(].*)', '', substr(eqt2, nchar(nn[1]), nchar(eqt2)))
 							tpr <- .add_dropped_zeros(scen@modInp, prm)
-							tpr <- tpr[tpr$year == last_noinc_mile, colnames(tpr) != 'year', drop = FALSE]
+							tpr <- tpr[tpr$year == last_noinc_mile, colnames(tpr) != 'year', with = FALSE]
 							# Replace
 							if (ncol(tpr) == 1) {
 								eqt2 <- sub('pCnsMult[[:alnum:]_]*[(][^)]*[)]', tpr$value, eqt2)
@@ -273,10 +273,10 @@
 					}
 					# Summing sum set & year
 					rem.sum <- c('year', strsplit(gsub(' ', '', sub('^[(]', '', sub('([)]|)[$].*$', '', cond))), '[,]')[[1]])
-					tpr <- tpr[, !(colnames(tpr) %in% rem.sum), drop = FALSE]
+					tpr <- tpr[, !(colnames(tpr) %in% rem.sum), with = FALSE]
 					# Add parameter or const to equation
 					if (ncol(tpr) > 1) {
-						tpr <- aggregate(tpr[, 'value', drop = FALSE], tpr[, colnames(tpr) != 'value', drop = FALSE], sum)
+						tpr <- aggregate(tpr[, 'value', with = FALSE], tpr[, colnames(tpr) != 'value', with = FALSE], sum)
 						NEW_PAR <- NEW_PAR + 1
 						xx <- newParameter(paste0('pCnsMult', new_cns, '_', NEW_PAR), colnames(tpr)[-ncol(tpr)], 'simple', defVal = 0, 
 							interpolation = 'back.inter.forth')
@@ -321,15 +321,15 @@
 	data.before$vObjective <- NULL
 	for (i in names(data.before)) 
 		if (!is.null(data.before[[i]]$year)) {
-			data.before[[i]] <- data.before[[i]][data.before[[i]]$year <= last_noinc_mile,, drop = FALSE]
+			data.before[[i]] <- data.before[[i]][data.before[[i]]$year <= last_noinc_mile,]
 		}
 	if (nrow(data.before$vExportRowAccumulated) > 0) {
-		data.before$vExportRowAccumulated <- aggregate(data.before$vExportRow[, 'value', drop = FALSE], 
-			data.before$vExportRow[data.before$vExportRow$year <= last_noinc_mile, c('expp', 'comm'), drop = FALSE], sum)
+		data.before$vExportRowAccumulated <- aggregate(data.before$vExportRow[, 'value', with = FALSE], 
+			data.before$vExportRow[data.before$vExportRow$year <= last_noinc_mile, c('expp', 'comm'), with = FALSE], sum)
 	}
 	if (nrow(data.before$vImportRowAccumulated) > 0) {
-		data.before$vImportRowAccumulated <- aggregate(data.before$vImportRow[, 'value', drop = FALSE], data.before$vImportRow[data.before$vImportRow$year <= last_noinc_mile, 
-			c('imp', 'comm'), drop = FALSE], sum)
+		data.before$vImportRowAccumulated <- aggregate(data.before$vImportRow[, 'value', with = FALSE], data.before$vImportRow[data.before$vImportRow$year <= last_noinc_mile, 
+			c('imp', 'comm'), with = FALSE], sum)
 	}
 	scen@misc$data.before <- data.before
 	scen

@@ -331,7 +331,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
   if (length(set.map) > 0) {
     mpp <- all.set[!is.na(all.set$new.map), c('new.map', 'alias')]
     mpp <- mpp[!duplicated(mpp$new.map), ]
-    mpp <- mpp[sort(mpp$new.map, index.return = TRUE)$ix,, drop = FALSE]
+    mpp <- mpp[sort(mpp$new.map, index.return = TRUE)$ix,]
     new.map.name <- paste0('mCns', stm@name, '_', mpp$new.map)
     new.map.name.full <- paste0(new.map.name, '(', mpp$alias, ')')
     for (i in seq_along(set.map)) 
@@ -369,25 +369,25 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
       if (i == 'year') {
         tmg <- prec@parameters[['mMidMilestone']]@data
         if (any(all.set$lag.year)) { 
-          tmg <- tmg[!(tmg$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, with = FALSE]
+          tmg <- tmg[!(tmg$year %in% prec@parameters[['mMilestoneFirst']]@data$year),]
         }
         if (any(all.set$lead.year)) { 
-          tmg <- tmg[tmg$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, with = FALSE]
+          tmg <- tmg[tmg$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,]
         }
       }
       tmp_fe <- rbind(merge(tmp_fe[, colnames(tmp_fe) != i, with = FALSE], tmg),
-        tmp_fe[!is.na(tmp_fe[[i]]),, with = FALSE])
-      tmp_fe <- tmp_fe[!duplicated(tmp_fe),, with = FALSE]
+        tmp_fe[!is.na(tmp_fe[[i]]),])
+      tmp_fe <- tmp_fe[!duplicated(tmp_fe),]
     }
     stm@for.each <- tmp_fe
   }
   if (!is.null(stm@for.each$year)) {
-    stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMidMilestone']]@data$year,, with = FALSE]
+    stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMidMilestone']]@data$year,]
     if (any(all.set$lag.year)) { 
-      stm@for.each <- stm@for.each[!(stm@for.each$year %in% prec@parameters[['mMilestoneFirst']]@data$year),, with = FALSE]
+      stm@for.each <- stm@for.each[!(stm@for.each$year %in% prec@parameters[['mMilestoneFirst']]@data$year),]
     }
     if (any(all.set$lead.year)) { 
-      stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,, with = FALSE]
+      stm@for.each <- stm@for.each[stm@for.each$year %in% prec@parameters[['mMilestoneHasNext']]@data$year,]
     }
   }
   if (nrow(stm@for.each) > 0) {
@@ -398,7 +398,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
   }
   res$equation <- paste0(res$equation, '.. ')
   # Add lhs to equation
-  lhs.set <- all.set[!all.set$for.each,, with = FALSE]
+  lhs.set <- all.set[!all.set$for.each,]
   for (i in seq_along(stm@lhs)) {
     vrb <- stm@lhs[[i]]@variable
     lhs.set2 <- lhs.set[lhs.set$lhs.num == i, with = FALSE]
@@ -421,7 +421,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
         approxim2$slice <- approxim2$slice@all_slice
       }
       need.set <- lhs.set2$set[lhs.set2$set %in% colnames(stm@lhs[[i]]@mult)]
-      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set %in% colnames(stm@lhs[[i]]@mult),, with = FALSE]
+      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set %in% colnames(stm@lhs[[i]]@mult),]
       
       for (j in seq_len(nrow(need.set2))) {
         approxim2[[need.set2[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
@@ -452,7 +452,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
     if (all(!lhs.set2$def.lhs)) {
       res$equation <- paste0(res$equation, vrb.lhs)
     } else {
-      lhs.set3 <- lhs.set2[lhs.set2$def.lhs,, with = FALSE]
+      lhs.set3 <- lhs.set2[lhs.set2$def.lhs,]
       cnd <- NULL
       if (any(!is.na(lhs.set3$new.map))) { 
         cnd <- c(cnd, new.map.name.full[lhs.set3$new.map[!is.na(lhs.set3$new.map)]])
@@ -497,7 +497,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
       approxim2$slice <- approxim2$slice@all_slice
     }
     fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
-    need.set <- all.set[fl,, with = FALSE]
+    need.set <- all.set[fl,]
     for (j in seq_len(nrow(need.set))) {
       approxim2[[need.set$set[j]]] <- set.map[[need.set$new.map[j]]]
     }
@@ -507,8 +507,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.table(), for.sum = list
                           interpolation = 'back.inter.forth', colName = 'rhs')
     yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != 'value']
-    yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 
-      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, with = FALSE]
+    yy <- yy[(apply(yy[, n1, with = FALSE], 1, paste0, collapse = '##') %in% 
+      apply(stm@for.each[, n1, with = FALSE], 1, paste0, collapse = '##')),]
     prec@parameters[[xx@name]] <- .add_data(xx, yy)
     # Add mult
     res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')

@@ -20,8 +20,8 @@
 		if (any(scen@modInp@parameters[[i]]@data$value < 0)) {
 			if (any(scen@modInp@parameters[[i]]@data$value < -1e-7)) {
 				msg <- paste0('Parameter: "', i, '" have to only non negative value\nWrong data:')
-				tmp <- scen@modInp@parameters[[i]]@data[scen@modInp@parameters[[i]]@data$value < 0,, drop = FALSE]
-				msg <- c(msg, capture.output(print(tmp[1:min(c(10, nrow(tmp))),, drop = FALSE])))
+				tmp <- scen@modInp@parameters[[i]]@data[scen@modInp@parameters[[i]]@data$value < 0,]
+				msg <- c(msg, capture.output(print(tmp[1:min(c(10, nrow(tmp))),])))
 				
 				if (nrow(tmp) > 10) {
 					msg <- c(msg, paste0('Show only first 10 errors data, from ', nrow(tmp), '\n'))
@@ -46,13 +46,13 @@
 		tmp <- .add_dropped_zeros(scen@modInp, 'pTechShare')
 		mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
 		tmp <- merge(tmp, mTechSpan)
-		tmp_lo <- merge(tmp[tmp$type == 'lo',, drop = FALSE], mTechGroupComm)
-		tmp_up <- merge(tmp[tmp$type == 'up',, drop = FALSE], mTechGroupComm)
-		tmp_lo <- aggregate(tmp_lo[, 'value', drop = FALSE], tmp_lo[, !(colnames(tmp_lo) %in% c('type', 'comm', 'value')), drop = FALSE], sum)
-		tmp_up <- aggregate(tmp_up[, 'value', drop = FALSE], tmp_up[, !(colnames(tmp_up) %in% c('type', 'comm', 'value')), drop = FALSE], sum)
+		tmp_lo <- merge(tmp[tmp$type == 'lo',], mTechGroupComm)
+		tmp_up <- merge(tmp[tmp$type == 'up',], mTechGroupComm)
+		tmp_lo <- aggregate(tmp_lo[, 'value', with = FALSE], tmp_lo[, !(colnames(tmp_lo) %in% c('type', 'comm', 'value')), with = FALSE], sum)
+		tmp_up <- aggregate(tmp_up[, 'value', with = FALSE], tmp_up[, !(colnames(tmp_up) %in% c('type', 'comm', 'value')), with = FALSE], sum)
 		if (any(tmp_lo$value > 1) || any(tmp_up$value < 1)) {
-			tech_wrong_lo <- tmp_lo[tmp_lo$value > 1,, drop = FALSE]
-			tech_wrong_up <- tmp_up[tmp_up$value < 1,, drop = FALSE]
+			tech_wrong_lo <- tmp_lo[tmp_lo$value > 1,]
+			tech_wrong_up <- tmp_up[tmp_up$value < 1,]
 			tech_wrong <- unique(c(tech_wrong_up$tech, tech_wrong_lo$tech))
 			assign('tech_wrong_lo', tech_wrong_lo, globalenv())
 			assign('tech_wrong_up', tech_wrong_up, globalenv())
@@ -60,9 +60,9 @@
 				' for technology "', paste0(tech_wrong, collapse = '", "'), '"'))
 		}
 		fl <- colnames(tmp)[!(colnames(tmp) %in% c('type'))]
-		tmp_cmd <- merge(tmp[tmp$type == 'lo', fl, drop = FALSE], tmp[tmp$type == 'up', fl, drop = FALSE], by = fl[fl != 'value'])
+		tmp_cmd <- merge(tmp[tmp$type == 'lo', fl, with = FALSE], tmp[tmp$type == 'up', fl, with = FALSE], by = fl[fl != 'value'])
 		if (any(tmp_cmd$value.x > tmp_cmd$value.y)) {
-			tech_wrong <- tmp_cmd[tmp_cmd$value.x > tmp_cmd$value.y,, drop = FALSE]
+			tech_wrong <- tmp_cmd[tmp_cmd$value.x > tmp_cmd$value.y,]
 			assign('tech_wrong', tech_wrong, globalenv())
 			stop(paste0('There are wrong share (for tuple (tech, comm, region, year, slice) lo share large than up) (wrong data in data frame tech_wrong) for technology "', 
 				paste0(unique(tech_wrong$tech), collapse = '", "'), '"'))

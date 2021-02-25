@@ -3,12 +3,12 @@ findDuplicates <- function(x) {
     rs <- NULL
     for (pr in names(x@modInp@parameters)) if (x@modInp@parameters[[pr]]@type %in% c('simple', 'multi')) {
       tmp <- x@modInp@parameters[[pr]]@data
-      tmp <- tmp[, -ncol(tmp), drop = FALSE]
+      tmp <- tmp[, -ncol(tmp), with = FALSE]
       fl <- duplicated(tmp)
       if (any(fl)) {
-        tmp <- tmp[fl,, drop = FALSE]
+        tmp <- tmp[fl,]
         tmp$parameter <- pr
-        tmp <- tmp[, c(ncol(tmp), 1:(ncol(tmp) - 1)), drop = FALSE]
+        tmp <- tmp[, c(ncol(tmp), 1:(ncol(tmp) - 1)), with = FALSE]
         rs <- rbind(rs, tmp)
       }
     }
@@ -24,10 +24,10 @@ findDuplicates <- function(x) {
         slt <- slot(x, i)
         set_slot <- colnames(slt)[colnames(slt) %in% c('acomm', energyRt:::.set_al[!(energyRt:::.set_al %in% c('dem'))])]
         value_slot <- colnames(slt)[!(colnames(slt) %in% set_slot)]
-        fl <- !is.na(slt[, value_slot, drop = FALSE])
+        fl <- !is.na(slt[, value_slot, with = FALSE])
         if (any(fl)) {
           for (j in value_slot[apply(fl, 2, any)]) {
-            f2 <- duplicated(slt[fl[, j], set_slot, drop = FALSE])
+            f2 <- duplicated(slt[fl[, j], set_slot, with = FALSE])
             if (any(f2)) {
               rs <- rbind(rs, data.table(slot = i, parameter = j, value = sum(f2), stringsAsFactors = FALSE))
             }

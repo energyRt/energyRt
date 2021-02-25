@@ -161,9 +161,9 @@ read.scenario <- function(scen, ...) {
 	    		}
 	    	}
 	    	if (nrow(in_dat) != 0) {
-		    	in_dat <- aggregate(in_dat[, 'value', drop = FALSE], in_dat[, c('region', 'year'), drop = FALSE], sum)
+		    	in_dat <- aggregate(in_dat[, 'value', with = FALSE], in_dat[, c('region', 'year'), with = FALSE], sum)
 		    	in_dat$costs <- tmp@name
-	    		costs_tot <- rbind(costs_tot, in_dat[, c('costs', 'region', 'year', 'value'), drop = FALSE])
+	    		costs_tot <- rbind(costs_tot, in_dat[, c('costs', 'region', 'year', 'value'), with = FALSE])
 	    	}
     	}
    		scen@modOut@variables$vUserCosts <- costs_tot
@@ -185,11 +185,11 @@ read_solution <- read.scenario
 	}
 	# Correct RowTradeAccumulated
 	if (nrow(scen@modOut@variables$vExportRowAccumulated) > 0)
-		scen@modOut@variables$vExportRowAccumulated <- aggregate(scen@modOut@variables$vExportRowAccumulated[, 'value', drop = FALSE],
-			scen@modOut@variables$vExportRowAccumulated[, c('expp', 'comm'), drop = FALSE], sum)
+		scen@modOut@variables$vExportRowAccumulated <- aggregate(scen@modOut@variables$vExportRowAccumulated[, 'value', with = FALSE],
+			scen@modOut@variables$vExportRowAccumulated[, c('expp', 'comm'), with = FALSE], sum)
 	if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0)
-		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', drop = FALSE],
-			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
+		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', with = FALSE],
+			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), with = FALSE], sum)
   scen	
 }
 

@@ -38,7 +38,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
     
   if (any(is.na(approxim$debug$comm) | approxim$debug$comm == cmd@name)) {
     approxim$debug$comm[is.na(approxim$debug$comm)] <- cmd@name
-    dbg <- approxim$debug[!is.na(approxim$debug$comm) & approxim$debug$comm == cmd@name,, with = FALSE]
+    dbg <- approxim$debug[!is.na(approxim$debug$comm) & approxim$debug$comm == cmd@name,]
     approxim$comm <-cmd@name
     obj@parameters[['pDummyImportCost']] <- .add_data(obj@parameters[['pDummyImportCost']],
         simpleInterpolation(dbg, 'dummyImport', obj@parameters[['pDummyImportCost']], approxim))   
@@ -60,7 +60,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   }
   approxim$parent_child <- approxim$slice@all_parent_child
   approxim$slice <- approxim$slice@slice_map[[lev]]
-  approxim$parent_child <- approxim$parent_child[approxim$parent_child$child %in% approxim$slice,, with = FALSE]
+  approxim$parent_child <- approxim$parent_child[approxim$parent_child$child %in% approxim$slice,]
   approxim
 }
 
@@ -86,7 +86,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'demand',
         approxim$region <- approxim$region[approxim$region %in% unique(dem@dem$region)]
       }
       if (length(dem@region) != 0) {
-        dem@dem <- dem@dem[is.na(dem@dem) | dem@dem$region %in% dem@region,, with = FALSE]
+        dem@dem <- dem@dem[is.na(dem@dem) | dem@dem$region %in% dem@region,]
         approxim$region <- approxim$region[approxim$region %in% dem@region]
       }
       # Slice
@@ -163,7 +163,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
     if (nrow(pExportRow2) != 0) {
       pExportRow2 <- mExportRow[1, 1:2, with = FALSE]
       if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge(mExportRow, pExportRow2)
-      mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),, with = FALSE]
+      mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),]
     }
   }
   mExportRow$comm <- exp@commodity
@@ -222,7 +222,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
     if (nrow(pImportRow2) != 0) {
       pImportRow2 <- mImportRow[1, 1:2, with = FALSE]
       if (ncol(pImportRow2) != ncol(mImportRow)) pImportRow2 <- merge(mImportRow, pImportRow2)
-      mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow2), fromLast = TRUE)[1:nrow(mImportRow)]),, with = FALSE]
+      mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow2), fromLast = TRUE)[1:nrow(mImportRow)]),]
     }
   }
   mImportRow$comm <- imp@commodity
@@ -271,7 +271,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   if (any(!fl)) {
     dstart[app@start[!fl, 'region'], 'year'] <- app@start[!fl, 'start']
   }
-  dstart <- dstart[!is.na(dstart$year),, with = FALSE]
+  dstart <- dstart[!is.na(dstart$year),]
   for(rr in dstart$region) {
     if (!is.na(dstart[rr, 'year']) && any(dd$year < dstart[rr, 'year'])) dd[dd$region == rr & dd$year < dstart[rr, 'year'], 'enable'] <- FALSE
   } 
@@ -287,7 +287,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   if (any(!fl)) {
     dend[app@end[!fl, 'region'], 'year'] <- app@end[!fl, 'end']
   }
-  dend <- dend[!is.na(dend$year),, with = FALSE]
+  dend <- dend[!is.na(dend$year),]
   for(rr in dend$region) {
     if (any(dd$year > dend[rr, 'year'])) dd[dd$region == rr & dd$year > dend[rr, 'year'], 'enable'] <- FALSE
   }  
@@ -303,7 +303,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
   if (any(!fl)) {
     dlife[app@olife[!fl, 'region'], 'year'] <- app@olife[!fl, 'olife']
   }
-  dlife <- dlife[!is.na(dlife$year),, with = FALSE]
+  dlife <- dlife[!is.na(dlife$year),]
   for(rr in dlife$region[dlife$region %in% dend$region]) {
     if (any(dd_able$year >= dend[rr, 'year'] + dlife[rr, 'year'])) 
       dd_able[dd_able$region == rr & dd_able$year >= dend[rr, 'year'] + dlife[rr, 'year'], 'enable'] <- FALSE
@@ -388,16 +388,16 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo', approxim = 'list')
   tmp <- data.table(year = .get_data_slot(obj@parameters$year))
   tmp$value <- seq_along(tmp$year)
   obj@parameters[['ordYear']] <- .add_data(obj@parameters[['ordYear']], tmp)
-  obj@parameters[['cardYear']] <- .add_data(obj@parameters[['cardYear']], tmp[nrow(tmp),, with = FALSE])
+  obj@parameters[['cardYear']] <- .add_data(obj@parameters[['cardYear']], tmp[nrow(tmp),])
   
   obj@parameters[['pPeriodLen']] <- .add_data(obj@parameters[['pPeriodLen']], 
      data.table(year = app@milestone$mid, value = (app@milestone$end - app@milestone$start + 1), stringsAsFactors = FALSE))
   
   ####################################################
-  pDiscount <- pDiscount[sort(pDiscount$year, index.return = TRUE)$ix,, with = FALSE]
-  pDiscountFactor <- pDiscount[0,, with = FALSE]
+  pDiscount <- pDiscount[sort(pDiscount$year, index.return = TRUE)$ix,]
+  pDiscountFactor <- pDiscount[0,]
   for(l in unique(pDiscount$region)) {
-    dd <- pDiscount[pDiscount$region == l,, with = FALSE]
+    dd <- pDiscount[pDiscount$region == l,]
     dd$value <- cumprod(1 / (1 + dd$value))
     pDiscountFactor <- rbind(pDiscountFactor, dd)
   }
@@ -517,7 +517,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
                 rr <- !is.na(slot(stg, sl)$region) & !(slot(stg, sl)$region %in% stg@region)
                 warning(paste('There are data storage "', stg@name, '" for unused region: "', 
                               paste(unique(slot(stg, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
-                slot(stg, sl) <- slot(stg, sl)[!rr,, with = FALSE]
+                slot(stg, sl) <- slot(stg, sl)[!rr,]
               }
             }
             stg <- stayOnlyVariable(stg, approxim$region, 'region')
@@ -569,7 +569,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
                 cmm <- stg@aeff$acomm[!is.na(stg@aeff$acomm)][stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]]
                 stop(paste0('Unknown aux commodity "', paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
               }
-              stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),, with = FALSE]
+              stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),]
               ainp_flag <- c('stg2ainp', 'cinp2ainp', 'cout2ainp', 'cap2ainp', 'ncap2ainp')
               aout_flag <- c('stg2aout', 'cinp2aout', 'cout2aout', 'cap2aout', 'ncap2aout')
               cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), 'acomm']
@@ -629,8 +629,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             obj@parameters[['pStorageInvcost']] <- .add_data(obj@parameters[['pStorageInvcost']], invcost)
             
             dd0 <- energyRt:::.start_end_fix(approxim, stg, 'stg', stock_exist)
-            dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, with = FALSE]
-            dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, with = FALSE]
+            dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,]
+            dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,]
             obj@parameters[['mStorageNew']] <- .add_data(obj@parameters[['mStorageNew']], dd0$new)
             mStorageSpan <- dd0$span
             obj@parameters[['mStorageSpan']] <- .add_data(obj@parameters[['mStorageSpan']], dd0$span)
@@ -767,7 +767,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
         rr <- !is.na(slot(sup, sl)$region) & !(slot(sup, sl)$region %in% sup@region)
         warning(paste('There are data supply "', sup@name, '" for unused region: "', 
                       paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
-        slot(sup, sl) <- slot(sup, sl)[!rr,, with = FALSE]
+        slot(sup, sl) <- slot(sup, sl)[!rr,]
       }
       mSupSpan <- data.table(sup = rep(sup@name, length(sup@region)), region = sup@region)
       obj@parameters[['mSupSpan']] <- .add_data(obj@parameters[['mSupSpan']], mSupSpan)
@@ -828,7 +828,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
       obj@parameters[['mSupWeatherLo']] <- .add_data(obj@parameters[['mSupWeatherLo']], tmp$maplo)
     }
     t1 <- mSupAva[, c('sup', 'region', 'year')]; t1 <- t1[!duplicated(t1), ]
-    t2 <- pSupCost[pSupCost$value != 0, colnames(pSupCost)[colnames(pSupCost) %in% c('sup', 'region', 'year')], with = FALSE]; t2 <- t2[!duplicated(t2),, with = FALSE]
+    t2 <- pSupCost[pSupCost$value != 0, colnames(pSupCost)[colnames(pSupCost) %in% c('sup', 'region', 'year')], with = FALSE]; t2 <- t2[!duplicated(t2),]
     if (!is.null(t2) && ncol(t2) != 3) {
       t2 <- merge(t2, mSupAva[!duplicated(mSupAva[, c('sup', 'region', 'year')]), c('sup', 'region', 'year')])
     }
@@ -922,7 +922,7 @@ setMethod(
         rr <- !is.na(slot(tech, sl)$region) & !(slot(tech, sl)$region %in% tech@region)
         warning(paste('There are data technology "', tech@name, '"for unused region: "', 
                       paste(unique(slot(tech, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
-        slot(tech, sl) <- slot(tech, sl)[!rr,, with = FALSE]
+        slot(tech, sl) <- slot(tech, sl)[!rr,]
       }
     }
     tech <- stayOnlyVariable(tech, approxim$region, 'region')
@@ -956,8 +956,8 @@ setMethod(
     olife <- simpleInterpolation(tech@olife, 'olife', obj@parameters[['pTechOlife']], approxim, 'tech', tech@name, removeDefault = FALSE)
     obj@parameters[['pTechOlife']] <- .add_data(obj@parameters[['pTechOlife']], olife)		
     dd0 <- energyRt:::.start_end_fix(approxim, tech, 'tech', stock_exist)
-    dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, with = FALSE]
-    dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, with = FALSE]
+    dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,]
+    dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,]
     obj@parameters[['mTechNew']] <- .add_data(obj@parameters[['mTechNew']], dd0$new)
     
     invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
@@ -1134,7 +1134,7 @@ setMethod(
     }
     merge_table2 <- function(mvTechInp, pTechCinp2use, pTechCinp2ginp) {
       tmp <- rbind(merge_table(mvTechInp, pTechCinp2use), merge_table(mvTechInp, pTechCinp2ginp))
-      tmp[!duplicated(tmp),, with = FALSE]
+      tmp[!duplicated(tmp),]
     }	 
     if (!is.null(mTechInpComm)) {
       mvTechInp <- merge(mvTechAct, mTechInpComm, by = 'tech')
@@ -1403,11 +1403,11 @@ setMethod(
             dst <- routes$dst[!(routes$dst %in% tmp[i, 'dst'])]
             if (length(dst) > 0) {
               nn <- nrow(tmp) + seq_along(dst)
-              tmp <- rbind(tmp, tmp[rep(i, length(dst)),, with = FALSE])
+              tmp <- rbind(tmp, tmp[rep(i, length(dst)),])
               tmp[nn, 'dst'] <- dst
             }
           }
-          tmp <- tmp[-fl,, with = FALSE]
+          tmp <- tmp[-fl,]
         }
         # dst NA
         fl <- seq_len(nrow(tmp))[!is.na(tmp$src) & is.na(tmp$dst)]
@@ -1416,25 +1416,25 @@ setMethod(
             src <- routes$dst[!(routes$src %in% tmp[i, 'src'])]
             if (length(src) > 0) {
               nn <- nrow(tmp) + seq_along(src)
-              tmp <- rbind(tmp, tmp[rep(i, length(src)),, with = FALSE])
+              tmp <- rbind(tmp, tmp[rep(i, length(src)),])
               tmp[nn, 'src'] <- src
             }
           }
-          tmp <- tmp[-fl,, with = FALSE]
+          tmp <- tmp[-fl,]
         }
       }
       # src & dst NA
       fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
       if (length(fl) > 0) {
         kk <- rbind(tmp[-fl, c('src', 'dst'), with = FALSE], routes)
-        kk <- kk[!(duplicated(kk) | duplicated(kk, fromLast = TRUE)),, with = FALSE]
+        kk <- kk[!(duplicated(kk) | duplicated(kk, fromLast = TRUE)),]
       }
       if (length(fl) > 0 && nrow(kk) > 0) {
         nn <- nrow(tmp) + seq_len(nrow(kk) * length(fl))
-        tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),, with = FALSE])
+        tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),])
         tmp[nn, 'src'] <- kk$src
         tmp[nn, 'dst'] <- kk$dst
-        tmp <- tmp[-fl,, with = FALSE]
+        tmp <- tmp[-fl,]
       }
       rownames(tmp) <- NULL
       tmp
@@ -1505,7 +1505,7 @@ setMethod(
     if (nrow(trd@aux) != 0) {
       if (any(is.na(trd@aux$acomm))) 
         stop('Wrong aux commodity for trade "', trd@name, '"')
-      trd@aeff <- trd@aeff[!is.na(trd@aeff$acomm),, with = FALSE]
+      trd@aeff <- trd@aeff[!is.na(trd@aeff$acomm),]
       if (!all(trd@aeff$acomm %in% trd@aux$acomm))
         stop('Wrong aux commodity for trade "', trd@name, '"')
       inp_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2ainp) | !is.na(trd@aeff$cdst2ainp), 'acomm'])
@@ -1552,14 +1552,14 @@ setMethod(
         if (any(is.na(trd@invcost$region))) {
           warning('There is a" NA "area for invcost in the"', trd@name, '"trade class. Investments will be smoothed along all routes of the regions.')
           rgg <- unique(c(trd@routes$src, trd@routes$dst))
-          trd@invcost <- trd@invcost[rep(1, length(rgg)),, with = FALSE]
+          trd@invcost <- trd@invcost[rep(1, length(rgg)),]
           trd@invcost[, 'region'] <- rgg
           trd@invcost[, 'invcost'] <- trd@invcost[1, 'invcost'] / length(rgg)
         }
       }
       invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
-      invcost <- invcost[invcost$value != 0,, with = FALSE]
-      if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,, with = FALSE]
+      invcost <- invcost[invcost$value != 0,]
+      if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,]
       if (nrow(invcost) == 0) invcost <- NULL
       stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
       obj@parameters[['pTradeStock']] <- .add_data(obj@parameters[['pTradeStock']], stock_exist)

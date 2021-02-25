@@ -5,7 +5,7 @@ fold <- function(scen) {
 		if ((scen@modInp@parameters[[pr]]@nValues == -1 && nrow(scen@modInp@parameters[[pr]]@data) > 0) ||
 				scen@modInp@parameters[[pr]]@nValues > 0) {
 			if (scen@modInp@parameters[[pr]]@nValues != -1)
-				scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[1:scen@modInp@parameters[[pr]]@nValues,, drop = FALSE]
+				scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[1:scen@modInp@parameters[[pr]]@nValues,]
 			tmp <- scen@modInp@parameters[[pr]]@data
 			tmp <- tmp[order(tmp$value), ]
 			if (all(tmp$value == tmp$value[1])) { # only one possible value
@@ -21,7 +21,7 @@ fold <- function(scen) {
 				cand <- names(unv)[!(names(unv) %in% c('type', 'value')) & nrow(tmp) / unv >= unv['value']]  
 				for (cc in cand) {
 					if (all(aggregate(tmp$value, tmp[, !(colnames(tmp) %in% c(cc, 'value')), with = FALSE], function(x) all(x == x[1]))$x)) {
-						tmp <- tmp[!duplicated(tmp[, !(colnames(tmp) %in% c(cc, 'value')), with = FALSE]), colnames(tmp) != cc, drop = FALSE]
+						tmp <- tmp[!duplicated(tmp[, !(colnames(tmp) %in% c(cc, 'value')), with = FALSE]), colnames(tmp) != cc, with = FALSE]
 					}
 				}
 			}

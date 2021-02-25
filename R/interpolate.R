@@ -93,10 +93,8 @@ interpolate <- function(obj, ...) { #- returns class scenario
     mileStoneForGrowth = xx,
     fullsets = fullsets
   )
-  approxim$ry <- merge(data.table(region = approxim$region, stringsAsFactors = FALSE), 
-    data.table(year = approxim$mileStoneYears, stringsAsFactors = FALSE))
-  approxim$rys <- merge(approxim$ry,
-    data.table(slice = approxim$slice@all_slice, stringsAsFactors = FALSE))
+  approxim$ry <- CJ(region = approxim$region, year = approxim$mileStoneYears)
+  approxim$rys <- CJ(region = approxim$region, year = approxim$mileStoneYears, slice = approxim$slice@all_slice)
   # Fill basic parameter interplotaion from sysInfo
   approxim$all_comm <- c(lapply(scen@model@data, function(x) c(lapply(x@data, function(y) {
   	if (class(y) != 'commodity') return(NULL)
@@ -140,14 +138,14 @@ interpolate <- function(obj, ...) { #- returns class scenario
           i <- i + 1
           tbl <- slot(scen@model@data[[rep_class2[i, 'repos']]]@data[[rep_class2[i, 'name']]], slt)
           if (nrow(tbl) > 0)
-            need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
+            need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, with = FALSE]), 1, any), need_col, with = FALSE]), 2, all)]
         }
         if (length(need_col) > 0) {
           scen@modInp@parameters[[pr]]@misc$rem_col <- seq_along(tmp@dimSetNames)[tmp@dimSetNames %in% need_col]
           scen@modInp@parameters[[pr]]@misc$not_need_interpolate <- need_col
           scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSetNames
           scen@modInp@parameters[[pr]]@dimSetNames <- tmp@dimSetNames[!(tmp@dimSetNames %in% need_col)]
-          scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
+          scen@modInp@parameters[[pr]]@data <- scen@modInp@parameters[[pr]]@data[, !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), with = FALSE]
           if (arg$verbose >= 1) {
             scen@misc$trimDroppedDimensions <- rbind(scen@misc$trimDroppedDimensions, 
                 data.table(parameter = rep(pr, length(need_col)), dimname = need_col, stringsAsFactors = FALSE))
@@ -226,7 +224,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   for(i in names(scen@modInp@parameters)) {
     if (scen@modInp@parameters[[i]]@nValues != -1) {
       scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
-        seq(length.out = scen@modInp@parameters[[i]]@nValues),, drop = FALSE]
+        seq(length.out = scen@modInp@parameters[[i]]@nValues),]
     }
   }
   scen@source <- energyRt:::.modelCode

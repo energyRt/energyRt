@@ -102,7 +102,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
 }
 
 .write_mapping <- function(prec, interpolation_time_begin, interpolation_count, len_name) {
-  reduce.duplicate <- function(x) x[!duplicated(x),, with = FALSE]
+  reduce.duplicate <- function(x) x[!duplicated(x),]
   bacs <- paste0(rep('\b', len_name), collapse = '')
   rest = interpolation_count - 77;
   cat(paste0(rep(' ', len_name), collapse = ''))
@@ -110,7 +110,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   # Clean previous set data if any
   reduce.sect <- function(x, set) {
     x <- x[, set, with = FALSE]
-    x <- x[!duplicated(x),, with = FALSE]
+    x <- x[!duplicated(x),]
   }
   reduce.sect.merge.unique <- function(xxx, set) {
     gg <- NULL
@@ -132,7 +132,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   colnames(uu) <- c('slicep', 'slice')
   map_for_comm <- merge(mCommSlice, uu)[, c('comm', 'slicep')]
   colnames(map_for_comm) <- c('comm', 'slice')
-  map_for_comm <- map_for_comm[!duplicated(map_for_comm),, with = FALSE]
+  map_for_comm <- map_for_comm[!duplicated(map_for_comm),]
   .interpolation_message('mCommSliceOrParent', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   # mCommSliceOrParent
   l1 <- merge(.get_data_slot(prec@parameters$comm), .get_data_slot(prec@parameters$slice))
@@ -140,7 +140,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   l3 <- l2[!duplicated(l2[, c('comm', 'slicep')]), c('comm', 'slicep')]
   colnames(l3)[2] <- 'slice'
   l3 <- rbind(l1, l3)
-  l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast=TRUE),, with = FALSE]
+  l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast=TRUE),]
   l3$slicep <- l3$slice
   mCommSliceOrParent <- rbind(l2, l3)
   prec@parameters[['mCommSliceOrParent']] <- .add_data(prec@parameters[['mCommSliceOrParent']], mCommSliceOrParent)
@@ -168,9 +168,9 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   tmp1 <- .get_data_slot(prec@parameters$pEmissionFactor)
   .interpolation_message('mvTechAct', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   tmp1 <- tmp1[value != 0, ]
-  tmp1 <- tmp1[!duplicated(tmp1),, with = FALSE]
+  tmp1 <- tmp1[!duplicated(tmp1),]
   tmp <- merge(tmp1, tmp, by = 'commp')[, c('tech', 'comm', 'commp', 'region', 'year', 'slice')]
-  tmp <- tmp[!duplicated(tmp),, with = FALSE]
+  tmp <- tmp[!duplicated(tmp),]
   .interpolation_message('mTechEmsFuel', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   colnames(tmp)[3] <- 'comm.1'
   prec@parameters[['mTechEmsFuel']] <- .add_data(prec@parameters[['mTechEmsFuel']], tmp)
