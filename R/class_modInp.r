@@ -697,7 +697,6 @@ setMethod("initialize", "modInp",
   tmp <- .get_default_values(modInp, name, drop.unused.values)
   # tmp$value <- 0
   dtt <- .get_data_slot(modInp@parameters[[name]])
-  # browser()
   if (!is.null(tmp)) {
     if (use.dplyr) {
       cols <- colnames(dtt)
@@ -706,7 +705,7 @@ setMethod("initialize", "modInp",
       return(gg)
     } else {
       if (ncol(dtt) == ncol(tmp)) gg <- rbind(dtt, tmp) else
-        gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
+        gg <- rbind(dtt, unique(tmp[, colnames(dtt), with = FALSE]))
       if (ncol(gg) == 1) return(dtt)
      }
   } else {
