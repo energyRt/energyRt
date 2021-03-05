@@ -11,22 +11,36 @@ checkInpOut <- function(tech) {
   ocomm <- tech@output$comm
   acomm <- tech@aux$acomm
   comm <- c(icomm, ocomm, acomm)
+  comm_ind <- seq_along(comm)
+  names(comm_ind) <- comm
   ctype[seq(along = comm), ] <- NA
-  rownames(ctype) <- comm
-  ctype[icomm, 'type'] <- 'input'
-  ctype[ocomm, 'type'] <- 'output'
-  ctype[acomm, 'type'] <- 'aux'
-  ctype[icomm, c('group', 'unit')] <- tech@input[, c('group', 'unit')]
-  ctype[ocomm, c('group', 'unit')] <- tech@output[, c('group', 'unit')]
-  ctype[, 'comb'] <- 0  
+
+  icomm2 <- comm_ind[icomm]
+  ocomm2 <- comm_ind[ocomm]
+  acomm2 <- comm_ind[acomm]
+  
+  ctype$type[icomm2] <- 'input'
+  ctype$type[ocomm2] <- 'output'
+  ctype$type[acomm2] <- 'aux'
+  
+  ctype$group[icomm2] <- tech@input$group
+  ctype$unit[icomm2] <- tech@input$unit
+
+  ctype$group[ocomm2] <- tech@output$group
+  ctype$unit[ocomm2] <- tech@output$unit
+
+  ctype$comb <- 0  
   tech@input$combustion[is.na(tech@input$combustion)] <- 1
-  ctype[tech@input$comm, 'comb'] <- tech@input$combustion
+  ctype$comb[icomm2] <- tech@input$combustion
+  
   aux <- data.table(input   = logical(),
                     output  = logical(),
                     stringsAsFactors = FALSE)
   if (length(acomm)) {
-    aux[seq(along = acomm), ] <- FALSE
-    rownames(aux) <- acomm
+    aux <- data.table(input   = rep(FALSE, length(acomm)),
+                    output  = rep(FALSE, length(acomm)))
+    acomm_ind <- seq_along(acomm)
+    names(acomm_ind) <- acomm
   }
   #  Check type
   #! have to realised 
@@ -37,38 +51,37 @@ checkInpOut <- function(tech) {
   for(i in comm) {
     # Group ?
     if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("cinp2ginp", "share.lo", 
-      "share.up", "share.fx")]))) {
-        if (is.na(ctype[i, 'group'])) stop('Wrong commodity "', tech@name, '": "', i, '"')
+      "share.up", "share.fx"), with = FALSE]))) {
+        if (is.na(ctype[comm_ind[i], 'group'])) stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Not group ?
-    if (any(!is.na(tech@ceff[tech@ceff$comm == i, 'cinp2use']))) {
-      if (!is.na(ctype[i, 'group'])) stop('Wrong commodity "', tech@name, '": "', i, '"')
+    if (any(!is.na(tech@ceff[tech@ceff$comm == i, 'cinp2use', with = FALSE]))) {
+      if (!is.na(ctype[comm_ind[i], 'group'])) stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Input ?
-    if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("cinp2use", "cinp2ginp")]))) {
-      if (ctype[i, 'type'] != 'input') stop('Wrong commodity "', tech@name, '": "', i, '"')
+    if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("cinp2use", "cinp2ginp"), with = FALSE]))) {
+      if (ctype[comm_ind[i], 'type'] != 'input') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Output ?
     if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("use2cact", "cact2cout"# , "afc.lo", "afc.up", "afc.fx"
-       )]))) {
-      if (ctype[i, 'type'] != 'output') stop('Wrong commodity "', tech@name, '": "', i, '"')
+       ), with = FALSE]))) {
+      if (ctype[comm_ind[i], 'type'] != 'output') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Aux ?
     if (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2ainp', 'act2aout', 
-              'cap2ainp', 'cap2aout', 'ncap2ainp', 'ncap2aout')])) || 
+              'cap2ainp', 'cap2aout', 'ncap2ainp', 'ncap2aout'), with = FALSE])) || 
         any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2ainp', 
-              'cinp2aout', 'cout2ainp', 'cout2aout')]))) {
-      if (ctype[i, 'type'] != 'aux') stop('Wrong commodity "', tech@name, '": "', i, '"')
+              'cinp2aout', 'cout2ainp', 'cout2aout'), with = FALSE]))) {
+      if (ctype[comm_ind[i], 'type'] != 'aux') stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
   }
   for(i in acomm) {
-    aux[i, 'input'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2ainp', 'cap2ainp', 'ncap2ainp')])) || 
-        any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2ainp', 'cout2ainp')]))) 
-    aux[i, 'output'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2aout', 'cap2aout', 'ncap2aout')])) || 
-        any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2aout', 'cout2aout')]))) 
+    aux[acomm_ind[i], 'input'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2ainp', 'cap2ainp', 'ncap2ainp'), with = FALSE])) || 
+        any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2ainp', 'cout2ainp'), with = FALSE]))) 
+    aux[acomm_ind[i], 'output'] <- (any(!is.na(tech@aeff[tech@aeff$acomm == i, c('act2aout', 'cap2aout', 'ncap2aout'), with = FALSE])) || 
+        any(!is.na(tech@aeff[tech@aeff$acomm == i, c('cinp2aout', 'cout2aout'), with = FALSE]))) 
   }
-  gtype <- data.table(type      = factor(NULL, c('input', 'output')),
-                      stringsAsFactors = FALSE)
+  gtype <- data.table(type = factor(NULL, c('input', 'output')))
                       
   # Define type group
   group <- unique(c(tech@geff$group, tech@geff$geff, 
@@ -78,8 +91,8 @@ checkInpOut <- function(tech) {
   if (length(group) != 0) {
     if (any(is.na(c(tech@group$group, tech@group$geff)))) 
         stop('There is NA group in technology "', tech@name, '"')
-    gtype[seq(along = group), ] <- NA
-    rownames(gtype) <- group
+    
+  gtype[seq(along = group), ] <- NA
    for(i in unique(tech@geff$group)) {
      if (any(!is.na(tech@geff[tech@geff$group == i, 'ginp2use']))) {
        if (!is.na(gtype[i, 'type']) && gtype[i, 'type'] == 'output') 

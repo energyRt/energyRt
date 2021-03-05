@@ -33,7 +33,7 @@
   obj <- obj[,c(prior[prior %in% colnames(obj)], 
     colnames(obj)[ncol(obj)]), with = FALSE]
   obj <- obj[!is.na(obj[[parameter]]),]
-  if (anyDuplicated(obj[, -ncol(obj)])) {
+  if (anyDuplicated(obj[, -ncol(obj), with = FALSE])) {
     jjj <- sys.status()
     kkk <- sapply(jjj$sys.calls, function(x) any(grep('.add0', x[1])))
     if (sum(kkk) == 0) {
@@ -44,11 +44,11 @@
       warning(paste0('"Duplicated values found (class "', class(tst_exm), '", name "', tst_exm@name, 
                      '", parameter: "', parameter, '") and dropped.'))
     }
-    obj <- obj[!duplicated(obj[, -ncol(obj)], fromLast = TRUE), ]
+    obj <- obj[!duplicated(obj[, -ncol(obj), with = FALSE], fromLast = TRUE), ]
   }
   if (nrow(obj) == 0 && (is.null(arg$all) || !arg$all)) return(NULL)
   if (ncol(obj) == 1) {
-    if (nrow(obj) == 0) obj[1, 1] <- defVal
+    if (nrow(obj) == 0) obj[[1]][1] <- defVal
     return(obj)
   }
   # Check do need realy approximation 
@@ -58,7 +58,7 @@
     if (is.null(approxim2$year))
       approxim2$year <- arg$approxim$year
   }
-  tmp_nona <- (!is.na(obj[, -ncol(obj)]))
+  tmp_nona <- (!is.na(obj[, -ncol(obj), with = FALSE]))
   if (all(tmp_nona)) { # There is not NA column
     possible_comb <- prod(sapply(approxim2, length))
     if (nrow(obj) >= possible_comb) {
@@ -72,14 +72,15 @@
     f1 <- apply(tmp_nona, 2, any)
     f2 <- apply(tmp_nona, 2, all)
     if (all(f1 == f2)) { # Could be small appr
-      obj2 <- obj[, c(f1, TRUE), drop = FALSE]
+      obj2 <- obj[, c(f1, TRUE), with = FALSE]
       for (i in colnames(obj2)[-ncol(obj2)])
         obj2 <- obj2[obj2[[i]] %in% approxim2[[i]],]
       if (ncol(obj2) == 1 || nrow(obj2) == prod(sapply(approxim2[names(obj2)[-ncol(obj2)]], length))) { # Simple approximation is possible
+        obj2 <- obj2[, k:=1]        
         for (i in names(obj)[c(!f1, FALSE)]) {
-          obj2 <- merge(obj2, approxim2[i])
+          obj2 <- merge(obj2, as.data.table(approxim2[i])[, k:=1])
         }
-        return(obj2[[colnames(obj)]])
+        return(obj2[, colnames(obj), with = FALSE])
       }
     }
   }
@@ -101,9 +102,9 @@
   if (nrow(obj) != 0) {
       ii <- 2 ^ (seq(length.out = ncol(obj) - 1) - 1)
       KK <- colSums(ii * t(is.na(obj[, true_prior[true_prior %in% prior], with = FALSE])))
-      dobj <- as.matrix(obj[, -ncol(obj)])
-      ddd <- t(as.matrix(dd[, -ncol(dd)]))
-      dff <- dd[, -ncol(dd)]
+      dobj <- as.matrix(obj[, -ncol(obj), with = FALSE])
+      ddd <- t(as.matrix(dd[, -ncol(dd), with = FALSE]))
+      dff <- dd[, -ncol(dd), with = FALSE]
       obj <- obj[, c(colnames(dff), parameter), with = FALSE]
       for(i in 1:ncol(dff)) dff[[i]] <- as.factor(as.character(dff[[i]]))
       for(i in 1:ncol(dff)) obj[[i]] <- factor(as.character(obj[[i]]), levels = levels(dff[[i]]))
@@ -121,7 +122,7 @@
       for(i in rev(sort(unique(KK)))) {
         fl <- seq(along = KK)[KK == i]
         #dff <- dd[fl, -ncol(dd), drop = FALSE]
-        zz <- !is.na(obj[fl[1], -ncol(obj)])
+        zz <- !is.na(obj[fl[1], -ncol(obj), with = FALSE])
         # gg <- rowSums(obj[fl, -ncol(obj), drop = FALSE])
         r1 <- rowSums(dff[, zz, with = FALSE])
         r2 <- rowSums(obj[fl, c(zz, FALSE), with = FALSE])
@@ -136,8 +137,8 @@
     dd[is.na(dd[[parameter]]), parameter] <- defVal
   } else {
     if (all(is.na(dd[[parameter]]))) {
-      dd[is.na(dd[[parameter]]), parameter] <- defVal
-    } else if (any(is.na(dd[, parameter]))) {
+      dd[[parameter]][is.na(dd[[parameter]])] <- defVal
+    } else if (any(is.na(dd[[parameter]]))) {
       zz <- matrix(dd[[parameter]], length(approxim$year))
       f1 <- apply(!is.na(zz), 2, all)
       if (any(!f1)) {
@@ -182,7 +183,7 @@
           f1[ll] <- TRUE
         }
       } 
-      dd[, parameter] <- c(zz)  
+      dd[[parameter]] <- c(zz)  
     }
     if (any(colnames(obj)[-ncol(obj)] == 'slice')) {
       dd <- dd[, c(true_prior, parameter), with = FALSE]
@@ -218,23 +219,23 @@
 .interpolation_bound <-  function(obj, parameter, defVal, rule, ...) {
   gg <- paste(parameter, c('.lo', '.fx', '.up'), sep = '')
   aa <- obj[, !(colnames(obj) %in% gg), with = FALSE]; 
-  aa[, parameter, with = FALSE] <- rep(NA, nrow(aa))
-  a1 <- aa; a1[, parameter, with = FALSE] <- obj[, gg[1], with = FALSE]
-  a2 <- aa; a2[, parameter, with = FALSE] <- obj[, gg[2], with = FALSE]
-  a3 <- aa; a3[, parameter, with = FALSE] <- obj[, gg[3], with = FALSE]
+  aa[[parameter]] <- rep(NA, nrow(aa))
+  a1 <- aa; a1[[parameter]] <- obj[[gg[1]]]
+  a2 <- aa; a2[[parameter]] <- obj[[gg[2]]]
+  a3 <- aa; a3[[parameter]] <- obj[[gg[3]]]
   d1 <- .interpolation(rbind(a1, a2), parameter, 
       defVal = defVal[1], rule = rule[1], ...)
   if (!is.null(d1)) {
     dd <- d1[, -ncol(d1), with = FALSE]
-    dd[, 'type', with = FALSE] <- 'lo'
-    dd[, parameter, with = FALSE] <- d1[, parameter, with = FALSE]
+    dd[['type']] <- 'lo'
+    dd[[parameter]] <- d1[[parameter]]
     }
   d2 <- .interpolation(rbind(a3, a2), parameter, 
     defVal = defVal[2], rule = rule[2], ...)
   if (!is.null(d2)) {
     zz <- d2[, -ncol(d2), with = FALSE]
-    zz[, 'type', with = FALSE] <- 'up'
-    zz[, parameter, with = FALSE] <- d2[, parameter, with = FALSE]
+    zz[['type']] <- 'up'
+    zz[[parameter]] <- d2[[parameter]]
   }
   if (!is.null(d1) && !is.null(d2)) {
     return(rbind(dd, zz))
