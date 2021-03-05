@@ -671,11 +671,12 @@ setMethod("initialize", "modInp",
       }
     }
     if (is.null(sets)) {
-      sets <- tmp
+      sets <- tmp[, k:=1]
     } else {
-      sets <- merge(sets, tmp)
+      sets <- merge.data.table(sets, tmp[, k:=1])
     }
   }
+  sets <- sets[, k:=NULL]
   if (modInp@parameters[[name]]@type == 'simple' && (is.null(sets) || nrow(sets) != 0)) {
     sets$value <- modInp@parameters[[name]]@defVal
     if (!is.data.table(sets)) sets <- as.data.table(sets)
@@ -700,7 +701,7 @@ setMethod("initialize", "modInp",
   if (!is.null(tmp)) {
     if (use.dplyr) {
       cols <- colnames(dtt)
-      gg <- suppressMessages(dplyr::anti_join(tmp, dtt[,cols], by = cols[cols != 'value']))
+      gg <- suppressMessages(dplyr::anti_join(tmp, dtt, by = cols[cols != 'value']))
       gg <- suppressMessages(dplyr::left_join(dtt, gg))
       return(gg)
     } else {
@@ -711,7 +712,7 @@ setMethod("initialize", "modInp",
   } else {
     gg <- dtt
   }
-  gg[!duplicated(gg[, colnames(gg) != 'value']),, drop = FALSE]
+  gg[!duplicated(gg[, colnames(gg) != 'value', with = FALSE]),]
 }
 
 # !!! use methods instead?
