@@ -122,10 +122,10 @@
       for(i in rev(sort(unique(KK)))) {
         fl <- seq(along = KK)[KK == i]
         #dff <- dd[fl, -ncol(dd), drop = FALSE]
-        zz <- !is.na(obj[fl[1], -ncol(obj), with = FALSE])
+        zz <- !is.na(as.vector(obj[fl[1], -ncol(obj)]))
         # gg <- rowSums(obj[fl, -ncol(obj), drop = FALSE])
-        r1 <- rowSums(dff[, zz, with = FALSE])
-        r2 <- rowSums(obj[fl, c(zz, FALSE), with = FALSE])
+        r1 <- rowSums(dff[, zz, drop = FALSE])
+        r2 <- rowSums(obj[fl, c(zz, FALSE), drop = FALSE])
         ll <- obj[[ncol(obj)]][fl]
         names(ll) <- r2
         nn <- (r1 %in% r2)

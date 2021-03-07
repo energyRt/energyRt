@@ -1,11 +1,6 @@
 #---------------------------------------------------------------------------------------------------------
 # Fill table commodity_type and check for conflict type definition
 checkInpOut <- function(tech) {
-  ctype <- data.table(type      = factor(NULL, c('input', 'output', 'aux')),
-                      group     = character(),
-                      comb      = numeric(),
-                      unit      = character(),
-                      stringsAsFactors = FALSE)
   # Define type commodity
   icomm <- tech@input$comm
   ocomm <- tech@output$comm
@@ -13,8 +8,15 @@ checkInpOut <- function(tech) {
   comm <- c(icomm, ocomm, acomm)
   comm_ind <- seq_along(comm)
   names(comm_ind) <- comm
-  ctype[seq(along = comm), ] <- NA
-
+  
+  ctype <- data.table(comm = character(), 
+                      type      = factor(NULL, c('input', 'output', 'aux')),
+                      group     = character(),
+                      comb      = numeric(),
+                      unit      = character(),
+                      stringsAsFactors = FALSE)
+  ctype <- ctype %>% add_row(comm = comm)
+  
   icomm2 <- comm_ind[icomm]
   ocomm2 <- comm_ind[ocomm]
   acomm2 <- comm_ind[acomm]

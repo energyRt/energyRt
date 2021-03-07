@@ -964,7 +964,7 @@ setMethod(
     ctype <- checkInpOut(tech)
     # Need choose comm more accuracy
     approxim_comm <- approxim
-    approxim_comm[['comm']] <- rownames(ctype$comm)
+    approxim_comm[['comm']] <- ctype$comm$comm
     if (length(approxim_comm[['comm']]) != 0) {
       pTechCvarom <- simpleInterpolation(tech@varom, 'cvarom',
                                          obj@parameters[['pTechCvarom']], approxim_comm, 'tech', tech@name, remValue = 0)
@@ -978,7 +978,7 @@ setMethod(
                                          obj@parameters[['pTechAvarom']], approxim_acomm, 'tech', tech@name, remValue = 0)
       obj@parameters[['pTechAvarom']] <- .add_data(obj@parameters[['pTechAvarom']], pTechAvarom)
     } else pTechAvarom <- NULL
-    approxim_comm[['comm']] <- rownames(ctype$comm)
+    approxim_comm[['comm']] <- ctype$comm$comm
     if (length(approxim_comm[['comm']]) != 0) {
       pTechAfc <- multiInterpolation(tech@ceff, 'afc',
             obj@parameters[['pTechAfc']], approxim_comm, 'tech', tech@name, remValueUp = Inf, remValueLo = 0)
@@ -1039,13 +1039,14 @@ setMethod(
     } else pTechAfs <- NULL
 
     
-    approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input' & is.na(ctype$comm[, 'group'])]
+    approxim_comm[['comm']] <- ctype$comm$comm[ctype$comm$type == 'input' & is.na(ctype$comm[, 'group'])]
     if (length(approxim_comm[['comm']]) != 0) {
       pTechCinp2use <- simpleInterpolation(tech@ceff, 'cinp2use',
                                            obj@parameters[['pTechCinp2use']], approxim_comm, 'tech', tech@name)
+      
       obj@parameters[['pTechCinp2use']] <- .add_data(obj@parameters[['pTechCinp2use']], pTechCinp2use)
     } else pTechCinp2use <- NULL
-    approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'output']
+    approxim_comm[['comm']] <- ctype$comm$comm[ctype$comm$type == 'output']
     if (length(approxim_comm[['comm']]) != 0) {
       pTechUse2cact <- simpleInterpolation(tech@ceff, 'use2cact',
                                            obj@parameters[['pTechUse2cact']], approxim_comm, 'tech', tech@name)
@@ -1058,7 +1059,7 @@ setMethod(
       if (any(!is.na(tech@ceff$use2cact) & (tech@ceff$use2cact == 0 | tech@ceff$use2cact == Inf)))
         stop('use2cact is not correct ', tech@name)
     } else {pTechUse2cact <- NULL; pTechCact2cout <- NULL;}
-    approxim_comm[['comm']] <- rownames(ctype$comm)[ctype$comm$type == 'input' & !is.na(ctype$comm[['group']])]
+    approxim_comm[['comm']] <- ctype$comm$comm[ctype$comm$type == 'input' & !is.na(ctype$comm[['group']])]
     if (length(approxim_comm[['comm']]) != 0) {
       pTechCinp2ginp <- simpleInterpolation(tech@ceff, 'cinp2ginp',
                                             obj@parameters[['pTechCinp2ginp']], approxim_comm, 'tech', tech@name)
@@ -1069,31 +1070,31 @@ setMethod(
     if (length(tech@upgrade.technology) != 0)
       obj@parameters[['mTechUpgrade']] <- .add_data(obj@parameters[['mTechUpgrade']], 
                                                     data.table(tech = rep(tech@name, length(tech@upgrade.technology)), techp = tech@upgrade.technology))
-    cmm <- rownames(ctype$comm)[ctype$comm$type == 'input'] 
+    cmm <- ctype$comm$comm[ctype$comm$type == 'input'] 
     if (length(cmm) != 0) {
       mTechInpComm <- data.table(tech = rep(tech@name, length(cmm)), comm = cmm)
       obj@parameters[['mTechInpComm']] <- .add_data(obj@parameters[['mTechInpComm']], mTechInpComm)
     } else mTechInpComm <- NULL
-    cmm <- rownames(ctype$comm)[ctype$comm$type == 'output']
+    cmm <- ctype$comm$comm[ctype$comm$type == 'output']
     if (length(cmm) != 0) {
       mTechOutComm <- data.table(tech = rep(tech@name, length(cmm)), comm = cmm)
       obj@parameters[['mTechOutComm']] <- .add_data(obj@parameters[['mTechOutComm']], mTechOutComm)
     } else mTechOutComm <- NULL
-    cmm <- rownames(ctype$comm)[is.na(ctype$comm$group)] 
+    cmm <- ctype$comm$comm[is.na(ctype$comm$group)] 
     if (length(cmm) != 0) {
       mTechOneComm <- data.table(tech = rep(tech@name, length(cmm)), comm = cmm)
       obj@parameters[['mTechOneComm']] <- .add_data(obj@parameters[['mTechOneComm']], mTechOneComm)
     } else mTechOneComm <- NULL
-    approxim_comm[['comm']] <- rownames(ctype$comm)[!is.na(ctype$comm$group)]
+    approxim_comm[['comm']] <- ctype$comm$comm[!is.na(ctype$comm$group)]
     if (length(approxim_comm[['comm']]) != 0) {
       pTechShare <- multiInterpolation(tech@ceff, 'share',
                  obj@parameters[['pTechShare']], approxim_comm, 'tech', tech@name, remValueUp = 1, remValueLo = 0)
       obj@parameters[['pTechShare']] <- .add_data(obj@parameters[['pTechShare']], pTechShare)
     } else pTechShare <- NULL
-    cmm <- rownames(ctype$comm)[ctype$comm$comb != 0]
+    cmm <- ctype$comm$comm[ctype$comm$comb != 0]
     if (length(cmm) != 0) {
       obj@parameters[['pTechEmisComm']] <- .add_data(obj@parameters[['pTechEmisComm']],
-                     data.table(tech = rep(tech@name, nrow(ctype$comm)), comm = rownames(ctype$comm),
+                     data.table(tech = rep(tech@name, nrow(ctype$comm)), comm = ctype$comm$comm,
                                 value = ctype$comm$comb))
     } 
     gpp <- rownames(ctype$group)[ctype$group$type == 'input']
@@ -1118,7 +1119,7 @@ setMethod(
     fl <- !is.na(ctype$comm$group)
     if (any(fl)) {
       mTechGroupComm <- data.table(tech = rep(tech@name, sum(fl)), group = ctype$comm$group[fl], 
-                                   comm = rownames(ctype$comm)[fl], stringsAsFactors = FALSE)
+                                   comm = ctype$comm$comm[fl], stringsAsFactors = FALSE)
       obj@parameters[['mTechGroupComm']] <- .add_data(obj@parameters[['mTechGroupComm']], mTechGroupComm)
     } else mTechGroupComm <- NULL
     if (any(ctype$aux$output)) {    
@@ -1160,7 +1161,7 @@ setMethod(
       obj@parameters[['mvTechRetiredNewCap']] <- .add_data(obj@parameters[['mvTechRetiredNewCap']], 
                                                            mvTechRetiredCap0)
     }
-    mvTechAct <- merge(mTechSpan, mTechSlice, by = 'tech')
+    mvTechAct <- mTechSpan[,list(slice = mTechSlice$slice), by = mTechSpan]
     obj@parameters[['mvTechAct']] <- .add_data(obj@parameters[['mvTechAct']], mvTechAct)
     # Stay only variable with non zero output
     merge_table <- function(mvTechInp, pTechCinp2use) {
@@ -1171,21 +1172,22 @@ setMethod(
       tmp <- rbind(merge_table(mvTechInp, pTechCinp2use), merge_table(mvTechInp, pTechCinp2ginp))
       tmp[!duplicated(tmp),]
     }	 
+    expand_comm <- function(x, y) x[,list(comm = y$comm), by = x]
     if (!is.null(mTechInpComm)) {
-      mvTechInp <- merge(mvTechAct, mTechInpComm, by = 'tech')
+      mvTechInp <- expand_comm(mvTechAct, mTechInpComm)
       mvTechInp <- merge_table2(mvTechInp, pTechCinp2use, pTechCinp2ginp)
       obj@parameters[['mvTechInp']]  <- .add_data(obj@parameters[['mvTechInp']], mvTechInp)
     } else mvTechInp <- NULL
     if (!is.null(mTechOutComm)) {
-      mvTechOut <-  merge(mvTechAct, mTechOutComm, by = 'tech')
+      mvTechOut <-  expand_comm(mvTechAct, mTechOutComm)
       obj@parameters[['mvTechOut']]  <- .add_data(obj@parameters[['mvTechOut']], mvTechOut)
     } else mvTechOut <- NULL
     if (!is.null(mTechAInp)) {
-      mvTechAInp <- merge(mvTechAct, mTechAInp, by = 'tech')
+      mvTechAInp <- expand_comm(mvTechAct, mTechAInp)
       obj@parameters[['mvTechAInp']] <- .add_data(obj@parameters[['mvTechAInp']], mvTechAInp)
     } else mvTechAInp <- NULL
     if (!is.null(mTechAOut)) {
-      mvTechAOut <- merge(mvTechAct, mTechAOut, by = 'tech')
+      mvTechAOut <- expand_comm(mvTechAct, mTechAOut)
       obj@parameters[['mvTechAOut']] <- .add_data(obj@parameters[['mvTechAOut']], mvTechAOut)
     } else mvTechAOut <- NULL
     #### aeff begin
@@ -1260,14 +1262,15 @@ setMethod(
     } else techGroupInp <- NULL
     if (!is.null(mvTechInp) && !is.null(mTechOneComm)) {
       techSingInp <- merge(mvTechInp, mTechOneComm);
-      if (!is.null(pTechCinp2use)) techSingInp <- merge(techSingInp, pTechCinp2use[pTechCinp2use$value != 0,
-      													colnames(pTechCinp2use) %in% colnames(techSingInp), with = FALSE])
+      if (!is.null(pTechCinp2use)) 
+      	techSingInp <- merge(techSingInp, pTechCinp2use[pTechCinp2use$value != 0,
+      													colnames(pTechCinp2use) %in% colnames(techSingInp), with = FALSE], by = colnames(techSingInp))
       if (nrow(techSingInp) == 0) techSingInp <- NULL
     } else techSingInp <- NULL
     if (!is.null(mvTechOut) && !is.null(mTechOneComm)) {
       techSingOut <- merge(mvTechOut, mTechOneComm);
       if (!is.null(pTechCact2cout)) techSingOut <- merge(techSingOut, pTechCact2cout[pTechCact2cout$value != 0, 
-      													colnames(pTechCact2cout) %in% colnames(techSingOut), with = FALSE])
+      													colnames(pTechCact2cout) %in% colnames(techSingOut), with = FALSE], by = colnames(techSingOut))
       if (nrow(techSingOut) == 0) techSingOut <- NULL
     } else techSingOut <- NULL
     if (!is.null(mTechInpGroup) && !is.null(techSingOut)) {

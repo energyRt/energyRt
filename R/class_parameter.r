@@ -82,6 +82,11 @@ setMethod("initialize", "parameter",
   if (any(type == c('simple', 'multi'))) dimSetNames <- c(dimSetNames, 'value')
   .Object@data <- data[, dimSetNames, with = FALSE]
   .Object@colName  <- colName
+  if (anyDuplicated(dimSetNames)) {
+    fl <- duplicated(dimSetNames)
+    .Object@dimSetNames[fl] <- paste0(.Object@dimSetNames[fl], '.1')
+    colnames(.Object@data)[fl] <- paste0(colnames(.Object@data)[fl], '.1')
+  }
   .Object
 })
 
