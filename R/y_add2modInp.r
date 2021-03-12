@@ -798,10 +798,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
                       paste(unique(slot(sup, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
         slot(sup, sl) <- slot(sup, sl)[!rr,, drop = FALSE]
       }
-      mSupSpan <- data.table(sup = rep(sup@name, length(sup@region)), region = sup@region)
+      mSupSpan <- CJ(sup = sup@name, region = sup@region)
       obj@parameters[['mSupSpan']] <- .add_data(obj@parameters[['mSupSpan']], mSupSpan)
     } else {
-      mSupSpan <- data.table(sup = rep(sup@name, length(approxim$region)), region = approxim$region)
+      mSupSpan <- CJ(sup = sup@name, region = approxim$region)
       obj@parameters[['mSupSpan']] <- .add_data(obj@parameters[['mSupSpan']], mSupSpan)
     }
     sup <- stayOnlyVariable(sup, approxim$region, 'region')
@@ -832,7 +832,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
       }
     }
     obj@parameters[['mSupAva']] <- .add_data(obj@parameters[['mSupAva']], mSupAva)
-    mvSupReserve <- merge(mSupComm, mSupSpan)
+    mvSupReserve <- mSupSpan
+    mvSupReserve$comm <- mSupComm$comm
     obj@parameters[['mvSupReserve']] <- .add_data(obj@parameters[['mvSupReserve']], mvSupReserve)
     if (all(c('sup', 'comm', 'region') %in% colnames(pSupReserve))) {
       obj@parameters[['mSupReserveUp']] <- .add_data(obj@parameters[['mSupReserveUp']], 

@@ -115,18 +115,18 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'data.table'),
           stop('Internal error: Wrong new data 2')
           data$type <- factor(data$type, levels = c('lo', 'up'))
       }
-      for(i in colnames(data)[sapply(data, class) == 'factor'])
-        if (i != 'type') data[[i]] <- as.character(data[[i]])
+      # for(i in colnames(data)[sapply(data, class) == 'factor'])
+      #   if (i != 'type') data[[i]] <- as.character(data[[i]])
       class2 <- function(x) if (class(x) == 'integer') 'numeric' else class(x)
       if (any(sapply(data, class2) != sapply(obj@data, class)))
           stop('Internal error: Wrong new data 3')
-        data <- data[apply(data, 1, function(x) all(!is.na(x))), ]
+        # data <- data[apply(data, 1, function(x) all(!is.na(x))), ]
         if (nrow(data) != 0) {
           if (obj@nValues != -1) {
             if (obj@nValues + nrow(data) > nrow(obj@data)) {
               ttmp <- obj@data
               ttmp[] <- NA
-              obj@data <- obj@data %>% add_row(data) %>% add_row(ttmp)
+              obj@data <- obj@data[seq_len(obj@nValues), ] %>% add_row(data) %>% add_row(ttmp)
             } else {
               obj@data[obj@nValues + 1:nrow(data), ] <- data
             }
