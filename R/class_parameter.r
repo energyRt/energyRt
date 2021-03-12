@@ -282,9 +282,9 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'numeric'),
         return(as_simple(obj@data, obj@name, obj@defVal, include.def))
     } else if (obj@type == 'multi') {     
       return(c(
-        as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data)], 
+        as_simple(obj@data[obj@data$type == 'lo', 1 - ncol(obj@data), with = FALSE], 
                   paste0(obj@name, 'Lo'), obj@defVal[1], include.def),
-        as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data)], 
+        as_simple(obj@data[obj@data$type == 'up', 1 - ncol(obj@data), with = FALSE], 
                   paste0(obj@name, 'Up'), obj@defVal[2], include.def)
       ))
     } else stop(paste0('Error: .toGams: unknown parameter type: ', obj@type, " / ", obj@name))
