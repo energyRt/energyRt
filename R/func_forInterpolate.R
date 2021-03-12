@@ -129,15 +129,15 @@
                                  interpolation_time_begin = interpolation_time_begin, len_name)
         }
         p1 <- proc.time()[3]
-        tryCatch({
+        # tryCatch({
           scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
-        }, error = function(e) {
-          assign('add0_message', list(tracedata = sys.calls(),
-            add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
-            globalenv())
-          message('\nError in .add0 function, additional info in "add0_message" object\n')
-          stop(e)
-        })
+        # }, error = function(e) {
+        #   assign('add0_message', list(tracedata = sys.calls(),
+        #     add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
+        #     globalenv())
+        #   message('\nError in .add0 function, additional info in "add0_message" object\n')
+        #   stop(e)
+        # })
         time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name
         time.log.tm[tmlg] <- proc.time()[3] - p1
       }
