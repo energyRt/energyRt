@@ -173,7 +173,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   tmp <- merge(tmp1, tmp, by = 'commp')[, c('tech', 'comm', 'commp', 'region', 'year', 'slice')]
   tmp <- tmp[!duplicated(tmp),, drop = FALSE]
   .interpolation_message('mTechEmsFuel', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
-  colnames(tmp)[3] <- 'comm.1'
+  colnames(tmp)[3] <- 'commp'
   prec@parameters[['mTechEmsFuel']] <- .add_data(prec@parameters[['mTechEmsFuel']], tmp)
 
   .interpolation_message('mEmsFuelTot', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
@@ -212,9 +212,9 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   
   ### Export
   mCommSliceOrParent2 <- mCommSliceOrParent
-  colnames(mCommSliceOrParent2)[3] <- 'slice.1'
+  colnames(mCommSliceOrParent2)[3] <- 'slicep'
   mExportIrSubSliceTrd <- merge(.get_data_slot(prec@parameters$mTradeComm), .get_data_slot(prec@parameters[['mTradeIr']]))
-  colnames(mExportIrSubSliceTrd)[6] <- 'slice.1'
+  colnames(mExportIrSubSliceTrd)[6] <- 'slicep'
   mExportIrSubSliceTrd$dst <- NULL
   mExportIrSubSliceTrd <- merge(mExportIrSubSliceTrd, mCommSliceOrParent2)
   colnames(mExportIrSubSliceTrd)[4] <- 'region'
@@ -225,9 +225,9 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   mExportIrSub <- mExportIrSub[!duplicated(mExportIrSub), ]
   mExportRowSubTmp <- reduce.sect(.get_data_slot(prec@parameters[['mExportRow']])[, c('comm', 'region', 'year', 'slice')],
                                   c('comm', 'region', 'year', 'slice'))
-  colnames(mExportRowSubTmp)[4] <- 'slice.1'
+  colnames(mExportRowSubTmp)[4] <- 'slicep'
   mExportRowSubSlice <- merge(mExportRowSubTmp, mCommSliceOrParent2)
-  mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != 'slice.1', with = FALSE]
+  mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != 'slicep', with = FALSE]
   mExportRowSub <- mExportRowSub[!duplicated(mExportRowSub), ]
   .interpolation_message('mExport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   mExport <- rbind(mExportRowSub, mExportIrSub)
@@ -236,7 +236,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   
   ### Import
   mImportIrSubSliceTrd <- merge(.get_data_slot(prec@parameters$mTradeComm), .get_data_slot(prec@parameters[['mTradeIr']]))
-  colnames(mImportIrSubSliceTrd)[6] <- 'slice.1'
+  colnames(mImportIrSubSliceTrd)[6] <- 'slicep'
   mImportIrSubSliceTrd$src <- NULL
   mImportIrSubSliceTrd <- merge(mImportIrSubSliceTrd, mCommSliceOrParent2)
   colnames(mImportIrSubSliceTrd)[4] <- 'region'
@@ -247,9 +247,9 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   mImportIrSub <- mImportIrSub[!duplicated(mImportIrSub), ]
   mImportRowSubTmp <- reduce.sect(.get_data_slot(prec@parameters[['mImportRow']])[, c('comm', 'region', 'year', 'slice')],
                                   c('comm', 'region', 'year', 'slice'))
-  colnames(mImportRowSubTmp)[4] <- 'slice.1'
+  colnames(mImportRowSubTmp)[4] <- 'slicep'
   mImportRowSubSlice <- merge(mImportRowSubTmp, mCommSliceOrParent2)
-  mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != 'slice.1', with = FALSE]
+  mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != 'slicep', with = FALSE]
   mImportRowSub <- mImportRowSub[!duplicated(mImportRowSub), ]
   .interpolation_message('mImport', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   mImport <- rbind(mImportRowSub, mImportIrSub)
@@ -342,8 +342,8 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   mvInp2Lo <- merge(.get_data_slot(prec@parameters[['mInp2Lo']]), .get_data_slot(prec@parameters[['mSliceParentChild']])
   )[,c('comm', 'region', 'year', 'slice', 'slicep')]
   mvInp2Lo <- merge(mvInp2Lo, mCommSlice2)
-  colnames(mvInp2Lo)[colnames(mvInp2Lo) == 'slicep'] <- 'slice.1'
-  mvInp2Lo <- mvInp2Lo[, c("comm", "region", "year", "slice", "slice.1")]
+  colnames(mvInp2Lo)[colnames(mvInp2Lo) == 'slicep'] <- 'slicep'
+  mvInp2Lo <- mvInp2Lo[, c("comm", "region", "year", "slice", "slicep")]
   prec@parameters[['mvInp2Lo']] <- .add_data(prec@parameters[['mvInp2Lo']], mvInp2Lo)
   
   .interpolation_message('mInpSub', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
@@ -357,8 +357,8 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   mvOut2Lo <- merge(.get_data_slot(prec@parameters[['mOut2Lo']]), .get_data_slot(prec@parameters[['mSliceParentChild']])
   )[,c('comm', 'region', 'year', 'slice', 'slicep')]
   mvOut2Lo <- merge(mvOut2Lo, mCommSlice2)
-  colnames(mvOut2Lo)[colnames(mvOut2Lo) == 'slicep'] <- 'slice.1'
-  mvOut2Lo <- mvOut2Lo[, c("comm", "region", "year", "slice", "slice.1")]
+  colnames(mvOut2Lo)[colnames(mvOut2Lo) == 'slicep'] <- 'slicep'
+  mvOut2Lo <- mvOut2Lo[, c("comm", "region", "year", "slice", "slicep")]
   
   prec@parameters[['mvOut2Lo']] <- .add_data(prec@parameters[['mvOut2Lo']], mvOut2Lo)
   
@@ -468,7 +468,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   tmp <- tmp[tmp$value != 0, ]
   if (nrow(tmp)) {
     tmp$value <- NULL
-    colnames(tmp)[2] <- 'comm.1'
+    colnames(tmp)[2] <- 'commp'
     prec@parameters[['mAggregateFactor']] <- .add_data(prec@parameters[['mAggregateFactor']], tmp)
   }
   cat(bacs, paste0(rep(' ', len_name), collapse = ''), bacs)

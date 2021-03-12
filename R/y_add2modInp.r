@@ -1158,7 +1158,7 @@ setMethod(
       mvTechRetiredCap0 <- mvTechRetiredCap0[(
         mvTechRetiredCap0$year.x + mvTechRetiredCap0$olife > mvTechRetiredCap0$year.y &
           mvTechRetiredCap0$year.x <= mvTechRetiredCap0$year.y), -5, with = FALSE] 
-      colnames(mvTechRetiredCap0)[3:4] <- c('year', 'year.1')
+      colnames(mvTechRetiredCap0)[3:4] <- c('year', 'yearp')
       obj@parameters[['mvTechRetiredNewCap']] <- .add_data(obj@parameters[['mvTechRetiredNewCap']], 
                                                            mvTechRetiredCap0)
     }
@@ -1215,7 +1215,7 @@ setMethod(
             if (!all(c("tech", "acomm", "comm", "region", "year", "slice") %in% colnames(tmp))) {
               if (i %in% c(1, 3)) tmp <- merge(tmp, mvTechInp) else tmp <- merge(tmp, mvTechOut)
             }
-            tmp$comm.1 <- tmp$comm; tmp$comm <- tmp$acomm; tmp$acomm <- NULL;
+            tmp$commp <- tmp$comm; tmp$comm <- tmp$acomm; tmp$acomm <- NULL;
             obj@parameters[[tbl2]] <- .add_data(obj@parameters[[tbl2]], tmp[!duplicated(tmp), ])
           }
         }
@@ -1247,8 +1247,8 @@ setMethod(
     }
     #### aeff end
     if (!is.null(mTechInpGroup) && !is.null(mTechOutGroup)) {
-      meqTechGrp2Grp <- merge(merge(mTechInpGroup, mTechOutGroup, by =  'tech', suffix = c('', '.1')), 
-                              mvTechAct)[, c('tech', 'region', 'group', 'group.1', 'year', 'slice')]
+      meqTechGrp2Grp <- merge(merge(mTechInpGroup, mTechOutGroup, by =  'tech', suffix = c('', 'p')), 
+                              mvTechAct)[, c('tech', 'region', 'group', 'groupp', 'year', 'slice')]
       obj@parameters[['meqTechGrp2Grp']] <- .add_data(obj@parameters[['meqTechGrp2Grp']], meqTechGrp2Grp)
     } else meqTechGrp2Grp <- NULL
     if (!is.null(mTechInpGroup) || !is.null(mTechOutGroup)) {
@@ -1284,7 +1284,7 @@ setMethod(
     } else meqTechSng2Grp <- NULL
     
     if (!is.null(techSingInp) && !is.null(techSingOut)) {
-      meqTechSng2Sng <- merge(techSingInp, techSingOut, by = c('tech', 'region', 'year', 'slice'), suffixes = c("",".1"))
+      meqTechSng2Sng <- merge(techSingInp, techSingOut, by = c('tech', 'region', 'year', 'slice'), suffixes = c("","p"))
       obj@parameters[['meqTechSng2Sng']] <- .add_data(obj@parameters[['meqTechSng2Sng']], meqTechSng2Sng)
     } else meqTechSng2Sng <- NULL
     if (!is.null(mpTechShareLo) && !is.null(techGroupOut)) {
