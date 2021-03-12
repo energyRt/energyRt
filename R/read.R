@@ -8,12 +8,12 @@ read.scenario <- function(scen, ...) {
   
   read_result_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
-  if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
+  if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- fread
   if (is.null(arg$tmp.dir)) {
     arg$tmp.dir <- scen@misc$tmp.dir 
     if (is.null(arg$tmp.dir))
       stop('Directory "tmp.dir" not specified')
-}
+  }
  # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
   vrb_list <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
   if (file.exists(paste(arg$tmp.dir, '/output/variable_list2.csv', sep = ''))) {
@@ -38,26 +38,26 @@ read.scenario <- function(scen, ...) {
 
   # Read variables
   for(i in c(vrb_list, vrb_list2)) {
-    jj <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), 
+    rr$variables[[i]] <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), 
                                  stringsAsFactors = FALSE)
-    if (ncol(jj) == 1) {
-      rr$variables[[i]] <- data.table(value = jj[1, 1])
-    } else {
-      for(j in seq_len(ncol(jj))[colnames(jj) != 'value']) {
-        # Remove [.][:digit:] if any
-        if (all(colnames(jj)[j] != names(rr$set_vec))) 
-          colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
-        # Save all data with all levels
-        if (colnames(jj)[j] != 'year')
-        	jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
-      }
-      rr$variables[[i]] <- jj
-    }
+    # if (ncol(jj) == 1) {
+    #   rr$variables[[i]] <- data.table(value = jj[1, 1])
+    # } else {
+    #   for(j in seq_len(ncol(jj))[colnames(jj) != 'value']) {
+    #     # Remove [.][:digit:] if any
+    #     if (all(colnames(jj)[j] != names(rr$set_vec))) 
+    #       colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
+    #     # Save all data with all levels
+    #     if (colnames(jj)[j] != 'year')
+    #     	jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+    #   }
+    #   rr$variables[[i]] <- jj
+    # }
   }
   
   scen@modOut <- new('modOut')
   # Read solution status
-  scen@modOut@solutionLogs <- read.csv(paste(arg$tmp.dir, '/output/log.csv', sep = ''))
+  scen@modOut@solutionLogs <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/log.csv', sep = ''))
   solver_data <- read.csv(paste(arg$tmp.dir, '/solver', sep = ''), stringsAsFactors = FALSE)
   codes <- solver_data[grep('^code', solver_data$name), ]
   for (i in seq_len(nrow(codes))) {
