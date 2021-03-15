@@ -39,7 +39,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'commodity',
   if (any(is.na(approxim$debug$comm) | approxim$debug$comm == cmd@name)) {
     approxim$debug$comm[is.na(approxim$debug$comm)] <- cmd@name
     dbg <- approxim$debug[!is.na(approxim$debug$comm) & approxim$debug$comm == cmd@name,]
-    approxim$comm <-cmd@name
+    approxim$comm <- cmd@name
     obj@parameters[['pDummyImportCost']] <- .add_data(obj@parameters[['pDummyImportCost']],
         simpleInterpolation(dbg, 'dummyImport', obj@parameters[['pDummyImportCost']], approxim))   
     obj@parameters[['pDummyExportCost']] <- .add_data(obj@parameters[['pDummyExportCost']],
@@ -93,6 +93,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'demand',
       mDemInp <- CJ(comm = dem@commodity, slice = approxim$slice)
       mvDemInp <- CJ(comm = dem@commodity, region = approxim$region, year = approxim$mileStoneYears, slice = approxim$slice)
     obj@parameters[['mvDemInp']] <- .add_data(obj@parameters[['mvDemInp']], mvDemInp)
+    
        pDemand <- simpleInterpolation(dem@dem, 'dem', obj@parameters[['pDemand']], approxim, c('dem', 'comm'), 
           c(dem@name, dem@commodity))
        obj@parameters[['pDemand']] <- .add_data(obj@parameters[['pDemand']], pDemand)
@@ -769,9 +770,12 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
 
 
 .merge_with_null <- function(x, y, by = NULL, ...) {
-	if (is.null(x) || is.null(y)) return(NULL)
-	if (is.null(by)) by <- intersect(colnames(x), colnames(y))
-	merge(x, y, by = by, ...)
+	if (is.null(x) || is.null(y) || nrow(x) == 0 || nrow(y) == 0) return(NULL)
+	if (length(by) == 0) by <- intersect(colnames(x), colnames(y))
+	if (length(by) == 0) return(crossing(x, y))
+	if (ncol(x) == ncol(y) && ncol(x) == length(by))
+		return(rbind(x, y)[duplicated(rbind(x, y)), ])
+	return (merge(x, y, by = by, ...))
 }
 #==============================================================================#
 # Add supply ####

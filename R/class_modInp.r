@@ -615,7 +615,7 @@ setMethod("initialize", "modInp",
   #       expanded grid of all (or used only, like milestone-years) 
   #       values of the parameter dimension (e.g. sets)
   # name - "character", name of the parameter
-  drop_duplicates <- function(x) x[!duplicated(x),, drop = FALSE]
+  drop_duplicates <- function(x) x[!duplicated(x),]
   sets0 <- modInp@parameters[[name]]@dimSetNames
   sets <- NULL
   for (i in sets0) {
@@ -626,23 +626,23 @@ setMethod("initialize", "modInp",
     if (nrow(tmp) == 0) return(NULL)
     if (drop.unused.values) {
       if (i == 'slice' && any(colnames(sets) == 'comm')) {
-        tmp <- merge(.get_data_slot(modInp@parameters$mCommSlice), tmp)
+        tmp <- .merge_with_null(.get_data_slot(modInp@parameters$mCommSlice), tmp)
       } 
       if (i == 'comm' && any(colnames(sets) == 'sup')) {
-        tmp <- merge(.get_data_slot(modInp@parameters$mSupComm), tmp)
+        tmp <- .merge_with_null(.get_data_slot(modInp@parameters$mSupComm), tmp)
       }      
       if (i == 'region' && any(colnames(sets) == 'sup') && all(sets0 != 'year')) {
         tmp <- merge(drop_duplicates(
           .get_data_slot(modInp@parameters$mSupSpan)[, c('sup', 'region')]), tmp)
       }      
       if (i == 'year' && any(colnames(sets) == 'sup') && any(colnames(sets) == 'region')) {
-        tmp <- merge(.get_data_slot(modInp@parameters$mSupSpan), tmp)
+        tmp <- .merge_with_null(.get_data_slot(modInp@parameters$mSupSpan), tmp)
       }      
       if (i == 'year') {
-        tmp <- merge(.get_data_slot(modInp@parameters$mMidMilestone), tmp)
+        tmp <- .merge_with_null(.get_data_slot(modInp@parameters$mMidMilestone), tmp)
       }
       if (i == 'year' && any(colnames(sets) == 'tech')) {
-        tmp <- merge(.get_data_slot(modInp@parameters$mTechSpan), tmp)
+	    	tmp <- .merge_with_null(.get_data_slot(modInp@parameters$mTechSpan), tmp)
       }
       if (i == 'region' && any(colnames(sets) == 'tech') && all(sets0 != 'year')) {
         tmp <- merge(drop_duplicates(
@@ -650,11 +650,11 @@ setMethod("initialize", "modInp",
       }
       
       if (i == 'comm' && any(colnames(sets) == 'tech')) {
-        tmp <- merge(rbind(.get_data_slot(modInp@parameters$mTechInpComm), 
+        tmp <- .merge_with_null(rbind(.get_data_slot(modInp@parameters$mTechInpComm), 
                            .get_data_slot(modInp@parameters$mTechOutComm)), tmp)
       }
       if (i == 'slice' && any(colnames(sets) == 'tech')) {
-        tmp <- merge(.get_data_slot(modInp@parameters$mTechSlice), tmp)
+        tmp <- .merge_with_null(.get_data_slot(modInp@parameters$mTechSlice), tmp)
       }
       if (i == 'src') {
         aa <- .get_data_slot(modInp@parameters$mTradeSrc)
@@ -664,19 +664,18 @@ setMethod("initialize", "modInp",
       if (i == 'dst') {
         aa <- .get_data_slot(modInp@parameters$mTradeDst)
         colnames(aa)[2] <- 'dst'
-        tmp <- merge(aa, tmp)
+        tmp <- .merge_with_null(aa, tmp)
       }
       if (i == 'comm' && any(colnames(sets) == 'trade')) {
-        tmp <- merge(.get_data_slot(modInp@parameters$mTradeComm), tmp)
+        tmp <- .merge_with_null(.get_data_slot(modInp@parameters$mTradeComm), tmp)
       }
     }
     if (is.null(sets)) {
-      sets <- tmp[, k:=1]
+      sets <- tmp
     } else {
-      sets <- merge.data.table(sets, tmp[, k:=1])
+      sets <- .merge_with_null(sets, tmp)
     }
   }
-  sets <- sets[, k:=NULL]
   if (modInp@parameters[[name]]@type == 'simple' && (is.null(sets) || nrow(sets) != 0)) {
     sets$value <- modInp@parameters[[name]]@defVal
     if (!is.data.table(sets)) sets <- as.data.table(sets)

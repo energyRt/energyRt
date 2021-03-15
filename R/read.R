@@ -54,7 +54,6 @@ read.scenario <- function(scen, ...) {
     #   rr$variables[[i]] <- jj
     # }
   }
-  
   scen@modOut <- new('modOut')
   # Read solution status
   scen@modOut@solutionLogs <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/log.csv', sep = ''))
@@ -74,7 +73,6 @@ read.scenario <- function(scen, ...) {
  
   if (scen@modOut@stage != 'solved')
     warning(scen@modOut@stage)
-  
   scen@modOut@sets <- rr$set_vec
   scen@modOut@variables <- rr$variables
   if (!is.null(scen@misc$data.before)) {
@@ -90,10 +88,10 @@ read.scenario <- function(scen, ...) {
     olife$olife <- olife$value; olife$value <- NULL
     discount$discount <- discount$value; discount$value <- NULL
     newcap$newcap <- newcap$value; newcap$value <- NULL
-    
-    salvage <- merge(merge(newcap, merge(olife, invcost)), discount, all.x = TRUE)
+    salvage <- .merge_with_null(.merge_with_null(newcap, .merge_with_null(olife, invcost)), discount, all.x = TRUE)
+    if (is.null(salvage) || nrow(salvage) == 0) return(NULL)
     end_year <- max(.get_data_slot(scen@modInp@parameters$mEndMilestone)$yearp)
-    salvage <- merge(salvage, .get_data_slot(scen@modInp@parameters$mStartMilestone))
+    salvage <- .merge_with_null(salvage, .get_data_slot(scen@modInp@parameters$mStartMilestone))
     salvage$start <- salvage$yearp; salvage$yearp <- NULL
     salvage <- salvage[salvage$start + salvage$olife > end_year, ]
     
@@ -111,12 +109,12 @@ read.scenario <- function(scen, ...) {
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, 'Storage')
     scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, 'Trade')
     pDummyImportCost <- .get_data_slot(scen@modInp@parameters$pDummyImportCost)
-    vDummyImportCost <- merge(pDummyImportCost, scen@modOut@variables$vDummyImport, by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyImportCost)])
+    vDummyImportCost <- .merge_with_null(pDummyImportCost, scen@modOut@variables$vDummyImport, by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyImportCost)])
     vDummyImportCost$value <- vDummyImportCost$value.x * vDummyImportCost$value.y;
     vDummyImportCost$value.x <- NULL; vDummyImportCost$value.y <- NULL;
     scen@modOut@variables$vDummyImportCost <- vDummyImportCost
     pDummyExportCost <- .get_data_slot(scen@modInp@parameters$pDummyExportCost)
-    vDummyExportCost <- merge(pDummyExportCost, scen@modOut@variables$vDummyExport, 
+    vDummyExportCost <- .merge_with_null(pDummyExportCost, scen@modOut@variables$vDummyExport, 
       by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyExportCost)])
     vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y;
     vDummyExportCost$value.x <- NULL; vDummyExportCost$value.y <- NULL;
@@ -124,7 +122,7 @@ read.scenario <- function(scen, ...) {
     tmp <- .get_data_slot(scen@modInp@parameters$pEmissionFactor)
     tmp$comm2 <- tmp$commp; tmp$commp <- tmp$comm; tmp$comm <- tmp$comm2; tmp$comm2 <- NULL
     pTechEmisComm <- .get_data_slot(scen@modInp@parameters$pTechEmisComm)
-    vTechEmsFuel <- merge(merge(pTechEmisComm, 
+    vTechEmsFuel <- .merge_with_null(.merge_with_null(pTechEmisComm, 
       scen@modOut@variables$vTechInp, by = c('tech', 'comm')), tmp, by = 'comm')
     vTechEmsFuel$comm <- vTechEmsFuel$commp
     if (nrow(vTechEmsFuel) > 0) {
@@ -150,12 +148,12 @@ read.scenario <- function(scen, ...) {
 			    colnames(in_dat) <- c(sets, 'value')
 			  }
 	    	if (nrow(in_dat) != 0 && !is.null(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
-	    		in_dat <- merge(in_dat, .get_data_slot(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
+	    		in_dat <- .merge_with_null(in_dat, .get_data_slot(scen@modInp@parameters[[paste0('mCosts', tmp@name)]]))
 	    	if (nrow(in_dat) != 0 && !is.null(scen@modInp@parameters[[paste0('pCosts', tmp@name)]])) {
 	    		prm <- .get_data_slot(scen@modInp@parameters[[paste0('pCosts', tmp@name)]])
 	    		if (ncol(prm) == 1) in_dat$value <- in_dat$value * prm$value else {
 	    			colnames(prm)[ncol(prm)] <- 'par'
-	    			in_dat <- merge(in_dat, prm)
+	    			in_dat <- .merge_with_null(in_dat, prm)
 	    			in_dat$value <- in_dat$value * in_dat$par
 	    			in_dat$par <- NULL
 	    		}
@@ -185,11 +183,11 @@ read_solution <- read.scenario
 	}
 	# Correct RowTradeAccumulated
 	if (nrow(scen@modOut@variables$vExportRowAccumulated) > 0)
-		scen@modOut@variables$vExportRowAccumulated <- aggregate(scen@modOut@variables$vExportRowAccumulated[, 'value', drop = FALSE],
-			scen@modOut@variables$vExportRowAccumulated[, c('expp', 'comm'), drop = FALSE], sum)
+		scen@modOut@variables$vExportRowAccumulated <- aggregate(scen@modOut@variables$vExportRowAccumulated[, 'value', with = FALSE],
+			scen@modOut@variables$vExportRowAccumulated[, c('expp', 'comm'), with = FALSE], sum)
 	if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0)
-		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', drop = FALSE],
-			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), drop = FALSE], sum)
+		scen@modOut@variables$vImportRowAccumulated <- aggregate(scen@modOut@variables$vImportRowAccumulated[, 'value', with = FALSE],
+			scen@modOut@variables$vImportRowAccumulated[, c('imp', 'comm'), with = FALSE], sum)
   scen	
 }
 

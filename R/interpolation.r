@@ -29,6 +29,7 @@
   approxim <- approxim[names(approxim) %in% prior]
   # Remove excess column
   obj <- obj[,colnames(obj) %in% c(prior, parameter), with = FALSE]
+  
   # Sort column
   obj <- obj[,c(prior[prior %in% colnames(obj)], 
     colnames(obj)[ncol(obj)]), with = FALSE]
@@ -75,6 +76,7 @@
       obj2 <- obj[, c(f1, TRUE), with = FALSE]
       for (i in colnames(obj2)[-ncol(obj2)])
         obj2 <- obj2[obj2[[i]] %in% approxim2[[i]],]
+      #  || defVal == 0
       if (ncol(obj2) == 1 || nrow(obj2) == prod(sapply(approxim2[names(obj2)[-ncol(obj2)]], length))) { # Simple approximation is possible
         obj2 <- obj2[, k:=1]        
         for (i in names(obj)[c(!f1, FALSE)]) {
@@ -115,8 +117,8 @@
       dff <- as.matrix(dff)
       obj <- as.matrix(obj)
       for (i in 1:ncol(dff)) {
-        dff[[i]] <- hh[i] * (dff[[i]] - 1)
-        obj[[i]] <- hh[i] * (obj[[i]] - 1)
+        dff[, i] <- hh[i] * (dff[, i] - 1)
+        obj[, i] <- hh[i] * (obj[, i] - 1)
       }
       # check all(sort(rowSums(dff)) == 0:max(rowSums(dff)))
       for(i in rev(sort(unique(KK)))) {
@@ -126,7 +128,7 @@
         # gg <- rowSums(obj[fl, -ncol(obj), drop = FALSE])
         r1 <- rowSums(dff[, zz, drop = FALSE])
         r2 <- rowSums(obj[fl, c(zz, FALSE), drop = FALSE])
-        ll <- obj[[ncol(obj)]][fl]
+        ll <- obj[, ncol(obj)][fl]
         names(ll) <- r2
         nn <- (r1 %in% r2)
         dd[[ncol(dd)]][nn] <- ll[as.character(r1[nn])]
