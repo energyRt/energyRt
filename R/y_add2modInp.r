@@ -1409,344 +1409,349 @@ setMethod(
 #==============================================================================#
 setMethod(
   '.add0', signature(obj = 'modInp', app = 'trade',
-                     approxim = 'list'), 
-  function(obj, app, approxim) {
-    # trd <- energyRt:::.upper_case(app)
-    trd <- app
-    if (length(trd@commodity) != 1 || is.na(trd@commodity) || all(trd@commodity != approxim$all_comm))
-      stop(paste0('Wrong commodity in trade "', trd@name, '"'))
-    trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
-    remove_duplicate <- list(c('src', 'dst'))
-    approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
-    trd <- .disaggregateSliceLevel(trd, approxim)
-    # other flag
-    mTradeSlice <- data.table(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice)
-    obj@parameters[['mTradeSlice']] <- .add_data(obj@parameters[['mTradeSlice']], mTradeSlice)
-    if (length(trd@commodity) == 0) stop('There is not commodity for trade flow ', trd@name)
-    obj@parameters[['mTradeComm']] <- .add_data(obj@parameters[['mTradeComm']],
-                                                data.table(trade = trd@name, comm = trd@commodity))
-    mTradeRoutes <- cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes)
-    obj@parameters[['mTradeRoutes']] <- .add_data(obj@parameters[['mTradeRoutes']], mTradeRoutes)
-    pTradeIrCdst2Aout <- NULL; pTradeIrCsrc2Aout <- NULL; pTradeIrCdst2Ainp <- NULL; pTradeIrCsrc2Ainp <- NULL;
-    # approxim <- approxim[names(approxim) != 'region']
-    approxim_srcdst <- approxim
-    approxim_srcdst$region <- paste0(trd@routes$src, '##', trd@routes$dst)
-    # Apply routes to approximation
-    routes <- trd@routes
-    imply_routes <- function(tmp) {
-      # Checking user data for errors
-      kk <- tmp[!is.na(tmp$src) & !is.na(tmp$dst), c('src', 'dst'), drop = FALSE]
-      if (nrow(kk) > 0) {
-        if (nrow(kk) != nrow(.merge_with_null(kk, routes))) {
-          cat('There are data for class trade "', trd@name, ' for unknown routes:\n', sep = '')
-          kk$ind <- seq_len(nrow(kk))
-          print(kk[kk$ind[!(kk$ind %in% .merge_with_null(kk, routes))], c('src', 'dst'), drop = FALSE])
-        }
+                   approxim = 'list'), 
+	function(obj, app, approxim) {
+  # trd <- energyRt:::.upper_case(app)
+  trd <- app
+  if (length(trd@commodity) != 1 || is.na(trd@commodity) || all(trd@commodity != approxim$all_comm))
+    stop(paste0('Wrong commodity in trade "', trd@name, '"'))
+  trd <- stayOnlyVariable(trd, approxim$region, 'region') ## ??
+  remove_duplicate <- list(c('src', 'dst'))
+  approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
+  trd <- .disaggregateSliceLevel(trd, approxim)
+  # other flag
+  mTradeSlice <- CJ(trade = trd@name, slice = approxim$slice)
+  obj@parameters[['mTradeSlice']] <- .add_data(obj@parameters[['mTradeSlice']], mTradeSlice)
+  if (length(trd@commodity) == 0) stop('There is not commodity for trade flow ', trd@name)
+  obj@parameters[['mTradeComm']] <- .add_data(obj@parameters[['mTradeComm']],
+                                              CJ(trade = trd@name, comm = trd@commodity))
+  mTradeRoutes <- cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes)
+  obj@parameters[['mTradeRoutes']] <- .add_data(obj@parameters[['mTradeRoutes']], mTradeRoutes)
+  pTradeIrCdst2Aout <- NULL; pTradeIrCsrc2Aout <- NULL; pTradeIrCdst2Ainp <- NULL; pTradeIrCsrc2Ainp <- NULL;
+  # approxim <- approxim[names(approxim) != 'region']
+  approxim_srcdst <- approxim
+  approxim_srcdst$region <- paste0(trd@routes$src, '##', trd@routes$dst)
+  # Apply routes to approximation
+  routes <- trd@routes
+  imply_routes <- function(tmp) {
+    # Checking user data for errors
+    kk <- tmp[!is.na(tmp$src) & !is.na(tmp$dst), c('src', 'dst'), with = FALSE]
+    if (nrow(kk) > 0) {
+      if (nrow(kk) != nrow(.merge_with_null(kk, routes))) {
+        cat('There are data for class trade "', trd@name, ' for unknown routes:\n', sep = '')
+        kk$ind <- seq_len(nrow(kk))
+        print(kk[kk$ind[!(kk$ind %in% .merge_with_null(kk, routes))], c('src', 'dst'), with = FALSE])
       }
-      # Approximation src/dst pair
-      if (any(is.na(tmp$src) != is.na(tmp$dst))) {
-        # src NA
-        fl <- seq_len(nrow(tmp))[is.na(tmp$src) & !is.na(tmp$dst)]
-        if (length(fl) > 0) {
-          for (i in fl) {
-            dst <- routes$dst[!(routes$dst %in% tmp[i, 'dst'])]
-            if (length(dst) > 0) {
-              nn <- nrow(tmp) + seq_along(dst)
-              tmp <- rbind(tmp, tmp[rep(i, length(dst)),, drop = FALSE])
-              tmp[nn, 'dst'] <- dst
-            }
-          }
-          tmp <- tmp[-fl,, drop = FALSE]
-        }
-        # dst NA
-        fl <- seq_len(nrow(tmp))[!is.na(tmp$src) & is.na(tmp$dst)]
-        if (length(fl) > 0) {
-          for (i in fl) {
-            src <- routes$dst[!(routes$src %in% tmp[i, 'src'])]
-            if (length(src) > 0) {
-              nn <- nrow(tmp) + seq_along(src)
-              tmp <- rbind(tmp, tmp[rep(i, length(src)),, drop = FALSE])
-              tmp[nn, 'src'] <- src
-            }
-          }
-          tmp <- tmp[-fl,, drop = FALSE]
-        }
-      }
-      # src & dst NA
-      fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
+    }
+    # Approximation src/dst pair
+    if (any(is.na(tmp$src) != is.na(tmp$dst))) {
+      # src NA
+      fl <- seq_len(nrow(tmp))[is.na(tmp$src) & !is.na(tmp$dst)]
       if (length(fl) > 0) {
-        kk <- rbind(tmp[-fl, c('src', 'dst'), drop = FALSE], routes)
-        kk <- kk[!(duplicated(kk) | duplicated(kk, fromLast = TRUE)),, drop = FALSE]
+        for (i in fl) {
+          dst <- routes$dst[!(routes$dst %in% tmp$dst[i])]
+          if (length(dst) > 0) {
+            nn <- nrow(tmp) + seq_along(dst)
+            tmp <- rbind(tmp, tmp[rep(i, length(dst)),])
+            tmp$dst[nn] <- dst
+          }
+        }
+        tmp <- tmp[-fl,]
       }
-      if (length(fl) > 0 && nrow(kk) > 0) {
-        nn <- nrow(tmp) + seq_len(nrow(kk) * length(fl))
-        tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),, drop = FALSE])
-        tmp[nn, 'src'] <- kk$src
-        tmp[nn, 'dst'] <- kk$dst
-        tmp <- tmp[-fl,, drop = FALSE]
+      # dst NA
+      fl <- seq_len(nrow(tmp))[!is.na(tmp$src) & is.na(tmp$dst)]
+      if (length(fl) > 0) {
+        for (i in fl) {
+          src <- routes$dst[!(routes$src %in% tmp$src[i])]
+          if (length(src) > 0) {
+            nn <- nrow(tmp) + seq_along(src)
+            tmp <- rbind(tmp, tmp[rep(i, length(src)),])
+            tmp$src[nn] <- src
+          }
+        }
+        tmp <- tmp[-fl,]
       }
-      rownames(tmp) <- NULL
-      tmp
     }
-    simpleInterpolation2 <- function(frm, approxim, parameter, ...) {
-      frm <- frm[!is.na(frm[[parameter]]), ]
-      if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
-      if (nrow(frm) != 0) {
-        frm <- imply_routes(frm)
-        frm$region <- paste0(frm$src, '##', frm$dst)
-      } else {
-        frm$region <- character()
-      }
-      frm$src <- NULL; frm$dst <- NULL
-      frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), with = FALSE]
-      dd <- simpleInterpolation(frm, approxim = approxim, parameter = parameter, ...)
-      if (is.null(dd) || nrow(dd) == 0) return(NULL)
-      if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
-      if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
-      dd$region <- NULL
-      dd
+    # src & dst NA
+    fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
+    if (length(fl) > 0) {
+      kk <- rbind(tmp[-fl, c('src', 'dst'), with = FALSE], routes)
+      kk <- kk[!(duplicated(kk) | duplicated(kk, fromLast = TRUE)),]
     }
-    multiInterpolation2 <- function(frm, approxim, parameter, ...) {
-      frm <- frm[!is.na(frm[[paste0(parameter, '.lo')]]) | !is.na(frm[[paste0(parameter, '.up')]]) | !is.na(frm[[paste0(parameter, '.fx')]]), ]
-      if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
-      if (nrow(frm) != 0) {
-        clo <- frm[[paste0(parameter, '.lo')]]
-        cup <- frm[[paste0(parameter, '.up')]]
-        cfx <- frm[[paste0(parameter, '.fx')]]
-        frm[, paste0(parameter, c('.up', '.fx', '.lo'))] <- NA
-        frm <- rbind(frm, frm)
-        frm[[paste0(parameter, '.lo')]] <- c(clo, cfx)
-        frm_lo <- imply_routes(frm[!is.na(c(clo, cfx)), ])
-        frm[[paste0(parameter, '.lo')]] <- NA
-        frm[[paste0(parameter, '.up')]] <- c(cup, cfx)
-        frm_up <- imply_routes(frm[!is.na(c(cup, cfx)),])
-        frm <- rbind(frm_lo, frm_up)
-        frm$region <- paste0(frm$src, '##', frm$dst)
-      } else {
-        frm$region <- character()
-      } 
-      frm$src <- NULL; frm$dst <- NULL
-      frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), with = FALSE]
-      dd <- multiInterpolation(frm, approxim = approxim, parameter = parameter, ...)
-      if (is.null(dd) || nrow(dd) == 0) return(NULL)
-      if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
-      if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
-      dd$region <- NULL
-      dd
+    if (length(fl) > 0 && nrow(kk) > 0) {
+      nn <- nrow(tmp) + seq_len(nrow(kk) * length(fl))
+      tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))),])
+      tmp$src[nn] <- kk$src
+      tmp$dst[nn] <- kk$dst
+      tmp <- tmp[-fl,]
     }
-    # pTradeIrCost
-    obj@parameters[['pTradeIrCost']] <- .add_data(obj@parameters[['pTradeIrCost']],
-                                                  simpleInterpolation2(trd@trade, parameter = 'cost', obj@parameters[['pTradeIrCost']], 
+    rownames(tmp) <- NULL
+    tmp
+  }
+  simpleInterpolation2 <- function(frm, approxim, parameter, ...) {
+    frm <- frm[!is.na(frm[[parameter]]), ]
+    if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
+    if (nrow(frm) != 0) {
+      frm <- imply_routes(frm)
+      frm$region <- paste0(frm$src, '##', frm$dst)
+    } else {
+      frm$region <- character()
+    }
+    frm$src <- NULL; frm$dst <- NULL
+    frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), with = FALSE]
+    dd <- simpleInterpolation(frm, approxim = approxim, parameter = parameter, ...)
+    if (is.null(dd) || nrow(dd) == 0) return(NULL)
+    if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
+    if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
+    dd$region <- NULL
+    dd
+  }
+  multiInterpolation2 <- function(frm, approxim, parameter, ...) {
+    frm <- frm[!is.na(frm[[paste0(parameter, '.lo')]]) | !is.na(frm[[paste0(parameter, '.up')]]) | !is.na(frm[[paste0(parameter, '.fx')]]), ]
+    if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
+    if (nrow(frm) != 0) {
+      clo <- frm[[paste0(parameter, '.lo')]]
+      cup <- frm[[paste0(parameter, '.up')]]
+      cfx <- frm[[paste0(parameter, '.fx')]]
+      frm[, paste0(parameter, c('.up', '.fx', '.lo'))] <- NA
+      frm <- rbind(frm, frm)
+      frm[[paste0(parameter, '.lo')]] <- c(clo, cfx)
+      frm_lo <- imply_routes(frm[!is.na(c(clo, cfx)), ])
+      frm[[paste0(parameter, '.lo')]] <- NA
+      frm[[paste0(parameter, '.up')]] <- c(cup, cfx)
+      frm_up <- imply_routes(frm[!is.na(c(cup, cfx)),])
+      frm <- rbind(frm_lo, frm_up)
+      frm$region <- paste0(frm$src, '##', frm$dst)
+    } else {
+      frm$region <- character()
+    } 
+    frm$src <- NULL; frm$dst <- NULL
+    frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), with = FALSE]
+    dd <- multiInterpolation(frm, approxim = approxim, parameter = parameter, ...)
+    if (is.null(dd) || nrow(dd) == 0) return(NULL)
+    if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
+    if (any(list(...)[[1]]@dimSetNames == 'dst')) dd$dst <- gsub('.*##', '', dd$region)
+    dd$region <- NULL
+    dd
+  }
+  # pTradeIrCost
+  obj@parameters[['pTradeIrCost']] <- .add_data(obj@parameters[['pTradeIrCost']],
+                                                simpleInterpolation2(trd@trade, parameter = 'cost', obj@parameters[['pTradeIrCost']], 
+                                                                     approxim = approxim_srcdst, 'trade', trd@name))
+  pTradeIrEff <- simpleInterpolation2(trd@trade, parameter = 'teff', obj@parameters[['pTradeIrEff']], 
+                                      approxim = approxim_srcdst, 'trade', trd@name)
+  obj@parameters[['pTradeIrEff']] <- .add_data(obj@parameters[['pTradeIrEff']], pTradeIrEff)
+  # pTradeIrMarkup
+  obj@parameters[['pTradeIrMarkup']] <- .add_data(obj@parameters[['pTradeIrMarkup']],
+                                                  simpleInterpolation2(trd@trade, parameter = 'markup', obj@parameters[['pTradeIrMarkup']], 
                                                                        approxim = approxim_srcdst, 'trade', trd@name))
-    pTradeIrEff <- simpleInterpolation2(trd@trade, parameter = 'teff', obj@parameters[['pTradeIrEff']], 
-                                        approxim = approxim_srcdst, 'trade', trd@name)
-    obj@parameters[['pTradeIrEff']] <- .add_data(obj@parameters[['pTradeIrEff']], pTradeIrEff)
-    # pTradeIrMarkup
-    obj@parameters[['pTradeIrMarkup']] <- .add_data(obj@parameters[['pTradeIrMarkup']],
-                                                    simpleInterpolation2(trd@trade, parameter = 'markup', obj@parameters[['pTradeIrMarkup']], 
-                                                                         approxim = approxim_srcdst, 'trade', trd@name))
-    # pTradeIr
-    pTradeIr <- multiInterpolation2(trd@trade, parameter = 'ava',
-                                    obj@parameters[['pTradeIr']], approxim = approxim_srcdst, 'trade', trd@name)
-    obj@parameters[['pTradeIr']] <- .add_data(obj@parameters[['pTradeIr']], pTradeIr)
-    # Trade ainp
-    mTradeIrAInp <- NULL; mTradeIrAOut <- NULL;
-    if (nrow(trd@aux) != 0) {
-      if (any(is.na(trd@aux$acomm))) 
-        stop('Wrong aux commodity for trade "', trd@name, '"')
-      trd@aeff <- trd@aeff[!is.na(trd@aeff$acomm),, drop = FALSE]
-      if (!all(trd@aeff$acomm %in% trd@aux$acomm))
-        stop('Wrong aux commodity for trade "', trd@name, '"')
-      inp_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2ainp) | !is.na(trd@aeff$cdst2ainp), 'acomm'])
-      out_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2aout) | !is.na(trd@aeff$cdst2aout), 'acomm'])
-      if (length(inp_comm) != 0) {
-        mTradeIrAInp <- data.table(trade = rep(trd@name, length(inp_comm)), comm = inp_comm)
-        obj@parameters[['mTradeIrAInp']] <- .add_data(obj@parameters[['mTradeIrAInp']], mTradeIrAInp)
-      } 
-      if (length(out_comm) != 0) {
-        mTradeIrAOut <- data.table(trade = rep(trd@name, length(out_comm)), comm = out_comm)
-        obj@parameters[['mTradeIrAOut']] <- .add_data(obj@parameters[['mTradeIrAOut']], mTradeIrAOut)
-      } 
-      for (cc in inp_comm) {
-        approxim_srcdst$acomm <- cc
-        pTradeIrCsrc2Ainp <- simpleInterpolation2(trd@aeff, parameter = 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
-                                                  approxim = approxim_srcdst, 'trade', trd@name)
-        obj@parameters[['pTradeIrCsrc2Ainp']] <- .add_data(obj@parameters[['pTradeIrCsrc2Ainp']], pTradeIrCsrc2Ainp)
-        pTradeIrCdst2Ainp <- simpleInterpolation2(trd@aeff, parameter = 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
-                                                  approxim = approxim_srcdst, 'trade', trd@name)
-        obj@parameters[['pTradeIrCdst2Ainp']] <- .add_data(obj@parameters[['pTradeIrCdst2Ainp']], pTradeIrCdst2Ainp)
-      }
-      for (cc in out_comm) {
-        approxim_srcdst$acomm <- cc
-        pTradeIrCsrc2Aout <- simpleInterpolation2(trd@aeff, parameter = 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
-                                                  approxim = approxim_srcdst, 'trade', trd@name)
-        obj@parameters[['pTradeIrCsrc2Aout']] <- .add_data(obj@parameters[['pTradeIrCsrc2Aout']], pTradeIrCsrc2Aout)
-        pTradeIrCdst2Aout <- simpleInterpolation2(trd@aeff, parameter = 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
-                                                  approxim = approxim_srcdst, 'trade', trd@name)
-        obj@parameters[['pTradeIrCdst2Aout']] <- .add_data(obj@parameters[['pTradeIrCdst2Aout']], pTradeIrCdst2Aout)
-      }
-      approxim_srcdst$acomm <- NULL
+  # pTradeIr
+  pTradeIr <- multiInterpolation2(trd@trade, parameter = 'ava',
+                                  obj@parameters[['pTradeIr']], approxim = approxim_srcdst, 'trade', trd@name)
+  obj@parameters[['pTradeIr']] <- .add_data(obj@parameters[['pTradeIr']], pTradeIr)
+  # Trade ainp
+  mTradeIrAInp <- NULL; mTradeIrAOut <- NULL;
+  if (nrow(trd@aux) != 0) {
+    if (any(is.na(trd@aux$acomm))) 
+      stop('Wrong aux commodity for trade "', trd@name, '"')
+    trd@aeff <- trd@aeff[!is.na(trd@aeff$acomm),]
+    if (!all(trd@aeff$acomm %in% trd@aux$acomm))
+      stop('Wrong aux commodity for trade "', trd@name, '"')
+    inp_comm <- unique(trd@aeff$acomm[!is.na(trd@aeff$csrc2ainp) | !is.na(trd@aeff$cdst2ainp)])
+    out_comm <- unique(trd@aeff$acomm[!is.na(trd@aeff$csrc2aout) | !is.na(trd@aeff$cdst2aout)])
+    if (length(inp_comm) != 0) {
+      mTradeIrAInp <- CJ(trade = trd@name, comm = inp_comm)
+      obj@parameters[['mTradeIrAInp']] <- .add_data(obj@parameters[['mTradeIrAInp']], mTradeIrAInp)
+    } 
+    if (length(out_comm) != 0) {
+      mTradeIrAOut <- CJ(trade = trd@name, comm = out_comm)
+      obj@parameters[['mTradeIrAOut']] <- .add_data(obj@parameters[['mTradeIrAOut']], mTradeIrAOut)
+    } 
+    for (cc in inp_comm) {
+      approxim_srcdst$acomm <- cc
+      pTradeIrCsrc2Ainp <- simpleInterpolation2(trd@aeff, parameter = 'csrc2ainp', obj@parameters[['pTradeIrCsrc2Ainp']], 
+                                                approxim = approxim_srcdst, 'trade', trd@name)
+      obj@parameters[['pTradeIrCsrc2Ainp']] <- .add_data(obj@parameters[['pTradeIrCsrc2Ainp']], pTradeIrCsrc2Ainp)
+      pTradeIrCdst2Ainp <- simpleInterpolation2(trd@aeff, parameter = 'cdst2ainp', obj@parameters[['pTradeIrCdst2Ainp']], 
+                                                approxim = approxim_srcdst, 'trade', trd@name)
+      obj@parameters[['pTradeIrCdst2Ainp']] <- .add_data(obj@parameters[['pTradeIrCdst2Ainp']], pTradeIrCdst2Ainp)
     }
-    # Add trade data
-    if (trd@capacityVariable) {
-      obj@parameters[['pTradeCap2Act']] <- .add_data(obj@parameters[['pTradeCap2Act']],
-                                                     data.table(trade = trd@name, value = trd@cap2act))
-      mTradeCapacityVariable <- data.table(trade = trd@name)
-      obj@parameters[['mTradeCapacityVariable']] <- .add_data(obj@parameters[['mTradeCapacityVariable']], mTradeCapacityVariable)
-      
-      ##!!! Trade 
-      if (nrow(trd@invcost) > 0) {
-        if (any(is.na(trd@invcost$region)) && nrow(trd@invcost) > 1)
-          stop('There is "NA" and other data for invcost in trade class "', trd@name, '".')
-        if (any(is.na(trd@invcost$region))) {
-          warning('There is a" NA "area for invcost in the"', trd@name, '"trade class. Investments will be smoothed along all routes of the regions.')
-          rgg <- unique(c(trd@routes$src, trd@routes$dst))
-          trd@invcost <- trd@invcost[rep(1, length(rgg)),, drop = FALSE]
-          trd@invcost[, 'region'] <- rgg
-          trd@invcost[, 'invcost'] <- trd@invcost[1, 'invcost'] / length(rgg)
-        }
-      }
-      invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
-      invcost <- invcost[invcost$value != 0,, drop = FALSE]
-      if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,, drop = FALSE]
-      if (nrow(invcost) == 0) invcost <- NULL
-      stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
-      obj@parameters[['pTradeStock']] <- .add_data(obj@parameters[['pTradeStock']], stock_exist)
-      obj@parameters[['pTradeOlife']] <- .add_data(obj@parameters[['pTradeOlife']], 
-                                                   data.table(trade = trd@name, value = trd@olife, stringsAsFactors=FALSE))
-      possible_invest_year <- approxim$mileStoneYears
-      possible_invest_year <- possible_invest_year[trd@start <= possible_invest_year & possible_invest_year <= trd@end]
-      if (length(possible_invest_year) > 0)
-        obj@parameters[['mTradeNew']] <- .add_data(obj@parameters[['mTradeNew']], 
-                                                   data.table(trade = rep(trd@name, length(possible_invest_year)), year = possible_invest_year, stringsAsFactors=FALSE))
-      
-      min0 <- function(x) {
-        if (length(x) == 0) return(-Inf)
-        return(min(x))
-      }
-      if (trd@olife == Inf) {
-        trade_eac <- unique(approxim$year[min0(possible_invest_year) <= approxim$year])
-        trade_span <- unique(c(trd@stock$year, trade_eac))
-        obj@parameters[['mTradeOlifeInf']] <- .add_data(obj@parameters[['mTradeOlifeInf']], data.table(trade = trd@name))
-      } else {
-        trade_eac <- unique(c(sapply(possible_invest_year, 
-                                     function(x) approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]), recursive = TRUE))
-        trade_span <- unique(c(trd@stock$year, trade_eac))
-      }
-      trade_eac <- trade_eac[trade_eac %in% approxim$mileStoneYears]
-      trade_span <- trade_span[trade_span %in% approxim$mileStoneYears]
-      if (length(trade_span) > 0) {
-        mTradeSpan <- data.table(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
-        obj@parameters[['mTradeSpan']] <- .add_data(obj@parameters[['mTradeSpan']], mTradeSpan)
-        meqTradeCapFlow <- .merge_with_null(mTradeSpan, mTradeSlice)
-        meqTradeCapFlow$comm <- trd@commodity
-        obj@parameters[['meqTradeCapFlow']] <- .add_data(obj@parameters[['meqTradeCapFlow']], meqTradeCapFlow)
-      }
-      # mTradeInv
-      if (!is.null(invcost)) {
-        end_year <- max(approxim$year)
-        obj@parameters[['pTradeInvcost']] <- .add_data(obj@parameters[['pTradeInvcost']], invcost)
-        if (any(!(obj@parameters[['mTradeInv']]@dimSetNames %in% colnames(invcost)))) {
-          if (is.null(invcost$year)) {
-            invcost <- .merge_with_null(invcost, list(year = possible_invest_year))
-          }
-          if (is.null(invcost$region)) {
-            invcost <- .merge_with_null(invcost, approxim['region'])
-          }
-        }
-        obj@parameters[['mTradeInv']] <- .add_data(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
-        invcost$invcost <- invcost$value; invcost$value <- NULL
-        if (length(trade_eac) > 0) {
-          mTradeEac <- .merge_with_null(unique(invcost$region), trade_eac)
-          mTradeEac$trade <- trd@name
-          mTradeEac$region <- as.character(mTradeEac$x)
-          mTradeEac$year <- mTradeEac$y
-          mTradeEac$x <- NULL; mTradeEac$y <- NULL
-          obj@parameters[['mTradeEac']] <- .add_data(obj@parameters[['mTradeEac']], mTradeEac)
-        }
-        
-        salv_data <- .merge_with_null(invcost, approxim$discount, all.x = TRUE)
-        salv_data$value[is.na(salv_data$value)] <- 0
-        salv_data$discount <- salv_data$value; salv_data$value <- NULL
-        salv_data$olife <- trd@olife
-        # EAC
-        salv_data$eac <- salv_data$invcost / salv_data$olife
-        fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
-        salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl]) ^ salv_data$olife[fl] / 
-                                                        ((1 + salv_data$discount[fl]) ^ salv_data$olife[fl] - 1))
-        fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
-        salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
-        salv_data$trade <- trd@name
-        salv_data$value <- salv_data$eac
-        pTradeEac <- salv_data[, c('trade', 'region', 'year', 'value')]
-        obj@parameters[['pTradeEac']] <- .add_data(obj@parameters[['pTradeEac']], unique(pTradeEac[, colnames(pTradeEac) %in% c(obj@parameters[['pTradeEac']]@dimSetNames, 'value'), drop = FALSE]))
-      }
+    for (cc in out_comm) {
+      approxim_srcdst$acomm <- cc
+      pTradeIrCsrc2Aout <- simpleInterpolation2(trd@aeff, parameter = 'csrc2aout', obj@parameters[['pTradeIrCsrc2Aout']], 
+                                                approxim = approxim_srcdst, 'trade', trd@name)
+      obj@parameters[['pTradeIrCsrc2Aout']] <- .add_data(obj@parameters[['pTradeIrCsrc2Aout']], pTradeIrCsrc2Aout)
+      pTradeIrCdst2Aout <- simpleInterpolation2(trd@aeff, parameter = 'cdst2aout', obj@parameters[['pTradeIrCdst2Aout']], 
+                                                approxim = approxim_srcdst, 'trade', trd@name)
+      obj@parameters[['pTradeIrCdst2Aout']] <- .add_data(obj@parameters[['pTradeIrCdst2Aout']], pTradeIrCdst2Aout)
     }
-    ####
-    mTradeIr <- .merge_with_null(mTradeRoutes, mTradeSlice)
-    if (trd@capacityVariable) {
-      mTradeIr <- .merge_with_null(mTradeIr, mTradeSpan)
-    } else mTradeIr <- data.table(crossing(mTradeIr, data.table(year = approxim$mileStoneYears)))
-
-    obj@parameters[['mTradeIr']] <- .add_data(obj@parameters[['mTradeIr']], mTradeIr)
-    ### To trades
-    if (!is.null(mTradeIrAInp)) {
-      if (!is.null(pTradeIrCsrc2Ainp) && any(pTradeIrCsrc2Ainp$value != 0)) {
-        mTradeIrCsrc2Ainp <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, colnames(pTradeIrCsrc2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCsrc2Ainp$acomm)) mTradeIrCsrc2Ainp <- .merge_with_null(mTradeIrCsrc2Ainp, mTradeIrAInp)
-        mTradeIrCsrc2Ainp$comm <- mTradeIrCsrc2Ainp$acomm; mTradeIrCsrc2Ainp$acomm <- NULL
-        if (ncol(mTradeIrCsrc2Ainp) != 6) mTradeIrCsrc2Ainp <- .merge_with_null(mTradeIrCsrc2Ainp, mTradeIr)
-        obj@parameters[['mTradeIrCsrc2Ainp']] <- .add_data(obj@parameters[['mTradeIrCsrc2Ainp']], mTradeIrCsrc2Ainp)
-        a1 <-  unique(mTradeIrCsrc2Ainp[, c('trade', 'comm', 'src', 'year', 'slice')])
-        colnames(a1)[3] <- 'region'
-      }  else a1 <- NULL
-      if (!is.null(pTradeIrCdst2Ainp) && any(pTradeIrCdst2Ainp$value != 0)) {
-        mTradeIrCdst2Ainp <- pTradeIrCdst2Ainp[pTradeIrCdst2Ainp$value != 0, colnames(pTradeIrCdst2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCdst2Ainp$acomm)) mTradeIrCdst2Ainp <- .merge_with_null(mTradeIrCdst2Ainp, mTradeIrAInp)
-        mTradeIrCdst2Ainp$comm <- mTradeIrCdst2Ainp$acomm; mTradeIrCdst2Ainp$acomm <- NULL
-        if (ncol(mTradeIrCdst2Ainp) != 6) mTradeIrCdst2Ainp <- .merge_with_null(mTradeIrCdst2Ainp, mTradeIr)
-        obj@parameters[['mTradeIrCdst2Ainp']] <- .add_data(obj@parameters[['mTradeIrCdst2Ainp']], mTradeIrCdst2Ainp)
-        a2 <-  unique(mTradeIrCdst2Ainp[, c('trade', 'comm', 'dst', 'year', 'slice')])
-        colnames(a2)[3] <- 'region'
-      } else a2 <- NULL
-      obj@parameters[['mvTradeIrAInp']] <- .add_data(obj@parameters[['mvTradeIrAInp']], unique(rbind(a1, a2)))
-    }
+    approxim_srcdst$acomm <- NULL
+  }
+  # Add trade data
+  if (trd@capacityVariable) {
+    obj@parameters[['pTradeCap2Act']] <- .add_data(obj@parameters[['pTradeCap2Act']],
+                                                   data.table(trade = trd@name, value = trd@cap2act))
+    mTradeCapacityVariable <- data.table(trade = trd@name)
+    obj@parameters[['mTradeCapacityVariable']] <- .add_data(obj@parameters[['mTradeCapacityVariable']], mTradeCapacityVariable)
     
-    if (!is.null(mTradeIrAOut)) {
-      if (!is.null(pTradeIrCsrc2Aout) && any(pTradeIrCsrc2Aout$value != 0)) {
-        mTradeIrCsrc2Aout <- pTradeIrCsrc2Aout[pTradeIrCsrc2Aout$value != 0, colnames(pTradeIrCsrc2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCsrc2Aout$acomm)) mTradeIrCsrc2Aout <- .merge_with_null(mTradeIrCsrc2Aout, mTradeIrAOut)
-        mTradeIrCsrc2Aout$comm <- mTradeIrCsrc2Aout$acomm; mTradeIrCsrc2Aout$acomm <- NULL
-        if (ncol(mTradeIrCsrc2Aout) != 6) mTradeIrCsrc2Aout <- .merge_with_null(mTradeIrCsrc2Aout, mTradeIr)
-        obj@parameters[['mTradeIrCsrc2Aout']] <- .add_data(obj@parameters[['mTradeIrCsrc2Aout']], mTradeIrCsrc2Aout)
-        a1 <-  unique(mTradeIrCsrc2Aout[, c('trade', 'comm', 'src', 'year', 'slice')])
-        colnames(a1)[3] <- 'region'
-      }  else a1 <- NULL
-      if (!is.null(pTradeIrCdst2Aout) && any(pTradeIrCdst2Aout$value != 0)) {
-        mTradeIrCdst2Aout <- pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0, colnames(pTradeIrCdst2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCdst2Aout$acomm)) mTradeIrCdst2Aout <- .merge_with_null(mTradeIrCdst2Aout, mTradeIrAOut)
-        mTradeIrCdst2Aout$comm <- mTradeIrCdst2Aout$acomm; mTradeIrCdst2Aout$acomm <- NULL
-        if (ncol(mTradeIrCdst2Aout) != 6) mTradeIrCdst2Aout <- .merge_with_null(mTradeIrCdst2Aout, mTradeIr)
-        obj@parameters[['mTradeIrCdst2Aout']] <- .add_data(obj@parameters[['mTradeIrCdst2Aout']], mTradeIrCdst2Aout)
-        a2 <-  unique(mTradeIrCdst2Aout[, c('trade', 'comm', 'dst', 'year', 'slice')])
-        colnames(a2)[3] <- 'region'
-      } else a2 <- NULL
-      obj@parameters[['mvTradeIrAOut']] <- .add_data(obj@parameters[['mvTradeIrAOut']], unique(rbind(a1, a2)))
+    ##!!! Trade 
+    if (nrow(trd@invcost) > 0) {
+      if (any(is.na(trd@invcost$region)) && nrow(trd@invcost) > 1)
+        stop('There is "NA" and other data for invcost in trade class "', trd@name, '".')
+      if (any(is.na(trd@invcost$region))) {
+        warning('There is a" NA "area for invcost in the"', trd@name, '"trade class. Investments will be smoothed along all routes of the regions.')
+        rgg <- unique(c(trd@routes$src, trd@routes$dst))
+        trd@invcost <- trd@invcost[rep(1, length(rgg)),]
+        trd@invcost$region <- rgg
+        trd@invcost$invcost <- trd@invcost$invcost[1] / length(rgg)
+      }
     }
-    mvTradeIr <- mTradeIr; mvTradeIr$comm <- trd@commodity
-    obj@parameters[['mvTradeIr']] <- .add_data(obj@parameters[['mvTradeIr']], mvTradeIr) 
-    if (!is.null(pTradeIr)) {
-      pTradeIr$comm <- trd@commodity
-      obj@parameters[['meqTradeFlowLo']] <- .add_data(obj@parameters[['meqTradeFlowLo']], 
-      								.merge_with_null(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, 
+    invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
+    invcost <- invcost[invcost$value != 0,]
+    if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,]
+    if (nrow(invcost) == 0) invcost <- NULL
+    stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
+    obj@parameters[['pTradeStock']] <- .add_data(obj@parameters[['pTradeStock']], stock_exist)
+    obj@parameters[['pTradeOlife']] <- .add_data(obj@parameters[['pTradeOlife']], 
+                                                 data.table(trade = trd@name, value = trd@olife))
+    possible_invest_year <- approxim$mileStoneYears
+    possible_invest_year <- possible_invest_year[trd@start <= possible_invest_year & possible_invest_year <= trd@end]
+    if (length(possible_invest_year) > 0)
+      obj@parameters[['mTradeNew']] <- .add_data(obj@parameters[['mTradeNew']],
+      								data.table(trade = trd@name, year = possible_invest_year))
+    
+    min0 <- function(x) {
+      if (length(x) == 0) return(-Inf)
+      return(min(x))
+    }
+    if (trd@olife == Inf) {
+      trade_eac <- unique(approxim$year[min0(possible_invest_year) <= approxim$year])
+      trade_span <- unique(c(trd@stock$year, trade_eac))
+      obj@parameters[['mTradeOlifeInf']] <- .add_data(obj@parameters[['mTradeOlifeInf']], data.table(trade = trd@name))
+    } else {
+      trade_eac <- unique(c(sapply(possible_invest_year, 
+                                   function(x) approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]), recursive = TRUE))
+      trade_span <- unique(c(trd@stock$year, trade_eac))
+    }
+    trade_eac <- trade_eac[trade_eac %in% approxim$mileStoneYears]
+    trade_span <- trade_span[trade_span %in% approxim$mileStoneYears]
+    if (length(trade_span) > 0) {
+      mTradeSpan <- data.table(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
+      obj@parameters[['mTradeSpan']] <- .add_data(obj@parameters[['mTradeSpan']], mTradeSpan)
+      meqTradeCapFlow <- .merge_with_null(mTradeSpan, mTradeSlice)
+      meqTradeCapFlow$comm <- trd@commodity
+      obj@parameters[['meqTradeCapFlow']] <- .add_data(obj@parameters[['meqTradeCapFlow']], meqTradeCapFlow)
+    }
+    # mTradeInv
+    if (!is.null(invcost)) {
+      end_year <- max(approxim$year)
+      obj@parameters[['pTradeInvcost']] <- .add_data(obj@parameters[['pTradeInvcost']], invcost)
+      if (any(!(obj@parameters[['mTradeInv']]@dimSetNames %in% colnames(invcost)))) {
+        if (is.null(invcost$year)) {
+          invcost <- .merge_with_null(invcost, list(year = possible_invest_year))
+        }
+        if (is.null(invcost$region)) {
+          invcost <- .merge_with_null(invcost, approxim['region'])
+        }
+      }
+      obj@parameters[['mTradeInv']] <- .add_data(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value', with = FALSE])
+      invcost$invcost <- invcost$value; invcost$value <- NULL
+      if (length(trade_eac) > 0) {
+        mTradeEac <- .merge_with_null(unique(invcost$region), trade_eac)
+        mTradeEac$trade <- trd@name
+        mTradeEac$region <- as.character(mTradeEac$x)
+        mTradeEac$year <- mTradeEac$y
+        mTradeEac$x <- NULL; mTradeEac$y <- NULL
+        obj@parameters[['mTradeEac']] <- .add_data(obj@parameters[['mTradeEac']], mTradeEac)
+      }
+      
+      salv_data <- .merge_with_null(invcost, approxim$discount, all.x = TRUE)
+      salv_data$value[is.na(salv_data$value)] <- 0
+      salv_data$discount <- salv_data$value; salv_data$value <- NULL
+      salv_data$olife <- trd@olife
+      # EAC
+      salv_data$eac <- salv_data$invcost / salv_data$olife
+      fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
+      salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl]) ^ salv_data$olife[fl] / 
+                                                      ((1 + salv_data$discount[fl]) ^ salv_data$olife[fl] - 1))
+      fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
+      salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
+      salv_data$trade <- trd@name
+      salv_data$value <- salv_data$eac
+      pTradeEac <- salv_data[, c('trade', 'region', 'year', 'value')]
+      obj@parameters[['pTradeEac']] <- .add_data(obj@parameters[['pTradeEac']], 
+      		  unique(pTradeEac[, colnames(pTradeEac) %in% c(obj@parameters[['pTradeEac']]@dimSetNames, 'value'), with = FALSE]))
+    }
+  }
+  ####
+  mTradeIr <- .merge_with_null(mTradeRoutes, mTradeSlice)
+  if (trd@capacityVariable) {
+    mTradeIr <- .merge_with_null(mTradeIr, mTradeSpan)
+  } else mTradeIr <- data.table(crossing(mTradeIr, data.table(year = approxim$mileStoneYears)))
+
+  obj@parameters[['mTradeIr']] <- .add_data(obj@parameters[['mTradeIr']], mTradeIr)
+  ### To trades
+  if (!is.null(mTradeIrAInp)) {
+    if (!is.null(pTradeIrCsrc2Ainp) && any(pTradeIrCsrc2Ainp$value != 0)) {
+      mTradeIrCsrc2Ainp <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, 
+      																			 colnames(pTradeIrCsrc2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), with = FALSE]
+      if (is.null(mTradeIrCsrc2Ainp$acomm)) mTradeIrCsrc2Ainp <- .merge_with_null(mTradeIrCsrc2Ainp, mTradeIrAInp)
+      mTradeIrCsrc2Ainp$comm <- mTradeIrCsrc2Ainp$acomm; mTradeIrCsrc2Ainp$acomm <- NULL
+      if (ncol(mTradeIrCsrc2Ainp) != 6) mTradeIrCsrc2Ainp <- .merge_with_null(mTradeIrCsrc2Ainp, mTradeIr)
+      obj@parameters[['mTradeIrCsrc2Ainp']] <- .add_data(obj@parameters[['mTradeIrCsrc2Ainp']], mTradeIrCsrc2Ainp)
+      a1 <-  unique(mTradeIrCsrc2Ainp[, c('trade', 'comm', 'src', 'year', 'slice')])
+      colnames(a1)[3] <- 'region'
+    }  else a1 <- NULL
+    if (!is.null(pTradeIrCdst2Ainp) && any(pTradeIrCdst2Ainp$value != 0)) {
+      mTradeIrCdst2Ainp <- pTradeIrCdst2Ainp[pTradeIrCdst2Ainp$value != 0, 
+      																			 colnames(pTradeIrCdst2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), with = FALSE]
+      if (is.null(mTradeIrCdst2Ainp$acomm)) mTradeIrCdst2Ainp <- .merge_with_null(mTradeIrCdst2Ainp, mTradeIrAInp)
+      mTradeIrCdst2Ainp$comm <- mTradeIrCdst2Ainp$acomm; mTradeIrCdst2Ainp$acomm <- NULL
+      if (ncol(mTradeIrCdst2Ainp) != 6) mTradeIrCdst2Ainp <- .merge_with_null(mTradeIrCdst2Ainp, mTradeIr)
+      obj@parameters[['mTradeIrCdst2Ainp']] <- .add_data(obj@parameters[['mTradeIrCdst2Ainp']], mTradeIrCdst2Ainp)
+      a2 <-  unique(mTradeIrCdst2Ainp[, c('trade', 'comm', 'dst', 'year', 'slice')])
+      colnames(a2)[3] <- 'region'
+    } else a2 <- NULL
+    obj@parameters[['mvTradeIrAInp']] <- .add_data(obj@parameters[['mvTradeIrAInp']], unique(rbind(a1, a2)))
+  }
+  
+  if (!is.null(mTradeIrAOut)) {
+    if (!is.null(pTradeIrCsrc2Aout) && any(pTradeIrCsrc2Aout$value != 0)) {
+      mTradeIrCsrc2Aout <- pTradeIrCsrc2Aout[pTradeIrCsrc2Aout$value != 0,
+      																			 colnames(pTradeIrCsrc2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), with = FALSE]
+      if (is.null(mTradeIrCsrc2Aout$acomm)) mTradeIrCsrc2Aout <- .merge_with_null(mTradeIrCsrc2Aout, mTradeIrAOut)
+      mTradeIrCsrc2Aout$comm <- mTradeIrCsrc2Aout$acomm; mTradeIrCsrc2Aout$acomm <- NULL
+      if (ncol(mTradeIrCsrc2Aout) != 6) mTradeIrCsrc2Aout <- .merge_with_null(mTradeIrCsrc2Aout, mTradeIr)
+      obj@parameters[['mTradeIrCsrc2Aout']] <- .add_data(obj@parameters[['mTradeIrCsrc2Aout']], mTradeIrCsrc2Aout)
+      a1 <-  unique(mTradeIrCsrc2Aout[, c('trade', 'comm', 'src', 'year', 'slice')])
+      colnames(a1)[3] <- 'region'
+    }  else a1 <- NULL
+    if (!is.null(pTradeIrCdst2Aout) && any(pTradeIrCdst2Aout$value != 0)) {
+      mTradeIrCdst2Aout <- pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0,
+      																			 colnames(pTradeIrCdst2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), with = FALSE]
+      if (is.null(mTradeIrCdst2Aout$acomm)) mTradeIrCdst2Aout <- .merge_with_null(mTradeIrCdst2Aout, mTradeIrAOut)
+      mTradeIrCdst2Aout$comm <- mTradeIrCdst2Aout$acomm; mTradeIrCdst2Aout$acomm <- NULL
+      if (ncol(mTradeIrCdst2Aout) != 6) mTradeIrCdst2Aout <- .merge_with_null(mTradeIrCdst2Aout, mTradeIr)
+      obj@parameters[['mTradeIrCdst2Aout']] <- .add_data(obj@parameters[['mTradeIrCdst2Aout']], mTradeIrCdst2Aout)
+      a2 <-  unique(mTradeIrCdst2Aout[, c('trade', 'comm', 'dst', 'year', 'slice')])
+      colnames(a2)[3] <- 'region'
+    } else a2 <- NULL
+    obj@parameters[['mvTradeIrAOut']] <- .add_data(obj@parameters[['mvTradeIrAOut']], unique(rbind(a1, a2)))
+  }
+  mvTradeIr <- mTradeIr; mvTradeIr$comm <- trd@commodity
+  obj@parameters[['mvTradeIr']] <- .add_data(obj@parameters[['mvTradeIr']], mvTradeIr) 
+  if (!is.null(pTradeIr)) {
+    pTradeIr$comm <- trd@commodity
+    obj@parameters[['meqTradeFlowLo']] <- .add_data(obj@parameters[['meqTradeFlowLo']], 
+    								.merge_with_null(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, 
+                      colnames(pTradeIr) %in% colnames(mvTradeIr), with = FALSE]))
+    obj@parameters[['meqTradeFlowUp']] <- .add_data(obj@parameters[['meqTradeFlowUp']], 
+    																							.merge_with_null(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, 
                         colnames(pTradeIr) %in% colnames(mvTradeIr), with = FALSE]))
-      obj@parameters[['meqTradeFlowUp']] <- .add_data(obj@parameters[['meqTradeFlowUp']], 
-      																							.merge_with_null(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, 
-                          colnames(pTradeIr) %in% colnames(mvTradeIr), with = FALSE]))
-      pTradeIr$comm <- NULL
-    }
-    obj
-  })
+    pTradeIr$comm <- NULL
+  }
+  obj
+})
 
 
 
