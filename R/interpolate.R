@@ -200,11 +200,14 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }
   # Remove group duplication
   scen@modInp@parameters$group <- .unique_set(scen@modInp@parameters$group)
+  scen@modInp@parameters$mvDemInp <- .unique_set(scen@modInp@parameters$mvDemInp)
   
   # Check for unknown set in constraints
   .check_constraint(scen)
   # Check for unknown weather
   .check_weather(scen)
+  # Check for unknown set in model and duplicated set
+  .check_sets(scen)
   
   # Tune for LEC 
   if (length(scen@model@LECdata) != 0) {
