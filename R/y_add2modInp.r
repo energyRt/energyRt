@@ -163,7 +163,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
     													colnames(pExportRow) %in% colnames(mExportRow), with = FALSE]
     if (nrow(pExportRow2) != 0) {
       pExportRow2 <- mExportRow[1, 1:2]
-      if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge(mExportRow, pExportRow2)
+      if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- .merge_with_null(mExportRow, pExportRow2)
       mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),]
     }
   }
@@ -174,15 +174,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
 			colnames(pExportRow) %in% obj@parameters[['mExportRowUp']]@dimSetNames, with = FALSE]
     mExportRowUp$comm <- exp@commodity
     if (!all(obj@parameters[['mExportRowUp']]@dimSetNames %in% mExportRowUp)) 
-      mExportRowUp <- merge(mExportRow, mExportRowUp)
+      mExportRowUp <- .merge_with_null(mExportRow, mExportRowUp)
     obj@parameters[['mExportRowUp']] <- .add_data(obj@parameters[['mExportRowUp']], mExportRowUp)
     meqExportRowLo <- pExportRow[pExportRow$type == 'lo' & pExportRow$value != 0, 
     														 colnames(pExportRow) %in% obj@parameters[['meqExportRowLo']]@dimSetNames, with = FALSE]
     meqExportRowLo$comm <- exp@commodity
     if (!all(obj@parameters[['meqExportRowLo']]@dimSetNames %in% meqExportRowLo)) 
-      meqExportRowLo <- merge(mExportRow, meqExportRowLo)
+      meqExportRowLo <- .merge_with_null(mExportRow, meqExportRowLo)
     obj@parameters[['meqExportRowLo']] <- .add_data(obj@parameters[['meqExportRowLo']], 
-              merge(mExportRow, meqExportRowLo)) 
+              .merge_with_null(mExportRow, meqExportRowLo)) 
   }
   if (!is.null(pExportRowRes)) {
     pExportRowRes$comm <- exp@commodity
@@ -225,7 +225,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
     													colnames(pImportRow) %in% colnames(mImportRow), with = FALSE]
     if (nrow(pImportRow2) != 0) {
       pImportRow2 <- mImportRow[1, 1:2]
-      if (ncol(pImportRow2) != ncol(mImportRow)) pImportRow2 <- merge(mImportRow, pImportRow2)
+      if (ncol(pImportRow2) != ncol(mImportRow)) pImportRow2 <- .merge_with_null(mImportRow, pImportRow2)
       mImportRow <- mImportRow[(!duplicated(rbind(mImportRow, pImportRow2), fromLast = TRUE)[1:nrow(mImportRow)]),]
     }
   }
@@ -236,15 +236,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'import',
     													 colnames(pImportRow) %in% obj@parameters[['mImportRowUp']]@dimSetNames, with = FALSE]
     mImportRowUp$comm <- imp@commodity
     if (!all(obj@parameters[['mImportRowUp']]@dimSetNames %in% mImportRowUp)) 
-      mImportRowUp <- merge(mImportRow, mImportRowUp)
+      mImportRowUp <- .merge_with_null(mImportRow, mImportRowUp)
     obj@parameters[['mImportRowUp']] <- .add_data(obj@parameters[['mImportRowUp']], mImportRowUp)
     meqImportRowLo <- pImportRow[pImportRow$type == 'lo' & pImportRow$value != 0, 
     														 colnames(pImportRow) %in% obj@parameters[['meqImportRowLo']]@dimSetNames, with = FALSE]
     meqImportRowLo$comm <- imp@commodity
     if (!all(obj@parameters[['meqImportRowLo']]@dimSetNames %in% meqImportRowLo)) 
-      meqImportRowLo <- merge(mImportRow, meqImportRowLo)
+      meqImportRowLo <- .merge_with_null(mImportRow, meqImportRowLo)
     obj@parameters[['meqImportRowLo']] <- .add_data(obj@parameters[['meqImportRowLo']], 
-              merge(mImportRow, meqImportRowLo)) 
+              .merge_with_null(mImportRow, meqImportRowLo)) 
    }
   if (!is.null(pImportRowRes)) {
     pImportRowRes$comm <- exp@commodity
@@ -648,13 +648,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             obj@parameters[['mStorageEac']] <- .add_data(obj@parameters[['mStorageEac']], dd0$eac)
             
             if (nrow(dd0$new) > 0  && !is.null(invcost) && nrow(invcost) > 0) {
-              salv_data <- merge(dd0$new, approxim$discount, all.x = TRUE)
+              salv_data <- .merge_with_null(dd0$new, approxim$discount, all.x = TRUE)
               salv_data$value[is.na(salv_data$value)] <- 0
               salv_data$discount <- salv_data$value; salv_data$value <- NULL
               olife$olife <- olife$value; olife$value <- NULL
-              salv_data <- merge(salv_data, olife)
+              salv_data <- .merge_with_null(salv_data, olife)
               invcost$invcost <- invcost$value; invcost$value <- NULL
-              salv_data <- merge(salv_data, invcost)
+              salv_data <- .merge_with_null(salv_data, invcost)
               # EAC
               salv_data$eac <- salv_data$invcost / salv_data$olife
               fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
@@ -693,7 +693,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
               mStorageOlifeInf <- pStorageOlife[pStorageOlife$olife != Inf, colnames(pStorageOlife) %in% 
                                                   obj@parameters[['mStorageOlifeInf']]@dimSetNames, with = FALSE]
               if (ncol(mStorageOlifeInf) != ncol(obj@parameters[['mStorageOlifeInf']]@data))
-                mStorageOlifeInf <- merge(mStorageOlifeInf, mStorageSpan[, colnames(mStorageSpan) %in% 
+                mStorageOlifeInf <- .merge_with_null(mStorageOlifeInf, mStorageSpan[, colnames(mStorageSpan) %in% 
                     obj@parameters[['mStorageOlifeInf']]@dimSetNames, with = FALSE])
               obj@parameters[['mStorageOlifeInf']] <- .add_data(obj@parameters[['mStorageOlifeInf']], mStorageOlifeInf)
             }
@@ -708,18 +708,18 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             if (!is.null(mStorageOMCost))
             	mStorageOMCost <- rbind(mStorageOMCost, pStorageCostStore[pStorageCostStore$value != 0, dsm, with = FALSE])
             if (!is.null(mStorageOMCost)) {
-              mStorageOMCost <- merge(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
+              mStorageOMCost <- .merge_with_null(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
               obj@parameters[['mStorageOMCost']] <- .add_data(obj@parameters[['mStorageOMCost']], mStorageOMCost)
             }
-            mvStorageStore <- merge(mStorageSpan, list(slice = stg_slice))
+            mvStorageStore <- .merge_with_null(mStorageSpan, list(slice = stg_slice))
             mvStorageStore$comm <- stg@commodity
             obj@parameters[['mvStorageStore']] <- .add_data(obj@parameters[['mvStorageStore']], mvStorageStore)
             
             if (nrow(stg@aux) != 0) {
               mvStorageStore2 <- mvStorageStore; mvStorageStore2$comm <- NULL
-              mvStorageAInp <- merge(mvStorageStore2, mStorageAInp)
+              mvStorageAInp <- .merge_with_null(mvStorageStore2, mStorageAInp)
               obj@parameters[['mvStorageAInp']] <- .add_data(obj@parameters[['mvStorageAInp']], mvStorageAInp)
-              mvStorageAOut <- merge(mvStorageStore2, mStorageAOut)
+              mvStorageAOut <- .merge_with_null(mvStorageStore2, mStorageAOut)
               obj@parameters[['mvStorageAOut']] <- .add_data(obj@parameters[['mvStorageAOut']], mvStorageAOut)
               for (i in c('mStorageStg2AOut', 'mStorageCinp2AOut', 'mStorageCout2AOut', 'mStorageCap2AOut', 
               						'mStorageNCap2AOut', 'mStorageStg2AInp', 'mStorageCinp2AInp', 'mStorageCout2AInp', 
@@ -728,10 +728,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
                   atmp <- aout_tmp[[gsub('^m', 'p', i)]]
                   if (any(grep('Out$', i))) {
                     atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAOut), with = FALSE]
-                    if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAOut)
+                    if (ncol(atmp) != 5) atmp <- .merge_with_null(atmp, mvStorageAOut)
                   } else {
                     atmp <- atmp[, colnames(atmp)%in% colnames(mvStorageAInp), with = FALSE]
-                    if (ncol(atmp) != 5) atmp <- merge(atmp, mvStorageAInp)
+                    if (ncol(atmp) != 5) atmp <- .merge_with_null(atmp, mvStorageAInp)
                   }
                   obj@parameters[[i]] <- .add_data(obj@parameters[[i]], atmp)
                 }
@@ -742,15 +742,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
               y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
             }
             rem_inf_def_inf <- function(x, y) {
-              merge(x[x$type == 'up' & x$value != Inf, colnames(x) %in% colnames(y), with = FALSE], y)
+              .merge_with_null(x[x$type == 'up' & x$value != Inf, colnames(x) %in% colnames(y), with = FALSE], y)
             }
             obj@parameters[['meqStorageAfLo']] <- .add_data(obj@parameters[['meqStorageAfLo']], 
-            merge(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0,], mvStorageStore))
+            .merge_with_null(pStorageAf[pStorageAf$type == 'lo' & pStorageAf$value != 0,], mvStorageStore))
             obj@parameters[['meqStorageAfUp']] <- .add_data(obj@parameters[['meqStorageAfUp']], 
             						rem_inf_def1(pStorageAf, mvStorageStore))
             if (!is.null(pStorageCinp)) {
               obj@parameters[['meqStorageInpLo']] <- .add_data(obj@parameters[['meqStorageInpLo']], 
-              			merge(pStorageCinp[pStorageCinp$type == 'lo' & pStorageCinp$value != 0, 
+              			.merge_with_null(pStorageCinp[pStorageCinp$type == 'lo' & pStorageCinp$value != 0, 
                          colnames(pStorageCinp) %in% obj@parameters[['meqStorageInpLo']]@dimSetNames, with = FALSE], 
               						mvStorageStore))
               obj@parameters[['meqStorageInpUp']] <- .add_data(obj@parameters[['meqStorageInpUp']], 
@@ -758,7 +758,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             }
             if (!is.null(pStorageCout)) {
               obj@parameters[['meqStorageOutLo']] <- .add_data(obj@parameters[['meqStorageOutLo']], 
-                     merge(pStorageCout[pStorageCout$type == 'lo' & pStorageCout$value != 0, 
+                     .merge_with_null(pStorageCout[pStorageCout$type == 'lo' & pStorageCout$value != 0, 
                        colnames(pStorageCout) %in% obj@parameters[['meqStorageOutLo']]@dimSetNames, with = FALSE], 
                        mvStorageStore))
               obj@parameters[['meqStorageOutUp']] <- .add_data(obj@parameters[['meqStorageOutUp']], 
@@ -772,7 +772,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
 .merge_with_null <- function(x, y, by = NULL, ...) {
 	if (is.null(x) || is.null(y) || nrow(x) == 0 || nrow(y) == 0) return(NULL)
 	if (length(by) == 0) by <- intersect(colnames(x), colnames(y))
-	if (length(by) == 0) return(crossing(x, y))
+	if (length(by) == 0) return(data.table(crossing(x, y)))
 	if (ncol(x) == ncol(y) && ncol(x) == length(by))
 		return(rbind(x, y)[duplicated(rbind(x, y)), ])
 	return (merge(x, y, by = by, ...))
@@ -1437,10 +1437,10 @@ setMethod(
       # Checking user data for errors
       kk <- tmp[!is.na(tmp$src) & !is.na(tmp$dst), c('src', 'dst'), drop = FALSE]
       if (nrow(kk) > 0) {
-        if (nrow(kk) != nrow(merge(kk, routes))) {
+        if (nrow(kk) != nrow(.merge_with_null(kk, routes))) {
           cat('There are data for class trade "', trd@name, ' for unknown routes:\n', sep = '')
           kk$ind <- seq_len(nrow(kk))
-          print(kk[kk$ind[!(kk$ind %in% merge(kk, routes))], c('src', 'dst'), drop = FALSE])
+          print(kk[kk$ind[!(kk$ind %in% .merge_with_null(kk, routes))], c('src', 'dst'), drop = FALSE])
         }
       }
       # Approximation src/dst pair
@@ -1489,7 +1489,7 @@ setMethod(
       tmp
     }
     simpleInterpolation2 <- function(frm, approxim, parameter, ...) {
-      frm <- frm[!is.na(frm[, parameter]), ]
+      frm <- frm[!is.na(frm[[parameter]]), ]
       if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
       if (nrow(frm) != 0) {
         frm <- imply_routes(frm)
@@ -1498,7 +1498,7 @@ setMethod(
         frm$region <- character()
       }
       frm$src <- NULL; frm$dst <- NULL
-      frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
+      frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), with = FALSE]
       dd <- simpleInterpolation(frm, approxim = approxim, parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) return(NULL)
       if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
@@ -1507,18 +1507,18 @@ setMethod(
       dd
     }
     multiInterpolation2 <- function(frm, approxim, parameter, ...) {
-      frm <- frm[apply(!is.na(frm[, paste0(parameter, c('.lo', '.up', '.fx'))]), 1, any), ]
+      frm <- frm[!is.na(frm[[paste0(parameter, '.lo')]]) | !is.na(frm[[paste0(parameter, '.up')]]) | !is.na(frm[[paste0(parameter, '.fx')]]), ]
       if (nrow(frm) == 0 && !approxim$fullsets) return(NULL)
       if (nrow(frm) != 0) {
-        clo <- frm[, paste0(parameter, '.lo')]
-        cup <- frm[, paste0(parameter, '.up')]
-        cfx <- frm[, paste0(parameter, '.fx')]
+        clo <- frm[[paste0(parameter, '.lo')]]
+        cup <- frm[[paste0(parameter, '.up')]]
+        cfx <- frm[[paste0(parameter, '.fx')]]
         frm[, paste0(parameter, c('.up', '.fx', '.lo'))] <- NA
         frm <- rbind(frm, frm)
-        frm[, paste0(parameter, '.lo')] <- c(clo, cfx)
+        frm[[paste0(parameter, '.lo')]] <- c(clo, cfx)
         frm_lo <- imply_routes(frm[!is.na(c(clo, cfx)), ])
-        frm[, paste0(parameter, '.lo')] <- NA
-        frm[, paste0(parameter, '.up')] <- c(cup, cfx)
+        frm[[paste0(parameter, '.lo')]] <- NA
+        frm[[paste0(parameter, '.up')]] <- c(cup, cfx)
         frm_up <- imply_routes(frm[!is.na(c(cup, cfx)),])
         frm <- rbind(frm_lo, frm_up)
         frm$region <- paste0(frm$src, '##', frm$dst)
@@ -1526,7 +1526,7 @@ setMethod(
         frm$region <- character()
       } 
       frm$src <- NULL; frm$dst <- NULL
-      frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), drop = FALSE]
+      frm <- frm[, c(ncol(frm), 2:ncol(frm) - 1), with = FALSE]
       dd <- multiInterpolation(frm, approxim = approxim, parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) return(NULL)
       if (any(list(...)[[1]]@dimSetNames == 'src')) dd$src <- gsub('##.*', '', dd$region)
@@ -1638,7 +1638,7 @@ setMethod(
       if (length(trade_span) > 0) {
         mTradeSpan <- data.table(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors=FALSE)
         obj@parameters[['mTradeSpan']] <- .add_data(obj@parameters[['mTradeSpan']], mTradeSpan)
-        meqTradeCapFlow <- merge(mTradeSpan, mTradeSlice)
+        meqTradeCapFlow <- .merge_with_null(mTradeSpan, mTradeSlice)
         meqTradeCapFlow$comm <- trd@commodity
         obj@parameters[['meqTradeCapFlow']] <- .add_data(obj@parameters[['meqTradeCapFlow']], meqTradeCapFlow)
       }
@@ -1648,16 +1648,16 @@ setMethod(
         obj@parameters[['pTradeInvcost']] <- .add_data(obj@parameters[['pTradeInvcost']], invcost)
         if (any(!(obj@parameters[['mTradeInv']]@dimSetNames %in% colnames(invcost)))) {
           if (is.null(invcost$year)) {
-            invcost <- merge(invcost, list(year = possible_invest_year))
+            invcost <- .merge_with_null(invcost, list(year = possible_invest_year))
           }
           if (is.null(invcost$region)) {
-            invcost <- merge(invcost, approxim['region'])
+            invcost <- .merge_with_null(invcost, approxim['region'])
           }
         }
         obj@parameters[['mTradeInv']] <- .add_data(obj@parameters[['mTradeInv']], invcost[, colnames(invcost) != 'value'])
         invcost$invcost <- invcost$value; invcost$value <- NULL
         if (length(trade_eac) > 0) {
-          mTradeEac <- merge(unique(invcost$region), trade_eac)
+          mTradeEac <- .merge_with_null(unique(invcost$region), trade_eac)
           mTradeEac$trade <- trd@name
           mTradeEac$region <- as.character(mTradeEac$x)
           mTradeEac$year <- mTradeEac$y
@@ -1665,7 +1665,7 @@ setMethod(
           obj@parameters[['mTradeEac']] <- .add_data(obj@parameters[['mTradeEac']], mTradeEac)
         }
         
-        salv_data <- merge(invcost, approxim$discount, all.x = TRUE)
+        salv_data <- .merge_with_null(invcost, approxim$discount, all.x = TRUE)
         salv_data$value[is.na(salv_data$value)] <- 0
         salv_data$discount <- salv_data$value; salv_data$value <- NULL
         salv_data$olife <- trd@olife
@@ -1683,28 +1683,28 @@ setMethod(
       }
     }
     ####
-    mTradeIr <- merge(mTradeRoutes, mTradeSlice)
+    mTradeIr <- .merge_with_null(mTradeRoutes, mTradeSlice)
     if (trd@capacityVariable) {
-      mTradeIr <- merge(mTradeIr, mTradeSpan)
-    } else mTradeIr <- merge(mTradeIr, list(year = approxim$mileStoneYears))
-    
+      mTradeIr <- .merge_with_null(mTradeIr, mTradeSpan)
+    } else mTradeIr <- data.table(crossing(mTradeIr, data.table(year = approxim$mileStoneYears)))
+
     obj@parameters[['mTradeIr']] <- .add_data(obj@parameters[['mTradeIr']], mTradeIr)
     ### To trades
     if (!is.null(mTradeIrAInp)) {
       if (!is.null(pTradeIrCsrc2Ainp) && any(pTradeIrCsrc2Ainp$value != 0)) {
         mTradeIrCsrc2Ainp <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, colnames(pTradeIrCsrc2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCsrc2Ainp$acomm)) mTradeIrCsrc2Ainp <- merge(mTradeIrCsrc2Ainp, mTradeIrAInp)
+        if (is.null(mTradeIrCsrc2Ainp$acomm)) mTradeIrCsrc2Ainp <- .merge_with_null(mTradeIrCsrc2Ainp, mTradeIrAInp)
         mTradeIrCsrc2Ainp$comm <- mTradeIrCsrc2Ainp$acomm; mTradeIrCsrc2Ainp$acomm <- NULL
-        if (ncol(mTradeIrCsrc2Ainp) != 6) mTradeIrCsrc2Ainp <- merge(mTradeIrCsrc2Ainp, mTradeIr)
+        if (ncol(mTradeIrCsrc2Ainp) != 6) mTradeIrCsrc2Ainp <- .merge_with_null(mTradeIrCsrc2Ainp, mTradeIr)
         obj@parameters[['mTradeIrCsrc2Ainp']] <- .add_data(obj@parameters[['mTradeIrCsrc2Ainp']], mTradeIrCsrc2Ainp)
         a1 <-  unique(mTradeIrCsrc2Ainp[, c('trade', 'comm', 'src', 'year', 'slice')])
         colnames(a1)[3] <- 'region'
       }  else a1 <- NULL
       if (!is.null(pTradeIrCdst2Ainp) && any(pTradeIrCdst2Ainp$value != 0)) {
         mTradeIrCdst2Ainp <- pTradeIrCdst2Ainp[pTradeIrCdst2Ainp$value != 0, colnames(pTradeIrCdst2Ainp) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCdst2Ainp$acomm)) mTradeIrCdst2Ainp <- merge(mTradeIrCdst2Ainp, mTradeIrAInp)
+        if (is.null(mTradeIrCdst2Ainp$acomm)) mTradeIrCdst2Ainp <- .merge_with_null(mTradeIrCdst2Ainp, mTradeIrAInp)
         mTradeIrCdst2Ainp$comm <- mTradeIrCdst2Ainp$acomm; mTradeIrCdst2Ainp$acomm <- NULL
-        if (ncol(mTradeIrCdst2Ainp) != 6) mTradeIrCdst2Ainp <- merge(mTradeIrCdst2Ainp, mTradeIr)
+        if (ncol(mTradeIrCdst2Ainp) != 6) mTradeIrCdst2Ainp <- .merge_with_null(mTradeIrCdst2Ainp, mTradeIr)
         obj@parameters[['mTradeIrCdst2Ainp']] <- .add_data(obj@parameters[['mTradeIrCdst2Ainp']], mTradeIrCdst2Ainp)
         a2 <-  unique(mTradeIrCdst2Ainp[, c('trade', 'comm', 'dst', 'year', 'slice')])
         colnames(a2)[3] <- 'region'
@@ -1715,18 +1715,18 @@ setMethod(
     if (!is.null(mTradeIrAOut)) {
       if (!is.null(pTradeIrCsrc2Aout) && any(pTradeIrCsrc2Aout$value != 0)) {
         mTradeIrCsrc2Aout <- pTradeIrCsrc2Aout[pTradeIrCsrc2Aout$value != 0, colnames(pTradeIrCsrc2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCsrc2Aout$acomm)) mTradeIrCsrc2Aout <- merge(mTradeIrCsrc2Aout, mTradeIrAOut)
+        if (is.null(mTradeIrCsrc2Aout$acomm)) mTradeIrCsrc2Aout <- .merge_with_null(mTradeIrCsrc2Aout, mTradeIrAOut)
         mTradeIrCsrc2Aout$comm <- mTradeIrCsrc2Aout$acomm; mTradeIrCsrc2Aout$acomm <- NULL
-        if (ncol(mTradeIrCsrc2Aout) != 6) mTradeIrCsrc2Aout <- merge(mTradeIrCsrc2Aout, mTradeIr)
+        if (ncol(mTradeIrCsrc2Aout) != 6) mTradeIrCsrc2Aout <- .merge_with_null(mTradeIrCsrc2Aout, mTradeIr)
         obj@parameters[['mTradeIrCsrc2Aout']] <- .add_data(obj@parameters[['mTradeIrCsrc2Aout']], mTradeIrCsrc2Aout)
         a1 <-  unique(mTradeIrCsrc2Aout[, c('trade', 'comm', 'src', 'year', 'slice')])
         colnames(a1)[3] <- 'region'
       }  else a1 <- NULL
       if (!is.null(pTradeIrCdst2Aout) && any(pTradeIrCdst2Aout$value != 0)) {
         mTradeIrCdst2Aout <- pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0, colnames(pTradeIrCdst2Aout) %in% c('trade', 'acomm', 'src', 'dst', 'year', 'slice'), drop = FALSE]
-        if (is.null(mTradeIrCdst2Aout$acomm)) mTradeIrCdst2Aout <- merge(mTradeIrCdst2Aout, mTradeIrAOut)
+        if (is.null(mTradeIrCdst2Aout$acomm)) mTradeIrCdst2Aout <- .merge_with_null(mTradeIrCdst2Aout, mTradeIrAOut)
         mTradeIrCdst2Aout$comm <- mTradeIrCdst2Aout$acomm; mTradeIrCdst2Aout$acomm <- NULL
-        if (ncol(mTradeIrCdst2Aout) != 6) mTradeIrCdst2Aout <- merge(mTradeIrCdst2Aout, mTradeIr)
+        if (ncol(mTradeIrCdst2Aout) != 6) mTradeIrCdst2Aout <- .merge_with_null(mTradeIrCdst2Aout, mTradeIr)
         obj@parameters[['mTradeIrCdst2Aout']] <- .add_data(obj@parameters[['mTradeIrCdst2Aout']], mTradeIrCdst2Aout)
         a2 <-  unique(mTradeIrCdst2Aout[, c('trade', 'comm', 'dst', 'year', 'slice')])
         colnames(a2)[3] <- 'region'
@@ -1737,9 +1737,9 @@ setMethod(
     obj@parameters[['mvTradeIr']] <- .add_data(obj@parameters[['mvTradeIr']], mvTradeIr) 
     if (!is.null(pTradeIr)) {
       pTradeIr$comm <- trd@commodity
-      obj@parameters[['meqTradeFlowLo']] <- .add_data(obj@parameters[['meqTradeFlowLo']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, 
+      obj@parameters[['meqTradeFlowLo']] <- .add_data(obj@parameters[['meqTradeFlowLo']], .merge_with_null(mvTradeIr, pTradeIr[pTradeIr$type == 'lo' & pTradeIr$value != 0, 
                                                                                                                     colnames(pTradeIr) %in% colnames(mvTradeIr), drop = FALSE]))
-      obj@parameters[['meqTradeFlowUp']] <- .add_data(obj@parameters[['meqTradeFlowUp']], merge(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, 
+      obj@parameters[['meqTradeFlowUp']] <- .add_data(obj@parameters[['meqTradeFlowUp']], .merge_with_null(mvTradeIr, pTradeIr[pTradeIr$type == 'up' & pTradeIr$value != Inf, 
                                                                                                                     colnames(pTradeIr) %in% colnames(mvTradeIr), drop = FALSE]))
       pTradeIr$comm <- NULL
     }
