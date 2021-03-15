@@ -282,6 +282,7 @@
 			lsets[[ss]] <- lsets[[i]]
 	}
 	
+	error_duplicated_value <- NULL
 	err_dtf <- NULL
 	int_err <- NULL
 	for (prm in scen@modInp@parameters) {
@@ -295,6 +296,11 @@
 				if (any(fl))
 					err_dtf <- rbind(err_dtf, data.table(name = prm@name, set = ss, value = unq[fl]))
 			}
+			tmp <- .get_data_slot(prm)[, colnames(prm@data) != 'value', with = FALSE]
+			tmp <- tmp[duplicated(tmp), ]
+			if (nrow(tmp) != 0)
+				error_duplicated_value <- rbind(error_duplicated_value, 
+					 	data.table(name = prm@name, value = apply(tmp, 1, paste0, collapse = '.')))
 		}
 	}
 	if (length(int_err) != 0)
@@ -305,6 +311,14 @@
 			paste0(capture.output(print(head(err_dtf))), collapse = '\n'))
 		if (nrow(head(err_dtf)) != nrow(err_dtf)) 
 			err_msg <- c(err_msg, paste0('\n', nrow(err_dtf) - nrow(head(err_dtf)), ' row(s) was ommited'))
+		stop(err_msg)
+	}
+	if (!is.null(error_duplicated_value)) {
+		assign('error_duplicated_value', error_duplicated_value, globalenv())
+		err_msg <- c('There is (are) duplicated values (see duplicated_values in globalenv)\n', 
+			paste0(capture.output(print(head(error_duplicated_value))), collapse = '\n'))
+		if (nrow(head(error_duplicated_value)) != nrow(error_duplicated_value)) 
+			err_msg <- c(err_msg, paste0('\n', nrow(error_duplicated_value) - nrow(head(error_duplicated_value)), ' row(s) was ommited'))
 		stop(err_msg)
 	}
 }

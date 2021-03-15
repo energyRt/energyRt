@@ -92,8 +92,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'demand',
       # Slice
       mDemInp <- CJ(comm = dem@commodity, slice = approxim$slice)
       mvDemInp <- CJ(comm = dem@commodity, region = approxim$region, year = approxim$mileStoneYears, slice = approxim$slice)
-    obj@parameters[['mvDemInp']] <- .add_data(obj@parameters[['mvDemInp']], mvDemInp)
-    
+      
+      obj@parameters[['mvDemInp']] <- .add_data(obj@parameters[['mvDemInp']], mvDemInp)
+      
        pDemand <- simpleInterpolation(dem@dem, 'dem', obj@parameters[['pDemand']], approxim, c('dem', 'comm'), 
           c(dem@name, dem@commodity))
        obj@parameters[['pDemand']] <- .add_data(obj@parameters[['pDemand']], pDemand)
@@ -770,11 +771,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
 
 
 .merge_with_null <- function(x, y, by = NULL, ...) {
-	if (is.null(x) || is.null(y) || nrow(x) == 0 || nrow(y) == 0) return(NULL)
+	if (is.null(x) || is.null(y)) return(NULL)
 	if (length(by) == 0) by <- intersect(colnames(x), colnames(y))
 	if (length(by) == 0) return(data.table(crossing(x, y)))
-	if (ncol(x) == ncol(y) && ncol(x) == length(by))
+	if (ncol(x) == ncol(y) && ncol(x) == length(by)) {
+		if (nrow(x) == 0 || nrow(y) == 0) return(x[0,])
 		return(rbind(x, y)[duplicated(rbind(x, y)), ])
+	}
 	return (merge(x, y, by = by, ...))
 }
 #==============================================================================#

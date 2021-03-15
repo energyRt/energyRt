@@ -40,6 +40,11 @@ read.scenario <- function(scen, ...) {
   for(i in c(vrb_list, vrb_list2)) {
     rr$variables[[i]] <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), 
                                  stringsAsFactors = FALSE)
+    for (j in colnames(rr$variables[[i]])) {
+    	if (any(j == c('value', 'year', 'yearp'))) {
+    		rr$variables[[i]][[j]] <- as.numeric(rr$variables[[i]][[j]])
+    	} else rr$variables[[i]][[j]] <- as.character(rr$variables[[i]][[j]])
+    }
     # if (ncol(jj) == 1) {
     #   rr$variables[[i]] <- data.table(value = jj[1, 1])
     # } else {
@@ -109,7 +114,8 @@ read.scenario <- function(scen, ...) {
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, 'Storage')
     scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, 'Trade')
     pDummyImportCost <- .get_data_slot(scen@modInp@parameters$pDummyImportCost)
-    vDummyImportCost <- .merge_with_null(pDummyImportCost, scen@modOut@variables$vDummyImport, by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyImportCost)])
+    vDummyImportCost <- .merge_with_null(pDummyImportCost, scen@modOut@variables$vDummyImport, 
+    				 by = c('comm', 'region', 'year', 'slice')[c('comm', 'region', 'year', 'slice') %in% colnames(pDummyImportCost)])
     vDummyImportCost$value <- vDummyImportCost$value.x * vDummyImportCost$value.y;
     vDummyImportCost$value.x <- NULL; vDummyImportCost$value.y <- NULL;
     scen@modOut@variables$vDummyImportCost <- vDummyImportCost
@@ -134,7 +140,7 @@ read.scenario <- function(scen, ...) {
         year = numeric(), value = numeric(), stringsAsFactors=FALSE)
     }
     scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
-    
+  
     # Estimate Costs
     if (length(getNames(scen, 'costs')) != 0) {
     	cst <- getObjects(scen, 'costs')
