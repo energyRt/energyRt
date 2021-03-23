@@ -525,7 +525,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
                 rr <- !is.na(slot(stg, sl)$region) & !(slot(stg, sl)$region %in% stg@region)
                 warning(paste('There are data storage "', stg@name, '" for unused region: "', 
                               paste(unique(slot(stg, sl)$region[rr]), collapse = '", "'), '"', sep = ''))
-                slot(stg, sl) <- slot(stg, sl)[!rr,, drop = FALSE]
+                slot(stg, sl) <- slot(stg, sl)[!rr,]
               }
             }
             stg <- stayOnlyVariable(stg, approxim$region, 'region')
@@ -579,7 +579,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
                 cmm <- stg@aeff$acomm[!is.na(stg@aeff$acomm)][stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]]
                 stop(paste0('Unknown aux commodity "', paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
               }
-              stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),, drop = FALSE]
+              stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm),]
               ainp_flag <- c('stg2ainp', 'cinp2ainp', 'cout2ainp', 'cap2ainp', 'ncap2ainp')
               aout_flag <- c('stg2aout', 'cinp2aout', 'cout2aout', 'cap2aout', 'ncap2aout')
               cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), 'acomm']
@@ -617,7 +617,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
               tmp$stg <- stg@name
               tmp$comm <- stg@commodity
               tmp$value <- tmp$ncap2stg
-              tmp <- tmp[, c('stg', 'comm', 'region', 'year', 'slice', 'value')]
+              tmp <- tmp[, c('stg', 'comm', 'region', 'year', 'slice', 'value'), with = FALSE]
               obj@parameters[['pStorageNCap2Stg']] <- .add_data(obj@parameters[['pStorageNCap2Stg']], tmp)
             }
             
@@ -625,11 +625,11 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
               fl <- (!is.na(stg@charge$charge) & stg@charge$charge != 0)
               if (any(is.na(stg@charge[fl, c('region', 'year', 'slice')])))
                 stop(paste0('Approximation is not allowed for storage "', stg@name, '" parameter charge'))
-              tmp <- stg@charge[fl, c('region', 'year', 'slice', 'charge')]
+              tmp <- stg@charge[fl, c('region', 'year', 'slice', 'charge'), with = FALSE]
               tmp$stg <- stg@name
               tmp$comm <- stg@commodity
               tmp$value <- tmp$charge
-              tmp <- tmp[, c('stg', 'comm', 'region', 'year', 'slice', 'value')]
+              tmp <- tmp[, c('stg', 'comm', 'region', 'year', 'slice', 'value'), with = FALSE]
               obj@parameters[['pStorageCharge']] <- .add_data(obj@parameters[['pStorageCharge']], tmp)
             }
             # Some slice
@@ -712,8 +712,9 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
               mStorageOMCost <- .merge_with_null(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
               obj@parameters[['mStorageOMCost']] <- .add_data(obj@parameters[['mStorageOMCost']], mStorageOMCost)
             }
-            mvStorageStore <- .merge_with_null(mStorageSpan, list(slice = stg_slice))
+            mvStorageStore <- .merge_with_null(mStorageSpan, data.table(slice = stg_slice))
             mvStorageStore$comm <- stg@commodity
+
             obj@parameters[['mvStorageStore']] <- .add_data(obj@parameters[['mvStorageStore']], mvStorageStore)
             
             if (nrow(stg@aux) != 0) {
@@ -738,9 +739,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
                 }
             }
             rem_inf_def1 <- function(x, y) {
-              if (is.null(x)) return(y)
-              x <- x[x$type == 'up' & x$value == Inf, ]
-              y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
+              if (is.null(x) || nrow(x) == 0) return(y)
+              x <- x[x$type == 'up' & x$value == Inf, !(colnames(x) %in% c('up', 'value', 'type')), with = FALSE]
+              if (nrow(x) == 0) return(y)
+              y[(!duplicated(rbind(y[, colnames(y) != 'comm', with = FALSE], x), fromLast = TRUE))[1:nrow(y)], ]
             }
             rem_inf_def_inf <- function(x, y) {
               .merge_with_null(x[x$type == 'up' & x$value != Inf, colnames(x) %in% colnames(y), with = FALSE], y)
@@ -826,15 +828,15 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
                                   obj@parameters[['pSupAva']], approxim, c('sup', 'comm'), c(sup@name, sup@commodity))
     obj@parameters[['pSupAva']] <- .add_data(obj@parameters[['pSupAva']], pSupAva)
     zero_ava_up <- pSupAva[pSupAva$value == 0 & pSupAva$type == 'up', colnames(pSupAva) != 'value', with = FALSE]
-    mSupAva <- merge.data.table(merge.data.table(mSupSpan, CJ(sup = sup@name, comm = sup@commodity, 
-			year = approxim$mileStoneYears), by = 'sup'), mSupSlice, by = 'sup')
+    mSupAva <- .merge_with_null(merge.data.table(mSupSpan, CJ(sup = sup@name, comm = sup@commodity, 
+			year = approxim$mileStoneYears), by = 'sup', allow.cartesian = TRUE), mSupSlice[, 'slice'])
 
     if (!is.null(zero_ava_up) && nrow(zero_ava_up) != 0) {
       if (all(colnames(mSupAva) %in% colnames(zero_ava_up))) {
         mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, zero_ava_up[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
       } else {
         mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, merge(mSupAva, 
-        					zero_ava_up[, colnames(zero_ava_up) %in% colnames(mSupAva), with = FALSE])[, colnames(mSupAva), with = FALSE]
+        					zero_ava_up[, colnames(zero_ava_up) %in% colnames(mSupAva), with = FALSE], allow.cartesian = TRUE)[, colnames(mSupAva), with = FALSE]
         ), fromLast = TRUE))[1:nrow(mSupAva)], ]
       }
     }
@@ -918,7 +920,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
               obj@parameters[[pname]], approxim2, set_name, tech@name)
 		mTechRampUp <- pTechRampUp[, colnames(pTechRampUp) != 'value', drop = FALSE]
     if (ncol(mTechRampUp) != ncol(obj@parameters[[mname]]@data)) {
-    	mTechRampUp <- merge(mTechRampUp, mact)
+    	mTechRampUp <- merge(mTechRampUp, mact, allow.cartesian = TRUE)
     }
 		obj@parameters[[pname]] <- .add_data(obj@parameters[[pname]], pTechRampUp)
 		obj@parameters[[mname]] <- .add_data(obj@parameters[[mname]], mTechRampUp)
