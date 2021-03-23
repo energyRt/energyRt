@@ -68,7 +68,7 @@
   }
 
   slice_def <- function(dtf, arg) {
-    if (is.null(names(arg)) || any(names(arg) == ""))
+   if (is.null(names(arg)) || any(names(arg) == ""))
       stop(paste('.setTimeSlices: Un named arguments: ', paste(capture.output(print(arg)), collapse = '\n'), sep = '\n'))
     add_val <- function(dtf, val_sh, val_nm, lv) {
       dtf0 <- dtf; 
@@ -87,7 +87,7 @@
     }
     while (length(arg) != 0) {
       lv <- names(arg)[1]
-      dtf[[lv]] <- rep(character(), nrow(dtf))
+      if (nrow(dtf) == 0) dtf[[lv]] <- character() else dtf[[lv]] <- as.character(rep(NA, nrow(dtf)))
       if (is.character(arg[[1]]) || (!is.null(names(arg[[1]])) && is.numeric(arg[[1]]))) {
         if (is.character(arg[[1]])) {
           val_sh <- rep(1 / length(arg[[1]]), length(arg[[1]]))
@@ -121,7 +121,7 @@
           dtf <- NULL
           arg2 <- arg[[1]]; 
           for (i in seq(length.out = length(arg2))) { 
-            dtf1 <- slice_def(add_val(dtf0, arg2[[i]][[1]], names(arg2)[i]), arg2[[i]][-1], lv)
+            dtf1 <- slice_def(add_val(dtf0, arg2[[i]][[1]], names(arg2)[i], lv), arg2[[i]][-1])
             if (i == 1) {
               dtf <- dtf1
             } else {
@@ -188,16 +188,19 @@ timeSlices <- function(x, asTibble = T, stringsAsFactors = FALSE) {
   slev
 }
 
+
 #! 1
-# .setTimeSlices("SEASON" = c("WINTER", "SUMMER"))
-# .setTimeSlices("SEASON" = c("WINTER" = .6, "SUMMER" = .4))
-# .setTimeSlices("SEASON" = list("WINTER" = .6, "SUMMER" = .4))
-# .setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING'))))
-# .setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING')))) # have to error
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = c("WINTER", "SUMMER"))
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = c("WINTER" = .6, "SUMMER" = .4))
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = list("WINTER" = .6, "SUMMER" = .4))
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = c("WINTER", "SUMMER"), DAY = c('MORNING', 'EVENING'))
+
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING'))))
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = list("WINTER" = list(.3, DAY = c('MORNING')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING')))) # have to error
 
 #! 2
-#.setTimeSlices("SEASON" = c("WINTER", "SUMMER"), HOUR = paste('H', seq(0, 21, by = 3), sep = ''))
-#.setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = list('MORNING' = list(.5, tp = c('x1' = .1, 'x2' = .9)), 'EVENING' = list(.5, tp = c('x1', 'x2')))), 
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = c("WINTER", "SUMMER"), HOUR = paste('H', seq(0, 21, by = 3), sep = ''))
+# .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = list("WINTER" = list(.3, DAY = list('MORNING' = list(.5, tp = c('x1' = .1, 'x2' = .9)), 'EVENING' = list(.5, tp = c('x1', 'x2')))),
 #                          "SUMMER" = list(.7, DAY = list('MORNING' = list(.5, tp = c('x1', 'x2')), 'EVENING' = list(.5, tp = c('x1', 'x2'))))))
 
-# sl = .setTimeSlices("SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING', 'PEAK')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING', 'PEAK'))))
+# sl = .setTimeSlices(ANNUAL = 'ANNUAL', "SEASON" = list("WINTER" = list(.3, DAY = c('MORNING', 'EVENING', 'PEAK')), "SUMMER" = list(.7, DAY = c('MORNING', 'EVENING', 'PEAK'))))

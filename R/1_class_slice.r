@@ -91,7 +91,7 @@ setClass("slice",
       tmp <- sl@parent_child
       tmp$nlev <- NA
       for (i in seq_along(sl@slice_map)) {
-        tmp[tmp$parent %in% sl@slice_map[[i]], 'nlev'] <- i
+        tmp$nlev[tmp$parent %in% sl@slice_map[[i]]] <- i
       }
       ll <- tmp[tmp$nlev  + 1 == length(sl@slice_map), -3]
       for (i in rev(seq_along(sl@slice_map))[-(1:2)]) {
@@ -112,14 +112,14 @@ setClass("slice",
     tmp$next_slice <- NA
     j <- 1
     for (i in 1:(nrow(tmp) - 1)) {
-      if (tmp[i, 'parent'] == tmp[i + 1, 'parent']) {
-        tmp[i, 'next_slice'] <- tmp[i + 1, 'child']
+      if (tmp$parent[i] == tmp$parent[i + 1]) {
+        tmp$next_slice[i] <- tmp$child[i + 1]
       } else {
-        tmp[i, 'next_slice'] <- tmp[j, 'child']
+        tmp$next_slice[i] <- tmp$child[j]
         j <- i + 1
       }
     }
-    tmp[i + 1, 'next_slice'] <- tmp[j, 'child']
+    tmp$next_slice[i + 1] <- tmp$child[j]
     sl@misc$next_slice <- data.table(slice = tmp$child, slicep = tmp$next_slice, stringsAsFactors = FALSE)
     n1 <- c(lapply(sl@slice_map[-1], function(x) x), recursive = TRUE); names(n1) <- NULL
     n2 <- c(lapply(sl@slice_map[-1], function(x) c(x[-1], x[1])), recursive = TRUE); 
