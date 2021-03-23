@@ -39,8 +39,10 @@ checkInpOut <- function(tech) {
                     output  = logical(),
                     stringsAsFactors = FALSE)
   if (length(acomm)) {
-    aux <- data.table(input   = rep(FALSE, length(acomm)),
-                    output  = rep(FALSE, length(acomm)))
+    aux <- data.table(
+      acomm = acomm,
+      input   = rep(FALSE, length(acomm)),
+      output  = rep(FALSE, length(acomm)))
     acomm_ind <- seq_along(acomm)
     names(acomm_ind) <- acomm
   }

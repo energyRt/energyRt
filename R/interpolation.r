@@ -29,7 +29,6 @@
   approxim <- approxim[names(approxim) %in% prior]
   # Remove excess column
   obj <- obj[,colnames(obj) %in% c(prior, parameter), with = FALSE]
-  
   # Sort column
   obj <- obj[,c(prior[prior %in% colnames(obj)], 
     colnames(obj)[ncol(obj)]), with = FALSE]
@@ -78,9 +77,8 @@
         obj2 <- obj2[obj2[[i]] %in% approxim2[[i]],]
       #  || defVal == 0
       if (ncol(obj2) == 1 || nrow(obj2) == prod(sapply(approxim2[names(obj2)[-ncol(obj2)]], length))) { # Simple approximation is possible
-        obj2 <- obj2[, k:=1]        
         for (i in names(obj)[c(!f1, FALSE)]) {
-          obj2 <- merge(obj2, as.data.table(approxim2[i])[, k:=1])
+          obj2 <- data.table(crossing(obj2, as.data.table(approxim2[i])))
         }
         return(obj2[, colnames(obj), with = FALSE])
       }
