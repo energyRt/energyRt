@@ -98,8 +98,8 @@ checkInpOut <- function(tech) {
 
    gtype <- data.table(group = group, type = factor(rep(NA, length(group)), c('input', 'output')))
    
-   for(i in unique(tech@geff$group)) {
-     if (any(!is.na(tech@geff[tech@geff$group == i, 'ginp2use']))) {
+   for(i in seq_along(group)) {
+     if (any(!is.na(tech@geff[tech@geff$group == group[i], 'ginp2use']))) {
        if (!is.na(gtype$type[i]) && gtype$type[i] == 'output') 
           stop('Wrong group in technology "', tech@name, '": "', i, '"')
        gtype$type[i] <- 'input'   
