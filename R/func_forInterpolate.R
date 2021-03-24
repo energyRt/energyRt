@@ -133,6 +133,7 @@
   k <- 0;
   time.log.nm <- rep(NA, num_classes_for_progrees_bar)
   time.log.tm <- rep(NA, num_classes_for_progrees_bar)
+  mdinp <- list()
   for(i in seq(along = scen@model@data)) {
     for(j in seq(along = scen@model@data[[i]]@data)) { 
       k <- k + 1;
@@ -143,15 +144,19 @@
                                  interpolation_time_begin = interpolation_time_begin, len_name)
         }
         p1 <- proc.time()[3]
-        tryCatch({
-          scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
-        }, error = function(e) {
-          assign('add0_message', list(tracedata = sys.calls(),
-            add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
-            globalenv())
-          message('\nError in .add0 function, additional info in "add0_message" object\n')
-          stop(e)
-        })
+        # tryCatch({
+        if (class(scen@model@data[[i]]@data[[j]]) == 'constraint') {
+        	scen@modInp <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
+        } else {
+        	mdinp[[length(mdinp) + 1]] <- .add0(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)@parameters
+        }
+        # }, error = function(e) {
+        #   assign('add0_message', list(tracedata = sys.calls(),
+        #     add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)), 
+        #     globalenv())
+        #   message('\nError in .add0 function, additional info in "add0_message" object\n')
+        #   stop(e)
+        # })
         time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name
         time.log.tm[tmlg] <- proc.time()[3] - p1
         # if (need.tick[k] && arg$echo) {
@@ -160,6 +165,22 @@
         # }
       }
     }
+  }
+  require(data.table)
+  nval <- rep(NA, length(mdinp))
+  for (pr in names(mdinp[[1]])) if (scen@modInp@parameters[[pr]]@nValues <= 0) {
+  	if (mdinp[[1]][[pr]]@nValues != -1) {
+  		for (i in seq_along(mdinp)) {
+ 				nval[i] <- mdinp[[i]][[pr]]@nValues
+  		}
+  		if (any(nval != 0)) {
+	  		scen@modInp@parameters[[pr]]@data <- as.data.frame(rbindlist(lapply(mdinp[nval != 0], 
+						function(x) x[[pr]]@data[1:x[[pr]]@nValues,, drop = FALSE])))
+	  		scen@modInp@parameters[[pr]]@nValues <- sum(nval)
+  		}
+  	} else {
+  		stop("don't assume that this is the case")
+  	}
   }
   scen@misc$time.log <- data.frame(name = time.log.nm[seq_len(tmlg)], 
                                    time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE)
@@ -333,7 +354,7 @@
 	}
 	if (!is.null(error_duplicated_value)) {
 		assign('error_duplicated_value', error_duplicated_value, globalenv())
-		err_msg <- c('There is (are) duplicated values (see duplicated_values in globalenv)\n', 
+		err_msg <- c('There is (are) duplicated values (see error_duplicated_value in globalenv)\n', 
 			paste0(capture.output(print(head(error_duplicated_value))), collapse = '\n'))
 		if (nrow(head(error_duplicated_value)) != nrow(error_duplicated_value)) 
 			err_msg <- c(err_msg, paste0('\n', nrow(error_duplicated_value) - nrow(head(error_duplicated_value)), ' row(s) was ommited'))
