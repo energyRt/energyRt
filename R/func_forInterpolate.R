@@ -166,7 +166,7 @@
       }
     }
   }
-  require(data.table)
+  # require(data.table)
   nval <- rep(NA, length(mdinp))
   for (pr in names(mdinp[[1]])) if (scen@modInp@parameters[[pr]]@nValues <= 0) {
   	if (mdinp[[1]][[pr]]@nValues != -1) {
@@ -179,7 +179,7 @@
 	  		scen@modInp@parameters[[pr]]@nValues <- sum(nval)
   		}
   	} else {
-  		stop("don't assume that this is the case")
+  		stop("should not be here")
   	}
   }
   scen@misc$time.log <- data.frame(name = time.log.nm[seq_len(tmlg)], 
@@ -231,7 +231,7 @@
      len_name <- len_name + abs(length_out)
      length_out <- 0
    }
-  jj <- paste0(jj, paste0(rep(' ', , length_out), collapse = ''))
+  jj <- paste0(jj, paste0(rep_len(' ', length_out), collapse = ''))
   cat(rep_len('\b', len_name), jj, sep = '') # , rep(' ', 100), rep('\b', 100)
 }
 
