@@ -679,8 +679,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
               mStorageOlifeInf <- pStorageOlife[pStorageOlife$olife != Inf, colnames(pStorageOlife) %in% 
                                                   obj@parameters[['mStorageOlifeInf']]@dimSetNames, drop = FALSE]
               if (ncol(mStorageOlifeInf) != ncol(obj@parameters[['mStorageOlifeInf']]@data))
-                mStorageOlifeInf <- merge(mStorageOlifeInf, mStorageSpan[, colnames(mStorageSpan) %in% 
-                                                                           obj@parameters[['mStorageOlifeInf']]@dimSetNames, drop = FALSE])
+                mStorageOlifeInf <- merge(mStorageOlifeInf, unique(mStorageSpan[, colnames(mStorageSpan) %in% 
+                                       obj@parameters[['mStorageOlifeInf']]@dimSetNames, drop = FALSE]))
               obj@parameters[['mStorageOlifeInf']] <- .add_data(obj@parameters[['mStorageOlifeInf']], mStorageOlifeInf)
             }
             dsm <- obj@parameters[['mStorageOMCost']]@dimSetNames
