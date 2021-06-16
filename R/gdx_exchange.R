@@ -87,7 +87,6 @@
     wipe <- paste0(rep("\b", max_length + 3), collapse = "")
     x <- c(x, list(.df2uels(dat[[i]], i)))
   } 
-  browser()
   gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")
