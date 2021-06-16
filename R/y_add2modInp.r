@@ -684,10 +684,10 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             }
             dsm <- obj@parameters[['mStorageOMCost']]@dimSetNames
             mStorageOMCost <- NULL
-            if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageFixom[pStorageFixom$value != 0, dsm])
-            if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostInp[pStorageCostInp$value != 0, dsm])
-            if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostOut[pStorageCostOut$value != 0, dsm])
-            if (!is.null(mStorageOMCost)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostStore[pStorageCostStore$value != 0, dsm])
+            if (!is.null(pStorageFixom)) mStorageOMCost <- rbind(mStorageOMCost, pStorageFixom[pStorageFixom$value != 0, dsm])
+            if (!is.null(pStorageCostInp)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostInp[pStorageCostInp$value != 0, dsm])
+            if (!is.null(pStorageCostOut)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostOut[pStorageCostOut$value != 0, dsm])
+            if (!is.null(pStorageCostStore)) mStorageOMCost <- rbind(mStorageOMCost, pStorageCostStore[pStorageCostStore$value != 0, dsm])
             if (!is.null(mStorageOMCost)) {
               mStorageOMCost <- merge0(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
               obj@parameters[['mStorageOMCost']] <- .add_data(obj@parameters[['mStorageOMCost']], mStorageOMCost)
