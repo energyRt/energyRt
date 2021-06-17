@@ -21,17 +21,10 @@ print.commodity <- function(x) {
   }
   cat("Name: ", x@name, "\n")
   # if (x@type != '') cat('type: ', x@type, '\n')
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   # if (x@origin != '') cat('Region of origin: ',x@origin, '\n')
   if (!is.null(x@misc$color)) cat("color: ", x@misc$color, "\n")
-  if (length(x@source) != 0) {
-    cat("source:\n")
-    print(x@source)
-  }
-  if (length(x@other) != 0) {
-    cat("other:\n")
-    print(x@other)
-  }
+
   g <- getClass("commodity")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
     g@slots[[z]] ==
@@ -50,7 +43,7 @@ print.demand <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   cat("Commodity: ", x@commodity, "\n")
   g <- getClass("demand")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
@@ -72,7 +65,7 @@ print.equation <- function(x) {
     }
   }
   cat("Name: ", x@name, ", eq: ", as.character(x@eq), ", defVal: ", x@defVal, "\n", sep = "")
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   g <- getClass("equation")
   zz <- names(g@slots)[sapply(names(g@slots), function(z) {
     g@slots[[z]] ==
@@ -119,7 +112,7 @@ print.model <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   print(x@sysInfo)
   if (length(x@data) != 0) {
     for (i in 1:length(x@data)) {
@@ -133,14 +126,14 @@ print.model <- function(x) {
 print.region <- function(x) {
   cat("Name: ", x@name, "\n")
   # if (x@type != '') cat('type: ', x@type, '\n')
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   if (!is.null(x@misc$color)) cat("color: ", x@misc$color, "\n")
 }
 
 #------------------------------------------------------------------------------
 print.repository <- function(x) {
   cat("Name: ", x@name, "\n")
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   for (i in seq(along = x@data)) {
     cat(class(x@data[[i]]), " ", i, ":\n", sep = "")
     print(x@data[[i]])
@@ -150,7 +143,7 @@ print.repository <- function(x) {
 #------------------------------------------------------------------------------
 print.scenario <- function(x) {
   cat("Name: ", x@name, "\n")
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   if (!is.null(x@model)) {
     cat("Model:\n")
     print(x@model)
@@ -185,7 +178,7 @@ print.supply <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   cat("Commodity: ", x@commodity, "\n")
   # cat('Reserve: ', x@reserve, '\n')
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
@@ -209,7 +202,7 @@ print.technology <- function(x, ...) {
   }
   cat("Name: ", x@name, "\n")
   # if (x@type!='') cat('type: ', x@type, '\n')
-  if (x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   if (x@cap2act != "") cat("cap2act: ", x@cap2act, "\n")
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
   # if(!is.null(x@reporting_years)) cat('reporting years: ', x@reporting_years, '\n')
