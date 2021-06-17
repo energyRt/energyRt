@@ -104,7 +104,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
 .write_mapping <- function(prec, interpolation_time_begin, interpolation_count, len_name) {
   reduce.duplicate <- function(x) x[!duplicated(x),, drop = FALSE]
   bacs <- paste0(rep('\b', len_name), collapse = '')
-  rest = interpolation_count - 77;
+  rest = interpolation_count - 45;
   cat(paste0(rep(' ', len_name), collapse = ''))
   
   # Clean previous set data if any
