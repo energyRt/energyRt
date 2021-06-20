@@ -40,6 +40,8 @@ read.scenario <- function(scen, ...) {
   	gd = gdx(paste(arg$tmp.dir, '/output/output.gdx', sep = ''))
 	  for(i in c(vrb_list, vrb_list2)) {
 	    jj <- gd[i]
+	    if (length(grep('region', colnames(jj))) == 2)
+	    	colnames(jj)[grep('region', colnames(jj))] <- c('src', 'dst')
 	    if (ncol(jj) == 1) {
 	      rr$variables[[i]] <- data.frame(value = jj[1, 1])
 	    } else {
