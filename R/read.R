@@ -13,7 +13,7 @@ read.scenario <- function(scen, ...) {
     arg$tmp.dir <- scen@misc$tmp.dir 
     if (is.null(arg$tmp.dir))
       stop('Directory "tmp.dir" not specified')
-}
+  }
  # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
   vrb_list <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/variable_list.csv', sep = ''), stringsAsFactors = FALSE)$value
   if (file.exists(paste(arg$tmp.dir, '/output/variable_list2.csv', sep = ''))) {
@@ -23,7 +23,7 @@ read.scenario <- function(scen, ...) {
              set = arg$readOutputFunction(paste(arg$tmp.dir, '/output/raw_data_set.csv', sep = ''), stringsAsFactors = FALSE))
   # Read set and alias
   ss <- list()
-  for(k in unique(rr$set$set)) {
+  for (k in unique(rr$set$set)) {
     ss[[k]] <- rr$set$value[rr$set$set == k]
   }
   # add alias
@@ -35,26 +35,51 @@ read.scenario <- function(scen, ...) {
   ss$commp <- ss$comm
   ss$slicep <- ss$slice
   rr$set_vec <- ss
-
-  # Read variables
-  for(i in c(vrb_list, vrb_list2)) {
-    jj <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), 
-                                 stringsAsFactors = FALSE)
-    if (ncol(jj) == 1) {
-      rr$variables[[i]] <- data.frame(value = jj[1, 1])
-    } else {
-      for(j in seq_len(ncol(jj))[colnames(jj) != 'value']) {
-        # Remove [.][:digit:] if any
-        if (all(colnames(jj)[j] != names(rr$set_vec))) 
-          colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
-        # Save all data with all levels
-        if (colnames(jj)[j] != 'year')
-        	jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
-      }
-      rr$variables[[i]] <- jj
-    }
+  if (scen@solver$import_format == 'gdx') {
+  	# Read variables gdx
+  	gd = gdx(paste(arg$tmp.dir, '/output/output.gdx', sep = ''))
+	  for (i in c(vrb_list, vrb_list2)) {
+	    jj <- gd[i]
+	    if (length(grep('region', colnames(jj))) == 2)
+	    	colnames(jj)[grep('region', colnames(jj))] <- c('src', 'dst')
+	    if (ncol(jj) == 1) {
+	      rr$variables[[i]] <- data.frame(value = jj[1, 1])
+	    } else {
+	      for (j in seq_len(ncol(jj))[colnames(jj) != 'value']) {
+	        # Remove [.][:digit:] if any
+	        if (all(colnames(jj)[j] != names(rr$set_vec))) 
+	          colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
+	        # Save all data with all levels
+	        if (colnames(jj)[j] != 'year') {
+	          jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+	        } else {
+	          jj[, j] <- as.integer(jj[, j])
+	        }
+	        	
+	      }
+	      rr$variables[[i]] <- jj
+	    }
+	  }
+  } else {
+	  # Read variables csv
+	  for (i in c(vrb_list, vrb_list2)) {
+	    jj <- arg$readOutputFunction(paste(arg$tmp.dir, '/output/', i, '.csv', sep = ''), 
+	                                 stringsAsFactors = FALSE)
+	    if (ncol(jj) == 1) {
+	      rr$variables[[i]] <- data.frame(value = jj[1, 1])
+	    } else {
+	      for (j in seq_len(ncol(jj))[colnames(jj) != 'value']) {
+	        # Remove [.][:digit:] if any
+	        if (all(colnames(jj)[j] != names(rr$set_vec))) 
+	          colnames(jj)[j] <- gsub('[.].*', '', colnames(jj)[j])
+	        # Save all data with all levels
+	        if (colnames(jj)[j] != 'year')
+	        	jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+	      }
+	      rr$variables[[i]] <- jj
+	    }
+	  }
   }
-  
   scen@modOut <- new('modOut')
   # Read solution status
   scen@modOut@solutionLogs <- read.csv(paste(arg$tmp.dir, '/output/log.csv', sep = ''))
@@ -133,7 +158,7 @@ read.scenario <- function(scen, ...) {
       vTechEmsFuel$value <- vTechEmsFuel$x; vTechEmsFuel$x <- NULL
     } else {
       vTechEmsFuel <- data.frame(tech = character(), comm = character(), region = character(), 
-        year = numeric(), value = numeric(), stringsAsFactors=FALSE)
+        year = numeric(), value = numeric(), stringsAsFactors = FALSE)
     }
     scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
     
@@ -169,8 +194,8 @@ read.scenario <- function(scen, ...) {
    		scen@modOut@variables$vUserCosts <- costs_tot
   	}
   }
-  if(arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
-  scen@status$optimial <- TRUE
+  if (arg$echo) cat('Reading solution: ', round(proc.time()[3] - read_result_time, 2), 's\n', sep = '')
+  if (scen@modOut@stage == 'solved') scen@status$optimal <- TRUE
   invisible(scen)
 }
 

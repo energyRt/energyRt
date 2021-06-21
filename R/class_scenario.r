@@ -23,7 +23,7 @@ setClass("scenario",
           solver = list(),
           status = list(
             interpolated = FALSE,
-            optimial = FALSE),
+            optimal = FALSE),
           #! Misc
       misc = list(
       )),

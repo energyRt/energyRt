@@ -85,7 +85,7 @@
   for(i in nms){
     cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
     wipe <- paste0(rep("\b", max_length + 3), collapse = "")
-    x <- c(x, list(.df2uels(dat[[i]], i)))
+    x <- c(x, list(.df2uels(data.frame(dat[[i]]), i)))
   } 
   gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
   cat(wipe, sep = "")

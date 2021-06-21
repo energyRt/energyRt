@@ -45,21 +45,21 @@ findData <- function(scen, dataType = c("parameters", "variables"),
     lt <- lapply(dat, function(x) {
       if (dim(x)[1] > 0 || !dropEmpty) {
         list(
-          dim = if(dfDim) dim(x) else NULL,
-          names = if(dfNames) names(x) else NULL
+          dim = if (dfDim) dim(x) else NULL,
+          names = if (dfNames) names(x) else NULL
         )
       }
     })
     ll <- c(ll, lt)
   }
   
-  if(valueColumn) {
+  if (valueColumn) {
     ii <- sapply(ll,function(x) any(grepl("^value$", x$names, ignore.case = ignore.case)))
     ll <- ll[ii]
   }
   
   # browser()
-  if(length(setsNames_) > 0) {
+  if (length(setsNames_) > 0) {
     ii <- sapply(ll, function(x) {
       if (allSets) {
         all(sapply(setsNames_, function(y) any(grepl(y, x$names, ignore.case = ignore.case))))
@@ -70,7 +70,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
     ll <- ll[ii]
   }
 
-  if(length(dataType) > 0) warning("Data type '", dataType, "' is not found.")
+  if (length(dataType) > 0) warning("Data type '", dataType, "' is not found.")
   
   if (dropEmpty) {
     ii <- sapply(ll, is.null)
@@ -256,7 +256,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                 }
               }
             } else {
-              if(verbose) cat("   ", pv, " has no data.\n")
+              if (verbose) cat("   ", pv, " has no data.\n")
             }
           }
           # browser()
@@ -288,6 +288,22 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
   # }
   
   # browser()
+  force_format <- function(x) {
+    # converts sets-columns to strings, year to integer
+    cnames <- colnames(x)
+    # ex <- grepl("value|year")
+    for (j in 1:length(cnames)) {
+      if (cnames[j] == "value") {
+        x[[j]] <- as.numeric(x[[j]])
+      } else if (cnames[j] == "year") {
+        x[[j]] <- as.integer(x[[j]])
+      } else {
+        x[[j]] <- as.character(x[[j]])
+      }
+    }
+    x
+  }
+  ll <- lapply(ll, force_format) # Workaround for merging of inconsistent formats
   
   # Renaming sets
   if (!is.null(newNames)) {
@@ -303,13 +319,13 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       dat <- ll[[1]]
       for (i in 2:length(ll)) {
         suppressMessages(
-          suppressWarnings(dat <- dplyr::full_join(dat, ll[[i]])))
+          suppressWarnings({dat <- dplyr::full_join(dat, ll[[i]])}))
       }
     } else {
       dat <- NULL
     }
     if (!is.null(dat)) {
-      if(na.rm) {
+      if (na.rm) {
         ii <- rowSums(apply(dat, 2, is.na))
         dat <- dat[!ii,]
       }
