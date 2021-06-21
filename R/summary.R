@@ -4,6 +4,7 @@ summary.model <- function(mod) {
 }
 
 summary.scenario <- function(scen) {
+  # browser()
   cat("Scenario:", scen@name, "\n")
   cat("Model:", scen@model@name, "\n")
   cat("Interpolated:", scen@status$interpolated, "\n")
@@ -16,12 +17,17 @@ summary.scenario <- function(scen) {
       if (abs(dum) > 0) {
         cat("Dummy import/export costs: ", dum, "\n")
       }
-    } else { # not solved
-      cat("Solution status:", scen@modOut@stage,"\n")
+    } else if (is.null(scen@modOut)) { # not solved
+      cat("Solution status: not solved\n")
+    } else {
+      status <- try(scen@modOut@stage)
+      if (class(status) == "try-error") status <- "unknown"
+      cat("Solution status:", status,"\n")
     }
   }
   cat("Size:", size(scen),"\n")
 }
+
 
 summary.levcost <- function(x) x$total
 
