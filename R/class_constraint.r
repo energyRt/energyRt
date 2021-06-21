@@ -271,7 +271,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   } else for.each.set <- NULL
   # lhs
   for (i in seq_along(stm@lhs)) {
-    need.set <- .variable_set[[stm@lhs[[i]]@variable]]
+    # browser()
+    
+     need.set <- .variable_set[[stm@lhs[[i]]@variable]]
     nn <- (nn[length(nn)] + seq_along(need.set))
     all.set[nn, 'set'] <- need.set
     all.set[nn, 'alias'] <- need.set
@@ -337,7 +339,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     # copy new.map for lhs set that define in for each
     fl <- seq_len(nrow(all.set))[all.set$for.each & !is.na(all.set$new.map)]
     for (i in fl) {
-      all.set[!all.set$for.each & !all.set$def.lhs & all.set$set == all.set$set[i], 'new.map'] <- i
+      all.set[!all.set$for.each & !all.set$def.lhs & all.set$set == all.set$set[i], 'new.map'] <- all.set$new.map[i]
     }
   }
   if (nrow(all.set) > 0) {

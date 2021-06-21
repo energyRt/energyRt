@@ -45,7 +45,8 @@
     scen@solver$import_format <- 'gms'
   } else {
     scen@solver$import_format <- 'gdx'
-    scen@source[['GAMS_output']] <- 'execute_unload "output/output.gdx"'
+    scen@source[['GAMS_output']] <- c(scen@source[['GAMS_output']][grep('^file variable_list_csv', 
+        scen@source[['GAMS_output']]):length(scen@source[['GAMS_output']])], 'execute_unload "output/output.gdx"')
   }
   dir.create(paste(arg$tmp.dir, '/input', sep = ''), showWarnings = FALSE)
   dir.create(paste(arg$tmp.dir, '/output', sep = ''), showWarnings = FALSE)

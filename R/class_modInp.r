@@ -369,14 +369,13 @@ setMethod("initialize", "modInp",
     x[['mStorageNew']] <- newParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     x[['mStorageSpan']] <- newParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
     x[['mStorageEac']] <- newParameter('mStorageEac', c('stg', 'region', 'year'), 'map')    
-    x[['mStorageOMCost']] <- newParameter('mStorageOMCost', c('stg', 'region', 'year'), 'map')    
-    
+    x[['mStorageOMCost']] <- newParameter('mStorageOMCost', c('stg', 'region', 'year'), 'map')
     x[['mStorageAInp']] <- newParameter('mStorageAInp', c('stg', 'comm'), 'map', cls = 'storage')    
     x[['mStorageAOut']] <- newParameter('mStorageAOut', c('stg', 'comm'), 'map', cls = 'storage')    
     stg_tmp <- c('pStorageStg2AInp' = 'stg2ainp', 'pStorageStg2AOut' = 'stg2aout', 'pStorageCinp2AInp' = 'cinp2ainp', 'pStorageCinp2AOut' = 'cinp2aout', 
     	'pStorageCout2AInp' = 'cout2ainp', 
 				'pStorageCout2AOut' = 'cout2aout', 'pStorageCap2AInp' = 'cap2ainp', 'pStorageCap2AOut' = 'cap2aout', 'pStorageNCap2AInp' = 'ncap2ainp', 'pStorageNCap2AOut' = 'ncap2aout')
-    for(i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageCinp2AInp', 'pStorageCinp2AOut', 
+    for (i in c('pStorageStg2AInp', 'pStorageStg2AOut', 'pStorageCinp2AInp', 'pStorageCinp2AOut', 
     	'pStorageCout2AInp', 'pStorageCout2AOut', 'pStorageCap2AInp', 'pStorageCap2AOut', 
     	'pStorageNCap2AInp', 'pStorageNCap2AOut'))
       x[[i]] <- newParameter(i, c('stg', 'acomm', 'region', 'year', 'slice'), 'simple', 
@@ -823,13 +822,14 @@ setMethod("initialize", "modInp",
 }
 
 .drop_sysinfo_param <- function(modInp) {
-  for(i in c('pDiscount', 'pDummyImportCost', 'pDummyExportCost')) 
+  for (i in c('pDiscount', 'pDummyImportCost', 'pDummyExportCost')) 
     modInp@parameters[[i]] <- .reset(modInp@parameters[[i]])
   modInp
 }
 
 .get_stg_prm_lst <- function() {
   # vector with parameter-names, relevant to "storage"
+  # ? add mStorageOMCost?
   c('mStorageSlice', 'ndefpStorageOlife', 'mStorageComm',
     'mStorageNew', 'mStorageSpan', 'ndefpStorageCapUp', 
     'ndefpStorageAvaUp', 'pStorageInpLoss', 'pStorageOutLoss', 

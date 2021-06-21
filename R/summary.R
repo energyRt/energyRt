@@ -9,7 +9,7 @@ summary.scenario <- function(scen) {
   cat("Interpolated:", scen@status$interpolated, "\n")
   if (scen@status$interpolated) {
     if (!is.null(scen@modOut) && scen@modOut@stage == "solved") {
-      cat("Solution status: ", ifelse(scen@status$optimial, "", "NOT "), "optimal\n", sep = "")
+      cat("Solution status: ", ifelse(scen@status$optimal, "", "NOT "), "optimal\n", sep = "")
       vObj <- getData(scen, "vObjective", merge = T)
       cat("vObjective: ", vObj$value, "\n")
       dum <- sum(scen@modOut@variables$vDummyCost$value)
@@ -17,7 +17,7 @@ summary.scenario <- function(scen) {
         cat("Dummy import/export costs: ", dum, "\n")
       }
     } else { # not solved
-      cat("Solution status: not solved\n")
+      cat("Solution status:", scen@modOut@stage,"\n")
     }
   }
   cat("Size:", size(scen),"\n")

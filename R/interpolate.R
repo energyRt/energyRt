@@ -184,7 +184,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   ## Begin interpolate data   by year, slice, ...
   # Begin interpolate data  
   if (arg$echo) cat('Interpolation: ')
-  interpolation_count <- .get_objects_count(scen) + 57
+  interpolation_count <- .get_objects_count(scen) + 46
   len_name <- .get_objects_len_name(scen)
   if (arg$n.threads == 1) {
     scen <- .add2_nthreads_1(0, 1, scen, arg, approxim, interpolation_time_begin = interpolation_time_begin, 
