@@ -79,6 +79,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
   return(ll)
 }
 
+# @param drop if TRUE, the sets with only one unique value will be dropped (not implemented)
 #' Extracts information from scenario objects, based on filters.
 #'
 #' @param scen Object scenario or list with scenarios.
@@ -89,7 +90,8 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @param parameters if TRUE, parameters will be included in the search and returned if found.
 #' @param variables if TRUE, variables will be included in the search and returned if found.
 #' @param na.rm if TRUE, NA values will be dropped.
-#' @param drop if TRUE, the sets with only one unique value will be dropped (not implemented)
+#' @param digits if integer, indicates the number of decimal places for rounding, if NULL - no actions.
+#' @param drop.zeros logical, should rows containing zero values be filtered out.
 #' @param asTibble logical, if the data.frames should be converted into tibbles.
 #' @param newNames renaming sets, named character vector or list with new names as values, and old names as names - the input parameter to renameSets function. The operation is performed before merging the data (merge parameter).
 #' @param newValues revalue sets, named character vector or list with new values as values, and old values as names - the input parameter to revalueSets function. The operation is performed after merging the data (merge parameter).
@@ -110,10 +112,11 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'}
 getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                     parameters = TRUE, variables = TRUE, ignore.case = FALSE, 
-                    newNames = NULL, newValues = NULL, na.rm = FALSE, drop = FALSE,
+                    newNames = NULL, newValues = NULL, na.rm = FALSE, 
+                    digits = NULL, drop.zeros = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
                     asTibble = TRUE, stringsAsFactors = FALSE, yearsAsFactors = FALSE, 
-                    scenNameInList = as.logical(length(scen)-1), verbose = FALSE) {
+                    scenNameInList = as.logical(length(scen) - 1), verbose = FALSE) {
   
   arg <- list(...)
   argnam <- names(arg)
@@ -134,7 +137,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
   }
   # browser()
   # Select scenarios, check and add names if not provided
-  if(!is.list(scen)) {
+  if (!is.list(scen)) {
     scen <- list(scen)
     names(scen) <- scen[[1]]@name
   } else {
@@ -145,7 +148,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
     }
     scen <- scen[ii] # keep scenarios only
     nm <- names(scen)
-    if(is.null(nm)) nm <- rep("", length(scen))
+    if (is.null(nm)) nm <- rep("", length(scen))
     ii <- nm == ""
     nm[ii] <- sapply(scen[ii], function(x) x@name) # work on names
     names(scen) <- nm
@@ -205,7 +208,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
         ii <- nflt1 %in% clNames
         if (!all(ii)) warning("Sets '", paste(nflt1, collapse = "', '"), "' have not been found in scenario '", sc, "',", datype,"'.")
         # find all matching names of columns
-        ii <- sapply(clNames, function (x) {any(grepl(x, nflt1, ignore.case = ignore.case))})
+        ii <- sapply(clNames, function(x) {any(grepl(x, nflt1, ignore.case = ignore.case))})
         clNames <- clNames[ii]
         # browser()
         if (length(clNames) == 0) {
@@ -304,12 +307,35 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
     x
   }
   ll <- lapply(ll, force_format) # Workaround for merging of inconsistent formats
+
+  # Round
+  if (!is.null(digits)) {
+    stopifnot(is.numeric(digits))
+    ll <- lapply(ll, function(x) {mutate(x, value = round(value, digits = digits))})
+  }
+  
+  # Drop zeros
+  if (drop.zeros) {
+    ll <- lapply(ll, function(x) {
+      x <- filter(x, value != 0)
+      if (nrow(x) == 0) return(NULL)
+      return(x)
+    })
+    }
+
+  ii <- sapply(ll, is.null)
+  if (all(ii)) {
+    ll <- list()
+  } else {
+    ll <- ll[!ii]
+  }
   
   # Renaming sets
   if (!is.null(newNames)) {
-    for (i in 1:length(ll)) {
-      ll[[i]] <- renameSets(ll[[i]], newNames)
-    }
+    # for (i in 1:length(ll)) {
+    #   ll[[i]] <- renameSets(ll[[i]], newNames)
+    # }
+    ll <- lapply(ll, function(x) renameSets(x, newNames))
   }
   
   if (merge) {
