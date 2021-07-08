@@ -155,17 +155,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   obj@parameters[['pExportRowRes']] <- .add_data(obj@parameters[['pExportRowRes']], pExportRowRes)
   pExportRow <- multiInterpolation(exp@exp, 'exp', obj@parameters[['pExportRow']], approxim, 'expp', exp@name)
   obj@parameters[['pExportRow']] <- .add_data(obj@parameters[['pExportRow']], pExportRow)
-  
+
  mExportRow <- merge0(merge0(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
   if (!is.null(pExportRow) && nrow(pExportRow) != 0) {
     pExportRow2 <- pExportRow[pExportRow$type == 'up' & pExportRow$value == 0, colnames(pExportRow) %in% colnames(mExportRow), drop = FALSE]
     if (nrow(pExportRow2) != 0) {
-      pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
+      # pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
       if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge0(mExportRow, pExportRow2)
       mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),, drop = FALSE]
     }
   }
-  mExportRow$comm <- exp@commodity
+ mExportRow$comm <- exp@commodity
   obj@parameters[['mExportRow']] <- .add_data(obj@parameters[['mExportRow']], mExportRow)
   if (!is.null(pExportRow) && any(pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0)) {
     mExportRowUp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, colnames(pExportRow) %in% obj@parameters[['mExportRowUp']]@dimSetNames, drop = FALSE]
