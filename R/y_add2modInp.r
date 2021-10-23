@@ -978,6 +978,8 @@ setMethod(
     dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
     obj@parameters[['mTechNew']] <- .add_data(obj@parameters[['mTechNew']], dd0$new)
     
+
+    
     invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
     if (!is.null(invcost)) {
       minvcost <- merge0(dd0$new, invcost) 
@@ -1586,7 +1588,8 @@ setMethod(
       invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
       invcost <- invcost[invcost$value != 0,, drop = FALSE]
       if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,, drop = FALSE]
-      if (nrow(invcost) == 0) invcost <- NULL
+
+      if (!is.null(invcost) && nrow(invcost) == 0) invcost <- NULL
       stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
       obj@parameters[['pTradeStock']] <- .add_data(obj@parameters[['pTradeStock']], stock_exist)
       obj@parameters[['pTradeOlife']] <- .add_data(obj@parameters[['pTradeOlife']], 
