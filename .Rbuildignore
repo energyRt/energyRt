@@ -7,3 +7,4 @@ solwork/
 tmp/
 .gpr
 ^\.github$
+^vignettes/articles$

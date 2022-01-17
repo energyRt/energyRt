@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://energyRt.org/404.html</loc>
+  </url>
+  <url>
+    <loc>https://energyRt.org/articles/articles/model.html</loc>
+  </url>
+  <url>
+    <loc>https://energyRt.org/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://energyRt.org/articles/model.html</loc>
+  </url>
+  <url>
+    <loc>https://energyRt.org/articles/utopia.html</loc>
+  </url>
+  <url>
+    <loc>https://energyRt.org/authors.html</loc>
+  </url>
+  <url>
     <loc>https://energyRt.org/index.html</loc>
+  </url>
+  <url>
+    <loc>https://energyRt.org/LICENSE-text.html</loc>
   </url>
   <url>
     <loc>https://energyRt.org/reference/addCenters.html</loc>
@@ -23,6 +44,9 @@
   </url>
   <url>
     <loc>https://energyRt.org/reference/getData.html</loc>
+  </url>
+  <url>
+    <loc>https://energyRt.org/reference/index.html</loc>
   </url>
   <url>
     <loc>https://energyRt.org/reference/lcompare.html</loc>
@@ -86,8 +110,5 @@
   </url>
   <url>
     <loc>https://energyRt.org/reference/write.scenario.html</loc>
-  </url>
-  <url>
-    <loc>https://energyRt.org/articles/utopia.html</loc>
   </url>
 </urlset>

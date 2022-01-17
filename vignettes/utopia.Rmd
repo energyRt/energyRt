@@ -87,6 +87,7 @@ library(energyRt)
 library(scales)
 library(tidyverse)
 library(lubridate)
+library(data.table)
 
 # Set color palette for figures
 # palette(RColorBrewer::brewer.pal(11, "Paired"))
@@ -103,7 +104,7 @@ par(mfrow = c(2, 2), mar = seq(0.1, 4))
 maps <- c("utopia_island", "utopia_continent", "utopia_squares", "utopia_honeycomb")
 for (i in 1:4) {
   gis <- get(data(list = maps[i])) # load map
-  plot(gis, col = 1:length(gis), main = maps[i], bg = "aliceblue")
+  sp::plot(gis, col = 1:length(gis), main = maps[i], bg = "aliceblue")
   cn <- get_labpt_spdf(gis) # get coordinates of the regions' centers
   text(cn$x, cn$y)
 }
