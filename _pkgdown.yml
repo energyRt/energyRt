@@ -3,7 +3,7 @@ url: https://energyRt.org
 title: energyRt
 
 development:
-  mode: devel
+  mode: unreleased
   version_label: info
 
 template:
