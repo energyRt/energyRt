@@ -253,7 +253,7 @@
       }
     }
     if (any(grep('^cost[.]', colnames(dsc)))) {
-      dsc[, 'fuel.cost'] <- dsc[, grep('^cost[.]', colnames(dsc))]
+      dsc[, 'fuel.cost'] <- rowSums(dsc[, grep('^cost[.]', colnames(dsc)), drop = FALSE])
     } else dsc$fuel.cost <- 0
     if (any(grep('^tax[.]', colnames(dsc)))) {
       dsc[, 'fuel.tax'] <- dsc[, grep('^tax[.]', colnames(dsc))]
@@ -275,6 +275,7 @@
       gvar <- tapply(gvar$value.x * gvar$value.y, gvar$year, sum)
       dsc[names(gvar), 'varom'] <- gvar
     }
+
     gvar <- merge(
       rr@modInp@parameters$pTechCvarom@data,
       rbind(
@@ -294,6 +295,7 @@
     dsc$total.cost <- apply(dsc[, c('fuel.total', 'invcost', 'fixom', 'varom')], 1, sum)
     dsc[, 'total.discount.cost'] <- dsc[, 'total.cost'] * dsc[, 'discount.factor']
   dd <- sum(dsc[, 'discount.factor'])
+
   structure(list(total = (sum(dsc[, 'total.discount.cost'] ) / sum(dd)), 
     invcost = sum(dsc[, 'invcost'] * dsc[, 'discount.factor']) / dd,
     fixom = sum(dsc[, 'fixom'] * dsc[, 'discount.factor']) / dd, 
