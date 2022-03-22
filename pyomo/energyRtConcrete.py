@@ -195,7 +195,7 @@ model.eqTechAfcInpUp = Constraint(meqTechAfcInpUp, rule = lambda model, t, r, c,
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechCap ", end = "")
 # eqTechCap(tech, region, year)$mTechSpan(tech, region, year)
-model.eqTechCap = Constraint(mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  pTechStock.get((t,r,y))-(model.vTechRetiredStock[t,r,y] if (t,r,y) in mvTechRetiredStock else 0)+sum(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredNewCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetiredNewCap and ordYear.get((y)) >= ordYear.get((ye)))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
+model.eqTechCap = Constraint(mTechSpan, rule = lambda model, t, r, y : model.vTechCap[t,r,y]  ==  pTechStock.get((t,r,y))-(model.vTechRetiredStock[t,r,y] if (t,r,y) in mvTechRetiredStock else 0)+sum(pPeriodLen.get((yp))*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredNewCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetiredNewCap and ordYear.get((y)) >= ordYear.get((ye))))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechRetiredNewCap ", end = "")
 # eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
@@ -207,7 +207,7 @@ model.eqTechRetiredStock = Constraint(mvTechRetiredStock, rule = lambda model, t
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechEac ", end = "")
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
-model.eqTechEac = Constraint(mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(pTechEac.get((t,r,yp))*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredNewCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetiredNewCap and ordYear.get((y)) >= ordYear.get((ye))))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
+model.eqTechEac = Constraint(mTechEac, rule = lambda model, t, r, y : model.vTechEac[t,r,y]  ==  sum(pTechEac.get((t,r,yp))*pPeriodLen.get((yp))*(model.vTechNewCap[t,r,yp]-sum(model.vTechRetiredNewCap[t,r,yp,ye] for ye in year if ((t,r,yp,ye) in mvTechRetiredNewCap and ordYear.get((y)) >= ordYear.get((ye))))) for yp in year if ((t,r,yp) in mTechNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTechOlife.get((t,r))+ordYear.get((yp)) or (t,r) in mTechOlifeInf))));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechInv ", end = "")
 # eqTechInv(tech, region, year)$mTechInv(tech, region, year)
@@ -295,7 +295,7 @@ model.eqStorageOutLo = Constraint(meqStorageOutLo, rule = lambda model, st1, c, 
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageCap ", end = "")
 # eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)
-model.eqStorageCap = Constraint(mStorageSpan, rule = lambda model, st1, r, y : model.vStorageCap[st1,r,y]  ==  pStorageStock.get((st1,r,y))+sum(model.vStorageNewCap[st1,r,yp] for yp in year if (ordYear.get((y)) >= ordYear.get((yp)) and ((st1,r) in mStorageOlifeInf or ordYear.get((y))<pStorageOlife.get((st1,r))+ordYear.get((yp))) and (st1,r,yp) in mStorageNew)));
+model.eqStorageCap = Constraint(mStorageSpan, rule = lambda model, st1, r, y : model.vStorageCap[st1,r,y]  ==  pStorageStock.get((st1,r,y))+sum(pPeriodLen.get((yp))*model.vStorageNewCap[st1,r,yp] for yp in year if (ordYear.get((y)) >= ordYear.get((yp)) and ((st1,r) in mStorageOlifeInf or ordYear.get((y))<pStorageOlife.get((st1,r))+ordYear.get((yp))) and (st1,r,yp) in mStorageNew)));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageInv ", end = "")
 # eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)
@@ -303,7 +303,7 @@ model.eqStorageInv = Constraint(mStorageNew, rule = lambda model, st1, r, y : mo
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageEac ", end = "")
 # eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)
-model.eqStorageEac = Constraint(mStorageEac, rule = lambda model, st1, r, y : model.vStorageEac[st1,r,y]  ==  sum(pStorageEac.get((st1,r,yp))*model.vStorageNewCap[st1,r,yp] for yp in year if ((st1,r,yp) in mStorageNew and ordYear.get((y)) >= ordYear.get((yp)) and ((st1,r) in mStorageOlifeInf or ordYear.get((y))<pStorageOlife.get((st1,r))+ordYear.get((yp))) and pStorageInvcost.get((st1,r,yp)) != 0)));
+model.eqStorageEac = Constraint(mStorageEac, rule = lambda model, st1, r, y : model.vStorageEac[st1,r,y]  ==  sum(pStorageEac.get((st1,r,yp))*pPeriodLen.get((yp))*model.vStorageNewCap[st1,r,yp] for yp in year if ((st1,r,yp) in mStorageNew and ordYear.get((y)) >= ordYear.get((yp)) and ((st1,r) in mStorageOlifeInf or ordYear.get((y))<pStorageOlife.get((st1,r))+ordYear.get((yp))) and pStorageInvcost.get((st1,r,yp)) != 0)));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageCost ", end = "")
 # eqStorageCost(stg, region, year)$mStorageOMCost(stg, region, year)
@@ -375,7 +375,7 @@ model.eqTradeCapFlow = Constraint(meqTradeCapFlow, rule = lambda model, t1, c, y
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTradeCap ", end = "")
 # eqTradeCap(trade, year)$mTradeSpan(trade, year)
-model.eqTradeCap = Constraint(mTradeSpan, rule = lambda model, t1, y : model.vTradeCap[t1,y]  ==  pTradeStock.get((t1,y))+sum(model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mTradeNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
+model.eqTradeCap = Constraint(mTradeSpan, rule = lambda model, t1, y : model.vTradeCap[t1,y]  ==  pTradeStock.get((t1,y))+sum(pPeriodLen.get((yp))*model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mTradeNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTradeInv ", end = "")
 # eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)
@@ -383,7 +383,7 @@ model.eqTradeInv = Constraint(mTradeInv, rule = lambda model, t1, r, y : model.v
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTradeEac ", end = "")
 # eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)
-model.eqTradeEac = Constraint(mTradeEac, rule = lambda model, t1, r, y : model.vTradeEac[t1,r,y]  ==  sum(pTradeEac.get((t1,r,yp))*model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mTradeNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
+model.eqTradeEac = Constraint(mTradeEac, rule = lambda model, t1, r, y : model.vTradeEac[t1,r,y]  ==  sum(pTradeEac.get((t1,r,yp))*pPeriodLen.get((yp))*model.vTradeNewCap[t1,yp] for yp in year if ((t1,yp) in mTradeNew and ordYear.get((y)) >= ordYear.get((yp)) and (ordYear.get((y))<pTradeOlife.get((t1))+ordYear.get((yp)) or t1 in mTradeOlifeInf))));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTradeIrAInp ", end = "")
 # eqTradeIrAInp(trade, comm, region, year, slice)$mvTradeIrAInp(trade, comm, region, year, slice)
