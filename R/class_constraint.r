@@ -375,7 +375,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         }
       }
       tmp_fe <- rbind(merge(tmp_fe[, colnames(tmp_fe) != i, drop = FALSE], tmg),
-        tmp_fe[!is.na(tmp_fe[[i]]),, drop = FALSE])
+                      tmp_fe[!is.na(tmp_fe[[i]]),, drop = FALSE])
       tmp_fe <- tmp_fe[!duplicated(tmp_fe),, drop = FALSE]
     }
     stm@for.each <- tmp_fe
@@ -392,10 +392,44 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
   if (nrow(stm@for.each) > 0) {
     nmn <- paste0('mCnsForEach', stm@name)
     prec@parameters[[nmn]] <- .add_data(newParameter(nmn, colnames(stm@for.each), 'map'),
-      stm@for.each)
+                                        stm@for.each)
     res$equation <- paste0(res$equation, '$', nmn, '(', paste0(colnames(stm@for.each), collapse = ', '), ')')
   }
   res$equation <- paste0(res$equation, '.. ')
+  
+ # Add eq
+  res$equation <- paste0(res$equation, ' ### ', c('==' = '=e=', '>=' = '=g=', '<=' = '=l=')[as.character(stm@eq)], ' ')
+  # Add rhs
+  if (nrow(stm@rhs) != 0 && (any(stm@rhs$rhs != 0) || (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
+    # Complicated rhs
+    # Generate approxim
+    approxim2 <- approxim[unique(c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)], 'solver', 'year'))]
+    if (any(names(approxim2) == 'slice')) {
+      approxim2$slice <- approxim2$slice@all_slice
+    }
+    fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
+    need.set <- all.set[fl,, drop = FALSE]
+    for (j in seq_len(nrow(need.set))) {
+      approxim2[[need.set[j, 'set']]] <- set.map[[need.set[j, 'new.map']]]
+    }
+    approxim2$fullsets <- approxim$fullsets
+    need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
+    xx <- newParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
+                          interpolation = 'back.inter.forth', colName = 'rhs')
+    yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
+    n1 <- colnames(yy)[colnames(yy) != 'value']
+    yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 
+      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, drop = FALSE]
+    prec@parameters[[xx@name]] <- .add_data(xx, yy)
+    # Add mult
+    res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')
+  } else {
+    res$equation <- paste0(res$equation, stm@defVal)
+  }
+  
+  # Add lhs
+  lhs_equation <- ''
+
   # Add lhs to equation
   lhs.set <- all.set[!all.set$for.each,, drop = FALSE]
   for (i in seq_along(stm@lhs)) {
@@ -424,10 +458,28 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       
       for (j in seq_len(nrow(need.set2))) {
         approxim2[[need.set2[j, 'set']]] <- set.map[[need.set2[j, 'new.map']]]
+        
+        if (any(colnames(stm@lhs[[i]]@mult) %in% c(need.set, 'value'))) {
+          if (!all(colnames(stm@lhs[[i]]@mult) %in% c(for.each.set, need.set, 'value'))) 
+            stop(paste0('There are unknown set in constraint ', stm@name, ', mult ', i, ': "', 
+                        paste0(colnames(stm@lhs[[i]]@mult)[!(colnames(stm@lhs[[i]]@mult) %in% c(for.each.set, 'value'))], collapse = '", "'), '"'))
+          # Add set that from  for.each
+          nslc <- colnames(stm@lhs[[i]]@mult)[!(colnames(stm@lhs[[i]]@mult) %in% c(need.set, 'value'))]
+          need.set <- c(need.set, nslc)
+          if (nrow(stm@for.each) > 0) {
+            for (j in nslc)
+              approxim2[[j]] <- unique(stm@for.each[[j]])
+          } else {
+            for (j in nslc)
+              approxim2[[j]] <- approxim[[j]]
+            if (any(nslc == 'slice')) approxim2$slice <- approxim$slice@all_slice
+          }
+        }
       }
       approxim2$fullsets <- approxim$fullsets
+      
       xx <- newParameter(paste0('pCnsMult', stm@name, '_', i), need.set, 'simple', defVal = stm@lhs[[i]]@defVal, 
-                            interpolation = 'back.inter.forth')
+                         interpolation = 'back.inter.forth')
       prec@parameters[[xx@name]] <- .add_data(xx, simpleInterpolation(stm@lhs[[i]]@mult, 'value', xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
         yy <- .add_dropped_zeros(prec, xx@name)
@@ -447,9 +499,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     }
     vrb.lhs <- gsub('[ ]*[$][ ]*', '$', gsub('[ ]*[)]', ')', gsub('[ ]*[(][ ]*', '(', gsub('[ ]*[,][ ]*', ', ', vrb.lhs))))
     # Generate data to equation
-    if (i != 1) res$equation <- paste0(res$equation, '+')
+    if (i != 1) lhs_equation <- paste0(lhs_equation, '+')
     if (all(!lhs.set2$def.lhs)) {
-      res$equation <- paste0(res$equation, vrb.lhs)
+      lhs_equation <- paste0(lhs_equation, vrb.lhs)
     } else {
       lhs.set3 <- lhs.set2[lhs.set2$def.lhs,, drop = FALSE]
       cnd <- NULL
@@ -472,50 +524,25 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       }
       # Finish for sum
       if (sum(lhs.set2$def.lhs) == 1) {
-        res$equation <- paste0(res$equation, ' sum(', lhs.set3$alias);
+        lhs_equation <- paste0(lhs_equation, ' sum(', lhs.set3$alias);
       } else {
-        res$equation <- paste0(res$equation, ' sum((', paste0(lhs.set3$alias, collapse = ', '), ')');
+        lhs_equation <- paste0(lhs_equation, ' sum((', paste0(lhs.set3$alias, collapse = ', '), ')');
       }
       if (length(cnd) > 1 || any(grep('[ )]and[ (]', cnd))) {
-        res$equation <- paste0(res$equation, '$(', paste0(cnd, collapse = ' and '), '), ', vrb.lhs, ')')
+        lhs_equation <- paste0(lhs_equation, '$(', paste0(cnd, collapse = ' and '), '), ', vrb.lhs, ')')
       } else if (length(cnd) == 1) {
-        res$equation <- paste0(res$equation, '$', cnd, ', ', vrb.lhs, ')')
+        lhs_equation <- paste0(lhs_equation, '$', cnd, ', ', vrb.lhs, ')')
       } else {
         stop('error!')
       }
     }
   }
- # Add eq
-  res$equation <- paste0(res$equation, ' ', c('==' = '=e=', '>=' = '=g=', '<=' = '=l=')[as.character(stm@eq)], ' ')
-  # Add rhs
-  if (nrow(stm@rhs) != 0 && (any(stm@rhs$rhs != 0) || (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
-    # Complicated rhs
-    # Generate approxim
-    approxim2 <- approxim[unique(c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)], 'solver', 'year'))]
-    if (any(names(approxim2) == 'slice')) {
-      approxim2$slice <- approxim2$slice@all_slice
-    }
-    fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
-    need.set <- all.set[fl,, drop = FALSE]
-    for (j in seq_len(nrow(need.set))) {
-      approxim2[[need.set[j, 'set']]] <- set.map[[need.set[j, 'new.map']]]
-    }
-    approxim2$fullsets <- approxim$fullsets
-    need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
-    xx <- newParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
-                          interpolation = 'back.inter.forth', colName = 'rhs')
-    yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
-    n1 <- colnames(yy)[colnames(yy) != 'value']
-    yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 
-      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = '##')),, drop = FALSE]
-    prec@parameters[[xx@name]] <- .add_data(xx, yy)
-    # Add mult
-    res$equation <- paste0(res$equation, xx@name, '(', paste0(need.set0, collapse = ', '), ')')
-  } else {
-    res$equation <- paste0(res$equation, stm@defVal)
-  }
+  
+  res$equation <- gsub('###', lhs_equation, res$equation)
+  
   res$equation <- gsub('[+][[:blank:]]*[-]', '-', res$equation)
   res$equation <- paste0(res$equation, ';')
+  
   prec@gams.equation[[stm@name]] <- res
   prec
 }

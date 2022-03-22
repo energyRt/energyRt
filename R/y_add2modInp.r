@@ -155,17 +155,17 @@ setMethod('.add0', signature(obj = 'modInp', app = 'export',
   obj@parameters[['pExportRowRes']] <- .add_data(obj@parameters[['pExportRowRes']], pExportRowRes)
   pExportRow <- multiInterpolation(exp@exp, 'exp', obj@parameters[['pExportRow']], approxim, 'expp', exp@name)
   obj@parameters[['pExportRow']] <- .add_data(obj@parameters[['pExportRow']], pExportRow)
-  
+
  mExportRow <- merge0(merge0(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
   if (!is.null(pExportRow) && nrow(pExportRow) != 0) {
     pExportRow2 <- pExportRow[pExportRow$type == 'up' & pExportRow$value == 0, colnames(pExportRow) %in% colnames(mExportRow), drop = FALSE]
     if (nrow(pExportRow2) != 0) {
-      pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
+      # pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
       if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge0(mExportRow, pExportRow2)
       mExportRow <- mExportRow[(!duplicated(rbind(mExportRow, pExportRow2), fromLast = TRUE)[1:nrow(mExportRow)]),, drop = FALSE]
     }
   }
-  mExportRow$comm <- exp@commodity
+ mExportRow$comm <- exp@commodity
   obj@parameters[['mExportRow']] <- .add_data(obj@parameters[['mExportRow']], mExportRow)
   if (!is.null(pExportRow) && any(pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0)) {
     mExportRowUp <- pExportRow[pExportRow$type == 'up' & pExportRow$value != Inf & pExportRow$value != 0, colnames(pExportRow) %in% obj@parameters[['mExportRowUp']]@dimSetNames, drop = FALSE]
@@ -678,7 +678,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
               mStorageOlifeInf <- pStorageOlife[pStorageOlife$olife != Inf, colnames(pStorageOlife) %in% 
                                                   obj@parameters[['mStorageOlifeInf']]@dimSetNames, drop = FALSE]
               if (ncol(mStorageOlifeInf) != ncol(obj@parameters[['mStorageOlifeInf']]@data))
-                mStorageOlifeInf <- merge0(mStorageOlifeInf, mStorageSpan[, colnames(mStorageSpan) %in% 
+                mStorageOlifeInf <- merge0(mStorageOlifeInf, mStorageSpan[!duplicated(mStorageSpan$region), colnames(mStorageSpan) %in% 
                                                                            obj@parameters[['mStorageOlifeInf']]@dimSetNames, drop = FALSE])
               obj@parameters[['mStorageOlifeInf']] <- .add_data(obj@parameters[['mStorageOlifeInf']], mStorageOlifeInf)
             }
@@ -977,6 +977,8 @@ setMethod(
     dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
     dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
     obj@parameters[['mTechNew']] <- .add_data(obj@parameters[['mTechNew']], dd0$new)
+    
+
     
     invcost <- simpleInterpolation(tech@invcost, 'invcost', obj@parameters[['pTechInvcost']], approxim, 'tech', tech@name)
     if (!is.null(invcost)) {
@@ -1586,7 +1588,8 @@ setMethod(
       invcost <- simpleInterpolation(trd@invcost, 'invcost', obj@parameters[['pTradeInvcost']], approxim, 'trade', trd@name)
       invcost <- invcost[invcost$value != 0,, drop = FALSE]
       if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end,, drop = FALSE]
-      if (nrow(invcost) == 0) invcost <- NULL
+
+      if (!is.null(invcost) && nrow(invcost) == 0) invcost <- NULL
       stock_exist <- simpleInterpolation(trd@stock, 'stock', obj@parameters[['pTradeStock']], approxim, 'trade', trd@name)
       obj@parameters[['pTradeStock']] <- .add_data(obj@parameters[['pTradeStock']], stock_exist)
       obj@parameters[['pTradeOlife']] <- .add_data(obj@parameters[['pTradeOlife']], 
