@@ -48,8 +48,8 @@ setMethod("initialize", "parameter",
   if (length(check) != 0 && (length(check) != 1 || !is.function(check)))
     stop('Wrong check function')
   if (any(!is.numeric(defVal))) stop('Wrong defVal value')
-  if (any(!is.character(interpolation)) || gsub('[.]', '',
-      sub('forth', '', sub('inter', '', sub('back', '', interpolation)))) != '')
+  if (any(!is.character(interpolation)) || any(gsub('[.]', '',
+      sub('forth', '', sub('inter', '', sub('back', '', interpolation)))) != ''))
           stop('Wrong interpolation rule')
   if (type == 'simple' && length(defVal) != 1) stop('Wrong defVal value')
   if (type == 'multi' && length(defVal) == 0) stop('Wrong defVal value')
@@ -85,8 +85,10 @@ setMethod("initialize", "parameter",
   .Object
 })
 
-newParameter <- function(...) new('parameter', ...)
-
+newParameter <- function(...) {
+  assign('dbtbs', list(...), globalenv())
+  new('parameter', ...)
+}
 .resetParameter <- function(x) {
   x@data <- x@data[0,, drop = FALSE]
   if (x@nValues > 0) x@nValues <- 0
