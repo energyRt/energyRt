@@ -85,10 +85,8 @@ setMethod("initialize", "parameter",
   .Object
 })
 
-newParameter <- function(...) {
-  assign('dbtbs', list(...), globalenv())
-  new('parameter', ...)
-}
+newParameter <- function(...) new('parameter', ...)
+
 .resetParameter <- function(x) {
   x@data <- x@data[0,, drop = FALSE]
   if (x@nValues > 0) x@nValues <- 0
