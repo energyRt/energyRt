@@ -458,9 +458,9 @@ s.t.  eqTechAfsLo{(t, r, y, s) in meqTechAfsLo}: pTechAfsLo[t,r,y,s]*pTechCap2ac
 
 s.t.  eqTechAfsUp{(t, r, y, s) in meqTechAfsUp}: sum{sp in slice:((s,sp) in mSliceParentChildE)}(sum{FORIF: (t,r,y,sp) in mvTechAct} (vTechAct[t,r,y,sp])) <=  pTechAfsUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{wth1 in weather:((wth1,t) in mTechWeatherAfsUp)}(pTechWeatherAfsUp[wth1,t]*pWeather[wth1,r,y,s]);
 
-s.t.  eqTechRampUp{(t, r, y, s) in mTechRampUp}: (vTechAct[t,r,y,s]) / (pSliceShare[s])-sum{sp in slice:((((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct))}((vTechAct[t,r,y,sp]) / (pSliceShare[sp])) <=  (pSliceShare[s]*365*24*pTechCap2act[t]*vTechCap[t,r,y]) / (pTechRampUp[t,r,y,s]);
+s.t.  eqTechRampUp{(t, r, y, s) in mTechRampUp}: vTechAct[t,r,y,s]-sum{sp in slice:((((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct))}(vTechAct[t,r,y,sp]) <=  pSliceShare[s]*pTechRampUp[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y];
 
-s.t.  eqTechRampDown{(t, r, y, s) in mTechRampDown}: sum{sp in slice:((((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct))}((vTechAct[t,r,y,sp]) / (pSliceShare[sp]))-(vTechAct[t,r,y,s]) / (pSliceShare[s]) <=  (pSliceShare[s]*365*24*pTechCap2act[t]*vTechCap[t,r,y]) / (pTechRampDown[t,r,y,s]);
+s.t.  eqTechRampDown{(t, r, y, s) in mTechRampDown}: sum{sp in slice:((((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct))}(vTechAct[t,r,y,sp])-vTechAct[t,r,y,s] <=  pSliceShare[s]*pTechRampDown[t,r,y,s]*pTechCap2act[t]*vTechCap[t,r,y];
 
 s.t.  eqTechActSng{(t, c, r, y, s) in meqTechActSng}: vTechAct[t,r,y,s]  =  (vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]);
 

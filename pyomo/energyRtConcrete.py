@@ -163,11 +163,11 @@ model.eqTechAfsUp = Constraint(meqTechAfsUp, rule = lambda model, t, r, y, s : s
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechRampUp ", end = "")
 # eqTechRampUp(tech, region, year, slice)$mTechRampUp(tech, region, year, slice)
-model.eqTechRampUp = Constraint(mTechRampUp, rule = lambda model, t, r, y, s : (model.vTechAct[t,r,y,s]) / (pSliceShare.get((s)))-sum((model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp))) for sp in slice if (((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct)) <=  (pSliceShare.get((s))*365*24*pTechCap2act.get((t))*model.vTechCap[t,r,y]) / (pTechRampUp.get((t,r,y,s))));
+model.eqTechRampUp = Constraint(mTechRampUp, rule = lambda model, t, r, y, s : model.vTechAct[t,r,y,s]-sum(model.vTechAct[t,r,y,sp] for sp in slice if (((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct)) <=  pSliceShare.get((s))*pTechRampUp.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]);
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechRampDown ", end = "")
 # eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slice)
-model.eqTechRampDown = Constraint(mTechRampDown, rule = lambda model, t, r, y, s : sum((model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp))) for sp in slice if (((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct))-(model.vTechAct[t,r,y,s]) / (pSliceShare.get((s))) <=  (pSliceShare.get((s))*365*24*pTechCap2act.get((t))*model.vTechCap[t,r,y]) / (pTechRampDown.get((t,r,y,s))));
+model.eqTechRampDown = Constraint(mTechRampDown, rule = lambda model, t, r, y, s : sum(model.vTechAct[t,r,y,sp] for sp in slice if (((t in mTechFullYear and (sp,s) in mSliceNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceFYearNext)) and (t,r,y,sp) in mvTechAct))-model.vTechAct[t,r,y,s] <=  pSliceShare.get((s))*pTechRampDown.get((t,r,y,s))*pTechCap2act.get((t))*model.vTechCap[t,r,y]);
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechActSng ", end = "")
 # eqTechActSng(tech, comm, region, year, slice)$meqTechActSng(tech, comm, region, year, slice)
