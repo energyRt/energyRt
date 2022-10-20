@@ -362,10 +362,10 @@ setMethod("initialize", "modInp",
     
     x[['pStorageCap2stg']] <- newParameter('pStorageCap2stg', 'stg', 'simple', 
     	defVal = 1, interpolation = 'back.inter.forth', cls = 'storage')#, colName = 'cap2stg', slot = 'cap2stg')    
-    x[['pStorageCinp']] <- newParameter('pStorageCinp', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
-    	defVal = c(0, -1), interpolation = rep('back.inter.forth', 2), cls = 'storage', colName = c('cinp.lo', 'cinp.up'), slot = 'seff')
+	    x[['pStorageCinp']] <- newParameter('pStorageCinp', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
+	    	defVal = c(0, -1), interpolation = 'back.inter.forth', cls = 'storage', colName = c('cinp.lo', 'cinp.up'), slot = 'af')
     x[['pStorageCout']] <- newParameter('pStorageCout', c('stg', 'comm', 'region', 'year', 'slice'), 'multi', 
-    	defVal = c(0, -1), interpolation = rep('back.inter.forth', 2), cls = 'storage', colName = c('cinp.lo', 'cinp.up'), slot = 'seff')
+    	defVal = c(0, -1), interpolation = 'back.inter.forth', cls = 'storage', colName = c('cout.lo', 'cout.up'), slot = 'af')
     x[['mStorageNew']] <- newParameter('mStorageNew', c('stg', 'region', 'year'), 'map')    
     x[['mStorageSpan']] <- newParameter('mStorageSpan', c('stg', 'region', 'year'), 'map')    
     x[['mStorageEac']] <- newParameter('mStorageEac', c('stg', 'region', 'year'), 'map')    
