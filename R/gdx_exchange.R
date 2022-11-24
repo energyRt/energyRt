@@ -19,7 +19,7 @@
 }
 
 .df2uels <- function(df, name = "x", value = "value") {
-  # The function takes data frame or character vector and returns
+  # The function takes data.frame or character vector and returns
   # named list for exporting to GDX-file using gdxrrw
   if (!is.data.frame(df)) {
     df <- data.frame(df)
@@ -75,7 +75,7 @@
 }
 
 .write_gdx_list <- function(dat, gdxName = "data.gdx") {
-  # the function exports names list of sets and parameters to GDX file
+  # the function exports named list of sets and parameters to GDX file
   stopifnot("gdxrrw" %in% rownames(installed.packages()))
   cat(" data.gdx ")
   nms <- names(dat)

@@ -15,10 +15,10 @@ Authors@R:
           role = c("aut")))
 URL: https://github.com/energyRt/energyRt
 BugReports: https://github.com/energyRt/energyRt/issues
-Description: Energy Technology Modeling Toolbox
-Depends: R (>= 3.6), tidyverse, parallel, sp
-Imports: rpivotTable, data.table, DBI, RSQLite
-Suggests: knitr, rmarkdown
+Description: Energy systems modeling toolbox in R
+Depends: R (>= 3.6), parallel
+Imports: rpivotTable, data.table, DBI, RSQLite, tidyverse
+Suggests: knitr, rmarkdown, sp
 License: AGLP-3.0
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
