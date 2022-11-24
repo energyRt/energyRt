@@ -500,6 +500,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             pStorageCout <- NULL; pStorageCinp <- NULL;
             # stg <- energyRt:::.upper_case(app)
             stg <- app
+            
             if (length(stg@commodity) != 1 || is.na(stg@commodity) || all(stg@commodity != approxim$all_comm))
               stop(paste0('Wrong commodity in storage "', stg@name, '"'))
             
@@ -627,6 +628,8 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             invcost <- simpleInterpolation(stg@invcost, 'invcost', obj@parameters[['pStorageInvcost']], approxim, 'stg', stg@name)
             obj@parameters[['pStorageInvcost']] <- .add_data(obj@parameters[['pStorageInvcost']], invcost)
             
+            
+            
             dd0 <- energyRt:::.start_end_fix(approxim, stg, 'stg', stock_exist)
             dd0$new <-  dd0$new[dd0$new$year   %in% approxim$mileStoneYears & dd0$new$region  %in% approxim$region,, drop = FALSE]
             dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region,, drop = FALSE]
@@ -711,7 +714,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'storage', approxim = 'list')
             #   mStorageOMCost <- merge0(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
             #   obj@parameters[['mStorageOMCost']] <- .add_data(obj@parameters[['mStorageOMCost']], mStorageOMCost)
             # }
-            mvStorageStore <- merge0(mStorageSpan, list(slice = stg_slice))
+            mvStorageStore <- merge0(mStorageSpan, data.frame(slice = stg_slice))
             mvStorageStore$comm <- stg@commodity
             obj@parameters[['mvStorageStore']] <- .add_data(obj@parameters[['mvStorageStore']], mvStorageStore)
             
@@ -1729,7 +1732,11 @@ setMethod(
 merge0 <- function(x, y, by = intersect(colnames(as.data.table(x)), colnames(as.data.table(y))), ...) {
   # assign('x', x, globalenv()) assign('y', y, globalenv())
   if (length(by) != 0) return(merge(as.data.table(x), as.data.table(y), by = by, ..., allow.cartesian = TRUE))
-  merge(as.data.frame(x), as.data.frame(y))
+  y <- as.data.frame(y)
+  x <- as.data.frame(x)
+  xy <- merge(x, y)
+  colnames(xy) <- c(colnames(x), colnames(y))
+  xy
 }
 
 
