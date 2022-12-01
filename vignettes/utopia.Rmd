@@ -83,7 +83,7 @@ if (T) {
   if (!any(mypks == "kableExtra")) install.packages("kableExtra")
 }
 # Load required packages
-library(energyRt)
+# library(energyRt)
 library(scales)
 library(tidyverse)
 library(lubridate)
@@ -1354,8 +1354,17 @@ scen_BASE_int@misc$tmp.dir
 ## Writing the model code and data on disk
 scen_BASE_gams <- write(
   scen_BASE_int,
-  solver = "GAMS",
-  tmp.dir = "solwork/UTOPIA_BASE_GAMS"
+  # solver = "GAMS",
+  tmp.dir = "solwork/UTOPIA_BASE_GAMS",
+  solver = list(
+    lang = "GAMS",
+    export_format = "gdx",
+    import_format = "gdx",
+    # inc3 = gams_options_barrier,
+    cmdline = 'C:/GAMS/win64/32.2/gams.exe energyRt.gms',
+    # solver = "cbc",
+    solver = "cplex"
+  )
 )
 scen_BASE_gams@misc$tmp.dir # directory
 

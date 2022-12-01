@@ -5,6 +5,7 @@ OPTION ITERLIM=999999, LIMROW=0, LIMCOL=0, SOLPRINT=OFF;
 *OPTION RESLIM=50000, PROFILE=1, SOLVEOPT=REPLACE;
 *OPTION ITERLIM=999999, LIMROW=10000, LIMCOL=10000, SOLPRINT=ON;
 
+* start log file
 file log_stat / 'output/log.csv'/;
 log_stat.lp = 1;
 put log_stat;
@@ -13,7 +14,7 @@ put '"model language",gams,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow
 put '"model definition",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
 
 * Main sets
-set
+sets
 weather weather
 tech   technology
 sup    supply
@@ -26,15 +27,15 @@ group  group of input or output commodities in technology
 comm   commodity
 region region
 year   year
-slice  time slice
+slice  time slices
 ;
 
-Alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
-Alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
+alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
+alias (slice, slicep), (slice, slicepp), (group, groupp), (comm, commp), (comm, acomm), (comm, comme), (sup, supp);
 alias (region, src), (region, dst), (region, region2), (year, year2), (slice, slice2);
 
 * Mapping sets
-set
+sets
 mSameRegion(region, region)   The same region (used in GLPK)
 mSameSlice(slice, slice)      The same slice (used in GLPK)
 *! technology:input
@@ -71,11 +72,11 @@ mSupSpan(sup, region)             Supply in regions
 * Demand
 mDemComm(dem, comm)               Demand commodities
 * Ballance
-mUpComm(comm)  Commodity balance type PRODUCTION <= CONSUMPTION
-mLoComm(comm)  Commodity balance type PRODUCTION >= CONSUMPTION
-mFxComm(comm)  Commodity balance type PRODUCTION == CONSUMPTION
+mUpComm(comm)  Commodity balance type TOTAL SUPPLY <= TOTAL DEMAND
+mLoComm(comm)  Commodity balance type TOTAL SUPPLY >= TOTAL DEMAND
+mFxComm(comm)  Commodity balance type TOTAL SUPPLY == TOTAL DEMAND
 * Storage
-mStorageFullYear(stg)                 Mapping of storage with joint slice
+mStorageFullYear(stg)              Mapping of storage with joint slice
 mStorageComm(stg, comm)            Mapping of storage technology and respective commodity
 mStorageAInp(stg, comm)            Aux-commodity input to storage
 mStorageAOut(stg, comm)            Aux-commodity output from storage
@@ -84,7 +85,7 @@ mStorageSpan(stg, region, year)    Storage set showing if the storage may exist 
 mStorageOMCost(stg, region, year)
 mStorageEac(stg, region, year)
 mSliceNext(slice, slice)           Next slice
-mSliceFYearNext(slice, slice)           Next slice joint
+mSliceFYearNext(slice, slice)      Next slice joint
 * Trade and ROW
 mTradeSlice(trade, slice)          Trade to slice
 mTradeComm(trade, comm)            Trade commodities
@@ -97,10 +98,9 @@ mExpSlice(expp, slice)             Export to slice
 mImpSlice(imp, slice)              Import to slice
 * Mapping for Salvage (temporary)
 mDiscountZero(region)
-mSliceParentChildE(slice, slice) Child slice or the same
-mSliceParentChild(slice, slice)        Child slice not the same
+mSliceParentChildE(slice, slice)   Child slice or the same
+mSliceParentChild(slice, slice)    Child slice not the same
 *
-
 
 mTradeRoutes(trade, region, region)
 mTradeSpan(trade, year)
@@ -113,46 +113,46 @@ mAggregateFactor(comm, comm)
 ;
 
 * Parameter
-parameter
-ordYear(year)           ord year for GLPK
-cardYear(year)          card year for GLPK
+parameters
+ordYear(year)           ord year for GLPK-MathProg
+cardYear(year)          card year for GLPK-MathProg
 pPeriodLen(year)        Length of perios for milestone year
 pSliceShare(slice)      Share of slice
 * Aggregate
 pAggregateFactor(comm, comm)                       Aggregation factor of commodities
 * Technology parameter
 pTechOlife(tech, region)                           Operational life of technologies
-pTechCinp2ginp(tech, comm, region, year, slice)    Multiplier that transforms commodity input into group input
-pTechGinp2use(tech, group, region, year, slice)    Multiplier that transforms group input into use
-pTechCinp2use(tech, comm, region, year, slice)     Multiplier that transforms commodity input to use
-pTechUse2cact(tech, comm, region, year, slice)     Multiplier that transforms use to commodity activity
-pTechCact2cout(tech, comm, region, year, slice)    Multiplier that transforms commodity activity to commodity output
+pTechCinp2ginp(tech, comm, region, year, slice)    Commodity input to group input
+pTechGinp2use(tech, group, region, year, slice)    Group input into use
+pTechCinp2use(tech, comm, region, year, slice)     Commodity input to use
+pTechUse2cact(tech, comm, region, year, slice)     Use to commodity activity
+pTechCact2cout(tech, comm, region, year, slice)    Commodity activity to commodity output
 pTechEmisComm(tech, comm)                          Combustion factor for input commodity (from 0 to 1)
 * Auxiliary input commodities
-pTechAct2AInp(tech, comm, region, year, slice)     Multiplier to activity to calculate aux-commodity input
-pTechCap2AInp(tech, comm, region, year, slice)     Multiplier to capacity to calculate aux-commodity input
-pTechNCap2AInp(tech, comm, region, year, slice)     Multiplier to new-capacity to calculate aux-commodity input
-pTechCinp2AInp(tech, comm, comm, region, year, slice)    Multiplier to commodity-input to calculate aux-commodity input
-pTechCout2AInp(tech, comm, comm, region, year, slice)    Multiplier to commodity-output to calculate aux-commodity input
+pTechAct2AInp(tech, comm, region, year, slice)     Activity to aux-commodity input
+pTechCap2AInp(tech, comm, region, year, slice)     Capacity to aux-commodity input
+pTechNCap2AInp(tech, comm, region, year, slice)     New capacity to aux-commodity input
+pTechCinp2AInp(tech, comm, comm, region, year, slice)    Commodity input to aux-commodity input
+pTechCout2AInp(tech, comm, comm, region, year, slice)    Commodity output to aux-commodity input
 * Aux output comm map
-pTechAct2AOut(tech, comm, region, year, slice)     Multiplier to activity to calculate aux-commodity output
-pTechCap2AOut(tech, comm, region, year, slice)     Multiplier to capacity to calculate aux-commodity output
-pTechNCap2AOut(tech, comm, region, year, slice)     Multiplier to new capacity to calculate aux-commodity output
-pTechCinp2AOut(tech, comm, comm, region, year, slice)     Multiplier to commodity to calculate aux-commodity output
-pTechCout2AOut(tech, comm, comm, region, year, slice)     Multiplier to commodity-output to calculate aux-commodity input
+pTechAct2AOut(tech, comm, region, year, slice)     Activity to aux-commodity output
+pTechCap2AOut(tech, comm, region, year, slice)     Capacity to aux-commodity output
+pTechNCap2AOut(tech, comm, region, year, slice)     New capacity to aux-commodity output
+pTechCinp2AOut(tech, comm, comm, region, year, slice)     Commodity to aux-commodity output
+pTechCout2AOut(tech, comm, comm, region, year, slice)     Commodity-output to aux-commodity input
 *
 pTechFixom(tech, region, year)                      Fixed Operating and maintenance (O&M) costs (per unit of capacity)
 pTechVarom(tech, region, year, slice)               Variable O&M costs (per unit of acticity)
 pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
-pTechEac(tech, region, year)                        Eac coefficient for investment costs (per unit of capacity)
-pTechShareLo(tech, comm, region, year, slice)       Lower bound for share of the commodity in total group input or output
-pTechShareUp(tech, comm, region, year, slice)       Upper bound for share of the commodity in total group input or output
-pTechAfLo(tech, region, year, slice)                Lower bound for activity for each slice
-pTechAfUp(tech, region, year, slice)                Upper bound for activity for each slice
-pTechRampUp(tech, region, year, slice)              Ramp Up for activity for each slice
-pTechRampDown(tech, region, year, slice)            Ramp Down for activity for each slice
-pTechAfsLo(tech, region, year, slice)               Lower bound for activity for sum over slices
-pTechAfsUp(tech, region, year, slice)               Upper bound for activity for sum over slices
+pTechEac(tech, region, year)                        Equivalent annual (investment) cost
+pTechShareLo(tech, comm, region, year, slice)       Lower bound of the share of the commodity in total group input or output
+pTechShareUp(tech, comm, region, year, slice)       Upper bound of the share of the commodity in total group input or output
+pTechAfLo(tech, region, year, slice)                Lower bound on availability factor by slices
+pTechAfUp(tech, region, year, slice)                Upper bound on availability factor by slices
+pTechRampUp(tech, region, year, slice)              Ramp Up on availability factor
+pTechRampDown(tech, region, year, slice)            Ramp Down on availability
+pTechAfsLo(tech, region, year, slice)               Lower bound on availability factor by groups of slices
+pTechAfsUp(tech, region, year, slice)               Upper bound on availability factor by groups of slices
 pTechAfcLo(tech, comm, region, year, slice)         Lower bound for commodity output
 pTechAfcUp(tech, comm, region, year, slice)         Upper bound for commodity output
 pTechStock(tech, region, year)                      Technology capacity stock
@@ -177,17 +177,17 @@ pEmissionFactor(comm, comm)                         Emission factor
 pDummyImportCost(comm, region, year, slice)         Dummy costs parameters (for debugging)
 pDummyExportCost(comm, region, year, slice)         Dummy costs parameters (for debuging)
 * Taxes and subsidies
-pTaxCostInp(comm, region, year, slice)                 Commodity taxes for input
-pTaxCostOut(comm, region, year, slice)                 Commodity taxes for output
-pTaxCostBal(comm, region, year, slice)                 Commodity taxes for balance
-pSubCostInp(comm, region, year, slice)                Commodity subsidies for input
-pSubCostOut(comm, region, year, slice)                Commodity subsidies for output
-pSubCostBal(comm, region, year, slice)                Commodity subsidies for balance
+pTaxCostInp(comm, region, year, slice)              Commodity taxes for input
+pTaxCostOut(comm, region, year, slice)              Commodity taxes for output
+pTaxCostBal(comm, region, year, slice)              Commodity taxes for balance
+pSubCostInp(comm, region, year, slice)              Commodity subsidies for input
+pSubCostOut(comm, region, year, slice)              Commodity subsidies for output
+pSubCostBal(comm, region, year, slice)              Commodity subsidies for balance
 *
 ;
 
 * Storage technology parameters
-parameter
+parameters
 pStorageInpEff(stg, comm, region, year, slice)      Storage input efficiency
 pStorageOutEff(stg, comm, region, year, slice)      Storage output efficiency
 pStorageStgEff(stg, comm, region, year, slice)      Storage time-efficiency (annual)
@@ -198,29 +198,29 @@ pStorageCostInp(stg, region, year, slice)           Storage input costs
 pStorageCostOut(stg, region, year, slice)           Storage output costs
 pStorageFixom(stg, region, year)                    Storage fixed O&M costs
 pStorageInvcost(stg, region, year)                  Storage investment costs
-pStorageEac(stg, region, year)
+pStorageEac(stg, region, year)                      Storage equivalent annual costs
 pStorageCap2stg(stg)                                Storage capacity units to activity units conversion factor
-pStorageAfLo(stg, region, year, slice)              Storage capacity lower bound (minimum charge level)
-pStorageAfUp(stg, region, year, slice)              Storage capacity upper bound (maximum charge level)
+pStorageAfLo(stg, region, year, slice)              Storage availability factor lower bound (minimum charge level)
+pStorageAfUp(stg, region, year, slice)              Storage availability factor upper bound (maximum charge level)
 pStorageCinpUp(stg, comm, region, year, slice)      Storage input upper bound
 pStorageCinpLo(stg, comm, region, year, slice)      Storage input lower bound
 pStorageCoutUp(stg, comm, region, year, slice)      Storage output upper bound
 pStorageCoutLo(stg, comm, region, year, slice)      Storage output lower bound
-pStorageNCap2Stg(stg, comm, region, year, slice)   Initial storage charging for new investment
-pStorageCharge(stg, comm, region, year, slice)    Initial storage charging for stock
+pStorageNCap2Stg(stg, comm, region, year, slice)    Initial storage charge level for new investment
+pStorageCharge(stg, comm, region, year, slice)      Initial storage charge level for stock
 pStorageStg2AInp(stg, comm, region, year, slice)    Storage accumulated volume to auxilary input
 pStorageStg2AOut(stg, comm, region, year, slice)    Storage accumulated volume output
-pStorageCinp2AInp(stg, comm, region, year, slice)    Storage input to auxilary input coefficient
-pStorageCinp2AOut(stg, comm, region, year, slice)    Storage input to auxilary output coefficient
-pStorageCout2AInp(stg, comm, region, year, slice)    Storage output to auxilary input coefficient
-pStorageCout2AOut(stg, comm, region, year, slice)    Storage output to auxilary output coefficient
-pStorageCap2AInp(stg, comm, region, year, slice)    Storage capacity to auxilary input coefficient
-pStorageCap2AOut(stg, comm, region, year, slice)    Storage capacity to auxilary output coefficient
-pStorageNCap2AInp(stg, comm, region, year, slice)   Storage new capacity to auxilary input coefficient
-pStorageNCap2AOut(stg, comm, region, year, slice)   Storage new capacity to auxilary output coefficient
+pStorageCinp2AInp(stg, comm, region, year, slice)   Storage input to auxilary input
+pStorageCinp2AOut(stg, comm, region, year, slice)   Storage input to auxilary output
+pStorageCout2AInp(stg, comm, region, year, slice)   Storage output to auxilary input
+pStorageCout2AOut(stg, comm, region, year, slice)   Storage output to auxilary output
+pStorageCap2AInp(stg, comm, region, year, slice)    Storage capacity to auxilary input
+pStorageCap2AOut(stg, comm, region, year, slice)    Storage capacity to auxilary output
+pStorageNCap2AInp(stg, comm, region, year, slice)   Storage new capacity to auxilary input
+pStorageNCap2AOut(stg, comm, region, year, slice)   Storage new capacity to auxilary output
 ;
 * Trade parameters
-parameter
+parameters
 pTradeIrEff(trade, region, region, year, slice)     Inter-regional trade efficiency
 pTradeIrUp(trade, region, region, year, slice)      Upper bound on trade flow
 pTradeIrLo(trade, region, region, year, slice)      Lower bound on trade flow
@@ -239,15 +239,15 @@ pImportRowRes(imp)                                   Upper bound on accumulated 
 pImportRowUp(imp, region, year, slice)               Upper bount on import from ROW
 pImportRowLo(imp, region, year, slice)               Lower bound on import from ROW
 pImportRowPrice(imp, region, year, slice)            Import prices from ROW
-pTradeStock(trade, year)
-pTradeOlife(trade)
-pTradeInvcost(trade, region, year)
-pTradeEac(trade, region, year)
-pTradeCap2Act(trade)
+pTradeStock(trade, year)                             Existing capacity
+pTradeOlife(trade)                                   Operational life
+pTradeInvcost(trade, region, year)                   Overnight investment costs
+pTradeEac(trade, region, year)                       Equivalent annual costs
+pTradeCap2Act(trade)                                 Capacity to activity factor
 ;
 
 * Weather map
-set
+sets
 mWeatherSlice(weather, slice)
 mWeatherRegion(weather, region)
 mSupWeatherLo(weather, sup)
@@ -266,25 +266,25 @@ mStorageWeatherCoutUp(weather, stg)
 mStorageWeatherCoutLo(weather, stg)
 ;
 * Weather parameter
-parameter
-pWeather(weather, region, year, slice)
-pSupWeatherUp(weather, sup)
-pSupWeatherLo(weather, sup)
-pTechWeatherAfLo(weather, tech)
-pTechWeatherAfUp(weather, tech)
-pTechWeatherAfsLo(weather, tech)
-pTechWeatherAfsUp(weather, tech)
-pTechWeatherAfcLo(weather, tech, comm)
-pTechWeatherAfcUp(weather, tech, comm)
-pStorageWeatherAfLo(weather, stg)
-pStorageWeatherAfUp(weather, stg)
-pStorageWeatherCinpUp(weather, stg)
-pStorageWeatherCinpLo(weather, stg)
-pStorageWeatherCoutUp(weather, stg)
-pStorageWeatherCoutLo(weather, stg)
+parameters
+pWeather(weather, region, year, slice)          weather factors
+pSupWeatherUp(weather, sup)                     weather factor for supply upper value (ava.up)
+pSupWeatherLo(weather, sup)                     weather factor for supply lower value (ava.lo)
+pTechWeatherAfLo(weather, tech)                 weather factor for technology availability lower value (af.lo)
+pTechWeatherAfUp(weather, tech)                 weather factor for technology availability upper value (af.up)
+pTechWeatherAfsLo(weather, tech)                weather factor for technology availability lower value (af.lo)
+pTechWeatherAfsUp(weather, tech)                weather factor for technology availability upper value (afs.lo)
+pTechWeatherAfcLo(weather, tech, comm)          weather factor for technology availability lower value (afs.lo)
+pTechWeatherAfcUp(weather, tech, comm)          weather factor for commodity availability upper value (afc.lo)
+pStorageWeatherAfLo(weather, stg)               weather factor for storage availability lower value (af.lo)
+pStorageWeatherAfUp(weather, stg)               weather factor for storage availability upper value (af.up)
+pStorageWeatherCinpUp(weather, stg)             weather factor for storage commodity input upper value (cinp.up)
+pStorageWeatherCinpLo(weather, stg)             weather factor for storage commodity input lower value (cinp.lo)
+pStorageWeatherCoutUp(weather, stg)             weather factor for storage commodity output upper value (cout.up)
+pStorageWeatherCoutLo(weather, stg)             weather factor for storage commodity output lower value (cout.lo)
 ;
 
-set
+sets
 mvSupCost(sup, region, year)
 mvTechInp(tech, comm, region, year, slice)
 mvSupReserve(sup, comm, region)
@@ -302,8 +302,8 @@ mvInpTot(comm, region, year, slice)
 mvOutTot(comm, region, year, slice)
 mvInp2Lo(comm, region, year, slice, slice)
 mvOut2Lo(comm, region, year, slice, slice)
-mInpSub(comm, region, year, slice) For increase speed eqInpTot
-mOutSub(comm, region, year, slice) For increase speed eqOutTot
+mInpSub(comm, region, year, slice)
+mOutSub(comm, region, year, slice)
 
 mvStorageAInp(stg, comm, region, year, slice)
 mvStorageAOut(stg, comm, region, year, slice)
@@ -335,13 +335,13 @@ mvTotalUserCosts(region, year)
 
 * Endogenous variables
 
-positive variable
+positive variables
 *@ mTechNew(tech, region, year)
 vTechNewCap(tech, region, year)                      New capacity
 *@ mvTechRetiredStock(tech, region, year)
-vTechRetiredStock(tech, region, year)            Early retired capacity
+vTechRetiredStock(tech, region, year)                Early retired stock
 *@ mvTechRetiredNewCap(tech, region, year, year)
-vTechRetiredNewCap(tech, region, year, year)            Early retired capacity
+vTechRetiredNewCap(tech, region, year, year)         Early retired new capacity
 * Activity and intput-output
 *@ mTechSpan(tech, region, year)
 vTechCap(tech, region, year)                         Total capacity of the technology
@@ -357,7 +357,7 @@ vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
 *@ mvTechAOut(tech, comm, region, year, slice)
 vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
 ;
-variable
+variables
 *@ mTechInv(tech, region, year)
 vTechInv(tech, region, year)                         Overnight investment costs
 *@ mTechEac(tech, region, year)
@@ -365,35 +365,35 @@ vTechEac(tech, region, year)                         Annualized investment costs
 *@ mTechOMCost(tech, region, year)
 vTechOMCost(tech, region, year)                      Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)
 ;
-positive variable
+positive variables
 * Supply
 *@ mSupAva(sup, comm, region, year, slice)
 vSupOut(sup, comm, region, year, slice)              Output of supply
 *@ mvSupReserve(sup, comm, region)
 vSupReserve(sup, comm, region)                       Total supply reserve
 ;
-variable
+variables
 *@ mvSupCost(sup, region, year)
 vSupCost(sup, region, year)                          Supply costs
 ;
-positive variable
+positive variables
 * Demand
 *@ mvDemInp(comm, region, year, slice)
 vDemInp(comm, region, year, slice)                   Input to demand
 ;
-variable
+variables
 * Emission
 *@ mEmsFuelTot(comm, region, year, slice)
-vEmsFuelTot(comm, region, year, slice)                   Total fuel emissions
+vEmsFuelTot(comm, region, year, slice)               Total emissions from fuels combustion
 ;
-variable
+variables
 * Ballance
 *@ mvBalance(comm, region, year, slice)
 vBalance(comm, region, year, slice)                  Net commodity balance
 ;
-positive variable
+positive variables
 *@ mvOutTot(comm, region, year, slice)
-vOutTot(comm, region, year, slice)                   Total commodity output (consumption is not counted)
+vOutTot(comm, region, year, slice)                   Total commodity output (consumption is not substracted)
 *@ mvInpTot(comm, region, year, slice)
 vInpTot(comm, region, year, slice)                   Total commodity input
 *@ mvInp2Lo(comm, region, year, slice, slice)
@@ -407,9 +407,9 @@ vTechInpTot(comm, region, year, slice)               Total commodity input to te
 *@ mTechOutTot(comm, region, year, slice)
 vTechOutTot(comm, region, year, slice)               Total commodity output from technologies
 *@ mStorageInpTot(comm, region, year, slice)
-vStorageInpTot(comm, region, year, slice)            Total commodity input to storages
+vStorageInpTot(comm, region, year, slice)            Total commodity input to storage
 *@ mStorageOutTot(comm, region, year, slice)
-vStorageOutTot(comm, region, year, slice)            Total commodity output from storages
+vStorageOutTot(comm, region, year, slice)            Total commodity output from storage
 *@ mvStorageAInp(stg, comm, region, year, slice)
 vStorageAInp(stg, comm, region, year, slice)         Aux-commodity input to storage
 *@ mvStorageAOut(stg, comm, region, year, slice)
@@ -421,7 +421,7 @@ variable
 vTotalCost(region, year)                             Regional annual total costs
 vObjective                                           Objective costs
 ;
-positive variable
+positive variables
 * Dummy import
 *@ mDummyImport(comm, region, year, slice)
 vDummyImport(comm, region, year, slice)               Dummy import (for debugging)
@@ -435,9 +435,6 @@ vTaxCost(comm, region, year)                         Total tax levies (tax costs
 * Sub
 *@ mSubCost(comm, region, year)
 vSubsCost(comm, region, year)                        Total subsidies (for substraction from costs)
-;
-
-variable
 *@ mAggOut(comm, region, year, slice)
 vAggOut(comm, region, year, slice)                   Aggregated commodity output
 ;
@@ -449,11 +446,11 @@ vStorageInp(stg, comm, region, year, slice)          Storage input
 *@ mvStorageStore(stg, comm, region, year, slice)
 vStorageOut(stg, comm, region, year, slice)          Storage output
 *@ mvStorageStore(stg, comm, region, year, slice)
-vStorageStore(stg, comm, region, year, slice)        Storage accumulated level
+vStorageStore(stg, comm, region, year, slice)        Storage level
 *@ mStorageNew(stg, region, year)
-vStorageInv(stg, region, year)                       Storage technology investments
+vStorageInv(stg, region, year)                       Storage investments
 *@ mStorageEac(stg, region, year)
-vStorageEac(stg, region, year)                       Storage technology EAC investments
+vStorageEac(stg, region, year)                       Storage EAC investments
 *@ mStorageSpan(stg, region, year)
 vStorageCap(stg, region, year)                       Storage capacity
 *@ mStorageNew(stg, region, year)
@@ -464,8 +461,8 @@ variable
 vStorageOMCost(stg, region, year)                    Storage O&M costs
 ;
 
-* Trade and Row variable
-positive variable
+* Trade and Row variables
+positive variables
 *@ mImport(comm, region, year, slice)
 vImport(comm, region, year, slice)                   Total regional import (Ir + ROW)
 *@ mExport(comm, region, year, slice)
@@ -479,7 +476,7 @@ vTradeIrAInpTot(comm, region, year, slice)           Trade total auxilari input
 *@ mvTradeIrAOut(trade, comm, region, year, slice)
 vTradeIrAOut(trade, comm, region, year, slice)       Trade auxilari output
 *@ mvTradeIrAOutTot(comm, region, year, slice)
-vTradeIrAOutTot(comm, region, year, slice)           Trade auxilari output
+vTradeIrAOutTot(comm, region, year, slice)           Trade auxilari output total
 *@ mExpComm(expp, comm)
 vExportRowAccumulated(expp, comm)                    Accumulated export to ROW
 *@ mExportRow(expp, comm, region, year, slice)
@@ -497,24 +494,24 @@ vTradeRowCost(region, year)                          Trade with ROW costs
 *@ mvTradeIrCost(region, year)
 vTradeIrCost(region, year)                           Interregional trade costs
 ;
-positive variable
+positive variables
 *@ mTradeSpan(trade, year)
-vTradeCap(trade, year)
+vTradeCap(trade, year)                               Trade capacity
 *@ mTradeEac(trade, region, year)
-vTradeInv(trade, region, year)
+vTradeInv(trade, region, year)                       Investment in trade capacity (overnight)
 *@ mTradeEac(trade, region, year)
-vTradeEac(trade, region, year)
+vTradeEac(trade, region, year)                       Investment in trade capacity (EAC)
 *@ mTradeNew(trade, year)
-vTradeNewCap(trade, year)
+vTradeNewCap(trade, year)                            New trade capacity
 *@ mvTotalUserCosts(region, year)
-vTotalUserCosts(region, year)
+vTotalUserCosts(region, year)                        Total additional costs (set by user)
 ;
 
 ********************************************************************************
 * Mapping to drop unised variables and parameters, speed-up the model generation
 * (especially in GLPK)
 ********************************************************************************
-set
+sets
 mTechInv(tech, region, year)
 mTechInpTot(comm, region, year, slice)               Total technology input  mapp
 mTechOutTot(comm, region, year, slice)               Total technology output mapp
@@ -558,7 +555,7 @@ mOut2Lo(comm, region, year, slice)
 mInp2Lo(comm, region, year, slice)
 ;
 
-set
+sets
 meqTechRetiredNewCap(tech, region, year)
 meqTechSng2Sng(tech, region, comm, comm, year, slice)
 meqTechGrp2Sng(tech, region, group, comm, year, slice)
@@ -628,7 +625,6 @@ eqTechSng2Grp(tech, region, comm, groupp, year, slice)     Technology input to g
 eqTechGrp2Grp(tech, region, group, groupp, year, slice)    Technology group input to group output
 ;
 
-
 eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)..
    vTechInp(tech, comm, region, year, slice) *
    pTechCinp2use(tech, comm, region, year, slice)
@@ -636,7 +632,6 @@ eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, regio
    vTechOut(tech, commp, region, year, slice) /
            pTechUse2cact(tech, commp, region, year, slice) /
            pTechCact2cout(tech, commp, region, year, slice);
-
 
 eqTechGrp2Sng(tech, region, group, commp, year, slice)$meqTechGrp2Sng(tech, region, group, commp, year, slice)..
    pTechGinp2use(tech, group, region, year, slice) *
@@ -672,8 +667,6 @@ eqTechGrp2Grp(tech, region, group, groupp, year, slice)$meqTechGrp2Grp(tech, reg
            pTechUse2cact(tech, commp, region, year, slice) /
            pTechCact2cout(tech, commp, region, year, slice))$mvTechOut(tech, commp, region, year, slice)
    );
-
-
 
 ********************************************************************************
 *** Shares for grouped commodities
@@ -729,10 +722,9 @@ eqTechShareOutUp(tech, region, group, comm, year, slice)$meqTechShareOutUp(tech,
 *** Auxiliary input & output
 ********************************************************************************
 equation
-eqTechAInp(tech, comm, region, year, slice) Technology auxiliary commodity input
-eqTechAOut(tech, comm, region, year, slice) Technology auxiliary commodity output
+eqTechAInp(tech, comm, region, year, slice)   Technology auxiliary commodity input
+eqTechAOut(tech, comm, region, year, slice)   Technology auxiliary commodity output
 ;
-
 
 eqTechAInp(tech, comm, region, year, slice)$mvTechAInp(tech, comm, region, year, slice)..
   vTechAInp(tech, comm, region, year, slice) =e=
@@ -764,7 +756,6 @@ eqTechAOut(tech, comm, region, year, slice)$mvTechAOut(tech, comm, region, year,
       pTechCout2AOut(tech, comm, commp, region, year, slice) *
          vTechOut(tech, commp, region, year, slice));
 
-
 ********************************************************************************
 *** Availability
 ********************************************************************************
@@ -774,13 +765,13 @@ eqTechAfLo(tech, region, year, slice) Technology availability factor lower bound
 * Availability factor UP
 eqTechAfUp(tech, region, year, slice) Technology availability factor upper bound
 * Availability sum factor LO
-eqTechAfsLo(tech, region, year, slice) Technology availability factor for sum lower bound
+eqTechAfsLo(tech, region, year, slice) Technology availability factor for sum of slices lower bound
 * Availability sum factor UP
-eqTechAfsUp(tech, region, year, slice) Technology availability factor for sum upper bound
+eqTechAfsUp(tech, region, year, slice) Technology availability factor for sum of slices upper bound
 * Ramp Up factor
-eqTechRampUp(tech, region, year, slice) Technology ramp up factor
+eqTechRampUp(tech, region, year, slice) Technology ramp up
 * Ramp Down factor
-eqTechRampDown(tech, region, year, slice) Technology ramp down factor
+eqTechRampDown(tech, region, year, slice) Technology ramp down
 ;
 
 * Availability factor LO
@@ -922,11 +913,11 @@ eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, co
 Equation
 * Capacity equation
 eqTechCap(tech, region, year)       Technology capacity
-eqTechRetiredNewCap(tech, region, year)  Stock retired eqution
-eqTechRetiredStock(tech, region, year)  Stock retired eqution
+eqTechRetiredNewCap(tech, region, year)  Retirement of new capacity
+eqTechRetiredStock(tech, region, year)  Retirement of stock
 eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
 * Investment equation
-eqTechInv(tech, region, year)       Technology investment costs
+eqTechInv(tech, region, year)       Technology overnight investment costs
 * Aggregated annual costs
 eqTechOMCost(tech, region, year)    Technology O&M costs
 ;
@@ -1007,8 +998,8 @@ Equation
 eqSupAvaUp(sup, comm, region, year, slice)  Supply availability upper bound
 eqSupAvaLo(sup, comm, region, year, slice)  Supply availability lower bound
 eqSupTotal(sup, comm, region)               Total supply of each commodity
-eqSupReserveUp(sup, comm, region)           Total supply vs reserve check
-eqSupReserveLo(sup, comm, region)           Total supply vs reserve check
+eqSupReserveUp(sup, comm, region)           Total reserve upper value
+eqSupReserveLo(sup, comm, region)           Total reserve lower value
 eqSupCost(sup, region, year)                Total supply costs
 ;
 
@@ -1060,7 +1051,7 @@ eqDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)..
 ********************************************************************************
 Equation
 eqAggOut(comm, region, year, slice)            Aggregating commodity output
-eqEmsFuelTot(comm, region, year, slice)         Emissions from commodity consumption (i.e. fuels combustion)
+eqEmsFuelTot(comm, region, year, slice)        Emissions from commodity consumption (i.e. fuels combustion)
 ;
 
 eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
@@ -1088,16 +1079,16 @@ eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
 *** Input & Output
 ********************************************************************************
 Equation
-eqStorageStore(stg, comm, region, year, slice)  Storage equation
+eqStorageStore(stg, comm, region, year, slice)  Storage level
 eqStorageAfLo(stg, comm, region, year, slice)   Storage availability factor lower
 eqStorageAfUp(stg, comm, region, year, slice)   Storage availability factor upper
-eqStorageClean(stg, comm, region, year, slice)  Storage input less Stote
-eqStorageAInp(stg, comm, region, year, slice)
-eqStorageAOut(stg, comm, region, year, slice)
-eqStorageInpUp(stg, comm, region, year, slice)
-eqStorageInpLo(stg, comm, region, year, slice)
-eqStorageOutUp(stg, comm, region, year, slice)
-eqStorageOutLo(stg, comm, region, year, slice)
+eqStorageClean(stg, comm, region, year, slice)  Storage output vs level
+eqStorageAInp(stg, comm, region, year, slice)   Storage aux-commodity input
+eqStorageAOut(stg, comm, region, year, slice)   Storage aux-commodity output
+eqStorageInpUp(stg, comm, region, year, slice)  Storage input upper constraint
+eqStorageInpLo(stg, comm, region, year, slice)  Storage input lower constraint
+eqStorageOutUp(stg, comm, region, year, slice)  Storage output upper constraint
+eqStorageOutLo(stg, comm, region, year, slice)  Storage output lower constraint
 ;
 
 eqStorageAInp(stg, comm, region, year, slice)$mvStorageAInp(stg, comm, region, year, slice)..
@@ -1182,10 +1173,10 @@ Equation
 * Capacity equation
 eqStorageCap(stg, region, year)     Storage capacity
 * Investition equation
-eqStorageInv(stg, region, year)     Storage investments
-eqStorageEac(stg, region, year)
+eqStorageInv(stg, region, year)     Storage overnight investment costs
+eqStorageEac(stg, region, year)     Storage equivalent annual cost
 * Aggregated annual costs
-eqStorageCost(stg, region, year)  Storage total costs
+eqStorageCost(stg, region, year)    Storage total costs
 * Constrain capacity
 ;
 
@@ -1250,18 +1241,18 @@ eqTradeFlowLo(trade, comm, region, region, year, slice)   Trade lower bound
 eqCostTrade(region, year)       Total trade costs
 eqCostRowTrade(region, year)    Costs of trade with the Rest of the World (ROW)
 eqCostIrTrade(region, year)     Costs of import
-eqExportRowUp(expp, comm, region, year, slice)    Export to ROW upper bound
-eqExportRowLo(expp, comm, region, year, slice)    Export to ROW lower bound
+eqExportRowUp(expp, comm, region, year, slice)    Export to ROW upper constraint
+eqExportRowLo(expp, comm, region, year, slice)    Export to ROW lower constraint
 eqExportRowCumulative(expp, comm)                 Cumulative export to ROW
-eqExportRowResUp(expp, comm)                      Accumulated export to ROW upper bound
-eqImportRowUp(imp, comm, region, year, slice)     Import from ROW upper bound
-eqImportRowLo(imp, comm, region, year, slice)     Import of ROW lower bound
-eqImportRowAccumulated(imp, comm)                 Accumulated import from ROW
-eqImportRowResUp(imp, comm)                       Accumulated import from ROW upper bound
-eqTradeCap(trade, year)
-eqTradeInv(trade, region, year)
-eqTradeEac(trade, region, year)
-eqTradeCapFlow(trade, comm, year, slice)
+eqExportRowResUp(expp, comm)                      Cumulative export to ROW upper constraint
+eqImportRowUp(imp, comm, region, year, slice)     Import from ROW upper constraint
+eqImportRowLo(imp, comm, region, year, slice)     Import of ROW lower constraint
+eqImportRowAccumulated(imp, comm)                 Cumulative import from ROW
+eqImportRowResUp(imp, comm)                       Cumulative import from ROW upper constraint
+eqTradeCap(trade, year)                           Trade capacity
+eqTradeInv(trade, region, year)                   Trade overnight investment costs
+eqTradeEac(trade, region, year)                   Trade equivalent annual costs
+eqTradeCapFlow(trade, comm, year, slice)          Trade capacity to activity
 ;
 
 
@@ -1416,12 +1407,12 @@ eqTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year,
 Equation
 eqBalUp(comm, region, year, slice)   PRODUCTION <= CONSUMPTION commodity balance
 eqBalLo(comm, region, year, slice)   PRODUCTION >= CONSUMPTION commodity balance
-eqBalFx(comm, region, year, slice)   PRODUCTION = CONSUMPTION commodity balance
+eqBalFx(comm, region, year, slice)   PRODUCTION == CONSUMPTION commodity balance
 eqBal(comm, region, year, slice)     Commodity balance
 eqOutTot(comm, region, year, slice)     Total commodity output
 eqInpTot(comm, region, year, slice)     Total commodity input
-eqInp2Lo(comm, region, year, slice)           From coomodity slice to lo level
-eqOut2Lo(comm, region, year, slice)           From coomodity slice to lo level
+eqInp2Lo(comm, region, year, slice)         From commodity slice to lo level
+eqOut2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqSupOutTot(comm, region, year, slice)      Supply total output
 eqTechInpTot(comm, region, year, slice)     Technology total input
 eqTechOutTot(comm, region, year, slice)     Technology total output
@@ -1589,14 +1580,14 @@ mLECRegion(region)
 ;
 
 parameter
-pLECLoACT(region)
+pLECLoACT(region)  levelized costs interim parameter
 ;
 
 **************************************
 ** LEC equation
 **************************************
 Equation
-eqLECActivity(tech, region, year)
+eqLECActivity(tech, region, year)  levelized costs (auxiliary equation)
 ;
 
 eqLECActivity(tech, region, year)$meqLECActivity(tech, region, year)..
