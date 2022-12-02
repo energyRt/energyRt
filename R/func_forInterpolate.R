@@ -166,7 +166,7 @@
       }
     }
   }
-  require(data.table)
+  # require(data.table)
   nval <- rep(NA, length(mdinp))
   for (pr in names(mdinp[[1]])) if (scen@modInp@parameters[[pr]]@nValues <= 0) {
   	if (mdinp[[1]][[pr]]@nValues != -1) {

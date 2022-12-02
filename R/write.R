@@ -1,6 +1,6 @@
 
 write.default <- function(x, file = "data",
-                          ncolumns = if(is.character(x)) 1 else 5,
+                          ncolumns = if (is.character(x)) 1 else 5,
                           append = FALSE, sep = " ") {
   base::write(x, file, ncolumns, append, sep)
 }
@@ -136,11 +136,11 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   .interpolation_message('mCommSliceOrParent', rest, interpolation_count, interpolation_time_begin, len_name); rest = rest + 1
   # mCommSliceOrParent
   l1 <- merge0(.get_data_slot(prec@parameters$comm), .get_data_slot(prec@parameters$slice))
-  l2 <-merge0(mCommSlice, mSliceParentChildE)[, c('comm', 'slice', 'slicep')]
+  l2 <- merge0(mCommSlice, mSliceParentChildE)[, c('comm', 'slice', 'slicep')]
   l3 <- l2[!duplicated(l2[, c('comm', 'slicep')]), c('comm', 'slicep')]
   colnames(l3)[2] <- 'slice'
   l3 <- rbind(l1, l3)
-  l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast=TRUE), ]
+  l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast = TRUE), ]
   l3$slicep <- l3$slice
   mCommSliceOrParent <- rbind(l2, l3)
   prec@parameters[['mCommSliceOrParent']] <- .add_data(prec@parameters[['mCommSliceOrParent']], mCommSliceOrParent)
@@ -185,7 +185,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
       nn <- rev(prec@parameters[[y]]@misc$not_need_interpolate)
       nn[nn == 'slice'] <- 'mCommSlice'
       nn[nn == 'year'] <- 'mMidMilestone'
-      for(i in nn)
+      for (i in nn)
         x <- merge0(.get_data_slot(prec@parameters[[i]]), x)
     }
     x[x$value != Inf, -ncol(x)]
@@ -403,7 +403,7 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   tmp_f0 <- function(x) {
     if (nrow(x) == 0) {
       x$value <- numeric()
-      return (x)
+      return(x)
     }
     x$value <- 1
     x

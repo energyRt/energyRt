@@ -42,17 +42,17 @@ knitr::opts_chunk$set(
 \pagebreak
 
 # Intoduction
-This tutorial demonstrates the application of `energyRt` package to develop a **Reference Energy System** (RES, or  **Energy system optimization**) model and conduct standard analysis, i.e. run scenarios, optimize several alternative development pathways of the simplified energy system. The initial (base-year) structure of the discussed below example of RES is flexible. The following features can be easily adjusted:  
-  * number of regions and the model GIS-info (the *map*),  
-  * the model horizon and annual time-steps ("milestone years"),  
-  * number and levels of sub-annual time-steps ("time slices"),  
-  * technological options, commodities, storage, supply, and demand,  
-  * interregional trade and trade with the rest of the world (ROW),  
-  * constraints on the model variables.  
+This tutorial demonstrates the application of `energyRt` package to develop a **Reference Energy System** (RES) optimization model and conduct standard analysis, i.e. run scenarios, optimize several alternative development pathways of the simplified energy system. The initial (base-year) structure of the discussed below example of RES is flexible. The following features can be easily adjusted:  
+* number of regions and the model GIS-info (the *map*),  
+* the model horizon and annual time-steps ("milestone years"),  
+* number and levels of sub-annual time-steps ("time slices"),  
+* technological options, commodities, storage, supply, and demand,  
+* interregional trade and trade with the rest of the world (ROW),  
+* constraints on the model variables.  
   
 The `energyRt` package provides a set of S4 classes, methods, and functions to design the model elements, such as technologies, commodities, supply, demand, and constraints, save them in a `model` object, process the data and save it in a format readable by solver-software (GAMS, GLPK/Mathprog, Python/Pyomo, or Julia/JuMP), run the model code in the solver-software, read the results back to R, and manipulate the data to produce charts and tables.  
 
-This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <https://github.com/energyRt/energyRt/vignettes>). It can be run step-by-step or at once to reproduce the results below. Playing with parameters and data is highly recommended for learning the package and the RES-models. This is the first beta-version of the package and the tutorial. Please report bugs, issues, thoughts here: <https://github.com/energyRt/energyRt/issues>.    
+This Vignette tutorial can be acquired from the `energyRt/vignetts` folder (or <https://github.com/energyRt/energyRt/vignettes>). It can be run step-by-step or at once to reproduce the results below. Playing with parameters and data is recommended for learning the package and the RES-models. This is a development version of the package and the tutorial. Please report bugs, issues here: <https://github.com/energyRt/energyRt/issues>.    
 
 # Prerequisites
 We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rstudio.com/>) has been already installed, and a scholar has some basic knowledge of `R`. The next step is to have installed `energyRt`, the solver software (`GAMS` or `GLPK`) and `LaTeX`. The detailed installation steps are available on the package website (<https://github.com/energyRt/energyRt/>).   
@@ -87,7 +87,7 @@ if (T) {
 library(scales)
 library(tidyverse)
 library(lubridate)
-library(data.table)
+library(energyRt)
 
 # Set color palette for figures
 # palette(RColorBrewer::brewer.pal(11, "Paired"))
@@ -1207,21 +1207,21 @@ GASIMP <- newImport(
 reps <- add(
   newRepository("utopia_repository"),
   # Commodities
-  ELC, # electricity
-  COA, GAS, NUC, HYD, BIO, # energy
-  WIN, SOL, # renewables
-  CO2, PM, NOX, SO2, HG, CH4, # emissions
-  # Supply
-  SUP_NUC, SUP_COA, SUP_GAS, RES_HYD,
-  RES_SOL, RES_WIN,
-  # Import from ROW
-  COAIMP, GASIMP,
-  # Technologies
-  ECOA, EGAS, ENUC, EHYD,
-  # EWIN, ESOL,
-  # Electricity trade
-  # TRD_ELC_ALL, # repository with electricity trade routes
-  DEM_ELC # ELC demand with load curve (24 hours x 12 months)
+  ELC # electricity
+  # COA, GAS, NUC, HYD, BIO, # energy
+  # WIN, SOL, # renewables
+  # CO2, PM, NOX, SO2, HG, CH4, # emissions
+  # # Supply
+  # SUP_NUC, SUP_COA, SUP_GAS, RES_HYD,
+  # RES_SOL, RES_WIN,
+  # # Import from ROW
+  # COAIMP, GASIMP,
+  # # Technologies
+  # ECOA, EGAS, ENUC, EHYD,
+  # # EWIN, ESOL,
+  # # Electricity trade
+  # # TRD_ELC_ALL, # repository with electricity trade routes
+  # DEM_ELC # ELC demand with load curve (24 hours x 12 months)
 )
 
 length(reps@data)
@@ -1233,12 +1233,12 @@ mdl <- newModel("UTOPIA",
     dummyExport = 1e6
   ),
   region = reg_names,
-  discount = 0.05,
+  # discount = 0.05,
   slice = timeslices,
   # slice = unlist(timeslices2),
-  repository = reps,
+  repository = reps
   # GIS = gis,
-  early.retirement = F
+  # early.retirement = F
 )
 ```
 
@@ -1263,8 +1263,8 @@ mdl@sysInfo@milestone
 scen_BASE <- solve(mdl,
   name = "BASE",
   # tmp.path = "C:/solwork",
-  solver = mysolver,
-  # solver = "GLPK",
+  # solver = mysolver,
+  solver = "GLPK",
   tmp.name = "UTOPIA_BASE",
   tmp.del = F
 )

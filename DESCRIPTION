@@ -16,9 +16,9 @@ Authors@R:
 URL: https://github.com/energyRt/energyRt
 BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy systems modeling toolbox in R
-Depends: R (>= 3.6), parallel
-Imports: rpivotTable, data.table, DBI, RSQLite, tidyverse
-Suggests: knitr, rmarkdown, sp
+Depends: R (>= 3.6), parallel, data.table
+Imports: rpivotTable, DBI, RSQLite, dplyr, ggplot2, tibble
+Suggests: knitr, rmarkdown, sp, sf
 License: AGLP-3.0
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr

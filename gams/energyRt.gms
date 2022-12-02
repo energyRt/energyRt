@@ -15,19 +15,19 @@ put '"model definition",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):
 
 * Main sets
 sets
-weather weather
-tech   technology
-sup    supply
-dem    demand
-stg    storage
-expp   export to the rest of the world (ROW)
-imp    import from the rest of the world
-trade  trade between regions
-group  group of input or output commodities in technology
 comm   commodity
 region region
 year   year
 slice  time slices
+sup    supply
+dem    demand
+tech   technology
+stg    storage
+trade  trade between regions
+expp   export to the rest of the world (ROW)
+imp    import from the ROW
+group  group of input or output commodities in technology
+weather weather
 ;
 
 alias (tech, techp), (region, regionp), (year, yearp), (year, yeare), (year, yearn);
@@ -114,13 +114,7 @@ mAggregateFactor(comm, comm)
 
 * Parameter
 parameters
-ordYear(year)           ord year for GLPK-MathProg
-cardYear(year)          card year for GLPK-MathProg
-pPeriodLen(year)        Length of perios for milestone year
-pSliceShare(slice)      Share of slice
-* Aggregate
-pAggregateFactor(comm, comm)                       Aggregation factor of commodities
-* Technology parameter
+* Technology parameters
 pTechOlife(tech, region)                           Operational life of technologies
 pTechCinp2ginp(tech, comm, region, year, slice)    Commodity input to group input
 pTechGinp2use(tech, group, region, year, slice)    Group input into use
@@ -159,7 +153,7 @@ pTechStock(tech, region, year)                      Technology capacity stock
 pTechCap2act(tech)                                  Technology capacity units to activity units conversion factor
 pTechCvarom(tech, comm, region, year, slice)        Commodity-specific variable costs (per unit of commodity input or output)
 pTechAvarom(tech, comm, region, year, slice)        Auxilary Commodity-specific variable costs (per unit of commodity input or output)
-* Exit stock and salvage
+* Discount
 pDiscount(region, year)                             Discount rate (can be region and year specific)
 pDiscountFactor(region, year)                       Discount factor (cumulative)
 pDiscountFactorMileStone(region, year)              Discount factor (cumulative) sum for MileStone
@@ -183,7 +177,13 @@ pTaxCostBal(comm, region, year, slice)              Commodity taxes for balance
 pSubCostInp(comm, region, year, slice)              Commodity subsidies for input
 pSubCostOut(comm, region, year, slice)              Commodity subsidies for output
 pSubCostBal(comm, region, year, slice)              Commodity subsidies for balance
-*
+* Aggregation
+pAggregateFactor(comm, comm)                        Aggregation factor of commodities
+* System parameters
+pPeriodLen(year)        Length of milestone-year-period
+pSliceShare(slice)      Share of slice
+ordYear(year)           ord year (used in GLPK-MathProg)
+cardYear(year)          card year (used in GLPK-MathProg)
 ;
 
 * Storage technology parameters
