@@ -172,7 +172,7 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
     tmp <- rbind(tmp, data.frame(
       name = paste0('code', seq_along(scen@solver$code)),
       value = scen@solver$code, stringsAsFactors = FALSE))
-    write.csv(tmp, file = paste0(arg$tmp.dir, 'solver'), row.names=FALSE)
+    write.csv(tmp, file = paste0(arg$tmp.dir, 'solver'), row.names = FALSE)
     
     if (arg$echo) { 
       cat(round(proc.time()[3] - solver_solver_time, 2), 's\n', sep = '')
@@ -180,7 +180,7 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
     }
   }
   .run_solve_model(arg, scen) # For all solvers
-  
+  # browser()
   if (readresult && arg$run) scen <- read_solution(scen)
   
   invisible(scen)
@@ -190,7 +190,7 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
   # browser()
   HOMEDIR <- getwd()
   if (!arg$run) return()
-  if(arg$echo) cat(scen@solver$lang, ' time: ')
+  if (arg$echo) cat(scen@solver$lang, ' time: ')
   gams_run_time <- proc.time()[3]
   tryCatch({
     setwd(arg$tmp.dir)

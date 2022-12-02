@@ -1734,7 +1734,7 @@ for (y in mdl@sysInfo@milestone$mid) {
 
 # Download and unpack ffmpeg (https://www.ffmpeg.org/) on your computer
 # correct the path below
-system("c:/utils/ffmpeg/bin/ffmpeg -r 4 -f image2 -s 1920x1080 -i Rplot%d.png -vcodec libx264 -crf 25 -pix_fmt yuv420p -y utopia_example_trade.mp4")
+system("c:/utils/ffmpeg/4.3.1/bin/ffmpeg -r 4 -f image2 -s 1920x1080 -i Rplot%d.png -vcodec libx264 -crf 25 -pix_fmt yuv420p -y utopia_example_trade.mp4")
 
 setwd(homedir)
 ```

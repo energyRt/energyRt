@@ -35,6 +35,7 @@ read.scenario <- function(scen, ...) {
   ss$commp <- ss$comm
   ss$slicep <- ss$slice
   rr$set_vec <- ss
+  if (is.null(scen@solver$import_format)) scen@solver$import_format <- "csv" # !!! workaround
   if (scen@solver$import_format == 'gdx') {
   	# Read variables gdx
   	gd = gdx(paste(arg$tmp.dir, '/output/output.gdx', sep = ''))
