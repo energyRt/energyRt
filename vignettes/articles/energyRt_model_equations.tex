@@ -1,0 +1,2120 @@
+\documentclass{article}
+\usepackage[a4paper,landscape,margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{breqn}
+\usepackage{longtable}
+\usepackage{graphicx}
+\title{\emph{energyRt} model framework}
+\begin{document}
+\maketitle
+\section*{Sets}
+\begin{longtable}{| l | l | l |}
+\hline
+\bf{Name} & \bf{Alias} & \bf{Description} \\ 
+ \hline
+comm & $c,cp,ce,cn$ & commodity \\ 
+ \hline
+region & $r,rp,re,rn$ & region \\ 
+ \hline
+year & $y,yp,ye,yn$ & year \\ 
+ \hline
+slice & $l,lp,le,ln$ & time slices \\ 
+ \hline
+sup & $u,up,ue,un$ & supply \\ 
+ \hline
+dem & $d,dp,de,dn$ & demand \\ 
+ \hline
+tech & $h,hp,he,hn$ & technology \\ 
+ \hline
+stg & $s,sp,se,sn$ & storage \\ 
+ \hline
+trade & $d,dp,de,dn$ & trade between regions \\ 
+ \hline
+expp & $x,xp,xe,xn$ & export to the rest of the world (ROW) \\ 
+ \hline
+imp & $m,mp,me,mn$ & import from the ROW \\ 
+ \hline
+group & $g,gp,ge,gn$ & group of input or output commodities in technology \\ 
+ \hline
+weather & $w,wp,we,wn$ & weather \\ 
+ \hline
+\end{longtable}
+
+\section*{Parameters}
+\begin{longtable}{|p{10cm}|p{5cm}|p{9cm}|}
+\hline
+\bf{Name} & \bf{Alias}  & \bf{Description} \\ 
+ \hline
+pTechOlife(tech, region) & $pTechOlife_{h,r}$ & Operational life of technologies \\ 
+ \hline
+pTechCinp2ginp(tech, comm, region, year, slice) & $pTechCinp2ginp_{h,c,r,y,l}$ & Commodity input to group input \\ 
+ \hline
+pTechGinp2use(tech, group, region, year, slice) & $pTechGinp2use_{h,g,r,y,l}$ & Group input into use \\ 
+ \hline
+pTechCinp2use(tech, comm, region, year, slice) & $pTechCinp2use_{h,c,r,y,l}$ & Commodity input to use \\ 
+ \hline
+pTechUse2cact(tech, comm, region, year, slice) & $pTechUse2cact_{h,c,r,y,l}$ & Use to commodity activity \\ 
+ \hline
+pTechCact2cout(tech, comm, region, year, slice) & $pTechCact2cout_{h,c,r,y,l}$ & Commodity activity to commodity output \\ 
+ \hline
+pTechEmisComm(tech, comm) & $pTechEmisComm_{h,c}$ & Combustion factor for input commodity (from 0 to 1) \\ 
+ \hline
+pTechAct2AInp(tech, comm, region, year, slice) & $pTechAct2AInp_{h,c,r,y,l}$ & Activity to aux-commodity input \\ 
+ \hline
+pTechCap2AInp(tech, comm, region, year, slice) & $pTechCap2AInp_{h,c,r,y,l}$ & Capacity to aux-commodity input \\ 
+ \hline
+pTechNCap2AInp(tech, comm, region, year, slice) & $pTechNCap2AInp_{h,c,r,y,l}$ & New capacity to aux-commodity input \\ 
+ \hline
+pTechCinp2AInp(tech, comm, comm, region, year, slice) & $pTechCinp2AInp_{h,c,c,r,y,l}$ & Commodity input to aux-commodity input \\ 
+ \hline
+pTechCout2AInp(tech, comm, comm, region, year, slice) & $pTechCout2AInp_{h,c,c,r,y,l}$ & Commodity output to aux-commodity input \\ 
+ \hline
+pTechAct2AOut(tech, comm, region, year, slice) & $pTechAct2AOut_{h,c,r,y,l}$ & Activity to aux-commodity output \\ 
+ \hline
+pTechCap2AOut(tech, comm, region, year, slice) & $pTechCap2AOut_{h,c,r,y,l}$ & Capacity to aux-commodity output \\ 
+ \hline
+pTechNCap2AOut(tech, comm, region, year, slice) & $pTechNCap2AOut_{h,c,r,y,l}$ & New capacity to aux-commodity output \\ 
+ \hline
+pTechCinp2AOut(tech, comm, comm, region, year, slice) & $pTechCinp2AOut_{h,c,c,r,y,l}$ & Commodity to aux-commodity output \\ 
+ \hline
+pTechCout2AOut(tech, comm, comm, region, year, slice) & $pTechCout2AOut_{h,c,c,r,y,l}$ & Commodity-output to aux-commodity input \\ 
+ \hline
+pTechFixom(tech, region, year) & $pTechFixom_{h,r,y}$ & Fixed Operating and maintenance (O\&M) costs (per unit of capacity) \\ 
+ \hline
+pTechVarom(tech, region, year, slice) & $pTechVarom_{h,r,y,l}$ & Variable O\&M costs (per unit of acticity) \\ 
+ \hline
+pTechInvcost(tech, region, year) & $pTechInvcost_{h,r,y}$ & Investment costs (per unit of capacity) \\ 
+ \hline
+pTechEac(tech, region, year) & $pTechEac_{h,r,y}$ & Equivalent annual (investment) cost \\ 
+ \hline
+pTechShareLo(tech, comm, region, year, slice) & $pTechShareLo_{h,c,r,y,l}$ & Lower bound of the share of the commodity in total group input or output \\ 
+ \hline
+pTechShareUp(tech, comm, region, year, slice) & $pTechShareUp_{h,c,r,y,l}$ & Upper bound of the share of the commodity in total group input or output \\ 
+ \hline
+pTechAfLo(tech, region, year, slice) & $pTechAfLo_{h,r,y,l}$ & Lower bound on availability factor by slices \\ 
+ \hline
+pTechAfUp(tech, region, year, slice) & $pTechAfUp_{h,r,y,l}$ & Upper bound on availability factor by slices \\ 
+ \hline
+pTechRampUp(tech, region, year, slice) & $pTechRampUp_{h,r,y,l}$ & Ramp Up on availability factor \\ 
+ \hline
+pTechRampDown(tech, region, year, slice) & $pTechRampDown_{h,r,y,l}$ & Ramp Down on availability \\ 
+ \hline
+pTechAfsLo(tech, region, year, slice) & $pTechAfsLo_{h,r,y,l}$ & Lower bound on availability factor by groups of slices \\ 
+ \hline
+pTechAfsUp(tech, region, year, slice) & $pTechAfsUp_{h,r,y,l}$ & Upper bound on availability factor by groups of slices \\ 
+ \hline
+pTechAfcLo(tech, comm, region, year, slice) & $pTechAfcLo_{h,c,r,y,l}$ & Lower bound for commodity output \\ 
+ \hline
+pTechAfcUp(tech, comm, region, year, slice) & $pTechAfcUp_{h,c,r,y,l}$ & Upper bound for commodity output \\ 
+ \hline
+pTechStock(tech, region, year) & $pTechStock_{h,r,y}$ & Technology capacity stock \\ 
+ \hline
+pTechCap2act(tech) & $pTechCap2act_{h}$ & Technology capacity units to activity units conversion factor \\ 
+ \hline
+pTechCvarom(tech, comm, region, year, slice) & $pTechCvarom_{h,c,r,y,l}$ & Commodity-specific variable costs (per unit of commodity input or output) \\ 
+ \hline
+pTechAvarom(tech, comm, region, year, slice) & $pTechAvarom_{h,c,r,y,l}$ & Auxilary Commodity-specific variable costs (per unit of commodity input or output) \\ 
+ \hline
+pDiscount(region, year) & $pDiscount_{r,y}$ & Discount rate (can be region and year specific) \\ 
+ \hline
+pDiscountFactor(region, year) & $pDiscountFactor_{r,y}$ & Discount factor (cumulative) \\ 
+ \hline
+pDiscountFactorMileStone(region, year) & $pDiscountFactorMileStone_{r,y}$ & Discount factor (cumulative) sum for MileStone \\ 
+ \hline
+pSupCost(sup, comm, region, year, slice) & $pSupCost_{u,c,r,y,l}$ & Costs of supply (price per unit) \\ 
+ \hline
+pSupAvaUp(sup, comm, region, year, slice) & $pSupAvaUp_{u,c,r,y,l}$ & Upper bound for supply \\ 
+ \hline
+pSupAvaLo(sup, comm, region, year, slice) & $pSupAvaLo_{u,c,r,y,l}$ & Lower bound for supply \\ 
+ \hline
+pSupReserveUp(sup, comm, region) & $pSupReserveUp_{u,c,r}$ & Total supply reserve by region Up \\ 
+ \hline
+pSupReserveLo(sup, comm, region) & $pSupReserveLo_{u,c,r}$ & Total supply reserve by region Lo \\ 
+ \hline
+pDemand(dem, comm, region, year, slice) & $pDemand_{d,c,r,y,l}$ & Exogenous demand \\ 
+ \hline
+pEmissionFactor(comm, comm) & $pEmissionFactor_{c,c}$ & Emission factor \\ 
+ \hline
+pDummyImportCost(comm, region, year, slice) & $pDummyImportCost_{c,r,y,l}$ & Dummy costs parameters (for debugging) \\ 
+ \hline
+pDummyExportCost(comm, region, year, slice) & $pDummyExportCost_{c,r,y,l}$ & Dummy costs parameters (for debuging) \\ 
+ \hline
+pTaxCostInp(comm, region, year, slice) & $pTaxCostInp_{c,r,y,l}$ & Commodity taxes for input \\ 
+ \hline
+pTaxCostOut(comm, region, year, slice) & $pTaxCostOut_{c,r,y,l}$ & Commodity taxes for output \\ 
+ \hline
+pTaxCostBal(comm, region, year, slice) & $pTaxCostBal_{c,r,y,l}$ & Commodity taxes for balance \\ 
+ \hline
+pSubCostInp(comm, region, year, slice) & $pSubCostInp_{c,r,y,l}$ & Commodity subsidies for input \\ 
+ \hline
+pSubCostOut(comm, region, year, slice) & $pSubCostOut_{c,r,y,l}$ & Commodity subsidies for output \\ 
+ \hline
+pSubCostBal(comm, region, year, slice) & $pSubCostBal_{c,r,y,l}$ & Commodity subsidies for balance \\ 
+ \hline
+pAggregateFactor(comm, comm) & $pAggregateFactor_{c,c}$ & Aggregation factor of commodities \\ 
+ \hline
+pPeriodLen(year) & $pPeriodLen_{y}$ & Length of milestone-year-period \\ 
+ \hline
+pSliceShare(slice) & $pSliceShare_{l}$ & Share of slice \\ 
+ \hline
+ordYear(year) & $ordYear_{y}$ & ord year (used in GLPK-MathProg) \\ 
+ \hline
+cardYear(year) & $cardYear_{y}$ & card year (used in GLPK-MathProg) \\ 
+ \hline
+pStorageInpEff(stg, comm, region, year, slice) & $pStorageInpEff_{s,c,r,y,l}$ & Storage input efficiency \\ 
+ \hline
+pStorageOutEff(stg, comm, region, year, slice) & $pStorageOutEff_{s,c,r,y,l}$ & Storage output efficiency \\ 
+ \hline
+pStorageStgEff(stg, comm, region, year, slice) & $pStorageStgEff_{s,c,r,y,l}$ & Storage time-efficiency (annual) \\ 
+ \hline
+pStorageStock(stg, region, year) & $pStorageStock_{s,r,y}$ & Storage capacity stock \\ 
+ \hline
+pStorageOlife(stg, region) & $pStorageOlife_{s,r}$ & Storage operational life \\ 
+ \hline
+pStorageCostStore(stg, region, year, slice) & $pStorageCostStore_{s,r,y,l}$ & Storing costs per stored amount (annual) \\ 
+ \hline
+pStorageCostInp(stg, region, year, slice) & $pStorageCostInp_{s,r,y,l}$ & Storage input costs \\ 
+ \hline
+pStorageCostOut(stg, region, year, slice) & $pStorageCostOut_{s,r,y,l}$ & Storage output costs \\ 
+ \hline
+pStorageFixom(stg, region, year) & $pStorageFixom_{s,r,y}$ & Storage fixed O\&M costs \\ 
+ \hline
+pStorageInvcost(stg, region, year) & $pStorageInvcost_{s,r,y}$ & Storage investment costs \\ 
+ \hline
+pStorageEac(stg, region, year) & $pStorageEac_{s,r,y}$ & Storage equivalent annual costs \\ 
+ \hline
+pStorageCap2stg(stg) & $pStorageCap2stg_{s}$ & Storage capacity units to activity units conversion factor \\ 
+ \hline
+pStorageAfLo(stg, region, year, slice) & $pStorageAfLo_{s,r,y,l}$ & Storage availability factor lower bound (minimum charge level) \\ 
+ \hline
+pStorageAfUp(stg, region, year, slice) & $pStorageAfUp_{s,r,y,l}$ & Storage availability factor upper bound (maximum charge level) \\ 
+ \hline
+pStorageCinpUp(stg, comm, region, year, slice) & $pStorageCinpUp_{s,c,r,y,l}$ & Storage input upper bound \\ 
+ \hline
+pStorageCinpLo(stg, comm, region, year, slice) & $pStorageCinpLo_{s,c,r,y,l}$ & Storage input lower bound \\ 
+ \hline
+pStorageCoutUp(stg, comm, region, year, slice) & $pStorageCoutUp_{s,c,r,y,l}$ & Storage output upper bound \\ 
+ \hline
+pStorageCoutLo(stg, comm, region, year, slice) & $pStorageCoutLo_{s,c,r,y,l}$ & Storage output lower bound \\ 
+ \hline
+pStorageNCap2Stg(stg, comm, region, year, slice) & $pStorageNCap2Stg_{s,c,r,y,l}$ & Initial storage charge level for new investment \\ 
+ \hline
+pStorageCharge(stg, comm, region, year, slice) & $pStorageCharge_{s,c,r,y,l}$ & Initial storage charge level for stock \\ 
+ \hline
+pStorageStg2AInp(stg, comm, region, year, slice) & $pStorageStg2AInp_{s,c,r,y,l}$ & Storage accumulated volume to auxilary input \\ 
+ \hline
+pStorageStg2AOut(stg, comm, region, year, slice) & $pStorageStg2AOut_{s,c,r,y,l}$ & Storage accumulated volume output \\ 
+ \hline
+pStorageCinp2AInp(stg, comm, region, year, slice) & $pStorageCinp2AInp_{s,c,r,y,l}$ & Storage input to auxilary input \\ 
+ \hline
+pStorageCinp2AOut(stg, comm, region, year, slice) & $pStorageCinp2AOut_{s,c,r,y,l}$ & Storage input to auxilary output \\ 
+ \hline
+pStorageCout2AInp(stg, comm, region, year, slice) & $pStorageCout2AInp_{s,c,r,y,l}$ & Storage output to auxilary input \\ 
+ \hline
+pStorageCout2AOut(stg, comm, region, year, slice) & $pStorageCout2AOut_{s,c,r,y,l}$ & Storage output to auxilary output \\ 
+ \hline
+pStorageCap2AInp(stg, comm, region, year, slice) & $pStorageCap2AInp_{s,c,r,y,l}$ & Storage capacity to auxilary input \\ 
+ \hline
+pStorageCap2AOut(stg, comm, region, year, slice) & $pStorageCap2AOut_{s,c,r,y,l}$ & Storage capacity to auxilary output \\ 
+ \hline
+pStorageNCap2AInp(stg, comm, region, year, slice) & $pStorageNCap2AInp_{s,c,r,y,l}$ & Storage new capacity to auxilary input \\ 
+ \hline
+pStorageNCap2AOut(stg, comm, region, year, slice) & $pStorageNCap2AOut_{s,c,r,y,l}$ & Storage new capacity to auxilary output \\ 
+ \hline
+pTradeIrEff(trade, region, region, year, slice) & $pTradeIrEff_{d,r,r,y,l}$ & Inter-regional trade efficiency \\ 
+ \hline
+pTradeIrUp(trade, region, region, year, slice) & $pTradeIrUp_{d,r,r,y,l}$ & Upper bound on trade flow \\ 
+ \hline
+pTradeIrLo(trade, region, region, year, slice) & $pTradeIrLo_{d,r,r,y,l}$ & Lower bound on trade flow \\ 
+ \hline
+pTradeIrCost(trade, region, region, year, slice) & $pTradeIrCost_{d,r,r,y,l}$ & Costs of trade flow \\ 
+ \hline
+pTradeIrMarkup(trade, region, region, year, slice) & $pTradeIrMarkup_{d,r,r,y,l}$ & Markup of trade flow \\ 
+ \hline
+pTradeIrCsrc2Ainp(trade, comm, region, region, year, slice) & $pTradeIrCsrc2Ainp_{d,c,r,r,y,l}$ & Auxiliary input commodity in source region \\ 
+ \hline
+pTradeIrCsrc2Aout(trade, comm, region, region, year, slice) & $pTradeIrCsrc2Aout_{d,c,r,r,y,l}$ & Auxiliary output commodity in source region \\ 
+ \hline
+pTradeIrCdst2Ainp(trade, comm, region, region, year, slice) & $pTradeIrCdst2Ainp_{d,c,r,r,y,l}$ & Auxiliary input commodity in destination region \\ 
+ \hline
+pTradeIrCdst2Aout(trade, comm, region, region, year, slice) & $pTradeIrCdst2Aout_{d,c,r,r,y,l}$ & Auxiliary output commodity in destination region \\ 
+ \hline
+pExportRowRes(expp) & $pExportRowRes_{x}$ & Upper bound on accumulated export to ROW \\ 
+ \hline
+pExportRowUp(expp, region, year, slice) & $pExportRowUp_{x,r,y,l}$ & Upper bound on export to ROW \\ 
+ \hline
+pExportRowLo(expp, region, year, slice) & $pExportRowLo_{x,r,y,l}$ & Lower bound on export to ROW \\ 
+ \hline
+pExportRowPrice(expp, region, year, slice) & $pExportRowPrice_{x,r,y,l}$ & Export prices to ROW \\ 
+ \hline
+pImportRowRes(imp) & $pImportRowRes_{m}$ & Upper bound on accumulated import to ROW \\ 
+ \hline
+pImportRowUp(imp, region, year, slice) & $pImportRowUp_{m,r,y,l}$ & Upper bount on import from ROW \\ 
+ \hline
+pImportRowLo(imp, region, year, slice) & $pImportRowLo_{m,r,y,l}$ & Lower bound on import from ROW \\ 
+ \hline
+pImportRowPrice(imp, region, year, slice) & $pImportRowPrice_{m,r,y,l}$ & Import prices from ROW \\ 
+ \hline
+pTradeStock(trade, year) & $pTradeStock_{d,y}$ & Existing capacity \\ 
+ \hline
+pTradeOlife(trade) & $pTradeOlife_{d}$ & Operational life \\ 
+ \hline
+pTradeInvcost(trade, region, year) & $pTradeInvcost_{d,r,y}$ & Overnight investment costs \\ 
+ \hline
+pTradeEac(trade, region, year) & $pTradeEac_{d,r,y}$ & Equivalent annual costs \\ 
+ \hline
+pTradeCap2Act(trade) & $pTradeCap2Act_{d}$ & Capacity to activity factor \\ 
+ \hline
+pWeather(weather, region, year, slice) & $pWeather_{w,r,y,l}$ & weather factors \\ 
+ \hline
+pSupWeatherUp(weather, sup) & $pSupWeatherUp_{w,u}$ & weather factor for supply upper value (ava.up) \\ 
+ \hline
+pSupWeatherLo(weather, sup) & $pSupWeatherLo_{w,u}$ & weather factor for supply lower value (ava.lo) \\ 
+ \hline
+pTechWeatherAfLo(weather, tech) & $pTechWeatherAfLo_{w,h}$ & weather factor for technology availability lower value (af.lo) \\ 
+ \hline
+pTechWeatherAfUp(weather, tech) & $pTechWeatherAfUp_{w,h}$ & weather factor for technology availability upper value (af.up) \\ 
+ \hline
+pTechWeatherAfsLo(weather, tech) & $pTechWeatherAfsLo_{w,h}$ & weather factor for technology availability lower value (af.lo) \\ 
+ \hline
+pTechWeatherAfsUp(weather, tech) & $pTechWeatherAfsUp_{w,h}$ & weather factor for technology availability upper value (afs.lo) \\ 
+ \hline
+pTechWeatherAfcLo(weather, tech, comm) & $pTechWeatherAfcLo_{w,h,c}$ & weather factor for technology availability lower value (afs.lo) \\ 
+ \hline
+pTechWeatherAfcUp(weather, tech, comm) & $pTechWeatherAfcUp_{w,h,c}$ & weather factor for commodity availability upper value (afc.lo) \\ 
+ \hline
+pStorageWeatherAfLo(weather, stg) & $pStorageWeatherAfLo_{w,s}$ & weather factor for storage availability lower value (af.lo) \\ 
+ \hline
+pStorageWeatherAfUp(weather, stg) & $pStorageWeatherAfUp_{w,s}$ & weather factor for storage availability upper value (af.up) \\ 
+ \hline
+pStorageWeatherCinpUp(weather, stg) & $pStorageWeatherCinpUp_{w,s}$ & weather factor for storage commodity input upper value (cinp.up) \\ 
+ \hline
+pStorageWeatherCinpLo(weather, stg) & $pStorageWeatherCinpLo_{w,s}$ & weather factor for storage commodity input lower value (cinp.lo) \\ 
+ \hline
+pStorageWeatherCoutUp(weather, stg) & $pStorageWeatherCoutUp_{w,s}$ & weather factor for storage commodity output upper value (cout.up) \\ 
+ \hline
+pStorageWeatherCoutLo(weather, stg) & $pStorageWeatherCoutLo_{w,s}$ & weather factor for storage commodity output lower value (cout.lo) \\ 
+ \hline
+pLECLoACT(region) & $pLECLoACT_{r}$ & levelized costs interim parameter \\ 
+ \hline
+\end{longtable}
+
+\section*{Variables}
+\begin{longtable}{|p{10cm}|p{5cm}|p{9cm}|}
+\hline
+\bf{Name} & \bf{Alias}   & \bf{Description} \\ 
+ \hline
+vTechInv(tech, region, year) & ${\bf vTechInv}_{h,r,y}$ & Overnight investment costs \\ 
+ \hline
+vTechEac(tech, region, year) & ${\bf vTechEac}_{h,r,y}$ & Annualized investment costs \\ 
+ \hline
+vTechOMCost(tech, region, year) & ${\bf vTechOMCost}_{h,r,y}$ & Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom) \\ 
+ \hline
+vSupCost(sup, region, year) & ${\bf vSupCost}_{u,r,y}$ & Supply costs \\ 
+ \hline
+vEmsFuelTot(comm, region, year, slice) & ${\bf vEmsFuelTot}_{c,r,y,l}$ & Total emissions from fuels combustion \\ 
+ \hline
+vBalance(comm, region, year, slice) & ${\bf vBalance}_{c,r,y,l}$ & Net commodity balance \\ 
+ \hline
+vTotalCost(region, year) & ${\bf vTotalCost}_{r,y}$ & Regional annual total costs \\ 
+ \hline
+vObjective & ${\bf vObjective}$ & Objective costs \\ 
+ \hline
+vTaxCost(comm, region, year) & ${\bf vTaxCost}_{c,r,y}$ & Total tax levies (tax costs) \\ 
+ \hline
+vSubsCost(comm, region, year) & ${\bf vSubsCost}_{c,r,y}$ & Total subsidies (for substraction from costs) \\ 
+ \hline
+vAggOut(comm, region, year, slice) & ${\bf vAggOut}_{c,r,y,l}$ & Aggregated commodity output \\ 
+ \hline
+vStorageOMCost(stg, region, year) & ${\bf vStorageOMCost}_{s,r,y}$ & Storage O\&M costs \\ 
+ \hline
+vTradeCost(region, year) & ${\bf vTradeCost}_{r,y}$ & Total trade costs \\ 
+ \hline
+vTradeRowCost(region, year) & ${\bf vTradeRowCost}_{r,y}$ & Trade with ROW costs \\ 
+ \hline
+vTradeIrCost(region, year) & ${\bf vTradeIrCost}_{r,y}$ & Interregional trade costs \\ 
+ \hline
+\end{longtable}
+
+\section*{Positive Variables}
+\begin{longtable}{|p{10cm}|p{5cm}|p{9cm}|}
+\hline
+\bf{Name} & \bf{Alias}   & \bf{Description} \\ 
+ \hline
+vTechNewCap(tech, region, year) & ${\bf vTechNewCap}_{h,r,y}$ & New capacity \\ 
+ \hline
+vTechRetiredStock(tech, region, year) & ${\bf vTechRetiredStock}_{h,r,y}$ & Early retired stock \\ 
+ \hline
+vTechRetiredNewCap(tech, region, year, year) & ${\bf vTechRetiredNewCap}_{h,r,y,y}$ & Early retired new capacity \\ 
+ \hline
+vTechCap(tech, region, year) & ${\bf vTechCap}_{h,r,y}$ & Total capacity of the technology \\ 
+ \hline
+vTechAct(tech, region, year, slice) & ${\bf vTechAct}_{h,r,y,l}$ & Activity level of technology \\ 
+ \hline
+vTechInp(tech, comm, region, year, slice) & ${\bf vTechInp}_{h,c,r,y,l}$ & Input level \\ 
+ \hline
+vTechOut(tech, comm, region, year, slice) & ${\bf vTechOut}_{h,c,r,y,l}$ & Output level \\ 
+ \hline
+vTechAInp(tech, comm, region, year, slice) & ${\bf vTechAInp}_{h,c,r,y,l}$ & Auxiliary commodity input \\ 
+ \hline
+vTechAOut(tech, comm, region, year, slice) & ${\bf vTechAOut}_{h,c,r,y,l}$ & Auxiliary commodity output \\ 
+ \hline
+vSupOut(sup, comm, region, year, slice) & ${\bf vSupOut}_{u,c,r,y,l}$ & Output of supply \\ 
+ \hline
+vSupReserve(sup, comm, region) & ${\bf vSupReserve}_{u,c,r}$ & Total supply reserve \\ 
+ \hline
+vDemInp(comm, region, year, slice) & ${\bf vDemInp}_{c,r,y,l}$ & Input to demand \\ 
+ \hline
+vOutTot(comm, region, year, slice) & ${\bf vOutTot}_{c,r,y,l}$ & Total commodity output (consumption is not substracted) \\ 
+ \hline
+vInpTot(comm, region, year, slice) & ${\bf vInpTot}_{c,r,y,l}$ & Total commodity input \\ 
+ \hline
+vInp2Lo(comm, region, year, slice, slice) & ${\bf vInp2Lo}_{c,r,y,l,l}$ & Desagregation of slices for input parent to (grand)child \\ 
+ \hline
+vOut2Lo(comm, region, year, slice, slice) & ${\bf vOut2Lo}_{c,r,y,l,l}$ & Desagregation of slices for output parent to (grand)child \\ 
+ \hline
+vSupOutTot(comm, region, year, slice) & ${\bf vSupOutTot}_{c,r,y,l}$ & Total commodity supply \\ 
+ \hline
+vTechInpTot(comm, region, year, slice) & ${\bf vTechInpTot}_{c,r,y,l}$ & Total commodity input to technologies \\ 
+ \hline
+vTechOutTot(comm, region, year, slice) & ${\bf vTechOutTot}_{c,r,y,l}$ & Total commodity output from technologies \\ 
+ \hline
+vStorageInpTot(comm, region, year, slice) & ${\bf vStorageInpTot}_{c,r,y,l}$ & Total commodity input to storage \\ 
+ \hline
+vStorageOutTot(comm, region, year, slice) & ${\bf vStorageOutTot}_{c,r,y,l}$ & Total commodity output from storage \\ 
+ \hline
+vStorageAInp(stg, comm, region, year, slice) & ${\bf vStorageAInp}_{s,c,r,y,l}$ & Aux-commodity input to storage \\ 
+ \hline
+vStorageAOut(stg, comm, region, year, slice) & ${\bf vStorageAOut}_{s,c,r,y,l}$ & Aux-commodity input from storage \\ 
+ \hline
+vDummyImport(comm, region, year, slice) & ${\bf vDummyImport}_{c,r,y,l}$ & Dummy import (for debugging) \\ 
+ \hline
+vDummyExport(comm, region, year, slice) & ${\bf vDummyExport}_{c,r,y,l}$ & Dummy export (for debugging) \\ 
+ \hline
+vStorageInp(stg, comm, region, year, slice) & ${\bf vStorageInp}_{s,c,r,y,l}$ & Storage input \\ 
+ \hline
+vStorageOut(stg, comm, region, year, slice) & ${\bf vStorageOut}_{s,c,r,y,l}$ & Storage output \\ 
+ \hline
+vStorageStore(stg, comm, region, year, slice) & ${\bf vStorageStore}_{s,c,r,y,l}$ & Storage level \\ 
+ \hline
+vStorageInv(stg, region, year) & ${\bf vStorageInv}_{s,r,y}$ & Storage investments \\ 
+ \hline
+vStorageEac(stg, region, year) & ${\bf vStorageEac}_{s,r,y}$ & Storage EAC investments \\ 
+ \hline
+vStorageCap(stg, region, year) & ${\bf vStorageCap}_{s,r,y}$ & Storage capacity \\ 
+ \hline
+vStorageNewCap(stg, region, year) & ${\bf vStorageNewCap}_{s,r,y}$ & Storage new capacity \\ 
+ \hline
+vImport(comm, region, year, slice) & ${\bf vImport}_{c,r,y,l}$ & Total regional import (Ir + ROW) \\ 
+ \hline
+vExport(comm, region, year, slice) & ${\bf vExport}_{c,r,y,l}$ & Total regional export (Ir + ROW) \\ 
+ \hline
+vTradeIr(trade, comm, region, region, year, slice) & ${\bf vTradeIr}_{d,c,r,r,y,l}$ & Total physical trade flows between regions \\ 
+ \hline
+vTradeIrAInp(trade, comm, region, year, slice) & ${\bf vTradeIrAInp}_{d,c,r,y,l}$ & Trade auxilari input \\ 
+ \hline
+vTradeIrAInpTot(comm, region, year, slice) & ${\bf vTradeIrAInpTot}_{c,r,y,l}$ & Trade total auxilari input \\ 
+ \hline
+vTradeIrAOut(trade, comm, region, year, slice) & ${\bf vTradeIrAOut}_{d,c,r,y,l}$ & Trade auxilari output \\ 
+ \hline
+vTradeIrAOutTot(comm, region, year, slice) & ${\bf vTradeIrAOutTot}_{c,r,y,l}$ & Trade auxilari output total \\ 
+ \hline
+vExportRowAccumulated(expp, comm) & ${\bf vExportRowAccumulated}_{x,c}$ & Accumulated export to ROW \\ 
+ \hline
+vExportRow(expp, comm, region, year, slice) & ${\bf vExportRow}_{x,c,r,y,l}$ & Export to ROW \\ 
+ \hline
+vImportRowAccumulated(imp, comm) & ${\bf vImportRowAccumulated}_{m,c}$ & Accumulated import from ROW \\ 
+ \hline
+vImportRow(imp, comm, region, year, slice) & ${\bf vImportRow}_{m,c,r,y,l}$ & Import from ROW \\ 
+ \hline
+vTradeCap(trade, year) & ${\bf vTradeCap}_{d,y}$ & Trade capacity \\ 
+ \hline
+vTradeInv(trade, region, year) & ${\bf vTradeInv}_{d,r,y}$ & Investment in trade capacity (overnight) \\ 
+ \hline
+vTradeEac(trade, region, year) & ${\bf vTradeEac}_{d,r,y}$ & Investment in trade capacity (EAC) \\ 
+ \hline
+vTradeNewCap(trade, year) & ${\bf vTradeNewCap}_{d,y}$ & New trade capacity \\ 
+ \hline
+vTotalUserCosts(region, year) & ${\bf vTotalUserCosts}_{r,y}$ & Total additional costs (set by user) \\ 
+ \hline
+\end{longtable}
+
+\section*{Equations}
+\subsection*{Technology}
+\subsubsection*{Activity Input \& Output}
+Technology input to output
+
+
+
+
+
+
+
+%1
+$eqTechSng2Sng_{h,r,c,cp,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechInp}_{h,c,r,y,l}*pTechCinp2use_{h,c,r,y,l}  =  \frac{{\bf vTechOut}_{h,cp,r,y,l}}{pTechUse2cact_{h,cp,r,y,l}*pTechCact2cout_{h,cp,r,y,l}}
+\end{dmath} 
+Technology group input to output
+
+
+
+
+
+
+
+%2
+$eqTechGrp2Sng_{h,r,g,cp,y,l}$
+
+
+
+
+
+\begin{dmath} 
+pTechGinp2use_{h,g,r,y,l}*\sum_{c}{\left({\bf vTechInp}_{h,c,r,y,l}*pTechCinp2ginp_{h,c,r,y,l}\right)}  =  \frac{{\bf vTechOut}_{h,cp,r,y,l}}{pTechUse2cact_{h,cp,r,y,l}*pTechCact2cout_{h,cp,r,y,l}}
+\end{dmath} 
+Technology input to group output
+
+
+
+
+
+
+
+%3
+$eqTechSng2Grp_{h,r,c,gp,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechInp}_{h,c,r,y,l}*pTechCinp2use_{h,c,r,y,l}  =  \sum_{cp}{\left(\frac{{\bf vTechOut}_{h,cp,r,y,l}}{pTechUse2cact_{h,cp,r,y,l}*pTechCact2cout_{h,cp,r,y,l}}\right)}
+\end{dmath} 
+Technology group input to group output
+
+
+
+
+
+
+
+%4
+$eqTechGrp2Grp_{h,r,g,gp,y,l}$
+
+
+
+
+
+\begin{dmath} 
+pTechGinp2use_{h,g,r,y,l}*\sum_{c}{\left({\bf vTechInp}_{h,c,r,y,l}*pTechCinp2ginp_{h,c,r,y,l}\right)}  =  \sum_{cp}{\left(\frac{{\bf vTechOut}_{h,cp,r,y,l}}{pTechUse2cact_{h,cp,r,y,l}*pTechCact2cout_{h,cp,r,y,l}}\right)}
+\end{dmath} 
+\subsubsection*{Shares for grouped commodities}
+Technology lower bound on input share
+
+
+
+
+
+
+
+%5
+$eqTechShareInpLo_{h,r,g,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechInp}_{h,c,r,y,l}  \ge  pTechShareLo_{h,c,r,y,l}*\sum_{cp}{\left({\bf vTechInp}_{h,cp,r,y,l}\right)}
+\end{dmath} 
+Technology upper bound on input share
+
+
+
+
+
+
+
+%6
+$eqTechShareInpUp_{h,r,g,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechInp}_{h,c,r,y,l}  \le  pTechShareUp_{h,c,r,y,l}*\sum_{cp}{\left({\bf vTechInp}_{h,cp,r,y,l}\right)}
+\end{dmath} 
+Technology lower bound on output share
+
+
+
+
+
+
+
+%7
+$eqTechShareOutLo_{h,r,g,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechOut}_{h,c,r,y,l}  \ge  pTechShareLo_{h,c,r,y,l}*\sum_{cp}{\left({\bf vTechOut}_{h,cp,r,y,l}\right)}
+\end{dmath} 
+Technology upper bound on output share
+
+
+
+
+
+
+
+%8
+$eqTechShareOutUp_{h,r,g,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechOut}_{h,c,r,y,l}  \le  pTechShareUp_{h,c,r,y,l}*\sum_{cp}{\left({\bf vTechOut}_{h,cp,r,y,l}\right)}
+\end{dmath} 
+\subsubsection*{Auxiliary input \& output}
+Technology auxiliary commodity input
+
+
+
+
+
+
+
+%9
+$eqTechAInp_{h,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechAInp}_{h,c,r,y,l}  =  \left({\bf vTechAct}_{h,r,y,l}*pTechAct2AInp_{h,c,r,y,l}\right)+\left({\bf vTechCap}_{h,r,y}*pTechCap2AInp_{h,c,r,y,l}\right)+\left({\bf vTechNewCap}_{h,r,y}*pTechNCap2AInp_{h,c,r,y,l}\right)+\sum_{cp}{\left(pTechCinp2AInp_{h,c,cp,r,y,l}*{\bf vTechInp}_{h,cp,r,y,l}\right)}+\sum_{cp}{\left(pTechCout2AInp_{h,c,cp,r,y,l}*{\bf vTechOut}_{h,cp,r,y,l}\right)}
+\end{dmath} 
+Technology auxiliary commodity output
+
+
+
+
+
+
+
+%10
+$eqTechAOut_{h,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechAOut}_{h,c,r,y,l}  =  \left({\bf vTechAct}_{h,r,y,l}*pTechAct2AOut_{h,c,r,y,l}\right)+\left({\bf vTechCap}_{h,r,y}*pTechCap2AOut_{h,c,r,y,l}\right)+\left({\bf vTechNewCap}_{h,r,y}*pTechNCap2AOut_{h,c,r,y,l}\right)+\sum_{cp}{\left(pTechCinp2AOut_{h,c,cp,r,y,l}*{\bf vTechInp}_{h,cp,r,y,l}\right)}+\sum_{cp}{\left(pTechCout2AOut_{h,c,cp,r,y,l}*{\bf vTechOut}_{h,cp,r,y,l}\right)}
+\end{dmath} 
+\subsubsection*{Availability}
+Technology availability factor lower bound
+
+
+
+
+
+
+
+%11
+$eqTechAfLo_{h,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+pTechAfLo_{h,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*pSliceShare_{l}*\prod_{w}{\left(pTechWeatherAfLo_{w,h}*pWeather_{w,r,y,l}\right)}  \le  {\bf vTechAct}_{h,r,y,l}
+\end{dmath} 
+Technology availability factor upper bound
+
+
+
+
+
+
+
+%12
+$eqTechAfUp_{h,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechAct}_{h,r,y,l}  \le  pTechAfUp_{h,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*pSliceShare_{l}*\prod_{w}{\left(pTechWeatherAfUp_{w,h}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Technology availability factor for sum of slices lower bound
+
+
+
+
+
+
+
+%13
+$eqTechAfsLo_{h,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+pTechAfsLo_{h,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*pSliceShare_{l}*\prod_{w}{\left(pTechWeatherAfsLo_{w,h}*pWeather_{w,r,y,l}\right)}  \le  \sum_{lp}{\left({\bf vTechAct}_{h,r,y,lp}\right)}
+\end{dmath} 
+Technology availability factor for sum of slices upper bound
+
+
+
+
+
+
+
+%14
+$eqTechAfsUp_{h,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+\sum_{lp}{\left({\bf vTechAct}_{h,r,y,lp}\right)}  \le  pTechAfsUp_{h,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*pSliceShare_{l}*\prod_{w}{\left(pTechWeatherAfsUp_{w,h}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Technology ramp up
+
+
+
+
+
+
+
+%15
+$eqTechRampUp_{h,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+\frac{{\bf vTechAct}_{h,r,y,l}}{pSliceShare_{l}}-\sum_{lp}{\left(\frac{{\bf vTechAct}_{h,r,y,lp}}{pSliceShare_{lp}}\right)}  \le  \frac{pSliceShare_{l}*365*24*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}}{pTechRampUp_{h,r,y,l}}
+\end{dmath} 
+Technology ramp down
+
+
+
+
+
+
+
+%16
+$eqTechRampDown_{h,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+\sum_{lp}{\left(\frac{{\bf vTechAct}_{h,r,y,lp}}{pSliceShare_{lp}}\right)}-\frac{{\bf vTechAct}_{h,r,y,l}}{pSliceShare_{l}}  \le  \frac{pSliceShare_{l}*365*24*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}}{pTechRampDown_{h,r,y,l}}
+\end{dmath} 
+\subsubsection*{Connect activity with output}
+Technology activity to commodity output
+
+
+
+
+
+
+
+%17
+$eqTechActSng_{h,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechAct}_{h,r,y,l}  =  \frac{{\bf vTechOut}_{h,c,r,y,l}}{pTechCact2cout_{h,c,r,y,l}}
+\end{dmath} 
+Technology activity to group output
+
+
+
+
+
+
+
+%18
+$eqTechActGrp_{h,g,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechAct}_{h,r,y,l}  =  \sum_{c}{\left(\frac{{\bf vTechOut}_{h,c,r,y,l}}{pTechCact2cout_{h,c,r,y,l}}\right)}
+\end{dmath} 
+\subsubsection*{Availability commodity factor}
+Technology commodity availability factor lower bound
+
+
+
+
+
+
+
+%19
+$eqTechAfcOutLo_{h,r,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+pTechCact2cout_{h,c,r,y,l}*pTechAfcLo_{h,c,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*pSliceShare_{l}*\prod_{w}{\left(pTechWeatherAfcLo_{w,h,c}*pWeather_{w,r,y,l}\right)}  \le  {\bf vTechOut}_{h,c,r,y,l}
+\end{dmath} 
+Technology commodity availability factor upper bound
+
+
+
+
+
+
+
+%20
+$eqTechAfcOutUp_{h,r,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechOut}_{h,c,r,y,l}  \le  pTechCact2cout_{h,c,r,y,l}*pTechAfcUp_{h,c,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*\prod_{w}{\left(pTechWeatherAfcUp_{w,h,c}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Technology commodity availability factor lower bound
+
+
+
+
+
+
+
+%21
+$eqTechAfcInpLo_{h,r,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+pTechAfcLo_{h,c,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*pSliceShare_{l}*\prod_{w}{\left(pTechWeatherAfcLo_{w,h,c}*pWeather_{w,r,y,l}\right)}  \le  {\bf vTechInp}_{h,c,r,y,l}
+\end{dmath} 
+Technology commodity availability factor upper bound
+
+
+
+
+
+
+
+%22
+$eqTechAfcInpUp_{h,r,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechInp}_{h,c,r,y,l}  \le  pTechAfcUp_{h,c,r,y,l}*pTechCap2act_{h}*{\bf vTechCap}_{h,r,y}*pSliceShare_{l}*\prod_{w}{\left(pTechWeatherAfcUp_{w,h,c}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+\subsubsection*{Capacity and costs equations}
+Technology capacity
+
+
+
+
+
+
+
+%23
+$eqTechCap_{h,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechCap}_{h,r,y}  =  pTechStock_{h,r,y}-{\bf vTechRetiredStock}_{h,r,y}+\sum_{yp}{\left(pPeriodLen_{yp}*\left({\bf vTechNewCap}_{h,r,yp}-\sum_{ye}{\left({\bf vTechRetiredNewCap}_{h,r,yp,ye}\right)}\right)\right)}
+\end{dmath} 
+Retirement of new capacity
+
+
+
+
+
+
+
+%24
+$eqTechRetiredNewCap_{h,r,y}$
+
+
+
+
+
+\begin{dmath} 
+\sum_{yp}{\left({\bf vTechRetiredNewCap}_{h,r,y,yp}\right)}  \le  {\bf vTechNewCap}_{h,r,y}
+\end{dmath} 
+Retirement of stock
+
+
+
+
+
+
+
+%25
+$eqTechRetiredStock_{h,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechRetiredStock}_{h,r,y}  \le  pTechStock_{h,r,y}
+\end{dmath} 
+Technology Equivalent Annual Cost (EAC)
+
+
+
+
+
+
+
+%26
+$eqTechEac_{h,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechEac}_{h,r,y}  =  \sum_{yp}{\left(pTechEac_{h,r,yp}*pPeriodLen_{yp}*\left({\bf vTechNewCap}_{h,r,yp}-\sum_{ye}{\left({\bf vTechRetiredNewCap}_{h,r,yp,ye}\right)}\right)\right)}
+\end{dmath} 
+Technology overnight investment costs
+
+
+
+
+
+
+
+%27
+$eqTechInv_{h,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechInv}_{h,r,y}  =  pTechInvcost_{h,r,y}*{\bf vTechNewCap}_{h,r,y}
+\end{dmath} 
+Technology O\&M costs
+
+
+
+
+
+
+
+%28
+$eqTechOMCost_{h,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechOMCost}_{h,r,y}  =  pTechFixom_{h,r,y}*{\bf vTechCap}_{h,r,y}+\sum_{l}{\left(pTechVarom_{h,r,y,l}*{\bf vTechAct}_{h,r,y,l}\right)}+\sum_{l}{\left(\sum_{c}{\left(pTechCvarom_{h,c,r,y,l}*{\bf vTechInp}_{h,c,r,y,l}\right)}\right)}+\sum_{l}{\left(\sum_{c}{\left(pTechCvarom_{h,c,r,y,l}*{\bf vTechOut}_{h,c,r,y,l}\right)}\right)}+\sum_{l}{\left(\sum_{c}{\left(pTechAvarom_{h,c,r,y,l}*{\bf vTechAOut}_{h,c,r,y,l}\right)}\right)}+\sum_{l}{\left(\sum_{c}{\left(pTechAvarom_{h,c,r,y,l}*{\bf vTechAInp}_{h,c,r,y,l}\right)}\right)}
+\end{dmath} 
+\subsection*{Supply}
+Supply availability upper bound
+
+
+
+
+
+
+
+%29
+$eqSupAvaUp_{u,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vSupOut}_{u,c,r,y,l}  \le  pSupAvaUp_{u,c,r,y,l}*\prod_{w}{\left(pSupWeatherUp_{w,u}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Supply availability lower bound
+
+
+
+
+
+
+
+%30
+$eqSupAvaLo_{u,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vSupOut}_{u,c,r,y,l}  \ge  pSupAvaLo_{u,c,r,y,l}*\prod_{w}{\left(pSupWeatherLo_{w,u}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Total supply of each commodity
+
+
+
+
+
+
+
+%31
+$eqSupTotal_{u,c,r}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vSupReserve}_{u,c,r}  =  \sum_{y,l}{\left(pPeriodLen_{y}*{\bf vSupOut}_{u,c,r,y,l}\right)}
+\end{dmath} 
+Total reserve upper value
+
+
+
+
+
+
+
+%32
+$eqSupReserveUp_{u,c,r}$
+
+
+
+
+
+\begin{dmath} 
+pSupReserveUp_{u,c,r}  \ge  {\bf vSupReserve}_{u,c,r}
+\end{dmath} 
+Total reserve lower value
+
+
+
+
+
+
+
+%33
+$eqSupReserveLo_{u,c,r}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vSupReserve}_{u,c,r}  \ge  pSupReserveLo_{u,c,r}
+\end{dmath} 
+Total supply costs
+
+
+
+
+
+
+
+%34
+$eqSupCost_{u,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vSupCost}_{u,r,y}  =  \sum_{c,l}{\left(pSupCost_{u,c,r,y,l}*{\bf vSupOut}_{u,c,r,y,l}\right)}
+\end{dmath} 
+\subsection*{Demand}
+Demand equation
+
+
+
+
+
+
+
+%35
+$eqDemInp_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vDemInp}_{c,r,y,l}  =  \sum_{d}{\left(pDemand_{d,c,r,y,l}\right)}
+\end{dmath} 
+\subsection*{Emission \& Aggregating commodity equation}
+Aggregating commodity output
+
+
+
+
+
+
+
+%36
+$eqAggOut_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vAggOut}_{c,r,y,l}  =  \sum_{cp}{\left(pAggregateFactor_{c,cp}*\sum_{lp}{\left({\bf vOutTot}_{cp,r,y,lp}\right)}\right)}
+\end{dmath} 
+Emissions from commodity consumption (i.e. fuels combustion)
+
+
+
+
+
+
+
+%37
+$eqEmsFuelTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vEmsFuelTot}_{c,r,y,l}  =  \sum_{cp}{\left(pEmissionFactor_{c,cp}*\sum_{h}{\left(pTechEmisComm_{h,cp}*\sum_{lp}{\left({\bf vTechInp}_{h,cp,r,y,lp}\right)}\right)}\right)}
+\end{dmath} 
+\subsection*{Storage}
+\subsubsection*{Input \& Output}
+Storage level
+
+
+
+
+
+
+
+%38
+$eqStorageAInp_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageAInp}_{s,c,r,y,l}  =  \sum_{cp}{\left(pStorageStg2AInp_{s,c,r,y,l}*{\bf vStorageStore}_{s,cp,r,y,l}\right)}+\sum_{cp}{\left(pStorageCinp2AInp_{s,c,r,y,l}*{\bf vStorageInp}_{s,cp,r,y,l}\right)}+\sum_{cp}{\left(pStorageCout2AInp_{s,c,r,y,l}*{\bf vStorageOut}_{s,cp,r,y,l}\right)}+\sum_{cp}{\left(pStorageCap2AInp_{s,c,r,y,l}*{\bf vStorageCap}_{s,r,y}\right)}+\sum_{cp}{\left(pStorageNCap2AInp_{s,c,r,y,l}*{\bf vStorageNewCap}_{s,r,y}\right)}
+\end{dmath} 
+Storage availability factor lower
+
+
+
+
+
+
+
+%39
+$eqStorageAOut_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageAOut}_{s,c,r,y,l}  =  \sum_{cp}{\left(pStorageStg2AOut_{s,c,r,y,l}*{\bf vStorageStore}_{s,cp,r,y,l}\right)}+\sum_{cp}{\left(pStorageCinp2AOut_{s,c,r,y,l}*{\bf vStorageInp}_{s,cp,r,y,l}\right)}+\sum_{cp}{\left(pStorageCout2AOut_{s,c,r,y,l}*{\bf vStorageOut}_{s,cp,r,y,l}\right)}+\sum_{cp}{\left(pStorageCap2AOut_{s,c,r,y,l}*{\bf vStorageCap}_{s,r,y}\right)}+\sum_{cp}{\left(pStorageNCap2AOut_{s,c,r,y,l}*{\bf vStorageNewCap}_{s,r,y}\right)}
+\end{dmath} 
+Storage availability factor upper
+
+
+
+
+
+
+
+%40
+$eqStorageStore_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageStore}_{s,c,r,y,l}  =  pStorageCharge_{s,c,r,y,l}+\left(pStorageNCap2Stg_{s,c,r,y,l}*{\bf vStorageNewCap}_{s,r,y}\right)+\sum_{lp}{\left(pStorageInpEff_{s,c,r,y,lp}*{\bf vStorageInp}_{s,c,r,y,lp}\right)}+\sum_{lp}{\left(\left({pStorageStgEff_{s,c,r,y,l}}^{pSliceShare_{l}}\right)*{\bf vStorageStore}_{s,c,r,y,lp}\right)}-\sum_{lp}{\left(\frac{{\bf vStorageOut}_{s,c,r,y,lp}}{pStorageOutEff_{s,c,r,y,lp}}\right)}
+\end{dmath} 
+Storage output vs level
+
+
+
+
+
+
+
+%41
+$eqStorageAfLo_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageStore}_{s,c,r,y,l}  \ge  pStorageAfLo_{s,r,y,l}*pStorageCap2stg_{s}*{\bf vStorageCap}_{s,r,y}*\prod_{w}{\left(pStorageWeatherAfLo_{w,s}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Storage aux-commodity input
+
+
+
+
+
+
+
+%42
+$eqStorageAfUp_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageStore}_{s,c,r,y,l}  \le  pStorageAfUp_{s,r,y,l}*pStorageCap2stg_{s}*{\bf vStorageCap}_{s,r,y}*\prod_{w}{\left(pStorageWeatherAfUp_{w,s}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Storage aux-commodity output
+
+
+
+
+
+
+
+%43
+$eqStorageClean_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+\frac{{\bf vStorageOut}_{s,c,r,y,l}}{pStorageOutEff_{s,c,r,y,l}}  \le  {\bf vStorageStore}_{s,c,r,y,l}
+\end{dmath} 
+Storage input upper constraint
+
+
+
+
+
+
+
+%44
+$eqStorageInpUp_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageInp}_{s,c,r,y,l}  \le  pStorageCap2stg_{s}*{\bf vStorageCap}_{s,r,y}*pStorageCinpUp_{s,c,r,y,l}*pSliceShare_{l}*\prod_{w}{\left(pStorageWeatherCinpUp_{w,s}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Storage input lower constraint
+
+
+
+
+
+
+
+%45
+$eqStorageInpLo_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageInp}_{s,c,r,y,l}  \ge  pStorageCap2stg_{s}*{\bf vStorageCap}_{s,r,y}*pStorageCinpLo_{s,c,r,y,l}*pSliceShare_{l}*\prod_{w}{\left(pStorageWeatherCinpLo_{w,s}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Storage output upper constraint
+
+
+
+
+
+
+
+%46
+$eqStorageOutUp_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageOut}_{s,c,r,y,l}  \le  pStorageCap2stg_{s}*{\bf vStorageCap}_{s,r,y}*pStorageCoutUp_{s,c,r,y,l}*pSliceShare_{l}*\prod_{w}{\left(pStorageWeatherCoutUp_{w,s}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+Storage output lower constraint
+
+
+
+
+
+
+
+%47
+$eqStorageOutLo_{s,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageOut}_{s,c,r,y,l}  \ge  pStorageCap2stg_{s}*{\bf vStorageCap}_{s,r,y}*pStorageCoutLo_{s,c,r,y,l}*pSliceShare_{l}*\prod_{w}{\left(pStorageWeatherCoutLo_{w,s}*pWeather_{w,r,y,l}\right)}
+\end{dmath} 
+\subsubsection*{Capacity and costs for storage}
+Storage capacity
+
+
+
+
+
+
+
+%48
+$eqStorageCap_{s,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageCap}_{s,r,y}  =  pStorageStock_{s,r,y}+\sum_{yp}{\left(pPeriodLen_{yp}*{\bf vStorageNewCap}_{s,r,yp}\right)}
+\end{dmath} 
+Storage overnight investment costs
+
+
+
+
+
+
+
+%49
+$eqStorageInv_{s,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageInv}_{s,r,y}  =  pStorageInvcost_{s,r,y}*{\bf vStorageNewCap}_{s,r,y}
+\end{dmath} 
+Storage equivalent annual cost
+
+
+
+
+
+
+
+%50
+$eqStorageEac_{s,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageEac}_{s,r,y}  =  \sum_{yp}{\left(pStorageEac_{s,r,yp}*pPeriodLen_{yp}*{\bf vStorageNewCap}_{s,r,yp}\right)}
+\end{dmath} 
+Storage total costs
+
+
+
+
+
+
+
+%51
+$eqStorageCost_{s,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageOMCost}_{s,r,y}  =  pStorageFixom_{s,r,y}*{\bf vStorageCap}_{s,r,y}+\sum_{c}{\left(\sum_{l}{\left(pStorageCostInp_{s,r,y,l}*{\bf vStorageInp}_{s,c,r,y,l}\right)}+\sum_{l}{\left(pStorageCostOut_{s,r,y,l}*{\bf vStorageOut}_{s,c,r,y,l}\right)}+\sum_{l}{\left(pStorageCostStore_{s,r,y,l}*{\bf vStorageStore}_{s,c,r,y,l}\right)}\right)}
+\end{dmath} 
+\subsection*{Interregional and ROW Trade equations}
+\subsubsection*{Flow}
+Import equation
+
+
+
+
+
+
+
+%52
+$eqImport_{c,dst,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vImport}_{c,dst,y,l}  =  \sum_{lp}{\left(\sum_{d}{\left(\sum_{src}{\left(pTradeIrEff_{d,src,dst,y,lp}*{\bf vTradeIr}_{d,c,src,dst,y,lp}\right)}\right)}\right)}+\sum_{lp}{\left(\sum_{m}{\left({\bf vImportRow}_{m,c,dst,y,lp}\right)}\right)}
+\end{dmath} 
+Export equation
+
+
+
+
+
+
+
+%53
+$eqExport_{c,src,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vExport}_{c,src,y,l}  =  \sum_{lp}{\left(\sum_{d}{\left(\sum_{dst}{\left({\bf vTradeIr}_{d,c,src,dst,y,lp}\right)}\right)}\right)}+\sum_{lp}{\left(\sum_{x}{\left({\bf vExportRow}_{x,c,src,y,lp}\right)}\right)}
+\end{dmath} 
+Trade upper bound
+
+
+
+
+
+
+
+%54
+$eqTradeFlowUp_{d,c,src,dst,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeIr}_{d,c,src,dst,y,l}  \le  pTradeIrUp_{d,src,dst,y,l}
+\end{dmath} 
+Trade lower bound
+
+
+
+
+
+
+
+%55
+$eqTradeFlowLo_{d,c,src,dst,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeIr}_{d,c,src,dst,y,l}  \ge  pTradeIrLo_{d,src,dst,y,l}
+\end{dmath} 
+Total trade costs
+
+
+
+
+
+
+
+%56
+$eqCostTrade_{r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeCost}_{r,y}  =  {\bf vTradeRowCost}_{r,y}+{\bf vTradeIrCost}_{r,y}
+\end{dmath} 
+Costs of trade with the Rest of the World (ROW)
+
+
+
+
+
+
+
+%57
+$eqCostRowTrade_{r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeRowCost}_{r,y}  =  \sum_{m,c,l}{\left(pImportRowPrice_{m,r,y,l}*{\bf vImportRow}_{m,c,r,y,l}\right)}-\sum_{x,c,l}{\left(pExportRowPrice_{x,r,y,l}*{\bf vExportRow}_{x,c,r,y,l}\right)}
+\end{dmath} 
+Costs of import
+
+
+
+
+
+
+
+%58
+$eqCostIrTrade_{r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeIrCost}_{r,y}  =  \sum_{d}{\left({\bf vTradeEac}_{d,r,y}\right)}+\sum_{d,src}{\left(\sum_{c}{\left(\sum_{l}{\left(\left(\left(pTradeIrCost_{d,src,r,y,l}+pTradeIrMarkup_{d,src,r,y,l}\right)*{\bf vTradeIr}_{d,c,src,r,y,l}\right)\right)}\right)}\right)}-\sum_{d,dst}{\left(\sum_{c}{\left(\sum_{l}{\left(\left(pTradeIrMarkup_{d,r,dst,y,l}*{\bf vTradeIr}_{d,c,r,dst,y,l}\right)\right)}\right)}\right)}
+\end{dmath} 
+Export to ROW upper constraint
+
+
+
+
+
+
+
+%59
+$eqExportRowUp_{x,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vExportRow}_{x,c,r,y,l}  \le  pExportRowUp_{x,r,y,l}
+\end{dmath} 
+Export to ROW lower constraint
+
+
+
+
+
+
+
+%60
+$eqExportRowLo_{x,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vExportRow}_{x,c,r,y,l}  \ge  pExportRowLo_{x,r,y,l}
+\end{dmath} 
+Cumulative export to ROW
+
+
+
+
+
+
+
+%61
+$eqExportRowCumulative_{x,c}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vExportRowAccumulated}_{x,c}  =  \sum_{r,y,l}{\left(pPeriodLen_{y}*{\bf vExportRow}_{x,c,r,y,l}\right)}
+\end{dmath} 
+Cumulative export to ROW upper constraint
+
+
+
+
+
+
+
+%62
+$eqExportRowResUp_{x,c}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vExportRowAccumulated}_{x,c}  \le  pExportRowRes_{x}
+\end{dmath} 
+Import from ROW upper constraint
+
+
+
+
+
+
+
+%63
+$eqImportRowUp_{m,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vImportRow}_{m,c,r,y,l}  \le  pImportRowUp_{m,r,y,l}
+\end{dmath} 
+Import of ROW lower constraint
+
+
+
+
+
+
+
+%64
+$eqImportRowLo_{m,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vImportRow}_{m,c,r,y,l}  \ge  pImportRowLo_{m,r,y,l}
+\end{dmath} 
+Cumulative import from ROW
+
+
+
+
+
+
+
+%65
+$eqImportRowAccumulated_{m,c}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vImportRowAccumulated}_{m,c}  =  \sum_{r,y,l}{\left(pPeriodLen_{y}*{\bf vImportRow}_{m,c,r,y,l}\right)}
+\end{dmath} 
+Cumulative import from ROW upper constraint
+
+
+
+
+
+
+
+%66
+$eqImportRowResUp_{m,c}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vImportRowAccumulated}_{m,c}  \le  pImportRowRes_{m}
+\end{dmath} 
+Trade capacity
+
+
+
+
+
+
+
+%67
+$eqTradeCapFlow_{d,c,y,l}$
+
+
+
+
+
+\begin{dmath} 
+pSliceShare_{l}*pTradeCap2Act_{d}*{\bf vTradeCap}_{d,y}  \ge  \sum_{src,dst}{\left({\bf vTradeIr}_{d,c,src,dst,y,l}\right)}
+\end{dmath} 
+Trade overnight investment costs
+
+
+
+
+
+
+
+%68
+$eqTradeCap_{d,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeCap}_{d,y}  =  pTradeStock_{d,y}+\sum_{yp}{\left(pPeriodLen_{yp}*{\bf vTradeNewCap}_{d,yp}\right)}
+\end{dmath} 
+Trade equivalent annual costs
+
+
+
+
+
+
+
+%69
+$eqTradeInv_{d,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeInv}_{d,r,y}  =  pTradeInvcost_{d,r,y}*{\bf vTradeNewCap}_{d,y}
+\end{dmath} 
+Trade capacity to activity
+
+
+
+
+
+
+
+%70
+$eqTradeEac_{d,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeEac}_{d,r,y}  =  \sum_{yp}{\left(pTradeEac_{d,r,yp}*pPeriodLen_{yp}*{\bf vTradeNewCap}_{d,yp}\right)}
+\end{dmath} 
+\subsubsection*{Trade IR capacity equations}
+\subsubsection*{Auxiliary input \& output equations}
+Trade auxiliary commodity input
+
+
+
+
+
+
+
+%71
+$eqTradeIrAInp_{d,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeIrAInp}_{d,c,r,y,l}  =  \sum_{dst}{\left(pTradeIrCsrc2Ainp_{d,c,r,dst,y,l}*\sum_{cp}{\left({\bf vTradeIr}_{d,cp,r,dst,y,l}\right)}\right)}+\sum_{src}{\left(pTradeIrCdst2Ainp_{d,c,src,r,y,l}*\sum_{cp}{\left({\bf vTradeIr}_{d,cp,src,r,y,l}\right)}\right)}
+\end{dmath} 
+Trade auxiliary commodity output
+
+
+
+
+
+
+
+%72
+$eqTradeIrAOut_{d,c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeIrAOut}_{d,c,r,y,l}  =  \sum_{dst}{\left(pTradeIrCsrc2Aout_{d,c,r,dst,y,l}*\sum_{cp}{\left({\bf vTradeIr}_{d,cp,r,dst,y,l}\right)}\right)}+\sum_{src}{\left(pTradeIrCdst2Aout_{d,c,src,r,y,l}*\sum_{cp}{\left({\bf vTradeIr}_{d,cp,src,r,y,l}\right)}\right)}
+\end{dmath} 
+Trade auxiliary commodity input
+
+
+
+
+
+
+
+%73
+$eqTradeIrAInpTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeIrAInpTot}_{c,r,y,l}  =  \sum_{d,lp}{\left({\bf vTradeIrAInp}_{d,c,r,y,lp}\right)}
+\end{dmath} 
+Trade auxiliary commodity output
+
+
+
+
+
+
+
+%74
+$eqTradeIrAOutTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTradeIrAOutTot}_{c,r,y,l}  =  \sum_{d,lp}{\left({\bf vTradeIrAOut}_{d,c,r,y,lp}\right)}
+\end{dmath} 
+\subsubsection*{Balance equations \& dummy import \& export}
+PRODUCTION <= CONSUMPTION commodity balance
+
+
+
+
+
+
+
+%75
+$eqBalLo_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vBalance}_{c,r,y,l}  \ge  0
+\end{dmath} 
+PRODUCTION >= CONSUMPTION commodity balance
+
+
+
+
+
+
+
+%76
+$eqBalUp_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vBalance}_{c,r,y,l}  \le  0
+\end{dmath} 
+PRODUCTION == CONSUMPTION commodity balance
+
+
+
+
+
+
+
+%77
+$eqBalFx_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vBalance}_{c,r,y,l}  =  0
+\end{dmath} 
+Commodity balance
+
+
+
+
+
+
+
+%78
+$eqBal_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vBalance}_{c,r,y,l}  =  {\bf vOutTot}_{c,r,y,l}-{\bf vInpTot}_{c,r,y,l}
+\end{dmath} 
+Total commodity output
+
+
+
+
+
+
+
+%79
+$eqOutTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vOutTot}_{c,r,y,l}  =  {\bf vDummyImport}_{c,r,y,l}+{\bf vSupOutTot}_{c,r,y,l}+{\bf vEmsFuelTot}_{c,r,y,l}+{\bf vAggOut}_{c,r,y,l}+{\bf vTechOutTot}_{c,r,y,l}+{\bf vStorageOutTot}_{c,r,y,l}+{\bf vImport}_{c,r,y,l}+{\bf vTradeIrAOutTot}_{c,r,y,l}+\sum_{lp}{\left({\bf vOut2Lo}_{c,r,y,lp,l}\right)}
+\end{dmath} 
+Total commodity input
+
+
+
+
+
+
+
+%80
+$eqOut2Lo_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+\sum_{lp}{\left({\bf vOut2Lo}_{c,r,y,l,lp}\right)}  =  {\bf vSupOutTot}_{c,r,y,l}+{\bf vEmsFuelTot}_{c,r,y,l}+{\bf vAggOut}_{c,r,y,l}+{\bf vTechOutTot}_{c,r,y,l}+{\bf vStorageOutTot}_{c,r,y,l}+{\bf vImport}_{c,r,y,l}+{\bf vTradeIrAOutTot}_{c,r,y,l}
+\end{dmath} 
+From commodity slice to lo level
+
+
+
+
+
+
+
+%81
+$eqInpTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vInpTot}_{c,r,y,l}  =  {\bf vDemInp}_{c,r,y,l}+{\bf vDummyExport}_{c,r,y,l}+{\bf vTechInpTot}_{c,r,y,l}+{\bf vStorageInpTot}_{c,r,y,l}+{\bf vExport}_{c,r,y,l}+{\bf vTradeIrAInpTot}_{c,r,y,l}+\sum_{lp}{\left({\bf vInp2Lo}_{c,r,y,lp,l}\right)}
+\end{dmath} 
+From commodity slice to lo level
+
+
+
+
+
+
+
+%82
+$eqInp2Lo_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+\sum_{lp}{\left({\bf vInp2Lo}_{c,r,y,l,lp}\right)}  =  {\bf vTechInpTot}_{c,r,y,l}+{\bf vStorageInpTot}_{c,r,y,l}+{\bf vExport}_{c,r,y,l}+{\bf vTradeIrAInpTot}_{c,r,y,l}
+\end{dmath} 
+Supply total output
+
+
+
+
+
+
+
+%83
+$eqSupOutTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vSupOutTot}_{c,r,y,l}  =  \sum_{u}{\left(\sum_{lp}{\left({\bf vSupOut}_{u,c,r,y,lp}\right)}\right)}
+\end{dmath} 
+Technology total input
+
+
+
+
+
+
+
+%84
+$eqTechInpTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechInpTot}_{c,r,y,l}  =  \sum_{h}{\left(\sum_{lp}{\left({\bf vTechInp}_{h,c,r,y,lp}\right)}\right)}+\sum_{h}{\left(\sum_{lp}{\left({\bf vTechAInp}_{h,c,r,y,lp}\right)}\right)}
+\end{dmath} 
+Technology total output
+
+
+
+
+
+
+
+%85
+$eqTechOutTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTechOutTot}_{c,r,y,l}  =  \sum_{h}{\left(\sum_{lp}{\left({\bf vTechOut}_{h,c,r,y,lp}\right)}\right)}+\sum_{h}{\left(\sum_{lp}{\left({\bf vTechAOut}_{h,c,r,y,lp}\right)}\right)}
+\end{dmath} 
+Storage total input
+
+
+
+
+
+
+
+%86
+$eqStorageInpTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageInpTot}_{c,r,y,l}  =  \sum_{s}{\left({\bf vStorageInp}_{s,c,r,y,l}\right)}+\sum_{s}{\left({\bf vStorageAInp}_{s,c,r,y,l}\right)}
+\end{dmath} 
+Storage total output
+
+
+
+
+
+
+
+%87
+$eqStorageOutTot_{c,r,y,l}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vStorageOutTot}_{c,r,y,l}  =  \sum_{s}{\left({\bf vStorageOut}_{s,c,r,y,l}\right)}+\sum_{s}{\left({\bf vStorageAOut}_{s,c,r,y,l}\right)}
+\end{dmath} 
+\subsection*{Objective and aggregated costs equations}
+Total costs
+
+
+
+
+
+
+
+%88
+$eqCost_{r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTotalCost}_{r,y}  =  \sum_{h}{\left({\bf vTechEac}_{h,r,y}\right)}+\sum_{h}{\left({\bf vTechOMCost}_{h,r,y}\right)}+\sum_{u}{\left({\bf vSupCost}_{u,r,y}\right)}+\sum_{c,l}{\left(pDummyImportCost_{c,r,y,l}*{\bf vDummyImport}_{c,r,y,l}\right)}+\sum_{c,l}{\left(pDummyExportCost_{c,r,y,l}*{\bf vDummyExport}_{c,r,y,l}\right)}+\sum_{c}{\left({\bf vTaxCost}_{c,r,y}\right)}-\sum_{c}{\left({\bf vSubsCost}_{c,r,y}\right)}+\sum_{s}{\left({\bf vStorageOMCost}_{s,r,y}\right)}+\sum_{s}{\left({\bf vStorageEac}_{s,r,y}\right)}+{\bf vTradeCost}_{r,y}+{\bf vTotalUserCosts}_{r,y}
+\end{dmath} 
+Commodity taxes
+
+
+
+
+
+
+
+%89
+$eqTaxCost_{c,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vTaxCost}_{c,r,y}  =  \sum_{l}{\left(pTaxCostOut_{c,r,y,l}*{\bf vOutTot}_{c,r,y,l}\right)}+\sum_{l}{\left(pTaxCostInp_{c,r,y,l}*{\bf vInpTot}_{c,r,y,l}\right)}+\sum_{l}{\left(pTaxCostBal_{c,r,y,l}*{\bf vBalance}_{c,r,y,l}\right)}
+\end{dmath} 
+Commodity subsidy
+
+
+
+
+
+
+
+%90
+$eqSubsCost_{c,r,y}$
+
+
+
+
+
+\begin{dmath} 
+{\bf vSubsCost}_{c,r,y}  =  \sum_{l}{\left(pSubCostOut_{c,r,y,l}*{\bf vOutTot}_{c,r,y,l}\right)}+\sum_{l}{\left(pSubCostInp_{c,r,y,l}*{\bf vInpTot}_{c,r,y,l}\right)}+\sum_{l}{\left(pSubCostBal_{c,r,y,l}*{\bf vBalance}_{c,r,y,l}\right)}
+\end{dmath} 
+Objective equation
+
+
+
+
+
+
+
+%91
+$eqObjective$
+
+
+
+
+
+\begin{dmath} 
+{\bf vObjective}  =  \sum_{r,y}{\left({\bf vTotalCost}_{r,y}*pDiscountFactorMileStone_{r,y}\right)}
+\end{dmath} 
+\subsection*{LEC equation}
+levelized costs (auxiliary equation)
+
+
+
+
+
+
+
+%92
+$eqLECActivity_{h,r,y}$
+
+
+
+
+
+\begin{dmath} 
+\sum_{l}{\left({\bf vTechAct}_{h,r,y,l}\right)}  \ge  pLECLoACT_{r}
+\end{dmath} 
+\end{document}
