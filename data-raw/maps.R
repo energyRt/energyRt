@@ -1,6 +1,12 @@
-#########################
-# equation map
-#########################
+#============================================================================#
+# THIS IS AN AUTO-GENERATED FILE BY gams2x LIBRARY,
+# IT NOT INTENDED FOR DIRECT EDITING - WILL BE OVERWRITTEN.
+# gams2x EXTRACTS THE MODEL FRAMEWORK FROM THE GAMS SOURCE FILE energyRt.gms,
+# TRANSLATES IT TO OTHER MATHEMATICAL PROGRAMMING LANGUGES,
+# AND CREATES THIS FILE WITH THE MODEL STRUCTURE DETAILS
+# FOR FURTHER SAVING IN "R/sysdata.rda" FILE OF the "energyRt" PACKAGE. 
+#============================================================================#
+########################## variables mapping #########################
 .variable_mapping = list(
   vTechNewCap = "vTechNewCap( tech , region , year ) $ mTechNew( tech , region , year )",
   vTechRetiredStock = "vTechRetiredStock( tech , region , year ) $ mvTechRetiredStock( tech , region , year )",
