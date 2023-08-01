@@ -75,9 +75,6 @@ setMethod(
             dim = c(2,2),
             dimnames = list(c("coeff", "simple"), c(unit, alias[i])))
         }
-        # browser()
-        # jj <- duplicated(names(convert_data[[database]][[type]])) #!!! quick fix
-        # convert_data[[database]][[type]] <- convert_data[[database]][[type]][,!jj]
       } else {
         convert_data[[database]][[type]] <- array(c(
           convert_coefficient,
@@ -115,8 +112,6 @@ setMethod(
             c(dimnames(convert_data[[database]][[type]])[[2]], unit, alias[i]))
         )
       }
-      # jj <- duplicated(names(convert_data[[database]][[type]])) #!!! quick fix
-      # convert_data[[database]][[type]] <- convert_data[[database]][[type]][,!jj]
     } else {
       convert_data[[database]][[type]] <- array(
         c(
