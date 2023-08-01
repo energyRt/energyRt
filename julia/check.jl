@@ -1,3 +1,4 @@
+println("Julia Version: ", VERSION)
 using Dates
 using JuMP
 model = Model();

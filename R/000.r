@@ -1,6 +1,6 @@
 # S3 methods ############################################
-add <- function (...) UseMethod("add")
-getData <- function (...) UseMethod("getData")
+add <- function(...) UseMethod("add")
+getData <- function(...) UseMethod("getData")
 read <- function(...) UseMethod("read")
 write <- function(...) UseMethod("write")
 # report <- function (...) UseMethod("report")
