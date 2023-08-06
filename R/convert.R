@@ -59,14 +59,16 @@ setMethod(
   ),
   function(type, unit, convert_coefficient, alias = "",
            SI_preffixes = FALSE, database = "user", update = TRUE) {
+    # browser()
     simple <- SI_preffixes # rename
-    # convert_data <- get("convert_data", globalenv())
+    convert_data <- get("convert_data", globalenv())
     alias <- unique(alias)
     # browser()
     if (!exists("convert_data", where = .GlobalEnv)) data("convert_data")
     if (all(names(convert_data[[database]]) != type)) {
       if (!simple) {
-        stop("First unit must be standart")
+        stop("Adding alternative databases is not implemented yet")
+        # stop("First unit must be standart")
       }
       if (alias[1] != "") {
         for (i in 1:length(alias)) { #ToDo: rewrite
@@ -81,7 +83,7 @@ setMethod(
           simple
         ), dim = c(2, 1), dimnames = list(c("coeff","simple"), unit))
       }
-    } else if (any(unit == dimnames(convert_data[[type]])[[2]])) {
+    } else if (any(unit == dimnames(convert_data[[database]][[type]])[[2]])) {
       if (any(convert_data[[database]][[type]][, unit] != c(
         convert_coefficient,
         simple
