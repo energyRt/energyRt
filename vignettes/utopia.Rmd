@@ -61,7 +61,7 @@ We assume that `R` (<https://www.r-project.org/>) and `RStudio` (<https://www.rs
 mysolver <- "GLPK"
 # mysolver = "JuMP"
 mysolver <- "Pyomo"
-mysolver <- "GAMS"
+# mysolver <- "GAMS"
 
 if (T) {
   # Installation of required packages - if not installed.
@@ -1263,10 +1263,19 @@ mdl@sysInfo@milestone
 scen_BASE <- solve(mdl,
   name = "BASE",
   # tmp.path = "C:/solwork",
-  solver = mysolver,
+  # solver = "JuMP",
   # solver = "GLPK",
+  # solver = "GAMS",
+  solver = list(
+    lang = "Pyomo",
+    solver = "glpk"
+    # solver = "cbc"
+    # solver = "cplex"
+    # solver = "gurobi"
+  ),
   tmp.name = "UTOPIA_BASE",
-  tmp.del = F
+  tmp.del = F,
+  wait = T
 )
 summary(scen_BASE)
 ```
@@ -1291,6 +1300,8 @@ scen_BASE_gams <- solve(add(mdl),
   solver = list(
     lang = "GAMS",
     # solver = "ipopt"),
+    # export_format = "csv",
+    # import_format = "csv",
     solver = "cbc"
   ),
   tmp.name = "UTOPIA_BASE_GAMS",
@@ -1306,7 +1317,8 @@ scen_BASE_py <- solve(add(mdl),
   solver = list(
     lang = "Pyomo",
     # solver = "ipopt"
-    solver = "cbc"
+    solver = "cplex"
+    inc1 = ""
   ),
   tmp.name = "UTOPIA_BASE_Python",
   tmp.del = F
@@ -1360,7 +1372,10 @@ scen_BASE_gams <- write(
 scen_BASE_gams@misc$tmp.dir # directory
 
 scen_BASE_py <- write(scen_BASE_int,
-  solver = "PYOMO",
+  solver = list(
+    lang = "PYOMO",
+    solver = "CPLEX"
+  ),
   tmp.dir = "solwork/UTOPIA_BASE_PYOMO"
 )
 scen_BASE_py@misc$tmp.dir
@@ -1371,15 +1386,18 @@ scen_BASE_glpk <- write(scen_BASE_int,
 )
 
 scen_BASE_jl <- write(scen_BASE_int,
-  solver = "JuMP",
+  solver = list(
+    lang = "JuMP",
+    solver = "HiGHS"
+  ),
   tmp.dir = "solwork/UTOPIA_BASE_Julia"
 )
 
 ## Solving the model
 solve(scen_BASE_gams, wait = FALSE)
-solve(scen_BASE_py, wait = FALSE)
+solve(scen_BASE_py, wait = T)
 solve(scen_BASE_glpk, wait = FALSE)
-solve(scen_BASE_jl, wait = FALSE)
+solve(scen_BASE_jl, wait = T)
 
 ## Read solution (wait until solved)
 scen_BASE_gams <- read(scen_BASE_gams)
@@ -1404,6 +1422,41 @@ getData(list(
 ),
 name = "vObjective", merge = TRUE
 )
+```
+
+
+```{r, eval=FALSE, include=FALSE}
+# debug GDX
+scen_BASE_int <- interpolate(
+  add(mdl), # , TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC),
+  name = "BASE", trim = T
+)
+
+summary(scen_BASE_int)
+scen_BASE_int@misc$tmp.dir
+
+gams_cmd_line <- "C:/GAMS/win64/32.2/gams.exe energyRt.gms"
+gdx_library <- "C:/GAMS/..." #
+library(gdxrrw)
+igdx(gdx_library)
+
+GAMS_solver <- list(
+  lang = "GAMS",
+  export_format = "gdx",
+  import_format = "gdx",
+  # inc3 = gams_options_parallel,
+  cmdline = gams_cmd_line,
+  # solver = "cbc",
+  solver = "cplex"
+)
+
+## Writing the model code and data on disk
+scen_BASE_gams <- write(
+  scen_BASE_int,
+  solver = GAMS_solver,
+  tmp.dir = "solwork/GAMS_gdx_debug"
+)
+
 ```
 
 
@@ -1801,7 +1854,8 @@ GHG50CapTrade <- add(
   newCommodity("GHGtrade"), # Commodity to take to account trade
   # Equation that provide quote mechanisme
   newConstraint("GHGcap",
-    eq = "<=", rhs = list(year = c(2015, 2055), rhs = c(1e8, 1e3)),
+    eq = "<=", 
+    rhs = list(year = c(2015, 2055), rhs = c(1e8, 1e3)),
     for.each = list(year = NULL), # Cap total emission
     variable = list(variable = "vOutTot", for.sum = list(comm = "HG")),
     variable = list(variable = "vOutTot", for.sum = list(comm = "HGtrade"), mult = -1)
