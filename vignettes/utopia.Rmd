@@ -71,13 +71,13 @@ if (T) {
   if (!any(mypks == "tidyverse")) install.packages("tidyverse")
   if (!any(mypks == "lubridate")) install.packages("lubridate")
   # energyRt
-  if (!any(mypks == "energyRt")) devtools::install_github("olugovoy/energyRt")
+  if (!any(mypks == "energyRt")) devtools::install_github("energyRt/energyRt")
   # GIS tools
-  if (!any(mypks == "rgeos")) install.packages("rgeos")
-  if (!any(mypks == "rgdal")) install.packages("rgdal")
+  # if (!any(mypks == "rgeos")) install.packages("rgeos")
+  # if (!any(mypks == "rgdal")) install.packages("rgdal")
   # if (!any(mypks == "gpclib")) install.packages("gpclib")
   if (!any(mypks == "spdep")) install.packages("spdep")
-  if (!any(mypks == "maptools")) install.packages("maptools")
+  # if (!any(mypks == "maptools")) install.packages("maptools")
   # Reporting
   if (!any(mypks == "scales")) install.packages("scales")
   if (!any(mypks == "kableExtra")) install.packages("kableExtra")
@@ -1263,8 +1263,9 @@ mdl@sysInfo@milestone
 scen_BASE <- solve(mdl,
   name = "BASE",
   # tmp.path = "C:/solwork",
-  solver = mysolver,
+  # solver = mysolver,
   # solver = "GLPK",
+  solver = GAMS_csv,
   tmp.name = "UTOPIA_BASE",
   tmp.del = F
 )
@@ -1354,14 +1355,15 @@ scen_BASE_int@misc$tmp.dir
 ## Writing the model code and data on disk
 scen_BASE_gams <- write(
   scen_BASE_int,
-  solver = "GAMS",
-  tmp.dir = "solwork/UTOPIA_BASE_GAMS"
+  # solver = "GAMS",
+  solver = GAMS_csv,
+  tmp.dir = "tmp/solwork/UTOPIA_BASE_GAMS"
 )
 scen_BASE_gams@misc$tmp.dir # directory
 
 scen_BASE_py <- write(scen_BASE_int,
   solver = "PYOMO",
-  tmp.dir = "solwork/UTOPIA_BASE_PYOMO"
+  tmp.dir = "tmp/solwork/UTOPIA_BASE_PYOMO"
 )
 scen_BASE_py@misc$tmp.dir
 
@@ -1376,7 +1378,7 @@ scen_BASE_jl <- write(scen_BASE_int,
 )
 
 ## Solving the model
-solve(scen_BASE_gams, wait = FALSE)
+solve(scen_BASE_gams, wait = T)
 solve(scen_BASE_py, wait = FALSE)
 solve(scen_BASE_glpk, wait = FALSE)
 solve(scen_BASE_jl, wait = FALSE)
