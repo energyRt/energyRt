@@ -1,9 +1,12 @@
+println("Julia Version: ", VERSION)
+using Pkg
+# Pkg.status("JuMP")
 using Dates
 include("inc1.jl")
 flog = open("output/log.csv", "w")
 println(flog,"parameter,value,time")
 println(flog,"\"model language\",JULIA,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
-println("start ", Dates.format(now(), "HH:MM:SS"))
+println("start time: ", Dates.format(now(), "HH:MM:SS"))
 using JuMP
 println(flog,"\"load data\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
 include("data.jl")
