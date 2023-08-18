@@ -39,6 +39,7 @@ def read_dict(name):
     tbl = pd.DataFrame(tbl.value.tolist(), index = idx, columns = ["value"])
     return tbl.to_dict()["value"]
 ##### decl par #####
+exec(open("inc2.py").read())
 print("variables... " + str(datetime.datetime.now().strftime("%H:%M:%S")) + " (" + str(round(time.time() - seconds, 2)) + " s)")
 model.vTechInv = Var(mTechInv, doc = "Overnight investment costs");
 model.vTechEac = Var(mTechEac, doc = "Annualized investment costs");
@@ -103,7 +104,6 @@ model.vTradeInv = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "Investmen
 model.vTradeEac = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "Investment in trade capacity (EAC)");
 model.vTradeNewCap = Var(mTradeNew, domain = pyo.NonNegativeReals, doc = "New trade capacity");
 model.vTotalUserCosts = Var(mvTotalUserCosts, domain = pyo.NonNegativeReals, doc = "Total additional costs (set by user)");
-exec(open("inc2.py").read())
 print("equations... " + str(datetime.datetime.now().strftime("%H:%M:%S")) + " (" + str(round(time.time() - seconds, 2)) + " s)")
 if verbose: print("eqTechSng2Sng ", end = "")
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)

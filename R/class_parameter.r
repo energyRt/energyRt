@@ -42,6 +42,7 @@ setMethod("initialize", "parameter",
     stop(paste('Wrong name: "', name, '"', sep = ''))
   if (any(!is.character(dimSetNames)) || #length(dimSetNames) == 0 ||
     any(!(dimSetNames %in% acceptable_set))) {
+    browser()
       stop('Wrong dimSetNames')
   }
   if (all(type != levels(.Object@type))) stop('Wrong type')
