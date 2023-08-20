@@ -1,4 +1,4 @@
 .onAttach <- function(...) {
-  packageStartupMessage("\n energyRt version: 0.01.30-dev")
+  packageStartupMessage("\n energyRt version: 0.01.31-dev")
 }
 

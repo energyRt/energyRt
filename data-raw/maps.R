@@ -336,6 +336,7 @@
 # parameter description
 #########################
 .parameter_description = c(
+  pYearFraction = "fraction of sum of sampled slices in year -- experimental",
   pTechOlife = "Operational life of technologies",
   pTechCinp2ginp = "Commodity input to group input",
   pTechGinp2use = "Group input into use",
@@ -466,6 +467,7 @@
 # parameter set
 #########################
 .parameter_set = list(
+  pYearFraction = c("year"),
   pTechOlife = c("tech", "region"),
   pTechCinp2ginp = c("tech", "comm", "region", "year", "slice"),
   pTechGinp2use = c("tech", "group", "region", "year", "slice"),

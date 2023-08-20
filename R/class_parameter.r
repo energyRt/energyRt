@@ -551,9 +551,10 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
   as_simple <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
+    browser()
       stop('.toPyomSQLite: check @data in ', obj@name)
     } else {
-      data <- data[data$value != Inf & data$value != def, ]
+      data <- data[data$value != Inf & data$value != def, , drop = F]
       if (nrow(data) == 0) {
         rtt <- paste0("# ", name, name2, '\n', name, ' = toPar(set(), ', def, ')\n')
         return(rtt)
@@ -581,7 +582,10 @@ setMethod('.add_data', signature(obj = 'parameter', data = 'NULL'),
       return(c(ret, paste0('\n', obj@name, ' = set(', tmp, ')')))
     }
   } else if (obj@type == 'simple') {
-    return(as_simple(obj@data, obj@name, paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), obj@defVal))
+    return(as_simple(obj@data, 
+                     obj@name, 
+                     paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')'), 
+                     obj@defVal))
   } else if (obj@type == 'multi') {
     hh = paste0('(', paste0(obj@dimSetNames, collapse = ', '), ')')
     return(c(

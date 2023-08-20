@@ -70,6 +70,21 @@ interpolate <- function(obj, ...) { #- returns class scenario
                                                        data.frame(year = scen@model@sysInfo@milestone$mid))
   # Fill slice
   scen@model@sysInfo@slice <- energyRt:::.init_slice(scen@model@sysInfo@slice)
+  # browser()
+  if (mean(scen@model@sysInfo@yearFraction$fraction) != 1.) {
+    # filter out unused slices
+    # browser()
+    scen@model@data <- subset_slices_repo(
+      repo = scen@model@data, 
+      yearFraction = mean(scen@model@sysInfo@yearFraction$fraction), 
+      keep_slices = scen@model@sysInfo@slice@all_slice
+    )
+  }
+  # !!! add filtering slices here
+  # nslices <- nrow(scen@model@sysInfo@slice@levels)
+  # scen@model@sysInfo@slice@levels$share <- scen@model@sysInfo@slice@levels$share * nslices/8760
+  # scen@model@sysInfo@slice@slice_share$share <- scen@model@sysInfo@slice@slice_share$share * nslices/8760
+  # 
   scen@modInp@parameters[['slice']] <- .add_data(scen@modInp@parameters[['slice']], 
                                                scen@model@sysInfo@slice@all_slice)
   # Fill region
@@ -80,8 +95,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   xx <- c(obj@sysInfo@milestone$mid[-1] - obj@sysInfo@milestone$mid[-nrow(obj@sysInfo@milestone)], 1)
   names(xx) <-  obj@sysInfo@milestone$mid
   
-  if (is.null(arg$fullsets)) fullsets <- TRUE else
-    fullsets <- arg$fullsets
+  if (is.null(arg$fullsets)) fullsets <- TRUE else fullsets <- arg$fullsets
   scen@status$fullsets <- fullsets
   
   approxim <- list(
@@ -97,7 +111,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     data.frame(year = approxim$mileStoneYears, stringsAsFactors = FALSE))
   approxim$rys <- merge(approxim$ry,
     data.frame(slice = approxim$slice@all_slice, stringsAsFactors = FALSE))
-  # Fill basic parameter interplotaion from sysInfo
+  # Fill basic parameter interpolation from sysInfo
   approxim$all_comm <- c(lapply(scen@model@data, function(x) c(lapply(x@data, function(y) {
   	if (class(y) != 'commodity') return(NULL)
   	return(y@name)
@@ -236,4 +250,76 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (arg$echo) cat(' ', round(proc.time()[3] - interpolation_time_begin, 2), 's\n')
   
   invisible(scen)
+}
+
+subset_slices <- function(obj, yearFraction = 1, keep_slices = NULL) {
+  # subset_hours <- length(SLICE_SUBSET)
+  # subset_fraction <- subset_hours/8760
+  if (yearFraction == 1) return(obj)
+  keep_slices <- unique(c(NA, "ANNUAL", keep_slices))
+  if (inherits(obj, "data.frame")) { # unnesecary - reserved for future
+    if (any(names(obj) == "slice")) {
+      obj <- filter(obj, slice %in% keep_slices)
+    }
+    return(obj)
+  } else if (!isS4(obj)) {
+    return(obj)
+  }
+  # S4
+  slot_names <- slotNames(obj)
+  ii <- sapply(slot_names, function(x) {
+    inherits(slot(obj, x), "data.frame") && 
+      any(colnames(slot(obj, x)) == "slice")
+  })
+  # summary(ii)
+  for (s in slot_names[ii]) {
+    # stop()
+    slot(obj, s) <- slot(obj, s) %>%
+      filter(slice %in% keep_slices)
+  }
+  #
+  # obj <- fract_year_adj(obj, subset_hours, check = TRUE)
+  #
+  return(obj)
+}
+
+subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
+  # browser()
+  if (yearFraction == 1) return(repo)
+  
+  if (inherits(repo, "list")) {
+    repo <- lapply(repo, function(o) 
+      subset_slices_repo(o, yearFraction, keep_slices))
+  }
+  # stopifnot(inherits(repo, c("repository")))
+  # if (repo)
+  # subset_hours <- length(SLICE_SUBSET)
+  # subset_fraction <- subset_hours/8760
+  # i <- 19
+  # browser()
+  if (inherits(repo, c("repository"))) {
+    x <- repo@data
+  } else {
+    x <- repo
+  }
+    
+  for (i in 1:length(x)) {
+    # print(i)
+    obj <- x[[i]]
+    if (inherits(obj, c("repository"))) {
+      # obj <- fract_year_adj_repo(obj, subset_hours, check)
+      subset_slices_repo(obj, yearFraction, keep_slices)
+    } else {
+      # print(obj@name)
+      # obj <- fract_year_adj(obj, subset_hours, check)
+      obj <- subset_slices(obj, yearFraction, keep_slices)
+    }
+    x[[i]] <- obj
+  }
+  if (inherits(repo, c("repository"))) {
+    repo@data <- x
+  } else {
+    repo <- x
+  }
+  return(repo)
 }

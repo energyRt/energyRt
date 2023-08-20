@@ -17,7 +17,7 @@
   }
   fl <- apply(dtf[, -c(1, ncol(dtf)), drop = FALSE], 2, function(x) length(unique(x)) == 1)
   if (any(fl)) {
-    stop(paste('.setTimeSlices: all slice levels except "ANNUAL", should have more than one slice, check: "',
+    stop(paste('.setTimeSlices: all slice levels except "ANNUAL", should have more than one elements, check: "',
       paste(colnames(dtf)[c(FALSE, fl, FALSE)], collapse = '", "'), '"',
       sep = ""
     ))
@@ -50,6 +50,7 @@
 
 # set Slice name vectors
 .setTimeSlices <- function(slice = NULL, ...) {
+  # browser()
   if (!is.null(slice) && length(list(...))) stop('setTimeSlices: only one argument could be define: "slice" or "..."')
   if (!is.null(slice)) {
     arg <- slice

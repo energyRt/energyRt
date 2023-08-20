@@ -10,7 +10,7 @@ setClass("sysInfo",
           year               = "numeric",
           milestone          = "data.frame",
           slice              = "slice",
-		      discountFirstYear  = "logical",
+          discountFirstYear  = "logical",
           interpolation      = "data.frame",
           defVal             = "data.frame",
 		      yearFraction       = "data.frame",
@@ -129,7 +129,7 @@ setClass("sysInfo",
           	value   = as.numeric(0),
             rampup      = as.numeric(Inf),
             rampdown      = as.numeric(Inf),
-						fraction  = as.numeric(1),
+						# fraction  = as.numeric(1),
           	stringsAsFactors = FALSE),
           interpolation            = data.frame(
 						          	teff        = as.character('back.inter.forth'),
@@ -231,7 +231,7 @@ setClass("sysInfo",
 			  year       = as.numeric(NA),
 			  fraction   = as.numeric(1),
 			  stringsAsFactors = FALSE),
-			#! Misc
+			# ! Misc
       misc = list()),
       S3methods = TRUE
 );

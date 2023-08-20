@@ -334,6 +334,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo', approxim = 'list')
                     'pDummyExportCost', 'mStartMilestone', 'mEndMilestone',
                     'mMilestoneLast', 'mMilestoneFirst', 'mMilestoneNext',
                     'mMilestoneHasNext', 'mSameSlice', 'mSameRegion', 'ordYear',
+                    'pYearFraction',
                     'cardYear', 'pPeriodLen', 'pDiscountFactor', 'mDiscountZero')
     for (i in clean_list)
       obj@parameters[[i]] <- .resetParameter(obj@parameters[[i]])
@@ -428,6 +429,13 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo', approxim = 'list')
   if (nrow(mDiscountZero) != 0) {
     obj@parameters[['mDiscountZero']] <- .add_data(obj@parameters[['mDiscountZero']], mDiscountZero)
   }
+  # browser()
+  pYearFraction <- data.frame(year = .get_data_slot(obj@parameters$year))
+  pYearFraction$value <- app@yearFraction$fraction
+  obj@parameters[['pYearFraction']] <- .add_data(obj@parameters[['pYearFraction']], pYearFraction)
+  # obj@parameters[['pYearFraction']] <- .add_data(obj@parameters[['pYearFraction']], data.frame(value = app@yearFraction))
+  #!!!
+  obj@parameters[['pYearFraction']]@defVal <- 1 #!!! temporary fix
   obj
 })
 
@@ -889,6 +897,7 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
 
 .add_ramp0 <- function(obj, name, tech, mact, approxim) {
   if (any(!is.na(tech@af[[name]]))) {
+    # browser()
   	pname <- paste0('p', c('technology' = 'Tech', 'storage' = 'Storage')[class(tech)],
   									c('rampup' = 'RampUp', 'rampdown' = 'RampDown', name)[name])
   	set_name <- c('technology' = 'tech', 'storage' = 'stg')[class(tech)]
@@ -903,6 +912,22 @@ setMethod('.add0', signature(obj = 'modInp', app = 'supply',
     if (ncol(mTechRampUp) != ncol(obj@parameters[[mname]]@data)) {
     	mTechRampUp <- merge0(mTechRampUp, mact)
     }
+		#!!! Temporary fix: drop values beyond technology lifespan
+		# synchronizing with activity slices
+		if (!is.null(pTechRampUp$region)) {
+		  pTechRampUp <- dplyr::filter(pTechRampUp, region %in% unique(mact$region))
+		  mTechRampUp <- dplyr::filter(mTechRampUp, region %in% unique(mact$region))
+		}
+		if (!is.null(pTechRampUp$year)) {
+		  pTechRampUp <- dplyr::filter(pTechRampUp, year %in% unique(mact$year))
+		  mTechRampUp <- dplyr::filter(mTechRampUp, year %in% unique(mact$year))
+		}
+		if (!is.null(pTechRampUp$slice)) {
+		  pTechRampUp <- dplyr::filter(pTechRampUp, slice %in% unique(mact$slice))
+		  mTechRampUp <- dplyr::filter(mTechRampUp, slice %in% unique(mact$slice))
+		}
+		#!!! end
+		
 		obj@parameters[[pname]] <- .add_data(obj@parameters[[pname]], pTechRampUp)
 		obj@parameters[[mname]] <- .add_data(obj@parameters[[mname]], mTechRampUp)
   }

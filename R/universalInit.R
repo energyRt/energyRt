@@ -189,6 +189,7 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
     sysInfVec <- sysInfVec[sysInfVec != ".S3Class"]        
 #    mlst_vec <- c('start', 'interval')
     args <- list(...)
+    # browser()
     mdl <- .new_object('model', name, exclude = c(sysInfVec), exclude_class = 'repository', ...)
 #    mdl <- .new_object('model', name, exclude = c(mlst_vec, sysInfVec), exclude_class = 'repository', ...)
     if (any(sapply(args, class) == 'repository'))  {
@@ -201,7 +202,9 @@ setMethod('newModel', signature(name = 'character'), function(name, ...) {
       exclude = c('slice', names(args)[!(names(args) %in% sysInfVec)]), ...)
     if (any(names(args) == 'slice')) {
       mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = args$slice)
-    } else mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = 'ANNUAL')
+    } else {
+      mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = 'ANNUAL')
+    }
 #    args <- list(...)
 #    if (any(names(args) %in% mlst_vec)) {
 #      if (sum(names(args) %in% mlst_vec) != 2) stop('Undefined all need parameters for setMileStoneYears')
