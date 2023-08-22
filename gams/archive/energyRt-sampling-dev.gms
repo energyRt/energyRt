@@ -187,6 +187,7 @@ pSliceShare(slice)      Share of slice
 ordYear(year)           ord year (used in GLPK-MathProg)
 cardYear(year)          card year (used in GLPK-MathProg)
 ;
+pYearFraction(year) = 1;
 
 * Storage technology parameters
 parameters
@@ -1021,7 +1022,7 @@ eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)..
          vSupReserve(sup, comm, region)
          =e=
          sum((year, slice)$mSupAva(sup, comm, region, year, slice),
-             pPeriodLen(year) * vSupOut(sup, comm, region, year, slice) / pYearFraction(year)
+             pPeriodLen(year) * vSupOut(sup, comm, region, year, slice)
          );
 
 eqSupReserveUp(sup, comm, region)$mSupReserveUp(sup, comm, region)..
@@ -1067,7 +1068,7 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
 
 
 eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
-     vEmsFuelTot(comm, region, year, slice) 
+     vEmsFuelTot(comm, region, year, slice)
          =e= sum(commp$(pEmissionFactor(comm, commp) > 0),
                  pEmissionFactor(comm, commp) *  sum(tech$mTechInpComm(tech, commp),
                          pTechEmisComm(tech, commp) * sum(slicep$mCommSliceOrParent(comm, slice, slicep),
@@ -1436,7 +1437,7 @@ eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
                   - vInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice);
 
 eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)..
-         vOutTot(comm, region, year, slice) * pYearFraction(year)
+         vOutTot(comm, region, year, slice)
          =e=
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
                   vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice) +
@@ -1461,7 +1462,7 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
                   vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice);
 
 eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)..
-         vInpTot(comm, region, year, slice) * pYearFraction(year)
+         vInpTot(comm, region, year, slice)
          =e=
          vDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice) +
          vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice) +

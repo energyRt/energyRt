@@ -74,6 +74,12 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (mean(scen@model@sysInfo@yearFraction$fraction) != 1.) {
     # filter out unused slices
     # browser()
+    warning(
+    "Solving for fractial year, status: experimental. 
+    Only some variables are scaled (using the given yearFraction)
+    to represent annual values of capacity, total output, and emissions.
+    Hourly (or lower slice level) variables are not scales and 
+    their sum will be different from annual aggregates (like `vOutTot` and `vEmsFuelTot`).")
     scen@model@data <- subset_slices_repo(
       repo = scen@model@data, 
       yearFraction = mean(scen@model@sysInfo@yearFraction$fraction), 
