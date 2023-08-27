@@ -440,14 +440,23 @@ setMethod('.add0', signature(obj = 'modInp', app = 'sysInfo', approxim = 'list')
 })
 
 
-
 #==============================================================================#
 # Add constraint ####
 #==============================================================================#
 setMethod('.add0', signature(obj = 'modInp', app = 'constraint',
-                             approxim = 'list'), function(obj, app, approxim) {
-                               .getSetEquation(obj, app, approxim)
-                             })
+                             approxim = 'list'), 
+          function(obj, app, approxim) {
+            #!!! Add interpolation of LHS and RHS here
+            # browser()
+            # simpleInterpolation(
+            #   app@rhs, parameter = 'rhs', 
+            #   # obj@parameters[['']], 
+            #   approxim = approxim
+            #   # add_set_name = 'rhs', 
+            #   # app@name
+            #   )
+            .getSetEquation(obj, app, approxim)
+            })
 
 #==============================================================================#
 # Add costs ####

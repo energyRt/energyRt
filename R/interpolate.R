@@ -75,18 +75,19 @@ interpolate <- function(obj, ...) { #- returns class scenario
     # filter out unused slices
     # browser()
     warning(
-    "Solving for fractial year, status: experimental. 
-    Only some variables are scaled (using the given yearFraction)
-    to represent annual values of capacity, total output, and emissions.
-    Hourly (or lower slice level) variables are not scales and 
-    their sum will be different from annual aggregates (like `vOutTot` and `vEmsFuelTot`).")
+    "Solving for a fraction of a year, status: experimental. ",
+    "Currently only capacity and some totals (`vOutTot` and `vEmsFuelTot`)",
+    " variables have been scaled (using the given yearFraction parameter)",
+    " to represent annual values of capacity, total output, and emissions.",
+    " Hourly (or lower slice level) variables have not been scaled,", 
+    " their annual sum will be different from their annual aggregates.")
     scen@model@data <- subset_slices_repo(
       repo = scen@model@data, 
       yearFraction = mean(scen@model@sysInfo@yearFraction$fraction), 
       keep_slices = scen@model@sysInfo@slice@all_slice
     )
   }
-  # !!! add filtering slices here
+  # !!!??? add filtering slices here
   # nslices <- nrow(scen@model@sysInfo@slice@levels)
   # scen@model@sysInfo@slice@levels$share <- scen@model@sysInfo@slice@levels$share * nslices/8760
   # scen@model@sysInfo@slice@slice_share$share <- scen@model@sysInfo@slice@slice_share$share * nslices/8760

@@ -1,9 +1,11 @@
-.interpolation0 <- function(obj, parameter, defVal, arg) { 
+.interpolation0 <- function(obj, parameter, defVal, arg) {
+  # browser()
   # obj <- interpolation_message$interpolation0_arg$obj;
   # parameter <- interpolation_message$interpolation0_arg$parameter;
   # defVal <- interpolation_message$interpolation0_arg$defVal;
   # arg <- interpolation_message$interpolation0_arg$arg;
   # Remove not used approxim
+  # print()
   if (length(defVal) != 1) stop('defVal value not define')
   if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
     

@@ -216,6 +216,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
+  # browser()
+  # !!! add interpolation patch here? or in the calling function? !!!
+  # if (nrow(stm@for.each) > 0) {
+  #   .interpolation0(obj = stm@rhs, parameter = "rhs", defVal = stm@defVal,
+  # 
+  #                   arg = list(approxim = approxim)
+  #                   )
+  # }
+  
+  # !!! end
   stop.constr <- function(x) 
     stop(paste0('Constraint "', stm@name, '" error: ', x))
   get.all.child <- function(x)  {
@@ -416,6 +426,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
     xx <- newParameter(paste0('pCnsRhs', stm@name), need.set0, 'simple', defVal = stm@defVal, 
                           interpolation = 'back.inter.forth', colName = 'rhs')
+    #!!! Similar interpolation for LHS is needed
     yy <- simpleInterpolation(stm@rhs, 'rhs', xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != 'value']
     yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = '##') %in% 

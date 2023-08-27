@@ -1174,7 +1174,7 @@ eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region
 Equation
 * Capacity equation
 eqStorageCap(stg, region, year)     Storage capacity
-* Investition equation
+* Investment equation
 eqStorageInv(stg, region, year)     Storage overnight investment costs
 eqStorageEac(stg, region, year)     Storage equivalent annual cost
 * Aggregated annual costs
@@ -1196,7 +1196,7 @@ eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)..
                  pPeriodLen(yearp) * vStorageNewCap(stg, region, yearp)
          );
 
-* Investition equation
+* Investment equation
 eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)..
          vStorageInv(stg, region, year)
          =e=
