@@ -1,236 +1,559 @@
-##################################################################################################################################    
-# GAMS part
-##################################################################################################################################    
+# Internal functions to write GAMS model files
 .write_model_GAMS <- function(arg, scen, trim = FALSE) {
-  if (trim) scen <- fold(scen)
-  .write_inc_solver(scen, arg, 'option lp = cplex;', '.gms', 'cplex')
-  if (is.null(scen@status$fullsets)) stop('scen@status$fullsets not found')
+  # if (trim) scen <- fold(scen)
+  .write_inc_solver(scen, arg, "option lp = cplex;", ".gms", "cplex")
+  if (is.null(scen@status$fullsets)) stop("scen@status$fullsets not found")
   if (!scen@status$fullsets) {
     .toGams <- function(x) .toGams0(x, TRUE)
-  } else .toGams <- function(x) .toGams0(x, FALSE)
+  } else {
+    .toGams <- function(x) .toGams0(x, FALSE)
+  }
   run_code <- scen@source[["GAMS"]]
-  
 
   # For downsize
-  fdownsize <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
+  fdownsize <- names(scen@modInp@parameters)[
+    sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)
+  ]
   for (nn in fdownsize) {
     rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
-    if (scen@modInp@parameters[[nn]]@type == 'multi') {
-      uuu <- paste0(nn, c('Lo', 'Up'))
-    } else uuu <- nn
+    if (scen@modInp@parameters[[nn]]@type == "multi") {
+      uuu <- paste0(nn, c("Lo", "Up"))
+    } else {
+      uuu <- nn
+    }
     for (yy in uuu) {
-      templ <- paste0('(^|[^[:alnum:]])', yy, '[(]')
-      if (any(grep('^pCns', nn))) {
+      templ <- paste0("(^|[^[:alnum:]])", yy, "[(]")
+      if (any(grep("^pCns", nn))) {
         for (www in seq_along(scen@modInp@gams.equation)) {
           mmm <- grep(templ, scen@modInp@gams.equation[[www]]$equation)
           if (any(mmm)) {
-            scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy), .rem_col, yy, rmm)
+            scen@modInp@gams.equation[[www]]$equation[mmm] <- sapply(
+              strsplit(scen@modInp@gams.equation[[www]]$equation[mmm], yy),
+              .rem_col, yy, rmm
+            )
           }
         }
-      } else if (any(grep('^pCosts', nn))) {
-          mmm <- grep(templ, scen@modInp@costs.equation)
-          if (any(mmm)) {
-            scen@modInp@costs.equation[mmm] <- sapply(strsplit(scen@modInp@costs.equation[mmm], yy), .rem_col, yy, rmm)
-          }
+      } else if (any(grep("^pCosts", nn))) {
+        mmm <- grep(templ, scen@modInp@costs.equation)
+        if (any(mmm)) {
+          scen@modInp@costs.equation[mmm] <- sapply(
+            strsplit(scen@modInp@costs.equation[mmm], yy), .rem_col, yy, rmm
+          )
+        }
       } else {
         mmm <- grep(templ, run_code)
-        if (any(mmm)) run_code[mmm] <- sapply(strsplit(run_code[mmm], yy), .rem_col, yy, rmm)
-      }
-    }
-  }
-  
-  if (is.null(scen@solver$export_format))
-    scen@solver$export_format <- 'gms'
-  if (is.null(scen@solver$import_format)) {
-    scen@solver$import_format <- 'gms'
-  } else {
-    scen@solver$import_format <- 'gdx'
-    scen@source[['GAMS_output']] <- c(scen@source[['GAMS_output']][grep('^file variable_list_csv', 
-        scen@source[['GAMS_output']]):length(scen@source[['GAMS_output']])], 'execute_unload "output/output.gdx"')
-  }
-  dir.create(paste(arg$tmp.dir, '/input', sep = ''), showWarnings = FALSE)
-  dir.create(paste(arg$tmp.dir, '/output', sep = ''), showWarnings = FALSE)
-  zz_output <- file(paste(arg$tmp.dir, '/output.gms', sep = ''), 'w')
-  cat(scen@source[['GAMS_output']], sep = '\n', file = zz_output)
-  close(zz_output)  
-  zz_data_gms <- file(paste(arg$tmp.dir, '/data.gms', sep = ''), 'w')
-  if (scen@solver$export_format == 'gdx') {
-    if (!scen@status$fullsets)
-      stop('for export_format = "gdx", interpolation parameter fullsets must be TRUE')
-    # Generate gdx
-    .write_gdx_list(dat = .get_scen_data(scen), 
-                    gdxName = paste0(arg$tmp.dir, 'input/data.gdx'))
-    
-    # Add gdx import
-    cat('$gdxin input/data.gdx\n', file = zz_data_gms)
-    for (j in c('set', 'map', 'simple', 'multi')) {
-      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j && 
-      		(is.null(scen@modInp@parameters[[i]]@misc$weather) || !scen@modInp@parameters[[i]]@misc$weather)) {
-        if (scen@modInp@parameters[[i]]@type != 'multi') {
-          cat(paste0('$loadm ', i, '\n'), file = zz_data_gms)
-        } else {
-          cat(paste0('$loadm ', i, 'Lo\n'), file = zz_data_gms)
-          cat(paste0('$loadm ', i, 'Up\n'), file = zz_data_gms)
+        if (any(mmm)) {
+          run_code[mmm] <- sapply(
+            strsplit(run_code[mmm], yy), .rem_col, yy, rmm
+          )
         }
       }
     }
-    cat('$gdxin\n', file = zz_data_gms)
+  }
+
+  if (is.null(scen@solver$export_format)) {
+    scen@solver$export_format <- "gms"
+  }
+  if (is.null(scen@solver$import_format)) {
+    scen@solver$import_format <- "gms"
+  } else {
+    scen@solver$import_format <- "gdx"
+    scen@source[["GAMS_output"]] <- c(scen@source[["GAMS_output"]][grep(
+      "^file variable_list_csv",
+      scen@source[["GAMS_output"]]
+    ):length(scen@source[["GAMS_output"]])], 'execute_unload "output/output.gdx"')
+  }
+  dir.create(paste(arg$tmp.dir, "/input", sep = ""), showWarnings = FALSE)
+  dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
+  zz_output <- file(paste(arg$tmp.dir, "/output.gms", sep = ""), "w")
+  cat(scen@source[["GAMS_output"]], sep = "\n", file = zz_output)
+  close(zz_output)
+  zz_data_gms <- file(paste(arg$tmp.dir, "/data.gms", sep = ""), "w")
+  if (scen@solver$export_format == "gdx") {
+    if (!scen@status$fullsets) {
+      stop('for export_format = "gdx", interpolation parameter fullsets must be TRUE')
+    }
+    # Generate gdx
+    .write_gdx_list(
+      dat = .get_scen_data(scen),
+      gdxName = paste0(arg$tmp.dir, "input/data.gdx")
+    )
+
+    # Add gdx import
+    cat("$gdxin input/data.gdx\n", file = zz_data_gms)
+    for (j in c("set", "map", "simple", "multi")) {
+      for (i in names(scen@modInp@parameters)) {
+        if (scen@modInp@parameters[[i]]@type == j &&
+          (is.null(scen@modInp@parameters[[i]]@misc$weather) || !scen@modInp@parameters[[i]]@misc$weather)) {
+          if (scen@modInp@parameters[[i]]@type != "multi") {
+            cat(paste0("$loadm ", i, "\n"), file = zz_data_gms)
+          } else {
+            cat(paste0("$loadm ", i, "Lo\n"), file = zz_data_gms)
+            cat(paste0("$loadm ", i, "Up\n"), file = zz_data_gms)
+          }
+        }
+      }
+    }
+    cat("$gdxin\n", file = zz_data_gms)
   } else if (arg$n.threads == 1) {
-    for (j in c('set', 'map', 'simple', 'multi')) {
-      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-        zz_data_tmp <- file(paste(arg$tmp.dir, '/input/', i, '.gms', sep = ''), 'w')
-        cat(.toGams(scen@modInp@parameters[[i]]), sep = '\n', file = zz_data_tmp)
-        close(zz_data_tmp)
-        cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
+    for (j in c("set", "map", "simple", "multi")) {
+      for (i in names(scen@modInp@parameters)) {
+        if (scen@modInp@parameters[[i]]@type == j) {
+          zz_data_tmp <- file(paste(arg$tmp.dir, "/input/", i, ".gms", sep = ""), "w")
+          cat(.toGams(scen@modInp@parameters[[i]]), sep = "\n", file = zz_data_tmp)
+          close(zz_data_tmp)
+          cat(paste0("$include input/", i, ".gms\n"), file = zz_data_gms)
+        }
       }
     }
   } else {
-    for (j in c('set', 'map', 'simple', 'multi')) {
-      for(i in names(scen@modInp@parameters)) if (scen@modInp@parameters[[i]]@type == j) {
-        cat(paste0('$include input/', i, '.gms\n'), file = zz_data_gms)
-      }
-    }    
-    .write_multi_threads(arg, scen, func = .toGams, type = 'gms')
+    # for (j in c("set", "map", "simple", "multi")) {
+    #   for (i in names(scen@modInp@parameters)) {
+    #     if (scen@modInp@parameters[[i]]@type == j) {
+    #       cat(paste0("$include input/", i, ".gms\n"), file = zz_data_gms)
+    #     }
+    #   }
+    # }
+    # .write_multi_threads(arg, scen, func = .toGams, type = "gms")
   }
-  close(zz_data_gms)    
+  close(zz_data_gms)
   ### Model code to text
   .generate_gpr_gams_file(arg$tmp.dir)
-  zz <- file(paste(arg$tmp.dir, '/energyRt.gms', sep = ''), 'w')
-  zz_constrains <- file(paste(arg$tmp.dir, '/inc_constraints.gms', sep = ''), 'w')
-  cat(run_code[1:grep('[$]include[[:space:]]*data.gms', run_code)], sep = '\n', file = zz)
+  fn <- file(paste(arg$tmp.dir, "/energyRt.gms", sep = ""), "w")
+  zz_constrains <- file(paste(arg$tmp.dir, "/inc_constraints.gms", sep = ""), "w")
+  cat(run_code[1:grep("[$]include[[:space:]]*data.gms", run_code)], sep = "\n", file = fn)
   # Add parameter constraint declaration
   if (length(scen@modInp@gams.equation) > 0) {
-    mps_name <- grep('^[m]Cns', names(scen@modInp@parameters), value = TRUE)
-    mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
-                                                           function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    pps_name <- grep('^[p]Cns', names(scen@modInp@parameters), value = TRUE)
-    pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
-                                                                 function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    pps_name_def <- gsub('[(][)]', '', pps_name_def)
+    mps_name <- grep("^[m]Cns", names(scen@modInp@parameters), value = TRUE)
+    mps_name_def <- c("set ", paste0(mps_name, "(", sapply(
+      scen@modInp@parameters[mps_name],
+      function(x) paste0(x@dimSets, collapse = ", ")
+    ), ")"), ";")
+    pps_name <- grep("^[p]Cns", names(scen@modInp@parameters), value = TRUE)
+    pps_name_def <- c("parameter ", paste0(pps_name, "(", sapply(
+      scen@modInp@parameters[pps_name],
+      function(x) paste0(x@dimSets, collapse = ", ")
+    ), ")"), ";")
+    pps_name_def <- gsub("[(][)]", "", pps_name_def)
     if (length(mps_name) != 0) {
-      cat(mps_name_def, sep = '\n', file = zz_constrains)
-      cat('\n', sep = '\n', file = zz_constrains)
+      cat(mps_name_def, sep = "\n", file = zz_constrains)
+      cat("\n", sep = "\n", file = zz_constrains)
     }
     if (length(pps_name) != 0) {
-      cat(pps_name_def, sep = '\n', file = zz_constrains)
-      cat('\n', sep = '\n', file = zz_constrains)
+      cat(pps_name_def, sep = "\n", file = zz_constrains)
+      cat("\n", sep = "\n", file = zz_constrains)
     }
   }
-  
+
   # Add parameter costs declaration
   {
-    mps_name <- grep('^[m]Costs', names(scen@modInp@parameters), value = TRUE)
-    mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
-                                                           function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    pps_name <- grep('^[p]Costs', names(scen@modInp@parameters), value = TRUE)
-    pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
-                                                                 function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    pps_name_def <- gsub('[(][)]', '', pps_name_def)
+    mps_name <- grep("^[m]Costs", names(scen@modInp@parameters), value = TRUE)
+    mps_name_def <- c("set ", paste0(mps_name, "(", sapply(
+      scen@modInp@parameters[mps_name],
+      function(x) paste0(x@dimSets, collapse = ", ")
+    ), ")"), ";")
+    pps_name <- grep("^[p]Costs", names(scen@modInp@parameters), value = TRUE)
+    pps_name_def <- c("parameter ", paste0(pps_name, "(", sapply(
+      scen@modInp@parameters[pps_name],
+      function(x) paste0(x@dimSets, collapse = ", ")
+    ), ")"), ";")
+    pps_name_def <- gsub("[(][)]", "", pps_name_def)
     if (length(mps_name) != 0) {
-      cat(mps_name_def, sep = '\n', file = zz_constrains)
-      cat('\n', sep = '\n', file = zz_constrains)
+      cat(mps_name_def, sep = "\n", file = zz_constrains)
+      cat("\n", sep = "\n", file = zz_constrains)
     }
     if (length(pps_name) != 0) {
-      cat(pps_name_def, sep = '\n', file = zz_constrains)
-      cat('\n', sep = '\n', file = zz_constrains)
+      cat(pps_name_def, sep = "\n", file = zz_constrains)
+      cat("\n", sep = "\n", file = zz_constrains)
     }
   }
-  
+
   # Add parameter costs declaration
   {
-    zz_costs <- file(paste(arg$tmp.dir, '/inc_costs.gms', sep = ''), 'w')
-    mps_name <- grep('^[m]Costs', names(scen@modInp@parameters), value = TRUE)
-    mps_name_def <- c('set ', paste0(mps_name, '(', sapply(scen@modInp@parameters[mps_name], 
-                         function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    pps_name <- grep('^[p]Costs', names(scen@modInp@parameters), value = TRUE)
-    pps_name_def <- c('parameter ', paste0(pps_name, '(', sapply(scen@modInp@parameters[pps_name], 
-                      function(x) paste0(x@dimSetNames, collapse= ', ')), ')'), ';')
-    pps_name_def <- gsub('[(][)]', '', pps_name_def)
+    zz_costs <- file(paste(arg$tmp.dir, "/inc_costs.gms", sep = ""), "w")
+    mps_name <- grep("^[m]Costs", names(scen@modInp@parameters), value = TRUE)
+    mps_name_def <- c("set ", paste0(mps_name, "(", sapply(
+      scen@modInp@parameters[mps_name],
+      function(x) paste0(x@dimSets, collapse = ", ")
+    ), ")"), ";")
+    pps_name <- grep("^[p]Costs", names(scen@modInp@parameters), value = TRUE)
+    pps_name_def <- c("parameter ", paste0(pps_name, "(", sapply(
+      scen@modInp@parameters[pps_name],
+      function(x) paste0(x@dimSets, collapse = ", ")
+    ), ")"), ";")
+    pps_name_def <- gsub("[(][)]", "", pps_name_def)
     if (length(mps_name) != 0) {
-      cat(mps_name_def, sep = '\n', file = zz_costs)
-      cat('\n', sep = '\n', file = zz_costs)
+      cat(mps_name_def, sep = "\n", file = zz_costs)
+      cat("\n", sep = "\n", file = zz_costs)
     }
     if (length(pps_name) != 0) {
-      cat(pps_name_def, sep = '\n', file = zz_costs)
-      cat('\n', sep = '\n', file = zz_costs)
+      cat(pps_name_def, sep = "\n", file = zz_costs)
+      cat("\n", sep = "\n", file = zz_costs)
     }
-    cat(c('Equation\neqTotalUserCosts(region, year)\n;\n', scen@modInp@costs.equation), file = zz_costs)
+    cat(c(
+      "Equation\neqTotalUserCosts(region, year)\n;\n",
+      scen@modInp@costs.equation
+    ), file = zz_costs)
   }
-  
-  # Add constraint equation 
+
+  # Add constraint equation
   if (length(scen@modInp@gams.equation) > 0) {
     # Declaration
-    cat('equation', sapply(scen@modInp@gams.equation, function(x) x$equationDeclaration), ';', '', sep = '\n', file = zz_constrains) 
+    cat("equation", sapply(
+      scen@modInp@gams.equation,
+      function(x) x$equationDeclaration
+    ),
+    ";", "",
+    sep = "\n", file = zz_constrains
+    )
     # Body equation
-    cat(sapply(scen@modInp@gams.equation, function(x) x$equation), '', sep = '\n', file = zz_constrains) 
+    cat(sapply(scen@modInp@gams.equation, function(x) x$equation), "",
+      sep = "\n", file = zz_constrains
+    )
   }
   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
-    cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz_constrains)
+    cat(scen@model@misc$additionalEquationGAMS$code,
+      sep = "\n",
+      file = zz_constrains
+    )
   }
-  cat(run_code[(grep('[$]include[[:space:]]*data.gms', run_code) + 1):length(run_code)], sep = '\n', file = zz)
-  
+  cat(run_code[
+    (grep("[$]include[[:space:]]*data.gms", run_code) + 1):length(run_code)
+  ], sep = "\n", file = fn)
+
   # Add constraint equation to model declaration
   if (!is.null(scen@model@misc$additionalEquationGAMS)) {
-    cat(scen@model@misc$additionalEquationGAMS$code, sep = '\n', file = zz_constrains)
+    cat(scen@model@misc$additionalEquationGAMS$code,
+      sep = "\n",
+      file = zz_constrains
+    )
   }
-  close(zz)
+  close(fn)
   close(zz_constrains)
   close(zz_costs)
   .write_inc_files(arg, scen, ".gms")
-  if (is.null(scen@solver$cmdline) || scen@solver$cmdline == '')
-    scen@solver$cmdline <- 'gams energyRt.gms'
-  scen@solver$code <- c('energyRt.gms', 'output.gms', 'inc_constraints.gms', 'inc_solver.gms')
+  if (is.null(scen@solver$cmdline) || scen@solver$cmdline == "") {
+    scen@solver$cmdline <- "gams energyRt.gms"
+  }
+  scen@solver$code <- c(
+    "energyRt.gms", "output.gms", "inc_constraints.gms",
+    "inc_solver.gms"
+  )
   scen
 }
 
 .check_miss_rem_col <- function(x, nn) {
-  kll <- rev(grep('[[:alnum:]]$', x))
+  kll <- rev(grep("[[:alnum:]]$", x))
   kll <- kll[kll != length(x)]
   if (length(kll) != 0) {
-    for (i in kll)
+    for (i in kll) {
       x[i] <- paste0(x[i], nn, x[i + 1])
+    }
     x <- x[-(kll + 1)]
   }
   x
 }
+
 .rem_col <- function(x, nn, rmm) {
   x <- .check_miss_rem_col(x, nn)
   for (i in 2:length(x)) {
-    tt <- gsub('(^.|[)].*)', '', x[i])  
-    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
-    mm <- strsplit(tt, '[,]')[[1]][-rmm]
-    if (length(mm) == 0) x[i] <- paste0(nn, til) else {
-      x[i] <- paste0(nn, '(', paste0(mm, collapse = ', '), ')', til)
+    tt <- gsub("(^.|[)].*)", "", x[i])
+    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))
+    mm <- strsplit(tt, "[,]")[[1]][-rmm]
+    if (length(mm) == 0) {
+      x[i] <- paste0(nn, til)
+    } else {
+      x[i] <- paste0(nn, "(", paste0(mm, collapse = ", "), ")", til)
     }
   }
-  return(paste0(x, collapse = ''))
+  return(paste0(x, collapse = ""))
 }
-
-
 
 .rem_col_sq <- function(x, nn, rmm) {
   x <- .check_miss_rem_col(x, nn)
   for (i in 2:length(x)) {
-    tt <- gsub('(^.|[]].*)', '', x[i])  
-    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
-    mm <- strsplit(tt, '[,]')[[1]][-rmm]
-    if (length(mm) == 0) x[i] <- paste0(nn, til) else {
-      x[i] <- paste0(nn, '[', paste0(mm, collapse = ', '), ']', til)
+    tt <- gsub("(^.|[]].*)", "", x[i])
+    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))
+    mm <- strsplit(tt, "[,]")[[1]][-rmm]
+    if (length(mm) == 0) {
+      x[i] <- paste0(nn, til)
+    } else {
+      x[i] <- paste0(nn, "[", paste0(mm, collapse = ", "), "]", til)
     }
   }
-  return(paste0(x, collapse = ''))
+  return(paste0(x, collapse = ""))
 }
 
 .rem_col_fg <- function(x, nn, rmm) {
   x <- .check_miss_rem_col(x, nn)
   for (i in 2:length(x)) {
-    tt <- gsub('(^.|[}].*)', '', x[i])  
-    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))   
-    mm <- strsplit(tt, '[,]')[[1]][-rmm]
-    if (length(mm) == 0) x[i] <- paste0(nn, til) else {
-      x[i] <- paste0(nn, '{', paste0(mm, collapse = ', '), '}', til)
+    tt <- gsub("(^.|[}].*)", "", x[i])
+    til <- substr(x[i], nchar(tt) + 3, nchar(x[i]))
+    mm <- strsplit(tt, "[,]")[[1]][-rmm]
+    if (length(mm) == 0) {
+      x[i] <- paste0(nn, til)
+    } else {
+      x[i] <- paste0(nn, "{", paste0(mm, collapse = ", "), "}", til)
     }
   }
-  return(paste0(x, collapse = ''))
+  return(paste0(x, collapse = ""))
 }
 
+# Generate GAMS code, return character string with the GAMS code
+.toGams0 <- function(obj, include.def) {
+  gen_gg <- function(name, dtt) {
+    if (ncol(dtt) == 1) {
+      ret <- paste0(name, " = ", dtt[1, 1], ";")
+    } else {
+      ret <- paste0(name, '("', dtt[, 1])
+      for (i in seq_len(ncol(dtt) - 2) + 1) {
+        ret <- paste0(ret, '", "', dtt[, i])
+      }
+      paste0(ret, '") = ', dtt[, ncol(dtt)], ";")
+    }
+  }
+  as_simple <- function(dtt, name, def, include.def) {
+    if (include.def) {
+      add_cnd <- function(y, x) {
+        if (x == "") {
+          return(x)
+        } else {
+          return(paste(x, "and", y))
+        }
+      }
+      add_cond2 <- ""
+      if (any(obj@dimSets == "tech") && any(obj@dimSets == "comm")) {
+        add_cond2 <- "(mTechInpComm(tech, comm) or mTechOutComm(tech, comm) or mTechAInp(tech, comm) or mTechAOut(tech, comm))"
+        if (any(obj@dimSets == "group")) add_cond2 <- paste("not(mTechOneComm(tech, comm)) and  ", add_cond2, sep = "")
+      }
+      if (any(obj@dimSets == "tech") && any(obj@dimSets == "slice")) {
+        add_cond2 <- add_cnd("mTechSlice(tech, slice)", add_cond2)
+      }
+      if (any(obj@dimSets == "tech") && any(obj@dimSets == "acomm")) {
+        add_cond2 <- add_cnd("(mTechAInp(tech, acomm) or mTechAOut(tech, acomm))", add_cond2)
+      }
+      if (any(obj@dimSets == "year")) {
+        add_cond2 <- add_cnd("mMidMilestone(year)", add_cond2)
+      }
+      if (name == "pTradeIrEff") {
+        add_cond2 <- "(sum(comm$(mTradeComm(trade, comm) and mvTradeIr(trade, comm, src, dst, year, slice)), 1))"
+      }
+      if (name == "pTechGinp2use") {
+        add_cond2 <- "(sum(commp$meqTechGrp2Sng(tech, region, group, commp, year, slice), 1) + (sum(groupp$meqTechGrp2Grp(tech, region, group, groupp, year, slice), 1) <> 0))"
+      }
+      if (name == "pTechAfUp") {
+        add_cond2 <- "meqTechAfUp(tech, region, year, slice)"
+      }
+
+      if (add_cond2 != "") add_cond2 <- paste("(", add_cond2, ")", sep = "")
+      if (nrow(dtt) == 0 || all(dtt$value == def)) { #
+        return(paste(name, "(", paste(obj@dimSets, collapse = ", "),
+          ")", "$"[add_cond2 != ""], add_cond2, " = ", def,
+          ";",
+          sep = ""
+        ))
+      } else {
+        if (def != 0 && def != Inf) {
+          fn <- paste0(
+            name, "(", paste0(obj@dimSets, collapse = ", "),
+            ")", "$"[add_cond2 != ""], add_cond2, " = ", def, ";"
+          )
+        } else {
+          fn <- ""
+        }
+        return(c(fn, gen_gg(name, dtt[dtt$value != def, , drop = FALSE]))) #
+      }
+    }
+    if (nrow(dtt) == 0 || all(dtt$value %in% c(0, Inf))) { #
+      if (ncol(dtt) > 1) {
+        return(paste0(
+          name, "(",
+          paste0(colnames(dtt)[-ncol(dtt)], collapse = ", "),
+          ")$0 = 0;"
+        ))
+      }
+      return(paste0(name, "$0 = 0;"))
+    } else {
+      return(c(gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf, , drop = FALSE]))) #
+    }
+  }
+  if (obj@nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  }
+  if (obj@type == "set") {
+    if (nrow(obj@data) == 0) {
+      return(paste0("set\n", obj@name, " / 1 /;\n"))
+    } else {
+      return(c(
+        "set", paste(obj@name, " /", sep = ""),
+        sort(obj@data[, 1]), "/;", ""
+      ))
+    }
+  } else if (obj@type == "map") {
+    if (nrow(obj@data) == 0) {
+      return(paste0(
+        obj@name, "(",
+        paste0(obj@dimSets, collapse = ", "), ")$0 = NO;"
+      ))
+    } else {
+      ret <- c("set", paste(obj@name, "(",
+        paste(obj@dimSets, collapse = ", "),
+        ") /",
+        sep = ""
+      ))
+      return(c(
+        ret, apply(obj@data, 1, function(x) paste(x, collapse = ".")),
+        "/;", ""
+      ))
+    }
+  } else if (obj@type == "simple") {
+    return(as_simple(obj@data, obj@name, obj@defVal, include.def))
+  } else if (obj@type == "multi") {
+    return(c(
+      as_simple(
+        obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        paste0(obj@name, "Lo"), obj@defVal[1], include.def
+      ),
+      as_simple(
+        obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        paste0(obj@name, "Up"), obj@defVal[2], include.def
+      )
+    ))
+  } else {
+    stop(paste0("Error: .toGams: unknown parameter type: ", obj@type, " / ", obj@name))
+  }
+  ret
+}
+
+
+# GDX exchange ####
+.get_scen_data <- function(scen) {
+  all_factor <- function(x) {
+    for (i in colnames(x)[colnames(x) != "value"]) {
+      x[[i]] <- factor(x[[i]])
+    }
+    x
+  }
+  gg <- list()
+  for (i in names(scen@modInp@parameters)) {
+    if (scen@modInp@parameters[[i]]@type != "multi") {
+      gg[[i]] <- all_factor(.get_data_slot(scen@modInp@parameters[[i]]))
+    } else {
+      tmp <- .get_data_slot(scen@modInp@parameters[[i]])
+      gg[[paste0(i, "Lo")]] <- all_factor(tmp[tmp$type == "lo",
+                                              colnames(tmp) != "type",
+                                              drop = FALSE])
+      gg[[paste0(i, "Up")]] <- all_factor(tmp[tmp$type == "up",
+                                              colnames(tmp) != "type",
+                                              drop = FALSE])
+    }
+    gg
+  }
+  return(gg)
+}
+
+.df2uels <- function(df, name = "x", value = "value") {
+  # The function takes data.frame or character vector and returns
+  # named list for exporting to GDX-file using gdxrrw
+  if (!is.data.frame(df)) {
+    df <- data.frame(df)
+    colnames(df) <- name
+  }
+  domains <- names(df)
+  v <- domains != value
+  nr <- nrow(df)
+  nc <- sum(v)
+  if (all(v)) {
+    type <- "set"
+  } else {
+    type <- "parameter"
+  }
+  df2val <- function(dd) {
+    if (nrow(dd) > 0) {
+      for (j in domains[v]) {
+        dd[, j] <- as.numeric(dd[, j])
+      }
+      dd <- as.matrix(dd)
+    } else {
+      rr <- nr
+      if (type == "set") rr <- 1
+      dd <- matrix(1L, nrow = rr, ncol = length(v))
+    }
+    dd
+  }
+  if (nr > 0) {
+    for (j in domains[v]) {
+      df[, j] <- factor(df[, j]) # add levels from sets!
+    }
+    uels <- list(
+      name = name,
+      type = type,
+      dim = nc,
+      domains = domains[v],
+      uels = lapply(domains[v], function(x) levels(df[, x])),
+      val = df2val(df),
+      form = "sparse"
+    )
+  } else {
+    uels <- list(
+      name = name,
+      type = type,
+      dim = nc,
+      domains = domains[v],
+      uels = lapply(domains[v], function(x) "1"),
+      val = df2val(df), # matrix(nrow = 0, ncol = nc),
+      form = "sparse"
+    )
+  }
+  return(uels)
+}
+
+.write_gdx_list <- function(dat, gdxName = "data.gdx") {
+  # the function exports named list of sets and parameters to GDX file
+  stopifnot("gdxrrw" %in% rownames(installed.packages()))
+  cat(" data.gdx ")
+  nms <- names(dat)
+  max_length <- max(nchar(nms))
+  x <- list()
+  wipe <- ""
+  for (i in nms) {
+    cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
+    wipe <- paste0(rep("\b", max_length + 3), collapse = "")
+    x <- c(x, list(.df2uels(data.frame(dat[[i]]), i)))
+  }
+  gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
+  cat(wipe, sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(wipe, wipe, "\b, ", utils:::format.object_size(file.size(gdxName), "auto"),
+      ", ", sep = "")
+}
+
+.write_sqlite_list <- function(dat, sqlFile = "data.db") {
+  cat(basename(sqlFile), " ", sep = "")
+  tStart <- Sys.time()
+  if (file.exists(sqlFile)) file.remove(sqlFile)
+  con <- DBI::dbConnect(RSQLite::SQLite(), sqlFile)
+  # DBI::dbListTables(con)
+  nms <- names(dat)
+  max_length <- max(nchar(nms))
+  wipe <- ""
+  for (i in nms) {
+    cat(wipe, "(", i, ")", rep(" ", max_length - nchar(i) + 1), sep = "")
+    wipe <- paste0(rep("\b", max_length + 3), collapse = "")
+    # cat(wipe, i, rep(" ", 10), sep = "")
+    # wipe <- paste0(rep("\b", nchar(i) + 10), collapse = "")
+    DBI::dbWriteTable(con, i, dat[[i]], overwrite = TRUE)
+  }
+  DBI::dbDisconnect(con)
+  # finf <- file.info(sqlFile)
+  # format(finf["size"])
+  cat(wipe, sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(rep(" ", max_length + 3), sep = "")
+  cat(wipe, wipe, "\b, ", utils:::format.object_size(file.size(sqlFile), "auto"),
+      ", ", sep = "")
+  # cat(format(round(Sys.time() - tStart), 1))
+}
+
+# end ####

@@ -12,5 +12,11 @@
 #' @importFrom data.table :=
 #' @importFrom data.table as.data.table
 #' @importFrom data.table data.table
+#' @importFrom data.table rbindlist
+#' @importFrom dplyr all_of
+#' @importFrom dplyr any_of
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
 ## usethis namespace: end
 NULL

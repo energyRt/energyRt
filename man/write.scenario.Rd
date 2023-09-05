@@ -7,16 +7,7 @@
 \method{write}{scenario}(scen, tmp.dir = NULL, solver = NULL, ...)
 }
 \arguments{
-\item{scen}{}
-
-\item{tmp.dir}{}
-
-\item{solver}{}
-
 \item{...}{}
-}
-\value{
-
 }
 \description{
 Title

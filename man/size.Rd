@@ -16,9 +16,8 @@ size(
 }
 \arguments{
 \item{x}{- any R object}
-}
-\value{
 
+\item{asNumeric}{}
 }
 \description{
 Size of an object

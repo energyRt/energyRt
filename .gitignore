@@ -9,6 +9,8 @@ solwork/
 *.ini
 *.Rproj
 solwork
+\.vs/
+\.git/
 
 #doc
 Meta

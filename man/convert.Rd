@@ -4,7 +4,7 @@
 \alias{convert}
 \title{Convert units}
 \usage{
-convert(from, to, value = 1, database = "user")
+convert(from, to, ...)
 }
 \arguments{
 \item{from}{character of length one with unit name}

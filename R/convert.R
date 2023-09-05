@@ -8,6 +8,7 @@
 #' @return numeric vector with converted values
 #' @export convert
 #'
+#' @include utils.R
 #'
 setGeneric("convert", function(from, to, ...) standardGeneric("convert"))
 
