@@ -103,6 +103,8 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @param scenNameInList logical, should the name of the scenarios be used if not provided in the list with several scenarios?
 #' @param verbose
 #'
+#' @aliases get_data
+#'
 #' \dontrun{
 #' @examples
 #' data("utopia_scen_BAU.RData")
@@ -433,6 +435,9 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
     return(ll)
   }
 }
+
+#' @rdname getData
+get_data <- getData
 
 if (F) { # test
   load("energyRt_tutorial/data/utopia_scen_BAU.RData")

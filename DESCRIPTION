@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
-Version: 0.02.00.9000
-Date: 2023-09-04
+Version: 0.03.00.9000
+Date: 2023-09-05
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -22,8 +22,13 @@ Imports:
     DBI,
     RSQLite,
     magrittr,
-    dplyr
-Suggests: knitr, rmarkdown
+    dplyr,
+    tibble,
+    ggplot2
+Suggests: 
+    knitr,
+    rmarkdown,
+    sf
 License: AGLP-3.0
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr

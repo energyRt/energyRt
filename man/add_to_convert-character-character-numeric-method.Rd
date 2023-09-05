@@ -7,25 +7,25 @@
 \S4method{add_to_convert}{character,character,numeric}(
   type,
   unit,
-  convert_coefficient,
+  coef,
   alias = "",
-  SI_preffixes = FALSE,
-  database = "user",
+  SI_prefixes = FALSE,
+  database = "base",
   update = TRUE
 )
 }
 \arguments{
 \item{type}{character, type of the unit (one of "Energy", "Power", "Mass", "Time", "Length", "Area", "Pressure", "Density", "Volume", "Flow Rates", "Currency").}
 
-\item{unit}{character, the name of the new unit.}
+\item{unit}{character, the name of the new unit to add to the `database`.}
 
-\item{convert_coefficient}{numeric, convert factor to the base unit of this type (see the first column of `convert_data[[database]][[type]]`).}
+\item{coef}{numeric, convert factor to the base unit of this type (see the first column of `convert_data[[database]][[type]]`).}
 
 \item{alias}{character vector, alternative name(s) for the same unit.}
 
-\item{SI_preffixes}{logical, can be used with `SI` prefixes, FALSE by default.}
+\item{SI_prefixes}{logical, can be used with `SI` prefixes, FALSE by default.}
 
-\item{database}{character name of a database with units (`user` by default, other options are not implemented yet).}
+\item{database}{character name of a database with units (`base` by default, other options are not implemented yet).}
 }
 \value{
 updated `convert_data` in the `.GlobalEnv`, the values will not update the package data.
@@ -35,8 +35,8 @@ Add units to convert function
 }
 \examples{
 do not run
-convert_data$user$Currency
-add_to_convert("Currency", unit = "JPY", convert_coefficient = 140)
-convert_data$user$Currency
+convert_data$base$Currency
+add_to_convert("Currency", unit = "JPY", coef = 140)
+convert_data$base$Currency
 
 }

@@ -2,9 +2,31 @@
 % Please edit documentation in R/get_data.R
 \name{getData}
 \alias{getData}
+\alias{get_data}
 \title{Extracts information from scenario objects, based on filters.}
 \usage{
 getData(
+  scen,
+  name = NULL,
+  ...,
+  merge = FALSE,
+  process = FALSE,
+  parameters = TRUE,
+  variables = TRUE,
+  ignore.case = FALSE,
+  newNames = NULL,
+  newValues = NULL,
+  na.rm = FALSE,
+  digits = NULL,
+  drop.zeros = FALSE,
+  asTibble = TRUE,
+  stringsAsFactors = FALSE,
+  yearsAsFactors = FALSE,
+  scenNameInList = as.logical(length(scen) - 1),
+  verbose = FALSE
+)
+
+get_data(
   scen,
   name = NULL,
   ...,
@@ -59,6 +81,8 @@ getData(
 \item{yearsAsFactors}{logical, should years  be converted to factors? Set 'year' is integer by default.}
 
 \item{scenNameInList}{logical, should the name of the scenarios be used if not provided in the list with several scenarios?}
+
+\item{verbose}{}
 }
 \description{
 Extracts information from scenario objects, based on filters.

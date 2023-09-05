@@ -2,16 +2,24 @@
 % Please edit documentation in R/convert.R
 \name{convert}
 \alias{convert}
+\alias{convert,character-method}
+\alias{convert,numeric-method}
 \title{Convert units}
 \usage{
-convert(from, to, ...)
+convert(x, ...)
+
+\S4method{convert}{character}(from, to, x = 1, database = "base", ...)
+
+\S4method{convert}{numeric}(x = 1, from, to, database = "base", ...)
 }
 \arguments{
+\item{x}{numeric vector with data to convert}
+
+\item{...}{currently ignored}
+
 \item{from}{character of length one with unit name}
 
 \item{to}{character of length one with unit name}
-
-\item{value}{numeric vector with data to convert}
 
 \item{database}{units database}
 }
@@ -20,4 +28,14 @@ numeric vector with converted values
 }
 \description{
 Convert units
+}
+\examples{
+convert("MWh", "kWh")
+convert("kWh", "MJ")
+convert("kWh/kg", "MJ/t", 1e-3)
+convert("cents/kWh", "USD/MWh")
+convert(1000, "kWh", "MWh")
+convert("kWh", "MJ")
+convert(1, "kWh/kg", "MJ/t")
+convert(5, "cents/kWh", "USD/MWh")
 }

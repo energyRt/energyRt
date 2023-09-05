@@ -18,5 +18,8 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
+#' @importFrom tibble as_tibble
+#' @importFrom tibble is_tibble
+#' @importFrom tibble tibble
 ## usethis namespace: end
 NULL

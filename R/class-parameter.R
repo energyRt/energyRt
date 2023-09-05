@@ -143,7 +143,7 @@ newSet <- function(dimSets) {
 
 setGeneric('.dat2par', function(obj, data) standardGeneric(".dat2par"))
 
-# Add data to Map Table with check new data
+# .dat2par: data.frame ####
 setMethod(
   ".dat2par", signature(obj = "parameter", data = "data.frame"),
   function(obj, data) {
@@ -191,7 +191,7 @@ setMethod(
 )
 
 
-# Append to character Set ####
+# .dat2par: character ####
 setMethod(
   ".dat2par", signature(obj = "parameter", data = "character"),
   function(obj, data) {
@@ -214,7 +214,7 @@ setMethod(
   }
 )
 
-# Append to numeric Set ####
+# .dat2par: numeric ####
 setMethod(
   ".dat2par", signature(obj = "parameter", data = "numeric"),
   function(obj, data) {
@@ -284,9 +284,10 @@ setMethod(
   obj
 }
 
-setGeneric('addMultipleSet', function(obj, dimSets) standardGeneric("addMultipleSet"))
+setGeneric('addMultipleSet',
+           function(obj, dimSets) standardGeneric("addMultipleSet"))
 
-# Add Set
+# mapping character ####
 setMethod(
   "addMultipleSet", signature(obj = "parameter", dimSets = "character"),
   function(obj, dimSets) {
@@ -301,7 +302,7 @@ setMethod(
   }
 )
 
-# Add Set
+# mapping numeric ####
 setMethod(
   "addMultipleSet", signature(obj = "parameter", dimSets = "numeric"),
   function(obj, dimSets) {
@@ -316,7 +317,7 @@ setMethod(
   }
 )
 
-# Add data to Map Table with check new data
+# print parameter ####
 setMethod("print", "parameter", function(x, ...) {
   if (nrow(x@data) == 0) {
     cat('parameter "', x@name, '" is empty\n', sep = "")

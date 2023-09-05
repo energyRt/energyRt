@@ -470,9 +470,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     vrb.lhs <- .variable_mapping[[vrb]]
     # Add multiple to vrb
     # Add to year multiplier if lag.year | lead.year
-    if ((any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) && (nrow(stm@lhs[[i]]@mult) == 0 || all(colnames(stm@lhs[[i]]@mult) != "year"))) {
+    if ((any(lhs.set2$lead.year) ||
+         any(lhs.set2$lag.year)) &&
+        (nrow(stm@lhs[[i]]@mult) == 0 ||
+         all(colnames(stm@lhs[[i]]@mult) != "year"))) {
       if (nrow(stm@lhs[[i]]@mult) == 0) {
-        stm@lhs[[i]]@mult <- data.frame(year = NA, value = stm@lhs[[i]]@defVal, stringsAsFactors = FALSE)
+        stm@lhs[[i]]@mult <- data.frame(year = NA, value = stm@lhs[[i]]@defVal,
+                                        stringsAsFactors = FALSE)
       } else {
         stm@lhs[[i]]@mult$year <- NA
       }
@@ -481,25 +485,32 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     if (nrow(stm@lhs[[i]]@mult) != 0) {
       # Complicated parameter
       # Generate approxim
-      approxim2 <- approxim[unique(c(colnames(stm@lhs[[i]]@mult)[colnames(stm@lhs[[i]]@mult) %in% names(approxim)], "solver", "year"))]
+      approxim2 <- approxim[unique(c(colnames(stm@lhs[[i]]@mult)[
+        colnames(stm@lhs[[i]]@mult) %in% names(approxim)], "solver", "year"))]
       if (any(names(approxim2) == "slice")) {
         approxim2$slice <- approxim2$slice@all_slice
       }
       need.set <- lhs.set2[lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), "set"]
-      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) & lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), ]
+      need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) &
+                              lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), ]
 
       for (j in seq_len(nrow(need.set2))) {
         approxim2[[need.set2[j, "set"]]] <- set.map[[need.set2[j, "new.map"]]]
 
         if (any(colnames(stm@lhs[[i]]@mult) %in% c(need.set, "value"))) {
-          if (!all(colnames(stm@lhs[[i]]@mult) %in% c(for.each.set, need.set, "value"))) {
+          if (!all(colnames(stm@lhs[[i]]@mult) %in%
+                   c(for.each.set, need.set, "value"))) {
             stop(paste0(
-              "There are unknown set in constraint ", stm@name, ", mult ", i, ': "',
-              paste0(colnames(stm@lhs[[i]]@mult)[!(colnames(stm@lhs[[i]]@mult) %in% c(for.each.set, "value"))], collapse = '", "'), '"'
+              "There are unknown set in constraint ",
+              stm@name, ", mult ", i, ': "',
+              paste0(colnames(stm@lhs[[i]]@mult)[
+                !(colnames(stm@lhs[[i]]@mult) %in% c(for.each.set, "value"))],
+                collapse = '", "'), '"'
             ))
           }
           # Add set that from  for.each
-          nslc <- colnames(stm@lhs[[i]]@mult)[!(colnames(stm@lhs[[i]]@mult) %in% c(need.set, "value"))]
+          nslc <- colnames(stm@lhs[[i]]@mult)[
+            !(colnames(stm@lhs[[i]]@mult) %in% c(need.set, "value"))]
           need.set <- c(need.set, nslc)
           if (nrow(stm@for.each) > 0) {
             for (j in nslc) {
@@ -519,7 +530,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
         defVal = stm@lhs[[i]]@defVal,
         interpolation = "back.inter.forth"
       )
-      prec@parameters[[xx@name]] <- .dat2par(xx, simpleInterpolation(stm@lhs[[i]]@mult, "value", xx, approxim2))
+      prec@parameters[[xx@name]] <-
+        .dat2par(xx, simpleInterpolation(stm@lhs[[i]]@mult, "value", xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
         yy <- .add_dropped_zeros(prec, xx@name)
         nn <- approxim$mileStoneForGrowth[as.character(yy$year)]
