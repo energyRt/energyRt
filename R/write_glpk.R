@@ -3,7 +3,7 @@
   run_code <- scen@source[["GLPK"]]
   dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
   file_w <- c()
-  for (j in c("set", "map", "simple", "multi")) {
+  for (j in c("set", "map", "single", "bounds")) {
     for (i in names(scen@modInp@parameters)) {
       if (scen@modInp@parameters[[i]]@type == j) {
         file_w <- c(file_w, energyRt:::.sm_to_glpk(scen@modInp@parameters[[i]]))
@@ -15,7 +15,7 @@
     sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)]
   for (nn in fdownsize) {
     rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
-    if (scen@modInp@parameters[[nn]]@type == "multi") {
+    if (scen@modInp@parameters[[nn]]@type == "bounds") {
       uuu <- paste0(nn, c("Lo", "Up"))
     } else {
       uuu <- nn
@@ -149,7 +149,7 @@
         }))
       ret <- c(ret, ";", "")
     }
-  } else if (obj@type == "simple") {
+  } else if (obj@type == "single") {
     if (nrow(obj@data) == 0) {
       dd <- obj@defVal
       if (dd == Inf) dd <- 0
@@ -168,7 +168,7 @@
       if (ncol(obj@data) == 1) ret <- gsub("[[][ ]*[]]", "", ret)
       ret <- c(ret, ";", "")
     }
-  } else if (obj@type == "multi") {
+  } else if (obj@type == "bounds") {
     gg <- obj@data
     gg <- gg[gg$type == "lo", , drop = FALSE]
     gg <- gg[, colnames(gg) != "type"]

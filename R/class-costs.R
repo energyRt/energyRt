@@ -159,11 +159,11 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
     for (ss in mult_sets) {
       stm@mult <- stm@mult[stm@mult[[ss]] %in% approxim2[[ss]], , drop = FALSE]
     }
-    xx <- newParameter(paste0("pCosts", stm@name), mult_sets, "simple",
+    xx <- newParameter(paste0("pCosts", stm@name), mult_sets, "single",
       defVal = 0,
       interpolation = "back.inter.forth", colName = "value"
     )
-    yy <- simpleInterpolation(stm@mult, "value", xx, approxim2)
+    yy <- .interp_single(stm@mult, "value", xx, approxim2)
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     sss <- ""
     if (length(mult_sets) != 0) sss <- paste0("(", paste0(mult_sets, collapse = '", "'), ")")

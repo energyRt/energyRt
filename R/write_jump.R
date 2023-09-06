@@ -43,7 +43,7 @@
   ]
   for (nn in fdownsize) {
     rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
-    if (scen@modInp@parameters[[nn]]@type == "multi") {
+    if (scen@modInp@parameters[[nn]]@type == "bounds") {
       uuu <- paste0(nn, c("Lo", "Up"))
     } else {
       uuu <- nn
@@ -107,7 +107,7 @@
     #   scen@modInp@parameters[[i]]@data$yearp <-
     #     as.character(as.integer(scen@modInp@parameters[[i]]@data$yearp))
     # }
-    if (scen@modInp@parameters[[i]]@type != "multi") {
+    if (scen@modInp@parameters[[i]]@type != "bounds") {
       dat[[i]] <- tmp
     } else {
       tmp <- .get_data_slot(scen@modInp@parameters[[i]])
@@ -121,7 +121,7 @@
   cat('using RData\nusing DataFrames\ndt = load("data.RData")["dat"]\n',
     sep = "\n", file = zz_data_julia
   )
-  for (j in c("set", "map", "simple", "multi")) {
+  for (j in c("set", "map", "single", "bounds")) {
     for (i in names(scen@modInp@parameters)) {
       if (scen@modInp@parameters[[i]]@type == j) {
         cat(energyRt:::.toJuliaHead(scen@modInp@parameters[[i]]),
@@ -203,7 +203,7 @@
 
 # Generate Julia code, return the code as a character vector
 .toJulia <- function(obj) {
-  as_simple <- function(data, name, name2, def) {
+  as_single <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
@@ -258,20 +258,20 @@
         ), "))\n"), collapse = "")
       ))
     }
-  } else if (obj@type == "simple") {
-    return(as_simple(
+  } else if (obj@type == "single") {
+    return(as_single(
       obj@data, obj@name,
       paste0("(", paste0(obj@dimSets, collapse = ", "), ")"),
       obj@defVal
     ))
-  } else if (obj@type == "multi") {
+  } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -282,7 +282,7 @@
 }
 
 .toJuliaHead <- function(obj) {
-  as_simple <- function(data, name, name2, def) {
+  as_single <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
@@ -332,17 +332,17 @@
         ), "end"
       ))
     }
-  } else if (obj@type == "simple") {
-    return(as_simple(obj@data, obj@name,
+  } else if (obj@type == "single") {
+    return(as_single(obj@data, obj@name,
                      paste0("(", paste0(obj@dimSets, collapse = ", "), ")"), obj@defVal))
-  } else if (obj@type == "multi") {
+  } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )

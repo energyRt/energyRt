@@ -65,12 +65,12 @@ setMethod(".obj2modInp",
     approxim$comm <- cmd@name
     obj@parameters[["pDummyImportCost"]] <- .dat2par(
       obj@parameters[["pDummyImportCost"]],
-      simpleInterpolation(dbg, "dummyImport",
+      .interp_single(dbg, "dummyImport",
                           obj@parameters[["pDummyImportCost"]], approxim)
     )
     obj@parameters[["pDummyExportCost"]] <- .dat2par(
       obj@parameters[["pDummyExportCost"]],
-      simpleInterpolation(dbg, "dummyExport",
+      .interp_single(dbg, "dummyExport",
                           obj@parameters[["pDummyExportCost"]], approxim)
     )
   }
@@ -118,7 +118,7 @@ setMethod(".obj2modInp", signature(
                      list(region = approxim$region))
   obj@parameters[["mvDemInp"]] <-
     .dat2par(obj@parameters[["mvDemInp"]], mvDemInp)
-  pDemand <- simpleInterpolation(
+  pDemand <- .interp_single(
     dem@dem, "dem", obj@parameters[["pDemand"]], approxim, c("dem", "comm"),
     c(dem@name, dem@commodity)
   )
@@ -150,7 +150,7 @@ setMethod(".obj2modInp", signature(
   wth <- .filter_data_in_slots(wth, approxim$region, "region")
   wth <- .disaggregateSliceLevel(wth, approxim)
   obj@parameters[["pWeather"]]@defVal <- wth@defVal
-  obj@parameters[["pWeather"]] <- .dat2par(obj@parameters[["pWeather"]], simpleInterpolation(
+  obj@parameters[["pWeather"]] <- .dat2par(obj@parameters[["pWeather"]], .interp_single(
     wth@weather, "wval",
     obj@parameters[["pWeather"]], approxim, "weather", wth@name
   ))
@@ -187,7 +187,7 @@ setMethod(".obj2modInp", signature(
   obj@parameters[["mExpComm"]] <- .dat2par(obj@parameters[["mExpComm"]], mExpComm)
   obj@parameters[["pExportRowPrice"]] <- .dat2par(
     obj@parameters[["pExportRowPrice"]],
-    simpleInterpolation(
+    .interp_single(
       exp@exp, "price",
       obj@parameters[["pExportRowPrice"]], approxim, "expp", exp@name
     )
@@ -195,7 +195,7 @@ setMethod(".obj2modInp", signature(
   pExportRowRes <- NULL
   if (exp@reserve != Inf) pExportRowRes <- data.frame(expp = exp@name, value = exp@reserve)
   obj@parameters[["pExportRowRes"]] <- .dat2par(obj@parameters[["pExportRowRes"]], pExportRowRes)
-  pExportRow <- multiInterpolation(exp@exp, "exp", obj@parameters[["pExportRow"]], approxim, "expp", exp@name)
+  pExportRow <- .interp_bounds(exp@exp, "exp", obj@parameters[["pExportRow"]], approxim, "expp", exp@name)
   obj@parameters[["pExportRow"]] <- .dat2par(obj@parameters[["pExportRow"]], pExportRow)
 
   mExportRow <- merge0(merge0(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
@@ -258,7 +258,7 @@ setMethod(
     obj@parameters[["mImpSlice"]] <- .dat2par(obj@parameters[["mImpSlice"]], mImpSlice)
     mImpComm <- data.frame(imp = imp@name, comm = imp@commodity)
     obj@parameters[["mImpComm"]] <- .dat2par(obj@parameters[["mImpComm"]], mImpComm)
-    pImportRowPrice <- simpleInterpolation(
+    pImportRowPrice <- .interp_single(
       imp@imp, "price",
       obj@parameters[["pImportRowPrice"]], approxim, "imp", imp@name
     )
@@ -266,7 +266,7 @@ setMethod(
     pImportRowRes <- NULL
     if (imp@reserve != Inf) pImportRowRes <- data.frame(imp = imp@name, value = imp@reserve)
     obj@parameters[["pImportRowRes"]] <- .dat2par(obj@parameters[["pImportRowRes"]], pImportRowRes)
-    pImportRow <- multiInterpolation(
+    pImportRow <- .interp_bounds(
       imp@imp, "imp",
       obj@parameters[["pImportRow"]], approxim, "imp", imp@name
     )
@@ -362,7 +362,7 @@ setMethod(
     # Discount
     approxim_no_mileStone_Year <- approxim
     approxim_no_mileStone_Year$mileStoneYears <- NULL
-    pDiscount <- simpleInterpolation(app@discount, "discount",
+    pDiscount <- .interp_single(app@discount, "discount",
       obj@parameters[["pDiscount"]], approxim_no_mileStone_Year,
       all.val = TRUE
     )
@@ -502,7 +502,7 @@ setMethod(
   function(obj, app, approxim) {
     # !!! Add interpolation of LHS and RHS here
     # browser()
-    # simpleInterpolation(
+    # .interp_single(
     #   app@rhs, parameter = 'rhs',
     #   # obj@parameters[['']],
     #   approxim = approxim
@@ -598,7 +598,7 @@ setMethod(
       obj@parameters[["mStorageComm"]],
       data.frame(stg = stg@name, comm = stg@commodity)
     )
-    olife <- simpleInterpolation(
+    olife <- .interp_single(
       stg@olife, "olife",
       obj@parameters[["pStorageOlife"]],
       approxim, "stg", stg@name
@@ -608,62 +608,62 @@ setMethod(
     # Loss
     obj@parameters[["pStorageInpEff"]] <- .dat2par(
       obj@parameters[["pStorageInpEff"]],
-      simpleInterpolation(
+      .interp_single(
         stg@seff, "inpeff", obj@parameters[["pStorageInpEff"]],
         approxim, c("stg", "comm"), c(stg@name, stg@commodity)
       )
     )
     obj@parameters[["pStorageOutEff"]] <- .dat2par(
       obj@parameters[["pStorageOutEff"]],
-      simpleInterpolation(
+      .interp_single(
         stg@seff, "outeff", obj@parameters[["pStorageOutEff"]],
         approxim, c("stg", "comm"), c(stg@name, stg@commodity)
       )
     )
     obj@parameters[["pStorageStgEff"]] <- .dat2par(
       obj@parameters[["pStorageStgEff"]],
-      simpleInterpolation(
+      .interp_single(
         stg@seff, "stgeff", obj@parameters[["pStorageStgEff"]],
         approxim, c("stg", "comm"), c(stg@name, stg@commodity)
       )
     )
     # Cost
-    pStorageCostInp <- simpleInterpolation(
+    pStorageCostInp <- .interp_single(
       stg@varom, "inpcost",
       obj@parameters[["pStorageCostInp"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageCostInp"]] <-
       .dat2par(obj@parameters[["pStorageCostInp"]], pStorageCostInp)
-    pStorageCostOut <- simpleInterpolation(
+    pStorageCostOut <- .interp_single(
       stg@varom, "outcost",
       obj@parameters[["pStorageCostOut"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageCostOut"]] <-
       .dat2par(obj@parameters[["pStorageCostOut"]], pStorageCostOut)
 
-    pStorageCostStore <- simpleInterpolation(
+    pStorageCostStore <- .interp_single(
       stg@varom, "stgcost",
       obj@parameters[["pStorageCostStore"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageCostStore"]] <-
       .dat2par(obj@parameters[["pStorageCostStore"]], pStorageCostStore)
 
-    pStorageFixom <- simpleInterpolation(
+    pStorageFixom <- .interp_single(
       stg@fixom, "fixom",
       obj@parameters[["pStorageFixom"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageFixom"]] <-
       .dat2par(obj@parameters[["pStorageFixom"]], pStorageFixom)
     # Ava/Cap
-    pStorageAf <- multiInterpolation(stg@af, "af", obj@parameters[["pStorageAf"]], approxim, "stg", stg@name)
+    pStorageAf <- .interp_bounds(stg@af, "af", obj@parameters[["pStorageAf"]], approxim, "stg", stg@name)
     obj@parameters[["pStorageAf"]] <- .dat2par(obj@parameters[["pStorageAf"]], pStorageAf)
     obj@parameters[["pStorageCap2stg"]] <- .dat2par(
       obj@parameters[["pStorageCap2stg"]],
       data.frame(stg = stg@name, value = stg@cap2stg)
     )
-    pStorageCinp <- multiInterpolation(stg@af, "cinp", obj@parameters[["pStorageCinp"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
+    pStorageCinp <- .interp_bounds(stg@af, "cinp", obj@parameters[["pStorageCinp"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
     obj@parameters[["pStorageCinp"]] <- .dat2par(obj@parameters[["pStorageCinp"]], pStorageCinp)
-    pStorageCout <- multiInterpolation(stg@af, "cout", obj@parameters[["pStorageCout"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
+    pStorageCout <- .interp_bounds(stg@af, "cout", obj@parameters[["pStorageCout"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
     obj@parameters[["pStorageCout"]] <- .dat2par(obj@parameters[["pStorageCout"]], pStorageCout)
     # Aux input/output
     if (nrow(stg@aux) != 0) {
@@ -697,7 +697,7 @@ setMethod(
         approxim_comm <- approxim_comm[names(approxim_comm) != "comm"]
         approxim_comm[["acomm"]] <- unique(stg@aeff[!is.na(stg@aeff[, dd[i, "table"]]), "acomm"])
         if (length(approxim_comm[["acomm"]]) != 0) {
-          aout_tmp[[dd[i, "list"]]] <- simpleInterpolation(stg@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "stg", stg@name)
+          aout_tmp[[dd[i, "list"]]] <- .interp_single(stg@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "stg", stg@name)
           obj@parameters[[dd[i, "list"]]] <- .dat2par(obj@parameters[[dd[i, "list"]]], aout_tmp[[dd[i, "list"]]])
         }
       }
@@ -735,12 +735,12 @@ setMethod(
       obj@parameters[["pStorageCharge"]] <- .dat2par(obj@parameters[["pStorageCharge"]], tmp)
     }
     # Some slice
-    stock_exist <- simpleInterpolation(
+    stock_exist <- .interp_single(
       stg@stock, "stock",
       obj@parameters[["pStorageStock"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageStock"]] <- .dat2par(obj@parameters[["pStorageStock"]], stock_exist)
-    invcost <- simpleInterpolation(stg@invcost, "invcost", obj@parameters[["pStorageInvcost"]], approxim, "stg", stg@name)
+    invcost <- .interp_single(stg@invcost, "invcost", obj@parameters[["pStorageInvcost"]], approxim, "stg", stg@name)
     obj@parameters[["pStorageInvcost"]] <- .dat2par(obj@parameters[["pStorageInvcost"]], invcost)
 
 
@@ -953,14 +953,14 @@ setMethod(
     obj@parameters[["mSupSlice"]] <- .dat2par(obj@parameters[["mSupSlice"]], mSupSlice)
     mSupComm <- data.frame(sup = sup@name, comm = sup@commodity)
     obj@parameters[["mSupComm"]] <- .dat2par(obj@parameters[["mSupComm"]], mSupComm)
-    pSupCost <- simpleInterpolation(sup@availability, "cost", obj@parameters[["pSupCost"]], approxim, c("sup", "comm"), c(sup@name, sup@commodity))
+    pSupCost <- .interp_single(sup@availability, "cost", obj@parameters[["pSupCost"]], approxim, c("sup", "comm"), c(sup@name, sup@commodity))
     obj@parameters[["pSupCost"]] <- .dat2par(obj@parameters[["pSupCost"]], pSupCost)
-    pSupReserve <- multiInterpolation(
+    pSupReserve <- .interp_bounds(
       sup@reserve, "res", obj@parameters[["pSupReserve"]],
       approxim, c("sup", "comm"), c(sup@name, sup@commodity)
     )
     obj@parameters[["pSupReserve"]] <- .dat2par(obj@parameters[["pSupReserve"]], pSupReserve)
-    pSupAva <- multiInterpolation(
+    pSupAva <- .interp_bounds(
       sup@availability, "ava",
       obj@parameters[["pSupAva"]], approxim, c("sup", "comm"), c(sup@name, sup@commodity)
     )
@@ -1079,7 +1079,7 @@ setMethod(
     if (all(!is.na(rampup$slice))) {
       approxim2$slice <- approxim2$slice[approxim2$slice %in% unique(rampup$slice)]
     }
-    pTechRampUp <- simpleInterpolation(
+    pTechRampUp <- .interp_single(
       rampup, name,
       obj@parameters[[pname]], approxim2, set_name, tech@name
     )
@@ -1181,7 +1181,7 @@ setMethod(
     approxim_comm <- approxim
     approxim_comm[["comm"]] <- rownames(ctype$comm)
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechCvarom <- simpleInterpolation(tech@varom, "cvarom",
+      pTechCvarom <- .interp_single(tech@varom, "cvarom",
         obj@parameters[["pTechCvarom"]], approxim_comm, "tech", tech@name
         # remValue = 0
       )
@@ -1193,7 +1193,7 @@ setMethod(
     approxim_acomm <- approxim
     approxim_acomm[["acomm"]] <- rownames(ctype$aux)
     if (length(approxim_acomm[["acomm"]]) != 0) {
-      pTechAvarom <- simpleInterpolation(tech@varom, "avarom",
+      pTechAvarom <- .interp_single(tech@varom, "avarom",
         obj@parameters[["pTechAvarom"]], approxim_acomm, "tech", tech@name
         # remValue = 0
       )
@@ -1204,7 +1204,7 @@ setMethod(
     }
     approxim_comm[["comm"]] <- rownames(ctype$comm)
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechAfc <- multiInterpolation(tech@ceff, "afc",
+      pTechAfc <- .interp_bounds(tech@ceff, "afc",
         obj@parameters[["pTechAfc"]], approxim_comm, "tech", tech@name,
         remValueUp = Inf, remValueLo = 0
       )
@@ -1214,12 +1214,12 @@ setMethod(
       pTechAfc <- NULL
     }
     # Stock & Capacity
-    stock_exist <- simpleInterpolation(tech@stock, "stock",
+    stock_exist <- .interp_single(tech@stock, "stock",
                                        obj@parameters[["pTechStock"]], approxim,
                                        "tech", tech@name)
     obj@parameters[["pTechStock"]] <-
       .dat2par(obj@parameters[["pTechStock"]], stock_exist)
-    olife <- simpleInterpolation(tech@olife, "olife",
+    olife <- .interp_single(tech@olife, "olife",
                                  obj@parameters[["pTechOlife"]], approxim,
                                  "tech", tech@name
                                  # , removeDefault = FALSE
@@ -1235,7 +1235,7 @@ setMethod(
     obj@parameters[["mTechNew"]] <-
       .dat2par(obj@parameters[["mTechNew"]], dd0$new)
 
-    invcost <- simpleInterpolation(tech@invcost, "invcost",
+    invcost <- .interp_single(tech@invcost, "invcost",
                                    obj@parameters[["pTechInvcost"]], approxim,
                                    "tech", tech@name)
     if (!is.null(invcost)) {
@@ -1280,7 +1280,7 @@ setMethod(
         .dat2par(obj@parameters[["pTechEac"]],
                   unique(pTechEac[, c(obj@parameters[["pTechEac"]]@dimSets, "value")]))
     }
-    pTechAf <- multiInterpolation(tech@af, "af",
+    pTechAf <- .interp_bounds(tech@af, "af",
       obj@parameters[["pTechAf"]], approxim, "tech", tech@name,
       remValueUp = Inf, remValueLo = 0
     )
@@ -1291,7 +1291,7 @@ setMethod(
       afs_slice <- afs_slice[!is.na(afs_slice)]
       approxim.afs <- approxim
       approxim.afs$slice <- afs_slice
-      pTechAfs <- multiInterpolation(tech@afs, "afs",
+      pTechAfs <- .interp_bounds(tech@afs, "afs",
                                      obj@parameters[["pTechAfs"]],
                                      approxim.afs, "tech",
                                      tech@name,
@@ -1306,7 +1306,7 @@ setMethod(
     approxim_comm[["comm"]] <-
       rownames(ctype$comm)[ctype$comm$type == "input" & is.na(ctype$comm[, "group"])]
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechCinp2use <- simpleInterpolation(
+      pTechCinp2use <- .interp_single(
         tech@ceff, "cinp2use",
         obj@parameters[["pTechCinp2use"]], approxim_comm, "tech", tech@name
       )
@@ -1317,12 +1317,12 @@ setMethod(
     }
     approxim_comm[["comm"]] <- rownames(ctype$comm)[ctype$comm$type == "output"]
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechUse2cact <- simpleInterpolation(
+      pTechUse2cact <- .interp_single(
         tech@ceff, "use2cact",
         obj@parameters[["pTechUse2cact"]], approxim_comm, "tech", tech@name
       )
       obj@parameters[["pTechUse2cact"]] <- .dat2par(obj@parameters[["pTechUse2cact"]], pTechUse2cact)
-      pTechCact2cout <- simpleInterpolation(
+      pTechCact2cout <- .interp_single(
         tech@ceff, "cact2cout",
         obj@parameters[["pTechCact2cout"]], approxim_comm, "tech", tech@name
       )
@@ -1340,7 +1340,7 @@ setMethod(
     approxim_comm[["comm"]] <-
       rownames(ctype$comm)[ctype$comm$type == "input" & !is.na(ctype$comm[, "group"])]
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechCinp2ginp <- simpleInterpolation(
+      pTechCinp2ginp <- .interp_single(
         tech@ceff, "cinp2ginp",
         obj@parameters[["pTechCinp2ginp"]], approxim_comm, "tech", tech@name
       )
@@ -1385,7 +1385,7 @@ setMethod(
     }
     approxim_comm[["comm"]] <- rownames(ctype$comm)[!is.na(ctype$comm$group)]
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechShare <- multiInterpolation(tech@ceff, "share",
+      pTechShare <- .interp_bounds(tech@ceff, "share",
         obj@parameters[["pTechShare"]], approxim_comm, "tech", tech@name,
         remValueUp = 1, remValueLo = 0
       )
@@ -1422,7 +1422,7 @@ setMethod(
     approxim_group <- approxim
     approxim_group[["group"]] <- rownames(ctype$group)[ctype$group$type == "input"]
     if (length(approxim_group[["group"]]) != 0) {
-      pTechGinp2use <- simpleInterpolation(
+      pTechGinp2use <- .interp_single(
         tech@geff, "ginp2use",
         obj@parameters[["pTechGinp2use"]], approxim_group, "tech", tech@name
       )
@@ -1457,14 +1457,14 @@ setMethod(
     } else {
       mTechAInp <- NULL
     }
-    # simple & multi
+    # single & bounds
     obj@parameters[["pTechCap2act"]] <- .dat2par(
       obj@parameters[["pTechCap2act"]],
       data.frame(tech = tech@name, value = tech@cap2act)
     )
-    pTechFixom <- simpleInterpolation(tech@fixom, "fixom", obj@parameters[["pTechFixom"]], approxim, "tech", tech@name)
+    pTechFixom <- .interp_single(tech@fixom, "fixom", obj@parameters[["pTechFixom"]], approxim, "tech", tech@name)
     obj@parameters[["pTechFixom"]] <- .dat2par(obj@parameters[["pTechFixom"]], pTechFixom)
-    pTechVarom <- simpleInterpolation(tech@varom, "varom", obj@parameters[["pTechVarom"]], approxim, "tech", tech@name)
+    pTechVarom <- .interp_single(tech@varom, "varom", obj@parameters[["pTechVarom"]], approxim, "tech", tech@name)
     obj@parameters[["pTechVarom"]] <- .dat2par(obj@parameters[["pTechVarom"]], pTechVarom)
 
     ## Move from reduce
@@ -1560,7 +1560,7 @@ setMethod(
           approxim_commp <- approxim
           approxim_commp$acomm <- unique(yy$acomm)
           approxim_commp$comm <- unique(yy$comm)
-          tmp <- simpleInterpolation(yy, ll, obj@parameters[[tbl]], approxim_commp, "tech", tech@name)
+          tmp <- .interp_single(yy, ll, obj@parameters[[tbl]], approxim_commp, "tech", tech@name)
           tmp <- tmp[tmp$value != 0, ]
           if (nrow(tmp) > 0) {
             obj@parameters[[tbl]] <- .dat2par(obj@parameters[[tbl]], tmp)
@@ -1590,7 +1590,7 @@ setMethod(
       approxim_comm <- approxim_comm[names(approxim_comm) != "comm"]
       approxim_comm[["acomm"]] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, "table"]]), "acomm"])
       if (length(approxim_comm[["acomm"]]) != 0) {
-        tmp <- simpleInterpolation(tech@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "tech", tech@name)
+        tmp <- .interp_single(tech@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "tech", tech@name)
         obj@parameters[[dd[i, "list"]]] <- .dat2par(obj@parameters[[dd[i, "list"]]], tmp)
         if (!all(c("tech", "acomm", "region", "year", "slice") %in% colnames(tmp))) {
           if (i <= 3) ll <- mvTechInp else ll <- mvTechOut
@@ -1852,8 +1852,10 @@ setMethod(
     # other flag
     mTradeSlice <- data.frame(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice)
     obj@parameters[["mTradeSlice"]] <- .dat2par(obj@parameters[["mTradeSlice"]], mTradeSlice)
-    if (length(trd@commodity) == 0) stop("There is not commodity for trade flow ", trd@name)
-    obj@parameters[["mTradeComm"]] <- .dat2par(
+    if (length(trd@commodity) == 0)
+      stop("There is not commodity for trade flow ", trd@name)
+    obj@parameters[["mTradeComm"]] <-
+      .dat2par(
       obj@parameters[["mTradeComm"]],
       data.frame(trade = trd@name, comm = trd@commodity)
     )
@@ -1870,12 +1872,15 @@ setMethod(
     routes <- trd@routes
     imply_routes <- function(tmp) {
       # Checking user data for errors
-      kk <- tmp[!is.na(tmp$src) & !is.na(tmp$dst), c("src", "dst"), drop = FALSE]
+      kk <- tmp[!is.na(tmp$src) & !is.na(tmp$dst), c("src", "dst"),
+                drop = FALSE]
       if (nrow(kk) > 0) {
         if (nrow(kk) != nrow(merge0(kk, routes))) {
-          cat('There are data for class trade "', trd@name, " for unknown routes:\n", sep = "")
+          cat('There are data for class trade "', trd@name,
+              " for unknown routes:\n", sep = "")
           kk$ind <- seq_len(nrow(kk))
-          print(kk[kk$ind[!(kk$ind %in% merge0(kk, routes))], c("src", "dst"), drop = FALSE])
+          print(kk[kk$ind[!(kk$ind %in% merge0(kk, routes))],
+                   c("src", "dst"), drop = FALSE])
         }
       }
       # Approximation src/dst pair
@@ -1911,11 +1916,14 @@ setMethod(
       fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
       if (length(fl) > 0) {
         kk <- rbind(tmp[-fl, c("src", "dst"), drop = FALSE], routes)
-        kk <- kk[!(duplicated(kk) | duplicated(kk, fromLast = TRUE)), , drop = FALSE]
+        kk <- kk[!(duplicated(kk) | duplicated(kk, fromLast = TRUE)), ,
+                 drop = FALSE]
       }
       if (length(fl) > 0 && nrow(kk) > 0) {
         nn <- nrow(tmp) + seq_len(nrow(kk) * length(fl))
-        tmp <- rbind(tmp, tmp[c(t(matrix(fl, length(fl), nrow(kk)))), , drop = FALSE])
+        tmp <- rbind(tmp,
+                     tmp[c(t(matrix(fl, length(fl), nrow(kk)))), ,
+                         drop = FALSE])
         tmp[nn, "src"] <- kk$src
         tmp[nn, "dst"] <- kk$dst
         tmp <- tmp[-fl, , drop = FALSE]
@@ -1923,9 +1931,11 @@ setMethod(
       rownames(tmp) <- NULL
       tmp
     }
-    simpleInterpolation2 <- function(dtf, approxim, parameter, ...) {
-      if (all(list(...)[[1]]@dimSets != "src") && all(list(...)[[1]]@dimSets != "dst")) {
-        return(simpleInterpolation(dtf, approxim = approxim, parameter = parameter, ...))
+    .interp_single2 <- function(dtf, approxim, parameter, ...) {
+      if (all(list(...)[[1]]@dimSets != "src") &&
+          all(list(...)[[1]]@dimSets != "dst")) {
+        return(.interp_single(dtf, approxim = approxim,
+                              parameter = parameter, ...))
       }
       dtf <- dtf[!is.na(dtf[, parameter]), ]
       if (nrow(dtf) == 0 && !approxim$fullsets) {
@@ -1940,20 +1950,27 @@ setMethod(
       dtf$src <- NULL
       dtf$dst <- NULL
       dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
-      dd <- simpleInterpolation(dtf, approxim = approxim, parameter = parameter, ...)
+      dd <- .interp_single(dtf, approxim = approxim,
+                           parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) {
         return(NULL)
       }
-      if (any(list(...)[[1]]@dimSets == "src")) dd$src <- gsub("##.*", "", dd$region)
-      if (any(list(...)[[1]]@dimSets == "dst")) dd$dst <- gsub(".*##", "", dd$region)
+      if (any(list(...)[[1]]@dimSets == "src"))
+        dd$src <- gsub("##.*", "", dd$region)
+      if (any(list(...)[[1]]@dimSets == "dst"))
+        dd$dst <- gsub(".*##", "", dd$region)
       dd$region <- NULL
       dd
     }
-    multiInterpolation2 <- function(dtf, approxim, parameter, ...) {
-      if (all(list(...)[[1]]@dimSets != "src") && all(list(...)[[1]]@dimSets != "dst")) {
-        return(multiInterpolation(dtf, approxim = approxim, parameter = parameter, ...))
+    .interp_bounds2 <- function(dtf, approxim, parameter, ...) {
+      if (all(list(...)[[1]]@dimSets != "src") &&
+          all(list(...)[[1]]@dimSets != "dst")) {
+        return(.interp_bounds(dtf, approxim = approxim,
+                              parameter = parameter, ...))
       }
-      dtf <- dtf[apply(!is.na(dtf[, paste0(parameter, c(".lo", ".up", ".fx"))]), 1, any), ]
+      dtf <- dtf[apply(
+        !is.na(dtf[, paste0(parameter,
+                            c(".lo", ".up", ".fx"))]), 1, any), ]
       if (nrow(dtf) == 0 && !approxim$fullsets) {
         return(NULL)
       }
@@ -1976,24 +1993,27 @@ setMethod(
       dtf$src <- NULL
       dtf$dst <- NULL
       dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
-      dd <- multiInterpolation(dtf, approxim = approxim, parameter = parameter, ...)
+      dd <- .interp_bounds(dtf, approxim = approxim,
+                           parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) {
         return(NULL)
       }
-      if (any(list(...)[[1]]@dimSets == "src")) dd$src <- gsub("##.*", "", dd$region)
-      if (any(list(...)[[1]]@dimSets == "dst")) dd$dst <- gsub(".*##", "", dd$region)
+      if (any(list(...)[[1]]@dimSets == "src"))
+        dd$src <- gsub("##.*", "", dd$region)
+      if (any(list(...)[[1]]@dimSets == "dst"))
+        dd$dst <- gsub(".*##", "", dd$region)
       dd$region <- NULL
       dd
     }
     # pTradeIrCost
     obj@parameters[["pTradeIrCost"]] <- .dat2par(
       obj@parameters[["pTradeIrCost"]],
-      simpleInterpolation2(trd@trade,
+      .interp_single2(trd@trade,
         parameter = "cost", obj@parameters[["pTradeIrCost"]],
         approxim = approxim_srcdst, "trade", trd@name
       )
     )
-    pTradeIrEff <- simpleInterpolation2(trd@trade,
+    pTradeIrEff <- .interp_single2(trd@trade,
       parameter = "teff", obj@parameters[["pTradeIrEff"]],
       approxim = approxim_srcdst, "trade", trd@name
     )
@@ -2001,17 +2021,19 @@ setMethod(
     # pTradeIrMarkup
     obj@parameters[["pTradeIrMarkup"]] <- .dat2par(
       obj@parameters[["pTradeIrMarkup"]],
-      simpleInterpolation2(trd@trade,
+      .interp_single2(trd@trade,
         parameter = "markup", obj@parameters[["pTradeIrMarkup"]],
         approxim = approxim_srcdst, "trade", trd@name
       )
     )
     # pTradeIr
-    pTradeIr <- multiInterpolation2(trd@trade,
+    pTradeIr <- .interp_bounds2(trd@trade,
       parameter = "ava",
-      obj@parameters[["pTradeIr"]], approxim = approxim_srcdst, "trade", trd@name
+      obj@parameters[["pTradeIr"]],
+      approxim = approxim_srcdst, "trade", trd@name
     )
-    obj@parameters[["pTradeIr"]] <- .dat2par(obj@parameters[["pTradeIr"]], pTradeIr)
+    obj@parameters[["pTradeIr"]] <-
+      .dat2par(obj@parameters[["pTradeIr"]], pTradeIr)
     # Trade ainp
     mTradeIrAInp <- NULL
     mTradeIrAOut <- NULL
@@ -2023,52 +2045,79 @@ setMethod(
       if (!all(trd@aeff$acomm %in% trd@aux$acomm)) {
         stop('Wrong aux commodity for trade "', trd@name, '"')
       }
-      inp_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2ainp) | !is.na(trd@aeff$cdst2ainp), "acomm"])
-      out_comm <- unique(trd@aeff[!is.na(trd@aeff$csrc2aout) | !is.na(trd@aeff$cdst2aout), "acomm"])
+      inp_comm <-
+        unique(trd@aeff[!is.na(trd@aeff$csrc2ainp) |
+                          !is.na(trd@aeff$cdst2ainp), "acomm"])
+      out_comm <-
+        unique(trd@aeff[!is.na(trd@aeff$csrc2aout) |
+                          !is.na(trd@aeff$cdst2aout), "acomm"])
       if (length(inp_comm) != 0) {
-        mTradeIrAInp <- data.frame(trade = rep(trd@name, length(inp_comm)), comm = inp_comm)
-        obj@parameters[["mTradeIrAInp"]] <- .dat2par(obj@parameters[["mTradeIrAInp"]], mTradeIrAInp)
+        mTradeIrAInp <-
+          data.frame(trade = rep(trd@name, length(inp_comm)),
+                     comm = inp_comm)
+        obj@parameters[["mTradeIrAInp"]] <-
+          .dat2par(obj@parameters[["mTradeIrAInp"]], mTradeIrAInp)
       }
       if (length(out_comm) != 0) {
-        mTradeIrAOut <- data.frame(trade = rep(trd@name, length(out_comm)), comm = out_comm)
-        obj@parameters[["mTradeIrAOut"]] <- .dat2par(obj@parameters[["mTradeIrAOut"]], mTradeIrAOut)
+        mTradeIrAOut <- data.frame(
+          trade = rep(trd@name, length(out_comm)),
+          comm = out_comm)
+        obj@parameters[["mTradeIrAOut"]] <-
+          .dat2par(obj@parameters[["mTradeIrAOut"]], mTradeIrAOut)
       }
       for (cc in inp_comm) {
         approxim_srcdst$acomm <- cc
-        pTradeIrCsrc2Ainp <- simpleInterpolation2(trd@aeff,
-          parameter = "csrc2ainp", obj@parameters[["pTradeIrCsrc2Ainp"]],
+        pTradeIrCsrc2Ainp <-
+          .interp_single2(trd@aeff,
+          parameter = "csrc2ainp",
+          obj@parameters[["pTradeIrCsrc2Ainp"]],
           approxim = approxim_srcdst, "trade", trd@name
         )
-        obj@parameters[["pTradeIrCsrc2Ainp"]] <- .dat2par(obj@parameters[["pTradeIrCsrc2Ainp"]], pTradeIrCsrc2Ainp)
-        pTradeIrCdst2Ainp <- simpleInterpolation2(trd@aeff,
-          parameter = "cdst2ainp", obj@parameters[["pTradeIrCdst2Ainp"]],
+        obj@parameters[["pTradeIrCsrc2Ainp"]] <-
+          .dat2par(obj@parameters[["pTradeIrCsrc2Ainp"]],
+                   pTradeIrCsrc2Ainp)
+        pTradeIrCdst2Ainp <-
+          .interp_single2(trd@aeff,
+          parameter = "cdst2ainp",
+          obj@parameters[["pTradeIrCdst2Ainp"]],
           approxim = approxim_srcdst, "trade", trd@name
         )
-        obj@parameters[["pTradeIrCdst2Ainp"]] <- .dat2par(obj@parameters[["pTradeIrCdst2Ainp"]], pTradeIrCdst2Ainp)
+        obj@parameters[["pTradeIrCdst2Ainp"]] <-
+          .dat2par(obj@parameters[["pTradeIrCdst2Ainp"]],
+                   pTradeIrCdst2Ainp)
       }
       for (cc in out_comm) {
         approxim_srcdst$acomm <- cc
-        pTradeIrCsrc2Aout <- simpleInterpolation2(trd@aeff,
-          parameter = "csrc2aout", obj@parameters[["pTradeIrCsrc2Aout"]],
-          approxim = approxim_srcdst, "trade", trd@name
-        )
-        obj@parameters[["pTradeIrCsrc2Aout"]] <- .dat2par(obj@parameters[["pTradeIrCsrc2Aout"]], pTradeIrCsrc2Aout)
-        pTradeIrCdst2Aout <- simpleInterpolation2(trd@aeff,
+        pTradeIrCsrc2Aout <-
+          .interp_single2(trd@aeff, parameter = "csrc2aout",
+                          obj@parameters[["pTradeIrCsrc2Aout"]],
+                          approxim = approxim_srcdst, "trade",
+                          trd@name)
+        obj@parameters[["pTradeIrCsrc2Aout"]] <-
+          .dat2par(obj@parameters[["pTradeIrCsrc2Aout"]],
+                   pTradeIrCsrc2Aout)
+        pTradeIrCdst2Aout <-
+          .interp_single2(trd@aeff,
           parameter = "cdst2aout", obj@parameters[["pTradeIrCdst2Aout"]],
           approxim = approxim_srcdst, "trade", trd@name
         )
-        obj@parameters[["pTradeIrCdst2Aout"]] <- .dat2par(obj@parameters[["pTradeIrCdst2Aout"]], pTradeIrCdst2Aout)
+        obj@parameters[["pTradeIrCdst2Aout"]] <-
+          .dat2par(obj@parameters[["pTradeIrCdst2Aout"]],
+                   pTradeIrCdst2Aout)
       }
       approxim_srcdst$acomm <- NULL
     }
     # Add trade data
     if (trd@capacityVariable) {
-      obj@parameters[["pTradeCap2Act"]] <- .dat2par(
+      obj@parameters[["pTradeCap2Act"]] <-
+        .dat2par(
         obj@parameters[["pTradeCap2Act"]],
         data.frame(trade = trd@name, value = trd@cap2act)
       )
       mTradeCapacityVariable <- data.frame(trade = trd@name)
-      obj@parameters[["mTradeCapacityVariable"]] <- .dat2par(obj@parameters[["mTradeCapacityVariable"]], mTradeCapacityVariable)
+      obj@parameters[["mTradeCapacityVariable"]] <-
+        .dat2par(obj@parameters[["mTradeCapacityVariable"]],
+                 mTradeCapacityVariable)
 
       ## !!! Trade
       if (nrow(trd@invcost) > 0) {
@@ -2083,12 +2132,12 @@ setMethod(
           trd@invcost[, "invcost"] <- trd@invcost[1, "invcost"] / length(rgg)
         }
       }
-      invcost <- simpleInterpolation(trd@invcost, "invcost", obj@parameters[["pTradeInvcost"]], approxim, "trade", trd@name)
+      invcost <- .interp_single(trd@invcost, "invcost", obj@parameters[["pTradeInvcost"]], approxim, "trade", trd@name)
       invcost <- invcost[invcost$value != 0, , drop = FALSE]
       if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end, , drop = FALSE]
 
       if (!is.null(invcost) && nrow(invcost) == 0) invcost <- NULL
-      stock_exist <- simpleInterpolation(trd@stock, "stock", obj@parameters[["pTradeStock"]], approxim, "trade", trd@name)
+      stock_exist <- .interp_single(trd@stock, "stock", obj@parameters[["pTradeStock"]], approxim, "trade", trd@name)
       obj@parameters[["pTradeStock"]] <- .dat2par(obj@parameters[["pTradeStock"]], stock_exist)
       obj@parameters[["pTradeOlife"]] <- .dat2par(
         obj@parameters[["pTradeOlife"]],
@@ -2469,7 +2518,7 @@ merge0 <- function(x, y,
     for (ii in c("Inp", "Out", "Bal")) {
       obj@parameters[[paste0("pTaxCost", ii)]] <- .dat2par(
         obj@parameters[[paste0("pTaxCost", ii)]],
-        simpleInterpolation(
+        .interp_single(
           app@tax, tolower(ii), obj@parameters[[paste0("pTaxCost", ii)]],
           approxim, "comm", app@comm
         )
@@ -2479,7 +2528,7 @@ merge0 <- function(x, y,
     for (ii in c("Inp", "Out", "Bal")) {
       obj@parameters[[paste0("pSubCost", ii)]] <- .dat2par(
         obj@parameters[[paste0("pSubCost", ii)]],
-        simpleInterpolation(
+        .interp_single(
           app@sub, tolower(ii), obj@parameters[[paste0("pSubCost", ii)]],
           approxim, "comm", app@comm
         )

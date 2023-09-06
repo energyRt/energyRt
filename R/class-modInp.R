@@ -142,12 +142,12 @@ setMethod("initialize", "modInp", function(.Object) {
       sets <- merge(sets, tmp)
     }
   }
-  if (modInp@parameters[[name]]@type == "simple" &&
+  if (modInp@parameters[[name]]@type == "single" &&
       (is.null(sets) || nrow(sets) != 0)) {
     sets$value <- modInp@parameters[[name]]@defVal
     if (!is.data.frame(sets)) sets <- as.data.frame(sets)
   }
-  if (modInp@parameters[[name]]@type == "multi" &&
+  if (modInp@parameters[[name]]@type == "bounds" &&
       (is.null(sets) || nrow(sets) != 0)) {
     sets$type <- "lo"
     sets$value <- modInp@parameters[[name]]@defVal[1]

@@ -19,10 +19,10 @@ setClass(
   representation(
     name = "character", # @name name Name for GAMS
     dimSets = "character", # @dimSets Dimension sets, comma separated, order is matter
-    type = "factor", # @type is it map (map),  simple (simple parameter),
-    # multi (Up / Lo /Fx parameter)
+    type = "factor", # @type is it map (map),  single (single parameter),
+    # bounds (Up / Lo /Fx parameter)
     defVal = "numeric", # @defVal Default value : zero value  for map,
-    # one for single, two for multi
+    # one for single, two for bounds
     interpolation = "character", # interpolation 'back.inter.forth'
     data = "data.frame", # @data Data for export
     # not_data        = "logical",  # @data NO flag for map
@@ -33,7 +33,7 @@ setClass(
   prototype(
     name = NULL,
     dimSets = NULL,
-    type = factor(NA, c("set", "map", "simple", "multi")),
+    type = factor(NA, c("set", "map", "single", "bounds")),
     defVal = NULL,
     interpolation = NULL,
     data = data.frame(),
@@ -82,16 +82,16 @@ setMethod("initialize", signature = "parameter",
     ) != "")) {
       stop("Wrong interpolation rule")
     }
-    if (type == "simple" && length(defVal) != 1) stop("Wrong defVal value")
-    if (type == "multi" && length(defVal) == 0) stop("Wrong defVal value")
-    if (type == "multi" && length(defVal) == 1) defVal <- rep(defVal, 2)
-    if (type == "simple" && length(interpolation) != 1) {
+    if (type == "single" && length(defVal) != 1) stop("Wrong defVal value")
+    if (type == "bounds" && length(defVal) == 0) stop("Wrong defVal value")
+    if (type == "bounds" && length(defVal) == 1) defVal <- rep(defVal, 2)
+    if (type == "single" && length(interpolation) != 1) {
       stop("Wrong interpolation rule")
     }
-    if (type == "multi" && length(interpolation) == 0) {
+    if (type == "bounds" && length(interpolation) == 0) {
       stop("Wrong interpolation rule")
     }
-    if (type == "multi" && length(interpolation) == 1) {
+    if (type == "bounds" && length(interpolation) == 1) {
       interpolation <- rep(interpolation, 2)
     }
     .Object@name <- name
@@ -126,8 +126,8 @@ setMethod("initialize", signature = "parameter",
     # data <- as_tibble(data)
     # browser()
 
-    if (type == "multi") dimSets <- c(dimSets, "type")
-    if (any(type == c("simple", "multi"))) dimSets <- c(dimSets, "value")
+    if (type == "bounds") dimSets <- c(dimSets, "type")
+    if (any(type == c("single", "bounds"))) dimSets <- c(dimSets, "value")
     .Object@data <- data[, dimSets, drop = FALSE]
     .Object@colName <- colName
     .Object

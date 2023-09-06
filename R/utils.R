@@ -96,7 +96,7 @@ findDuplicates <- function(x) {
   if (class(x) == 'scenario') {
     rs <- NULL
     for (pr in names(x@modInp@parameters))
-      if (x@modInp@parameters[[pr]]@type %in% c('simple', 'multi')) {
+      if (x@modInp@parameters[[pr]]@type %in% c('single', 'bounds')) {
         tmp <- x@modInp@parameters[[pr]]@data
         tmp <- tmp[, -ncol(tmp), drop = FALSE]
         fl <- duplicated(tmp)

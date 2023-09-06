@@ -443,12 +443,12 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
     }
     approxim2$fullsets <- approxim$fullsets
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
-    xx <- newParameter(paste0("pCnsRhs", stm@name), need.set0, "simple",
+    xx <- newParameter(paste0("pCnsRhs", stm@name), need.set0, "single",
       defVal = stm@defVal,
       interpolation = "back.inter.forth", colName = "rhs"
     )
     # !!! Similar interpolation for LHS is needed
-    yy <- simpleInterpolation(stm@rhs, "rhs", xx, approxim2)
+    yy <- .interp_single(stm@rhs, "rhs", xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != "value"]
     yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = "##") %in%
       apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = "##")), , drop = FALSE]
@@ -526,12 +526,12 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
       }
       approxim2$fullsets <- approxim$fullsets
 
-      xx <- newParameter(paste0("pCnsMult", stm@name, "_", i), need.set, "simple",
+      xx <- newParameter(paste0("pCnsMult", stm@name, "_", i), need.set, "single",
         defVal = stm@lhs[[i]]@defVal,
         interpolation = "back.inter.forth"
       )
       prec@parameters[[xx@name]] <-
-        .dat2par(xx, simpleInterpolation(stm@lhs[[i]]@mult, "value", xx, approxim2))
+        .dat2par(xx, .interp_single(stm@lhs[[i]]@mult, "value", xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
         yy <- .add_dropped_zeros(prec, xx@name)
         nn <- approxim$mileStoneForGrowth[as.character(yy$year)]

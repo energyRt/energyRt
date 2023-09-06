@@ -96,7 +96,7 @@ pWeather:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: wval
@@ -252,7 +252,7 @@ pSupWeather:
   dimSets:
   - weather
   - sup
-  type: multi
+  type: bounds
   defVal:
   - 1.0
   - 1.0
@@ -265,7 +265,7 @@ pTechWeatherAf:
   dimSets:
   - weather
   - tech
-  type: multi
+  type: bounds
   defVal:
   - 1.0
   - 1.0
@@ -278,7 +278,7 @@ pTechWeatherAfs:
   dimSets:
   - weather
   - tech
-  type: multi
+  type: bounds
   defVal:
   - 1.0
   - 1.0
@@ -292,7 +292,7 @@ pTechWeatherAfc:
   - weather
   - tech
   - comm
-  type: multi
+  type: bounds
   defVal:
   - 1.0
   - 1.0
@@ -305,7 +305,7 @@ pStorageWeatherAf:
   dimSets:
   - weather
   - stg
-  type: multi
+  type: bounds
   defVal:
   - 1.0
   - 1.0
@@ -318,7 +318,7 @@ pStorageWeatherCinp:
   dimSets:
   - weather
   - stg
-  type: multi
+  type: bounds
   defVal:
   - 1.0
   - 1.0
@@ -331,7 +331,7 @@ pStorageWeatherCout:
   dimSets:
   - weather
   - stg
-  type: multi
+  type: bounds
   defVal:
   - 1.0
   - 1.0
@@ -378,21 +378,21 @@ mSameSlice:
 ordYear:
   name: ordYear
   dimSets: year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: inter.forth
   colName: ''
 cardYear:
   name: cardYear
   dimSets: year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: inter.forth
   colName: ''
 pPeriodLen:
   name: pPeriodLen
   dimSets: year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: inter.forth
   colName: ''
@@ -517,7 +517,7 @@ mSliceParentChild:
 pSliceShare:
   name: pSliceShare
   dimSets: slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
@@ -526,7 +526,7 @@ pEmissionFactor:
   dimSets:
   - comm
   - commp
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: emis
@@ -537,7 +537,7 @@ pAggregateFactor:
   dimSets:
   - comm
   - commp
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
@@ -560,7 +560,7 @@ pDemand:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: dem
@@ -573,7 +573,7 @@ pDummyImportCost:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: .inf
   interpolation: back.inter.forth
   colName: dummyImport
@@ -586,7 +586,7 @@ pDummyExportCost:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: .inf
   interpolation: back.inter.forth
   colName: dummyExport
@@ -599,7 +599,7 @@ pTaxCostInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: value
@@ -610,7 +610,7 @@ pSubCostInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: value
@@ -621,7 +621,7 @@ pTaxCostOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: value
@@ -632,7 +632,7 @@ pSubCostOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: value
@@ -643,7 +643,7 @@ pTaxCostBal:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: value
@@ -654,7 +654,7 @@ pSubCostBal:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: value
@@ -695,7 +695,7 @@ pSupCost:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cost
@@ -707,7 +707,7 @@ pSupReserve:
   - sup
   - comm
   - region
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -727,7 +727,7 @@ pSupAva:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -1041,7 +1041,7 @@ mTechCout2AOut:
 pTechCap2act:
   name: pTechCap2act
   dimSets: tech
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: ''
@@ -1052,7 +1052,7 @@ pTechEac:
   - tech
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: invcost
@@ -1062,7 +1062,7 @@ pTechEmisComm:
   dimSets:
   - tech
   - comm
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: combustion
@@ -1072,7 +1072,7 @@ pTechOlife:
   dimSets:
   - tech
   - region
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: olife
@@ -1084,7 +1084,7 @@ pTechFixom:
   - tech
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: fixom
@@ -1095,7 +1095,7 @@ pTechInvcost:
   - tech
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: invcost
@@ -1106,7 +1106,7 @@ pTechStock:
   - tech
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: stock
@@ -1118,7 +1118,7 @@ pTechVarom:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: varom
@@ -1130,7 +1130,7 @@ pTechAf:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - 1.0
@@ -1148,7 +1148,7 @@ pTechRampUp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: .inf
   interpolation: back.inter.forth
   colName: rampup
@@ -1160,7 +1160,7 @@ pTechRampDown:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: .inf
   interpolation: back.inter.forth
   colName: rampdown
@@ -1172,7 +1172,7 @@ pTechAfs:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -1191,7 +1191,7 @@ pTechGinp2use:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: ginp2use
@@ -1204,7 +1204,7 @@ pTechCinp2ginp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: cinp2ginp
@@ -1217,7 +1217,7 @@ pTechUse2cact:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: use2cact
@@ -1230,7 +1230,7 @@ pTechAct2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: act2ainp
@@ -1243,7 +1243,7 @@ pTechCap2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cap2ainp
@@ -1256,7 +1256,7 @@ pTechAct2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: act2aout
@@ -1269,7 +1269,7 @@ pTechCap2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cap2aout
@@ -1282,7 +1282,7 @@ pTechNCap2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cap2aout
@@ -1295,7 +1295,7 @@ pTechNCap2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cap2aout
@@ -1309,7 +1309,7 @@ pTechCinp2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cinp2ainp
@@ -1323,7 +1323,7 @@ pTechCout2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cout2ainp
@@ -1337,7 +1337,7 @@ pTechCinp2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cinp2aout
@@ -1351,7 +1351,7 @@ pTechCout2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cout2aout
@@ -1364,7 +1364,7 @@ pTechCact2cout:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: cact2cout
@@ -1377,7 +1377,7 @@ pTechCinp2use:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: cinp2use
@@ -1390,7 +1390,7 @@ pTechCvarom:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cvarom
@@ -1403,7 +1403,7 @@ pTechAvarom:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: avarom
@@ -1416,7 +1416,7 @@ pTechShare:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - 1.0
@@ -1435,7 +1435,7 @@ pTechAfc:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -1460,7 +1460,7 @@ pStorageOlife:
   dimSets:
   - stg
   - region
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: olife
@@ -1471,7 +1471,7 @@ pStorageStock:
   - stg
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: stock
@@ -1482,7 +1482,7 @@ pStorageFixom:
   - stg
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: fixom
@@ -1493,7 +1493,7 @@ pStorageInvcost:
   - stg
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: invcost
@@ -1504,7 +1504,7 @@ pStorageEac:
   - stg
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: invcost
@@ -1517,7 +1517,7 @@ pStorageInpEff:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: inpeff
@@ -1530,7 +1530,7 @@ pStorageOutEff:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: outeff
@@ -1543,7 +1543,7 @@ pStorageStgEff:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: stgeff
@@ -1555,7 +1555,7 @@ pStorageCostStore:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: stgcost
@@ -1567,7 +1567,7 @@ pStorageCostInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: inpcost
@@ -1579,7 +1579,7 @@ pStorageCostOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: outcost
@@ -1591,7 +1591,7 @@ pStorageAf:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - 1.0
@@ -1605,7 +1605,7 @@ pStorageAf:
 pStorageCap2stg:
   name: pStorageCap2stg
   dimSets: stg
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: ''
@@ -1618,7 +1618,7 @@ pStorageCinp:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -1638,7 +1638,7 @@ pStorageCout:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -1718,7 +1718,7 @@ pStorageStg2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: stg2ainp
@@ -1731,7 +1731,7 @@ pStorageStg2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: stg2aout
@@ -1744,7 +1744,7 @@ pStorageCinp2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cinp2ainp
@@ -1757,7 +1757,7 @@ pStorageCinp2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cinp2aout
@@ -1770,7 +1770,7 @@ pStorageCout2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cout2ainp
@@ -1783,7 +1783,7 @@ pStorageCout2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cout2aout
@@ -1796,7 +1796,7 @@ pStorageCap2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cap2ainp
@@ -1809,7 +1809,7 @@ pStorageCap2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cap2aout
@@ -1822,7 +1822,7 @@ pStorageNCap2AInp:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ncap2ainp
@@ -1835,7 +1835,7 @@ pStorageNCap2AOut:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ncap2aout
@@ -1848,7 +1848,7 @@ pStorageNCap2Stg:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: ''
   colName: ncap2stg
@@ -1861,7 +1861,7 @@ pStorageCharge:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: ''
   colName: charge
@@ -2055,7 +2055,7 @@ pTradeIrCsrc2Aout:
   - dst
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: csrc2aout
@@ -2069,7 +2069,7 @@ pTradeIrCsrc2Ainp:
   - dst
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: csrc2ainp
@@ -2083,7 +2083,7 @@ pTradeIrCdst2Aout:
   - dst
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cdst2aout
@@ -2097,7 +2097,7 @@ pTradeIrCdst2Ainp:
   - dst
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cdst2ainp
@@ -2110,7 +2110,7 @@ pTradeIrCost:
   - dst
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: cost
@@ -2123,7 +2123,7 @@ pTradeIrEff:
   - dst
   - year
   - slice
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: teff
@@ -2136,7 +2136,7 @@ pTradeIrMarkup:
   - dst
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: markup
@@ -2148,7 +2148,7 @@ pExportRowPrice:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: price
@@ -2160,7 +2160,7 @@ pImportRowPrice:
   - region
   - year
   - slice
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: price
@@ -2173,7 +2173,7 @@ pTradeIr:
   - dst
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -2191,7 +2191,7 @@ pExportRow:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -2209,7 +2209,7 @@ pImportRow:
   - region
   - year
   - slice
-  type: multi
+  type: bounds
   defVal:
   - 0.0
   - .inf
@@ -2223,14 +2223,14 @@ pImportRow:
 pExportRowRes:
   name: pExportRowRes
   dimSets: expp
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
 pImportRowRes:
   name: pImportRowRes
   dimSets: imp
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
@@ -2244,14 +2244,14 @@ mLECRegion:
 pLECLoACT:
   name: pLECLoACT
   dimSets: region
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
 pYearFraction:
   name: pYearFraction
   dimSets: year
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: fraction
@@ -2261,7 +2261,7 @@ pDiscount:
   dimSets:
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.1
   interpolation: back.inter.forth
   colName: discount
@@ -2271,7 +2271,7 @@ pDiscountFactor:
   dimSets:
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
@@ -2280,7 +2280,7 @@ pDiscountFactorMileStone:
   dimSets:
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
@@ -2896,7 +2896,7 @@ pTradeStock:
   dimSets:
   - trade
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: stock
@@ -2904,7 +2904,7 @@ pTradeStock:
 pTradeOlife:
   name: pTradeOlife
   dimSets: trade
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: olife
@@ -2915,7 +2915,7 @@ pTradeInvcost:
   - trade
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: invcost
@@ -2926,7 +2926,7 @@ pTradeEac:
   - trade
   - region
   - year
-  type: simple
+  type: single
   defVal: 0.0
   interpolation: back.inter.forth
   colName: invcost
@@ -2934,7 +2934,7 @@ pTradeEac:
 pTradeCap2Act:
   name: pTradeCap2Act
   dimSets: trade
-  type: simple
+  type: single
   defVal: 1.0
   interpolation: back.inter.forth
   colName: cap2act

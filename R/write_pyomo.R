@@ -11,7 +11,7 @@
     ]
     for (nn in fdownsize) {
       rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
-      if (scen@modInp@parameters[[nn]]@type == "multi") {
+      if (scen@modInp@parameters[[nn]]@type == "bounds") {
         uuu <- paste0(nn, c("Lo", "Up"))
       } else {
         uuu <- nn
@@ -54,7 +54,7 @@
     ]
     for (nn in fdownsize) {
       rmm <- scen@modInp@parameters[[nn]]@misc$rem_col
-      if (scen@modInp@parameters[[nn]]@type == "multi") {
+      if (scen@modInp@parameters[[nn]]@type == "bounds") {
         uuu <- paste0(nn, c("Lo", "Up"))
       } else {
         uuu <- nn
@@ -148,7 +148,7 @@
     zz_data_pyomo <- file(paste(arg$tmp.dir, "data.dat", sep = ""), "w")
   }
   file_w <- c()
-  for (j in c("set", "map", "simple", "multi")) {
+  for (j in c("set", "map", "single", "bounds")) {
     for (i in names(scen@modInp@parameters)) {
       if (scen@modInp@parameters[[i]]@type == j) {
         if (AbstractModel) {
@@ -285,7 +285,7 @@
 
 # Generate PYOMO code, return character vector
 .toPyomo <- function(obj) {
-  as_simple <- function(data, name, name2, def) {
+  as_single <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       if (nrow(obj@data) == 1) def <- obj@data[[1]]
@@ -333,22 +333,22 @@
         ), "')"), collapse = ",\n"), "]);"
       )))
     }
-  } else if (obj@type == "simple") {
-    return(as_simple(
+  } else if (obj@type == "single") {
+    return(as_single(
       obj@data, obj@name, gsub(
         "[(][)]", "",
         paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
       ),
       obj@defVal
     ))
-  } else if (obj@type == "multi") {
+  } else if (obj@type == "bounds") {
     hh <- gsub("[(][)]", "", paste0("(", paste0(obj@dimSets, collapse = ", "), ")"))
     return(c(
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -362,7 +362,7 @@
 }
 
 .toPyomoAbstractModel <- function(obj) {
-  as_simple <- function(data, name, name2, def) {
+  as_single <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       if (nrow(data) != 0) def <- data$value
       return(paste0("# ", name, "\nparam ", name, " := ", def, ";\n"))
@@ -400,19 +400,19 @@
         function(x) paste(x, collapse = " ")
       ), "\n"), collapse = ""), ";")))
     }
-  } else if (obj@type == "simple") {
-    return(as_simple(
+  } else if (obj@type == "single") {
+    return(as_single(
       obj@data, obj@name,
       paste0("(", paste0(obj@dimSets, collapse = ", "), ")"), obj@defVal
     ))
-  } else if (obj@type == "multi") {
+  } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -426,7 +426,7 @@
 }
 
 .toPyomSQLite <- function(obj) {
-  as_simple <- function(data, name, name2, def) {
+  as_single <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       browser()
@@ -462,21 +462,21 @@
       tmp <- paste0("read_set('", obj@name, "')")
       return(c(ret, paste0("\n", obj@name, " = set(", tmp, ")")))
     }
-  } else if (obj@type == "simple") {
-    return(as_simple(
+  } else if (obj@type == "single") {
+    return(as_single(
       obj@data,
       obj@name,
       paste0("(", paste0(obj@dimSets, collapse = ", "), ")"),
       obj@defVal
     ))
-  } else if (obj@type == "multi") {
+  } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_simple(
+      as_single(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -508,7 +508,7 @@
     return(x)
   }
   # Generate single parameter declaration
-  for (tmp in param[sapply(param, function(x) x@type == "simple")]) {
+  for (tmp in param[sapply(param, function(x) x@type == "single")]) {
     decl <- c(
       decl,
       paste0(
@@ -518,8 +518,8 @@
       )
     )
   }
-  # Generate multi parameter declaration
-  for (tmp in param[sapply(param, function(x) x@type == "multi")]) {
+  # Generate bounds parameter declaration
+  for (tmp in param[sapply(param, function(x) x@type == "bounds")]) {
     decl <- c(
       decl,
       paste0(

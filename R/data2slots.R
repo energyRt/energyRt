@@ -86,7 +86,7 @@
                 slot_column_class <- class(slot(obj, s)[nn, i])
                 data_column_class <- class(dat[, i])
                 if (!any(data_column_class %in% slot_column_class)) {
-                  # allow multi-class (inheritance) format
+                  # allow bounds-class (inheritance) format
                   if (is.numeric(slot(obj, s)[nn, i]) & is.numeric(dat[, i])) {
                     # coerce-able between numeric classes, not an error
                     dat[, i] <- as(dat[, i], slot_column_class)

@@ -107,7 +107,7 @@
       }
       if (ncol(obj2) == 1 || nrow(obj2) == prod(
         sapply(approxim2[names(obj2)[-ncol(obj2)]], length)
-      )) { # Simple approximation is applicable
+      )) { # single approximation is applicable
         for (i in names(dtf)[c(!f1, FALSE)]) {
           obj2 <- merge0(obj2, approxim2[i])
         }
@@ -329,7 +329,7 @@
   }
 }
 
-#' Internal function to interpolate 'simple' parameter
+#' Internal function to interpolate 'single' parameter
 #'
 #' @param dtf data.frame, a slot with the data for interpolation.
 #' @param parameter character, name of the column in the `dtf` to interpolate.
@@ -341,10 +341,7 @@
 #' @param all.val
 #'
 #' @return
-#' @export
-#'
-#' @examples
-simpleInterpolation <- function(
+.interp_single <- function(
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     # removeDefault = TRUE, # not used
@@ -424,7 +421,7 @@ simpleInterpolation <- function(
   dd
 }
 
-#' Internal funtion to interpolate 'multi' parameter
+#' Internal function to interpolate 'bounds' parameter
 #'
 #' @param dtf
 #' @param parameter
@@ -437,10 +434,8 @@ simpleInterpolation <- function(
 #' @param remValueLo
 #'
 #' @return
-#' @export
 #'
-#' @examples
-multiInterpolation <- function(
+.interp_bounds <- function(
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     remValueUp = NULL, remValueLo = NULL) {

@@ -182,7 +182,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
         need_col <- tmp@dimSets[tmp@dimSets %in% colnames(slot(prot, slt))]
         if (any(pr == c("pDummyImportCost", "pDummyExportCost")))
           need_col <- need_col[need_col != "comm"]
-        if (tmp@type == "simple") {
+        if (tmp@type == "single") {
           val_col <- tmp@colName
         } else {
           val_col <- c(tmp@colName, gsub("[.].*", ".fx", tmp@colName[1]))
