@@ -5,11 +5,11 @@
 \title{An internal function to add data to slots of a new S4-class object or update a given one.}
 \usage{
 .data2slots(
-  class_name,
+  class_name = NULL,
   x,
   ...,
-  drop_args = NULL,
-  drop_class = NULL,
+  ignore_args = NULL,
+  ignore_classes = NULL,
   update = !is.character(x)
 )
 }
@@ -20,9 +20,9 @@
 
 \item{...}{slot names with the data to add to the object's slots.}
 
-\item{drop_args}{character vector of arguments to drop from `...` if exist.}
+\item{ignore_args}{character vector of arguments to drop from `...` if exist.}
 
-\item{drop_class}{character vector of classes to drop from `...`.}
+\item{ignore_classes}{character vector of classes to drop from `...`.}
 
 \item{update}{logical, if an object of class `class_name` is supplied (in `x`) then `update` must be `TRUE`, and the object will be updated with the given data in `...`. Otherwise, if the `x` is character, the `update` should be `FALSE`, and the new object will be created.}
 }

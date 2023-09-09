@@ -14,7 +14,7 @@ An S4 class to specify the model set or parameter
 
 \item{\code{dimSets}}{character.}
 
-\item{\code{type}}{factor.}
+\item{\code{type}}{factor,}
 
 \item{\code{defVal}}{numeric.}
 
@@ -29,3 +29,4 @@ An S4 class to specify the model set or parameter
 \item{\code{misc}}{list.}
 }}
 
+\concept{parameter}

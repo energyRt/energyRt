@@ -225,8 +225,8 @@ read.scenario <- function(scen, ...) {
       )
       for (tmp in cst) {
         in_dat <- scen@modOut@variables[[tmp@variable]]
-        if (anyDuplicated(energyRt:::.variable_set[[tmp@variable]])) {
-          sets <- energyRt:::.variable_set[[tmp@variable]]
+        if (anyDuplicated(.variable_set[[tmp@variable]])) {
+          sets <- .variable_set[[tmp@variable]]
           sets[duplicated(sets)] <- paste0(sets[duplicated(sets)], 2)
           colnames(in_dat) <- c(sets, "value")
         }

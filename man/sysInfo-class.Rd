@@ -3,33 +3,15 @@
 \docType{class}
 \name{sysInfo-class}
 \alias{sysInfo-class}
-\title{Class (S4) to represent model configuration settings.}
+\title{Class (S4) to represent default model configuration.}
 \description{
-Class (S4) to represent model configuration settings.
+Class (S4) to represent default model configuration.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{discount}}{data.frame.}
+\item{\code{info}}{character string with the configuration information.}
 
-\item{\code{region}}{character.}
-
-\item{\code{year}}{numeric.}
-
-\item{\code{milestone}}{data.frame.}
-
-\item{\code{slice}}{slice.}
-
-\item{\code{discountFirstYear}}{logical.}
-
-\item{\code{interpolation}}{data.frame.}
-
-\item{\code{defVal}}{data.frame.}
-
-\item{\code{yearFraction}}{data.frame.}
-
-\item{\code{debug}}{data.frame.}
-
-\item{\code{misc}}{list.}
+\item{\code{misc}}{}
 }}
 

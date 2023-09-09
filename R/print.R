@@ -206,7 +206,7 @@ print.technology <- function(x, ...) {
   if (x@cap2act != "") cat("cap2act: ", x@cap2act, "\n")
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
   # if(!is.null(x@reporting_years)) cat('reporting years: ', x@reporting_years, '\n')
-  for (i in energyRt:::.technology_data_frame()) if_print_data_frame(x, i)
+  for (i in .technology_data_frame()) if_print_data_frame(x, i)
 }
 
 #------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ print.sysInfo <- function(x) {
       cat("\n")
     }
   }
-  for (i in c("region", "year", "milestone", "slice")) {
+  for (i in c("region", "year", "horizon", "slice")) {
     if (is.null(slot(x, i))) {
       cat("There is no ", i, "\n", sep = "")
     } else {

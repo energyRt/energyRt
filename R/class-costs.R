@@ -41,7 +41,7 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
   obj@description <- description
 
   # Add variable
-  sets <- energyRt:::.variable_set[[variable]]
+  sets <- .variable_set[[variable]]
   if (is.null(sets)) {
     stop(paste0('There are unknown variable "', variable, '" in cost "', name, '".'))
   }
@@ -134,8 +134,8 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
   have.all.set <- function(x, name) {
     return(any(is.na(x)) || (name != "slice" && all(approxim[[name]] %in% x)))
   }
-  sets <- energyRt:::.variable_set[[stm@variable]]
-  if (anyDuplicated(energyRt:::.variable_set[[stm@variable]])) {
+  sets <- .variable_set[[stm@variable]]
+  if (anyDuplicated(.variable_set[[stm@variable]])) {
     dsets <- sets[duplicated(sets)]
     for (dst in dsets) {
       approxim[[paste0(dst, 2)]] <- approxim[[dst]]
@@ -159,11 +159,11 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
     for (ss in mult_sets) {
       stm@mult <- stm@mult[stm@mult[[ss]] %in% approxim2[[ss]], , drop = FALSE]
     }
-    xx <- newParameter(paste0("pCosts", stm@name), mult_sets, "single",
+    xx <- newParameter(paste0("pCosts", stm@name), mult_sets, "numpar",
       defVal = 0,
       interpolation = "back.inter.forth", colName = "value"
     )
-    yy <- .interp_single(stm@mult, "value", xx, approxim2)
+    yy <- .interp_numpar(stm@mult, "value", xx, approxim2)
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     sss <- ""
     if (length(mult_sets) != 0) sss <- paste0("(", paste0(mult_sets, collapse = '", "'), ")")
@@ -206,7 +206,7 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
   }
 
   # Generate equation text
-  mps <- energyRt:::.variable_mapping[[stm@variable]]
+  mps <- .variable_mapping[[stm@variable]]
   if (length(sets) == 2) {
     if (is.null(subset_txt)) {
       costs <- paste0(mult_txt, mps)

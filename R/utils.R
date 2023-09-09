@@ -96,7 +96,7 @@ findDuplicates <- function(x) {
   if (class(x) == 'scenario') {
     rs <- NULL
     for (pr in names(x@modInp@parameters))
-      if (x@modInp@parameters[[pr]]@type %in% c('single', 'bounds')) {
+      if (x@modInp@parameters[[pr]]@type %in% c('numpar', 'bounds')) {
         tmp <- x@modInp@parameters[[pr]]@data
         tmp <- tmp[, -ncol(tmp), drop = FALSE]
         fl <- duplicated(tmp)
@@ -121,8 +121,8 @@ findDuplicates <- function(x) {
         slt <- slot(x, i)
         set_slot <- colnames(slt)[
           colnames(slt) %in% c('acomm',
-                               energyRt:::.set_al[
-                                 !(energyRt:::.set_al %in% c('dem'))
+                               .set_al[
+                                 !(.set_al %in% c('dem'))
                                ])]
         value_slot <- colnames(slt)[!(colnames(slt) %in% set_slot)]
         fl <- !is.na(slt[, value_slot, drop = FALSE])

@@ -86,15 +86,15 @@ setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
 })
 
 setMethod(
-  "setMilestoneYears", signature(obj = "scenario", start = "numeric", interval = "numeric"),
+  "setHorizon", signature(obj = "scenario", start = "numeric", interval = "numeric"),
   function(obj, start, interval) {
-    obj@model <- setMilestoneYears(obj@model, start, interval)
+    obj@model <- setHorizon(obj@model, start, interval)
     obj
   }
 )
 
-setMethod("getMilestoneYears", signature(obj = "scenario"), function(obj) {
-  getMilestoneYears(obj@model)
+setMethod("getHorizon", signature(obj = "scenario"), function(obj) {
+  getHorizon(obj@model)
 })
 
 # .modelCode <- list(

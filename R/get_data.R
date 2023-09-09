@@ -295,7 +295,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
   }
 
   ## Temporary solution for non-mileStone years data in parameters
-  # msy <- scen[[1]]@model@sysInfo@milestone$mid
+  # msy <- scen[[1]]@model@sysInfo@horizon$mid
   # if (length(ll) > 0) {
   #   for (i in 1:length(ll)) {
   #     if (!is.null(ll[[i]]$year)) {
@@ -594,7 +594,7 @@ if (F) { # Check
                            function(xx) unique(sapply(xx@data, class))),
                     recursive = TRUE))
     for (cl in cls) {
-      ll <- energyRt:::.getNames(obj, cl,
+      ll <- .getNames(obj, cl,
                                  regex = regex, ignore.case = ignore.case, fixed = fixed,
                                  useBytes = useBytes, invert = invert, ...
       )
@@ -811,17 +811,17 @@ if (F) { # Check
 
 
 getNames <- function(obj, class = c(), regex = NULL, ...) {
-  names(energyRt:::.getNames(obj, cls = class, regex = regex, ...))
+  names(.getNames(obj, cls = class, regex = regex, ...))
 }
 
 getNames_ <- function(obj, class = c(), ...) {
-  names(energyRt:::.getNames(obj, cls = class, regex = TRUE, ...))
+  names(.getNames(obj, cls = class, regex = TRUE, ...))
 }
 
 getObjects <- function(obj, class = c(), regex = NULL, ...) {
-  energyRt:::.getNames(obj, cls = class, regex = regex, ...)
+  .getNames(obj, cls = class, regex = regex, ...)
 }
 
 getObjects_ <- function(obj, class = c(), ...) {
-  energyRt:::.getNames(obj, cls = class, regex = TRUE, ...)
+  .getNames(obj, cls = class, regex = TRUE, ...)
 }

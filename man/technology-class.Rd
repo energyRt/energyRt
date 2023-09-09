@@ -10,9 +10,9 @@ An S4 class to represent technology
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character.}
+\item{\code{name}}{character, name of technology used in sets}
 
-\item{\code{description}}{character.}
+\item{\code{description}}{character, detailed description of the technology for reference.}
 
 \item{\code{input}}{data.frame.}
 
@@ -65,3 +65,8 @@ An S4 class to represent technology
 \item{\code{misc}}{list.}
 }}
 
+\seealso{
+Other technology: 
+\code{\link{newTechnology}()}
+}
+\concept{technology}

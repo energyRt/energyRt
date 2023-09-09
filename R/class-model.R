@@ -4,7 +4,6 @@
 #' @slot description character.
 #' @slot data list.
 #' @slot sysInfo sysInfo.
-#' @slot LECdata list.
 #' @slot earlyRetirement logical.
 #' @slot misc list.
 #'
@@ -19,7 +18,7 @@ setClass("model",
     description = "character", # Details
     data = "list",
     sysInfo = "sysInfo",
-    LECdata = "list",
+    # LECdata = "list",
     # earlyRetirement = "logical",
     misc = "list"
   ),
@@ -28,7 +27,7 @@ setClass("model",
     description = "", # Details
     data = list(),
     sysInfo = new("sysInfo"),
-    LECdata = list(),
+    # LECdata = list(),
     # earlyRetirement = FALSE,
     misc = list()
   ),
@@ -145,17 +144,17 @@ setMethod("newModel", signature(name = "character"), function(name, ...) {
   #    mlst_vec <- c('start', 'interval')
   args <- list(...)
   # browser()
-  mdl <- .data2slots("model", name, drop_args = c(sysInfVec), drop_class = "repository", ...)
-  #    mdl <- .data2slots('model', name, drop_args = c(mlst_vec, sysInfVec), drop_class = 'repository', ...)
+  mdl <- .data2slots("model", name, ignore_args = c(sysInfVec), ignore_classes = "repository", ...)
+  #    mdl <- .data2slots('model', name, ignore_args = c(mlst_vec, sysInfVec), ignore_classes = 'repository', ...)
   if (any(sapply(args, class) == "repository")) {
     fl <- seq(along = args)[sapply(args, class) == "repository"]
     for (j in fl) mdl <- add(mdl, args[[j]])
   }
   sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
   mdl@sysInfo <- .data2slots("sysInfo", "",
-                             drop_class = "repository",
-                             #      drop_args = c(names(args)[!(names(args) %in% sysInfVec)], mlst_vec), ...)
-                             drop_args = c("slice", names(args)[!(names(args) %in% sysInfVec)]), ...
+                             ignore_classes = "repository",
+                             #      ignore_args = c(names(args)[!(names(args) %in% sysInfVec)], mlst_vec), ...)
+                             ignore_args = c("slice", names(args)[!(names(args) %in% sysInfVec)]), ...
   )
   if (any(names(args) == "slice")) {
     mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = args$slice)
@@ -176,14 +175,14 @@ setMethod("setTimeSlices", signature(obj = "model"), function(obj, ...) {
 })
 
 setMethod(
-  "setMilestoneYears", signature(obj = "model", start = "numeric", interval = "numeric"),
+  "setHorizon", signature(obj = "model", start = "numeric", interval = "numeric"),
   function(obj, start, interval) {
-    obj@sysInfo <- setMilestoneYears(obj@sysInfo, start, interval)
+    obj@sysInfo <- setHorizon(obj@sysInfo, start, interval)
     obj
   }
 )
 
-setMethod("getMilestoneYears", signature(obj = "model"), function(obj) {
-  getMilestoneYears(obj@sysInfo)
+setMethod("getHorizon", signature(obj = "model"), function(obj) {
+  getHorizon(obj@sysInfo)
 })
 

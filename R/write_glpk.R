@@ -3,10 +3,10 @@
   run_code <- scen@source[["GLPK"]]
   dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
   file_w <- c()
-  for (j in c("set", "map", "single", "bounds")) {
+  for (j in c("set", "map", "numpar", "bounds")) {
     for (i in names(scen@modInp@parameters)) {
       if (scen@modInp@parameters[[i]]@type == j) {
-        file_w <- c(file_w, energyRt:::.sm_to_glpk(scen@modInp@parameters[[i]]))
+        file_w <- c(file_w, .sm_to_glpk(scen@modInp@parameters[[i]]))
       }
     }
   }
@@ -149,7 +149,7 @@
         }))
       ret <- c(ret, ";", "")
     }
-  } else if (obj@type == "single") {
+  } else if (obj@type == "numpar") {
     if (nrow(obj@data) == 0) {
       dd <- obj@defVal
       if (dd == Inf) dd <- 0

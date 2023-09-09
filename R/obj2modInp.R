@@ -8,7 +8,7 @@ setMethod(".obj2modInp",
           signature(obj = "modInp", app = "commodity", approxim = "list"),
           function(obj, app, approxim) {
   .checkSliceLevel(app, approxim)
-  # cmd <- energyRt:::.upper_case(app)
+  # cmd <- .upper_case(app)
   # browser()
   cmd <- app
   cmd <- .filter_data_in_slots(cmd, approxim$region, "region")
@@ -65,12 +65,12 @@ setMethod(".obj2modInp",
     approxim$comm <- cmd@name
     obj@parameters[["pDummyImportCost"]] <- .dat2par(
       obj@parameters[["pDummyImportCost"]],
-      .interp_single(dbg, "dummyImport",
+      .interp_numpar(dbg, "dummyImport",
                           obj@parameters[["pDummyImportCost"]], approxim)
     )
     obj@parameters[["pDummyExportCost"]] <- .dat2par(
       obj@parameters[["pDummyExportCost"]],
-      .interp_single(dbg, "dummyExport",
+      .interp_numpar(dbg, "dummyExport",
                           obj@parameters[["pDummyExportCost"]], approxim)
     )
   }
@@ -84,7 +84,7 @@ setMethod(".obj2modInp", signature(
   obj = "modInp", app = "demand",
   approxim = "list"
 ), function(obj, app, approxim) {
-  # dem <- energyRt:::.upper_case(app)
+  # dem <- .upper_case(app)
   dem <- app
   if (length(dem@commodity) != 1 || is.na(dem@commodity) ||
       all(dem@commodity != approxim$all_comm)) {
@@ -118,7 +118,7 @@ setMethod(".obj2modInp", signature(
                      list(region = approxim$region))
   obj@parameters[["mvDemInp"]] <-
     .dat2par(obj@parameters[["mvDemInp"]], mvDemInp)
-  pDemand <- .interp_single(
+  pDemand <- .interp_numpar(
     dem@dem, "dem", obj@parameters[["pDemand"]], approxim, c("dem", "comm"),
     c(dem@name, dem@commodity)
   )
@@ -135,7 +135,7 @@ setMethod(".obj2modInp", signature(
   obj = "modInp", app = "weather",
   approxim = "list"
 ), function(obj, app, approxim) {
-  # wth <- energyRt:::.upper_case(app)
+  # wth <- .upper_case(app)
   wth <- app
   if (length(wth@slice) == 0 && length(approxim$slice@misc$nlevel) > 1) {
     stop("Slot weather@slice is empty, it should have information about slice level")
@@ -150,7 +150,7 @@ setMethod(".obj2modInp", signature(
   wth <- .filter_data_in_slots(wth, approxim$region, "region")
   wth <- .disaggregateSliceLevel(wth, approxim)
   obj@parameters[["pWeather"]]@defVal <- wth@defVal
-  obj@parameters[["pWeather"]] <- .dat2par(obj@parameters[["pWeather"]], .interp_single(
+  obj@parameters[["pWeather"]] <- .dat2par(obj@parameters[["pWeather"]], .interp_numpar(
     wth@weather, "wval",
     obj@parameters[["pWeather"]], approxim, "weather", wth@name
   ))
@@ -173,7 +173,7 @@ setMethod(".obj2modInp", signature(
   approxim = "list"
 ), function(obj, app, approxim) {
   .checkSliceLevel(app, approxim)
-  # exp <- energyRt:::.upper_case(app)
+  # exp <- .upper_case(app)
   exp <- app
   if (length(exp@commodity) != 1 || is.na(exp@commodity) || all(exp@commodity != approxim$all_comm)) {
     stop(paste0('Wrong commodity in export "', exp@name, '"'))
@@ -187,7 +187,7 @@ setMethod(".obj2modInp", signature(
   obj@parameters[["mExpComm"]] <- .dat2par(obj@parameters[["mExpComm"]], mExpComm)
   obj@parameters[["pExportRowPrice"]] <- .dat2par(
     obj@parameters[["pExportRowPrice"]],
-    .interp_single(
+    .interp_numpar(
       exp@exp, "price",
       obj@parameters[["pExportRowPrice"]], approxim, "expp", exp@name
     )
@@ -246,7 +246,7 @@ setMethod(
   ),
   function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
-    # imp <- energyRt:::.upper_case(app)
+    # imp <- .upper_case(app)
     imp <- app
     if (length(imp@commodity) != 1 || is.na(imp@commodity) || all(imp@commodity != approxim$all_comm)) {
       stop(paste0('Wrong commodity in import "', imp@name, '"'))
@@ -258,7 +258,7 @@ setMethod(
     obj@parameters[["mImpSlice"]] <- .dat2par(obj@parameters[["mImpSlice"]], mImpSlice)
     mImpComm <- data.frame(imp = imp@name, comm = imp@commodity)
     obj@parameters[["mImpComm"]] <- .dat2par(obj@parameters[["mImpComm"]], mImpComm)
-    pImportRowPrice <- .interp_single(
+    pImportRowPrice <- .interp_numpar(
       imp@imp, "price",
       obj@parameters[["pImportRowPrice"]], approxim, "imp", imp@name
     )
@@ -362,7 +362,7 @@ setMethod(
     # Discount
     approxim_no_mileStone_Year <- approxim
     approxim_no_mileStone_Year$mileStoneYears <- NULL
-    pDiscount <- .interp_single(app@discount, "discount",
+    pDiscount <- .interp_numpar(app@discount, "discount",
       obj@parameters[["pDiscount"]], approxim_no_mileStone_Year,
       all.val = TRUE
     )
@@ -378,35 +378,35 @@ setMethod(
     )
     approxim_comm$slice <- approxim$slice@all_slice
 
-    if (nrow(app@milestone) == 0) {
-      app <- setMilestoneYears(app, start = min(app@year), interval = rep(1, length(app@year)))
+    if (nrow(app@horizon) == 0) {
+      app <- setHorizon(app, start = min(app@year), interval = rep(1, length(app@year)))
     }
 
     obj@parameters[["mStartMilestone"]] <- .dat2par(
       obj@parameters[["mStartMilestone"]],
-      data.frame(year = app@milestone$mid, yearp = app@milestone$start)
+      data.frame(year = app@horizon$mid, yearp = app@horizon$start)
     )
     obj@parameters[["mEndMilestone"]] <- .dat2par(
       obj@parameters[["mEndMilestone"]],
-      data.frame(year = app@milestone$mid, yearp = app@milestone$end)
+      data.frame(year = app@horizon$mid, yearp = app@horizon$end)
     )
     obj@parameters[["mMilestoneLast"]] <- .dat2par(
       obj@parameters[["mMilestoneLast"]],
-      data.frame(year = max(app@milestone$mid))
+      data.frame(year = max(app@horizon$mid))
     )
     obj@parameters[["mMilestoneFirst"]] <- .dat2par(
       obj@parameters[["mMilestoneFirst"]],
-      data.frame(year = min(app@milestone$mid))
+      data.frame(year = min(app@horizon$mid))
     )
 
     obj@parameters[["mMilestoneNext"]] <- .dat2par(
       obj@parameters[["mMilestoneNext"]],
-      data.frame(year = app@milestone$mid[-nrow(app@milestone)],
-                 yearp = app@milestone$mid[-1])
+      data.frame(year = app@horizon$mid[-nrow(app@horizon)],
+                 yearp = app@horizon$mid[-1])
     )
     obj@parameters[["mMilestoneHasNext"]] <- .dat2par(
       obj@parameters[["mMilestoneHasNext"]],
-      data.frame(year = app@milestone$mid[-nrow(app@milestone)])
+      data.frame(year = app@horizon$mid[-nrow(app@horizon)])
     )
 
     obj@parameters[["mSameSlice"]] <- .dat2par(
@@ -427,8 +427,8 @@ setMethod(
 
     obj@parameters[["pPeriodLen"]] <- .dat2par(
       obj@parameters[["pPeriodLen"]],
-      data.frame(year = app@milestone$mid,
-                 value = (app@milestone$end - app@milestone$start + 1),
+      data.frame(year = app@horizon$mid,
+                 value = (app@horizon$end - app@horizon$start + 1),
                  stringsAsFactors = FALSE)
     )
 
@@ -442,11 +442,11 @@ setMethod(
     }
     obj@parameters[["pDiscountFactor"]] <- .dat2par(obj@parameters[["pDiscountFactor"]], pDiscountFactor)
     # pDiscountFactorMileStone
-    yrr <- app@milestone$start[1]:app@milestone$end[nrow(app@milestone)]
+    yrr <- app@horizon$start[1]:app@horizon$end[nrow(app@horizon)]
     tyr <- rep(NA, length(yrr))
     names(tyr) <- yrr
-    for (yr in seq_len(nrow(app@milestone))) {
-      tyr[app@milestone$start[yr] <= yrr & yrr <= app@milestone$end[yr]] <- app@milestone$mid[yr]
+    for (yr in seq_len(nrow(app@horizon))) {
+      tyr[app@horizon$start[yr] <= yrr & yrr <= app@horizon$end[yr]] <- app@horizon$mid[yr]
     }
     # browser()
     pDiscountFactorMileStone <- pDiscountFactor
@@ -502,7 +502,7 @@ setMethod(
   function(obj, app, approxim) {
     # !!! Add interpolation of LHS and RHS here
     # browser()
-    # .interp_single(
+    # .interp_numpar(
     #   app@rhs, parameter = 'rhs',
     #   # obj@parameters[['']],
     #   approxim = approxim
@@ -553,7 +553,7 @@ setMethod(
   function(obj, app, approxim) {
     pStorageCout <- NULL
     pStorageCinp <- NULL
-    # stg <- energyRt:::.upper_case(app)
+    # stg <- .upper_case(app)
     stg <- app
     if (length(stg@commodity) != 1 ||
         is.na(stg@commodity) ||
@@ -598,7 +598,7 @@ setMethod(
       obj@parameters[["mStorageComm"]],
       data.frame(stg = stg@name, comm = stg@commodity)
     )
-    olife <- .interp_single(
+    olife <- .interp_numpar(
       stg@olife, "olife",
       obj@parameters[["pStorageOlife"]],
       approxim, "stg", stg@name
@@ -608,47 +608,47 @@ setMethod(
     # Loss
     obj@parameters[["pStorageInpEff"]] <- .dat2par(
       obj@parameters[["pStorageInpEff"]],
-      .interp_single(
+      .interp_numpar(
         stg@seff, "inpeff", obj@parameters[["pStorageInpEff"]],
         approxim, c("stg", "comm"), c(stg@name, stg@commodity)
       )
     )
     obj@parameters[["pStorageOutEff"]] <- .dat2par(
       obj@parameters[["pStorageOutEff"]],
-      .interp_single(
+      .interp_numpar(
         stg@seff, "outeff", obj@parameters[["pStorageOutEff"]],
         approxim, c("stg", "comm"), c(stg@name, stg@commodity)
       )
     )
     obj@parameters[["pStorageStgEff"]] <- .dat2par(
       obj@parameters[["pStorageStgEff"]],
-      .interp_single(
+      .interp_numpar(
         stg@seff, "stgeff", obj@parameters[["pStorageStgEff"]],
         approxim, c("stg", "comm"), c(stg@name, stg@commodity)
       )
     )
     # Cost
-    pStorageCostInp <- .interp_single(
+    pStorageCostInp <- .interp_numpar(
       stg@varom, "inpcost",
       obj@parameters[["pStorageCostInp"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageCostInp"]] <-
       .dat2par(obj@parameters[["pStorageCostInp"]], pStorageCostInp)
-    pStorageCostOut <- .interp_single(
+    pStorageCostOut <- .interp_numpar(
       stg@varom, "outcost",
       obj@parameters[["pStorageCostOut"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageCostOut"]] <-
       .dat2par(obj@parameters[["pStorageCostOut"]], pStorageCostOut)
 
-    pStorageCostStore <- .interp_single(
+    pStorageCostStore <- .interp_numpar(
       stg@varom, "stgcost",
       obj@parameters[["pStorageCostStore"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageCostStore"]] <-
       .dat2par(obj@parameters[["pStorageCostStore"]], pStorageCostStore)
 
-    pStorageFixom <- .interp_single(
+    pStorageFixom <- .interp_numpar(
       stg@fixom, "fixom",
       obj@parameters[["pStorageFixom"]], approxim, "stg", stg@name
     )
@@ -697,7 +697,7 @@ setMethod(
         approxim_comm <- approxim_comm[names(approxim_comm) != "comm"]
         approxim_comm[["acomm"]] <- unique(stg@aeff[!is.na(stg@aeff[, dd[i, "table"]]), "acomm"])
         if (length(approxim_comm[["acomm"]]) != 0) {
-          aout_tmp[[dd[i, "list"]]] <- .interp_single(stg@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "stg", stg@name)
+          aout_tmp[[dd[i, "list"]]] <- .interp_numpar(stg@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "stg", stg@name)
           obj@parameters[[dd[i, "list"]]] <- .dat2par(obj@parameters[[dd[i, "list"]]], aout_tmp[[dd[i, "list"]]])
         }
       }
@@ -735,17 +735,17 @@ setMethod(
       obj@parameters[["pStorageCharge"]] <- .dat2par(obj@parameters[["pStorageCharge"]], tmp)
     }
     # Some slice
-    stock_exist <- .interp_single(
+    stock_exist <- .interp_numpar(
       stg@stock, "stock",
       obj@parameters[["pStorageStock"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageStock"]] <- .dat2par(obj@parameters[["pStorageStock"]], stock_exist)
-    invcost <- .interp_single(stg@invcost, "invcost", obj@parameters[["pStorageInvcost"]], approxim, "stg", stg@name)
+    invcost <- .interp_numpar(stg@invcost, "invcost", obj@parameters[["pStorageInvcost"]], approxim, "stg", stg@name)
     obj@parameters[["pStorageInvcost"]] <- .dat2par(obj@parameters[["pStorageInvcost"]], invcost)
 
 
     # browser()
-    dd0 <- energyRt:::.start_end_fix(approxim, stg, "stg", stock_exist)
+    dd0 <- .start_end_fix(approxim, stg, "stg", stock_exist)
     dd0$new <- dd0$new[dd0$new$year %in% approxim$mileStoneYears & dd0$new$region %in% approxim$region, , drop = FALSE]
     dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region, , drop = FALSE]
     obj@parameters[["mStorageNew"]] <- .dat2par(obj@parameters[["mStorageNew"]], dd0$new)
@@ -918,7 +918,7 @@ setMethod(
   function(obj, app, approxim) {
     .checkSliceLevel(app, approxim)
     sup <- app
-    # sup <- energyRt:::.upper_case(app)
+    # sup <- .upper_case(app)
     if (length(sup@commodity) != 1 || is.na(sup@commodity) || all(sup@commodity != approxim$all_comm)) {
       stop(paste0('Wrong commodity in supply "', sup@name, '"'))
     }
@@ -953,7 +953,7 @@ setMethod(
     obj@parameters[["mSupSlice"]] <- .dat2par(obj@parameters[["mSupSlice"]], mSupSlice)
     mSupComm <- data.frame(sup = sup@name, comm = sup@commodity)
     obj@parameters[["mSupComm"]] <- .dat2par(obj@parameters[["mSupComm"]], mSupComm)
-    pSupCost <- .interp_single(sup@availability, "cost", obj@parameters[["pSupCost"]], approxim, c("sup", "comm"), c(sup@name, sup@commodity))
+    pSupCost <- .interp_numpar(sup@availability, "cost", obj@parameters[["pSupCost"]], approxim, c("sup", "comm"), c(sup@name, sup@commodity))
     obj@parameters[["pSupCost"]] <- .dat2par(obj@parameters[["pSupCost"]], pSupCost)
     pSupReserve <- .interp_bounds(
       sup@reserve, "res", obj@parameters[["pSupReserve"]],
@@ -1079,7 +1079,7 @@ setMethod(
     if (all(!is.na(rampup$slice))) {
       approxim2$slice <- approxim2$slice[approxim2$slice %in% unique(rampup$slice)]
     }
-    pTechRampUp <- .interp_single(
+    pTechRampUp <- .interp_numpar(
       rampup, name,
       obj@parameters[[pname]], approxim2, set_name, tech@name
     )
@@ -1115,8 +1115,8 @@ setMethod(
   ".obj2modInp",
   signature(obj = "modInp", app = "technology", approxim = "list"),
   function(obj, app, approxim) {
-    energyRt:::.checkSliceLevel(app, approxim)
-    # tech <- energyRt:::.upper_case(app)
+    .checkSliceLevel(app, approxim)
+    # tech <- .upper_case(app)
     tech <- app
     if (length(tech@slice) == 0) {
       use_cmd <- unique(
@@ -1141,7 +1141,7 @@ setMethod(
       }
       tech@afs <- tech@afs[-chk, ]
     }
-    approxim <- energyRt:::.fix_approximation_list(approxim, lev = tech@slice)
+    approxim <- .fix_approximation_list(approxim, lev = tech@slice)
     tech <- .disaggregateSliceLevel(tech, approxim)
     mTechSlice <- data.frame(
       tech = rep(tech@name, length(approxim$slice)), slice = approxim$slice,
@@ -1181,7 +1181,7 @@ setMethod(
     approxim_comm <- approxim
     approxim_comm[["comm"]] <- rownames(ctype$comm)
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechCvarom <- .interp_single(tech@varom, "cvarom",
+      pTechCvarom <- .interp_numpar(tech@varom, "cvarom",
         obj@parameters[["pTechCvarom"]], approxim_comm, "tech", tech@name
         # remValue = 0
       )
@@ -1193,7 +1193,7 @@ setMethod(
     approxim_acomm <- approxim
     approxim_acomm[["acomm"]] <- rownames(ctype$aux)
     if (length(approxim_acomm[["acomm"]]) != 0) {
-      pTechAvarom <- .interp_single(tech@varom, "avarom",
+      pTechAvarom <- .interp_numpar(tech@varom, "avarom",
         obj@parameters[["pTechAvarom"]], approxim_acomm, "tech", tech@name
         # remValue = 0
       )
@@ -1214,12 +1214,12 @@ setMethod(
       pTechAfc <- NULL
     }
     # Stock & Capacity
-    stock_exist <- .interp_single(tech@stock, "stock",
+    stock_exist <- .interp_numpar(tech@stock, "stock",
                                        obj@parameters[["pTechStock"]], approxim,
                                        "tech", tech@name)
     obj@parameters[["pTechStock"]] <-
       .dat2par(obj@parameters[["pTechStock"]], stock_exist)
-    olife <- .interp_single(tech@olife, "olife",
+    olife <- .interp_numpar(tech@olife, "olife",
                                  obj@parameters[["pTechOlife"]], approxim,
                                  "tech", tech@name
                                  # , removeDefault = FALSE
@@ -1227,7 +1227,7 @@ setMethod(
     obj@parameters[["pTechOlife"]] <-
       .dat2par(obj@parameters[["pTechOlife"]], olife)
     # browser()
-    dd0 <- energyRt:::.start_end_fix(approxim, tech, "tech", stock_exist)
+    dd0 <- .start_end_fix(approxim, tech, "tech", stock_exist)
     dd0$new <- dd0$new[dd0$new$year %in% approxim$mileStoneYears &
                          dd0$new$region %in% approxim$region, , drop = FALSE]
     dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears &
@@ -1235,7 +1235,7 @@ setMethod(
     obj@parameters[["mTechNew"]] <-
       .dat2par(obj@parameters[["mTechNew"]], dd0$new)
 
-    invcost <- .interp_single(tech@invcost, "invcost",
+    invcost <- .interp_numpar(tech@invcost, "invcost",
                                    obj@parameters[["pTechInvcost"]], approxim,
                                    "tech", tech@name)
     if (!is.null(invcost)) {
@@ -1306,7 +1306,7 @@ setMethod(
     approxim_comm[["comm"]] <-
       rownames(ctype$comm)[ctype$comm$type == "input" & is.na(ctype$comm[, "group"])]
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechCinp2use <- .interp_single(
+      pTechCinp2use <- .interp_numpar(
         tech@ceff, "cinp2use",
         obj@parameters[["pTechCinp2use"]], approxim_comm, "tech", tech@name
       )
@@ -1317,12 +1317,12 @@ setMethod(
     }
     approxim_comm[["comm"]] <- rownames(ctype$comm)[ctype$comm$type == "output"]
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechUse2cact <- .interp_single(
+      pTechUse2cact <- .interp_numpar(
         tech@ceff, "use2cact",
         obj@parameters[["pTechUse2cact"]], approxim_comm, "tech", tech@name
       )
       obj@parameters[["pTechUse2cact"]] <- .dat2par(obj@parameters[["pTechUse2cact"]], pTechUse2cact)
-      pTechCact2cout <- .interp_single(
+      pTechCact2cout <- .interp_numpar(
         tech@ceff, "cact2cout",
         obj@parameters[["pTechCact2cout"]], approxim_comm, "tech", tech@name
       )
@@ -1340,7 +1340,7 @@ setMethod(
     approxim_comm[["comm"]] <-
       rownames(ctype$comm)[ctype$comm$type == "input" & !is.na(ctype$comm[, "group"])]
     if (length(approxim_comm[["comm"]]) != 0) {
-      pTechCinp2ginp <- .interp_single(
+      pTechCinp2ginp <- .interp_numpar(
         tech@ceff, "cinp2ginp",
         obj@parameters[["pTechCinp2ginp"]], approxim_comm, "tech", tech@name
       )
@@ -1422,7 +1422,7 @@ setMethod(
     approxim_group <- approxim
     approxim_group[["group"]] <- rownames(ctype$group)[ctype$group$type == "input"]
     if (length(approxim_group[["group"]]) != 0) {
-      pTechGinp2use <- .interp_single(
+      pTechGinp2use <- .interp_numpar(
         tech@geff, "ginp2use",
         obj@parameters[["pTechGinp2use"]], approxim_group, "tech", tech@name
       )
@@ -1457,14 +1457,14 @@ setMethod(
     } else {
       mTechAInp <- NULL
     }
-    # single & bounds
+    # numpar & bounds
     obj@parameters[["pTechCap2act"]] <- .dat2par(
       obj@parameters[["pTechCap2act"]],
       data.frame(tech = tech@name, value = tech@cap2act)
     )
-    pTechFixom <- .interp_single(tech@fixom, "fixom", obj@parameters[["pTechFixom"]], approxim, "tech", tech@name)
+    pTechFixom <- .interp_numpar(tech@fixom, "fixom", obj@parameters[["pTechFixom"]], approxim, "tech", tech@name)
     obj@parameters[["pTechFixom"]] <- .dat2par(obj@parameters[["pTechFixom"]], pTechFixom)
-    pTechVarom <- .interp_single(tech@varom, "varom", obj@parameters[["pTechVarom"]], approxim, "tech", tech@name)
+    pTechVarom <- .interp_numpar(tech@varom, "varom", obj@parameters[["pTechVarom"]], approxim, "tech", tech@name)
     obj@parameters[["pTechVarom"]] <- .dat2par(obj@parameters[["pTechVarom"]], pTechVarom)
 
     ## Move from reduce
@@ -1560,7 +1560,7 @@ setMethod(
           approxim_commp <- approxim
           approxim_commp$acomm <- unique(yy$acomm)
           approxim_commp$comm <- unique(yy$comm)
-          tmp <- .interp_single(yy, ll, obj@parameters[[tbl]], approxim_commp, "tech", tech@name)
+          tmp <- .interp_numpar(yy, ll, obj@parameters[[tbl]], approxim_commp, "tech", tech@name)
           tmp <- tmp[tmp$value != 0, ]
           if (nrow(tmp) > 0) {
             obj@parameters[[tbl]] <- .dat2par(obj@parameters[[tbl]], tmp)
@@ -1590,7 +1590,7 @@ setMethod(
       approxim_comm <- approxim_comm[names(approxim_comm) != "comm"]
       approxim_comm[["acomm"]] <- unique(tech@aeff[!is.na(tech@aeff[, dd[i, "table"]]), "acomm"])
       if (length(approxim_comm[["acomm"]]) != 0) {
-        tmp <- .interp_single(tech@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "tech", tech@name)
+        tmp <- .interp_numpar(tech@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "tech", tech@name)
         obj@parameters[[dd[i, "list"]]] <- .dat2par(obj@parameters[[dd[i, "list"]]], tmp)
         if (!all(c("tech", "acomm", "region", "year", "slice") %in% colnames(tmp))) {
           if (i <= 3) ll <- mvTechInp else ll <- mvTechOut
@@ -1840,7 +1840,7 @@ setMethod(
     approxim = "list"
   ),
   function(obj, app, approxim) {
-    # trd <- energyRt:::.upper_case(app)
+    # trd <- .upper_case(app)
     trd <- app
     if (length(trd@commodity) != 1 || is.na(trd@commodity) || all(trd@commodity != approxim$all_comm)) {
       stop(paste0('Wrong commodity in trade "', trd@name, '"'))
@@ -1931,10 +1931,10 @@ setMethod(
       rownames(tmp) <- NULL
       tmp
     }
-    .interp_single2 <- function(dtf, approxim, parameter, ...) {
+    .interp_numpar2 <- function(dtf, approxim, parameter, ...) {
       if (all(list(...)[[1]]@dimSets != "src") &&
           all(list(...)[[1]]@dimSets != "dst")) {
-        return(.interp_single(dtf, approxim = approxim,
+        return(.interp_numpar(dtf, approxim = approxim,
                               parameter = parameter, ...))
       }
       dtf <- dtf[!is.na(dtf[, parameter]), ]
@@ -1950,7 +1950,7 @@ setMethod(
       dtf$src <- NULL
       dtf$dst <- NULL
       dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
-      dd <- .interp_single(dtf, approxim = approxim,
+      dd <- .interp_numpar(dtf, approxim = approxim,
                            parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) {
         return(NULL)
@@ -2008,12 +2008,12 @@ setMethod(
     # pTradeIrCost
     obj@parameters[["pTradeIrCost"]] <- .dat2par(
       obj@parameters[["pTradeIrCost"]],
-      .interp_single2(trd@trade,
+      .interp_numpar2(trd@trade,
         parameter = "cost", obj@parameters[["pTradeIrCost"]],
         approxim = approxim_srcdst, "trade", trd@name
       )
     )
-    pTradeIrEff <- .interp_single2(trd@trade,
+    pTradeIrEff <- .interp_numpar2(trd@trade,
       parameter = "teff", obj@parameters[["pTradeIrEff"]],
       approxim = approxim_srcdst, "trade", trd@name
     )
@@ -2021,7 +2021,7 @@ setMethod(
     # pTradeIrMarkup
     obj@parameters[["pTradeIrMarkup"]] <- .dat2par(
       obj@parameters[["pTradeIrMarkup"]],
-      .interp_single2(trd@trade,
+      .interp_numpar2(trd@trade,
         parameter = "markup", obj@parameters[["pTradeIrMarkup"]],
         approxim = approxim_srcdst, "trade", trd@name
       )
@@ -2068,7 +2068,7 @@ setMethod(
       for (cc in inp_comm) {
         approxim_srcdst$acomm <- cc
         pTradeIrCsrc2Ainp <-
-          .interp_single2(trd@aeff,
+          .interp_numpar2(trd@aeff,
           parameter = "csrc2ainp",
           obj@parameters[["pTradeIrCsrc2Ainp"]],
           approxim = approxim_srcdst, "trade", trd@name
@@ -2077,7 +2077,7 @@ setMethod(
           .dat2par(obj@parameters[["pTradeIrCsrc2Ainp"]],
                    pTradeIrCsrc2Ainp)
         pTradeIrCdst2Ainp <-
-          .interp_single2(trd@aeff,
+          .interp_numpar2(trd@aeff,
           parameter = "cdst2ainp",
           obj@parameters[["pTradeIrCdst2Ainp"]],
           approxim = approxim_srcdst, "trade", trd@name
@@ -2089,7 +2089,7 @@ setMethod(
       for (cc in out_comm) {
         approxim_srcdst$acomm <- cc
         pTradeIrCsrc2Aout <-
-          .interp_single2(trd@aeff, parameter = "csrc2aout",
+          .interp_numpar2(trd@aeff, parameter = "csrc2aout",
                           obj@parameters[["pTradeIrCsrc2Aout"]],
                           approxim = approxim_srcdst, "trade",
                           trd@name)
@@ -2097,7 +2097,7 @@ setMethod(
           .dat2par(obj@parameters[["pTradeIrCsrc2Aout"]],
                    pTradeIrCsrc2Aout)
         pTradeIrCdst2Aout <-
-          .interp_single2(trd@aeff,
+          .interp_numpar2(trd@aeff,
           parameter = "cdst2aout", obj@parameters[["pTradeIrCdst2Aout"]],
           approxim = approxim_srcdst, "trade", trd@name
         )
@@ -2132,12 +2132,12 @@ setMethod(
           trd@invcost[, "invcost"] <- trd@invcost[1, "invcost"] / length(rgg)
         }
       }
-      invcost <- .interp_single(trd@invcost, "invcost", obj@parameters[["pTradeInvcost"]], approxim, "trade", trd@name)
+      invcost <- .interp_numpar(trd@invcost, "invcost", obj@parameters[["pTradeInvcost"]], approxim, "trade", trd@name)
       invcost <- invcost[invcost$value != 0, , drop = FALSE]
       if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end, , drop = FALSE]
 
       if (!is.null(invcost) && nrow(invcost) == 0) invcost <- NULL
-      stock_exist <- .interp_single(trd@stock, "stock", obj@parameters[["pTradeStock"]], approxim, "trade", trd@name)
+      stock_exist <- .interp_numpar(trd@stock, "stock", obj@parameters[["pTradeStock"]], approxim, "trade", trd@name)
       obj@parameters[["pTradeStock"]] <- .dat2par(obj@parameters[["pTradeStock"]], stock_exist)
       obj@parameters[["pTradeOlife"]] <- .dat2par(
         obj@parameters[["pTradeOlife"]],
@@ -2518,7 +2518,7 @@ merge0 <- function(x, y,
     for (ii in c("Inp", "Out", "Bal")) {
       obj@parameters[[paste0("pTaxCost", ii)]] <- .dat2par(
         obj@parameters[[paste0("pTaxCost", ii)]],
-        .interp_single(
+        .interp_numpar(
           app@tax, tolower(ii), obj@parameters[[paste0("pTaxCost", ii)]],
           approxim, "comm", app@comm
         )
@@ -2528,7 +2528,7 @@ merge0 <- function(x, y,
     for (ii in c("Inp", "Out", "Bal")) {
       obj@parameters[[paste0("pSubCost", ii)]] <- .dat2par(
         obj@parameters[[paste0("pSubCost", ii)]],
-        .interp_single(
+        .interp_numpar(
           app@sub, tolower(ii), obj@parameters[[paste0("pSubCost", ii)]],
           approxim, "comm", app@comm
         )

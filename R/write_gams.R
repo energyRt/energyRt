@@ -81,7 +81,7 @@
 
     # Add gdx import
     cat("$gdxin input/data.gdx\n", file = zz_data_gms)
-    for (j in c("set", "map", "single", "bounds")) {
+    for (j in c("set", "map", "numpar", "bounds")) {
       for (i in names(scen@modInp@parameters)) {
         if (scen@modInp@parameters[[i]]@type == j &&
           (is.null(scen@modInp@parameters[[i]]@misc$weather) || !scen@modInp@parameters[[i]]@misc$weather)) {
@@ -96,7 +96,7 @@
     }
     cat("$gdxin\n", file = zz_data_gms)
   } else if (arg$n.threads == 1) {
-    for (j in c("set", "map", "single", "bounds")) {
+    for (j in c("set", "map", "numpar", "bounds")) {
       for (i in names(scen@modInp@parameters)) {
         if (scen@modInp@parameters[[i]]@type == j) {
           zz_data_tmp <- file(paste(arg$tmp.dir, "/input/", i, ".gms", sep = ""), "w")
@@ -107,7 +107,7 @@
       }
     }
   } else {
-    # for (j in c("set", "map", "single", "bounds")) {
+    # for (j in c("set", "map", "numpar", "bounds")) {
     #   for (i in names(scen@modInp@parameters)) {
     #     if (scen@modInp@parameters[[i]]@type == j) {
     #       cat(paste0("$include input/", i, ".gms\n"), file = zz_data_gms)
@@ -312,7 +312,7 @@
       paste0(ret, '") = ', dtt[, ncol(dtt)], ";")
     }
   }
-  as_single <- function(dtt, name, def, include.def) {
+  as_numpar <- function(dtt, name, def, include.def) {
     if (include.def) {
       add_cnd <- function(y, x) {
         if (x == "") {
@@ -406,15 +406,15 @@
         "/;", ""
       ))
     }
-  } else if (obj@type == "single") {
-    return(as_single(obj@data, obj@name, obj@defVal, include.def))
+  } else if (obj@type == "numpar") {
+    return(as_numpar(obj@data, obj@name, obj@defVal, include.def))
   } else if (obj@type == "bounds") {
     return(c(
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste0(obj@name, "Lo"), obj@defVal[1], include.def
       ),
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste0(obj@name, "Up"), obj@defVal[2], include.def
       )

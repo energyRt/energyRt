@@ -107,7 +107,7 @@
       }
       if (ncol(obj2) == 1 || nrow(obj2) == prod(
         sapply(approxim2[names(obj2)[-ncol(obj2)]], length)
-      )) { # single approximation is applicable
+      )) { # numpar approximation is applicable
         for (i in names(dtf)[c(!f1, FALSE)]) {
           obj2 <- merge0(obj2, approxim2[i])
         }
@@ -329,7 +329,7 @@
   }
 }
 
-#' Internal function to interpolate 'single' parameter
+#' Internal function to interpolate 'numpar' parameter
 #'
 #' @param dtf data.frame, a slot with the data for interpolation.
 #' @param parameter character, name of the column in the `dtf` to interpolate.
@@ -341,7 +341,7 @@
 #' @param all.val
 #'
 #' @return
-.interp_single <- function(
+.interp_numpar <- function(
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     # removeDefault = TRUE, # not used

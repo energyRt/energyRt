@@ -121,10 +121,10 @@
   cat('using RData\nusing DataFrames\ndt = load("data.RData")["dat"]\n',
     sep = "\n", file = zz_data_julia
   )
-  for (j in c("set", "map", "single", "bounds")) {
+  for (j in c("set", "map", "numpar", "bounds")) {
     for (i in names(scen@modInp@parameters)) {
       if (scen@modInp@parameters[[i]]@type == j) {
-        cat(energyRt:::.toJuliaHead(scen@modInp@parameters[[i]]),
+        cat(.toJuliaHead(scen@modInp@parameters[[i]]),
           sep = "\n", file = zz_data_julia
         )
         cat(paste0('println("', i,
@@ -143,7 +143,7 @@
   if (length(scen@modInp@gams.equation) > 0) {
     for (i in seq_along(scen@modInp@gams.equation)) {
       eqt <- scen@modInp@gams.equation[[i]]
-      cat(energyRt:::.equation.from.gams.to.julia(eqt$equation),
+      cat(.equation.from.gams.to.julia(eqt$equation),
         sep = "\n",
         file = zz_data_constr
       )
@@ -159,7 +159,7 @@
   close(zz_data_constr)
   # Add costs
   {
-    cat(energyRt:::.equation.from.gams.to.julia(scen@modInp@costs.equation),
+    cat(.equation.from.gams.to.julia(scen@modInp@costs.equation),
       sep = "\n", file = zz_data_costs
     )
     cat(
@@ -203,7 +203,7 @@
 
 # Generate Julia code, return the code as a character vector
 .toJulia <- function(obj) {
-  as_single <- function(data, name, name2, def) {
+  as_numpar <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
@@ -258,8 +258,8 @@
         ), "))\n"), collapse = "")
       ))
     }
-  } else if (obj@type == "single") {
-    return(as_single(
+  } else if (obj@type == "numpar") {
+    return(as_numpar(
       obj@data, obj@name,
       paste0("(", paste0(obj@dimSets, collapse = ", "), ")"),
       obj@defVal
@@ -267,11 +267,11 @@
   } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -282,7 +282,7 @@
 }
 
 .toJuliaHead <- function(obj) {
-  as_single <- function(data, name, name2, def) {
+  as_numpar <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
@@ -332,17 +332,17 @@
         ), "end"
       ))
     }
-  } else if (obj@type == "single") {
-    return(as_single(obj@data, obj@name,
+  } else if (obj@type == "numpar") {
+    return(as_numpar(obj@data, obj@name,
                      paste0("(", paste0(obj@dimSets, collapse = ", "), ")"), obj@defVal))
   } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )

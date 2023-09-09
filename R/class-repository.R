@@ -140,7 +140,7 @@ setGeneric("newRepository", function(name, ...) standardGeneric("newRepository")
 #'
 setMethod("newRepository", signature(name = "character"), function(name, ...) {
   in_rep <- c("commodity", "technology", "supply", "demand", "trade", "import", "export", "trade", "storage")
-  rps <- .data2slots("repository", name, drop_class = in_rep, ...)
+  rps <- .data2slots("repository", name, ignore_classes = in_rep, ...)
   arg <- list(...)
   arg <- arg[sapply(arg, class) %in% in_rep]
   if (length(arg) > 0) rps <- add(rps, arg)

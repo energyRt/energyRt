@@ -35,8 +35,17 @@ newTechnology(
 )
 }
 \arguments{
+\item{af}{data.frame, percentage (share) of time the technology is able to operate in every time-slice.}
+
+\item{afs}{data.frame, percentage (share) of time the technology is able to operate over set/group of time-slices.}
+
 \item{misc}{}
 }
 \description{
 Create object of class `technology` with specified parameters.
 }
+\seealso{
+Other technology: 
+\code{\link{technology-class}}
+}
+\concept{technology}

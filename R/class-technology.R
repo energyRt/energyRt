@@ -1,7 +1,8 @@
 #' An S4 class to represent technology
 #'
-#' @slot name character.
-#' @slot description character.
+#' @sections structure
+#' @slot name character, name of technology used in sets
+#' @slot description character, detailed description of the technology for reference.
 #' @slot input data.frame.
 #' @slot output data.frame.
 #' @slot aux data.frame.
@@ -29,6 +30,8 @@
 #' @slot misc list.
 #'
 #' @include class-supply.R
+#'
+#' @family technology
 #'
 #' @return
 #' @export
@@ -253,6 +256,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 
 #' Create object of class `technology` with specified parameters.
 #'
+#' @inherit "technology-class" structure
 #' @param name
 #' @param description
 #' @param input
@@ -262,8 +266,8 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @param geff
 #' @param ceff
 #' @param aeff
-#' @param af
-#' @param afs
+#' @param af data.frame, percentage (share) of time the technology is able to operate in every time-slice.
+#' @param afs data.frame, percentage (share) of time the technology is able to operate over set/group of time-slices.
 #' @param weather
 #' @param stock
 #' @param invcost
@@ -278,6 +282,8 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @param earlyRetirement
 #' @param upgrade.technology
 #' @param misc
+#'
+#' @family technology
 #'
 #' @return
 #' @export
@@ -406,7 +412,9 @@ checkInpOut <- function(tech) {
         stop('Wrong commodity "', tech@name, '": "', i, '"')
     }
     # Input ?
-    if (any(!is.na(tech@ceff[tech@ceff$comm == i, c("cinp2use", "cinp2ginp")]))) {
+    if (any(!is.na(tech@ceff[tech@ceff$comm == i,
+
+                             c("cinp2use", "cinp2ginp")]))) {
       if (ctype[i, "type"] != "input")
         stop('Wrong commodity "', tech@name, '": "', i, '"')
     }

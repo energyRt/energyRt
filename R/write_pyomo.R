@@ -148,11 +148,11 @@
     zz_data_pyomo <- file(paste(arg$tmp.dir, "data.dat", sep = ""), "w")
   }
   file_w <- c()
-  for (j in c("set", "map", "single", "bounds")) {
+  for (j in c("set", "map", "numpar", "bounds")) {
     for (i in names(scen@modInp@parameters)) {
       if (scen@modInp@parameters[[i]]@type == j) {
         if (AbstractModel) {
-          cat(energyRt:::.toPyomoAbstractModel(scen@modInp@parameters[[i]]),
+          cat(.toPyomoAbstractModel(scen@modInp@parameters[[i]]),
             sep = "\n", file = zz_data_pyomo
           )
         } else {
@@ -165,7 +165,7 @@
               )
               ## SQLite import
             } else {
-              cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]),
+              cat(.toPyomo(scen@modInp@parameters[[i]]),
                 sep = "\n",
                 file = zz_constr
               )
@@ -179,7 +179,7 @@
               )
               ## SQLite import
             } else {
-              cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]),
+              cat(.toPyomo(scen@modInp@parameters[[i]]),
                 sep = "\n",
                 file = zz_costs
               )
@@ -195,7 +195,7 @@
               tfl <- paste0("input/", scen@modInp@parameters[[i]]@name, ".py")
               cat(paste0('exec(open("', tfl, '").read())\n'), file = zz_inp_file)
               zz_tfl <- file(paste0(arg$tmp.dir, tfl), "w")
-              cat(energyRt:::.toPyomo(scen@modInp@parameters[[i]]),
+              cat(.toPyomo(scen@modInp@parameters[[i]]),
                 sep = "\n", file = zz_tfl
               )
               close(zz_tfl)
@@ -215,11 +215,11 @@
     for (i in seq_along(scen@modInp@gams.equation)) {
       eqt <- scen@modInp@gams.equation[[i]]
       if (AbstractModel) {
-        cat(energyRt:::.equation.from.gams.to.pyomo.AbstractModel(eqt$equation),
+        cat(.equation.from.gams.to.pyomo.AbstractModel(eqt$equation),
           sep = "\n", file = zz_constr
         )
       } else {
-        cat(energyRt:::.equation.from.gams.to.pyomo(eqt$equation),
+        cat(.equation.from.gams.to.pyomo(eqt$equation),
           sep = "\n", file = zz_constr
         )
       }
@@ -229,11 +229,11 @@
   {
     cat("\n", file = zz_costs)
     if (AbstractModel) {
-      cat(energyRt:::.equation.from.gams.to.pyomo.AbstractModel(
+      cat(.equation.from.gams.to.pyomo.AbstractModel(
         scen@modInp@costs.equation
       ), sep = "\n", file = zz_costs)
     } else {
-      cat(energyRt:::.equation.from.gams.to.pyomo(
+      cat(.equation.from.gams.to.pyomo(
         scen@modInp@costs.equation
       ), sep = "\n", file = zz_costs)
     }
@@ -285,7 +285,7 @@
 
 # Generate PYOMO code, return character vector
 .toPyomo <- function(obj) {
-  as_single <- function(data, name, name2, def) {
+  as_numpar <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       if (nrow(obj@data) == 1) def <- obj@data[[1]]
@@ -333,8 +333,8 @@
         ), "')"), collapse = ",\n"), "]);"
       )))
     }
-  } else if (obj@type == "single") {
-    return(as_single(
+  } else if (obj@type == "numpar") {
+    return(as_numpar(
       obj@data, obj@name, gsub(
         "[(][)]", "",
         paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
@@ -344,11 +344,11 @@
   } else if (obj@type == "bounds") {
     hh <- gsub("[(][)]", "", paste0("(", paste0(obj@dimSets, collapse = ", "), ")"))
     return(c(
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -362,7 +362,7 @@
 }
 
 .toPyomoAbstractModel <- function(obj) {
-  as_single <- function(data, name, name2, def) {
+  as_numpar <- function(data, name, name2, def) {
     if (ncol(obj@data) == 1) {
       if (nrow(data) != 0) def <- data$value
       return(paste0("# ", name, "\nparam ", name, " := ", def, ";\n"))
@@ -400,19 +400,19 @@
         function(x) paste(x, collapse = " ")
       ), "\n"), collapse = ""), ";")))
     }
-  } else if (obj@type == "single") {
-    return(as_single(
+  } else if (obj@type == "numpar") {
+    return(as_numpar(
       obj@data, obj@name,
       paste0("(", paste0(obj@dimSets, collapse = ", "), ")"), obj@defVal
     ))
   } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -426,7 +426,7 @@
 }
 
 .toPyomSQLite <- function(obj) {
-  as_single <- function(data, name, name2, def) {
+  as_numpar <- function(data, name, name2, def) {
     if (def == Inf) def <- 0
     if (ncol(obj@data) == 1) {
       browser()
@@ -462,8 +462,8 @@
       tmp <- paste0("read_set('", obj@name, "')")
       return(c(ret, paste0("\n", obj@name, " = set(", tmp, ")")))
     }
-  } else if (obj@type == "single") {
-    return(as_single(
+  } else if (obj@type == "numpar") {
+    return(as_numpar(
       obj@data,
       obj@name,
       paste0("(", paste0(obj@dimSets, collapse = ", "), ")"),
@@ -472,11 +472,11 @@
   } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
-      as_single(
+      as_numpar(
         obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
@@ -497,7 +497,7 @@
   for (tmp in param[sapply(param, function(x) x@type == "map")]) {
     decl <- c(decl, paste0(
       "model.", tmp@name, " = Set(within = ",
-      paste0("model.", energyRt:::.removeEndSet(tmp@dimSets), collapse = "*"),
+      paste0("model.", .removeEndSet(tmp@dimSets), collapse = "*"),
       ");"
     ))
   }
@@ -507,13 +507,13 @@
     }
     return(x)
   }
-  # Generate single parameter declaration
-  for (tmp in param[sapply(param, function(x) x@type == "single")]) {
+  # Generate numpar parameter declaration
+  for (tmp in param[sapply(param, function(x) x@type == "numpar")]) {
     decl <- c(
       decl,
       paste0(
         "model.", tmp@name, " = Param(",
-        paste0("model.", energyRt:::.removeEndSet(tmp@dimSets), collapse = "*"),
+        paste0("model.", .removeEndSet(tmp@dimSets), collapse = "*"),
         ", default = ", value_or_zero(tmp@defVal), ");"
       )
     )
@@ -524,13 +524,13 @@
       decl,
       paste0(
         "model.", tmp@name, "Lo = Param(",
-        paste0("model.", energyRt:::.removeEndSet(tmp@dimSets), collapse = "*"),
+        paste0("model.", .removeEndSet(tmp@dimSets), collapse = "*"),
         ", default = ",
         value_or_zero(tmp@defVal[1]), ");"
       ),
       paste0(
         "model.", tmp@name, "Up = Param(",
-        paste0("model.", energyRt:::.removeEndSet(tmp@dimSets), collapse = "*"),
+        paste0("model.", .removeEndSet(tmp@dimSets), collapse = "*"),
         ", default = ",
         value_or_zero(tmp@defVal[2]), ");"
       )

@@ -1,16 +1,18 @@
-#' Class (S4) to represent model configuration settings.
+#' Class (S4) to represent default model configuration.
 #'
-#' @slot discount data.frame.
-#' @slot region character.
-#' @slot year numeric.
-#' @slot milestone data.frame.
-#' @slot slice slice.
-#' @slot discountFirstYear logical.
-#' @slot interpolation data.frame.
-#' @slot defVal data.frame.
-#' @slot yearFraction data.frame.
-#' @slot debug data.frame.
-#' @slot misc list.
+#' @slot info character string with the configuration information.
+#' @slot region
+#' @slot horizon
+#' @slot year
+#' @slot slice
+#' @slot discount
+#' @slot discountFirstYear
+#' @slot earlyRetirement
+#' @slot yearFraction
+#' @slot defVal
+#' @slot interpolation
+#' @slot debug
+#' @slot misc
 #'
 #' @include class-slice.R class-timeslices.R
 #'
@@ -20,20 +22,22 @@
 #' @examples
 setClass("sysInfo",
   representation(
-    discount = "data.frame",
+    info = "character",
     region = "character",
+    horizon = "data.frame",
     year = "numeric",
-    milestone = "data.frame", # !!!rename to milestoneYears?
     slice = "slice", # !!!rename to timeslices?
-    interpolation = "data.frame",
-    defVal = "data.frame",
+    discount = "data.frame",
     discountFirstYear = "logical",
     earlyRetirement = "logical",
     yearFraction = "data.frame",
+    defVal = "data.frame",
+    interpolation = "data.frame",
     debug = "data.frame",
     misc = "list"
   ),
   prototype(
+    info = "Default model configuration",
     debug = data.frame(
       comm = character(),
       region = character(),
@@ -52,7 +56,7 @@ setClass("sysInfo",
     ),
     region = NULL,
     year = as.numeric(2005:2050),
-    milestone = data.frame(
+    horizon = data.frame(
       start = numeric(),
       mid = numeric(),
       end = numeric()
@@ -76,12 +80,6 @@ setMethod("initialize", "sysInfo", function(.Object, ...) {
   .Object
 })
 
-# setClass("settings",
-#          representation(sample = "list"),
-#          contains = "sysInfo",
-#          S3methods = TRUE)
-
-
 setGeneric("setTimeSlices", function(obj, ...) standardGeneric("setTimeSlices"))
 
 setMethod("setTimeSlices", signature(obj = "sysInfo"), function(obj, ...) {
@@ -89,25 +87,25 @@ setMethod("setTimeSlices", signature(obj = "sysInfo"), function(obj, ...) {
   obj
 })
 
-setGeneric("setMilestoneYears",
-           function(obj, start, interval) standardGeneric("setMilestoneYears"))
+setGeneric("setHorizon",
+           function(obj, start, interval) standardGeneric("setHorizon"))
 
-setMethod("setMilestoneYears",
+setMethod("setHorizon",
           signature(obj = "sysInfo", start = "numeric", interval = "numeric"),
   function(obj, start, interval) {
-    obj@milestone <- milestoneYears(start, interval)
-    obj@year <- min(obj@milestone$start):max(obj@milestone$end)
+    obj@horizon <- milestoneYears(start, interval)
+    obj@year <- min(obj@horizon$start):max(obj@horizon$end)
     obj
   }
 )
 
-setGeneric("getMilestoneYears",
-           function(obj) standardGeneric("getMilestoneYears"))
+setGeneric("getHorizon",
+           function(obj) standardGeneric("getHorizon"))
 
-setMethod("getMilestoneYears",
+setMethod("getHorizon",
           signature(obj = "sysInfo"),
           function(obj) {
-            obj@milestone
+            obj@horizon
 })
 
 setGeneric("milestoneYears",
@@ -119,13 +117,15 @@ setMethod("milestoneYears",
   if (interval[1] != 1) stop("setMileStoneYears: first interval have to be 1")
   mlst <- data.frame(
     start = start + cumsum(c(0, interval[-length(interval)])),
-    mid = rep(NA, length(interval)), end = start + cumsum(interval) - 1
+    mid = rep(NA, length(interval)),
+    end = start + cumsum(interval) - 1
   )
   mlst[, "mid"] <- trunc(.5 * (mlst[, "start"] + mlst[, "end"]))
   mlst
 })
 
 
+# saved in .defVal & .defInt
 # defVal = data.frame(
 #   # !!! distinguish interpolation for different objects and slots
 #   teff = as.numeric(1),

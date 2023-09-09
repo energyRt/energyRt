@@ -18,8 +18,6 @@ S4 class to represent model
 
 \item{\code{sysInfo}}{sysInfo.}
 
-\item{\code{LECdata}}{list.}
-
 \item{\code{earlyRetirement}}{logical.}
 
 \item{\code{misc}}{list.}

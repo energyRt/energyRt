@@ -19,9 +19,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "commodity", approxim = "list"),
   function(obj, app, approxim) {
-    # cmd <- energyRt:::.upper_case(app)
+    # cmd <- .upper_case(app)
     cmd <- app
-    if (!energyRt:::check_name(cmd@name)) {
+    if (!check_name(cmd@name)) {
       stop(paste('Incorrect commodity name "', cmd@name, '"', sep = ""))
     }
     if (.find_commodity(obj, cmd@name)) {
@@ -43,9 +43,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "demand", approxim = "list"),
   function(obj, app, approxim) {
-    # dem <- energyRt:::.upper_case(app)
+    # dem <- .upper_case(app)
     dem <- app
-    if (!energyRt:::check_name(dem@name)) {
+    if (!check_name(dem@name)) {
       stop(paste('Incorrect demand name "', dem@name, '"', sep = ""))
     }
     if (.find_demand(obj, dem@name)) {
@@ -67,9 +67,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "weather", approxim = "list"),
   function(obj, app, approxim) {
-    # wth <- energyRt:::.upper_case(app)
+    # wth <- .upper_case(app)
     wth <- app
-    if (!energyRt:::check_name(wth@name)) {
+    if (!check_name(wth@name)) {
       stop(paste('Incorrect weather name "', wth@name, '"', sep = ""))
     }
     if (.find_weather(obj, wth@name)) {
@@ -113,9 +113,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "supply", approxim = "list"),
   function(obj, app, approxim) {
-    # sup <- energyRt:::.upper_case(app)
+    # sup <- .upper_case(app)
     sup <- app
-    if (!energyRt:::check_name(sup@name)) {
+    if (!check_name(sup@name)) {
       stop(paste('Incorrect supply name "', sup@name, '"', sep = ""))
     }
     if (.find_supply(obj, sup@name)) {
@@ -137,9 +137,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "storage", approxim = "list"),
   function(obj, app, approxim) {
-    # stg <- energyRt:::.upper_case(app)
+    # stg <- .upper_case(app)
     stg <- app
-    if (!energyRt:::check_name(stg@name)) {
+    if (!check_name(stg@name)) {
       stop(paste('Incorrect storage name "', stg@name, '"', sep = ""))
     }
     if (.find_supply(obj, stg@name)) {
@@ -161,9 +161,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "export", approxim = "list"),
   function(obj, app, approxim) {
-    # exp <- energyRt:::.upper_case(app)
+    # exp <- .upper_case(app)
     exp <- app
-    if (!energyRt:::check_name(exp@name)) {
+    if (!check_name(exp@name)) {
       stop(paste('Incorrect export name "', exp@name, '"', sep = ""))
     }
     if (.find_export(obj, exp@name)) {
@@ -185,9 +185,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "import", approxim = "list"),
   function(obj, app, approxim) {
-    # imp <- energyRt:::.upper_case(app)
+    # imp <- .upper_case(app)
     imp <- app
-    if (!energyRt:::check_name(imp@name)) {
+    if (!check_name(imp@name)) {
       stop(paste('Incorrect import name "', imp@name, '"', sep = ""))
     }
     if (.find_import(obj, imp@name)) {
@@ -209,14 +209,14 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "technology", approxim = "list"),
   function(obj, app, approxim) {
-    # tech <- energyRt:::.upper_case(app)
+    # tech <- .upper_case(app)
     tech <- app
     # Temporary solution for infinite-olife technology
     if (nrow(tech@olife) == 0) {
       tech@olife[1, ] <- NA
       tech@olife[1, "olife"] <- 1e3
     }
-    if (!energyRt:::check_name(tech@name)) {
+    if (!check_name(tech@name)) {
       stop(paste('Incorrect technology name "', tech@name, '"', sep = ""))
     }
     if (.find_technology(obj, tech@name)) {
@@ -238,9 +238,9 @@ setMethod(
   ".add2set",
   signature(obj = "modInp", app = "trade", approxim = "list"),
   function(obj, app, approxim) {
-    # trd <- energyRt:::.upper_case(app)
+    # trd <- .upper_case(app)
     trd <- app
-    if (!energyRt:::check_name(trd@name)) {
+    if (!check_name(trd@name)) {
       stop(paste('Incorrect trade name "', trd@name, '"', sep = ""))
     }
     if (.find_trade(obj, trd@name)) {

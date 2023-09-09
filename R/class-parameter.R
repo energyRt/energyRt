@@ -2,7 +2,7 @@
 #'
 #' @slot name character.
 #' @slot dimSets character.
-#' @slot type factor.
+#' @slot type factor,
 #' @slot defVal numeric.
 #' @slot interpolation character.
 #' @slot data data.frame.
@@ -11,21 +11,23 @@
 #' @slot misc list.
 #'
 #' @include class-model.R
-#'
+#' @family parameter
 #' @export
 #'
 setClass(
   "parameter", # @parameter
   representation(
     name = "character", # @name name Name for GAMS
-    dimSets = "character", # @dimSets Dimension sets, comma separated, order is matter
-    type = "factor", # @type is it map (map),  single (single parameter),
-    # bounds (Up / Lo /Fx parameter)
+    type = "factor", # set, map, numpar, or bounds (Up / Lo /Fx)
+    dimSets = "character", # @dimSets comma separated, order is matter
     defVal = "numeric", # @defVal Default value : zero value  for map,
-    # one for single, two for bounds
-    interpolation = "character", # interpolation 'back.inter.forth'
     data = "data.frame", # @data Data for export
+    # one for numpar, two for bounds
+    interpolation = "character", # interpolation 'back.inter.forth'
     # not_data        = "logical",  # @data NO flag for map
+    # class = "character",
+    # slot = "character",
+    inClass = "data.frame",
     colName = "character", # @colName Column name in slot
     nValues = "numeric", # @nValues Number of non-NA values in 'data' (to speed-up processing) - !!! drop in the future
     misc = "list"
@@ -33,13 +35,18 @@ setClass(
   prototype(
     name = NULL,
     dimSets = NULL,
-    type = factor(NA, c("set", "map", "single", "bounds")),
+    type = factor(NA, c("set", "map", "numpar", "bounds")),
     defVal = NULL,
     interpolation = NULL,
     data = data.frame(),
     # not_data       = FALSE,
     colName = NULL,
     nValues = 0,
+    inClass = data.frame(
+      class = character(),
+      slot = character(),
+      column = character()
+    ),
     misc = list(
       class = NULL,
       slot = NULL
@@ -63,7 +70,7 @@ setMethod("initialize", signature = "parameter",
     #   "group", "region", "regionp", "src", "dst",
     #   "year", "yearp", "slice", "slicep", "stg", "expp", "imp", "trade"
     # )
-    if (!is.character(name) || length(name) != 1 || !energyRt:::check_name(name)) {
+    if (!is.character(name) || length(name) != 1 || !check_name(name)) {
       stop(paste('Wrong name: "', name, '"', sep = ""))
     }
     if (any(!is.character(dimSets)) || # length(dimSets) == 0 ||
@@ -82,10 +89,10 @@ setMethod("initialize", signature = "parameter",
     ) != "")) {
       stop("Wrong interpolation rule")
     }
-    if (type == "single" && length(defVal) != 1) stop("Wrong defVal value")
+    if (type == "numpar" && length(defVal) != 1) stop("Wrong defVal value")
     if (type == "bounds" && length(defVal) == 0) stop("Wrong defVal value")
     if (type == "bounds" && length(defVal) == 1) defVal <- rep(defVal, 2)
-    if (type == "single" && length(interpolation) != 1) {
+    if (type == "numpar" && length(interpolation) != 1) {
       stop("Wrong interpolation rule")
     }
     if (type == "bounds" && length(interpolation) == 0) {
@@ -127,15 +134,17 @@ setMethod("initialize", signature = "parameter",
     # browser()
 
     if (type == "bounds") dimSets <- c(dimSets, "type")
-    if (any(type == c("single", "bounds"))) dimSets <- c(dimSets, "value")
+    if (any(type == c("numpar", "bounds"))) dimSets <- c(dimSets, "value")
     .Object@data <- data[, dimSets, drop = FALSE]
     .Object@colName <- colName
     .Object
   }
 )
 
+#' @family parameter
 newParameter <- function(...) new("parameter", ...)
 
+#' @family parameter
 newSet <- function(dimSets) {
   if (length(dimSets) != 1) stop("Sets must have only one dimension")
   newParameter(dimSets, dimSets, "set")

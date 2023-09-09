@@ -14,7 +14,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # description
   # n.threads - number of threads use for approximation
   # startYear && fixTo have to define both (or not define both) - run with startYear
-  # year - basic milestone year definition (not recommended for use), use only if milestone not defined
+  # year - basic horizon year definition (not recommended for use), use only if horizon not defined
   # discount - define discount, not good practice
   # region - define region, not good practice
   # repository - class for add to model (repository or list of repository)
@@ -53,17 +53,18 @@ interpolate <- function(obj, ...) { #- returns class scenario
   ## Fill basic sets
   # Fill year
   if (!is.null(arg$year)) {
-    if (nrow(scen@model@sysInfo@milestone) != 0) {
-      stop("argument can't use with milestone")
+    if (nrow(scen@model@sysInfo@horizon) != 0) {
+      stop("argument can't use with horizon")
     }
     scen@model@sysInfo@year <- arg$year
   }
-  if (nrow(scen@model@sysInfo@milestone) == 0) {
+  if (nrow(scen@model@sysInfo@horizon) == 0) {
     if (any(sort(scen@model@sysInfo@year) != scen@model@sysInfo@year) ||
-      max(scen@model@sysInfo@year) - min(scen@model@sysInfo@year) + 1 != length(scen@model@sysInfo@year)) {
+      max(scen@model@sysInfo@year) - min(scen@model@sysInfo@year) + 1 !=
+      length(scen@model@sysInfo@year)) {
       stop("wrong year parameter")
     }
-    scen@model <- setMilestoneYears(scen@model,
+    scen@model <- setHorizon(scen@model,
       start = scen@model@sysInfo@year[1],
       interval = rep(1, length(scen@model@sysInfo@year))
     )
@@ -74,10 +75,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # browser()
   scen@modInp@parameters[["mMidMilestone"]] <-
     .dat2par(scen@modInp@parameters[["mMidMilestone"]],
-              data.frame(year = scen@model@sysInfo@milestone$mid)
+              data.frame(year = scen@model@sysInfo@horizon$mid)
   )
   # Fill slice
-  scen@model@sysInfo@slice <- energyRt:::.init_slice(scen@model@sysInfo@slice)
+  scen@model@sysInfo@slice <- .init_slice(scen@model@sysInfo@slice)
   # browser()
   if (mean(scen@model@sysInfo@yearFraction$fraction) != 1.) {
     # filter out unused slices
@@ -111,9 +112,9 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   # List for approximation
   # Generate approxim list, that contain basic data for approximation
-  xx <- c(obj@sysInfo@milestone$mid[-1] -
-    obj@sysInfo@milestone$mid[-nrow(obj@sysInfo@milestone)], 1)
-  names(xx) <- obj@sysInfo@milestone$mid
+  xx <- c(obj@sysInfo@horizon$mid[-1] -
+    obj@sysInfo@horizon$mid[-nrow(obj@sysInfo@horizon)], 1)
+  names(xx) <- obj@sysInfo@horizon$mid
 
   if (is.null(arg$fullsets)) fullsets <- TRUE else fullsets <- arg$fullsets
   scen@status$fullsets <- fullsets # !!!???
@@ -123,7 +124,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     year = scen@model@sysInfo@year,
     slice = scen@model@sysInfo@slice,
     solver = arg$solver,
-    mileStoneYears = scen@model@sysInfo@milestone$mid,
+    mileStoneYears = scen@model@sysInfo@horizon$mid,
     mileStoneForGrowth = xx,
     fullsets = fullsets
   )
@@ -176,13 +177,15 @@ interpolate <- function(obj, ...) { #- returns class scenario
         psb_slot <- getSlots(tmp@misc$class)
         psb_slot <- names(psb_slot)[psb_slot == "data.frame"]
         psb_slot <- psb_slot[!(psb_slot %in% c("defVal", "interpolation"))]
-        fl <- sapply(psb_slot, function(x) any(colnames(slot(prot, x)) %in% tmp@colName))
+        fl <- sapply(psb_slot, function(x) {
+          any(colnames(slot(prot, x)) %in% tmp@colName)
+          })
         if (sum(fl) != 1) stop("Internal error")
         slt <- psb_slot[fl]
         need_col <- tmp@dimSets[tmp@dimSets %in% colnames(slot(prot, slt))]
         if (any(pr == c("pDummyImportCost", "pDummyExportCost")))
           need_col <- need_col[need_col != "comm"]
-        if (tmp@type == "single") {
+        if (tmp@type == "numpar") {
           val_col <- tmp@colName
         } else {
           val_col <- c(tmp@colName, gsub("[.].*", ".fx", tmp@colName[1]))
@@ -205,7 +208,8 @@ interpolate <- function(obj, ...) { #- returns class scenario
           scen@modInp@parameters[[pr]]@dimSets <-
             tmp@dimSets[!(tmp@dimSets %in% need_col)]
           scen@modInp@parameters[[pr]]@data <-
-            scen@modInp@parameters[[pr]]@data[,!(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
+            scen@modInp@parameters[[pr]]@data[,!(colnames(
+              scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
           if (arg$verbose >= 1) {
             scen@misc$trimDroppedDimensions <- rbind(
               scen@misc$trimDroppedDimensions,
@@ -250,11 +254,12 @@ interpolate <- function(obj, ...) { #- returns class scenario
   interpolation_count <- .get_objects_count(scen) + 46
   len_name <- .get_objects_len_name(scen)
   if (arg$n.threads == 1) {
-    scen <- .add2_nthreads_1(0, 1, scen, arg, approxim,
-      interpolation_start_time = interpolation_start_time,
-      interpolation_count = interpolation_count, len_name = len_name
-    )
+    # scen <- .add2_nthreads_1(0, 1, scen, arg, approxim,
+    #   interpolation_start_time = interpolation_start_time,
+    #   interpolation_count = interpolation_count, len_name = len_name
+    # )
   } else {
+    warning("Multiple threads are not implemented yet, ignoring `n.threads` parameter")
     # use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
     # # require(parallel)
     # cl <- makeCluster(arg$n.threads)
@@ -265,7 +270,14 @@ interpolate <- function(obj, ...) { #- returns class scenario
     # stopCluster(cl)
     # scen <- .merge_scen(scen_pr, use_par)
   }
-  # Remove group duplication
+  scen <- .add2_nthreads_1(n.thread = 0, max.thread = 1,
+                           scen = scen, arg = arg, approxim = approxim,
+                           interpolation_start_time = interpolation_start_time,
+                           interpolation_count = interpolation_count,
+                           len_name = len_name
+                           )
+
+  # Remove duplicates
   scen@modInp@parameters$group <- .unique_set(scen@modInp@parameters$group)
   scen@modInp@parameters$mvDemInp <- .unique_set(scen@modInp@parameters$mvDemInp)
 
@@ -277,22 +289,22 @@ interpolate <- function(obj, ...) { #- returns class scenario
   .check_sets(scen)
 
   # Tune for LEC
-  if (length(scen@model@LECdata) != 0) {
-    scen@modInp@parameters$mLECRegion <-
-      addMultipleSet(
-        scen@modInp@parameters$mLECRegion,
-        scen@model@LECdata$region
-      )
-    if (length(obj@LECdata$pLECLoACT) == 1) {
-      scen@modInp@parameters$pLECLoACT <- .dat2par(
-        scen@modInp@parameters$pLECLoACT,
-        data.frame(
-          region = scen@model@LECdata$region,
-          value = scen@model@LECdata$pLECLoACT
-        )
-      )
-    }
-  }
+  # if (length(scen@model@LECdata) != 0) {
+  #   scen@modInp@parameters$mLECRegion <-
+  #     addMultipleSet(
+  #       scen@modInp@parameters$mLECRegion,
+  #       scen@model@LECdata$region
+  #     )
+  #   if (length(obj@LECdata$pLECLoACT) == 1) {
+  #     scen@modInp@parameters$pLECLoACT <- .dat2par(
+  #       scen@modInp@parameters$pLECLoACT,
+  #       data.frame(
+  #         region = scen@model@LECdata$region,
+  #         value = scen@model@LECdata$pLECLoACT
+  #       )
+  #     )
+  #   }
+  # }
   # Reduce mapping
   scen@modInp <- .write_mapping(scen@modInp,
     interpolation_count = interpolation_count,
@@ -308,7 +320,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
       ]
     }
   }
-  scen@source <- energyRt:::.modelCode
+  scen@source <- .modelCode
   scen@status$interpolated <- TRUE
 
   # Check parameters

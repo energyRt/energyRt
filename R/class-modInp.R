@@ -70,7 +70,7 @@ setMethod("initialize", "modInp", function(.Object) {
 # ============================================================================ #
 .get_default_values <- function(modInp, name, drop.unused.values) {
   # Returns data.frame with default values of parameters on
-  #       expanded grid of all (or used only, like milestone-years)
+  #       expanded grid of all (or used only, like horizon-mid-years)
   #       values of the parameter dimension (e.g. sets)
   # name - "character", name of the parameter
   drop_duplicates <- function(x) x[!duplicated(x), , drop = FALSE]
@@ -142,7 +142,7 @@ setMethod("initialize", "modInp", function(.Object) {
       sets <- merge(sets, tmp)
     }
   }
-  if (modInp@parameters[[name]]@type == "single" &&
+  if (modInp@parameters[[name]]@type == "numpar" &&
       (is.null(sets) || nrow(sets) != 0)) {
     sets$value <- modInp@parameters[[name]]@defVal
     if (!is.data.frame(sets)) sets <- as.data.frame(sets)

@@ -6,37 +6,40 @@
 #' @param class_name character, name of the class to create.
 #' @param x character or object. Character string with a name to add to the `@name` slot of the object to create, or the object of `class_name` to update.
 #' @param ... slot names with the data to add to the object's slots.
-#' @param drop_args character vector of arguments to drop from `...` if exist.
-#' @param drop_class character vector of classes to drop from `...`.
+#' @param ignore_args character vector of arguments to drop from `...` if exist.
+#' @param ignore_classes character vector of classes to drop from `...`.
 #' @param update logical, if an object of class `class_name` is supplied (in `x`) then `update` must be `TRUE`, and the object will be updated with the given data in `...`. Otherwise, if the `x` is character, the `update` should be `FALSE`, and the new object will be created.
 #'
 #' @return created or updated object with the added/updated data in the object slots.
 #'
-.data2slots <- function(class_name, x, ..., drop_args = NULL, drop_class = NULL,
-                     update = !is.character(x)) {
-  # alternative names: data2slots, add2slots, fit2slots, ...
+.data2slots <- function(class_name = NULL, x, ..., ignore_args = NULL,
+                        ignore_classes = NULL,
+                        update = !is.character(x)) {
+  # alternative names: data2class, add2slots, fit2slots, ...
   # browser()
   if (update) {
     if (!grepl("energyRt", attr(class(x), "package"))) {
       stop("Unknown type of the object")
     }
-    if (class(x) != class_name) {
+    if (!is.null(class_name) && (class(x) != class_name)) {
       stop(
         "In the case of update = TRUE, 'x' should be an object of class ",
         class_name
       )
     }
     obj <- x
-    x <- obj@name
+    try({x <- obj@name})
+    class_name = class(obj)
   } else {
     stopifnot(is.character(class_name))
     obj <- new(class_name)
   }
   slots <- getSlots(class_name)
   arg <- list(...)
-  if (!is.null(drop_args)) arg <- arg[!(names(arg) %in% drop_args)]
-  if (!is.null(drop_class)) arg <- arg[!(sapply(arg, class) %in% drop_class)]
-  if (class_name != "sysInfo") obj@name <- x
+  if (!is.null(ignore_args)) arg <- arg[!(names(arg) %in% ignore_args)]
+  if (!is.null(ignore_classes)) arg <- arg[!(sapply(arg, class) %in%
+                                               ignore_classes)]
+  if (class_name != "sysInfo") try({obj@name <- x})
   if (length(arg) != 0) {
     # if (any(names(arg) == "name")) stop('Duplicated parameter "name"')
     if (is.null(names(arg)) || any(names(arg) == "")) stop("Unnamed parameters")
@@ -78,7 +81,8 @@
             slot(obj, s)[nn, ] <- NA
             for (i in names(dat)) {
               # fill-in the data by columns
-              if (is.factor(slot(obj, s)[, i, drop = FALSE]) || is.factor(dat[, i])) {
+              if (is.factor(slot(obj, s)[, i, drop = FALSE]) ||
+                  is.factor(dat[, i])) {
                 # coerce factors to characters
                 slot(obj, s)[nn, i] <- as.character(dat[, i])
               } else {
