@@ -24,7 +24,7 @@ write.scenario <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
     scen@misc$tmp.dir <- tmp.dir
   }
   if (F) {} # check if the scenario is interpolated
-  if (is.null(solver)) solver <- scen@solver
+  if (is.null(solver)) solver <- scen@settings@solver
   .solver_solve(scen,
     tmp.dir = tmp.dir, solver = solver, ...,
     run = FALSE, write = TRUE
@@ -70,33 +70,33 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
 # }
 
 .write_inc_solver <- function(scen, arg, def_inc_solver, type, templ) {
-  if (!is.null(scen@solver$inc_solver) && !is.null(scen@solver$solver)) {
-    stop("have to define only one argument from scen@solver$inc_solver & scen@solver$solver")
+  if (!is.null(scen@settings@solver$inc_solver) && !is.null(scen@settings@solver$solver)) {
+    stop("have to define only one argument from scen@settings@solver$inc_solver & scen@settings@solver$solver")
   }
-  if (!is.null(scen@solver$solver)) {
-    scen@solver$inc_solver <- gsub(templ, scen@solver$solver, def_inc_solver)
+  if (!is.null(scen@settings@solver$solver)) {
+    scen@settings@solver$inc_solver <- gsub(templ, scen@settings@solver$solver, def_inc_solver)
   }
-  if (is.null(scen@solver$inc_solver) && is.null(scen@solver$solver)) {
-    scen@solver$inc_solver <- def_inc_solver
+  if (is.null(scen@settings@solver$inc_solver) && is.null(scen@settings@solver$solver)) {
+    scen@settings@solver$inc_solver <- def_inc_solver
   }
   fn <- file(paste0(arg$tmp.dir, "inc_solver", type), "w")
-  cat(scen@solver$inc_solver, file = fn, sep = "\n")
+  cat(scen@settings@solver$inc_solver, file = fn, sep = "\n")
   close(fn)
 }
 
 # writes "include" files to tmp.dir ("inc1" ... "inc5" - see GAMS code)
 .write_inc_files <- function(arg, scen, type) { # renamed .add_five_includes
   if (is.null(type)) {
-    fl <- c(names(scen@solver$files))
+    fl <- c(names(scen@settings@solver$files))
     for (i in 1:5) {
-      if (is.null(scen@solver[[paste0("inc", i)]])) {
+      if (is.null(scen@settings@solver[[paste0("inc", i)]])) {
         fl <- c(fl, paste0("inc", i))
       }
     }
     if (is.null(fl)) {
       tmp <- paste0(
         "There is (are) ", length(fl),
-        " files, that not suitable for lang ", scen@solver@lang,
+        " files, that not suitable for lang ", scen@settings@solver@lang,
         '. File(s) list: "', paste0(fl, collapse = '", "'), '"'
       )
       stop(tmp)
@@ -104,12 +104,12 @@ write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   }
   for (i in 1:5) {
     fn <- file(paste0(arg$tmp.dir, "inc", i, type), "w")
-    cat(scen@solver[[paste0("inc", i)]], sep = "\n", file = fn)
+    cat(scen@settings@solver[[paste0("inc", i)]], sep = "\n", file = fn)
     close(fn)
   }
-  for (i in names(scen@solver$files)) {
+  for (i in names(scen@settings@solver$files)) {
     fn <- file(paste0(arg$tmp.dir, i), "w")
-    cat(scen@solver$files[[i]], sep = "\n", file = fn)
+    cat(scen@settings@solver$files[[i]], sep = "\n", file = fn)
     close(fn)
   }
 }

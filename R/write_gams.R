@@ -8,7 +8,7 @@
   } else {
     .toGams <- function(x) .toGams0(x, FALSE)
   }
-  run_code <- scen@source[["GAMS"]]
+  run_code <- scen@settings@sourceCode[["GAMS"]]
 
   # For downsize
   fdownsize <- names(scen@modInp@parameters)[
@@ -51,25 +51,25 @@
     }
   }
 
-  if (is.null(scen@solver$export_format)) {
-    scen@solver$export_format <- "gms"
+  if (is.null(scen@settings@solver$export_format)) {
+    scen@settings@solver$export_format <- "gms"
   }
-  if (is.null(scen@solver$import_format)) {
-    scen@solver$import_format <- "gms"
+  if (is.null(scen@settings@solver$import_format)) {
+    scen@settings@solver$import_format <- "gms"
   } else {
-    scen@solver$import_format <- "gdx"
-    scen@source[["GAMS_output"]] <- c(scen@source[["GAMS_output"]][grep(
+    scen@settings@solver$import_format <- "gdx"
+    scen@settings@sourceCode[["GAMS_output"]] <- c(scen@settings@sourceCode[["GAMS_output"]][grep(
       "^file variable_list_csv",
-      scen@source[["GAMS_output"]]
-    ):length(scen@source[["GAMS_output"]])], 'execute_unload "output/output.gdx"')
+      scen@settings@sourceCode[["GAMS_output"]]
+    ):length(scen@settings@sourceCode[["GAMS_output"]])], 'execute_unload "output/output.gdx"')
   }
   dir.create(paste(arg$tmp.dir, "/input", sep = ""), showWarnings = FALSE)
   dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
   zz_output <- file(paste(arg$tmp.dir, "/output.gms", sep = ""), "w")
-  cat(scen@source[["GAMS_output"]], sep = "\n", file = zz_output)
+  cat(scen@settings@sourceCode[["GAMS_output"]], sep = "\n", file = zz_output)
   close(zz_output)
   zz_data_gms <- file(paste(arg$tmp.dir, "/data.gms", sep = ""), "w")
-  if (scen@solver$export_format == "gdx") {
+  if (scen@settings@solver$export_format == "gdx") {
     if (!scen@status$fullsets) {
       stop('for export_format = "gdx", interpolation parameter fullsets must be TRUE')
     }
@@ -232,10 +232,10 @@
   close(zz_constrains)
   close(zz_costs)
   .write_inc_files(arg, scen, ".gms")
-  if (is.null(scen@solver$cmdline) || scen@solver$cmdline == "") {
-    scen@solver$cmdline <- "gams energyRt.gms"
+  if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
+    scen@settings@solver$cmdline <- "gams energyRt.gms"
   }
-  scen@solver$code <- c(
+  scen@settings@solver$code <- c(
     "energyRt.gms", "output.gms", "inc_constraints.gms",
     "inc_solver.gms"
   )
@@ -377,8 +377,8 @@
       return(c(gen_gg(name, dtt[dtt$value != 0 & dtt$value != Inf, , drop = FALSE]))) #
     }
   }
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   }
   if (obj@type == "set") {
     if (nrow(obj@data) == 0) {

@@ -39,7 +39,7 @@
   if (!is.null(ignore_args)) arg <- arg[!(names(arg) %in% ignore_args)]
   if (!is.null(ignore_classes)) arg <- arg[!(sapply(arg, class) %in%
                                                ignore_classes)]
-  if (class_name != "sysInfo") try({obj@name <- x})
+  if (class_name != "config") try({obj@name <- x})
   if (length(arg) != 0) {
     # if (any(names(arg) == "name")) stop('Duplicated parameter "name"')
     if (is.null(names(arg)) || any(names(arg) == "")) stop("Unnamed parameters")

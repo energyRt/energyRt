@@ -45,8 +45,8 @@ read.scenario <- function(scen, ...) {
   ss$commp <- ss$comm
   ss$slicep <- ss$slice
   rr$set_vec <- ss
-  if (is.null(scen@solver$import_format)) scen@solver$import_format <- "csv" # !!! workaround
-  if (scen@solver$import_format == "gdx") {
+  if (is.null(scen@settings@solver$import_format)) scen@settings@solver$import_format <- "csv" # !!! workaround
+  if (scen@settings@solver$import_format == "gdx") {
     # Read variables gdx
     gd <- gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
     for (i in c(vrb_list, vrb_list2)) {
@@ -101,7 +101,7 @@ read.scenario <- function(scen, ...) {
   solver_data <- read.csv(paste(arg$tmp.dir, "/solver", sep = ""), stringsAsFactors = FALSE)
   codes <- solver_data[grep("^code", solver_data$name), ]
   for (i in seq_len(nrow(codes))) {
-    scen@solver[[codes[i, "name"]]] <-
+    scen@settings@solver[[codes[i, "name"]]] <-
       readLines(paste(arg$tmp.dir, "/", codes[i, "value"], sep = ""))
   }
   if (all(scen@modOut@solutionLogs$parameter != "solution status")) {

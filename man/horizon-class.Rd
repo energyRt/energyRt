@@ -12,7 +12,7 @@ An S4 class to represent model/scenario horizon with intervals (year-steps)
 \describe{
 \item{\code{info}}{character, a comment or a short description.}
 
-\item{\code{horizon}}{integer, a full (without gaps), arranged sequence of modeled years.}
+\item{\code{years}}{integer, an arranged, full sequence (without gaps) of modeled years.}
 
 \item{\code{intervals}}{data.table,}
 }}

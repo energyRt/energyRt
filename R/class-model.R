@@ -3,11 +3,10 @@
 #' @slot name character.
 #' @slot description character.
 #' @slot data list.
-#' @slot sysInfo sysInfo.
-#' @slot earlyRetirement logical.
+#' @slot config config.
 #' @slot misc list.
 #'
-#' @include class-sysInfo.R class-repository.R
+#' @include class-config.R class-repository.R
 #' @return
 #' @export
 #'
@@ -17,7 +16,7 @@ setClass("model",
     name = "character",
     description = "character", # Details
     data = "list",
-    sysInfo = "sysInfo",
+    config = "config",
     # LECdata = "list",
     # earlyRetirement = "logical",
     misc = "list"
@@ -26,7 +25,7 @@ setClass("model",
     name = "",
     description = "", # Details
     data = list(),
-    sysInfo = new("sysInfo"),
+    config = new("config"),
     # LECdata = list(),
     # earlyRetirement = FALSE,
     misc = list()
@@ -139,7 +138,7 @@ setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #'
 
 setMethod("newModel", signature(name = "character"), function(name, ...) {
-  sysInfVec <- names(getSlots("sysInfo"))
+  sysInfVec <- names(getSlots("config"))
   sysInfVec <- sysInfVec[sysInfVec != ".S3Class"]
   #    mlst_vec <- c('start', 'interval')
   args <- list(...)
@@ -151,15 +150,15 @@ setMethod("newModel", signature(name = "character"), function(name, ...) {
     for (j in fl) mdl <- add(mdl, args[[j]])
   }
   sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
-  mdl@sysInfo <- .data2slots("sysInfo", "",
+  mdl@config <- .data2slots("config", "",
                              ignore_classes = "repository",
                              #      ignore_args = c(names(args)[!(names(args) %in% sysInfVec)], mlst_vec), ...)
                              ignore_args = c("slice", names(args)[!(names(args) %in% sysInfVec)]), ...
   )
   if (any(names(args) == "slice")) {
-    mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = args$slice)
+    mdl@config <- setTimeSlices(mdl@config, slice = args$slice)
   } else {
-    mdl@sysInfo <- setTimeSlices(mdl@sysInfo, slice = "ANNUAL")
+    mdl@config <- setTimeSlices(mdl@config, slice = "ANNUAL")
   }
   #    args <- list(...)
   #    if (any(names(args) %in% mlst_vec)) {
@@ -170,19 +169,19 @@ setMethod("newModel", signature(name = "character"), function(name, ...) {
 })
 
 setMethod("setTimeSlices", signature(obj = "model"), function(obj, ...) {
-  obj@sysInfo@slice <- .setTimeSlices(...)
+  obj@config@slice <- .setTimeSlices(...)
   obj
 })
 
-setMethod(
-  "setHorizon", signature(obj = "model", start = "numeric", interval = "numeric"),
-  function(obj, start, interval) {
-    obj@sysInfo <- setHorizon(obj@sysInfo, start, interval)
+setMethod("setHorizon",
+  signature(obj = "model", horizon = "numeric", intervals = "ANY"),
+  function(obj, horizon, intervals) {
+    obj@config <- setHorizon(obj@config, horizon, intervals)
     obj
   }
 )
 
 setMethod("getHorizon", signature(obj = "model"), function(obj) {
-  getHorizon(obj@sysInfo)
+  getHorizon(obj@config)
 })
 

@@ -26,8 +26,8 @@ usethis::use_data(model_structure, #.modelCode,
                   internal = FALSE, overwrite = TRUE)
 
 # Internal data ####
-.defVal <- yaml::read_yaml("data-raw/sysInfo_default_values.yml")
-.defInt <- yaml::read_yaml(file = "data-raw/sysInfo_default_interpolation.yml")
+.defVal <- yaml::read_yaml("data-raw/config_default_values.yml")
+.defInt <- yaml::read_yaml(file = "data-raw/config_default_interpolation.yml")
 .modInp <- yaml::read_yaml("data-raw/modInp.yml")
 
 # all names of sets used in parameter@dimSet

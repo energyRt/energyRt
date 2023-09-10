@@ -1,9 +1,9 @@
 # Functions to write PYOMO model and data files
 .write_model_PYOMO <- function(arg, scen) {
-  AbstractModel <- any(grep("abstract", scen@solver$lang, ignore.case = TRUE))
+  AbstractModel <- any(grep("abstract", scen@settings@solver$lang, ignore.case = TRUE))
   if (AbstractModel) {
-    run_code <- scen@source[["PYOMOAbstract"]]
-    run_codeout <- scen@source[["PYOMOAbstractOutput"]]
+    run_code <- scen@settings@sourceCode[["PYOMOAbstract"]]
+    run_codeout <- scen@settings@sourceCode[["PYOMOAbstractOutput"]]
 
     # For downsize
     fdownsize <- names(scen@modInp@parameters)[
@@ -46,8 +46,8 @@
       }
     }
   } else {
-    run_code <- scen@source[["PYOMOConcrete"]]
-    run_codeout <- scen@source[["PYOMOConcreteOutput"]]
+    run_code <- scen@settings@sourceCode[["PYOMOConcrete"]]
+    run_codeout <- scen@settings@sourceCode[["PYOMOConcreteOutput"]]
     # For downsize
     fdownsize <- names(scen@modInp@parameters)[
       sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)
@@ -98,11 +98,11 @@
   }
   dir.create(paste(arg$tmp.dir, "/input", sep = ""), showWarnings = FALSE)
   dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
-  # if (!is.null(scen@solver$SQLite) && scen@solver$SQLite) {
-  if (is.null(scen@solver$export_format)) {
+  # if (!is.null(scen@settings@solver$SQLite) && scen@settings@solver$SQLite) {
+  if (is.null(scen@settings@solver$export_format)) {
     SQLite <- FALSE
   } else {
-    SQLite <- tolower(scen@solver$export_format) == "sqlite"
+    SQLite <- tolower(scen@settings@solver$export_format) == "sqlite"
   }
   if (is.null(SQLite)) SQLite <- FALSE
   if (SQLite) {
@@ -157,7 +157,7 @@
           )
         } else {
           if (any(grep("^.Cns", i))) {
-            # if (!is.null(scen@solver$SQLite) && scen@solver$SQLite) {
+            # if (!is.null(scen@settings@solver$SQLite) && scen@settings@solver$SQLite) {
             if (SQLite) {
               cat(.toPyomSQLite(scen@modInp@parameters[[i]]),
                 sep = "\n",
@@ -171,7 +171,7 @@
               )
             }
           } else if (any(grep("^.Costs", i))) {
-            # if (!is.null(scen@solver$SQLite) && scen@solver$SQLite) {
+            # if (!is.null(scen@settings@solver$SQLite) && scen@settings@solver$SQLite) {
             if (SQLite) {
               cat(.toPyomSQLite(scen@modInp@parameters[[i]]),
                 sep = "\n",
@@ -259,10 +259,10 @@
   cat(run_codeout, sep = "\n", file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".py")
-  if (is.null(scen@solver$cmdline) || scen@solver$cmdline == "") {
-    scen@solver$cmdline <- "python energyRt.py"
+  if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
+    scen@settings@solver$cmdline <- "python energyRt.py"
   }
-  scen@solver$code <- c(
+  scen@settings@solver$code <- c(
     "energyRt.py", "output.py", "inc_constraints.py",
     "inc_costs.py", "inc_solver.py"
   )
@@ -311,8 +311,8 @@
       return(kk)
     }
   }
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   }
   if (obj@type == "set") {
     tmp <- ""
@@ -381,8 +381,8 @@
       return(kk)
     }
   }
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   }
   if (obj@type == "set") {
     tmp <- ""
@@ -444,8 +444,8 @@
       return(kk)
     }
   }
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   }
   if (obj@type == "set") {
     tmp <- ""

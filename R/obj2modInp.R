@@ -312,11 +312,11 @@ setMethod(
 
 
 # =============================================================================#
-# Add sysInfo ####
+# Add settings ####
 # =============================================================================#
 setMethod(
   f = ".obj2modInp",
-  signature = signature(obj = "modInp", app = "sysInfo", approxim = "list"),
+  signature = signature(obj = "modInp", app = "config", approxim = "list"),
   function(obj, app, approxim) {
     # browser()
   clean_list <- c(
@@ -331,7 +331,7 @@ setMethod(
     for (i in clean_list) {
       obj@parameters[[i]] <- .resetParameter(obj@parameters[[i]])
     }
-    obj <- .drop_sysinfo_param(obj)
+    obj <- .drop_config_param(obj)
     app <- .filter_data_in_slots(app, approxim$region, "region")
     obj@parameters[["mSliceParentChild"]] <- .dat2par(
       obj@parameters[["mSliceParentChild"]],
@@ -378,35 +378,38 @@ setMethod(
     )
     approxim_comm$slice <- approxim$slice@all_slice
 
-    if (nrow(app@horizon) == 0) {
-      app <- setHorizon(app, start = min(app@year), interval = rep(1, length(app@year)))
+    if (nrow(app@horizon@intervals) == 0) { # ???
+      browser()
+      app <- setHorizon(app,
+                        horizon = app@horizon@years,
+                        intervals = rep(1, length(app@horizon@years)))
     }
 
     obj@parameters[["mStartMilestone"]] <- .dat2par(
       obj@parameters[["mStartMilestone"]],
-      data.frame(year = app@horizon$mid, yearp = app@horizon$start)
+      data.frame(year = app@horizon@intervals$mid, yearp = app@horizon@intervals$start)
     )
     obj@parameters[["mEndMilestone"]] <- .dat2par(
       obj@parameters[["mEndMilestone"]],
-      data.frame(year = app@horizon$mid, yearp = app@horizon$end)
+      data.frame(year = app@horizon@intervals$mid, yearp = app@horizon@intervals$end)
     )
     obj@parameters[["mMilestoneLast"]] <- .dat2par(
       obj@parameters[["mMilestoneLast"]],
-      data.frame(year = max(app@horizon$mid))
+      data.frame(year = max(app@horizon@intervals$mid))
     )
     obj@parameters[["mMilestoneFirst"]] <- .dat2par(
       obj@parameters[["mMilestoneFirst"]],
-      data.frame(year = min(app@horizon$mid))
+      data.frame(year = min(app@horizon@intervals$mid))
     )
-
+    # browser()
     obj@parameters[["mMilestoneNext"]] <- .dat2par(
       obj@parameters[["mMilestoneNext"]],
-      data.frame(year = app@horizon$mid[-nrow(app@horizon)],
-                 yearp = app@horizon$mid[-1])
+      data.frame(year = app@horizon@intervals$mid[-nrow(app@horizon@intervals)],
+                 yearp = app@horizon@intervals$mid[-1])
     )
     obj@parameters[["mMilestoneHasNext"]] <- .dat2par(
       obj@parameters[["mMilestoneHasNext"]],
-      data.frame(year = app@horizon$mid[-nrow(app@horizon)])
+      data.frame(year = app@horizon@intervals$mid[-nrow(app@horizon@intervals)])
     )
 
     obj@parameters[["mSameSlice"]] <- .dat2par(
@@ -427,8 +430,8 @@ setMethod(
 
     obj@parameters[["pPeriodLen"]] <- .dat2par(
       obj@parameters[["pPeriodLen"]],
-      data.frame(year = app@horizon$mid,
-                 value = (app@horizon$end - app@horizon$start + 1),
+      data.frame(year = app@horizon@intervals$mid,
+                 value = (app@horizon@intervals$end - app@horizon@intervals$start + 1),
                  stringsAsFactors = FALSE)
     )
 
@@ -442,11 +445,11 @@ setMethod(
     }
     obj@parameters[["pDiscountFactor"]] <- .dat2par(obj@parameters[["pDiscountFactor"]], pDiscountFactor)
     # pDiscountFactorMileStone
-    yrr <- app@horizon$start[1]:app@horizon$end[nrow(app@horizon)]
+    yrr <- app@horizon@intervals$start[1]:app@horizon@intervals$end[nrow(app@horizon@intervals)]
     tyr <- rep(NA, length(yrr))
     names(tyr) <- yrr
-    for (yr in seq_len(nrow(app@horizon))) {
-      tyr[app@horizon$start[yr] <= yrr & yrr <= app@horizon$end[yr]] <- app@horizon$mid[yr]
+    for (yr in seq_len(nrow(app@horizon@intervals))) {
+      tyr[app@horizon@intervals$start[yr] <= yrr & yrr <= app@horizon@intervals$end[yr]] <- app@horizon@intervals$mid[yr]
     }
     # browser()
     pDiscountFactorMileStone <- pDiscountFactor
@@ -468,8 +471,10 @@ setMethod(
     obj@parameters[["pDiscountFactorMileStone"]] <-
       .dat2par(obj@parameters[["pDiscountFactorMileStone"]],
                 pDiscountFactorMileStone)
+    # browser()
     # pDiscountFactorMileStone
-    mDiscountZero <- pDiscount[pDiscount$year == as.character(max(app@year)), -2]
+    mDiscountZero <-
+      pDiscount[pDiscount$year == as.character(max(app@horizon@years)), -2]
     mDiscountZero <- mDiscountZero[mDiscountZero$value == 0, "region", drop = FALSE]
     # Add mDiscountZero - zero discount rate in final period
     if (nrow(mDiscountZero) != 0) {

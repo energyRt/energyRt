@@ -577,7 +577,7 @@ pDummyImportCost:
   defVal: .inf
   interpolation: back.inter.forth
   colName: dummyImport
-  class: sysInfo
+  class: config
   slot: debug
 pDummyExportCost:
   name: pDummyExportCost
@@ -590,7 +590,7 @@ pDummyExportCost:
   defVal: .inf
   interpolation: back.inter.forth
   colName: dummyExport
-  class: sysInfo
+  class: config
   slot: debug
 pTaxCostInp:
   name: pTaxCostInp
@@ -2255,7 +2255,7 @@ pYearFraction:
   defVal: 1.0
   interpolation: back.inter.forth
   colName: fraction
-  class: sysInfo
+  class: config
 pDiscount:
   name: pDiscount
   dimSets:
@@ -2265,7 +2265,7 @@ pDiscount:
   defVal: 0.1
   interpolation: back.inter.forth
   colName: discount
-  class: sysInfo
+  class: config
 pDiscountFactor:
   name: pDiscountFactor
   dimSets:

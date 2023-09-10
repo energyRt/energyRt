@@ -113,7 +113,7 @@ print.model <- function(x) {
   }
   cat("Name: ", x@name, "\n")
   if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
-  print(x@sysInfo)
+  print(x@config)
   if (length(x@data) != 0) {
     for (i in 1:length(x@data)) {
       cat("Repository ", i, "(", class(x@data[[i]]), "):\n", sep = "")
@@ -210,7 +210,7 @@ print.technology <- function(x, ...) {
 }
 
 #------------------------------------------------------------------------------
-print.sysInfo <- function(x) {
+print.config <- function(x) {
   # print model
   if_print_data_frame <- function(x, sl) {
     if (nrow(slot(x, sl)) != 0) {

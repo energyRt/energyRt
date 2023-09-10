@@ -413,7 +413,7 @@ setMethod(
   any(names(modInp@parameters$constraint) == name)
 }
 
-.drop_sysinfo_param <- function(modInp) {
+.drop_config_param <- function(modInp) {
   for (i in c("pDiscount", "pDummyImportCost", "pDummyExportCost")) {
     modInp@parameters[[i]] <- .resetParameter(modInp@parameters[[i]])
   }

@@ -3,34 +3,32 @@
 #' @slot info character string with the configuration information.
 #' @slot region
 #' @slot horizon
-#' @slot year
 #' @slot slice
 #' @slot discount
 #' @slot discountFirstYear
 #' @slot earlyRetirement
-#' @slot yearFraction
 #' @slot defVal
 #' @slot interpolation
 #' @slot debug
 #' @slot misc
 #'
-#' @include class-slice.R class-timeslices.R
+#' @include class-slice.R class-calendar.R class-horizon.R
 #'
 #' @return
 #' @export
 #'
 #' @examples
-setClass("sysInfo",
+setClass("config",
   representation(
     info = "character",
     region = "character",
-    horizon = "data.frame",
-    year = "numeric",
+    horizon = "horizon", # change to class
+    # year = "numeric", # move to horizon
     slice = "slice", # !!!rename to timeslices?
+    # yearFraction = "data.frame",
     discount = "data.frame",
     discountFirstYear = "logical",
     earlyRetirement = "logical",
-    yearFraction = "data.frame",
     defVal = "data.frame",
     interpolation = "data.frame",
     debug = "data.frame",
@@ -41,7 +39,6 @@ setClass("sysInfo",
     debug = data.frame(
       comm = character(),
       region = character(),
-      # sp = NULL,
       year = numeric(),
       slice = character(),
       dummyImport = numeric(),
@@ -55,74 +52,68 @@ setClass("sysInfo",
       stringsAsFactors = FALSE
     ),
     region = NULL,
-    year = as.numeric(2005:2050),
-    horizon = data.frame(
-      start = numeric(),
-      mid = numeric(),
-      end = numeric()
-    ),
+    # year = as.numeric(2005:2050),
+    horizon = new("horizon"),
     slice = new("slice"),
     discountFirstYear = FALSE,
     earlyRetirement = FALSE,
     defVal = as.data.frame(.defVal, stringsAsFactors = FALSE),
     interpolation = as.data.frame(.defInt, stringsAsFactors = FALSE),
-    yearFraction = data.frame(
-      year = as.numeric(NA),
-      fraction = as.numeric(1),
-      stringsAsFactors = FALSE
-    ),
+    # yearFraction = data.frame(
+    #   year = as.numeric(NA),
+    #   fraction = as.numeric(1),
+    #   stringsAsFactors = FALSE
+    # ),
     misc = list()
   ),
   S3methods = TRUE
 )
 
-setMethod("initialize", "sysInfo", function(.Object, ...) {
+setMethod("initialize", "config", function(.Object, ...) {
   .Object
 })
 
 setGeneric("setTimeSlices", function(obj, ...) standardGeneric("setTimeSlices"))
 
-setMethod("setTimeSlices", signature(obj = "sysInfo"), function(obj, ...) {
+setMethod("setTimeSlices", signature(obj = "config"), function(obj, ...) {
   obj@slice <- .setTimeSlices(...)
   obj
 })
 
 setGeneric("setHorizon",
-           function(obj, start, interval) standardGeneric("setHorizon"))
+           function(obj, horizon, intervals) standardGeneric("setHorizon"))
 
 setMethod("setHorizon",
-          signature(obj = "sysInfo", start = "numeric", interval = "numeric"),
-  function(obj, start, interval) {
-    obj@horizon <- milestoneYears(start, interval)
-    obj@year <- min(obj@horizon$start):max(obj@horizon$end)
+          signature(obj = "config", horizon = "numeric", intervals = "ANY"),
+  function(obj, horizon, intervals) {
+    # browser()
+    # obj@horizon <- milestoneYears(start, interval)
+    # obj@year <- min(obj@horizon@intervals$start):max(obj@horizon@intervals$end)
+    obj@horizon <- newHorizon(horizon, intervals)
     obj
   }
 )
 
-setGeneric("getHorizon",
-           function(obj) standardGeneric("getHorizon"))
+setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
 
-setMethod("getHorizon",
-          signature(obj = "sysInfo"),
-          function(obj) {
-            obj@horizon
-})
+setMethod("getHorizon", signature(obj = "config"), function(obj) obj@horizon)
 
-setGeneric("milestoneYears",
-           function(start, interval) standardGeneric("milestoneYears"))
-
-setMethod("milestoneYears",
-          signature(start = "numeric", interval = "numeric"),
-          function(start, interval) {
-  if (interval[1] != 1) stop("setMileStoneYears: first interval have to be 1")
-  mlst <- data.frame(
-    start = start + cumsum(c(0, interval[-length(interval)])),
-    mid = rep(NA, length(interval)),
-    end = start + cumsum(interval) - 1
-  )
-  mlst[, "mid"] <- trunc(.5 * (mlst[, "start"] + mlst[, "end"]))
-  mlst
-})
+# setGeneric("milestoneYears",
+#            function(start, interval) standardGeneric("milestoneYears"))
+#
+# setMethod("milestoneYears",
+#           signature(start = "numeric", interval = "numeric"),
+#           function(start, interval) {
+#             browser()
+#   if (interval[1] != 1) stop("setMileStoneYears: first interval have to be 1")
+#   mlst <- data.frame(
+#     start = start + cumsum(c(0, interval[-length(interval)])),
+#     mid = rep(NA, length(interval)),
+#     end = start + cumsum(interval) - 1
+#   )
+#   mlst[, "mid"] <- trunc(.5 * (mlst[, "start"] + mlst[, "end"]))
+#   mlst
+# })
 
 
 # saved in .defVal & .defInt

@@ -1,7 +1,7 @@
 # Functions to write Julia/JuMP model and data files
 .write_model_JuMP <- function(arg, scen) {
-  run_code <- scen@source[["JuMP"]]
-  run_codeout <- scen@source[["JuMPOutput"]]
+  run_code <- scen@settings@sourceCode[["JuMP"]]
+  run_codeout <- scen@settings@sourceCode[["JuMPOutput"]]
   # There is not prod in jump julia. Remove it, until jump will be better
   for (i in grep("^[@].*prod[(]", run_code)) {
     tx <- gsub("^[@].*prod[(]", "", run_code[i])
@@ -175,10 +175,10 @@
   cat(run_codeout, sep = "\n", file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".jl")
-  if (is.null(scen@solver$cmdline) || scen@solver$cmdline == "") {
-    scen@solver$cmdline <- "julia energyRt.jl"
+  if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
+    scen@settings@solver$cmdline <- "julia energyRt.jl"
   }
-  scen@solver$code <- c(
+  scen@settings@solver$code <- c(
     "energyRt.jl", "output.jl", "inc_constraints.jl",
     "inc_costs.jl", "inc_solver.jl"
   )
@@ -232,8 +232,8 @@
       return(c(rtt, kk))
     }
   }
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   }
   if (obj@type == "set") {
     tmp <- ""
@@ -309,8 +309,8 @@
       ))
     }
   }
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   }
   if (obj@type == "map" || obj@type == "set") {
     ret <- paste0("# ", obj@name)

@@ -30,6 +30,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     scen@model <- obj
     scen@name <- "Default scenario name"
     scen@description <- "Default description"
+    scen@settings <- .config_to_settings(obj@config)
   } else if (class(obj) == "scenario") {
     scen <- obj
   } else {
@@ -42,10 +43,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (is.null(arg$startYear) != is.null(arg$fixTo)) {
     stop("startYear && fixTo have to define both (or not define both")
   }
-  if (!is.null(arg$year)) scen@model@sysInfo@year <- arg$year
+  if (!is.null(arg$year)) scen@settings@horizon@years <- arg$year
   if (!is.null(arg$repository)) scen@model <- .add_repository(scen@model, arg$repository)
-  if (!is.null(arg$region)) scen@model@sysInfo@region <- arg$region
-  if (!is.null(arg$discount)) scen@model@sysInfo@discount <- arg$discount
+  if (!is.null(arg$region)) scen@settings@region <- arg$region
+  if (!is.null(arg$discount)) scen@settings@discount <- arg$discount
   if (is.null(arg$verbose)) arg$verbose <- 0
 
   ### Interpolation
@@ -53,34 +54,35 @@ interpolate <- function(obj, ...) { #- returns class scenario
   ## Fill basic sets
   # Fill year
   if (!is.null(arg$year)) {
-    if (nrow(scen@model@sysInfo@horizon) != 0) {
+    if (nrow(scen@settings@horizon@intervals) != 0) {
       stop("argument can't use with horizon")
     }
-    scen@model@sysInfo@year <- arg$year
+    scen@settings@horizon@years <- arg$year
   }
-  if (nrow(scen@model@sysInfo@horizon) == 0) {
-    if (any(sort(scen@model@sysInfo@year) != scen@model@sysInfo@year) ||
-      max(scen@model@sysInfo@year) - min(scen@model@sysInfo@year) + 1 !=
-      length(scen@model@sysInfo@year)) {
+  # browser()
+  if (nrow(scen@settings@horizon@intervals) == 0) {
+    if (any(sort(scen@settings@horizon@years) != scen@settings@horizon@years) ||
+      max(scen@settings@horizon@years) - min(scen@settings@horizon@years) + 1 !=
+      length(scen@settings@horizon@years)) {
       stop("wrong year parameter")
     }
     scen@model <- setHorizon(scen@model,
-      start = scen@model@sysInfo@year[1],
-      interval = rep(1, length(scen@model@sysInfo@year))
+      horizon = scen@settings@horizon@years[1],
+      intervals = rep(1, length(scen@settings@horizon@years))
     )
   }
 
   scen@modInp@parameters[["year"]] <-
-    .dat2par(scen@modInp@parameters[["year"]], scen@model@sysInfo@year)
+    .dat2par(scen@modInp@parameters[["year"]], scen@settings@horizon@years)
   # browser()
   scen@modInp@parameters[["mMidMilestone"]] <-
     .dat2par(scen@modInp@parameters[["mMidMilestone"]],
-              data.frame(year = scen@model@sysInfo@horizon$mid)
-  )
+             data.frame(year = scen@settings@horizon@intervals$mid)
+             )
   # Fill slice
-  scen@model@sysInfo@slice <- .init_slice(scen@model@sysInfo@slice)
+  scen@settings@slice <- .init_slice(scen@settings@slice)
   # browser()
-  if (mean(scen@model@sysInfo@yearFraction$fraction) != 1.) {
+  if (mean(scen@settings@yearFraction$fraction) != 1.) {
     # filter out unused slices
     # browser()
     warning(
@@ -93,38 +95,39 @@ interpolate <- function(obj, ...) { #- returns class scenario
     )
     scen@model@data <- subset_slices_repo(
       repo = scen@model@data,
-      yearFraction = mean(scen@model@sysInfo@yearFraction$fraction),
-      keep_slices = scen@model@sysInfo@slice@all_slice
+      yearFraction = mean(scen@settings@yearFraction$fraction),
+      keep_slices = scen@settings@slice@all_slice
     )
   }
   # !!!??? add filtering slices here
-  # nslices <- nrow(scen@model@sysInfo@slice@levels)
-  # scen@model@sysInfo@slice@levels$share <- scen@model@sysInfo@slice@levels$share * nslices/8760
-  # scen@model@sysInfo@slice@slice_share$share <- scen@model@sysInfo@slice@slice_share$share * nslices/8760
+  # nslices <- nrow(scen@settings@slice@levels)
+  # scen@settings@slice@levels$share <- scen@settings@slice@levels$share * nslices/8760
+  # scen@settings@slice@slice_share$share <- scen@settings@slice@slice_share$share * nslices/8760
   #
   scen@modInp@parameters[["slice"]] <- .dat2par(
     scen@modInp@parameters[["slice"]],
-    scen@model@sysInfo@slice@all_slice
+    scen@settings@slice@all_slice
   )
   # Fill region
   scen@modInp@parameters[["region"]] <-
-    .dat2par(scen@modInp@parameters[["region"]], scen@model@sysInfo@region)
+    .dat2par(scen@modInp@parameters[["region"]], scen@settings@region)
 
+  # browser()
   # List for approximation
   # Generate approxim list, that contain basic data for approximation
-  xx <- c(obj@sysInfo@horizon$mid[-1] -
-    obj@sysInfo@horizon$mid[-nrow(obj@sysInfo@horizon)], 1)
-  names(xx) <- obj@sysInfo@horizon$mid
+  xx <- c(scen@settings@horizon@intervals$mid[-1] -
+    scen@settings@horizon@intervals$mid[-nrow(scen@settings@horizon@intervals)], 1)
+  names(xx) <- scen@settings@horizon@intervals$mid
 
   if (is.null(arg$fullsets)) fullsets <- TRUE else fullsets <- arg$fullsets
   scen@status$fullsets <- fullsets # !!!???
 
   approxim <- list(
-    region = scen@model@sysInfo@region,
-    year = scen@model@sysInfo@year,
-    slice = scen@model@sysInfo@slice,
+    region = scen@settings@region,
+    year = scen@settings@horizon@years,
+    slice = scen@settings@slice,
     solver = arg$solver,
-    mileStoneYears = scen@model@sysInfo@horizon$mid,
+    mileStoneYears = scen@settings@horizon@intervals$mid,
     mileStoneForGrowth = xx,
     fullsets = fullsets
   )
@@ -137,7 +140,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     data.frame(slice = approxim$slice@all_slice, stringsAsFactors = FALSE)
   )
 
-  # Basic interpolation parameter from sysInfo
+  # Basic interpolation parameter from config
   approxim$all_comm <-
     c(lapply(scen@model@data, function(x) {
       c(lapply(x@data, function(y) {
@@ -148,7 +151,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
       }), recursive = TRUE)
     }), recursive = TRUE)
   names(approxim$all_comm) <- NULL
-  scen@modInp <- .read_default_data(scen@modInp, scen@model@sysInfo)
+  scen@modInp <- .read_default_data(scen@modInp, scen@settings)
 
   # (Optional/experimental) trimming the model == dropping unused dimensions
   if (!is.null(arg$trim) && arg$trim) {
@@ -169,16 +172,16 @@ interpolate <- function(obj, ...) { #- returns class scenario
     # Trim data
     for (pr in par_name) {
       tmp <- scen@modInp@parameters[[pr]]
-      if (!is.null(tmp@misc$class) &&
-          (length(tmp@colName) != 1 || tmp@colName != "") &&
+      if (!is.null(tmp@inClass$class) &&
+          (length(tmp@inClass$colName) != 1 || tmp@inClass$colName != "") &&
           length(tmp@dimSets) > 1) {
         # Get prototype
-        prot <- new(tmp@misc$class)
-        psb_slot <- getSlots(tmp@misc$class)
+        prot <- new(tmp@inClass$class)
+        psb_slot <- getSlots(tmp@inClass$class)
         psb_slot <- names(psb_slot)[psb_slot == "data.frame"]
         psb_slot <- psb_slot[!(psb_slot %in% c("defVal", "interpolation"))]
         fl <- sapply(psb_slot, function(x) {
-          any(colnames(slot(prot, x)) %in% tmp@colName)
+          any(colnames(slot(prot, x)) %in% tmp@inClass$colName)
           })
         if (sum(fl) != 1) stop("Internal error")
         slt <- psb_slot[fl]
@@ -186,12 +189,12 @@ interpolate <- function(obj, ...) { #- returns class scenario
         if (any(pr == c("pDummyImportCost", "pDummyExportCost")))
           need_col <- need_col[need_col != "comm"]
         if (tmp@type == "numpar") {
-          val_col <- tmp@colName
+          val_col <- tmp@inClass$colName
         } else {
-          val_col <- c(tmp@colName, gsub("[.].*", ".fx", tmp@colName[1]))
+          val_col <- c(tmp@inClass$colName, gsub("[.].*", ".fx", tmp@inClass$colName[1]))
         }
         # Try find reduce column
-        rep_class2 <- rep_class[rep_class$class == tmp@misc$class, ]
+        rep_class2 <- rep_class[rep_class$class == tmp@inClass$class, ]
         i <- 0
         while (i < nrow(rep_class2) && length(need_col) != 0) {
           i <- i + 1
@@ -225,17 +228,17 @@ interpolate <- function(obj, ...) { #- returns class scenario
     }
   }
 
-  scen@modInp <- .obj2modInp(scen@modInp, scen@model@sysInfo, approxim = approxim)
+  scen@modInp <- .obj2modInp(scen@modInp, scen@settings, approxim = approxim)
 
   # Add discount data to approxim
   approxim <- .add_discount_approxim(scen, approxim)
 
   # Update early retirement parameter
   # browser()
-  if (!scen@config@earlyRetirement) {
+  if (!scen@settings@earlyRetirement) {
     scen <- .remove_early_retirment(scen)
   }
-  approxim$debug <- scen@model@sysInfo@debug
+  approxim$debug <- scen@settings@debug
   # Fill slice level for commodity if not defined
   scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
   # Add commodity slice_level map to approxim
@@ -313,14 +316,14 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
   for (i in names(scen@modInp@parameters)) {
-    if (scen@modInp@parameters[[i]]@nValues != -1) {
+    if (scen@modInp@parameters[[i]]@misc$nValues != -1) {
       scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
-        seq(length.out = scen@modInp@parameters[[i]]@nValues), ,
+        seq(length.out = scen@modInp@parameters[[i]]@misc$nValues), ,
         drop = FALSE
       ]
     }
   }
-  scen@source <- .modelCode
+  scen@settings@sourceCode <- .modelCode
   scen@status$interpolated <- TRUE
 
   # Check parameters
@@ -455,8 +458,8 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   if (nrow(scen@modInp@parameters$pTechShare@data) > 0) {
     mTechGroupComm <- .get_data_slot(scen@modInp@parameters$mTechGroupComm)
     # scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
-    # if (scen@modInp@parameters$pTechShare@nValues != - 1)
-    # 		scen@modInp@parameters$pTechShare@nValues <- nrow(scen@modInp@parameters$pTechShare@data)
+    # if (scen@modInp@parameters$pTechShare@misc$nValues != - 1)
+    # 		scen@modInp@parameters$pTechShare@misc$nValues <- nrow(scen@modInp@parameters$pTechShare@data)
     tmp <- .add_dropped_zeros(scen@modInp, "pTechShare")
     mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
     tmp <- merge(tmp, mTechSpan)
@@ -490,26 +493,26 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 }
 
 .unique_set <- function(obj) {
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
     obj@data <- obj@data[!duplicated(obj@data), , drop = FALSE]
   }
   obj@data <- obj@data[!duplicated(obj@data), , drop = FALSE]
-  if (obj@nValues != -1) {
-    obj@nValues <- nrow(obj@data)
+  if (obj@misc$nValues != -1) {
+    obj@misc$nValues <- nrow(obj@data)
   }
   return(obj)
 }
 
-# Read default parameter from sysInfo
+# Read default parameter from config
 .read_default_data <- function(prec, ss) {
   for (i in seq(along = prec@parameters)) {
     # assign('test', prec@parameters[[i]], globalenv())
-    if (any(prec@parameters[[i]]@colName != "")) {
+    if (any(prec@parameters[[i]]@inClass$colName != "")) {
       prec@parameters[[i]]@defVal <-
-        as.numeric(ss@defVal[1, prec@parameters[[i]]@colName])
+        as.numeric(ss@defVal[1, prec@parameters[[i]]@inClass$colName])
       prec@parameters[[i]]@interpolation <-
-        as.character(ss@interpolation[1, prec@parameters[[i]]@colName])
+        as.character(ss@interpolation[1, prec@parameters[[i]]@inClass$colName])
     }
   }
   prec
@@ -686,17 +689,17 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   # require(data.table)
   nval <- rep(NA, length(mdinp))
   for (pr in names(mdinp[[1]])) {
-    if (scen@modInp@parameters[[pr]]@nValues <= 0) {
-      if (mdinp[[1]][[pr]]@nValues != -1) {
+    if (scen@modInp@parameters[[pr]]@misc$nValues <= 0) {
+      if (mdinp[[1]][[pr]]@misc$nValues != -1) {
         for (i in seq_along(mdinp)) {
-          nval[i] <- mdinp[[i]][[pr]]@nValues
+          nval[i] <- mdinp[[i]][[pr]]@misc$nValues
         }
         if (any(nval != 0)) {
           scen@modInp@parameters[[pr]]@data <- as.data.frame(rbindlist(lapply(
             mdinp[nval != 0],
-            function(x) x[[pr]]@data[1:x[[pr]]@nValues, , drop = FALSE]
+            function(x) x[[pr]]@data[1:x[[pr]]@misc$nValues, , drop = FALSE]
           )))
-          scen@modInp@parameters[[pr]]@nValues <- sum(nval)
+          scen@modInp@parameters[[pr]]@misc$nValues <- sum(nval)
         }
       } else {
         stop("don't assume that this is the case")
@@ -715,23 +718,23 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 }
 
 .merge_scen <- function(scen_pr, use_par) {
-  if (scen_pr[[1]]@modInp@parameters$mCommSlice@nValues == -1) {
+  if (scen_pr[[1]]@modInp@parameters$mCommSlice@misc$nValues == -1) {
     stop("have to do")
   }
   scen <- scen_pr[[1]]
   scen_pr <- scen_pr[-1]
   for (nm in use_par) {
-    hh <- sapply(scen_pr, function(x) x@modInp@parameters[[nm]]@nValues)
+    hh <- sapply(scen_pr, function(x) x@modInp@parameters[[nm]]@misc$nValues)
     if (sum(hh) != 0) {
-      scen@modInp@parameters[[nm]]@data[scen@modInp@parameters[[nm]]@nValues +
+      scen@modInp@parameters[[nm]]@data[scen@modInp@parameters[[nm]]@misc$nValues +
                                           sum(hh), ] <- NA
     }
     for (i in seq_along(hh)[hh != 0]) {
-      scen@modInp@parameters[[nm]]@data[scen@modInp@parameters[[nm]]@nValues +
+      scen@modInp@parameters[[nm]]@data[scen@modInp@parameters[[nm]]@misc$nValues +
                                           1:hh[i], ] <-
         scen_pr[[i]]@modInp@parameters[[nm]]@data[1:hh[i], ]
-      scen@modInp@parameters[[nm]]@nValues <-
-        scen@modInp@parameters[[nm]]@nValues + hh[i]
+      scen@modInp@parameters[[nm]]@misc$nValues <-
+        scen@modInp@parameters[[nm]]@misc$nValues + hh[i]
     }
   }
   for (i in seq_along(scen_pr)) {

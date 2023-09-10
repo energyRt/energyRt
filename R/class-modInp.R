@@ -170,7 +170,8 @@ setMethod("initialize", "modInp", function(.Object) {
   if (!is.null(tmp)) {
     if (use.dplyr) {
       cols <- colnames(dtt)
-      gg <- suppressMessages(dplyr::anti_join(tmp, dtt[, cols], by = cols[cols != "value"]))
+      gg <- suppressMessages(dplyr::anti_join(tmp, dtt[, cols],
+                                              by = cols[cols != "value"]))
       gg <- suppressMessages(dplyr::left_join(dtt, gg))
       return(gg)
     } else {

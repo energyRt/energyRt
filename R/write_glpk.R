@@ -1,6 +1,6 @@
 # MathProg GLPK (& MathProg with CBC) ####
 .write_model_GLPK_CBC <- function(arg, scen) {
-  run_code <- scen@source[["GLPK"]]
+  run_code <- scen@settings@sourceCode[["GLPK"]]
   dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
   file_w <- c()
   for (j in c("set", "map", "numpar", "bounds")) {
@@ -115,22 +115,22 @@
   close(fn)
   .write_inc_files(arg, scen, NULL)
 
-  if (is.null(scen@solver$cmdline) || scen@solver$cmdline == "") {
-    if (toupper(scen@solver$lang) == "GLPK") {
-      scen@solver$cmdline <- "glpsol -m energyRt.mod -d energyRt.dat"
+  if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
+    if (toupper(scen@settings@solver$lang) == "GLPK") {
+      scen@settings@solver$cmdline <- "glpsol -m energyRt.mod -d energyRt.dat"
     } else {
-      scen@solver$cmdline <- "cbc energyRt.mod%energyRt.dat -solve"
+      scen@settings@solver$cmdline <- "cbc energyRt.mod%energyRt.dat -solve"
     }
   }
-  scen@solver$code <- c("energyRt.mod")
+  scen@settings@solver$code <- c("energyRt.mod")
   scen
 }
 
 
 
 .sm_to_glpk <- function(obj) {
-  if (obj@nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) {
+    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   }
   if (obj@type == "set") {
     if (nrow(obj@data) == 0) {

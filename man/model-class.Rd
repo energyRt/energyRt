@@ -16,9 +16,7 @@ S4 class to represent model
 
 \item{\code{data}}{list.}
 
-\item{\code{sysInfo}}{sysInfo.}
-
-\item{\code{earlyRetirement}}{logical.}
+\item{\code{config}}{config.}
 
 \item{\code{misc}}{list.}
 }}

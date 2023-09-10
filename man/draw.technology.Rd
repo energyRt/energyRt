@@ -18,8 +18,8 @@
   bbcol2 = "white",
   sng_lwd = 4,
   grp_lwd = 2,
-  rule = new("sysInfo")@interpolation,
-  defVal = new("sysInfo")@defVal,
+  rule = new("config")@interpolation,
+  defVal = new("config")@defVal,
   show_all = TRUE
 )
 }

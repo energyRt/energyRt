@@ -295,7 +295,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
   }
 
   ## Temporary solution for non-mileStone years data in parameters
-  # msy <- scen[[1]]@model@sysInfo@horizon$mid
+  # msy <- scen[[1]]@model@config@horizon@intervals$mid
   # if (length(ll) > 0) {
   #   for (i in 1:length(ll)) {
   #     if (!is.null(ll[[i]]$year)) {

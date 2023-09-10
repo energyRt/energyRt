@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
-Version: 0.04.00.9000
-Date: 2023-09-09
+Version: 0.05.00.9000
+Date: 2023-09-10
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -36,7 +36,11 @@ VignetteBuilder: knitr
 LazyData: true
 Encoding: UTF-8
 Collate: 
-    'class-timeslices.R'
+    'class-horizon.R'
+    'class-calendar.R'
+    'class-slice.R'
+    'class-config.R'
+    'class-settings.R'
     'class-commodity.R'
     'class-demand.R'
     'class-supply.R'
@@ -51,16 +55,12 @@ Collate:
     'class-constraint.R'
     'class-costs.R'
     'class-repository.R'
-    'class-slice.R'
-    'class-sysInfo.R'
     'class-model.R'
     'class-parameter.R'
     'class-modInp.R'
     'class-modOut.R'
     'class-scenario.R'
     'add2set.R'
-    'class-horizon.R'
-    'class-settings.R'
     'utils.R'
     'convert.R'
     'data2slots.R'

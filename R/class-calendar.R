@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-setClass("timeslices", # alt: timestructure, timescales
+setClass("timeslices", # alt: timestructure, timescales, timescheme, timeframe, schedule, calendar
   representation(
     structure = "list", # renamed `slice_map` // alt.names: hierarchy, nest, ..
     table = "data.frame", # renames `levels`

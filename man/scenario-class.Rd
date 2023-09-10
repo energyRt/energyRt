@@ -16,7 +16,7 @@ An S4 class to represent scenario, an interpolated and/or solved model.
 
 \item{\code{model}}{model.}
 
-\item{\code{config}}{sysInfo.}
+\item{\code{settings}}{settings.}
 
 \item{\code{modInp}}{modInp.}
 

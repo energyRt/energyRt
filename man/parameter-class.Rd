@@ -22,10 +22,6 @@ An S4 class to specify the model set or parameter
 
 \item{\code{data}}{data.frame.}
 
-\item{\code{colName}}{character.}
-
-\item{\code{nValues}}{numeric.}
-
 \item{\code{misc}}{list.}
 }}
 

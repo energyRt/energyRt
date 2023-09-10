@@ -57,9 +57,9 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
     if (tmp %in% c("TRUE", "FALSE")) tmp <- (tmp == "TRUE")
     solver_list[[solv_par[i, "name"]]] <- tmp
   }
-  if (!is.null(scen) && !is.null(scen@solver)) {
-    for (i in grep("^(inc[1-5]|files)$", names(scen@solver), value = TRUE, invert = TRUE)) {
-      solver_list[[i]] <- scen@solver[[i]]
+  if (!is.null(scen) && !is.null(scen@settings@solver)) {
+    for (i in grep("^(inc[1-5]|files)$", names(scen@settings@solver), value = TRUE, invert = TRUE)) {
+      solver_list[[i]] <- scen@settings@solver[[i]]
     }
   }
   for (i in grep("^(inc[1-5]|files)$", names(solver), value = TRUE, invert = TRUE)) {
@@ -98,11 +98,11 @@ setMethod("solve", "scenario", solve.scenario)
   }
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) {
-    scen@solver <- list(lang = "PYOMO")
+    scen@settings@solver <- list(lang = "PYOMO")
   } else if (is.character(arg$solver)) {
-    scen@solver <- list(lang = arg$solver)
+    scen@settings@solver <- list(lang = arg$solver)
   } else if (is.list(arg$solver)) {
-    scen@solver <- arg$solver
+    scen@settings@solver <- arg$solver
   }
   if (is.null(arg$open.folder)) arg$open.folder <- FALSE
   if (is.null(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
@@ -111,21 +111,21 @@ setMethod("solve", "scenario", solve.scenario)
   if (is.null(arg$readresult)) arg$readresult <- TRUE
   arg$write <- write
   if (is.null(arg$wait)) {
-    if (is.null(scen@solver$wait)) {
+    if (is.null(scen@settings@solver$wait)) {
       arg$wait <- TRUE
     } else {
-      arg$wait <- scen@solver$wait
+      arg$wait <- scen@settings@solver$wait
     }
   } else if (is.null(arg$invisible)) arg$invisible <- arg$wait
-  scen@solver$wait <- arg$wait
+  scen@settings@solver$wait <- arg$wait
   if (is.null(arg$invisible)) {
-    if (is.null(scen@solver$invisible)) {
+    if (is.null(scen@settings@solver$invisible)) {
       arg$invisible <- TRUE
     } else {
-      arg$invisible <- scen@solver$invisible
+      arg$invisible <- scen@settings@solver$invisible
     }
   }
-  scen@solver$invisible <- arg$invisible
+  scen@settings@solver$invisible <- arg$invisible
   if (is.null(arg$run)) arg$run <- TRUE
   if (is.null(arg$n.threads)) arg$n.threads <- 1
 
@@ -175,35 +175,35 @@ setMethod("solve", "scenario", solve.scenario)
   if (arg$write) {
     if (arg$echo) cat("Writing files: ")
     solver_solver_time <- proc.time()[3]
-    if (any(grep("^gams$", scen@solver$lang, ignore.case = TRUE))) {
+    if (any(grep("^gams$", scen@settings@solver$lang, ignore.case = TRUE))) {
       if (is.null(arg$trim)) arg$trim <- FALSE
       scen <- .write_model_GAMS(arg, scen, trim = arg$trim)
-    } else if (any(grep("^(glpk|cbcb)$", scen@solver$lang, ignore.case = TRUE))) {
+    } else if (any(grep("^(glpk|cbcb)$", scen@settings@solver$lang, ignore.case = TRUE))) {
       scen <- .write_model_GLPK_CBC(arg, scen)
-    } else if (any(grep("^pyomo", scen@solver$lang, ignore.case = TRUE))) {
+    } else if (any(grep("^pyomo", scen@settings@solver$lang, ignore.case = TRUE))) {
       scen <- .write_model_PYOMO(arg, scen)
-    } else if (any(grep("^jump$", scen@solver$lang, ignore.case = TRUE))) {
+    } else if (any(grep("^jump$", scen@settings@solver$lang, ignore.case = TRUE))) {
       scen <- .write_model_JuMP(arg, scen)
     } else {
-      stop("Unknown solver ", scen@solver$lang)
+      stop("Unknown solver ", scen@settings@solver$lang)
     }
 
     ## Write solver parameter
     nn <- grep("^(inc[1-5]|files|code[[:digit:]]*)$",
-      names(scen@solver),
+      names(scen@settings@solver),
       value = TRUE, invert = TRUE
     )
     tmp <- data.frame(
       name = nn,
       value = sapply(
-        scen@solver[nn],
+        scen@settings@solver[nn],
         function(x) paste0(c(x, recursive = TRUE), collapse = " ")
       ),
       stringsAsFactors = FALSE
     )
     tmp <- rbind(tmp, data.frame(
-      name = paste0("code", seq_along(scen@solver$code)),
-      value = scen@solver$code, stringsAsFactors = FALSE
+      name = paste0("code", seq_along(scen@settings@solver$code)),
+      value = scen@settings@solver$code, stringsAsFactors = FALSE
     ))
     write.csv(tmp, file = paste0(arg$tmp.dir, "solver"), row.names = FALSE)
 
@@ -225,7 +225,7 @@ setMethod("solve", "scenario", solve.scenario)
   if (!arg$run) {
     return()
   }
-  if (arg$echo) cat("Starting ", scen@solver$lang, "\n")
+  if (arg$echo) cat("Starting ", scen@settings@solver$lang, "\n")
   gams_run_time <- proc.time()[3]
   tryCatch(
     {
@@ -236,12 +236,12 @@ setMethod("solve", "scenario", solve.scenario)
         } else {
           cmd <- "cmd /k"
         }
-        rs <- system(paste(cmd, scen@solver$cmdline), #' gams energyRt.gms', arg$gamsCompileParameter),
+        rs <- system(paste(cmd, scen@settings@solver$cmdline), #' gams energyRt.gms', arg$gamsCompileParameter),
           invisible = arg$invisible, wait = arg$wait
           # show.output.on.console = arg$show.output.on.console
         )
       } else {
-        rs <- system(paste(scen@solver$cmdline),
+        rs <- system(paste(scen@settings@solver$cmdline),
           # invisible = arg$invisible,
           wait = arg$wait
           # show.output.on.console = arg$show.output.on.console

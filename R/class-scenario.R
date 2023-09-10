@@ -3,7 +3,8 @@
 #' @slot name character.
 #' @slot description character.
 #' @slot model model.
-#' @slot config sysInfo.
+#' @slot subset
+#' @slot settings settings.
 #' @slot modInp modInp.
 #' @slot modOut modOut.
 #' @slot source list.
@@ -11,7 +12,7 @@
 #' @slot status list.
 #' @slot misc list.
 #'
-#' @include class-modOut.R
+#' @include class-modOut.R class-settings.R
 #'
 #' @return
 #' @export
@@ -20,26 +21,32 @@ setClass("scenario",
     name = "character",
     description = "character",
     model = "model",
-    config = "sysInfo",
+    # subset = list(),
+    settings = "settings",
     modInp = "modInp",
     modOut = "modOut",
-    source = "list", # Model source
-    solver = "list",
+    # source = "list", # Model/scenario source code
     status = "list",
+    inMemory = "logical", # reserved
+    path = "character", # reserved
     misc = "list"
   ),
   prototype(
     name = NULL,
     description = NULL,
     model = NULL,
+    # subset = list(),
+    settings = NULL,
     modInp = NULL,
     modOut = NULL,
-    source = list(), # Model source
-    solver = list(),
+    # source = list(), # Model source
+    # solver = list(),
     status = list(
       interpolated = FALSE,
       optimal = FALSE
     ),
+    inMemory = TRUE,
+    path = character(),
     misc = list()
   ),
   S3methods = TRUE
@@ -81,14 +88,14 @@ setMethod("summary", "scenario", summary.scenario)
 
 
 setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
-  obj@model@sysInfo@slice <- .setTimeSlices(...)
+  obj@model@settings@slice <- .setTimeSlices(...)
   obj
 })
 
-setMethod(
-  "setHorizon", signature(obj = "scenario", start = "numeric", interval = "numeric"),
-  function(obj, start, interval) {
-    obj@model <- setHorizon(obj@model, start, interval)
+setMethod("setHorizon",
+  signature(obj = "scenario", horizon = "numeric", intervals = "ANY"),
+  function(obj, horizon, intervals) {
+    obj@model <- setHorizon(obj@model, horizon, intervals)
     obj
   }
 )

@@ -1,6 +1,5 @@
 #' An S4 class to represent technology
 #'
-#' @sections structure
 #' @slot name character, name of technology used in sets
 #' @slot description character, detailed description of the technology for reference.
 #' @slot input data.frame.
@@ -70,7 +69,6 @@ setClass("technology",
     region = "character",
     misc = "list"
   ), #
-  # Default values and structure of slots
   prototype(
     name = "",
     description = "",
@@ -131,7 +129,7 @@ setClass("technology",
       share.up = numeric(),
       share.fx = numeric(),
       # afc
-      afc.lo = numeric(),
+      afc.lo = numeric(), # !!! check and potentially rename avc.*
       afc.up = numeric(),
       afc.fx = numeric(),
       stringsAsFactors = FALSE
@@ -256,7 +254,6 @@ setMethod("initialize", "technology", function(.Object, ...) {
 
 #' Create object of class `technology` with specified parameters.
 #'
-#' @inherit "technology-class" structure
 #' @param name
 #' @param description
 #' @param input
@@ -282,6 +279,8 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @param earlyRetirement
 #' @param upgrade.technology
 #' @param misc
+#' @param aux
+#' @param units
 #'
 #' @family technology
 #'

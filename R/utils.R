@@ -151,10 +151,10 @@ findDuplicates <- function(x) {
           rs <- rbind(rs, tmp)
         }
       }
-      tmp <- findDuplicates0(x@sysInfo)
+      tmp <- findDuplicates0(x@config)
       if (!is.null(tmp)) {
         tmp$repository <- '-'
-        tmp$object <- 'sysInfo'
+        tmp$object <- 'config'
         rs <- rbind(rs, tmp[, c(ncol(tmp), 2:ncol(tmp) - 1)])
       }
       if (is.null(rs)) return(NULL)
@@ -194,7 +194,7 @@ findDuplicates <- function(x) {
           tmp <- check_by_slots(x, c('for.sum', 'for.each', 'mult'))
           return(tmp)
         } else if (class(x) %in% c('slice', 'commodity')) {
-        } else if (class(x) %in% c('sysInfo')) {
+        } else if (class(x) %in% c('config')) {
           return(check_by_slots(x, c('debug', 'discount')))
         } else warning(paste0('Unknown class "', class(x), '"'))
     NULL

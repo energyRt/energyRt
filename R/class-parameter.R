@@ -6,8 +6,7 @@
 #' @slot defVal numeric.
 #' @slot interpolation character.
 #' @slot data data.frame.
-#' @slot colName character.
-#' @slot nValues numeric.
+#' @slot inClass
 #' @slot misc list.
 #'
 #' @include class-model.R
@@ -28,8 +27,8 @@ setClass(
     # class = "character",
     # slot = "character",
     inClass = "data.frame",
-    colName = "character", # @colName Column name in slot
-    nValues = "numeric", # @nValues Number of non-NA values in 'data' (to speed-up processing) - !!! drop in the future
+    # colName = "character", # @inClass$colName Column name in slot
+    # nValues = "numeric", # @misc$nValues Number of non-NA values in 'data' (to speed-up processing) - !!! drop in the future
     misc = "list"
   ),
   prototype(
@@ -40,28 +39,31 @@ setClass(
     interpolation = NULL,
     data = data.frame(),
     # not_data       = FALSE,
-    colName = NULL,
-    nValues = 0,
+    # colName = NULL,
+    # nValues = 0,
     inClass = data.frame(
       class = character(),
       slot = character(),
-      column = character()
+      colName = character()
     ),
     misc = list(
-      class = NULL,
-      slot = NULL
+      # class = NULL,
+      # slot = NULL,
+      nValues = 0
     )
   ) # ,
 )
 
 setMethod("initialize", signature = "parameter",
-  function(.Object, name,
+  function(.Object,
+           name,
            dimSets,
            type,
            check = NULL,
            defVal = 0,
            interpolation = "back.inter.forth",
-           colName = "",
+           inClass = NULL,
+           colName = NULL,
            cls = NULL,
            slot = NULL) {
 
@@ -107,8 +109,8 @@ setMethod("initialize", signature = "parameter",
     if (!is.null(check)) .Object@check <- check
     .Object@defVal <- defVal
     .Object@interpolation <- interpolation
-    .Object@misc$class <- cls
-    .Object@misc$slot <- slot
+    # .Object@inClass$class <- cls
+    # .Object@inClass$slot <- slot
     # make @data
     # data <- data.frame(
     #   tech = character(), techp = character(), sup = character(),
@@ -136,7 +138,24 @@ setMethod("initialize", signature = "parameter",
     if (type == "bounds") dimSets <- c(dimSets, "type")
     if (any(type == c("numpar", "bounds"))) dimSets <- c(dimSets, "value")
     .Object@data <- data[, dimSets, drop = FALSE]
-    .Object@colName <- colName
+    if (any(!is_null(inClass), !is_null(cls), !is_null(slot),
+             !is_null(colName) && any(colName != ""))) {
+      # add the record
+      if (nrow(.Object@inClass) > 0)
+        message("multiple records in parameter ", name, "@inClass")
+      if (!is.null(inClass)) {
+        .Object@inClass <- bind_rows(.Object@inClass, inClass)
+      } else {
+        message("initialize parameter: unfinished translation: ",
+                name, " ", cls, " ", slot, " ", colName) # debug
+      .Object@inClass <- .Object@inClass %>%
+        add_row(
+          class = cls,
+          slot = slot,
+          colName = colName)
+      }
+    }
+    # .Object@inClass$colName <- colName
     .Object
   }
 )
@@ -179,12 +198,12 @@ setMethod(
       }
       data <- data[apply(data, 1, function(x) all(!is.na(x))), , drop = FALSE]
       if (nrow(data) != 0) {
-        if (obj@nValues != -1) {
-          if (obj@nValues + nrow(data) > nrow(obj@data)) {
+        if (obj@misc$nValues != -1) {
+          if (obj@misc$nValues + nrow(data) > nrow(obj@data)) {
             obj@data[nrow(obj@data) + 1:(nrow(data) + nrow(obj@data)), ] <- NA
           }
-          nn <- obj@nValues + 1:nrow(data)
-          obj@nValues <- obj@nValues + nrow(data)
+          nn <- obj@misc$nValues + 1:nrow(data)
+          obj@misc$nValues <- obj@misc$nValues + nrow(data)
           obj@data[nn, ] <- data
         } else {
           nn <- nrow(obj@data) + 1:nrow(data)
@@ -218,7 +237,7 @@ setMethod(
     # !!! rewrite with dplyr or data.table
     nn <- nrow(obj@data) + 1:length(data)
     obj@data[nn, ] <- data
-    obj@nValues <- obj@nValues + length(data)
+    obj@misc$nValues <- obj@misc$nValues + length(data)
     obj
   }
 )
@@ -241,14 +260,14 @@ setMethod(
     # !!! rewrite with dplyr or data.table
     nn <- nrow(obj@data) + 1:length(data)
     obj@data[nn, ] <- data
-    obj@nValues <- obj@nValues + length(data)
+    obj@misc$nValues <- obj@misc$nValues + length(data)
     obj
   }
 )
 
 .resetParameter <- function(x) {
   x@data <- x@data[0, , drop = FALSE]
-  if (x@nValues > 0) x@nValues <- 0
+  if (x@misc$nValues > 0) x@misc$nValues <- 0
   x
 }
 
@@ -257,7 +276,7 @@ setMethod(
 # setMethod('clear', signature(obj = 'parameter'),
 # .reset <- function(obj) {
 #   obj@data <- obj@data[0, , drop = FALSE]
-#   if (obj@nValues != -1) obj@nValues <- 0
+#   if (obj@misc$nValues != -1) obj@misc$nValues <- 0
 #   obj
 # }
 
@@ -266,14 +285,14 @@ setMethod(
 #   function(obj, dimSets) {
 #     if (length(dimSets) != 1 || all(dimSets != obj@dimSets))
 #           stop('Internal error: Wrong dimSets request')
-#     if (obj@nValues != -1) unique(obj@data[seq(length.out = obj@nValues), dimSets]) else
+#     if (obj@misc$nValues != -1) unique(obj@data[seq(length.out = obj@misc$nValues), dimSets]) else
 #         unique(obj@data[, dimSets])
 # })
 
 # setMethod('.get_data_slot', signature(obj = 'parameter'), # getParameterTable
 .get_data_slot <- function(obj) {
-  if (obj@nValues != -1) { # reserved for???
-    obj@data[seq(length.out = obj@nValues), , drop = FALSE]
+  if (obj@misc$nValues != -1) { # reserved for???
+    obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
   } else {
     obj@data
   }

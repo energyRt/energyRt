@@ -4,16 +4,22 @@
 \alias{newHorizon}
 \title{Create a new object of class 'horizon'}
 \usage{
-newHorizon(horizon = NULL, intervals = NULL, info = NULL, BY_int_1 = T, ...)
+newHorizon(
+  years = NULL,
+  intervals = NULL,
+  info = NULL,
+  force_BY_interval_to_1_year = T,
+  ...
+)
 }
 \arguments{
-\item{horizon}{(optional) integer vector with a range or a sequence of years; will be arranged, gaps will be filled. If missing}
+\item{years}{(optional) integer vector with a range or a sequence of years; will be arranged, gaps will be filled. If missing}
 
 \item{intervals}{(optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled period in years.}
 
 \item{info}{character, a comment or description.}
 
-\item{BY_int_1}{logical, if TRUE (default), the first (base-year) interval will be forced to one year.}
+\item{force_BY_interval_to_1_year}{logical, if TRUE (default), the base-year (first) interval will be forced to one year.}
 
 \item{...}{ignored}
 }
@@ -33,17 +39,17 @@ newHorizon(intervals = data.frame(
   info = "Explicit assignment of intervals via data.frame"
   )
 
-newHorizon(horizon = 2020:2050,
+newHorizon(years = 2020:2050,
            intervals = data.frame(
              start = c(2030, 2031, 2034),
              mid =   c(2030, 2032, 2037),
              end =   c(2030, 2033, 2040)),
-             info = "The horizon will be trimmed to the scope of intervals")
+             info = "The years will be trimmed to the scope of intervals")
 
 newHorizon(2020:2050, c(3, 2, 5, 10),
            info = "Pay attention to the length of the first interval")
 
-newHorizon(horizon = 2020:2040,
+newHorizon(years = 2020:2040,
            intervals = data.frame(
              start = c(2030, 2032, 2035),
              mid =   c(2031, 2033, 2037),

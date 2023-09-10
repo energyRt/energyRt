@@ -10,7 +10,7 @@
 #' @slot agg data.frame with aggregation parameters of several commodities into one
 #' @slot misc list with miscellaneous information to store
 #'
-#' @include class-timeslices.R
+#' @include class-calendar.R
 #'
 setClass("commodity",
   representation(

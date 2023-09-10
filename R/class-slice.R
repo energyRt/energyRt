@@ -379,25 +379,25 @@ setClass("slice",
 }
 
 # setMethod("setTimeSlices", signature(obj = "model"), function(obj, ...) {
-#   obj@sysInfo@slice <- .setTimeSlices(...)
+#   obj@config@slice <- .setTimeSlices(...)
 #   obj
 # })
 
 # setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
-#   obj@model@sysInfo@slice <- .setTimeSlices(...)
+#   obj@model@config@slice <- .setTimeSlices(...)
 #   obj
 # })
 
-# setMethod("setTimeSlices", signature(obj = "sysInfo"), function(obj, ...) {
+# setMethod("setTimeSlices", signature(obj = "config"), function(obj, ...) {
 #   obj@slice <- .setTimeSlices(...)
 #   obj
 # })
 
 timeSlices <- function(x, asTibble = T, stringsAsFactors = FALSE) {
-  # invisible(newModel("dummymod", slice = xx)@sysInfo@slice)
+  # invisible(newModel("dummymod", slice = xx)@config@slice)
   mm <- newModel("dummymod", slice = x)
-  slev <- mm@sysInfo@slice@levels
-  nlev <- length(mm@sysInfo@slice@slice_map)
+  slev <- mm@config@slice@levels
+  nlev <- length(mm@config@slice@slice_map)
   if (nlev == 1) {
     slev$slice <- slev$ANNUAL
   } else {
