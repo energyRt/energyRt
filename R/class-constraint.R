@@ -50,7 +50,7 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 #' @slot mult data.frame.
 #' @slot defVal numeric.
 #' @slot misc list.
-#'
+#' @export
 setClass("summand",
   representation(
     description = "character", # description
@@ -83,7 +83,7 @@ setClass("summand",
 #'
 #' @return Object of class `constraint`.
 #'
-#'
+#' @export
 newConstraint <- function(name, ..., eq = "==", rhs = data.frame(), for.each = NULL, defVal = 0, arg = NULL) {
   obj <- new("constraint")
   # stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
@@ -167,7 +167,9 @@ newConstraint <- function(name, ..., eq = "==", rhs = data.frame(), for.each = N
 }
 
 
-addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list(), arg) {
+#' @export
+addSummand <- function(eqt, variable = NULL, mult = data.frame(),
+                       for.sum = list(), arg) {
   if (!is.null(names(arg))) {
     if (any(names(arg) == "variable")) variable <- arg$variable
     if (any(names(arg) == "mult")) mult <- arg$mult
@@ -601,7 +603,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(), for.sum = list
 
 #  .getSetEquation(prec, stm, approxim)@gams.equation
 
-
+#' @export
 newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
                            for.each = list(), defVal = 0, rule = NULL, comm = NULL,
                            cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE) { # , emis = TRUE

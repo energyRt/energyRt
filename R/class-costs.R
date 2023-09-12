@@ -8,7 +8,7 @@
 #' @slot misc list.
 #'
 #' @include class-constraint.R
-#'
+#' @export
 setClass("costs",
   representation(
     name = "character",
@@ -34,7 +34,7 @@ setMethod("initialize", "costs", function(.Object, ...) {
   .Object
 })
 
-
+#' @export
 newCosts <- function(name, variable, description = "", mult = NULL, subset = NULL) {
   obj <- new("costs")
   obj@name <- name

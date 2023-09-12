@@ -18,7 +18,7 @@ setClass("model",
     data = "list",
     config = "config",
     # LECdata = "list",
-    # earlyRetirement = "logical",
+    # early.retirement = "logical",
     misc = "list"
   ),
   prototype(
@@ -27,7 +27,7 @@ setClass("model",
     data = list(),
     config = new("config"),
     # LECdata = list(),
-    # earlyRetirement = FALSE,
+    # early.retirement = FALSE,
     misc = list()
   ),
   S3methods = TRUE
@@ -37,21 +37,9 @@ setMethod("initialize", "model", function(.Object, ...) {
   .Object
 })
 
-add <- function(...) UseMethod("add")
+# add <- function(...) UseMethod("add")
 
-#' Add an object to the model's repository
-#'
-#' @param obj model objuect
-#' @param ... model elements, allowed classess: ...
-#' @param overwrite logical, if TRUE, objects with the same name will be overwritten, error will be reported if FALSE
-#' @param repo_name character, optional name of a (sub-)repository to add the object.
-#'
-#' @method add model
-#' @rdname add
-#'
-#' @return
-#' @export
-#'
+
 add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
   cls <- c('technology', 'commodity', 'region', 'commodity',
            'constraint', 'costs',
@@ -127,52 +115,76 @@ add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
   obj
 }
 
-summary.model <- function(mod) {
+#' Add an object to the model's repository
+#'
+#' @param obj model objuect
+#' @param ... model elements, allowed classess: ...
+#' @param overwrite logical, if TRUE, objects with the same name will be overwritten, error will be reported if FALSE
+#' @param repo_name character, optional name of a (sub-)repository to add the object.
+#'
+#' @method add model
+#' @rdname add
+#'
+#' @return
+#' @export
+setMethod("add", "model", add.model)
 
-}
+# summary.model <- function(mod) {
+#
+# }
+# setMethod("summary", "model", summary.model)
 
-setGeneric("newModel", function(name, ...) standardGeneric("newModel"))
 #' Create new model object
 #'
-#' @name newModel
+#' @param name name of the model
+#' @param ... configuration parameters (see class config) and model elements (classes commodity, technology, etc.)
 #'
-
-setMethod("newModel", signature(name = "character"), function(name, ...) {
-  sysInfVec <- names(getSlots("config"))
-  sysInfVec <- sysInfVec[sysInfVec != ".S3Class"]
-  #    mlst_vec <- c('start', 'interval')
+#' @return
+#' @export
+#'
+#' @examples
+newModel <- function(name = "", description = "", ...) {
   args <- list(...)
+  config_slots <- names(getSlots("config"))
+  config_slots <- config_slots[config_slots != ".S3Class"]
+  #    mlst_vec <- c('start', 'interval')
   # browser()
-  mdl <- .data2slots("model", name, ignore_args = c(sysInfVec), ignore_classes = "repository", ...)
-  #    mdl <- .data2slots('model', name, ignore_args = c(mlst_vec, sysInfVec), ignore_classes = 'repository', ...)
+  mdl <- .data2slots("model", name, ignore_args = c(config_slots),
+                     ignore_classes = "repository", ...)
+  #    mdl <- .data2slots('model', name, ignore_args = c(mlst_vec, config_slots),
+  #                       ignore_classes = 'repository', ...)
   if (any(sapply(args, class) == "repository")) {
     fl <- seq(along = args)[sapply(args, class) == "repository"]
     for (j in fl) mdl <- add(mdl, args[[j]])
   }
-  sysInfVec <- sysInfVec[sysInfVec %in% names(args)]
-  mdl@config <- .data2slots("config", "",
-                             ignore_classes = "repository",
-                             #      ignore_args = c(names(args)[!(names(args) %in% sysInfVec)], mlst_vec), ...)
-                             ignore_args = c("slice", names(args)[!(names(args) %in% sysInfVec)]), ...
-  )
+  config_slots <- config_slots[config_slots %in% names(args)]
+  mdl@config <- .data2slots(
+    "config", "", ignore_classes = "repository",
+    ignore_args = c("slice", names(args)[!(names(args) %in% config_slots)]),
+    ...)
+  # ignore_args = c(names(args)[!(names(args) %in% config_slots)], mlst_vec), ...)
+
   if (any(names(args) == "slice")) {
     mdl@config <- setTimeSlices(mdl@config, slice = args$slice)
   } else {
     mdl@config <- setTimeSlices(mdl@config, slice = "ANNUAL")
   }
+
   #    args <- list(...)
   #    if (any(names(args) %in% mlst_vec)) {
   #      if (sum(names(args) %in% mlst_vec) != 2) stop('Undefined all need parameters for setMileStoneYears')
   #      mdl <- setMileStoneYears(mdl, start = args$start, interval = args$interval)
   #    }
   mdl
-})
+}
 
+#' @export
 setMethod("setTimeSlices", signature(obj = "model"), function(obj, ...) {
   obj@config@slice <- .setTimeSlices(...)
   obj
 })
 
+#' @export
 setMethod("setHorizon",
   signature(obj = "model", horizon = "numeric", intervals = "ANY"),
   function(obj, horizon, intervals) {
@@ -181,6 +193,7 @@ setMethod("setHorizon",
   }
 )
 
+#' @export
 setMethod("getHorizon", signature(obj = "model"), function(obj) {
   getHorizon(obj@config)
 })

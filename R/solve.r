@@ -1,8 +1,5 @@
-solve <- function(...) UseMethod("solve")
+# solve <- function(...) UseMethod("solve")
 
-#' @rdname solve
-#' @method solve model
-#' @export
 solve.model <- function(obj, name = NULL, solver = "GAMS",
                         tmp.path = file.path(getwd(), "/solwork"),
                         tmp.time = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
@@ -33,12 +30,12 @@ solve.model <- function(obj, name = NULL, solver = "GAMS",
   invisible(scen)
 }
 
+#' @rdname solve
+#' @method solve model
+#' @export
 setMethod("solve", "model", solve.model)
 # .S3method("solve", "model", .solve_model)
 
-#' @rdname solve
-#' @method solve scenario
-#' @export
 solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
   if (is.null(tmp.dir)) {
     if (is.null(scen)) {
@@ -58,7 +55,8 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
     solver_list[[solv_par[i, "name"]]] <- tmp
   }
   if (!is.null(scen) && !is.null(scen@settings@solver)) {
-    for (i in grep("^(inc[1-5]|files)$", names(scen@settings@solver), value = TRUE, invert = TRUE)) {
+    for (i in grep("^(inc[1-5]|files)$", names(scen@settings@solver),
+                   value = TRUE, invert = TRUE)) {
       solver_list[[i]] <- scen@settings@solver[[i]]
     }
   }
@@ -73,7 +71,9 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
     tmp.dir = tmp.dir, write = FALSE, ...
   )
 }
-
+#' @rdname solve
+#' @method solve scenario
+#' @export
 setMethod("solve", "scenario", solve.scenario)
 
 # .S3method("solve", "scenario", solve_model)
@@ -81,7 +81,8 @@ setMethod("solve", "scenario", solve.scenario)
 
 ####### Internal functions ##########
 
-.solver_solve <- function(scen, tmp.dir = NULL, solver = NULL, ..., interpolate = FALSE,
+.solver_solve <- function(scen, tmp.dir = NULL, solver = NULL, ...,
+                          interpolate = FALSE,
                           readresult = FALSE, write = TRUE) {
   # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments

@@ -1,3 +1,4 @@
+# load("R/sysdata.rda")
 #' Class (S4) to represent default model configuration.
 #'
 #' @slot info character string with the configuration information.
@@ -6,7 +7,7 @@
 #' @slot slice
 #' @slot discount
 #' @slot discountFirstYear
-#' @slot earlyRetirement
+#' @slot early.retirement
 #' @slot defVal
 #' @slot interpolation
 #' @slot debug
@@ -14,10 +15,7 @@
 #'
 #' @include class-slice.R class-calendar.R class-horizon.R
 #'
-#' @return
 #' @export
-#'
-#' @examples
 setClass("config",
   representation(
     info = "character",
@@ -28,7 +26,7 @@ setClass("config",
     # yearFraction = "data.frame",
     discount = "data.frame",
     discountFirstYear = "logical",
-    earlyRetirement = "logical",
+    early.retirement = "logical",
     defVal = "data.frame",
     interpolation = "data.frame",
     debug = "data.frame",
@@ -56,9 +54,11 @@ setClass("config",
     horizon = new("horizon"),
     slice = new("slice"),
     discountFirstYear = FALSE,
-    earlyRetirement = FALSE,
-    defVal = as.data.frame(.defVal, stringsAsFactors = FALSE),
-    interpolation = as.data.frame(.defInt, stringsAsFactors = FALSE),
+    early.retirement = FALSE,
+    defVal = data.frame(),
+    interpolation = data.frame(),
+    # defVal = as.data.frame(.defVal, stringsAsFactors = FALSE),
+    # interpolation = as.data.frame(.defInt, stringsAsFactors = FALSE),
     # yearFraction = data.frame(
     #   year = as.numeric(NA),
     #   fraction = as.numeric(1),
@@ -68,21 +68,26 @@ setClass("config",
   ),
   S3methods = TRUE
 )
-
 setMethod("initialize", "config", function(.Object, ...) {
+  if (!exists(".defVal")) load("R/sysdata.rda")
+  .Object@defVal <- as.data.frame(.defVal, stringsAsFactors = FALSE)
+  .Object@interpolation <- as.data.frame(.defInt, stringsAsFactors = FALSE)
   .Object
 })
 
+#' @export
 setGeneric("setTimeSlices", function(obj, ...) standardGeneric("setTimeSlices"))
 
+#' @export
 setMethod("setTimeSlices", signature(obj = "config"), function(obj, ...) {
   obj@slice <- .setTimeSlices(...)
   obj
 })
 
-setGeneric("setHorizon",
-           function(obj, horizon, intervals) standardGeneric("setHorizon"))
+# setGeneric("setHorizon",
+#            function(obj, horizon, intervals) standardGeneric("setHorizon"))
 
+#' @export
 setMethod("setHorizon",
           signature(obj = "config", horizon = "numeric", intervals = "ANY"),
   function(obj, horizon, intervals) {
@@ -94,8 +99,9 @@ setMethod("setHorizon",
   }
 )
 
-setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
+# setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
 
+#' @export
 setMethod("getHorizon", signature(obj = "config"), function(obj) obj@horizon)
 
 # setGeneric("milestoneYears",

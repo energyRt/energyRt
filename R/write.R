@@ -1,49 +1,48 @@
-write <- function(...) UseMethod("write")
-
-# write.default <- function(x, file = "data",
-#                           ncolumns = if (is.character(x)) 1 else 5,
-#                           append = FALSE, sep = " ") {
-#   base::write(x, file, ncolumns, append, sep)
-# }
-
-#' Title
-#'
-#' @param scen
-#' @param tmp.dir
-#' @param solver
-#' @param ...
-#'
-#' @return
-#' @export
-#'
-#' @examples
-write.scenario <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
+write.scenario <- function(obj, tmp.dir = NULL, solver = NULL, ...) {
+  scen <- obj
   if (is.null(tmp.dir)) {
     if (!is.null(scen@misc$tmp.dir)) tmp.dir <- scen@misc$tmp.dir
   } else {
     scen@misc$tmp.dir <- tmp.dir
   }
   if (F) {} # check if the scenario is interpolated
-  if (is.null(solver)) solver <- scen@settings@solver
-  .solver_solve(scen,
-    tmp.dir = tmp.dir, solver = solver, ...,
-    run = FALSE, write = TRUE
-  )
-}
-
-write.model <- function(scen, ...) {
-  message('Error:
-  No applicable method for "write" applied to an object of class "model".
-  Use "interpolate(model, ...)" instead to get "scenario" object,
-  and then "write(scenario, ...)"')
-  # stop()
+  if (is.null(solver)) solver <- scen@solver
+  .solver_solve(scen, tmp.dir = tmp.dir, solver = solver, ...,
+                run = FALSE, write = TRUE)
 }
 
 
-write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
-  message("The function is depreciated, use `write` instead")
-  write.scenario(scen, tmp.dir, solver, ...)
-}
+#' Write model script with data files to a directory
+#'
+#' @param obj
+#' @param tmp.dir
+#' @param solver
+#' @param ...
+#'
+#' @method write scenario
+#' @family write scenario
+#' @rdname write
+#'
+#' @export
+#'
+setMethod("write", signature("scenario"), definition = write.scenario)
+
+
+# write <- function(scen, ...) UseMethod("write")
+
+# write.model <- function(scen, ...) {
+#   message('Error:
+#   No applicable method for "write" applied to an object of class "model".
+#   Use "interpolate(model, ...)" instead to get "scenario" object,
+#   and then "write(scenario, ...)"')
+#   # stop()
+# }
+#
+#
+# write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
+#   message("The function is depreciated, use `write` instead")
+#   write.scenario(scen, tmp.dir, solver, ...)
+# }
 
 
 #### Internal functions ####

@@ -48,6 +48,8 @@ setClass("tax",
 )
 
 setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
+
+#' @export
 setMethod("newTax", signature(name = "character"), function(name, ...) {
-  .data2slots("tax", name = name, ...)
+  .data2slots("tax", name, ...)
 })

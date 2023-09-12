@@ -7,6 +7,7 @@
 
 
 # The function creates scenario object with interpolated data, ready to pass to a solver
+#' @export
 interpolate <- function(obj, ...) { #- returns class scenario
   ## arguments
   # obj - scenario or model
@@ -235,7 +236,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   # Update early retirement parameter
   # browser()
-  if (!scen@settings@earlyRetirement) {
+  if (!scen@settings@early.retirement) {
     scen <- .remove_early_retirment(scen)
   }
   approxim$debug <- scen@settings@debug
@@ -616,7 +617,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   scen <- .apply_to_code_ret_scen(
     scen = scen, clss = "technology",
     func = function(x) {
-      x@earlyRetirement <- FALSE
+      x@early.retirement <- FALSE
       x
     }
   )

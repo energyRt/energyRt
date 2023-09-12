@@ -4,7 +4,7 @@
 \alias{draw.technology}
 \title{Schematic representation of technology}
 \usage{
-\method{draw}{technology}(
+draw.technology(
   tech,
   year = NULL,
   region = NULL,
@@ -29,3 +29,4 @@
 \description{
 Schematic representation of technology
 }
+\concept{draw technology}

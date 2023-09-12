@@ -52,7 +52,7 @@ An S4 class to represent technology
 
 \item{\code{stock}}{data.frame.}
 
-\item{\code{earlyRetirement}}{logical.}
+\item{\code{early.retirement}}{logical.}
 
 \item{\code{upgrade.technology}}{character.}
 

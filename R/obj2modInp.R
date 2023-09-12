@@ -1,5 +1,5 @@
-setGeneric(".obj2modInp",
-           function(obj, app, approxim) standardGeneric(".obj2modInp"))
+# setGeneric(".obj2modInp",
+#            function(obj, app, approxim) standardGeneric(".obj2modInp"))
 
 # =============================================================================#
 # Add commodity ####
@@ -1354,7 +1354,7 @@ setMethod(
     } else {
       pTechCinp2ginp <- NULL
     }
-    if (tech@earlyRetirement) {
+    if (tech@early.retirement) {
       obj@parameters[["mTechRetirement"]] <-
         .dat2par(obj@parameters[["mTechRetirement"]], data.frame(tech = tech@name))
     }
@@ -1476,14 +1476,14 @@ setMethod(
     mTechNew <- dd0$new
     mTechSpan <- dd0$span
     pTechOlife <- olife
-    if (tech@earlyRetirement) {
+    if (tech@early.retirement) {
       obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
         obj@parameters[["mvTechRetiredStock"]],
         stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
       )
     }
     # browser()
-    if (nrow(dd0$new) > 0 && tech@earlyRetirement) {
+    if (nrow(dd0$new) > 0 && tech@early.retirement) {
       obj@parameters[["meqTechRetiredNewCap"]] <- .dat2par(obj@parameters[["meqTechRetiredNewCap"]], mTechNew)
 
 

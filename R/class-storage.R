@@ -179,16 +179,21 @@ setMethod("initialize", "storage", function(.Object, ...) {
   .Object
 })
 
+
 setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
 #' Create new import object
 #'
 #' @name newStorage
+#' @family storage
+#' @export
 #'
 setMethod("newStorage", signature(name = "character"), function(name, ...) {
   .data2slots("storage", name, ...)
 })
 
 # setMethod('update', signature(obj = 'storage'), function(obj, ...)
+#' @family storage update
+#' @export
 update.storage <- function(obj, ...) {
   .data2slots("storage", obj, ...)
 }

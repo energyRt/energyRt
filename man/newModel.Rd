@@ -4,7 +4,12 @@
 \alias{newModel}
 \title{Create new model object}
 \usage{
-\S4method{newModel}{character}(name, ...)
+newModel(name = "", description = "", ...)
+}
+\arguments{
+\item{name}{name of the model}
+
+\item{...}{configuration parameters (see class config) and model elements (classes commodity, technology, etc.)}
 }
 \description{
 Create new model object

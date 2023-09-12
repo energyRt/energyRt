@@ -50,12 +50,15 @@ setGeneric("newWeather", function(name, ...) standardGeneric("newWeather"))
 #' Create new weather object
 #'
 #' @name newWeather
-#'
+#' @family weather
+#' @export
 setMethod("newWeather", signature(name = "character"), function(name, ...) {
   .data2slots("weather", name, ...)
 })
 
 # setMethod('update', signature(obj = 'weather'), function(obj, ...)
+#' @export
+#' @family update weather
 update.weather <- function(obj, ...) {
   .data2slots("weather", obj, ...)
 }

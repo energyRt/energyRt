@@ -15,6 +15,7 @@ getData <- function(...) UseMethod("getData")
 #'
 #' @return list with variables and parameters name, each includes _dim_ and _names_ character vectors.
 #'
+#' @export
 findData <- function(scen, dataType = c("parameters", "variables"),
                      setsNames_ = NULL, valueColumn = TRUE,
                      allSets = TRUE, ignore.case = FALSE, # anyOfTheSets = !allSets,
@@ -114,6 +115,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' names(elc2050)
 #' elc2050$vBalance
 #'
+#' @export
 getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                     parameters = TRUE, variables = TRUE, ignore.case = FALSE,
                     newNames = NULL, newValues = NULL, na.rm = FALSE,
@@ -437,6 +439,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
 }
 
 #' @rdname getData
+#' @export
 get_data <- getData
 
 if (F) { # test

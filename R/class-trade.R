@@ -111,7 +111,10 @@ setMethod("initialize", "trade", function(.Object, ...) {
 })
 
 setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
-setMethod("newTrade", signature(name = "character"), function(name, ..., source = NULL, destination = NULL, avaUpDef = Inf) {
+#' @family trade
+#' @export
+setMethod("newTrade", signature(name = "character"),
+          function(name, ..., source = NULL, destination = NULL, avaUpDef = Inf) {
   trd <- .data2slots("trade", name, ...)
   if (avaUpDef != Inf) {
     trd@trade[nrow(trd@trade) + 1, ] <- NA

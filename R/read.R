@@ -1,8 +1,5 @@
-read <- function(...) UseMethod("read")
+# read <- function(...) UseMethod("read")
 
-#' @rdname read
-#' @method read scenario
-#' @export
 read.scenario <- function(scen, ...) {
   ## arguments
   # scen
@@ -266,6 +263,9 @@ read.scenario <- function(scen, ...) {
   if (scen@modOut@stage == "solved") scen@status$optimal <- TRUE
   invisible(scen)
 }
+#' @rdname read
+#' @method read scenario
+#' @export
 setMethod("read", "scenario", read.scenario)
 
 read_solution <- read.scenario

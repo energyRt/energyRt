@@ -111,7 +111,7 @@
 #   scen <- .apply_to_code_ret_scen(
 #     scen = scen, clss = "technology",
 #     func = function(x) {
-#       x@earlyRetirement <- FALSE
+#       x@early.retirement <- FALSE
 #       x
 #     }
 #   )

@@ -4,8 +4,13 @@
 \alias{newRepository}
 \title{Create new repository object}
 \usage{
-\S4method{newRepository}{character}(name, ...)
+newRepository(name = "", ...)
 }
 \description{
 Create new repository object
 }
+\seealso{
+Other repository: 
+\code{\link{repository-class}}
+}
+\concept{repository}

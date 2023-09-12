@@ -19,3 +19,8 @@ An S4 class to store the model objects.
 \item{\code{misc}}{list, any additional data or information to store in the object.}
 }}
 
+\seealso{
+Other repository: 
+\code{\link{newRepository}()}
+}
+\concept{repository}

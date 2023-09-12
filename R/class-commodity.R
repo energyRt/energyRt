@@ -86,4 +86,8 @@ newCommodity <- function(
   )
 }
 
+#' @importFrom stats update
+#' @rdname update
+#' @family update commodity
+#' @export
 update.commodity <- function(obj, ...) .data2slots("commodity", obj, ...)

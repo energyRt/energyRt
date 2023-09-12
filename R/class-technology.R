@@ -21,7 +21,7 @@
 #' @slot end data.frame.
 #' @slot olife data.frame.
 #' @slot stock data.frame.
-#' @slot earlyRetirement logical.
+#' @slot early.retirement logical.
 #' @slot upgrade.technology character.
 #' @slot fullYear logical.
 #' @slot slice character.
@@ -62,7 +62,7 @@ setClass("technology",
     end = "data.frame", #
     olife = "data.frame", #
     stock = "data.frame", #
-    earlyRetirement = "logical",
+    early.retirement = "logical",
     upgrade.technology = "character",
     fullYear = "logical",
     slice = "character",
@@ -238,7 +238,7 @@ setClass("technology",
       stock = numeric(),
       stringsAsFactors = FALSE
     ),
-    earlyRetirement = TRUE,
+    early.retirement = TRUE,
     upgrade.technology = character(),
     region = character(),
     slice = character(),
@@ -276,7 +276,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @param end
 #' @param slice
 #' @param fullYear
-#' @param earlyRetirement
+#' @param early.retirement
 #' @param upgrade.technology
 #' @param misc
 #' @param aux
@@ -313,7 +313,7 @@ newTechnology <- function(
     end = data.frame(),
     slice = character(),
     fullYear = TRUE,
-    earlyRetirement = FALSE,
+    early.retirement = FALSE,
     upgrade.technology = character(),
     misc = list()) {
   # browser()
@@ -341,13 +341,26 @@ newTechnology <- function(
     end = end,
     slice = slice,
     fullYear = fullYear,
-    earlyRetirement = earlyRetirement,
+    early.retirement = early.retirement,
     upgrade.technology = upgrade.technology,
     misc = misc
   )
 }
 
-update.technology <- function(obj, ...) .data2slots("technology", obj, ...)
+#' @param obj object of class technology
+#'
+#' @param ... slot-names with data to update (see `newTechnology`)
+#'
+#' @importFrom stats update
+#' @rdname newTechnology
+#' @family update technology
+#' @method update technology
+#' @export
+update.technology <- function(obj, ...) {
+  .data2slots("technology", obj, ...)
+}
+
+# setMethod("update", "technology", update.technology)
 
 # get names of data.frame slots
 .technology_data_frame <- function() {

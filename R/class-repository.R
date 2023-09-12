@@ -5,9 +5,9 @@
 #' @slot data list with the model classes, including other repositories, excluding model and scenario classes.
 #' @slot misc list, any additional data or information to store in the object.
 #'
-#' @include class-costs.R
-#'
 #' @export
+#' @family repository
+#' @include generics.R
 #'
 setClass("repository",
   representation(
@@ -33,6 +33,7 @@ setMethod("initialize", "repository", function(.Object, ...) {
 setMethod("[[", c("repository", "ANY"),
   function(x, name) x@data[[name]]
 )
+#' @export
 setMethod("$", "repository", function(x, name) x@data[[name]])
 
 setReplaceMethod("$", c("repository", "ANY"),
@@ -59,8 +60,12 @@ setReplaceMethod("$", c("repository", "ANY"),
 #                  }
 # )
 
+#' @export
+#' @family repository
 setMethod("names", "repository", function(x) names(x@data))
 
+#' @export
+#' @family repository
 setMethod("print", "repository", function(x) {
   data.frame(
     name = sapply(x@data, function(x) x@name),
@@ -68,10 +73,19 @@ setMethod("print", "repository", function(x) {
   )
 })
 
+#' @method show repository
+#' @export
+#' @family repository
 setMethod("show", "repository", function(object) print(object))
 
+#' @method length repository
+#' @export
+#' @family repository
 setMethod("length", "repository", function(x) length(x@data))
 
+#' @export
+#' @method summary repository
+#' @family repository
 summary.repository <- function(object) {
   x <- sapply(object@data, class)
   x <- as.factor(x)
@@ -84,13 +98,12 @@ summary.repository <- function(object) {
 # if (!isClassUnion('repository')) setClassUnion("repository")
 # Add to repository
 
-add <- function(...) UseMethod("add")
+# add <- function(...) UseMethod("add")
 
-#' @method add repository
-#' @export
-#'
-#' @rdname add
-#'
+# @rdname add
+#
+# @export
+# @family repository
 add.repository <- function(obj, app, ..., overwrite = FALSE) {
   if (length(list(...)) != 0) {
     obj <- add(obj, app, overwrite = overwrite)
@@ -130,19 +143,33 @@ add.repository <- function(obj, app, ..., overwrite = FALSE) {
   obj
 }
 
+#' @method add repository
+#' @family repository
+#' @export
 setMethod("add", "repository", add.repository)
 
 
-setGeneric("newRepository", function(name, ...) standardGeneric("newRepository"))
+# setGeneric("newRepository", function(name, ...) standardGeneric("newRepository"))
+#
+# setMethod("newRepository", signature(name = "character"), function(name, ...) {
+#   in_rep <- c("commodity", "technology", "supply", "demand", "trade", "import", "export", "trade", "storage")
+#   rps <- .data2slots("repository", name, ignore_classes = in_rep, ...)
+#   arg <- list(...)
+#   arg <- arg[sapply(arg, class) %in% in_rep]
+#   if (length(arg) > 0) rps <- add(rps, arg)
+#   rps
+# })
+
 #' Create new repository object
 #'
 #' @name newRepository
-#'
-setMethod("newRepository", signature(name = "character"), function(name, ...) {
+#' @export
+#' @family repository
+newRepository <- function(name = "", ...) {
   in_rep <- c("commodity", "technology", "supply", "demand", "trade", "import", "export", "trade", "storage")
   rps <- .data2slots("repository", name, ignore_classes = in_rep, ...)
   arg <- list(...)
   arg <- arg[sapply(arg, class) %in% in_rep]
   if (length(arg) > 0) rps <- add(rps, arg)
   rps
-})
+}

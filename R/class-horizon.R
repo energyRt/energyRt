@@ -8,6 +8,7 @@
 #'
 #' @family horizon
 #'
+#' @include generics.R
 #' @return
 #' @export
 #'

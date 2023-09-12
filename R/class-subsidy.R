@@ -49,6 +49,7 @@ setClass("sub",
 
 setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
 
+#' @export
 setMethod("newSub", signature(name = "character"), function(name, ..., value = NULL) {
-  .data2slots("sub", name = name, ...)
+  .data2slots("sub", name, ...)
 })

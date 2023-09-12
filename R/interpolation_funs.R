@@ -289,7 +289,6 @@
 #' @param ... list of additional interpolation settings.
 #'
 #' @return
-#' @export
 #'
 #' @examples
 .interpolation_bound <- function(dtf, parameter, defVal, rule, ...) {

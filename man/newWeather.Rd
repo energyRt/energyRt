@@ -9,3 +9,4 @@
 \description{
 Create new weather object
 }
+\concept{weather}

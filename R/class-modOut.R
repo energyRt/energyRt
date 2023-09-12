@@ -2,7 +2,7 @@
 #'
 #' @slot sets list.
 #' @slot variables list.
-#' @slot stage character.
+#' @slot stage character. # !!! move to scenario-status
 #' @slot solutionLogs data.frame.
 #' @slot misc list.
 #'

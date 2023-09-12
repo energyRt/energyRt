@@ -1,15 +1,16 @@
-#' Internal function to add (append) elements to sets in `modInp@set`
-#'
-#' @param obj modInp object
-#' @param app object which name `obj@name` will be appended to sets.
-#' @param approxim list with interpolation rules.
-#'
+# Internal function to add (append) elements to sets in `modInp@set`
+#
+# @param obj modInp object
+# @param app object which name `obj@name` will be appended to sets.
+# @param approxim list with interpolation rules.
+#
 #' @include class-scenario.R
-#'
-#' @return
-#'
-setGeneric(".add2set", function(obj, app, approxim) standardGeneric(".add2set"))
-# ToDo:
+#' @include generics.R class-costs.R
+#
+# @return
+#
+# setGeneric(".add2set", function(obj, app, approxim) standardGeneric(".add2set"))
+# ToDo: !!!
 #   - rename arguments
 
 #==============================================================================#

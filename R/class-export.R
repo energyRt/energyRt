@@ -57,11 +57,13 @@ setGeneric("newExport", function(name, ...) standardGeneric("newExport"))
 #'
 #' @name newExport
 #'
+#' @export
 setMethod("newExport", signature(name = "character"), function(name, ...) {
   .data2slots("export", name, ...)
 })
 
 # setMethod('update', signature(obj = 'export'), function(obj, ...)
+#' @export
 update.export <- function(obj, ...) {
   .data2slots("export", obj, ...)
 }

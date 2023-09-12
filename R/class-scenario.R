@@ -56,10 +56,8 @@ setMethod("initialize", "scenario", function(.Object, ...) {
   .Object
 })
 
-summary <- function(...) UseMethod("summary")
-#' @rdname summary
-#' @method summary scenario
-#' @export
+# summary <- function(...) UseMethod("summary")
+
 summary.scenario <- function(scen, ...) {
   # browser()
   cat("Scenario:", scen@name, "\n")
@@ -84,14 +82,19 @@ summary.scenario <- function(scen, ...) {
   }
   cat("Size:", size(scen),"\n")
 }
+#' @rdname summary
+#' @method summary scenario
+#' @export
 setMethod("summary", "scenario", summary.scenario)
 
 
+#' @export
 setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
   obj@model@settings@slice <- .setTimeSlices(...)
   obj
 })
 
+#' @export
 setMethod("setHorizon",
   signature(obj = "scenario", horizon = "numeric", intervals = "ANY"),
   function(obj, horizon, intervals) {
@@ -100,6 +103,7 @@ setMethod("setHorizon",
   }
 )
 
+#' @export
 setMethod("getHorizon", signature(obj = "scenario"), function(obj) {
   getHorizon(obj@model)
 })

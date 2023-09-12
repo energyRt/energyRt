@@ -54,12 +54,14 @@ setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
 #' Create new import object
 #'
 #' @name newImport
+#' @export
 #'
 setMethod("newImport", signature(name = "character"), function(name, ...) {
   .data2slots("import", name, ...)
 })
 
 # setMethod('update', signature(obj = 'import'), function(obj, ...)
+#' @export
 update.import <- function(obj, ...) {
   .data2slots("import", obj, ...)
 }

@@ -1,18 +1,5 @@
-#' Convert units
-#'
-#' @param from character of length one with unit name
-#' @param to character of length one with unit name
-#' @param x numeric vector with data to convert
-#' @param database units database
-#' @param ... currently ignored
-#'
-#' @return numeric vector with converted values
-#'
-#' @include utils.R
-#'
-convert <- function(x, ...) UseMethod("convert")
+# convert <- function(x, ...) UseMethod("convert")
 # @export convert
-
 convert.character <- function(from, to, x = 1, database = "base", ...) {
   h_from <- .find_unit(from, database = database)
   h_to <- .find_unit(to, database = database)
@@ -24,7 +11,18 @@ convert.character <- function(from, to, x = 1, database = "base", ...) {
   conval
 }
 
+#' Convert units
+#'
+#' @param from character of length one with unit name
+#' @param to character of length one with unit name
+#' @param x numeric vector with data to convert
+#' @param database units database
+#' @param ... currently ignored
+#'
+#' @return numeric vector with converted values
 #' @rdname convert
+#'
+#' @include utils.R
 #' @method convert character
 #' @export
 #'

@@ -1,4 +1,4 @@
-draw <- function(...) UseMethod("draw")
+# draw <- function(...) UseMethod("draw")
 
 #' Schematic representation of technology
 #'
@@ -22,7 +22,9 @@ draw <- function(...) UseMethod("draw")
 #' @return
 #' @export
 #'
+#' @rdname draw
 #' @include utils.R
+#' @family draw technology
 #'
 #' @examples
 draw.technology <- function(
@@ -526,6 +528,11 @@ draw.technology <- function(
     }
   )
 }
+
+#' @family draw technology
+#' @method draw technology
+#' @export
+setMethod("draw", "technology", draw.technology)
 
 #---------------------------------------------------------------------------------------------------------
 # ! to_format <- function(x, def = 1) : numeric to convenient format (no more then 5 symbols)

@@ -146,8 +146,8 @@ setMethod("initialize", signature = "parameter",
       if (!is.null(inClass)) {
         .Object@inClass <- bind_rows(.Object@inClass, inClass)
       } else {
-        message("initialize parameter: unfinished translation: ",
-                name, " ", cls, " ", slot, " ", colName) # debug
+        # message("initialize parameter: unfinished translation: ",
+        #         name, " ", cls, " ", slot, " ", colName) # debug
       .Object@inClass <- .Object@inClass %>%
         add_row(
           class = cls,
@@ -161,15 +161,17 @@ setMethod("initialize", signature = "parameter",
 )
 
 #' @family parameter
+#' @export
 newParameter <- function(...) new("parameter", ...)
 
 #' @family parameter
+#' @export
 newSet <- function(dimSets) {
   if (length(dimSets) != 1) stop("Sets must have only one dimension")
   newParameter(dimSets, dimSets, "set")
 }
 
-setGeneric('.dat2par', function(obj, data) standardGeneric(".dat2par"))
+# setGeneric('.dat2par', function(obj, data) standardGeneric(".dat2par"))
 
 # .dat2par: data.frame ####
 setMethod(

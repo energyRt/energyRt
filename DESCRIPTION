@@ -36,11 +36,8 @@ VignetteBuilder: knitr
 LazyData: true
 Encoding: UTF-8
 Collate: 
-    'class-horizon.R'
+    'generics.R'
     'class-calendar.R'
-    'class-slice.R'
-    'class-config.R'
-    'class-settings.R'
     'class-commodity.R'
     'class-demand.R'
     'class-supply.R'
@@ -54,6 +51,10 @@ Collate:
     'class-subsidy.R'
     'class-constraint.R'
     'class-costs.R'
+    'class-horizon.R'
+    'class-slice.R'
+    'class-config.R'
+    'class-settings.R'
     'class-repository.R'
     'class-model.R'
     'class-parameter.R'

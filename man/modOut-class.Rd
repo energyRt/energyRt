@@ -14,7 +14,7 @@ modOut-class to store the output from the model (solution)
 
 \item{\code{variables}}{list.}
 
-\item{\code{stage}}{character.}
+\item{\code{stage}}{character. # !!! move to scenario-status}
 
 \item{\code{solutionLogs}}{data.frame.}
 

@@ -12,7 +12,8 @@
 #'
 #' @return created or updated object with the added/updated data in the object slots.
 #'
-.data2slots <- function(class_name = NULL, x, ..., ignore_args = NULL,
+.data2slots <- function(class_name = NULL, x, ...,
+                        ignore_args = NULL,
                         ignore_classes = NULL,
                         update = !is.character(x)) {
   # alternative names: data2class, add2slots, fit2slots, ...

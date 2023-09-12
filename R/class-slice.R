@@ -3,6 +3,7 @@
 # all_parent_child -> ???
 # levels -> table?
 #
+#' @export
 setClass("slice",
   representation(
     levels = "data.frame",
@@ -393,6 +394,7 @@ setClass("slice",
 #   obj
 # })
 
+#' @export
 timeSlices <- function(x, asTibble = T, stringsAsFactors = FALSE) {
   # invisible(newModel("dummymod", slice = xx)@config@slice)
   mm <- newModel("dummymod", slice = x)

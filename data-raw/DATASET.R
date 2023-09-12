@@ -39,12 +39,15 @@ usethis::use_data(model_structure, #.modelCode,
 
 .set_dimSets <- .set_set # drop after renaming in gams2x
 
+# DefVal <- .defVal
+
+# .set_set,
 usethis::use_data(
   .dimSets,
   .modInp,
   .defInt,
   .defVal,
-  # .set_set,
+  # DefVal,
   .set_dimSets,
   .set_description,
   .parameter_set,
@@ -57,5 +60,5 @@ usethis::use_data(
   .equation_description,
   .equation_variable,
   .modelCode,
-  internal = TRUE, overwrite = TRUE
+  internal = T, overwrite = TRUE
 )
