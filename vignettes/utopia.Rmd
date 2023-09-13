@@ -1259,6 +1259,7 @@ mdl@sysInfo@milestone
 
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=F, echo=F}
+# GAMS_csv$inc2 <- "pYearFraction = 1;"
 # Four alternative languages to solve the model
 scen_BASE <- solve(mdl,
   name = "BASE",

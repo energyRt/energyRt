@@ -13,6 +13,7 @@ setClass("sysInfo",
 		      discountFirstYear  = "logical",
           interpolation      = "data.frame",
           defVal             = "data.frame",
+		      yearFraction       = "numeric",
           misc               = "list"
       ),
       prototype(
@@ -222,7 +223,9 @@ setClass("sysInfo",
           	outcost  = as.character('back.inter.forth'),
             rampup      = as.character('back.inter.forth'),
             rampdown      = as.character('back.inter.forth'),
+						# fraction = 1.,
           	stringsAsFactors = FALSE),
+			yearFraction = 1.,
       #! Misc
       misc = list()),
       S3methods = TRUE

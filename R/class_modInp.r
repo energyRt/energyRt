@@ -440,6 +440,14 @@ setMethod("initialize", "modInp",
     
     
     # other/system ####
+    #!!! year fraction #### 
+    #!!! (experimental - for sample of time-slices)
+    x[['pYearFraction']] <- 
+      newParameter('pYearFraction', character(0), 'simple',
+                   defVal = 1., 
+                   interpolation = 'back.inter.forth',
+                   colName = 'fraction',
+                   cls = 'sysInfo')
     # discount ####
     x[['pDiscount']] <- 
     	newParameter('pDiscount', c('region', 'year'), 'simple', 
