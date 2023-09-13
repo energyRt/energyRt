@@ -2,9 +2,13 @@
 % Please edit documentation in R/class-calendar.R
 \name{make_timetable}
 \alias{make_timetable}
-\title{Create table of time-slices from given structure as a list}
+\title{Create timetable of time-slices from given structure as a list}
 \usage{
-make_timetable(struct = list(ANNUAL = "ANNUAL"), warn = FALSE)
+make_timetable(
+  struct = list(ANNUAL = "ANNUAL"),
+  year_fraction = 1,
+  warn = FALSE
+)
 }
 \arguments{
 \item{struct}{named list of timeframes with sets of timeslices and optional shares of every slice or frame in the nest}
@@ -12,7 +16,7 @@ make_timetable(struct = list(ANNUAL = "ANNUAL"), warn = FALSE)
 \item{warn}{logical, if TRUE, warning will be issued if `ANNUAL` level does not exists in the given structure. The level will be auto-created to complete the time-structure.}
 }
 \description{
-Create table of time-slices from given structure as a list
+Create timetable of time-slices from given structure as a list
 }
 \examples{
 make_timetable()

@@ -1,6 +1,5 @@
 #' An S4 class to represent scenario settings
 #'
-#' @importFrom class-config.R
 #' @slot subset list.
 #' @slot solver list.
 #' @slot sourceCode list.

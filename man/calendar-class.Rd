@@ -3,9 +3,9 @@
 \docType{class}
 \name{calendar-class}
 \alias{calendar-class}
-\title{An S4 class to represent sub-annual time resolution structure (time slices).}
+\title{An S4 class to represent sub-annual time resolution structure (timeframes and timeslices).}
 \description{
-An S4 class to represent sub-annual time resolution structure (time slices).
+An S4 class to represent sub-annual time resolution structure (timeframes and timeslices).
 }
 \details{
 Sub-annual time resolution is represented by nested, named fractions of a year ("slices").
@@ -28,7 +28,5 @@ Sub-annual time resolution is represented by nested, named fractions of a year (
 \item{\code{slice_ancestry}}{data.frame mapping all "(grand-)parent" to all "(grand-)children".}
 
 \item{\code{misc}}{list with additional data and calculated mappings.}
-
-\item{\code{next_in_year}}{}
 }}
 

@@ -58,8 +58,9 @@ setMethod("initialize", "scenario", function(.Object, ...) {
 
 # summary <- function(...) UseMethod("summary")
 
-summary.scenario <- function(scen, ...) {
+summary.scenario <- function(object, ...) {
   # browser()
+  scen <- object
   cat("Scenario:", scen@name, "\n")
   cat("Model:", scen@model@name, "\n")
   cat("Interpolated:", scen@status$interpolated, "\n")
@@ -85,7 +86,9 @@ summary.scenario <- function(scen, ...) {
 #' @rdname summary
 #' @method summary scenario
 #' @export
-setMethod("summary", "scenario", summary.scenario)
+setMethod("summary", signature(object = "scenario"),
+          definition = summary.scenario)
+# setMethod("summary", "scenario", summary.scenario)
 
 
 #' @export

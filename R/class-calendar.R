@@ -1,4 +1,5 @@
-#' An S4 class to represent sub-annual time resolution structure (time slices).
+# calendar-class ####
+#' An S4 class to represent sub-annual time resolution structure (timeframes and timeslices).
 #'
 #' @details
 #' Sub-annual time resolution is represented by nested, named fractions of a year ("slices").
@@ -11,9 +12,9 @@
 #' @slot slices_in_frame (!!! to depreciate)
 #' @slot slice_family data.frame mapping "parent" to "child" slices in the nested hierarchy.
 #' @slot slice_ancestry data.frame mapping all "(grand-)parent" to all "(grand-)children".
-#' @slot misc list with additional data and calculated mappings.
 #' @slot next_in_frame
 #' @slot next_in_year
+#' @slot misc list with additional data and calculated mappings.
 #'
 #' @include generics.R
 #' @return
@@ -22,7 +23,10 @@
 #' @examples
 setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, schedule, calendar
   representation(
+    name = "character",
+    info = "character",
     timeframes = "list", # renamed `slice_map` // alt.names: hierarchy, nest, ..
+    year_fraction = "numeric",
     timetable = "data.frame", # renames `levels`
     slice_share = "data.frame", # !!! rename to fraction?
     default_frame = "character", # renamed `default_slice_level`
@@ -36,7 +40,10 @@ setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, sc
     # full_set = "character", # renamed `all_slice` -> slice_share$slice
   ),
   prototype(
+    name = character(),
+    info = character(),
     timeframes = list(), # Slices set by level
+    year_fraction = as.numeric(1),
     timetable = data.frame(stringsAsFactors = FALSE),
     slice_share = data.frame(
       # year = numeric(),
@@ -78,7 +85,7 @@ setMethod("initialize", "calendar", function(.Object, ...) {
 })
 
 
-#' Create table of time-slices from given structure as a list
+#' Create timetable of time-slices from given structure as a list
 #'
 #' @param struct named list of timeframes with sets of timeslices and optional shares of every slice or frame in the nest
 #' @param warn logical, if TRUE, warning will be issued if `ANNUAL` level does not exists in the given structure. The level will be auto-created to complete the time-structure.
@@ -102,18 +109,20 @@ setMethod("initialize", "calendar", function(.Object, ...) {
 #'   "DAY" = c("MORNING", "EVENING")
 #' ))
 #'
-make_timetable <- function(struct = list(ANNUAL = "ANNUAL"), warn = FALSE) {
+make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
+                           year_fraction = 1, warn = FALSE) {
   # an old version, adjusted for data.table
   # class and content check
   if (inherits(struct, "list")) {
     # check/add ANNUAL
     if (is.null(struct$ANNUAL)) {
-      if (warn) warning("Adding `ANNUAL` level to timeslices structure")
+      if (warn) warning("Adding `ANNUAL` level to timeframes")
       struct <- c(ANNUAL = "ANNUAL", struct)
     }
     # arg <- unlist(struct)
   } else {
-    stop("`struct` should be a named list with time-slices structure (see examples)")
+    stop("`struct` should be a named nested list with timeframes and slices ",
+         "(see examples)")
   }
   # check for duplicates
   nms <- names(struct)
@@ -124,22 +133,28 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"), warn = FALSE) {
       sep = ""
     ))
   }
-  # create table
+  # create timetable
   dtf <- data.table(share = numeric(), stringsAsFactors = FALSE)
   if (length(struct) == 1 && is.character(struct[[1]]) && length(struct[[1]]) == 1) {
-    dtf <- data.table(share = 1, ANNUAL = struct[[1]], stringsAsFactors = FALSE)
+    dtf <- data.table(share = year_fraction,
+                      ANNUAL = struct[[1]],
+                      stringsAsFactors = FALSE)
     if (!is.null(names(struct))) colnames(dtf)[2] <- names(struct)[1]
   } else {
-    dtf <- .slice_constructor(dtf, struct)
+    # browser()
+    dtf <- .slice_constructor(dtf, struct) # , year_fraction = year_fraction
+    if (year_fraction != 1) dtf$share <- dtf$share * year_fraction
   }
   # dtf <- dtf[, c(2:ncol(dtf), 1), drop = FALSE] # arrange columns
   setcolorder(dtf, c(2:ncol(dtf)))
-  if (abs(sum(dtf$share) - 1) < 1e-10) dtf$share <- (dtf$share / sum(dtf$share))
+  if (abs(sum(dtf$share) - year_fraction) < 1e-10) {
+    dtf$share <- (dtf$share / sum(dtf$share) * year_fraction)
+  }
 
   x <- select(dtf, if_else(ncol(dtf) > 2, 2, 1):share, -share) %>% unite(slice)
   dtf <- mutate(dtf, slice = x$slice, .before = "share")
   # browser()
-  .check_timetable(dtf) # check validity
+  .check_timetable(dtf, year_fraction = year_fraction) # check validity
   return(dtf)
 }
 
@@ -165,11 +180,53 @@ if (F) {
   make_timetable(timeslices)
   make_timetable(timeslices1)
   make_timetable(timeslices2)
+  make_timetable(timeslices2, year_fraction = .5)
   make_timetable(timeslices3)
 
   dtf <- make_timetable(timeslices2)
-  # obj <- new("timeslices")
+  # obj <- new("calendar")
   # obj@timetable <- dtf
+}
+
+#' Generate a new calendar object from
+#'
+#' @param timetable data.frame with the calendar structure.
+#' @param year_fraction numeric scalar, used for validation or calculation (if missing) of the `share` column in the given `timetable`. The default value is `1L` meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to `NULL` will drop the validation.
+#' @param ... optional `name`, `info`, strings, character `default_frame`, and list `misc` with any relevant content. All other arguments will be ignored.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+newCalendar <- function(timetable = NULL, year_fraction = 1, ...) {
+  obj <- .init_calendar(timetable = timetable, year_fraction = year_fraction)
+  arg <- list(...)
+  if (!is.null(arg$name)) obj@name <- arg$name
+  if (!is.null(arg$info)) obj@info <- arg$info
+  if (!is.null(arg$default_frame)) {
+    if (!(obj@default_frame %in% names(obj@timeframes))) {
+      stop("The default_frame = ", default_frame,
+           " is inconsistent with timeframes:\n       ",
+           paste(names(obj@timeframes), collapse = " "))
+    }
+    obj@default_frame <- arg$default_frame
+  }
+  obj
+}
+
+if (F) { # tests ####
+  newCalendar()
+  newCalendar(make_timetable(timeslices))
+  newCalendar(make_timetable(timeslices2), name = "WRSA_DN",
+              info = "Four Seasons, day-night")
+  newCalendar(make_timetable(timeslices3), name = "m12h24",
+              info = "One day per month, 24 hours per day")
+
+  cal <- make_timetable(timeslices3)
+  cal_subset <- cal[grepl("h0[12]", HOUR)]
+  cal$share %>% sum(); cal_subset$share %>% sum()
+  newCalendar(cal_subset, year_fraction = sum(cal_subset$share))
+
 }
 
 # validation of names of individual time-slices
@@ -202,8 +259,8 @@ if (F) {
   }
 }
 
-# validation of timeslices@timetable
-.check_timetable <- function(dtf) {
+# validation of calendar@timetable
+.check_timetable <- function(dtf, year_fraction = 1) {
   # adjusted for data.table & dtplyr
   # browser()
   sl <- select(dtf, slice)
@@ -250,11 +307,11 @@ if (F) {
       sep = ""
     ))
   }
-  # Check sum == 1
-  if (round(sum(dtf$share), 5) != 1) {
+  # Check sum == year_fraction
+  if (round(sum(dtf$share) - year_fraction, 7) != 0) {
     stop(
-      "Sum of slice shares should be equal to one, check: ",
-      sum(dtf$share)
+      "Sum of slice shares must be equal to the given year_fraction = ",
+      year_fraction, ", check: ", sum(dtf$share)
     )
   }
   # full year
@@ -281,7 +338,7 @@ if (F) {
   }
 }
 
-# internal function to create timeslices table from a given list with structure
+# internal function to ??? create timeslices table from a given list with structure
 # !!! ToDo: optimize/rewrite for data.table
 .slice_constructor <- function(dtf, arg) {
   # browser()
@@ -382,15 +439,15 @@ if (F) {
   as.data.table(dtf)
 }
 
-# internal function to populate all slots of `timeslices` from given timeslices@timetable
-.complete_timeslices <- function(obj) {
+# internal function to populate all slots of `calendar` from given calendar@timetable
+.complete_calendar <- function(obj, year_fraction = 1) {
   # browser()
   if (nrow(obj@timetable) == 0) {
     warning('no slices info, using default: "ANNUAL"')
     obj@timetable <- make_timetable()
   }
-  # validate the timeslices table
-  .check_timetable(obj@timetable)
+  # validate the timetable
+  .check_timetable(obj@timetable, year_fraction = year_fraction)
   # obj@misc <- list()
   dtf <- obj@timetable %>% select(-any_of("slice"))
 
@@ -400,6 +457,7 @@ if (F) {
   names(obj@frame_rank) <- colnames(d)
 
   # number of slices on every level
+  # browser()
   obj@slices_in_frame <- sapply(d, function(x) length(unique(x)))
 
   # share of every slice in a year
@@ -408,7 +466,7 @@ if (F) {
     share = as.numeric(NA)
   )
   obj@slice_share[1, "slice"] <- dtf[1, 1]
-  obj@slice_share[1, "share"] <- 1
+  obj@slice_share[1, "share"] <- year_fraction
   k <- 1
   if (ncol(dtf) > 2) {
     for (i in 2:(ncol(dtf) - 1)) {
@@ -423,12 +481,13 @@ if (F) {
   }
 
   # @structure
-  tmp <- nchar(obj@slice_share$slice) - nchar(gsub("[_]", "", obj@slice_share$slice)) + 2
+  tmp <- nchar(obj@slice_share$slice) -
+    nchar(gsub("[_]", "", obj@slice_share$slice)) + 2
   names(tmp) <- obj@slice_share$slice
   tmp[obj@timetable[[1]][1]] <- 1
-  obj@structure <- lapply(1:(ncol(obj@timetable) - 2),
+  obj@timeframes <- lapply(1:(ncol(obj@timetable) - 2),
                           function(x) names(tmp)[tmp == x])
-  names(obj@structure) <- colnames(d)
+  names(obj@timeframes) <- colnames(d)
 
   obj@default_frame <- colnames(d)[ncol(d)]
 
@@ -461,11 +520,11 @@ if (F) {
     # @slice_ancestry
     tmp <- obj@slice_family
     tmp$nlev <- NA
-    for (i in seq_along(obj@structure)) {
-      tmp$nlev[tmp$parent %in% obj@structure[[i]]] <- i
+    for (i in seq_along(obj@timeframes)) {
+      tmp$nlev[tmp$parent %in% obj@timeframes[[i]]] <- i
     }
-    ll <- tmp[tmp$nlev + 1 == length(obj@structure), -3]
-    for (i in rev(seq_along(obj@structure))[-(1:2)]) {
+    ll <- tmp[tmp$nlev + 1 == length(obj@timeframes), -3]
+    for (i in rev(seq_along(obj@timeframes))[-(1:2)]) {
       gg <- tmp[tmp$nlev == i, -3]
       g3 <- gg
       colnames(gg)[2] <- "sht"
@@ -477,7 +536,7 @@ if (F) {
     }
     obj@slice_ancestry <- ll
   }
-
+  # browser()
   # next slice in the same nest & in a year
   # obj@slices_in_frame <- NULL
   if (nrow(obj@timetable) != 1) {
@@ -499,50 +558,54 @@ if (F) {
       # }
     }
     tmp$next_slice[i + 1] <- tmp$child[j]
-    obj@slices_in_frame <- data.table(
+    obj@slice_family <- data.table(
       slice = tmp$child, slicep = tmp$next_slice,
       stringsAsFactors = FALSE
     )
-    n1 <- c(lapply(obj@structure[-1], function(x) x), recursive = TRUE)
+    n1 <- c(lapply(obj@timeframes[-1], function(x) x), recursive = TRUE)
     names(n1) <- NULL
-    n2 <- c(lapply(obj@structure[-1], function(x) c(x[-1], x[1])), recursive = TRUE)
+    n2 <- c(lapply(obj@timeframes[-1], function(x) c(x[-1], x[1])), recursive = TRUE)
     names(n2) <- NULL
     obj@next_in_year <- data.table(
       slice = n1, slicep = n2,
       stringsAsFactors = FALSE
     )
   }
+  obj@year_fraction <- year_fraction
   obj@slice_family <- as.data.table(obj@slice_family)
   obj@slice_ancestry <- as.data.table(obj@slice_ancestry)
+  obj@next_in_frame <- as.data.table(obj@next_in_frame)
+  obj@next_in_year <- as.data.table(obj@next_in_year)
   obj
 }
 
-# initialize timeslices object from given list ("struct") or "table"
-.init_timeslices <- function(struct = NULL, table = NULL) {
+# initialize calendar object from given list ("struct") or "timetable"
+.init_calendar <- function(struct = NULL, timetable = NULL, year_fraction = 1) {
   # browser()
   tsl <- new("calendar")
-  if (is.null(table)) {
+  if (is.null(timetable)) {
     if (is.null(struct)) {
       tsl@timetable <- make_timetable()
     } else {
       tsl@timetable <- make_timetable(struct)
     }
   } else if (!is.null(struct)) {
-    stop("Only one parameter `struct` or `table` can be specified")
+    stop("Only one parameter `struct` or `timetable` can be specified")
   } else {
-    tsl@timetable <- table
+    tsl@timetable <- timetable
   }
-  .complete_timeslices(tsl)
+  .complete_calendar(tsl, year_fraction = year_fraction)
 }
 
 if (F) {
   # tests ####
-  .init_timeslices()
-  .init_timeslices(struct = timeslices2)
-  .init_timeslices(struct = timeslices3)
+  .init_calendar()
+  .init_calendar(struct = timeslices2)
+  .init_calendar(struct = timeslices2, year_fraction = .5)
+  .init_calendar(struct = timeslices3)
   make_timetable(timeslices2)
   make_timetable(timeslices3)
-  .init_timeslices(table = make_timetable(timeslices2))
-  .init_timeslices(table = make_timetable(timeslices3))
-  # .init_timeslices(table = tsl@timetable)
+  .init_calendar(timetable = make_timetable(timeslices2))
+  .init_calendar(timetable = make_timetable(timeslices3))
+  # .init_calendar(timetable = tsl@timetable)
 }

@@ -1,14 +1,91 @@
-# solve <- function(...) UseMethod("solve")
+# Functions and methods to solve model and scenario objects
+# The multiple methods in this file aim adopting the
+# generic `base::solve(a, b, ...)` method to `solve(obj, name, ...)`
 
-solve.model <- function(obj, name = NULL, solver = "GAMS",
-                        tmp.path = file.path(getwd(), "/solwork"),
-                        tmp.time = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
-                        tmp.name = paste(solver, obj@name, name, tmp.time, sep = "_"),
-                        tmp.dir = file.path(tmp.path, tmp.name),
-                        tmp.del = TRUE, n.threads = 1, ...) {
-  tmp.path <- gsub("[\\/]+", "/", tmp.path)
+#' Solve a model
+#'
+#' The function interpolates model, writes the script in a directory, runs the external software to solve the model, reads the solution results, and returns a scenario object with the solution.
+#'
+#' @param obj model object
+#' @param name character name of scenario to return
+#' @param solver a character or list with solver settings
+#' @param tmp.path
+#' @param tmp.timestamp
+#' @param tmp.name
+#' @param tmp.dir
+#' @param tmp.del
+#' @param ...
+#'
+#' @rdname solve
+#' @return
+#' @export
+solve_model <- function(
+    obj,
+    name = paste("scen", obj@name, sep = "_"),
+    solver = NULL,
+    # tmp.path = file.path(getwd(), "/solwork"),
+    # tmp.time = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
+    # tmp.name = paste(solver, obj@name, name, tmp.time, sep = "_"),
+    tmp.dir = NULL,
+    tmp.del = TRUE,
+    ...) {
+  # browser()
+  arg <- list(...)
+  # tmp.path
+  if (!is.null(arg[["tmp.del"]])) {
+    tmp.path <- arg[["tmp.path"]]; arg[["tmp.path"]] <- NULL
+    tmp.path <- gsub("[\\/]+", "/", tmp.path)
+  }
+  # tmp.path
+  if (!is.null(arg[["tmp.path"]])) {
+    tmp.path <- arg[["tmp.path"]]; arg[["tmp.path"]] <- NULL
+    tmp.path <- gsub("[\\/]+", "/", tmp.path)
+  } else {
+    tmp.path = file.path(getwd(), "/solwork")
+  }
+  # tmp.timestamp
+  if (!is.null(arg[["tmp.timestamp"]])) {
+    if (!is.logical(arg[["tmp.timestamp"]])) {
+      tmp.timestamp <- arg[["tmp.timestamp"]]; arg[["tmp.timestamp"]] <- NULL
+    } else if (arg[["tmp.timestamp"]]) {
+      tmp.timestamp = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
+      arg[["tmp.timestamp"]] <- NULL
+    } else {
+      tmp.timestamp <- NULL; arg[["tmp.timestamp"]] <- NULL
+    }
+  } else {
+    if (tmp.del) {
+      tmp.timestamp <- format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
+    } else {
+      tmp.timestamp <- NULL
+    }
+  }
+  # tmp.name
+  if (!is.null(arg[["tmp.name"]])) {
+    tmp.name <- arg[["tmp.name"]]; arg[["tmp.name"]] <- NULL
+    # tmp.name <- gsub("[\\/]+", "/", tmp.path)
+  } else {
+    tmp.name <- obj@name
+    paste(obj@name, name, sep = "_")
+    if (!is.null(tmp.timestamp)) {
+      tmp.name <- paste(tmp.name, tmp.timestamp, sep = "_")
+    }
+  }
+  # tmp.dir
+  if (is.null(tmp.dir)) {
+    if (!is.null(arg[["tmp.dir"]])) {
+      tmp.dir <- arg[["tmp.dir"]]; arg[["tmp.dir"]] <- NULL
+    } else {
+      if (is.null(tmp.name) | tmp.name == "") {
+        stop('Scenario directory name cannot be NULL or ""')
+      }
+      tmp.dir <- file.path(tmp.path, tmp.name)
+    }
+  }
+
+  # tmp.dir = file.path(tmp.path, tmp.name),
+  # tmp.path <- gsub("[\\/]+", "/", tmp.path)
   tmp.dir <- gsub("[\\/]+", "/", tmp.dir)
-  arg <- list()
   solve.time.start <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
 
@@ -17,26 +94,63 @@ solve.model <- function(obj, name = NULL, solver = "GAMS",
     name <- "DEFAULT"
   }
   if (is.null(tmp.dir) || tmp.dir == "") stop("Incorrect directory tmp.dir: ", tmp.del)
-  if (is.null(arg$echo)) {
-    message("The solver working directory: ", tmp.dir)
-    message("Starting time: ", Sys.time())
+  if (arg$echo) {
+    tmp.msg <- sub(getwd(), "", tmp.dir)
+    cat("Scenario directory:\n", tmp.msg, "\n")
+    cat("Starting time: ", format(Sys.time()), "\n")
   }
-  scen <- interpolate(obj, name = name, n.threads = n.threads)
-  scen <- .solver_solve(scen,
-    name = name, solver = solver,
-    tmp.dir = tmp.dir, tmp.del = tmp.del, ..., readresult = TRUE
-  )
+  scen <- interpolate(obj, name = name)
+  arg$scen <- scen
+  arg$name <- name
+  arg$solver <- solver
+  arg$tmp.dir <- tmp.dir
+  arg$tmp.del <- tmp.del
+  arg$read.solution <- TRUE
+  scen <- do.call(.solver_solve, arg)
+  # scen <- .solver_solve(scen,
+  #   name = name, solver = solver,
+  #   tmp.dir = tmp.dir, tmp.del = tmp.del, ..., read.solution = TRUE
+  # )
   if (tmp.del) unlink(tmp.dir, recursive = TRUE)
   invisible(scen)
 }
 
+# a function to use in solve methods
+solve.model <- function(a, b, ...) {
+  arg <- list(...)
+  if (missing(b)) {
+    if (!is.null(arg$name)) {
+      b <- arg$name; arg$name <- NULL
+    } else {
+      b <- NULL
+    }
+  }
+  if (!is.null(arg$obj)) stop("'obj' is 'a' argument in `solve(a, b, ..)` method")
+  if (!is.null(arg$name)) stop("'name' is 'b' argument in `solve(a, b, ..)` method")
+  arg$obj <- a
+  if (!is.null(b)) arg$name <- b
+  do.call(solve_model, arg)
+}
+
 #' @rdname solve
-#' @method solve model
 #' @export
-setMethod("solve", "model", solve.model)
+setMethod("solve", signature(a = "model", b = "character"), solve.model)
+
+#' @rdname solve
+#' @export
+setMethod("solve", signature(a = "model", b = "missing"), solve.model)
+
 # .S3method("solve", "model", .solve_model)
 
-solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
+#' Solve scenario
+#'
+#' @export
+#' @rdname solve
+#'
+solve_scenario <- function(obj = NULL, tmp.dir = NULL, solver = NULL, ...) {
+  scen <- obj
+  # browser()
+  arg <- list(...)
   if (is.null(tmp.dir)) {
     if (is.null(scen)) {
       stop("At least one of two parameters ('scen' or 'tmp.dir') should be specified")
@@ -66,24 +180,63 @@ solve.scenario <- function(scen = NULL, tmp.dir = NULL, solver = NULL, ...) {
   if (is.null(scen)) {
     scen <- new("scenario")
   }
-  .solver_solve(
-    scen = scen, run = TRUE, solver = solver_list,
-    tmp.dir = tmp.dir, write = FALSE, ...
-  )
-}
-#' @rdname solve
-#' @method solve scenario
-#' @export
-setMethod("solve", "scenario", solve.scenario)
 
-# .S3method("solve", "scenario", solve_model)
+  arg$scen <- scen
+  arg$tmp.dir <- tmp.dir
+  arg$solver <- solver_list
+  arg$run <- TRUE
+  arg$write <- FALSE
+  do.call(.solver_solve, arg)
+
+  # .solver_solve(
+  #   scen = scen, run = TRUE, solver = solver_list,
+  #   tmp.dir = tmp.dir, write = FALSE, ...
+  # )
+}
+
+# a function to use in solve methods
+solve.scenario <- function(a, b, ...) {
+  if (missing(b)) b <- NULL
+  arg <- list(...)
+  if (!is.null(arg$obj)) stop("'obj' is 'a' argument in `solve(a, b, ..)` method")
+  if (!is.null(arg$name)) stop("'name' is 'b' argument in `solve(a, b, ..)` method")
+  arg$obj <- a
+  if (!is.null(b)) arg$name <- b
+  do.call(solve_scenario, arg)
+}
+
+## solve(scenario, character) ####
+#' @rdname solve
+#' @export
+setMethod("solve", signature(a = "scenario", b = "character"), solve.scenario)
+
+## solve(scenario, missing) ####
+#' @rdname solve
+#' @export
+setMethod("solve", signature(a = "scenario", b = "missing"), solve.scenario)
+
+## solve(missing, missing) ####
+#' @rdname solve
+#' @export
+setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
+  # browser()
+  arg <- list(...)
+  if (is.null(arg$obj)) do.call(NextMethod, arg)
+  if (class(arg$obj)[1] == "scenario") {
+    return(do.call(solve_scenario, arg))
+  } else if (class(arg$obj)[1] == "model") {
+    return(do.call(solve_model, arg))
+  } else {
+    NextMethod(arg)
+  }
+})
 
 
 ####### Internal functions ##########
 
 .solver_solve <- function(scen, tmp.dir = NULL, solver = NULL, ...,
                           interpolate = FALSE,
-                          readresult = FALSE, write = TRUE) {
+                          read.solution = FALSE, write = TRUE) {
   # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # tmp.dir - solver working directory
@@ -91,7 +244,7 @@ setMethod("solve", "scenario", solve.scenario)
   # open.folder = FALSE - open folder before the run
   # show.output.on.console = FALSE & invisible = FALSE arg for command system
   # only.listing = FALSE (!depreciated?) generate only listing file (works for gams only)
-  # readresult = TRUE read result
+  # read.solution = TRUE read result
   # tmp.del delete results
   arg <- list(tmp.dir = tmp.dir, solver = solver, ...)
   if (is.null(arg$tmp.dir)) {
@@ -109,7 +262,7 @@ setMethod("solve", "scenario", solve.scenario)
   if (is.null(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
   # if (is.null(arg$invisible)) arg$invisible <- FALSE
   if (is.null(arg$tmp.del)) arg$tmp.del <- FALSE
-  if (is.null(arg$readresult)) arg$readresult <- TRUE
+  if (is.null(arg$read.solution)) arg$read.solution <- TRUE
   arg$write <- write
   if (is.null(arg$wait)) {
     if (is.null(scen@settings@solver$wait)) {
@@ -215,7 +368,7 @@ setMethod("solve", "scenario", solve.scenario)
   }
   .run_solve_model(arg, scen) # For all solvers
   # browser()
-  if (readresult && arg$run) scen <- read_solution(scen)
+  if (read.solution && arg$run) scen <- read_solution(scen)
 
   invisible(scen)
 }
