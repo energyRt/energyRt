@@ -23,5 +23,17 @@
 #' @importFrom tibble as_tibble
 #' @importFrom tibble is_tibble
 #' @importFrom tibble tibble
+#' @importFrom tidyr complete
+#' @importFrom tidyr crossing
+#' @importFrom tidyr drop_na
+#' @importFrom tidyr expand
+#' @importFrom tidyr expand_grid
+#' @importFrom tidyr fill
+#' @importFrom tidyr full_seq
+#' @importFrom tidyr nesting
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#' @importFrom tidyr replace_na
+#' @importFrom tidyr unite
 ## usethis namespace: end
 NULL

@@ -22,7 +22,8 @@ setClass("config",
     region = "character",
     horizon = "horizon", # change to class
     # year = "numeric", # move to horizon
-    slice = "slice", # !!!rename to timeslices?
+    calendar = "calendar",
+    slice = "slice", #
     # yearFraction = "data.frame",
     discount = "data.frame",
     discountFirstYear = "logical",
@@ -52,7 +53,8 @@ setClass("config",
     region = NULL,
     # year = as.numeric(2005:2050),
     horizon = new("horizon"),
-    slice = new("slice"),
+    calendar = newCalendar(),
+    # slice = new("slice"),
     discountFirstYear = FALSE,
     early.retirement = FALSE,
     defVal = data.frame(),

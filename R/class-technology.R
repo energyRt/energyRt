@@ -347,20 +347,22 @@ newTechnology <- function(
   )
 }
 
-#' @param obj object of class technology
+#' @param object object of class technology
 #'
 #' @param ... slot-names with data to update (see `newTechnology`)
 #'
-#' @importFrom stats update
 #' @rdname newTechnology
 #' @family update technology
 #' @method update technology
 #' @export
-update.technology <- function(obj, ...) {
-  .data2slots("technology", obj, ...)
-}
+setMethod("update", "technology", function(object, ...) {
+  .data2slots("technology", object, ...)
+})
+# alternative option: S3 method
+# update.technology <- function(obj, ...) {
+#   .data2slots("technology", obj, ...)
+# }
 
-# setMethod("update", "technology", update.technology)
 
 # get names of data.frame slots
 .technology_data_frame <- function() {

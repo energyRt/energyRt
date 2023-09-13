@@ -11,7 +11,7 @@
 #' @param update logical, if an object of class `class_name` is supplied (in `x`) then `update` must be `TRUE`, and the object will be updated with the given data in `...`. Otherwise, if the `x` is character, the `update` should be `FALSE`, and the new object will be created.
 #'
 #' @return created or updated object with the added/updated data in the object slots.
-#'
+#' @noRd
 .data2slots <- function(class_name = NULL, x, ...,
                         ignore_args = NULL,
                         ignore_classes = NULL,

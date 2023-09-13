@@ -2,7 +2,7 @@
 % Please edit documentation in R/class-technology.R
 \name{newTechnology}
 \alias{newTechnology}
-\alias{update.technology}
+\alias{update,technology-method}
 \title{Create object of class `technology` with specified parameters.}
 \usage{
 newTechnology(
@@ -35,7 +35,7 @@ newTechnology(
   misc = list()
 )
 
-\method{update}{technology}(obj, ...)
+\S4method{update}{technology}(object, ...)
 }
 \arguments{
 \item{units}{}
@@ -44,7 +44,7 @@ newTechnology(
 
 \item{afs}{data.frame, percentage (share) of time the technology is able to operate over set/group of time-slices.}
 
-\item{obj}{object of class technology}
+\item{object}{object of class technology}
 
 \item{...}{slot-names with data to update (see `newTechnology`)}
 }

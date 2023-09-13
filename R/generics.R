@@ -1,12 +1,12 @@
 # S3 methods from R base (and to avoid conflicts with other libraries)
-# write <- function(x, ...) UseMethod("write")
+# write <- function(x, ...) UseMethod("write") # conflict with base::write
 
 # S4 methods from R base (and to avoid conflicts with other libraries)
 setGeneric("add", function(...) UseMethod("add"))
 setGeneric("convert", function(x, ...) UseMethod("convert"))
-setGeneric("read", function(...) UseMethod("read"))
 setGeneric("draw", function(...) UseMethod("draw"))
-setGeneric("write", function(x, ...) UseMethod("write"))
+# setGeneric("write.sc", function(x, ...) UseMethod("write.sc")) # use function instead
+setGeneric("read", function(...) UseMethod("read")) #
 
 # energyRt methods (exported)
 setGeneric("setHorizon", function(obj, horizon, intervals) standardGeneric("setHorizon"))

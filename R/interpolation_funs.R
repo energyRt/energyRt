@@ -8,6 +8,7 @@
 #' @return
 #'
 #' @examples
+#' @noRd
 .interpolation0 <- function(dtf, parameter, defVal, arg) {
   # browser()
   # dtf <- interpolation_message$interpolation0_arg$dtf;
@@ -254,6 +255,7 @@
 #' @return
 #'
 #' @examples
+#' @noRd
 .interpolation <- function(dtf, parameter, defVal, ...) {
   arg <- list(...)
   tryCatch(
@@ -291,6 +293,8 @@
 #' @return
 #'
 #' @examples
+#' @noRd
+#' @noRd
 .interpolation_bound <- function(dtf, parameter, defVal, rule, ...) {
   gg <- paste(parameter, c(".lo", ".fx", ".up"), sep = "")
   aa <- dtf[, !(colnames(dtf) %in% gg), drop = FALSE]
@@ -340,6 +344,7 @@
 #' @param all.val
 #'
 #' @return
+#' @noRd
 .interp_numpar <- function(
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
@@ -434,6 +439,7 @@
 #'
 #' @return
 #'
+#' @noRd
 .interp_bounds <- function(
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,

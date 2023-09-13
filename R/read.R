@@ -1,6 +1,18 @@
-# read <- function(...) UseMethod("read")
-
-read.scenario <- function(scen, ...) {
+#' Read solution
+#'
+#' The function and method read outputs of solved model/scenario and return the scenario object populated with variables data.
+#'
+#' @param obj scenario object
+#' @param ... optional tmp.dir (if missing in the scenario object or to replace the saved path)
+#'
+#' @return
+#' @export
+#' @seealso [solve()] to run the script, solve the scenario. [write_sc()] to read
+#'
+#' @examples
+#' @rdname read
+read_solution <- function(obj, ...) {
+  scen <- obj
   ## arguments
   # scen
   # readOutputFunction = read.csv (may use data.table::fread)
@@ -266,9 +278,9 @@ read.scenario <- function(scen, ...) {
 #' @rdname read
 #' @method read scenario
 #' @export
-setMethod("read", "scenario", read.scenario)
+setMethod("read", "scenario", read_solution)
 
-read_solution <- read.scenario
+# read_solution <- read.scenario
 # read.scenario <- function(scen, ...) read_solution(scen, ...)
 # .S3method("read", "scenario", read_solution)
 

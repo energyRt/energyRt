@@ -1,8 +1,8 @@
-# Functions and methods to solve model and scenario objects
-# The multiple methods in this file aim adopting the
+# Solve model and scenario objects ####
+# Functions and methods. Multiple methods in this file aim adopting the
 # generic `base::solve(a, b, ...)` method to `solve(obj, name, ...)`
 
-#' Solve a model
+#' Functions and methods to solve model and scenario objects
 #'
 #' The function interpolates model, writes the script in a directory, runs the external software to solve the model, reads the solution results, and returns a scenario object with the solution.
 #'
@@ -15,6 +15,8 @@
 #' @param tmp.dir
 #' @param tmp.del
 #' @param ...
+#'
+#' @seealso [read_solution()]
 #'
 #' @rdname solve
 #' @return
@@ -132,12 +134,14 @@ solve.model <- function(a, b, ...) {
   do.call(solve_model, arg)
 }
 
+## solve(model, character) ####
 #' @rdname solve
 #' @export
 setMethod("solve", signature(a = "model", b = "character"), solve.model)
 
-#' @rdname solve
+## solve(model, missing) ####
 #' @export
+#' @noRd
 setMethod("solve", signature(a = "model", b = "missing"), solve.model)
 
 # .S3method("solve", "model", .solve_model)
@@ -146,7 +150,6 @@ setMethod("solve", signature(a = "model", b = "missing"), solve.model)
 #'
 #' @export
 #' @rdname solve
-#'
 solve_scenario <- function(obj = NULL, tmp.dir = NULL, solver = NULL, ...) {
   scen <- obj
   # browser()
@@ -211,13 +214,13 @@ solve.scenario <- function(a, b, ...) {
 setMethod("solve", signature(a = "scenario", b = "character"), solve.scenario)
 
 ## solve(scenario, missing) ####
-#' @rdname solve
 #' @export
+#' @noRd
 setMethod("solve", signature(a = "scenario", b = "missing"), solve.scenario)
 
 ## solve(missing, missing) ####
-#' @rdname solve
 #' @export
+#' @noRd
 setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
   # browser()
   arg <- list(...)

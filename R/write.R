@@ -1,14 +1,15 @@
-#' Write a model script with data files to a directory
+#' Write scenario object as a Python, Julia, GAMS, or MathProg script with data files to a directory
 #'
-#' @param `x` or `obj` scenario object, must be interpolated
+#' @param x scenario object, must be interpolated
 #' @param tmp.dir character, path
 #' @param solver list of character with solver specification.
 #' @param ... additional solver parameters
 #' @family write scenario
 #' @rdname write
+#' @seealso [solve()] to run the script, solve the scenario. [read_solution] to read model solution.
 #'
 #' @export
-write_scenario <- function(x, tmp.dir = NULL, solver = NULL, ...) {
+write_scenario_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
   scen <- x
   if (is.null(tmp.dir)) {
     if (!is.null(scen@misc$tmp.dir)) tmp.dir <- scen@misc$tmp.dir
@@ -21,40 +22,49 @@ write_scenario <- function(x, tmp.dir = NULL, solver = NULL, ...) {
                 run = FALSE, write = TRUE)
 }
 
-
-#' @method write scenario
-#' @family write scenario
-#' @rdname write
-#' @name write
-#'
 #' @export
-setMethod("write", signature(x = "scenario"), definition = write_scenario)
-
-#' @family write scenario
 #' @rdname write
-#' @export
-setMethod("write", signature(x = "missing"), definition = function(...) {
-  arg <- list(...)
-  if (is.null(arg$obj)) {
-    if (is.null(arg$x) | class(arg$x)[1] != "scenario") NextMethod(...)
-  } else if (!is.null(arg$x)) {
-    if (class(arg$x)[1] != "scenario") NextMethod(...)
-  } else if (class(arg$obj)[1] != "scenario") {
-    NextMethod(...)
-  }
-  return(do.call(write_scenario, arg))
-})
+write_sc <- function(x, tmp.dir = NULL, solver = NULL, ...) {
+  write_scenario_script(x, tmp.dir, solver, ...)
+}
 
-#' @family write scenario
-#' @rdname write
 #' @export
-setMethod("write", signature(x = "ANY"), definition = function(...) {
-  browser()
-  arg <- list(...)
-  arg <- c(x = x, arg)
-  if (class(x)[1] == "scenario") return(do.call(write_scenario, arg))
-  return(do.call(base::write, arg))
-})
+#' @rdname write
+write.sc <- write_sc
+
+# @method write scenario
+# @family write scenario
+# @rdname write
+# @name write
+#
+# @export
+# setMethod("write", signature(x = "scenario"), definition = write_scenario_script)
+
+# @family write scenario
+# @rdname write
+# @export
+# setMethod("write", signature(x = "missing"), definition = function(...) {
+#   arg <- list(...)
+#   if (is.null(arg$obj)) {
+#     if (is.null(arg$x) | class(arg$x)[1] != "scenario") NextMethod(...)
+#   } else if (!is.null(arg$x)) {
+#     if (class(arg$x)[1] != "scenario") NextMethod(...)
+#   } else if (class(arg$obj)[1] != "scenario") {
+#     NextMethod(...)
+#   }
+#   return(do.call(write_scenario_script, arg))
+# })
+
+# @family write scenario
+# @rdname write
+# @export
+# setMethod("write", signature(x = "ANY"), definition = function(...) {
+#   browser()
+#   arg <- list(...)
+#   arg <- c(x = x, arg)
+#   if (class(x)[1] == "scenario") return(do.call(write_scenario_script, arg))
+#   return(do.call(base::write, arg))
+# })
 
 # write <- function(scen, ...) UseMethod("write")
 
@@ -69,7 +79,7 @@ setMethod("write", signature(x = "ANY"), definition = function(...) {
 #
 # write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
 #   message("The function is depreciated, use `write` instead")
-#   write_scenario(scen, tmp.dir, solver, ...)
+#   write_scenario_script(scen, tmp.dir, solver, ...)
 # }
 
 

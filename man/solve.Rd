@@ -3,12 +3,9 @@
 \name{solve_model}
 \alias{solve_model}
 \alias{solve,model,character-method}
-\alias{solve,model,missing-method}
 \alias{solve_scenario}
 \alias{solve,scenario,character-method}
-\alias{solve,scenario,missing-method}
-\alias{solve,missing,missing-method}
-\title{Solve a model}
+\title{Functions and methods to solve model and scenario objects}
 \usage{
 solve_model(
   obj,
@@ -21,15 +18,9 @@ solve_model(
 
 \S4method{solve}{model,character}(a, b, ...)
 
-\S4method{solve}{model,missing}(a, b, ...)
-
 solve_scenario(obj = NULL, tmp.dir = NULL, solver = NULL, ...)
 
 \S4method{solve}{scenario,character}(a, b, ...)
-
-\S4method{solve}{scenario,missing}(a, b, ...)
-
-\S4method{solve}{missing,missing}(a, b, ...)
 }
 \arguments{
 \item{obj}{model object}
@@ -42,4 +33,7 @@ solve_scenario(obj = NULL, tmp.dir = NULL, solver = NULL, ...)
 }
 \description{
 The function interpolates model, writes the script in a directory, runs the external software to solve the model, reads the solution results, and returns a scenario object with the solution.
+}
+\seealso{
+[read_solution()]
 }

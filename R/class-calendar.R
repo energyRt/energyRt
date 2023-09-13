@@ -1,17 +1,24 @@
 # calendar-class ####
-#' An S4 class to represent sub-annual time resolution structure (timeframes and timeslices).
+#' An S4 class to represent sub-annual time resolution structure
+#' (time-frames and time-slices).
 #'
 #' @details
-#' Sub-annual time resolution is represented by nested, named fractions of a year ("slices").
+#' Sub-annual time resolution is represented by nested, named fractions
+#' of a year ("slices").
 #'
-#' @slot timeframes a named list of nested sub-annual levels with vectors of individual elements.
-#' @slot timetable data.frame with levels of slices in the named columns, and number of rows equal to the total number of time-slices on the lowest level.
-#' @slot slice_share two column data.frame with slices from all levels with their individual share in a year.
+#' @slot timeframes a named list of nested sub-annual levels with vectors
+#' of individual elements.
+#' @slot timetable data.frame with levels of slices in the named columns,
+#' and number of rows equal to the total number of time-slices on the lowest level.
+#' @slot slice_share two column data.frame with slices from all levels
+#' with their individual share in a year.
 #' @slot default_frame character, the name of the default level of the time-slices used in the model.
 #' @slot frame_rank
 #' @slot slices_in_frame (!!! to depreciate)
-#' @slot slice_family data.frame mapping "parent" to "child" slices in the nested hierarchy.
-#' @slot slice_ancestry data.frame mapping all "(grand-)parent" to all "(grand-)children".
+#' @slot slice_family data.frame mapping "parent" to "child" slices in
+#' the nested hierarchy.
+#' @slot slice_ancestry data.frame mapping all "(grand-)parent" to all
+#' "(grand-)children".
 #' @slot next_in_frame
 #' @slot next_in_year
 #' @slot misc list with additional data and calculated mappings.
@@ -21,7 +28,7 @@
 #' @export
 #'
 #' @examples
-setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, schedule, calendar
+setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, schedule
   representation(
     name = "character",
     info = "character",
@@ -160,7 +167,7 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
 
 
 if (F) {
-  # tests ####
+  ### tests ####
   make_timetable()
   make_timetable(list("SEASON" = c("WINTER", "SUMMER")))
   make_timetable(list("SEASON" = c("WINTER" = .6, "SUMMER" = .4)))
@@ -214,7 +221,8 @@ newCalendar <- function(timetable = NULL, year_fraction = 1, ...) {
   obj
 }
 
-if (F) { # tests ####
+if (F) {
+  ## tests ####
   newCalendar()
   newCalendar(make_timetable(timeslices))
   newCalendar(make_timetable(timeslices2), name = "WRSA_DN",
@@ -229,6 +237,20 @@ if (F) { # tests ####
 
 }
 
+# print calendar ####
+setMethod("print", "calendar", function(x, ...) {
+  if (length(x@parameters) == 0) {
+    cat("There is no data\n")
+  } else {
+    for (i in 1:length(x@parameters)) {
+      print(x@parameters[[i]])
+    }
+  }
+})
+
+
+
+# internal functions ####
 # validation of names of individual time-slices
 .check_slice_name <- function(nm) {
   # check / optimize script
@@ -396,13 +418,16 @@ if (F) { # tests ####
       if (is.null(names(arg2)) || any(names(arg2) == "")) {
         stop(paste(paste('Check time-slice data for level "', lv, '"\n',
           sep = ""
-        ), paste(capture.output(print(arg[[1]])), collapse = "\n"), sep = "\n"))
+        ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
+        sep = "\n"))
       }
       if (is.numeric(arg2[[1]])) {
         if (!all(sapply(arg2, is.numeric))) {
-          stop(paste(paste('Check time-slice data for level "', lv, '"\n',
+          stop(paste(
+            paste('Check time-slice data for level "', lv, '"\n',
             sep = ""
-          ), paste(capture.output(print(arg[[1]])), collapse = "\n"), sep = "\n"))
+          ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
+          sep = "\n"))
         }
         dtf <- add_val(dtf, c(arg2, recursive = TRUE), names(arg2))
         arg <- arg[-1]
@@ -410,7 +435,8 @@ if (F) { # tests ####
         if (!all(sapply(arg2, is.list))) {
           stop(paste(paste('Check time-slice data for level "', lv, '"\n',
             sep = ""
-          ), paste(capture.output(print(arg[[1]])), collapse = "\n"), sep = "\n"))
+          ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
+          sep = "\n"))
         }
         dtf0 <- dtf
         dtf <- NULL
@@ -433,7 +459,8 @@ if (F) { # tests ####
         arg <- arg[-1]
       }
     } else {
-      stop(paste('Unknown type of argument for slice level "', lv, '"', sep = ""))
+      stop(paste('Unknown type of argument for slice level "', lv, '"',
+                 sep = ""))
     }
   }
   as.data.table(dtf)
@@ -558,7 +585,7 @@ if (F) { # tests ####
       # }
     }
     tmp$next_slice[i + 1] <- tmp$child[j]
-    obj@slice_family <- data.table(
+    obj@next_in_frame <- data.table(
       slice = tmp$child, slicep = tmp$next_slice,
       stringsAsFactors = FALSE
     )
@@ -598,7 +625,7 @@ if (F) { # tests ####
 }
 
 if (F) {
-  # tests ####
+  ## tests ####
   .init_calendar()
   .init_calendar(struct = timeslices2)
   .init_calendar(struct = timeslices2, year_fraction = .5)
