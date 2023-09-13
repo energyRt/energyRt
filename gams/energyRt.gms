@@ -114,6 +114,8 @@ mAggregateFactor(comm, comm)
 
 * Parameter
 parameters
+* Fraction of a year of selected time slices
+pYearFraction(year)   fraction of sum of sampled slices in year -- experimental 
 * Technology parameters
 pTechOlife(tech, region)                           Operational life of technologies
 pTechCinp2ginp(tech, comm, region, year, slice)    Commodity input to group input
@@ -777,7 +779,7 @@ eqTechRampDown(tech, region, year, slice) Technology ramp down
 * Availability factor LO
 eqTechAfLo(tech, region, year, slice)$meqTechAfLo(tech, region, year, slice)..
          pTechAfLo(tech, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice)  *  prod(weather$mTechWeatherAfLo(weather, tech),
             pTechWeatherAfLo(weather, tech) * pWeather(weather, region, year, slice))
@@ -789,7 +791,7 @@ eqTechAfUp(tech, region, year, slice)$meqTechAfUp(tech, region, year, slice)..
          vTechAct(tech, region, year, slice)
          =l=
          pTechAfUp(tech, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice) *  prod(weather$mTechWeatherAfUp(weather, tech),
             pTechWeatherAfUp(weather, tech) * pWeather(weather, region, year, slice));
@@ -797,7 +799,7 @@ eqTechAfUp(tech, region, year, slice)$meqTechAfUp(tech, region, year, slice)..
 * Availability factor for sum LO
 eqTechAfsLo(tech, region, year, slice)$meqTechAfsLo(tech, region, year, slice)..
          pTechAfsLo(tech, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice)  *  prod(weather$mTechWeatherAfsLo(weather, tech),
             pTechWeatherAfsLo(weather, tech) * pWeather(weather, region, year, slice))
@@ -810,7 +812,7 @@ eqTechAfsUp(tech, region, year, slice)$meqTechAfsUp(tech, region, year, slice)..
          vTechAct(tech, region, year, slicep)$mvTechAct(tech, region, year, slicep))
          =l=
          pTechAfsUp(tech, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice) *  prod(weather$mTechWeatherAfsUp(weather, tech),
             pTechWeatherAfsUp(weather, tech) * pWeather(weather, region, year, slice));
@@ -819,18 +821,18 @@ eqTechAfsUp(tech, region, year, slice)$meqTechAfsUp(tech, region, year, slice)..
 * Ramp Up factor
 eqTechRampUp(tech, region, year, slice)$mTechRampUp(tech, region, year, slice)..
          vTechAct(tech, region, year, slice) / pSliceShare(slice)
-         - sum(slicep$(((mTechFullYear(tech) and mSliceNext(slicep, slice)) or (not(mTechFullYear(tech)) and mSliceFYearNext(slicep, slice)))
+         - sum(slicep$(((mTechFullYear(tech) and mSliceFYearNext(slicep, slice)) or (not(mTechFullYear(tech)) and mSliceNext(slicep, slice)))
                           and mvTechAct(tech, region, year, slicep)), vTechAct(tech, region, year, slicep) / pSliceShare(slicep))
          =l=
-         pSliceShare(slice) * 365 * 24 / pTechRampUp(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
+         pSliceShare(slice) * 365 * 24 * pYearFraction(year) / pTechRampUp(tech, region, year, slice) * pYearFraction(year) * pTechCap2act(tech) * vTechCap(tech, region, year);
 
 * Ramp Down factor
 eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slice)..
-         sum(slicep$(((mTechFullYear(tech) and mSliceNext(slicep, slice)) or (not(mTechFullYear(tech)) and mSliceFYearNext(slicep, slice)))
+         sum(slicep$(((mTechFullYear(tech) and mSliceFYearNext(slicep, slice)) or (not(mTechFullYear(tech)) and mSliceNext(slicep, slice)))
                           and mvTechAct(tech, region, year, slicep)), vTechAct(tech, region, year, slicep) / pSliceShare(slicep))
                  - vTechAct(tech, region, year, slice) / pSliceShare(slice)
          =l=
-         pSliceShare(slice) * 365 * 24 / pTechRampDown(tech, region, year, slice) * pTechCap2act(tech) * vTechCap(tech, region, year);
+         pSliceShare(slice) * 365 * 24 * pYearFraction(year) / pTechRampDown(tech, region, year, slice) * pYearFraction(year) * pTechCap2act(tech) * vTechCap(tech, region, year);
 
 ********************************************************************************
 *** Connect activity with output
@@ -870,7 +872,7 @@ eqTechAfcInpUp(tech, region, comm, year, slice) Technology commodity availabilit
 eqTechAfcOutLo(tech, region, comm, year, slice)$meqTechAfcOutLo(tech, region, comm, year, slice)..
          pTechCact2cout(tech, comm, region, year, slice) *
          pTechAfcLo(tech, comm, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice) * prod(weather$mTechWeatherAfcLo(weather, tech, comm),
             pTechWeatherAfcLo(weather, tech, comm) * pWeather(weather, region, year, slice))
@@ -883,14 +885,14 @@ eqTechAfcOutUp(tech, region, comm, year, slice)$meqTechAfcOutUp(tech, region, co
          =l=
          pTechCact2cout(tech, comm, region, year, slice) *
          pTechAfcUp(tech, comm, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *  prod(weather$mTechWeatherAfcUp(weather, tech, comm),
             pTechWeatherAfcUp(weather, tech, comm) * pWeather(weather, region, year, slice));
 
 * Availability commodity factor LO input equations
 eqTechAfcInpLo(tech, region, comm, year, slice)$meqTechAfcInpLo(tech, region, comm, year, slice)..
          pTechAfcLo(tech, comm, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice)  *  prod(weather$mTechWeatherAfcLo(weather, tech, comm),
             pTechWeatherAfcLo(weather, tech, comm) * pWeather(weather, region, year, slice))
@@ -902,7 +904,7 @@ eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, co
          vTechInp(tech, comm, region, year, slice)
          =l=
          pTechAfcUp(tech, comm, region, year, slice) *
-         pTechCap2act(tech) *
+         pYearFraction(year) * pTechCap2act(tech) *
          vTechCap(tech, region, year) *
          pSliceShare(slice)  *  prod(weather$mTechWeatherAfcUp(weather, tech, comm),
             pTechWeatherAfcUp(weather, tech, comm) * pWeather(weather, region, year, slice));
@@ -951,7 +953,7 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
          =e=
          sum(yearp$(mTechNew(tech, region, yearp) and ordYear(year) >= ordYear(yearp) and
                          (ordYear(year) < pTechOlife(tech, region) + ordYear(yearp) or mTechOlifeInf(tech, region))),
-                  pTechEac(tech, region, yearp) * pPeriodLen(yearp) * (
+                  pYearFraction(year) * pTechEac(tech, region, yearp) * pPeriodLen(yearp) * (
                    vTechNewCap(tech, region, yearp) -
                    sum(yeare$(mvTechRetiredNewCap(tech, region, yearp, yeare) and ordYear(year) >= ordYear(yeare)),
                        vTechRetiredNewCap(tech, region, yearp, yeare)))
@@ -959,14 +961,14 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
 
 * Investment equation
 eqTechInv(tech, region, year)$mTechInv(tech, region, year)..  vTechInv(tech, region, year) =e=
-   pTechInvcost(tech, region, year) * vTechNewCap(tech, region, year);
+   pYearFraction(year) * pTechInvcost(tech, region, year) * vTechNewCap(tech, region, year);
 
 
 * Annual O&M costs
 eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)..
          vTechOMCost(tech, region, year)
          =e=
-         pTechFixom(tech, region, year) * vTechCap(tech, region, year) +
+         pYearFraction(year) * pTechFixom(tech, region, year) * vTechCap(tech, region, year) +
          sum(slice$mTechSlice(tech, slice),
                   pTechVarom(tech, region, year, slice) *
                   vTechAct(tech, region, year, slice) +
@@ -1019,7 +1021,7 @@ eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)..
          vSupReserve(sup, comm, region)
          =e=
          sum((year, slice)$mSupAva(sup, comm, region, year, slice),
-             pPeriodLen(year) * vSupOut(sup, comm, region, year, slice)
+             pPeriodLen(year) * vSupOut(sup, comm, region, year, slice) / pYearFraction(year)
          );
 
 eqSupReserveUp(sup, comm, region)$mSupReserveUp(sup, comm, region)..
@@ -1065,7 +1067,7 @@ eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
 
 
 eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
-     vEmsFuelTot(comm, region, year, slice)
+     vEmsFuelTot(comm, region, year, slice) 
          =e= sum(commp$(pEmissionFactor(comm, commp) > 0),
                  pEmissionFactor(comm, commp) *  sum(tech$mTechInpComm(tech, commp),
                          pTechEmisComm(tech, commp) * sum(slicep$mCommSliceOrParent(comm, slice, slicep),
@@ -1172,7 +1174,7 @@ eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region
 Equation
 * Capacity equation
 eqStorageCap(stg, region, year)     Storage capacity
-* Investition equation
+* Investment equation
 eqStorageInv(stg, region, year)     Storage overnight investment costs
 eqStorageEac(stg, region, year)     Storage equivalent annual cost
 * Aggregated annual costs
@@ -1194,7 +1196,7 @@ eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)..
                  pPeriodLen(yearp) * vStorageNewCap(stg, region, yearp)
          );
 
-* Investition equation
+* Investment equation
 eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)..
          vStorageInv(stg, region, year)
          =e=
@@ -1209,7 +1211,7 @@ eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
                  (       mStorageNew(stg, region, yearp) and ordYear(year) >= ordYear(yearp) and
                          (mStorageOlifeInf(stg, region) or ordYear(year) < pStorageOlife(stg, region) + ordYear(yearp)) and pStorageInvcost(stg, region, yearp) <> 0
                  ),
-                  pStorageEac(stg, region, yearp) * pPeriodLen(yearp) * vStorageNewCap(stg, region, yearp)
+                  pYearFraction(year) * pStorageEac(stg, region, yearp) * pPeriodLen(yearp) * vStorageNewCap(stg, region, yearp)
          );
 
 
@@ -1217,7 +1219,7 @@ eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
 eqStorageCost(stg, region, year)$mStorageOMCost(stg, region, year)..
          vStorageOMCost(stg, region, year)
          =e=
-         pStorageFixom(stg, region, year) * vStorageCap(stg, region, year) +
+         pYearFraction(year) * pStorageFixom(stg, region, year) * vStorageCap(stg, region, year) +
          sum(comm$mStorageComm(stg, comm),
          sum(slice$mCommSlice(comm, slice),
              pStorageCostInp(stg, region, year, slice) * vStorageInp(stg, comm, region, year, slice)
@@ -1362,7 +1364,7 @@ eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          =e=
          sum(yearp$(mTradeNew(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
             (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))),
-                pTradeEac(trade, region, yearp) * pPeriodLen(yearp) * vTradeNewCap(trade, yearp));
+                pYearFraction(year) * pTradeEac(trade, region, yearp) * pPeriodLen(yearp) * vTradeNewCap(trade, yearp));
 
 ********************************************************************************
 *** Auxiliary input & output equations
@@ -1434,7 +1436,7 @@ eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
                   - vInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice);
 
 eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)..
-         vOutTot(comm, region, year, slice)
+         vOutTot(comm, region, year, slice) * pYearFraction(year)
          =e=
          vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice) +
                   vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice) +
@@ -1459,7 +1461,7 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
                   vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice);
 
 eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)..
-         vInpTot(comm, region, year, slice)
+         vInpTot(comm, region, year, slice) * pYearFraction(year)
          =e=
          vDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice) +
          vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice) +

@@ -181,7 +181,7 @@ report.scenario <- function(obj, texdir = paste(getwd(), '/reports/', sep = ''),
       # Discount cost data
       dsc <- getParameterData(obj@modInp@parameters$pDiscountFactor)
       dsc[, 'mid'] <- NA
-      mlst <- getMilestone(obj)
+      mlst <- getMilestoneYears(obj)
       for(i in seq(length.out = nrow(mlst))) {
         dsc[mlst$start[i] <= dsc$year & dsc$year <= mlst$end[i], 'mid'] <- mlst$mid[i]
       }

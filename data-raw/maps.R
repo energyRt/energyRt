@@ -1,13 +1,13 @@
-#============================================================================#
+# ============================================================================#
 # THIS IS AN AUTO-GENERATED FILE BY gams2x LIBRARY,
 # IT NOT INTENDED FOR DIRECT EDITING - WILL BE OVERWRITTEN.
 # gams2x EXTRACTS THE MODEL FRAMEWORK FROM THE GAMS SOURCE FILE energyRt.gms,
 # TRANSLATES IT TO OTHER MATHEMATICAL PROGRAMMING LANGUGES,
 # AND CREATES THIS FILE WITH THE MODEL STRUCTURE DETAILS
-# FOR FURTHER SAVING IN "R/sysdata.rda" FILE OF the "energyRt" PACKAGE. 
-#============================================================================#
+# FOR FURTHER SAVING IN "R/sysdata.rda" FILE OF the "energyRt" PACKAGE.
+# ============================================================================#
 ########################## variables mapping #########################
-.variable_mapping = list(
+.variable_mapping <- list(
   vTechNewCap = "vTechNewCap( tech , region , year ) $ mTechNew( tech , region , year )",
   vTechRetiredStock = "vTechRetiredStock( tech , region , year ) $ mvTechRetiredStock( tech , region , year )",
   vTechRetiredNewCap = "vTechRetiredNewCap( tech , region , year , year ) $ mvTechRetiredNewCap( tech , region , year , year )",
@@ -71,12 +71,12 @@
   vTradeEac = "vTradeEac( trade , region , year ) $ mTradeEac( trade , region , year )",
   vTradeNewCap = "vTradeNewCap( trade , year ) $ mTradeNew( trade , year )",
   vTotalUserCosts = "vTotalUserCosts( region , year ) $ mvTotalUserCosts( region , year )"
-);
- .variable_set = lapply(.variable_mapping, function(x) strsplit(gsub('[ ]*[)].*$', '', gsub('^[^(]*[(][ ]*', '', x)), '[ ]*[,][ ]*')[[1]])
+)
+.variable_set <- lapply(.variable_mapping, function(x) strsplit(gsub("[ ]*[)].*$", "", gsub("^[^(]*[(][ ]*", "", x)), "[ ]*[,][ ]*")[[1]])
 #########################
 # variable description
 #########################
-.variable_description = c(
+.variable_description <- c(
   vTechInv = "Overnight investment costs",
   vTechEac = "Annualized investment costs",
   vTechOMCost = "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)",
@@ -139,11 +139,12 @@
   vTradeInv = "Investment in trade capacity (overnight)",
   vTradeEac = "Investment in trade capacity (EAC)",
   vTradeNewCap = "New trade capacity",
-  vTotalUserCosts = "Total additional costs (set by user)");
+  vTotalUserCosts = "Total additional costs (set by user)"
+)
 #########################
 # equation description
 #########################
-.equation_description = c(
+.equation_description <- c(
   eqTechSng2Sng = "Technology input to output",
   eqTechGrp2Sng = "Technology group input to output",
   eqTechSng2Grp = "Technology input to group output",
@@ -235,11 +236,12 @@
   eqTaxCost = "Commodity taxes",
   eqSubsCost = "Commodity subsidy",
   eqObjective = "Objective equation",
-  eqLECActivity = "levelized costs (auxiliary equation)");
+  eqLECActivity = "levelized costs (auxiliary equation)"
+)
 #########################
 # equation set
 #########################
-.equation_set = list(
+.equation_set <- list(
   eqTechSng2Sng = c("tech", "region", "comm", "commp", "year", "slice"),
   eqTechGrp2Sng = c("tech", "region", "group", "commp", "year", "slice"),
   eqTechSng2Grp = c("tech", "region", "comm", "groupp", "year", "slice"),
@@ -331,11 +333,13 @@
   eqTaxCost = c("comm", "region", "year"),
   eqSubsCost = c("comm", "region", "year"),
   eqObjective = NULL,
-  eqLECActivity = c("tech", "region", "year"));
+  eqLECActivity = c("tech", "region", "year")
+)
 #########################
 # parameter description
 #########################
-.parameter_description = c(
+.parameter_description <- c(
+  pYearFraction = "fraction of sum of sampled slices in year -- experimental",
   pTechOlife = "Operational life of technologies",
   pTechCinp2ginp = "Commodity input to group input",
   pTechGinp2use = "Group input into use",
@@ -461,11 +465,13 @@
   pStorageWeatherCinpLo = "weather factor for storage commodity input lower value (cinp.lo)",
   pStorageWeatherCoutUp = "weather factor for storage commodity output upper value (cout.up)",
   pStorageWeatherCoutLo = "weather factor for storage commodity output lower value (cout.lo)",
-  pLECLoACT = "levelized costs interim parameter");
+  pLECLoACT = "levelized costs interim parameter"
+)
 #########################
 # parameter set
 #########################
-.parameter_set = list(
+.parameter_set <- list(
+  pYearFraction = c("year"),
   pTechOlife = c("tech", "region"),
   pTechCinp2ginp = c("tech", "comm", "region", "year", "slice"),
   pTechGinp2use = c("tech", "group", "region", "year", "slice"),
@@ -591,11 +597,12 @@
   pStorageWeatherCinpLo = c("weather", "stg"),
   pStorageWeatherCoutUp = c("weather", "stg"),
   pStorageWeatherCoutLo = c("weather", "stg"),
-  pLECLoACT = c("region"));
+  pLECLoACT = c("region")
+)
 #########################
 # equation map
 #########################
-.equation_mapping = list(
+.equation_mapping <- list(
   eqTechSng2Sng = "meqTechSng2Sng(tech, region, comm, commp, year, slice)",
   eqTechGrp2Sng = "meqTechGrp2Sng(tech, region, group, commp, year, slice)",
   eqTechSng2Grp = "meqTechSng2Grp(tech, region, comm, groupp, year, slice)",
@@ -688,11 +695,11 @@
   eqSubsCost = "mSubCost(comm, region, year)",
   eqObjective = "",
   eqLECActivity = "meqLECActivity(tech, region, year)"
-);
+)
 #########################
 # set description
 #########################
-.set_description = c(
+.set_description <- c(
   comm = "commodity",
   region = "region",
   year = "year",
@@ -910,11 +917,12 @@
   mTechNCap2AOut = "",
   mTechCinp2AOut = "",
   mTechCout2AOut = "",
-  mLECRegion = "");
+  mLECRegion = ""
+)
 #########################
 # set set
 #########################
-.set_set = list(
+.set_set <- list(
   comm = NULL,
   region = NULL,
   year = NULL,
@@ -1132,12 +1140,14 @@
   mTechNCap2AOut = c("tech", "comm", "region", "year", "slice"),
   mTechCinp2AOut = c("tech", "comm", "comm", "region", "year", "slice"),
   mTechCout2AOut = c("tech", "comm", "comm", "region", "year", "slice"),
-  mLECRegion = c("region"));
+  mLECRegion = c("region")
+)
 #########################
-# equation_variable 
+# equation_variable
 #########################
-.equation_variable <- data.frame(equation = character(), variable = character(), stringsAsFactors = FALSE)
-.equation_variable[1:238, ] <- NA;
+.equation_variable <- data.frame(equation = character(), variable = character(),
+                                 stringsAsFactors = FALSE)
+.equation_variable[1:238, ] <- NA
 .equation_variable[1, ] <- c("eqTechSng2Sng", "vTechInp")
 .equation_variable[2, ] <- c("eqTechSng2Sng", "vTechOut")
 .equation_variable[3, ] <- c("eqTechGrp2Sng", "vTechInp")
@@ -1377,16 +1387,58 @@
 .equation_variable[237, ] <- c("eqObjective", "vObjective")
 .equation_variable[238, ] <- c("eqLECActivity", "vTechAct")
 model_structure <- rbind(
-	data.frame(name = names(.set_description), description = .set_description, 
-						 type = 'set', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .set_set), map = ''),
-	data.frame(name = names(.parameter_description), description = .parameter_description,
-						 type = 'parameter', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .parameter_set), map = ''),
-	data.frame(name = names(.variable_description), description = .variable_description, 
-						 type = 'variable', dim = gsub('(["]|[)].*|^[^(]*[(])', '', .variable_set), 
-	    map = gsub('[,]', ', ', gsub('(.*[$]|[ ])', '', sapply(.variable_mapping, 
-			function(x) if (any(grep('[$]', x))) x else '')))))
-save(list = "model_structure", 
-file = "../data/model_structure.RData")
-save(list = c(".set_set", ".set_description", ".parameter_set", ".parameter_description", ".variable_set", 
-".variable_description", ".variable_mapping", ".equation_mapping", ".equation_set", ".equation_description", ".equation_variable"), 
-file = "../R/sysdata.rda")
+  data.frame(
+    name = names(.set_description),
+    description = .set_description,
+    type = "set",
+    dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', "", .set_set),
+    map = ""
+  ),
+  data.frame(
+    name = names(.parameter_description),
+    description = .parameter_description,
+    type = "parameter",
+    dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', "", .parameter_set),
+    map = ""
+  ),
+  data.frame(
+    name = names(.variable_description),
+    description = .variable_description,
+    type = "variable",
+    dim = gsub('(["]|[)].*|^[^(]*[(])', "", .variable_set),
+    map = gsub(
+      "[,]",
+      ", ",
+      gsub(
+        "(.*[$]|[ ])",
+        "",
+        sapply(
+          .variable_mapping,
+          function(x) {
+            if (any(grep("[$]", x))) x else ""
+          }
+        )
+      )
+    )
+  )
+)
+# save(
+#   list = "model_structure",
+#   file = "../data/model_structure.RData"
+# )
+# save(
+#   list = c(
+#     ".set_set",
+#     ".set_description",
+#     ".parameter_set",
+#     ".parameter_description",
+#     ".variable_set",
+#     ".variable_description",
+#     ".variable_mapping",
+#     ".equation_mapping",
+#     ".equation_set",
+#     ".equation_description",
+#     ".equation_variable"
+#   ),
+#   file = "../R/sysdata.rda"
+# )

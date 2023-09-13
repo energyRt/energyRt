@@ -12,5 +12,16 @@
 #' @importFrom data.table :=
 #' @importFrom data.table as.data.table
 #' @importFrom data.table data.table
+#' @importFrom data.table rbindlist
+#' @importFrom data.table setcolorder
+#' @importFrom dplyr all_of
+#' @importFrom dplyr any_of
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
+#' @importFrom dplyr summarize
+#' @importFrom tibble as_tibble
+#' @importFrom tibble is_tibble
+#' @importFrom tibble tibble
 ## usethis namespace: end
 NULL

@@ -8,3 +8,16 @@ tmp/
 .gpr
 ^\.github$
 ^vignettes/articles$
+^data-raw$
+dev/
+\.vs/
+\.git/
+^solwork$
+^tmp$
+drafts/
+depreciated/
+
+
+
+
+
