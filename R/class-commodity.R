@@ -86,8 +86,13 @@ newCommodity <- function(
   )
 }
 
+# update.commodity <- function(obj, ...) .data2slots("commodity", obj, ...)
+
 #' @importFrom stats update
-#' @rdname update
-#' @family update commodity
+#' @rdname commodity
+#' @family commodity update
 #' @export
-update.commodity <- function(obj, ...) .data2slots("commodity", obj, ...)
+setMethod('update', signature(object = 'commodity'), function(object, ...) {
+  # update.supply <- function(obj, ...) {
+  .data2slots("commodity", object, ...)
+})

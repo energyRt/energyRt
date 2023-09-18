@@ -80,13 +80,16 @@ setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
 #' Create new supply object
 #'
 #' @name newSupply
+#' @rdname sypply
 #' @export
 setMethod("newSupply", signature(name = "character"), function(name, ...) {
   .data2slots("supply", name, ...)
 })
 
-# setMethod('update', signature(obj = 'supply'), function(obj, ...)
+#' @rdname sypply
+#' @family supply update
 #' @export
-update.supply <- function(obj, ...) {
-  .data2slots("supply", obj, ...)
-}
+setMethod('update', signature(object = 'supply'), function(object, ...) {
+# update.supply <- function(obj, ...) {
+  .data2slots("supply", object, ...)
+})

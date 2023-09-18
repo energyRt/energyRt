@@ -14,7 +14,9 @@ An S4 class to store the model objects.
 
 \item{\code{description}}{character, short description of the purpose or content of the repository.}
 
-\item{\code{data}}{list with the model classes, including other repositories, excluding model and scenario classes.}
+\item{\code{data}}{list of repositories with objects of permitted classes. All names of objects (`object@name`) must be unique.}
+
+\item{\code{permit}}{character vector with names of classes permitted to store in the repository.}
 
 \item{\code{misc}}{list, any additional data or information to store in the object.}
 }}

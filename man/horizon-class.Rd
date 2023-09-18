@@ -3,18 +3,18 @@
 \docType{class}
 \name{horizon-class}
 \alias{horizon-class}
-\title{An S4 class to represent model/scenario horizon with intervals (year-steps)}
+\title{An S4 class to represent model/scenario planning horizon with intervals (year-steps)}
 \description{
-An S4 class to represent model/scenario horizon with intervals (year-steps)
+An S4 class to represent model/scenario planning horizon with intervals (year-steps)
 }
 \section{Slots}{
 
 \describe{
 \item{\code{info}}{character, a comment or a short description.}
 
-\item{\code{years}}{integer, an arranged, full sequence (without gaps) of modeled years.}
+\item{\code{period}}{integer, an arranged, full sequence (without gaps) of modeled period.}
 
-\item{\code{intervals}}{data.table,}
+\item{\code{intervals}}{data.frame with three columns, representing start, middle, and the end year of every interval.}
 }}
 
 \seealso{

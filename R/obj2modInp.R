@@ -820,13 +820,18 @@ setMethod(
       if (is.null(pStorageFixom) || all(pStorageFixom$value == 0)) {
         return(mStorageOMCost)
       }
-      return(rbind(mStorageOMCost, merge0(
-        mStorageSpan,
-        pStorageFixom[pStorageFixom$value != 0,
-          colnames(pStorageFixom) %in% colnames(mStorageSpan),
-          drop = FALSE
-        ]
-      )))
+      return(rbind(
+        mStorageOMCost,
+        merge0(mStorageSpan,
+               select(filter(pStorageFixom, value != 0),
+                      any_of(colnames(mStorageSpan))
+                      )
+               )
+        # pStorageFixom[pStorageFixom$value != 0,
+        #   colnames(pStorageFixom) %in% colnames(mStorageSpan),
+        #   drop = FALSE
+        # ])
+      ))
     }
     mStorageOMCost <- add_omcost(mStorageOMCost, pStorageFixom)
     mStorageOMCost <- add_omcost(mStorageOMCost, pStorageCostInp)
@@ -863,20 +868,25 @@ setMethod(
       mvStorageStore2 <- mvStorageStore
       mvStorageStore2$comm <- NULL
       mvStorageAInp <- merge0(mvStorageStore2, mStorageAInp)
-      obj@parameters[["mvStorageAInp"]] <- .dat2par(obj@parameters[["mvStorageAInp"]], mvStorageAInp)
+      obj@parameters[["mvStorageAInp"]] <-
+        .dat2par(obj@parameters[["mvStorageAInp"]], mvStorageAInp)
       mvStorageAOut <- merge0(mvStorageStore2, mStorageAOut)
-      obj@parameters[["mvStorageAOut"]] <- .dat2par(obj@parameters[["mvStorageAOut"]], mvStorageAOut)
+      obj@parameters[["mvStorageAOut"]] <-
+        .dat2par(obj@parameters[["mvStorageAOut"]], mvStorageAOut)
       for (i in c(
-        "mStorageStg2AOut", "mStorageCinp2AOut", "mStorageCout2AOut", "mStorageCap2AOut", "mStorageNCap2AOut",
-        "mStorageStg2AInp", "mStorageCinp2AInp", "mStorageCout2AInp", "mStorageCap2AInp", "mStorageNCap2AInp"
-      )) {
+        "mStorageStg2AOut", "mStorageCinp2AOut", "mStorageCout2AOut",
+        "mStorageCap2AOut", "mStorageNCap2AOut", "mStorageStg2AInp",
+        "mStorageCinp2AInp", "mStorageCout2AInp", "mStorageCap2AInp",
+        "mStorageNCap2AInp")) {
         if (!is.null(aout_tmp[[gsub("^m", "p", i)]])) {
           atmp <- aout_tmp[[gsub("^m", "p", i)]]
           if (any(grep("Out$", i))) {
-            atmp <- atmp[, colnames(atmp) %in% colnames(mvStorageAOut), drop = FALSE]
+            # atmp <- atmp[, colnames(atmp) %in% colnames(mvStorageAOut), drop = FALSE]
+            atmp <- atmp %>% select(any_of(colnames(mvStorageAOut)))
             if (ncol(atmp) != 5) atmp <- merge0(atmp, mvStorageAOut)
           } else {
-            atmp <- atmp[, colnames(atmp) %in% colnames(mvStorageAInp), drop = FALSE]
+            # atmp <- atmp[, colnames(atmp) %in% colnames(mvStorageAInp), drop = FALSE]
+            atmp <- atmp %>% select(any_of(colnames(mvStorageAInp)))
             if (ncol(atmp) != 5) atmp <- merge0(atmp, mvStorageAInp)
           }
           obj@parameters[[i]] <- .dat2par(obj@parameters[[i]], atmp)
@@ -891,28 +901,54 @@ setMethod(
       y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
     }
     rem_inf_def_inf <- function(x, y) {
-      merge0(x[x$type == "up" & x$value != Inf, colnames(x) %in% colnames(y), drop = FALSE], y)
+      merge0(
+        # x[x$type == "up" & x$value != Inf, colnames(x) %in% colnames(y), drop = FALSE],
+        select(filter(x, type == "up", x$value != Inf), any_of(colnames(y))),
+        y)
     }
-    obj@parameters[["meqStorageAfLo"]] <- .dat2par(obj@parameters[["meqStorageAfLo"]], merge0(pStorageAf[pStorageAf$type == "lo" & pStorageAf$value != 0, ], mvStorageStore))
-    obj@parameters[["meqStorageAfUp"]] <- .dat2par(obj@parameters[["meqStorageAfUp"]], rem_inf_def1(pStorageAf, mvStorageStore))
+    obj@parameters[["meqStorageAfLo"]] <-
+      .dat2par(obj@parameters[["meqStorageAfLo"]],
+               merge0(
+                 # pStorageAf[pStorageAf$type == "lo" & pStorageAf$value != 0, ],
+                 filter(pStorageAf, type == "lo" & value != 0),
+                 mvStorageStore
+                 ))
+    obj@parameters[["meqStorageAfUp"]] <-
+      .dat2par(obj@parameters[["meqStorageAfUp"]],
+               rem_inf_def1(pStorageAf, mvStorageStore)
+               )
     if (!is.null(pStorageCinp)) {
-      obj@parameters[["meqStorageInpLo"]] <- .dat2par(obj@parameters[["meqStorageInpLo"]], merge0(pStorageCinp[
-        pStorageCinp$type == "lo" & pStorageCinp$value != 0,
-        colnames(pStorageCinp) %in% obj@parameters[["meqStorageInpLo"]]@dimSets
-      ], mvStorageStore))
-      obj@parameters[["meqStorageInpUp"]] <- .dat2par(obj@parameters[["meqStorageInpUp"]], rem_inf_def_inf(pStorageCinp, mvStorageStore))
+      obj@parameters[["meqStorageInpLo"]] <-
+        .dat2par(
+          obj@parameters[["meqStorageInpLo"]],
+          merge0(
+            # pStorageCinp[pStorageCinp$type == "lo" & pStorageCinp$value != 0,
+            #              colnames(pStorageCinp) %in%
+            #                obj@parameters[["meqStorageInpLo"]]@dimSets],
+            select(filter(pStorageCinp, type == "lo" & value != 0),
+                   any_of(obj@parameters[["meqStorageInpLo"]]@dimSets)),
+            mvStorageStore))
+      obj@parameters[["meqStorageInpUp"]] <-
+        .dat2par(obj@parameters[["meqStorageInpUp"]],
+                 rem_inf_def_inf(pStorageCinp, mvStorageStore))
     }
     if (!is.null(pStorageCout)) {
-      obj@parameters[["meqStorageOutLo"]] <- .dat2par(
-        obj@parameters[["meqStorageOutLo"]],
-        merge0(pStorageCout[pStorageCout$type == "lo" & pStorageCout$value != 0,
-          colnames(pStorageCout) %in% obj@parameters[["meqStorageOutLo"]]@dimSets,
-          drop = FALSE
-        ], mvStorageStore)
+      obj@parameters[["meqStorageOutLo"]] <-
+        .dat2par(
+          obj@parameters[["meqStorageOutLo"]],
+          merge0(
+            # pStorageCout[pStorageCout$type == "lo" & pStorageCout$value != 0,
+            #              colnames(pStorageCout) %in%
+            #                obj@parameters[["meqStorageOutLo"]]@dimSets,
+            #              drop = FALSE],
+            select(filter(pStorageCout, type == "lo" & value != 0),
+                   any_of(obj@parameters[["meqStorageOutLo"]]@dimSets)),
+            mvStorageStore)
       )
-      obj@parameters[["meqStorageOutUp"]] <- .dat2par(obj@parameters[["meqStorageOutUp"]], rem_inf_def_inf(pStorageCout, mvStorageStore))
+      obj@parameters[["meqStorageOutUp"]] <-
+        .dat2par(obj@parameters[["meqStorageOutUp"]],
+                 rem_inf_def_inf(pStorageCout, mvStorageStore))
     }
-
     obj
   }
 )
@@ -940,8 +976,8 @@ setMethod(".obj2modInp",
       ss <- names(ss)[ss %in% "data.frame"]
       ss <- ss[sapply(ss, function(x) {
         (any(colnames(slot(sup, x)) == "region") &&
-          any(!is.na(slot(sup, x)$region)))
-      })]
+           any(!is.na(slot(sup, x)$region)))
+        })]
       for (sl in ss) {
         if (any(!is.na(slot(sup, sl)$region) &
                 !(slot(sup, sl)$region %in% sup@region))) {
@@ -1026,14 +1062,12 @@ setMethod(".obj2modInp",
         # mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, merge0(mSupAva, zero_ava_up[, colnames(zero_ava_up) %in% colnames(mSupAva), drop = FALSE])[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
         ii <- mSupAva %>%
           rbind(
-            merge0(
-              mSupAva,
-              select(zero_ava_up, any_of(colnames(mSupAva)))
-              )
+            merge0(mSupAva,
+                   select(zero_ava_up, any_of(colnames(mSupAva)))                   )
             ) %>%
           select(all_of(colnames(mSupAva))) %>%
           duplicated(fromLast = TRUE)
-        ii <- ii[1:nrow(mSupAva)]
+        ii <- ii[1:nrow(mSupAva)] # ???
         mSupAva <- mSupAva[!ii,]
       }
     }
@@ -1042,16 +1076,18 @@ setMethod(".obj2modInp",
     obj@parameters[["mvSupReserve"]] <-
       .dat2par(obj@parameters[["mvSupReserve"]], mvSupReserve)
     if (all(c("sup", "comm", "region") %in% colnames(pSupReserve))) {
-      obj@parameters[["mSupReserveUp"]] <- .dat2par(
-        obj@parameters[["mSupReserveUp"]],
-        pSupReserve[pSupReserve$type == "up" & pSupReserve$value != Inf,
-                    c("sup", "comm", "region")]
-      )
-      obj@parameters[["meqSupReserveLo"]] <- .dat2par(
-        obj@parameters[["meqSupReserveLo"]],
-        pSupReserve[pSupReserve$type == "lo" & pSupReserve$value != 0,
-                    c("sup", "comm", "region")]
-      )
+      obj@parameters[["mSupReserveUp"]] <-
+        .dat2par(
+          obj@parameters[["mSupReserveUp"]],
+          pSupReserve[pSupReserve$type == "up" & pSupReserve$value != Inf,
+                      c("sup", "comm", "region")]
+          )
+      obj@parameters[["meqSupReserveLo"]] <-
+        .dat2par(
+          obj@parameters[["meqSupReserveLo"]],
+          pSupReserve[pSupReserve$type == "lo" & pSupReserve$value != 0,
+                      c("sup", "comm", "region")]
+          )
     } else {
       # obj@parameters[["mSupReserveUp"]] <- .dat2par(
       #   obj@parameters[["mSupReserveUp"]],
@@ -1062,15 +1098,16 @@ setMethod(".obj2modInp",
       # )
       .null_to_empty_param("pSupReserve", obj@parameters)
       # browser()
-      obj@parameters[["mSupReserveUp"]] <- .dat2par(
-        obj@parameters[["mSupReserveUp"]],
-        merge0(mvSupReserve,
-               select(
-                 filter(pSupReserve, type == "up" & value != Inf),
-                 any_of(c("sup", "comm", "region"))
+      obj@parameters[["mSupReserveUp"]] <-
+        .dat2par(
+          obj@parameters[["mSupReserveUp"]],
+          merge0(mvSupReserve,
+                 select(
+                   filter(pSupReserve, type == "up" & value != Inf),
+                   any_of(c("sup", "comm", "region"))
+                   )
                  )
-               )
-        )
+          )
       # obj@parameters[["meqSupReserveLo"]] <- .dat2par(
       #   obj@parameters[["meqSupReserveLo"]],
       #   merge0(mvSupReserve, pSupReserve[pSupReserve$type == "lo" & pSupReserve$value != 0,
@@ -1078,15 +1115,16 @@ setMethod(".obj2modInp",
       #     drop = FALSE
       #   ])
       # )
-      obj@parameters[["meqSupReserveLo"]] <- .dat2par(
-        obj@parameters[["meqSupReserveLo"]],
-        merge0(mvSupReserve,
-               select(
-                 filter(pSupReserve, type == "lo" & value != 0),
-                 any_of(c("sup", "comm", "region"))
+      obj@parameters[["meqSupReserveLo"]] <-
+        .dat2par(
+          obj@parameters[["meqSupReserveLo"]],
+          merge0(mvSupReserve,
+                 select(
+                   filter(pSupReserve, type == "lo" & value != 0),
+                   any_of(c("sup", "comm", "region"))
+                   )
                  )
-               )
-      )
+          )
     }
     .null_to_empty_param("pSupAva", obj@parameters)
     obj@parameters[["meqSupAvaLo"]] <- .dat2par(
@@ -1147,36 +1185,54 @@ setMethod(".obj2modInp",
 )
 
 .toWeatherImply <- function(dtf, val, add_set, add_val, sets = NULL) {
-  browser()
+  dtf <- as.data.table(dtf)
+  # browser() ### !!! ToDo: dplyr
   # f1 <- dtf[!is.na(dtf[, paste0(val, ".up")]),
   #           c(paste0(val, ".up"), "weather", sets),
   #           drop = FALSE]
+  # colnames(f1)[1] <- "value"
   c_nm <- paste0(val, ".up")
   ii <- select(dtf, all_of(c_nm))[[1]] %>% is.na()
   f1 <- dtf %>%
     filter(!ii) %>%
-    select(all_of(c(paste0(val, ".up"), "weather", sets)))
-  colnames(f1)[1] <- "value"
-  f2 <- dtf[!is.na(dtf[, paste0(val, ".fx")]),
-            c(paste0(val, ".fx"), "weather", sets),
-            drop = FALSE]
-  colnames(f2)[1] <- "value"
-  f3 <- dtf[!is.na(dtf[, paste0(val, ".lo")]),
-            c(paste0(val, ".lo"), "weather", sets),
-            drop = FALSE]
-  colnames(f3)[1] <- "value"
+    select(all_of(c(c_nm, "weather", sets))) %>%
+    rename(value = all_of(c_nm))
+  # f2 <- dtf[!is.na(dtf[, paste0(val, ".fx")]),
+  #           c(paste0(val, ".fx"), "weather", sets),
+  #           drop = FALSE]
+  # colnames(f2)[1] <- "value"
+  c_nm <- paste0(val, ".fx")
+  ii <- select(dtf, all_of(c_nm))[[1]] %>% is.na()
+  f2 <- dtf %>%
+    filter(!ii) %>%
+    select(all_of(c(c_nm, "weather", sets))) %>%
+    rename(value = all_of(c_nm))
+  # f3 <- dtf[!is.na(dtf[, paste0(val, ".lo")]),
+  #           c(paste0(val, ".lo"), "weather", sets),
+  #           drop = FALSE]
+  # colnames(f3)[1] <- "value"
+  c_nm <- paste0(val, ".lo")
+  ii <- select(dtf, all_of(c_nm))[[1]] %>% is.na()
+  f3 <- dtf %>%
+    filter(!ii) %>%
+    select(all_of(c(c_nm, "weather", sets))) %>%
+    rename(value = all_of(c_nm))
   rs <- list(par = NULL)
   if (nrow(f1) + nrow(f2) != 0) {
     tmp <- rbind(f1, f2)
-    tmp[, add_set] <- add_val
-    rs$mapup <- tmp[, -1, drop = FALSE]
+    # tmp[, add_set] <- add_val
+    tmp[[add_set]] <- add_val
+    # rs$mapup <- tmp[, -1, drop = FALSE]
+    rs$mapup <- select(tmp, -value)
     tmp$type <- "up"
     rs$par <- tmp
   }
   if (nrow(f3) + nrow(f2) != 0) {
     tmp <- rbind(f3, f2)
-    tmp[, add_set] <- add_val
-    rs$maplo <- tmp[, -1, drop = FALSE]
+    # tmp[, add_set] <- add_val
+    tmp[[add_set]] <- add_val
+    # rs$maplo <- tmp[, -1, drop = FALSE]
+    rs$maplo <- select(tmp, -value)
     tmp$type <- "lo"
     rs$par <- rbind(rs$par, tmp)
   }
@@ -2004,7 +2060,7 @@ setMethod(
         merge_afc(obj@parameters[["meqTechAfcInpUp"]], mvTechInp, pTechAfc, "up")
     }
 
-    if (nrow(tech@weather) > 0) {
+    if (nrow(tech@weather) > 0) { # !!!ToDo: dplyr
       tmp <- .toWeatherImply(tech@weather, "waf", "tech", tech@name)
       obj@parameters[["pTechWeatherAf"]] <-
         .dat2par(obj@parameters[["pTechWeatherAf"]], tmp$par)

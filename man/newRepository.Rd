@@ -4,7 +4,10 @@
 \alias{newRepository}
 \title{Create new repository object}
 \usage{
-newRepository(name = "", ...)
+newRepository(name = "default_repository", ...)
+}
+\arguments{
+\item{name}{character,}
 }
 \description{
 Create new repository object

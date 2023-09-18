@@ -21,3 +21,12 @@ setGeneric(".add2set", function(obj, app, approxim) standardGeneric(".add2set"))
 setGeneric('.dat2par', function(obj, data) standardGeneric(".dat2par"))
 setGeneric(".obj2modInp", function(obj, app, approxim) standardGeneric(".obj2modInp"))
 
+# atable <- data.table
+# as_atable <- as.data.table
+#
+# atable <- tibble
+# as_atable <- as_tibble
+
+# atable <- data.frame
+# as_atable <- as.data.frame
+

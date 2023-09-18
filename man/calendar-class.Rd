@@ -3,29 +3,37 @@
 \docType{class}
 \name{calendar-class}
 \alias{calendar-class}
-\title{An S4 class to represent sub-annual time resolution structure (time-frames and time-slices).}
+\title{An S4 class to represent sub-annual time resolution structure
+(time-frames and time-slices).}
 \description{
-An S4 class to represent sub-annual time resolution structure (time-frames and time-slices).
+An S4 class to represent sub-annual time resolution structure
+(time-frames and time-slices).
 }
 \details{
-Sub-annual time resolution is represented by nested, named fractions of a year ("slices").
+Sub-annual time resolution is represented by nested, named fractions
+of a year ("slices").
 }
 \section{Slots}{
 
 \describe{
-\item{\code{timeframes}}{a named list of nested sub-annual levels with vectors of individual elements.}
+\item{\code{timeframes}}{a named list of nested sub-annual levels with vectors
+of individual elements.}
 
-\item{\code{timetable}}{data.frame with levels of slices in the named columns, and number of rows equal to the total number of time-slices on the lowest level.}
+\item{\code{timetable}}{data.frame with levels of slices in the named columns,
+and number of rows equal to the total number of time-slices on the lowest level.}
 
-\item{\code{slice_share}}{two column data.frame with slices from all levels with their individual share in a year.}
+\item{\code{slice_share}}{two column data.frame with slices from all levels
+with their individual share in a year.}
 
-\item{\code{default_frame}}{character, the name of the default level of the time-slices used in the model.}
+\item{\code{default_timeframe}}{character, the name of the default level of the time-slices used in the model.}
 
 \item{\code{slices_in_frame}}{(!!! to depreciate)}
 
-\item{\code{slice_family}}{data.frame mapping "parent" to "child" slices in the nested hierarchy.}
+\item{\code{slice_family}}{data.frame mapping "parent" to "child" slices in
+the nested hierarchy.}
 
-\item{\code{slice_ancestry}}{data.frame mapping all "(grand-)parent" to all "(grand-)children".}
+\item{\code{slice_ancestry}}{data.frame mapping all "(grand-)parent" to all
+"(grand-)children".}
 
 \item{\code{misc}}{list with additional data and calculated mappings.}
 }}

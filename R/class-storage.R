@@ -190,9 +190,12 @@ setMethod("newStorage", signature(name = "character"), function(name, ...) {
   .data2slots("storage", name, ...)
 })
 
-# setMethod('update', signature(obj = 'storage'), function(obj, ...)
+#' @importFrom stats update
+#' @rdname storage
 #' @family storage update
 #' @export
-update.storage <- function(obj, ...) {
-  .data2slots("storage", obj, ...)
-}
+setMethod('update', signature(object = 'storage'), function(object, ...) {
+  # update.storage <- function(obj, ...) {
+  .data2slots("storage", object, ...)
+})
+

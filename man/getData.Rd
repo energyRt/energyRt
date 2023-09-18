@@ -78,7 +78,7 @@ get_data(
 
 \item{stringsAsFactors}{logical, should the sets values be converted to factors?}
 
-\item{yearsAsFactors}{logical, should years  be converted to factors? Set 'year' is integer by default.}
+\item{yearsAsFactors}{logical, should `year` be converted to factors? Set 'year' is integer by default.}
 
 \item{scenNameInList}{logical, should the name of the scenarios be used if not provided in the list with several scenarios?}
 
