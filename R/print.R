@@ -131,15 +131,15 @@ print.region <- function(x) {
 }
 
 #------------------------------------------------------------------------------
-print.repository <- function(x) {
-  cat("Name: ", x@name, "\n")
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
-  for (i in seq(along = x@data)) {
-    cat(class(x@data[[i]]), " ", i, ":\n", sep = "")
-    print(x@data[[i]])
-  }
-}
-
+# print.repository <- function(x) {
+#   cat("Name: ", x@name, "\n")
+#   if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+#   for (i in seq(along = x@data)) {
+#     cat(class(x@data[[i]]), " ", i, ":\n", sep = "")
+#     print(x@data[[i]])
+#   }
+# }
+#
 #------------------------------------------------------------------------------
 print.scenario <- function(x) {
   cat("Name: ", x@name, "\n")
@@ -205,7 +205,7 @@ print.technology <- function(x, ...) {
   if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
   if (x@cap2act != "") cat("cap2act: ", x@cap2act, "\n")
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
-  # if(!is.null(x@reporting_years)) cat('reporting years: ', x@reporting_years, '\n')
+  # if(!is.null(x@reporting_years)) cat('reporting period: ', x@reporting_years, '\n')
   for (i in .technology_data_frame()) if_print_data_frame(x, i)
 }
 

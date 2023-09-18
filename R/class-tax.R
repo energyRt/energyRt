@@ -44,7 +44,7 @@ setClass("tax",
     # ! Misc
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setGeneric("newTax", function(name, ...) standardGeneric("newTax"))

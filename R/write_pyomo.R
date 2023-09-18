@@ -301,7 +301,7 @@
       rtt <- paste0("# ", name, name2, "\ntmp = {} \n")
       kk <- paste0("tmp[('", data[, 1])
       for (i in seq_len(ncol(data) - 2) + 1) {
-        kk <- paste0(kk, "', '", data[, i])
+        kk <- paste0(kk, "', '", data[[i]])
       }
       kk <- paste0(kk, "')] = ", data[, "value"])
       kk <- c(
@@ -374,7 +374,7 @@
       }
       kk <- paste0("  ", data[, 1])
       for (i in seq_len(ncol(data) - 2) + 1) {
-        kk <- paste0(kk, " ", data[, i])
+        kk <- paste0(kk, " ", data[[i]])
       }
       kk <- paste0(kk, " ", data[, "value"])
       kk <- c(rtt, paste0(kk, collapse = "\n"), "\n;\n")

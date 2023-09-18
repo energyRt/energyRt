@@ -47,8 +47,16 @@ setMethod("initialize", "modInp", function(.Object) {
   ob <- .modInp
   for (i in 1:length(ob)) {
     nm <- ob[[i]]$name
+    # if (nm == "DEBUG") browser() # DEBUG
     if (ob[[i]]$type == "set") {
+      # browser()
       x[[nm]] <- newSet(nm)
+    } else if (ob[[i]]$type == "map") {
+      x[[nm]] <- newParameter(
+        nm,
+        ob[[i]]$dimSets,
+        type = ob[[i]]$type
+      )
     } else {
       x[[nm]] <- newParameter(
         nm,
@@ -70,10 +78,11 @@ setMethod("initialize", "modInp", function(.Object) {
 # ============================================================================ #
 .get_default_values <- function(modInp, name, drop.unused.values) {
   # Returns data.frame with default values of parameters on
-  #       expanded grid of all (or used only, like horizon-mid-years)
+  #       expanded grid of all (or used only, like horizon-mid-period)
   #       values of the parameter dimension (e.g. sets)
   # name - "character", name of the parameter
-  drop_duplicates <- function(x) x[!duplicated(x), , drop = FALSE]
+  # drop_duplicates <- function(x) x[!duplicated(x), , drop = FALSE]
+  drop_duplicates <- function(x) filter(x, !duplicated(x))
   sets0 <- modInp@parameters[[name]]@dimSets
   sets <- NULL
   for (i in sets0) {
@@ -139,7 +148,8 @@ setMethod("initialize", "modInp", function(.Object) {
     if (is.null(sets)) {
       sets <- tmp
     } else {
-      sets <- merge(sets, tmp)
+      # browser()
+      sets <- merge0(sets, tmp)
     }
   }
   if (modInp@parameters[[name]]@type == "numpar" &&
@@ -170,15 +180,18 @@ setMethod("initialize", "modInp", function(.Object) {
   if (!is.null(tmp)) {
     if (use.dplyr) {
       cols <- colnames(dtt)
-      gg <- suppressMessages(dplyr::anti_join(tmp, dtt[, cols],
-                                              by = cols[cols != "value"]))
+      # gg <- suppressMessages(dplyr::anti_join(tmp, dtt[, cols],
+      #                                         by = cols[cols != "value"]))
+      gg <- suppressMessages(dplyr::anti_join(tmp, dtt, by = cols[cols != "value"]))
       gg <- suppressMessages(dplyr::left_join(dtt, gg))
       return(gg)
     } else {
       if (ncol(dtt) == ncol(tmp)) {
         gg <- rbind(dtt, tmp)
       } else {
-        gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
+        # gg <- rbind(dtt, unique(tmp[, colnames(dtt), drop = FALSE]))
+        if (anyDuplicated(colnames(dtt))) browser() # mappings check
+        gg <- rbind(dtt, unique(select(tmp, all_of(colnames(dtt)))))
       }
       if (ncol(gg) == 1) {
         return(dtt)
@@ -187,7 +200,9 @@ setMethod("initialize", "modInp", function(.Object) {
   } else {
     gg <- dtt
   }
-  gg[!duplicated(gg[, colnames(gg) != "value"]), , drop = FALSE]
+  # gg[!duplicated(gg[, colnames(gg) != "value"]), , drop = FALSE]
+  ii <- gg %>% select(-value) %>% duplicated()
+  filter(gg, !ii)
 }
 
 #### end ===================================================================####

@@ -76,7 +76,7 @@ setClass("storage",
     charge = data.frame(
       region = character(),
       year = numeric(),
-      slice = numeric(),
+      slice = character(),
       charge = numeric(),
       stringsAsFactors = FALSE
     ),
@@ -172,13 +172,12 @@ setClass("storage",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "storage", function(.Object, ...) {
   .Object
 })
-
 
 setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
 #' Create new import object

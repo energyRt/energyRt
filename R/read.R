@@ -152,14 +152,21 @@ read_solution <- function(obj, ...) {
     newcap$newcap <- newcap$value
     newcap$value <- NULL
 
-    salvage <- merge(merge(newcap, merge(olife, invcost)), discount, all.x = TRUE)
+    salvage <-
+      merge0(
+        merge0(
+          newcap,
+          merge0(olife, invcost)),
+        discount,
+        all.x = TRUE)
     end_year <- max(.get_data_slot(scen@modInp@parameters$mEndMilestone)$yearp)
-    salvage <- merge(salvage, .get_data_slot(scen@modInp@parameters$mStartMilestone))
+    salvage <- merge0(salvage,
+                     .get_data_slot(scen@modInp@parameters$mStartMilestone))
     salvage$start <- salvage$yearp
     salvage$yearp <- NULL
-    if (F) {
+    # if (F) {
       # !!! unfinished
-      browser()
+      # browser()
       salvage <- salvage[salvage$start + salvage$olife > end_year, ]
 
       salvage$value <- salvage$newcap * salvage$invcost *
@@ -173,8 +180,8 @@ read_solution <- function(obj, ...) {
                               salvage$olife)[fl]
 
       salvage[, c(3, 2, 1, 9)]
-    }
-    NULL # temporary
+    # }
+    # NULL # temporary
   }
   if (scen@modOut@stage == "solved") {
     # Postprocessing
@@ -182,7 +189,8 @@ read_solution <- function(obj, ...) {
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, "Storage")
     scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, "Trade")
     pDummyImportCost <- .get_data_slot(scen@modInp@parameters$pDummyImportCost)
-    vDummyImportCost <- merge(pDummyImportCost,
+    # browser()
+    vDummyImportCost <- merge0(pDummyImportCost,
                               scen@modOut@variables$vDummyImport,
                               by = c("comm", "region", "year", "slice")[
                                 c("comm", "region", "year", "slice") %in%
@@ -192,7 +200,7 @@ read_solution <- function(obj, ...) {
     vDummyImportCost$value.y <- NULL
     scen@modOut@variables$vDummyImportCost <- vDummyImportCost
     pDummyExportCost <- .get_data_slot(scen@modInp@parameters$pDummyExportCost)
-    vDummyExportCost <- merge(pDummyExportCost, scen@modOut@variables$vDummyExport,
+    vDummyExportCost <- merge0(pDummyExportCost, scen@modOut@variables$vDummyExport,
       by = c("comm", "region", "year", "slice")[c("comm", "region", "year", "slice") %in% colnames(pDummyExportCost)]
     )
     vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y
@@ -205,10 +213,11 @@ read_solution <- function(obj, ...) {
     tmp$comm <- tmp$comm2
     tmp$comm2 <- NULL
     pTechEmisComm <- .get_data_slot(scen@modInp@parameters$pTechEmisComm)
-    vTechEmsFuel <- merge(merge(pTechEmisComm,
-      scen@modOut@variables$vTechInp,
-      by = c("tech", "comm")
-    ), tmp, by = "comm")
+    vTechEmsFuel <-
+      merge0(
+        merge0(pTechEmisComm, scen@modOut@variables$vTechInp,
+               by = c("tech", "comm")),
+        tmp, by = "comm")
     vTechEmsFuel$comm <- vTechEmsFuel$commp
     if (nrow(vTechEmsFuel) > 0) {
       vTechEmsFuel <- aggregate(
@@ -241,7 +250,7 @@ read_solution <- function(obj, ...) {
         }
         if (nrow(in_dat) != 0 &&
             !is.null(scen@modInp@parameters[[paste0("mCosts", tmp@name)]])) {
-          in_dat <- merge(in_dat,
+          in_dat <- merge0(in_dat,
                           .get_data_slot(
                             scen@modInp@parameters[[paste0("mCosts", tmp@name)]]))
         }
@@ -253,7 +262,7 @@ read_solution <- function(obj, ...) {
             in_dat$value <- in_dat$value * prm$value
           } else {
             colnames(prm)[ncol(prm)] <- "par"
-            in_dat <- merge(in_dat, prm)
+            in_dat <- merge0(in_dat, prm)
             in_dat$value <- in_dat$value * in_dat$par
             in_dat$par <- NULL
           }

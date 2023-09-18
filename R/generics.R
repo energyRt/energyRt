@@ -1,16 +1,19 @@
 # S3 methods from R base (and to avoid conflicts with other libraries)
-# write <- function(x, ...) UseMethod("write") # conflict with base::write
+# write <- function(x, ...) UseMethod("write") # conflicts with base::write
 
 # S4 methods from R base (and to avoid conflicts with other libraries)
-setGeneric("add", function(...) UseMethod("add"))
+setGeneric("add", function(obj, ...) UseMethod("add"))
 setGeneric("convert", function(x, ...) UseMethod("convert"))
 setGeneric("draw", function(...) UseMethod("draw"))
 # setGeneric("write.sc", function(x, ...) UseMethod("write.sc")) # use function instead
 setGeneric("read", function(...) UseMethod("read")) #
+setGeneric("interpolate", function(object, ...) UseMethod("interpolate"))
 
 # energyRt methods (exported)
-setGeneric("setHorizon", function(obj, horizon, intervals) standardGeneric("setHorizon"))
+setGeneric("setHorizon", function(obj, ...) standardGeneric("setHorizon"))
 setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
+setGeneric("setCalendar", function(obj, ...) standardGeneric("setCalendar"))
+setGeneric("getCalendar", function(obj) standardGeneric("getCalendar"))
 
 
 # energyRt internal methods

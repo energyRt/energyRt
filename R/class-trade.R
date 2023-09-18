@@ -103,7 +103,7 @@ setClass("trade",
     cap2act = 1, #
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "trade", function(.Object, ...) {

@@ -44,7 +44,7 @@ setClass("import",
     slice = character(),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 setMethod("initialize", "import", function(.Object, ...) {
   .Object

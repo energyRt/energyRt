@@ -1,10 +1,10 @@
 # check <- function(...) UseMethod("check")
 
-#' An S4 class to represent model/scenario horizon with intervals (year-steps)
+#' An S4 class to represent model/scenario planning horizon with intervals (year-steps)
 #'
 #' @slot info character, a comment or a short description.
-#' @slot years integer, an arranged, full sequence (without gaps) of modeled years.
-#' @slot intervals data.table,
+#' @slot period integer, an arranged, full sequence (without gaps) of modeled period.
+#' @slot intervals data.frame with three columns, representing start, middle, and the end year of every interval.
 #'
 #' @family horizon
 #'
@@ -17,12 +17,12 @@ setClass(
   "horizon",
   representation(
     info = "character",
-    years = "integer",
+    period = "integer",
     intervals = "data.table"
   ),
   prototype(
     info = character(),
-    years = integer(),
+    period = integer(),
     intervals = data.table(
       start = integer(),
       mid = integer(),
@@ -35,8 +35,8 @@ setClass(
 
 #' Create a new object of class 'horizon'
 #'
-#' @param years (optional) integer vector with a range or a sequence of years; will be arranged, gaps will be filled. If missing
-#' @param intervals (optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled period in years.
+#' @param period (optional) integer vector with a range or a sequence of period; will be arranged, gaps will be filled. If missing
+#' @param intervals (optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.
 #' @param ... ignored
 #' @param info character, a comment or description.
 #' @param force_BY_interval_to_1_year logical, if TRUE (default), the base-year (first) interval will be forced to one year.
@@ -60,22 +60,22 @@ setClass(
 #'   info = "Explicit assignment of intervals via data.frame"
 #'   )
 #'
-#' newHorizon(years = 2020:2050,
+#' newHorizon(period = 2020:2050,
 #'            intervals = data.frame(
 #'              start = c(2030, 2031, 2034),
 #'              mid =   c(2030, 2032, 2037),
 #'              end =   c(2030, 2033, 2040)),
-#'              info = "The years will be trimmed to the scope of intervals")
+#'              info = "The period will be trimmed to the scope of intervals")
 #'
 #' newHorizon(2020:2050, c(3, 2, 5, 10),
 #'            info = "Pay attention to the length of the first interval")
 #'
-#' newHorizon(years = 2020:2040,
+#' newHorizon(period = 2020:2040,
 #'            intervals = data.frame(
 #'              start = c(2030, 2032, 2035),
 #'              mid =   c(2031, 2033, 2037),
 #'              end =   c(2032, 2034, 2040)))
-newHorizon <- function(years = NULL, intervals = NULL, info = NULL,
+newHorizon <- function(period = NULL, intervals = NULL, info = NULL,
                        force_BY_interval_to_1_year = T, ...) {
   # browser()
   h <- new("horizon") # !!! update .data2slots for this class
@@ -84,9 +84,9 @@ newHorizon <- function(years = NULL, intervals = NULL, info = NULL,
     h@info <- as.character(info)
   }
 
-  if (!is.null(years)) {
-    .check_integer(years, ": years")
-    years <- min(years):max(years) %>% as.integer()
+  if (!is.null(period)) {
+    .check_integer(period, ": period")
+    period <- min(period):max(period) %>% as.integer()
   }
 
   if (!is.null(intervals)) {
@@ -98,12 +98,12 @@ newHorizon <- function(years = NULL, intervals = NULL, info = NULL,
         unlist() %>%
         range() %>%
         as.integer()
-      # next step: merge the data.frame with `years`
+      # next step: merge the data.frame with `period`
     } else if (is.numeric(intervals)) {
-      if (is.null(years)) {
+      if (is.null(period)) {
         stop(
           "When `intervals` is an integer vector with length of intervals, ",
-          "`years` must be a vector (or range) of modeled years."
+          "`period` must be a vector (or range) of modeled period."
         )
       }
       .check_integer(intervals, ": intervals")
@@ -116,16 +116,16 @@ newHorizon <- function(years = NULL, intervals = NULL, info = NULL,
         }
       }
       intervals <- data.table(
-        start = years[1] + cumsum(c(0, intervals[-length(intervals)])),
+        start = period[1] + cumsum(c(0, intervals[-length(intervals)])),
         mid = as.integer(rep(NA, length(intervals))),
-        end = years[1] + cumsum(intervals) - 1
+        end = period[1] + cumsum(intervals) - 1
       )
       intervals$mid <- trunc(.5 * (intervals[, "start"] + intervals[, "end"]))
 
-      intervals <- intervals[start >= years[1] & start <= max(years), ]
+      intervals <- intervals[start >= period[1] & start <= max(period), ]
       nr <- nrow(intervals)
-      if (intervals$end[nr] > max(years)) {
-        intervals$end[nr] <- max(years)
+      if (intervals$end[nr] > max(period)) {
+        intervals$end[nr] <- max(period)
         intervals$mid[nr] <- round(mean(intervals$start[nr], intervals$end[nr]))
       }
       int_range <- intervals %>%
@@ -134,32 +134,32 @@ newHorizon <- function(years = NULL, intervals = NULL, info = NULL,
         as.vector() %>%
         range() %>%
         as.integer()
-      years <- years[years >= min(int_range) & years <= max(int_range)]
-      h@years <- years
+      period <- period[period >= min(int_range) & period <= max(int_range)]
+      h@period <- period
       h@intervals <- intervals
       return(h)
     }
-  } else if (!is.null(years)) { # intervals == NULL
+  } else if (!is.null(period)) { # intervals == NULL
     intervals <- data.table(
-      start = as.integer(years),
-      mid = as.integer(years),
-      end = as.integer(years)
+      start = as.integer(period),
+      mid = as.integer(period),
+      end = as.integer(period)
     )
-    h@years <- years
+    h@period <- period
     h@intervals <- intervals
     return(h) # one year steps
-  } else if (is.null(years)) { # no data
+  } else if (is.null(period)) { # no data
     return(h) # empty
   }
 
-  if (is.null(years)) {
-    years <- min(int_range):max(int_range) %>% as.integer()
-  } else { # merge `years` vector with `intervals` data.table
-    years <- seq(max(min(int_range), min(years)),
-      min(max(int_range), max(years)),
+  if (is.null(period)) {
+    period <- min(int_range):max(int_range) %>% as.integer()
+  } else { # merge `period` vector with `intervals` data.table
+    period <- seq(max(min(int_range), min(period)),
+      min(max(int_range), max(period)),
       by = 1L
     ) %>% as.integer()
-    intervals <- intervals[start >= min(years) & end <= max(years), ]
+    intervals <- intervals[start >= min(period) & end <= max(period), ]
   }
 
   # Check & fix BY interval
@@ -181,11 +181,26 @@ newHorizon <- function(years = NULL, intervals = NULL, info = NULL,
     intervals <- intervals[order(start)]
     .check_intervals(intervals) # double-check
   }
-  h@years <- years
+  h@period <- period
   h@intervals <- intervals
-  # h <- .data2slots("years", x = "", years = years, intervals = intervals)
+  # h <- .data2slots("period", x = "", period = period, intervals = intervals)
   return(h)
 }
+
+#' @rdname newHorizon
+#' @family update horizon
+#' @method update horizon
+#' @export
+setMethod("update", "horizon", function(object, ..., warn_nodata = TRUE) {
+  # browser()
+  # !!! add no-data check for warning
+  # cf <- .data2slots("config", object, ..., warn_nodata = FALSE)
+  object <- .data2slots("horizon", object, ...,
+                        # ignore_args = c("name", "info"),
+                        warn_nodata = warn_nodata)
+  object
+})
+
 
 .check_integer <- function(x, msg_end = NULL, skip_null = TRUE) {
   if (is.null(x) & skip_null) {
@@ -224,7 +239,8 @@ newHorizon <- function(years = NULL, intervals = NULL, info = NULL,
   return(invisible(NULL))
 }
 
-if (F) { # tests ####
+## tests ####
+if (F) {
   newHorizon()
   newHorizon(2020:2030)
   newHorizon(2020:2030, c(1, 2, 5, 10))
@@ -240,7 +256,7 @@ if (F) { # tests ####
   )
 
   newHorizon(
-    years = 2020:2050,
+    period = 2020:2050,
     intervals = data.frame(
       start = c(2030, 2031, 2034),
       mid =   c(2030, 2032, 2037),
@@ -251,7 +267,7 @@ if (F) { # tests ####
   newHorizon(2020:2050, c(3, 2, 5, 10), info = "")
 
   newHorizon(
-    years = 2020:2040,
+    period = 2020:2040,
     intervals = data.frame(
       start = c(2030, 2032, 2035),
       mid =   c(2031, 2033, 2037),
@@ -259,3 +275,5 @@ if (F) { # tests ####
     )
   )
 }
+
+

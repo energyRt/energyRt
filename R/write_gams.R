@@ -1,6 +1,7 @@
 # Internal functions to write GAMS model files
 .write_model_GAMS <- function(arg, scen, trim = FALSE) {
   # if (trim) scen <- fold(scen)
+  # browser()
   .write_inc_solver(scen, arg, "option lp = cplex;", ".gms", "cplex")
   if (is.null(scen@status$fullsets)) stop("scen@status$fullsets not found")
   if (!scen@status$fullsets) {
@@ -84,7 +85,8 @@
     for (j in c("set", "map", "numpar", "bounds")) {
       for (i in names(scen@modInp@parameters)) {
         if (scen@modInp@parameters[[i]]@type == j &&
-          (is.null(scen@modInp@parameters[[i]]@misc$weather) || !scen@modInp@parameters[[i]]@misc$weather)) {
+          (is.null(scen@modInp@parameters[[i]]@misc$weather) ||
+           !scen@modInp@parameters[[i]]@misc$weather)) {
           if (scen@modInp@parameters[[i]]@type != "bounds") {
             cat(paste0("$loadm ", i, "\n"), file = zz_data_gms)
           } else {
@@ -302,14 +304,18 @@
 # Generate GAMS code, return character string with the GAMS code
 .toGams0 <- function(obj, include.def) {
   gen_gg <- function(name, dtt) {
+    # browser()
     if (ncol(dtt) == 1) {
-      ret <- paste0(name, " = ", dtt[1, 1], ";")
+      ret <- paste0(name, " = ", dtt[[1]][1], ";")
     } else {
-      ret <- paste0(name, '("', dtt[, 1])
+      ret <- paste0(name, '("', dtt[[1]])
       for (i in seq_len(ncol(dtt) - 2) + 1) {
-        ret <- paste0(ret, '", "', dtt[, i])
+        ret <- paste0(ret, '", "', dtt[[i]])
       }
-      paste0(ret, '") = ', dtt[, ncol(dtt)], ";")
+      # browser()
+      # paste0(ret, '") = ', dtt[, ncol(dtt)], ";")
+      # paste0(ret, '") = ', select(dtt, last_col()), ";")
+      paste0(ret, '") = ', dtt[[ncol(dtt)]], ";")
     }
   }
   as_numpar <- function(dtt, name, def, include.def) {
@@ -364,8 +370,10 @@
         return(c(fn, gen_gg(name, dtt[dtt$value != def, , drop = FALSE]))) #
       }
     }
+    # print(dtt)
     if (nrow(dtt) == 0 || all(dtt$value %in% c(0, Inf))) { #
       if (ncol(dtt) > 1) {
+        # browser()
         return(paste0(
           name, "(",
           paste0(colnames(dtt)[-ncol(dtt)], collapse = ", "),
@@ -386,7 +394,7 @@
     } else {
       return(c(
         "set", paste(obj@name, " /", sep = ""),
-        sort(obj@data[, 1]), "/;", ""
+        sort(obj@data[[1]]), "/;", ""
       ))
     }
   } else if (obj@type == "map") {
@@ -409,13 +417,17 @@
   } else if (obj@type == "numpar") {
     return(as_numpar(obj@data, obj@name, obj@defVal, include.def))
   } else if (obj@type == "bounds") {
+    # cat(obj@name, "\n")
+    # browser()
     return(c(
       as_numpar(
-        obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "lo"), -type),
         paste0(obj@name, "Lo"), obj@defVal[1], include.def
       ),
       as_numpar(
-        obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "up"), -type),
         paste0(obj@name, "Up"), obj@defVal[2], include.def
       )
     ))
@@ -434,22 +446,24 @@
     }
     x
   }
-  gg <- list()
+  gx <- list()
   for (i in names(scen@modInp@parameters)) {
     if (scen@modInp@parameters[[i]]@type != "bounds") {
-      gg[[i]] <- all_factor(.get_data_slot(scen@modInp@parameters[[i]]))
+      gx[[i]] <- all_factor(.get_data_slot(scen@modInp@parameters[[i]]))
     } else {
-      tmp <- .get_data_slot(scen@modInp@parameters[[i]])
-      gg[[paste0(i, "Lo")]] <- all_factor(tmp[tmp$type == "lo",
-                                              colnames(tmp) != "type",
-                                              drop = FALSE])
-      gg[[paste0(i, "Up")]] <- all_factor(tmp[tmp$type == "up",
-                                              colnames(tmp) != "type",
-                                              drop = FALSE])
+      prm <- .get_data_slot(scen@modInp@parameters[[i]])
+      gx[[paste0(i, "Lo")]] <- all_factor(
+        # prm[prm$type == "lo", colnames(prm) != "type", drop = FALSE]
+        select(filter(prm, type == "lo"), -type)
+      )
+      gx[[paste0(i, "Up")]] <- all_factor(
+        # prm[prm$type == "up", colnames(prm) != "type", drop = FALSE]
+        select(filter(prm, type == "up"), -type)
+      )
     }
-    gg
+    gx
   }
-  return(gg)
+  return(gx)
 }
 
 .df2uels <- function(df, name = "x", value = "value") {
@@ -471,7 +485,8 @@
   df2val <- function(dd) {
     if (nrow(dd) > 0) {
       for (j in domains[v]) {
-        dd[, j] <- as.numeric(dd[, j])
+        # dd[, j] <- as.numeric(dd[, j])
+        dd[[j]] <- as.numeric(dd[[j]])
       }
       dd <- as.matrix(dd)
     } else {
@@ -483,14 +498,17 @@
   }
   if (nr > 0) {
     for (j in domains[v]) {
-      df[, j] <- factor(df[, j]) # add levels from sets!
+      # browser()
+      # df[, j] <- factor(df[, j]) # add levels from sets!
+      df[[j]] <- factor(df[[j]]) # add levels from sets!
     }
     uels <- list(
       name = name,
       type = type,
       dim = nc,
       domains = domains[v],
-      uels = lapply(domains[v], function(x) levels(df[, x])),
+      # uels = lapply(domains[v], function(x) levels(df[, x])),
+      uels = lapply(domains[v], function(x) levels(df[[x]])),
       val = df2val(df),
       form = "sparse"
     )

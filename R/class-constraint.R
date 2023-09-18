@@ -34,7 +34,7 @@ setClass("constraint",
     # ! Misc
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 setMethod("initialize", "constraint", function(.Object, ...) {
   .Object
@@ -69,7 +69,7 @@ setClass("summand",
     defVal = 1,
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 #' Create (equality or inequality) constraint object
 #'
@@ -125,7 +125,7 @@ newConstraint <- function(name, ..., eq = "==", rhs = data.frame(), for.each = N
     if (xx[1] >= 1) {
       xx <- data.frame(stringsAsFactors = FALSE)
       xx[seq_len(length(rhs[[1]])), ] <- NA
-      for (i in names(rhs)) xx[, i] <- rhs[[i]]
+      for (i in names(rhs)) xx[[i]] <- rhs[[i]]
       rhs <- xx
     }
   }
@@ -187,7 +187,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     if (xx[1] >= 1) {
       xx <- data.frame(stringsAsFactors = FALSE)
       xx[seq_len(length(mult[[1]])), ] <- NA
-      for (i in names(mult)) xx[, i] <- mult[[i]]
+      for (i in names(mult)) xx[[i]] <- mult[[i]]
       mult <- xx
     }
   }
@@ -237,7 +237,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     stop(paste0('Constraint "', stm@name, '" error: ', x))
   }
   get.all.child <- function(x) {
-    unique(c(x, c(approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% x, "child"])))
+    unique(c(x, c(approxim$calendar@slice_ancestry[approxim$calendar@slice_ancestry$parent %in% x, "child"])))
   }
   # all.set contain all set for for.each & lhs
   # Estimate is need sum for for.each
@@ -268,7 +268,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
   nn <- seq_len(length(old_for_each) + sum(sapply(stm@lhs, function(x) length(.variable_set[[x@variable]]))))
   all.set[seq_along(nn), ] <- NA
   for (i in (1:ncol(all.set))[sapply(all.set, class) == "logical"]) {
-    all.set[, i] <- FALSE
+    all.set[[i]] <- FALSE
   }
   nn <- 0
   if (length(old_for_each) > 0) {
@@ -436,7 +436,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     # Generate approxim
     approxim2 <- approxim[unique(c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)], "solver", "year"))]
     if (any(names(approxim2) == "slice")) {
-      approxim2$slice <- approxim2$slice@all_slice
+      approxim2$slice <- approxim2$calendar@slice_share$slice
     }
     fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
     need.set <- all.set[fl, , drop = FALSE]
@@ -490,7 +490,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       approxim2 <- approxim[unique(c(colnames(stm@lhs[[i]]@mult)[
         colnames(stm@lhs[[i]]@mult) %in% names(approxim)], "solver", "year"))]
       if (any(names(approxim2) == "slice")) {
-        approxim2$slice <- approxim2$slice@all_slice
+        approxim2$slice <- approxim2$calendar@slice_share$slice
       }
       need.set <- lhs.set2[lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), "set"]
       need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) &
@@ -522,7 +522,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
             for (j in nslc) {
               approxim2[[j]] <- approxim[[j]]
             }
-            if (any(nslc == "slice")) approxim2$slice <- approxim$slice@all_slice
+            if (any(nslc == "slice")) approxim2$slice <- approxim$calendar@slice_share$slice
           }
         }
       }

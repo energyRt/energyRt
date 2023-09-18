@@ -37,7 +37,7 @@ setClass("demand",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "demand", function(.Object, ...) {

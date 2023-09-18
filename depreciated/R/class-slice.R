@@ -41,7 +41,7 @@ setClass("slice",
 )
 
 .init_slice <- function(sl) {
-  # browser()
+  browser()
   if (nrow(sl@levels) == 0) {
     warning('no slices info, using default: "ANNUAL"')
     sl@levels <- .setSlice(ANNUAL = "ANNUAL")

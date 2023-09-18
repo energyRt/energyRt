@@ -43,7 +43,7 @@ setClass("commodity",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "commodity", function(.Object, ...) {

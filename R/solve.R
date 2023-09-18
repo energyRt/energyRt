@@ -249,9 +249,10 @@ setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
   # only.listing = FALSE (!depreciated?) generate only listing file (works for gams only)
   # read.solution = TRUE read result
   # tmp.del delete results
+  # browser()
   arg <- list(tmp.dir = tmp.dir, solver = solver, ...)
   if (is.null(arg$tmp.dir)) {
-
+    browser()
   }
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) {
@@ -335,7 +336,8 @@ setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
     if (any(grep("^gams$", scen@settings@solver$lang, ignore.case = TRUE))) {
       if (is.null(arg$trim)) arg$trim <- FALSE
       scen <- .write_model_GAMS(arg, scen, trim = arg$trim)
-    } else if (any(grep("^(glpk|cbcb)$", scen@settings@solver$lang, ignore.case = TRUE))) {
+    } else if (any(grep("^(glpk|cbcb)$", scen@settings@solver$lang,
+                        ignore.case = TRUE))) {
       scen <- .write_model_GLPK_CBC(arg, scen)
     } else if (any(grep("^pyomo", scen@settings@solver$lang, ignore.case = TRUE))) {
       scen <- .write_model_PYOMO(arg, scen)

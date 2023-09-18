@@ -40,7 +40,7 @@ setClass("weather",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 setMethod("initialize", "weather", function(.Object, ...) {
   .Object

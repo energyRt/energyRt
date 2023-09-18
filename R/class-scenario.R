@@ -49,7 +49,7 @@ setClass("scenario",
     path = character(),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "scenario", function(.Object, ...) {
@@ -91,15 +91,14 @@ setMethod("summary", signature(object = "scenario"),
 # setMethod("summary", "scenario", summary.scenario)
 
 
-#' @export
-setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
-  obj@model@settings@slice <- .setTimeSlices(...)
-  obj
-})
+# @export
+# setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
+#   obj@model@settings@slice <- .setTimeSlices(...)
+#   obj
+# })
 
 #' @export
-setMethod("setHorizon",
-  signature(obj = "scenario", horizon = "numeric", intervals = "ANY"),
+setMethod("setHorizon", signature(obj = "scenario"),
   function(obj, horizon, intervals) {
     obj@model <- setHorizon(obj@model, horizon, intervals)
     obj

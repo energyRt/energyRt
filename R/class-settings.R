@@ -36,7 +36,7 @@ setClass("settings",
     sourceCode = list() # Model source
     # misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "settings", function(.Object, ...) {

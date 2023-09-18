@@ -9,7 +9,7 @@
 #' @seealso [solve()] to run the script, solve the scenario. [read_solution] to read model solution.
 #'
 #' @export
-write_scenario_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
+write_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
   scen <- x
   if (is.null(tmp.dir)) {
     if (!is.null(scen@misc$tmp.dir)) tmp.dir <- scen@misc$tmp.dir
@@ -25,7 +25,7 @@ write_scenario_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
 #' @export
 #' @rdname write
 write_sc <- function(x, tmp.dir = NULL, solver = NULL, ...) {
-  write_scenario_script(x, tmp.dir, solver, ...)
+  write_script(x, tmp.dir, solver, ...)
 }
 
 #' @export
@@ -38,7 +38,7 @@ write.sc <- write_sc
 # @name write
 #
 # @export
-# setMethod("write", signature(x = "scenario"), definition = write_scenario_script)
+# setMethod("write", signature(x = "scenario"), definition = write_script)
 
 # @family write scenario
 # @rdname write
@@ -52,7 +52,7 @@ write.sc <- write_sc
 #   } else if (class(arg$obj)[1] != "scenario") {
 #     NextMethod(...)
 #   }
-#   return(do.call(write_scenario_script, arg))
+#   return(do.call(write_script, arg))
 # })
 
 # @family write scenario
@@ -62,7 +62,7 @@ write.sc <- write_sc
 #   browser()
 #   arg <- list(...)
 #   arg <- c(x = x, arg)
-#   if (class(x)[1] == "scenario") return(do.call(write_scenario_script, arg))
+#   if (class(x)[1] == "scenario") return(do.call(write_script, arg))
 #   return(do.call(base::write, arg))
 # })
 
@@ -79,7 +79,7 @@ write.sc <- write_sc
 #
 # write_model <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
 #   message("The function is depreciated, use `write` instead")
-#   write_scenario_script(scen, tmp.dir, solver, ...)
+#   write_script(scen, tmp.dir, solver, ...)
 # }
 
 
@@ -108,6 +108,7 @@ write.sc <- write_sc
 
 .write_inc_solver <- function(scen, arg, def_inc_solver, type, templ) {
   if (!is.null(scen@settings@solver$inc_solver) && !is.null(scen@settings@solver$solver)) {
+    browser()
     stop("have to define only one argument from scen@settings@solver$inc_solver & scen@settings@solver$solver")
   }
   if (!is.null(scen@settings@solver$solver)) {
@@ -151,8 +152,21 @@ write.sc <- write_sc
   }
 }
 
-.write_mapping <- function(prec, interpolation_start_time,
-                           interpolation_count, len_name) {
+#' Title
+#'
+#' @param prec modInp object
+#' @param interpolation_start_time numeric
+#' @param interpolation_count numeric
+#' @param len_name numeric
+#'
+#' @return
+#'
+#' @noRd
+.write_mapping <- function(
+    prec,
+    interpolation_start_time,
+    interpolation_count,
+    len_name) {
   reduce.duplicate <- function(x) x[!duplicated(x), , drop = FALSE]
   bacs <- paste0(rep("\b", len_name), collapse = "")
   rest <- interpolation_count - 45
@@ -160,7 +174,11 @@ write.sc <- write_sc
 
   # Clean previous set data if any
   reduce.sect <- function(x, set) {
-    x <- x[, set, drop = FALSE]
+    # browser()
+    # x <- x[, set, drop = FALSE]
+    if (!missing(set)) {
+      x <- select(x, all_of(set)) %>% relocate(all_of(set))
+    }
     x[!duplicated(x), , drop = FALSE]
   }
   reduce.sect.merge.unique <- function(tx, set) {
@@ -171,17 +189,21 @@ write.sc <- write_sc
     unique(gg)
   }
 
-  .interpolation_message("region", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("region", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   region <- .get_data_slot(prec@parameters$region)
-  .interpolation_message("mMidMilestone", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mMidMilestone", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   year <- .get_data_slot(prec@parameters$mMidMilestone)
-  .interpolation_message("mSliceParentChildE", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mSliceParentChildE", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   # Total parameter ruductions
   mSliceParentChildE <- .get_data_slot(prec@parameters$mSliceParentChildE)
-  .interpolation_message("mCommSlice", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mCommSlice", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   mCommSlice <- .get_data_slot(prec@parameters$mCommSlice)
   uu <- mSliceParentChildE
@@ -189,10 +211,12 @@ write.sc <- write_sc
   map_for_comm <- merge0(mCommSlice, uu)[, c("comm", "slicep")]
   colnames(map_for_comm) <- c("comm", "slice")
   map_for_comm <- map_for_comm[!duplicated(map_for_comm), ]
-  .interpolation_message("mCommSliceOrParent", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mCommSliceOrParent", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   # mCommSliceOrParent
-  l1 <- merge0(.get_data_slot(prec@parameters$comm), .get_data_slot(prec@parameters$slice))
+  l1 <- merge0(.get_data_slot(prec@parameters$comm),
+               .get_data_slot(prec@parameters$slice))
   l2 <- merge0(mCommSlice, mSliceParentChildE)[, c("comm", "slice", "slicep")]
   l3 <- l2[!duplicated(l2[, c("comm", "slicep")]), c("comm", "slicep")]
   colnames(l3)[2] <- "slice"
@@ -200,8 +224,10 @@ write.sc <- write_sc
   l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast = TRUE), ]
   l3$slicep <- l3$slice
   mCommSliceOrParent <- rbind(l2, l3)
-  prec@parameters[["mCommSliceOrParent"]] <- .dat2par(prec@parameters[["mCommSliceOrParent"]], mCommSliceOrParent)
-  .interpolation_message("mTechInpTot", rest, interpolation_count, interpolation_start_time, len_name)
+  prec@parameters[["mCommSliceOrParent"]] <-
+    .dat2par(prec@parameters[["mCommSliceOrParent"]], mCommSliceOrParent)
+  .interpolation_message("mTechInpTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
   reduce_total_map <- function(yy) {
@@ -209,46 +235,84 @@ write.sc <- write_sc
     yy$slice <- NULL
     reduce.duplicate(merge0(yy, mCommSliceOrParent, by = c("comm", "slicep"))[, -2])
   }
-  prec@parameters[["mTechInpTot"]] <- .dat2par(prec@parameters[["mTechInpTot"]], reduce_total_map(reduce.sect(
-    rbind(.get_data_slot(prec@parameters$mvTechInp)[, -1], .get_data_slot(prec@parameters$mvTechAInp)[, -1])
-  )))
-  .interpolation_message("mTechOutTot", rest, interpolation_count, interpolation_start_time, len_name)
-  rest <- rest + 1
-  prec@parameters[["mTechOutTot"]] <- .dat2par(prec@parameters[["mTechOutTot"]], reduce_total_map(reduce.sect(
-    rbind(.get_data_slot(prec@parameters$mvTechOut)[, -1], .get_data_slot(prec@parameters$mvTechAOut)[, -1])
-  )))
-  .interpolation_message("mSupOutTot", rest, interpolation_count, interpolation_start_time, len_name)
-  rest <- rest + 1
-  prec@parameters[["mSupOutTot"]] <- .dat2par(prec@parameters[["mSupOutTot"]], reduce.sect(
-    .get_data_slot(prec@parameters$mSupAva)[, -1]
-  ))
 
-  .interpolation_message("pEmissionFactor", rest, interpolation_count, interpolation_start_time, len_name)
+# browser()
+
+  prec@parameters[["mTechInpTot"]] <-
+    .dat2par(
+      prec@parameters[["mTechInpTot"]],
+      reduce_total_map(
+        reduce.sect(
+          rbind(.get_data_slot(prec@parameters$mvTechInp)[, -1],
+                .get_data_slot(prec@parameters$mvTechAInp)[, -1])
+        )
+      )
+    )
+  .interpolation_message("mTechOutTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
-  #### This section have to move to add (after interpolate comm first)
+  prec@parameters[["mTechOutTot"]] <-
+    .dat2par(
+      prec@parameters[["mTechOutTot"]],
+      reduce_total_map(
+        reduce.sect(
+          rbind(.get_data_slot(prec@parameters$mvTechOut)[, -1],
+                .get_data_slot(prec@parameters$mvTechAOut)[, -1])
+          )
+        )
+      )
+  .interpolation_message("mSupOutTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
+  rest <- rest + 1
+  prec@parameters[["mSupOutTot"]] <-
+    .dat2par(prec@parameters[["mSupOutTot"]],
+             reduce.sect(.get_data_slot(prec@parameters$mSupAva)[, -1])
+             )
+
+  .interpolation_message("pEmissionFactor", rest, interpolation_count,
+                         interpolation_start_time, len_name)
+  rest <- rest + 1
+  #### This section should be moved to add (after interpolate comm first)
   tmp0 <- .get_data_slot(prec@parameters$pTechEmisComm)
-  tmp <- merge0(.get_data_slot(prec@parameters$mvTechInp), tmp0[tmp0$value != 0, ], by = c("tech", "comm"))
-  .interpolation_message("mvTechAct", rest, interpolation_count, interpolation_start_time, len_name)
+  tmp <- merge0(.get_data_slot(prec@parameters$mvTechInp),
+                tmp0[tmp0$value != 0, ],
+                by = c("tech", "comm"))
+  .interpolation_message("mvTechAct", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   colnames(tmp)[colnames(tmp) == "comm"] <- "commp"
   tmp1 <- .get_data_slot(prec@parameters$pEmissionFactor)
-  .interpolation_message("mvTechAct", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mvTechAct", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   tmp1 <- tmp1[tmp1$value != 0, ]
   tmp1 <- tmp1[!duplicated(tmp1), , drop = FALSE]
-  tmp <- merge0(tmp1, tmp, by = "commp")[, c("tech", "comm", "commp", "region", "year", "slice")]
+  tmp <- merge0(
+    tmp1, tmp, by = "commp"
+    )[, c("tech", "comm", "commp", "region", "year", "slice")]
   tmp <- tmp[!duplicated(tmp), , drop = FALSE]
-  .interpolation_message("mTechEmsFuel", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mTechEmsFuel", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   colnames(tmp)[3] <- "comm.1"
-  prec@parameters[["mTechEmsFuel"]] <- .dat2par(prec@parameters[["mTechEmsFuel"]], tmp)
-  .interpolation_message("mEmsFuelTot", rest, interpolation_count, interpolation_start_time, len_name)
+  prec@parameters[["mTechEmsFuel"]] <-
+    .dat2par(prec@parameters[["mTechEmsFuel"]], tmp)
+  .interpolation_message("mEmsFuelTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
-  prec@parameters[["mEmsFuelTot"]] <- .dat2par(prec@parameters[["mEmsFuelTot"]], reduce_total_map(
-    reduce.sect(.get_data_slot(prec@parameters[["mTechEmsFuel"]]), c("comm", "region", "year", "slice"))
-  ))
-  .interpolation_message("mDummyImport", rest, interpolation_count, interpolation_start_time, len_name)
+  prec@parameters[["mEmsFuelTot"]] <-
+    .dat2par(
+      prec@parameters[["mEmsFuelTot"]],
+      reduce_total_map(
+        reduce.sect(
+          .get_data_slot(prec@parameters[["mTechEmsFuel"]]),
+          c("comm", "region", "year", "slice")
+          )
+        )
+      )
+  .interpolation_message("mDummyImport", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   no_inf <- function(y) {
     x <- .get_data_slot(prec@parameters[[y]])
@@ -260,13 +324,19 @@ write.sc <- write_sc
         x <- merge0(.get_data_slot(prec@parameters[[i]]), x)
       }
     }
-    x[x$value != Inf, -ncol(x)]
+    # x[x$value != Inf, -ncol(x)]
+    x %>% filter(value != Inf) %>% select(-last_col())
   }
-  prec@parameters[["mDummyImport"]] <- .dat2par(prec@parameters[["mDummyImport"]], no_inf("pDummyImportCost"))
-  .interpolation_message("mDummyExport", rest, interpolation_count, interpolation_start_time, len_name)
+  # browser()
+  prec@parameters[["mDummyImport"]] <-
+    .dat2par(prec@parameters[["mDummyImport"]], no_inf("pDummyImportCost"))
+  .interpolation_message("mDummyExport", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
-  prec@parameters[["mDummyExport"]] <- .dat2par(prec@parameters[["mDummyExport"]], no_inf("pDummyExportCost"))
-  .interpolation_message("mDummyCost", rest, interpolation_count, interpolation_start_time, len_name)
+  prec@parameters[["mDummyExport"]] <-
+    .dat2par(prec@parameters[["mDummyExport"]], no_inf("pDummyExportCost"))
+  .interpolation_message("mDummyCost", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
   prec@parameters[["mDummyCost"]] <- .dat2par(
@@ -276,26 +346,41 @@ write.sc <- write_sc
       .get_data_slot(prec@parameters[["mDummyExport"]])
     ), c("comm", "region", "year"))
   )
-  .interpolation_message("mvTradeIrAInpTot", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mvTradeIrAInpTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
   # mvTradeIrAInpTot
-  prec@parameters[["mvTradeIrAInpTot"]] <- .dat2par(prec@parameters[["mvTradeIrAInpTot"]], reduce_total_map(
-    reduce.sect(.get_data_slot(prec@parameters$mvTradeIrAInp), c("comm", "region", "year", "slice"))
-  ))
-  .interpolation_message("mvTradeIrAOutTot", rest, interpolation_count, interpolation_start_time, len_name)
+  prec@parameters[["mvTradeIrAInpTot"]] <- .dat2par(
+    prec@parameters[["mvTradeIrAInpTot"]],
+    reduce_total_map(
+      reduce.sect(
+        .get_data_slot(prec@parameters$mvTradeIrAInp),
+        c("comm", "region", "year", "slice"))
+      )
+    )
+  .interpolation_message("mvTradeIrAOutTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
-  prec@parameters[["mvTradeIrAOutTot"]] <- .dat2par(prec@parameters[["mvTradeIrAOutTot"]], reduce_total_map(
-    reduce.sect(.get_data_slot(prec@parameters$mvTradeIrAOut), c("comm", "region", "year", "slice"))
-  ))
-  .interpolation_message("mTradeComm", rest, interpolation_count, interpolation_start_time, len_name)
+  prec@parameters[["mvTradeIrAOutTot"]] <- .dat2par(
+    prec@parameters[["mvTradeIrAOutTot"]],
+    reduce_total_map(
+      reduce.sect(
+        .get_data_slot(prec@parameters$mvTradeIrAOut),
+        c("comm", "region", "year", "slice"))
+      )
+    )
+  .interpolation_message("mTradeComm", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
-
 
   ### Export
   mCommSliceOrParent2 <- mCommSliceOrParent
   colnames(mCommSliceOrParent2)[3] <- "slice.1"
-  mExportIrSubSliceTrd <- merge0(.get_data_slot(prec@parameters$mTradeComm), .get_data_slot(prec@parameters[["mTradeIr"]]))
+  mExportIrSubSliceTrd <- merge0(
+    .get_data_slot(prec@parameters$mTradeComm),
+    .get_data_slot(prec@parameters[["mTradeIr"]])
+    )
   colnames(mExportIrSubSliceTrd)[6] <- "slice.1"
   mExportIrSubSliceTrd$dst <- NULL
   mExportIrSubSliceTrd <- merge0(mExportIrSubSliceTrd, mCommSliceOrParent2)
@@ -305,22 +390,28 @@ write.sc <- write_sc
   mExportIrSubSlice <- mExportIrSubSlice[!duplicated(mExportIrSubSlice), ]
   mExportIrSub <- mExportIrSubSlice[, -2]
   mExportIrSub <- mExportIrSub[!duplicated(mExportIrSub), ]
-  mExportRowSubTmp <- reduce.sect(
-    .get_data_slot(prec@parameters[["mExportRow"]])[, c("comm", "region", "year", "slice")],
-    c("comm", "region", "year", "slice")
-  )
+  mExportRowSubTmp <-
+    reduce.sect(
+      .get_data_slot(
+        prec@parameters[["mExportRow"]]
+        )[, c("comm", "region", "year", "slice")],
+      c("comm", "region", "year", "slice")
+      )
   colnames(mExportRowSubTmp)[4] <- "slice.1"
   mExportRowSubSlice <- merge0(mExportRowSubTmp, mCommSliceOrParent2)
-  mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != "slice.1"]
+  # mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != "slice.1"]
+  mExportRowSub <- mExportRowSubSlice %>% select(-any_of("slice.1"))
   mExportRowSub <- mExportRowSub[!duplicated(mExportRowSub), ]
-  .interpolation_message("mExport", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mExport", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   mExport <- rbind(mExportRowSub, mExportIrSub)
   mExport <- mExport[!duplicated(mExport), ]
   prec@parameters[["mExport"]] <- .dat2par(prec@parameters[["mExport"]], mExport)
 
   ### Import
-  mImportIrSubSliceTrd <- merge0(.get_data_slot(prec@parameters$mTradeComm), .get_data_slot(prec@parameters[["mTradeIr"]]))
+  mImportIrSubSliceTrd <- merge0(.get_data_slot(prec@parameters$mTradeComm),
+                                 .get_data_slot(prec@parameters[["mTradeIr"]]))
   colnames(mImportIrSubSliceTrd)[6] <- "slice.1"
   mImportIrSubSliceTrd$src <- NULL
   mImportIrSubSliceTrd <- merge0(mImportIrSubSliceTrd, mCommSliceOrParent2)
@@ -331,34 +422,54 @@ write.sc <- write_sc
   mImportIrSub <- mImportIrSubSlice[, -2]
   mImportIrSub <- mImportIrSub[!duplicated(mImportIrSub), ]
   mImportRowSubTmp <- reduce.sect(
-    .get_data_slot(prec@parameters[["mImportRow"]])[, c("comm", "region", "year", "slice")],
+    .get_data_slot(
+      prec@parameters[["mImportRow"]]
+      )[, c("comm", "region", "year", "slice")],
     c("comm", "region", "year", "slice")
   )
   colnames(mImportRowSubTmp)[4] <- "slice.1"
   mImportRowSubSlice <- merge0(mImportRowSubTmp, mCommSliceOrParent2)
-  mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != "slice.1"]
+  # mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != "slice.1"]
+  mImportRowSub <- mImportRowSubSlice %>% select(-any_of("slice.1"))
   mImportRowSub <- mImportRowSub[!duplicated(mImportRowSub), ]
-  .interpolation_message("mImport", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mImport", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   mImport <- rbind(mImportRowSub, mImportIrSub)
   mImport <- mImport[!duplicated(mImport), ]
-  prec@parameters[["mImport"]] <- .dat2par(prec@parameters[["mImport"]], mImport)
+  prec@parameters[["mImport"]] <-
+    .dat2par(prec@parameters[["mImport"]], mImport)
 
   #
-  .interpolation_message("mStorageInpTot", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mStorageInpTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
   prec@parameters[["mStorageInpTot"]] <- .dat2par(
     prec@parameters[["mStorageInpTot"]],
-    reduce.sect(rbind(.get_data_slot(prec@parameters$mvStorageAInp)[, -1], .get_data_slot(prec@parameters$mvStorageStore)[, -1]))
-  )
-  .interpolation_message("mStorageOutTot", rest, interpolation_count, interpolation_start_time, len_name)
+    reduce.sect(
+      rbind(
+        .get_data_slot(
+          prec@parameters$mvStorageAInp)[, -1],
+        .get_data_slot(prec@parameters$mvStorageStore)[, -1]
+        )
+      )
+    )
+  .interpolation_message("mStorageOutTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   prec@parameters[["mStorageOutTot"]] <- .dat2par(
     prec@parameters[["mStorageOutTot"]],
-    reduce.sect(rbind(.get_data_slot(prec@parameters$mvStorageAInp)[, -1], .get_data_slot(prec@parameters$mvStorageStore)[, -1]))
-  )
-  .interpolation_message("mTaxCost", rest, interpolation_count, interpolation_start_time, len_name)
+    reduce.sect(
+      rbind(
+        .get_data_slot(
+          prec@parameters$mvStorageAInp)[, -1],
+        .get_data_slot(prec@parameters$mvStorageStore)[, -1]
+        )
+      )
+    )
+  .interpolation_message("mTaxCost", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
   # mTaxCost(comm, region, year)  sum(slice$pTaxCost(comm, region, year, slice), 1)
@@ -371,7 +482,8 @@ write.sc <- write_sc
     ), c("comm", "region", "year"))
   )
   # mSubCost(comm, region, year)  sum(slice$pSubCost(comm, region, year, slice), 1)
-  .interpolation_message("mSubCost", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mSubCost", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   prec@parameters[["mSubCost"]] <- .dat2par(
     prec@parameters[["mSubCost"]],
@@ -382,17 +494,33 @@ write.sc <- write_sc
     ), c("comm", "region", "year"))
   )
   #    (sum(commp$pAggregateFactor(comm, commp), 1))
-  .interpolation_message("mAggOut", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mAggOut", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   if (nrow(.get_data_slot(prec@parameters$pAggregateFactor)) > 0) {
-    prec@parameters[["mAggOut"]] <- .dat2par(prec@parameters[["mAggOut"]], reduce_total_map(reduce.duplicate(
-      merge0(merge0(
-        merge0(reduce.sect(.get_data_slot(prec@parameters$pAggregateFactor), "comm"), .get_data_slot(prec@parameters$region)),
-        year
-      ), .get_data_slot(prec@parameters$slice))
-    )))
+    prec@parameters[["mAggOut"]] <-
+      .dat2par(
+        prec@parameters[["mAggOut"]],
+        reduce_total_map(
+          reduce.duplicate(
+            merge0(
+              merge0(
+                merge0(
+                  reduce.sect(
+                    .get_data_slot(prec@parameters$pAggregateFactor), "comm"
+                    ),
+                  .get_data_slot(prec@parameters$region)
+                  ),
+                year
+                ),
+              .get_data_slot(prec@parameters$slice)
+              )
+            )
+          )
+        )
   }
-  .interpolation_message("mOut2Lo", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mOut2Lo", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
   a1 <- mCommSlice
@@ -401,35 +529,59 @@ write.sc <- write_sc
   for2Lo <- merge0(a1, a2, by = "slicep")
   for2Lo$slicep <- NULL
   for2Lo <- reduce.duplicate(for2Lo)
-  cll <- c("comm", "region", "year", "slice")
-  mOut2Lo <- merge0(reduce.duplicate(rbind(
+  # cll <- c("comm", "region", "year", "slice")
+  # browser()
+  mOut2Lo <-
     merge0(
-      .get_data_slot(prec@parameters$mSupOutTot),
-      .get_data_slot(prec@parameters$year)
-    )[, cll],
-    .get_data_slot(prec@parameters$mEmsFuelTot)[, cll],
-    .get_data_slot(prec@parameters$mAggOut)[, cll],
-    .get_data_slot(prec@parameters$mTechOutTot)[, cll],
-    .get_data_slot(prec@parameters$mStorageOutTot)[, cll],
-    .get_data_slot(prec@parameters$mImport)[, cll],
-    .get_data_slot(prec@parameters$mvTradeIrAOutTot)[, cll]
-  )), for2Lo, by = c("comm", "slice"))[, cll]
-  mOut2Lo <- mOut2Lo[!(paste0(mOut2Lo$comm, "#", mOut2Lo$slice) %in%
-    paste0(mCommSlice$comm, "#", mCommSlice$slice)), ]
-  prec@parameters[["mOut2Lo"]] <- .dat2par(prec@parameters[["mOut2Lo"]], mOut2Lo)
+      reduce.duplicate(
+        rbind(
+          merge0(
+            .get_data_slot(prec@parameters$mSupOutTot),
+            .get_data_slot(prec@parameters$year)
+          )[, c("comm", "region", "year", "slice")],
+          .get_data_slot(
+            prec@parameters$mEmsFuelTot
+          )[, c("comm", "region", "year", "slice")],
+          .get_data_slot(
+            prec@parameters$mAggOut
+          )[, c("comm", "region", "year", "slice")],
+          .get_data_slot(
+            prec@parameters$mTechOutTot
+          )[, c("comm", "region", "year", "slice")],
+          .get_data_slot(
+            prec@parameters$mStorageOutTot
+          )[, c("comm", "region", "year", "slice")],
+          .get_data_slot(
+            prec@parameters$mImport
+          )[, c("comm", "region", "year", "slice")],
+          .get_data_slot(
+            prec@parameters$mvTradeIrAOutTot
+          )[, c("comm", "region", "year", "slice")]
+        )
+      ),
+      for2Lo,
+      by = c("comm", "slice")
+    )[, c("comm", "region", "year", "slice")]
+  mOut2Lo <- mOut2Lo[!(
+    paste0(mOut2Lo$comm, "#", mOut2Lo$slice) %in%
+      paste0(mCommSlice$comm, "#", mCommSlice$slice)
+    ), ]
+  prec@parameters[["mOut2Lo"]] <-
+    .dat2par(prec@parameters[["mOut2Lo"]], mOut2Lo)
 
-  .interpolation_message("mInp2Lo", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mInp2Lo", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   mInp2Lo <- merge0(
     reduce.duplicate(rbind(
-      .get_data_slot(prec@parameters$mTechInpTot)[, cll],
-      .get_data_slot(prec@parameters$mStorageInpTot)[, cll],
-      .get_data_slot(prec@parameters$mExport)[, cll],
-      .get_data_slot(prec@parameters$mvTradeIrAInpTot)[, cll]
+      .get_data_slot(prec@parameters$mTechInpTot)[, c("comm", "region", "year", "slice")],
+      .get_data_slot(prec@parameters$mStorageInpTot)[, c("comm", "region", "year", "slice")],
+      .get_data_slot(prec@parameters$mExport)[, c("comm", "region", "year", "slice")],
+      .get_data_slot(prec@parameters$mvTradeIrAInpTot)[, c("comm", "region", "year", "slice")]
     )),
     for2Lo,
     by = c("comm", "slice")
-  )[, cll]
+  )[, c("comm", "region", "year", "slice")]
   mInp2Lo <- mInp2Lo[!(paste0(mInp2Lo$comm, "#", mInp2Lo$slice) %in% paste0(mCommSlice$comm, "#", mCommSlice$slice)), ]
   prec@parameters[["mInp2Lo"]] <- .dat2par(prec@parameters[["mInp2Lo"]], mInp2Lo)
   .interpolation_message("mvTradeCost", rest, interpolation_count, interpolation_start_time, len_name)
@@ -498,7 +650,9 @@ write.sc <- write_sc
 
   mCosts <- lapply(grep("^mCosts", names(prec@parameters), value = TRUE), function(x) {
     xx <- .get_data_slot(prec@parameters[[x]])
-    xx <- unique(xx[, colnames(xx) %in% c("region", "year"), drop = FALSE])
+    # xx <- unique(xx[, colnames(xx) %in% c("region", "year"), drop = FALSE])
+    if (sum(colnames(xx) %in% c("region", "year")) > 2) browser() # rewrite for multiple columns
+    xx <- select(xx, any_of(c("region", "year"))) %>% unique()
     if (nrow(xx) == nrow(dregionyear) || ncol(xx) == 0) {
       return(dregionyear)
     }

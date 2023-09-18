@@ -45,7 +45,7 @@ setClass("export",
     # ! Misc
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "export", function(.Object, ...) {

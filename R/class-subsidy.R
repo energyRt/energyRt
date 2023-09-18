@@ -44,7 +44,7 @@ setClass("sub",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setGeneric("newSub", function(name, ...) standardGeneric("newSub"))

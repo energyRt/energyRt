@@ -45,6 +45,7 @@ draw.technology <- function(
     defVal = new("config")@defVal,
     show_all = TRUE) {
   tech_color <- as.data.frame(tech@misc$color)
+  # browser()
   get_set <- function(x, att) {
     # Finds and returns full set of parameter 'att' in slots of technology 'x'
     #
@@ -52,7 +53,8 @@ draw.technology <- function(
     g <- getClass("technology")
     for (z in names(g@slots)) {
       if (g@slots[[z]] == "data.frame" & any(colnames(slot(x, z)) == att)) {
-        rr <- unique(c(slot(x, z)[, att], rr))
+        # rr <- unique(c(slot(x, z)[, att], rr))
+        rr <- unique(c(slot(x, z)[[att]], rr))
       }
     }
     rr <- rr[!is.na(rr)]
@@ -124,13 +126,15 @@ draw.technology <- function(
           approxim$acomm <- y
           approxim$comm <- NULL
           tech@aeff <- tech@aeff[tech@aeff$acomm == y, , drop = FALSE]
+          # browser()
           sng <- sapply(aname, function(x) {
             .interpolation(tech@aeff, x,
               defVal = as.numeric(defVal[x]),
               rule = rule[x],
               year_range = range(year),
               approxim = approxim, all = TRUE
-            )[, x]
+            # )[, x]
+            )[[x]]
           })
           sng <- sng[sng != 0]
           ll <- tech@aeff[tech@aeff$acomm == y, , drop = FALSE]
@@ -142,7 +146,8 @@ draw.technology <- function(
               year_range = range(year),
               approxim = approxim, all = TRUE
             )
-            hh[hh[, x] != 0, , drop = FALSE]
+            # hh[hh[, x] != 0, , drop = FALSE]
+            hh[hh[[x]] != 0, , drop = FALSE]
           })
           names(dbl) <- acname
           dbl <- dbl[sapply(dbl, nrow) != 0]
@@ -402,11 +407,12 @@ draw.technology <- function(
             gg <- paste(gg, " (", tech@output[tech@output$comm == gg, "unit"], ")", sep = "")
           }
           text(.80, y + .03, gg, adj = 0, cex = fnt)
+          # browser()
+          ii_lo <- afc$comm == cmm & afc$type == "lo"
+          ii_up <- afc$comm == cmm & afc$type == "up"
           lo_legend <- paste("afc ",
-            to_format(as.numeric(afc[afc$comm == cmm & afc$type == "lo", "afc"])),
-            " .. ",
-            to_format(as.numeric(afc[afc$comm == cmm & afc$type == "up", "afc"])),
-            "",
+            to_format(as.numeric(afc[ii_lo, "afc"])), " .. ",
+            to_format(as.numeric(afc[ii_up, "afc"])), "",
             sep = ""
           )
           # if (show_all ||lo_legend != 'afc 0 .. Inf')
