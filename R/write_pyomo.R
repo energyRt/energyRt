@@ -1,5 +1,6 @@
 # Functions to write PYOMO model and data files
 .write_model_PYOMO <- function(arg, scen) {
+  # browser()
   AbstractModel <- any(grep("abstract", scen@settings@solver$lang, ignore.case = TRUE))
   if (AbstractModel) {
     run_code <- scen@settings@sourceCode[["PYOMOAbstract"]]
@@ -205,6 +206,7 @@
       }
     }
   }
+  # browser()
   if (AbstractModel) close(zz_data_pyomo)
   if (!AbstractModel && !SQLite) close(zz_inp_file)
   npar2 <- (grep("^model[.]obj ", run_code)[1] - 1)
@@ -225,6 +227,7 @@
       }
     }
   }
+  # browser()
   ## Add costs equation
   {
     cat("\n", file = zz_costs)
@@ -299,11 +302,11 @@
         return(rtt)
       }
       rtt <- paste0("# ", name, name2, "\ntmp = {} \n")
-      kk <- paste0("tmp[('", data[, 1])
+      kk <- paste0("tmp[('", data[[1]])
       for (i in seq_len(ncol(data) - 2) + 1) {
         kk <- paste0(kk, "', '", data[[i]])
       }
-      kk <- paste0(kk, "')] = ", data[, "value"])
+      kk <- paste0(kk, "')] = ", data[["value"]])
       kk <- c(
         rtt, paste0(kk, collapse = "\n"), "\n\n",
         paste0(name, " = toPar(tmp, ", def, ")\n")
@@ -317,7 +320,7 @@
   if (obj@type == "set") {
     tmp <- ""
     if (nrow(obj@data) > 0) {
-      tmp <- paste0("['", paste0(sort(obj@data[, 1]), collapse = "', '"), "']")
+      tmp <- paste0("['", paste0(sort(obj@data[[1]]), collapse = "', '"), "']")
     }
     return(c(paste0("# ", obj@name), paste0("\n", obj@name, " = set(", tmp, ");")))
   } else if (obj@type == "map") {
@@ -342,14 +345,19 @@
       obj@defVal
     ))
   } else if (obj@type == "bounds") {
-    hh <- gsub("[(][)]", "", paste0("(", paste0(obj@dimSets, collapse = ", "), ")"))
+    hh <- gsub("[(][)]", "",
+               paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
+               )
+    # browser()
     return(c(
       as_numpar(
-        obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "lo"), -type),
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
       as_numpar(
-        obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "up"), -type),
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
     ))
@@ -372,11 +380,11 @@
       if (nrow(data) == 0) {
         return(paste0("# ", name, name2, " no data except default\n"))
       }
-      kk <- paste0("  ", data[, 1])
+      kk <- paste0("  ", data[[1]])
       for (i in seq_len(ncol(data) - 2) + 1) {
         kk <- paste0(kk, " ", data[[i]])
       }
-      kk <- paste0(kk, " ", data[, "value"])
+      kk <- paste0(kk, " ", data[["value"]])
       kk <- c(rtt, paste0(kk, collapse = "\n"), "\n;\n")
       return(kk)
     }
@@ -387,7 +395,7 @@
   if (obj@type == "set") {
     tmp <- ""
     if (nrow(obj@data) > 0) {
-      tmp <- paste0("\n  ", sort(obj@data[, 1]), collapse = "")
+      tmp <- paste0("\n  ", sort(obj@data[[1]]), collapse = "")
     }
     return(c(paste0("# ", obj@name), paste0("\nset ", obj@name, " := ", tmp, ";")))
   } else if (obj@type == "map") {
@@ -409,11 +417,13 @@
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
       as_numpar(
-        obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "lo"), -type),
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
       as_numpar(
-        obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "up"), -type),
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
     ))
@@ -473,11 +483,13 @@
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
       as_numpar(
-        obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "lo"), -type),
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
       as_numpar(
-        obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "up"), -type),
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
     ))

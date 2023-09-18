@@ -137,7 +137,7 @@
       ret <- c(paste("set ", obj@name, " := ;", sep = ""), "")
     } else {
       ret <- c(paste("set ", obj@name, " := ",
-                     paste(obj@data[, 1], collapse = " "), ";", sep = ""), "")
+                     paste(obj@data[[1]], collapse = " "), ";", sep = ""), "")
     }
   } else if (obj@type == "map") {
     if (nrow(obj@data) == 0) {
@@ -158,12 +158,16 @@
       dd <- obj@defVal
       if (dd == Inf) dd <- 0
       ret <- paste("param ", obj@name, " default ", dd, " := ", sep = "")
-      fl <- obj@data[, "value"] != Inf
+      fl <- obj@data[["value"]] != Inf
       if (any(fl)) {
-        ret <- c(ret, paste("[", apply(
-          obj@data[fl, -ncol(obj@data), drop = FALSE], 1,
-          function(x) paste(x, collapse = ",")
-        ), "] ", obj@data[fl, "value"], sep = ""))
+        ret <- c(
+          ret,
+          paste("[", apply(
+            # obj@data[fl, -ncol(obj@data), drop = FALSE],
+            select(filter(obj@data, fl), -ncol(obj@data)),
+            1, function(x) paste(x, collapse = ",")
+            ), "] ", obj@data[["value"]][fl], sep = "")
+          )
       }
       if (ncol(obj@data) == 1) ret <- gsub("[[][ ]*[]]", "", ret)
       ret <- c(ret, ";", "")
@@ -171,7 +175,8 @@
   } else if (obj@type == "bounds") {
     gg <- obj@data
     gg <- gg[gg$type == "lo", , drop = FALSE]
-    gg <- gg[, colnames(gg) != "type"]
+    # gg <- gg[, colnames(gg) != "type"]
+    gg <- gg %>% select(-any_of("type"))
     if (nrow(gg) == 0) { #  || all(gg$value[1] == gg$value)
       if (nrow(gg) == 0) dd <- obj@defVal[1] else dd <- gg$value[1]
       if (dd == Inf) dd <- 0
@@ -180,19 +185,22 @@
       dd <- obj@defVal[1]
       if (dd == Inf) dd <- 0
       ret <- paste("param ", obj@name, "Lo default ", dd, " := ", sep = "")
-      fl <- gg[, "value"] != Inf
+      fl <- gg[["value"]] != Inf
       if (any(fl)) {
-        ret <- c(ret, paste("[", apply(
-          gg[fl, -ncol(gg), drop = FALSE], 1,
-          function(x) paste(x, collapse = ",")
-        ), "] ", gg[fl, "value"], sep = ""))
+        ret <- c(
+          ret, paste("[", apply(
+            # gg[fl, -ncol(gg), drop = FALSE],
+            select(filter(gg, fl), -last_col()),
+            1, function(x) paste(x, collapse = ",")
+            ), "] ", gg[["value"]][fl], sep = ""))
       }
       if (ncol(gg) == 1) ret <- gsub("[[][ ]*[]]", "", ret)
       ret <- c(ret, ";", "")
     }
     gg <- obj@data
     gg <- gg[gg$type == "up", , drop = FALSE]
-    gg <- gg[, colnames(gg) != "type"]
+    # gg <- gg[, colnames(gg) != "type"]
+    gg <- gg %>% select(-any_of("type"))
     if (nrow(gg) == 0) { #  || all(gg$value[1] == gg$value)
       if (nrow(gg) == 0) dd <- obj@defVal[2] else dd <- gg$value[1]
       if (dd == Inf) dd <- 0
@@ -201,12 +209,15 @@
       dd <- obj@defVal[2]
       if (dd == Inf) dd <- 0
       ret <- c(ret, paste("param ", obj@name, "Up default ", dd, " := ", sep = ""))
-      fl <- gg[, "value"] != Inf
+      fl <- gg[["value"]] != Inf
       if (any(fl)) {
-        ret <- c(ret, paste("[", apply(
-          gg[fl, -ncol(gg), drop = FALSE], 1,
-          function(x) paste(x, collapse = ",")
-        ), "] ", gg[fl, "value"], sep = ""))
+        ret <- c(
+          ret, paste("[", apply(
+            # gg[fl, -ncol(gg), drop = FALSE],
+            select(filter(gg, fl), -ncol(gg)),
+            1, function(x) paste(x, collapse = ",")
+            ), "] ", gg[["value"]][fl], sep = "")
+          )
       }
       if (ncol(gg) == 1) ret <- gsub("[[][ ]*[]]", "", ret)
       ret <- c(ret, ";", "")

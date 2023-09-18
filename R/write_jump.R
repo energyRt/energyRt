@@ -111,10 +111,19 @@
       dat[[i]] <- tmp
     } else {
       tmp <- .get_data_slot(scen@modInp@parameters[[i]])
-      dat[[paste0(i, "Up")]] <- tmp[tmp$type == "up", colnames(tmp) != "type"]
-      dat[[paste0(i, "Lo")]] <- tmp[tmp$type == "lo", colnames(tmp) != "type"]
+      # dat[[paste0(i, "Up")]] <- tmp[tmp$type == "up", colnames(tmp) != "type"]
+      # dat[[paste0(i, "Lo")]] <- tmp[tmp$type == "lo", colnames(tmp) != "type"]
+      dat[[paste0(i, "Up")]] <- select(filter(tmp, type == "up"), -type)
+      dat[[paste0(i, "Lo")]] <- select(filter(tmp, type == "lo"), -type)
     }
   }
+  # browser()
+  # data.tables - > data.frames to avoid warning:
+  # ┌ Warning: Conversion of RData.RExtPtr to Julia is not implemented
+  # └ @ RData C:\Users\...\.julia\packages\RData\L5u8v\src\convert.jl:198
+  dat <- lapply(dat, function(x) {
+    if (is.data.table(x)) as.data.frame(x) else x
+    })
 
   save("dat", file = paste0(arg$tmp.dir, "data.RData"))
 
@@ -238,7 +247,7 @@
   if (obj@type == "set") {
     tmp <- ""
     if (nrow(obj@data) > 0) {
-      tmp <- paste0("\n  (:", paste0(sort(obj@data[, 1]),
+      tmp <- paste0("\n  (:", paste0(sort(obj@data[[1]]),
         collapse = "),\n  (:"
       ), ")\n")
     }
@@ -268,11 +277,13 @@
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
       as_numpar(
-        obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "lo"), -type),
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
       as_numpar(
-        obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "up"), -type),
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
     ))
@@ -339,11 +350,13 @@
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(
       as_numpar(
-        obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "lo", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "lo"), -type),
         paste(obj@name, "Lo", sep = ""), hh, obj@defVal[1]
       ),
       as_numpar(
-        obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        # obj@data[obj@data$type == "up", 1 - ncol(obj@data), drop = FALSE],
+        select(filter(obj@data, type == "up"), -type),
         paste(obj@name, "Up", sep = ""), hh, obj@defVal[2]
       )
     ))
