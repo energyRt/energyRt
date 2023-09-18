@@ -26,6 +26,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   obj <- object
   arg <- list(...)
 
+
   interpolation_start_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
 
@@ -52,6 +53,15 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   if (!is.null(arg$region)) scen@settings@region <- arg$region
   if (!is.null(arg$discount)) scen@settings@discount <- arg$discount
   if (is.null(arg$verbose)) arg$verbose <- 0
+  if (!is.null(arg$name)) {
+    scen@misc$table_format <- arg$table_format
+    # set_table_format(scen@misc$table_format)
+    arg$table_format <- NULL
+  } else {
+    scen@misc$table_format <- "data.table"
+    # set_table_format(scen@misc$table_format)
+  }
+
 
   ### Interpolation
   scen@modInp <- new("modInp")

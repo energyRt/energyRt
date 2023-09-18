@@ -678,18 +678,28 @@ setMethod(
     obj@parameters[["pStorageCout"]] <- .dat2par(obj@parameters[["pStorageCout"]], pStorageCout)
     # Aux input/output
     if (nrow(stg@aux) != 0) {
-      if (any(!(stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]))) {
+      if (any(!(stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in%
+                stg@aux$acomm[!is.na(stg@aux$acomm)]))) {
         cmm <- stg@aeff$acomm[!is.na(stg@aeff$acomm)][stg@aeff$acomm[!is.na(stg@aeff$acomm)] %in% stg@aux$acomm[!is.na(stg@aux$acomm)]]
-        stop(paste0('Unknown aux commodity "', paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
+        stop(paste0('Unknown aux commodity "',
+                    paste0(cmm, collapse = '", "'), '", in storage "', stg@name, '"'))
       }
       stg@aeff <- stg@aeff[!is.na(stg@aeff$acomm), , drop = FALSE]
-      ainp_flag <- c("stg2ainp", "cinp2ainp", "cout2ainp", "cap2ainp", "ncap2ainp")
-      aout_flag <- c("stg2aout", "cinp2aout", "cout2aout", "cap2aout", "ncap2aout")
+      ainp_flag <- c("stg2ainp", "cinp2ainp", "cout2ainp", "cap2ainp",
+                     "ncap2ainp")
+      aout_flag <- c("stg2aout", "cinp2aout", "cout2aout", "cap2aout",
+                     "ncap2aout")
       cmp_inp <- stg@aeff[apply(!is.na(stg@aeff[, ainp_flag]), 1, any), "acomm"]
       cmp_out <- stg@aeff[apply(!is.na(stg@aeff[, aout_flag]), 1, any), "acomm"]
-      mStorageAInp <- data.table(stg = rep(stg@name, length(cmp_inp)), comm = cmp_inp)
-      obj@parameters[["mStorageAInp"]] <- .dat2par(obj@parameters[["mStorageAInp"]], mStorageAInp)
-      mStorageAOut <- data.table(stg = rep(stg@name, length(cmp_out)), comm = cmp_out)
+      mStorageAInp <- data.table(
+        stg = rep(stg@name, length(cmp_inp)),
+        comm = cmp_inp)
+      obj@parameters[["mStorageAInp"]] <-
+        .dat2par(obj@parameters[["mStorageAInp"]], mStorageAInp)
+      mStorageAOut <- data.table(
+        stg = rep(stg@name, length(cmp_out)),
+        comm = cmp_out
+        )
       obj@parameters[["mStorageAOut"]] <- .dat2par(obj@parameters[["mStorageAOut"]], mStorageAOut)
       dd <- data.table(
         list = c(
@@ -706,16 +716,22 @@ setMethod(
       aout_tmp <- list()
       for (i in 1:nrow(dd)) {
         approxim_comm <- approxim_comm[names(approxim_comm) != "comm"]
-        approxim_comm[["acomm"]] <- unique(stg@aeff[!is.na(stg@aeff[, dd[i, "table"]]), "acomm"])
+        approxim_comm[["acomm"]] <-
+          unique(stg@aeff[!is.na(stg@aeff[, dd[i, "table"]]), "acomm"])
         if (length(approxim_comm[["acomm"]]) != 0) {
-          aout_tmp[[dd[i, "list"]]] <- .interp_numpar(stg@aeff, dd[i, "table"], obj@parameters[[dd[i, "list"]]], approxim_comm, "stg", stg@name)
-          obj@parameters[[dd[i, "list"]]] <- .dat2par(obj@parameters[[dd[i, "list"]]], aout_tmp[[dd[i, "list"]]])
+          aout_tmp[[dd[i, "list"]]] <-
+            .interp_numpar(stg@aeff, dd[i, "table"],
+                           obj@parameters[[dd[i, "list"]]],
+                           approxim_comm, "stg", stg@name)
+          obj@parameters[[dd[i, "list"]]] <-
+            .dat2par(obj@parameters[[dd[i, "list"]]], aout_tmp[[dd[i, "list"]]])
         }
       }
     } else {
       if (nrow(stg@aeff) != 0 && any(stg@aeff$acomm[!is.na(stg@aeff$acomm)])) {
         stop(paste0(
-          'Unknown aux commodity "', paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'),
+          'Unknown aux commodity "',
+          paste0(stg@aeff$acomm[!is.na(stg@aeff$acomm)], collapse = '", "'),
           '", in storage "', stg@name, '"'
         ))
       }
@@ -723,46 +739,59 @@ setMethod(
     if (any(!is.na(stg@aeff$ncap2stg) & stg@aeff$ncap2stg != 0)) {
       fl <- (!is.na(stg@aeff$ncap2stg) & stg@aeff$ncap2stg != 0)
       if (any(is.na(stg@aeff[fl, c("region", "year", "slice")]))) {
-        stop(paste0('Approximation is not allowed for storage "', stg@name, '" parameter ncap2stg'))
+        stop(paste0('Interpolation is not allowed for storage "',
+                    stg@name, '" parameter ncap2stg'))
       }
       tmp <- stg@aeff[fl, c("region", "year", "slice", "ncap2stg")]
       tmp$stg <- stg@name
       tmp$comm <- stg@commodity
       tmp$value <- tmp$ncap2stg
       tmp <- tmp[, c("stg", "comm", "region", "year", "slice", "value")]
-      obj@parameters[["pStorageNCap2Stg"]] <- .dat2par(obj@parameters[["pStorageNCap2Stg"]], tmp)
+      obj@parameters[["pStorageNCap2Stg"]] <-
+        .dat2par(obj@parameters[["pStorageNCap2Stg"]], tmp)
     }
 
     if (any(!is.na(stg@charge$charge) & stg@charge$charge != 0)) {
       fl <- (!is.na(stg@charge$charge) & stg@charge$charge != 0)
       if (any(is.na(stg@charge[fl, c("region", "year", "slice")]))) {
-        stop(paste0('Approximation is not allowed for storage "', stg@name, '" parameter charge'))
+        stop(paste0('Interpolation is not allowed for storage "',
+                    stg@name, '" parameter charge'))
       }
       tmp <- stg@charge[fl, c("region", "year", "slice", "charge")]
       tmp$stg <- stg@name
       tmp$comm <- stg@commodity
       tmp$value <- tmp$charge
       tmp <- tmp[, c("stg", "comm", "region", "year", "slice", "value")]
-      obj@parameters[["pStorageCharge"]] <- .dat2par(obj@parameters[["pStorageCharge"]], tmp)
+      obj@parameters[["pStorageCharge"]] <-
+        .dat2par(obj@parameters[["pStorageCharge"]], tmp)
     }
     # Some slice
     stock_exist <- .interp_numpar(
       stg@stock, "stock",
       obj@parameters[["pStorageStock"]], approxim, "stg", stg@name
     )
-    obj@parameters[["pStorageStock"]] <- .dat2par(obj@parameters[["pStorageStock"]], stock_exist)
-    invcost <- .interp_numpar(stg@invcost, "invcost", obj@parameters[["pStorageInvcost"]], approxim, "stg", stg@name)
+    obj@parameters[["pStorageStock"]] <-
+      .dat2par(obj@parameters[["pStorageStock"]], stock_exist)
+    invcost <- .interp_numpar(stg@invcost, "invcost",
+                              obj@parameters[["pStorageInvcost"]],
+                              approxim, "stg", stg@name)
     obj@parameters[["pStorageInvcost"]] <- .dat2par(obj@parameters[["pStorageInvcost"]], invcost)
 
 
     # browser()
     dd0 <- .start_end_fix(approxim, stg, "stg", stock_exist)
-    dd0$new <- dd0$new[dd0$new$year %in% approxim$mileStoneYears & dd0$new$region %in% approxim$region, , drop = FALSE]
-    dd0$span <- dd0$span[dd0$span$year %in% approxim$mileStoneYears & dd0$span$region %in% approxim$region, , drop = FALSE]
-    obj@parameters[["mStorageNew"]] <- .dat2par(obj@parameters[["mStorageNew"]], dd0$new)
+    dd0$new <- dd0$new[dd0$new$year %in% approxim$mileStoneYears &
+                         dd0$new$region %in% approxim$region, , drop = FALSE]
+    dd0$span <- dd0$span[
+      dd0$span$year %in% approxim$mileStoneYears &
+        dd0$span$region %in% approxim$region, , drop = FALSE]
+    obj@parameters[["mStorageNew"]] <-
+      .dat2par(obj@parameters[["mStorageNew"]], dd0$new)
     mStorageSpan <- dd0$span
-    obj@parameters[["mStorageSpan"]] <- .dat2par(obj@parameters[["mStorageSpan"]], dd0$span)
-    obj@parameters[["mStorageEac"]] <- .dat2par(obj@parameters[["mStorageEac"]], dd0$eac)
+    obj@parameters[["mStorageSpan"]] <-
+      .dat2par(obj@parameters[["mStorageSpan"]], dd0$span)
+    obj@parameters[["mStorageEac"]] <-
+      .dat2par(obj@parameters[["mStorageEac"]], dd0$eac)
 
     if (nrow(dd0$new) > 0 && !is.null(invcost) && nrow(invcost) > 0) {
       salv_data <- merge0(dd0$new, approxim$discount, all.x = TRUE)
@@ -778,42 +807,77 @@ setMethod(
       # EAC
       salv_data$eac <- salv_data$invcost / salv_data$olife
       fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
-      salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl])^salv_data$olife[fl] /
-        ((1 + salv_data$discount[fl])^salv_data$olife[fl] - 1))
+      salv_data$eac[fl] <-
+        salv_data$invcost[fl] *
+        (salv_data$discount[fl] *
+           (1 + salv_data$discount[fl])^salv_data$olife[fl] /
+           ((1 + salv_data$discount[fl])^salv_data$olife[fl] - 1)
+         )
       fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
       salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
       salv_data$tech <- stg@name
       salv_data$value <- salv_data$eac
       pStorageEac <- salv_data[, c("stg", "region", "year", "value")]
-      obj@parameters[["pStorageEac"]] <- .dat2par(obj@parameters[["pStorageEac"]], unique(pStorageEac[, colnames(pStorageEac) %in% c(obj@parameters[["pStorageEac"]]@dimSets, "value"), drop = FALSE]))
+      obj@parameters[["pStorageEac"]] <-
+        .dat2par(
+          obj@parameters[["pStorageEac"]],
+          unique(
+            select(pStorageEac,
+                   any_of(c(obj@parameters[["pStorageEac"]]@dimSets, "value"))
+                   )
+            # pStorageEac[, colnames(pStorageEac) %in%
+            #               c(obj@parameters[["pStorageEac"]]@dimSets, "value"),
+            #             drop = FALSE])
+          ))
     }
-
 
     if (nrow(stg@weather) > 0) {
       tmp <- .toWeatherImply(stg@weather, "waf", "stg", stg@name)
-      obj@parameters[["pStorageWeatherAf"]] <- .dat2par(obj@parameters[["pStorageWeatherAf"]], tmp$par)
-      obj@parameters[["mStorageWeatherAfUp"]] <- .dat2par(obj@parameters[["mStorageWeatherAfUp"]], tmp$mapup)
-      obj@parameters[["mStorageWeatherAfLo"]] <- .dat2par(obj@parameters[["mStorageWeatherAfLo"]], tmp$maplo)
+      obj@parameters[["pStorageWeatherAf"]] <-
+        .dat2par(obj@parameters[["pStorageWeatherAf"]], tmp$par)
+      obj@parameters[["mStorageWeatherAfUp"]] <-
+        .dat2par(obj@parameters[["mStorageWeatherAfUp"]], tmp$mapup)
+      obj@parameters[["mStorageWeatherAfLo"]] <-
+        .dat2par(obj@parameters[["mStorageWeatherAfLo"]], tmp$maplo)
 
       tmp <- .toWeatherImply(stg@weather, "wcinp", "stg", stg@name)
-      obj@parameters[["pStorageWeatherCinp"]] <- .dat2par(obj@parameters[["pStorageWeatherCinp"]], tmp$par)
-      obj@parameters[["mStorageWeatherCinpUp"]] <- .dat2par(obj@parameters[["mStorageWeatherCinpUp"]], tmp$mapup)
-      obj@parameters[["mStorageWeatherCinpLo"]] <- .dat2par(obj@parameters[["mStorageWeatherCinpLo"]], tmp$maplo)
+      obj@parameters[["pStorageWeatherCinp"]] <-
+        .dat2par(obj@parameters[["pStorageWeatherCinp"]], tmp$par)
+      obj@parameters[["mStorageWeatherCinpUp"]] <-
+        .dat2par(obj@parameters[["mStorageWeatherCinpUp"]], tmp$mapup)
+      obj@parameters[["mStorageWeatherCinpLo"]] <-
+        .dat2par(obj@parameters[["mStorageWeatherCinpLo"]], tmp$maplo)
 
       tmp <- .toWeatherImply(stg@weather, "wcout", "stg", stg@name)
-      obj@parameters[["pStorageWeatherCout"]] <- .dat2par(obj@parameters[["pStorageWeatherCout"]], tmp$par)
-      obj@parameters[["mStorageWeatherCoutUp"]] <- .dat2par(obj@parameters[["mStorageWeatherCoutUp"]], tmp$mapup)
-      obj@parameters[["mStorageWeatherCoutLo"]] <- .dat2par(obj@parameters[["mStorageWeatherCoutLo"]], tmp$maplo)
+      obj@parameters[["pStorageWeatherCout"]] <-
+        .dat2par(obj@parameters[["pStorageWeatherCout"]], tmp$par)
+      obj@parameters[["mStorageWeatherCoutUp"]] <-
+        .dat2par(obj@parameters[["mStorageWeatherCoutUp"]], tmp$mapup)
+      obj@parameters[["mStorageWeatherCoutLo"]] <-
+        .dat2par(obj@parameters[["mStorageWeatherCoutLo"]], tmp$maplo)
     }
     pStorageOlife <- olife
     if (any(pStorageOlife$olife != Inf)) {
-      mStorageOlifeInf <- pStorageOlife[pStorageOlife$olife != Inf, colnames(pStorageOlife) %in%
-        obj@parameters[["mStorageOlifeInf"]]@dimSets, drop = FALSE]
+      mStorageOlifeInf <-
+        select(filter(pStorageOlife, !is.infinite(olife)),
+               any_of(obj@parameters[["mStorageOlifeInf"]]@dimSets))
+      # pStorageOlife[pStorageOlife$olife != Inf,
+      #                 colnames(pStorageOlife) %in%
+      #                   obj@parameters[["mStorageOlifeInf"]]@dimSets,
+      #                 drop = FALSE]
       if (ncol(mStorageOlifeInf) != ncol(obj@parameters[["mStorageOlifeInf"]]@data)) {
-        mStorageOlifeInf <- merge0(mStorageOlifeInf, mStorageSpan[!duplicated(mStorageSpan$region), colnames(mStorageSpan) %in%
-          obj@parameters[["mStorageOlifeInf"]]@dimSets, drop = FALSE])
+        mStorageOlifeInf <- merge0(
+          mStorageOlifeInf,
+          select(filter(mStorageSpan, !duplicated(region)),
+                 any_of(obj@parameters[["mStorageOlifeInf"]]@dimSets))
+          # mStorageSpan[!duplicated(mStorageSpan$region),
+          #              colnames(mStorageSpan) %in%
+          #                obj@parameters[["mStorageOlifeInf"]]@dimSets,
+          #              drop = FALSE]
+          )
       }
-      obj@parameters[["mStorageOlifeInf"]] <- .dat2par(obj@parameters[["mStorageOlifeInf"]], mStorageOlifeInf)
+      obj@parameters[["mStorageOlifeInf"]] <-
+        .dat2par(obj@parameters[["mStorageOlifeInf"]], mStorageOlifeInf)
     }
     mStorageOMCost <- NULL
     add_omcost <- function(mStorageOMCost, pStorageFixom) {
@@ -897,8 +961,14 @@ setMethod(
       if (is.null(x)) {
         return(y)
       }
-      x <- x[x$type == "up" & x$value == Inf, ]
-      y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
+      # x <- x[x$type == "up" & x$value == Inf, ]
+      # r <- try(y[(!duplicated(rbind(y, select(x, -value))))[1:nrow(y)], ])
+      # # y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
+      # if (inherits(r, "try-error")) browser() # !!! To check
+      # r
+      merge0(
+        select(filter(x, type == "up", x$value == Inf), any_of(colnames(y))),
+        y)
     }
     rem_inf_def_inf <- function(x, y) {
       merge0(
@@ -913,6 +983,7 @@ setMethod(
                  filter(pStorageAf, type == "lo" & value != 0),
                  mvStorageStore
                  ))
+    # browser() !!! check meqStorageAfUp
     obj@parameters[["meqStorageAfUp"]] <-
       .dat2par(obj@parameters[["meqStorageAfUp"]],
                rem_inf_def1(pStorageAf, mvStorageStore)
@@ -2152,7 +2223,8 @@ setMethod(
   function(obj, app, approxim) {
     # trd <- .upper_case(app)
     trd <- app
-    if (length(trd@commodity) != 1 || is.na(trd@commodity) || all(trd@commodity != approxim$all_comm)) {
+    if (length(trd@commodity) != 1 || is.na(trd@commodity) ||
+        all(trd@commodity != approxim$all_comm)) {
       stop(paste0('Wrong commodity in trade "', trd@name, '"'))
     }
     trd <- .filter_data_in_slots(trd, approxim$region, "region") ## ??
@@ -2160,17 +2232,25 @@ setMethod(
     approxim <- .fix_approximation_list(approxim, comm = trd@commodity)
     trd <- .disaggregateSliceLevel(trd, approxim)
     # other flag
-    mTradeSlice <- data.table(trade = rep(trd@name, length(approxim$slice)), slice = approxim$slice)
-    obj@parameters[["mTradeSlice"]] <- .dat2par(obj@parameters[["mTradeSlice"]], mTradeSlice)
+    mTradeSlice <- data.table(
+      trade = rep(trd@name, length(approxim$slice)),
+      slice = approxim$slice)
+    obj@parameters[["mTradeSlice"]] <-
+      .dat2par(obj@parameters[["mTradeSlice"]], mTradeSlice)
     if (length(trd@commodity) == 0)
       stop("There is not commodity for trade flow ", trd@name)
     obj@parameters[["mTradeComm"]] <-
-      .dat2par(
-      obj@parameters[["mTradeComm"]],
-      data.table(trade = trd@name, comm = trd@commodity)
+      .dat2par(obj@parameters[["mTradeComm"]],
+               data.table(trade = trd@name,
+                          comm = trd@commodity)
     )
-    mTradeRoutes <- cbind(trade = rep(trd@name, nrow(trd@routes)), trd@routes)
-    obj@parameters[["mTradeRoutes"]] <- .dat2par(obj@parameters[["mTradeRoutes"]], mTradeRoutes)
+    # !!!
+    mTradeRoutes <- cbind(
+      data.table(trade = rep(trd@name, nrow(trd@routes))),
+      trd@routes
+      )
+    obj@parameters[["mTradeRoutes"]] <-
+      .dat2par(obj@parameters[["mTradeRoutes"]], mTradeRoutes)
     pTradeIrCdst2Aout <- NULL
     pTradeIrCsrc2Aout <- NULL
     pTradeIrCdst2Ainp <- NULL
@@ -2225,7 +2305,11 @@ setMethod(
       # src & dst NA
       fl <- seq_len(nrow(tmp))[is.na(tmp$src) & is.na(tmp$dst)]
       if (length(fl) > 0) {
-        kk <- rbind(tmp[-fl, c("src", "dst"), drop = FALSE], routes)
+        # kk <- rbind(tmp[-fl, c("src", "dst"), drop = FALSE], routes)
+        kk <- rbind(
+          select(filter(tmp, -fl), all_of(c("src", "dst")),
+          routes)
+          )
         kk <- kk[!(duplicated(kk) | duplicated(kk, fromLast = TRUE)), ,
                  drop = FALSE]
       }
@@ -2234,9 +2318,11 @@ setMethod(
         tmp <- rbind(tmp,
                      tmp[c(t(matrix(fl, length(fl), nrow(kk)))), ,
                          drop = FALSE])
-        tmp[nn, "src"] <- kk$src
-        tmp[nn, "dst"] <- kk$dst
-        tmp <- tmp[-fl, , drop = FALSE]
+        # tmp[nn, "src"] <- kk$src
+        # tmp[nn, "dst"] <- kk$dst
+        tmp$src[nn] <- kk$src
+        tmp$dst[nn] <- kk$dst
+        tmp <- tmp %>% filter(-fl)
       }
       rownames(tmp) <- NULL
       tmp
@@ -2259,7 +2345,9 @@ setMethod(
       }
       dtf$src <- NULL
       dtf$dst <- NULL
-      dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
+      # dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
+      jj <- colnames(dtf)[c(ncol(dtf), 2:ncol(dtf) - 1)]
+      dtf <- dtf %>% select(all_of(jj))
       dd <- .interp_numpar(dtf, approxim = approxim,
                            parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) {
@@ -2278,22 +2366,31 @@ setMethod(
         return(.interp_bounds(dtf, approxim = approxim,
                               parameter = parameter, ...))
       }
-      dtf <- dtf[apply(
-        !is.na(dtf[, paste0(parameter,
-                            c(".lo", ".up", ".fx"))]), 1, any), ]
+      # dtf <- dtf[apply(
+      #   !is.na(dtf[, paste0(parameter,
+      #                       c(".lo", ".up", ".fx"))]), 1, any), ]
+      dtf_bnd <- select(dtf, all_of(paste0(parameter, c(".lo", ".up", ".fx"))))
+      dtf <- dtf[apply(!is.na(dtf_bnd), 1, any), ]
       if (nrow(dtf) == 0 && !approxim$fullsets) {
         return(NULL)
       }
       if (nrow(dtf) != 0) {
-        clo <- dtf[, paste0(parameter, ".lo")]
-        cup <- dtf[, paste0(parameter, ".up")]
-        cfx <- dtf[, paste0(parameter, ".fx")]
-        dtf[, paste0(parameter, c(".up", ".fx", ".lo"))] <- NA
+        # clo <- dtf[, paste0(parameter, ".lo")]
+        clo <- dtf %>% select(all_of(paste0(parameter, ".lo")))
+        # cup <- dtf[, paste0(parameter, ".up")]
+        cup <- dtf %>% select(all_of(paste0(parameter, ".up")))
+        # cfx <- dtf[, paste0(parameter, ".fx")]
+        cfx <- dtf %>% select(all_of(paste0(parameter, ".fx")))
+        # dtf[, paste0(parameter, c(".up", ".fx", ".lo"))] <- NA
+        dtf[[paste0(parameter, c(".up", ".fx", ".lo"))]] <- NA
         dtf <- rbind(dtf, dtf)
-        dtf[, paste0(parameter, ".lo")] <- c(clo, cfx)
+        # dtf[, paste0(parameter, ".lo")] <- c(clo, cfx)
+        dtf[[paste0(parameter, ".lo")]] <- c(clo, cfx)
         frm_lo <- imply_routes(dtf[!is.na(c(clo, cfx)), ])
-        dtf[, paste0(parameter, ".lo")] <- NA
-        dtf[, paste0(parameter, ".up")] <- c(cup, cfx)
+        # dtf[, paste0(parameter, ".lo")] <- NA
+        dtf[[paste0(parameter, ".lo")]] <- NA
+        # dtf[, paste0(parameter, ".up")] <- c(cup, cfx)
+        dtf[[paste0(parameter, ".up")]] <- c(cup, cfx)
         frm_up <- imply_routes(dtf[!is.na(c(cup, cfx)), ])
         dtf <- rbind(frm_lo, frm_up)
         dtf$region <- paste0(dtf$src, "##", dtf$dst)
@@ -2302,7 +2399,9 @@ setMethod(
       }
       dtf$src <- NULL
       dtf$dst <- NULL
-      dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
+      dtf_nms <- colnames(dtf)[c(ncol(dtf), 2:ncol(dtf) - 1)]
+      # dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
+      dtf <- dtf %>% select(all_of(dtf_nms))
       dd <- .interp_bounds(dtf, approxim = approxim,
                            parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) {
@@ -2316,18 +2415,21 @@ setMethod(
       dd
     }
     # pTradeIrCost
-    obj@parameters[["pTradeIrCost"]] <- .dat2par(
-      obj@parameters[["pTradeIrCost"]],
-      .interp_numpar2(trd@trade,
-        parameter = "cost", obj@parameters[["pTradeIrCost"]],
-        approxim = approxim_srcdst, "trade", trd@name
-      )
-    )
-    pTradeIrEff <- .interp_numpar2(trd@trade,
-      parameter = "teff", obj@parameters[["pTradeIrEff"]],
-      approxim = approxim_srcdst, "trade", trd@name
-    )
-    obj@parameters[["pTradeIrEff"]] <- .dat2par(obj@parameters[["pTradeIrEff"]], pTradeIrEff)
+    obj@parameters[["pTradeIrCost"]] <-
+      .dat2par(obj@parameters[["pTradeIrCost"]],
+               .interp_numpar2(
+                 trd@trade,
+                 parameter = "cost", obj@parameters[["pTradeIrCost"]],
+                 approxim = approxim_srcdst, "trade", trd@name
+                 )
+               )
+    pTradeIrEff <- .interp_numpar2(trd@trade, parameter = "teff",
+                                   obj@parameters[["pTradeIrEff"]],
+                                   approxim = approxim_srcdst, "trade",
+                                   trd@name
+                                   )
+    obj@parameters[["pTradeIrEff"]] <-
+      .dat2par(obj@parameters[["pTradeIrEff"]], pTradeIrEff)
     # pTradeIrMarkup
     obj@parameters[["pTradeIrMarkup"]] <- .dat2par(
       obj@parameters[["pTradeIrMarkup"]],
@@ -2432,33 +2534,47 @@ setMethod(
       ## !!! Trade
       if (nrow(trd@invcost) > 0) {
         if (any(is.na(trd@invcost$region)) && nrow(trd@invcost) > 1) {
-          stop('There is "NA" and other data for invcost in trade class "', trd@name, '".')
+          stop('There is "NA" and other data for invcost in trade class "',
+               trd@name, '".')
         }
         if (any(is.na(trd@invcost$region))) {
-          warning('There is a" NA "area for invcost in the"', trd@name, '"trade class. Investments will be smoothed along all routes of the regions.')
+          warning('There is a" NA "area for invcost in the"', trd@name,
+                  '"trade class. Investments will be smoothed along all ',
+                  'routes of the regions.')
           rgg <- unique(c(trd@routes$src, trd@routes$dst))
           trd@invcost <- trd@invcost[rep(1, length(rgg)), , drop = FALSE]
           trd@invcost[, "region"] <- rgg
           trd@invcost[, "invcost"] <- trd@invcost[1, "invcost"] / length(rgg)
         }
       }
-      invcost <- .interp_numpar(trd@invcost, "invcost", obj@parameters[["pTradeInvcost"]], approxim, "trade", trd@name)
+      invcost <- .interp_numpar(trd@invcost, "invcost",
+                                obj@parameters[["pTradeInvcost"]], approxim,
+                                "trade", trd@name)
       invcost <- invcost[invcost$value != 0, , drop = FALSE]
-      if (!is.null(invcost$year)) invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end, , drop = FALSE]
-
+      if (!is.null(invcost$year)) {
+        invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end, ,
+                           drop = FALSE]
+      }
       if (!is.null(invcost) && nrow(invcost) == 0) invcost <- NULL
-      stock_exist <- .interp_numpar(trd@stock, "stock", obj@parameters[["pTradeStock"]], approxim, "trade", trd@name)
-      obj@parameters[["pTradeStock"]] <- .dat2par(obj@parameters[["pTradeStock"]], stock_exist)
+      stock_exist <- .interp_numpar(trd@stock, "stock",
+                                    obj@parameters[["pTradeStock"]], approxim,
+                                    "trade", trd@name)
+      obj@parameters[["pTradeStock"]] <-
+        .dat2par(obj@parameters[["pTradeStock"]], stock_exist)
       obj@parameters[["pTradeOlife"]] <- .dat2par(
         obj@parameters[["pTradeOlife"]],
         data.table(trade = trd@name, value = trd@olife, stringsAsFactors = FALSE)
       )
       possible_invest_year <- approxim$mileStoneYears
-      possible_invest_year <- possible_invest_year[trd@start <= possible_invest_year & possible_invest_year <= trd@end]
+      possible_invest_year <- possible_invest_year[
+        trd@start <= possible_invest_year & possible_invest_year <= trd@end
+        ]
       if (length(possible_invest_year) > 0) {
         obj@parameters[["mTradeNew"]] <- .dat2par(
           obj@parameters[["mTradeNew"]],
-          data.table(trade = rep(trd@name, length(possible_invest_year)), year = possible_invest_year, stringsAsFactors = FALSE)
+          data.table(trade = rep(trd@name, length(possible_invest_year)),
+                     year = possible_invest_year,
+                     stringsAsFactors = FALSE)
         )
       }
 
@@ -2469,30 +2585,43 @@ setMethod(
         return(min(x))
       }
       if (trd@olife == Inf) {
-        trade_eac <- unique(approxim$year[min0(possible_invest_year) <= approxim$year])
+        trade_eac <- unique(
+          approxim$year[min0(possible_invest_year) <= approxim$year]
+          )
         trade_span <- unique(c(trd@stock$year, trade_eac))
-        obj@parameters[["mTradeOlifeInf"]] <- .dat2par(obj@parameters[["mTradeOlifeInf"]], data.table(trade = trd@name))
+        obj@parameters[["mTradeOlifeInf"]] <-
+          .dat2par(obj@parameters[["mTradeOlifeInf"]],
+                   data.table(trade = trd@name))
       } else {
         trade_eac <- unique(c(sapply(
           possible_invest_year,
-          function(x) approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]
+          function(x) {
+            approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]
+          }
         ), recursive = TRUE))
         trade_span <- unique(c(trd@stock$year, trade_eac))
       }
       trade_eac <- trade_eac[trade_eac %in% approxim$mileStoneYears]
       trade_span <- trade_span[trade_span %in% approxim$mileStoneYears]
       if (length(trade_span) > 0) {
-        mTradeSpan <- data.table(trade = rep(trd@name, length(trade_span)), year = trade_span, stringsAsFactors = FALSE)
-        obj@parameters[["mTradeSpan"]] <- .dat2par(obj@parameters[["mTradeSpan"]], mTradeSpan)
+        mTradeSpan <- data.table(
+          trade = rep(trd@name, length(trade_span)),
+          year = trade_span,
+          stringsAsFactors = FALSE)
+        obj@parameters[["mTradeSpan"]] <-
+          .dat2par(obj@parameters[["mTradeSpan"]], mTradeSpan)
         meqTradeCapFlow <- merge0(mTradeSpan, mTradeSlice)
         meqTradeCapFlow$comm <- trd@commodity
-        obj@parameters[["meqTradeCapFlow"]] <- .dat2par(obj@parameters[["meqTradeCapFlow"]], meqTradeCapFlow)
+        obj@parameters[["meqTradeCapFlow"]] <-
+          .dat2par(obj@parameters[["meqTradeCapFlow"]], meqTradeCapFlow)
       }
       # mTradeInv
       if (!is.null(invcost)) {
         end_year <- max(approxim$year)
-        obj@parameters[["pTradeInvcost"]] <- .dat2par(obj@parameters[["pTradeInvcost"]], invcost)
-        if (any(!(obj@parameters[["mTradeInv"]]@dimSets %in% colnames(invcost)))) {
+        obj@parameters[["pTradeInvcost"]] <-
+          .dat2par(obj@parameters[["pTradeInvcost"]], invcost)
+        if (any(!(obj@parameters[["mTradeInv"]]@dimSets %in%
+                  colnames(invcost)))) {
           if (is.null(invcost$year)) {
             invcost <- merge0(invcost, list(year = possible_invest_year))
           }
@@ -2500,19 +2629,29 @@ setMethod(
             invcost <- merge0(invcost, approxim["region"])
           }
         }
-        obj@parameters[["mTradeInv"]] <- .dat2par(obj@parameters[["mTradeInv"]], invcost[, colnames(invcost) != "value"])
+        obj@parameters[["mTradeInv"]] <-
+          .dat2par(obj@parameters[["mTradeInv"]],
+                   # invcost[, colnames(invcost) != "value"]
+                   select(invcost, -value)
+                   )
         invcost$invcost <- invcost$value
         invcost$value <- NULL
         if (length(trade_eac) > 0) {
-          mTradeEac <- merge0(unique(invcost$region), trade_eac)
+          # browser()
+          # mTradeEac <- merge(unique(invcost$region), trade_eac) %>%
+            # as.data.table()
+          mTradeEac <- expand_grid(
+            region = unique(invcost$region),
+            year = trade_eac) %>%
+            as.data.table()
           mTradeEac$trade <- trd@name
-          mTradeEac$region <- as.character(mTradeEac$x)
-          mTradeEac$year <- mTradeEac$y
-          mTradeEac$x <- NULL
-          mTradeEac$y <- NULL
-          obj@parameters[["mTradeEac"]] <- .dat2par(obj@parameters[["mTradeEac"]], mTradeEac)
+          # mTradeEac$region <- as.character(mTradeEac$x)
+          # mTradeEac$year <- mTradeEac$y
+          # mTradeEac$x <- NULL
+          # mTradeEac$y <- NULL
+          obj@parameters[["mTradeEac"]] <-
+            .dat2par(obj@parameters[["mTradeEac"]], mTradeEac)
         }
-
         salv_data <- merge0(invcost, approxim$discount, all.x = TRUE)
         salv_data$value[is.na(salv_data$value)] <- 0
         salv_data$discount <- salv_data$value
@@ -2521,14 +2660,26 @@ setMethod(
         # EAC
         salv_data$eac <- salv_data$invcost / salv_data$olife
         fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
-        salv_data$eac[fl] <- salv_data$invcost[fl] * (salv_data$discount[fl] * (1 + salv_data$discount[fl])^salv_data$olife[fl] /
-          ((1 + salv_data$discount[fl])^salv_data$olife[fl] - 1))
+        salv_data$eac[fl] <- salv_data$invcost[fl] *
+          (salv_data$discount[fl] *
+             (1 + salv_data$discount[fl])^salv_data$olife[fl] /
+             ((1 + salv_data$discount[fl])^salv_data$olife[fl] - 1))
         fl <- (salv_data$discount != 0 & salv_data$olife == Inf)
         salv_data$eac[fl] <- salv_data$invcost[fl] * salv_data$discount[fl]
         salv_data$trade <- trd@name
         salv_data$value <- salv_data$eac
         pTradeEac <- salv_data[, c("trade", "region", "year", "value")]
-        obj@parameters[["pTradeEac"]] <- .dat2par(obj@parameters[["pTradeEac"]], unique(pTradeEac[, colnames(pTradeEac) %in% c(obj@parameters[["pTradeEac"]]@dimSets, "value"), drop = FALSE]))
+        obj@parameters[["pTradeEac"]] <-
+          .dat2par(
+            obj@parameters[["pTradeEac"]],
+            unique(
+             # pTradeEac[, colnames(pTradeEac) %in%
+             #             c(obj@parameters[["pTradeEac"]]@dimSets, "value"),
+             #           drop = FALSE]
+              select(
+                pTradeEac,
+                any_of(c(obj@parameters[["pTradeEac"]]@dimSets, "value")))
+              ))
       }
     }
     ####
@@ -2539,62 +2690,125 @@ setMethod(
       mTradeIr <- merge0(mTradeIr, list(year = approxim$mileStoneYears))
     }
 
-    obj@parameters[["mTradeIr"]] <- .dat2par(obj@parameters[["mTradeIr"]], mTradeIr)
+    obj@parameters[["mTradeIr"]] <-
+      .dat2par(obj@parameters[["mTradeIr"]], mTradeIr)
     ### To trades
     if (!is.null(mTradeIrAInp)) {
       if (!is.null(pTradeIrCsrc2Ainp) && any(pTradeIrCsrc2Ainp$value != 0)) {
-        mTradeIrCsrc2Ainp <- pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0, colnames(pTradeIrCsrc2Ainp) %in% c("trade", "acomm", "src", "dst", "year", "slice"), drop = FALSE]
-        if (is.null(mTradeIrCsrc2Ainp$acomm)) mTradeIrCsrc2Ainp <- merge0(mTradeIrCsrc2Ainp, mTradeIrAInp)
+        mTradeIrCsrc2Ainp <-
+          select(
+            filter(pTradeIrCsrc2Ainp, value != 0),
+            any_of(c("trade", "acomm", "src", "dst", "year", "slice"))
+          )
+      # pTradeIrCsrc2Ainp[pTradeIrCsrc2Ainp$value != 0,
+      #                   colnames(pTradeIrCsrc2Ainp) %in%
+      #                     c("trade", "acomm", "src", "dst", "year", "slice"),
+      #                   drop = FALSE]
+
+        if (is.null(mTradeIrCsrc2Ainp$acomm))
+          mTradeIrCsrc2Ainp <- merge0(mTradeIrCsrc2Ainp, mTradeIrAInp)
         mTradeIrCsrc2Ainp$comm <- mTradeIrCsrc2Ainp$acomm
         mTradeIrCsrc2Ainp$acomm <- NULL
-        if (ncol(mTradeIrCsrc2Ainp) != 6) mTradeIrCsrc2Ainp <- merge0(mTradeIrCsrc2Ainp, mTradeIr)
-        obj@parameters[["mTradeIrCsrc2Ainp"]] <- .dat2par(obj@parameters[["mTradeIrCsrc2Ainp"]], mTradeIrCsrc2Ainp)
-        a1 <- unique(mTradeIrCsrc2Ainp[, c("trade", "comm", "src", "year", "slice")])
+        if (ncol(mTradeIrCsrc2Ainp) != 6) {
+          mTradeIrCsrc2Ainp <- merge0(mTradeIrCsrc2Ainp, mTradeIr)
+        }
+        obj@parameters[["mTradeIrCsrc2Ainp"]] <-
+          .dat2par(obj@parameters[["mTradeIrCsrc2Ainp"]], mTradeIrCsrc2Ainp)
+        a1 <- unique(
+          mTradeIrCsrc2Ainp[, c("trade", "comm", "src", "year", "slice")]
+          )
         colnames(a1)[3] <- "region"
       } else {
         a1 <- NULL
       }
       if (!is.null(pTradeIrCdst2Ainp) && any(pTradeIrCdst2Ainp$value != 0)) {
-        mTradeIrCdst2Ainp <- pTradeIrCdst2Ainp[pTradeIrCdst2Ainp$value != 0, colnames(pTradeIrCdst2Ainp) %in% c("trade", "acomm", "src", "dst", "year", "slice"), drop = FALSE]
-        if (is.null(mTradeIrCdst2Ainp$acomm)) mTradeIrCdst2Ainp <- merge0(mTradeIrCdst2Ainp, mTradeIrAInp)
+        mTradeIrCdst2Ainp <-
+          select(
+            filter(pTradeIrCdst2Ainp, value != 0),
+            any_of(c("trade", "acomm", "src", "dst", "year", "slice"))
+          )
+        # pTradeIrCdst2Ainp[
+        #   pTradeIrCdst2Ainp$value != 0,
+        #   colnames(pTradeIrCdst2Ainp) %in%
+        #     c("trade", "acomm", "src", "dst", "year", "slice"),
+        #   drop = FALSE]
+
+        if (is.null(mTradeIrCdst2Ainp$acomm)) {
+          mTradeIrCdst2Ainp <- merge0(mTradeIrCdst2Ainp, mTradeIrAInp)
+        }
         mTradeIrCdst2Ainp$comm <- mTradeIrCdst2Ainp$acomm
         mTradeIrCdst2Ainp$acomm <- NULL
-        if (ncol(mTradeIrCdst2Ainp) != 6) mTradeIrCdst2Ainp <- merge0(mTradeIrCdst2Ainp, mTradeIr)
-        obj@parameters[["mTradeIrCdst2Ainp"]] <- .dat2par(obj@parameters[["mTradeIrCdst2Ainp"]], mTradeIrCdst2Ainp)
-        a2 <- unique(mTradeIrCdst2Ainp[, c("trade", "comm", "dst", "year", "slice")])
+        if (ncol(mTradeIrCdst2Ainp) != 6) {
+          mTradeIrCdst2Ainp <- merge0(mTradeIrCdst2Ainp, mTradeIr)
+        }
+        obj@parameters[["mTradeIrCdst2Ainp"]] <-
+          .dat2par(obj@parameters[["mTradeIrCdst2Ainp"]], mTradeIrCdst2Ainp)
+        a2 <- unique(
+          mTradeIrCdst2Ainp[, c("trade", "comm", "dst", "year", "slice")]
+          )
         colnames(a2)[3] <- "region"
       } else {
         a2 <- NULL
       }
-      obj@parameters[["mvTradeIrAInp"]] <- .dat2par(obj@parameters[["mvTradeIrAInp"]], unique(rbind(a1, a2)))
+      obj@parameters[["mvTradeIrAInp"]] <-
+        .dat2par(obj@parameters[["mvTradeIrAInp"]], unique(rbind(a1, a2)))
     }
 
     if (!is.null(mTradeIrAOut)) {
       if (!is.null(pTradeIrCsrc2Aout) && any(pTradeIrCsrc2Aout$value != 0)) {
-        mTradeIrCsrc2Aout <- pTradeIrCsrc2Aout[pTradeIrCsrc2Aout$value != 0, colnames(pTradeIrCsrc2Aout) %in% c("trade", "acomm", "src", "dst", "year", "slice"), drop = FALSE]
-        if (is.null(mTradeIrCsrc2Aout$acomm)) mTradeIrCsrc2Aout <- merge0(mTradeIrCsrc2Aout, mTradeIrAOut)
+        mTradeIrCsrc2Aout <-
+          select(filter(pTradeIrCsrc2Aout, value != 0),
+                 any_of(c("trade", "acomm", "src", "dst", "year", "slice")))
+        # pTradeIrCsrc2Aout[
+          #   pTradeIrCsrc2Aout$value != 0,
+          #   colnames(pTradeIrCsrc2Aout) %in%
+          #     c("trade", "acomm", "src", "dst", "year", "slice"),
+          #   drop = FALSE]
+        if (is.null(mTradeIrCsrc2Aout$acomm)) {
+          mTradeIrCsrc2Aout <- merge0(mTradeIrCsrc2Aout, mTradeIrAOut)
+        }
         mTradeIrCsrc2Aout$comm <- mTradeIrCsrc2Aout$acomm
         mTradeIrCsrc2Aout$acomm <- NULL
-        if (ncol(mTradeIrCsrc2Aout) != 6) mTradeIrCsrc2Aout <- merge0(mTradeIrCsrc2Aout, mTradeIr)
-        obj@parameters[["mTradeIrCsrc2Aout"]] <- .dat2par(obj@parameters[["mTradeIrCsrc2Aout"]], mTradeIrCsrc2Aout)
-        a1 <- unique(mTradeIrCsrc2Aout[, c("trade", "comm", "src", "year", "slice")])
+        if (ncol(mTradeIrCsrc2Aout) != 6) {
+          mTradeIrCsrc2Aout <- merge0(mTradeIrCsrc2Aout, mTradeIr)
+        }
+        obj@parameters[["mTradeIrCsrc2Aout"]] <-
+          .dat2par(obj@parameters[["mTradeIrCsrc2Aout"]], mTradeIrCsrc2Aout)
+        a1 <- unique(
+          mTradeIrCsrc2Aout[, c("trade", "comm", "src", "year", "slice")]
+          )
         colnames(a1)[3] <- "region"
       } else {
         a1 <- NULL
       }
       if (!is.null(pTradeIrCdst2Aout) && any(pTradeIrCdst2Aout$value != 0)) {
-        mTradeIrCdst2Aout <- pTradeIrCdst2Aout[pTradeIrCdst2Aout$value != 0, colnames(pTradeIrCdst2Aout) %in% c("trade", "acomm", "src", "dst", "year", "slice"), drop = FALSE]
-        if (is.null(mTradeIrCdst2Aout$acomm)) mTradeIrCdst2Aout <- merge0(mTradeIrCdst2Aout, mTradeIrAOut)
+        mTradeIrCdst2Aout <-
+          select(filter(pTradeIrCdst2Aout, value != 0.),
+                 any_of(c("trade", "acomm", "src", "dst", "year", "slice")))
+          # pTradeIrCdst2Aout[
+          #   pTradeIrCdst2Aout$value != 0,
+          #   colnames(pTradeIrCdst2Aout) %in%
+          #     c("trade", "acomm", "src", "dst", "year", "slice"),
+          #   drop = FALSE]
+        if (is.null(mTradeIrCdst2Aout$acomm)) {
+          mTradeIrCdst2Aout <- merge0(mTradeIrCdst2Aout, mTradeIrAOut)
+        }
         mTradeIrCdst2Aout$comm <- mTradeIrCdst2Aout$acomm
         mTradeIrCdst2Aout$acomm <- NULL
-        if (ncol(mTradeIrCdst2Aout) != 6) mTradeIrCdst2Aout <- merge0(mTradeIrCdst2Aout, mTradeIr)
-        obj@parameters[["mTradeIrCdst2Aout"]] <- .dat2par(obj@parameters[["mTradeIrCdst2Aout"]], mTradeIrCdst2Aout)
-        a2 <- unique(mTradeIrCdst2Aout[, c("trade", "comm", "dst", "year", "slice")])
+        if (ncol(mTradeIrCdst2Aout) != 6) {
+          mTradeIrCdst2Aout <- merge0(mTradeIrCdst2Aout, mTradeIr)
+        }
+        obj@parameters[["mTradeIrCdst2Aout"]] <-
+          .dat2par(obj@parameters[["mTradeIrCdst2Aout"]], mTradeIrCdst2Aout)
+        a2 <- unique(
+          mTradeIrCdst2Aout[, c("trade", "comm", "dst", "year", "slice")]
+          )
         colnames(a2)[3] <- "region"
       } else {
         a2 <- NULL
       }
-      obj@parameters[["mvTradeIrAOut"]] <- .dat2par(obj@parameters[["mvTradeIrAOut"]], unique(rbind(a1, a2)))
+      obj@parameters[["mvTradeIrAOut"]] <-
+        .dat2par(obj@parameters[["mvTradeIrAOut"]], unique(rbind(a1, a2)))
     }
     mvTradeIr <- mTradeIr
     mvTradeIr$comm <- trd@commodity
@@ -2603,15 +2817,31 @@ setMethod(
     if (!is.null(pTradeIr)) {
       pTradeIr$comm <- trd@commodity
       obj@parameters[["meqTradeFlowLo"]] <-
-        .dat2par(obj@parameters[["meqTradeFlowLo"]],
-                  merge0(mvTradeIr,
-                         pTradeIr[pTradeIr$type == "lo" & pTradeIr$value != 0,
-                                  colnames(pTradeIr) %in% colnames(mvTradeIr),
-                                  drop = FALSE]))
-      obj@parameters[["meqTradeFlowUp"]] <- .dat2par(obj@parameters[["meqTradeFlowUp"]], merge0(mvTradeIr, pTradeIr[pTradeIr$type == "up" & pTradeIr$value != Inf,
-        colnames(pTradeIr) %in% colnames(mvTradeIr),
-        drop = FALSE
-      ]))
+        .dat2par(
+          obj@parameters[["meqTradeFlowLo"]],
+          merge0(
+            mvTradeIr,
+            select(
+              filter(pTradeIr, type == "lo" & value != 0),
+              any_of(colnames(mvTradeIr))
+            )
+            # pTradeIr[pTradeIr$type == "lo" & pTradeIr$value != 0,
+            #          colnames(pTradeIr) %in% colnames(mvTradeIr),
+            #          drop = FALSE]
+            )
+          )
+      obj@parameters[["meqTradeFlowUp"]] <-
+        .dat2par(
+          obj@parameters[["meqTradeFlowUp"]],
+          merge0(
+            mvTradeIr,
+            select(filter(pTradeIr, type == "up" & value != Inf))
+          )
+          # pTradeIr[pTradeIr$type == "up" & pTradeIr$value != Inf,
+                 #          colnames(pTradeIr) %in% colnames(mvTradeIr),
+                 #          drop = FALSE]
+                 # )
+        )
       pTradeIr$comm <- NULL
     }
     obj
