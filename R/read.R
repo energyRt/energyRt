@@ -23,7 +23,9 @@ read_solution <- function(obj, ...) {
   read_result_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
   # if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
-  if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- data.table::fread
+  if (is.null(arg$readOutputFunction)) {
+    arg$readOutputFunction <- data.table::fread
+  }
   if (is.null(arg$tmp.dir)) {
     arg$tmp.dir <- scen@misc$tmp.dir
     if (is.null(arg$tmp.dir)) {
@@ -57,6 +59,7 @@ read_solution <- function(obj, ...) {
   rr$set_vec <- ss
   if (is.null(scen@settings@solver$import_format)) scen@settings@solver$import_format <- "csv" # !!! workaround
   if (scen@settings@solver$import_format == "gdx") {
+    .check_load_gdxlib()
     # Read variables gdx
     gd <- gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
     for (i in c(vrb_list, vrb_list2)) {
@@ -74,7 +77,8 @@ read_solution <- function(obj, ...) {
           }
           # Save all data with all levels
           if (colnames(jj)[j] != "year") {
-            jj[[j]] <- factor(jj[[j]], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+            jj[[j]] <- factor(jj[[j]],
+                              levels = sort(rr$set_vec[[colnames(jj)[j]]]))
           } else {
             jj[[j]] <- as.integer(jj[[j]])
           }

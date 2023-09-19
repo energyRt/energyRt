@@ -1,3 +1,74 @@
+#' Set GAMS and GDX library directory
+#'
+#' @description
+#' This (optional) function sets path to GAMS directory to R-options. It might be useful if for the cases when several different version (and licenses) of GAMS installed, to easily switch between them. It is also possible to set different path for GAMS and GAMS Data Exchange (GDX) libraries.
+#' If GDX path is not set, the GAMS path will be used. If GAMS path is not set, the default system GAMS-path (OS environment variables) instead.
+#'
+#' @param path character, path to installed GAMS distribution to use to solve models and/or with GDX library to use in reading and writing gdx-files.
+#'
+#' @rdname gams
+#' @family GAMS
+#' @export
+#' @examples
+#' # set_gams_path("C:/GAMS/win64/32.2/")
+#'
+set_gams_path <- function(path = NULL) {
+  options(en_gams_path = path)
+}
+
+#' @rdname gams
+#' @family GAMS
+#' @export
+#' @examples
+#' # get_gams_path()
+get_gams_path <- function() {
+  getOption("en_gams_path")
+}
+
+#' @return
+#' @export
+#'
+#' @rdname gams
+#' @family GAMS
+#'
+#' @examples
+#' # set_gdxlib("C:/GAMS/35")
+set_gdxlib_path <- function(path = NULL) {
+  options(en_gdxlib_path = path)
+}
+
+#' @rdname gams
+#' @family GAMS
+#' @export
+#' @examples
+#' # get_gdxlib()
+get_gdxlib_path <- function() {
+  getOption("en_gdxlib_path")
+}
+
+.check_load_gdxlib <- function() {
+  rw <- require("gdxrrw")
+  if (!rw) {
+    stop('"gdxrrw" package has not been found. ',
+         'It is required for writing and reading "*.gdx" files.',
+         '"https://github.com/GAMS-dev/gdxrrw"')
+  }
+  en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
+  if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
+    lb <- getOption("en_gdxlib_path")
+    if (is.null(lb)) {
+      lb <- getOption("en_gams_path")
+    }
+    ix <- igdx(lb)
+    if (!ix) {
+      stop('Cannot load "gdx" library. Check "?set_gdxlib_path" to setup.')
+    } else {
+      options(en_gdxlib_loaded = TRUE)
+    }
+  }
+
+}
+
 # Internal functions to write GAMS model files
 .write_model_GAMS <- function(arg, scen, trim = FALSE) {
   # if (trim) scen <- fold(scen)
@@ -62,7 +133,8 @@
     scen@settings@sourceCode[["GAMS_output"]] <- c(scen@settings@sourceCode[["GAMS_output"]][grep(
       "^file variable_list_csv",
       scen@settings@sourceCode[["GAMS_output"]]
-    ):length(scen@settings@sourceCode[["GAMS_output"]])], 'execute_unload "output/output.gdx"')
+    ):length(scen@settings@sourceCode[["GAMS_output"]])],
+    'execute_unload "output/output.gdx"')
   }
   dir.create(paste(arg$tmp.dir, "/input", sep = ""), showWarnings = FALSE)
   dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
@@ -72,7 +144,8 @@
   zz_data_gms <- file(paste(arg$tmp.dir, "/data.gms", sep = ""), "w")
   if (scen@settings@solver$export_format == "gdx") {
     if (!scen@status$fullsets) {
-      stop('for export_format = "gdx", interpolation parameter fullsets must be TRUE')
+      stop('for export_format = "gdx", ',
+           'interpolation parameter fullsets must be TRUE')
     }
     # Generate gdx
     .write_gdx_list(
@@ -101,8 +174,10 @@
     for (j in c("set", "map", "numpar", "bounds")) {
       for (i in names(scen@modInp@parameters)) {
         if (scen@modInp@parameters[[i]]@type == j) {
-          zz_data_tmp <- file(paste(arg$tmp.dir, "/input/", i, ".gms", sep = ""), "w")
-          cat(.toGams(scen@modInp@parameters[[i]]), sep = "\n", file = zz_data_tmp)
+          zz_data_tmp <- file(paste(arg$tmp.dir, "/input/", i, ".gms",
+                                    sep = ""), "w")
+          cat(.toGams(scen@modInp@parameters[[i]]), sep = "\n",
+              file = zz_data_tmp)
           close(zz_data_tmp)
           cat(paste0("$include input/", i, ".gms\n"), file = zz_data_gms)
         }
@@ -122,8 +197,10 @@
   ### Model code to text
   .generate_gpr_gams_file(arg$tmp.dir)
   fn <- file(paste(arg$tmp.dir, "/energyRt.gms", sep = ""), "w")
-  zz_constrains <- file(paste(arg$tmp.dir, "/inc_constraints.gms", sep = ""), "w")
-  cat(run_code[1:grep("[$]include[[:space:]]*data.gms", run_code)], sep = "\n", file = fn)
+  zz_constrains <- file(paste(arg$tmp.dir, "/inc_constraints.gms", sep = ""),
+                        "w")
+  cat(run_code[1:grep("[$]include[[:space:]]*data.gms", run_code)], sep = "\n",
+      file = fn)
   # Add parameter constraint declaration
   if (length(scen@modInp@gams.equation) > 0) {
     mps_name <- grep("^[m]Cns", names(scen@modInp@parameters), value = TRUE)
@@ -528,7 +605,28 @@
 
 .write_gdx_list <- function(dat, gdxName = "data.gdx") {
   # the function exports named list of sets and parameters to GDX file
-  stopifnot("gdxrrw" %in% rownames(installed.packages()))
+  # stopifnot("gdxrrw" %in% rownames(installed.packages()))
+  .check_load_gdxlib()
+  # rw <- require("gdxrrw")
+  # if (!rw) {
+  #   stop('"gdxrrw" package has not been found. ',
+  #        'It is required for writing and reading "*.gdx" files.',
+  #        '"https://github.com/GAMS-dev/gdxrrw"')
+  # }
+  # en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
+  # if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
+  #   lb <- getOption("en_gdxlib_path")
+  #   if (is.null(lb)) {
+  #     lb <- getOption("en_gams_path")
+  #   }
+  #   ix <- igdx(lb)
+  #   if (!ix) {
+  #     stop('Cannot load "gdx" library. Check "?set_gdxlib_path" to setup.')
+  #   } else {
+  #     options(en_gdxlib_loaded = TRUE)
+  #   }
+  # }
+
   cat(" data.gdx ")
   nms <- names(dat)
   max_length <- max(nchar(nms))
@@ -539,7 +637,8 @@
     wipe <- paste0(rep("\b", max_length + 3), collapse = "")
     x <- c(x, list(.df2uels(data.frame(dat[[i]]), i)))
   }
-  gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
+  # gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
+  wgdx(gdxName = gdxName, x, squeeze = FALSE)
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")
   cat(rep(" ", max_length + 3), sep = "")
