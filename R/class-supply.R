@@ -1,7 +1,7 @@
 #' An S4 class to represent a supply of a commodity
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot info character.
 #' @slot commodity character.
 #' @slot unit character.
 #' @slot weather data.frame.
@@ -19,7 +19,7 @@
 setClass("supply",
   representation(
     name = "character",
-    description = "character",
+    info = "character",
     # color         = "data.frame",      #
     commodity = "character",
     unit = "character",
@@ -33,7 +33,7 @@ setClass("supply",
   ),
   prototype(
     name = "",
-    description = "",
+    info = "",
     # color         = data.frame(region   = character(),
     #                            color    = character(),
     #                            stringsAsFactors = FALSE),

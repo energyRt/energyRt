@@ -5,7 +5,7 @@
 #'
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot info character.
 #' @slot commodity character.
 #' @slot start data.frame.
 #' @slot end data.frame.
@@ -33,7 +33,7 @@
 setClass("storage",
   representation(
     name = "character",
-    description = "character",
+    info = "character",
     commodity = "character",
     aux = "data.frame", #
     region = "character",
@@ -55,7 +55,7 @@ setClass("storage",
   ),
   prototype(
     name = "",
-    description = "",
+    info = "",
     commodity = "",
     start = data.frame(
       region = character(),

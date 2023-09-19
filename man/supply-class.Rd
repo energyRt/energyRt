@@ -12,7 +12,7 @@ An S4 class to represent a supply of a commodity
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{description}}{character.}
+\item{\code{info}}{character.}
 
 \item{\code{commodity}}{character.}
 

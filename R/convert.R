@@ -76,6 +76,7 @@ setGeneric("add_to_convert", function(type, unit, coef, ...) {
 #'
 #' @return updated `convert_data` in the `.GlobalEnv`, the values will not update the package data.
 #'
+#' @rdname convert
 #' @export
 #'
 #' @examples

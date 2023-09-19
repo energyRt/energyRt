@@ -1,7 +1,7 @@
 #' An S4 class to declare a demand in the model
 #'
 #' @slot name short name (character) used in sets.
-#' @slot description optional description, comment (character).
+#' @slot info optional info, comment (character).
 #' @slot commodity character.
 #' @slot unit character.
 #' @slot dem data.frame.
@@ -16,7 +16,7 @@
 setClass("demand",
   representation(
     name = "character",
-    description = "character",
+    info = "character",
     commodity = "character",
     unit = "character",
     dem = "data.frame",
@@ -25,7 +25,7 @@ setClass("demand",
   ),
   prototype(
     name = "",
-    description = "",
+    info = "",
     unit = "",
     region = character(),
     dem = data.frame(
@@ -47,7 +47,7 @@ setMethod("initialize", "demand", function(.Object, ...) {
 #' Create new demand
 #'
 #' @param name
-#' @param description
+#' @param info
 #' @param commodity
 #' @param unit
 #' @param dem
@@ -60,7 +60,7 @@ setMethod("initialize", "demand", function(.Object, ...) {
 #' @examples
 newDemand <- function(
     name = "",
-    description = character(),
+    info = character(),
     commodity = character(),
     unit = character(),
     dem = data.frame(),
@@ -68,7 +68,7 @@ newDemand <- function(
     misc = list())
 {
   .data2slots("demand", name,
-    description = description,
+    info = info,
     commodity = commodity,
     unit = unit,
     dem = dem,

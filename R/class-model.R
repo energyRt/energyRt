@@ -3,7 +3,7 @@
 #' S4 class to represent model
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot info character.
 #' @slot data list.
 #' @slot config config.
 #' @slot misc list.
@@ -16,7 +16,7 @@
 setClass("model",
   representation(
     name = "character",
-    description = "character", # Details
+    info = "character", # Details
     data = "list",
     config = "config",
     # LECdata = "list",
@@ -25,7 +25,7 @@ setClass("model",
   ),
   prototype(
     name = "",
-    description = "", # Details
+    info = "", # Details
     data = list(),
     config = new("config"),
     # LECdata = list(),
@@ -148,7 +148,7 @@ add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
 #' @param repo_name character, optional name of a (sub-)repository to add the object.
 #'
 #' @method add model
-#' @rdname add
+#' @rdname newModel
 #'
 #' @return
 #' @export
@@ -164,18 +164,19 @@ setMethod("add", "model", add.model)
 #' @param name name of the model
 #' @param ... configuration parameters (see class config) and model elements (classes commodity, technology, etc.)
 #'
+#' @rdname newModel
 #' @return
 #' @export
 #'
 #' @examples
-newModel <- function(name = "", description = "", ...) {
+newModel <- function(name = "", info = "", ...) {
   # browser()
   # mdl <- .data2slots("model", name,
   #                    ignore_args = unique(c(config_slots, horizon_slots)),
   #                    ignore_classes = "repository", ...)
   obj <- new("model")
   obj@name <- name
-  obj@description <- description
+  obj@info <- info
   arg <- list(...)
   if (is_empty(arg)) return(obj)
   #
@@ -316,6 +317,7 @@ newModel <- function(name = "", description = "", ...) {
 #   obj
 # })
 
+#' @rdname newModel
 #' @export
 setMethod("setHorizon", signature(obj = "model"),
   # signature(obj = "model", horizon = "numeric", intervals = "ANY"),
@@ -325,6 +327,7 @@ setMethod("setHorizon", signature(obj = "model"),
   }
 )
 
+#' @rdname newModel
 #' @export
 setMethod("getHorizon", signature(obj = "model"), function(obj) {
   getHorizon(obj@config)

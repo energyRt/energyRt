@@ -12,7 +12,7 @@ An S4 class to represent technology
 \describe{
 \item{\code{name}}{character, name of technology used in sets}
 
-\item{\code{description}}{character, detailed description of the technology for reference.}
+\item{\code{info}}{character, detailed description of the technology for reference.}
 
 \item{\code{input}}{data.frame.}
 

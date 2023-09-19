@@ -1,6 +1,7 @@
 #' An S4 class to specify the model set or parameter
 #'
 #' @slot name character.
+#' @slot info character.
 #' @slot dimSets character.
 #' @slot type factor,
 #' @slot defVal numeric.
@@ -17,6 +18,7 @@ setClass(
   "parameter", # @parameter
   representation(
     name = "character", # @name name Name for GAMS
+    info = "character",
     type = "factor", # set, map, numpar, or bounds (Up / Lo /Fx)
     dimSets = "character", # @dimSets comma separated, order is matter
     defVal = "numeric", # @defVal Default value : zero value  for map,

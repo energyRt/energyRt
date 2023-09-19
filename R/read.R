@@ -60,8 +60,9 @@ read_solution <- function(obj, ...) {
   if (is.null(scen@settings@solver$import_format)) scen@settings@solver$import_format <- "csv" # !!! workaround
   if (scen@settings@solver$import_format == "gdx") {
     .check_load_gdxlib()
+    .check_load_gdxtools()
     # Read variables gdx
-    gd <- gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
+    gd <- gdxtools::gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
     for (i in c(vrb_list, vrb_list2)) {
       jj <- gd[i]
       if (length(grep("region", colnames(jj))) == 2) {

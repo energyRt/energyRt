@@ -98,7 +98,7 @@ solve_model <- function(
   if (is.null(tmp.dir) || tmp.dir == "") stop("Incorrect directory tmp.dir: ", tmp.del)
   if (arg$echo) {
     tmp.msg <- sub(getwd(), "", tmp.dir)
-    cat("Scenario directory:\n", tmp.msg, "\n")
+    cat("Scenario directory: ", tmp.msg, "\n")
     cat("Starting time: ", format(Sys.time()), "\n")
   }
   scen <- interpolate(obj, name = name)

@@ -50,8 +50,8 @@ get_gdxlib_path <- function() {
   rw <- require("gdxrrw")
   if (!rw) {
     stop('"gdxrrw" package has not been found. ',
-         'It is required for writing and reading "*.gdx" files.',
-         '"https://github.com/GAMS-dev/gdxrrw"')
+         'It is required for writing and reading "*.gdx" files.\n',
+         'Check: "https://github.com/GAMS-dev/gdxrrw"')
   }
   en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
@@ -68,6 +68,17 @@ get_gdxlib_path <- function() {
   }
 
 }
+
+.check_load_gdxtools <- function() {
+  xt <- rlang::is_installed("gdxtools")
+  if (!xt) {
+    stop('"gdxtools" package has not been found. ',
+         'It is required for reading "*.gdx" files.\n',
+         'Check: "https://github.com/lolow/gdxtools".')
+  }
+  # xt <- require("gdxrrw", warn.conflicts = FALSE)
+}
+
 
 # Internal functions to write GAMS model files
 .write_model_GAMS <- function(arg, scen, trim = FALSE) {

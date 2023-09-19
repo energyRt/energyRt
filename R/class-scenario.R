@@ -1,7 +1,7 @@
 #' An S4 class to represent scenario, an interpolated and/or solved model.
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot info character.
 #' @slot model model.
 #' @slot subset
 #' @slot settings settings.
@@ -19,7 +19,7 @@
 setClass("scenario",
   representation(
     name = "character",
-    description = "character",
+    info = "character",
     model = "model",
     # subset = list(),
     settings = "settings",
@@ -33,7 +33,7 @@ setClass("scenario",
   ),
   prototype(
     name = NULL,
-    description = NULL,
+    info = NULL,
     model = NULL,
     # subset = list(),
     settings = NULL,

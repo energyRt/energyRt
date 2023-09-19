@@ -12,6 +12,8 @@ An S4 class to specify the model set or parameter
 \describe{
 \item{\code{name}}{character.}
 
+\item{\code{info}}{character.}
+
 \item{\code{dimSets}}{character.}
 
 \item{\code{type}}{factor,}

@@ -7,7 +7,7 @@
 \usage{
 newTechnology(
   name = "",
-  description = "",
+  info = "",
   input = data.frame(),
   output = data.frame(),
   group = data.frame(),

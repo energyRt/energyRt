@@ -12,7 +12,7 @@ An S4 class to store the model objects.
 \describe{
 \item{\code{name}}{character. Name of the repository.}
 
-\item{\code{description}}{character, short description of the purpose or content of the repository.}
+\item{\code{info}}{character, short info of the purpose or content of the repository.}
 
 \item{\code{data}}{list of repositories with objects of permitted classes. All names of objects (`object@name`) must be unique.}
 

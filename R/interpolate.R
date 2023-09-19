@@ -14,7 +14,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   ## arguments
   # obj - scenario or model
   # name
-  # description
+  # info
   # n.threads - number of threads use for approximation
   # startYear && fixTo have to define both (or not define both) - run with startYear
   # year - basic horizon year definition (not recommended for use), use only if horizon not defined
@@ -34,7 +34,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen <- new("scenario")
     scen@model <- obj
     scen@name <- "Default scenario name"
-    scen@description <- "Default description"
+    scen@info <- ""
     scen@settings <- .config_to_settings(obj@config)
   } else if (class(obj) == "scenario") {
     scen <- obj
@@ -43,7 +43,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   }
 
   if (!is.null(arg$name)) scen@name <- arg$name
-  if (!is.null(arg$description)) scen@description <- arg$description
+  if (!is.null(arg$info)) scen@info <- arg$info
   if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
   if (is.null(arg$startYear) != is.null(arg$fixTo)) {
     stop("startYear && fixTo have to define both (or not define both")

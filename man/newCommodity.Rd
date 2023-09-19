@@ -6,7 +6,7 @@
 \usage{
 newCommodity(
   name = "",
-  description = "",
+  info = "",
   limtype = "LO",
   slice = character(),
   unit = character(),

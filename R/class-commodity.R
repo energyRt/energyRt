@@ -14,18 +14,18 @@
 #'
 setClass("commodity",
   representation(
-    name          = "character", # Short name
-    description   = "character", # Details
-    limtype       = "factor",
-    slice         = "character",
-    unit          = "character",
-    emis          = "data.frame", # Emission factors
-    agg           = "data.frame", # Aggregation parameter
-    misc          = "list"
+    name = "character", # Short name
+    info = "character", # Details
+    limtype = "factor",
+    slice = "character",
+    unit = "character",
+    emis = "data.frame", # Emission factors
+    agg = "data.frame", # Aggregation parameter
+    misc = "list"
   ),
   prototype(
     name = character(),
-    description = character(),
+    info = character(),
     limtype = factor("LO", levels = c("FX", "UP", "LO")),
     slice = character(),
     unit = character(),
@@ -53,7 +53,7 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 #' Create class commodity
 #'
 #' @param name
-#' @param description
+#' @param info
 #' @param limtype
 #' @param slice
 #' @param unit
@@ -67,16 +67,15 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 #' @examples
 newCommodity <- function(
     name = "",
-    description = "",
+    info = "",
     limtype = "LO",
     slice = character(),
     unit = character(),
     agg = data.frame(),
     emis = data.frame(),
-    misc = list())
-{
+    misc = list()) {
   .data2slots("commodity", name,
-    description = "",
+    info = "",
     limtype = "LO",
     slice = slice,
     unit = unit,
@@ -92,7 +91,7 @@ newCommodity <- function(
 #' @rdname commodity
 #' @family commodity update
 #' @export
-setMethod('update', signature(object = 'commodity'), function(object, ...) {
+setMethod("update", signature(object = "commodity"), function(object, ...) {
   # update.supply <- function(obj, ...) {
   .data2slots("commodity", object, ...)
 })

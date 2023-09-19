@@ -1,7 +1,7 @@
 #' Class 'constraint'
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot info character.
 #' @slot eq factor.
 #' @slot for.each list.
 #' @slot rhs data.frame.
@@ -14,7 +14,7 @@
 setClass("constraint",
   representation(
     name = "character",
-    description = "character", # description
+    info = "character", # info
     eq = "factor",
     for.each = "data.frame",
     rhs = "data.frame",
@@ -25,7 +25,7 @@ setClass("constraint",
   ),
   prototype(
     name = NULL,
-    description = "", # description
+    info = "", # info
     eq = factor("==", levels = c(">=", "<=", "==")),
     for.each = data.frame(),
     rhs = data.frame(),
@@ -44,7 +44,7 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 # term for equation
 #' Title
 #'
-#' @slot description character.
+#' @slot info character.
 #' @slot variable character.
 #' @slot for.sum list.
 #' @slot mult data.frame.
@@ -53,7 +53,7 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 #' @export
 setClass("summand",
   representation(
-    description = "character", # description
+    info = "character", # info
     variable = "character",
     for.sum = "list",
     mult = "data.frame",
@@ -62,7 +62,7 @@ setClass("summand",
     # parameter= list() # For the future
   ),
   prototype(
-    description = NULL, # description
+    info = NULL, # info
     variable = NULL,
     for.sum = list(),
     mult = data.frame(),

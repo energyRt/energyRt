@@ -1,7 +1,7 @@
 #' An S4 class to represent a commodity subsidy
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot info character.
 #' @slot comm character.
 #' @slot region character.
 #' @slot defVal numeric.
@@ -20,7 +20,7 @@ setClass("sub",
   representation(
     # General information
     name = "character", # Short name
-    description = "character", # Details
+    info = "character", # Details
     comm = "character", #
     region = "character", #
     defVal = "numeric", #
@@ -30,7 +30,7 @@ setClass("sub",
   prototype(
     name = "", # Short name
     comm = "",
-    description = "",
+    info = "",
     region = character(), #
     defVal = 0, #
     sub = data.frame(
