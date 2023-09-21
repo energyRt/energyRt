@@ -3,7 +3,7 @@
 #' S4 class to represent model
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot data list.
 #' @slot config config.
 #' @slot misc list.
@@ -16,7 +16,7 @@
 setClass("model",
   representation(
     name = "character",
-    info = "character", # Details
+    desc = "character", # Details
     data = "list",
     config = "config",
     # LECdata = "list",
@@ -25,7 +25,7 @@ setClass("model",
   ),
   prototype(
     name = "",
-    info = "", # Details
+    desc = "", # Details
     data = list(),
     config = new("config"),
     # LECdata = list(),
@@ -43,6 +43,7 @@ setMethod("initialize", "model", function(.Object, ...) {
 
 
 add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
+  # browser()
   # cls <- c('technology', 'commodity', 'region', 'commodity',
   #          'constraint', 'costs',
   #          'stock', 'reserve',
@@ -72,16 +73,21 @@ add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
     # arg <- arg[cc != 'repository']
     # Generate name
     if (is.null(repo_name)) {
-      if (length(obj@data) > 1) {
-        repo_name <- obj@data[[length(obj@data)]]@name
-        warning('"repo_name" is not specified, adding objects to "',
-                repo_name, '" repository')
-      } else {
+      # if (length(obj@data) >= 1) {
+      #   # repo_name <- obj@data[[length(obj@data)]]@name
+      #   repo_name <- names(obj@data)[length(obj@data)]
+      #   warning('"repo_name" is not specified, adding objects to "',
+      #           repo_name, '" repository')
+      # } else {
         # if (length(obj@data) == 0) {
-        # repo_name <- "default_repository"
-        obj@data[[repo_name]] <- new('repository')
-        repo_name <- obj@data[[1]]@name # default name
+      add_repo <- new('repository', repo_name)
+      repo_name <- add_repo@name
+      # repo_name <- "default_repository"
+      if (is.null(obj@data[[repo_name]])) {
+        obj@data[[repo_name]] <- add_repo
       }
+        # repo_name <- obj@data[[1]]@name # default name
+      # }
     } else {
       ff <- c(sapply(obj@data, function(x) x@name), recursive = TRUE)
       if (all(ff != repo_name)) {
@@ -169,14 +175,14 @@ setMethod("add", "model", add.model)
 #' @export
 #'
 #' @examples
-newModel <- function(name = "", info = "", ...) {
+newModel <- function(name = "", desc = "", ...) {
   # browser()
   # mdl <- .data2slots("model", name,
   #                    ignore_args = unique(c(config_slots, horizon_slots)),
   #                    ignore_classes = "repository", ...)
   obj <- new("model")
   obj@name <- name
-  obj@info <- info
+  obj@desc <- desc
   arg <- list(...)
   if (is_empty(arg)) return(obj)
   #
@@ -260,7 +266,7 @@ newModel <- function(name = "", info = "", ...) {
   if (is_empty(arg)) return(obj)
   #
   ## named other slots ####
-  ex_slots <- c(".S3Class", "name", "info")
+  ex_slots <- c(".S3Class", "name", "desc")
   ### @config slots ####
   config_slots <- names(getSlots("config"))
   config_slots <- config_slots[!(config_slots %in% ex_slots)]

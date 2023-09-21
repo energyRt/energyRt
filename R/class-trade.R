@@ -1,7 +1,7 @@
 #' An S4 class to represent inter-regional trade
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot commodity character.
 #' @slot routes data.frame.
 #' @slot trade data.frame.
@@ -25,7 +25,7 @@ setClass("trade",
   representation(
     # General information
     name = "character", # Short name
-    info = "character", # Details
+    desc = "character", # Details
     commodity = "character", # Vector if NULL that
     routes = "data.frame",
     # Performance parameters
@@ -47,7 +47,7 @@ setClass("trade",
   prototype(
     # General information
     name = "", # name in sets
-    info = "",
+    desc = "",
     commodity = NULL, #
     routes = data.frame(
       src        = character(),

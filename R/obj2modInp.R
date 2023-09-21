@@ -958,21 +958,34 @@ setMethod(
       }
     }
     rem_inf_def1 <- function(x, y) {
-      if (is.null(x)) {
-        return(y)
-      }
+      if (is.null(x)) return(y)
+      # browser()
+      # jjs <- intersect(names(x), names(y))
+      ex_cols <- c("value", "type")
+      x <- filter(x, type == 'up' & value == Inf) %>% select(-any_of(ex_cols))
+      y <- select(y, -any_of(ex_cols))
+      ii <- duplicated(bind_rows(y, x))[1:nrow(y)]
+      y <- filter(y, !ii)
+      return(y)
+
+      # rbind(
+      #   select(filter(x, type == "up", x$value == Inf), any_of(jjs)),
+      #   select(y, any_of(jjs))
+      #   ) %>% unique()
+
       # x <- x[x$type == "up" & x$value == Inf, ]
       # r <- try(y[(!duplicated(rbind(y, select(x, -value))))[1:nrow(y)], ])
       # # y[(!duplicated(rbind(y, x)))[1:nrow(y)], ]
       # if (inherits(r, "try-error")) browser() # !!! To check
       # r
-      merge0(
-        select(filter(x, type == "up", x$value == Inf), any_of(colnames(y))),
-        y)
+      # merge0(
+      #   select(filter(x, type == "up", x$value == Inf), any_of(colnames(y))),
+      #   y)
     }
     rem_inf_def_inf <- function(x, y) {
       merge0(
-        # x[x$type == "up" & x$value != Inf, colnames(x) %in% colnames(y), drop = FALSE],
+        # x[x$type == "up" & x$value != Inf, colnames(x) %in% colnames(y),
+        #     drop = FALSE],
         select(filter(x, type == "up", x$value != Inf), any_of(colnames(y))),
         y)
     }
@@ -983,7 +996,7 @@ setMethod(
                  filter(pStorageAf, type == "lo" & value != 0),
                  mvStorageStore
                  ))
-    # browser() !!! check meqStorageAfUp
+    # browser() #!!! check meqStorageAfUp
     obj@parameters[["meqStorageAfUp"]] <-
       .dat2par(obj@parameters[["meqStorageAfUp"]],
                rem_inf_def1(pStorageAf, mvStorageStore)
@@ -2361,6 +2374,7 @@ setMethod(
       dd
     }
     .interp_bounds2 <- function(dtf, approxim, parameter, ...) {
+      # browser()
       if (all(list(...)[[1]]@dimSets != "src") &&
           all(list(...)[[1]]@dimSets != "dst")) {
         return(.interp_bounds(dtf, approxim = approxim,
@@ -2382,16 +2396,21 @@ setMethod(
         # cfx <- dtf[, paste0(parameter, ".fx")]
         cfx <- dtf %>% select(all_of(paste0(parameter, ".fx")))
         # dtf[, paste0(parameter, c(".up", ".fx", ".lo"))] <- NA
-        dtf[[paste0(parameter, c(".up", ".fx", ".lo"))]] <- NA
+        # dtf <- mutate_at(dtf, # superseded
+        #                  .vars = paste0(parameter, c(".up", ".fx", ".lo")),
+        #                  .funs = function(x) NA)
+        dtf <- mutate(dtf, across(paste0(parameter, c(".up", ".fx", ".lo")),
+                                  function(x) as.numeric(NA))
+                      )
         dtf <- rbind(dtf, dtf)
         # dtf[, paste0(parameter, ".lo")] <- c(clo, cfx)
-        dtf[[paste0(parameter, ".lo")]] <- c(clo, cfx)
-        frm_lo <- imply_routes(dtf[!is.na(c(clo, cfx)), ])
+        dtf[[paste0(parameter, ".lo")]] <- c(clo[[1]], cfx[[1]])
+        frm_lo <- imply_routes(dtf[!is.na(c(clo[[1]], cfx[[1]])), ])
         # dtf[, paste0(parameter, ".lo")] <- NA
-        dtf[[paste0(parameter, ".lo")]] <- NA
+        dtf[[paste0(parameter, ".lo")]] <- as.numeric(NA)
         # dtf[, paste0(parameter, ".up")] <- c(cup, cfx)
-        dtf[[paste0(parameter, ".up")]] <- c(cup, cfx)
-        frm_up <- imply_routes(dtf[!is.na(c(cup, cfx)), ])
+        dtf[[paste0(parameter, ".up")]] <- c(cup[[1]], cfx[[1]])
+        frm_up <- imply_routes(dtf[!is.na(c(cup[[1]], cfx[[1]])), ])
         dtf <- rbind(frm_lo, frm_up)
         dtf$region <- paste0(dtf$src, "##", dtf$dst)
       } else {

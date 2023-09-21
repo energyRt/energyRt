@@ -12,7 +12,7 @@ An S4 class to represent commodity export to the rest of the world.
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{commodity}}{character.}
 

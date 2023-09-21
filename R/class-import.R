@@ -1,7 +1,7 @@
 #' An S4 class to represent commodity import from the rest of the world.
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot commodity character.
 #' @slot unit character.
 #' @slot reserve numeric.
@@ -17,7 +17,7 @@
 setClass("import",
   representation(
     name = "character",
-    info = "character",
+    desc = "character",
     commodity = "character",
     unit = "character",
     reserve = "numeric",
@@ -27,7 +27,7 @@ setClass("import",
   ),
   prototype(
     name = "",
-    info = "",
+    desc = "",
     commodity = "",
     unit = "",
     reserve = Inf,

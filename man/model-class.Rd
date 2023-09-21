@@ -12,7 +12,7 @@ S4 class to represent model
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{data}}{list.}
 

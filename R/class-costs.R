@@ -1,7 +1,7 @@
 #' Class 'costs'
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot variable character.
 #' @slot subset data.frame.
 #' @slot mult data.frame.
@@ -12,7 +12,7 @@
 setClass("costs",
   representation(
     name = "character",
-    info = "character", # info
+    desc = "character", # desc
     variable = "character",
     subset = "data.frame",
     mult = "data.frame",
@@ -21,7 +21,7 @@ setClass("costs",
   ),
   prototype(
     name = NULL,
-    info = "", # info
+    desc = "", # desc
     variable = character(),
     subset = data.frame(),
     mult = data.frame(),
@@ -35,10 +35,10 @@ setMethod("initialize", "costs", function(.Object, ...) {
 })
 
 #' @export
-newCosts <- function(name, variable, info = "", mult = NULL, subset = NULL) {
+newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
   obj <- new("costs")
   obj@name <- name
-  obj@info <- info
+  obj@desc <- desc
 
   # Add variable
   sets <- .variable_set[[variable]]

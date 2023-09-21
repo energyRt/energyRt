@@ -12,7 +12,7 @@ Title
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{unit}}{character.}
 

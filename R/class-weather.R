@@ -1,7 +1,7 @@
 #' Title
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot unit character.
 #' @slot region character.
 #' @slot slice character.
@@ -16,7 +16,7 @@
 setClass("weather",
   representation(
     name = "character",
-    info = "character",
+    desc = "character",
     unit = "character",
     region = "character",
     slice = "character",
@@ -26,7 +26,7 @@ setClass("weather",
   ),
   prototype(
     name = "",
-    info = "",
+    desc = "",
     unit = as.character(NA),
     region = character(),
     slice = character(),

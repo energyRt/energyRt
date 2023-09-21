@@ -1,10 +1,9 @@
 # calendar-class ####
-#' An S4 class to represent sub-annual time resolution structure
-#' (time-frames and time-slices).
+#' An S4 class to represent sub-annual time resolution structure.
 #'
 #' @details
-#' Sub-annual time resolution is represented by nested, named fractions
-#' of a year ("slices").
+#' Sub-annual time resolution is represented by nested, named
+#' time-frames and time-slices.
 #'
 #' @slot timeframes a named list of nested sub-annual levels with vectors
 #' of individual elements.
@@ -31,7 +30,7 @@
 setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, schedule
   representation(
     name = "character",
-    info = "character",
+    desc = "character",
     timeframes = "list", # renamed `slice_map` // alt.names: hierarchy, nest, ..
     year_fraction = "numeric",
     timetable = "data.frame", # renames `levels`
@@ -48,7 +47,7 @@ setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, sc
   ),
   prototype(
     name = character(),
-    info = character(),
+    desc = character(),
     timeframes = list(), # Slices set by level
     year_fraction = as.numeric(1),
     timetable = data.frame(stringsAsFactors = FALSE),
@@ -200,7 +199,7 @@ if (F) {
 #'
 #' @param timetable data.frame with the calendar structure.
 #' @param year_fraction numeric scalar, used for validation or calculation (if missing) of the `share` column in the given `timetable`. The default value is `1L` meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to `NULL` will drop the validation.
-#' @param ... optional `name`, `info`, strings, character `default_timeframe`, and list `misc` with any relevant content. All other arguments will be ignored.
+#' @param ... optional `name`, `desc`, strings, character `default_timeframe`, and list `misc` with any relevant content. All other arguments will be ignored.
 #'
 #' @return
 #' @export
@@ -210,7 +209,7 @@ newCalendar <- function(timetable = NULL, year_fraction = 1, ...) {
   obj <- .init_calendar(timetable = timetable, year_fraction = year_fraction)
   arg <- list(...)
   if (!is.null(arg$name)) obj@name <- arg$name
-  if (!is.null(arg$info)) obj@info <- arg$info
+  if (!is.null(arg$desc)) obj@desc <- arg$desc
   if (!is.null(arg$default_timeframe)) {
     if (!(obj@default_timeframe %in% names(obj@timeframes))) {
       stop("The default_timeframe = ", default_timeframe,
@@ -227,9 +226,9 @@ if (F) {
   newCalendar()
   newCalendar(make_timetable(timeslices))
   newCalendar(make_timetable(timeslices2), name = "WRSA_DN",
-              info = "Four Seasons, day-night")
+              desc = "Four Seasons, day-night")
   newCalendar(make_timetable(timeslices3), name = "m12h24",
-              info = "One day per month, 24 hours per day")
+              desc = "One day per month, 24 hours per day")
 
   cal <- make_timetable(timeslices3)
   cal_subset <- cal[grepl("h0[12]", HOUR)]
@@ -471,7 +470,7 @@ setMethod("print", "calendar", function(x, ...) {
 .complete_calendar <- function(obj, year_fraction = 1) {
   # browser()
   if (nrow(obj@timetable) == 0) {
-    warning('no slices info, using default: "ANNUAL"')
+    warning('no slices desc, using default: "ANNUAL"')
     obj@timetable <- make_timetable()
   }
   # validate the timetable

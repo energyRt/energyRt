@@ -10,7 +10,7 @@ Class (S4) to represent default model configuration.
 \section{Slots}{
 
 \describe{
-\item{\code{info}}{character string with the configuration information.}
+\item{\code{desc}}{character string with the configuration information.}
 
 \item{\code{misc}}{}
 }}

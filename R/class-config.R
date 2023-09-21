@@ -1,7 +1,7 @@
 # load("R/sysdata.rda")
 #' Class (S4) to represent default model configuration.
 #'
-#' @slot info character string with the configuration information.
+#' @slot desc character string with the configuration information.
 #' @slot region
 #' @slot horizon
 #' @slot slice
@@ -19,7 +19,7 @@
 setClass("config",
   representation(
     name = "character",
-    info = "character",
+    desc = "character",
     region = "character",
     horizon = "horizon", # change to class
     # year = "numeric", # move to horizon
@@ -36,7 +36,7 @@ setClass("config",
   ),
   prototype(
     name = "default",
-    info = "model configuration",
+    desc = "model configuration",
     debug = data.frame(
       comm = character(),
       region = character(),
@@ -127,10 +127,10 @@ setMethod("update", "config", function(object, ..., warn_nodata = TRUE) {
   # !!! add no-data check for warning
   cf <- .data2slots("config", object, ..., warn_nodata = FALSE)
   cf@calendar <- .data2slots("calendar", cf@calendar, ...,
-                             ignore_args = c("name", "info", "misc"),
+                             ignore_args = c("name", "desc", "misc"),
                              warn_nodata = FALSE)
   cf@horizon <-  .data2slots("horizon", cf@horizon, ...,
-                             ignore_args = c("name", "info", "misc"),
+                             ignore_args = c("name", "desc", "misc"),
                              warn_nodata = FALSE)
   cf
 })

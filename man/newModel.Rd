@@ -9,7 +9,7 @@
 \usage{
 \S4method{add}{model}(obj, ..., overwrite = FALSE, repo_name = NULL)
 
-newModel(name = "", info = "", ...)
+newModel(name = "", desc = "", ...)
 
 \S4method{setHorizon}{model}(obj, horizon, intervals)
 

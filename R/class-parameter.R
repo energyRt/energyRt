@@ -1,7 +1,7 @@
 #' An S4 class to specify the model set or parameter
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot dimSets character.
 #' @slot type factor,
 #' @slot defVal numeric.
@@ -18,7 +18,7 @@ setClass(
   "parameter", # @parameter
   representation(
     name = "character", # @name name Name for GAMS
-    info = "character",
+    desc = "character",
     type = "factor", # set, map, numpar, or bounds (Up / Lo /Fx)
     dimSets = "character", # @dimSets comma separated, order is matter
     defVal = "numeric", # @defVal Default value : zero value  for map,
@@ -182,7 +182,11 @@ setMethod(
   ".dat2par", signature(obj = "parameter", data = "data.frame"),
   function(obj, data) {
     # cat(paste0(obj@name, ": ", class(data)[1], ", ncol =", ncol(data), "\n"))
-    if (!is.data.table(data)) browser() # DEBUG
+    # if (!is.data.table(data)) browser() # DEBUG
+    if (!is.data.table(data)) { # DEBUG
+      warning("\nDEBUG info: class ", class(data), " in ", obj@name, "@data\n")
+      # browser()
+    }
     # if (obj@name == "ordYear") browser() # DEBUG
     # browser()
     if (nrow(data) > 0) {

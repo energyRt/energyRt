@@ -5,7 +5,7 @@
 #'
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot commodity character.
 #' @slot start data.frame.
 #' @slot end data.frame.
@@ -33,7 +33,7 @@
 setClass("storage",
   representation(
     name = "character",
-    info = "character",
+    desc = "character",
     commodity = "character",
     aux = "data.frame", #
     region = "character",
@@ -55,7 +55,7 @@ setClass("storage",
   ),
   prototype(
     name = "",
-    info = "",
+    desc = "",
     commodity = "",
     start = data.frame(
       region = character(),
@@ -179,20 +179,32 @@ setMethod("initialize", "storage", function(.Object, ...) {
   .Object
 })
 
-setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
-#' Create new import object
+#' Create new storage object
 #'
 #' @name newStorage
 #' @family storage
 #' @export
 #'
-setMethod("newStorage", signature(name = "character"), function(name, ...) {
+newStorage <- function(name, ...) {
   .data2slots("storage", name, ...)
-})
+}
 
-#' @importFrom stats update
-#' @rdname storage
+# setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
+# setMethod("newStorage", signature(name = "character"), function(name, ...) {
+#   .data2slots("storage", name, ...)
+# })
+
+# @rdname update
+# @describeIn update
+
+#' Updating an object
+#'
+#' @name update
+#'
+#' @param object storage object
+#'
 #' @family storage update
+#' @keywords storage update
 #' @export
 setMethod('update', signature(object = 'storage'), function(object, ...) {
   # update.storage <- function(obj, ...) {

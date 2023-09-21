@@ -2,7 +2,7 @@
 #' An S4 class to store the model objects.
 #'
 #' @slot name character. Name of the repository.
-#' @slot info character, short info of the purpose or content of the repository.
+#' @slot desc character, short desc of the purpose or content of the repository.
 #' @slot data list of repositories with objects of permitted classes. All names of objects (`object@name`) must be unique.
 #' @slot permit character vector with names of classes permitted to store in the repository.
 #' @slot misc list, any additional data or information to store in the object.
@@ -14,14 +14,14 @@
 setClass("repository",
   representation(
     name = "character",
-    info = "character", # Details
+    desc = "character", # Details
     data = "list",
     permit = "character",
     misc = "list"
   ),
   prototype(
     name = "",
-    info = "", # Details
+    desc = "", # Details
     data = list(),
     permit = character(),
     misc = list()
@@ -131,8 +131,8 @@ setMethod("names", "repository", function(x) names(x@data))
 #' @family repository
 setMethod("print", "repository", function(x) {
   cat("repository '", x@name, "': ", length(x@data), " objects.",
-      if_else(is_empty(x@info) || x@info == "", "\n",
-             paste("\n", x@info, "\n")), sep = "")
+      if_else(is_empty(x@desc) || x@desc == "", "\n",
+             paste("\n", x@desc, "\n")), sep = "")
   # print(
     data.table::data.table(
       name = sapply(x@data, function(x) x@name),

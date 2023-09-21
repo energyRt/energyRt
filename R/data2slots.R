@@ -1,6 +1,6 @@
 #' An internal function to add data to slots of a new S4-class object or update a given one.
 #'
-#' @info
+#' @desc
 #' This function creates and adds data/parameters to `energyRt` classes. It is recommended to to use wrapper functions such as `newTechnology`, `newCommodity`, etc. with guided names of each class slots.
 #'
 #' @param class_name character, name of the class to create.

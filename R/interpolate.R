@@ -14,7 +14,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   ## arguments
   # obj - scenario or model
   # name
-  # info
+  # desc
   # n.threads - number of threads use for approximation
   # startYear && fixTo have to define both (or not define both) - run with startYear
   # year - basic horizon year definition (not recommended for use), use only if horizon not defined
@@ -34,7 +34,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen <- new("scenario")
     scen@model <- obj
     scen@name <- "Default scenario name"
-    scen@info <- ""
+    scen@desc <- ""
     scen@settings <- .config_to_settings(obj@config)
   } else if (class(obj) == "scenario") {
     scen <- obj
@@ -43,7 +43,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   }
 
   if (!is.null(arg$name)) scen@name <- arg$name
-  if (!is.null(arg$info)) scen@info <- arg$info
+  if (!is.null(arg$desc)) scen@desc <- arg$desc
   if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
   if (is.null(arg$startYear) != is.null(arg$fixTo)) {
     stop("startYear && fixTo have to define both (or not define both")
@@ -733,7 +733,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
         #   assign('add0_message', list(tracedata = sys.calls(),
         #     add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)),
         #     globalenv())
-        #   message('\nError in .obj2modInp function, additional info in "add0_message" object\n')
+        #   message('\nError in .obj2modInp function, additional desc in "add0_message" object\n')
         #   stop(e)
         # })
         time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name

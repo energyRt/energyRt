@@ -15,7 +15,7 @@ Storage type of technological processes are characterized by the same input and 
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{commodity}}{character.}
 

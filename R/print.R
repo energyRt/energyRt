@@ -21,7 +21,7 @@ print.commodity <- function(x) {
   }
   cat("Name: ", x@name, "\n")
   # if (x@type != '') cat('type: ', x@type, '\n')
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   # if (x@origin != '') cat('Region of origin: ',x@origin, '\n')
   if (!is.null(x@misc$color)) cat("color: ", x@misc$color, "\n")
 
@@ -43,7 +43,7 @@ print.demand <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   cat("Commodity: ", x@commodity, "\n")
   g <- getClass("demand")
   yy <- names(g@slots)[sapply(names(g@slots), function(y) {
@@ -65,7 +65,7 @@ print.equation <- function(x) {
     }
   }
   cat("Name: ", x@name, ", eq: ", as.character(x@eq), ", defVal: ", x@defVal, "\n", sep = "")
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   g <- getClass("equation")
   yy <- names(g@slots)[sapply(names(g@slots), function(y) {
     g@slots[[y]] ==
@@ -112,7 +112,7 @@ print.model <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   print(x@config)
   if (length(x@data) != 0) {
     for (i in 1:length(x@data)) {
@@ -126,14 +126,14 @@ print.model <- function(x) {
 print.region <- function(x) {
   cat("Name: ", x@name, "\n")
   # if (x@type != '') cat('type: ', x@type, '\n')
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   if (!is.null(x@misc$color)) cat("color: ", x@misc$color, "\n")
 }
 
 #------------------------------------------------------------------------------
 # print.repository <- function(x) {
 #   cat("Name: ", x@name, "\n")
-#   if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+#   if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
 #   for (i in seq(along = x@data)) {
 #     cat(class(x@data[[i]]), " ", i, ":\n", sep = "")
 #     print(x@data[[i]])
@@ -143,7 +143,7 @@ print.region <- function(x) {
 #------------------------------------------------------------------------------
 print.scenario <- function(x) {
   cat("Name: ", x@name, "\n")
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   if (!is.null(x@model)) {
     cat("Model:\n")
     print(x@model)
@@ -178,7 +178,7 @@ print.supply <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   cat("Commodity: ", x@commodity, "\n")
   # cat('Reserve: ', x@reserve, '\n')
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
@@ -202,7 +202,7 @@ print.technology <- function(x, ...) {
   }
   cat("Name: ", x@name, "\n")
   # if (x@type!='') cat('type: ', x@type, '\n')
-  if (length(x@info) != 0 && x@info != "") cat("info: ", x@info, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   if (x@cap2act != "") cat("cap2act: ", x@cap2act, "\n")
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
   # if(!is.null(x@reporting_years)) cat('reporting period: ', x@reporting_years, '\n')

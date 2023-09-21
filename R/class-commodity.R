@@ -15,7 +15,7 @@
 setClass("commodity",
   representation(
     name = "character", # Short name
-    info = "character", # Details
+    desc = "character", # Details
     limtype = "factor",
     slice = "character",
     unit = "character",
@@ -25,7 +25,7 @@ setClass("commodity",
   ),
   prototype(
     name = character(),
-    info = character(),
+    desc = character(),
     limtype = factor("LO", levels = c("FX", "UP", "LO")),
     slice = character(),
     unit = character(),
@@ -53,7 +53,7 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 #' Create class commodity
 #'
 #' @param name
-#' @param info
+#' @param desc
 #' @param limtype
 #' @param slice
 #' @param unit
@@ -67,7 +67,7 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 #' @examples
 newCommodity <- function(
     name = "",
-    info = "",
+    desc = "",
     limtype = "LO",
     slice = character(),
     unit = character(),
@@ -75,7 +75,7 @@ newCommodity <- function(
     emis = data.frame(),
     misc = list()) {
   .data2slots("commodity", name,
-    info = "",
+    desc = "",
     limtype = "LO",
     slice = slice,
     unit = unit,

@@ -2,7 +2,7 @@
 #'
 #' @slot name character.
 #' @slot comm character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot region character.
 #' @slot year numeric.
 #' @slot slice character.
@@ -19,7 +19,7 @@
 setClass("tax",
   representation(
     name = "character", #
-    info = "character", #
+    desc = "character", #
     comm = "character", #
     region = "character", #
     defVal = "numeric", #
@@ -29,7 +29,7 @@ setClass("tax",
   prototype(
     name = "", # Short name
     comm = "",
-    info = "",
+    desc = "",
     region = character(), #
     defVal = 0, #
     tax = data.frame(

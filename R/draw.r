@@ -100,7 +100,7 @@ draw.technology <- function(
         border = rgb(56 / 255, 93 / 255, 138 / 255)
       )
       text(.5, 1, tech@name, cex = 1.5)
-      text(.5, .95, tech@info)
+      text(.5, .95, tech@desc)
       ctype <- checkInpOut(tech)
       ctype$comm <- ctype$comm[rev(c(
         seq(length.out = nrow(ctype$comm))[

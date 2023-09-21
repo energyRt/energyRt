@@ -10,7 +10,7 @@ An S4 class to represent model/scenario planning horizon with intervals (year-st
 \section{Slots}{
 
 \describe{
-\item{\code{info}}{character, a comment or a short description.}
+\item{\code{desc}}{character, a comment or a short description.}
 
 \item{\code{period}}{integer, an arranged, full sequence (without gaps) of modeled period.}
 

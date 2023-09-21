@@ -3,15 +3,13 @@
 \docType{class}
 \name{calendar-class}
 \alias{calendar-class}
-\title{An S4 class to represent sub-annual time resolution structure
-(time-frames and time-slices).}
+\title{An S4 class to represent sub-annual time resolution structure.}
 \description{
-An S4 class to represent sub-annual time resolution structure
-(time-frames and time-slices).
+An S4 class to represent sub-annual time resolution structure.
 }
 \details{
-Sub-annual time resolution is represented by nested, named fractions
-of a year ("slices").
+Sub-annual time resolution is represented by nested, named
+time-frames and time-slices.
 }
 \section{Slots}{
 

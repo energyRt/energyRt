@@ -10,7 +10,7 @@ Title
 \section{Slots}{
 
 \describe{
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{variable}}{character.}
 

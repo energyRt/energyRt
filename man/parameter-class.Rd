@@ -12,7 +12,7 @@ An S4 class to specify the model set or parameter
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{dimSets}}{character.}
 

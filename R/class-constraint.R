@@ -1,7 +1,7 @@
 #' Class 'constraint'
 #'
 #' @slot name character.
-#' @slot info character.
+#' @slot desc character.
 #' @slot eq factor.
 #' @slot for.each list.
 #' @slot rhs data.frame.
@@ -14,7 +14,7 @@
 setClass("constraint",
   representation(
     name = "character",
-    info = "character", # info
+    desc = "character", # desc
     eq = "factor",
     for.each = "data.frame",
     rhs = "data.frame",
@@ -25,7 +25,7 @@ setClass("constraint",
   ),
   prototype(
     name = NULL,
-    info = "", # info
+    desc = "", # desc
     eq = factor("==", levels = c(">=", "<=", "==")),
     for.each = data.frame(),
     rhs = data.frame(),
@@ -44,7 +44,7 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 # term for equation
 #' Title
 #'
-#' @slot info character.
+#' @slot desc character.
 #' @slot variable character.
 #' @slot for.sum list.
 #' @slot mult data.frame.
@@ -53,7 +53,7 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 #' @export
 setClass("summand",
   representation(
-    info = "character", # info
+    desc = "character", # desc
     variable = "character",
     for.sum = "list",
     mult = "data.frame",
@@ -62,7 +62,7 @@ setClass("summand",
     # parameter= list() # For the future
   ),
   prototype(
-    info = NULL, # info
+    desc = NULL, # desc
     variable = NULL,
     for.sum = list(),
     mult = data.frame(),
@@ -282,7 +282,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       if (!is.null(old_for_each[[j]]) && !all(prec@set[[j]] %in% old_for_each[[j]])) {
         if (any(old_for_each[[j]] %in% prec@set[[j]])) {
           # warning(paste0('Set "'))
-          old_for_each[[j]] <- old_for_each[[j]][old_for_each[[j]] %in% prec@set[[j]]]
+          old_for_each[[j]] <-
+            old_for_each[[j]][old_for_each[[j]] %in% prec@set[[j]]]
         }
         set.map.name <- c(set.map.name, j)
         set.map[[length(set.map.name)]] <- old_for_each[[j]]
@@ -325,8 +326,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
         !all(prec@set[[j]] %in% get.all.child(stm@lhs[[i]]@for.sum[[j]])))) {
         # check if the same set in lhs exist
         fl <- FALSE
-        if (all(!c(all.set[nn[need.set == j], c("lead.year", "lag.year")], recursive = TRUE))) {
-          fl <- nn[(!all.set$for.each[nn] & all.set$set[nn] == j & !is.na(all.set$new.map[nn]))]
+        if (all(!c(all.set[nn[need.set == j], c("lead.year", "lag.year")],
+                   recursive = TRUE))) {
+          fl <- nn[(!all.set$for.each[nn] & all.set$set[nn] == j &
+                      !is.na(all.set$new.map[nn]))]
         }
         add.new <- TRUE
         if (any(fl)) {
@@ -453,10 +456,12 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     yy <- .interp_numpar(stm@rhs, "rhs", xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != "value"]
     yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = "##") %in%
-      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = "##")), , drop = FALSE]
+      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = "##")), ,
+      drop = FALSE]
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     # Add mult
-    res$equation <- paste0(res$equation, xx@name, "(", paste0(need.set0, collapse = ", "), ")")
+    res$equation <- paste0(res$equation, xx@name, "(",
+                           paste0(need.set0, collapse = ", "), ")")
   } else {
     res$equation <- paste0(res$equation, stm@defVal)
   }
@@ -473,12 +478,14 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     # Add multiple to vrb
     # Add to year multiplier if lag.year | lead.year
     if ((any(lhs.set2$lead.year) ||
-         any(lhs.set2$lag.year)) &&
-        (nrow(stm@lhs[[i]]@mult) == 0 ||
-         all(colnames(stm@lhs[[i]]@mult) != "year"))) {
+      any(lhs.set2$lag.year)) &&
+      (nrow(stm@lhs[[i]]@mult) == 0 ||
+        all(colnames(stm@lhs[[i]]@mult) != "year"))) {
       if (nrow(stm@lhs[[i]]@mult) == 0) {
-        stm@lhs[[i]]@mult <- data.frame(year = NA, value = stm@lhs[[i]]@defVal,
-                                        stringsAsFactors = FALSE)
+        stm@lhs[[i]]@mult <- data.frame(
+          year = NA, value = stm@lhs[[i]]@defVal,
+          stringsAsFactors = FALSE
+        )
       } else {
         stm@lhs[[i]]@mult$year <- NA
       }
@@ -488,31 +495,36 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       # Complicated parameter
       # Generate approxim
       approxim2 <- approxim[unique(c(colnames(stm@lhs[[i]]@mult)[
-        colnames(stm@lhs[[i]]@mult) %in% names(approxim)], "solver", "year"))]
+        colnames(stm@lhs[[i]]@mult) %in% names(approxim)
+      ], "solver", "year"))]
       if (any(names(approxim2) == "slice")) {
         approxim2$slice <- approxim2$calendar@slice_share$slice
       }
       need.set <- lhs.set2[lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), "set"]
       need.set2 <- lhs.set2[!is.na(lhs.set2$new.map) &
-                              lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), ]
+        lhs.set2$set %in% colnames(stm@lhs[[i]]@mult), ]
 
       for (j in seq_len(nrow(need.set2))) {
         approxim2[[need.set2[j, "set"]]] <- set.map[[need.set2[j, "new.map"]]]
 
         if (any(colnames(stm@lhs[[i]]@mult) %in% c(need.set, "value"))) {
           if (!all(colnames(stm@lhs[[i]]@mult) %in%
-                   c(for.each.set, need.set, "value"))) {
+            c(for.each.set, need.set, "value"))) {
             stop(paste0(
               "There are unknown set in constraint ",
               stm@name, ", mult ", i, ': "',
-              paste0(colnames(stm@lhs[[i]]@mult)[
-                !(colnames(stm@lhs[[i]]@mult) %in% c(for.each.set, "value"))],
-                collapse = '", "'), '"'
+              paste0(
+                colnames(stm@lhs[[i]]@mult)[
+                  !(colnames(stm@lhs[[i]]@mult) %in% c(for.each.set, "value"))
+                ],
+                collapse = '", "'
+              ), '"'
             ))
           }
           # Add set that from  for.each
           nslc <- colnames(stm@lhs[[i]]@mult)[
-            !(colnames(stm@lhs[[i]]@mult) %in% c(need.set, "value"))]
+            !(colnames(stm@lhs[[i]]@mult) %in% c(need.set, "value"))
+          ]
           need.set <- c(need.set, nslc)
           if (nrow(stm@for.each) > 0) {
             for (j in nslc) {
@@ -542,7 +554,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
         prec@parameters[[xx@name]] <- .dat2par(xx, yy)
       }
       # Add mult
-      vrb.lhs <- paste0(xx@name, "(", paste0(need.set, collapse = ", "), ") * ", vrb.lhs)
+      vrb.lhs <- paste0(xx@name, "(", paste0(need.set, collapse = ", "),
+                        ") * ", vrb.lhs)
     } else if (stm@lhs[[i]]@defVal != 1) {
       vrb.lhs <- paste0(stm@lhs[[i]]@defVal, " * ", vrb.lhs)
     }
@@ -550,7 +563,11 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     for (j in seq_len(nrow(lhs.set2))[lhs.set2$alias != lhs.set2$set]) {
       vrb.lhs <- gsub(paste0(" ", lhs.set2$set[j], " "), lhs.set2$alias[j], vrb.lhs)
     }
-    vrb.lhs <- gsub("[ ]*[$][ ]*", "$", gsub("[ ]*[)]", ")", gsub("[ ]*[(][ ]*", "(", gsub("[ ]*[,][ ]*", ", ", vrb.lhs))))
+    vrb.lhs <- gsub("[ ]*[$][ ]*", "$",
+                    gsub("[ ]*[)]", ")",
+                         gsub("[ ]*[(][ ]*", "(",
+                              gsub("[ ]*[,][ ]*", ", ",
+                                   vrb.lhs))))
     # Generate data to equation
     if (i != 1) lhs_equation <- paste0(lhs_equation, "+")
     if (all(!lhs.set2$def.lhs)) {
@@ -580,10 +597,12 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       if (sum(lhs.set2$def.lhs) == 1) {
         lhs_equation <- paste0(lhs_equation, " sum(", lhs.set3$alias)
       } else {
-        lhs_equation <- paste0(lhs_equation, " sum((", paste0(lhs.set3$alias, collapse = ", "), ")")
+        lhs_equation <- paste0(lhs_equation, " sum((",
+                               paste0(lhs.set3$alias, collapse = ", "), ")")
       }
       if (length(cnd) > 1 || any(grep("[ )]and[ (]", cnd))) {
-        lhs_equation <- paste0(lhs_equation, "$(", paste0(cnd, collapse = " and "), "), ", vrb.lhs, ")")
+        lhs_equation <- paste0(lhs_equation, "$(",
+                               paste0(cnd, collapse = " and "), "), ", vrb.lhs, ")")
       } else if (length(cnd) == 1) {
         lhs_equation <- paste0(lhs_equation, "$", cnd, ", ", vrb.lhs, ")")
       } else {
@@ -635,7 +654,8 @@ newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
   #
   set.vec <- c(names(for.each), names(for.sum))
   psb.vec <- c("sup", "stg", "tech", "imp", "expp")
-  psb.vec.tp <- c(sup = "Sup", stg = "Storage", tech = "Tech", imp = "Import", expp = "Export")
+  psb.vec.tp <- c(sup = "Sup", stg = "Storage", tech = "Tech",
+                  imp = "Import", expp = "Export")
   names(psb.vec) <- psb.vec
   is.set <- psb.vec[psb.vec %in% set.vec]
   if (length(is.set) > 1) {
@@ -680,7 +700,8 @@ newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
     # for (i in seq_along(arg)) {
     #   arg[[i]]$mult <- rhs
     # }
-    term <- list(for.sum = for.sum[!(names(for.sum) %in% psb.vec)], variable = paste0("v", inpout, "Tot"), mult = rhs)
+    term <- list(for.sum = for.sum[!(names(for.sum) %in% psb.vec)],
+                 variable = paste0("v", inpout, "Tot"), mult = rhs)
     rhs <- 0
     defVal <- 0
     arg[[length(arg) + 1]] <- term
@@ -709,5 +730,6 @@ newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
     rhs <- 0
     defVal <- 0
   }
-  newConstraint(name, eq = eq, for.each = for.each, defVal = defVal, rhs = rhs, arg = arg)
+  newConstraint(name, eq = eq, for.each = for.each, defVal = defVal,
+                rhs = rhs, arg = arg)
 }

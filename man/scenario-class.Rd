@@ -12,7 +12,7 @@ An S4 class to represent scenario, an interpolated and/or solved model.
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{model}}{model.}
 

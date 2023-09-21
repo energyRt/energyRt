@@ -1,7 +1,7 @@
 #' An S4 class to represent technology
 #'
 #' @slot name character, name of technology used in sets
-#' @slot info character, detailed description of the technology for reference.
+#' @slot desc character, detailed description of the technology for reference.
 #' @slot input data.frame.
 #' @slot output data.frame.
 #' @slot aux data.frame.
@@ -39,7 +39,7 @@ setClass("technology",
   representation(
     # General information
     name = "character", # Short name
-    info = "character", # info
+    desc = "character", # desc
     input = "data.frame", #
     output = "data.frame", #
     aux = "data.frame", #
@@ -71,7 +71,7 @@ setClass("technology",
   ), #
   prototype(
     name = "",
-    info = "",
+    desc = "",
     input = data.frame(
       comm = character(),
       unit = character(),
@@ -99,7 +99,7 @@ setClass("technology",
     ),
     group = data.frame(
       group = character(),
-      info = character(),
+      desc = character(),
       unit = character(),
       stringsAsFactors = FALSE
     ),
@@ -255,7 +255,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' Create object of class `technology` with specified parameters.
 #'
 #' @param name
-#' @param info
+#' @param desc
 #' @param input
 #' @param output
 #' @param group
@@ -290,7 +290,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @examples
 newTechnology <- function(
     name = "",
-    info = "",
+    desc = "",
     input = data.frame(),
     output = data.frame(),
     group = data.frame(),
@@ -318,7 +318,7 @@ newTechnology <- function(
     misc = list()) {
   # browser()
   .data2slots("technology", name,
-    info = info,
+    desc = desc,
     input = input,
     output = output,
     group = group,

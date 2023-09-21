@@ -14,7 +14,7 @@ An S4 class to represent a commodity tax
 
 \item{\code{comm}}{character.}
 
-\item{\code{info}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{region}}{character.}
 

@@ -76,7 +76,20 @@ get_gdxlib_path <- function() {
          'It is required for reading "*.gdx" files.\n',
          'Check: "https://github.com/lolow/gdxtools".')
   }
-  # xt <- require("gdxrrw", warn.conflicts = FALSE)
+  xt <- require("gdxtools", warn.conflicts = FALSE)
+  en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
+  if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
+    lb <- getOption("en_gdxlib_path")
+    if (is.null(lb)) {
+      lb <- getOption("en_gams_path")
+    }
+    ix <- igdx(lb)
+    if (!ix) {
+      stop('Cannot load "gdx" library. Check "?set_gdxlib_path" to setup.')
+    } else {
+      options(en_gdxlib_loaded = TRUE)
+    }
+  }
 }
 
 
@@ -617,7 +630,8 @@ get_gdxlib_path <- function() {
 .write_gdx_list <- function(dat, gdxName = "data.gdx") {
   # the function exports named list of sets and parameters to GDX file
   # stopifnot("gdxrrw" %in% rownames(installed.packages()))
-  .check_load_gdxlib()
+  .check_load_gdxtools()
+  # .check_load_gdxlib()
   # rw <- require("gdxrrw")
   # if (!rw) {
   #   stop('"gdxrrw" package has not been found. ',
@@ -674,7 +688,7 @@ get_gdxlib_path <- function() {
     DBI::dbWriteTable(con, i, dat[[i]], overwrite = TRUE)
   }
   DBI::dbDisconnect(con)
-  # finf <- file.info(sqlFile)
+  # finf <- file.desc(sqlFile)
   # format(finf["size"])
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")
