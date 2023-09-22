@@ -2,7 +2,7 @@
 #'
 #' @slot name character.
 #' @slot comm character.
-#' @slot description character.
+#' @slot desc character.
 #' @slot region character.
 #' @slot year numeric.
 #' @slot slice character.
@@ -19,7 +19,7 @@
 setClass("tax",
   representation(
     name = "character", #
-    description = "character", #
+    desc = "character", #
     comm = "character", #
     region = "character", #
     defVal = "numeric", #
@@ -29,7 +29,7 @@ setClass("tax",
   prototype(
     name = "", # Short name
     comm = "",
-    description = "",
+    desc = "",
     region = character(), #
     defVal = 0, #
     tax = data.frame(
@@ -44,7 +44,7 @@ setClass("tax",
     # ! Misc
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setGeneric("newTax", function(name, ...) standardGeneric("newTax"))

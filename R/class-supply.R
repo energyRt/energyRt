@@ -1,7 +1,7 @@
 #' An S4 class to represent a supply of a commodity
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot desc character.
 #' @slot commodity character.
 #' @slot unit character.
 #' @slot weather data.frame.
@@ -19,7 +19,7 @@
 setClass("supply",
   representation(
     name = "character",
-    description = "character",
+    desc = "character",
     # color         = "data.frame",      #
     commodity = "character",
     unit = "character",
@@ -33,7 +33,7 @@ setClass("supply",
   ),
   prototype(
     name = "",
-    description = "",
+    desc = "",
     # color         = data.frame(region   = character(),
     #                            color    = character(),
     #                            stringsAsFactors = FALSE),
@@ -69,7 +69,7 @@ setClass("supply",
     # ! Misc
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "supply", function(.Object, ...) {
@@ -80,13 +80,16 @@ setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
 #' Create new supply object
 #'
 #' @name newSupply
+#' @rdname sypply
 #' @export
 setMethod("newSupply", signature(name = "character"), function(name, ...) {
   .data2slots("supply", name, ...)
 })
 
-# setMethod('update', signature(obj = 'supply'), function(obj, ...)
+#' @rdname sypply
+#' @family supply update
 #' @export
-update.supply <- function(obj, ...) {
-  .data2slots("supply", obj, ...)
-}
+setMethod('update', signature(object = 'supply'), function(object, ...) {
+# update.supply <- function(obj, ...) {
+  .data2slots("supply", object, ...)
+})

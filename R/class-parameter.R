@@ -1,6 +1,7 @@
 #' An S4 class to specify the model set or parameter
 #'
 #' @slot name character.
+#' @slot desc character.
 #' @slot dimSets character.
 #' @slot type factor,
 #' @slot defVal numeric.
@@ -17,6 +18,7 @@ setClass(
   "parameter", # @parameter
   representation(
     name = "character", # @name name Name for GAMS
+    desc = "character",
     type = "factor", # set, map, numpar, or bounds (Up / Lo /Fx)
     dimSets = "character", # @dimSets comma separated, order is matter
     defVal = "numeric", # @defVal Default value : zero value  for map,
@@ -67,6 +69,7 @@ setMethod("initialize", signature = "parameter",
            cls = NULL,
            slot = NULL) {
 
+    # if (name == "DEBUG") browser() # DEBUG
     # expected_sets <- c(
     #   "tech", "techp", "dem", "sup", "weather", "acomm", "comm", "commp",
     #   "group", "region", "regionp", "src", "dst",
@@ -137,7 +140,8 @@ setMethod("initialize", signature = "parameter",
 
     if (type == "bounds") dimSets <- c(dimSets, "type")
     if (any(type == c("numpar", "bounds"))) dimSets <- c(dimSets, "value")
-    .Object@data <- data[, dimSets, drop = FALSE]
+    .Object@data <- data[, dimSets, drop = FALSE] %>% as.data.table
+    # .Object@data <- select(data, all_of(dimSets)) #!!! drops duplicated columns
     if (any(!is_null(inClass), !is_null(cls), !is_null(slot),
              !is_null(colName) && any(colName != ""))) {
       # add the record
@@ -177,12 +181,21 @@ newSet <- function(dimSets) {
 setMethod(
   ".dat2par", signature(obj = "parameter", data = "data.frame"),
   function(obj, data) {
+    # cat(paste0(obj@name, ": ", class(data)[1], ", ncol =", ncol(data), "\n"))
+    # if (!is.data.table(data)) browser() # DEBUG
+    if (!is.data.table(data)) { # DEBUG
+      warning("\nDEBUG info: class ", class(data), " in ", obj@name, "@data\n")
+      # browser()
+    }
+    # if (obj@name == "ordYear") browser() # DEBUG
+    # browser()
     if (nrow(data) > 0) {
       if (ncol(data) != ncol(obj@data) ||
         any(sort(colnames(data)) != sort(colnames(obj@data)))) {
         stop("Internal error: Wrong new data 1")
       }
-      data <- data[, colnames(obj@data), drop = FALSE]
+      # data <- data[, colnames(obj@data), drop = FALSE]
+      data <- select(data, all_of(colnames(obj@data)))
       if (any(colnames(data) == "type")) {
         if (any(!(data$type %in% c("lo", "up")))) {
           stop("Internal error: Wrong new data 2")
@@ -190,7 +203,7 @@ setMethod(
         data$type <- factor(data$type, levels = c("lo", "up"))
       }
       for (i in colnames(data)[sapply(data, class) == "factor"]) {
-        if (i != "type") data[, i] <- as.character(data[, i])
+        if (i != "type") data[[i]] <- as.character(data[[i]])
       }
       # class2 <- function(x) if (class(x) == 'integer') 'numeric' else class(x)
       class2 <- function(x) if (inherits(x, "integer")) "numeric" else class(x)
@@ -198,19 +211,30 @@ setMethod(
           any(sapply(data, class2) != sapply(obj@data, class))) {
         stop("Internal error: Wrong new data 3")
       }
-      data <- data[apply(data, 1, function(x) all(!is.na(x))), , drop = FALSE]
-      if (nrow(data) != 0) {
-        if (obj@misc$nValues != -1) {
-          if (obj@misc$nValues + nrow(data) > nrow(obj@data)) {
-            obj@data[nrow(obj@data) + 1:(nrow(data) + nrow(obj@data)), ] <- NA
-          }
-          nn <- obj@misc$nValues + 1:nrow(data)
-          obj@misc$nValues <- obj@misc$nValues + nrow(data)
-          obj@data[nn, ] <- data
-        } else {
-          nn <- nrow(obj@data) + 1:nrow(data)
-          obj@data[nn, ] <- NA
-          obj@data[nn, ] <- data
+      # data <- data[apply(data, 1, function(x) all(!is.na(x))), , drop = FALSE]
+      data <- drop_na(data)
+      if (nrow(data) != 0) { # !!! rewrite !!!
+        if (obj@misc$nValues != -1) { # ??? add after nrow = nValues?
+          # if (obj@misc$nValues + nrow(data) > nrow(obj@data)) {
+          #   browser()
+          #   obj@data[nrow(obj@data) + 1:(nrow(data) + nrow(obj@data)), ] <- NA
+          # }
+          # nn <- obj@misc$nValues + 1:nrow(data)
+          # obj@misc$nValues <- obj@misc$nValues + nrow(data)
+          # obj@data[nn, ] <- data
+          # obj@data <- bind_rows(obj@data, data)
+          obj@data <- rbindlist(list(as.data.table(obj@data),
+                                     as.data.table(data)), use.names = TRUE)
+          obj@misc$nValues <- obj@misc$nValues + length(data)
+
+          obj@misc$nValues <- nrow(obj@data)
+        } else { # append ???
+          # nn <- nrow(obj@data) + 1:nrow(data)
+          # obj@data[nn, ] <- NA
+          # obj@data[nn, ] <- data
+          # obj@data <- bind_rows(obj@data, data)
+          obj@data <- rbindlist(list(as.data.table(obj@data),
+                                     as.data.table(data)), use.names = TRUE)
         }
       }
     }
@@ -225,7 +249,10 @@ setMethod(
 setMethod(
   ".dat2par", signature(obj = "parameter", data = "character"),
   function(obj, data) {
+    # browser()
     if (obj@type != "set") {
+      message("Error: ", obj@name, " parameter:")
+      print(head(data))
       stop("Set type of parameter is expected for the character data. \n",
            "Parameter: ", obj@name, ", data: ", head(data), "...")
     }
@@ -234,11 +261,16 @@ setMethod(
            ") data to the character set ", obj@name)
     }
     if (length(data) == 0) {
+      obj@data <- as.data.table(obj@data)
       return(obj)
     }
     # !!! rewrite with dplyr or data.table
-    nn <- nrow(obj@data) + 1:length(data)
-    obj@data[nn, ] <- data
+    # nn <- nrow(obj@data) + 1:length(data)
+    # obj@data[nn, ] <- data
+    obj@data <- rbindlist(list(as.data.table(obj@data), as.data.table(data)),
+                          use.names = FALSE)
+    if (ncol(obj@data) != 1) browser()
+    if (is.factor(obj@data[[1]])) browser()
     obj@misc$nValues <- obj@misc$nValues + length(data)
     obj
   }
@@ -248,6 +280,7 @@ setMethod(
 setMethod(
   ".dat2par", signature(obj = "parameter", data = "numeric"),
   function(obj, data) {
+    # browser()
     if (obj@type != "set") {
       stop("Set type of parameter is expected for the numeric data. \n",
            "Parameter: ", obj@name, ", data: ", head(data), "...")
@@ -257,11 +290,16 @@ setMethod(
            ") data to the numeric set ", obj@name)
     }
     if (length(data) == 0) {
+      obj@data <- as.data.table(obj@data)
       return(obj)
     }
     # !!! rewrite with dplyr or data.table
-    nn <- nrow(obj@data) + 1:length(data)
-    obj@data[nn, ] <- data
+    # nn <- nrow(obj@data) + 1:length(data)
+    # obj@data[nn, ] <- data
+    obj@data <- rbindlist(list(as.data.table(obj@data), as.data.table(data)),
+                          use.names = FALSE)
+    obj@data <- .force_year_class_df(obj@data)
+    obj@data <- .force_value_class_df(obj@data)
     obj@misc$nValues <- obj@misc$nValues + length(data)
     obj
   }
@@ -294,7 +332,9 @@ setMethod(
 # setMethod('.get_data_slot', signature(obj = 'parameter'), # getParameterTable
 .get_data_slot <- function(obj) {
   if (obj@misc$nValues != -1) { # reserved for???
-    obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
+    # obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
+    ii <- seq(length.out = obj@misc$nValues)
+    return(obj@data[ii, , drop = FALSE])
   } else {
     obj@data
   }
@@ -303,6 +343,7 @@ setMethod(
 # Remove all data by all set
 # setMethod('.drop_set_value', signature(obj = 'parameter', dimSets = "character", value = "character"),
 .drop_set_value <- function(obj, dimSets, value) {
+  # !!! better name? value -> ? dimSets -> dimSet?
   browser()
   if (length(dimSets) != 1 || all(dimSets != obj@dimSets)) {
     stop(
@@ -310,7 +351,10 @@ setMethod(
       "check dimSets: ", paste(dimSets, collapse = ", ")
     )
   }
-  obj@data <- obj@data[!(obj@data[, dimSets] %in% value), , drop = FALSE]
+  # obj@data <- obj@data[!(obj@data[, dimSets] %in% value), , drop = FALSE]
+  ii <- obj@data[[dimSets]] %in% value
+  if (length(dimSets) > 1) browser() # check filter below
+  obj@data <- obj@data %>% filter(!ii)
   obj
 }
 
@@ -321,12 +365,13 @@ setGeneric('addMultipleSet',
 setMethod(
   "addMultipleSet", signature(obj = "parameter", dimSets = "character"),
   function(obj, dimSets) {
-    dimSets <- dimSets[!(dimSets %in% obj@data[, 1])]
+    dimSets <- dimSets[!(dimSets %in% obj@data[[1]])]
     if (length(dimSets) == 0) {
       obj
     } else {
       gg <- data.frame(dimSets)
       colnames(gg) <- obj@dimSets
+      gg <- as.data.table(gg)
       .dat2par(obj, gg)
     }
   }
@@ -336,12 +381,13 @@ setMethod(
 setMethod(
   "addMultipleSet", signature(obj = "parameter", dimSets = "numeric"),
   function(obj, dimSets) {
-    dimSets <- dimSets[!(dimSets %in% obj@data[, 1])]
+    dimSets <- dimSets[!(dimSets %in% obj@data[[1]])]
     if (length(dimSets) == 0) {
       obj
     } else {
       gg <- data.frame(dimSets)
       colnames(gg) <- obj@dimSets
+      gg <- as.data.table(gg)
       .dat2par(obj, gg)
     }
   }

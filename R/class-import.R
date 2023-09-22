@@ -1,7 +1,7 @@
 #' An S4 class to represent commodity import from the rest of the world.
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot desc character.
 #' @slot commodity character.
 #' @slot unit character.
 #' @slot reserve numeric.
@@ -17,7 +17,7 @@
 setClass("import",
   representation(
     name = "character",
-    description = "character",
+    desc = "character",
     commodity = "character",
     unit = "character",
     reserve = "numeric",
@@ -27,7 +27,7 @@ setClass("import",
   ),
   prototype(
     name = "",
-    description = "",
+    desc = "",
     commodity = "",
     unit = "",
     reserve = Inf,
@@ -44,7 +44,7 @@ setClass("import",
     slice = character(),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 setMethod("initialize", "import", function(.Object, ...) {
   .Object

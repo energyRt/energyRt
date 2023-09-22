@@ -8,11 +8,13 @@
 
 # The function creates scenario object with interpolated data, ready to pass to a solver
 #' @export
-interpolate <- function(obj, ...) { #- returns class scenario
+#' @rdname interpolate
+#' @family interpolate model scenario
+interpolate_model <- function(object, ...) { #- returns class scenario
   ## arguments
   # obj - scenario or model
   # name
-  # description
+  # desc
   # n.threads - number of threads use for approximation
   # startYear && fixTo have to define both (or not define both) - run with startYear
   # year - basic horizon year definition (not recommended for use), use only if horizon not defined
@@ -20,8 +22,10 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # region - define region, not good practice
   # repository - class for add to model (repository or list of repository)
   # echo - print working data
-
+  # browser()
+  obj <- object
   arg <- list(...)
+
 
   interpolation_start_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
@@ -30,7 +34,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     scen <- new("scenario")
     scen@model <- obj
     scen@name <- "Default scenario name"
-    scen@description <- "Default description"
+    scen@desc <- ""
     scen@settings <- .config_to_settings(obj@config)
   } else if (class(obj) == "scenario") {
     scen <- obj
@@ -39,16 +43,25 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }
 
   if (!is.null(arg$name)) scen@name <- arg$name
-  if (!is.null(arg$description)) scen@description <- arg$description
+  if (!is.null(arg$desc)) scen@desc <- arg$desc
   if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
   if (is.null(arg$startYear) != is.null(arg$fixTo)) {
     stop("startYear && fixTo have to define both (or not define both")
   }
-  if (!is.null(arg$year)) scen@settings@horizon@years <- arg$year
+  if (!is.null(arg$year)) scen@settings@horizon@period <- arg$year
   if (!is.null(arg$repository)) scen@model <- .add_repository(scen@model, arg$repository)
   if (!is.null(arg$region)) scen@settings@region <- arg$region
   if (!is.null(arg$discount)) scen@settings@discount <- arg$discount
   if (is.null(arg$verbose)) arg$verbose <- 0
+  if (!is.null(arg$name)) {
+    scen@misc$table_format <- arg$table_format
+    # set_table_format(scen@misc$table_format)
+    arg$table_format <- NULL
+  } else {
+    scen@misc$table_format <- "data.table"
+    # set_table_format(scen@misc$table_format)
+  }
+
 
   ### Interpolation
   scen@modInp <- new("modInp")
@@ -56,32 +69,33 @@ interpolate <- function(obj, ...) { #- returns class scenario
   # Fill year
   if (!is.null(arg$year)) {
     if (nrow(scen@settings@horizon@intervals) != 0) {
-      stop("argument can't use with horizon")
+      stop("argument can't be used with horizon")
     }
-    scen@settings@horizon@years <- arg$year
+    scen@settings@horizon@period <- arg$year
   }
   # browser()
   if (nrow(scen@settings@horizon@intervals) == 0) {
-    if (any(sort(scen@settings@horizon@years) != scen@settings@horizon@years) ||
-      max(scen@settings@horizon@years) - min(scen@settings@horizon@years) + 1 !=
-      length(scen@settings@horizon@years)) {
+    if (any(sort(scen@settings@horizon@period) != scen@settings@horizon@period) ||
+      max(scen@settings@horizon@period) - min(scen@settings@horizon@period) + 1 !=
+      length(scen@settings@horizon@period)) {
       stop("wrong year parameter")
     }
     scen@model <- setHorizon(scen@model,
-      horizon = scen@settings@horizon@years[1],
-      intervals = rep(1, length(scen@settings@horizon@years))
+      horizon = scen@settings@horizon@period[1],
+      intervals = rep(1, length(scen@settings@horizon@period))
     )
   }
 
   scen@modInp@parameters[["year"]] <-
-    .dat2par(scen@modInp@parameters[["year"]], scen@settings@horizon@years)
+    .dat2par(scen@modInp@parameters[["year"]], scen@settings@horizon@period)
   # browser()
   scen@modInp@parameters[["mMidMilestone"]] <-
     .dat2par(scen@modInp@parameters[["mMidMilestone"]],
-             data.frame(year = scen@settings@horizon@intervals$mid)
+             data.table(year = scen@settings@horizon@intervals$mid)
              )
-  # Fill slice
-  scen@settings@slice <- .init_slice(scen@settings@slice)
+  # slices ####
+  # browser()
+  # scen@settings@slice <- .init_slice(scen@settings@slice)
   # browser()
   if (mean(scen@settings@yearFraction$fraction) != 1.) {
     # filter out unused slices
@@ -97,19 +111,19 @@ interpolate <- function(obj, ...) { #- returns class scenario
     scen@model@data <- subset_slices_repo(
       repo = scen@model@data,
       yearFraction = mean(scen@settings@yearFraction$fraction),
-      keep_slices = scen@settings@slice@all_slice
+      keep_slices = scen@settings@calendar@slice_share$slice
     )
   }
   # !!!??? add filtering slices here
-  # nslices <- nrow(scen@settings@slice@levels)
-  # scen@settings@slice@levels$share <- scen@settings@slice@levels$share * nslices/8760
-  # scen@settings@slice@slice_share$share <- scen@settings@slice@slice_share$share * nslices/8760
-  #
+  # nslices <- nrow(scen@settings@calendar@timetable)
+  # scen@settings@calendar@timetable$share <- scen@settings@calendar@timetable$share * nslices/8760
+  # scen@settings@calendar@slice_share$share <- scen@settings@calendar@slice_share$share * nslices/8760
+  # browser()
   scen@modInp@parameters[["slice"]] <- .dat2par(
     scen@modInp@parameters[["slice"]],
-    scen@settings@slice@all_slice
+    scen@settings@calendar@slice_share$slice
   )
-  # Fill region
+  # region ####
   scen@modInp@parameters[["region"]] <-
     .dat2par(scen@modInp@parameters[["region"]], scen@settings@region)
 
@@ -123,23 +137,30 @@ interpolate <- function(obj, ...) { #- returns class scenario
   if (is.null(arg$fullsets)) fullsets <- TRUE else fullsets <- arg$fullsets
   scen@status$fullsets <- fullsets # !!!???
 
+  # browser()
   approxim <- list(
     region = scen@settings@region,
-    year = scen@settings@horizon@years,
-    slice = scen@settings@slice,
+    year = scen@settings@horizon@period,
+    # slice = scen@settings@slice,
+    calendar = scen@settings@calendar,
     solver = arg$solver,
     mileStoneYears = scen@settings@horizon@intervals$mid,
     mileStoneForGrowth = xx,
     fullsets = fullsets
   )
-  approxim$ry <- merge(
-    data.frame(region = approxim$region, stringsAsFactors = FALSE),
-    data.frame(year = approxim$mileStoneYears, stringsAsFactors = FALSE)
-  )
-  approxim$rys <- merge(
+  approxim$ry <- merge0(
+    data.table(region = approxim$region, stringsAsFactors = FALSE),
+    data.table(year = approxim$mileStoneYears, stringsAsFactors = FALSE)
+  ) %>% as.data.table
+  approxim$rys <- merge0(
     approxim$ry,
-    data.frame(slice = approxim$slice@all_slice, stringsAsFactors = FALSE)
-  )
+    data.table(
+      slice = approxim$calendar@slice_share$slice,
+      stringsAsFactors = FALSE
+    )
+  ) %>% as.data.table()
+  approxim$ry <- as.data.table(approxim$ry)
+  approxim$rys <- as.data.table(approxim$rys)
 
   # Basic interpolation parameter from config
   approxim$all_comm <-
@@ -163,7 +184,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
-      rep_class <- rbind(rep_class, data.frame(
+      rep_class <- rbind(rep_class, data.table(
         repos = rep(i, length(scen@model@data[[i]]@data)),
         class = sapply(scen@model@data[[i]]@data, class),
         name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
@@ -179,7 +200,7 @@ interpolate <- function(obj, ...) { #- returns class scenario
         # Get prototype
         prot <- new(tmp@inClass$class)
         psb_slot <- getSlots(tmp@inClass$class)
-        psb_slot <- names(psb_slot)[psb_slot == "data.frame"]
+        psb_slot <- names(psb_slot)[psb_slot %in% "data.frame"]
         psb_slot <- psb_slot[!(psb_slot %in% c("defVal", "interpolation"))]
         fl <- sapply(psb_slot, function(x) {
           any(colnames(slot(prot, x)) %in% tmp@inClass$colName)
@@ -192,16 +213,23 @@ interpolate <- function(obj, ...) { #- returns class scenario
         if (tmp@type == "numpar") {
           val_col <- tmp@inClass$colName
         } else {
-          val_col <- c(tmp@inClass$colName, gsub("[.].*", ".fx", tmp@inClass$colName[1]))
+          val_col <- c(tmp@inClass$colName,
+                       gsub("[.].*", ".fx", tmp@inClass$colName[1]))
         }
         # Try find reduce column
         rep_class2 <- rep_class[rep_class$class == tmp@inClass$class, ]
         i <- 0
         while (i < nrow(rep_class2) && length(need_col) != 0) {
           i <- i + 1
-          tbl <- slot(scen@model@data[[rep_class2[i, "repos"]]]@data[[rep_class2[i, "name"]]], slt)
+          tbl <- slot(
+            scen@model@data[[rep_class2[i, "repos"]]]@data[[rep_class2[i, "name"]]], slt)
           if (nrow(tbl) > 0) {
-            need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
+            # need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
+            # tb_nna <- tbl %>% select(all_of(val_col))
+            if (anyDuplicated(colnames(val_col))) browser() # mappings check
+            ii <- apply(!is.na(select(all_of(val_col))), 1, any)
+            ii <- apply(is.na(filter(tbl, ii)), 2, all)
+            need_col <- need_col[ii]
           }
         }
         if (length(need_col) > 0) {
@@ -211,13 +239,18 @@ interpolate <- function(obj, ...) { #- returns class scenario
           scen@modInp@parameters[[pr]]@misc$init_dim <- tmp@dimSets
           scen@modInp@parameters[[pr]]@dimSets <-
             tmp@dimSets[!(tmp@dimSets %in% need_col)]
-          scen@modInp@parameters[[pr]]@data <-
-            scen@modInp@parameters[[pr]]@data[,!(colnames(
-              scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
+          # scen@modInp@parameters[[pr]]@data <-
+          #   scen@modInp@parameters[[pr]]@data[,!(colnames(
+          #     scen@modInp@parameters[[pr]]@data) %in% need_col), drop = FALSE]
+          ii <-
+          scen@modInp@parameters[[pr]]@data <- select(
+            scen@modInp@parameters[[pr]]@data,
+            !(colnames(scen@modInp@parameters[[pr]]@data) %in% need_col)
+          )
           if (arg$verbose >= 1) {
             scen@misc$trimDroppedDimensions <- rbind(
               scen@misc$trimDroppedDimensions,
-              data.frame(parameter = rep(pr, length(need_col)),
+              data.table(parameter = rep(pr, length(need_col)),
                          dimname = need_col, stringsAsFactors = FALSE)
             )
             warning(paste0('Dropping dimension "',
@@ -241,17 +274,18 @@ interpolate <- function(obj, ...) { #- returns class scenario
   }
   approxim$debug <- scen@settings@debug
   # Fill slice level for commodity if not defined
-  scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$slice@default_slice_level)
+  scen <- .fill_default_slice_leve4comm(scen, def.level = approxim$calendar@default_timeframe)
   # Add commodity slice_level map to approxim
   approxim$commodity_slice_map <- .get_map_commodity_slice_map(scen)
   scen@misc$approxim <- approxim
 
   # Fill set list for interpolation and os one
+  # browser()
   scen <- .add_name_for_basic_set(scen, approxim)
   scen@modInp@set <-
     lapply(scen@modInp@parameters[sapply(scen@modInp@parameters,
                                          function(x) x@type == "set")],
-           function(x) .get_data_slot(x)[, 1])
+           function(x) .get_data_slot(x)[[1]])
 
   ## interpolate data by year, slice, ...
   if (arg$echo) cat("Interpolation: ")
@@ -310,9 +344,11 @@ interpolate <- function(obj, ...) { #- returns class scenario
   #   }
   # }
   # Reduce mapping
+  # browser()
   scen@modInp <- .write_mapping(scen@modInp,
     interpolation_count = interpolation_count,
-    interpolation_start_time = interpolation_start_time, len_name = len_name
+    interpolation_start_time = interpolation_start_time,
+    len_name = len_name
   )
 
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
@@ -333,6 +369,28 @@ interpolate <- function(obj, ...) { #- returns class scenario
 
   invisible(scen)
 }
+
+#' @param object object of class model or scenario
+#'
+#' @param ...
+#'
+#' @rdname interpolate
+#' @family interpolate model
+#' @method interpolate model
+#'
+#' @export
+setMethod("interpolate", signature(object = "model"),
+  function(object, ...) {
+    interpolate_model(object, ...)
+})
+
+#' @rdname interpolate
+#' @family interpolate scenario
+#' @method interpolate scenario
+#' @export
+setMethod("interpolate", "scenario", function(object, ...) {
+  interpolate_model(object, ...)
+})
 
 subset_slices <- function(obj, yearFraction = 1, keep_slices = NULL) {
   # subset_hours <- length(SLICE_SUBSET)
@@ -552,7 +610,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       prec <- .add2set(prec, obj@data[[i]]@data[[j]], approxim = approxim)
       if (class(obj@data[[i]]@data[[j]]) == "commodity") {
         if (length(obj@data[[i]]@data[[j]]@slice) == 0) {
-          obj@data[[i]]@data[[j]]@slice <- approxim$slice@default_slice_level
+          obj@data[[i]]@data[[j]]@slice <- approxim$calendar@default_timeframe
         }
         commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@slice
       }
@@ -675,7 +733,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
         #   assign('add0_message', list(tracedata = sys.calls(),
         #     add0_arg = list(obj = scen@modInp, app = scen@model@data[[i]]@data[[j]], approxim = approxim)),
         #     globalenv())
-        #   message('\nError in .obj2modInp function, additional info in "add0_message" object\n')
+        #   message('\nError in .obj2modInp function, additional desc in "add0_message" object\n')
         #   stop(e)
         # })
         time.log.nm[tmlg] <- scen@model@data[[i]]@data[[j]]@name
@@ -696,10 +754,15 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
           nval[i] <- mdinp[[i]][[pr]]@misc$nValues
         }
         if (any(nval != 0)) {
-          scen@modInp@parameters[[pr]]@data <- as.data.frame(rbindlist(lapply(
-            mdinp[nval != 0],
-            function(x) x[[pr]]@data[1:x[[pr]]@misc$nValues, , drop = FALSE]
-          )))
+          scen@modInp@parameters[[pr]]@data <-
+            # as.data.frame(
+              rbindlist(
+                lapply(
+                  mdinp[nval != 0], function(x) {
+                    x[[pr]]@data[1:x[[pr]]@misc$nValues, , drop = FALSE]
+                  })
+                )
+          # )
           scen@modInp@parameters[[pr]]@misc$nValues <- sum(nval)
         }
       } else {
@@ -707,7 +770,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       }
     }
   }
-  scen@misc$time.log <- data.frame(
+  scen@misc$time.log <- data.table(
     name = time.log.nm[seq_len(tmlg)],
     time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE
   )
@@ -794,7 +857,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   add_to_err <- function(err_msg, cns, slt, have, psb) {
     if (!all(have %in% psb)) {
       have <- unique(have[!(have %in% psb)])
-      tmp <- data.frame(value = have, stringsAsFactors = FALSE)
+      tmp <- data.table(value = have, stringsAsFactors = FALSE)
       tmp$slot <- slt
       tmp$constraint <- cns
       return(rbind(err_msg, tmp[, c("constraint", "slot", "value"), drop = FALSE]))
@@ -884,21 +947,27 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     if (!all(prm@dimSets %in% names(lsets))) {
       int_err <- unique(c(int_err, prm@dimSets[!(prm@dimSets %in% names(lsets))]))
     } else {
-      tmp <- .get_data_slot(prm)[, prm@dimSets, drop = FALSE]
+      # tmp <- .get_data_slot(prm)[, prm@dimSets, drop = FALSE]
+      tmp <- .get_data_slot(prm) %>% select(prm@dimSets)
       for (ss in prm@dimSets) {
         unq <- unique(tmp[[ss]])
         fl <- !(unq %in% lsets[[ss]])
         if (any(fl)) {
-          err_dtf <- rbind(err_dtf, data.frame(name = prm@name, set = ss,
-                                               value = unq[fl]))
+          err_dtf <- rbind(err_dtf,
+                           data.table(name = prm@name, set = ss, value = unq[fl]
+                                      )
+                           )
         }
       }
-      tmp <- .get_data_slot(prm)[, colnames(prm@data) != "value", drop = FALSE]
+      # tmp <- .get_data_slot(prm)[, colnames(prm@data) != "value", drop = FALSE]
+      tmp <- .get_data_slot(prm) %>% select(-any_of("value"))
       tmp <- tmp[duplicated(tmp), , drop = FALSE]
+      # tmp <- filter(duplicated(tmp)) # need if_empty check
       if (nrow(tmp) != 0) {
         error_duplicated_value <- rbind(
           error_duplicated_value,
-          data.frame(name = prm@name, value = apply(tmp, 1, paste0, collapse = "."))
+          data.table(name = prm@name,
+                     value = apply(tmp, 1, paste0, collapse = "."))
         )
       }
     }
@@ -909,8 +978,9 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
   if (!is.null(err_dtf)) {
     assign("unknown_sets", err_dtf, globalenv())
+    browser()
     err_msg <- c(
-      "There is (are) unknown sets (see unknown_sets in globalenv)\n",
+      "Unknown sets (see unknown_sets in .globalenv)\n",
       paste0(capture.output(print(head(err_dtf))), collapse = "\n")
     )
     if (nrow(head(err_dtf)) != nrow(err_dtf)) {

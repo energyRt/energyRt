@@ -11,7 +11,7 @@ newCalendar(timetable = NULL, year_fraction = 1, ...)
 
 \item{year_fraction}{numeric scalar, used for validation or calculation (if missing) of the `share` column in the given `timetable`. The default value is `1L` meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to `NULL` will drop the validation.}
 
-\item{...}{optional `name`, `info`, strings, character `default_frame`, and list `misc` with any relevant content. All other arguments will be ignored.}
+\item{...}{optional `name`, `desc`, strings, character `default_timeframe`, and list `misc` with any relevant content. All other arguments will be ignored.}
 }
 \description{
 Generate a new calendar object from

@@ -2,11 +2,11 @@
 % Please edit documentation in R/class-storage.R
 \name{newStorage}
 \alias{newStorage}
-\title{Create new import object}
+\title{Create new storage object}
 \usage{
-\S4method{newStorage}{character}(name, ...)
+newStorage(name, ...)
 }
 \description{
-Create new import object
+Create new storage object
 }
 \concept{storage}

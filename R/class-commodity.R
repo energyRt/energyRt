@@ -14,18 +14,18 @@
 #'
 setClass("commodity",
   representation(
-    name          = "character", # Short name
-    description   = "character", # Details
-    limtype       = "factor",
-    slice         = "character",
-    unit          = "character",
-    emis          = "data.frame", # Emission factors
-    agg           = "data.frame", # Aggregation parameter
-    misc          = "list"
+    name = "character", # Short name
+    desc = "character", # Details
+    limtype = "factor",
+    slice = "character",
+    unit = "character",
+    emis = "data.frame", # Emission factors
+    agg = "data.frame", # Aggregation parameter
+    misc = "list"
   ),
   prototype(
     name = character(),
-    description = character(),
+    desc = character(),
     limtype = factor("LO", levels = c("FX", "UP", "LO")),
     slice = character(),
     unit = character(),
@@ -43,7 +43,7 @@ setClass("commodity",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "commodity", function(.Object, ...) {
@@ -53,7 +53,7 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 #' Create class commodity
 #'
 #' @param name
-#' @param description
+#' @param desc
 #' @param limtype
 #' @param slice
 #' @param unit
@@ -67,16 +67,15 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 #' @examples
 newCommodity <- function(
     name = "",
-    description = "",
+    desc = "",
     limtype = "LO",
     slice = character(),
     unit = character(),
     agg = data.frame(),
     emis = data.frame(),
-    misc = list())
-{
+    misc = list()) {
   .data2slots("commodity", name,
-    description = "",
+    desc = "",
     limtype = "LO",
     slice = slice,
     unit = unit,
@@ -86,8 +85,13 @@ newCommodity <- function(
   )
 }
 
+# update.commodity <- function(obj, ...) .data2slots("commodity", obj, ...)
+
 #' @importFrom stats update
-#' @rdname update
-#' @family update commodity
+#' @rdname commodity
+#' @family commodity update
 #' @export
-update.commodity <- function(obj, ...) .data2slots("commodity", obj, ...)
+setMethod("update", signature(object = "commodity"), function(object, ...) {
+  # update.supply <- function(obj, ...) {
+  .data2slots("commodity", object, ...)
+})

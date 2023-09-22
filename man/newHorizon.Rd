@@ -2,22 +2,25 @@
 % Please edit documentation in R/class-horizon.R
 \name{newHorizon}
 \alias{newHorizon}
+\alias{update,horizon-method}
 \title{Create a new object of class 'horizon'}
 \usage{
 newHorizon(
-  years = NULL,
+  period = NULL,
   intervals = NULL,
-  info = NULL,
+  desc = NULL,
   force_BY_interval_to_1_year = T,
   ...
 )
+
+\S4method{update}{horizon}(object, ..., warn_nodata = TRUE)
 }
 \arguments{
-\item{years}{(optional) integer vector with a range or a sequence of years; will be arranged, gaps will be filled. If missing}
+\item{period}{(optional) integer vector with a range or a sequence of period; will be arranged, gaps will be filled. If missing}
 
-\item{intervals}{(optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled period in years.}
+\item{intervals}{(optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.}
 
-\item{info}{character, a comment or description.}
+\item{desc}{character, a comment or description.}
 
 \item{force_BY_interval_to_1_year}{logical, if TRUE (default), the base-year (first) interval will be forced to one year.}
 
@@ -28,28 +31,28 @@ Create a new object of class 'horizon'
 }
 \examples{
 newHorizon(2020:2050)
-newHorizon(2020:2030, info = "One-year intervals")
-newHorizon(2020:2030, c(1, 2, 5, 10), info = "Different length intervals")
+newHorizon(2020:2030, desc = "One-year intervals")
+newHorizon(2020:2030, c(1, 2, 5, 10), desc = "Different length intervals")
 newHorizon(2020:2035, c(1, 2, 5, 5, 5))
 newHorizon(2020:2050, c(1, 2, 5, 7, 1))
 newHorizon(intervals = data.frame(
   start = c(2030, 2031, 2034),
   mid =   c(2030, 2032, 2037),
   end =   c(2030, 2033, 2040)),
-  info = "Explicit assignment of intervals via data.frame"
+  desc = "Explicit assignment of intervals via data.frame"
   )
 
-newHorizon(years = 2020:2050,
+newHorizon(period = 2020:2050,
            intervals = data.frame(
              start = c(2030, 2031, 2034),
              mid =   c(2030, 2032, 2037),
              end =   c(2030, 2033, 2040)),
-             info = "The years will be trimmed to the scope of intervals")
+             desc = "The period will be trimmed to the scope of intervals")
 
 newHorizon(2020:2050, c(3, 2, 5, 10),
-           info = "Pay attention to the length of the first interval")
+           desc = "Pay attention to the length of the first interval")
 
-newHorizon(years = 2020:2040,
+newHorizon(period = 2020:2040,
            intervals = data.frame(
              start = c(2030, 2032, 2035),
              mid =   c(2031, 2033, 2037),
@@ -60,3 +63,4 @@ Other horizon:
 \code{\link{horizon-class}}
 }
 \concept{horizon}
+\concept{update horizon}

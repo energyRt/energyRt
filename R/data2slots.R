@@ -1,6 +1,6 @@
 #' An internal function to add data to slots of a new S4-class object or update a given one.
 #'
-#' @description
+#' @desc
 #' This function creates and adds data/parameters to `energyRt` classes. It is recommended to to use wrapper functions such as `newTechnology`, `newCommodity`, etc. with guided names of each class slots.
 #'
 #' @param class_name character, name of the class to create.
@@ -11,11 +11,11 @@
 #' @param update logical, if an object of class `class_name` is supplied (in `x`) then `update` must be `TRUE`, and the object will be updated with the given data in `...`. Otherwise, if the `x` is character, the `update` should be `FALSE`, and the new object will be created.
 #'
 #' @return created or updated object with the added/updated data in the object slots.
-#'
+#' @noRd
 .data2slots <- function(class_name = NULL, x, ...,
                         ignore_args = NULL,
                         ignore_classes = NULL,
-                        update = !is.character(x)) {
+                        update = !is.character(x), warn_nodata = TRUE) {
   # alternative names: data2class, add2slots, fit2slots, ...
   # browser()
   if (update) {
@@ -29,8 +29,12 @@
       )
     }
     obj <- x
-    try({x <- obj@name})
     class_name = class(obj)
+    if ("name" %in% slotNames(class_name)) {
+      x <- obj@name
+    } else {
+      x <- ""
+    }
   } else {
     stopifnot(is.character(class_name))
     obj <- new(class_name)
@@ -40,7 +44,7 @@
   if (!is.null(ignore_args)) arg <- arg[!(names(arg) %in% ignore_args)]
   if (!is.null(ignore_classes)) arg <- arg[!(sapply(arg, class) %in%
                                                ignore_classes)]
-  if (class_name != "config") try({obj@name <- x})
+  if ("name" %in% slotNames(class_name)) {obj@name <- x}
   if (length(arg) != 0) {
     # if (any(names(arg) == "name")) stop('Duplicated parameter "name"')
     if (is.null(names(arg)) || any(names(arg) == "")) stop("Unnamed parameters")
@@ -51,11 +55,13 @@
     arg <- arg[!sapply(arg, is.null)]
     if (any(!(names(arg) %in% names(slots)))) {
       # check consistency of the data in `...` with the object slots
-      stop(
-        'Unidentified slots: "',
-        paste(names(arg)[!(names(arg) %in% names(slots))], collapse = '", "'),
-        '", in class = ', class_name, ", object x = ", x
-      )
+      if (warn_nodata) {
+        warning('Unidentified slots: "',
+                paste(names(arg)[!(names(arg) %in% names(slots))],
+                      collapse = '", "'),
+                '", in class = ', class_name, ", object x = ", x)
+      }
+      return(obj)
     }
     # Add data from `...`, s - slot, dat - data in the argument with s-name
     for (s in names(arg)) {
@@ -81,21 +87,22 @@
             nn <- 1:nrow(dat)
             slot(obj, s)[nn, ] <- NA
             for (i in names(dat)) {
-              # fill-in the data by columns
+              # fill-in the data by columns !!! Check ANNUAL/HOUR
+              # browser()
               if (is.factor(slot(obj, s)[, i, drop = FALSE]) ||
-                  is.factor(dat[, i])) {
+                  is.factor(dat[[i]])) {
                 # coerce factors to characters
-                slot(obj, s)[nn, i] <- as.character(dat[, i])
+                slot(obj, s)[[i]][nn] <- as.character(dat[[i]])
               } else {
                 # add check of type of columns
-                slot_column_class <- class(slot(obj, s)[nn, i])
-                data_column_class <- class(dat[, i])
+                slot_column_class <- class(slot(obj, s)[[i]][nn])
+                data_column_class <- class(dat[[i]])
                 if (!any(data_column_class %in% slot_column_class)) {
                   # allow bounds-class (inheritance) format
-                  if (is.numeric(slot(obj, s)[nn, i]) & is.numeric(dat[, i])) {
+                  if (is.numeric(slot(obj, s)[[i]][nn]) & is.numeric(dat[[i]])) {
                     # coerce-able between numeric classes, not an error
-                    dat[, i] <- as(dat[, i], slot_column_class)
-                    data_column_class <- class(dat[, i])
+                    dat[[i]] <- as(dat[[i]], slot_column_class)
+                    data_column_class <- class(dat[[i]])
                   } else {
                     # error
                     stop(
@@ -113,9 +120,9 @@
                     data_column_class, ") and the expected format (",
                     slot_column_class, ", coercing."
                   )
-                  dat[, i] <- as(dat[, i], slot_column_class) # try to coerce
+                  dat[[i]] <- as(dat[[i]], slot_column_class) # try to coerce
                 }
-                slot(obj, s)[nn, i] <- dat[, i]
+                slot(obj, s)[[i]][nn] <- dat[[i]]
               }
             }
           }
@@ -151,7 +158,7 @@
             nn <- 1:hh[1]
             slot(obj, s)[nn, ] <- NA
             for (i in names(dat)) {
-              slot(obj, s)[nn, i] <- dat[[i]]
+              slot(obj, s)[[i]][nn] <- dat[[i]]
             }
           }
         } else if (any(colnames(slot(obj, s)) == s) && length(dat) == 1) {

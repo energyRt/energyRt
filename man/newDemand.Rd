@@ -6,7 +6,7 @@
 \usage{
 newDemand(
   name = "",
-  description = character(),
+  desc = character(),
   commodity = character(),
   unit = character(),
   dem = data.frame(),

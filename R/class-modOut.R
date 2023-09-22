@@ -31,7 +31,7 @@ setClass("modOut",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "modOut", function(.Object, ...) {

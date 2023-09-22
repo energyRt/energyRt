@@ -1,7 +1,7 @@
 #' Class 'costs'
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot desc character.
 #' @slot variable character.
 #' @slot subset data.frame.
 #' @slot mult data.frame.
@@ -12,7 +12,7 @@
 setClass("costs",
   representation(
     name = "character",
-    description = "character", # description
+    desc = "character", # desc
     variable = "character",
     subset = "data.frame",
     mult = "data.frame",
@@ -21,29 +21,30 @@ setClass("costs",
   ),
   prototype(
     name = NULL,
-    description = "", # description
+    desc = "", # desc
     variable = character(),
     subset = data.frame(),
     mult = data.frame(),
     # ! Misc
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 setMethod("initialize", "costs", function(.Object, ...) {
   .Object
 })
 
 #' @export
-newCosts <- function(name, variable, description = "", mult = NULL, subset = NULL) {
+newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
   obj <- new("costs")
   obj@name <- name
-  obj@description <- description
+  obj@desc <- desc
 
   # Add variable
   sets <- .variable_set[[variable]]
   if (is.null(sets)) {
-    stop(paste0('There are unknown variable "', variable, '" in cost "', name, '".'))
+    stop(paste0('There are unknown variable "', variable, '" in cost "', name,
+                '".'))
   }
   # if (anyDuplicated(sets))
   #       stop(paste0('Add cost to variable with duplicated sets is not allowed now (cost "', name, '").'))
@@ -51,7 +52,8 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
     sets[duplicated(sets)] <- paste0(sets[duplicated(sets)], 2)
   }
   if (sum(sets %in% c("region", "year")) != 2) {
-    stop(paste0('Add cost to variable without sets region & year is not allowed (cost "', name, '").'))
+    stop(paste0('Add cost to variable without sets region & year is not ',
+                'allowed (cost "', name, '").'))
   }
   obj@variable <- variable
 
@@ -70,7 +72,8 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
       bug <- colnames(subset)[!(colnames(subset) %in% sets)]
       stop(paste0(
         "There ", c("is", "are")[1 + length(bug) != 1], " unnecessary column",
-        "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'), '" in subset (cost "', name, '").'
+        "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'),
+        '" in subset (cost "', name, '").'
       ))
     }
     if (!is.data.frame(subset)) {
@@ -95,7 +98,8 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
         bug <- colnames(mult)[!(colnames(mult) %in% c("value", sets))]
         stop(paste0(
           "There ", c("is", "are")[1 + length(bug) != 1], " unnecessary column",
-          "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'), '" in mult (cost "', name, '").'
+          "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'),
+          '" in mult (cost "', name, '").'
         ))
       }
       mult <- mult[, !apply(is.na(mult), 2, all), drop = FALSE]
@@ -129,7 +133,8 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
     stop(paste0('Cost "', stm@name, '" error: ', x))
   }
   get.all.child <- function(x) {
-    unique(c(x, c(approxim$slice@all_parent_child[approxim$slice@all_parent_child$parent %in% x, "child"])))
+    unique(c(x, c(approxim$calendar@slice_ancestry[
+      approxim$calendar@slice_ancestry$parent %in% x, "child"])))
   }
   have.all.set <- function(x, name) {
     return(any(is.na(x)) || (name != "slice" && all(approxim[[name]] %in% x)))
@@ -145,9 +150,15 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
   # Generate mult
   if (nrow(stm@mult) != 0) {
     # browser()
-    approxim2 <- approxim[unique(c(colnames(stm@mult)[colnames(stm@mult) %in% names(approxim)], "fullsets", "solver", "year"))]
-    if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$slice@all_slice
-    if (!is.null(approxim2$slice2)) approxim2$slice2 <- approxim2$slice@all_slice2
+    approxim2 <- approxim[
+      unique(c(colnames(stm@mult)[colnames(stm@mult) %in% names(approxim)],
+               "fullsets", "solver", "year"))]
+    if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$calendar@slice_share$slice
+    if (!is.null(approxim2$slice2)) {
+      # approxim2$slice2 <- approxim2$slice@all__slice2 #???
+      browser()
+      approxim2$slice2 <- approxim2$calendar@slice_share$slice #???
+    }
     if (nrow(stm@subset) != 0) {
       same <- colnames(stm@subset)[colnames(stm@subset) %in% colnames(stm@mult)]
       same <- same[!apply(is.na(stm@subset[, same, drop = FALSE]), 2, any)]
@@ -166,7 +177,9 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
     yy <- .interp_numpar(stm@mult, "value", xx, approxim2)
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     sss <- ""
-    if (length(mult_sets) != 0) sss <- paste0("(", paste0(mult_sets, collapse = '", "'), ")")
+    if (length(mult_sets) != 0) sss <- paste0("(", paste0(mult_sets,
+                                                          collapse = '", "'),
+                                              ")")
     mult_txt <- paste0(xx@name, sss, " * ")
   } else {
     mult_txt <- paste0(stm@defVal, " * ")
@@ -177,7 +190,7 @@ newCosts <- function(name, variable, description = "", mult = NULL, subset = NUL
     fl <- apply(!is.na(stm@subset), 1, all)
     subset <- stm@subset[fl, , drop = FALSE]
     approxim2 <- approxim[colnames(stm@subset)]
-    if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$slice@all_slice
+    if (!is.null(approxim2$slice)) approxim2$slice <- approxim2$calendar@slice_share$slice
     if (any(!fl)) {
       subset_na <- stm@subset[!fl, , drop = FALSE]
       for (i in seq_len(ncol(subset_na))[apply(is.na(subset_na), 2, any)]) {

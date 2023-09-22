@@ -1,8 +1,8 @@
-# Functions and methods to solve model and scenario objects
-# The multiple methods in this file aim adopting the
+# Solve model and scenario objects ####
+# Functions and methods. Multiple methods in this file aim adopting the
 # generic `base::solve(a, b, ...)` method to `solve(obj, name, ...)`
 
-#' Solve a model
+#' Functions and methods to solve model and scenario objects
 #'
 #' The function interpolates model, writes the script in a directory, runs the external software to solve the model, reads the solution results, and returns a scenario object with the solution.
 #'
@@ -15,6 +15,8 @@
 #' @param tmp.dir
 #' @param tmp.del
 #' @param ...
+#'
+#' @seealso [read_solution()]
 #'
 #' @rdname solve
 #' @return
@@ -96,7 +98,7 @@ solve_model <- function(
   if (is.null(tmp.dir) || tmp.dir == "") stop("Incorrect directory tmp.dir: ", tmp.del)
   if (arg$echo) {
     tmp.msg <- sub(getwd(), "", tmp.dir)
-    cat("Scenario directory:\n", tmp.msg, "\n")
+    cat("Scenario directory: ", tmp.msg, "\n")
     cat("Starting time: ", format(Sys.time()), "\n")
   }
   scen <- interpolate(obj, name = name)
@@ -132,12 +134,14 @@ solve.model <- function(a, b, ...) {
   do.call(solve_model, arg)
 }
 
+## solve(model, character) ####
 #' @rdname solve
 #' @export
 setMethod("solve", signature(a = "model", b = "character"), solve.model)
 
-#' @rdname solve
+## solve(model, missing) ####
 #' @export
+#' @noRd
 setMethod("solve", signature(a = "model", b = "missing"), solve.model)
 
 # .S3method("solve", "model", .solve_model)
@@ -146,7 +150,6 @@ setMethod("solve", signature(a = "model", b = "missing"), solve.model)
 #'
 #' @export
 #' @rdname solve
-#'
 solve_scenario <- function(obj = NULL, tmp.dir = NULL, solver = NULL, ...) {
   scen <- obj
   # browser()
@@ -211,13 +214,13 @@ solve.scenario <- function(a, b, ...) {
 setMethod("solve", signature(a = "scenario", b = "character"), solve.scenario)
 
 ## solve(scenario, missing) ####
-#' @rdname solve
 #' @export
+#' @noRd
 setMethod("solve", signature(a = "scenario", b = "missing"), solve.scenario)
 
 ## solve(missing, missing) ####
-#' @rdname solve
 #' @export
+#' @noRd
 setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
   # browser()
   arg <- list(...)
@@ -246,9 +249,10 @@ setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
   # only.listing = FALSE (!depreciated?) generate only listing file (works for gams only)
   # read.solution = TRUE read result
   # tmp.del delete results
+  # browser()
   arg <- list(tmp.dir = tmp.dir, solver = solver, ...)
   if (is.null(arg$tmp.dir)) {
-
+    browser()
   }
   if (is.null(arg$echo)) arg$echo <- TRUE
   if (is.null(arg$solver)) {
@@ -332,7 +336,8 @@ setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
     if (any(grep("^gams$", scen@settings@solver$lang, ignore.case = TRUE))) {
       if (is.null(arg$trim)) arg$trim <- FALSE
       scen <- .write_model_GAMS(arg, scen, trim = arg$trim)
-    } else if (any(grep("^(glpk|cbcb)$", scen@settings@solver$lang, ignore.case = TRUE))) {
+    } else if (any(grep("^(glpk|cbcb)$", scen@settings@solver$lang,
+                        ignore.case = TRUE))) {
       scen <- .write_model_GLPK_CBC(arg, scen)
     } else if (any(grep("^pyomo", scen@settings@solver$lang, ignore.case = TRUE))) {
       scen <- .write_model_PYOMO(arg, scen)

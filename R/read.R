@@ -1,6 +1,18 @@
-# read <- function(...) UseMethod("read")
-
-read.scenario <- function(scen, ...) {
+#' Read solution
+#'
+#' The function and method read outputs of solved model/scenario and return the scenario object populated with variables data.
+#'
+#' @param obj scenario object
+#' @param ... optional tmp.dir (if missing in the scenario object or to replace the saved path)
+#'
+#' @return
+#' @export
+#' @seealso [solve()] to run the script, solve the scenario. [write_sc()] to read
+#'
+#' @examples
+#' @rdname read
+read_solution <- function(obj, ...) {
+  scen <- obj
   ## arguments
   # scen
   # readOutputFunction = read.csv (may use data.table::fread)
@@ -10,7 +22,10 @@ read.scenario <- function(scen, ...) {
 
   read_result_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
-  if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
+  # if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
+  if (is.null(arg$readOutputFunction)) {
+    arg$readOutputFunction <- data.table::fread
+  }
   if (is.null(arg$tmp.dir)) {
     arg$tmp.dir <- scen@misc$tmp.dir
     if (is.null(arg$tmp.dir)) {
@@ -44,6 +59,8 @@ read.scenario <- function(scen, ...) {
   rr$set_vec <- ss
   if (is.null(scen@settings@solver$import_format)) scen@settings@solver$import_format <- "csv" # !!! workaround
   if (scen@settings@solver$import_format == "gdx") {
+    # .check_load_gdxlib()
+    .check_load_gdxtools()
     # Read variables gdx
     gd <- gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
     for (i in c(vrb_list, vrb_list2)) {
@@ -61,9 +78,10 @@ read.scenario <- function(scen, ...) {
           }
           # Save all data with all levels
           if (colnames(jj)[j] != "year") {
-            jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+            jj[[j]] <- factor(jj[[j]],
+                              levels = sort(rr$set_vec[[colnames(jj)[j]]]))
           } else {
-            jj[, j] <- as.integer(jj[, j])
+            jj[[j]] <- as.integer(jj[[j]])
           }
         }
         rr$variables[[i]] <- jj
@@ -85,7 +103,7 @@ read.scenario <- function(scen, ...) {
           }
           # Save all data with all levels
           if (colnames(jj)[j] != "year") {
-            jj[, j] <- factor(jj[, j], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+            jj[[j]] <- factor(jj[[j]], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
           }
         }
         rr$variables[[i]] <- jj
@@ -140,14 +158,21 @@ read.scenario <- function(scen, ...) {
     newcap$newcap <- newcap$value
     newcap$value <- NULL
 
-    salvage <- merge(merge(newcap, merge(olife, invcost)), discount, all.x = TRUE)
+    salvage <-
+      merge0(
+        merge0(
+          newcap,
+          merge0(olife, invcost)),
+        discount,
+        all.x = TRUE)
     end_year <- max(.get_data_slot(scen@modInp@parameters$mEndMilestone)$yearp)
-    salvage <- merge(salvage, .get_data_slot(scen@modInp@parameters$mStartMilestone))
+    salvage <- merge0(salvage,
+                     .get_data_slot(scen@modInp@parameters$mStartMilestone))
     salvage$start <- salvage$yearp
     salvage$yearp <- NULL
-    if (F) {
+    # if (F) {
       # !!! unfinished
-      browser()
+      # browser()
       salvage <- salvage[salvage$start + salvage$olife > end_year, ]
 
       salvage$value <- salvage$newcap * salvage$invcost *
@@ -161,8 +186,8 @@ read.scenario <- function(scen, ...) {
                               salvage$olife)[fl]
 
       salvage[, c(3, 2, 1, 9)]
-    }
-    NULL # temporary
+    # }
+    # NULL # temporary
   }
   if (scen@modOut@stage == "solved") {
     # Postprocessing
@@ -170,7 +195,8 @@ read.scenario <- function(scen, ...) {
     scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, "Storage")
     scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, "Trade")
     pDummyImportCost <- .get_data_slot(scen@modInp@parameters$pDummyImportCost)
-    vDummyImportCost <- merge(pDummyImportCost,
+    # browser()
+    vDummyImportCost <- merge0(pDummyImportCost,
                               scen@modOut@variables$vDummyImport,
                               by = c("comm", "region", "year", "slice")[
                                 c("comm", "region", "year", "slice") %in%
@@ -180,7 +206,7 @@ read.scenario <- function(scen, ...) {
     vDummyImportCost$value.y <- NULL
     scen@modOut@variables$vDummyImportCost <- vDummyImportCost
     pDummyExportCost <- .get_data_slot(scen@modInp@parameters$pDummyExportCost)
-    vDummyExportCost <- merge(pDummyExportCost, scen@modOut@variables$vDummyExport,
+    vDummyExportCost <- merge0(pDummyExportCost, scen@modOut@variables$vDummyExport,
       by = c("comm", "region", "year", "slice")[c("comm", "region", "year", "slice") %in% colnames(pDummyExportCost)]
     )
     vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y
@@ -193,10 +219,11 @@ read.scenario <- function(scen, ...) {
     tmp$comm <- tmp$comm2
     tmp$comm2 <- NULL
     pTechEmisComm <- .get_data_slot(scen@modInp@parameters$pTechEmisComm)
-    vTechEmsFuel <- merge(merge(pTechEmisComm,
-      scen@modOut@variables$vTechInp,
-      by = c("tech", "comm")
-    ), tmp, by = "comm")
+    vTechEmsFuel <-
+      merge0(
+        merge0(pTechEmisComm, scen@modOut@variables$vTechInp,
+               by = c("tech", "comm")),
+        tmp, by = "comm")
     vTechEmsFuel$comm <- vTechEmsFuel$commp
     if (nrow(vTechEmsFuel) > 0) {
       vTechEmsFuel <- aggregate(
@@ -229,7 +256,7 @@ read.scenario <- function(scen, ...) {
         }
         if (nrow(in_dat) != 0 &&
             !is.null(scen@modInp@parameters[[paste0("mCosts", tmp@name)]])) {
-          in_dat <- merge(in_dat,
+          in_dat <- merge0(in_dat,
                           .get_data_slot(
                             scen@modInp@parameters[[paste0("mCosts", tmp@name)]]))
         }
@@ -241,7 +268,7 @@ read.scenario <- function(scen, ...) {
             in_dat$value <- in_dat$value * prm$value
           } else {
             colnames(prm)[ncol(prm)] <- "par"
-            in_dat <- merge(in_dat, prm)
+            in_dat <- merge0(in_dat, prm)
             in_dat$value <- in_dat$value * in_dat$par
             in_dat$par <- NULL
           }
@@ -266,9 +293,9 @@ read.scenario <- function(scen, ...) {
 #' @rdname read
 #' @method read scenario
 #' @export
-setMethod("read", "scenario", read.scenario)
+setMethod("read", "scenario", read_solution)
 
-read_solution <- read.scenario
+# read_solution <- read.scenario
 # read.scenario <- function(scen, ...) read_solution(scen, ...)
 # .S3method("read", "scenario", read_solution)
 

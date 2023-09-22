@@ -100,7 +100,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @param newValues revalue sets, named character vector or list with new values as values, and old values as names - the input parameter to revalueSets function. The operation is performed after merging the data (merge parameter).
 #' @param ignore.case grepl parameter if regular expressions are used in '...' or 'name_'.
 #' @param stringsAsFactors logical, should the sets values be converted to factors?
-#' @param yearsAsFactors logical, should years  be converted to factors? Set 'year' is integer by default.
+#' @param yearsAsFactors logical, should `year` be converted to factors? Set 'year' is integer by default.
 #' @param scenNameInList logical, should the name of the scenarios be used if not provided in the list with several scenarios?
 #' @param verbose
 #'
@@ -296,7 +296,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
     }
   }
 
-  ## Temporary solution for non-mileStone years data in parameters
+  ## Temporary solution for non-mileStone period data in parameters
   # msy <- scen[[1]]@model@config@horizon@intervals$mid
   # if (length(ll) > 0) {
   #   for (i in 1:length(ll)) {
@@ -381,14 +381,14 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       }
       if (stringsAsFactors) {
         for (i in 1:length(names(dat))) {
-          if (is.character(dat[, i])) {
-            dat[, i] <- .crs2fct(dat[, i])
+          if (is.character(dat[[i]])) {
+            dat[[i]] <- .crs2fct(dat[[i]])
           }
         }
       } else {
         for (i in 1:length(names(dat))) {
-          if (is.factor(dat[, i])) {
-            dat[, i] <- as.character(dat[, i])
+          if (is.factor(dat[[i]])) {
+            dat[[i]] <- as.character(dat[[i]])
           }
         }
       }

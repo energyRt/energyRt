@@ -8,6 +8,7 @@
 #' @return
 #'
 #' @examples
+#' @noRd
 .interpolation0 <- function(dtf, parameter, defVal, arg) {
   # browser()
   # dtf <- interpolation_message$interpolation0_arg$dtf;
@@ -16,6 +17,8 @@
   # arg <- interpolation_message$interpolation0_arg$arg;
   # Remove not used approxim
   # print()
+  # browser()
+  if (parameter == "DEBUG") browser() # DEBUG
   if (length(defVal) != 1) stop("defVal value is not defined")
   if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
 
@@ -46,29 +49,37 @@
   prior <- prior[prior %in% colnames(dtf)[-ncol(dtf)]]
   true_prior <- true_prior[true_prior %in% prior]
   approxim <- approxim[names(approxim) %in% prior]
-  # Remove excess column
-  dtf <- dtf[, colnames(dtf) %in% c(prior, parameter), drop = FALSE]
+  # drop excess columns
+  # dtf <- dtf[, colnames(dtf) %in% c(prior, parameter), drop = FALSE]
+  if (anyDuplicated(c(prior, parameter))) browser() # DEBUG-
+  dtf <- select(dtf, all_of(c(prior, parameter)))
   # Sort column
-  dtf <- dtf[, c(
-    prior[prior %in% colnames(dtf)],
-    colnames(dtf)[ncol(dtf)]
-  ), drop = FALSE]
-  dtf <- dtf[!is.na(dtf[, parameter]), , drop = FALSE]
-  if (anyDuplicated(dtf[, -ncol(dtf)])) {
-    jjj <- sys.status()
-    kkk <- sapply(jjj$sys.calls, function(x) any(grep(".obj2modInp", x[1])))
-    if (sum(kkk) == 0) {
+  # dtf <- dtf[, c(
+  #   prior[prior %in% colnames(dtf)],
+  #   colnames(dtf)[ncol(dtf)]
+  # ), drop = FALSE]
+  col_ord <- c(prior[prior %in% colnames(dtf)], colnames(dtf)[ncol(dtf)])
+  setcolorder(dtf, col_ord)
+  # dtf <- dtf[!is.na(dtf[[parameter]]), , drop = FALSE]
+  dtf <- dtf %>% filter(!is.na(dtf[[parameter]]))
+  ii <- select(dtf, -ncol(dtf)) %>% duplicated(fromLast = TRUE)
+  # if (anyDuplicated(dtf[, -ncol(dtf)])) {
+  if (any(ii)) {
+    sstat <- sys.status()
+    kstat <- sapply(sstat$sys.calls, function(x) any(grep(".obj2modInp", x[1])))
+    if (sum(kstat) == 0) {
       warning("Duplicated values found and dropped. Use findDuplicates()",
               " function for the identification.")
     } else {
-      tst_env <- jjj$sys.frames[[max(seq_along(kkk)[kkk])]]
+      tst_env <- sstat$sys.frames[[max(seq_along(kstat)[kstat])]]
       tst_exm <- get("app", tst_env)
       warning(paste0(
         '"Duplicated values found (class "', class(tst_exm), '", name "',
         tst_exm@name, '", parameter: "', parameter, '") and dropped.'
       ))
     }
-    dtf <- dtf[!duplicated(dtf[, -ncol(dtf)], fromLast = TRUE), ]
+    # dtf <- dtf[!duplicated(dtf[, -ncol(dtf)], fromLast = TRUE), ]
+    dtf <- dtf %>% filter(!ii)
   }
   if (nrow(dtf) == 0 && (is.null(arg$all) || !arg$all)) {
     return(NULL)
@@ -85,7 +96,8 @@
       approxim2$year <- arg$approxim$year
     }
   }
-  tmp_nona <- (!is.na(dtf[, -ncol(dtf), drop = FALSE]))
+  # tmp_nona <- (!is.na(dtf[, -ncol(dtf), drop = FALSE]))
+  tmp_nona <- !is.na(select(dtf, -ncol(dtf)))
   if (all(tmp_nona)) { # There is not NA column
     possible_comb <- prod(sapply(approxim2, length))
     if (nrow(dtf) >= possible_comb) {
@@ -101,17 +113,22 @@
     f1 <- apply(tmp_nona, 2, any)
     f2 <- apply(tmp_nona, 2, all)
     if (all(f1 == f2)) { # Could be small appr
-      obj2 <- dtf[, c(f1, TRUE), drop = FALSE]
+      # obj2 <- dtf[, c(f1, TRUE), drop = FALSE]
+      if (anyDuplicated(colnames(dtf))) browser() # mappings check
+      obj2 <- dtf %>% select(all_of(colnames(dtf)[c(f1, TRUE)]))
       for (i in colnames(obj2)[-ncol(obj2)]) {
         obj2 <- obj2[obj2[[i]] %in% approxim2[[i]], , drop = FALSE]
       }
       if (ncol(obj2) == 1 || nrow(obj2) == prod(
         sapply(approxim2[names(obj2)[-ncol(obj2)]], length)
       )) { # numpar approximation is applicable
+        # browser()
         for (i in names(dtf)[c(!f1, FALSE)]) {
           obj2 <- merge0(obj2, approxim2[i])
         }
-        return(obj2[, colnames(dtf)])
+        # return(obj2[, colnames(dtf)])
+        if (anyDuplicated(colnames(dtf))) browser() # mappings check
+        return(select(obj2, all_of(colnames(dtf))))
       }
     }
   }
@@ -127,30 +144,40 @@
     if (any(sapply(apr, length) == 0)) {
       return(NULL)
     }
-    dd <- as.data.frame.table(array(NA,
-      dim = sapply(apr, length),
-      dimnames = apr
-    ), stringsAsFactors = FALSE, responseName = parameter)
-    dd <- dd[, c(prior, parameter), drop = FALSE]
+    # browser()
+    dd <- as.data.frame.table(
+      array(NA, dim = sapply(apr, length), dimnames = apr),
+      stringsAsFactors = FALSE, responseName = parameter)
+    # browser()
+    # dd <- dd[, c(prior, parameter), drop = FALSE]
+    if (anyDuplicated(c(prior, parameter))) browser() # mappings check
+    dd <- dd %>% select(all_of(c(prior, parameter)))
   } else {
-    dd <- as.data.frame.table(array(NA,
-      dim = sapply(approxim, length),
-      dimnames = approxim
-    ), stringsAsFactors = FALSE, responseName = parameter)
+    dd <- as.data.frame.table(
+      array(NA, dim = sapply(approxim, length), dimnames = approxim),
+      stringsAsFactors = FALSE, responseName = parameter)
   }
   if (nrow(dtf) != 0) {
     ii <- 2^(seq(length.out = ncol(dtf) - 1) - 1)
-    KK <- colSums(ii * t(is.na(dtf[, true_prior[true_prior %in% prior],
-                                   drop = FALSE])))
-    dobj <- as.matrix(dtf[, -ncol(dtf), drop = FALSE])
-    ddd <- t(as.matrix(dd[, -ncol(dd), drop = FALSE]))
-    dff <- dd[, -ncol(dd), drop = FALSE]
-    dtf <- dtf[, c(colnames(dff), parameter), drop = FALSE]
-    for (i in 1:ncol(dff)) dff[, i] <- as.factor(as.character(dff[, i]))
-    for (i in 1:ncol(dff)) dtf[, i] <- factor(as.character(dtf[[i]]),
-                                              levels = levels(dff[, i]))
-    for (i in 1:ncol(dff)) dtf[, i] <- as.numeric(dtf[[i]])
-    for (i in 1:ncol(dff)) dff[, i] <- as.numeric(dff[, i])
+    # browser()
+    # KK <- colSums(ii * t(is.na(dtf[, true_prior[true_prior %in% prior],
+    #                                drop = FALSE])))
+    sel_col <- true_prior[true_prior %in% prior]
+    if (anyDuplicated(sel_col)) browser() # mappings check
+    KK <- colSums(ii * t(is.na(select(dtf, all_of(sel_col)))))
+    # dobj <- as.matrix(dtf[, -ncol(dtf), drop = FALSE])
+    dobj <- as.matrix(select(dtf, -ncol(dtf)))
+    # ddd <- t(as.matrix(dd[, -ncol(dd), drop = FALSE]))
+    ddd <- t(as.matrix(select(dd, -ncol(dd))))
+    # dff <- dd[, -ncol(dd), drop = FALSE]
+    dff <- dd %>% select(-ncol(dd))
+    # dtf <- dtf[, c(colnames(dff), parameter), drop = FALSE]
+    dtf <- dtf %>% select(all_of(c(colnames(dff), parameter)))
+    for (i in 1:ncol(dff)) dff[[i]] <- as.factor(as.character(dff[[i]]))
+    for (i in 1:ncol(dff)) dtf[[i]] <- factor(as.character(dtf[[i]]),
+                                              levels = levels(dff[[i]]))
+    for (i in 1:ncol(dff)) dtf[[i]] <- as.numeric(dtf[[i]])
+    for (i in 1:ncol(dff)) dff[[i]] <- as.numeric(dff[[i]])
     hh <- sapply(dff, max)
     hh <- c(1, cumprod(hh[-length(hh)]))
     dff <- as.matrix(dff)
@@ -166,21 +193,25 @@
       mx <- !is.na(dtf[fl[1], -ncol(dtf)])
       # gg <- rowSums(dtf[fl, -ncol(dtf), drop = FALSE])
       r1 <- rowSums(dff[, mx, drop = FALSE])
+      # r1 <- rowSums(select(dff, all_of(names(dff)[mx])))
       r2 <- rowSums(dtf[fl, c(mx, FALSE), drop = FALSE])
+      # r2 <- rowSums(select(dtf[fl,], names(dtf)[c(mx, FALSE)]))
       ll <- dtf[fl, ncol(dtf)]
+      # ll <- dtf[[ncol(dtf)]][fl]
       names(ll) <- r2
       nn <- (r1 %in% r2)
-      dd[nn, ncol(dd)] <- ll[as.character(r1[nn])]
+      # dd[nn, ncol(dd)] <- ll[as.character(r1[nn])]
+      dd[[ncol(dd)]][nn] <- ll[as.character(r1[nn])]
     }
   }
   # Interpolation
   if (!there.are.year) {
-    dd[is.na(dd[, parameter]), parameter] <- defVal
+    dd[[parameter]][is.na(dd[[parameter]])] <- defVal
   } else {
-    if (all(is.na(dd[, parameter]))) {
-      dd[is.na(dd[, parameter]), parameter] <- defVal
-    } else if (any(is.na(dd[, parameter]))) {
-      mx <- matrix(dd[, parameter], length(approxim$year))
+    if (all(is.na(dd[[parameter]]))) {
+      dd[[parameter]][is.na(dd[[parameter]])] <- defVal
+    } else if (any(is.na(dd[[parameter]]))) {
+      mx <- matrix(dd[[parameter]], length(approxim$year))
       f1 <- apply(!is.na(mx), 2, all)
       if (any(!f1)) {
         gg <- seq(along = f1)[!f1][apply(is.na(mx[, !f1, drop = FALSE]), 2, all)]
@@ -227,10 +258,11 @@
           f1[ll] <- TRUE
         }
       }
-      dd[, parameter] <- c(mx)
+      dd[[parameter]] <- c(mx)
     }
     if (any(colnames(dtf)[-ncol(dtf)] == "slice")) {
-      dd <- dd[, c(true_prior, parameter), drop = FALSE]
+      # dd <- dd[, c(true_prior, parameter), drop = FALSE]
+      dd <- dd %>% select(all_of(c(true_prior, parameter)))
     }
     if (length(approxim$year) != year_range[2] - year_range[1] + 1) {
       dd <- dd[rep(
@@ -254,6 +286,7 @@
 #' @return
 #'
 #' @examples
+#' @noRd
 .interpolation <- function(dtf, parameter, defVal, ...) {
   arg <- list(...)
   tryCatch(
@@ -291,38 +324,47 @@
 #' @return
 #'
 #' @examples
+#' @noRd
+#' @noRd
 .interpolation_bound <- function(dtf, parameter, defVal, rule, ...) {
+  # browser()
+  dtf <- as.data.table(dtf)
   gg <- paste(parameter, c(".lo", ".fx", ".up"), sep = "")
-  aa <- dtf[, !(colnames(dtf) %in% gg), drop = FALSE]
-  aa[, parameter] <- rep(NA, nrow(aa))
+  # aa <- dtf[, !(colnames(dtf) %in% gg), drop = FALSE]
+  aa <- dtf %>% select(all_of(colnames(dtf)[!(colnames(dtf) %in% gg)]))
+  aa[[parameter]] <- rep(NA, nrow(aa))
   a1 <- aa
-  a1[, parameter] <- dtf[, gg[1]]
+  a1[[parameter]] <- dtf[[gg[1]]]
   a2 <- aa
-  a2[, parameter] <- dtf[, gg[2]]
+  a2[[parameter]] <- dtf[[gg[2]]]
   a3 <- aa
-  a3[, parameter] <- dtf[, gg[3]]
+  a3[[parameter]] <- dtf[[gg[3]]]
   d1 <- .interpolation(rbind(a1, a2), parameter,
     defVal = defVal[1], rule = rule[1], ...
   )
   if (!is.null(d1)) {
-    dd <- d1[, -ncol(d1), drop = FALSE]
+    # dd <- d1[, -ncol(d1), drop = FALSE]
+    dd <- d1 %>% select(-ncol(d1))
     dd[, "type"] <- "lo"
-    dd[, parameter] <- d1[, parameter]
+    dd[[parameter]] <- d1[[parameter]]
   }
   d2 <- .interpolation(rbind(a3, a2), parameter,
     defVal = defVal[2], rule = rule[2], ...
   )
   if (!is.null(d2)) {
-    mx <- d2[, -ncol(d2), drop = FALSE]
-    mx[, "type"] <- "up"
-    mx[, parameter] <- d2[, parameter]
+    # browser()
+    # mx <- d2[, -ncol(d2), drop = FALSE]
+    mx <- d2 %>% select(-ncol(d2))
+    # mx[, "type"] <- "up"
+    mx[["type"]] <- "up"
+    mx[[parameter]] <- d2[[parameter]]
   }
   if (!is.null(d1) && !is.null(d2)) {
-    return(rbind(dd, mx))
+    return(as.data.table(rbind(dd, mx)))
   } else if (!is.null(d1)) {
-    return(dd)
+    return(as.data.table(dd))
   } else if (!is.null(d2)) {
-    return(mx)
+    return(as.data.table(mx))
   } else {
     return(NULL)
   }
@@ -340,12 +382,14 @@
 #' @param all.val
 #'
 #' @return
+#' @noRd
 .interp_numpar <- function(
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     # removeDefault = TRUE, # not used
     # remValue = NULL, # not used
     all.val = FALSE) {
+  if (parameter == "pSupCost") browser() # DEBUG
   has_year_col <- any(colnames(dtf) == "year")
   if (approxim$fullsets && mtp@defVal != 0 && mtp@defVal != Inf) all.val <- TRUE
   if (!all.val && nrow(dtf) == 0) {
@@ -354,7 +398,11 @@
 
   if (!is.null(mtp@misc$not_need_interpolate)) {
     # approxim <- approxim[!(names(approxim) %in% mtp@misc$not_need_interpolate)]
-    dtf <- dtf[, !(colnames(dtf) %in% mtp@misc$not_need_interpolate), drop = FALSE]
+    # dtf <- dtf[, !(colnames(dtf) %in% mtp@misc$not_need_interpolate), drop = FALSE]
+    dtf <- dtf %>%
+      select(all_of(
+        colnames(dtf)[!(colnames(dtf) %in% mtp@misc$not_need_interpolate)]
+        ))
     if (any(mtp@misc$not_need_interpolate == "year")) has_year_col <- FALSE
     fl <- add_set_name %in% mtp@misc$not_need_interpolate
     if (any(fl)) {
@@ -363,14 +411,15 @@
     }
     dtf <- dtf[!duplicated(dtf), , drop = FALSE]
   }
-
+  # if (parameter == "meqLECActivity") browser()
   dd <- .interpolation(dtf, parameter,
                        rule = mtp@interpolation,
                        defVal = mtp@defVal,
                        year_range = range(approxim$year),
                        approxim = approxim, all = all.val
   )
-
+  # if (parameter == "meqLECActivity") browser()
+  dtf <- as.data.table(dtf)
   if (is.null(dd)) {
     return(NULL)
   }
@@ -380,33 +429,42 @@
       return(NULL)
     }
   }
-  # Must fixed in the future
+  # Must fix in the future
   colnames(dd)[[ncol(dd)]] <- "value"
-  for (i in colnames(dd)[-ncol(dd)]) {
+  char_col <- colnames(dd)
+  char_col <- char_col[!(char_col %in% c("year", "value"))]
+  for (i in char_col) {
     dd[[i]] <- as.character(dd[[i]])
   }
-  if (has_year_col) dd[["year"]] <- as.numeric(dd[["year"]])
+  if (has_year_col) dd[["year"]] <- as.integer(dd[["year"]])
+  # if (parameter == "meqLECActivity") browser()
   if (is.null(add_set_name)) {
-    dd <- dd[, c(mtp@dimSets, "value"), drop = FALSE]
+    # dd <- dd[, c(mtp@dimSets, "value"), drop = FALSE]
+    dd <- dd %>% select(all_of(c(mtp@dimSets, "value")))
   } else {
-    d3 <- data.frame(stringsAsFactors = FALSE)
-    for (i in 1:length(add_set_value)) {
-      d3[1:nrow(dd), i] <- rep(add_set_value[i])
-    }
-    colnames(d3) <- add_set_name
+    # browser()
+    # d3 <- data.frame(stringsAsFactors = FALSE)
+    # for (i in 1:length(add_set_value)) {
+    #   d3[1:nrow(dd), i] <- rep(add_set_value[i])
+    # }
+    # colnames(d3) <- add_set_name
+    d3 <- matrix(add_set_value, nrow = nrow(dd), ncol = length(add_set_value),
+                 byrow = T, dimnames = list(NULL, add_set_name)) %>%
+      as.data.table()
     stnd <- mtp@dimSets[-(1:length(d3))]
     # It was added for trading routes
     if (sum(stnd %in% c("src", "dst")) == 2) {
       stnd <- c(stnd[stnd != "src" & stnd != "dst"], "region")
     }
     stnd <- stnd[!(stnd %in% mtp@misc$not_need_interpolate)]
-    if (any(ls(globalenv()) == "KKK")) browser()
-    dd <- cbind(d3, dd[, c(stnd, "value"), drop = FALSE])
+    if (any(ls(globalenv()) == "kstat")) browser()
+    # dd <- cbind(d3, dd[, c(stnd, "value"), drop = FALSE])
+    dd <- cbind(d3, select(dd, all_of(c(stnd, "value"))))
   }
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
-      fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
+      fl <- (fl & dd[[remove_duplicate[[i]][1]]] != dd[[remove_duplicate[[i]][2]]])
     }
     dd <- dd[fl, , drop = FALSE]
   }
@@ -434,13 +492,16 @@
 #'
 #' @return
 #'
+#' @noRd
 .interp_bounds <- function(
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     remValueUp = NULL, remValueLo = NULL) {
   has_year_col <- any(colnames(dtf) == "year")
   if (!is.null(mtp@misc$not_need_interpolate)) {
-    dtf <- dtf[, !(colnames(dtf) %in% mtp@misc$not_need_interpolate), drop = FALSE]
+    # dtf <- dtf[, !(colnames(dtf) %in% mtp@misc$not_need_interpolate), drop = FALSE]
+    dtf <- dtf %>%
+      select(colnames(dtf)[!(colnames(dtf) %in% mtp@misc$not_need_interpolate)])
     if (any(mtp@misc$not_need_interpolate == "year")) has_year_col <- FALSE
     fl <- add_set_name %in% mtp@misc$not_need_interpolate
     if (any(fl)) {
@@ -468,12 +529,13 @@
   for (i in colnames(dd)[-ncol(dd)]) {
     dd[[i]] <- as.character(dd[[i]])
   }
-  if (has_year_col) dd[["year"]] <- as.numeric(dd[["year"]])
+  if (has_year_col) dd[["year"]] <- as.integer(dd[["year"]])
   if (is.null(add_set_name)) {
-    dd <- dd[, c(mtp@dimSets, "type", "value"), drop = FALSE]
+    # dd <- dd[, c(mtp@dimSets, "type", "value"), drop = FALSE]
+    dd <- dd %>% select(all_of(c(mtp@dimSets, "type", "value")))
   } else {
     d3 <- data.frame(stringsAsFactors = FALSE)
-    for (i in 1:length(add_set_value)) {
+    for (i in 1:length(add_set_value)) { # !!! rewrite
       d3[1:nrow(dd), i] <- rep(add_set_value[i])
     }
     colnames(d3) <- add_set_name
@@ -483,13 +545,14 @@
       stnd <- c(stnd[stnd != "src" & stnd != "dst"], "region")
     }
     stnd <- stnd[!(stnd %in% mtp@misc$not_need_interpolate)]
-
-    dd <- cbind(d3, dd[, c(stnd, "type", "value"), drop = FALSE])
+    # dd <- cbind(d3, dd[, c(stnd, "type", "value"), drop = FALSE])
+    dd <- cbind(d3, select(dd, all_of(c(stnd, "type", "value"))))
   }
   dd <- dd[(dd$type == "lo") | (dd$type == "up"), , drop = FALSE]
   if (!is.null(remove_duplicate) && nrow(dd) != 0) {
     fl <- rep(TRUE, nrow(dd))
     for (i in seq_along(remove_duplicate)) {
+      browser() # duplicated columns?
       fl <- (fl & dd[, remove_duplicate[[i]][1]] != dd[, remove_duplicate[[i]][2]])
     }
     dd <- dd[fl, , drop = FALSE]
@@ -500,7 +563,7 @@
   if (nrow(dd) == 0) {
     return(NULL)
   }
-  dd
+  return(as.data.table(dd))
 }
 
 

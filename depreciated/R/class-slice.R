@@ -41,7 +41,7 @@ setClass("slice",
 )
 
 .init_slice <- function(sl) {
-  # browser()
+  browser()
   if (nrow(sl@levels) == 0) {
     warning('no slices info, using default: "ANNUAL"')
     sl@levels <- .setSlice(ANNUAL = "ANNUAL")
@@ -75,10 +75,12 @@ setClass("slice",
     }
   }
   # slice_map & all_slice
-  tmp <- nchar(sl@slice_share$slice) - nchar(gsub("[_]", "", sl@slice_share$slice)) + 2
+  tmp <- nchar(sl@slice_share$slice) -
+    nchar(gsub("[_]", "", sl@slice_share$slice)) + 2
   names(tmp) <- sl@slice_share$slice
   tmp[sl@levels[1, 1]] <- 1
-  sl@slice_map <- lapply(1:(ncol(sl@levels) - 1), function(x) names(tmp)[tmp == x])
+  sl@slice_map <- lapply(1:(ncol(sl@levels) - 1),
+                         function(x) names(tmp)[tmp == x])
   names(sl@slice_map) <- colnames(sl@levels)[-ncol(sl@levels)]
   sl@default_slice_level <- colnames(sl@levels)[ncol(sl@levels) - 1]
   sl@all_slice <- sl@slice_share$slice

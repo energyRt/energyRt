@@ -2,10 +2,14 @@
 % Please edit documentation in R/class-supply.R
 \name{newSupply}
 \alias{newSupply}
+\alias{update,supply-method}
 \title{Create new supply object}
 \usage{
 \S4method{newSupply}{character}(name, ...)
+
+\S4method{update}{supply}(object, ...)
 }
 \description{
 Create new supply object
 }
+\concept{supply update}

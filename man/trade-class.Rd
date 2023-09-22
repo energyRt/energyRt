@@ -12,7 +12,7 @@ An S4 class to represent inter-regional trade
 \describe{
 \item{\code{name}}{character.}
 
-\item{\code{description}}{character.}
+\item{\code{desc}}{character.}
 
 \item{\code{commodity}}{character.}
 

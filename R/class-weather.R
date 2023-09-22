@@ -1,7 +1,7 @@
 #' Title
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot desc character.
 #' @slot unit character.
 #' @slot region character.
 #' @slot slice character.
@@ -16,7 +16,7 @@
 setClass("weather",
   representation(
     name = "character",
-    description = "character",
+    desc = "character",
     unit = "character",
     region = "character",
     slice = "character",
@@ -26,7 +26,7 @@ setClass("weather",
   ),
   prototype(
     name = "",
-    description = "",
+    desc = "",
     unit = as.character(NA),
     region = character(),
     slice = character(),
@@ -40,7 +40,7 @@ setClass("weather",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 setMethod("initialize", "weather", function(.Object, ...) {
   .Object

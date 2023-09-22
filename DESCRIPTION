@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
-Version: 0.05.00.9000
-Date: 2023-09-10
+Version: 0.07.07.9000
+Date: 2023-09-20
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -23,10 +23,15 @@ Imports:
     RSQLite,
     magrittr,
     tibble,
+    tidyr,
     dplyr,
     dtplyr,
-    ggplot2
+    ggplot2,
+    rlang,
+    purrr
 Suggests: 
+    gdxrrw,
+    gdxtools,
     knitr,
     rmarkdown,
     sf
@@ -52,7 +57,6 @@ Collate:
     'class-constraint.R'
     'class-costs.R'
     'class-horizon.R'
-    'class-slice.R'
     'class-config.R'
     'class-settings.R'
     'class-repository.R'

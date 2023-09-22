@@ -3,11 +3,22 @@
 \name{convert,character-method}
 \alias{convert,character-method}
 \alias{convert,numeric-method}
+\alias{add_to_convert,character,character,numeric-method}
 \title{Convert units}
 \usage{
 \S4method{convert}{character}(from, to, x = 1, database = "base", ...)
 
 \S4method{convert}{numeric}(x = 1, from, to, database = "base", ...)
+
+\S4method{add_to_convert}{character,character,numeric}(
+  type,
+  unit,
+  coef,
+  alias = "",
+  SI_prefixes = FALSE,
+  database = "base",
+  update = TRUE
+)
 }
 \arguments{
 \item{from}{character of length one with unit name}
@@ -16,15 +27,29 @@
 
 \item{x}{numeric vector with data to convert}
 
-\item{database}{units database}
+\item{database}{character name of a database with units (`base` by default, other options are not implemented yet).}
 
 \item{...}{currently ignored}
+
+\item{type}{character, type of the unit (one of "Energy", "Power", "Mass", "Time", "Length", "Area", "Pressure", "Density", "Volume", "Flow Rates", "Currency").}
+
+\item{unit}{character, the name of the new unit to add to the `database`.}
+
+\item{coef}{numeric, convert factor to the base unit of this type (see the first column of `convert_data[[database]][[type]]`).}
+
+\item{alias}{character vector, alternative name(s) for the same unit.}
+
+\item{SI_prefixes}{logical, can be used with `SI` prefixes, FALSE by default.}
 }
 \value{
 numeric vector with converted values
+
+updated `convert_data` in the `.GlobalEnv`, the values will not update the package data.
 }
 \description{
 Convert units
+
+Add units to convert function
 }
 \examples{
 convert("MWh", "kWh")
@@ -35,4 +60,9 @@ convert(1000, "kWh", "MWh")
 convert("kWh", "MJ")
 convert(1, "kWh/kg", "MJ/t")
 convert(5, "cents/kWh", "USD/MWh")
+do not run
+convert_data$base$Currency
+add_to_convert("Currency", unit = "JPY", coef = 140)
+convert_data$base$Currency
+
 }

@@ -1,7 +1,7 @@
 #' An S4 class to represent technology
 #'
 #' @slot name character, name of technology used in sets
-#' @slot description character, detailed description of the technology for reference.
+#' @slot desc character, detailed description of the technology for reference.
 #' @slot input data.frame.
 #' @slot output data.frame.
 #' @slot aux data.frame.
@@ -39,7 +39,7 @@ setClass("technology",
   representation(
     # General information
     name = "character", # Short name
-    description = "character", # description
+    desc = "character", # desc
     input = "data.frame", #
     output = "data.frame", #
     aux = "data.frame", #
@@ -71,7 +71,7 @@ setClass("technology",
   ), #
   prototype(
     name = "",
-    description = "",
+    desc = "",
     input = data.frame(
       comm = character(),
       unit = character(),
@@ -99,7 +99,7 @@ setClass("technology",
     ),
     group = data.frame(
       group = character(),
-      description = character(),
+      desc = character(),
       unit = character(),
       stringsAsFactors = FALSE
     ),
@@ -245,7 +245,7 @@ setClass("technology",
     misc = list()
   ),
   # validity = .check_technology_data_frame,
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "technology", function(.Object, ...) {
@@ -255,7 +255,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' Create object of class `technology` with specified parameters.
 #'
 #' @param name
-#' @param description
+#' @param desc
 #' @param input
 #' @param output
 #' @param group
@@ -290,7 +290,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @examples
 newTechnology <- function(
     name = "",
-    description = "",
+    desc = "",
     input = data.frame(),
     output = data.frame(),
     group = data.frame(),
@@ -318,7 +318,7 @@ newTechnology <- function(
     misc = list()) {
   # browser()
   .data2slots("technology", name,
-    description = description,
+    desc = desc,
     input = input,
     output = output,
     group = group,
@@ -347,20 +347,22 @@ newTechnology <- function(
   )
 }
 
-#' @param obj object of class technology
+#' @param object object of class technology
 #'
 #' @param ... slot-names with data to update (see `newTechnology`)
 #'
-#' @importFrom stats update
 #' @rdname newTechnology
 #' @family update technology
 #' @method update technology
 #' @export
-update.technology <- function(obj, ...) {
-  .data2slots("technology", obj, ...)
-}
+setMethod("update", "technology", function(object, ...) {
+  .data2slots("technology", object, ...)
+})
+# alternative option: S3 method
+# update.technology <- function(obj, ...) {
+#   .data2slots("technology", obj, ...)
+# }
 
-# setMethod("update", "technology", update.technology)
 
 # get names of data.frame slots
 .technology_data_frame <- function() {

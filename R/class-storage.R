@@ -5,7 +5,7 @@
 #'
 #'
 #' @slot name character.
-#' @slot description character.
+#' @slot desc character.
 #' @slot commodity character.
 #' @slot start data.frame.
 #' @slot end data.frame.
@@ -33,7 +33,7 @@
 setClass("storage",
   representation(
     name = "character",
-    description = "character",
+    desc = "character",
     commodity = "character",
     aux = "data.frame", #
     region = "character",
@@ -55,7 +55,7 @@ setClass("storage",
   ),
   prototype(
     name = "",
-    description = "",
+    desc = "",
     commodity = "",
     start = data.frame(
       region = character(),
@@ -76,7 +76,7 @@ setClass("storage",
     charge = data.frame(
       region = character(),
       year = numeric(),
-      slice = numeric(),
+      slice = character(),
       charge = numeric(),
       stringsAsFactors = FALSE
     ),
@@ -172,28 +172,42 @@ setClass("storage",
     ),
     misc = list()
   ),
-  S3methods = TRUE
+  S3methods = FALSE
 )
 
 setMethod("initialize", "storage", function(.Object, ...) {
   .Object
 })
 
-
-setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
-#' Create new import object
+#' Create new storage object
 #'
 #' @name newStorage
 #' @family storage
 #' @export
 #'
-setMethod("newStorage", signature(name = "character"), function(name, ...) {
+newStorage <- function(name, ...) {
   .data2slots("storage", name, ...)
+}
+
+# setGeneric("newStorage", function(name, ...) standardGeneric("newStorage"))
+# setMethod("newStorage", signature(name = "character"), function(name, ...) {
+#   .data2slots("storage", name, ...)
+# })
+
+# @rdname update
+# @describeIn update
+
+#' Updating an object
+#'
+#' @name update
+#'
+#' @param object storage object
+#'
+#' @family storage update
+#' @keywords storage update
+#' @export
+setMethod('update', signature(object = 'storage'), function(object, ...) {
+  # update.storage <- function(obj, ...) {
+  .data2slots("storage", object, ...)
 })
 
-# setMethod('update', signature(obj = 'storage'), function(obj, ...)
-#' @family storage update
-#' @export
-update.storage <- function(obj, ...) {
-  .data2slots("storage", obj, ...)
-}

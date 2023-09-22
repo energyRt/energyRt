@@ -12,7 +12,7 @@ An S4 class to declare a demand in the model
 \describe{
 \item{\code{name}}{short name (character) used in sets.}
 
-\item{\code{description}}{optional description, comment (character).}
+\item{\code{desc}}{optional desc, comment (character).}
 
 \item{\code{commodity}}{character.}
 
