@@ -35,7 +35,7 @@ setClass("sub",
     defVal = 0, #
     sub = data.frame(
       region = character(),
-      year = numeric(),
+      year = integer(),
       slice = character(),
       inp = numeric(),
       out = numeric(),

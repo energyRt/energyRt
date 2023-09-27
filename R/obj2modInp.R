@@ -129,9 +129,9 @@ setMethod(".obj2modInp", signature(
   obj
 })
 
-# ==============================================================================#
+# =============================================================================#
 # Add weather ####
-# ==============================================================================#
+# =============================================================================#
 setMethod(".obj2modInp", signature(
   obj = "modInp", app = "weather",
   approxim = "list"
@@ -166,9 +166,9 @@ setMethod(".obj2modInp", signature(
   obj
 })
 
-# ==============================================================================#
+# =============================================================================#
 # Add export ####
-# ==============================================================================#
+# =============================================================================#
 setMethod(".obj2modInp", signature(
   obj = "modInp", app = "export",
   approxim = "list"
@@ -237,9 +237,9 @@ setMethod(".obj2modInp", signature(
   obj
 })
 
-# ==============================================================================#
+# =============================================================================#
 # Add import ####
-# ==============================================================================#
+# =============================================================================#
 setMethod(
   ".obj2modInp", signature(
     obj = "modInp", app = "import",
@@ -323,7 +323,8 @@ setMethod(
   clean_list <- c(
       "mSliceParentChild", "mSliceParentChildE", "mSliceNext",
       "mSliceFYearNext", "pDiscount", "pSliceShare", "pDummyImportCost",
-      "pDummyExportCost", "mStartMilestone", "mEndMilestone",
+      "pDummyExportCost",
+      # "mStartMilestone", "mEndMilestone",
       "mMilestoneLast", "mMilestoneFirst", "mMilestoneNext",
       "mMilestoneHasNext", "mSameSlice", "mSameRegion", "ordYear",
       "pYearFraction",
@@ -369,7 +370,11 @@ setMethod(
       obj@parameters[["pDiscount"]], approxim_no_mileStone_Year,
       all.val = TRUE
     )
-    obj@parameters[["pDiscount"]] <- .dat2par(obj@parameters[["pDiscount"]], pDiscount)
+    obj@parameters[["pDiscount"]] <-
+      .dat2par(obj@parameters[["pDiscount"]],
+               filter(pDiscount, year %in% obj@parameters$year@data$year)
+               # pDiscount
+               )
     approxim_comm <- approxim
     approxim_comm[["comm"]] <- approxim$all_comm
     obj@parameters[["pSliceShare"]] <- .dat2par(
@@ -387,15 +392,21 @@ setMethod(
                         horizon = app@horizon@period,
                         intervals = rep(1, length(app@horizon@period)))
     }
-
-    obj@parameters[["mStartMilestone"]] <- .dat2par(
-      obj@parameters[["mStartMilestone"]],
-      data.table(year = app@horizon@intervals$mid, yearp = app@horizon@intervals$start)
-    )
-    obj@parameters[["mEndMilestone"]] <- .dat2par(
-      obj@parameters[["mEndMilestone"]],
-      data.table(year = app@horizon@intervals$mid, yearp = app@horizon@intervals$end)
-    )
+    # browser()
+    #!!! Suppressed parameter
+    # obj@parameters[["mStartMilestone"]] <- .dat2par(
+    #   obj@parameters[["mStartMilestone"]],
+    #   data.table(year = app@horizon@intervals$mid,
+    #              horizon = app@horizon@intervals$start)
+    #   # data.table(year = app@horizon@intervals$mid, yearp = app@horizon@intervals$start)
+    # )
+    #!!! Suppressed parameter
+    # obj@parameters[["mEndMilestone"]] <- .dat2par(
+    #   obj@parameters[["mEndMilestone"]],
+    #   data.table(year = app@horizon@intervals$mid,
+    #              horizon = app@horizon@intervals$end)
+    #   # data.table(year = app@horizon@intervals$mid, yearp = app@horizon@intervals$end)
+    # )
     obj@parameters[["mMilestoneLast"]] <- .dat2par(
       obj@parameters[["mMilestoneLast"]],
       data.table(year = max(app@horizon@intervals$mid))
@@ -440,7 +451,7 @@ setMethod(
                             app@horizon@intervals$start + 1),
                  stringsAsFactors = FALSE)
     )
-
+    # browser()
     pDiscount <-
       pDiscount[sort(pDiscount$year, index.return = TRUE)$ix, , drop = FALSE]
     pDiscountFactor <- pDiscount[0, , drop = FALSE]
@@ -449,7 +460,11 @@ setMethod(
       dd$value <- cumprod(1 / (1 + dd$value))
       pDiscountFactor <- rbind(pDiscountFactor, dd)
     }
-    obj@parameters[["pDiscountFactor"]] <- .dat2par(obj@parameters[["pDiscountFactor"]], pDiscountFactor)
+    obj@parameters[["pDiscountFactor"]] <-
+      .dat2par(obj@parameters[["pDiscountFactor"]],
+               filter(pDiscountFactor, year %in% obj@parameters$year@data$year)
+               # pDiscountFactor
+               )
     # pDiscountFactorMileStone
     yrr <- app@horizon@intervals$start[1]:app@horizon@intervals$end[nrow(app@horizon@intervals)]
     tyr <- rep(NA, length(yrr))
@@ -2225,9 +2240,9 @@ setMethod(
 )
 
 
-# ==============================================================================#
+# =============================================================================#
 # Add trade ####
-# ==============================================================================#
+# =============================================================================#
 setMethod(
   ".obj2modInp", signature(
     obj = "modInp", app = "trade",
@@ -2867,9 +2882,9 @@ setMethod(
   }
 )
 
-# ==============================================================================#
+# =============================================================================#
 # Internal functions ####
-# ==============================================================================#
+# =============================================================================#
 
 # ???
 .start_end_fix <- function(approxim, app, als, stock_exist) {
@@ -3034,7 +3049,7 @@ merge0 <- function(x, y,
   as.data.table(dtf)
 }
 
-# ==============================================================================#
+# =============================================================================#
 # ???
 .filter_data_in_slots <- function(obj, lst, coln) {
   # browser()
@@ -3059,10 +3074,10 @@ merge0 <- function(x, y,
   obj
 }
 
-# ==============================================================================#
+# =============================================================================#
 # Add approximation list
 # (auxiliary list for approximation) to standard view
-# ==============================================================================#
+# =============================================================================#
 .fix_approximation_list <- function(approxim, lev = NULL, comm = NULL) {
   # better name?
   # browser()
@@ -3083,9 +3098,9 @@ merge0 <- function(x, y,
   approxim
 }
 
-# ==============================================================================#
+# =============================================================================#
 # tax & sub
-# ==============================================================================#
+# =============================================================================#
 .subtax_approxim <- function(obj, app, tax, whr, approxim) {
   if (all(app@comm != names(approxim$commodity_slice_map))) {
     stop('Unknown commodity "', app@comm, '" in ', whr, ' "', app@name, '"')
@@ -3098,7 +3113,7 @@ merge0 <- function(x, y,
     }
     approxim$region <- app@region
   }
-  browser()
+  # browser()
   approxim$slice <-
     approxim$calendar@timeframes[[approxim$commodity_slice_map[[app@comm]]]]
   if (whr == "tax") {
@@ -3128,7 +3143,7 @@ merge0 <- function(x, y,
 }
 
 
-# ==============================================================================#
+# =============================================================================#
 .null_to_empty_param <- function(pname, pp) {
   # pp - podInp@parameters
   # browser()

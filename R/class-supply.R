@@ -55,7 +55,7 @@ setClass("supply",
     ),
     availability = data.frame(
       region = character(),
-      year = numeric(),
+      year = integer(),
       slice = character(),
       ava.lo = numeric(),
       ava.up = numeric(),

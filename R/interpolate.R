@@ -85,10 +85,38 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       intervals = rep(1, length(scen@settings@horizon@period))
     )
   }
+  # browser()
+  #!!! Suppressed parameter
+  # newParameter("horizon", dimSets = "horizon", type = "map")
+  # scen@modInp@parameters[["horizon"]] <-
+  #   .dat2par(scen@modInp@parameters[["horizon"]],
+  #            scen@settings@horizon@period)
 
   scen@modInp@parameters[["year"]] <-
-    .dat2par(scen@modInp@parameters[["year"]], scen@settings@horizon@period)
+    .dat2par(scen@modInp@parameters[["year"]],
+             scen@settings@horizon@intervals$mid)
+  # .dat2par(scen@modInp@parameters[["year"]], scen@settings@horizon@period)
+
   # browser()
+  # nYears <- length(scen@settings@horizon@intervals$mid)
+  # scen@modInp@parameters[["nextYear"]] <-
+  #   .dat2par(scen@modInp@parameters[["nextYear"]],
+  #            data.table(
+  #              year = scen@settings@horizon@intervals$mid[-nYears],
+  #              value = scen@settings@horizon@intervals$mid[-1]
+  #              )
+  #            )
+
+  #!!! Suppressed parameter
+  # scen@modInp@parameters[["pYear"]] <-
+  #   .dat2par(scen@modInp@parameters[["pYear"]],
+  #            data.table(
+  #              year = scen@settings@horizon@intervals$mid,
+  #              value = scen@settings@horizon@intervals$mid
+  #            )
+  #   )
+
+
   scen@modInp@parameters[["mMidMilestone"]] <-
     .dat2par(scen@modInp@parameters[["mMidMilestone"]],
              data.table(year = scen@settings@horizon@intervals$mid)

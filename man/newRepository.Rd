@@ -14,6 +14,7 @@ Create new repository object
 }
 \seealso{
 Other repository: 
+\code{\link{add,repository-method}},
 \code{\link{repository-class}}
 }
 \concept{repository}

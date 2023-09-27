@@ -40,7 +40,7 @@ setClass("config",
     debug = data.frame(
       comm = character(),
       region = character(),
-      year = numeric(),
+      year = integer(),
       slice = character(),
       dummyImport = numeric(),
       dummyExport = numeric(),
@@ -48,7 +48,7 @@ setClass("config",
     ),
     discount = data.frame(
       region = character(),
-      year = numeric(),
+      year = integer(),
       discount = numeric(),
       stringsAsFactors = FALSE
     ),

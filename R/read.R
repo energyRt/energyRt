@@ -191,9 +191,9 @@ read_solution <- function(obj, ...) {
   }
   if (scen@modOut@stage == "solved") {
     # Postprocessing
-    scen@modOut@variables$vTechSalv <- salvage_cost0(scen, "Tech")
-    scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, "Storage")
-    scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, "Trade")
+    # scen@modOut@variables$vTechSalv <- salvage_cost0(scen, "Tech")
+    # scen@modOut@variables$vStorageSalv <- salvage_cost0(scen, "Storage")
+    # scen@modOut@variables$vTradeSalv <- salvage_cost0(scen, "Trade")
     pDummyImportCost <- .get_data_slot(scen@modInp@parameters$pDummyImportCost)
     # browser()
     vDummyImportCost <- merge0(pDummyImportCost,
@@ -235,7 +235,7 @@ read_solution <- function(obj, ...) {
     } else {
       vTechEmsFuel <- data.frame(
         tech = character(), comm = character(), region = character(),
-        year = numeric(), value = numeric(), stringsAsFactors = FALSE
+        year = integer(), value = numeric(), stringsAsFactors = FALSE
       )
     }
     scen@modOut@variables$vTechEmsFuel <- vTechEmsFuel
@@ -244,7 +244,7 @@ read_solution <- function(obj, ...) {
     if (length(getNames(scen, "costs")) != 0) {
       cst <- getObjects(scen, "costs")
       costs_tot <- data.frame(
-        costs = character(), region = character(), year = numeric(),
+        costs = character(), region = character(), year = integer(),
         value = numeric(), stringsAsFactors = FALSE
       )
       for (tmp in cst) {
