@@ -112,7 +112,6 @@ setMethod("setHorizon", signature(obj = "config"), function(obj, period, ...) {
     obj
   }
 )
-
 # setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
 
 #' @export

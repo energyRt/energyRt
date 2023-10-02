@@ -2,7 +2,7 @@
 
 #' Schematic representation of technology
 #'
-#' @param tech
+#' @param tech .
 #' @param year
 #' @param region
 #' @param slice
