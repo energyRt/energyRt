@@ -15,9 +15,9 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # obj - scenario or model
   # name
   # desc
-  # n.threads - number of threads use for approximation
-  # startYear && fixTo have to define both (or not define both) - run with startYear
-  # year - basic horizon year definition (not recommended for use), use only if horizon not defined
+  # (!!! depreciated) n.threads - number of threads use for approximation
+  # (!!! depreciated) startYear && fixTo have to define both (or not define both) - run with startYear
+  # (!!! depreciated) year - basic horizon year definition (not recommended for use), use only if horizon not defined
   # discount - define discount, not good practice
   # region - define region, not good practice
   # repository - class for add to model (repository or list of repository)
@@ -25,7 +25,6 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # browser()
   obj <- object
   arg <- list(...)
-
 
   interpolation_start_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
@@ -35,25 +34,124 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@model <- obj
     scen@name <- "Default scenario name"
     scen@desc <- ""
-    scen@settings <- .config_to_settings(obj@config)
+    scen@settings <- .config_to_settings(obj@config) # import model settings
   } else if (class(obj) == "scenario") {
     scen <- obj
   } else {
     stop('Interpolation is not available for class: "', class(obj), '"')
   }
 
-  if (!is.null(arg$name)) scen@name <- arg$name
-  if (!is.null(arg$desc)) scen@desc <- arg$desc
-  if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
-  if (is.null(arg$startYear) != is.null(arg$fixTo)) {
-    stop("startYear && fixTo have to define both (or not define both")
+  if (!is.null(arg$name)) {scen@name <- arg$name; arg$name <- NULL}
+  if (!is.null(arg$desc)) {scen@desc <- arg$desc; arg$desc <- NULL}
+  # if (is.null(arg$startYear) != is.null(arg$fixTo)) {
+  #   stop("startYear && fixTo have to define both (or not define both")
+  # }
+  if (!is.null(arg$repository)) {
+    if (!is.null(arg$data))
+      stop("Only one of arguments 'repository' or 'data' can be used.",
+           call. = FALSE)
+    scen@model <- .add_repository(scen@model, arg$repository) # !!! use add?
+    arg$repository <- NULL
   }
-  if (!is.null(arg$year)) scen@settings@horizon@period <- arg$year
-  if (!is.null(arg$repository)) scen@model <- .add_repository(scen@model, arg$repository)
-  if (!is.null(arg$region)) scen@settings@region <- arg$region
-  if (!is.null(arg$discount)) scen@settings@discount <- arg$discount
+  if (!is.null(arg$data)) {
+    scen@model <- .add_repository(scen@model, arg$data) # !!! use add instead?
+    arg$data <- NULL
+  }
+  carg <- sapply(arg, function(x) class(x)[1])
+  # check if there are more repositories
+  ii <- carg == "repository"
+  if (any(ii)) {
+    for (ob in arg[ii]) {
+      scen@model <- add(scen@model, ob)
+    }
+    arg[ii] <- NULL; carg <- carg[!ii]
+  }
+  # check if there are any objects to add to a repository
+  repo_objs <- newRepository("")@permit
+  ii <- carg %in% repo_objs
+  if (any(ii)) {
+    scen_repo <- newRepository(name = paste0(scen@name, "_repo"), arg[ii][[1]])
+    scen@model <- add(scen@model, scen_repo); rm(scen_repo)
+    arg[ii] <- NULL; carg <- carg[!ii]
+  }
+  # check if `...` has `settings` object
+  ii <- carg %in% "settings"
+  if (any(ii)) {
+    if (sum(ii) > 1) {
+      stop("Two or more 'settings' objects found in 'interpolation' arguments.",
+           call. = FALSE)
+    }
+    scen@settings <- arg[ii][[1]]
+    arg[ii] <- NULL; carg <- carg[!ii]
+  }
+  # browser()
+  # check if `...` has `calendar` object
+  ii <- carg %in% "calendar"
+  if (any(ii)) {
+    if (sum(ii) > 1) {
+      stop("Two or more 'calendar' objects found in 'interpolation' arguments.",
+           call. = FALSE)
+    }
+    # scen <- setCalendar(scen, arg[ii][[1]]) # !!! ToDo
+    scen@settings@calendar <- arg[ii][[1]]
+    scen@settings@yearFraction$fraction <-
+      sum(scen@settings@calendar@timetable$share)
+    arg[ii] <- NULL; carg <- carg[!ii]
+  }
+  # check if `...` has `horizon` object
+  ii <- carg %in% "horizon"
+  if (any(ii)) {
+    if (sum(ii) > 1) {
+      stop("Two or more 'horizon' objects found in 'interpolation' arguments.",
+           call. = FALSE)
+    }
+    scen <- setHorizon(scen, arg[ii][[1]])
+    # scen@settings <- arg[ii]
+    arg[ii] <- NULL; carg <- carg[!ii]
+  }
+  # check if `...` has data for `settings` or `horizon` parameters
+  # ToDo: rewrite with 'add' once implemented for settings/horizon
+  # sett_slots <- unique(c(slotNames("settings"), slotNames("horizon"))) %>%
+  #   unique()
+  # sett_slots[sett_slots %in% c("name", "desc", "misc")] <- NULL
+  # !!! currently one-by-one
+
+  if (!is.null(arg$region)) {
+    stop("Regions must be defined before the interpolation")
+    scen@settings@region <- arg$region
+    arg$region <- NULL
+  }
+  if (!is.null(arg$discount)) {
+    scen@settings@discount <- arg$discount
+    arg$discount <- NULL
+  }
+  if (!is.null(arg$year)) {
+    stop("\nThe 'year' argument is depreciated. \nUse 'period' ",
+         "to set planning (optimization) period.  \n",
+         "See ?horizon and ?settings for help", call. = FALSE)
+  }
+  if (!is.null(arg$period) | !is.null(arg$intervals)) {
+    if (!is.null(arg$period)) {
+      upd_period <- arg$period
+    } else {
+      upd_period <- scen@settings@horizon@period
+    }
+    if (!is.null(arg$intervals)) {
+      upd_intervals <- arg$intervals
+    } else {
+      upd_intervals <- scen@settings@horizon@intervals
+    }
+    scen@settings@horizon <- newHorizon(
+      period = upd_period,
+      intervals = upd_intervals,
+      desc = scen@settings@horizon@desc
+    )
+  }
+
+  # other parameters
+  if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
   if (is.null(arg$verbose)) arg$verbose <- 0
-  if (!is.null(arg$name)) {
+  if (!is.null(arg$table_format)) { # !!! draft, not actual
     scen@misc$table_format <- arg$table_format
     # set_table_format(scen@misc$table_format)
     arg$table_format <- NULL
@@ -62,12 +160,11 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     # set_table_format(scen@misc$table_format)
   }
 
-
   ### Interpolation
   scen@modInp <- new("modInp")
   ## Fill basic sets
   # Fill year
-  if (!is.null(arg$year)) {
+  if (!is.null(arg$year)) { #
     if (nrow(scen@settings@horizon@intervals) != 0) {
       stop("argument can't be used with horizon")
     }
@@ -75,12 +172,16 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   }
   # browser()
   if (nrow(scen@settings@horizon@intervals) == 0) {
-    if (any(sort(scen@settings@horizon@period) != scen@settings@horizon@period) ||
-      max(scen@settings@horizon@period) - min(scen@settings@horizon@period) + 1 !=
-      length(scen@settings@horizon@period)) {
-      stop("wrong year parameter")
+    # if (any(sort(scen@settings@horizon@period) !=
+    #         scen@settings@horizon@period) ||
+    #     max(scen@settings@horizon@period) -
+    #     min(scen@settings@horizon@period) + 1 !=
+    #   length(scen@settings@horizon@period)) {
+    if (length(scen@settings@horizon@period) == 0) {
+      stop("Empty 'period' parameter. \n",
+           "Add 'settings' or 'horizon' to the model or 'interpolation(...)'")
     }
-    scen@model <- setHorizon(scen@model,
+    scen@settings <- setHorizon(scen@settings,
       horizon = scen@settings@horizon@period[1],
       intervals = rep(1, length(scen@settings@horizon@period))
     )
@@ -116,7 +217,6 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   #            )
   #   )
 
-
   scen@modInp@parameters[["mMidMilestone"]] <-
     .dat2par(scen@modInp@parameters[["mMidMilestone"]],
              data.table(year = scen@settings@horizon@intervals$mid)
@@ -125,6 +225,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # browser()
   # scen@settings@slice <- .init_slice(scen@settings@slice)
   # browser()
+
   if (mean(scen@settings@yearFraction$fraction) != 1.) {
     # filter out unused slices
     # browser()
@@ -158,8 +259,10 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # browser()
   # List for approximation
   # Generate approxim list, that contain basic data for approximation
-  xx <- c(scen@settings@horizon@intervals$mid[-1] -
-    scen@settings@horizon@intervals$mid[-nrow(scen@settings@horizon@intervals)], 1)
+  xx <- c(
+    scen@settings@horizon@intervals$mid[-1] -
+    scen@settings@horizon@intervals$mid[-nrow(scen@settings@horizon@intervals)],
+    1)
   names(xx) <- scen@settings@horizon@intervals$mid
 
   if (is.null(arg$fullsets)) fullsets <- TRUE else fullsets <- arg$fullsets
@@ -250,7 +353,8 @@ interpolate_model <- function(object, ...) { #- returns class scenario
         while (i < nrow(rep_class2) && length(need_col) != 0) {
           i <- i + 1
           tbl <- slot(
-            scen@model@data[[rep_class2[i, "repos"]]]@data[[rep_class2[i, "name"]]], slt)
+            scen@model@data[[rep_class2[i, "repos"]]]@data[[rep_class2[i, "name"]]],
+            slt)
           if (nrow(tbl) > 0) {
             # need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
             # tb_nna <- tbl %>% select(all_of(val_col))
@@ -347,6 +451,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   scen@modInp@parameters$group <- .unique_set(scen@modInp@parameters$group)
   scen@modInp@parameters$mvDemInp <- .unique_set(scen@modInp@parameters$mvDemInp)
 
+  # browser()
   # Check for unknown set in constraints
   .check_constraint(scen)
   # Check for unknown weather
@@ -691,9 +796,15 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 
 # Add name for basic set
 .add_name_for_basic_set <- function(scen, approxim) {
+  # browser()
   for (i in seq(along = scen@model@data)) {
     for (j in seq(along = scen@model@data[[i]]@data)) {
-      scen@modInp <- .add2set(scen@modInp, scen@model@data[[i]]@data[[j]], approxim)
+      inRange <- withinHorizon(scen@model@data[[i]]@data[[j]], scen@settings)
+      if (!isFALSE(inRange)) { # NULL is allowed
+        scen@modInp <- .add2set(scen@modInp,
+                                scen@model@data[[i]]@data[[j]],
+                                approxim)
+      }
     }
   }
   scen
@@ -746,16 +857,30 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       if (k %% max.thread == n.thread) {
         tmlg <- tmlg + 1
         if (arg$echo) {
-          .interpolation_message(scen@model@data[[i]]@data[[j]]@name, k, interpolation_count,
-                                 interpolation_start_time = interpolation_start_time, len_name
+          .interpolation_message(
+            scen@model@data[[i]]@data[[j]]@name, k, interpolation_count,
+            interpolation_start_time = interpolation_start_time, len_name
           )
         }
         p1 <- proc.time()[3]
         # tryCatch({
-        if (class(scen@model@data[[i]]@data[[j]]) == "constraint") {
-          scen@modInp <- .obj2modInp(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)
+        inRange <- withinHorizon(scen@model@data[[i]]@data[[j]], scen@settings)
+        if (!isFALSE(inRange)) { # NULL is allowed
+          if (class(scen@model@data[[i]]@data[[j]]) == "constraint") { #isConstraint
+            scen@modInp <- .obj2modInp(
+              scen@modInp,
+              scen@model@data[[i]]@data[[j]],
+              approxim = approxim
+            )
+          } else {
+            mdinp[[length(mdinp) + 1]] <- .obj2modInp(
+              scen@modInp,
+              scen@model@data[[i]]@data[[j]],
+              approxim = approxim
+            )@parameters
+          }
         } else {
-          mdinp[[length(mdinp) + 1]] <- .obj2modInp(scen@modInp, scen@model@data[[i]]@data[[j]], approxim = approxim)@parameters
+          # ignore this obj
         }
         # }, error = function(e) {
         #   assign('add0_message', list(tracedata = sys.calls(),
@@ -773,9 +898,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       }
     }
   }
+  # browser()
+  scen <- .filter_sets(scen)
   # require(data.table)
   nval <- rep(NA, length(mdinp))
-  for (pr in names(mdinp[[1]])) {
+  for (pr in names(mdinp[[1]])) { # !!! Rewrite this part with rbindlist
     if (scen@modInp@parameters[[pr]]@misc$nValues <= 0) {
       if (mdinp[[1]][[pr]]@misc$nValues != -1) {
         for (i in seq_along(mdinp)) {
@@ -794,10 +921,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
           scen@modInp@parameters[[pr]]@misc$nValues <- sum(nval)
         }
       } else {
-        stop("don't assume that this is the case")
+        stop("should not be here - debug is required")
       }
     }
   }
+  # browser()
   scen@misc$time.log <- data.table(
     name = time.log.nm[seq_len(tmlg)],
     time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE
@@ -926,7 +1054,8 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
   if (!is.null(err_msg)) {
     nn <- capture.output(err_msg)
-    stop(paste0("There unknow sets in constrint(s)\n", paste0(nn, collapse = "\n")))
+    # print(err_msg); stop("Unknow sets in constrint(s)")
+    warning("Unused (ignored) sets in constraints: ", err_msg)
   }
 }
 
@@ -1033,3 +1162,85 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
 }
 
+# the function checks if the object (from repository)
+# is within the settings@horizon@period, returns TRUE if it is
+# FALSE, if beyond the period, and NULL if the object cannot be checked
+withinHorizon <- function(obj, settings) {
+  # return(T)
+  # browser()
+  if (inherits(obj, "constraint")) return(NULL)
+  # yrs <- range()
+  yrs <- settings@horizon@period
+  ret <- NULL # return NULL if not applicable to the object
+  # check stock
+  sn <- slotNames(obj)
+  if (any(sn == "stock")) {
+    stock <- obj@stock # !!! add check for interpolation rule or interpolate first
+    if (nrow(stock) > 0 && any(stock$year > min(yrs)) && any(stock$stock > 0)) {
+      return(TRUE) # capacity exists within the period
+    } else {
+      ret <- FALSE
+    }
+  }
+  if (any(sn == "end")) {
+    if (is.data.frame(obj@end)) {
+      end <- obj@end$end
+    } else {
+      end <- obj@end
+    }
+
+    if (is.null(end) || is_empty(end)) {
+      end <- TRUE
+    } else if (any(is.na(end))) { # at least in one region
+      end <- TRUE
+    } else if (!all(end < min(yrs))) {
+      end <- TRUE
+    } else {
+      end <- FALSE
+      return(FALSE) # not available for investment
+    }
+
+    # if (end == TRUE) { supposed to be true
+    if (is.data.frame(obj@start)) {
+      start <- obj@start$start
+    } else {
+      start <- obj@start
+    }
+    if (is.null(start) || is_empty(start)) {
+      start <- TRUE
+    } else if (any(is.na(start))) { # at least in one region
+      start <- TRUE
+    } else if (!all(start > max(yrs))) {
+      start <- TRUE
+    } else {
+      start <- FALSE
+      return(FALSE) # not available for investment
+    }
+
+    if (end & start) return(TRUE)
+    ret <- FALSE
+    # }
+  }
+  return(ret)
+}
+
+# filter data for non-valid sets
+.filter_sets <- function(scen) {
+  dropped <- list() # log removed data
+  set_names <- names(scen@modInp@set)
+  for (i in seq_along(scen@modInp@parameters)) {
+    x <- scen@modInp@parameters[[i]]
+    ii <- x@dimSets %in% set_names
+    for (s in x@dimSets[ii]) {
+      kk <- x@data[[s]] %in% scen@modInp@set[[s]]
+      if (!all(kk)) {
+        dropped[[x@name]] <- x@data[!kk,]
+        x@data <- x@data[kk,]
+        x@misc$nValues <- x@misc$nValues - length(sum(!kk))
+        scen@modInp@parameters[[i]] <- x
+      }
+    }
+  }
+  scen@misc$dropped_data <- dropped
+  scen
+}

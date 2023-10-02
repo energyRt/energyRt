@@ -35,7 +35,8 @@ Create a new object of class 'horizon'
 \describe{
 \item{\code{desc}}{character, a comment or a short description.}
 
-\item{\code{period}}{integer, an arranged, full sequence (without gaps) of modeled period.}
+\item{\code{period}}{integer, a planning period defined as a sequence of years (arranged, without gaps) of the model planning (e.g. optimization) window. Data with years before or after the planning `period` can present in the model-objects and will be taken into account during interpolation of the model parameters.
+will be excluded from the the optimization.}
 
 \item{\code{intervals}}{data.frame with three columns, representing start, middle, and the end year of every interval.}
 }}

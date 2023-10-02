@@ -201,7 +201,12 @@ setMethod(".obj2modInp", signature(
 
   mExportRow <- merge0(merge0(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
   if (!is.null(pExportRow) && nrow(pExportRow) != 0) {
-    pExportRow2 <- pExportRow[pExportRow$type == "up" & pExportRow$value == 0, colnames(pExportRow) %in% colnames(mExportRow), drop = FALSE]
+    pExportRow2 <- pExportRow %>%
+      filter(type == "up" & value == 0) %>%
+      select(any_of(colnames(mExportRow)))
+    # pExportRow2 <- pExportRow[pExportRow$type == "up" & pExportRow$value == 0,
+    #                           colnames(pExportRow) %in% colnames(mExportRow),
+    #                           drop = FALSE]
     if (nrow(pExportRow2) != 0) {
       # pExportRow2 <- mExportRow[1, 1:2, drop = FALSE]
       if (ncol(pExportRow2) != ncol(mExportRow)) pExportRow2 <- merge0(mExportRow, pExportRow2)
@@ -211,13 +216,25 @@ setMethod(".obj2modInp", signature(
   mExportRow$comm <- exp@commodity
   obj@parameters[["mExportRow"]] <- .dat2par(obj@parameters[["mExportRow"]], mExportRow)
   if (!is.null(pExportRow) && any(pExportRow$type == "up" & pExportRow$value != Inf & pExportRow$value != 0)) {
-    mExportRowUp <- pExportRow[pExportRow$type == "up" & pExportRow$value != Inf & pExportRow$value != 0, colnames(pExportRow) %in% obj@parameters[["mExportRowUp"]]@dimSets, drop = FALSE]
+    mExportRowUp <- pExportRow %>%
+      filter(type == "up" & value != Inf & value != 0) %>%
+      select(any_of(obj@parameters[["mExportRowUp"]]@dimSets))
+    # mExportRowUp <- pExportRow[
+    #   pExportRow$type == "up" & pExportRow$value != Inf & pExportRow$value != 0,
+    #   colnames(pExportRow) %in% obj@parameters[["mExportRowUp"]]@dimSets,
+    #   drop = FALSE]
     mExportRowUp$comm <- exp@commodity
     if (!all(obj@parameters[["mExportRowUp"]]@dimSets %in% mExportRowUp)) {
       mExportRowUp <- merge0(mExportRow, mExportRowUp)
     }
-    obj@parameters[["mExportRowUp"]] <- .dat2par(obj@parameters[["mExportRowUp"]], mExportRowUp)
-    meqExportRowLo <- pExportRow[pExportRow$type == "lo" & pExportRow$value != 0, colnames(pExportRow) %in% obj@parameters[["meqExportRowLo"]]@dimSets, drop = FALSE]
+    obj@parameters[["mExportRowUp"]] <-
+      .dat2par(obj@parameters[["mExportRowUp"]], mExportRowUp)
+    meqExportRowLo <- pExportRow %>%
+      filter(type == "lo" & value != 0) %>%
+      select(any_of(obj@parameters[["meqExportRowLo"]]@dimSets))
+    # pExportRow[pExportRow$type == "lo" & pExportRow$value != 0,
+      #            colnames(pExportRow) %in% obj@parameters[["meqExportRowLo"]]@dimSets,
+      #            drop = FALSE]
     meqExportRowLo$comm <- exp@commodity
     if (!all(obj@parameters[["meqExportRowLo"]]@dimSets %in% meqExportRowLo)) {
       meqExportRowLo <- merge0(mExportRow, meqExportRowLo)
@@ -274,7 +291,11 @@ setMethod(
     obj@parameters[["pImportRow"]] <- .dat2par(obj@parameters[["pImportRow"]], pImportRow)
     mImportRow <- merge0(merge0(mImpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
     if (!is.null(pImportRow) && nrow(pImportRow) != 0) {
-      pImportRow2 <- pImportRow[pImportRow$type == "up" & pImportRow$value == 0, colnames(pImportRow) %in% colnames(mImportRow), drop = FALSE]
+      pImportRow2 <- pImportRow %>%
+        filter(type == "up" & value == 0) %>%
+        select(any_of(colnames(mImportRow)))
+      # pImportRow[pImportRow$type == "up" & pImportRow$value == 0,
+        #            colnames(pImportRow) %in% colnames(mImportRow), drop = FALSE]
       if (nrow(pImportRow2) != 0) {
         pImportRow2 <- mImportRow[1, 1:2, drop = FALSE]
         if (ncol(pImportRow2) != ncol(mImportRow)) pImportRow2 <- merge0(mImportRow, pImportRow2)
@@ -284,13 +305,25 @@ setMethod(
     mImportRow$comm <- imp@commodity
     obj@parameters[["mImportRow"]] <- .dat2par(obj@parameters[["mImportRow"]], mImportRow)
     if (!is.null(pImportRow)) {
-      mImportRowUp <- pImportRow[pImportRow$type == "up" & pImportRow$value != Inf & pImportRow$value != 0, colnames(pImportRow) %in% obj@parameters[["mImportRowUp"]]@dimSets, drop = FALSE]
+      mImportRowUp <- pImportRow %>%
+        filter(type == "up" & value != Inf & value != 0) %>%
+        select(any_of(obj@parameters[["mImportRowUp"]]@dimSets))
+      # pImportRow[
+        #   pImportRow$type == "up" & pImportRow$value != Inf & pImportRow$value != 0,
+        #   colnames(pImportRow) %in% obj@parameters[["mImportRowUp"]]@dimSets,
+        #   drop = FALSE]
       mImportRowUp$comm <- imp@commodity
       if (!all(obj@parameters[["mImportRowUp"]]@dimSets %in% mImportRowUp)) {
         mImportRowUp <- merge0(mImportRow, mImportRowUp)
       }
       obj@parameters[["mImportRowUp"]] <- .dat2par(obj@parameters[["mImportRowUp"]], mImportRowUp)
-      meqImportRowLo <- pImportRow[pImportRow$type == "lo" & pImportRow$value != 0, colnames(pImportRow) %in% obj@parameters[["meqImportRowLo"]]@dimSets, drop = FALSE]
+      meqImportRowLo <- pImportRow %>%
+        filter(type == "lo" & value != 0) %>%
+        select(any_of(obj@parameters[["meqImportRowLo"]]@dimSets))
+      # meqImportRowLo <- pImportRow[
+      #   pImportRow$type == "lo" & pImportRow$value != 0,
+      #   colnames(pImportRow) %in% obj@parameters[["meqImportRowLo"]]@dimSets,
+      #   drop = FALSE]
       meqImportRowLo$comm <- imp@commodity
       if (!all(obj@parameters[["meqImportRowLo"]]@dimSets %in% meqImportRowLo)) {
         meqImportRowLo <- merge0(mImportRow, meqImportRowLo)
@@ -439,7 +472,8 @@ setMethod(
     # browser()
     # tmp <- data.frame(year = .get_data_slot(obj@parameters$year))
     tmp <- .get_data_slot(obj@parameters$year)
-    tmp$value <- seq_along(tmp$year)
+    # tmp$value <- seq_along(tmp$year)
+    tmp$value <- tmp$year - min(tmp$year) + 1
     obj@parameters[["ordYear"]] <- .dat2par(obj@parameters[["ordYear"]], tmp)
     obj@parameters[["cardYear"]] <- .dat2par(obj@parameters[["cardYear"]],
                                               tmp[nrow(tmp), , drop = FALSE])
@@ -526,6 +560,7 @@ setMethod(
   ".obj2modInp",
   signature(obj = "modInp", app = "constraint", approxim = "list"),
   function(obj, app, approxim) {
+    # browser()
     # !!! Add interpolation of LHS and RHS here
     # browser()
     # .interp_numpar(
@@ -1357,28 +1392,66 @@ setMethod(".obj2modInp",
       rampup, name,
       obj@parameters[[pname]], approxim2, set_name, tech@name
     )
-    mTechRampUp <- pTechRampUp[, colnames(pTechRampUp) != "value", drop = FALSE]
+    # mTechRampUp <- pTechRampUp[, colnames(pTechRampUp) != "value", drop = FALSE]
+    mTechRampUp <- select(pTechRampUp, -value)
     if (ncol(mTechRampUp) != ncol(obj@parameters[[mname]]@data)) {
       mTechRampUp <- merge0(mTechRampUp, mact)
     }
+    # browser()
+    # adding slicep (next) to the mapping
+    # ramp_data <- c(tech@af$rampdown, tech@af$rampup)
+    # if (!is_empty(ramp_data) && any(!is.na(ramp_data))) {
+
+    if (tech@fullYear) {
+      SliceNext <- obj@parameters[["mSliceFYearNext"]]@data
+    } else {
+      SliceNext <- obj@parameters[["mSliceNext"]]@data
+    }
+    mTechRampUp <- left_join(mTechRampUp, SliceNext, by = "slice") %>%
+      select(all_of(obj@parameters[[mname]]@dimSets))
+
+    # tech_name <- tech@name
+      # mTechRampSliceNext <- mTechRampSliceNext %>%
+      #   mutate(tech = tech_name, .before = 1) %>%
+      #   merge0(mvTechAct) %>%
+        # select(all_of(obj@parameters[["mTechRampSliceNext"]]@dimSets))
+      # obj@parameters[["mTechRampSliceNext"]] <-
+      #   .dat2par(obj@parameters[["mTechRampSliceNext"]], mTechRampSliceNext)
+    # }
     # !!! Temporary fix: drop values beyond technology lifespan
     # synchronizing with activity slices
-    if (!is.null(pTechRampUp$region)) {
-      pTechRampUp <- dplyr::filter(pTechRampUp, region %in% unique(mact$region))
-      mTechRampUp <- dplyr::filter(mTechRampUp, region %in% unique(mact$region))
-    }
-    if (!is.null(pTechRampUp$year)) {
-      pTechRampUp <- dplyr::filter(pTechRampUp, year %in% unique(mact$year))
-      mTechRampUp <- dplyr::filter(mTechRampUp, year %in% unique(mact$year))
-    }
-    if (!is.null(pTechRampUp$slice)) {
-      pTechRampUp <- dplyr::filter(pTechRampUp, slice %in% unique(mact$slice))
-      mTechRampUp <- dplyr::filter(mTechRampUp, slice %in% unique(mact$slice))
-    }
+    # if (!is.null(pTechRampUp$region)) {
+    #   pTechRampUp <- dplyr::filter(pTechRampUp, region %in% unique(mact$region))
+    #   mTechRampUp <- dplyr::filter(mTechRampUp, region %in% unique(mact$region))
+    # }
+    # if (!is.null(pTechRampUp$year)) {
+    #   pTechRampUp <- dplyr::filter(pTechRampUp, year %in% unique(mact$year))
+    #   mTechRampUp <- dplyr::filter(mTechRampUp, year %in% unique(mact$year))
+    # }
+    # if (!is.null(pTechRampUp$slice)) {
+    #   pTechRampUp <- dplyr::filter(pTechRampUp, slice %in% unique(mact$slice))
+    #   mTechRampUp <- dplyr::filter(mTechRampUp, slice %in% unique(mact$slice))
+    # }
     # !!! end
-
+    #
     obj@parameters[[pname]] <- .dat2par(obj@parameters[[pname]], pTechRampUp)
     obj@parameters[[mname]] <- .dat2par(obj@parameters[[mname]], mTechRampUp)
+    #
+    # browser()
+    # adding mapping for `slicep`
+    # "mTechRampSliceNext" # tech, region, year, slice, slicep
+    # if (tech@fullYear) {
+    #   x <- obj@parameters[["mSliceFYearNext"]]@data
+    # } else {
+    #   x <- obj@parameters[["mSliceNext"]]@data
+    # }
+    # tech_name <- tech@name
+    # x <- mutate(x, tech = tech_name, .before = 1) %>%
+    #   merge0(mact)
+    # obj@parameters[["mTechFullYear"]]@data
+    # obj@parameters[["mSliceFYearNext"]]@data
+    # obj@parameters[["mSliceNext"]]
+    # obj@parameters[["mvTechAct"]]@data
   }
   obj
 }
@@ -1761,7 +1834,9 @@ setMethod(
     if (tech@early.retirement) {
       obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
         obj@parameters[["mvTechRetiredStock"]],
-        stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
+        # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
+        select(filter(stock_exist, value != 0), -any_of("value"))
+        # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
       )
     }
     # browser()
@@ -1812,6 +1887,7 @@ setMethod(
         pTechCinp2ginp[pTechCinp2ginp$value != 0 & pTechCinp2ginp$value != Inf, ]
       )))
     }
+    # browser()
     if (!is.null(mTechInpComm)) {
       mvTechInp <- merge0(mvTechAct, mTechInpComm, by = "tech")
       mvTechInp <- merge_table2(mvTechInp, pTechCinp2use, pTechCinp2ginp)
@@ -1824,6 +1900,10 @@ setMethod(
       mvTechOut <- merge0(mvTechAct, mTechOutComm, by = "tech")
       obj@parameters[["mvTechOut"]] <-
         .dat2par(obj@parameters[["mvTechOut"]], mvTechOut)
+      # browser()
+      # mvTechOutS <- mvTechOut %>%
+      #   left_join()
+
     } else {
       mvTechOut <- NULL
     }
@@ -1921,7 +2001,8 @@ setMethod(
         if (ncol(tmp) != ncol(mvTechAct) + 1) {
           tmp <- merge0(tmp, mvTechAct)
         }
-        obj@parameters[[dd[i, "tab2"]]] <- .dat2par(obj@parameters[[dd[i, "tab2"]]], tmp)
+        obj@parameters[[dd[i, "tab2"]]] <-
+          .dat2par(obj@parameters[[dd[i, "tab2"]]], tmp)
       }
     }
     #### aeff end
@@ -1930,13 +2011,16 @@ setMethod(
         merge0(mTechInpGroup, mTechOutGroup, by = "tech", suffix = c("", ".1")),
         mvTechAct
       )[, c("tech", "region", "group", "group.1", "year", "slice")]
-      obj@parameters[["meqTechGrp2Grp"]] <- .dat2par(obj@parameters[["meqTechGrp2Grp"]], meqTechGrp2Grp)
+      obj@parameters[["meqTechGrp2Grp"]] <-
+        .dat2par(obj@parameters[["meqTechGrp2Grp"]], meqTechGrp2Grp)
     } else {
       meqTechGrp2Grp <- NULL
     }
     if (!is.null(mTechInpGroup) || !is.null(mTechOutGroup)) {
-      mpTechShareLo <- pTechShare[pTechShare$type == "lo" & pTechShare$value > 0, colnames(pTechShare) != "value"]
-      mpTechShareUp <- pTechShare[pTechShare$type == "up" & pTechShare$value < 1, colnames(pTechShare) != "value"]
+      mpTechShareLo <- pTechShare %>%
+        select(filter(type == "lo" & value > 0), -value)
+      # mpTechShareUp <- pTechShare[pTechShare$type == "up" & pTechShare$value < 1,
+      #                             colnames(pTechShare) != "value"]
     } else {
       mpTechShareUp <- NULL
       mpTechShareLo <- NULL
@@ -2235,6 +2319,25 @@ setMethod(
 
     obj <- .add_ramp0(obj, "rampup", tech, mvTechAct, approxim)
     obj <- .add_ramp0(obj, "rampdown", tech, mvTechAct, approxim)
+
+    # browser()
+    # "mTechRampSliceNext" # tech, region, year, slice, slicep
+    # ramp_data <- c(tech@af$rampdown, tech@af$rampup)
+    # if (!is_empty(ramp_data) && any(!is.na(ramp_data))) {
+    #
+    #   if (tech@fullYear) {
+    #     mTechRampSliceNext <- obj@parameters[["mSliceFYearNext"]]@data
+    #   } else {
+    #     mTechRampSliceNext <- obj@parameters[["mSliceNext"]]@data
+    #   }
+    #   tech_name <- tech@name
+    #   mTechRampSliceNext <- mTechRampSliceNext %>%
+    #     mutate(tech = tech_name, .before = 1) %>%
+    #     merge0(mvTechAct) %>%
+    #     select(all_of(obj@parameters[["mTechRampSliceNext"]]@dimSets))
+    #   obj@parameters[["mTechRampSliceNext"]] <-
+    #     .dat2par(obj@parameters[["mTechRampSliceNext"]], mTechRampSliceNext)
+    # }
     obj
   }
 )

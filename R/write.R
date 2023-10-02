@@ -200,7 +200,7 @@ write.sc <- write_sc
   .interpolation_message("mSliceParentChildE", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
-  # Total parameter ruductions
+  # Total parameter reductions
   mSliceParentChildE <- .get_data_slot(prec@parameters$mSliceParentChildE)
   .interpolation_message("mCommSlice", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -214,7 +214,7 @@ write.sc <- write_sc
   .interpolation_message("mCommSliceOrParent", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
-  # mCommSliceOrParent
+  # mCommSliceOrParent ####
   l1 <- merge0(.get_data_slot(prec@parameters$comm),
                .get_data_slot(prec@parameters$slice))
   l2 <- merge0(mCommSlice, mSliceParentChildE)[, c("comm", "slice", "slicep")]
@@ -228,6 +228,66 @@ write.sc <- write_sc
     .dat2par(prec@parameters[["mCommSliceOrParent"]], mCommSliceOrParent)
   .interpolation_message("mTechInpTot", rest, interpolation_count,
                          interpolation_start_time, len_name)
+
+  # browser()
+  # mvTechOutS ####
+  # finish: mTechCommSliceSliceP
+  mvTechOutS <- prec@parameters[["mvTechOut"]]@data %>%
+    rename(slicep = slice) %>%
+    left_join(prec@parameters[["mCommSliceOrParent"]]@data,
+              by = c("comm", "slicep")) %>%
+    select(all_of(prec@parameters[["mvTechOutS"]]@dimSets)) %>%
+    unique()
+  prec@parameters[["mvTechOutS"]] <-
+    .dat2par(prec@parameters[["mvTechOutS"]], mvTechOutS)
+
+  # mvTechAOutS ####
+  mvTechAOutS <- prec@parameters[["mvTechAOut"]]@data %>%
+    rename(slicep = slice) %>%
+    left_join(prec@parameters[["mCommSliceOrParent"]]@data,
+              by = c("comm", "slicep")) %>%
+    select(all_of(prec@parameters[["mvTechAOutS"]]@dimSets)) %>%
+    unique()
+  prec@parameters[["mvTechAOutS"]] <-
+    .dat2par(prec@parameters[["mvTechAOutS"]], mvTechAOutS)
+
+  # mTechCommSliceSliceP ####
+  # new map for eqTechOutTot
+  mTechCommSliceSliceP <- prec@parameters[["mTechSlice"]]@data %>%
+    rename(slicep = slice) %>%
+    left_join(mCommSliceOrParent, by = c("slicep")) %>%
+    select(all_of(prec@parameters[["mTechCommSliceSliceP"]]@dimSets)) %>%
+    unique()
+  prec@parameters[["mTechCommSliceSliceP"]] <-
+    .dat2par(prec@parameters[["mTechCommSliceSliceP"]], mTechCommSliceSliceP)
+  # browser()
+
+  mTechCommOutSliceSliceP <- prec@parameters[["mvTechOut"]]@data %>%
+    # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
+    rename(slicep = slice) %>%
+    select(-region, -year) %>% unique() %>%
+    left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
+    select(all_of(prec@parameters[["mTechCommOutSliceSliceP"]]@dimSets)) %>%
+    unique()
+  prec@parameters[["mTechCommOutSliceSliceP"]] <-
+    .dat2par(prec@parameters[["mTechCommOutSliceSliceP"]],
+             mTechCommOutSliceSliceP)
+
+  mTechCommAOutSliceSliceP <- prec@parameters[["mvTechAOut"]]@data %>%
+    # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
+    rename(slicep = slice) %>%
+    select(-region, -year) %>% unique() %>%
+    left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
+    select(all_of(prec@parameters[["mTechCommAOutSliceSliceP"]]@dimSets)) %>%
+    unique()
+  prec@parameters[["mTechCommAOutSliceSliceP"]] <-
+    .dat2par(prec@parameters[["mTechCommAOutSliceSliceP"]],
+             mTechCommAOutSliceSliceP)
+
+  # mStorageCommSliceNext ####
+  # new map for eqTechOutTot
+
+
   rest <- rest + 1
 
   reduce_total_map <- function(yy) {

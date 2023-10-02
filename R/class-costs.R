@@ -103,7 +103,8 @@ newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
         ))
       }
       mult <- mult[, !apply(is.na(mult), 2, all), drop = FALSE]
-      if (anyDuplicated(mult[, colnames(mult) != "value", drop = FALSE])) {
+      # if (anyDuplicated(mult[, colnames(mult) != "value", drop = FALSE])) {
+      if (anyDuplicated(select(mult, -value))) {
         stop(paste0('There are duplicated row(s) in mult (cost "', name, '").'))
       }
       if (is.null(mult$value)) {
@@ -212,7 +213,8 @@ newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
     }
 
     xnm <- paste0("mCosts", stm@name)
-    prec@parameters[[xnm]] <- .dat2par(newParameter(xnm, colnames(subset), "map"), subset)
+    prec@parameters[[xnm]] <- .dat2par(newParameter(xnm, colnames(subset), "map"),
+                                       subset)
     subset_txt <- paste0(xnm, "(", paste0(colnames(subset), collapse = ", "), ")")
   } else {
     subset_txt <- NULL

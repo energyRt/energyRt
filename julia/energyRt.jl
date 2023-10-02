@@ -1,4 +1,3 @@
-println("Julia Version: ", VERSION)
 using Dates
 include("inc1.jl")
 flog = open("output/log.csv", "w")
@@ -32,8 +31,10 @@ model = Model();
 @variable(model, vTechAct[mvTechAct] >= 0);
 @variable(model, vTechInp[mvTechInp] >= 0);
 @variable(model, vTechOut[mvTechOut] >= 0);
+@variable(model, vTechOutS[mvTechOutS] >= 0);
 @variable(model, vTechAInp[mvTechAInp] >= 0);
 @variable(model, vTechAOut[mvTechAOut] >= 0);
+@variable(model, vTechAOutS[mvTechAOutS] >= 0);
 @variable(model, vSupOut[mSupAva] >= 0);
 @variable(model, vSupReserve[mvSupReserve] >= 0);
 @variable(model, vDemInp[mvDemInp] >= 0);
@@ -115,12 +116,12 @@ println("eqTechAfsLo(tech, region, year, slice) done ", Dates.format(now(), "HH:
 # eqTechAfsUp(tech, region, year, slice)$meqTechAfsUp(tech, region, year, slice)
 @constraint(model, [(t, r, y, s) in meqTechAfsUp], sum((if (t,r,y,sp) in mvTechAct; vTechAct[(t,r,y,sp)]; else 0; end;) for sp in slice if (s,sp) in mSliceParentChildE) <=  (if haskey(pTechAfsUp, (t,r,y,s)); pTechAfsUp[(t,r,y,s)]; else pTechAfsUpDef; end)*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pTechCap2act, (t)); pTechCap2act[(t)]; else pTechCap2actDef; end)*vTechCap[(t,r,y)]*(if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)*prod((if haskey(pTechWeatherAfsUp, (wth1,t)); pTechWeatherAfsUp[(wth1,t)]; else pTechWeatherAfsUpDef; end)*(if haskey(pWeather, (wth1,r,y,s)); pWeather[(wth1,r,y,s)]; else pWeatherDef; end) for wth1 in weather if (wth1,t) in mTechWeatherAfsUp));
 println("eqTechAfsUp(tech, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
-# eqTechRampUp(tech, region, year, slice)$mTechRampUp(tech, region, year, slice)
-@constraint(model, [(t, r, y, s) in mTechRampUp], (vTechAct[(t,r,y,s)]) / ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end))-sum((vTechAct[(t,r,y,sp)]) / ((if haskey(pSliceShare, (sp)); pSliceShare[(sp)]; else pSliceShareDef; end)) for sp in slice if (((t in mTechFullYear && (sp,s) in mSliceFYearNext) || (!((t in mTechFullYear)) && (sp,s) in mSliceNext)) && (t,r,y,sp) in mvTechAct)) <=  ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)*365*24*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pTechCap2act, (t)); pTechCap2act[(t)]; else pTechCap2actDef; end)*vTechCap[(t,r,y)]) / ((if haskey(pTechRampUp, (t,r,y,s)); pTechRampUp[(t,r,y,s)]; else pTechRampUpDef; end)));
-println("eqTechRampUp(tech, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
-# eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slice)
-@constraint(model, [(t, r, y, s) in mTechRampDown], sum((vTechAct[(t,r,y,sp)]) / ((if haskey(pSliceShare, (sp)); pSliceShare[(sp)]; else pSliceShareDef; end)) for sp in slice if (((t in mTechFullYear && (sp,s) in mSliceFYearNext) || (!((t in mTechFullYear)) && (sp,s) in mSliceNext)) && (t,r,y,sp) in mvTechAct))-(vTechAct[(t,r,y,s)]) / ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)) <=  ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)*365*24*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pTechCap2act, (t)); pTechCap2act[(t)]; else pTechCap2actDef; end)*vTechCap[(t,r,y)]) / ((if haskey(pTechRampDown, (t,r,y,s)); pTechRampDown[(t,r,y,s)]; else pTechRampDownDef; end)));
-println("eqTechRampDown(tech, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
+# eqTechRampUp(tech, region, year, slice, slicep)$mTechRampUp(tech, region, year, slice, slicep)
+@constraint(model, [(t, r, y, s, sp) in mTechRampUp], (vTechAct[(t,r,y,s)]) / ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end))-(vTechAct[(t,r,y,sp)]) / ((if haskey(pSliceShare, (sp)); pSliceShare[(sp)]; else pSliceShareDef; end)) <=  ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)*(if haskey(pTechCap2act, (t)); pTechCap2act[(t)]; else pTechCap2actDef; end)*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pTechCap2act, (t)); pTechCap2act[(t)]; else pTechCap2actDef; end)*vTechCap[(t,r,y)]) / ((if haskey(pTechRampUp, (t,r,y,s)); pTechRampUp[(t,r,y,s)]; else pTechRampUpDef; end)));
+println("eqTechRampUp(tech, region, year, slice, slicep) done ", Dates.format(now(), "HH:MM:SS"))
+# eqTechRampDown(tech, region, year, slice, slicep)$mTechRampDown(tech, region, year, slice, slicep)
+@constraint(model, [(t, r, y, s, sp) in mTechRampDown], (vTechAct[(t,r,y,sp)]) / ((if haskey(pSliceShare, (sp)); pSliceShare[(sp)]; else pSliceShareDef; end))-(vTechAct[(t,r,y,s)]) / ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)) <=  ((if haskey(pSliceShare, (s)); pSliceShare[(s)]; else pSliceShareDef; end)*(if haskey(pTechCap2act, (t)); pTechCap2act[(t)]; else pTechCap2actDef; end)*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pYearFraction, (y)); pYearFraction[(y)]; else pYearFractionDef; end)*(if haskey(pTechCap2act, (t)); pTechCap2act[(t)]; else pTechCap2actDef; end)*vTechCap[(t,r,y)]) / ((if haskey(pTechRampDown, (t,r,y,s)); pTechRampDown[(t,r,y,s)]; else pTechRampDownDef; end)));
+println("eqTechRampDown(tech, region, year, slice, slicep) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechActSng(tech, comm, region, year, slice)$meqTechActSng(tech, comm, region, year, slice)
 @constraint(model, [(t, c, r, y, s) in meqTechActSng], vTechAct[(t,r,y,s)]  ==  (vTechOut[(t,c,r,y,s)]) / ((if haskey(pTechCact2cout, (t,c,r,y,s)); pTechCact2cout[(t,c,r,y,s)]; else pTechCact2coutDef; end)));
 println("eqTechActSng(tech, comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
@@ -323,10 +324,16 @@ println("eqInp2Lo(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:
 @constraint(model, [(c, r, y, s) in mSupOutTot], vSupOutTot[(c,r,y,s)]  ==  sum(sum(vSupOut[(s1,c,r,y,sp)] for sp in slice if ((c,s,sp) in mCommSliceOrParent && (s1,c,r,y,sp) in mSupAva)) for s1 in sup if (s1,c) in mSupComm));
 println("eqSupOutTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
-@constraint(model, [(c, r, y, s) in mTechInpTot], vTechInpTot[(c,r,y,s)]  ==  sum(sum((if (t,c,r,y,sp) in mvTechInp; vTechInp[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,sp) in mTechSlice && (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechInpComm)+sum(sum((if (t,c,r,y,sp) in mvTechAInp; vTechAInp[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,sp) in mTechSlice && (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAInp));
+@constraint(model, [(c, r, y, s) in mTechInpTot], vTechInpTot[(c,r,y,s)]  ==  sum(sum((if (t,c,r,y,sp) in mvTechInp; vTechInp[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)) for t in tech if (t,c) in mTechInpComm)+sum(sum((if (t,c,r,y,sp) in mvTechAInp; vTechAInp[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)) for t in tech if (t,c) in mTechAInp));
 println("eqTechInpTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
+# eqTechOutS(tech, comm, region, year, slice)$mvTechOutS(tech, comm, region, year, slice)
+@constraint(model, [(t, c, r, y, s) in mvTechOutS], vTechOutS[(t,c,r,y,s)]  ==  sum((if (t,c,r,y,sp) in mvTechOut; vTechOut[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)));
+println("eqTechOutS(tech, comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
+# eqTechAOutS(tech, comm, region, year, slice)$mvTechAOutS(tech, comm, region, year, slice)
+@constraint(model, [(t, c, r, y, s) in mvTechAOutS], vTechAOutS[(t,c,r,y,s)]  ==  sum((if (t,c,r,y,sp) in mvTechAOut; vTechAOut[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)));
+println("eqTechAOutS(tech, comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
-@constraint(model, [(c, r, y, s) in mTechOutTot], vTechOutTot[(c,r,y,s)]  ==  sum(sum((if (t,c,r,y,sp) in mvTechOut; vTechOut[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,sp) in mTechSlice && (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechOutComm)+sum(sum((if (t,c,r,y,sp) in mvTechAOut; vTechAOut[(t,c,r,y,sp)]; else 0; end;) for sp in slice if ((t,sp) in mTechSlice && (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAOut));
+@constraint(model, [(c, r, y, s) in mTechOutTot], vTechOutTot[(c,r,y,s)]  ==  sum((if (t,c,r,y,s) in mvTechOutS; vTechOutS[(t,c,r,y,s)]; else 0; end;) for t in tech if (t,c) in mTechOutComm)+sum((if (t,c,r,y,s) in mvTechAOutS; vTechAOutS[(t,c,r,y,s)]; else 0; end;) for t in tech if (t,c) in mTechAOut));
 println("eqTechOutTot(comm, region, year, slice) done ", Dates.format(now(), "HH:MM:SS"))
 # eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
 @constraint(model, [(c, r, y, s) in mStorageInpTot], vStorageInpTot[(c,r,y,s)]  ==  sum(vStorageInp[(st1,c,r,y,s)] for st1 in stg if (st1,c,r,y,s) in mvStorageStore)+sum(vStorageAInp[(st1,c,r,y,s)] for st1 in stg if (st1,c,r,y,s) in mvStorageAInp));

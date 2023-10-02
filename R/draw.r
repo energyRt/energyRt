@@ -328,7 +328,8 @@ draw.technology <- function(
                 paste(c(
                   sapply(seq(along = ll$wcomm[[x]]$comm), function(z) {
                     paste(substr(x, 2, 4), ".", ll$wcomm[[x]]$comm[z],
-                      " = ", to_format(ll$wcomm[[x]][z, x]),
+                      # " = ", to_format(ll$wcomm[[x]][z, x]),
+                      " = ", to_format(select(ll$wcomm[[x]], x)[z]),
                       sep = ""
                     )
                   }),
@@ -506,7 +507,8 @@ draw.technology <- function(
               paste(c(
                 sapply(seq(along = ll$wcomm[[x]]$comm), function(z) {
                   paste(substr(x, 2, 4), ".", ll$wcomm[[x]]$comm[z],
-                    " = ", to_format(ll$wcomm[[x]][z, x]),
+                    # " = ", to_format(ll$wcomm[[x]][z, x]),
+                    " = ", to_format(select(ll$wcomm[[x]], x)[z]),
                     sep = ""
                   )
                 }),
@@ -544,6 +546,7 @@ setMethod("draw", "technology", draw.technology)
 # ! to_format <- function(x, def = 1) : numeric to convenient format (no more then 5 symbols)
 #---------------------------------------------------------------------------------------------------------
 to_format <- function(x, def = 1) {
+  # browser()
   # numeric to convinient format (no more then 5 symbols)
   if (is.na(x)) {
     "NA"

@@ -118,7 +118,7 @@ add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
         obj@data[[nm]] <- add(obj@data[[nm]], arg[ii][[i]])
       } else {
         # !!! add name-check with other repositories
-        obj@data[[arg[ii][[i]]@name]] <- arg[ii][[i]]
+        obj@data[[nm]] <- arg[ii][[i]]
       }
     }
     arg <- arg[!ii]

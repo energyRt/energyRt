@@ -173,6 +173,7 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
   dtf <- mutate(dtf, slice = x$slice, .before = "share")
   # browser()
   .check_timetable(dtf, year_fraction = year_fraction) # check validity
+  dtf <- dplyr::arrange(dtf, across(1:slice))
   return(dtf)
 }
 
@@ -540,14 +541,29 @@ setMethod("print", "calendar", function(x, ...) {
   }
 
   # @structure
-  tmp <- nchar(obj@slice_share$slice) -
-    nchar(gsub("[_]", "", obj@slice_share$slice)) + 2
-  names(tmp) <- obj@slice_share$slice
-  tmp[obj@timetable[[1]][1]] <- 1
-  obj@timeframes <- lapply(
-    1:(ncol(obj@timetable) - 2),
-    function(x) names(tmp)[tmp == x]
-  )
+  # browser()
+  nframes <- select(obj@timetable, 1:slice, -slice) %>% ncol()
+  fnames <- names(obj@slices_in_frame)
+  if (nframes > 2) {
+    tmp <- nchar(obj@slice_share$slice) -
+      nchar(gsub("[_]", "", obj@slice_share$slice)) + 2
+    names(tmp) <- obj@slice_share$slice
+    tmp[obj@timetable[[1]][1]] <- 1
+    obj@timeframes <- lapply(
+      1:(ncol(obj@timetable) - 2),
+      function(x) names(tmp)[tmp == x]
+    )
+  } else if (nframes == 1) {
+    obj@timeframes <- list()
+    obj@timeframes[fnames[1]] <- fnames[1]
+  } else if (nframes == 2) {
+    obj@timeframes <- list()
+    obj@timeframes[[fnames[1]]] <- fnames[1]
+    obj@timeframes[[fnames[2]]] <- obj@timetable[[fnames[2]]] #%>% sort()
+  } else {
+    stop("Empty timeframes / timeslices")
+  }
+
   names(obj@timeframes) <- colnames(d)
 
   obj@default_timeframe <- colnames(d)[ncol(d)]
@@ -625,10 +641,13 @@ setMethod("print", "calendar", function(x, ...) {
     )
     n1 <- c(lapply(obj@timeframes[-1], function(x) x), recursive = TRUE)
     names(n1) <- NULL
-    n2 <- c(lapply(obj@timeframes[-1], function(x) c(x[-1], x[1])), recursive = TRUE)
+    n2 <- c(lapply(obj@timeframes[-1], function(x) c(x[-1], x[1])),
+            recursive = TRUE)
     names(n2) <- NULL
+    # browser()
     obj@next_in_year <- data.table(
-      slice = n1, slicep = n2,
+      slice = n1,
+      slicep = n2,
       stringsAsFactors = FALSE
     )
   }
@@ -701,13 +720,13 @@ if (F) {
   if (class(app) == "technology") slt <- slt[slt != "afs"]
   for (ss in slt) {
     if (any(colnames(slot(app, ss)) == "slice")) {
-      tmp <- slot(app, ss)
+      tmp <- slot(app, ss) %>% as.data.frame() # !!! rewrite
       fl <- (!is.na(tmp$slice) & !(tmp$slice %in% approxim$slice)) # !!! @calendar?
       if (any(fl)) {
         mark_col <- (sapply(tmp, is.character) | colnames(tmp) == "year")
         mark_coli <- colnames(tmp)[mark_col]
-        t1 <- tmp[fl, , drop = FALSE]
-        t2 <- tmp[!fl, , drop = FALSE]
+        t1 <- tmp[fl, , drop = FALSE] %>% as.data.frame() # !!! rewrite
+        t2 <- tmp[!fl, , drop = FALSE] %>% as.data.frame() # !!! rewrite
         # Sort from lowest level to largest
         ff <- approxim$parent_child$parent[
           !duplicated(approxim$parent_child$parent)
@@ -725,22 +744,29 @@ if (F) {
           sort(f1[t1$slice], index.return = TRUE, decreasing = TRUE)$ix, ,
           drop = FALSE
         ]
-        # Add child desaggregation
+        # browser()
+        # Add child disaggregation
         for (i in seq_len(nrow(t1))) {
-          ll <- approxim$parent_child[
-            approxim$parent_child$parent == t1[i, "slice"], "child"
-          ]
+          # ll <- approxim$parent_child[
+          #   approxim$parent_child$parent == t1[i, "slice"], "child"
+          # ]
+          ll <- approxim$parent_child %>%
+            filter(parent == t1$slice[i]) %>%
+            select(child) %>% purrr::simplify()
+
           t0 <- t1[rep(i, length(ll)), , drop = FALSE]
           t0$slice <- ll
-          tes <- t0[, mark_coli, drop = FALSE]
+          # tes <- t0[, mark_coli, drop = FALSE]
+          tes <- select(t0, all_of(mark_coli)) %>% as.matrix()
           tes[is.na(tes)] <- "-"
           z1 <- apply(tes, 1, paste0, collapse = "##")
-          tes <- t2[, mark_coli, drop = FALSE]
+          # tes <- t2[, mark_coli, drop = FALSE]
+          tes <- select(t2, all_of(mark_coli)) %>% as.matrix()
           tes[is.na(tes)] <- "-"
           z2 <- apply(tes, 1, paste0, collapse = "##")
           # If there are the same row, after splititng
           if (any(z1 %in% z2)) {
-            merge_col <- merge(t0, t2, by = mark_coli)
+            merge_col <- merge0(t0, t2, by = mark_coli)
             colnames(merge_col)[seq_len(ncol(t0))] <- colnames(t0)
             for (j in colnames(tmp)[!mark_col]) {
               merge_col[!is.na(merge_col[, paste0(j, ".y")]), j] <- NA
@@ -798,3 +824,8 @@ if (F) {
 #   sl <- .init_slice(sl)
 #   sl
 # }
+
+# ToDo: write methods: ####
+## `add` ####
+## `update` ####
+

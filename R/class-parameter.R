@@ -184,7 +184,7 @@ setMethod(
     # cat(paste0(obj@name, ": ", class(data)[1], ", ncol =", ncol(data), "\n"))
     # if (!is.data.table(data)) browser() # DEBUG
     if (!is.data.table(data)) { # DEBUG
-      warning("\nDEBUG info: class ", class(data), " in ", obj@name, "@data\n")
+      # warning("\nDEBUG info: class ", class(data), " in ", obj@name, "@data\n")
       # browser()
     }
     # if (obj@name == "ordYear") browser() # DEBUG

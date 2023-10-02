@@ -1,5 +1,26 @@
 # Some commonly used functions
 
+factors_in_prams <- function(x) {
+  # x - list
+  # if (inherits(x, "list")) y <- lapply()
+  # browser()
+  y <- lapply(x, function(y) any(sapply(y@data, class) == "factors"))
+  y[unlist(y)]
+}
+
+# factors_in_prams(scen_BASE_int@modInp@parameters)
+
+nonchar_in_sets <- function(x) {
+  # x - list
+  # if (inherits(x, "list")) y <- lapply()
+  # browser()
+  y <- lapply(x, function(y) any(class(y) != "character"))
+  y[unlist(y)]
+}
+# nonchar_in_sets(scen_BASE_int@modInp@set)
+# scen_BASE_int@modInp@set$year %>% class()
+
+
 #' Size of an object
 #'
 #' @param x - any R object

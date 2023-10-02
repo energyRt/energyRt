@@ -10,7 +10,7 @@ newConstraint(
   eq = "==",
   rhs = data.frame(),
   for.each = NULL,
-  defVal = 0,
+  defVal = 0.001,
   arg = NULL
 )
 }

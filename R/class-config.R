@@ -92,7 +92,7 @@ setMethod("initialize", "config", function(.Object, ...) {
 
 #' @export
 setMethod("setCalendar", signature(obj = "config"), function(obj, ...) {
-  obj@calendar <- newCalendar(...)
+  obj@calendar <- newCalendar(...) ## ToDo: add check for fractional data
   obj
 })
 

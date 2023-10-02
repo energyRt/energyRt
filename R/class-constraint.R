@@ -84,7 +84,13 @@ setClass("summand",
 #' @return Object of class `constraint`.
 #'
 #' @export
-newConstraint <- function(name, ..., eq = "==", rhs = data.frame(), for.each = NULL, defVal = 0, arg = NULL) {
+newConstraint <- function(
+    name, ...,
+    eq = "==",
+    rhs = data.frame(),
+    for.each = NULL,
+    defVal = .001, # temporary solution to avoid dropping default zeros during interpolation
+    arg = NULL) {
   obj <- new("constraint")
   # stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq))) {
@@ -166,6 +172,19 @@ newConstraint <- function(name, ..., eq = "==", rhs = data.frame(), for.each = N
   obj
 }
 
+
+
+#' @param object any R object
+#'
+#' @return TRUE if the object inherits class `constraint`, FALSE otherwise.
+#' @export
+#'
+#' @examples
+#' isConstraint(1)
+#' isConstraint(newConstraint(""))
+isConstraint <- function(object) {
+  inherits(object, "constraint")
+}
 
 #' @export
 addSummand <- function(eqt, variable = NULL, mult = data.frame(),
@@ -398,14 +417,21 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       if (i == "year") {
         tmg <- prec@parameters[["mMidMilestone"]]@data
         if (any(all.set$lag.year)) {
-          tmg <- tmg[!(tmg$year %in% prec@parameters[["mMilestoneFirst"]]@data$year), , drop = FALSE]
+          tmg <- tmg[
+            !(tmg$year %in% prec@parameters[["mMilestoneFirst"]]@data$year), ,
+            drop = FALSE]
         }
         if (any(all.set$lead.year)) {
-          tmg <- tmg[tmg$year %in% prec@parameters[["mMilestoneHasNext"]]@data$year, , drop = FALSE]
+          tmg <- tmg[
+            tmg$year %in% prec@parameters[["mMilestoneHasNext"]]@data$year, ,
+            drop = FALSE]
         }
       }
       tmp_fe <- rbind(
-        merge(tmp_fe[, colnames(tmp_fe) != i, drop = FALSE], tmg),
+        merge(
+          select(tmp_fe, -any_of(i)),
+          # tmp_fe[, colnames(tmp_fe) != i, drop = FALSE],
+          tmg),
         tmp_fe[!is.na(tmp_fe[[i]]), , drop = FALSE]
       )
       tmp_fe <- tmp_fe[!duplicated(tmp_fe), , drop = FALSE]

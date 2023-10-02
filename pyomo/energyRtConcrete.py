@@ -39,7 +39,6 @@ def read_dict(name):
     tbl = pd.DataFrame(tbl.value.tolist(), index = idx, columns = ["value"])
     return tbl.to_dict()["value"]
 ##### decl par #####
-exec(open("inc2.py").read())
 print("variables... " + str(datetime.datetime.now().strftime("%H:%M:%S")) + " (" + str(round(time.time() - seconds, 2)) + " s)")
 model.vTechInv = Var(mTechInv, doc = "Overnight investment costs");
 model.vTechEac = Var(mTechEac, doc = "Annualized investment costs");
@@ -62,9 +61,11 @@ model.vTechRetiredNewCap = Var(mvTechRetiredNewCap, domain = pyo.NonNegativeReal
 model.vTechCap = Var(mTechSpan, domain = pyo.NonNegativeReals, doc = "Total capacity of the technology");
 model.vTechAct = Var(mvTechAct, domain = pyo.NonNegativeReals, doc = "Activity level of technology");
 model.vTechInp = Var(mvTechInp, domain = pyo.NonNegativeReals, doc = "Input level");
-model.vTechOut = Var(mvTechOut, domain = pyo.NonNegativeReals, doc = "Output level");
+model.vTechOut = Var(mvTechOut, domain = pyo.NonNegativeReals, doc = "Commodity output from technology - tech timeframe");
+model.vTechOutS = Var(mvTechOutS, domain = pyo.NonNegativeReals, doc = "Commodity output from technology - comm timeframe");
 model.vTechAInp = Var(mvTechAInp, domain = pyo.NonNegativeReals, doc = "Auxiliary commodity input");
 model.vTechAOut = Var(mvTechAOut, domain = pyo.NonNegativeReals, doc = "Auxiliary commodity output");
+model.vTechAOutS = Var(mvTechAOutS, domain = pyo.NonNegativeReals, doc = "Auxiliary commodity output");
 model.vSupOut = Var(mSupAva, domain = pyo.NonNegativeReals, doc = "Output of supply");
 model.vSupReserve = Var(mvSupReserve, domain = pyo.NonNegativeReals, doc = "Total supply reserve");
 model.vDemInp = Var(mvDemInp, domain = pyo.NonNegativeReals, doc = "Input to demand");
@@ -104,6 +105,7 @@ model.vTradeInv = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "Investmen
 model.vTradeEac = Var(mTradeEac, domain = pyo.NonNegativeReals, doc = "Investment in trade capacity (EAC)");
 model.vTradeNewCap = Var(mTradeNew, domain = pyo.NonNegativeReals, doc = "New trade capacity");
 model.vTotalUserCosts = Var(mvTotalUserCosts, domain = pyo.NonNegativeReals, doc = "Total additional costs (set by user)");
+exec(open("inc2.py").read())
 print("equations... " + str(datetime.datetime.now().strftime("%H:%M:%S")) + " (" + str(round(time.time() - seconds, 2)) + " s)")
 if verbose: print("eqTechSng2Sng ", end = "")
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
@@ -162,12 +164,12 @@ if verbose: print("eqTechAfsUp ", end = "")
 model.eqTechAfsUp = Constraint(meqTechAfsUp, rule = lambda model, t, r, y, s : sum((model.vTechAct[t,r,y,sp] if (t,r,y,sp) in mvTechAct else 0) for sp in slice if (s,sp) in mSliceParentChildE) <=  pTechAfsUp.get((t,r,y,s))*pYearFraction.get((y))*pTechCap2act.get((t))*model.vTechCap[t,r,y]*pSliceShare.get((s))*prod(pTechWeatherAfsUp.get((wth1,t))*pWeather.get((wth1,r,y,s)) for wth1 in weather if (wth1,t) in mTechWeatherAfsUp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechRampUp ", end = "")
-# eqTechRampUp(tech, region, year, slice)$mTechRampUp(tech, region, year, slice)
-model.eqTechRampUp = Constraint(mTechRampUp, rule = lambda model, t, r, y, s : (model.vTechAct[t,r,y,s]) / (pSliceShare.get((s)))-sum((model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp))) for sp in slice if (((t in mTechFullYear and (sp,s) in mSliceFYearNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceNext)) and (t,r,y,sp) in mvTechAct)) <=  (pSliceShare.get((s))*365*24*pYearFraction.get((y))*pYearFraction.get((y))*pTechCap2act.get((t))*model.vTechCap[t,r,y]) / (pTechRampUp.get((t,r,y,s))));
+# eqTechRampUp(tech, region, year, slice, slicep)$mTechRampUp(tech, region, year, slice, slicep)
+model.eqTechRampUp = Constraint(mTechRampUp, rule = lambda model, t, r, y, s, sp : (model.vTechAct[t,r,y,s]) / (pSliceShare.get((s)))-(model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp))) <=  (pSliceShare.get((s))*pTechCap2act.get((t))*pYearFraction.get((y))*pYearFraction.get((y))*pTechCap2act.get((t))*model.vTechCap[t,r,y]) / (pTechRampUp.get((t,r,y,s))));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechRampDown ", end = "")
-# eqTechRampDown(tech, region, year, slice)$mTechRampDown(tech, region, year, slice)
-model.eqTechRampDown = Constraint(mTechRampDown, rule = lambda model, t, r, y, s : sum((model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp))) for sp in slice if (((t in mTechFullYear and (sp,s) in mSliceFYearNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceNext)) and (t,r,y,sp) in mvTechAct))-(model.vTechAct[t,r,y,s]) / (pSliceShare.get((s))) <=  (pSliceShare.get((s))*365*24*pYearFraction.get((y))*pYearFraction.get((y))*pTechCap2act.get((t))*model.vTechCap[t,r,y]) / (pTechRampDown.get((t,r,y,s))));
+# eqTechRampDown(tech, region, year, slice, slicep)$mTechRampDown(tech, region, year, slice, slicep)
+model.eqTechRampDown = Constraint(mTechRampDown, rule = lambda model, t, r, y, s, sp : (model.vTechAct[t,r,y,sp]) / (pSliceShare.get((sp)))-(model.vTechAct[t,r,y,s]) / (pSliceShare.get((s))) <=  (pSliceShare.get((s))*pTechCap2act.get((t))*pYearFraction.get((y))*pYearFraction.get((y))*pTechCap2act.get((t))*model.vTechCap[t,r,y]) / (pTechRampDown.get((t,r,y,s))));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechActSng ", end = "")
 # eqTechActSng(tech, comm, region, year, slice)$meqTechActSng(tech, comm, region, year, slice)
@@ -439,11 +441,19 @@ model.eqSupOutTot = Constraint(mSupOutTot, rule = lambda model, c, r, y, s : mod
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechInpTot ", end = "")
 # eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
-model.eqTechInpTot = Constraint(mTechInpTot, rule = lambda model, c, r, y, s : model.vTechInpTot[c,r,y,s]  ==  sum(sum((model.vTechInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechInp else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechInpComm)+sum(sum((model.vTechAInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAInp else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAInp));
+model.eqTechInpTot = Constraint(mTechInpTot, rule = lambda model, c, r, y, s : model.vTechInpTot[c,r,y,s]  ==  sum(sum((model.vTechInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechInp else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)) for t in tech if (t,c) in mTechInpComm)+sum(sum((model.vTechAInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAInp else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)) for t in tech if (t,c) in mTechAInp));
+if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
+if verbose: print("eqTechOutS ", end = "")
+# eqTechOutS(tech, comm, region, year, slice)$mvTechOutS(tech, comm, region, year, slice)
+model.eqTechOutS = Constraint(mvTechOutS, rule = lambda model, t, c, r, y, s : model.vTechOutS[t,c,r,y,s]  ==  sum((model.vTechOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechOut else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)));
+if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
+if verbose: print("eqTechAOutS ", end = "")
+# eqTechAOutS(tech, comm, region, year, slice)$mvTechAOutS(tech, comm, region, year, slice)
+model.eqTechAOutS = Constraint(mvTechAOutS, rule = lambda model, t, c, r, y, s : model.vTechAOutS[t,c,r,y,s]  ==  sum((model.vTechAOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAOut else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechOutTot ", end = "")
 # eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
-model.eqTechOutTot = Constraint(mTechOutTot, rule = lambda model, c, r, y, s : model.vTechOutTot[c,r,y,s]  ==  sum(sum((model.vTechOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechOut else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechOutComm)+sum(sum((model.vTechAOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAOut else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAOut));
+model.eqTechOutTot = Constraint(mTechOutTot, rule = lambda model, c, r, y, s : model.vTechOutTot[c,r,y,s]  ==  sum((model.vTechOutS[t,c,r,y,s] if (t,c,r,y,s) in mvTechOutS else 0) for t in tech if (t,c) in mTechOutComm)+sum((model.vTechAOutS[t,c,r,y,s] if (t,c,r,y,s) in mvTechAOutS else 0) for t in tech if (t,c) in mTechAOut));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageInpTot ", end = "")
 # eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
