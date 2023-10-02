@@ -24,6 +24,8 @@ draw.technology(
 )
 }
 \arguments{
+\item{tech}{.}
+
 \item{show_all}{}
 }
 \description{
