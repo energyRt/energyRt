@@ -40,7 +40,7 @@ setClass("config",
     debug = data.frame(
       comm = character(),
       region = character(),
-      year = numeric(),
+      year = integer(),
       slice = character(),
       dummyImport = numeric(),
       dummyExport = numeric(),
@@ -48,7 +48,7 @@ setClass("config",
     ),
     discount = data.frame(
       region = character(),
-      year = numeric(),
+      year = integer(),
       discount = numeric(),
       stringsAsFactors = FALSE
     ),
@@ -92,7 +92,7 @@ setMethod("initialize", "config", function(.Object, ...) {
 
 #' @export
 setMethod("setCalendar", signature(obj = "config"), function(obj, ...) {
-  obj@calendar <- newCalendar(...)
+  obj@calendar <- newCalendar(...) ## ToDo: add check for fractional data
   obj
 })
 
@@ -112,7 +112,6 @@ setMethod("setHorizon", signature(obj = "config"), function(obj, period, ...) {
     obj
   }
 )
-
 # setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
 
 #' @export

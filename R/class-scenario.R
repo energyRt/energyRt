@@ -99,8 +99,8 @@ setMethod("summary", signature(object = "scenario"),
 
 #' @export
 setMethod("setHorizon", signature(obj = "scenario"),
-  function(obj, horizon, intervals) {
-    obj@model <- setHorizon(obj@model, horizon, intervals)
+  function(obj, period, intervals) {
+    obj@model <- setHorizon(obj@model, period, intervals)
     obj
   }
 )
@@ -125,3 +125,17 @@ setMethod("getHorizon", signature(obj = "scenario"), function(obj) {
 #   checkPYOMO = readLines("pyomo/check.py"),
 #   checkGLPK = readLines("glpk/check.mod")
 # )
+
+#' @method add scenario
+#' @rdname add
+#'
+#' @return
+#' @export
+setMethod(
+  "add",
+  "scenario",
+  function(obj, ..., overwrite = FALSE, repo_name = NULL) {
+    stop("'add' method is not yet implemented for scenario.\n",
+         "You can add objects to a new scenario on 'interpolation' stage.")
+  }
+)

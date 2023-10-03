@@ -23,6 +23,7 @@ An S4 class to store the model objects.
 
 \seealso{
 Other repository: 
+\code{\link{add,repository-method}},
 \code{\link{newRepository}()}
 }
 \concept{repository}

@@ -9,6 +9,8 @@ setGeneric("draw", function(...) UseMethod("draw"))
 setGeneric("read", function(...) UseMethod("read")) #
 setGeneric("interpolate", function(object, ...) UseMethod("interpolate"))
 
+# setGeneric("update", function(object, ...) UseMethod("update"))
+
 # energyRt methods (exported)
 setGeneric("setHorizon", function(obj, ...) standardGeneric("setHorizon"))
 setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))

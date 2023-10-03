@@ -101,8 +101,10 @@ set mvTechRetiredNewCap dimen 4;
 set mvTechRetiredStock dimen 3;
 set mvTechAct dimen 4;
 set mvTechOut dimen 5;
+set mvTechOutS dimen 5;
 set mvTechAInp dimen 5;
 set mvTechAOut dimen 5;
+set mvTechAOutS dimen 5;
 set mvDemInp dimen 4;
 set mvBalance dimen 4;
 set mvInpTot dimen 4;
@@ -165,8 +167,11 @@ set mSubCost dimen 3;
 set mAggOut dimen 4;
 set mTechAfUp dimen 4;
 set mTechFullYear dimen 1;
-set mTechRampUp dimen 4;
-set mTechRampDown dimen 4;
+set mTechRampUp dimen 5;
+set mTechRampDown dimen 5;
+set mTechCommSliceSliceP dimen 4;
+set mTechCommOutSliceSliceP dimen 4;
+set mTechCommAOutSliceSliceP dimen 4;
 set mTechOlifeInf dimen 2;
 set mStorageOlifeInf dimen 2;
 set mTechAfcUp dimen 5;
@@ -384,8 +389,10 @@ var vTechCap{tech, region, year} >= 0;
 var vTechAct{tech, region, year, slice} >= 0;
 var vTechInp{tech, comm, region, year, slice} >= 0;
 var vTechOut{tech, comm, region, year, slice} >= 0;
+var vTechOutS{tech, comm, region, year, slice} >= 0;
 var vTechAInp{tech, comm, region, year, slice} >= 0;
 var vTechAOut{tech, comm, region, year, slice} >= 0;
+var vTechAOutS{tech, comm, region, year, slice} >= 0;
 var vSupOut{sup, comm, region, year, slice} >= 0;
 var vSupReserve{sup, comm, region} >= 0;
 var vDemInp{comm, region, year, slice} >= 0;
@@ -459,9 +466,9 @@ s.t.  eqTechAfsLo{(t, r, y, s) in meqTechAfsLo}: pTechAfsLo[t,r,y,s]*pYearFracti
 
 s.t.  eqTechAfsUp{(t, r, y, s) in meqTechAfsUp}: sum{sp in slice:((s,sp) in mSliceParentChildE)}(sum{FORIF: (t,r,y,sp) in mvTechAct} (vTechAct[t,r,y,sp])) <=  pTechAfsUp[t,r,y,s]*pYearFraction[y]*pTechCap2act[t]*vTechCap[t,r,y]*pSliceShare[s]*prod{wth1 in weather:((wth1,t) in mTechWeatherAfsUp)}(pTechWeatherAfsUp[wth1,t]*pWeather[wth1,r,y,s]);
 
-s.t.  eqTechRampUp{(t, r, y, s) in mTechRampUp}: (vTechAct[t,r,y,s]) / (pSliceShare[s])-sum{sp in slice:((((t in mTechFullYear and (sp,s) in mSliceFYearNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceNext)) and (t,r,y,sp) in mvTechAct))}((vTechAct[t,r,y,sp]) / (pSliceShare[sp])) <=  (pSliceShare[s]*365*24*pYearFraction[y]*pYearFraction[y]*pTechCap2act[t]*vTechCap[t,r,y]) / (pTechRampUp[t,r,y,s]);
+s.t.  eqTechRampUp{(t, r, y, s, sp) in mTechRampUp}: (vTechAct[t,r,y,s]) / (pSliceShare[s])-(vTechAct[t,r,y,sp]) / (pSliceShare[sp]) <=  (pSliceShare[s]*pTechCap2act[t]*pYearFraction[y]*pYearFraction[y]*pTechCap2act[t]*vTechCap[t,r,y]) / (pTechRampUp[t,r,y,s]);
 
-s.t.  eqTechRampDown{(t, r, y, s) in mTechRampDown}: sum{sp in slice:((((t in mTechFullYear and (sp,s) in mSliceFYearNext) or (not((t in mTechFullYear)) and (sp,s) in mSliceNext)) and (t,r,y,sp) in mvTechAct))}((vTechAct[t,r,y,sp]) / (pSliceShare[sp]))-(vTechAct[t,r,y,s]) / (pSliceShare[s]) <=  (pSliceShare[s]*365*24*pYearFraction[y]*pYearFraction[y]*pTechCap2act[t]*vTechCap[t,r,y]) / (pTechRampDown[t,r,y,s]);
+s.t.  eqTechRampDown{(t, r, y, s, sp) in mTechRampDown}: (vTechAct[t,r,y,sp]) / (pSliceShare[sp])-(vTechAct[t,r,y,s]) / (pSliceShare[s]) <=  (pSliceShare[s]*pTechCap2act[t]*pYearFraction[y]*pYearFraction[y]*pTechCap2act[t]*vTechCap[t,r,y]) / (pTechRampDown[t,r,y,s]);
 
 s.t.  eqTechActSng{(t, c, r, y, s) in meqTechActSng}: vTechAct[t,r,y,s]  =  (vTechOut[t,c,r,y,s]) / (pTechCact2cout[t,c,r,y,s]);
 
@@ -597,9 +604,13 @@ s.t.  eqInp2Lo{(c, r, y, s) in mInp2Lo}: sum{sp in slice:((c,r,y,s,sp) in mvInp2
 
 s.t.  eqSupOutTot{(c, r, y, s) in mSupOutTot}: vSupOutTot[c,r,y,s]  =  sum{s1 in sup:((s1,c) in mSupComm)}(sum{sp in slice:(((c,s,sp) in mCommSliceOrParent and (s1,c,r,y,sp) in mSupAva))}(vSupOut[s1,c,r,y,sp]));
 
-s.t.  eqTechInpTot{(c, r, y, s) in mTechInpTot}: vTechInpTot[c,r,y,s]  =  sum{t in tech:((t,c) in mTechInpComm)}(sum{sp in slice:(((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent))}(sum{FORIF: (t,c,r,y,sp) in mvTechInp} (vTechInp[t,c,r,y,sp])))+sum{t in tech:((t,c) in mTechAInp)}(sum{sp in slice:(((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent))}(sum{FORIF: (t,c,r,y,sp) in mvTechAInp} (vTechAInp[t,c,r,y,sp])));
+s.t.  eqTechInpTot{(c, r, y, s) in mTechInpTot}: vTechInpTot[c,r,y,s]  =  sum{t in tech:((t,c) in mTechInpComm)}(sum{sp in slice:(((t,c,s,sp) in mTechCommSliceSliceP))}(sum{FORIF: (t,c,r,y,sp) in mvTechInp} (vTechInp[t,c,r,y,sp])))+sum{t in tech:((t,c) in mTechAInp)}(sum{sp in slice:(((t,c,s,sp) in mTechCommSliceSliceP))}(sum{FORIF: (t,c,r,y,sp) in mvTechAInp} (vTechAInp[t,c,r,y,sp])));
 
-s.t.  eqTechOutTot{(c, r, y, s) in mTechOutTot}: vTechOutTot[c,r,y,s]  =  sum{t in tech:((t,c) in mTechOutComm)}(sum{sp in slice:(((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent))}(sum{FORIF: (t,c,r,y,sp) in mvTechOut} (vTechOut[t,c,r,y,sp])))+sum{t in tech:((t,c) in mTechAOut)}(sum{sp in slice:(((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent))}(sum{FORIF: (t,c,r,y,sp) in mvTechAOut} (vTechAOut[t,c,r,y,sp])));
+s.t.  eqTechOutS{(t, c, r, y, s) in mvTechOutS}: vTechOutS[t,c,r,y,s]  =  sum{sp in slice:(((t,c,s,sp) in mTechCommSliceSliceP))}(sum{FORIF: (t,c,r,y,sp) in mvTechOut} (vTechOut[t,c,r,y,sp]));
+
+s.t.  eqTechAOutS{(t, c, r, y, s) in mvTechAOutS}: vTechAOutS[t,c,r,y,s]  =  sum{sp in slice:(((t,c,s,sp) in mTechCommSliceSliceP))}(sum{FORIF: (t,c,r,y,sp) in mvTechAOut} (vTechAOut[t,c,r,y,sp]));
+
+s.t.  eqTechOutTot{(c, r, y, s) in mTechOutTot}: vTechOutTot[c,r,y,s]  =  sum{t in tech:((t,c) in mTechOutComm)}(sum{FORIF: (t,c,r,y,s) in mvTechOutS} (vTechOutS[t,c,r,y,s]))+sum{t in tech:((t,c) in mTechAOut)}(sum{FORIF: (t,c,r,y,s) in mvTechAOutS} (vTechAOutS[t,c,r,y,s]));
 
 s.t.  eqStorageInpTot{(c, r, y, s) in mStorageInpTot}: vStorageInpTot[c,r,y,s]  =  sum{st1 in stg:((st1,c,r,y,s) in mvStorageStore)}(vStorageInp[st1,c,r,y,s])+sum{st1 in stg:((st1,c,r,y,s) in mvStorageAInp)}(vStorageAInp[st1,c,r,y,s]);
 
@@ -651,6 +662,10 @@ printf "tech,comm,region,year,slice,value\n" > "output/vTechOut.csv";
 for{(t, c, r, y, s) in mvTechOut : vTechOut[t,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechOut[t,c,r,y,s] >> "output/vTechOut.csv";
 }
+printf "tech,comm,region,year,slice,value\n" > "output/vTechOutS.csv";
+for{(t, c, r, y, s) in mvTechOutS : vTechOutS[t,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechOutS[t,c,r,y,s] >> "output/vTechOutS.csv";
+}
 printf "tech,comm,region,year,slice,value\n" > "output/vTechAInp.csv";
 for{(t, c, r, y, s) in mvTechAInp : vTechAInp[t,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAInp[t,c,r,y,s] >> "output/vTechAInp.csv";
@@ -658,6 +673,10 @@ for{(t, c, r, y, s) in mvTechAInp : vTechAInp[t,c,r,y,s] <> 0} {
 printf "tech,comm,region,year,slice,value\n" > "output/vTechAOut.csv";
 for{(t, c, r, y, s) in mvTechAOut : vTechAOut[t,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAOut[t,c,r,y,s] >> "output/vTechAOut.csv";
+}
+printf "tech,comm,region,year,slice,value\n" > "output/vTechAOutS.csv";
+for{(t, c, r, y, s) in mvTechAOutS : vTechAOutS[t,c,r,y,s] <> 0} {
+  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAOutS[t,c,r,y,s] >> "output/vTechAOutS.csv";
 }
 printf "tech,region,year,value\n" > "output/vTechInv.csv";
 for{(t, r, y) in mTechInv : vTechInv[t,r,y] <> 0} {
@@ -897,8 +916,10 @@ printf "value\n" > "output/variable_list.csv";
     printf "vTechAct\n" >> "output/variable_list.csv";
     printf "vTechInp\n" >> "output/variable_list.csv";
     printf "vTechOut\n" >> "output/variable_list.csv";
+    printf "vTechOutS\n" >> "output/variable_list.csv";
     printf "vTechAInp\n" >> "output/variable_list.csv";
     printf "vTechAOut\n" >> "output/variable_list.csv";
+    printf "vTechAOutS\n" >> "output/variable_list.csv";
     printf "vSupOut\n" >> "output/variable_list.csv";
     printf "vSupReserve\n" >> "output/variable_list.csv";
     printf "vDemInp\n" >> "output/variable_list.csv";

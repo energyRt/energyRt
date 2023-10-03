@@ -1,15 +1,27 @@
 #' An S4 class to represent a commodity
 #'
 #' @slot name short name, used in sets, no white spaces or special characters
-#' @slot description (optional) description of
-#' @slot limtype limit type of the commodity in balance equation ("LO" by default)
+#' @slot limtype limit type of the commodity in balance equation ("LO" by default, meaning that the level of commodity in the model is satisfied with the lower bound)
 #' @slot slice the level of time-slice the commodity operates in the model
 #'             (the lowest slice-level used by default)
 #' @slot unit the main unit of the commodity used in the model, character string
-#' @slot emis data.frame with emissions factors, see details
-#' @slot agg data.frame with aggregation parameters of several commodities into one
+#' @slot emis data.frame with emissions factors, columns:
+#' \describe{
+#'  \item{comm}{character string, name of the commodity}
+#'  \item{unit}{character string, unit of the emission factor}
+#'  \item{emis}{numeric, emission factor, applied to the consumed commodity (`@name`) by a technology with combustion parameter > 0, to calculate emissions of the commodity specified in the slot (`@emis$comm`).}
+#' }
+#' @slot agg data.frame with aggregation parameters of several commodities
+#' into the `@name` commodity, with columns:
+#' \describe{
+#'  \item{comm}{character string, name of the commodity being aggregated}
+#'  \item{unit}{numeric, unit of the commodity being aggregated}
+#'  \item{agg}{numeric, aggregation parameter, applied to the commodity specified in the slot (`@agg$comm`) to calculate the `@name` commodity.}
+#' }
 #' @slot misc list with miscellaneous information to store
+#' @slot desc
 #'
+#' @rdname commodity
 #' @include class-calendar.R
 #'
 setClass("commodity",
@@ -52,19 +64,15 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 
 #' Create class commodity
 #'
-#' @param name
-#' @param desc
-#' @param limtype
-#' @param slice
-#' @param unit
-#' @param agg
-#' @param emis
-#' @param misc
-#'
 #' @return
 #' @export
 #'
+#' @rdname commodity
+#'
+#' @family sets
+#'
 #' @examples
+#' newCommodity(name = "ELC", desc = "Electricity")
 newCommodity <- function(
     name = "",
     desc = "",
@@ -85,10 +93,8 @@ newCommodity <- function(
   )
 }
 
-# update.commodity <- function(obj, ...) .data2slots("commodity", obj, ...)
 
-#' @importFrom stats update
-#' @rdname commodity
+#' @describeIn update update commodity
 #' @family commodity update
 #' @export
 setMethod("update", signature(object = "commodity"), function(object, ...) {

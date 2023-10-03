@@ -121,7 +121,7 @@ setMethod("initialize", signature = "parameter",
     #   acomm = character(), comm = character(), commp = character(),
     #   group = character(), region = character(), regionp = character(),
     #   src = character(), dst = character(),
-    #   year = numeric(), yearp = numeric(), slicep = character(),
+    #   year = integer(), yearp = numeric(), slicep = character(),
     #   slice = character(), stg = character(),
     #   expp = character(), imp = character(), trade = character(),
     #   type = factor(levels = c("lo", "up")),
@@ -184,7 +184,7 @@ setMethod(
     # cat(paste0(obj@name, ": ", class(data)[1], ", ncol =", ncol(data), "\n"))
     # if (!is.data.table(data)) browser() # DEBUG
     if (!is.data.table(data)) { # DEBUG
-      warning("\nDEBUG info: class ", class(data), " in ", obj@name, "@data\n")
+      # warning("\nDEBUG info: class ", class(data), " in ", obj@name, "@data\n")
       # browser()
     }
     # if (obj@name == "ordYear") browser() # DEBUG

@@ -66,7 +66,6 @@ get_gdxlib_path <- function() {
       options(en_gdxlib_loaded = TRUE)
     }
   }
-
 }
 
 .check_load_gdxtools <- function() {
@@ -74,9 +73,9 @@ get_gdxlib_path <- function() {
   if (!xt) {
     stop('"gdxtools" package has not been found. ',
          'It is required for reading "*.gdx" files.\n',
-         'Check: "https://github.com/lolow/gdxtools".')
+         'To install: "https://github.com/lolow/gdxtools".')
   }
-  xt <- require("gdxtools", warn.conflicts = FALSE)
+  xt <- require("gdxtools", warn.conflicts = FALSE, quietly = T)
   en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
     lb <- getOption("en_gdxlib_path")

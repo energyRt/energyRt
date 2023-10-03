@@ -1,13 +1,13 @@
-# ============================================================================#
+#============================================================================#
 # THIS IS AN AUTO-GENERATED FILE BY gams2x LIBRARY,
-# IT NOT INTENDED FOR DIRECT EDITING - WILL BE OVERWRITTEN.
+# IT IS NOT INTENDED FOR DIRECT EDITING - WILL BE OVERWRITTEN.
 # gams2x EXTRACTS THE MODEL FRAMEWORK FROM THE GAMS SOURCE FILE energyRt.gms,
 # TRANSLATES IT TO OTHER MATHEMATICAL PROGRAMMING LANGUGES,
 # AND CREATES THIS FILE WITH THE MODEL STRUCTURE DETAILS
-# FOR FURTHER SAVING IN "R/sysdata.rda" FILE OF the "energyRt" PACKAGE.
-# ============================================================================#
+# FOR FURTHER SAVING IN "R/sysdata.rda" FILE OF the "energyRt" PACKAGE. 
+#============================================================================#
 ########################## variables mapping #########################
-.variable_mapping <- list(
+.variable_mapping = list(
   vTechNewCap = "vTechNewCap( tech , region , year ) $ mTechNew( tech , region , year )",
   vTechRetiredStock = "vTechRetiredStock( tech , region , year ) $ mvTechRetiredStock( tech , region , year )",
   vTechRetiredNewCap = "vTechRetiredNewCap( tech , region , year , year ) $ mvTechRetiredNewCap( tech , region , year , year )",
@@ -15,8 +15,10 @@
   vTechAct = "vTechAct( tech , region , year , slice ) $ mvTechAct( tech , region , year , slice )",
   vTechInp = "vTechInp( tech , comm , region , year , slice ) $ mvTechInp( tech , comm , region , year , slice )",
   vTechOut = "vTechOut( tech , comm , region , year , slice ) $ mvTechOut( tech , comm , region , year , slice )",
+  vTechOutS = "vTechOutS( tech , comm , region , year , slice ) $ mvTechOutS( tech , comm , region , year , slice )",
   vTechAInp = "vTechAInp( tech , comm , region , year , slice ) $ mvTechAInp( tech , comm , region , year , slice )",
   vTechAOut = "vTechAOut( tech , comm , region , year , slice ) $ mvTechAOut( tech , comm , region , year , slice )",
+  vTechAOutS = "vTechAOutS( tech , comm , region , year , slice ) $ mvTechAOutS( tech , comm , region , year , slice )",
   vTechInv = "vTechInv( tech , region , year ) $ mTechInv( tech , region , year )",
   vTechEac = "vTechEac( tech , region , year ) $ mTechEac( tech , region , year )",
   vTechOMCost = "vTechOMCost( tech , region , year ) $ mTechOMCost( tech , region , year )",
@@ -71,12 +73,12 @@
   vTradeEac = "vTradeEac( trade , region , year ) $ mTradeEac( trade , region , year )",
   vTradeNewCap = "vTradeNewCap( trade , year ) $ mTradeNew( trade , year )",
   vTotalUserCosts = "vTotalUserCosts( region , year ) $ mvTotalUserCosts( region , year )"
-)
-.variable_set <- lapply(.variable_mapping, function(x) strsplit(gsub("[ ]*[)].*$", "", gsub("^[^(]*[(][ ]*", "", x)), "[ ]*[,][ ]*")[[1]])
+);
+ .variable_set = lapply(.variable_mapping, function(x) strsplit(gsub('[ ]*[)].*$', '', gsub('^[^(]*[(][ ]*', '', x)), '[ ]*[,][ ]*')[[1]])
 #########################
 # variable description
 #########################
-.variable_description <- c(
+.variable_description = c(
   vTechInv = "Overnight investment costs",
   vTechEac = "Annualized investment costs",
   vTechOMCost = "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)",
@@ -98,9 +100,11 @@
   vTechCap = "Total capacity of the technology",
   vTechAct = "Activity level of technology",
   vTechInp = "Input level",
-  vTechOut = "Output level",
+  vTechOut = "Commodity output from technology - tech timeframe",
+  vTechOutS = "Commodity output from technology - comm timeframe",
   vTechAInp = "Auxiliary commodity input",
   vTechAOut = "Auxiliary commodity output",
+  vTechAOutS = "Auxiliary commodity output",
   vSupOut = "Output of supply",
   vSupReserve = "Total supply reserve",
   vDemInp = "Input to demand",
@@ -139,12 +143,11 @@
   vTradeInv = "Investment in trade capacity (overnight)",
   vTradeEac = "Investment in trade capacity (EAC)",
   vTradeNewCap = "New trade capacity",
-  vTotalUserCosts = "Total additional costs (set by user)"
-)
+  vTotalUserCosts = "Total additional costs (set by user)");
 #########################
 # equation description
 #########################
-.equation_description <- c(
+.equation_description = c(
   eqTechSng2Sng = "Technology input to output",
   eqTechGrp2Sng = "Technology group input to output",
   eqTechSng2Grp = "Technology input to group output",
@@ -219,16 +222,18 @@
   eqTradeIrAOut = "Trade auxiliary commodity output",
   eqTradeIrAInpTot = "Trade auxiliary commodity input",
   eqTradeIrAOutTot = "Trade auxiliary commodity output",
-  eqBalUp = "PRODUCTION <= CONSUMPTION commodity balance",
-  eqBalLo = "PRODUCTION >= CONSUMPTION commodity balance",
-  eqBalFx = "PRODUCTION == CONSUMPTION commodity balance",
-  eqBal = "Commodity balance",
+  eqBalUp = "commodity balance <= 0 (e.g. upper limit - deficit is allowed)",
+  eqBalLo = "commodity balance >= 0 (e.g. lower limit - excess is allower)",
+  eqBalFx = "commodity balance >= 0 (no excess nor deficit is allowed)",
+  eqBal = "Commodity balance definition",
   eqOutTot = "Total commodity output",
   eqInpTot = "Total commodity input",
   eqInp2Lo = "From commodity slice to lo level",
   eqOut2Lo = "From commodity slice to lo level",
   eqSupOutTot = "Supply total output",
   eqTechInpTot = "Technology total input",
+  eqTechOutS = "Main output aggregation to comm timeframe",
+  eqTechAOutS = "Aux output aggregation to comm timeframe",
   eqTechOutTot = "Technology total output",
   eqStorageInpTot = "Storage total input",
   eqStorageOutTot = "Storage total output",
@@ -236,12 +241,11 @@
   eqTaxCost = "Commodity taxes",
   eqSubsCost = "Commodity subsidy",
   eqObjective = "Objective equation",
-  eqLECActivity = "levelized costs (auxiliary equation)"
-)
+  eqLECActivity = "levelized costs (auxiliary equation)");
 #########################
 # equation set
 #########################
-.equation_set <- list(
+.equation_set = list(
   eqTechSng2Sng = c("tech", "region", "comm", "commp", "year", "slice"),
   eqTechGrp2Sng = c("tech", "region", "group", "commp", "year", "slice"),
   eqTechSng2Grp = c("tech", "region", "comm", "groupp", "year", "slice"),
@@ -256,8 +260,8 @@
   eqTechAfUp = c("tech", "region", "year", "slice"),
   eqTechAfsLo = c("tech", "region", "year", "slice"),
   eqTechAfsUp = c("tech", "region", "year", "slice"),
-  eqTechRampUp = c("tech", "region", "year", "slice"),
-  eqTechRampDown = c("tech", "region", "year", "slice"),
+  eqTechRampUp = c("tech", "region", "year", "slice", "slicep"),
+  eqTechRampDown = c("tech", "region", "year", "slice", "slicep"),
   eqTechActSng = c("tech", "comm", "region", "year", "slice"),
   eqTechActGrp = c("tech", "group", "region", "year", "slice"),
   eqTechAfcOutLo = c("tech", "region", "comm", "year", "slice"),
@@ -326,6 +330,8 @@
   eqOut2Lo = c("comm", "region", "year", "slice"),
   eqSupOutTot = c("comm", "region", "year", "slice"),
   eqTechInpTot = c("comm", "region", "year", "slice"),
+  eqTechOutS = c("tech", "comm", "region", "year", "slice"),
+  eqTechAOutS = c("tech", "comm", "region", "year", "slice"),
   eqTechOutTot = c("comm", "region", "year", "slice"),
   eqStorageInpTot = c("comm", "region", "year", "slice"),
   eqStorageOutTot = c("comm", "region", "year", "slice"),
@@ -333,12 +339,11 @@
   eqTaxCost = c("comm", "region", "year"),
   eqSubsCost = c("comm", "region", "year"),
   eqObjective = NULL,
-  eqLECActivity = c("tech", "region", "year")
-)
+  eqLECActivity = c("tech", "region", "year"));
 #########################
 # parameter description
 #########################
-.parameter_description <- c(
+.parameter_description = c(
   pYearFraction = "fraction of sum of sampled slices in year -- experimental",
   pTechOlife = "Operational life of technologies",
   pTechCinp2ginp = "Commodity input to group input",
@@ -465,12 +470,11 @@
   pStorageWeatherCinpLo = "weather factor for storage commodity input lower value (cinp.lo)",
   pStorageWeatherCoutUp = "weather factor for storage commodity output upper value (cout.up)",
   pStorageWeatherCoutLo = "weather factor for storage commodity output lower value (cout.lo)",
-  pLECLoACT = "levelized costs interim parameter"
-)
+  pLECLoACT = "levelized costs interim parameter");
 #########################
 # parameter set
 #########################
-.parameter_set <- list(
+.parameter_set = list(
   pYearFraction = c("year"),
   pTechOlife = c("tech", "region"),
   pTechCinp2ginp = c("tech", "comm", "region", "year", "slice"),
@@ -597,12 +601,11 @@
   pStorageWeatherCinpLo = c("weather", "stg"),
   pStorageWeatherCoutUp = c("weather", "stg"),
   pStorageWeatherCoutLo = c("weather", "stg"),
-  pLECLoACT = c("region")
-)
+  pLECLoACT = c("region"));
 #########################
 # equation map
 #########################
-.equation_mapping <- list(
+.equation_mapping = list(
   eqTechSng2Sng = "meqTechSng2Sng(tech, region, comm, commp, year, slice)",
   eqTechGrp2Sng = "meqTechGrp2Sng(tech, region, group, commp, year, slice)",
   eqTechSng2Grp = "meqTechSng2Grp(tech, region, comm, groupp, year, slice)",
@@ -617,8 +620,8 @@
   eqTechAfUp = "meqTechAfUp(tech, region, year, slice)",
   eqTechAfsLo = "meqTechAfsLo(tech, region, year, slice)",
   eqTechAfsUp = "meqTechAfsUp(tech, region, year, slice)",
-  eqTechRampUp = "mTechRampUp(tech, region, year, slice)",
-  eqTechRampDown = "mTechRampDown(tech, region, year, slice)",
+  eqTechRampUp = "mTechRampUp(tech, region, year, slice, slicep)",
+  eqTechRampDown = "mTechRampDown(tech, region, year, slice, slicep)",
   eqTechActSng = "meqTechActSng(tech, comm, region, year, slice)",
   eqTechActGrp = "meqTechActGrp(tech, group, region, year, slice)",
   eqTechAfcOutLo = "meqTechAfcOutLo(tech, region, comm, year, slice)",
@@ -687,6 +690,8 @@
   eqOut2Lo = "mOut2Lo(comm, region, year, slice)",
   eqSupOutTot = "mSupOutTot(comm, region, year, slice)",
   eqTechInpTot = "mTechInpTot(comm, region, year, slice)",
+  eqTechOutS = "mvTechOutS(tech, comm, region, year, slice)",
+  eqTechAOutS = "mvTechAOutS(tech, comm, region, year, slice)",
   eqTechOutTot = "mTechOutTot(comm, region, year, slice)",
   eqStorageInpTot = "mStorageInpTot(comm, region, year, slice)",
   eqStorageOutTot = "mStorageOutTot(comm, region, year, slice)",
@@ -695,11 +700,11 @@
   eqSubsCost = "mSubCost(comm, region, year)",
   eqObjective = "",
   eqLECActivity = "meqLECActivity(tech, region, year)"
-)
+);
 #########################
 # set description
 #########################
-.set_description <- c(
+.set_description = c(
   comm = "commodity",
   region = "region",
   year = "year",
@@ -796,8 +801,10 @@
   mvTechRetiredStock = "",
   mvTechAct = "",
   mvTechOut = "",
+  mvTechOutS = "",
   mvTechAInp = "",
   mvTechAOut = "",
+  mvTechAOutS = "",
   mvDemInp = "",
   mvBalance = "",
   mvInpTot = "",
@@ -862,6 +869,9 @@
   mTechFullYear = "",
   mTechRampUp = "",
   mTechRampDown = "",
+  mTechCommSliceSliceP = "",
+  mTechCommOutSliceSliceP = "",
+  mTechCommAOutSliceSliceP = "",
   mTechOlifeInf = "",
   mStorageOlifeInf = "",
   mTechAfcUp = "",
@@ -917,12 +927,11 @@
   mTechNCap2AOut = "",
   mTechCinp2AOut = "",
   mTechCout2AOut = "",
-  mLECRegion = ""
-)
+  mLECRegion = "");
 #########################
 # set set
 #########################
-.set_set <- list(
+.set_set = list(
   comm = NULL,
   region = NULL,
   year = NULL,
@@ -1019,8 +1028,10 @@
   mvTechRetiredStock = c("tech", "region", "year"),
   mvTechAct = c("tech", "region", "year", "slice"),
   mvTechOut = c("tech", "comm", "region", "year", "slice"),
+  mvTechOutS = c("tech", "comm", "region", "year", "slice"),
   mvTechAInp = c("tech", "comm", "region", "year", "slice"),
   mvTechAOut = c("tech", "comm", "region", "year", "slice"),
+  mvTechAOutS = c("tech", "comm", "region", "year", "slice"),
   mvDemInp = c("comm", "region", "year", "slice"),
   mvBalance = c("comm", "region", "year", "slice"),
   mvInpTot = c("comm", "region", "year", "slice"),
@@ -1083,8 +1094,11 @@
   mAggOut = c("comm", "region", "year", "slice"),
   mTechAfUp = c("tech", "region", "year", "slice"),
   mTechFullYear = c("tech"),
-  mTechRampUp = c("tech", "region", "year", "slice"),
-  mTechRampDown = c("tech", "region", "year", "slice"),
+  mTechRampUp = c("tech", "region", "year", "slice", "slicep"),
+  mTechRampDown = c("tech", "region", "year", "slice", "slicep"),
+  mTechCommSliceSliceP = c("tech", "comm", "slice", "slicep"),
+  mTechCommOutSliceSliceP = c("tech", "comm", "slice", "slicep"),
+  mTechCommAOutSliceSliceP = c("tech", "comm", "slice", "slicep"),
   mTechOlifeInf = c("tech", "region"),
   mStorageOlifeInf = c("stg", "region"),
   mTechAfcUp = c("tech", "comm", "region", "year", "slice"),
@@ -1140,14 +1154,12 @@
   mTechNCap2AOut = c("tech", "comm", "region", "year", "slice"),
   mTechCinp2AOut = c("tech", "comm", "comm", "region", "year", "slice"),
   mTechCout2AOut = c("tech", "comm", "comm", "region", "year", "slice"),
-  mLECRegion = c("region")
-)
+  mLECRegion = c("region"));
 #########################
-# equation_variable
+# equation_variable 
 #########################
-.equation_variable <- data.frame(equation = character(), variable = character(),
-                                 stringsAsFactors = FALSE)
-.equation_variable[1:238, ] <- NA
+.equation_variable <- data.frame(equation = character(), variable = character(), stringsAsFactors = FALSE)
+.equation_variable[1:242, ] <- NA;
 .equation_variable[1, ] <- c("eqTechSng2Sng", "vTechInp")
 .equation_variable[2, ] <- c("eqTechSng2Sng", "vTechOut")
 .equation_variable[3, ] <- c("eqTechGrp2Sng", "vTechInp")
@@ -1354,91 +1366,53 @@
 .equation_variable[204, ] <- c("eqTechInpTot", "vTechInp")
 .equation_variable[205, ] <- c("eqTechInpTot", "vTechAInp")
 .equation_variable[206, ] <- c("eqTechInpTot", "vTechInpTot")
-.equation_variable[207, ] <- c("eqTechOutTot", "vTechOut")
-.equation_variable[208, ] <- c("eqTechOutTot", "vTechAOut")
-.equation_variable[209, ] <- c("eqTechOutTot", "vTechOutTot")
-.equation_variable[210, ] <- c("eqStorageInpTot", "vStorageInpTot")
-.equation_variable[211, ] <- c("eqStorageInpTot", "vStorageAInp")
-.equation_variable[212, ] <- c("eqStorageInpTot", "vStorageInp")
-.equation_variable[213, ] <- c("eqStorageOutTot", "vStorageOutTot")
-.equation_variable[214, ] <- c("eqStorageOutTot", "vStorageAOut")
-.equation_variable[215, ] <- c("eqStorageOutTot", "vStorageOut")
-.equation_variable[216, ] <- c("eqCost", "vTechEac")
-.equation_variable[217, ] <- c("eqCost", "vTechOMCost")
-.equation_variable[218, ] <- c("eqCost", "vSupCost")
-.equation_variable[219, ] <- c("eqCost", "vTotalCost")
-.equation_variable[220, ] <- c("eqCost", "vTaxCost")
-.equation_variable[221, ] <- c("eqCost", "vSubsCost")
-.equation_variable[222, ] <- c("eqCost", "vStorageOMCost")
-.equation_variable[223, ] <- c("eqCost", "vTradeCost")
-.equation_variable[224, ] <- c("eqCost", "vDummyImport")
-.equation_variable[225, ] <- c("eqCost", "vDummyExport")
-.equation_variable[226, ] <- c("eqCost", "vStorageEac")
-.equation_variable[227, ] <- c("eqCost", "vTotalUserCosts")
-.equation_variable[228, ] <- c("eqTaxCost", "vBalance")
-.equation_variable[229, ] <- c("eqTaxCost", "vTaxCost")
-.equation_variable[230, ] <- c("eqTaxCost", "vOutTot")
-.equation_variable[231, ] <- c("eqTaxCost", "vInpTot")
-.equation_variable[232, ] <- c("eqSubsCost", "vBalance")
-.equation_variable[233, ] <- c("eqSubsCost", "vSubsCost")
-.equation_variable[234, ] <- c("eqSubsCost", "vOutTot")
-.equation_variable[235, ] <- c("eqSubsCost", "vInpTot")
-.equation_variable[236, ] <- c("eqObjective", "vTotalCost")
-.equation_variable[237, ] <- c("eqObjective", "vObjective")
-.equation_variable[238, ] <- c("eqLECActivity", "vTechAct")
+.equation_variable[207, ] <- c("eqTechOutS", "vTechOut")
+.equation_variable[208, ] <- c("eqTechOutS", "vTechOutS")
+.equation_variable[209, ] <- c("eqTechAOutS", "vTechAOut")
+.equation_variable[210, ] <- c("eqTechAOutS", "vTechAOutS")
+.equation_variable[211, ] <- c("eqTechOutTot", "vTechOutS")
+.equation_variable[212, ] <- c("eqTechOutTot", "vTechAOutS")
+.equation_variable[213, ] <- c("eqTechOutTot", "vTechOutTot")
+.equation_variable[214, ] <- c("eqStorageInpTot", "vStorageInpTot")
+.equation_variable[215, ] <- c("eqStorageInpTot", "vStorageAInp")
+.equation_variable[216, ] <- c("eqStorageInpTot", "vStorageInp")
+.equation_variable[217, ] <- c("eqStorageOutTot", "vStorageOutTot")
+.equation_variable[218, ] <- c("eqStorageOutTot", "vStorageAOut")
+.equation_variable[219, ] <- c("eqStorageOutTot", "vStorageOut")
+.equation_variable[220, ] <- c("eqCost", "vTechEac")
+.equation_variable[221, ] <- c("eqCost", "vTechOMCost")
+.equation_variable[222, ] <- c("eqCost", "vSupCost")
+.equation_variable[223, ] <- c("eqCost", "vTotalCost")
+.equation_variable[224, ] <- c("eqCost", "vTaxCost")
+.equation_variable[225, ] <- c("eqCost", "vSubsCost")
+.equation_variable[226, ] <- c("eqCost", "vStorageOMCost")
+.equation_variable[227, ] <- c("eqCost", "vTradeCost")
+.equation_variable[228, ] <- c("eqCost", "vDummyImport")
+.equation_variable[229, ] <- c("eqCost", "vDummyExport")
+.equation_variable[230, ] <- c("eqCost", "vStorageEac")
+.equation_variable[231, ] <- c("eqCost", "vTotalUserCosts")
+.equation_variable[232, ] <- c("eqTaxCost", "vBalance")
+.equation_variable[233, ] <- c("eqTaxCost", "vTaxCost")
+.equation_variable[234, ] <- c("eqTaxCost", "vOutTot")
+.equation_variable[235, ] <- c("eqTaxCost", "vInpTot")
+.equation_variable[236, ] <- c("eqSubsCost", "vBalance")
+.equation_variable[237, ] <- c("eqSubsCost", "vSubsCost")
+.equation_variable[238, ] <- c("eqSubsCost", "vOutTot")
+.equation_variable[239, ] <- c("eqSubsCost", "vInpTot")
+.equation_variable[240, ] <- c("eqObjective", "vTotalCost")
+.equation_variable[241, ] <- c("eqObjective", "vObjective")
+.equation_variable[242, ] <- c("eqLECActivity", "vTechAct")
 model_structure <- rbind(
-  data.frame(
-    name = names(.set_description),
-    description = .set_description,
-    type = "set",
-    dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', "", .set_set),
-    map = ""
-  ),
-  data.frame(
-    name = names(.parameter_description),
-    description = .parameter_description,
-    type = "parameter",
-    dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', "", .parameter_set),
-    map = ""
-  ),
-  data.frame(
-    name = names(.variable_description),
-    description = .variable_description,
-    type = "variable",
-    dim = gsub('(["]|[)].*|^[^(]*[(])', "", .variable_set),
-    map = gsub(
-      "[,]",
-      ", ",
-      gsub(
-        "(.*[$]|[ ])",
-        "",
-        sapply(
-          .variable_mapping,
-          function(x) {
-            if (any(grep("[$]", x))) x else ""
-          }
-        )
-      )
-    )
-  )
-)
-# save(
-#   list = "model_structure",
-#   file = "../data/model_structure.RData"
-# )
-# save(
-#   list = c(
-#     ".set_set",
-#     ".set_description",
-#     ".parameter_set",
-#     ".parameter_description",
-#     ".variable_set",
-#     ".variable_description",
-#     ".variable_mapping",
-#     ".equation_mapping",
-#     ".equation_set",
-#     ".equation_description",
-#     ".equation_variable"
-#   ),
-#   file = "../R/sysdata.rda"
-# )
+	data.frame(name = names(.set_description), description = .set_description, 
+						 type = 'set', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .set_set), map = ''),
+	data.frame(name = names(.parameter_description), description = .parameter_description,
+						 type = 'parameter', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .parameter_set), map = ''),
+	data.frame(name = names(.variable_description), description = .variable_description, 
+						 type = 'variable', dim = gsub('(["]|[)].*|^[^(]*[(])', '', .variable_set), 
+	    map = gsub('[,]', ', ', gsub('(.*[$]|[ ])', '', sapply(.variable_mapping, 
+			function(x) if (any(grep('[$]', x))) x else '')))))
+#save(list = "model_structure", 
+#file = "../data/model_structure.RData")
+#save(list = c(".set_set", ".set_description", ".parameter_set", ".parameter_description", ".variable_set", 
+#".variable_description", ".variable_mapping", ".equation_mapping", ".equation_set", ".equation_description", ".equation_variable"), 
+#file = "../R/sysdata.rda")

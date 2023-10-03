@@ -33,7 +33,7 @@ setClass("weather",
     defVal = 0.,
     weather = data.frame(
       region = character(), #
-      year = numeric(),
+      year = integer(),
       slice = character(),
       wval = numeric(),
       stringsAsFactors = FALSE
@@ -46,19 +46,54 @@ setMethod("initialize", "weather", function(.Object, ...) {
   .Object
 })
 
-setGeneric("newWeather", function(name, ...) standardGeneric("newWeather"))
-#' Create new weather object
+
+
+
+#' Title
 #'
-#' @name newWeather
-#' @family weather
+#' @param name
+#' @param desc
+#' @param unit
+#' @param region
+#' @param slice
+#' @param defVal
+#' @param weather
+#' @param ...
+#'
+#' @return
 #' @export
-setMethod("newWeather", signature(name = "character"), function(name, ...) {
-  .data2slots("weather", name, ...)
+#'
+#' @examples
+newWeather <- function(
+    name = "",
+    desc = "",
+    unit = as.character(NA),
+    region = character(),
+    slice = character(),
+    defVal = 0.,
+    weather = data.frame(),
+    ...) {
+  .data2slots("weather",
+              name,
+              desc = desc,
+              unit = unit,
+              region = region,
+              slice = slice,
+              defVal = defVal,
+              weather = weather,
+              ...)
+}
+
+
+#' @param object object of class export
+#'
+#' @param ... slot-names with data to update (see `newWeather`)
+#'
+#' @rdname newTechnology
+#' @family update weather
+#' @method update weather
+#' @export
+setMethod("update", "weather", function(object, ...) {
+  .data2slots("weather", object, ...)
 })
 
-# setMethod('update', signature(obj = 'weather'), function(obj, ...)
-#' @export
-#' @family update weather
-update.weather <- function(obj, ...) {
-  .data2slots("weather", obj, ...)
-}

@@ -2,11 +2,22 @@
 % Please edit documentation in R/class-weather.R
 \name{newWeather}
 \alias{newWeather}
-\title{Create new weather object}
+\title{Title}
 \usage{
-\S4method{newWeather}{character}(name, ...)
+newWeather(
+  name = "",
+  desc = "",
+  unit = as.character(NA),
+  region = character(),
+  slice = character(),
+  defVal = 0,
+  weather = data.frame(),
+  ...
+)
+}
+\arguments{
+\item{...}{}
 }
 \description{
-Create new weather object
+Title
 }
-\concept{weather}

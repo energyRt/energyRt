@@ -4,7 +4,15 @@
 \alias{newExport}
 \title{Create new export object}
 \usage{
-\S4method{newExport}{character}(name, ...)
+newExport(
+  name,
+  desc = "",
+  commodity = "",
+  unit = NULL,
+  reserve = Inf,
+  exp = data.frame(),
+  ...
+)
 }
 \description{
 Create new export object

@@ -165,6 +165,7 @@ setMethod("summary", signature(object = "repository"), function(object, ...) {
 
 ## add ####
 #' @method add repository
+#' @rdname add
 #' @family repository
 #' @export
 setMethod("add", signature("repository"), function(obj, ..., overwrite = FALSE) {

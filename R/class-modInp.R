@@ -42,6 +42,8 @@ setMethod("initialize", "modInp", function(.Object) {
   # browser()
   # x <- .Object@parameters
   x <- list()
+  # .dimSets <- c("horizon", .dimSets) %>% unique() #!!! test
+  # x[["horizon"]] <- newSet("horizon")
   ob <- .modInp
   for (i in 1:length(ob)) {
     nm <- ob[[i]]$name

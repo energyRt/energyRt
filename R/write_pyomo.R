@@ -194,7 +194,8 @@
               ## SQLite import
             } else {
               tfl <- paste0("input/", scen@modInp@parameters[[i]]@name, ".py")
-              cat(paste0('exec(open("', tfl, '").read())\n'), file = zz_inp_file)
+              cat(paste0('exec(open("', tfl, '").read())\n'),
+                  file = zz_inp_file)
               zz_tfl <- file(paste0(arg$tmp.dir, tfl), "w")
               cat(.toPyomo(scen@modInp@parameters[[i]]),
                 sep = "\n", file = zz_tfl
@@ -207,8 +208,8 @@
     }
   }
   # browser()
-  if (AbstractModel) close(zz_data_pyomo)
-  if (!AbstractModel && !SQLite) close(zz_inp_file)
+  if (AbstractModel) try(close(zz_data_pyomo))
+  if (!AbstractModel) try(close(zz_inp_file))
   npar2 <- (grep("^model[.]obj ", run_code)[1] - 1)
   cat(run_code[npar:npar2], sep = "\n", file = zz_mod)
   ## Add constraint equation

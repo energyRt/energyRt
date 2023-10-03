@@ -32,6 +32,7 @@ usethis::use_data(model_structure, #.modelCode,
 
 # all names of sets used in parameter@dimSet
 .dimSets <- c(
+  "horizon", # test
   "tech", "techp", "dem", "sup", "weather", "acomm", "comm", "commp",
   "group", "region", "regionp", "src", "dst",
   "year", "yearp", "slice", "slicep", "stg", "expp", "imp", "trade"

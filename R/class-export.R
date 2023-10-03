@@ -19,20 +19,21 @@ setClass("export",
     desc = "character",
     commodity = "character",
     unit = "character",
+    # region !!! add
     reserve = "numeric",
     exp = "data.frame",
     slice = "character",
     misc = "list"
   ),
   prototype(
-    name = "",
+    name = "", # ...
     desc = "",
     commodity = "",
     unit = "",
     reserve = Inf,
     exp = data.frame(
       region = character(),
-      year = numeric(),
+      year = integer(),
       slice = character(),
       exp.lo = numeric(),
       exp.up = numeric(),
@@ -52,18 +53,46 @@ setMethod("initialize", "export", function(.Object, ...) {
   .Object
 })
 
-setGeneric("newExport", function(name, ...) standardGeneric("newExport"))
 #' Create new export object
 #'
 #' @name newExport
 #'
 #' @export
-setMethod("newExport", signature(name = "character"), function(name, ...) {
-  .data2slots("export", name, ...)
+#'
+#' @param name
+#' @param desc
+#' @param commodity
+#' @param unit
+#' @param reserve
+#' @param exp
+#' @param ...
+newExport <- function(
+    name,
+    desc = "",
+    commodity = "",
+    unit = NULL,
+    reserve = Inf,
+    exp = data.frame(),
+    ...) {
+  .data2slots("export",
+    name,
+    desc = desc,
+    commodity = commodity,
+    unit = unit,
+    reserve = reserve,
+    exp = exp,
+    ...)
+}
+
+#' @param object object of class export
+#'
+#' @param ... slot-names with data to update (see `newTechnology`)
+#'
+#' @rdname newTechnology
+#' @family update export
+#' @method update export
+#' @export
+setMethod("update", "export", function(object, ...) {
+  .data2slots("export", object, ...)
 })
 
-# setMethod('update', signature(obj = 'export'), function(obj, ...)
-#' @export
-update.export <- function(obj, ...) {
-  .data2slots("export", obj, ...)
-}

@@ -171,6 +171,7 @@ solve_scenario <- function(obj = NULL, tmp.dir = NULL, solver = NULL, ...) {
     if (tmp %in% c("TRUE", "FALSE")) tmp <- (tmp == "TRUE")
     solver_list[[solv_par[i, "name"]]] <- tmp
   }
+  # browser()
   if (!is.null(scen) && !is.null(scen@settings@solver)) {
     for (i in grep("^(inc[1-5]|files)$", names(scen@settings@solver),
                    value = TRUE, invert = TRUE)) {

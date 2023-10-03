@@ -33,7 +33,7 @@ setClass("import",
     reserve = Inf,
     imp = data.frame(
       region = character(),
-      year = numeric(),
+      year = integer(),
       slice = character(),
       imp.lo = numeric(),
       imp.up = numeric(),
@@ -50,18 +50,45 @@ setMethod("initialize", "import", function(.Object, ...) {
   .Object
 })
 
-setGeneric("newImport", function(name, ...) standardGeneric("newImport"))
-#' Create new import object
+#' Create new export object
 #'
 #' @name newImport
+#'
 #' @export
 #'
-setMethod("newImport", signature(name = "character"), function(name, ...) {
-  .data2slots("import", name, ...)
-})
-
-# setMethod('update', signature(obj = 'import'), function(obj, ...)
-#' @export
-update.import <- function(obj, ...) {
-  .data2slots("import", obj, ...)
+#' @param name character name of the object (used in sets)
+#' @param desc optional character description
+#' @param commodity character name of the import commodity
+#' @param unit character name of unit of the commodity
+#' @param reserve numeric, total accumulated limit through the model horizon
+#' @param imp data frame with import parameters
+#' @param ...
+newImport <- function(
+    name,
+    desc = "",
+    commodity = "",
+    unit = NULL,
+    reserve = Inf,
+    imp = data.frame(),
+    ...) {
+  .data2slots(
+    "import", name,
+    desc = desc,
+    commodity = commodity,
+    unit = unit,
+    reserve = reserve,
+    imp = imp,
+    ...)
 }
+
+#' @param object an S4 class object to be updated.
+#'
+#' @param ... slot-names with data to update the S4 object
+#'
+#' @rdname update
+#' @family update import
+#' @method update import
+#' @export
+setMethod("update", "import", function(object, ...) {
+  .data2slots("import", object, ...)
+})

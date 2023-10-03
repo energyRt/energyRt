@@ -1,3 +1,53 @@
+# nextYear:
+#   name: pYear
+#   dimSets: year
+#   type: numpar
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName:
+# nextYear:
+#   name: nextYear
+#   dimSets: year
+#   type: numpar
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName:
+# mTechRampSliceNext:
+#   name: mTechRampSliceNext
+#   dimSets:
+#   - tech
+#   - region
+#   - year
+#   - slice
+#   - slicep
+#   type: map
+#   # defVal: 0.0
+#   # interpolation: back.inter.forth
+#   # colName:
+mTechCommSliceSliceP:
+  name: mTechCommSliceSliceP
+  dimSets:
+  - tech
+  - comm
+  - slice
+  - slicep
+  type: map
+mTechCommOutSliceSliceP:
+  name: mTechCommOutSliceSliceP
+  dimSets:
+  - tech
+  - comm
+  - slice
+  - slicep
+  type: map
+mTechCommAOutSliceSliceP:
+  name: mTechCommAOutSliceSliceP
+  dimSets:
+  - tech
+  - comm
+  - slice
+  - slicep
+  type: map
 region:
   name: region
   dimSets: region
@@ -2319,24 +2369,26 @@ mMilestoneLast:
   defVal: 1.0
   interpolation: back.inter.forth
   colName: ''
-mStartMilestone:
-  name: mStartMilestone
-  dimSets:
-  - year
-  - yearp
-  type: map
-  defVal: 1.0
-  interpolation: back.inter.forth
-  colName: ''
-mEndMilestone:
-  name: mEndMilestone
-  dimSets:
-  - year
-  - yearp
-  type: map
-  defVal: 1.0
-  interpolation: back.inter.forth
-  colName: ''
+# mStartMilestone:
+#   name: mStartMilestone
+#   dimSets:
+#   - year
+#   - horizon
+# #  - yearp
+#   type: map
+#   defVal: 1.0
+#   interpolation: back.inter.forth
+#   colName: ''
+# mEndMilestone:
+#   name: mEndMilestone
+#   dimSets:
+#   - year
+#   - horizon
+# #  - yearp
+#   type: map
+#   defVal: 1.0
+#   interpolation: back.inter.forth
+#   colName: ''
 mMilestoneNext:
   name: mMilestoneNext
   dimSets:
@@ -2799,10 +2851,11 @@ mTechRampUp:
   - region
   - year
   - slice
+  - slicep
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+#  defVal: 0.0
+#  interpolation: back.inter.forth
+#  colName: ''
 mTechRampDown:
   name: mTechRampDown
   dimSets:
@@ -2810,10 +2863,11 @@ mTechRampDown:
   - region
   - year
   - slice
+  - slicep
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+#  defVal: 0.0
+#  interpolation: back.inter.forth
+#  colName: ''
 mTechFullYear:
   name: mTechFullYear
   dimSets: tech
@@ -3003,9 +3057,21 @@ mvTechOut:
   - year
   - slice
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+#  defVal: 0.0
+#  interpolation: back.inter.forth
+#  colName: ''
+mvTechOutS:
+  name: mvTechOutS
+  dimSets:
+  - tech
+  - comm
+  - region
+  - year
+  - slice
+  type: map
+  # defVal: 0.0
+  # interpolation: back.inter.forth
+  # colName: ''
 mvTechAInp:
   name: mvTechAInp
   dimSets:
@@ -3027,9 +3093,18 @@ mvTechAOut:
   - year
   - slice
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+  # defVal: 0.0
+  # interpolation: back.inter.forth
+  # colName: ''
+mvTechAOutS:
+  name: mvTechAOutS
+  dimSets:
+  - tech
+  - comm
+  - region
+  - year
+  - slice
+  type: map
 mvDemInp:
   name: mvDemInp
   dimSets:

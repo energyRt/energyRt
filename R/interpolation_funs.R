@@ -281,11 +281,8 @@
 #' @param defVal numeric, default value of a parameter.
 #' @param ... interpolation parameters.
 #'
-#' @param
-#'
 #' @return
 #'
-#' @examples
 #' @noRd
 .interpolation <- function(dtf, parameter, defVal, ...) {
   arg <- list(...)
@@ -321,10 +318,6 @@
 #' @param rule character, interpolation rule.
 #' @param ... list of additional interpolation settings.
 #'
-#' @return
-#'
-#' @examples
-#' @noRd
 #' @noRd
 .interpolation_bound <- function(dtf, parameter, defVal, rule, ...) {
   # browser()

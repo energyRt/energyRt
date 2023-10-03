@@ -34,7 +34,7 @@ setClass("tax",
     defVal = 0, #
     tax = data.frame(
       region = character(),
-      year = numeric(),
+      year = integer(),
       slice = character(),
       inp = numeric(),
       out = numeric(),

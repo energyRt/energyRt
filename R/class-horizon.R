@@ -1,9 +1,11 @@
 # check <- function(...) UseMethod("check")
 
 #' An S4 class to represent model/scenario planning horizon with intervals (year-steps)
+#' @rdname horizon
 #'
 #' @slot desc character, a comment or a short description.
-#' @slot period integer, an arranged, full sequence (without gaps) of modeled period.
+#' @slot period integer, a planning period defined as a sequence of years (arranged, without gaps) of the model planning (e.g. optimization) window. Data with years before or after the planning `period` can present in the model-objects and will be taken into account during interpolation of the model parameters.
+#' will be excluded from the the optimization.
 #' @slot intervals data.frame with three columns, representing start, middle, and the end year of every interval.
 #'
 #' @family horizon
@@ -34,6 +36,8 @@ setClass(
 # Functions and methods to define and set model horizon
 
 #' Create a new object of class 'horizon'
+#'
+#' @rdname horizon
 #'
 #' @param period (optional) integer vector with a range or a sequence of period; will be arranged, gaps will be filled. If missing
 #' @param intervals (optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.
@@ -187,7 +191,7 @@ newHorizon <- function(period = NULL, intervals = NULL, desc = NULL,
   return(h)
 }
 
-#' @rdname newHorizon
+#' @describeIn newHorizon
 #' @family update horizon
 #' @method update horizon
 #' @export
@@ -276,4 +280,6 @@ if (F) {
   )
 }
 
-
+# ToDo: write methods: ####
+## `add` ####
+## `update` ####

@@ -1,32 +1,37 @@
 # calendar-class ####
 #' An S4 class to represent sub-annual time resolution structure.
 #'
-#' @details
+#' @description
 #' Sub-annual time resolution is represented by nested, named
 #' time-frames and time-slices.
 #'
+#' @slot name character, (optional) name of the calendar for own references
+#' @slot desc character, (optional) description of the calendar
 #' @slot timeframes a named list of nested sub-annual levels with vectors
 #' of individual elements.
-#' @slot timetable data.frame with levels of slices in the named columns,
-#' and number of rows equal to the total number of time-slices on the lowest level.
+#' @slot timetable data.frame with levels of timeframes in the named columns,
+#' and number of rows equal to the total number of time-slices on the lowest level. Every timeframe is a set of timeslices ("slices") - a named fragment of time with a year-share. Timeframes have nested structure. Though every slice may have different sub-slices (similar to the real-world calendar).
+#' \describe{
+#'   \item{ANNUAL}{character, annual, the top level of timeframes}
+#'   \item{TIMEFRAME2}{character, (optional) first subannual level of timeframes}
+#'   \item{TIMEFRAME3}{character, (optional) second subannual level of timeframes}
+#'   \item{...}{character, (optional) further subannual levels of timeframes}
+#'   \item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `{SLICE2}_{SLICE3}...`}
+#' }
+#' @slot year_fraction numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of `timetable$share` or used default value (1).
 #' @slot slice_share two column data.frame with slices from all levels
 #' with their individual share in a year.
 #' @slot default_timeframe character, the name of the default level of the time-slices used in the model.
-#' @slot frame_rank
+#' @slot frame_rank named character vector with ranks of the timeframes.
 #' @slot slices_in_frame (!!! to depreciate)
-#' @slot slice_family data.frame mapping "parent" to "child" slices in
-#' the nested hierarchy.
-#' @slot slice_ancestry data.frame mapping all "(grand-)parent" to all
-#' "(grand-)children".
-#' @slot next_in_frame
-#' @slot next_in_year
+#' @slot slice_family data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.
+#' @slot next_in_frame data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.
+#' @slot next_in_year data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.
 #' @slot misc list with additional data and calculated mappings.
 #'
 #' @include generics.R
-#' @return
+#' @rdname calendar
 #' @export
-#'
-#' @examples
 setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, schedule
   representation(
     name = "character",
@@ -52,20 +57,20 @@ setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, sc
     year_fraction = as.numeric(1),
     timetable = data.frame(stringsAsFactors = FALSE),
     slice_share = data.frame(
-      # year = numeric(),
+      # year = integer(),
       slice = character(), # == time interval
       share = numeric(), # fraction of a year // rename?
       stringsAsFactors = FALSE
     ),
     slices_in_frame = integer(),
     slice_family = data.frame(
-      # year = numeric(),
+      # year = integer(),
       parent = character(),
       child = character(),
       stringsAsFactors = FALSE
     ),
     slice_ancestry = data.frame(
-      # year = numeric(),
+      # year = integer(),
       parent = character(),
       child = character(),
       stringsAsFactors = FALSE
@@ -76,7 +81,7 @@ setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, sc
       slice = character(),
       slicep = character()
     ),
-    next_in_year =  data.frame(
+    next_in_year = data.frame(
       slice = character(),
       slicep = character()
     ),
@@ -96,8 +101,10 @@ setMethod("initialize", "calendar", function(.Object, ...) {
 #' @param struct named list of timeframes with sets of timeslices and optional shares of every slice or frame in the nest
 #' @param warn logical, if TRUE, warning will be issued if `ANNUAL` level does not exists in the given structure. The level will be auto-created to complete the time-structure.
 #'
-#' @return
+#' @return an data.frame with the specified structure.
+#' @order 2
 #' @export
+#' @rdname calendar
 #'
 #' @examples
 #' make_timetable()
@@ -127,8 +134,10 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
     }
     # arg <- unlist(struct)
   } else {
-    stop("`struct` should be a named nested list with timeframes and slices ",
-         "(see examples)")
+    stop(
+      "`struct` should be a named nested list with timeframes and slices ",
+      "(see examples)"
+    )
   }
   # check for duplicates
   nms <- names(struct)
@@ -142,9 +151,11 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
   # create timetable
   dtf <- data.table(share = numeric(), stringsAsFactors = FALSE)
   if (length(struct) == 1 && is.character(struct[[1]]) && length(struct[[1]]) == 1) {
-    dtf <- data.table(share = year_fraction,
-                      ANNUAL = struct[[1]],
-                      stringsAsFactors = FALSE)
+    dtf <- data.table(
+      share = year_fraction,
+      ANNUAL = struct[[1]],
+      stringsAsFactors = FALSE
+    )
     if (!is.null(names(struct))) colnames(dtf)[2] <- names(struct)[1]
   } else {
     # browser()
@@ -162,6 +173,7 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
   dtf <- mutate(dtf, slice = x$slice, .before = "share")
   # browser()
   .check_timetable(dtf, year_fraction = year_fraction) # check validity
+  dtf <- dplyr::arrange(dtf, across(1:slice))
   return(dtf)
 }
 
@@ -201,10 +213,13 @@ if (F) {
 #' @param year_fraction numeric scalar, used for validation or calculation (if missing) of the `share` column in the given `timetable`. The default value is `1L` meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to `NULL` will drop the validation.
 #' @param ... optional `name`, `desc`, strings, character `default_timeframe`, and list `misc` with any relevant content. All other arguments will be ignored.
 #'
-#' @return
+#' @rdname calendar
+#' @return an object of class `calendar` with the specified structure.
+#' @order 1
 #' @export
 #'
 #' @examples
+#' newCalendar()
 newCalendar <- function(timetable = NULL, year_fraction = 1, ...) {
   obj <- .init_calendar(timetable = timetable, year_fraction = year_fraction)
   arg <- list(...)
@@ -212,9 +227,11 @@ newCalendar <- function(timetable = NULL, year_fraction = 1, ...) {
   if (!is.null(arg$desc)) obj@desc <- arg$desc
   if (!is.null(arg$default_timeframe)) {
     if (!(obj@default_timeframe %in% names(obj@timeframes))) {
-      stop("The default_timeframe = ", default_timeframe,
-           " is inconsistent with timeframes:\n       ",
-           paste(names(obj@timeframes), collapse = " "))
+      stop(
+        "The default_timeframe = ", default_timeframe,
+        " is inconsistent with timeframes:\n       ",
+        paste(names(obj@timeframes), collapse = " ")
+      )
     }
     obj@default_timeframe <- arg$default_timeframe
   }
@@ -225,16 +242,20 @@ if (F) {
   ## tests ####
   newCalendar()
   newCalendar(make_timetable(timeslices))
-  newCalendar(make_timetable(timeslices2), name = "WRSA_DN",
-              desc = "Four Seasons, day-night")
-  newCalendar(make_timetable(timeslices3), name = "m12h24",
-              desc = "One day per month, 24 hours per day")
+  newCalendar(make_timetable(timeslices2),
+    name = "WRSA_DN",
+    desc = "Four Seasons, day-night"
+  )
+  newCalendar(make_timetable(timeslices3),
+    name = "m12h24",
+    desc = "One day per month, 24 hours per day"
+  )
 
   cal <- make_timetable(timeslices3)
   cal_subset <- cal[grepl("h0[12]", HOUR)]
-  cal$share %>% sum(); cal_subset$share %>% sum()
+  cal$share %>% sum()
+  cal_subset$share %>% sum()
   newCalendar(cal_subset, year_fraction = sum(cal_subset$share))
-
 }
 
 # print calendar ####
@@ -247,8 +268,6 @@ setMethod("print", "calendar", function(x, ...) {
     }
   }
 })
-
-
 
 # internal functions ####
 # validation of names of individual time-slices
@@ -322,7 +341,8 @@ setMethod("print", "calendar", function(x, ...) {
   }
   rcs <- c(
     apply(select(dtf, -share), 2, function(x) unique(x)),
-    recursive = TRUE)
+    recursive = TRUE
+  )
   if (anyDuplicated(rcs)) {
     stop(paste('duplicated slice names in levels: "',
       paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"',
@@ -345,18 +365,23 @@ setMethod("print", "calendar", function(x, ...) {
     ))
   }
   # check length
-  if (length(ll) != prod(sapply(select(dtf, -share),
-                                function(x) length(unique(x))))) {
+  if (length(ll) != prod(sapply(
+    select(dtf, -share),
+    function(x) length(unique(x))
+  ))) {
     # error - investigate
     dtf2 <- unique(dtf[[1]])
     for (i in seq(length = ncol(dtf) - 2) + 1) {
       ln <- length(unique(dtf[[i]]))
       dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), ".",
-                    unique(dtf[[i]]), sep = "")
+        unique(dtf[[i]]),
+        sep = ""
+      )
     }
     stop(paste('(empty?) time-slices. ("',
       paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").',
-      sep = ""))
+      sep = ""
+    ))
   }
 }
 
@@ -416,34 +441,41 @@ setMethod("print", "calendar", function(x, ...) {
     } else if (is.list(arg[[1]])) {
       arg2 <- arg[[1]] # arg <- arg[-1]
       if (is.null(names(arg2)) || any(names(arg2) == "")) {
-        stop(paste(paste('Check time-slice data for level "', lv, '"\n',
-          sep = ""
-        ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
-        sep = "\n"))
+        stop(paste(
+          paste('Check time-slice data for level "', lv, '"\n',
+            sep = ""
+          ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
+          sep = "\n"
+        ))
       }
       if (is.numeric(arg2[[1]])) {
         if (!all(sapply(arg2, is.numeric))) {
           stop(paste(
             paste('Check time-slice data for level "', lv, '"\n',
-            sep = ""
-          ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
-          sep = "\n"))
+              sep = ""
+            ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
+            sep = "\n"
+          ))
         }
         dtf <- add_val(dtf, c(arg2, recursive = TRUE), names(arg2))
         arg <- arg[-1]
       } else {
         if (!all(sapply(arg2, is.list))) {
-          stop(paste(paste('Check time-slice data for level "', lv, '"\n',
-            sep = ""
-          ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
-          sep = "\n"))
+          stop(paste(
+            paste('Check time-slice data for level "', lv, '"\n',
+              sep = ""
+            ), paste(capture.output(print(arg[[1]])), collapse = "\n"),
+            sep = "\n"
+          ))
         }
         dtf0 <- dtf
         dtf <- NULL
         arg2 <- arg[[1]]
         for (i in seq(length.out = length(arg2))) {
-          dtf1 <- .slice_constructor(add_val(dtf0, arg2[[i]][[1]],
-                                             names(arg2)[i]), arg2[[i]][-1])
+          dtf1 <- .slice_constructor(add_val(
+            dtf0, arg2[[i]][[1]],
+            names(arg2)[i]
+          ), arg2[[i]][-1])
           if (i == 1) {
             dtf <- dtf1
           } else {
@@ -460,7 +492,8 @@ setMethod("print", "calendar", function(x, ...) {
       }
     } else {
       stop(paste('Unknown type of argument for slice level "', lv, '"',
-                 sep = ""))
+        sep = ""
+      ))
     }
   }
   as.data.table(dtf)
@@ -508,12 +541,29 @@ setMethod("print", "calendar", function(x, ...) {
   }
 
   # @structure
-  tmp <- nchar(obj@slice_share$slice) -
-    nchar(gsub("[_]", "", obj@slice_share$slice)) + 2
-  names(tmp) <- obj@slice_share$slice
-  tmp[obj@timetable[[1]][1]] <- 1
-  obj@timeframes <- lapply(1:(ncol(obj@timetable) - 2),
-                          function(x) names(tmp)[tmp == x])
+  # browser()
+  nframes <- select(obj@timetable, 1:slice, -slice) %>% ncol()
+  fnames <- names(obj@slices_in_frame)
+  if (nframes > 2) {
+    tmp <- nchar(obj@slice_share$slice) -
+      nchar(gsub("[_]", "", obj@slice_share$slice)) + 2
+    names(tmp) <- obj@slice_share$slice
+    tmp[obj@timetable[[1]][1]] <- 1
+    obj@timeframes <- lapply(
+      1:(ncol(obj@timetable) - 2),
+      function(x) names(tmp)[tmp == x]
+    )
+  } else if (nframes == 1) {
+    obj@timeframes <- list()
+    obj@timeframes[fnames[1]] <- fnames[1]
+  } else if (nframes == 2) {
+    obj@timeframes <- list()
+    obj@timeframes[[fnames[1]]] <- fnames[1]
+    obj@timeframes[[fnames[2]]] <- obj@timetable[[fnames[2]]] #%>% sort()
+  } else {
+    stop("Empty timeframes / timeslices")
+  }
+
   names(obj@timeframes) <- colnames(d)
 
   obj@default_timeframe <- colnames(d)[ncol(d)]
@@ -591,10 +641,13 @@ setMethod("print", "calendar", function(x, ...) {
     )
     n1 <- c(lapply(obj@timeframes[-1], function(x) x), recursive = TRUE)
     names(n1) <- NULL
-    n2 <- c(lapply(obj@timeframes[-1], function(x) c(x[-1], x[1])), recursive = TRUE)
+    n2 <- c(lapply(obj@timeframes[-1], function(x) c(x[-1], x[1])),
+            recursive = TRUE)
     names(n2) <- NULL
+    # browser()
     obj@next_in_year <- data.table(
-      slice = n1, slicep = n2,
+      slice = n1,
+      slicep = n2,
       stringsAsFactors = FALSE
     )
   }
@@ -650,8 +703,10 @@ if (F) {
   #     all(app@slice != colnames(approxim$calendar@timetable)[
   #       -ncol(approxim$calendar@timetable)])) {
   if (!is_empty(app@slice) && !any(app@slice %in% timeframes)) {
-    stop(paste0('Unrecognized timeframe level "', app@slice, '" in ',
-                class(app), ': "', app@name, '"'))
+    stop(paste0(
+      'Unrecognized timeframe level "', app@slice, '" in ',
+      class(app), ': "', app@name, '"'
+    ))
   }
 }
 # =============================================================================#
@@ -665,16 +720,17 @@ if (F) {
   if (class(app) == "technology") slt <- slt[slt != "afs"]
   for (ss in slt) {
     if (any(colnames(slot(app, ss)) == "slice")) {
-      tmp <- slot(app, ss)
+      tmp <- slot(app, ss) %>% as.data.frame() # !!! rewrite
       fl <- (!is.na(tmp$slice) & !(tmp$slice %in% approxim$slice)) # !!! @calendar?
       if (any(fl)) {
         mark_col <- (sapply(tmp, is.character) | colnames(tmp) == "year")
         mark_coli <- colnames(tmp)[mark_col]
-        t1 <- tmp[fl, , drop = FALSE]
-        t2 <- tmp[!fl, , drop = FALSE]
+        t1 <- tmp[fl, , drop = FALSE] %>% as.data.frame() # !!! rewrite
+        t2 <- tmp[!fl, , drop = FALSE] %>% as.data.frame() # !!! rewrite
         # Sort from lowest level to largest
         ff <- approxim$parent_child$parent[
-          !duplicated(approxim$parent_child$parent)]
+          !duplicated(approxim$parent_child$parent)
+        ]
         f1 <- seq_along(ff)
         names(f1) <- ff
         if (!all(t1$slice %in% ff)) {
@@ -686,22 +742,31 @@ if (F) {
         }
         t1 <- t1[
           sort(f1[t1$slice], index.return = TRUE, decreasing = TRUE)$ix, ,
-          drop = FALSE]
-        # Add child desaggregation
+          drop = FALSE
+        ]
+        # browser()
+        # Add child disaggregation
         for (i in seq_len(nrow(t1))) {
-          ll <- approxim$parent_child[
-            approxim$parent_child$parent == t1[i, "slice"], "child"]
+          # ll <- approxim$parent_child[
+          #   approxim$parent_child$parent == t1[i, "slice"], "child"
+          # ]
+          ll <- approxim$parent_child %>%
+            filter(parent == t1$slice[i]) %>%
+            select(child) %>% purrr::simplify()
+
           t0 <- t1[rep(i, length(ll)), , drop = FALSE]
           t0$slice <- ll
-          tes <- t0[, mark_coli, drop = FALSE]
+          # tes <- t0[, mark_coli, drop = FALSE]
+          tes <- select(t0, all_of(mark_coli)) %>% as.matrix()
           tes[is.na(tes)] <- "-"
           z1 <- apply(tes, 1, paste0, collapse = "##")
-          tes <- t2[, mark_coli, drop = FALSE]
+          # tes <- t2[, mark_coli, drop = FALSE]
+          tes <- select(t2, all_of(mark_coli)) %>% as.matrix()
           tes[is.na(tes)] <- "-"
           z2 <- apply(tes, 1, paste0, collapse = "##")
           # If there are the same row, after splititng
           if (any(z1 %in% z2)) {
-            merge_col <- merge(t0, t2, by = mark_coli)
+            merge_col <- merge0(t0, t2, by = mark_coli)
             colnames(merge_col)[seq_len(ncol(t0))] <- colnames(t0)
             for (j in colnames(tmp)[!mark_col]) {
               merge_col[!is.na(merge_col[, paste0(j, ".y")]), j] <- NA
@@ -759,3 +824,8 @@ if (F) {
 #   sl <- .init_slice(sl)
 #   sl
 # }
+
+# ToDo: write methods: ####
+## `add` ####
+## `update` ####
+
