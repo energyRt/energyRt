@@ -2,9 +2,8 @@
 #' Class (S4) to represent default model configuration.
 #'
 #' @slot desc character string with the configuration information.
-#' @slot region
+#' @slot region character string with
 #' @slot horizon
-#' @slot slice
 #' @slot discount
 #' @slot discountFirstYear
 #' @slot early.retirement

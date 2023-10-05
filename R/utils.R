@@ -1,5 +1,38 @@
 # Some commonly used functions
 
+
+#' Convert hours (integer) values to HOUR set 'hNN'
+#'
+#' @param x
+#' @param width
+#' @param prefix
+#' @param flag
+#'
+#' @return
+#' @export
+#'
+#' @examples
+hour2HOUR <- function(x, width = 2, prefix = "h", flag = "0") {
+  paste0(prefix, formatC(x, width = width, flag = flag))
+}
+
+#' Convert year-days to YDAY set 'dNNN'
+#'
+#' @param x
+#' @param width
+#' @param prefix
+#' @param flag
+#'
+#' @return
+#' @export
+#'
+#' @examples
+yday2YDAY <- function(x, width = 3, prefix = "d", flag = "0") {
+  paste0(prefix, formatC(x, width = width, flag = flag))
+}
+
+
+
 factors_in_prams <- function(x) {
   # x - list
   # if (inherits(x, "list")) y <- lapply()

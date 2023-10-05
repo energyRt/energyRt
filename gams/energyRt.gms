@@ -553,7 +553,7 @@ mTechAfUp(tech, region, year, slice)
 mTechFullYear(tech)
 mTechRampUp(tech, region, year, slice, slicep)
 mTechRampDown(tech, region, year, slice, slicep)
-mTechCommSliceSliceP(tech, comm, slice, slicep)
+*mTechCommSliceSliceP(tech, comm, slice, slicep)
 mTechCommOutSliceSliceP(tech, comm, slice, slicep)
 mTechCommAOutSliceSliceP(tech, comm, slice, slicep)
 mTechOlifeInf(tech, region)
@@ -1280,14 +1280,6 @@ eqTradeEac(trade, region, year)                   Trade equivalent annual costs
 eqTradeCapFlow(trade, comm, year, slice)          Trade capacity to activity
 ;
 
-*         sum(trade$mTradeComm(trade, comm),
-*             sum(src$mTradeRoutes(trade, src, dst),
-*                 (pTradeIrEff(trade, src, dst, year, slicep)
-*                  * vTradeIr(trade, comm, src, dst, year, slicep)
-*                  )$mvTradeIr(trade, comm, src, dst, year, slicep)
-*                 )
-*            )
-
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
   vImport(comm, dst, year, slice) =e=
      sum(slicep$mCommSliceOrParent(comm, slice, slicep),
@@ -1455,8 +1447,8 @@ eqInp2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqOut2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqSupOutTot(comm, region, year, slice)      Supply total output
 eqTechInpTot(comm, region, year, slice)     Technology total input
-eqTechOutS(tech, comm, region, year, slice) Main output aggregation to comm timeframe
-eqTechAOutS(tech, comm, region, year, slice) Aux output aggregation to comm timeframe
+*eqTechOutS(tech, comm, region, year, slice) Main output aggregation to comm timeframe
+*eqTechAOutS(tech, comm, region, year, slice) Aux output aggregation to comm timeframe
 eqTechOutTot(comm, region, year, slice)     Technology total output
 eqStorageInpTot(comm, region, year, slice)  Storage total input
 eqStorageOutTot(comm, region, year, slice)  Storage total output
@@ -1531,17 +1523,35 @@ eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
          vTechInpTot(comm, region, year, slice)
          =e=
          sum(tech$mTechInpComm(tech, comm),
-             sum(slicep$(mTechCommSliceSliceP(tech, comm, slice, slicep)),
+             sum(slicep$(mTechSlice(tech, slicep) and mCommSliceOrParent(comm, slice, slicep)),
                  vTechInp(tech, comm, region, year, slicep)$mvTechInp(tech, comm, region, year, slicep)
                  )
              )
          +
          sum(tech$mTechAInp(tech, comm),
-             sum(slicep$(mTechCommSliceSliceP(tech, comm, slice, slicep)),
-                 vTechAInp(tech, comm, region, year, slicep)$mvTechAInp(tech, comm, region, year, slicep)
+             sum(slicep$(mTechSlice(tech, slicep) and mCommSliceOrParent(comm, slice, slicep)),
+             vTechAInp(tech, comm, region, year, slicep)$mvTechAInp(tech, comm, region, year, slicep)
+             )
+         );
+
+eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)..
+         vTechOutTot(comm, region, year, slice)
+         =e=
+         sum(tech$mTechOutComm(tech, comm),
+             sum(slicep$(mTechSlice(tech, slicep) and mCommSliceOrParent(comm, slice, slicep)),
+                 vTechOut(tech, comm, region, year, slicep)$mvTechOut(tech, comm, region, year, slicep)
+                 )
+             )
+         +
+         sum(tech$mTechAOut(tech, comm),
+             sum(slicep$(mTechSlice(tech, slicep) and mCommSliceOrParent(comm, slice, slicep)),
+                 vTechAOut(tech, comm, region, year, slicep)$mvTechAOut(tech, comm, region, year, slicep)
                  )
              );
 
+$ontext
+* an attempt to improve mapping to speed-up Julia and Python versions
+* goes with an expence of memory use (large mTechCommSliceSliceP) in models with many commodities
 eqTechOutS(tech, comm, region, year, slice)$mvTechOutS(tech, comm, region, year, slice)..
   vTechOutS(tech, comm, region, year, slice) =e=
   sum(slicep$(mTechCommSliceSliceP(tech, comm, slice, slicep)),
@@ -1564,7 +1574,7 @@ eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)..
          sum(tech$mTechAOut(tech, comm),
 *         sum(tech$mvTechAOutS(tech, comm, region, year, slice),
              vTechAOutS(tech, comm, region, year, slice)$mvTechAOutS(tech, comm, region, year, slice));
-
+$offtext
 
 eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)..
          vStorageInpTot(comm, region, year, slice)

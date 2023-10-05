@@ -24,30 +24,30 @@
 #   # defVal: 0.0
 #   # interpolation: back.inter.forth
 #   # colName:
-mTechCommSliceSliceP:
-  name: mTechCommSliceSliceP
-  dimSets:
-  - tech
-  - comm
-  - slice
-  - slicep
-  type: map
-mTechCommOutSliceSliceP:
-  name: mTechCommOutSliceSliceP
-  dimSets:
-  - tech
-  - comm
-  - slice
-  - slicep
-  type: map
-mTechCommAOutSliceSliceP:
-  name: mTechCommAOutSliceSliceP
-  dimSets:
-  - tech
-  - comm
-  - slice
-  - slicep
-  type: map
+# mTechCommSliceSliceP:
+#   name: mTechCommSliceSliceP
+#   dimSets:
+#   - tech
+#   - comm
+#   - slice
+#   - slicep
+#   type: map
+# mTechCommOutSliceSliceP:
+#   name: mTechCommOutSliceSliceP
+#   dimSets:
+#   - tech
+#   - comm
+#   - slice
+#   - slicep
+#   type: map
+# mTechCommAOutSliceSliceP:
+#   name: mTechCommAOutSliceSliceP
+#   dimSets:
+#   - tech
+#   - comm
+#   - slice
+#   - slicep
+#   type: map
 region:
   name: region
   dimSets: region

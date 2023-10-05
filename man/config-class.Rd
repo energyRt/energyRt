@@ -12,6 +12,8 @@ Class (S4) to represent default model configuration.
 \describe{
 \item{\code{desc}}{character string with the configuration information.}
 
+\item{\code{region}}{character string with}
+
 \item{\code{misc}}{}
 }}
 

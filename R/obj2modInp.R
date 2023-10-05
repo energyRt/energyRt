@@ -107,7 +107,8 @@ setMethod(".obj2modInp", signature(
     approxim$region <- approxim$region[approxim$region %in% unique(dem@dem$region)]
   }
   if (length(dem@region) != 0) {
-    dem@dem <- dem@dem[is.na(dem@dem) | dem@dem$region %in% dem@region, , drop = FALSE]
+    dem@dem <- dem@dem[is.na(dem@dem) | dem@dem$region %in% dem@region, ,
+                       drop = FALSE]
     approxim$region <- approxim$region[approxim$region %in% dem@region]
   }
   # Slice
@@ -124,7 +125,6 @@ setMethod(".obj2modInp", signature(
     c(dem@name, dem@commodity)
   )
   obj@parameters[["pDemand"]] <- .dat2par(obj@parameters[["pDemand"]], pDemand)
-
 
   obj
 })
@@ -337,7 +337,8 @@ setMethod(
       pImportRowRes$comm <- exp@commodity
       obj@parameters[["mImportRowAccumulatedUp"]] <- .dat2par(
         obj@parameters[["mImportRowAccumulatedUp"]],
-        pImportRowRes[pImportRowRes$value != Inf, c("expp", "comm"), drop = FALSE]
+        pImportRowRes[pImportRowRes$value != Inf, c("expp", "comm"),
+                      drop = FALSE]
       )
     }
     obj

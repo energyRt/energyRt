@@ -251,42 +251,40 @@ write.sc <- write_sc
   prec@parameters[["mvTechAOutS"]] <-
     .dat2par(prec@parameters[["mvTechAOutS"]], mvTechAOutS)
 
-  # mTechCommSliceSliceP ####
+  # # mTechCommSliceSliceP ####
+  # ! mTechCommSliceSliceP, mTechCommOutSliceSliceP, mTechCommAOutSliceSliceP
+  # ! have been dropped due to large size in models with many commodities
   # new map for eqTechOutTot
-  mTechCommSliceSliceP <- prec@parameters[["mTechSlice"]]@data %>%
-    rename(slicep = slice) %>%
-    left_join(mCommSliceOrParent, by = c("slicep")) %>%
-    select(all_of(prec@parameters[["mTechCommSliceSliceP"]]@dimSets)) %>%
-    unique()
-  prec@parameters[["mTechCommSliceSliceP"]] <-
-    .dat2par(prec@parameters[["mTechCommSliceSliceP"]], mTechCommSliceSliceP)
-  # browser()
-
-  mTechCommOutSliceSliceP <- prec@parameters[["mvTechOut"]]@data %>%
-    # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
-    rename(slicep = slice) %>%
-    select(-region, -year) %>% unique() %>%
-    left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
-    select(all_of(prec@parameters[["mTechCommOutSliceSliceP"]]@dimSets)) %>%
-    unique()
-  prec@parameters[["mTechCommOutSliceSliceP"]] <-
-    .dat2par(prec@parameters[["mTechCommOutSliceSliceP"]],
-             mTechCommOutSliceSliceP)
-
-  mTechCommAOutSliceSliceP <- prec@parameters[["mvTechAOut"]]@data %>%
-    # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
-    rename(slicep = slice) %>%
-    select(-region, -year) %>% unique() %>%
-    left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
-    select(all_of(prec@parameters[["mTechCommAOutSliceSliceP"]]@dimSets)) %>%
-    unique()
-  prec@parameters[["mTechCommAOutSliceSliceP"]] <-
-    .dat2par(prec@parameters[["mTechCommAOutSliceSliceP"]],
-             mTechCommAOutSliceSliceP)
-
-  # mStorageCommSliceNext ####
-  # new map for eqTechOutTot
-
+  # mTechCommSliceSliceP <- prec@parameters[["mTechSlice"]]@data %>%
+  #   rename(slicep = slice) %>%
+  #   left_join(mCommSliceOrParent, by = c("slicep")) %>%
+  #   select(all_of(prec@parameters[["mTechCommSliceSliceP"]]@dimSets)) %>%
+  #   unique()
+  # prec@parameters[["mTechCommSliceSliceP"]] <-
+  #   .dat2par(prec@parameters[["mTechCommSliceSliceP"]], mTechCommSliceSliceP)
+  # # browser()
+  #
+  # mTechCommOutSliceSliceP <- prec@parameters[["mvTechOut"]]@data %>%
+  #   # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
+  #   rename(slicep = slice) %>%
+  #   select(-region, -year) %>% unique() %>%
+  #   left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
+  #   select(all_of(prec@parameters[["mTechCommOutSliceSliceP"]]@dimSets)) %>%
+  #   unique()
+  # prec@parameters[["mTechCommOutSliceSliceP"]] <-
+  #   .dat2par(prec@parameters[["mTechCommOutSliceSliceP"]],
+  #            mTechCommOutSliceSliceP)
+  #
+  # mTechCommAOutSliceSliceP <- prec@parameters[["mvTechAOut"]]@data %>%
+  #   # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
+  #   rename(slicep = slice) %>%
+  #   select(-region, -year) %>% unique() %>%
+  #   left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
+  #   select(all_of(prec@parameters[["mTechCommAOutSliceSliceP"]]@dimSets)) %>%
+  #   unique()
+  # prec@parameters[["mTechCommAOutSliceSliceP"]] <-
+  #   .dat2par(prec@parameters[["mTechCommAOutSliceSliceP"]],
+  #            mTechCommAOutSliceSliceP)
 
   rest <- rest + 1
 

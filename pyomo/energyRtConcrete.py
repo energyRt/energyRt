@@ -441,19 +441,11 @@ model.eqSupOutTot = Constraint(mSupOutTot, rule = lambda model, c, r, y, s : mod
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechInpTot ", end = "")
 # eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
-model.eqTechInpTot = Constraint(mTechInpTot, rule = lambda model, c, r, y, s : model.vTechInpTot[c,r,y,s]  ==  sum(sum((model.vTechInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechInp else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)) for t in tech if (t,c) in mTechInpComm)+sum(sum((model.vTechAInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAInp else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)) for t in tech if (t,c) in mTechAInp));
-if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
-if verbose: print("eqTechOutS ", end = "")
-# eqTechOutS(tech, comm, region, year, slice)$mvTechOutS(tech, comm, region, year, slice)
-model.eqTechOutS = Constraint(mvTechOutS, rule = lambda model, t, c, r, y, s : model.vTechOutS[t,c,r,y,s]  ==  sum((model.vTechOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechOut else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)));
-if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
-if verbose: print("eqTechAOutS ", end = "")
-# eqTechAOutS(tech, comm, region, year, slice)$mvTechAOutS(tech, comm, region, year, slice)
-model.eqTechAOutS = Constraint(mvTechAOutS, rule = lambda model, t, c, r, y, s : model.vTechAOutS[t,c,r,y,s]  ==  sum((model.vTechAOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAOut else 0) for sp in slice if ((t,c,s,sp) in mTechCommSliceSliceP)));
+model.eqTechInpTot = Constraint(mTechInpTot, rule = lambda model, c, r, y, s : model.vTechInpTot[c,r,y,s]  ==  sum(sum((model.vTechInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechInp else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechInpComm)+sum(sum((model.vTechAInp[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAInp else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAInp));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTechOutTot ", end = "")
 # eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
-model.eqTechOutTot = Constraint(mTechOutTot, rule = lambda model, c, r, y, s : model.vTechOutTot[c,r,y,s]  ==  sum((model.vTechOutS[t,c,r,y,s] if (t,c,r,y,s) in mvTechOutS else 0) for t in tech if (t,c) in mTechOutComm)+sum((model.vTechAOutS[t,c,r,y,s] if (t,c,r,y,s) in mvTechAOutS else 0) for t in tech if (t,c) in mTechAOut));
+model.eqTechOutTot = Constraint(mTechOutTot, rule = lambda model, c, r, y, s : model.vTechOutTot[c,r,y,s]  ==  sum(sum((model.vTechOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechOut else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechOutComm)+sum(sum((model.vTechAOut[t,c,r,y,sp] if (t,c,r,y,sp) in mvTechAOut else 0) for sp in slice if ((t,sp) in mTechSlice and (c,s,sp) in mCommSliceOrParent)) for t in tech if (t,c) in mTechAOut));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqStorageInpTot ", end = "")
 # eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
