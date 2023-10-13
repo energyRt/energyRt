@@ -19,7 +19,7 @@ read_solution <- function(obj, ...) {
   # tmp.dir dir from wich read results, by default in scen@misc$tmp.dir
   # echo = TRUE - print working data
   arg <- list(...)
-
+  # browser()
   read_result_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
   # if (is.null(arg$readOutputFunction)) arg$readOutputFunction <- read.csv
@@ -33,15 +33,24 @@ read_solution <- function(obj, ...) {
     }
   }
   # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
-  vrb_list <- arg$readOutputFunction(paste(arg$tmp.dir, "/output/variable_list.csv", sep = ""), stringsAsFactors = FALSE)$value
+  vrb_list <- arg$readOutputFunction(
+    paste(arg$tmp.dir, "/output/variable_list.csv", sep = ""),
+    stringsAsFactors = FALSE
+  )$value
   if (file.exists(paste(arg$tmp.dir, "/output/variable_list2.csv", sep = ""))) {
-    vrb_list2 <- arg$readOutputFunction(paste(arg$tmp.dir, "/output/variable_list2.csv", sep = ""), stringsAsFactors = FALSE)$value
+    vrb_list2 <- arg$readOutputFunction(
+      paste(arg$tmp.dir, "/output/variable_list2.csv", sep = ""),
+      stringsAsFactors = FALSE
+    )$value
   } else {
     vrb_list2 <- character()
   }
   rr <- list(
     variables = list(),
-    set = arg$readOutputFunction(paste(arg$tmp.dir, "/output/raw_data_set.csv", sep = ""), stringsAsFactors = FALSE)
+    set = arg$readOutputFunction(
+      paste(arg$tmp.dir, "/output/raw_data_set.csv", sep = ""),
+      stringsAsFactors = FALSE
+    )
   )
   # Read set and alias
   ss <- list()
@@ -57,63 +66,85 @@ read_solution <- function(obj, ...) {
   ss$commp <- ss$comm
   ss$slicep <- ss$slice
   rr$set_vec <- ss
-  if (is.null(scen@settings@solver$import_format)) scen@settings@solver$import_format <- "csv" # !!! workaround
+  if (is.null(scen@settings@solver$import_format)) {
+    scen@settings@solver$import_format <- "csv" # !!! workaround
+  }
   if (scen@settings@solver$import_format == "gdx") {
     # .check_load_gdxlib()
     .check_load_gdxtools()
     # Read variables gdx
     gd <- gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
     for (i in c(vrb_list, vrb_list2)) {
-      jj <- gd[i]
-      if (length(grep("region", colnames(jj))) == 2) {
-        colnames(jj)[grep("region", colnames(jj))] <- c("src", "dst")
+      # cat(i, "\n")
+      # if (i == "vTradeIr") browser() # debug
+      vr <- gd[i]
+      if (is.null(vr)) next
+      if (length(grep("region", colnames(vr))) == 2) {
+        colnames(vr)[grep("region", colnames(vr))] <- c("src", "dst")
       }
-      if (ncol(jj) == 1) {
-        rr$variables[[i]] <- data.frame(value = jj[1, 1])
+      if (ncol(vr) == 1) {
+        rr$variables[[i]] <- data.frame(value = vr[1, 1])
       } else {
-        for (j in seq_len(ncol(jj))[colnames(jj) != "value"]) {
+        for (j in seq_len(ncol(vr))[colnames(vr) != "value"]) {
           # Remove [.][:digit:] if any
-          if (all(colnames(jj)[j] != names(rr$set_vec))) {
-            colnames(jj)[j] <- gsub("[.].*", "", colnames(jj)[j])
+          if (all(colnames(vr)[j] != names(rr$set_vec))) {
+            colnames(vr)[j] <- gsub("[.].*", "", colnames(vr)[j])
           }
-          # Save all data with all levels
-          if (colnames(jj)[j] != "year") {
-            jj[[j]] <- factor(jj[[j]],
-                              levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+          sname <- colnames(vr)[j] # set name
+          # Save as.factor with existing levels
+          if (sname != "year") {
+            if (!is.null(scen@modInp@parameters[[sname]])) {
+              # !!! move to the top before aliases
+              set_levels <- scen@modInp@parameters[[sname]]@data[[sname]]
+            } else {
+              set_levels <- sort(rr$set_vec[[sname]])
+            }
+            # set_levels <- scen@modInp@parameters[[sname]]@data[[sname]]
+            # vr[[j]] <- factor(vr[[j]], levels = sort(rr$set_vec[[sname]]))
+            vr[[j]] <- factor(vr[[j]], levels = set_levels)
           } else {
-            jj[[j]] <- as.integer(jj[[j]])
+            vr[[j]] <- as.integer(vr[[j]])
           }
         }
-        rr$variables[[i]] <- jj
+        rr$variables[[i]] <- vr
       }
     }
   } else {
     # Read variables csv
     for (i in c(vrb_list, vrb_list2)) {
-      jj <- arg$readOutputFunction(paste(arg$tmp.dir, "/output/", i, ".csv", sep = ""),
+      vr <- arg$readOutputFunction(
+        paste(arg$tmp.dir, "/output/", i, ".csv",
+          sep = ""
+        ),
         stringsAsFactors = FALSE
       )
-      if (ncol(jj) == 1) {
-        rr$variables[[i]] <- data.frame(value = jj[1, 1])
+      if (ncol(vr) == 1) {
+        rr$variables[[i]] <- data.frame(value = vr[1, 1])
       } else {
-        for (j in seq_len(ncol(jj))[colnames(jj) != "value"]) {
+        for (j in seq_len(ncol(vr))[colnames(vr) != "value"]) {
           # Remove [.][:digit:] if any
-          if (all(colnames(jj)[j] != names(rr$set_vec))) {
-            colnames(jj)[j] <- gsub("[.].*", "", colnames(jj)[j])
+          if (all(colnames(vr)[j] != names(rr$set_vec))) {
+            colnames(vr)[j] <- gsub("[.].*", "", colnames(vr)[j])
           }
           # Save all data with all levels
-          if (colnames(jj)[j] != "year") {
-            jj[[j]] <- factor(jj[[j]], levels = sort(rr$set_vec[[colnames(jj)[j]]]))
+          if (colnames(vr)[j] != "year") {
+            vr[[j]] <- factor(vr[[j]],
+              levels = sort(rr$set_vec[[colnames(vr)[j]]])
+            )
           }
         }
-        rr$variables[[i]] <- jj
+        rr$variables[[i]] <- vr
       }
     }
   }
   scen@modOut <- new("modOut")
   # Read solution status
-  scen@modOut@solutionLogs <- read.csv(paste(arg$tmp.dir, "/output/log.csv", sep = ""))
-  solver_data <- read.csv(paste(arg$tmp.dir, "/solver", sep = ""), stringsAsFactors = FALSE)
+  scen@modOut@solutionLogs <- read.csv(paste(arg$tmp.dir, "/output/log.csv",
+    sep = ""
+  ))
+  solver_data <- read.csv(paste(arg$tmp.dir, "/solver", sep = ""),
+    stringsAsFactors = FALSE
+  )
   codes <- solver_data[grep("^code", solver_data$name), ]
   for (i in seq_len(nrow(codes))) {
     scen@settings@solver[[codes[i, "name"]]] <-
@@ -122,11 +153,13 @@ read_solution <- function(obj, ...) {
   if (all(scen@modOut@solutionLogs$parameter != "solution status")) {
     scen@modOut@stage <- "Scenario is not solved"
   } else if (all(scen@modOut@solutionLogs[
-    scen@modOut@solutionLogs$parameter == "solution status", "value"] != 1)) {
+    scen@modOut@solutionLogs$parameter == "solution status", "value"
+  ] != 1)) {
     scen@modOut@stage <- paste0(
       "The solution status is not optimal (",
       scen@modOut@solutionLogs[
-        scen@modOut@solutionLogs$parameter == "solution status", "value"], ")"
+        scen@modOut@solutionLogs$parameter == "solution status", "value"
+      ], ")"
     )
   } else if (all(scen@modOut@solutionLogs$parameter != "done")) {
     scen@modOut@stage <- "Unexpected termination"
@@ -162,30 +195,34 @@ read_solution <- function(obj, ...) {
       merge0(
         merge0(
           newcap,
-          merge0(olife, invcost)),
+          merge0(olife, invcost)
+        ),
         discount,
-        all.x = TRUE)
+        all.x = TRUE
+      )
     end_year <- max(.get_data_slot(scen@modInp@parameters$mEndMilestone)$yearp)
-    salvage <- merge0(salvage,
-                     .get_data_slot(scen@modInp@parameters$mStartMilestone))
+    salvage <- merge0(
+      salvage,
+      .get_data_slot(scen@modInp@parameters$mStartMilestone)
+    )
     salvage$start <- salvage$yearp
     salvage$yearp <- NULL
     # if (F) {
-      # !!! unfinished
-      # browser()
-      salvage <- salvage[salvage$start + salvage$olife > end_year, ]
+    # !!! unfinished
+    # browser()
+    salvage <- salvage[salvage$start + salvage$olife > end_year, ]
 
-      salvage$value <- salvage$newcap * salvage$invcost *
-        ((1 + salvage$discount)^(salvage$olife) -
-           (1 + salvage$discount)^(end_year - salvage$start + 1)) /
-        ((1 + salvage$discount)^salvage$olife - 1)
+    salvage$value <- salvage$newcap * salvage$invcost *
+      ((1 + salvage$discount)^(salvage$olife) -
+        (1 + salvage$discount)^(end_year - salvage$start + 1)) /
+      ((1 + salvage$discount)^salvage$olife - 1)
 
-      fl <- (salvage$discount == 0)
-      salvage$value[fl] <- (salvage$newcap * salvage$invcost *
-                              (salvage$olife - (end_year - salvage$start + 1)) /
-                              salvage$olife)[fl]
+    fl <- (salvage$discount == 0)
+    salvage$value[fl] <- (salvage$newcap * salvage$invcost *
+      (salvage$olife - (end_year - salvage$start + 1)) /
+      salvage$olife)[fl]
 
-      salvage[, c(3, 2, 1, 9)]
+    salvage[, c(3, 2, 1, 9)]
     # }
     # NULL # temporary
   }
@@ -197,17 +234,23 @@ read_solution <- function(obj, ...) {
     pDummyImportCost <- .get_data_slot(scen@modInp@parameters$pDummyImportCost)
     # browser()
     vDummyImportCost <- merge0(pDummyImportCost,
-                              scen@modOut@variables$vDummyImport,
-                              by = c("comm", "region", "year", "slice")[
-                                c("comm", "region", "year", "slice") %in%
-                                  colnames(pDummyImportCost)])
+      scen@modOut@variables$vDummyImport,
+      by = c("comm", "region", "year", "slice")[
+        c("comm", "region", "year", "slice") %in%
+          colnames(pDummyImportCost)
+      ]
+    )
     vDummyImportCost$value <- vDummyImportCost$value.x * vDummyImportCost$value.y
     vDummyImportCost$value.x <- NULL
     vDummyImportCost$value.y <- NULL
     scen@modOut@variables$vDummyImportCost <- vDummyImportCost
     pDummyExportCost <- .get_data_slot(scen@modInp@parameters$pDummyExportCost)
-    vDummyExportCost <- merge0(pDummyExportCost, scen@modOut@variables$vDummyExport,
-      by = c("comm", "region", "year", "slice")[c("comm", "region", "year", "slice") %in% colnames(pDummyExportCost)]
+    vDummyExportCost <- merge0(
+      pDummyExportCost,
+      scen@modOut@variables$vDummyExport,
+      by = c("comm", "region", "year", "slice")[
+        c("comm", "region", "year", "slice") %in% colnames(pDummyExportCost)
+      ]
     )
     vDummyExportCost$value <- vDummyExportCost$value.x * vDummyExportCost$value.y
     vDummyExportCost$value.x <- NULL
@@ -222,8 +265,11 @@ read_solution <- function(obj, ...) {
     vTechEmsFuel <-
       merge0(
         merge0(pTechEmisComm, scen@modOut@variables$vTechInp,
-               by = c("tech", "comm")),
-        tmp, by = "comm")
+          by = c("tech", "comm")
+        ),
+        tmp,
+        by = "comm"
+      )
     vTechEmsFuel$comm <- vTechEmsFuel$commp
     if (nrow(vTechEmsFuel) > 0) {
       vTechEmsFuel <- aggregate(
@@ -255,15 +301,19 @@ read_solution <- function(obj, ...) {
           colnames(in_dat) <- c(sets, "value")
         }
         if (nrow(in_dat) != 0 &&
-            !is.null(scen@modInp@parameters[[paste0("mCosts", tmp@name)]])) {
-          in_dat <- merge0(in_dat,
-                          .get_data_slot(
-                            scen@modInp@parameters[[paste0("mCosts", tmp@name)]]))
+          !is.null(scen@modInp@parameters[[paste0("mCosts", tmp@name)]])) {
+          in_dat <- merge0(
+            in_dat,
+            .get_data_slot(
+              scen@modInp@parameters[[paste0("mCosts", tmp@name)]]
+            )
+          )
         }
         if (nrow(in_dat) != 0 &&
-            !is.null(scen@modInp@parameters[[paste0("pCosts", tmp@name)]])) {
+          !is.null(scen@modInp@parameters[[paste0("pCosts", tmp@name)]])) {
           prm <- .get_data_slot(
-            scen@modInp@parameters[[paste0("pCosts", tmp@name)]])
+            scen@modInp@parameters[[paste0("pCosts", tmp@name)]]
+          )
           if (ncol(prm) == 1) {
             in_dat$value <- in_dat$value * prm$value
           } else {
@@ -274,19 +324,26 @@ read_solution <- function(obj, ...) {
           }
         }
         if (nrow(in_dat) != 0) {
-          in_dat <- aggregate(in_dat[, "value", drop = FALSE],
-                              in_dat[, c("region", "year"), drop = FALSE], sum)
+          in_dat <- aggregate(
+            in_dat[, "value", drop = FALSE],
+            in_dat[, c("region", "year"), drop = FALSE], sum
+          )
           in_dat$costs <- tmp@name
-          costs_tot <- rbind(costs_tot,
-                             in_dat[, c("costs", "region", "year", "value"),
-                                    drop = FALSE])
+          costs_tot <- rbind(
+            costs_tot,
+            in_dat[, c("costs", "region", "year", "value"),
+              drop = FALSE
+            ]
+          )
         }
       }
       scen@modOut@variables$vUserCosts <- costs_tot
     }
   }
-  if (arg$echo) cat("Reading solution: ", round(proc.time()[3] -
-                                                  read_result_time, 2), "s\n", sep = "")
+  if (arg$echo) {
+    cat("Reading solution: ", round(proc.time()[3] -
+      read_result_time, 2), "s\n", sep = "")
+  }
   if (scen@modOut@stage == "solved") scen@status$optimal <- TRUE
   invisible(scen)
 }
@@ -308,7 +365,9 @@ setMethod("read", "scenario", read_solution)
   if (nrow(scen@modOut@variables$vExportRowAccumulated) > 0) {
     scen@modOut@variables$vExportRowAccumulated <- aggregate(
       scen@modOut@variables$vExportRowAccumulated[, "value", drop = FALSE],
-      scen@modOut@variables$vExportRowAccumulated[, c("expp", "comm"), drop = FALSE], sum
+      scen@modOut@variables$vExportRowAccumulated[, c("expp", "comm"),
+        drop = FALSE
+      ], sum
     )
   }
   if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0) {

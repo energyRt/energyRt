@@ -1305,7 +1305,10 @@ eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)..
               sum(dst$mTradeRoutes(trade, src, dst),
                   vTradeIr(trade, comm, src, dst, year, slicep)$mvTradeIr(trade, comm, src, dst, year, slicep))))
     + sum(slicep$mCommSliceOrParent(comm, slice, slicep),
-        sum(expp$mExpComm(expp, comm), vExportRow(expp, comm, src, year, slicep)$mExportRow(expp, comm, src, year, slicep)));
+        sum(expp$mExpComm(expp, comm),
+            vExportRow(expp, comm, src, year, slicep)$mExportRow(expp, comm, src, year, slicep)
+            )
+          );
 
 
 eqTradeFlowUp(trade, comm, src, dst, year, slice)$meqTradeFlowUp(trade, comm, src, dst, year, slice)..
@@ -1628,9 +1631,18 @@ eqCost(region, year)$mvTotalCost(region, year)..
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
          vTaxCost(comm, region, year)
          =e=
-         sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCostOut(comm, region, year, slice) * vOutTot(comm, region, year, slice))
-         + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCostInp(comm, region, year, slice) * vInpTot(comm, region, year, slice))
-         + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)), pTaxCostBal(comm, region, year, slice) * vBalance(comm, region, year, slice))
+         sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)),
+             pTaxCostOut(comm, region, year, slice)
+             * vOutTot(comm, region, year, slice)
+             )
+       + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)),
+             pTaxCostInp(comm, region, year, slice)
+             * vInpTot(comm, region, year, slice)
+             )
+       + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)),
+             pTaxCostBal(comm, region, year, slice)
+             * vBalance(comm, region, year, slice)
+             )
          ;
 
 eqSubsCost(comm, region, year)$mSubCost(comm, region, year)..

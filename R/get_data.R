@@ -216,7 +216,11 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       if (length(nflt1) > 0 & length(clNames) > 0) {
         # Check if provided sets/filters exist
         ii <- nflt1 %in% clNames
-        if (!all(ii)) warning("Sets '", paste(nflt1, collapse = "', '"), "' have not been found in scenario '", sc, "',", datype, "'.")
+        if (!all(ii)) {
+          warning("Sets '", paste(nflt1, collapse = "', '"),
+                  "' have not been found in scenario '", sc, "',", datype, "'."
+                  )
+        }
         # find all matching names of columns
         ii <- sapply(clNames, function(x) {
           any(grepl(x, nflt1, ignore.case = ignore.case))
@@ -237,9 +241,13 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       }
       pvNames <- names(lt)
       if (length(pvNames) == 0) {
-        if (verbose) cat("No ", datype,
-                         " found for the selected set of filters, scenario '",
-                         sc, "'.\n", sep = "")
+        if (verbose) {
+          cat("No ", datype,
+            " found for the selected set of filters, scenario '",
+            sc, "'.\n",
+            sep = ""
+          )
+        }
       } else {
         for (pv in pvNames) { # selected pars/vars
           if (datype == "parameters") {
@@ -263,13 +271,13 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
               for (st in prcl) { # selected sets (columns)
                 cl_ <- nflt0[grepl(st, nflt_, ignore.case = ignore.case)] # regex match of sets names (find all comm* etc.) for regex match selection
                 for (k in cl_) { # loop over sets for regex filtration
-                  kk <- kk & grepl(flt_[[paste0(k, "_")]], dat[, k], ignore.case = ignore.case)
+                  kk <- kk & grepl(flt_[[paste0(k, "_")]], dat[[k]], ignore.case = ignore.case)
                 }
                 cl <- nflt[grepl(st, nflt, ignore.case = ignore.case)] # regex match of sets names (find all comm* etc.) for exact match selection
                 for (k in cl) { # loop over sets/columns for exact filtration
                   kk2 <- rep(FALSE, length(kk))
                   for (h in flt[[k]]) { # loop over filtration vector
-                    kk2 <- kk2 | (dat[, k] == h)
+                    kk2 <- kk2 | (dat[[k]] == h)
                   }
                   kk <- kk & kk2
                 }
@@ -420,12 +428,12 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
         if (stringsAsFactors) {
           colnam <- names(ll[[i]])[sapply(ll[[i]], is.character)]
           for (j in colnam) {
-            ll[[i]][, j] <- .crs2fct(ll[[i]][, j])
+            ll[[i]][[j]] <- .crs2fct(ll[[i]][[j]])
           }
         } else {
           colnam <- names(ll[[i]])[sapply(ll[[i]], is.factor)]
           for (j in colnam) {
-            ll[[i]][, j] <- as.character(ll[[i]][, j])
+            ll[[i]][[j]] <- as.character(ll[[i]][[j]])
           }
         }
         if (asTibble) ll[[i]] <- tibble::as_tibble(ll[[i]])
@@ -444,7 +452,7 @@ get_data <- getData
 
 if (F) { # test
   load("energyRt_tutorial/data/utopia_scen_BAU.RData")
-  (dem = getData(scen, name = "pDemand", year = 2015, merge = T))
+  (dem <- getData(scen, name = "pDemand", year = 2015, merge = T))
   (vTechOut = getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015))
   # Storage capacity
   getData(scen, name = "vStorageCap", merge = T)
@@ -561,7 +569,6 @@ if (F) { # Check
   revalueSets(d, newValues)
 }
 
-
 .getNames <- function(
     obj, cls, regex = NULL, ignore.case = FALSE,
     fixed = FALSE, useBytes = FALSE, invert = FALSE, ...) {
@@ -569,8 +576,8 @@ if (F) { # Check
     grep2 <- function(x, y, FL) {
       if (FL) {
         grep(x, as.character(y),
-             ignore.case = ignore.case, fixed = fixed,
-             useBytes = useBytes, invert = invert
+          ignore.case = ignore.case, fixed = fixed,
+          useBytes = useBytes, invert = invert
         )
       } else {
         y %in% x
@@ -579,8 +586,8 @@ if (F) { # Check
   } else if (regex) {
     grep2 <- function(x, y, FL) {
       grep(x, as.character(y),
-           ignore.case = ignore.case, fixed = fixed,
-           useBytes = useBytes, invert = invert
+        ignore.case = ignore.case, fixed = fixed,
+        useBytes = useBytes, invert = invert
       )
     }
   } else {
@@ -593,13 +600,17 @@ if (F) { # Check
   }
   if (is.null(cls)) {
     lst <- list()
-    cls <- unique(c(lapply(obj@data,
-                           function(xx) unique(sapply(xx@data, class))),
-                    recursive = TRUE))
+    cls <- unique(c(
+      lapply(
+        obj@data,
+        function(xx) unique(sapply(xx@data, class))
+      ),
+      recursive = TRUE
+    ))
     for (cl in cls) {
       ll <- .getNames(obj, cl,
-                                 regex = regex, ignore.case = ignore.case, fixed = fixed,
-                                 useBytes = useBytes, invert = invert, ...
+        regex = regex, ignore.case = ignore.case, fixed = fixed,
+        useBytes = useBytes, invert = invert, ...
       )
       for (i in seq(along = ll)) {
         lst[[names(ll)[i]]] <- ll[[i]]
@@ -630,7 +641,9 @@ if (F) { # Check
       } else {
         if (nrow(rst) > 0) {
           error_msg <- paste('.getNames: undefined condition argument "',
-                             names(arg)[a], '" for class "', cls, '"', sep = "")
+            names(arg)[a], '" for class "', cls, '"',
+            sep = ""
+          )
           nm <- names(arg)[a]
           cnd <- arg[[a]]
           if (s1[nm] == "list") stop(error_msg)
@@ -639,9 +652,12 @@ if (F) { # Check
             if (!(class(cnd) %in% c("character", "factor"))) stop(error_msg)
             for (i in seq(length.out = nrow(rst))) {
               rst[i, "use"] <- any(
-                grep2(cnd,
-                      slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                      FL[nm]))
+                grep2(
+                  cnd,
+                  slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
+                  FL[nm]
+                )
+              )
             }
             rst <- rst[rst$use, , drop = FALSE]
           } else if (s1[nm] == "logical") {
@@ -650,21 +666,28 @@ if (F) { # Check
             for (i in seq(length.out = nrow(rst))) {
               rst[i, "use"] <- any(
                 cnd == slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                na.rm = TRUE)
+                na.rm = TRUE
+              )
             }
             rst <- rst[rst$use, , drop = FALSE]
           } else if (s1[nm] == "numeric") {
             # Numeric
             if (!(class(cnd) %in% c("integer", "numeric"))) stop(error_msg)
             if (is.null(names(cnd)) && length(cnd) > 2) stop(error_msg)
-            if (is.null(names(cnd)) && length(cnd) == 2) names(cnd) <- c("ge", "le")
+            if (is.null(names(cnd)) && length(cnd) == 2) {
+              names(cnd) <- c("ge", "le")
+            }
             if (is.null(names(cnd)) && length(cnd) == 1) names(cnd) <- "e"
-            if (any(!(names(cnd) %in% c("l", "le", "e", "ge", "g", "ne")))) stop(error_msg)
+            if (any(!(names(cnd) %in% c("l", "le", "e", "ge", "g", "ne")))) {
+              stop(error_msg)
+            }
             if (any(names(cnd) == "le")) {
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
-                  cnd["le"] >= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                  na.rm = TRUE)
+                  cnd["le"] >= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                                    nm),
+                  na.rm = TRUE
+                )
               }
               rst <- rst[rst$use, , drop = FALSE]
             }
@@ -672,7 +695,8 @@ if (F) { # Check
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
                   cnd["l"] > slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                  na.rm = TRUE)
+                  na.rm = TRUE
+                )
               }
               rst <- rst[rst$use, , drop = FALSE]
             }
@@ -680,15 +704,18 @@ if (F) { # Check
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
                   cnd["e"] == slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                  na.rm = TRUE)
+                  na.rm = TRUE
+                )
               }
               rst <- rst[rst$use, , drop = FALSE]
             }
             if (any(names(cnd) == "ge")) {
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
-                  cnd["ge"] <= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                  na.rm = TRUE)
+                  cnd["ge"] <= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                                    nm),
+                  na.rm = TRUE
+                )
               }
               rst <- rst[rst$use, , drop = FALSE]
             }
@@ -696,15 +723,18 @@ if (F) { # Check
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
                   cnd["g"] < slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                  na.rm = TRUE)
+                  na.rm = TRUE
+                )
               }
               rst <- rst[rst$use, , drop = FALSE]
             }
             if (any(names(cnd) == "ne")) {
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
-                  cnd["ne"] != slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
-                  na.rm = TRUE)
+                  cnd["ne"] != slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                                    nm),
+                  na.rm = TRUE
+                )
               }
               rst <- rst[rst$use, , drop = FALSE]
             }
@@ -719,79 +749,116 @@ if (F) { # Check
               if (all(colnames(slot(s2, nm)) != nm2)) stop(error_msg)
               # Character
               if (class(cnd2) %in% c("character", "factor")) {
-                if (!(class(cnd2) %in% c("character", "factor"))) stop(error_msg)
+                if (!(class(cnd2) %in% c("character", "factor"))) {
+                  stop(error_msg)
+                }
                 for (i in seq(length.out = nrow(rst))) {
-                  rst[i, "use"] <- any(grep2(
-                    cnd2,
-                    slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2], FL2[nm2]
-                  ), na.rm = TRUE)
+                  rst[i, "use"] <- any(
+                    grep2(
+                      cnd2,
+                      slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[[nm2]],
+                      FL2[nm2]
+                    ),
+                    na.rm = TRUE
+                  )
                 }
                 rst <- rst[rst$use, , drop = FALSE]
               } else if (class(cnd2) == "logical") {
                 # Logical
                 if (class(cnd2) != "logical") stop(error_msg)
                 for (i in seq(length.out = nrow(rst))) {
-                  rst[i, "use"] <- any(cnd ==
-                                         slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2],
-                                       na.rm = TRUE)
+                  rst[i, "use"] <-
+                    any(
+                      cnd == slot(
+                        obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                        nm
+                      )[[nm2]],
+                      na.rm = TRUE
+                    )
                 }
                 rst <- rst[rst$use, , drop = FALSE]
               } else if (class(cnd2) == "numeric") {
                 # Numeric
-                if (!(class(slot(s2, nm)[, nm2]) %in% c("integer", "numeric")))
+                if (!(class(slot(s2, nm)[[nm2]]) %in% c("integer", "numeric"))) {
                   stop(error_msg)
+                }
                 if (is.null(names(cnd2)) && length(cnd2) > 2) stop(error_msg)
-                if (is.null(names(cnd2)) && length(cnd2) == 2)
+                if (is.null(names(cnd2)) && length(cnd2) == 2) {
                   names(cnd2) <- c("ge", "le")
-                if (is.null(names(cnd2)) && length(cnd2) == 1)
+                }
+                if (is.null(names(cnd2)) && length(cnd2) == 1) {
                   names(cnd2) <- "e"
-                if (any(!(names(cnd2) %in% c("l", "le", "e", "ge", "g", "ne"))))
+                }
+                if (any(!(names(cnd2) %in% c("l", "le", "e", "ge", "g", "ne")))) {
                   stop(error_msg)
+                }
                 if (any(names(cnd2) == "le")) {
                   for (i in seq(length.out = nrow(rst))) {
-                    rst[i, "use"] <- any(cnd2["le"] >=
-                                           slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2],
-                                         na.rm = TRUE)
+                    rst[i, "use"] <- any(
+                      cnd2["le"] >=
+                        slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[[nm2]],
+                      na.rm = TRUE
+                    )
                   }
                   rst <- rst[rst$use, , drop = FALSE]
                 }
                 if (any(names(cnd2) == "l")) {
                   for (i in seq(length.out = nrow(rst))) {
-                    rst[i, "use"] <- any(cnd2["l"] >
-                                           slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2],
-                                         na.rm = TRUE)
+                    rst[i, "use"] <- any(
+                      cnd2["l"] > slot(
+                        obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                        nm
+                      )[[nm2]],
+                      na.rm = TRUE
+                    )
                   }
                   rst <- rst[rst$use, , drop = FALSE]
                 }
                 if (any(names(cnd2) == "e")) {
                   for (i in seq(length.out = nrow(rst))) {
-                    rst[i, "use"] <- any(cnd2["e"] ==
-                                           slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2],
-                                         na.rm = TRUE)
+                    rst[i, "use"] <- any(
+                      cnd2["e"] == slot(
+                        obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                        nm
+                      )[[nm2]],
+                      na.rm = TRUE
+                    )
                   }
                   rst <- rst[rst$use, , drop = FALSE]
                 }
                 if (any(names(cnd2) == "ge")) {
                   for (i in seq(length.out = nrow(rst))) {
-                    rst[i, "use"] <- any(cnd2["ge"] <=
-                                           slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2],
-                                         na.rm = TRUE)
+                    rst[i, "use"] <- any(
+                      cnd2["ge"] <= slot(
+                        obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                        nm
+                      )[[nm2]],
+                      na.rm = TRUE
+                    )
                   }
                   rst <- rst[rst$use, , drop = FALSE]
                 }
                 if (any(names(cnd2) == "g")) {
                   for (i in seq(length.out = nrow(rst))) {
-                    rst[i, "use"] <- any(cnd2["g"] <
-                                           slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2],
-                                         na.rm = TRUE)
+                    rst[i, "use"] <- any(
+                      cnd2["g"] < slot(
+                        obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                        nm
+                      )[[nm2]],
+                      na.rm = TRUE
+                    )
                   }
                   rst <- rst[rst$use, , drop = FALSE]
                 }
                 if (any(names(cnd2) == "ne")) {
                   for (i in seq(length.out = nrow(rst))) {
-                    rst[i, "use"] <- any(cnd2["ne"] !=
-                                           slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm)[, nm2],
-                                         na.rm = TRUE)
+                    rst[i, "use"] <- any(
+                      cnd2["ne"] != slot(
+                        obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                        nm
+                      )[[nm2]],
+                      na.rm = TRUE
+                    )
                   }
                   rst <- rst[rst$use, , drop = FALSE]
                 }
@@ -811,7 +878,6 @@ if (F) { # Check
     nn
   }
 }
-
 
 getNames <- function(obj, class = c(), regex = NULL, ...) {
   names(.getNames(obj, cls = class, regex = regex, ...))
