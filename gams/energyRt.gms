@@ -445,7 +445,7 @@ vTaxCost(comm, region, year)                         Total tax levies (tax costs
 *@ mSubCost(comm, region, year)
 vSubsCost(comm, region, year)                        Total subsidies (substracted from costs)
 *@ mAggOut(comm, region, year, slice)
-vAggOut(comm, region, year, slice)                   Aggregated commodity output
+vAggOutTot(comm, region, year, slice)                   Aggregated commodity output
 ;
 
 * Reserves
@@ -473,9 +473,9 @@ vStorageOMCost(stg, region, year)                    Storage O&M costs
 * Trade and Row variables
 positive variables
 *@ mImport(comm, region, year, slice)
-vImport(comm, region, year, slice)                   Total regional import (Ir + ROW)
+vImportTot(comm, region, year, slice)                   Total regional import (Ir + ROW)
 *@ mExport(comm, region, year, slice)
-vExport(comm, region, year, slice)                   Total regional export (Ir + ROW)
+vExportTot(comm, region, year, slice)                   Total regional export (Ir + ROW)
 *@ mvTradeIr(trade, comm, region, region, year, slice)
 vTradeIr(trade, comm, region, region, year, slice)   Total physical trade flows between regions
 *@ mvTradeIrAInp(trade, comm, region, year, slice)
@@ -1137,7 +1137,7 @@ eqEmsFuelTot(comm, region, year, slice)        Emissions from commodity consumpt
 ;
 
 eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
-         vAggOut(comm, region, year, slice)
+         vAggOutTot(comm, region, year, slice)
          =e=
          sum(commp$mAggregateFactor(comm, commp),
              pAggregateFactor(comm, commp)
@@ -1405,7 +1405,7 @@ eqTradeCapFlow(trade, comm, year, slice)          Trade capacity to activity
 ;
 
 eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
-  vImport(comm, dst, year, slice) =e=
+  vImportTot(comm, dst, year, slice) =e=
      sum(slicep$mCommSliceOrParent(comm, slice, slicep),
          sum(trade$mTradeComm(trade, comm),
              sum(src$mTradeRoutes(trade, src, dst),
@@ -1423,7 +1423,7 @@ eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
      );
 
 eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)..
-  vExport(comm, src, year, slice)
+  vExportTot(comm, src, year, slice)
   =e=
   sum(slicep$mCommSliceOrParent(comm, slice, slicep),
       sum(trade$mTradeComm(trade, comm),
@@ -1669,10 +1669,10 @@ eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)..
          + vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
          + vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
          + pSliceWeight(slice) *
-           vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
+           vAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
          + vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
          + vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)
-         + vImport(comm, region, year, slice)$mImport(comm, region, year, slice)
+         + vImportTot(comm, region, year, slice)$mImport(comm, region, year, slice)
          + vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice)
          + pSliceWeight(slice) *
            sum(slicep$(mSliceParentChild(slicep, slice)
@@ -1688,10 +1688,10 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
          vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
          + vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
          + pSliceWeight(slice)
-           * vAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
+           * vAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
          + vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
          + vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)
-         + vImport(comm, region, year, slice)$mImport(comm, region, year, slice)
+         + vImportTot(comm, region, year, slice)$mImport(comm, region, year, slice)
          + vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice);
 
 eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)..
@@ -1703,7 +1703,7 @@ eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)..
       + vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice)
       + vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
       + vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
-      + vExport(comm, region, year, slice)$mExport(comm, region, year, slice)
+      + vExportTot(comm, region, year, slice)$mExport(comm, region, year, slice)
       + vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)
       + pSliceWeight(slice) *
         sum(slicep$(mSliceParentChild(slicep, slice)
@@ -1720,7 +1720,7 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
         =e=
         vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
         + vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
-        + vExport(comm, region, year, slice)$mExport(comm, region, year, slice)
+        + vExportTot(comm, region, year, slice)$mExport(comm, region, year, slice)
         + vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice);
 
 eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)..
@@ -1871,16 +1871,16 @@ eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
          ;
 
 eqSubsCost(comm, region, year)$mSubCost(comm, region, year)..
-        vSubsCost(comm, region, year) 
+        vSubsCost(comm, region, year)
         =e=
-        sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)), 
+        sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)),
             pSubCostOut(comm, region, year, slice) * vOutTot(comm, region, year, slice)
         )
-      + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)), 
+      + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)),
             pSubCostInp(comm, region, year, slice) * vInpTot(comm, region, year, slice)
         )
-      + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)), 
-            pSubCostBal(comm, region, year, slice) 
+      + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)),
+            pSubCostBal(comm, region, year, slice)
             * pSliceWeight(slice)
             * vBalance(comm, region, year, slice))
          ;

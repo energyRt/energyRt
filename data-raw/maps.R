@@ -45,7 +45,7 @@
   vDummyExport = "vDummyExport( comm , region , year , slice ) $ mDummyExport( comm , region , year , slice )",
   vTaxCost = "vTaxCost( comm , region , year ) $ mTaxCost( comm , region , year )",
   vSubsCost = "vSubsCost( comm , region , year ) $ mSubCost( comm , region , year )",
-  vAggOut = "vAggOut( comm , region , year , slice ) $ mAggOut( comm , region , year , slice )",
+  vAggOutTot = "vAggOutTot( comm , region , year , slice ) $ mAggOut( comm , region , year , slice )",
   vStorageInp = "vStorageInp( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",
   vStorageOut = "vStorageOut( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",
   vStorageStore = "vStorageStore( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",
@@ -54,8 +54,8 @@
   vStorageCap = "vStorageCap( stg , region , year ) $ mStorageSpan( stg , region , year )",
   vStorageNewCap = "vStorageNewCap( stg , region , year ) $ mStorageNew( stg , region , year )",
   vStorageOMCost = "vStorageOMCost( stg , region , year ) $ mStorageOMCost( stg , region , year )",
-  vImport = "vImport( comm , region , year , slice ) $ mImport( comm , region , year , slice )",
-  vExport = "vExport( comm , region , year , slice ) $ mExport( comm , region , year , slice )",
+  vImportTot = "vImportTot( comm , region , year , slice ) $ mImport( comm , region , year , slice )",
+  vExportTot = "vExportTot( comm , region , year , slice ) $ mExport( comm , region , year , slice )",
   vTradeIr = "vTradeIr( trade , comm , region , region , year , slice ) $ mvTradeIr( trade , comm , region , region , year , slice )",
   vTradeIrAInp = "vTradeIrAInp( trade , comm , region , year , slice ) $ mvTradeIrAInp( trade , comm , region , year , slice )",
   vTradeIrAInpTot = "vTradeIrAInpTot( comm , region , year , slice ) $ mvTradeIrAInpTot( comm , region , year , slice )",
@@ -89,7 +89,7 @@
   vObjective = "Objective costs",
   vTaxCost = "Total tax levies (tax costs)",
   vSubsCost = "Total subsidies (substracted from costs)",
-  vAggOut = "Aggregated commodity output",
+  vAggOutTot = "Aggregated commodity output",
   vStorageOMCost = "Storage O&M costs",
   vTradeCost = "Total trade costs",
   vTradeRowCost = "Trade with ROW costs",
@@ -128,8 +128,8 @@
   vStorageEac = "Storage EAC investments",
   vStorageCap = "Storage capacity",
   vStorageNewCap = "Storage new capacity",
-  vImport = "Total regional import (Ir + ROW)",
-  vExport = "Total regional export (Ir + ROW)",
+  vImportTot = "Total regional import (Ir + ROW)",
+  vExportTot = "Total regional export (Ir + ROW)",
   vTradeIr = "Total physical trade flows between regions",
   vTradeIrAInp = "Trade auxilari input",
   vTradeIrAInpTot = "Trade total auxilari input",
@@ -1230,7 +1230,7 @@
 .equation_variable[74, ] <- c("eqSupCost", "vSupCost")
 .equation_variable[75, ] <- c("eqSupCost", "vSupOut")
 .equation_variable[76, ] <- c("eqDemInp", "vDemInp")
-.equation_variable[77, ] <- c("eqAggOut", "vAggOut")
+.equation_variable[77, ] <- c("eqAggOut", "vAggOutTot")
 .equation_variable[78, ] <- c("eqAggOut", "vOutTot")
 .equation_variable[79, ] <- c("eqEmsFuelTot", "vEmsFuelTot")
 .equation_variable[80, ] <- c("eqEmsFuelTot", "vTechInp")
@@ -1275,10 +1275,10 @@
 .equation_variable[119, ] <- c("eqStorageCost", "vStorageOut")
 .equation_variable[120, ] <- c("eqStorageCost", "vStorageStore")
 .equation_variable[121, ] <- c("eqStorageCost", "vStorageCap")
-.equation_variable[122, ] <- c("eqImport", "vImport")
+.equation_variable[122, ] <- c("eqImport", "vImportTot")
 .equation_variable[123, ] <- c("eqImport", "vTradeIr")
 .equation_variable[124, ] <- c("eqImport", "vImportRow")
-.equation_variable[125, ] <- c("eqExport", "vExport")
+.equation_variable[125, ] <- c("eqExport", "vExportTot")
 .equation_variable[126, ] <- c("eqExport", "vTradeIr")
 .equation_variable[127, ] <- c("eqExport", "vExportRow")
 .equation_variable[128, ] <- c("eqTradeFlowUp", "vTradeIr")
@@ -1325,22 +1325,22 @@
 .equation_variable[169, ] <- c("eqBal", "vOutTot")
 .equation_variable[170, ] <- c("eqBal", "vInpTot")
 .equation_variable[171, ] <- c("eqOutTot", "vEmsFuelTot")
-.equation_variable[172, ] <- c("eqOutTot", "vAggOut")
+.equation_variable[172, ] <- c("eqOutTot", "vAggOutTot")
 .equation_variable[173, ] <- c("eqOutTot", "vOutTot")
 .equation_variable[174, ] <- c("eqOutTot", "vOut2Lo")
 .equation_variable[175, ] <- c("eqOutTot", "vSupOutTot")
 .equation_variable[176, ] <- c("eqOutTot", "vTechOutTot")
 .equation_variable[177, ] <- c("eqOutTot", "vStorageOutTot")
 .equation_variable[178, ] <- c("eqOutTot", "vDummyImport")
-.equation_variable[179, ] <- c("eqOutTot", "vImport")
+.equation_variable[179, ] <- c("eqOutTot", "vImportTot")
 .equation_variable[180, ] <- c("eqOutTot", "vTradeIrAOutTot")
 .equation_variable[181, ] <- c("eqInpTot", "vEmsFuelTot")
-.equation_variable[182, ] <- c("eqInpTot", "vAggOut")
+.equation_variable[182, ] <- c("eqInpTot", "vAggOutTot")
 .equation_variable[183, ] <- c("eqInpTot", "vOut2Lo")
 .equation_variable[184, ] <- c("eqInpTot", "vSupOutTot")
 .equation_variable[185, ] <- c("eqInpTot", "vTechOutTot")
 .equation_variable[186, ] <- c("eqInpTot", "vStorageOutTot")
-.equation_variable[187, ] <- c("eqInpTot", "vImport")
+.equation_variable[187, ] <- c("eqInpTot", "vImportTot")
 .equation_variable[188, ] <- c("eqInpTot", "vTradeIrAOutTot")
 .equation_variable[189, ] <- c("eqInp2Lo", "vDemInp")
 .equation_variable[190, ] <- c("eqInp2Lo", "vInpTot")
@@ -1348,12 +1348,12 @@
 .equation_variable[192, ] <- c("eqInp2Lo", "vTechInpTot")
 .equation_variable[193, ] <- c("eqInp2Lo", "vStorageInpTot")
 .equation_variable[194, ] <- c("eqInp2Lo", "vDummyExport")
-.equation_variable[195, ] <- c("eqInp2Lo", "vExport")
+.equation_variable[195, ] <- c("eqInp2Lo", "vExportTot")
 .equation_variable[196, ] <- c("eqInp2Lo", "vTradeIrAInpTot")
 .equation_variable[197, ] <- c("eqOut2Lo", "vInp2Lo")
 .equation_variable[198, ] <- c("eqOut2Lo", "vTechInpTot")
 .equation_variable[199, ] <- c("eqOut2Lo", "vStorageInpTot")
-.equation_variable[200, ] <- c("eqOut2Lo", "vExport")
+.equation_variable[200, ] <- c("eqOut2Lo", "vExportTot")
 .equation_variable[201, ] <- c("eqOut2Lo", "vTradeIrAInpTot")
 .equation_variable[202, ] <- c("eqSupOutTot", "vSupOut")
 .equation_variable[203, ] <- c("eqSupOutTot", "vSupOutTot")

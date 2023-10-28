@@ -67,12 +67,12 @@ for (c,r,y) in mSubCost:
     if model.vSubsCost[(c,r,y)].value != 0:
         f.write(str(c) + "," + str(r) + "," + str(y) + "," +  str(model.vSubsCost[(c,r,y)].value) + "\n")
 f.close()
-flist.write("vAggOut\n");
-f = open("output/vAggOut.csv","w");
+flist.write("vAggOutTot\n");
+f = open("output/vAggOutTot.csv","w");
 f.write("comm,region,year,slice,value\n");
 for (c,r,y,s) in mAggOut:
-    if model.vAggOut[(c,r,y,s)].value != 0:
-        f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vAggOut[(c,r,y,s)].value) + "\n")
+    if model.vAggOutTot[(c,r,y,s)].value != 0:
+        f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vAggOutTot[(c,r,y,s)].value) + "\n")
 f.close()
 flist.write("vStorageOMCost\n");
 f = open("output/vStorageOMCost.csv","w");
@@ -340,19 +340,19 @@ for (st1,r,y) in mStorageNew:
     if model.vStorageNewCap[(st1,r,y)].value != 0:
         f.write(str(st1) + "," + str(r) + "," + str(y) + "," +  str(model.vStorageNewCap[(st1,r,y)].value) + "\n")
 f.close()
-flist.write("vImport\n");
-f = open("output/vImport.csv","w");
+flist.write("vImportTot\n");
+f = open("output/vImportTot.csv","w");
 f.write("comm,region,year,slice,value\n");
 for (c,r,y,s) in mImport:
-    if model.vImport[(c,r,y,s)].value != 0:
-        f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vImport[(c,r,y,s)].value) + "\n")
+    if model.vImportTot[(c,r,y,s)].value != 0:
+        f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vImportTot[(c,r,y,s)].value) + "\n")
 f.close()
-flist.write("vExport\n");
-f = open("output/vExport.csv","w");
+flist.write("vExportTot\n");
+f = open("output/vExportTot.csv","w");
 f.write("comm,region,year,slice,value\n");
 for (c,r,y,s) in mExport:
-    if model.vExport[(c,r,y,s)].value != 0:
-        f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vExport[(c,r,y,s)].value) + "\n")
+    if model.vExportTot[(c,r,y,s)].value != 0:
+        f.write(str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vExportTot[(c,r,y,s)].value) + "\n")
 f.close()
 flist.write("vTradeIr\n");
 f = open("output/vTradeIr.csv","w");

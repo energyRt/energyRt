@@ -129,17 +129,17 @@ close(fvSubsCost);
 
 
 
-fvAggOut = open("output/vAggOut.csv", "w");
+fvAggOutTot = open("output/vAggOutTot.csv", "w");
 
-println(fvAggOut, "comm,region,year,slice,value");
+println(fvAggOutTot, "comm,region,year,slice,value");
 
-for (c,r,y,s) in mAggOut if JuMP.value(vAggOut[(c,r,y,s)]) != 0
-  println(fvAggOut, c, ",", r, ",", y, ",", s, ",", JuMP.value(vAggOut[(c,r,y,s)]));
+for (c,r,y,s) in mAggOut if JuMP.value(vAggOutTot[(c,r,y,s)]) != 0
+  println(fvAggOutTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vAggOutTot[(c,r,y,s)]));
 end;
 end;
 
 
-close(fvAggOut);
+close(fvAggOutTot);
 
 
 
@@ -505,22 +505,22 @@ end;
 close(fvStorageNewCap);
 
 
-fvImport = open("output/vImport.csv", "w");
-println(fvImport, "comm,region,year,slice,value");
-for (c,r,y,s) in mImport if JuMP.value(vImport[(c,r,y,s)]) != 0
-  println(fvImport, c, ",", r, ",", y, ",", s, ",", JuMP.value(vImport[(c,r,y,s)]));
+fvImportTot = open("output/vImportTot.csv", "w");
+println(fvImportTot, "comm,region,year,slice,value");
+for (c,r,y,s) in mImport if JuMP.value(vImportTot[(c,r,y,s)]) != 0
+  println(fvImportTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vImportTot[(c,r,y,s)]));
 end;
 end;
-close(fvImport);
+close(fvImportTot);
 
 
-fvExport = open("output/vExport.csv", "w");
-println(fvExport, "comm,region,year,slice,value");
-for (c,r,y,s) in mExport if JuMP.value(vExport[(c,r,y,s)]) != 0
-  println(fvExport, c, ",", r, ",", y, ",", s, ",", JuMP.value(vExport[(c,r,y,s)]));
+fvExportTot = open("output/vExportTot.csv", "w");
+println(fvExportTot, "comm,region,year,slice,value");
+for (c,r,y,s) in mExport if JuMP.value(vExportTot[(c,r,y,s)]) != 0
+  println(fvExportTot, c, ",", r, ",", y, ",", s, ",", JuMP.value(vExportTot[(c,r,y,s)]));
 end;
 end;
-close(fvExport);
+close(fvExportTot);
 
 
 fvTradeIr = open("output/vTradeIr.csv", "w");
@@ -661,7 +661,7 @@ println(vrb_list, "vTotalCost");
 println(vrb_list, "vObjective");
 println(vrb_list, "vTaxCost");
 println(vrb_list, "vSubsCost");
-println(vrb_list, "vAggOut");
+println(vrb_list, "vAggOutTot");
 println(vrb_list, "vStorageOMCost");
 println(vrb_list, "vTradeCost");
 println(vrb_list, "vTradeRowCost");
@@ -700,8 +700,8 @@ println(vrb_list, "vStorageInv");
 println(vrb_list, "vStorageEac");
 println(vrb_list, "vStorageCap");
 println(vrb_list, "vStorageNewCap");
-println(vrb_list, "vImport");
-println(vrb_list, "vExport");
+println(vrb_list, "vImportTot");
+println(vrb_list, "vExportTot");
 println(vrb_list, "vTradeIr");
 println(vrb_list, "vTradeIrAInp");
 println(vrb_list, "vTradeIrAInpTot");

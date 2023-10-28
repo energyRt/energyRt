@@ -50,7 +50,7 @@ model.vTotalCost = Var(mvTotalCost, doc = "Regional annual total costs");
 model.vObjective = Var(doc = "Objective costs");
 model.vTaxCost = Var(mTaxCost, doc = "Total tax levies (tax costs)");
 model.vSubsCost = Var(mSubCost, doc = "Total subsidies (substracted from costs)");
-model.vAggOut = Var(mAggOut, doc = "Aggregated commodity output");
+model.vAggOutTot = Var(mAggOut, doc = "Aggregated commodity output");
 model.vStorageOMCost = Var(mStorageOMCost, doc = "Storage O&M costs");
 model.vTradeCost = Var(mvTradeCost, doc = "Total trade costs");
 model.vTradeRowCost = Var(mvTradeRowCost, doc = "Trade with ROW costs");
@@ -89,8 +89,8 @@ model.vStorageInv = Var(mStorageNew, domain = pyo.NonNegativeReals, doc = "Stora
 model.vStorageEac = Var(mStorageEac, domain = pyo.NonNegativeReals, doc = "Storage EAC investments");
 model.vStorageCap = Var(mStorageSpan, domain = pyo.NonNegativeReals, doc = "Storage capacity");
 model.vStorageNewCap = Var(mStorageNew, domain = pyo.NonNegativeReals, doc = "Storage new capacity");
-model.vImport = Var(mImport, domain = pyo.NonNegativeReals, doc = "Total regional import (Ir + ROW)");
-model.vExport = Var(mExport, domain = pyo.NonNegativeReals, doc = "Total regional export (Ir + ROW)");
+model.vImportTot = Var(mImport, domain = pyo.NonNegativeReals, doc = "Total regional import (Ir + ROW)");
+model.vExportTot = Var(mExport, domain = pyo.NonNegativeReals, doc = "Total regional export (Ir + ROW)");
 model.vTradeIr = Var(mvTradeIr, domain = pyo.NonNegativeReals, doc = "Total physical trade flows between regions");
 model.vTradeIrAInp = Var(mvTradeIrAInp, domain = pyo.NonNegativeReals, doc = "Trade auxilari input");
 model.vTradeIrAInpTot = Var(mvTradeIrAInpTot, domain = pyo.NonNegativeReals, doc = "Trade total auxilari input");
@@ -249,7 +249,7 @@ model.eqDemInp = Constraint(mvDemInp, rule = lambda model, c, r, y, s : model.vD
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqAggOut ", end = "")
 # eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
-model.eqAggOut = Constraint(mAggOut, rule = lambda model, c, r, y, s : model.vAggOut[c,r,y,s]  ==  sum(pAggregateFactor.get((c,cp))*sum(model.vOutTot[cp,r,y,sp] for sp in slice if ((c,r,y,sp) in mvOutTot and (s,sp) in mSliceParentChildE and (cp,sp) in mCommSlice)) for cp in comm if (c,cp) in mAggregateFactor));
+model.eqAggOut = Constraint(mAggOut, rule = lambda model, c, r, y, s : model.vAggOutTot[c,r,y,s]  ==  sum(pAggregateFactor.get((c,cp))*sum(model.vOutTot[cp,r,y,sp] for sp in slice if ((c,r,y,sp) in mvOutTot and (s,sp) in mSliceParentChildE and (cp,sp) in mCommSlice)) for cp in comm if (c,cp) in mAggregateFactor));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqEmsFuelTot ", end = "")
 # eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
@@ -313,11 +313,11 @@ model.eqStorageCost = Constraint(mStorageOMCost, rule = lambda model, st1, r, y 
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqImport ", end = "")
 # eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)
-model.eqImport = Constraint(mImport, rule = lambda model, c, dst, y, s : model.vImport[c,dst,y,s]  ==  sum(sum(sum(((pTradeIrEff.get((t1,src,dst,y,sp))*model.vTradeIr[t1,c,src,dst,y,sp]) if (t1,c,src,dst,y,sp) in mvTradeIr else 0) for src in region if (t1,src,dst) in mTradeRoutes) for t1 in trade if (t1,c) in mTradeComm) for sp in slice if (c,s,sp) in mCommSliceOrParent)+sum(sum((model.vImportRow[i,c,dst,y,sp] if (i,c,dst,y,sp) in mImportRow else 0) for i in imp if (i,c) in mImpComm) for sp in slice if (c,s,sp) in mCommSliceOrParent));
+model.eqImport = Constraint(mImport, rule = lambda model, c, dst, y, s : model.vImportTot[c,dst,y,s]  ==  sum(sum(sum(((pTradeIrEff.get((t1,src,dst,y,sp))*model.vTradeIr[t1,c,src,dst,y,sp]) if (t1,c,src,dst,y,sp) in mvTradeIr else 0) for src in region if (t1,src,dst) in mTradeRoutes) for t1 in trade if (t1,c) in mTradeComm) for sp in slice if (c,s,sp) in mCommSliceOrParent)+sum(sum((model.vImportRow[i,c,dst,y,sp] if (i,c,dst,y,sp) in mImportRow else 0) for i in imp if (i,c) in mImpComm) for sp in slice if (c,s,sp) in mCommSliceOrParent));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqExport ", end = "")
 # eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)
-model.eqExport = Constraint(mExport, rule = lambda model, c, src, y, s : model.vExport[c,src,y,s]  ==  sum(sum(sum((model.vTradeIr[t1,c,src,dst,y,sp] if (t1,c,src,dst,y,sp) in mvTradeIr else 0) for dst in region if (t1,src,dst) in mTradeRoutes) for t1 in trade if (t1,c) in mTradeComm) for sp in slice if (c,s,sp) in mCommSliceOrParent)+sum(sum((model.vExportRow[e,c,src,y,sp] if (e,c,src,y,sp) in mExportRow else 0) for e in expp if (e,c) in mExpComm) for sp in slice if (c,s,sp) in mCommSliceOrParent));
+model.eqExport = Constraint(mExport, rule = lambda model, c, src, y, s : model.vExportTot[c,src,y,s]  ==  sum(sum(sum((model.vTradeIr[t1,c,src,dst,y,sp] if (t1,c,src,dst,y,sp) in mvTradeIr else 0) for dst in region if (t1,src,dst) in mTradeRoutes) for t1 in trade if (t1,c) in mTradeComm) for sp in slice if (c,s,sp) in mCommSliceOrParent)+sum(sum((model.vExportRow[e,c,src,y,sp] if (e,c,src,y,sp) in mExportRow else 0) for e in expp if (e,c) in mExpComm) for sp in slice if (c,s,sp) in mCommSliceOrParent));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTradeFlowUp ", end = "")
 # eqTradeFlowUp(trade, comm, src, dst, year, slice)$meqTradeFlowUp(trade, comm, src, dst, year, slice)
@@ -421,19 +421,19 @@ model.eqBal = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vBal
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqOutTot ", end = "")
 # eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
-model.eqOutTot = Constraint(mvOutTot, rule = lambda model, c, r, y, s : model.vOutTot[c,r,y,s]  ==  pSliceWeight.get((s))*(model.vDummyImport[c,r,y,s] if (c,r,y,s) in mDummyImport else 0)+(model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+pSliceWeight.get((s))*(model.vAggOut[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImport[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0)+pSliceWeight.get((s))*(sum(model.vOut2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvOut2Lo)) if (c,r,y,s) in mOutSub else 0));
+model.eqOutTot = Constraint(mvOutTot, rule = lambda model, c, r, y, s : model.vOutTot[c,r,y,s]  ==  pSliceWeight.get((s))*(model.vDummyImport[c,r,y,s] if (c,r,y,s) in mDummyImport else 0)+(model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+pSliceWeight.get((s))*(model.vAggOutTot[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImportTot[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0)+pSliceWeight.get((s))*(sum(model.vOut2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvOut2Lo)) if (c,r,y,s) in mOutSub else 0));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqOut2Lo ", end = "")
 # eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)
-model.eqOut2Lo = Constraint(mOut2Lo, rule = lambda model, c, r, y, s : sum(model.vOut2Lo[c,r,y,s,sp] for sp in slice if (c,r,y,s,sp) in mvOut2Lo)  ==  (model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+pSliceWeight.get((s))*(model.vAggOut[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImport[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0));
+model.eqOut2Lo = Constraint(mOut2Lo, rule = lambda model, c, r, y, s : sum(model.vOut2Lo[c,r,y,s,sp] for sp in slice if (c,r,y,s,sp) in mvOut2Lo)  ==  (model.vSupOutTot[c,r,y,s] if (c,r,y,s) in mSupOutTot else 0)+(model.vEmsFuelTot[c,r,y,s] if (c,r,y,s) in mEmsFuelTot else 0)+pSliceWeight.get((s))*(model.vAggOutTot[c,r,y,s] if (c,r,y,s) in mAggOut else 0)+(model.vTechOutTot[c,r,y,s] if (c,r,y,s) in mTechOutTot else 0)+(model.vStorageOutTot[c,r,y,s] if (c,r,y,s) in mStorageOutTot else 0)+(model.vImportTot[c,r,y,s] if (c,r,y,s) in mImport else 0)+(model.vTradeIrAOutTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAOutTot else 0));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqInpTot ", end = "")
 # eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)
-model.eqInpTot = Constraint(mvInpTot, rule = lambda model, c, r, y, s : model.vInpTot[c,r,y,s]  ==  pSliceWeight.get((s))*(model.vDemInp[c,r,y,s] if (c,r,y,s) in mvDemInp else 0)+(model.vDummyExport[c,r,y,s] if (c,r,y,s) in mDummyExport else 0)+(model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExport[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0)+pSliceWeight.get((s))*(sum(model.vInp2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvInp2Lo)) if (c,r,y,s) in mInpSub else 0));
+model.eqInpTot = Constraint(mvInpTot, rule = lambda model, c, r, y, s : model.vInpTot[c,r,y,s]  ==  pSliceWeight.get((s))*(model.vDemInp[c,r,y,s] if (c,r,y,s) in mvDemInp else 0)+(model.vDummyExport[c,r,y,s] if (c,r,y,s) in mDummyExport else 0)+(model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExportTot[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0)+pSliceWeight.get((s))*(sum(model.vInp2Lo[c,r,y,sp,s] for sp in slice if ((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvInp2Lo)) if (c,r,y,s) in mInpSub else 0));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqInp2Lo ", end = "")
 # eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)
-model.eqInp2Lo = Constraint(mInp2Lo, rule = lambda model, c, r, y, s : sum(model.vInp2Lo[c,r,y,s,sp] for sp in slice if (c,r,y,s,sp) in mvInp2Lo)  ==  (model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExport[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0));
+model.eqInp2Lo = Constraint(mInp2Lo, rule = lambda model, c, r, y, s : sum(model.vInp2Lo[c,r,y,s,sp] for sp in slice if (c,r,y,s,sp) in mvInp2Lo)  ==  (model.vTechInpTot[c,r,y,s] if (c,r,y,s) in mTechInpTot else 0)+(model.vStorageInpTot[c,r,y,s] if (c,r,y,s) in mStorageInpTot else 0)+(model.vExportTot[c,r,y,s] if (c,r,y,s) in mExport else 0)+(model.vTradeIrAInpTot[c,r,y,s] if (c,r,y,s) in mvTradeIrAInpTot else 0));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqSupOutTot ", end = "")
 # eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
