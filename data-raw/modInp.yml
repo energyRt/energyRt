@@ -1,3 +1,7 @@
+# Edit this file to declare new sets, mapping, and parameters
+# (all stored in class "parameter")
+# This YAML file will be read and stored in ".modInp" package internal data
+#
 # nextYear:
 #   name: pYear
 #   dimSets: year
@@ -505,16 +509,16 @@ mSupSlice:
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
-  colName: ''
-  class: supply
+  # colName: ''
+  # class: supply
 mStorageFullYear:
   name: mStorageFullYear
   dimSets: stg
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
-  colName: ''
-  class: storage
+  # colName: ''
+  # class: storage
 mTradeSlice:
   name: mTradeSlice
   dimSets:
@@ -523,8 +527,8 @@ mTradeSlice:
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
-  colName: ''
-  class: trade
+  # colName: ''
+  # class: trade
 mCommSlice:
   name: mCommSlice
   dimSets:
@@ -533,8 +537,8 @@ mCommSlice:
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
-  colName: ''
-  class: commodity
+  # colName: ''
+  # class: commodity
 mCommSliceOrParent:
   name: mCommSliceOrParent
   dimSets:
@@ -544,8 +548,31 @@ mCommSliceOrParent:
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
-  colName: ''
-  class: commodity
+  # colName: ''
+  # class: commodity
+# !!! Attempt to separate commodities with multi and one time frame !!!
+# mCommSliceOrParent0:
+#   name: mCommSliceOrParent0
+#   dimSets:
+#   - comm
+#   # - slice
+#   # - slicep
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+#   class: commodity
+# mCommSliceOrParent1:
+#   name: mCommSliceOrParent1
+#   dimSets:
+#   - comm
+#   - slice
+#   - slicep
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+#   class: commodity
 mSliceParentChildE:
   name: mSliceParentChildE
   dimSets:
@@ -567,6 +594,15 @@ mSliceParentChild:
 pSliceShare:
   name: pSliceShare
   dimSets: slice
+  type: numpar
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+pSliceWeight:
+  name: pSliceWeight
+  dimSets:
+  # - year
+  - slice
   type: numpar
   defVal: 0.0
   interpolation: back.inter.forth

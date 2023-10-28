@@ -1,7 +1,7 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
-Version: 0.09.07.9000
+Version: 0.10.00.9000
 Date: 2023-10-12
 Authors@R: 
   c(person(given = "Oleg", 
@@ -34,7 +34,8 @@ Suggests:
     gdxtools,
     knitr,
     rmarkdown,
-    sf
+    sf,
+    testthat (>= 3.0.0)
 License: AGLP-3.0
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
@@ -86,3 +87,4 @@ Collate:
     'write_glpk.R'
     'write_jump.R'
     'write_pyomo.R'
+Config/testthat/edition: 3

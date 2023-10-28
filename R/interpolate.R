@@ -606,7 +606,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 .check_scen_par <- function(scen) {
   # Check for non negative parameters, all except 'pAggregateFactor', 'pTechCvarom', 'pTechAvarom', 'pTechVarom', 'pTechInvcost'
   non_negative <- unique(c(
-    "pSliceShare", "pTechOlife", "pTechCinp2ginp", "pTechGinp2use", "pTechCinp2use", "pTechUse2cact", "pTechCact2cout",
+    "pSliceShare", "pSliceWeight", "pTechOlife", "pTechCinp2ginp", "pTechGinp2use", "pTechCinp2use", "pTechUse2cact", "pTechCact2cout",
     "pTechEmisComm", "pTechAct2AInp", "pTechCap2AInp", "pTechNCap2AInp", "pTechCinp2AInp", "pTechCout2AInp",
     "pTechAct2AOut", "pTechCap2AOut", "pTechNCap2AOut", "pTechCinp2AOut", "pTechCout2AOut", "pTechFixom", "pTechShare",
     "pTechShare", "pTechAf", "pTechAf", "pTechAfs", "pTechAfs", "pTechAfc", "pTechAfc", "pTechStock", "pTechCap2act", "pDiscount",

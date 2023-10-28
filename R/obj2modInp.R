@@ -358,6 +358,7 @@ setMethod(
       "mSliceParentChild", "mSliceParentChildE", "mSliceNext",
       "mSliceFYearNext", "pDiscount", "pSliceShare", "pDummyImportCost",
       "pDummyExportCost",
+      "pSliceWeight",
       # "mStartMilestone", "mEndMilestone",
       "mMilestoneLast", "mMilestoneFirst", "mMilestoneNext",
       "mMilestoneHasNext", "mSameSlice", "mSameRegion", "ordYear",
@@ -419,6 +420,14 @@ setMethod(
       )
     )
     approxim_comm$slice <- approxim$calendar@slice_share$slice
+
+    obj@parameters[["pSliceWeight"]] <- .dat2par(
+      obj@parameters[["pSliceWeight"]],
+      data.table(
+        slice = approxim$calendar@slice_share$slice,
+        value = approxim$calendar@slice_share$weight
+      )
+    )
 
     if (nrow(app@horizon@intervals) == 0) { # ???
       browser()

@@ -60,6 +60,7 @@ setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, sc
       # year = integer(),
       slice = character(), # == time interval
       share = numeric(), # fraction of a year // rename?
+      weight = numeric(),
       stringsAsFactors = FALSE
     ),
     slices_in_frame = integer(),
@@ -174,9 +175,9 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
   # browser()
   .check_timetable(dtf, year_fraction = year_fraction) # check validity
   dtf <- dplyr::arrange(dtf, across(1:slice))
+  dtf$weight <- 1.
   return(dtf)
 }
-
 
 if (F) {
   ### tests ####
@@ -306,6 +307,7 @@ setMethod("print", "calendar", function(x, ...) {
   # browser()
   sl <- select(dtf, slice)
   dtf <- select(dtf, -any_of("slice")) # to fit "old" check algo
+  dtf <- select(dtf, -any_of("weight")) # !!! add check of weights
   # check / optimize the script
   if (ncol(dtf) < 2) {
     stop("time-slices data.table must have more than one columns")
@@ -505,14 +507,18 @@ setMethod("print", "calendar", function(x, ...) {
   if (nrow(obj@timetable) == 0) {
     warning('no slices desc, using default: "ANNUAL"')
     obj@timetable <- make_timetable()
+  } else if (is.null(obj@timetable$weight)) {
+    obj@timetable <- mutate(
+      weight = 1 / sum(obj@timetable$share)
+    )
   }
   # validate the timetable
   .check_timetable(obj@timetable, year_fraction = year_fraction)
   # obj@misc <- list()
-  dtf <- obj@timetable %>% select(-any_of("slice"))
+  dtf <- obj@timetable %>% select(-any_of(c("slice")))
 
   # frame_rank / levels
-  d <- select(dtf, -any_of(c("share", "year", "slice")))
+  d <- select(dtf, -any_of(c("share", "year", "slice", "weight")))
   obj@frame_rank <- 1:ncol(d)
   names(obj@frame_rank) <- colnames(d)
 
@@ -521,22 +527,30 @@ setMethod("print", "calendar", function(x, ...) {
   obj@slices_in_frame <- sapply(d, function(x) length(unique(x)))
 
   # share of every slice in a year
+  # browser()
   obj@slice_share <- data.table(
     slice = rep(as.character(NA), sum(cumprod(obj@slices_in_frame))),
-    share = as.numeric(NA)
+    share = as.numeric(NA),
+    weight = 1.
   )
   obj@slice_share[1, "slice"] <- dtf[1, 1]
   obj@slice_share[1, "share"] <- year_fraction
+  obj@slice_share[1, "weight"] <- 1/year_fraction
   k <- 1
-  if (ncol(dtf) > 2) {
-    for (i in 2:(ncol(dtf) - 1)) {
+  if (ncol(dtf) > 3) {
+    # browser()
+    for (i in 2:(ncol(dtf) - 2)) {
       # tmp <- apply(dtf[, 2:i, drop = FALSE], 1, paste, collapse = "_")
-      tmp <- apply(select(dtf, 2:i), 1, paste, collapse = "_")
+      slice_names <- apply(select(dtf, 2:i), 1, paste, collapse = "_")
       # tmp <- tapply(dtf[, ncol(dtf)], tmp, sum)
-      tmp <- tapply(dtf[, share], tmp, sum)
-      obj@slice_share$slice[k + seq(along = tmp)] <- names(tmp)
-      obj@slice_share$share[k + seq(along = tmp)] <- tmp
-      k <- (k + length(tmp))
+      wh <- tapply(dtf[, weight], slice_names, sum)
+      # w <- 1/year_fraction
+      sh <- tapply(dtf[, share], slice_names, sum)
+      wh <- wh / sum(wh * sh)
+      obj@slice_share$slice[k + seq(along = sh)] <- names(sh)
+      obj@slice_share$share[k + seq(along = sh)] <- sh
+      obj@slice_share$weight[k + seq(along = sh)] <- wh
+      k <- (k + length(sh))
     }
   }
 
@@ -550,7 +564,8 @@ setMethod("print", "calendar", function(x, ...) {
     names(tmp) <- obj@slice_share$slice
     tmp[obj@timetable[[1]][1]] <- 1
     obj@timeframes <- lapply(
-      1:(ncol(obj@timetable) - 2),
+      1:nframes,
+      # 1:(ncol(obj@timetable) - 2),
       function(x) names(tmp)[tmp == x]
     )
   } else if (nframes == 1) {
@@ -563,7 +578,7 @@ setMethod("print", "calendar", function(x, ...) {
   } else {
     stop("Empty timeframes / timeslices")
   }
-
+  # browser()
   names(obj@timeframes) <- colnames(d)
 
   obj@default_timeframe <- colnames(d)[ncol(d)]
@@ -583,7 +598,7 @@ setMethod("print", "calendar", function(x, ...) {
     i <- 1
     k <- 0
     z <- 1
-    while (i != ncol(dtf) - 1) {
+    while (i != ncol(dtf) - 2) {
       l <- obj@slices_in_frame[i + 1]
       for (j in 1:obj@slices_in_frame[i]) {
         obj@slice_family$parent[k + 1:l] <- obj@slice_share$slice[z]
@@ -639,6 +654,7 @@ setMethod("print", "calendar", function(x, ...) {
       slice = tmp$child, slicep = tmp$next_slice,
       stringsAsFactors = FALSE
     )
+    # browser()
     n1 <- c(lapply(obj@timeframes[-1], function(x) x), recursive = TRUE)
     names(n1) <- NULL
     n2 <- c(lapply(obj@timeframes[-1], function(x) c(x[-1], x[1])),

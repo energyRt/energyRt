@@ -226,9 +226,41 @@ write.sc <- write_sc
   mCommSliceOrParent <- rbind(l2, l3)
   prec@parameters[["mCommSliceOrParent"]] <-
     .dat2par(prec@parameters[["mCommSliceOrParent"]], mCommSliceOrParent)
+  # browser()
+  # !!! Attempt to separate commodities with multi and one time frame !!!
+  # prec@parameters[["mCommSliceOrParent1"]] <-
+  #   .dat2par(prec@parameters[["mCommSliceOrParent1"]],
+  #            filter(mCommSliceOrParent, slice != slicep)
+  #            )
+  # cm <- unique(mCommSliceOrParent$comm)
+  # cm1 <- unique(prec@parameters[["mCommSliceOrParent1"]]@data$comm)
+  # ii <- cm %in% cm1
+  # mCommSliceOrParent0 <- cm[!ii]
+  # prec@parameters[["mCommSliceOrParent0"]] <-
+  #   .dat2par(prec@parameters[["mCommSliceOrParent0"]],
+  #            data.table(comm = mCommSliceOrParent0))
+  #  Example of use in GAMS equations:
+  # eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
+  # vEmsFuelTot(comm, region, year, slice)
+  # =e=
+  #   sum(commp$(pEmissionFactor(comm, commp) > 0),
+  #       pEmissionFactor(comm, commp)
+  #       * sum(tech$mTechInpComm(tech, commp),
+  #             pTechEmisComm(tech, commp)
+  #             * (sum(slicep$mCommSliceOrParent1(comm, slice, slicep),
+  #                    vTechInp(tech, commp, region, year, slicep)$mTechEmsFuel(tech, comm, commp, region, year, slicep))
+  #                +
+  #                  vTechInp(tech, commp, region, year, slice)$(
+  #                    mTechEmsFuel(tech, comm, commp, region, year, slice)
+  #                    and
+  #                    mCommSliceOrParent0(commp)
+  #                  )
+  #             )
+  #       )
+  #   ) * pSliceWeight(slice);
+
   .interpolation_message("mTechInpTot", rest, interpolation_count,
                          interpolation_start_time, len_name)
-
   # browser()
   # mvTechOutS ####
   # finish: mTechCommSliceSliceP
