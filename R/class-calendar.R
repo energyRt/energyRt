@@ -22,10 +22,10 @@
 #' @slot slice_share two column data.frame with slices from all levels
 #' with their individual share in a year.
 #' @slot default_timeframe character, the name of the default level of the time-slices used in the model.
-#' @slot frame_rank named character vector with ranks of the timeframes.
+#' @slot timeframe_rank named character vector with ranks of the timeframes.
 #' @slot slices_in_frame (!!! to depreciate)
 #' @slot slice_family data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.
-#' @slot next_in_frame data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.
+#' @slot next_in_timeframe data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.
 #' @slot next_in_year data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.
 #' @slot misc list with additional data and calculated mappings.
 #'
@@ -41,11 +41,11 @@ setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, sc
     timetable = "data.frame", # renames `levels`
     slice_share = "data.frame", # !!! rename to fraction?
     default_timeframe = "character", # renamed `default_slice_level`
-    frame_rank = "integer", # renamed `misc$deep`
+    timeframe_rank = "integer", # renamed `misc$deep`
     slices_in_frame = "integer", # renamed `misc$nlevel`
     slice_family = "data.frame", # renamed `parent_child`
     slice_ancestry = "data.frame", # renamed `all_parent_child`
-    next_in_frame = "data.frame", # renamed `misc$next_slice`
+    next_in_timeframe = "data.frame", # renamed `misc$next_slice`
     next_in_year = "data.frame", # renamed `misc$fyear_next_slice`
     misc = "list"
     # full_set = "character", # renamed `all_slice` -> slice_share$slice
@@ -77,8 +77,8 @@ setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, sc
       stringsAsFactors = FALSE
     ),
     default_timeframe = character(), # Default slice
-    frame_rank = c("ANNUAL" = 1L),
-    next_in_frame = data.frame(
+    timeframe_rank = c("ANNUAL" = 1L),
+    next_in_timeframe = data.frame(
       slice = character(),
       slicep = character()
     ),
@@ -517,10 +517,10 @@ setMethod("print", "calendar", function(x, ...) {
   # obj@misc <- list()
   dtf <- obj@timetable %>% select(-any_of(c("slice")))
 
-  # frame_rank / levels
+  # timeframe_rank / levels
   d <- select(dtf, -any_of(c("share", "year", "slice", "weight")))
-  obj@frame_rank <- 1:ncol(d)
-  names(obj@frame_rank) <- colnames(d)
+  obj@timeframe_rank <- 1:ncol(d)
+  names(obj@timeframe_rank) <- colnames(d)
 
   # number of slices on every level
   # browser()
@@ -650,7 +650,7 @@ setMethod("print", "calendar", function(x, ...) {
       # }
     }
     tmp$next_slice[i + 1] <- tmp$child[j]
-    obj@next_in_frame <- data.table(
+    obj@next_in_timeframe <- data.table(
       slice = tmp$child, slicep = tmp$next_slice,
       stringsAsFactors = FALSE
     )
@@ -670,7 +670,7 @@ setMethod("print", "calendar", function(x, ...) {
   obj@year_fraction <- year_fraction
   obj@slice_family <- as.data.table(obj@slice_family)
   obj@slice_ancestry <- as.data.table(obj@slice_ancestry)
-  obj@next_in_frame <- as.data.table(obj@next_in_frame)
+  obj@next_in_timeframe <- as.data.table(obj@next_in_timeframe)
   obj@next_in_year <- as.data.table(obj@next_in_year)
   obj
 }
@@ -714,13 +714,13 @@ if (F) {
 # =============================================================================#
 .checkSliceLevel <- function(app, approxim) {
   # browser()
-  timeframes <- names(approxim$calendar@frame_rank)
+  timeframes <- names(approxim$calendar@timeframe_rank)
   # if (length(app@slice) != 0 &&
   #     all(app@slice != colnames(approxim$calendar@timetable)[
   #       -ncol(approxim$calendar@timetable)])) {
-  if (!is_empty(app@slice) && !any(app@slice %in% timeframes)) {
+  if (!is_empty(app@timeframe) && !any(app@timeframe %in% timeframes)) {
     stop(paste0(
-      'Unrecognized timeframe level "', app@slice, '" in ',
+      'Unrecognized timeframe level "', app@timeframe, '" in ',
       class(app), ': "', app@name, '"'
     ))
   }

@@ -1,11 +1,10 @@
 #' An S4 class to represent a commodity tax
 #'
-#' @slot name character.
+#' @slot name character. Name of
 #' @slot comm character.
 #' @slot desc character.
 #' @slot region character.
 #' @slot year numeric.
-#' @slot slice character.
 #' @slot defVal numeric.
 #' @slot value data.frame.
 #' @slot misc list.

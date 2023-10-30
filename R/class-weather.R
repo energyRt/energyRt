@@ -4,7 +4,7 @@
 #' @slot desc character.
 #' @slot unit character.
 #' @slot region character.
-#' @slot slice character.
+#' @slot timeframe character.
 #' @slot defVal numeric.
 #' @slot weather data.frame.
 #' @slot misc list.
@@ -19,7 +19,7 @@ setClass("weather",
     desc = "character",
     unit = "character",
     region = "character",
-    slice = "character",
+    timeframe = "character",
     defVal = "numeric",
     weather = "data.frame", # weather factor (availability multiplier)
     misc = "list"
@@ -29,7 +29,7 @@ setClass("weather",
     desc = "",
     unit = as.character(NA),
     region = character(),
-    slice = character(),
+    timeframe = character(),
     defVal = 0.,
     weather = data.frame(
       region = character(), #
@@ -55,7 +55,7 @@ setMethod("initialize", "weather", function(.Object, ...) {
 #' @param desc
 #' @param unit
 #' @param region
-#' @param slice
+#' @param timeframe
 #' @param defVal
 #' @param weather
 #' @param ...
@@ -69,7 +69,7 @@ newWeather <- function(
     desc = "",
     unit = as.character(NA),
     region = character(),
-    slice = character(),
+    timeframe = character(),
     defVal = 0.,
     weather = data.frame(),
     ...) {
@@ -78,7 +78,7 @@ newWeather <- function(
               desc = desc,
               unit = unit,
               region = region,
-              slice = slice,
+              timeframe = timeframe,
               defVal = defVal,
               weather = weather,
               ...)

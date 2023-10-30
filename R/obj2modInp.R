@@ -138,11 +138,11 @@ setMethod(".obj2modInp", signature(
 ), function(obj, app, approxim) {
   # wth <- .upper_case(app)
   wth <- app
-  if (length(wth@slice) == 0 && length(approxim$calendar@slices_in_frame) > 1) {
-    stop("Slot weather@slice is empty, it should have information about slice level")
+  if (length(wth@timeframe) == 0 && length(approxim$calendar@slices_in_frame) > 1) {
+    stop("Slot weather@timeframe is empty, it should have information about slice level")
   }
-  if (length(wth@slice) == 0) wth@slice <- names(approxim$calendar@slices_in_frame)[1]
-  approxim <- .fix_approximation_list(approxim, lev = wth@slice)
+  if (length(wth@timeframe) == 0) wth@timeframe <- names(approxim$calendar@slices_in_frame)[1]
+  approxim <- .fix_approximation_list(approxim, lev = wth@timeframe)
   # region fix
   if (length(wth@region) != 0) {
     approxim$region <- approxim$region[approxim$region %in% wth@region]
@@ -180,7 +180,7 @@ setMethod(".obj2modInp", signature(
     stop(paste0('Wrong commodity in export "', exp@name, '"'))
   }
   exp <- .filter_data_in_slots(exp, approxim$region, "region")
-  approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@slice)
+  approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@timeframe)
   exp <- .disaggregateSliceLevel(exp, approxim)
   mExpSlice <- data.table(expp = rep(exp@name, length(approxim$slice)), slice = approxim$slice)
   obj@parameters[["mExpSlice"]] <- .dat2par(obj@parameters[["mExpSlice"]], mExpSlice)
@@ -270,7 +270,7 @@ setMethod(
       stop(paste0('Wrong commodity in import "', imp@name, '"'))
     }
     imp <- .filter_data_in_slots(imp, approxim$region, "region")
-    approxim <- .fix_approximation_list(approxim, comm = imp@commodity, lev = imp@slice)
+    approxim <- .fix_approximation_list(approxim, comm = imp@commodity, lev = imp@timeframe)
     imp <- .disaggregateSliceLevel(imp, approxim)
     mImpSlice <- data.table(imp = rep(imp@name, length(approxim$slice)), slice = approxim$slice)
     obj@parameters[["mImpSlice"]] <- .dat2par(obj@parameters[["mImpSlice"]], mImpSlice)
@@ -389,10 +389,10 @@ setMethod(
       )
     )
     # browser()
-    if (length(approxim$calendar@next_in_frame) != 0) {
+    if (length(approxim$calendar@next_in_timeframe) != 0) {
       obj@parameters[["mSliceNext"]] <-
         .dat2par(obj@parameters[["mSliceNext"]],
-                  approxim$calendar@next_in_frame)
+                  approxim$calendar@next_in_timeframe)
       obj@parameters[["mSliceFYearNext"]] <-
         .dat2par(obj@parameters[["mSliceFYearNext"]],
                   approxim$calendar@next_in_year)
@@ -1104,15 +1104,17 @@ setMethod(
 setMethod(".obj2modInp",
   signature(obj = "modInp", app = "supply", approxim = "list"),
   function(obj, app, approxim) {
-    .checkSliceLevel(app, approxim)
+    # .checkSliceLevel(app, approxim)
     sup <- app
     # sup <- .upper_case(app)
     if (length(sup@commodity) != 1 || is.na(sup@commodity) ||
         all(sup@commodity != approxim$all_comm)) {
       stop(paste0('Wrong commodity in supply "', sup@name, '"'))
     }
-    approxim <- .fix_approximation_list(approxim, comm = sup@commodity,
-                                        lev = sup@slice)
+    # browser()
+    # approxim <- .fix_approximation_list(approxim, comm = sup@commodity,
+                                        # lev = sup@timeframe) # dropped
+    approxim <- .fix_approximation_list(approxim, comm = sup@commodity)
     sup <- .disaggregateSliceLevel(sup, approxim)
     if (length(sup@region) != 0) {
       approxim$region <- approxim$region[approxim$region %in% sup@region]
@@ -1476,13 +1478,13 @@ setMethod(
     .checkSliceLevel(app, approxim)
     # tech <- .upper_case(app)
     tech <- app
-    if (length(tech@slice) == 0) {
+    if (length(tech@timeframe) == 0) {
       use_cmd <- unique(
         sapply(c(tech@output$comm, tech@output$comm, tech@aux$acomm),
                function(x) approxim$commodity_slice_map[x])
         )
-      tech@slice <- colnames(approxim$calendar@timetable)[
-        max(c(approxim$calendar@frame_rank[c(use_cmd, recursive = TRUE)],
+      tech@timeframe <- colnames(approxim$calendar@timetable)[
+        max(c(approxim$calendar@timeframe_rank[c(use_cmd, recursive = TRUE)],
               recursive = TRUE))
         ]
     }
@@ -1499,7 +1501,7 @@ setMethod(
       }
       tech@afs <- tech@afs[-chk, ]
     }
-    approxim <- .fix_approximation_list(approxim, lev = tech@slice)
+    approxim <- .fix_approximation_list(approxim, lev = tech@timeframe)
     tech <- .disaggregateSliceLevel(tech, approxim)
     mTechSlice <- data.table(
       tech = rep(tech@name, length(approxim$slice)), slice = approxim$slice,

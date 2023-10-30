@@ -11,7 +11,7 @@ getData <- function(...) UseMethod("getData")
 #' @param asMatrix return results as a matric (not implemented).
 #' @param setsNames_ regular expression pattern for names of sets which will be included in search.
 #' @param allSets logical, if TRUE _and_ operator should be used in search the sets, _or_ will be used if FALSE.
-#' @param ignore.case grepl parameter for matchin names.
+#' @param ignore.case grepl parameter for matching names.
 #'
 #' @return list with variables and parameters name, each includes _dim_ and _names_ character vectors.
 #'
@@ -19,6 +19,7 @@ getData <- function(...) UseMethod("getData")
 findData <- function(scen, dataType = c("parameters", "variables"),
                      setsNames_ = NULL, valueColumn = TRUE,
                      allSets = TRUE, ignore.case = FALSE, # anyOfTheSets = !allSets,
+                     add_weights = "auto",
                      dropEmpty = TRUE, dfDim = TRUE, dfNames = TRUE, asMatrix = FALSE) {
   ll <- list()
   lt <- list()

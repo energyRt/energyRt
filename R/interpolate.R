@@ -223,7 +223,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
              )
   # slices ####
   # browser()
-  # scen@settings@slice <- .init_slice(scen@settings@slice)
+  # scen@settings@timeframe <- .init_slice(scen@settings@timeframe)
   # browser()
 
   if (mean(scen@settings@yearFraction$fraction) != 1.) {
@@ -742,10 +742,10 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     for (j in seq(along = obj@data[[i]]@data)) { #
       prec <- .add2set(prec, obj@data[[i]]@data[[j]], approxim = approxim)
       if (class(obj@data[[i]]@data[[j]]) == "commodity") {
-        if (length(obj@data[[i]]@data[[j]]@slice) == 0) {
-          obj@data[[i]]@data[[j]]@slice <- approxim$calendar@default_timeframe
+        if (length(obj@data[[i]]@data[[j]]@timeframe) == 0) {
+          obj@data[[i]]@data[[j]]@timeframe <- approxim$calendar@default_timeframe
         }
-        commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@slice
+        commodity_slice_map[[obj@data[[i]]@data[[j]]@name]] <- obj@data[[i]]@data[[j]]@timeframe
       }
     }
   }
@@ -788,7 +788,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   .apply_to_code_ret_scen(
     scen = scen, clss = "commodity", def.level,
     func = function(x, def.level) {
-      if (length(x@slice) == 0) x@slice <- def.level
+      if (length(x@timeframe) == 0) x@timeframe <- def.level
       x
     }
   )
@@ -824,7 +824,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 # Add commodity slice_level map to approxim
 .get_map_commodity_slice_map <- function(scen) {
   .apply_to_code_ret_list(scen = scen, clss = "commodity", func = function(x) {
-    list(name = x@name, val = x@slice)
+    list(name = x@name, val = x@timeframe)
   })
 }
 

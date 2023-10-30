@@ -6,7 +6,7 @@
 #' @slot unit character.
 #' @slot reserve numeric.
 #' @slot imp data.frame.
-#' @slot slice character.
+#' @slot timeframe character.
 #' @slot misc list.
 #'
 #' @include class-trade.R
@@ -22,7 +22,7 @@ setClass("import",
     unit = "character",
     reserve = "numeric",
     imp = "data.frame",
-    slice = "character",
+    timeframe = "character",
     misc = "list"
   ),
   prototype(
@@ -41,7 +41,7 @@ setClass("import",
       price = numeric(),
       stringsAsFactors = FALSE
     ),
-    slice = character(),
+    timeframe = character(),
     misc = list()
   ),
   S3methods = FALSE

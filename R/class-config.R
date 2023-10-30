@@ -2,15 +2,15 @@
 #' Class (S4) to represent default model configuration.
 #'
 #' @slot desc character string with the configuration information.
-#' @slot region character string with
-#' @slot horizon
-#' @slot discount
-#' @slot discountFirstYear
-#' @slot early.retirement
-#' @slot defVal
-#' @slot interpolation
-#' @slot debug
-#' @slot misc
+#' @slot region character coma separated string of all region names in the model
+#' @slot horizon class horizon with the model time parameters
+#' @slot discount data frame with discount rates by region and year
+#' @slot discountFirstYear logical, if TRUE, the discounting starts from the beginning of the year
+#' @slot early.retirement currently ignored
+#' @slot defVal data.frame with default values of parameters (energyRt:::.defVal)
+#' @slot interpolation data.frame with interpolation rules (energyRt:::.defInt)
+#' @slot debug data.frame to define artificial (dummy) variables to debug model infeasibility
+#' @slot misc list with miscelaneous data to store in the object.
 #'
 #' @include class-calendar.R class-horizon.R
 #'

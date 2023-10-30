@@ -8,7 +8,7 @@
 #' @slot reserve data.frame.
 #' @slot availability data.frame.
 #' @slot region character.
-#' @slot slice character.
+# @slot slice character.
 #' @slot misc list.
 #'
 #' @include class-demand.R
@@ -28,7 +28,7 @@ setClass("supply",
     availability = "data.frame", # Availability of the resource with prices
     region = "character",
     # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-    slice = "character",
+    # slice = "character",
     misc = "list"
   ),
   prototype(
@@ -65,7 +65,7 @@ setClass("supply",
     ),
     region = character(),
     # GIS           = NULL,
-    slice = character(),
+    # slice = character(),
     # ! Misc
     misc = list()
   ),

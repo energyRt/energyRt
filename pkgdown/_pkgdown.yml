@@ -60,6 +60,8 @@ reference:
   - matches("rename")
   - matches("revalue")
   - matches("size")
+  - matches("hour2HOUR")
+  - matches("yday2YDAY")
 
 - title: Visualisation
   contents:

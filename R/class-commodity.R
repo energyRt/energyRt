@@ -1,9 +1,9 @@
 #' An S4 class to represent a commodity
 #'
-#' @slot name short name, used in sets, no white spaces or special characters
-#' @slot limtype limit type of the commodity in balance equation ("LO" by default, meaning that the level of commodity in the model is satisfied with the lower bound)
-#' @slot slice the level of time-slice the commodity operates in the model
-#'             (the lowest slice-level used by default)
+#' @slot name character, a short name used in sets, no white spaces or special characters
+#' @slot limtype, character or factor, the limit type of the commodity in balance equation ("LO" by default, meaning that the level of commodity in the model is satisfied with the lower bound)
+#' @slot timeframe character, the default time-frame this commodity operates in the model
+#'             (the lowest timeframe used by default)
 #' @slot unit the main unit of the commodity used in the model, character string
 #' @slot emis data.frame with emissions factors, columns:
 #' \describe{
@@ -29,7 +29,7 @@ setClass("commodity",
     name = "character", # Short name
     desc = "character", # Details
     limtype = "factor",
-    slice = "character",
+    timeframe = "character",
     unit = "character",
     emis = "data.frame", # Emission factors
     agg = "data.frame", # Aggregation parameter
@@ -39,7 +39,7 @@ setClass("commodity",
     name = character(),
     desc = character(),
     limtype = factor("LO", levels = c("FX", "UP", "LO")),
-    slice = character(),
+    timeframe = character(),
     unit = character(),
     agg = data.frame(
       comm = character(),
@@ -77,7 +77,7 @@ newCommodity <- function(
     name = "",
     desc = "",
     limtype = "LO",
-    slice = character(),
+    timeframe = character(),
     unit = character(),
     agg = data.frame(),
     emis = data.frame(),
@@ -85,7 +85,7 @@ newCommodity <- function(
   .data2slots("commodity", name,
     desc = "",
     limtype = "LO",
-    slice = slice,
+    timeframe = timeframe,
     unit = unit,
     agg = agg,
     emis = emis,

@@ -1,13 +1,21 @@
 #' An S4 class to represent commodity export to the rest of the world.
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot commodity character.
-#' @slot unit character.
-#' @slot reserve numeric.
-#' @slot exp data.frame.
-#' @slot slice character.
-#' @slot misc list.
+#' @slot name character. Name of the export process (used in sets).
+#' @slot desc character. A short description of the export process.
+#' @slot commodity character. Name of the commodity.
+#' @slot unit character. Unit of the exported commodity.
+#' @slot reserve numeric. Constraints on the total accumulated (over years) export resource (similar to "reserve" in supply).
+#' @slot exp data.frame. Export data.frame with columns:
+#'  \describe{
+#'      \item{region}{character name of region or NA for all regions}
+#'      \item{year}{integer year or NA for all years}
+#'      \item{slice}{name of time-slices, or name timeframe to represent a group of time-slices, or NA for all time-slices}
+#'      \item{exp.lo}{numeric, lower constraint on export}
+#'      \item{exp.up}{numeric, upper constraint on export}
+#'      \item{exp.fx}{numeric, fixed level of export}
+#'      \item{price}{price of the export}.
+#' @slot timeframe character. Name of timeframe for the export to operate on.
+#' @slot misc list. Any additional information to store.
 #'
 #' @include class-import.R
 #'
@@ -22,7 +30,7 @@ setClass("export",
     # region !!! add
     reserve = "numeric",
     exp = "data.frame",
-    slice = "character",
+    timeframe = "character",
     misc = "list"
   ),
   prototype(
@@ -42,7 +50,7 @@ setClass("export",
       stringsAsFactors = FALSE
     ),
     # GIS           = NULL,
-    slice = character(),
+    timeframe = character(),
     # ! Misc
     misc = list()
   ),

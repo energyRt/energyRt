@@ -164,7 +164,7 @@
 #' @slot early.retirement logical. Currently ignored.
 #' @slot upgrade.technology character. Currently ignored.
 #' @slot fullYear logical. Currently ignored.
-#' @slot slice character name of timeframe level the technology is operating. By default, the lowest level of commodities in the technology is applied.
+#' @slot timeframe character name of timeframe level the technology is operating. By default, the lowest level of commodities in the technology is applied.
 #' @slot region character vector of regions where the technology exist or can be installed.
 #' @slot misc list with any miscellaneous information.
 #'
@@ -204,7 +204,7 @@ setClass("technology",
     early.retirement = "logical",
     upgrade.technology = "character",
     fullYear = "logical",
-    slice = "character",
+    timeframe = "character",
     region = "character",
     misc = "list"
   ), #
@@ -377,7 +377,7 @@ setClass("technology",
     early.retirement = TRUE,
     upgrade.technology = character(),
     region = character(),
-    slice = character(),
+    timeframe = character(),
     misc = list()
   ),
   # validity = .check_technology_data_frame,
@@ -390,7 +390,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 
 #' Create object of class `technology`.
 #'
-#' @family technology
+#' @family technology, process
 #' @rdname technology
 #'
 #' @return an object of class technology.
@@ -420,7 +420,7 @@ newTechnology <- function(
     region = character(),
     start = data.frame(),
     end = data.frame(),
-    slice = character(),
+    timeframe = character(),
     fullYear = TRUE,
     early.retirement = FALSE,
     upgrade.technology = character(),
@@ -448,7 +448,7 @@ newTechnology <- function(
     region = region,
     start = start,
     end = end,
-    slice = slice,
+    timeframe = timeframe,
     fullYear = fullYear,
     early.retirement = early.retirement,
     upgrade.technology = upgrade.technology,
