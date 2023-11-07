@@ -12,8 +12,22 @@ Class (S4) to represent default model configuration.
 \describe{
 \item{\code{desc}}{character string with the configuration information.}
 
-\item{\code{region}}{character string with}
+\item{\code{region}}{character coma separated string of all region names in the model}
 
-\item{\code{misc}}{}
+\item{\code{horizon}}{class horizon with the model time parameters}
+
+\item{\code{discount}}{data frame with discount rates by region and year}
+
+\item{\code{discountFirstYear}}{logical, if TRUE, the discounting starts from the beginning of the year}
+
+\item{\code{early.retirement}}{currently ignored}
+
+\item{\code{defVal}}{data.frame with default values of parameters (energyRt:::.defVal)}
+
+\item{\code{interpolation}}{data.frame with interpolation rules (energyRt:::.defInt)}
+
+\item{\code{debug}}{data.frame to define artificial (dummy) variables to debug model infeasibility}
+
+\item{\code{misc}}{list with miscelaneous data to store in the object.}
 }}
 

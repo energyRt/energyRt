@@ -3,13 +3,14 @@
 [**documentation in progress.**](https://energyrt.github.io/book/)
 
 ## Installing the package:  
-stable:  
+stable version (for models built before Aug-2023):  
 `remotes::install_github("energyRt/energyRt")` 
 
-development (not consistent with the 'stable')
+development (not consistent with the 'stable', current models):   
 `remotes::install_github("energyRt/energyRt", ref = "dev")` 
 
-> **⚠️ Warning** *`energyRt`* is currently in preparation for its first release and publication on CRAN. Names, behavior, meaning of functions, methods, and parameters are being reviewed and may be changed in order to improve the readability and transparency of the code, consistency with other libraries, functionality and features of the final product. Thanks for testing and for your patience. Please report bugs, issues or suggest improvements here: <https://github.com/energyRt/energyRt/issues>
+> **⚠️ Warning**   
+*`energyRt`* is currently in preparation for its first release and publication on CRAN. Names, behavior, meaning of functions, methods, and parameters are being reviewed and may be changed in order to improve the readability and transparency of the code, consistency with other libraries, functionality and features of the final product. Thanks for testing and for your patience. Please report bugs, issues or suggest improvements here: <https://github.com/energyRt/energyRt/issues>
 
 **energyRt** is a package for [R](https://www.r-project.org/) to develop Reference Energy System (RES) models (also known as Capacity Expansion Models (CEM), or "Bottom-Up" technological energy models), and analyze energy-technologies.
 

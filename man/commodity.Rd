@@ -10,7 +10,7 @@ newCommodity(
   name = "",
   desc = "",
   limtype = "LO",
-  slice = character(),
+  timeframe = character(),
   unit = character(),
   agg = data.frame(),
   emis = data.frame(),
@@ -25,12 +25,12 @@ Create class commodity
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{short name, used in sets, no white spaces or special characters}
+\item{\code{name}}{character, a short name used in sets, no white spaces or special characters}
 
-\item{\code{limtype}}{limit type of the commodity in balance equation ("LO" by default, meaning that the level of commodity in the model is satisfied with the lower bound)}
+\item{\code{limtype,}}{character or factor, the limit type of the commodity in balance equation ("LO" by default, meaning that the level of commodity in the model is satisfied with the lower bound)}
 
-\item{\code{slice}}{the level of time-slice the commodity operates in the model
-(the lowest slice-level used by default)}
+\item{\code{timeframe}}{character, the default time-frame this commodity operates in the model
+(the lowest timeframe used by default)}
 
 \item{\code{unit}}{the main unit of the commodity used in the model, character string}
 

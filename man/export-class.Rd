@@ -10,20 +10,18 @@ An S4 class to represent commodity export to the rest of the world.
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character.}
+\item{\code{name}}{character. Name of the export process (used in sets).}
 
-\item{\code{desc}}{character.}
+\item{\code{desc}}{character. A short description of the export process.}
 
-\item{\code{commodity}}{character.}
+\item{\code{commodity}}{character. Name of the commodity.}
 
-\item{\code{unit}}{character.}
+\item{\code{unit}}{character. Unit of the exported commodity.}
 
-\item{\code{reserve}}{numeric.}
+\item{\code{reserve}}{numeric. Constraints on the total accumulated (over years) export resource (similar to "reserve" in supply).}
 
-\item{\code{exp}}{data.frame.}
+\item{\code{timeframe}}{character. Name of timeframe for the export to operate on.}
 
-\item{\code{slice}}{character.}
-
-\item{\code{misc}}{list.}
+\item{\code{misc}}{list. Any additional information to store.}
 }}
 

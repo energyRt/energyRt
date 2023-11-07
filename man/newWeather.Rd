@@ -9,7 +9,7 @@ newWeather(
   desc = "",
   unit = as.character(NA),
   region = character(),
-  slice = character(),
+  timeframe = character(),
   defVal = 0,
   weather = data.frame(),
   ...

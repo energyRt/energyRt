@@ -151,13 +151,6 @@ for (t,c,r,y,s) in mvTechOut:
     if model.vTechOut[(t,c,r,y,s)].value != 0:
         f.write(str(t) + "," + str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vTechOut[(t,c,r,y,s)].value) + "\n")
 f.close()
-flist.write("vTechOutS\n");
-f = open("output/vTechOutS.csv","w");
-f.write("tech,comm,region,year,slice,value\n");
-for (t,c,r,y,s) in mvTechOutS:
-    if model.vTechOutS[(t,c,r,y,s)].value != 0:
-        f.write(str(t) + "," + str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vTechOutS[(t,c,r,y,s)].value) + "\n")
-f.close()
 flist.write("vTechAInp\n");
 f = open("output/vTechAInp.csv","w");
 f.write("tech,comm,region,year,slice,value\n");
@@ -171,13 +164,6 @@ f.write("tech,comm,region,year,slice,value\n");
 for (t,c,r,y,s) in mvTechAOut:
     if model.vTechAOut[(t,c,r,y,s)].value != 0:
         f.write(str(t) + "," + str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vTechAOut[(t,c,r,y,s)].value) + "\n")
-f.close()
-flist.write("vTechAOutS\n");
-f = open("output/vTechAOutS.csv","w");
-f.write("tech,comm,region,year,slice,value\n");
-for (t,c,r,y,s) in mvTechAOutS:
-    if model.vTechAOutS[(t,c,r,y,s)].value != 0:
-        f.write(str(t) + "," + str(c) + "," + str(r) + "," + str(y) + "," + str(s) + "," +  str(model.vTechAOutS[(t,c,r,y,s)].value) + "\n")
 f.close()
 flist.write("vSupOut\n");
 f = open("output/vSupOut.csv","w");

@@ -62,13 +62,13 @@ with their individual share in a year.}
 
 \item{\code{default_timeframe}}{character, the name of the default level of the time-slices used in the model.}
 
-\item{\code{frame_rank}}{named character vector with ranks of the timeframes.}
+\item{\code{timeframe_rank}}{named character vector with ranks of the timeframes.}
 
 \item{\code{slices_in_frame}}{(!!! to depreciate)}
 
 \item{\code{slice_family}}{data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.}
 
-\item{\code{next_in_frame}}{data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.}
+\item{\code{next_in_timeframe}}{data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.}
 
 \item{\code{next_in_year}}{data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.}
 

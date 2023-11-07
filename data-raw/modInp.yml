@@ -143,6 +143,15 @@ weather:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
+mCommReg:
+  name: mCommReg
+  dimSets:
+  - comm
+  - region
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
 pWeather:
   name: pWeather
   dimSets:
@@ -3096,18 +3105,18 @@ mvTechOut:
 #  defVal: 0.0
 #  interpolation: back.inter.forth
 #  colName: ''
-mvTechOutS:
-  name: mvTechOutS
-  dimSets:
-  - tech
-  - comm
-  - region
-  - year
-  - slice
-  type: map
-  # defVal: 0.0
-  # interpolation: back.inter.forth
-  # colName: ''
+# mvTechOutS:
+#   name: mvTechOutS
+#   dimSets:
+#   - tech
+#   - comm
+#   - region
+#   - year
+#   - slice
+#   type: map
+#   # defVal: 0.0
+#   # interpolation: back.inter.forth
+#   # colName: ''
 mvTechAInp:
   name: mvTechAInp
   dimSets:
@@ -3132,15 +3141,15 @@ mvTechAOut:
   # defVal: 0.0
   # interpolation: back.inter.forth
   # colName: ''
-mvTechAOutS:
-  name: mvTechAOutS
-  dimSets:
-  - tech
-  - comm
-  - region
-  - year
-  - slice
-  type: map
+# mvTechAOutS:
+#   name: mvTechAOutS
+#   dimSets:
+#   - tech
+#   - comm
+#   - region
+#   - year
+#   - slice
+#   type: map
 mvDemInp:
   name: mvDemInp
   dimSets:

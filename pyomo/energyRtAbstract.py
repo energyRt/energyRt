@@ -34,10 +34,8 @@ model.vTechCap = Var(model.mTechSpan, domain = pyo.NonNegativeReals, doc = "Tota
 model.vTechAct = Var(model.mvTechAct, domain = pyo.NonNegativeReals, doc = "Activity level of technology");
 model.vTechInp = Var(model.mvTechInp, domain = pyo.NonNegativeReals, doc = "Input level");
 model.vTechOut = Var(model.mvTechOut, domain = pyo.NonNegativeReals, doc = "Commodity output from technology - tech timeframe");
-model.vTechOutS = Var(model.mvTechOutS, domain = pyo.NonNegativeReals, doc = "Commodity output from technology - comm timeframe");
 model.vTechAInp = Var(model.mvTechAInp, domain = pyo.NonNegativeReals, doc = "Auxiliary commodity input");
 model.vTechAOut = Var(model.mvTechAOut, domain = pyo.NonNegativeReals, doc = "Auxiliary commodity output");
-model.vTechAOutS = Var(model.mvTechAOutS, domain = pyo.NonNegativeReals, doc = "Auxiliary commodity output");
 model.vSupOut = Var(model.mSupAva, domain = pyo.NonNegativeReals, doc = "Output of supply");
 model.vSupReserve = Var(model.mvSupReserve, domain = pyo.NonNegativeReals, doc = "Total (accumulated) supply");
 model.vDemInp = Var(model.mvDemInp, domain = pyo.NonNegativeReals, doc = "Input to demand");

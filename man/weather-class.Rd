@@ -18,7 +18,7 @@ Title
 
 \item{\code{region}}{character.}
 
-\item{\code{slice}}{character.}
+\item{\code{timeframe}}{character.}
 
 \item{\code{defVal}}{numeric.}
 

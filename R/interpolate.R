@@ -478,6 +478,36 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # }
   # Reduce mapping
   # browser()
+  # mCommReg ####
+  # rest <- rest + 1
+  # .interpolation_message("mCommReg", rest, interpolation_count,
+  #                        interpolation_start_time, len_name)
+  # browser()
+  # scan all "^p"-parameters for (comm, region)
+  allpar <- names(scen@modInp@parameters)
+  allpar <- allpar[grepl("^p", allpar)] # parameters
+  allpar <- allpar[!grepl("Dummy", allpar)] # drop Dummy-Imp/Exp (for filtering)
+  allpar <- c(allpar, "mSupAva") # add sup with default/missing data
+  mCommReg <- lapply(scen@modInp@parameters[allpar], function(x) {
+    if (!all(c("comm", "region") %in% x@dimSets)) return(NULL)
+    select(x@data, comm, region) %>% unique()
+  }) %>%
+    rbindlist() %>%
+    unique()
+  scen@modInp@parameters[["mCommReg"]] <-
+    .dat2par(scen@modInp@parameters[["mCommReg"]], mCommReg)
+  rm(mCommReg)
+
+  # filter parameters by (comm, region)
+  filter_params <- c("pDummyExportCost", "pDummyImportCost")
+  for (p in filter_params) {
+    d <- scen@modInp@parameters[[p]]@data %>%
+      inner_join(scen@modInp@parameters[["mCommReg"]]@data,
+                 by = c("comm", "region"))
+    scen@modInp@parameters[[p]]@data <- scen@modInp@parameters[[p]]@data[0,]
+    scen@modInp@parameters[[p]] <- .dat2par(scen@modInp@parameters[[p]], d)
+  }
+
   scen@modInp <- .write_mapping(scen@modInp,
     interpolation_count = interpolation_count,
     interpolation_start_time = interpolation_start_time,

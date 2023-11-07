@@ -58,6 +58,7 @@ setMethod(".obj2modInp",
     )
   )
 
+  # browser()
   if (any(is.na(approxim$debug$comm) | approxim$debug$comm == cmd@name)) {
     approxim$debug$comm[is.na(approxim$debug$comm)] <- cmd@name
     dbg <- approxim$debug[!is.na(approxim$debug$comm) &
@@ -1154,7 +1155,8 @@ setMethod(".obj2modInp",
       .dat2par(obj@parameters[["mSupSlice"]], mSupSlice)
     # browser()
     mSupComm <- data.table(sup = sup@name, comm = sup@commodity)
-    obj@parameters[["mSupComm"]] <- .dat2par(obj@parameters[["mSupComm"]], mSupComm)
+    obj@parameters[["mSupComm"]] <-
+      .dat2par(obj@parameters[["mSupComm"]], mSupComm)
     # browser()
     pSupCost <- .interp_numpar(sup@availability, "cost",
                                obj@parameters[["pSupCost"]],
@@ -1188,9 +1190,9 @@ setMethod(".obj2modInp",
       # browser()
     }
     # mSupAva <- merge0(merge0(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
-      mSupAva <- mSupSpan %>%
-        merge0(list(comm = sup@commodity, year = approxim$mileStoneYears)) %>%
-        merge0(mSupSlice)
+    mSupAva <- mSupSpan %>%
+      merge0(list(comm = sup@commodity, year = approxim$mileStoneYears)) %>%
+      merge0(mSupSlice)
 
     if (!is.null(zero_ava_up) && nrow(zero_ava_up) != 0) {
       if (all(colnames(mSupAva) %in% colnames(zero_ava_up))) {
@@ -1208,8 +1210,7 @@ setMethod(".obj2modInp",
         # mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, merge0(mSupAva, zero_ava_up[, colnames(zero_ava_up) %in% colnames(mSupAva), drop = FALSE])[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
         ii <- mSupAva %>%
           rbind(
-            merge0(mSupAva,
-                   select(zero_ava_up, any_of(colnames(mSupAva)))                   )
+            merge0(mSupAva, select(zero_ava_up, any_of(colnames(mSupAva))))
             ) %>%
           select(all_of(colnames(mSupAva))) %>%
           duplicated(fromLast = TRUE)

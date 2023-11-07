@@ -11,6 +11,7 @@ findData(
   valueColumn = TRUE,
   allSets = TRUE,
   ignore.case = FALSE,
+  add_weights = "auto",
   dropEmpty = TRUE,
   dfDim = TRUE,
   dfNames = TRUE,
@@ -28,7 +29,7 @@ findData(
 
 \item{allSets}{logical, if TRUE _and_ operator should be used in search the sets, _or_ will be used if FALSE.}
 
-\item{ignore.case}{grepl parameter for matchin names.}
+\item{ignore.case}{grepl parameter for matching names.}
 
 \item{dropEmpty}{logical, if TRUE drops parameters and variables with zero length.}
 

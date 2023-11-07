@@ -262,15 +262,6 @@ end;
 close(fvTechOut);
 
 
-fvTechOutS = open("output/vTechOutS.csv", "w");
-println(fvTechOutS, "tech,comm,region,year,slice,value");
-for (t,c,r,y,s) in mvTechOutS if JuMP.value(vTechOutS[(t,c,r,y,s)]) != 0
-  println(fvTechOutS, t, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechOutS[(t,c,r,y,s)]));
-end;
-end;
-close(fvTechOutS);
-
-
 fvTechAInp = open("output/vTechAInp.csv", "w");
 println(fvTechAInp, "tech,comm,region,year,slice,value");
 for (t,c,r,y,s) in mvTechAInp if JuMP.value(vTechAInp[(t,c,r,y,s)]) != 0
@@ -287,15 +278,6 @@ for (t,c,r,y,s) in mvTechAOut if JuMP.value(vTechAOut[(t,c,r,y,s)]) != 0
 end;
 end;
 close(fvTechAOut);
-
-
-fvTechAOutS = open("output/vTechAOutS.csv", "w");
-println(fvTechAOutS, "tech,comm,region,year,slice,value");
-for (t,c,r,y,s) in mvTechAOutS if JuMP.value(vTechAOutS[(t,c,r,y,s)]) != 0
-  println(fvTechAOutS, t, ",", c, ",", r, ",", y, ",", s, ",", JuMP.value(vTechAOutS[(t,c,r,y,s)]));
-end;
-end;
-close(fvTechAOutS);
 
 
 fvSupOut = open("output/vSupOut.csv", "w");
@@ -673,10 +655,8 @@ println(vrb_list, "vTechCap");
 println(vrb_list, "vTechAct");
 println(vrb_list, "vTechInp");
 println(vrb_list, "vTechOut");
-println(vrb_list, "vTechOutS");
 println(vrb_list, "vTechAInp");
 println(vrb_list, "vTechAOut");
-println(vrb_list, "vTechAOutS");
 println(vrb_list, "vSupOut");
 println(vrb_list, "vSupReserve");
 println(vrb_list, "vDemInp");

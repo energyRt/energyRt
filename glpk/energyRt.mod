@@ -18,6 +18,7 @@ set FORIF;
 
 
 
+set mCommReg dimen 2;
 set mSameRegion dimen 2;
 set mSameSlice dimen 2;
 set mMilestoneFirst dimen 1;
@@ -101,10 +102,8 @@ set mvTechRetiredNewCap dimen 4;
 set mvTechRetiredStock dimen 3;
 set mvTechAct dimen 4;
 set mvTechOut dimen 5;
-set mvTechOutS dimen 5;
 set mvTechAInp dimen 5;
 set mvTechAOut dimen 5;
-set mvTechAOutS dimen 5;
 set mvDemInp dimen 4;
 set mvBalance dimen 4;
 set mvInpTot dimen 4;
@@ -389,10 +388,8 @@ var vTechCap{tech, region, year} >= 0;
 var vTechAct{tech, region, year, slice} >= 0;
 var vTechInp{tech, comm, region, year, slice} >= 0;
 var vTechOut{tech, comm, region, year, slice} >= 0;
-var vTechOutS{tech, comm, region, year, slice} >= 0;
 var vTechAInp{tech, comm, region, year, slice} >= 0;
 var vTechAOut{tech, comm, region, year, slice} >= 0;
-var vTechAOutS{tech, comm, region, year, slice} >= 0;
 var vSupOut{sup, comm, region, year, slice} >= 0;
 var vSupReserve{sup, comm, region} >= 0;
 var vDemInp{comm, region, year, slice} >= 0;
@@ -658,10 +655,6 @@ printf "tech,comm,region,year,slice,value\n" > "output/vTechOut.csv";
 for{(t, c, r, y, s) in mvTechOut : vTechOut[t,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechOut[t,c,r,y,s] >> "output/vTechOut.csv";
 }
-printf "tech,comm,region,year,slice,value\n" > "output/vTechOutS.csv";
-for{(t, c, r, y, s) in mvTechOutS : vTechOutS[t,c,r,y,s] <> 0} {
-  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechOutS[t,c,r,y,s] >> "output/vTechOutS.csv";
-}
 printf "tech,comm,region,year,slice,value\n" > "output/vTechAInp.csv";
 for{(t, c, r, y, s) in mvTechAInp : vTechAInp[t,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAInp[t,c,r,y,s] >> "output/vTechAInp.csv";
@@ -669,10 +662,6 @@ for{(t, c, r, y, s) in mvTechAInp : vTechAInp[t,c,r,y,s] <> 0} {
 printf "tech,comm,region,year,slice,value\n" > "output/vTechAOut.csv";
 for{(t, c, r, y, s) in mvTechAOut : vTechAOut[t,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAOut[t,c,r,y,s] >> "output/vTechAOut.csv";
-}
-printf "tech,comm,region,year,slice,value\n" > "output/vTechAOutS.csv";
-for{(t, c, r, y, s) in mvTechAOutS : vTechAOutS[t,c,r,y,s] <> 0} {
-  printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechAOutS[t,c,r,y,s] >> "output/vTechAOutS.csv";
 }
 printf "tech,region,year,value\n" > "output/vTechInv.csv";
 for{(t, r, y) in mTechInv : vTechInv[t,r,y] <> 0} {
@@ -912,10 +901,8 @@ printf "value\n" > "output/variable_list.csv";
     printf "vTechAct\n" >> "output/variable_list.csv";
     printf "vTechInp\n" >> "output/variable_list.csv";
     printf "vTechOut\n" >> "output/variable_list.csv";
-    printf "vTechOutS\n" >> "output/variable_list.csv";
     printf "vTechAInp\n" >> "output/variable_list.csv";
     printf "vTechAOut\n" >> "output/variable_list.csv";
-    printf "vTechAOutS\n" >> "output/variable_list.csv";
     printf "vSupOut\n" >> "output/variable_list.csv";
     printf "vSupReserve\n" >> "output/variable_list.csv";
     printf "vDemInp\n" >> "output/variable_list.csv";

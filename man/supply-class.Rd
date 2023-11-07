@@ -26,8 +26,6 @@ An S4 class to represent a supply of a commodity
 
 \item{\code{region}}{character.}
 
-\item{\code{slice}}{character.}
-
 \item{\code{misc}}{list.}
 }}
 

@@ -193,14 +193,19 @@ write.sc <- write_sc
                          interpolation_start_time, len_name)
   rest <- rest + 1
   region <- .get_data_slot(prec@parameters$region)
+
+  # mMidMilestone ####
   .interpolation_message("mMidMilestone", rest, interpolation_count,
                          interpolation_start_time, len_name)
+
+  # mSliceParentChildE ####
   rest <- rest + 1
   year <- .get_data_slot(prec@parameters$mMidMilestone)
   .interpolation_message("mSliceParentChildE", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
   # Total parameter reductions
+  # mCommSlice ####
   mSliceParentChildE <- .get_data_slot(prec@parameters$mSliceParentChildE)
   .interpolation_message("mCommSlice", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -211,6 +216,23 @@ write.sc <- write_sc
   map_for_comm <- merge0(mCommSlice, uu)[, c("comm", "slicep")]
   colnames(map_for_comm) <- c("comm", "slice")
   map_for_comm <- map_for_comm[!duplicated(map_for_comm), ]
+
+  # # mCommReg ####
+  # rest <- rest + 1
+  # .interpolation_message("mCommReg", rest, interpolation_count,
+  #                        interpolation_start_time, len_name)
+  # browser()
+  # # scan all "^p"-parameters for (comm, region)
+  # allpar <- names(prec@parameters); allpar <- allpar[grepl("^p", allpar)]
+  # comreg <- lapply(prec@parameters[allpar], function(x) {
+  #   if (!all(c("comm", "region") %in% x@dimSets)) return(NULL)
+  #   select(x@data, comm, region) %>% unique()
+  # }) %>%
+  #   rbindlist() %>%
+  #   unique()
+  # prec@parameters[["mCommReg"]] <-
+  #   .dat2par(prec@parameters[["mCommReg"]], comreg)
+
   .interpolation_message("mCommSliceOrParent", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
@@ -259,30 +281,28 @@ write.sc <- write_sc
   #       )
   #   ) * pSliceWeight(slice);
 
-  .interpolation_message("mTechInpTot", rest, interpolation_count,
-                         interpolation_start_time, len_name)
   # browser()
   # mvTechOutS ####
   # finish: mTechCommSliceSliceP
-  mvTechOutS <- prec@parameters[["mvTechOut"]]@data %>%
-    rename(slicep = slice) %>%
-    left_join(prec@parameters[["mCommSliceOrParent"]]@data,
-              by = c("comm", "slicep")) %>%
-    select(all_of(prec@parameters[["mvTechOutS"]]@dimSets)) %>%
-    unique()
-  prec@parameters[["mvTechOutS"]] <-
-    .dat2par(prec@parameters[["mvTechOutS"]], mvTechOutS)
-
+  # mvTechOutS <- prec@parameters[["mvTechOut"]]@data %>%
+  #   rename(slicep = slice) %>%
+  #   left_join(prec@parameters[["mCommSliceOrParent"]]@data,
+  #             by = c("comm", "slicep")) %>%
+  #   select(all_of(prec@parameters[["mvTechOutS"]]@dimSets)) %>%
+  #   unique()
+  # prec@parameters[["mvTechOutS"]] <-
+  #   .dat2par(prec@parameters[["mvTechOutS"]], mvTechOutS)
+  #
   # mvTechAOutS ####
-  mvTechAOutS <- prec@parameters[["mvTechAOut"]]@data %>%
-    rename(slicep = slice) %>%
-    left_join(prec@parameters[["mCommSliceOrParent"]]@data,
-              by = c("comm", "slicep")) %>%
-    select(all_of(prec@parameters[["mvTechAOutS"]]@dimSets)) %>%
-    unique()
-  prec@parameters[["mvTechAOutS"]] <-
-    .dat2par(prec@parameters[["mvTechAOutS"]], mvTechAOutS)
-
+  # mvTechAOutS <- prec@parameters[["mvTechAOut"]]@data %>%
+  #   rename(slicep = slice) %>%
+  #   left_join(prec@parameters[["mCommSliceOrParent"]]@data,
+  #             by = c("comm", "slicep")) %>%
+  #   select(all_of(prec@parameters[["mvTechAOutS"]]@dimSets)) %>%
+  #   unique()
+  # prec@parameters[["mvTechAOutS"]] <-
+  #   .dat2par(prec@parameters[["mvTechAOutS"]], mvTechAOutS)
+  #
   # # mTechCommSliceSliceP ####
   # ! mTechCommSliceSliceP, mTechCommOutSliceSliceP, mTechCommAOutSliceSliceP
   # ! have been dropped due to large size in models with many commodities
@@ -318,39 +338,50 @@ write.sc <- write_sc
   #   .dat2par(prec@parameters[["mTechCommAOutSliceSliceP"]],
   #            mTechCommAOutSliceSliceP)
 
+  # mTechInpTot ####
+  .interpolation_message("mTechInpTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
-
   reduce_total_map <- function(yy) {
     yy$slicep <- yy$slice
     yy$slice <- NULL
-    reduce.duplicate(merge0(yy, mCommSliceOrParent, by = c("comm", "slicep"))[, -2])
+    reduce.duplicate(merge0(yy, mCommSliceOrParent,
+                            by = c("comm", "slicep"))[, -2])
   }
-
-# browser()
-
+  # browser()
+  mTechInpTot <- rbind(
+    select(.get_data_slot(prec@parameters$mvTechInp), -any_of("tech")),
+    select(.get_data_slot(prec@parameters$mvTechAInp), -any_of("tech"))
+  ) %>%
+    reduce.sect() %>%
+    reduce_total_map() %>%
+    inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region"))
   prec@parameters[["mTechInpTot"]] <-
-    .dat2par(
-      prec@parameters[["mTechInpTot"]],
-      reduce_total_map(
-        reduce.sect(
-          rbind(.get_data_slot(prec@parameters$mvTechInp)[, -1],
-                .get_data_slot(prec@parameters$mvTechAInp)[, -1])
-        )
-      )
-    )
+    .dat2par(prec@parameters[["mTechInpTot"]], mTechInpTot)
+  rm(mTechInpTot)
+
+  # mTechOutTot ####
   .interpolation_message("mTechOutTot", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
+  mTechOutTot <- rbind(
+    select(.get_data_slot(prec@parameters$mvTechOut), -any_of("tech")),
+    select(.get_data_slot(prec@parameters$mvTechAOut), -any_of("tech"))
+  ) %>%
+    reduce.sect() %>%
+    reduce_total_map() %>%
+    inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region"))
   prec@parameters[["mTechOutTot"]] <-
-    .dat2par(
-      prec@parameters[["mTechOutTot"]],
-      reduce_total_map(
-        reduce.sect(
-          rbind(.get_data_slot(prec@parameters$mvTechOut)[, -1],
-                .get_data_slot(prec@parameters$mvTechAOut)[, -1])
-          )
-        )
-      )
+    .dat2par(prec@parameters[["mTechOutTot"]], mTechOutTot)
+  rm(mTechOutTot)
+      # reduce_total_map(
+      #   reduce.sect(
+      #     rbind(.get_data_slot(prec@parameters$mvTechOut)[, -1],
+      #           .get_data_slot(prec@parameters$mvTechAOut)[, -1])
+      #     )
+      #   )
+      # )
+  # mSupOutTot ####
   .interpolation_message("mSupOutTot", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
@@ -358,39 +389,41 @@ write.sc <- write_sc
     .dat2par(prec@parameters[["mSupOutTot"]],
              reduce.sect(.get_data_slot(prec@parameters$mSupAva)[, -1])
              )
-
-  .interpolation_message("pEmissionFactor", rest, interpolation_count,
-                         interpolation_start_time, len_name)
-  rest <- rest + 1
-  #### This section should be moved to add (after interpolate comm first)
+  # pEmissionFactor ####
+  # .interpolation_message("pEmissionFactor", rest, interpolation_count,
+                         # interpolation_start_time, len_name)
+  # rest <- rest + 1
+  # mvTechAct ####
+  # .interpolation_message("mvTechAct", rest, interpolation_count,
+  #                        interpolation_start_time, len_name)
+  # rest <- rest + 1
+  # #### This section should be moved to add (after interpolate comm first)
   tmp0 <- .get_data_slot(prec@parameters$pTechEmisComm)
   tmp <- merge0(.get_data_slot(prec@parameters$mvTechInp),
-                tmp0[tmp0$value != 0, ],
+                filter(tmp0, value != 0),
                 by = c("tech", "comm"))
-  .interpolation_message("mvTechAct", rest, interpolation_count,
-                         interpolation_start_time, len_name)
-  rest <- rest + 1
   colnames(tmp)[colnames(tmp) == "comm"] <- "commp"
   tmp1 <- .get_data_slot(prec@parameters$pEmissionFactor)
-  .interpolation_message("mvTechAct", rest, interpolation_count,
-                         interpolation_start_time, len_name)
-  rest <- rest + 1
   tmp1 <- tmp1[tmp1$value != 0, ]
   tmp1 <- tmp1[!duplicated(tmp1), , drop = FALSE]
   tmp <- merge0(
     tmp1, tmp, by = "commp"
     )[, c("tech", "comm", "commp", "region", "year", "slice")]
-  tmp <- tmp[!duplicated(tmp), , drop = FALSE]
+  # tmp <- tmp[!duplicated(tmp), , drop = FALSE]
+  tmp <- tmp %>%
+    inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region")) %>%
+    unique()
+  # mTechEmsFuel ####
   .interpolation_message("mTechEmsFuel", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
   colnames(tmp)[3] <- "comm.1"
   prec@parameters[["mTechEmsFuel"]] <-
     .dat2par(prec@parameters[["mTechEmsFuel"]], tmp)
+  # mEmsFuelTot ####
   .interpolation_message("mEmsFuelTot", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
-
   prec@parameters[["mEmsFuelTot"]] <-
     .dat2par(
       prec@parameters[["mEmsFuelTot"]],
@@ -401,6 +434,7 @@ write.sc <- write_sc
           )
         )
       )
+  # mDummyImport ####
   .interpolation_message("mDummyImport", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
@@ -711,34 +745,47 @@ write.sc <- write_sc
     prec@parameters[["mInpSub"]] <- .dat2par(prec@parameters[["mInpSub"]], mInpSub)
   }
 
-  .interpolation_message("mvOut2Lo", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mvOut2Lo", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
-  mvOut2Lo <- merge0(.get_data_slot(prec@parameters[["mOut2Lo"]]), .get_data_slot(prec@parameters[["mSliceParentChild"]]))[, c("comm", "region", "year", "slice", "slicep")]
+  mvOut2Lo <- merge0(
+    .get_data_slot(prec@parameters[["mOut2Lo"]]),
+    .get_data_slot(
+      prec@parameters[["mSliceParentChild"]]))[
+        , c("comm", "region", "year", "slice", "slicep")
+        ]
   mvOut2Lo <- merge0(mvOut2Lo, mCommSlice2)
   colnames(mvOut2Lo)[colnames(mvOut2Lo) == "slicep"] <- "slice.1"
   mvOut2Lo <- mvOut2Lo[, c("comm", "region", "year", "slice", "slice.1")]
 
-  prec@parameters[["mvOut2Lo"]] <- .dat2par(prec@parameters[["mvOut2Lo"]], mvOut2Lo)
+  prec@parameters[["mvOut2Lo"]] <-
+    .dat2par(prec@parameters[["mvOut2Lo"]], mvOut2Lo)
 
-  .interpolation_message("mOutSub", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mOutSub", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   if (!is.null(mvOut2Lo)) {
     mOutSub <- mvOut2Lo[!duplicated(mvOut2Lo[, -4]), -4]
     colnames(mOutSub)[4] <- "slice"
-    prec@parameters[["mOutSub"]] <- .dat2par(prec@parameters[["mOutSub"]], mOutSub)
+    prec@parameters[["mOutSub"]] <-
+      .dat2par(prec@parameters[["mOutSub"]], mOutSub)
   }
-  .interpolation_message("meqLECActivity", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("meqLECActivity", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
   prec@parameters[["meqLECActivity"]] <- .dat2par(
     prec@parameters[["meqLECActivity"]],
-    merge0(.get_data_slot(prec@parameters[["mTechSpan"]]), .get_data_slot(prec@parameters[["mLECRegion"]]))
+    merge0(.get_data_slot(prec@parameters[["mTechSpan"]]),
+           .get_data_slot(prec@parameters[["mLECRegion"]]))
   )
 
-  .interpolation_message("mvTotalUserCosts", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mvTotalUserCosts", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
 
-  mCosts <- lapply(grep("^mCosts", names(prec@parameters), value = TRUE), function(x) {
+  mCosts <- lapply(grep("^mCosts", names(prec@parameters), value = TRUE),
+                   function(x) {
     xx <- .get_data_slot(prec@parameters[[x]])
     # xx <- unique(xx[, colnames(xx) %in% c("region", "year"), drop = FALSE])
     if (sum(colnames(xx) %in% c("region", "year")) > 2) browser() # rewrite for multiple columns
@@ -749,7 +796,9 @@ write.sc <- write_sc
     if (is.null(xx$region)) {
       return(dregionyear[dregionyear$year %in% unique(xx$year), , drop = FALSE])
     } else if (is.null(xx$year)) {
-      return(dregionyear[dregionyear$region %in% unique(xx$region), , drop = FALSE])
+      return(dregionyear[
+        dregionyear$region %in% unique(xx$region), , drop = FALSE
+        ])
     } else {
       return(xx)
     }
@@ -791,7 +840,8 @@ write.sc <- write_sc
     x$value <- 1
     x
   }
-
+  # browser()
+  # mvInpTot ####
   .interpolation_message("mvInpTot", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
   mvInpTot <- rbind(
@@ -804,8 +854,21 @@ write.sc <- write_sc
     .get_data_slot(prec@parameters$mInpSub)
   )
   mvInpTot <- mvInpTot[!duplicated(mvInpTot), ]
-  mvInpTot <- merge0(mvInpTot, mCommSlice)
-  .interpolation_message("mvOutTot", rest, interpolation_count, interpolation_start_time, len_name)
+  mvInpTot <- merge0(mvInpTot, mCommSlice) %>% unique()
+  if (T) { # check
+    # mvInpTot <-
+    dim_mvInpTot <- mvInpTot %>%
+      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+      unique() %>% dim()
+    if (!all(dim_mvInpTot == dim(mvInpTot))) browser() # Debug
+  }
+  prec@parameters[["mvInpTot"]] <-
+    .dat2par(prec@parameters[["mvInpTot"]], mvInpTot)
+  rm(mvInpTot)
+
+  # mvOutTot ####
+  .interpolation_message("mvOutTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   mvOutTot <- rbind(
     .get_data_slot(prec@parameters$mDummyImport),
@@ -819,33 +882,59 @@ write.sc <- write_sc
     .get_data_slot(prec@parameters$mOutSub)
   )
   mvOutTot <- mvOutTot[!duplicated(mvOutTot), ]
-  mvOutTot <- merge0(mvOutTot, mCommSlice)
-  .interpolation_message("mvBalance", rest, interpolation_count, interpolation_start_time, len_name)
+  mvOutTot <- merge0(mvOutTot, mCommSlice) %>% unique()
+  if (T) { # check
+    # mvOutTot <-
+    dim_mvOutTot <- mvOutTot %>%
+      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+      unique() %>% dim()
+    if (!all(dim_mvOutTot == dim(mvOutTot))) browser() # Debug
+  }
+  prec@parameters[["mvOutTot"]] <-
+    .dat2par(prec@parameters[["mvOutTot"]], mvOutTot)
+  rm(mvOutTot)
+  # mvBalance ####
+  .interpolation_message("mvBalance", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
-  mvBalance <- rbind(mvInpTot, mvOutTot)
-  mvBalance <- mvBalance[!duplicated(mvBalance), ]
-  mvBalance <- merge0(dregionyear, mCommSlice)
-  prec@parameters[["mvBalance"]] <- .dat2par(prec@parameters[["mvBalance"]], mvBalance)
-  prec@parameters[["mvInpTot"]] <- .dat2par(prec@parameters[["mvInpTot"]], mvBalance)
-  prec@parameters[["mvOutTot"]] <- .dat2par(prec@parameters[["mvOutTot"]], mvBalance)
+  mvBalance <- rbind(
+    prec@parameters[["mvInpTot"]]@data,
+    prec@parameters[["mvOutTot"]]@data) %>%
+    unique()
+  # mvBalance <- mvBalance[!duplicated(mvBalance), ]
+  if (T) { # check
+    dim_mvBalance <- merge0(dregionyear, mCommSlice) %>%
+      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+      unique() %>% dim()
+    if (!all(dim_mvBalance == dim(mvBalance))) browser() # Debug
+  }
+  prec@parameters[["mvBalance"]] <-
+    .dat2par(prec@parameters[["mvBalance"]], mvBalance)
+  # prec@parameters[["mvInpTot"]] <-
+  #   .dat2par(prec@parameters[["mvInpTot"]], mvBalance)
+  # prec@parameters[["mvOutTot"]] <-
+  #   .dat2par(prec@parameters[["mvOutTot"]], mvBalance)
 
   .interpolation_message("meqBalLo", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
   prec@parameters[["meqBalLo"]] <- .dat2par(
     prec@parameters[["meqBalLo"]],
-    merge0(.get_data_slot(prec@parameters[["mvBalance"]]), .get_data_slot(prec@parameters[["mLoComm"]]))
+    merge0(.get_data_slot(prec@parameters[["mvBalance"]]),
+           .get_data_slot(prec@parameters[["mLoComm"]]))
   )
   .interpolation_message("meqBalUp", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
   prec@parameters[["meqBalUp"]] <- .dat2par(
     prec@parameters[["meqBalUp"]],
-    merge0(.get_data_slot(prec@parameters[["mvBalance"]]), .get_data_slot(prec@parameters[["mUpComm"]]))
+    merge0(.get_data_slot(prec@parameters[["mvBalance"]]),
+           .get_data_slot(prec@parameters[["mUpComm"]]))
   )
   .interpolation_message("meqBalFx", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
   prec@parameters[["meqBalFx"]] <- .dat2par(
     prec@parameters[["meqBalFx"]],
-    merge0(.get_data_slot(prec@parameters[["mvBalance"]]), .get_data_slot(prec@parameters[["mFxComm"]]))
+    merge0(.get_data_slot(prec@parameters[["mvBalance"]]),
+           .get_data_slot(prec@parameters[["mFxComm"]]))
   )
 
   .interpolation_message("mAggregateFactor", rest, interpolation_count, interpolation_start_time, len_name)

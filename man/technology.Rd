@@ -30,7 +30,7 @@ newTechnology(
   region = character(),
   start = data.frame(),
   end = data.frame(),
-  slice = character(),
+  timeframe = character(),
   fullYear = TRUE,
   early.retirement = FALSE,
   upgrade.technology = character(),
@@ -242,7 +242,7 @@ Create object of class `technology`.
 
 \item{\code{fullYear}}{logical. Currently ignored.}
 
-\item{\code{slice}}{character name of timeframe level the technology is operating. By default, the lowest level of commodities in the technology is applied.}
+\item{\code{timeframe}}{character name of timeframe level the technology is operating. By default, the lowest level of commodities in the technology is applied.}
 
 \item{\code{region}}{character vector of regions where the technology exist or can be installed.}
 
@@ -250,4 +250,5 @@ Create object of class `technology`.
 }}
 
 \concept{technology}
+\concept{technology, process}
 \concept{update technology}

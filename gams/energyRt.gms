@@ -36,6 +36,7 @@ alias (region, src), (region, dst), (region, region2), (year, year2), (slice, sl
 
 * Mapping sets
 sets
+mCommReg(comm, region)        Commodity to region mapping (to filter out unused cases)
 mSameRegion(region, region)   The same region (used in GLPK)
 mSameSlice(slice, slice)      The same slice (used in GLPK)
 *! technology:input
@@ -297,10 +298,10 @@ mvTechRetiredStock(tech, region, year)
 mvTechAct(tech, region, year, slice)
 mvTechInp(tech, comm, region, year, slice)
 mvTechOut(tech, comm, region, year, slice)
-mvTechOutS(tech, comm, region, year, slice)
+*mvTechOutS(tech, comm, region, year, slice)
 mvTechAInp(tech, comm, region, year, slice)
 mvTechAOut(tech, comm, region, year, slice)
-mvTechAOutS(tech, comm, region, year, slice)
+*mvTechAOutS(tech, comm, region, year, slice)
 mvDemInp(comm, region, year, slice)
 mvBalance(comm, region, year, slice)
 mvInpTot(comm, region, year, slice)
@@ -356,15 +357,11 @@ vTechAct(tech, region, year, slice)                  Activity level of technolog
 vTechInp(tech, comm, region, year, slice)            Input level
 *@ mvTechOut(tech, comm, region, year, slice)
 vTechOut(tech, comm, region, year, slice)            Commodity output from technology - tech timeframe
-*@ mvTechOutS(tech, comm, region, year, slice)
-vTechOutS(tech, comm, region, year, slice)           Commodity output from technology - comm timeframe
 * Auxiliary input & output
 *@ mvTechAInp(tech, comm, region, year, slice)
 vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
 *@ mvTechAOut(tech, comm, region, year, slice)
 vTechAOut(tech, comm, region, year, slice)           Auxiliary commodity output
-*@ mvTechAOutS(tech, comm, region, year, slice)
-vTechAOutS(tech, comm, region, year, slice)           Auxiliary commodity output
 ;
 variables
 *@ mTechInv(tech, region, year)
@@ -1637,8 +1634,6 @@ eqInp2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqOut2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqSupOutTot(comm, region, year, slice)      Supply total output
 eqTechInpTot(comm, region, year, slice)     Technology total input
-*eqTechOutS(tech, comm, region, year, slice) Main output aggregation to comm timeframe
-*eqTechAOutS(tech, comm, region, year, slice) Aux output aggregation to comm timeframe
 eqTechOutTot(comm, region, year, slice)     Technology total output
 eqStorageInpTot(comm, region, year, slice)  Storage total input
 eqStorageOutTot(comm, region, year, slice)  Storage total output

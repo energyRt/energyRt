@@ -43,7 +43,7 @@ setClass("commodity",
     unit = character(),
     agg = data.frame(
       comm = character(),
-      unit = numeric(),
+      unit = character(),
       agg = numeric(),
       stringsAsFactors = FALSE
     ),
