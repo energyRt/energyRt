@@ -340,3 +340,43 @@ setMethod("getHorizon", signature(obj = "model"), function(obj) {
   getHorizon(obj@config)
 })
 
+# Methods ####
+## [[ ####
+#' @export
+setMethod("[[", c("model", "ANY"), function(x, i) {
+  # browser()
+  flatten_mod_data(x@data)[i]
+  }
+)
+
+#' @export
+setMethod("[", c("model", "ANY"), function(x, i) {
+  # browser()
+  flatten_mod_data(x@data)[i]
+}
+)
+
+## $ ####
+#' @export
+setMethod("$", "repository", function(x, name) x@data[[name]])
+
+setReplaceMethod("$", c("repository", "ANY"),
+                 function(x, name, value) {
+                   nm <- names(x@data)
+                   ii <- which(nm == value@name)
+                   if (length(ii) > 0) {
+                     # replace name
+                     nm[ii] <- value@name
+                     x@data[[name]] <- value
+                     names(x@data) <- nm
+                   } else {
+                     x@data[[name]] <- value
+                   }
+                   x
+                 }
+)
+
+## names ####
+#' @export
+#' @family repository
+setMethod("names", "repository", function(x) names(x@data))

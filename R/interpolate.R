@@ -484,16 +484,19 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   #                        interpolation_start_time, len_name)
   # browser()
   # scan all "^p"-parameters for (comm, region)
-  allpar <- names(scen@modInp@parameters)
-  allpar <- allpar[grepl("^p", allpar)] # parameters
-  allpar <- allpar[!grepl("Dummy", allpar)] # drop Dummy-Imp/Exp (for filtering)
-  allpar <- c(allpar, "mSupAva") # add sup with default/missing data
-  mCommReg <- lapply(scen@modInp@parameters[allpar], function(x) {
-    if (!all(c("comm", "region") %in% x@dimSets)) return(NULL)
-    select(x@data, comm, region) %>% unique()
-  }) %>%
-    rbindlist() %>%
-    unique()
+  # allpar <- names(scen@modInp@parameters)
+  # allpar <- allpar[grepl("^p", allpar)] # parameters
+  # allpar <- allpar[!grepl("Dummy", allpar)] # drop Dummy-Imp/Exp (for filtering)
+  # allpar <- c(allpar, "mSupAva") # add sup with default/missing data
+  # mCommReg <- lapply(scen@modInp@parameters[allpar], function(x) {
+  #   if (!all(c("comm", "region") %in% x@dimSets)) return(NULL)
+  #   select(x@data, comm, region) %>% unique()
+  # }) %>%
+  #   rbindlist() %>%
+  #   unique()
+  # browser()
+  mCommReg <- fmCommReg(scen@model, scen@settings@region) %>%
+    filter(region %in% scen@settings@region)
   scen@modInp@parameters[["mCommReg"]] <-
     .dat2par(scen@modInp@parameters[["mCommReg"]], mCommReg)
   rm(mCommReg)

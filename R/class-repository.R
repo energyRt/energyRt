@@ -101,6 +101,16 @@ setMethod("[[", c("repository", "ANY"),
   function(x, name) x@data[[name]]
 )
 
+#' @export
+setMethod("[[", c("repository", "character"),
+          function(x, i) x@data[[i]]
+)
+
+#' @export
+setMethod("[[", c("repository", "numeric"),
+          function(x, i) x@data[[i]]
+)
+
 ## $ ####
 #' @export
 setMethod("$", "repository", function(x, name) x@data[[name]])

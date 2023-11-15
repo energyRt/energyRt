@@ -371,19 +371,20 @@ setMethod("print", "calendar", function(x, ...) {
     select(dtf, -share),
     function(x) length(unique(x))
   ))) {
-    # error - investigate
-    dtf2 <- unique(dtf[[1]])
-    for (i in seq(length = ncol(dtf) - 2) + 1) {
-      ln <- length(unique(dtf[[i]]))
-      dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), ".",
-        unique(dtf[[i]]),
-        sep = ""
-      )
-    }
-    stop(paste('(empty?) time-slices. ("',
-      paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").',
-      sep = ""
-    ))
+    message("Irregular calendar / time series")
+    # # error - investigate
+    # dtf2 <- unique(dtf[[1]])
+    # for (i in seq(length = ncol(dtf) - 2) + 1) {
+    #   ln <- length(unique(dtf[[i]]))
+    #   dtf2 <- paste(c(t(matrix(dtf2, length(dtf2), ln))), ".",
+    #     unique(dtf[[i]]),
+    #     sep = ""
+    #   )
+    # }
+    # stop(paste('(empty?) time-slices. ("',
+    #   paste(dtf2[!(dtf2 %in% ll)], collapse = '", "'), '").',
+    #   sep = ""
+    # ))
   }
 }
 
