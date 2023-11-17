@@ -244,4 +244,27 @@ fmCommReg <- function(m, regions = NULL) {
 
 if (F) {
   fmCommReg(m, regions)
+
+  # ...
+  x <- merge0(dregionyear, mCommSlice) %>%
+    inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+    unique()
+  dim(x); dim(mvBalance)
+  y <- anti_join(x, mvBalance)
+  y$comm %>% unique()
+
+  ###
+  prec@parameters[["mvInpTot"]]@data %>% filter(comm == "CASO_batteries_1_comm")
+  prec@parameters[["mvOutTot"]]@data %>% filter(comm == "CASO_batteries_1_comm")
+  prec@parameters[["mCommReg"]]@data %>% filter(comm == "CASO_batteries_1_comm")
+  .get_data_slot(prec@parameters$mStorageOutTot) %>% filter(comm == "CASO_batteries_1_comm")
+  .get_data_slot(prec@parameters$mTechOutTot) %>% filter(comm == "CASO_batteries_1_comm")
+  prec@parameters[["mvOutTot"]]@data %>% filter(comm == "CASO_batteries_1_comm")
+  grepl("CASO_batteries", prec@set$tech) %>% any()
+  grepl("CASO_batteries_1", prec@set$stg) %>% any()
+  grepl("CASO_batteries_1", prec@set$comm) %>% any()
+
+  mod_2040@data$repo$CASO_batteries_1
+  mod_2040@data$repo$CASO_batteries_1_charger
+  # check filtration on the sampling sage
 }

@@ -1202,6 +1202,9 @@ withinHorizon <- function(obj, settings) {
   # return(T)
   # browser()
   if (inherits(obj, "constraint")) return(NULL)
+  # if (T) { ## Debug
+  #   if (grepl("", obj@name)) browser()
+  # }
   # yrs <- range()
   yrs <- settings@horizon@period
   ret <- NULL # return NULL if not applicable to the object
@@ -1209,7 +1212,8 @@ withinHorizon <- function(obj, settings) {
   sn <- slotNames(obj)
   if (any(sn == "stock")) {
     stock <- obj@stock # !!! add check for interpolation rule or interpolate first
-    if (nrow(stock) > 0 && any(stock$year > min(yrs)) && any(stock$stock > 0)) {
+    if (nrow(stock) > 0 && any(stock$year >= min(yrs)) &&
+        any(stock$stock[!is.na(stock$stock)] > 0)) {
       return(TRUE) # capacity exists within the period
     } else {
       ret <- FALSE
@@ -1276,4 +1280,24 @@ withinHorizon <- function(obj, settings) {
   }
   scen@misc$dropped_data <- dropped
   scen
+}
+
+interpolate_slot <- function(
+    x,
+    keys = c("region", "slice", "comm", "acomm", "tech", "process",
+             "weather", "stg", "sub", "dst", "src"),
+    year_seq = NULL,
+    val = "value"
+) {
+  if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
+  x %>%
+    group_by(
+      across(any_of(keys))
+    ) %>%
+    complete(year = year_seq) %>%
+    mutate(
+      {{val}} := zoo::na.approx(.data[[val]], x = year)
+    ) %>%
+    # as.data.table() %>%
+    ungroup()
 }
