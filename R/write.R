@@ -237,11 +237,16 @@ write.sc <- write_sc
                          interpolation_start_time, len_name)
   rest <- rest + 1
   # mCommSliceOrParent ####
+  # browser()
   l1 <- merge0(.get_data_slot(prec@parameters$comm),
                .get_data_slot(prec@parameters$slice))
-  l2 <- merge0(mCommSlice, mSliceParentChildE)[, c("comm", "slice", "slicep")]
-  l3 <- l2[!duplicated(l2[, c("comm", "slicep")]), c("comm", "slicep")]
-  colnames(l3)[2] <- "slice"
+  # l2 <- merge0(mCommSlice, mSliceParentChildE)[, c("comm", "slice", "slicep")]
+  l2 <- merge0(mCommSlice, mSliceParentChildE) %>%
+    select(all_of(c("comm", "slice", "slicep")))
+  # l3 <- l2[!duplicated(l2[, c("comm", "slicep")]), c("comm", "slicep")]
+  l3 <- l2 %>% select(all_of(c("comm", "slicep"))) %>% unique() %>%
+    rename(slice = slicep)
+  # colnames(l3)[2] <- "slice"
   l3 <- rbind(l1, l3)
   l3 <- l3[!duplicated(l3) & !duplicated(l3, fromLast = TRUE), ]
   l3$slicep <- l3$slice
@@ -860,7 +865,16 @@ write.sc <- write_sc
     dim_mvInpTot <- mvInpTot %>%
       inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
       unique() %>% dim()
-    if (!all(dim_mvInpTot == dim(mvInpTot))) browser() # Debug
+    if (!all(dim_mvInpTot == dim(mvInpTot))) {
+     if (F) browser() # Debug
+      x <- merge0(dregionyear, mCommSlice) %>%
+        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+        unique()
+      y <- anti_join(x, mvBalance)
+      yc <- y$comm %>% unique()
+      warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
+      rm(x, y, yc)
+    }
   }
   prec@parameters[["mvInpTot"]] <-
     .dat2par(prec@parameters[["mvInpTot"]], mvInpTot)
