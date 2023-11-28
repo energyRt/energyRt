@@ -1,11 +1,11 @@
 #' An S4 class to represent scenario, an interpolated and/or solved model.
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot model model.
-#' @slot subset
-#' @slot settings settings.
-#' @slot modInp modInp.
+#' @slot name character. Name of the scenario.
+#' @slot desc character. Description of the scenario.
+#' @slot model model. Model object.
+# @slot subset
+#' @slot settings settings. 
+#' @slot modInp modInp object.
 #' @slot modOut modOut.
 #' @slot source list.
 #' @slot solver list.
@@ -62,8 +62,10 @@ summary.scenario <- function(object, ...) {
   # browser()
   scen <- object
   cat("Scenario:", scen@name, "\n")
+  cat("desc:", scen@desc, "\n")
   cat("Model:", scen@model@name, "\n")
   cat("Interpolated:", scen@status$interpolated, "\n")
+  cat("path:", scen@path, "\n")
   if (scen@status$interpolated) {
     if (!is.null(scen@modOut) && scen@modOut@stage == "solved") {
       cat("Solution status: ", ifelse(scen@status$optimal, "", "NOT "), "optimal\n", sep = "")
@@ -90,6 +92,11 @@ setMethod("summary", signature(object = "scenario"),
           definition = summary.scenario)
 # setMethod("summary", "scenario", summary.scenario)
 
+## show ####
+#' @method show scenario
+#' @export
+#' @family repository
+setMethod("show", "scenario", function(object) summary(object))
 
 # @export
 # setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
@@ -135,7 +142,7 @@ setMethod(
   "add",
   "scenario",
   function(obj, ..., overwrite = FALSE, repo_name = NULL) {
-    stop("'add' method is not yet implemented for scenario.\n",
+    stop("'add' method is not implemented yet for scenario.\n",
          "You can add objects to a new scenario on 'interpolation' stage.")
   }
 )

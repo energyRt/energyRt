@@ -461,7 +461,7 @@ newTechnology <- function(
 #' @param ... slot-names with data to update (see `newTechnology`)
 #'
 #' @rdname technology
-#' @family update technology
+#' @family update technology process
 #' @method update technology
 #' @export
 setMethod("update", "technology", function(object, ...) {

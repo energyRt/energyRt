@@ -219,14 +219,14 @@ print.config <- function(x) {
       cat("\n")
     }
   }
-  for (i in c("region", "year", "horizon", "slice")) {
-    if (is.null(slot(x, i))) {
-      cat("There is no ", i, "\n", sep = "")
-    } else {
-      cat(i, ":\n", sep = "")
-      print(slot(x, i))
-    }
-  }
+  # for (i in c("region", "horizon")) {
+  #   if (is.null(slot(x, i))) {
+  #     # cat("There is no ", i, "\n", sep = "")
+  #   } else {
+  #     cat(i, ":\n", sep = "")
+  #     print(slot(x, i))
+  #   }
+  # }
   if_print_data_frame(x, "debug")
   if_print_data_frame(x, "discount")
   # if_print_data_frame(x, 'tax')

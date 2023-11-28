@@ -251,4 +251,4 @@ Create object of class `technology`.
 
 \concept{technology}
 \concept{technology, process}
-\concept{update technology}
+\concept{update technology process}
