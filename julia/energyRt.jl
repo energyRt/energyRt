@@ -461,7 +461,7 @@ print(" ", Dates.format(now(), "HH:MM:SS"), "
 ")
 # eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)
 print("eqBal(comm, region, year, slice)...")
-@constraint(model, [(c, r, y, s) in mvBalance], vBalance[(c,r,y,s)]*(if haskey(pSliceWeight, (s)); pSliceWeight[(s)]; else pSliceWeightDef; end)  ==  (if (c,r,y,s) in mvOutTot; vOutTot[(c,r,y,s)]; else 0; end;)-(if (c,r,y,s) in mvInpTot; vInpTot[(c,r,y,s)]; else 0; end;)); 
+@constraint(model, [(c, r, y, s) in mvBalance], vBalance[(c,r,y,s)]  ==  (if (c,r,y,s) in mvOutTot; vOutTot[(c,r,y,s)]; else 0; end;)-(if (c,r,y,s) in mvInpTot; vInpTot[(c,r,y,s)]; else 0; end;)); 
 print(" ", Dates.format(now(), "HH:MM:SS"), "
 ")
 # eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
@@ -516,12 +516,12 @@ print(" ", Dates.format(now(), "HH:MM:SS"), "
 ")
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
 print("eqTaxCost(comm, region, year)...")
-@constraint(model, [(c, r, y) in mTaxCost], vTaxCost[(c,r,y)]  ==  sum((if haskey(pTaxCostOut, (c,r,y,s)); pTaxCostOut[(c,r,y,s)]; else pTaxCostOutDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostInp, (c,r,y,s)); pTaxCostInp[(c,r,y,s)]; else pTaxCostInpDef; end)*vInpTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvInpTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostBal, (c,r,y,s)); pTaxCostBal[(c,r,y,s)]; else pTaxCostBalDef; end)*(if haskey(pSliceWeight, (s)); pSliceWeight[(s)]; else pSliceWeightDef; end)*vBalance[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvBalance && (c,s) in mCommSlice))); 
+@constraint(model, [(c, r, y) in mTaxCost], vTaxCost[(c,r,y)]  ==  sum((if haskey(pTaxCostOut, (c,r,y,s)); pTaxCostOut[(c,r,y,s)]; else pTaxCostOutDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostInp, (c,r,y,s)); pTaxCostInp[(c,r,y,s)]; else pTaxCostInpDef; end)*vInpTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvInpTot && (c,s) in mCommSlice))+sum((if haskey(pTaxCostBal, (c,r,y,s)); pTaxCostBal[(c,r,y,s)]; else pTaxCostBalDef; end)*vBalance[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvBalance && (c,s) in mCommSlice))); 
 print(" ", Dates.format(now(), "HH:MM:SS"), "
 ")
 # eqSubsCost(comm, region, year)$mSubCost(comm, region, year)
 print("eqSubsCost(comm, region, year)...")
-@constraint(model, [(c, r, y) in mSubCost], vSubsCost[(c,r,y)]  ==  sum((if haskey(pSubCostOut, (c,r,y,s)); pSubCostOut[(c,r,y,s)]; else pSubCostOutDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice))+sum((if haskey(pSubCostInp, (c,r,y,s)); pSubCostInp[(c,r,y,s)]; else pSubCostInpDef; end)*vInpTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvInpTot && (c,s) in mCommSlice))+sum((if haskey(pSubCostBal, (c,r,y,s)); pSubCostBal[(c,r,y,s)]; else pSubCostBalDef; end)*(if haskey(pSliceWeight, (s)); pSliceWeight[(s)]; else pSliceWeightDef; end)*vBalance[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvBalance && (c,s) in mCommSlice))); 
+@constraint(model, [(c, r, y) in mSubCost], vSubsCost[(c,r,y)]  ==  sum((if haskey(pSubCostOut, (c,r,y,s)); pSubCostOut[(c,r,y,s)]; else pSubCostOutDef; end)*vOutTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvOutTot && (c,s) in mCommSlice))+sum((if haskey(pSubCostInp, (c,r,y,s)); pSubCostInp[(c,r,y,s)]; else pSubCostInpDef; end)*vInpTot[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvInpTot && (c,s) in mCommSlice))+sum((if haskey(pSubCostBal, (c,r,y,s)); pSubCostBal[(c,r,y,s)]; else pSubCostBalDef; end)*vBalance[(c,r,y,s)] for s in slice if ((c,r,y,s) in mvBalance && (c,s) in mCommSlice))); 
 print(" ", Dates.format(now(), "HH:MM:SS"), "
 ")
 # eqObjective

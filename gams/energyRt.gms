@@ -1649,7 +1649,8 @@ eqBalFx(comm, region, year, slice)$meqBalFx(comm, region, year, slice)..
   vBalance(comm, region, year, slice) =e= 0;
 
 eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
-  vBalance(comm, region, year, slice) * pSliceWeight(slice)
+  vBalance(comm, region, year, slice)
+* pSliceWeight(slice)
   =e=
   vOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
   -
@@ -1660,7 +1661,7 @@ eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)..
 *         * pYearFraction(year)
          =e=
          pSliceWeight(slice) *
-         vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice)
+           vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice)
          + vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
          + vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
          + pSliceWeight(slice) *
@@ -1694,13 +1695,13 @@ eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)..
 *        * pYearFraction(year)
         =e=
         pSliceWeight(slice) *
-        vDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)
-      + vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice)
-      + vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
-      + vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
-      + vExportTot(comm, region, year, slice)$mExport(comm, region, year, slice)
-      + vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)
-      + pSliceWeight(slice) *
+          vDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)
+        + vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice)
+        + vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
+        + vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
+        + vExportTot(comm, region, year, slice)$mExport(comm, region, year, slice)
+        + vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)
+        + pSliceWeight(slice) *
         sum(slicep$(mSliceParentChild(slicep, slice)
                     and
                     mvInp2Lo(comm, region, year, slicep, slice)
@@ -1860,7 +1861,7 @@ eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
              )
        + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)),
              pTaxCostBal(comm, region, year, slice)
-             * pSliceWeight(slice)
+*             * pSliceWeight(slice)
              * vBalance(comm, region, year, slice)
              )
          ;
@@ -1876,7 +1877,7 @@ eqSubsCost(comm, region, year)$mSubCost(comm, region, year)..
         )
       + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)),
             pSubCostBal(comm, region, year, slice)
-            * pSliceWeight(slice)
+*            * pSliceWeight(slice)
             * vBalance(comm, region, year, slice))
          ;
 

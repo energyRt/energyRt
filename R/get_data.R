@@ -8,7 +8,7 @@ getData <- function(...) UseMethod("getData")
 #' @param valueColumn logical, if TRUE will return variables and parameters with 'value' column (to filter sets and mappings).
 #' @param dfDim logical, if TRUE returns dimension _dim_.
 #' @param dfNames logical, when TRUE returns names of the data frame column.
-#' @param asMatrix return results as a matric (not implemented).
+#' @param asMatrix return results as a matrix (not implemented).
 #' @param setsNames_ regular expression pattern for names of sets which will be included in search.
 #' @param allSets logical, if TRUE _and_ operator should be used in search the sets, _or_ will be used if FALSE.
 #' @param ignore.case grepl parameter for matching names.
@@ -18,22 +18,26 @@ getData <- function(...) UseMethod("getData")
 #' @export
 findData <- function(scen, dataType = c("parameters", "variables"),
                      setsNames_ = NULL, valueColumn = TRUE,
-                     allSets = TRUE, ignore.case = FALSE, # anyOfTheSets = !allSets,
+                     allSets = TRUE, ignore.case = FALSE,
+                     # anyOfTheSets = !allSets,
                      add_weights = "auto",
-                     dropEmpty = TRUE, dfDim = TRUE, dfNames = TRUE, asMatrix = FALSE) {
-  ll <- list()
-  lt <- list()
-
+                     dropEmpty = TRUE,
+                     dfDim = TRUE, dfNames = TRUE,
+                     asMatrix = FALSE) {
+  ll <- lt <- list()
+  # browser()
   # 1 Parameters
   ii <- dataType == "parameters"
   if (any(ii)) {
     dataType <- dataType[!ii]
-    dat <- scen@modInp@parameters
-    lt <- lapply(dat, function(x) {
-      if (dim(x@data)[1] > 0 || !dropEmpty) {
-        list(
-          dim = dim(x@data),
-          names = names(x@data)
+    # dat <- scen@modInp@parameters
+    lt <- lapply(scen@modInp@parameters, function(x) {
+      # if (dim(x@data)[1] > 0 || !dropEmpty) {
+      qu <- get_lazy_data(x, slot = "data")
+      if (nrow(qu) > 0 || !dropEmpty) {
+          list(
+          dim = dim(qu),
+          names = names(qu)
         )
       }
     })
@@ -43,21 +47,35 @@ findData <- function(scen, dataType = c("parameters", "variables"),
   # 2. Variables
   ii <- dataType == "variables"
   if (any(ii)) {
+    lt <- list()
     dataType <- dataType[!ii]
-    dat <- scen@modOut@variables
-    lt <- lapply(dat, function(x) {
-      if (dim(x)[1] > 0 || !dropEmpty) {
-        list(
-          dim = if (dfDim) dim(x) else NULL,
-          names = if (dfNames) names(x) else NULL
+    # dat <- scen@modOut@variables
+    # lt <- lapply(dat, function(x) {
+    #   if (dim(x)[1] > 0 || !dropEmpty) {
+    #     list(
+    #       dim = if (dfDim) dim(x) else NULL,
+    #       names = if (dfNames) names(x) else NULL
+    #     )
+    #   }
+    # })
+    for (v in names(scen@modOut@variables)) {
+      # if (dim(x)[1] > 0 || !dropEmpty) {
+      qu <- get_lazy_data(scen@modOut, slot = "variables", element = v)
+      # nr <- get_lazy_data(scen@modOut, slot = "variables", element = v) |> nrow()
+      if (nrow(qu) > 0 || !dropEmpty) {
+        lt[[v]] <- list(
+          dim = if (dfDim) dim(qu) else NULL,
+          names = if (dfNames) names(qu) else NULL
         )
       }
-    })
+    # })
+    }
     ll <- c(ll, lt)
   }
 
   if (valueColumn) {
-    ii <- sapply(ll, function(x) any(grepl("^value$", x$names, ignore.case = ignore.case)))
+    ii <- sapply(ll, function(x) any(grepl("^value$", x$names,
+                                           ignore.case = ignore.case)))
     ll <- ll[ii]
   }
 
@@ -65,9 +83,17 @@ findData <- function(scen, dataType = c("parameters", "variables"),
   if (length(setsNames_) > 0) {
     ii <- sapply(ll, function(x) {
       if (allSets) {
-        all(sapply(setsNames_, function(y) any(grepl(y, x$names, ignore.case = ignore.case))))
+        all(
+          sapply(setsNames_, function(y) any(grepl(y, x$names,
+                                                   ignore.case = ignore.case))
+                )
+          )
       } else {
-        any(sapply(setsNames_, function(y) any(grepl(y, x$names, ignore.case = ignore.case))))
+        any(
+          sapply(setsNames_, function(y) any(grepl(y, x$names,
+                                                   ignore.case = ignore.case))
+                 )
+          )
       }
     })
     ll <- ll[ii]
@@ -86,7 +112,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 
 #' Extracts information from scenario objects, based on filters.
 #'
-#' @param scen Object scenario or list with scenarios.
+#' @param scen Object scenario or list of scenarios.
 #' @param ... filters for various sets (setname = c(val1, val2) or setname_ = "matching pattern"), see details.
 #' @param name character vector with names of parameters and/or variables.
 #' @param merge if TRUE, the search results will be merged in one dataframe; the named list will be returned if FALSE.
@@ -122,8 +148,11 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                     newNames = NULL, newValues = NULL, na.rm = FALSE,
                     digits = NULL, drop.zeros = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
-                    asTibble = TRUE, stringsAsFactors = FALSE, yearsAsFactors = FALSE,
-                    scenNameInList = as.logical(length(scen) - 1), verbose = FALSE) {
+                    asTibble = TRUE, stringsAsFactors = FALSE,
+                    yearsAsFactors = FALSE,
+                    drop_duplicated_scenarios = TRUE,
+                    scenNameInList = as.logical(length(scen) - 1),
+                    verbose = FALSE) {
   arg <- list(...)
   argnam <- names(arg)
   stopifnot(!any(duplicated(argnam)))
@@ -161,15 +190,19 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
     names(scen) <- nm
     ii <- duplicated(nm)
     if (any(ii)) {
-      warning("Dropping duplicated scenarios: ", nm[ii])
-      scen <- scen[!ii]
+      if (drop_duplicated_scenarios) {
+        warning("Dropping duplicated scenarios: ", nm[ii])
+        scen <- scen[!ii]
+      } else {
+        if (verbose) cat("Found scenarios with identical names: ", nm[ii], "\n")
+      }
     }
   }
 
   # Identify filters
   ii <- grepl("name_", argnam, ignore.case = ignore.case)
   if (any(ii)) {
-    if (!is.null(name)) stop("Duplicate parameter 'name' ('name_')")
+    if (!is.null(name)) stop("Duplicated parameter 'name' ('name_')")
     name_ <- arg[ii][[1]]
     arg <- arg[!ii]
   } else {
@@ -183,13 +216,14 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
   nflt_ <- names(flt_)
   nflt0 <- sub("_$", "", nflt_)
   ii <- (nflt %in% nflt0)
-  if (any(ii)) stop("Duplicate parameters ", nflt_[ii])
+  if (any(ii)) stop("Duplicated parameters ", nflt_[ii])
   nflt1 <- c(nflt, nflt0)
 
   # Fishing for the data in scenarios
   ll <- list()
   parvar <- c(parameters = parameters, variables = variables)
-  for (sc in names(scen)) { # loop over scenarios
+  for (s in 1:length(scen)) { # loop over scenarios
+    sc <- names(scen)[s]
     # Temporary solution for missing "comm" in "pDemand"
     # browser()
     # if(is.null(scen[[sc]]@modInp@parameters$pDemand@data$comm)) {scen[[sc]] <- .addComm2pDemand(scen[[sc]])}
@@ -200,7 +234,8 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       } else {
         sets_names <- NULL
       }
-      lt <- findData(scen[[sc]], dataType = datype, setsNames_ = sets_names, ignore.case = ignore.case)
+      lt <- findData(scen[[s]], dataType = datype, setsNames_ = sets_names,
+                     ignore.case = ignore.case)
       pvNames <- names(lt)
       # filter for variable/parameter names
       if (!is.null(name)) {
@@ -252,27 +287,36 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       } else {
         for (pv in pvNames) { # selected pars/vars
           if (datype == "parameters") {
-            if (!is.null(scen[[sc]]@modInp@parameters[[pv]])) {
-              dat <- scen[[sc]]@modInp@parameters[[pv]]@data
-              if (verbose) cat("   ", pv, "\n")
-            } else {
-              warning("Parameter '", pv, "' was not found.")
-            }
+            dat <- get_lazy_data(scen[[s]]@modInp@parameters[[pv]],
+                                 slot = "data") |>
+              collect() # temporary. ToDo: rewrite filter-algo for lazy-data
+            # if (!is.null(scen[[sc]]@modInp@parameters[[pv]])) {
+            # if (!is.null(qu) {
+              # dat <- scen[[sc]]@modInp@parameters[[pv]]@data
+              # if (verbose) cat("   ", pv, "\n")
+            # } else {
+              # warning("Parameter '", pv, "' was not found.")
+            # }
           } else {
-            dat <- scen[[sc]]@modOut@variables[[pv]]
+            # dat <- scen[[sc]]@modOut@variables[[pv]]
+            dat <- get_lazy_data(scen[[s]]@modOut, slot = "variables",
+                                 element = pv) |>
+              collect() # temporary. ToDo: rewrite filter-algo for lazy-data
           }
           dim1 <- dim(dat)[1]
           if (is.null(dim1)) dim1 <- 0
           kk <- rep(TRUE, dim1)
           # browser()
           if (length(nflt1) > 0) { # the data should be filtered
+            # browser()
             if (dim1 > 0) { # data exists
               prcl <- names(dat)
               prcl <- prcl[prcl %in% nflt1]
               for (st in prcl) { # selected sets (columns)
                 cl_ <- nflt0[grepl(st, nflt_, ignore.case = ignore.case)] # regex match of sets names (find all comm* etc.) for regex match selection
                 for (k in cl_) { # loop over sets for regex filtration
-                  kk <- kk & grepl(flt_[[paste0(k, "_")]], dat[[k]], ignore.case = ignore.case)
+                  kk <- kk & grepl(flt_[[paste0(k, "_")]], dat[[k]],
+                                   ignore.case = ignore.case)
                 }
                 cl <- nflt[grepl(st, nflt, ignore.case = ignore.case)] # regex match of sets names (find all comm* etc.) for exact match selection
                 for (k in cl) { # loop over sets/columns for exact filtration
@@ -288,12 +332,15 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
             }
           }
           # browser()
-          if (!is.null(dat[kk, , drop = FALSE]) && nrow(dat[kk, , drop = FALSE]) > 0) {
+          dkk <- dat |> collect() |> filter(kk)
+          if (!is.null(dkk) && nrow(dkk) > 0) {
             nkk <- sum(kk)
-            dat <- dplyr::bind_cols(data.frame(
-              scenario = rep(sc, nkk),
-              name = rep(pv, nkk)
-            ), dat[kk, , drop = FALSE])
+            dat <- dplyr::bind_cols(
+              data.frame(
+                scenario = rep(sc, nkk),
+                name = rep(pv, nkk)
+                ),
+              dkk)
             le <- length(ll) + 1
             nm_ll <- names(ll)
             if (scenNameInList) nm_le <- paste(sc, pv, sep = ".") else nm_le <- pv
@@ -421,7 +468,9 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       for (i in 1:length(ll)) {
         if (!is.null(ll[[i]]$year)) {
           if (yearsAsFactors) {
-            if (class(ll[[i]]$year) != "factor") ll[[i]]$year <- .crs2fct(ll[[i]]$year)
+            if (class(ll[[i]]$year) != "factor") {
+              ll[[i]]$year <- .crs2fct(ll[[i]]$year)
+            }
           } else {
             ll[[i]]$year <- .crs2int(ll[[i]]$year)
           }

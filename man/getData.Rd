@@ -22,6 +22,7 @@ getData(
   asTibble = TRUE,
   stringsAsFactors = FALSE,
   yearsAsFactors = FALSE,
+  drop_duplicated_scenarios = TRUE,
   scenNameInList = as.logical(length(scen) - 1),
   verbose = FALSE
 )
@@ -43,12 +44,13 @@ get_data(
   asTibble = TRUE,
   stringsAsFactors = FALSE,
   yearsAsFactors = FALSE,
+  drop_duplicated_scenarios = TRUE,
   scenNameInList = as.logical(length(scen) - 1),
   verbose = FALSE
 )
 }
 \arguments{
-\item{scen}{Object scenario or list with scenarios.}
+\item{scen}{Object scenario or list of scenarios.}
 
 \item{name}{character vector with names of parameters and/or variables.}
 

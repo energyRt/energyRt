@@ -921,7 +921,7 @@ write.sc <- write_sc
       inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
       unique() %>% dim()
     if (!all(dim_mvBalance == dim(mvBalance))) {
-      browser() # Debug
+      # browser() # !!! Debug
       x <- merge0(dregionyear, mCommSlice) %>%
         inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
         unique()

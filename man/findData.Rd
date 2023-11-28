@@ -37,7 +37,7 @@ findData(
 
 \item{dfNames}{logical, when TRUE returns names of the data frame column.}
 
-\item{asMatrix}{return results as a matric (not implemented).}
+\item{asMatrix}{return results as a matrix (not implemented).}
 }
 \value{
 list with variables and parameters name, each includes _dim_ and _names_ character vectors.

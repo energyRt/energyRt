@@ -65,7 +65,7 @@ mysolver <- "GLPK"
 
 # Load required packages
 # devtools::install_github("energyRt/energyRt", ref = "dev")
-library(energyRt)
+# library(energyRt)
 # devtools::load_all(".")
 library(scales)
 library(sf)
@@ -298,7 +298,7 @@ COA <- newCommodity(
     unit = "kt/PJ", # the unit of emissions for refference
     emis = 100 # i.e. 100 kt of CO2 emmitted per one unit of energy (1 PJ)
   ),
-  slice = "ANNUAL" # 'ANNUAL' means no sub-annual granularity for the commodity
+  timeframe = "ANNUAL" # 'ANNUAL' means no sub-annual granularity for the commodity
   # color = "brown" # reserved for output figures, optional
 )
 
@@ -309,7 +309,7 @@ OIL <- newCommodity(
     comm = "CO2",
     emis = 80
   ),
-  slice = "ANNUAL"
+  timeframe = "ANNUAL"
 )
 
 GAS <- newCommodity(
@@ -320,36 +320,36 @@ GAS <- newCommodity(
     unit = "kt/PJ",
     emis = 70
   ),
-  slice = "MONTH" # This commodity will appear in month-level equations
+  timeframe = "MONTH" # This commodity will appear in month-level equations
 )
 
 CH4 <- newCommodity(
   name = "CH4",
   desc = "Methan emmisions",
-  slice = "MONTH"
+  timeframe = "MONTH"
 )
 
 BIO <- newCommodity(
   name = "BIO",
   desc = "Generic biomass, all types",
-  slice = "ANNUAL"
+  timeframe = "ANNUAL"
 )
 
 # More energy commodities with less details
-ELC <- newCommodity("ELC", desc = "Electricity", slice = "HOUR")
-HVE <- newCommodity("HVE", desc = "High voltage electricity", slice = "HOUR")
-UHV <- newCommodity("UHV", desc = "Ultra high voltage electricity", slice = "HOUR")
-NUC <- newCommodity("NUC", desc = "Nuclear fuel", slice = "ANNUAL")
-HYD <- newCommodity("HYD", desc = "Hydro energy", slice = "HOUR")
-SOL <- newCommodity("SOL", desc = "Solar energy", slice = "HOUR")
-WIN <- newCommodity("WIN", desc = "Wind energy", slice = "HOUR")
+ELC <- newCommodity("ELC", desc = "Electricity", timeframe = "HOUR")
+HVE <- newCommodity("HVE", desc = "High voltage electricity", timeframe = "HOUR")
+UHV <- newCommodity("UHV", desc = "Ultra high voltage electricity", timeframe = "HOUR")
+NUC <- newCommodity("NUC", desc = "Nuclear fuel", timeframe = "ANNUAL")
+HYD <- newCommodity("HYD", desc = "Hydro energy", timeframe = "HOUR")
+SOL <- newCommodity("SOL", desc = "Solar energy", timeframe = "HOUR")
+WIN <- newCommodity("WIN", desc = "Wind energy", timeframe = "HOUR")
 
 # Emissions
-CO2 <- newCommodity("CO2", desc = "Carbon dioxide emissions", slice = "HOUR")
-NOX <- newCommodity("NOX", desc = "Nitrogen oxide emissions", slice = "HOUR")
-SO2 <- newCommodity("SO2", desc = "Sulfur dioxide emissions", slice = "MONTH")
-HG <- newCommodity("HG", desc = "Mercury emissions", slice = "HOUR")
-PM <- newCommodity("PM", desc = "Particulate matter emissions", slice = "ANNUAL")
+CO2 <- newCommodity("CO2", desc = "Carbon dioxide emissions", timeframe = "HOUR")
+NOX <- newCommodity("NOX", desc = "Nitrogen oxide emissions", timeframe = "HOUR")
+SO2 <- newCommodity("SO2", desc = "Sulfur dioxide emissions", timeframe = "MONTH")
+HG <- newCommodity("HG", desc = "Mercury emissions", timeframe = "HOUR")
+PM <- newCommodity("PM", desc = "Particulate matter emissions", timeframe = "ANNUAL")
 ```
 
 ## The final demand
@@ -478,8 +478,8 @@ SUP_COA <- newSupply(
     year = c(2015, 2030, 2050),
     ava.up = c(1000, 2000, 1000), # the upper bound on availability of the commodity
     cost = c(convert("USD/tce", "MUSD/PJ", c(50, 60, 70) * .7)) # assumed price per 1PJ
-  ),
-  slice = "ANNUAL"
+  )
+  # timeframe = "ANNUAL"
 )
 ```
 
@@ -505,8 +505,8 @@ SUP_GAS <- newSupply(
     year = c(2015, 2030, 2050),
     ava.up = c(1000, 2000, 1000),
     cost = c(convert("USD/tce", "MUSD/PJ", c(60, 70, 80) * .7))
-  ),
-  slice = "ANNUAL"
+  )
+  # timeframe = "ANNUAL"
 )
 
 SUP_NUC <- newSupply(
@@ -514,8 +514,8 @@ SUP_NUC <- newSupply(
   commodity = "NUC",
   availability = list(
     cost = convert("USD/MWh", "MUSD/PJ", 4) # assumed
-  ),
-  slice = "ANNUAL"
+  )
+  # timeframe = "ANNUAL"
 )
 
 RES_HYD <- newSupply(
@@ -599,7 +599,7 @@ ECOA <- newTechnology(
   olife = list(
     olife = 30
   ),
-  slice = "HOUR"
+  timeframe = "HOUR"
 )
 draw(ECOA)
 ```
@@ -656,7 +656,7 @@ EGAS <- newTechnology(
   olife = list(
     olife = 30
   ),
-  slice = "HOUR"
+  timeframe = "HOUR"
 )
 draw(EGAS)
 ```
@@ -716,7 +716,7 @@ EBIO <- newTechnology(
   olife = list(
     olife = 30
   ),
-  slice = "HOUR"
+  timeframe = "HOUR"
 )
 draw(EBIO)
 ```
@@ -764,7 +764,7 @@ ENUC <- newTechnology(
   olife = list(
     olife = 60
   ),
-  slice = "HOUR"
+  timeframe = "HOUR"
 )
 draw(ENUC)
 ```
@@ -814,7 +814,7 @@ EHYD <- newTechnology(
   olife = list(
     olife = 80
   ),
-  slice = "HOUR"
+  timeframe = "HOUR"
 )
 draw(EHYD)
 ```
@@ -881,7 +881,7 @@ if (F) { # test
 set.seed(1111)
 WWIN <- newWeather("WWIN",
   desc = "Wind availability factor",
-  slice = "HOUR",
+  timeframe = "HOUR",
   weather = data.frame(
     region = rep(reg_names, each = nslc),
     year = 2015,
@@ -892,7 +892,7 @@ WWIN <- newWeather("WWIN",
 
 WSOL <- newWeather("WSOL",
   desc = "Solar radiation index",
-  slice = "HOUR",
+  timeframe = "HOUR",
   weather = data.frame(
     region = rep(reg_names, each = nslc),
     year = 2015,
@@ -1367,7 +1367,7 @@ scen_BASE_gams <- write_sc(
   solver = GAMS,
   # solver = GAMS_simplex,
   # solver = GAMS_barrier,
-  tmp.dir = "solwork/UTOPIA/"
+  tmp.dir = "solwork/UTOPIA-tmp/"
   # tmp.dir = "tmp/solwork/UTOPIA_BASE_GAMS_test"
 )
 scen_BASE_gams@misc$tmp.dir # directory
@@ -1397,7 +1397,7 @@ scen_BASE_jl <- write_sc(scen_BASE_int,
 solve(scen_BASE_gams, wait = F)
 solve(scen_BASE_py, wait = FALSE)
 solve(scen_BASE_glpk, wait = FALSE)
-solve(scen_BASE_jl, wait = F)
+solve(scen_BASE_jl, wait = T)
 
 ## Read solution (wait until solved)
 scen_BASE_gams <- read(scen_BASE_gams)
@@ -1424,6 +1424,33 @@ name = "vObjective", merge = TRUE
 )
 ```
 
+## CO2 cap
+```{r, eval=FALSE}
+emis_co2 <- getData(scen_BASE, "vBalance", comm = "CO2", merge = T) %>%
+  group_by(scenario, comm, year) %>%
+  summarize(value = sum(value, na.rm = T)) %>%
+  filter(year == 2030)
+
+CO2CAP <- newConstraint(
+  name = "CO2CAP",
+  eq = "<=",
+  for.each = data.frame(
+    # region = CO2_cap_national$V1,
+    year = c(2030, 2060),
+    comm = "CO2"
+  ),
+  term1 = list(
+    variable = "vBalance"
+  ),
+  rhs = data.frame(
+    # region = CO2_cap$V1,
+    year = c(2030, 2060),
+    rhs = round(emis_co2$value, -4) * c(1, .5)
+  )
+)
+
+```
+
 
 ## Myopic run
 ```{r BASE, eval=T, echo=T}
@@ -1444,7 +1471,5 @@ scen_BASE_myopic <- write_sc(
 )
 scen_BASE_gams@misc$tmp.dir # directory
 solve(scen_BASE_myopic, wait = F)
-
-
 
 ```

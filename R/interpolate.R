@@ -43,6 +43,11 @@ interpolate_model <- function(object, ...) { #- returns class scenario
 
   if (!is.null(arg$name)) {scen@name <- arg$name; arg$name <- NULL}
   if (!is.null(arg$desc)) {scen@desc <- arg$desc; arg$desc <- NULL}
+  if (!is.null(arg$path)) {scen@path <- arg$path; arg$path <- NULL}
+  if (!is.null(arg$inMemory)) {
+    scen@inMemory <- arg$inMemory;
+    arg$inMemory <- NULL
+  }
   # if (is.null(arg$startYear) != is.null(arg$fixTo)) {
   #   stop("startYear && fixTo have to define both (or not define both")
   # }
@@ -755,6 +760,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 }
 
 .add_discount_approxim <- function(scen, approxim) {
+  # browser()
   approxim$discountFactor <- .add_dropped_zeros(scen@modInp,
                                                 "pDiscountFactor", FALSE)
   approxim$discount <- .add_dropped_zeros(scen@modInp, "pDiscount", FALSE)

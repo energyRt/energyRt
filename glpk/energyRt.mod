@@ -589,7 +589,7 @@ s.t.  eqBalUp{(c, r, y, s) in meqBalUp}: vBalance[c,r,y,s] <=  0;
 
 s.t.  eqBalFx{(c, r, y, s) in meqBalFx}: vBalance[c,r,y,s]  =  0;
 
-s.t.  eqBal{(c, r, y, s) in mvBalance}: vBalance[c,r,y,s]*pSliceWeight[s]  =  sum{FORIF: (c,r,y,s) in mvOutTot} (vOutTot[c,r,y,s])-sum{FORIF: (c,r,y,s) in mvInpTot} (vInpTot[c,r,y,s]);
+s.t.  eqBal{(c, r, y, s) in mvBalance}: vBalance[c,r,y,s]  =  sum{FORIF: (c,r,y,s) in mvOutTot} (vOutTot[c,r,y,s])-sum{FORIF: (c,r,y,s) in mvInpTot} (vInpTot[c,r,y,s]);
 
 s.t.  eqOutTot{(c, r, y, s) in mvOutTot}: vOutTot[c,r,y,s]  =  pSliceWeight[s]*sum{FORIF: (c,r,y,s) in mDummyImport} (vDummyImport[c,r,y,s])+sum{FORIF: (c,r,y,s) in mSupOutTot} (vSupOutTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mEmsFuelTot} (vEmsFuelTot[c,r,y,s])+pSliceWeight[s]*sum{FORIF: (c,r,y,s) in mAggOut} (vAggOutTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mTechOutTot} (vTechOutTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mStorageOutTot} (vStorageOutTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mImport} (vImportTot[c,r,y,s])+sum{FORIF: (c,r,y,s) in mvTradeIrAOutTot} (vTradeIrAOutTot[c,r,y,s])+pSliceWeight[s]*sum{FORIF: (c,r,y,s) in mOutSub} (sum{sp in slice:(((sp,s) in mSliceParentChild and (c,r,y,sp,s) in mvOut2Lo))}(vOut2Lo[c,r,y,sp,s]));
 
@@ -611,9 +611,9 @@ s.t.  eqStorageOutTot{(c, r, y, s) in mStorageOutTot}: vStorageOutTot[c,r,y,s]  
 
 s.t.  eqCost{(r, y) in mvTotalCost}: vTotalCost[r,y]  =  sum{t in tech:((t,r,y) in mTechEac)}(vTechEac[t,r,y])+sum{t in tech:((t,r,y) in mTechOMCost)}(vTechOMCost[t,r,y])+sum{s1 in sup:((s1,r,y) in mvSupCost)}(vSupCost[s1,r,y])+sum{c in comm,s in slice:((c,r,y,s) in mDummyImport)}(pDummyImportCost[c,r,y,s]*pSliceWeight[s]*vDummyImport[c,r,y,s])+sum{c in comm,s in slice:((c,r,y,s) in mDummyExport)}(pDummyExportCost[c,r,y,s]*pSliceWeight[s]*vDummyExport[c,r,y,s])+sum{c in comm:((c,r,y) in mTaxCost)}(vTaxCost[c,r,y])-sum{c in comm:((c,r,y) in mSubCost)}(vSubsCost[c,r,y])+sum{st1 in stg:((st1,r,y) in mStorageOMCost)}(vStorageOMCost[st1,r,y])+sum{st1 in stg:((st1,r,y) in mStorageEac)}(vStorageEac[st1,r,y])+sum{FORIF: (r,y) in mvTradeCost} (vTradeCost[r,y])+sum{FORIF: (r,y) in mvTotalUserCosts} (vTotalUserCosts[r,y]);
 
-s.t.  eqTaxCost{(c, r, y) in mTaxCost}: vTaxCost[c,r,y]  =  sum{s in slice:(((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))}(pTaxCostOut[c,r,y,s]*vOutTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))}(pTaxCostInp[c,r,y,s]*vInpTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvBalance and (c,s) in mCommSlice))}(pTaxCostBal[c,r,y,s]*pSliceWeight[s]*vBalance[c,r,y,s]);
+s.t.  eqTaxCost{(c, r, y) in mTaxCost}: vTaxCost[c,r,y]  =  sum{s in slice:(((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))}(pTaxCostOut[c,r,y,s]*vOutTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))}(pTaxCostInp[c,r,y,s]*vInpTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvBalance and (c,s) in mCommSlice))}(pTaxCostBal[c,r,y,s]*vBalance[c,r,y,s]);
 
-s.t.  eqSubsCost{(c, r, y) in mSubCost}: vSubsCost[c,r,y]  =  sum{s in slice:(((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))}(pSubCostOut[c,r,y,s]*vOutTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))}(pSubCostInp[c,r,y,s]*vInpTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvBalance and (c,s) in mCommSlice))}(pSubCostBal[c,r,y,s]*pSliceWeight[s]*vBalance[c,r,y,s]);
+s.t.  eqSubsCost{(c, r, y) in mSubCost}: vSubsCost[c,r,y]  =  sum{s in slice:(((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))}(pSubCostOut[c,r,y,s]*vOutTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))}(pSubCostInp[c,r,y,s]*vInpTot[c,r,y,s])+sum{s in slice:(((c,r,y,s) in mvBalance and (c,s) in mCommSlice))}(pSubCostBal[c,r,y,s]*vBalance[c,r,y,s]);
 
 s.t.  eqObjective: vObjective  =  sum{r in region,y in year:((r,y) in mvTotalCost)}(vTotalCost[r,y]*pDiscountFactorMileStone[r,y]);
 

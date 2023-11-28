@@ -415,7 +415,7 @@ model.eqBalFx = Constraint(meqBalFx, rule = lambda model, c, r, y, s : model.vBa
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqBal ", end = "")
 # eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)
-model.eqBal = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vBalance[c,r,y,s]*pSliceWeight.get((s))  ==  (model.vOutTot[c,r,y,s] if (c,r,y,s) in mvOutTot else 0)-(model.vInpTot[c,r,y,s] if (c,r,y,s) in mvInpTot else 0));
+model.eqBal = Constraint(mvBalance, rule = lambda model, c, r, y, s : model.vBalance[c,r,y,s]  ==  (model.vOutTot[c,r,y,s] if (c,r,y,s) in mvOutTot else 0)-(model.vInpTot[c,r,y,s] if (c,r,y,s) in mvInpTot else 0));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqOutTot ", end = "")
 # eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
@@ -459,11 +459,11 @@ model.eqCost = Constraint(mvTotalCost, rule = lambda model, r, y : model.vTotalC
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqTaxCost ", end = "")
 # eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)
-model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(pTaxCostOut.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))+sum(pTaxCostInp.get((c,r,y,s))*model.vInpTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))+sum(pTaxCostBal.get((c,r,y,s))*pSliceWeight.get((s))*model.vBalance[c,r,y,s] for s in slice if ((c,r,y,s) in mvBalance and (c,s) in mCommSlice)));
+model.eqTaxCost = Constraint(mTaxCost, rule = lambda model, c, r, y : model.vTaxCost[c,r,y]  ==  sum(pTaxCostOut.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))+sum(pTaxCostInp.get((c,r,y,s))*model.vInpTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))+sum(pTaxCostBal.get((c,r,y,s))*model.vBalance[c,r,y,s] for s in slice if ((c,r,y,s) in mvBalance and (c,s) in mCommSlice)));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqSubsCost ", end = "")
 # eqSubsCost(comm, region, year)$mSubCost(comm, region, year)
-model.eqSubsCost = Constraint(mSubCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubCostOut.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))+sum(pSubCostInp.get((c,r,y,s))*model.vInpTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))+sum(pSubCostBal.get((c,r,y,s))*pSliceWeight.get((s))*model.vBalance[c,r,y,s] for s in slice if ((c,r,y,s) in mvBalance and (c,s) in mCommSlice)));
+model.eqSubsCost = Constraint(mSubCost, rule = lambda model, c, r, y : model.vSubsCost[c,r,y]  ==  sum(pSubCostOut.get((c,r,y,s))*model.vOutTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvOutTot and (c,s) in mCommSlice))+sum(pSubCostInp.get((c,r,y,s))*model.vInpTot[c,r,y,s] for s in slice if ((c,r,y,s) in mvInpTot and (c,s) in mCommSlice))+sum(pSubCostBal.get((c,r,y,s))*model.vBalance[c,r,y,s] for s in slice if ((c,r,y,s) in mvBalance and (c,s) in mCommSlice)));
 if verbose: print(datetime.datetime.now().strftime("%H:%M:%S"), " (", round(time.time() - seconds, 2), " s)", sep = "")
 if verbose: print("eqObjective ", end = "")
 # eqObjective
