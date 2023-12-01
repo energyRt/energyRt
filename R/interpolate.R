@@ -75,7 +75,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   repo_objs <- newRepository("")@permit
   ii <- carg %in% repo_objs
   if (any(ii)) {
-    scen_repo <- newRepository(name = paste0(scen@name, "_repo"), arg[ii][[1]])
+    scen_repo <- newRepository(name = paste0(scen@name, "_repo"), arg[ii])
     scen@model <- add(scen@model, scen_repo); rm(scen_repo)
     arg[ii] <- NULL; carg <- carg[!ii]
   }
