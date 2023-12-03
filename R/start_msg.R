@@ -12,5 +12,22 @@ Thanks for testing and for your patience.
 Please report bugs, issues or suggest improvements here:
     https://github.com/energyRt/energyRt/issues\n",
 "===========================================================")
+  
+  # options
+  options(en.debug = FALSE)
+  options(en.verbose = TRUE)
+  options(en.progress_bar = TRUE)
+  options(en.scenarios_dir = "scenarios/")
+  
+  
+  # environments
+  .initiate_env <- function(e) {
+    if (!exists(e, envir = .GlobalEnv)) {
+      assign(e, new.env(parent = .GlobalEnv), envir = .GlobalEnv)
+    }
+  }
+  .initiate_env(".scen")
+  .initiate_env(".tmp")
+  
 }
 
