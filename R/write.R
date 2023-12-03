@@ -12,10 +12,15 @@
 write_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
   scen <- x
   if (is.null(tmp.dir)) {
-    if (!is.null(scen@misc$tmp.dir)) tmp.dir <- scen@misc$tmp.dir
-  } else {
-    scen@misc$tmp.dir <- tmp.dir
+    if (!is.null(scen@misc$tmp.dir)) {
+      tmp.dir <- scen@misc$tmp.dir
+    } else if (!is.null(scen@path)) {
+      tmp.dir <- file.path(scen@path, "script", solver$lang, solver$solver)
+    }
+    if (is.null(tmp.dir))
+      stop('Either "tmp.dir" or "scenario@path" must be set')
   }
+  scen@misc$tmp.dir <- tmp.dir
   if (F) {} # check if the scenario is interpolated
   if (is.null(solver)) solver <- scen@solver
   .solver_solve(scen, tmp.dir = tmp.dir, solver = solver, ...,
