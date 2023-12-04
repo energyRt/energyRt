@@ -479,11 +479,21 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       interpolation = "back.inter.forth", colName = "rhs"
     )
     # !!! Similar interpolation for LHS is needed
+    # browser()
     yy <- .interp_numpar(stm@rhs, "rhs", xx, approxim2)
     n1 <- colnames(yy)[colnames(yy) != "value"]
-    yy <- yy[(apply(yy[, n1, drop = FALSE], 1, paste0, collapse = "##") %in%
-      apply(stm@for.each[, n1, drop = FALSE], 1, paste0, collapse = "##")), ,
-      drop = FALSE]
+    # yy <- yy[
+    #   (apply(yy[, n1, drop = FALSE], 1,
+    #          paste0, collapse = "##") %in%
+    #      apply(stm@for.each[, n1, drop = FALSE], 1,
+    #            paste0, collapse = "##")
+    #    ), , drop = FALSE]
+    # check:
+    # yy[apply(select(yy, all_of(n1)), 1, paste0, collapse = "##") %in%
+    #     apply(select(stm@for.each, all_of(n1)), 1, paste0, collapse = "##"),]
+    # same using dplyr
+    yy <- yy |> right_join(select(stm@for.each, all_of(n1)))
+
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     # Add mult
     res$equation <- paste0(res$equation, xx@name, "(",
