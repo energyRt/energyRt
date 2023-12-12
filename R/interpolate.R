@@ -1234,6 +1234,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 withinHorizon <- function(obj, settings) {
   # return(T)
   # browser()
+  # if (inherits(obj, "trade")) browser()
   if (inherits(obj, "constraint")) return(NULL)
   # if (T) { ## Debug
   #   if (grepl("", obj@name)) browser()
@@ -1245,11 +1246,13 @@ withinHorizon <- function(obj, settings) {
   sn <- slotNames(obj)
   if (any(sn == "stock")) {
     stock <- obj@stock # !!! add check for interpolation rule or interpolate first
-    if (nrow(stock) > 0 && any(stock$year >= min(yrs)) &&
-        any(stock$stock[!is.na(stock$stock)] > 0)) {
-      return(TRUE) # capacity exists within the period
-    } else {
-      ret <- FALSE
+    if (nrow(stock) > 0) {
+      if (all(is.na(stock$year))) return(TRUE) # years are not defined
+      if (any(stock$year >= min(yrs)) && any(stock$stock[!is.na(stock$stock)] > 0)) {
+        return(TRUE) # capacity exists within the period
+      } else {
+        ret <- FALSE
+      }
     }
   }
   if (any(sn == "end")) {
