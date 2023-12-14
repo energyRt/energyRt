@@ -3003,14 +3003,14 @@ setMethod(
 # =============================================================================#
 
 # ???
-.start_end_fix <- function(approxim, app, als, stock_exist) {
+.start_end_fix <- function(approxim, obj, als, stock_exist) {
   # browser()
   if (is.null(stock_exist)) stock_exist <- data.table()
   stock_exist <- stock_exist[stock_exist$value != 0, ]
   # Start / End year
   dd <- data.table(
     enable = rep(TRUE, length(approxim$region) * length(approxim$year)),
-    app = rep(app@name, length(approxim$region) * length(approxim$year)),
+    obj = rep(obj@name, length(approxim$region) * length(approxim$year)),
     region = rep(approxim$region, length(approxim$year)),
     year = c(t(matrix(rep(approxim$year, length(approxim$region)),
                       length(approxim$year)))),
@@ -3022,15 +3022,15 @@ setMethod(
     year = as.integer(rep(NA, length(approxim$region))),
     stringsAsFactors = FALSE
   )
-  fl <- is.na(app@start$region)
+  fl <- is.na(obj@start$region)
   if (any(fl)) {
     if (sum(fl) != 1) {
-      stop('Wrong start year for "', class(app), '" ', app@name)
+      stop('Wrong start year for "', class(obj), '" ', obj@name)
     }
-    dstart[, "year"] <- app@start[fl, "start"]
+    dstart[, "year"] <- obj@start[fl, "start"]
   }
   if (any(!fl)) {
-    dstart[app@start[!fl, "region"], "year"] <- app@start[!fl, "start"]
+    dstart[obj@start[!fl, "region"], "year"] <- obj@start[!fl, "start"]
   }
   dstart <- dstart[!is.na(dstart$year), , drop = FALSE]
   for (rr in dstart$region) {
@@ -3050,14 +3050,19 @@ setMethod(
     year = as.integer(rep(NA, length(approxim$region))),
     stringsAsFactors = FALSE
   )
-  fl <- is.na(app@end$region)
+  fl <- is.na(obj@end$region)
   if (any(fl)) {
     if (sum(fl) != 1)
-      stop('Wrong start year for "', class(app), '" ', app@name)
-    dend[, "year"] <- app@end[fl, "end"]
+      stop('Two or more "NA" values in "@end" slot, column "region", class "',
+           class(obj), '" ', obj@name)
+    dend[, "year"] <- obj@end[fl, "end"]
   }
   if (any(!fl)) {
-    dend[app@end[!fl, "region"], "year"] <- app@end[!fl, "end"]
+    # if (obj@name == "ECCG") browser()
+    dend <- dend |> filter(!fl) |> select(-year) |>
+      left_join(obj@end[!fl, ]) |> rename(year = end) |>
+      rbind(filter(dend, fl))
+    # dend[obj@end[!fl, "region"], "year"] <- obj@end[!fl, "end"]
   }
   dend <- dend[!is.na(dend$year), , drop = FALSE]
   for (rr in dend$region) {
@@ -3072,14 +3077,14 @@ setMethod(
     year = as.integer(rep(NA, length(approxim$region))),
     stringsAsFactors = FALSE
   )
-  fl <- is.na(app@olife$region)
+  fl <- is.na(obj@olife$region)
   if (any(fl)) {
     if (sum(fl) != 1)
-      stop('Wrong start year for "', class(app), '" ', app@name)
-    dlife[, "year"] <- app@olife[fl, "olife"] # !!! ???
+      stop('Wrong start year for "', class(obj), '" ', obj@name)
+    dlife[, "year"] <- obj@olife[fl, "olife"] # !!! ???
   }
   if (any(!fl)) {
-    dlife[app@olife[!fl, "region"], "year"] <- app@olife[!fl, "olife"]
+    dlife[obj@olife[!fl, "region"], "year"] <- obj@olife[!fl, "olife"]
   }
   dlife <- dlife[!is.na(dlife$year), , drop = FALSE]
   for (rr in dlife$region[dlife$region %in% dend$region]) {

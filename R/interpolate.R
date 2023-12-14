@@ -1076,6 +1076,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   add_to_err <- function(err_msg, cns, slt, have, psb) {
     if (!all(have %in% psb)) {
       have <- unique(have[!(have %in% psb)])
+      have <- have[!is.na(have)]
       tmp <- data.table(value = have, stringsAsFactors = FALSE)
       tmp$slot <- slt
       tmp$constraint <- cns
@@ -1090,6 +1091,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   for (i in seq_along(scen@model@data)) {
     for (j in seq_along(scen@model@data[[i]]@data)[
       sapply(scen@model@data[[i]]@data, class) == "constraint"]) {
+      # browser()
       tmp <- scen@model@data[[i]]@data[[j]]
       for (k in colnames(tmp@rhs)) {
         if (k != "value" && k != "year") {
@@ -1115,9 +1117,10 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       }
     }
   }
-  if (!is.null(err_msg)) {
+  if (!is.null(err_msg) && nrow(err_msg) > 0) {
     nn <- capture.output(err_msg)
     # print(err_msg); stop("Unknow sets in constrint(s)")
+    # browser()
     warning("Unused (ignored) sets in constraints: ", err_msg)
   }
 }
@@ -1231,6 +1234,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 withinHorizon <- function(obj, settings) {
   # return(T)
   # browser()
+  # if (inherits(obj, "trade")) browser()
   if (inherits(obj, "constraint")) return(NULL)
   # if (T) { ## Debug
   #   if (grepl("", obj@name)) browser()
@@ -1242,11 +1246,13 @@ withinHorizon <- function(obj, settings) {
   sn <- slotNames(obj)
   if (any(sn == "stock")) {
     stock <- obj@stock # !!! add check for interpolation rule or interpolate first
-    if (nrow(stock) > 0 && any(stock$year >= min(yrs)) &&
-        any(stock$stock[!is.na(stock$stock)] > 0)) {
-      return(TRUE) # capacity exists within the period
-    } else {
-      ret <- FALSE
+    if (nrow(stock) > 0) {
+      if (all(is.na(stock$year))) return(TRUE) # years are not defined
+      if (any(stock$year >= min(yrs)) && any(stock$stock[!is.na(stock$stock)] > 0)) {
+        return(TRUE) # capacity exists within the period
+      } else {
+        ret <- FALSE
+      }
     }
   }
   if (any(sn == "end")) {
