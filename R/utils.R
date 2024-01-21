@@ -119,6 +119,15 @@ if (F) { # Check
   head(scen@modInp@parameters$pTradeIrEff@data)
 }
 
+dir_size <- function(path) {
+  if (!dir.exists(path)) {
+    stop("Directory '", path, "' does not exist")
+  }
+  files <- list.files(path, recursive = TRUE, full.names = TRUE)
+  sizes <- file.size(files)
+  # sum(file.info(list.files(".", all.files = TRUE, recursive = TRUE))$size)
+  return(sum(sizes))
+}
 
 .fix_path <- function(x) {
   gsub("[\\/]+", "/", paste0(x, "/"))

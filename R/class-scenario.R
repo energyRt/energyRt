@@ -69,6 +69,7 @@ summary.scenario <- function(object, ...) {
   if (scen@status$interpolated) {
     if (!is.null(scen@modOut) && scen@modOut@stage == "solved") {
       cat("Solution status: ", ifelse(scen@status$optimal, "", "NOT "), "optimal\n", sep = "")
+      # browser()
       vObj <- getData(scen, "vObjective", merge = T)
       cat("vObjective: ", vObj$value, "\n")
       dum <- sum(scen@modOut@variables$vDummyCost$value)

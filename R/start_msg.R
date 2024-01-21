@@ -1,6 +1,6 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-"energyRt version: 0.11.02-dev (2023-12-11)\n",
+"energyRt version: 0.11.04-dev (2024-01-20)\n",
 "======================== WARNING ==========================\n",
 "The package is currently in preparation for its first release
 and publication on CRAN. The names, behavior, meaning of
@@ -17,8 +17,13 @@ Please report bugs, issues or suggest improvements here:
   options(en.debug = FALSE)
   options(en.verbose = TRUE)
   options(en.progress_bar = TRUE)
+  options(progressr.clear = FALSE)
   options(en.scenarios_dir = "scenarios/")
   
+  # progressr::handlers("cli")
+  # progressr::handlers("pbcol")
+  # progressr::handlers("progress")
+  # progressr::handlers(global = TRUE)
   
   # environments
   .initiate_env <- function(e) {

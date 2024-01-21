@@ -18,11 +18,13 @@ getData <- function(...) UseMethod("getData")
 #' @export
 findData <- function(scen, dataType = c("parameters", "variables"),
                      setsNames_ = NULL, valueColumn = TRUE,
-                     allSets = TRUE, ignore.case = FALSE,
+                     allSets = TRUE, 
+                     ignore.case = FALSE,
                      # anyOfTheSets = !allSets,
                      add_weights = "auto",
                      dropEmpty = TRUE,
-                     dfDim = TRUE, dfNames = TRUE,
+                     dfDim = TRUE, 
+                     dfNames = TRUE,
                      asMatrix = FALSE) {
   ll <- lt <- list()
   # browser()
@@ -33,15 +35,20 @@ findData <- function(scen, dataType = c("parameters", "variables"),
     # dat <- scen@modInp@parameters
     lt <- lapply(scen@modInp@parameters, function(x) {
       # if (dim(x@data)[1] > 0 || !dropEmpty) {
-      qu <- get_lazy_data(x, slot = "data")
-      if (nrow(qu) > 0 || !dropEmpty) {
-          list(
-          dim = dim(qu),
-          names = names(qu)
-        )
-      }
+      # browser()
+      # cat(x@name, " ")
+      # if (x@name == "meqLECActivity") browser()
+      qu <- get_lazy_dim_names(x, slot = "data")
+      # qu <- get_lazy_data(x, slot = "data")
+      # if (nrow(qu) > 0 || !dropEmpty) {
+      #     list(
+      #     dim = dim(qu),
+      #     names = names(qu)
+      #   )
+      # }
     })
   }
+  # browser()
   ll <- c(ll, lt)
 
   # 2. Variables
@@ -59,20 +66,26 @@ findData <- function(scen, dataType = c("parameters", "variables"),
     #   }
     # })
     for (v in names(scen@modOut@variables)) {
+      # if (v == "vObjective") browser()
+      # cat(v, " ")
+      qu <- get_lazy_dim_names(scen@modOut, slot = "variables", element = v)
+      lt[[v]] <- list(
+        dim = qu$dim,
+        names = qu$names
+      )
       # if (dim(x)[1] > 0 || !dropEmpty) {
-      qu <- get_lazy_data(scen@modOut, slot = "variables", element = v)
-      # nr <- get_lazy_data(scen@modOut, slot = "variables", element = v) |> nrow()
-      if (nrow(qu) > 0 || !dropEmpty) {
-        lt[[v]] <- list(
-          dim = if (dfDim) dim(qu) else NULL,
-          names = if (dfNames) names(qu) else NULL
-        )
-      }
+      # qu <- get_lazy_data(scen@modOut, slot = "variables", element = v)
+      # if (nrow(qu) > 0 || !dropEmpty) {
+      #   lt[[v]] <- list(
+      #     dim = if (dfDim) dim(qu) else NULL,
+      #     names = if (dfNames) names(qu) else NULL
+      #   )
+      # }
     # })
     }
     ll <- c(ll, lt)
   }
-
+  # browser()
   if (valueColumn) {
     ii <- sapply(ll, function(x) any(grepl("^value$", x$names,
                                            ignore.case = ignore.case)))
@@ -144,7 +157,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #'
 #' @export
 getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
-                    parameters = TRUE, variables = TRUE, ignore.case = FALSE,
+                    parameters = TRUE, variables = TRUE, ignore.case = TRUE,
                     newNames = NULL, newValues = NULL, na.rm = FALSE,
                     digits = NULL, drop.zeros = FALSE,
                     # addGroups = list(), summarizeGroups = list(),
@@ -153,6 +166,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                     drop_duplicated_scenarios = TRUE,
                     scenNameInList = as.logical(length(scen) - 1),
                     verbose = FALSE) {
+  # if (name == "vObjective") browser()
   arg <- list(...)
   argnam <- names(arg)
   stopifnot(!any(duplicated(argnam)))

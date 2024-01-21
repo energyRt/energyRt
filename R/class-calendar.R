@@ -259,16 +259,37 @@ if (F) {
   newCalendar(cal_subset, year_fraction = sum(cal_subset$share))
 }
 
+.print_if_not_empty <- function(x, pref = NULL, suff = NULL) {
+  # browser()
+  x <- as.character(x)
+  msg <- paste0(pref, x, suff)
+  if (length(x) != 0) cat(msg, "\n")
+}
+
 # print calendar ####
 setMethod("print", "calendar", function(x, ...) {
-  if (length(x@parameters) == 0) {
-    cat("There is no data\n")
-  } else {
-    for (i in 1:length(x@parameters)) {
-      print(x@parameters[[i]])
-    }
-  }
+  # browser()
+  cat('An object of class "calendar"\n')
+  .print_if_not_empty(x@name, "name: ")
+  .print_if_not_empty(x@desc, "desc: ")
+  printed_timeframes <- lapply(x@timeframes, function(y) {
+    if (length(y) <= 10) return(y)
+    y <- c(
+      head(y, 5),
+      # paste0(y[10], "... (", length(y), " total)")
+      "...", tail(y, 5), paste0(
+      "(", length(y), " total)"
+    ))
+    paste(y, collapse = ", ")
+  })
+  
 })
+
+if (F) {
+  tmtbl <- make_timetable(timeslices::tsl_sets$d365_h24)
+  calend <- newCalendar(tmtbl, name = "d365_h24")  
+  print(calend)
+}
 
 # internal functions ####
 # validation of names of individual time-slices
