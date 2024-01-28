@@ -1,6 +1,6 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-"energyRt version: 0.11.04-dev (2024-01-20)\n",
+"energyRt version: 0.11.05-dev (2024-01-24)\n",
 "======================== WARNING ==========================\n",
 "The package is currently in preparation for its first release
 and publication on CRAN. The names, behavior, meaning of
@@ -12,19 +12,19 @@ Thanks for testing and for your patience.
 Please report bugs, issues or suggest improvements here:
     https://github.com/energyRt/energyRt/issues\n",
 "===========================================================")
-  
+
   # options
   options(en.debug = FALSE)
   options(en.verbose = TRUE)
   options(en.progress_bar = TRUE)
   options(progressr.clear = FALSE)
   options(en.scenarios_dir = "scenarios/")
-  
+
   # progressr::handlers("cli")
   # progressr::handlers("pbcol")
   # progressr::handlers("progress")
   # progressr::handlers(global = TRUE)
-  
+
   # environments
   .initiate_env <- function(e) {
     if (!exists(e, envir = .GlobalEnv)) {
@@ -33,6 +33,6 @@ Please report bugs, issues or suggest improvements here:
   }
   .initiate_env(".scen")
   .initiate_env(".tmp")
-  
+
 }
 

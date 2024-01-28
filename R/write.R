@@ -348,6 +348,78 @@ write.sc <- write_sc
   #   .dat2par(prec@parameters[["mTechCommAOutSliceSliceP"]],
   #            mTechCommAOutSliceSliceP)
 
+  # browser()
+  # mTechInpCommAggSlice ####
+  mTechInpCommAggSlice <- prec@parameters$mvTechInp@data |>
+    select(-(any_of(c("region", "year")))) |> unique() |>
+    left_join(prec@parameters$mCommSliceOrParent@data,
+              by = c("comm", slice = "slicep"), suffix = c("", "p"))
+
+  # mTechInpCommSameSlice ###
+  mTechInpCommSameSlice <- mTechInpCommAggSlice |>
+    filter(slicep == slice) |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  prec@parameters[["mTechInpCommSameSlice"]] <-
+    .dat2par(prec@parameters[["mTechInpCommSameSlice"]], mTechInpCommSameSlice)
+  #
+  # mvTechInpCommSameSlice <- prec@parameters[["mvTechInp"]]@data |>
+  #   semi_join(mTechInpCommSameSlice,
+  #             by = c("tech", "comm"))
+  # prec@parameters[["mvTechInpCommSameSlice"]] <-
+  #   .dat2par(prec@parameters[["mvTechInpCommSameSlice"]],
+  #            mvTechInpCommSameSlice)
+  # rm(mTechInpCommSameSlice, mvTechInpCommSameSlice)
+
+  mTechInpCommAggSlice <- mTechInpCommAggSlice |>
+    filter(slicep != slice) |>
+    unique()
+  prec@parameters[["mTechInpCommAggSlice"]] <-
+    .dat2par(prec@parameters[["mTechInpCommAggSlice"]], mTechInpCommAggSlice)
+  mTechInpCommAgg <- mTechInpCommAggSlice |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  prec@parameters[["mTechInpCommAgg"]] <-
+    .dat2par(prec@parameters[["mTechInpCommAgg"]], mTechInpCommAgg)
+  rm(mTechInpCommAggSlice, mTechInpCommAgg)
+
+  # mvTechInpCommAggSlice <- prec@parameters[["mvTechInp"]]@data |>
+  #   semi_join(mTechInpCommAggSlice,
+  #             by = c("tech", "comm")) |>
+  #   unique()
+  # prec@parameters[["mvTechInpCommAggSlice"]] <-
+  #   .dat2par(prec@parameters[["mvTechInpCommAggSlice"]], mvTechInpCommAggSlice)
+  # rm(mTechInpCommAggSlice, mvTechInpCommAggSlice)
+
+  # mTechAInpCommAggSlice ####
+  mTechAInpCommAggSlice <- prec@parameters$mvTechAInp@data |>
+    select(-(any_of(c("region", "year")))) |> unique() |>
+    left_join(prec@parameters$mCommSliceOrParent@data,
+              by = c("comm", slice = "slicep"), suffix = c("", "p")) |>
+    unique()
+
+  # mTechAInpCommSameSlice ###
+  mTechAInpCommSameSlice <- mTechAInpCommAggSlice |>
+    filter(slicep == slice) |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  prec@parameters[["mTechAInpCommSameSlice"]] <-
+    .dat2par(prec@parameters[["mTechAInpCommSameSlice"]],
+             mTechAInpCommSameSlice)
+  rm(mTechAInpCommSameSlice)
+
+  mTechAInpCommAggSlice <- mTechAInpCommAggSlice |>
+    filter(slicep != slice) |>
+    unique()
+  prec@parameters[["mTechAInpCommAggSlice"]] <-
+    .dat2par(prec@parameters[["mTechAInpCommAggSlice"]], mTechAInpCommAggSlice)
+  mTechAInpCommAgg <- mTechAInpCommAggSlice |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  prec@parameters[["mTechAInpCommAgg"]] <-
+    .dat2par(prec@parameters[["mTechAInpCommAgg"]], mTechAInpCommAgg)
+  rm(mTechAInpCommAggSlice, mTechAInpCommAgg)
+
   # mTechInpTot ####
   .interpolation_message("mTechInpTot", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -391,6 +463,67 @@ write.sc <- write_sc
       #     )
       #   )
       # )
+  # browser()
+  # mTechOutCommAggSlice ####
+  mTechOutCommAggSlice <- prec@parameters$mvTechOut@data |>
+    select(-(any_of(c("region", "year")))) |> unique() |>
+    left_join(prec@parameters$mCommSliceOrParent@data,
+              by = c("comm", slice = "slicep"), suffix = c("", "p"))
+
+  # mTechOutCommSameSlice ###
+  mTechOutCommSameSlice <- mTechOutCommAggSlice |>
+    filter(slicep == slice) |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  prec@parameters[["mTechOutCommSameSlice"]] <-
+    .dat2par(prec@parameters[["mTechOutCommSameSlice"]], mTechOutCommSameSlice)
+  rm(mTechOutCommSameSlice)
+
+  mTechOutCommAggSlice <- mTechOutCommAggSlice |>
+    filter(slicep != slice) |>
+    unique()
+  prec@parameters[["mTechOutCommAggSlice"]] <-
+    .dat2par(prec@parameters[["mTechOutCommAggSlice"]], mTechOutCommAggSlice)
+
+  mTechOutCommAgg <- mTechOutCommAggSlice |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  prec@parameters[["mTechOutCommAgg"]] <-
+    .dat2par(prec@parameters[["mTechOutCommAgg"]], mTechOutCommAgg)
+  rm(mTechOutCommAggSlice, mTechOutCommAgg)
+
+  # mTechAOutCommAggSlice ####
+  mTechAOutCommAggSlice <- prec@parameters$mvTechAOut@data |>
+    select(-(any_of(c("region", "year")))) |> unique() |>
+    left_join(prec@parameters$mCommSliceOrParent@data,
+              by = c("comm", slice = "slicep"), suffix = c("", "p"))
+
+  # mTechAOutCommSameSlice ####
+  mTechAOutCommSameSlice <- mTechAOutCommAggSlice |>
+    filter(slicep == slice) |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  prec@parameters[["mTechAOutCommSameSlice"]] <-
+    .dat2par(prec@parameters[["mTechAOutCommSameSlice"]], mTechAOutCommSameSlice)
+  rm(mTechAOutCommSameSlice)
+
+  mTechAOutCommAggSlice <- mTechAOutCommAggSlice |>
+    filter(slicep != slice) |>
+    unique()
+  prec@parameters[["mTechAOutCommAggSlice"]] <-
+    .dat2par(prec@parameters[["mTechAOutCommAggSlice"]],
+             mTechAOutCommAggSlice)
+
+  mTechAOutCommAgg <- mTechAOutCommAggSlice |>
+    select(-any_of(c("slicep", "slice"))) |>
+    unique()
+  # browser()
+  prec@parameters[["mTechAOutCommAgg"]] <-
+    .dat2par(prec@parameters[["mTechAOutCommAgg"]],
+             mTechAOutCommAgg)
+  rm(mTechAOutCommAgg)
+  rm(mTechAOutCommAggSlice)
+
   # mSupOutTot ####
   .interpolation_message("mSupOutTot", rest, interpolation_count,
                          interpolation_start_time, len_name)

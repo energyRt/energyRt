@@ -2,20 +2,25 @@
 .write_model_JuMP <- function(arg, scen) {
   run_code <- scen@settings@sourceCode[["JuMP"]]
   run_codeout <- scen@settings@sourceCode[["JuMPOutput"]]
-  # There is not prod in jump julia. Remove it, until jump will be better
-  for (i in grep("^[@].*prod[(]", run_code)) {
-    tx <- gsub("^[@].*prod[(]", "", run_code[i])
-    k <- 1
-    while (k != 0) {
-      tx <- gsub("^[^)(]*", "", tx)
-      if (substr(tx, 1, 1) == "(") k <- k + 1 else k <- k - 1
-      tx <- gsub("^[)(]", "", tx)
-    }
-    run_code[i] <- paste0(gsub(
-      "[*][ ]*prod[(]", "*(1 + sum(-1 + ",
-      substr(run_code[i], 1, nchar(run_code[i]) - nchar(tx))
-    ), ")", tx)
-  }
+  # # resolving `prod` issue in JuMP/Julia. temporary solution
+  # # UPDATE: the issue can be resolved by adding 'init = 1':
+  # # prod(...; init = 1)
+  # # The addition is not is currently not automated - ToDo.
+  # # the for-loop below doesn't work for formatted Julia script
+  # for (i in grep("^[@].*prod[(]", run_code)) {
+  #   # browser() # julia code is not formatted
+  #   tx <- gsub("^[@].*prod[(]", "", run_code[i])
+  #   k <- 1
+  #   while (k != 0) {
+  #     tx <- gsub("^[^)(]*", "", tx)
+  #     if (substr(tx, 1, 1) == "(") k <- k + 1 else k <- k - 1
+  #     tx <- gsub("^[)(]", "", tx)
+  #   }
+  #   run_code[i] <- paste0(gsub(
+  #     "[*][ ]*prod[(]", "*(1 + sum(-1 + ",
+  #     substr(run_code[i], 1, nchar(run_code[i]) - nchar(tx))
+  #   ), ")", tx)
+  # }
   # Check for complicated weather
   for (pr in c(
     "mTechWeatherAfLo", "mTechWeatherAfUp", "mTechWeatherAfsLo",
@@ -505,8 +510,11 @@ names(.alias_set) <- .set_al
     if (substr(tmp, 1, 4) == "sum(") {
       rs <- paste0(rs, "sum", .handle.sum.julia(substr(tmp, 4, nchar(tmp))))
       tmp <- ""
-    } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
-      a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
+    # } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
+    #   a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
+    # changing pattern to include scientific numbers
+    } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
+      a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {

@@ -6,7 +6,7 @@
 #' @slot unit character.
 #' @slot reserve numeric.
 #' @slot imp data.frame.
-#' @slot timeframe character.
+#@slot timeframe character. - depreciated
 #' @slot misc list.
 #'
 #' @include class-trade.R
@@ -22,7 +22,7 @@ setClass("import",
     unit = "character",
     reserve = "numeric",
     imp = "data.frame",
-    timeframe = "character",
+    # timeframe = "character", # setting to commodity@timeframe
     misc = "list"
   ),
   prototype(
@@ -41,7 +41,7 @@ setClass("import",
       price = numeric(),
       stringsAsFactors = FALSE
     ),
-    timeframe = character(),
+    # timeframe = character(),
     misc = list()
   ),
   S3methods = FALSE

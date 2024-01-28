@@ -89,7 +89,7 @@ newConstraint <- function(
     eq = "==",
     rhs = data.frame(),
     for.each = NULL,
-    defVal = .001, # temporary solution to avoid dropping default zeros during interpolation
+    defVal = 1e-20, # temporary solution to avoid dropping default zeros during interpolation
     arg = NULL) {
   obj <- new("constraint")
   # stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))

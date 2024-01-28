@@ -181,7 +181,12 @@ setMethod(".obj2modInp", signature(
     stop(paste0('Wrong commodity in export "', exp@name, '"'))
   }
   exp <- .filter_data_in_slots(exp, approxim$region, "region")
-  approxim <- .fix_approximation_list(approxim, comm = exp@commodity, lev = exp@timeframe)
+  # browser()
+  approxim <- .fix_approximation_list(approxim,
+                                      comm = exp@commodity,
+                                      lev = character(0)
+                                      # lev = exp@timeframe
+                                      )
   exp <- .disaggregateSliceLevel(exp, approxim)
   mExpSlice <- data.table(expp = rep(exp@name, length(approxim$slice)), slice = approxim$slice)
   obj@parameters[["mExpSlice"]] <- .dat2par(obj@parameters[["mExpSlice"]], mExpSlice)
@@ -271,10 +276,18 @@ setMethod(
       stop(paste0('Wrong commodity in import "', imp@name, '"'))
     }
     imp <- .filter_data_in_slots(imp, approxim$region, "region")
-    approxim <- .fix_approximation_list(approxim, comm = imp@commodity, lev = imp@timeframe)
+    # browser()
+    approxim <- .fix_approximation_list(approxim,
+                                        comm = imp@commodity,
+                                        lev = character(0)
+                                        # lev = imp@timeframe
+                                        )
     imp <- .disaggregateSliceLevel(imp, approxim)
-    mImpSlice <- data.table(imp = rep(imp@name, length(approxim$slice)), slice = approxim$slice)
-    obj@parameters[["mImpSlice"]] <- .dat2par(obj@parameters[["mImpSlice"]], mImpSlice)
+    mImpSlice <- data.table(
+      imp = rep(imp@name, length(approxim$slice)),
+      slice = approxim$slice)
+    obj@parameters[["mImpSlice"]] <-
+      .dat2par(obj@parameters[["mImpSlice"]], mImpSlice)
     mImpComm <- data.table(imp = imp@name, comm = imp@commodity)
     obj@parameters[["mImpComm"]] <- .dat2par(obj@parameters[["mImpComm"]], mImpComm)
     pImportRowPrice <- .interp_numpar(
@@ -987,7 +1000,36 @@ setMethod(
     } else {
       mvStorageStore$comm <- character()
     }
-    obj@parameters[["mvStorageStore"]] <- .dat2par(obj@parameters[["mvStorageStore"]], mvStorageStore)
+    obj@parameters[["mvStorageStore"]] <-
+      .dat2par(obj@parameters[["mvStorageStore"]], mvStorageStore)
+
+    ## Split mvStorageStore to FullYear and notFullYear == ParentSlice
+    ## to improve performance of Julia and Python
+
+    # browser()
+
+    meqStorageStore <- mvStorageStore |>
+      left_join(obj@parameters[["mSliceNext"]]@data,
+                by = c(slice = "slicep"), suffix = c(".x", ".y")) |>
+      rename(slicep = slice.y) |>
+      relocate(any_of(c("stg", "comm", "region", "year", "slicep", "slice")))
+    obj@parameters[["meqStorageStore"]] <-
+      .dat2par(obj@parameters[["meqStorageStore"]], meqStorageStore)
+    rm(meqStorageStore)
+
+
+    # meqStorageStoreFY <- obj@parameters[["mvStorageStore"]]@data |>
+    #   filter(stg %in% obj@parameters[["mStorageFullYear"]]@data$stg)
+    # obj@parameters[["meqStorageStoreFY"]] <-
+    #   .dat2par(obj@parameters[["meqStorageStoreFY"]], meqStorageStoreFY)
+    # rm(meqStorageStoreFY)
+    #
+    # meqStorageStorePS <- obj@parameters[["mvStorageStore"]]@data |>
+    #   filter(!(stg %in% obj@parameters[["mStorageFullYear"]]@data$stg))
+    # obj@parameters[["meqStorageStorePS"]] <-
+    #   .dat2par(obj@parameters[["meqStorageStorePS"]], meqStorageStorePS)
+    # rm(meqStorageStorePS)
+
 
     if (nrow(stg@aux) != 0) {
       mvStorageStore2 <- mvStorageStore
@@ -1737,6 +1779,8 @@ setMethod(
     } else {
       mTechInpComm <- NULL
     }
+    # browser()
+
     cmm <- rownames(ctype$comm)[ctype$comm$type == "output"]
     if (length(cmm) != 0) {
       mTechOutComm <- data.table(tech = rep(tech@name, length(cmm)), comm = cmm)

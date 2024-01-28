@@ -14,7 +14,6 @@
 #'      \item{exp.up}{numeric, upper constraint on export}
 #'      \item{exp.fx}{numeric, fixed level of export}
 #'      \item{price}{price of the export}.
-#' @slot timeframe character. Name of timeframe for the export to operate on.
 #' @slot misc list. Any additional information to store.
 #'
 #' @include class-import.R
@@ -30,7 +29,7 @@ setClass("export",
     # region !!! add
     reserve = "numeric",
     exp = "data.frame",
-    timeframe = "character",
+    # timeframe = "character", # depreciated (equal to commodity@timeframe)
     misc = "list"
   ),
   prototype(
@@ -50,7 +49,7 @@ setClass("export",
       stringsAsFactors = FALSE
     ),
     # GIS           = NULL,
-    timeframe = character(),
+    # timeframe = character(),
     # ! Misc
     misc = list()
   ),
