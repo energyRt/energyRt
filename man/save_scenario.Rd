@@ -2,7 +2,7 @@
 % Please edit documentation in R/arrow.R
 \name{save_scenario}
 \alias{save_scenario}
-\title{Save scenario object into a scenario directory}
+\title{Save scenario object on disk in parquet format using `arrow` package.}
 \usage{
 save_scenario(
   scen,
@@ -11,12 +11,27 @@ save_scenario(
   overwrite = TRUE,
   clean_start = FALSE,
   write_log = TRUE,
-  verbose = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
-\item{verbose}{}
+\item{scen}{scenario object.}
+
+\item{path}{character. Path to scenario directory.}
+
+\item{format}{file format (currently `parquet` only, arrow or feather will be implemented in further releases).}
+
+\item{overwrite}{logical. Overwrite existing scenario directory.}
+
+\item{clean_start}{logical. Clean scenario directory before saving.}
+
+\item{write_log}{logical. Write (update) logfile.}
+
+\item{verbose}{logical. Print messages.}
+}
+\value{
+scenario object with most of the slots saved on disk.
 }
 \description{
-Save scenario object into a scenario directory
+Save scenario object on disk in parquet format using `arrow` package.
 }
