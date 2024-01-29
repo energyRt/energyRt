@@ -96,10 +96,6 @@ model.vTechOutTot = Var(
     domain=pyo.NonNegativeReals,
     doc="Total commodity output from technologies",
 )
-model.vTechOutTot1 = Var(model.mTechOutTot, domain=pyo.NonNegativeReals, doc="a")
-model.vTechOutTot2 = Var(model.mTechOutTot, domain=pyo.NonNegativeReals, doc="b")
-model.vTechOutTot3 = Var(model.mTechOutTot, domain=pyo.NonNegativeReals, doc="c")
-model.vTechOutTot4 = Var(model.mTechOutTot, domain=pyo.NonNegativeReals, doc="d")
 model.vStorageInpTot = Var(
     model.mStorageInpTot,
     domain=pyo.NonNegativeReals,

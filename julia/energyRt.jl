@@ -1,9 +1,5 @@
-print(
-    "Julia v",
-    VERSION,
-    "
-",
-)
+println("Julia v", VERSION)
+println("Executing energyRt model in Julia/JuMP")
 using Dates
 include("inc1.jl")
 flog = open("output/log.csv", "w")
@@ -14,12 +10,15 @@ println(
     Dates.format(now(), "yyyy-mm-dd HH:MM:SS"),
     "\"",
 )
-println("start ", Dates.format(now(), "HH:MM:SS"))
+println("Starting time ", Dates.format(now(), "HH:MM:SS"))
 using JuMP
 println(flog, "\"load data\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
+println("Reading data")
 include("data.jl")
 include("inc2.jl")
+println("Building JuMP model")
 model = Model();
+print("variables... ")
 @variable(model, vTechInv[mTechInv]);
 @variable(model, vTechEac[mTechEac]);
 @variable(model, vTechOMCost[mTechOMCost]);
@@ -54,10 +53,6 @@ model = Model();
 @variable(model, vSupOutTot[mSupOutTot] >= 0);
 @variable(model, vTechInpTot[mTechInpTot] >= 0);
 @variable(model, vTechOutTot[mTechOutTot] >= 0);
-@variable(model, vTechOutTot1[mTechOutTot] >= 0);
-@variable(model, vTechOutTot2[mTechOutTot] >= 0);
-@variable(model, vTechOutTot3[mTechOutTot] >= 0);
-@variable(model, vTechOutTot4[mTechOutTot] >= 0);
 @variable(model, vStorageInpTot[mStorageInpTot] >= 0);
 @variable(model, vStorageOutTot[mStorageOutTot] >= 0);
 @variable(model, vStorageAInp[mvStorageAInp] >= 0);
@@ -87,6 +82,8 @@ model = Model();
 @variable(model, vTradeEac[mTradeEac] >= 0);
 @variable(model, vTradeNewCap[mTradeNew] >= 0);
 @variable(model, vTotalUserCosts[mvTotalUserCosts] >= 0);
+print(Dates.format(now(), "HH:MM:SS"), "\n")
+print("constraints... ")
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 print("eqTechSng2Sng(tech, region, comm, commp, year, slice)...")
 @constraint(

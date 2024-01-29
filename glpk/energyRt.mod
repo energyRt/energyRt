@@ -414,10 +414,6 @@ var vOut2Lo{comm, region, year, slice, slice} >= 0;
 var vSupOutTot{comm, region, year, slice} >= 0;
 var vTechInpTot{comm, region, year, slice} >= 0;
 var vTechOutTot{comm, region, year, slice} >= 0;
-var vTechOutTot1{comm, region, year, slice} >= 0;
-var vTechOutTot2{comm, region, year, slice} >= 0;
-var vTechOutTot3{comm, region, year, slice} >= 0;
-var vTechOutTot4{comm, region, year, slice} >= 0;
 var vStorageInpTot{comm, region, year, slice} >= 0;
 var vStorageOutTot{comm, region, year, slice} >= 0;
 var vStorageAInp{stg, comm, region, year, slice} >= 0;
@@ -745,22 +741,6 @@ printf "comm,region,year,slice,value\n" > "output/vTechOutTot.csv";
 for{(c, r, y, s) in mTechOutTot : vTechOutTot[c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTechOutTot[c,r,y,s] >> "output/vTechOutTot.csv";
 }
-printf "comm,region,year,slice,value\n" > "output/vTechOutTot1.csv";
-for{(c, r, y, s) in mTechOutTot : vTechOutTot1[c,r,y,s] <> 0} {
-  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTechOutTot1[c,r,y,s] >> "output/vTechOutTot1.csv";
-}
-printf "comm,region,year,slice,value\n" > "output/vTechOutTot2.csv";
-for{(c, r, y, s) in mTechOutTot : vTechOutTot2[c,r,y,s] <> 0} {
-  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTechOutTot2[c,r,y,s] >> "output/vTechOutTot2.csv";
-}
-printf "comm,region,year,slice,value\n" > "output/vTechOutTot3.csv";
-for{(c, r, y, s) in mTechOutTot : vTechOutTot3[c,r,y,s] <> 0} {
-  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTechOutTot3[c,r,y,s] >> "output/vTechOutTot3.csv";
-}
-printf "comm,region,year,slice,value\n" > "output/vTechOutTot4.csv";
-for{(c, r, y, s) in mTechOutTot : vTechOutTot4[c,r,y,s] <> 0} {
-  printf "%s,%s,%s,%s,%f\n", c,r,y,s,vTechOutTot4[c,r,y,s] >> "output/vTechOutTot4.csv";
-}
 printf "comm,region,year,slice,value\n" > "output/vStorageInpTot.csv";
 for{(c, r, y, s) in mStorageInpTot : vStorageInpTot[c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%f\n", c,r,y,s,vStorageInpTot[c,r,y,s] >> "output/vStorageInpTot.csv";
@@ -947,10 +927,6 @@ printf "value\n" > "output/variable_list.csv";
     printf "vSupOutTot\n" >> "output/variable_list.csv";
     printf "vTechInpTot\n" >> "output/variable_list.csv";
     printf "vTechOutTot\n" >> "output/variable_list.csv";
-    printf "vTechOutTot1\n" >> "output/variable_list.csv";
-    printf "vTechOutTot2\n" >> "output/variable_list.csv";
-    printf "vTechOutTot3\n" >> "output/variable_list.csv";
-    printf "vTechOutTot4\n" >> "output/variable_list.csv";
     printf "vStorageInpTot\n" >> "output/variable_list.csv";
     printf "vStorageOutTot\n" >> "output/variable_list.csv";
     printf "vStorageAInp\n" >> "output/variable_list.csv";

@@ -21,28 +21,31 @@
   #     substr(run_code[i], 1, nchar(run_code[i]) - nchar(tx))
   #   ), ")", tx)
   # }
-  # Check for complicated weather
-  for (pr in c(
-    "mTechWeatherAfLo", "mTechWeatherAfUp", "mTechWeatherAfsLo",
-    "mTechWeatherAfsUp", "mTechWeatherAfcLo", "mTechWeatherAfcUp",
-    "mTechWeatherAfcLo", "mTechWeatherAfcUp", "mSupWeatherUp",
-    "mSupWeatherLo", "mStorageWeatherAfLo", "mStorageWeatherAfUp",
-    "mStorageWeatherCinpUp", "mStorageWeatherCinpLo",
-    "mStorageWeatherCoutUp", "mStorageWeatherCoutLo"
-  )) {
-    tmp <- .get_data_slot(scen@modInp@parameters[[pr]])
-    tmp$weather <- NULL
-    if (anyDuplicated(tmp)) {
-      assign("error_msg", tmp[duplicated(tmp), , drop = FALSE], globalenv())
-      stop(paste0(
-        "It is forbidden to determine more than one weather for Julia,",
-        " since the prod is not a allowed. ",
-        'List of duplicated weather for map "', pr,
-        '"assign to error_msg.'
-      ))
-    }
-  }
-  # For downsize
+  # # Check for complicated weather
+  # for (pr in c(
+  #   "mTechWeatherAfLo", "mTechWeatherAfUp", "mTechWeatherAfsLo",
+  #   "mTechWeatherAfsUp", "mTechWeatherAfcLo", "mTechWeatherAfcUp",
+  #   "mTechWeatherAfcLo", "mTechWeatherAfcUp", "mSupWeatherUp",
+  #   "mSupWeatherLo", "mStorageWeatherAfLo", "mStorageWeatherAfUp",
+  #   "mStorageWeatherCinpUp", "mStorageWeatherCinpLo",
+  #   "mStorageWeatherCoutUp", "mStorageWeatherCoutLo"
+  # )) {
+  #   tmp <- .get_data_slot(scen@modInp@parameters[[pr]])
+  #   tmp$weather <- NULL
+  #   if (anyDuplicated(tmp)) {
+  #     assign("error_msg", tmp[duplicated(tmp), , drop = FALSE], globalenv())
+  #     stop(paste0(
+  #       "Multiplication of weather-factors is not supported in Julia/JuMP",
+  #       "version of energyRt.",
+  #       "The problem with `prod` is resolved, but to be implemented. ",
+  #       'The list of weather-factors to multiply"', pr,
+  #       '"is stored in `error_msg` object.',
+  #       "To execute the this model in Julia/JuMP language,",
+  #       "these weather-factors must be combined into one."
+  #     ))
+  #   }
+  # }
+  # For downsize (rename?)
   fdownsize <- names(scen@modInp@parameters)[
     sapply(scen@modInp@parameters, function(x) length(x@misc$rem_col) != 0)
   ]
@@ -135,9 +138,11 @@
   cat('using RData\nusing DataFrames\ndt = load("data.RData")["dat"]\n',
     sep = "\n", file = zz_data_julia
   )
+  # browser()
   for (j in c("set", "map", "numpar", "bounds")) {
     for (i in names(scen@modInp@parameters)) {
       if (scen@modInp@parameters[[i]]@type == j) {
+        # add here the line: sizehint!(PARAMETER, nrow(dt["PARAMETER"])
         cat(.toJuliaHead(scen@modInp@parameters[[i]]),
           sep = "\n", file = zz_data_julia
         )
@@ -218,6 +223,8 @@
 # Generate Julia code, return the code as a character vector
 .toJulia <- function(obj) {
   as_numpar <- function(data, name, name2, def) {
+    # browser()
+    # add here the line: sizehint!(PARAMETER, nrow(dt["PARAMETER"])
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
@@ -299,6 +306,8 @@
 
 .toJuliaHead <- function(obj) {
   as_numpar <- function(data, name, name2, def) {
+    # browser()
+    # add here the line: sizehint!(PARAMETER, nrow(dt["PARAMETER"])
     if (ncol(obj@data) == 1) {
       return(c(
         paste0("# ", name),
@@ -308,12 +317,18 @@
       data <- data[data$value != Inf & data$value != def, ]
       rtt <- paste0("# ", name, name2, "\n", name, "Def = ", def, ";\n")
       if (nrow(data) == 0) {
-        return(paste0(rtt, name, " = Dict()"))
+        return(
+          c(
+            paste0(rtt, name, " = Dict()"),
+            paste0('sizehint!(', name, ', nrow(dt["', name, '"]))')
+          )
+        )
       }
       colnames(data) <- gsub("[.]1", "p", colnames(data))
       return(c(
         rtt,
         paste0(name, " = Dict()"),
+        paste0('sizehint!(', name, ', nrow(dt["', name, '"]))'),
         paste0('for i in 1:nrow(dt["', name, '"])'),
         paste0(
           "    ", name, "[(",
@@ -338,6 +353,7 @@
       colnames(obj@data) <- gsub("[.]1", "p", colnames(obj@data))
       return(c(
         ret, paste0(obj@name, " = Set()"),
+        paste0("sizehint!(", obj@name, ', nrow(dt["', obj@name, '"]))'),
         paste0('for i in 1:nrow(dt["', obj@name, '"])'),
         paste0(
           "    push!(", obj@name, ", (",
@@ -349,8 +365,14 @@
       ))
     }
   } else if (obj@type == "numpar") {
-    return(as_numpar(obj@data, obj@name,
-                     paste0("(", paste0(obj@dimSets, collapse = ", "), ")"), obj@defVal))
+    return(
+      as_numpar(
+        obj@data,
+        obj@name,
+        paste0("(", paste0(obj@dimSets, collapse = ", "), ")"),
+        obj@defVal
+        )
+      )
   } else if (obj@type == "bounds") {
     hh <- paste0("(", paste0(obj@dimSets, collapse = ", "), ")")
     return(c(

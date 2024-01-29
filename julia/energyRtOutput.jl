@@ -539,86 +539,6 @@ for (c, r, y, s) in mTechOutTot
 end;
 close(fvTechOutTot);
 
-fvTechOutTot1 = open("output/vTechOutTot1.csv", "w");
-println(fvTechOutTot1, "comm,region,year,slice,value");
-for (c, r, y, s) in mTechOutTot
-    if JuMP.value(vTechOutTot1[(c, r, y, s)]) != 0
-        println(
-            fvTechOutTot1,
-            c,
-            ",",
-            r,
-            ",",
-            y,
-            ",",
-            s,
-            ",",
-            JuMP.value(vTechOutTot1[(c, r, y, s)]),
-        )
-    end
-end;
-close(fvTechOutTot1);
-
-fvTechOutTot2 = open("output/vTechOutTot2.csv", "w");
-println(fvTechOutTot2, "comm,region,year,slice,value");
-for (c, r, y, s) in mTechOutTot
-    if JuMP.value(vTechOutTot2[(c, r, y, s)]) != 0
-        println(
-            fvTechOutTot2,
-            c,
-            ",",
-            r,
-            ",",
-            y,
-            ",",
-            s,
-            ",",
-            JuMP.value(vTechOutTot2[(c, r, y, s)]),
-        )
-    end
-end;
-close(fvTechOutTot2);
-
-fvTechOutTot3 = open("output/vTechOutTot3.csv", "w");
-println(fvTechOutTot3, "comm,region,year,slice,value");
-for (c, r, y, s) in mTechOutTot
-    if JuMP.value(vTechOutTot3[(c, r, y, s)]) != 0
-        println(
-            fvTechOutTot3,
-            c,
-            ",",
-            r,
-            ",",
-            y,
-            ",",
-            s,
-            ",",
-            JuMP.value(vTechOutTot3[(c, r, y, s)]),
-        )
-    end
-end;
-close(fvTechOutTot3);
-
-fvTechOutTot4 = open("output/vTechOutTot4.csv", "w");
-println(fvTechOutTot4, "comm,region,year,slice,value");
-for (c, r, y, s) in mTechOutTot
-    if JuMP.value(vTechOutTot4[(c, r, y, s)]) != 0
-        println(
-            fvTechOutTot4,
-            c,
-            ",",
-            r,
-            ",",
-            y,
-            ",",
-            s,
-            ",",
-            JuMP.value(vTechOutTot4[(c, r, y, s)]),
-        )
-    end
-end;
-close(fvTechOutTot4);
-
 fvStorageInpTot = open("output/vStorageInpTot.csv", "w");
 println(fvStorageInpTot, "comm,region,year,slice,value");
 for (c, r, y, s) in mStorageInpTot
@@ -1186,10 +1106,6 @@ println(vrb_list, "vOut2Lo");
 println(vrb_list, "vSupOutTot");
 println(vrb_list, "vTechInpTot");
 println(vrb_list, "vTechOutTot");
-println(vrb_list, "vTechOutTot1");
-println(vrb_list, "vTechOutTot2");
-println(vrb_list, "vTechOutTot3");
-println(vrb_list, "vTechOutTot4");
 println(vrb_list, "vStorageInpTot");
 println(vrb_list, "vStorageOutTot");
 println(vrb_list, "vStorageAInp");
