@@ -1301,8 +1301,8 @@ scen_BASE_gams <- solve(add(mdl),
   name = "BASE_gams",
   # tmp.path = "C:/solwork",
   # solver = "GAMS",
-  # solver = GAMS_csv,
-  solver = GAMS,
+  solver = GAMS_csv,
+  # solver = GAMS,
   # solver = list(
     # lang = "GAMS"
     # solver = "ipopt"),
@@ -1424,12 +1424,72 @@ name = "vObjective", merge = TRUE
 )
 ```
 
+## Positive costs
+```{r}
+COSTSGE0 <- newConstraint(
+  name = "COSTSGE0",
+  eq = ">=",
+  for.each = list(
+    region = NULL,
+    year = NULL
+  ),
+  term1 = list(
+    variable = "vTotalCost"
+  ),
+  rhs = data.frame(
+    region = NA,
+    year = NA,
+    rhs = 0
+  )
+)
+
+scen_COSTSGE0 <- solve(
+  add(mdl, COSTSGE0), 
+  name = "CO2CAP",
+  tmp.dir = "solwork/UTOPIA_COSTSGE0",
+  # solver = mysolver,
+  # solver = "GLPK",
+  # solver = GAMS_csv,
+  # solver = GAMS_simplex,
+  solver = GAMS,
+  # tmp.name = "UTOPIA_BASE_test",
+  tmp.del = F
+)
+
+```
+
+
 ## CO2 cap
 ```{r, eval=FALSE}
 emis_co2 <- getData(scen_BASE, "vBalance", comm = "CO2", merge = T) %>%
   group_by(scenario, comm, year) %>%
-  summarize(value = sum(value, na.rm = T)) %>%
+  summarize(value = sum(value, na.rm = T))
+emis_co2
+emis_co2 <- emis_co2 |>
   filter(year == 2030)
+
+CO2CAP <- newConstraint(
+  name = "CO2CAP",
+  eq = "<=",
+  for.each = data.frame(
+    # region = CO2_cap_national$V1,
+    year = c(2030:2060),
+    comm = "CO2"
+  ),
+  term1 = list(
+    variable = "vBalance"
+  ),
+  rhs = data.frame(
+    # region = CO2_cap$V1,
+    year = c(2030:2060),
+    rhs = approx(
+      x = c(2030, 2060),
+      y = round(emis_co2$value, -3) * c(1, .1), 
+      xout = c(2030:2060)
+    )$y
+  )
+)
+CO2CAP@rhs
 
 CO2CAP <- newConstraint(
   name = "CO2CAP",
@@ -1445,9 +1505,46 @@ CO2CAP <- newConstraint(
   rhs = data.frame(
     # region = CO2_cap$V1,
     year = c(2030, 2060),
-    rhs = round(emis_co2$value, -4) * c(1, .5)
+    rhs = round(emis_co2$value, -3) * c(1, .1)
   )
 )
+
+CO2EXP <- newExport(
+  name = "CO2EXP", 
+  commodity = "CO2", 
+  exp = list(price = -10000)
+)
+
+scen_CO2CAP <- solve(
+  add(mdl, CO2CAP), 
+  name = "CO2CAP",
+  tmp.dir = "solwork/UTOPIA_CO2CAP",
+  # solver = mysolver,
+  # solver = "GLPK",
+  # solver = GAMS_csv,
+  # solver = GAMS_simplex,
+  solver = GAMS,
+  # tmp.name = "UTOPIA_BASE_test",
+  tmp.del = F
+)
+summary(scen_CO2CAP)
+scen_CO2CAP@misc$tmp.dir
+scen_CO2CAP@model@data[[2]]$CO2CAP
+scen_CO2CAP@modInp@parameters$pCnsRhsCO2CAP
+
+getData(scen_CO2CAP, "vBalance", comm = "CO2", merge = T) %>%
+  group_by(scenario, comm, year) %>%
+  summarize(value = sum(value, na.rm = T))
+
+getData(scen_CO2CAP, "vEmsFuelTot", comm = "CO2", merge = T) %>%
+  group_by(scenario, comm, year) %>%
+  summarize(value = sum(value, na.rm = T))
+
+
+getData(scen_CO2CAP, "vExportRow", comm = "CO2", merge = T) %>%
+  group_by(scenario, comm, year) %>%
+  summarize(value = sum(value, na.rm = T))
+
 
 ```
 

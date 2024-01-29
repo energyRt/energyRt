@@ -20,8 +20,6 @@ An S4 class to represent commodity export to the rest of the world.
 
 \item{\code{reserve}}{numeric. Constraints on the total accumulated (over years) export resource (similar to "reserve" in supply).}
 
-\item{\code{timeframe}}{character. Name of timeframe for the export to operate on.}
-
 \item{\code{misc}}{list. Any additional information to store.}
 }}
 

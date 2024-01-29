@@ -282,12 +282,12 @@ setMethod("print", "calendar", function(x, ...) {
     ))
     paste(y, collapse = ", ")
   })
-  
+
 })
 
 if (F) {
   tmtbl <- make_timetable(timeslices::tsl_sets$d365_h24)
-  calend <- newCalendar(tmtbl, name = "d365_h24")  
+  calend <- newCalendar(tmtbl, name = "d365_h24")
   print(calend)
 }
 
@@ -740,11 +740,13 @@ if (F) {
   # if (length(app@slice) != 0 &&
   #     all(app@slice != colnames(approxim$calendar@timetable)[
   #       -ncol(approxim$calendar@timetable)])) {
-  if (!is_empty(app@timeframe) && !any(app@timeframe %in% timeframes)) {
-    stop(paste0(
-      'Unrecognized timeframe level "', app@timeframe, '" in ',
-      class(app), ': "', app@name, '"'
-    ))
+  if (.hasSlot(app, "timeframe")) {
+    if (!is_empty(app@timeframe) && !any(app@timeframe %in% timeframes)) {
+      stop(paste0(
+        'Unrecognized timeframe level "', app@timeframe, '" in ',
+        class(app), ': "', app@name, '"'
+      ))
+    }
   }
 }
 # =============================================================================#

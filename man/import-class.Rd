@@ -22,8 +22,6 @@ An S4 class to represent commodity import from the rest of the world.
 
 \item{\code{imp}}{data.frame.}
 
-\item{\code{timeframe}}{character.}
-
 \item{\code{misc}}{list.}
 }}
 
