@@ -212,7 +212,7 @@ fmEmisCommReg <- function(m, mCommReg = NULL) {
     )
   }) %>%
     rbindlist()
-  if (is.null(a)) {
+  if (is.null(a) || nrow(a) == 0) {
     a <- data.table(comm = "", comm1 = "")[0,]
   }
 
@@ -230,7 +230,7 @@ if (F) {
 }
 
 fmCommReg <- function(m, regions = NULL) {
-
+  # browser()
   a <- fmSupCommReg(m, regions) %>% select(-sup) %>% unique()
   a <- fmImpCommReg(m, regions) %>% select(-imp) %>%
     rbind(a) %>% unique()
