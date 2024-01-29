@@ -1406,3 +1406,108 @@ name = "vObjective", merge = TRUE
 )
 ```
 
+
+## Market share constraints
+```{r}
+scen <- scen_BASE
+scen <- scen_CSHARE
+
+vTechCap <- getData(scen, "vTechCap", merge = T) 
+
+vTechOutTot <- getData(scen, "vTechOutTot", comm = "ELC", merge = T, 
+                       process = T) |>
+  group_by(scenario, name,region, year) |>
+  summarize(value = sum(value, na.rm = T), .groups = "drop") |>
+  pivot_wider()
+
+vTechOut <- getData(scen, "vTechOut", comm = "ELC", merge = T, process = T) |>
+  group_by(scenario, name, process, region, year) |>
+  summarize(value = sum(value, na.rm = T), .groups = "drop") |>
+  pivot_wider()
+
+vDemInp <- getData(scen, "vDemInp", comm = "ELC", merge = T) |>
+  group_by(scenario, name, region, year) |>
+  summarize(value = sum(value, na.rm = T), .groups = "drop") |>
+  pivot_wider()
+
+mktShareDem <- vTechOut |> left_join(vDemInp) |>
+  mutate(share = vTechOut / vDemInp)
+summary(mktShareDem$share)
+
+mktShareOut <- vTechOut |> left_join(vTechOutTot) |>
+  mutate(share = vTechOut / vTechOutTot)
+summary(mktShareOut$share)
+
+ggplot(mktShareOut) +
+  # geom_area(aes(year, share), stat = "identity") +
+  geom_line(aes(year, share), stat = "identity") +
+  facet_grid(process~region)
+
+cn_dim <- expand_grid(
+  year = scen@settings@horizon@intervals$mid, 
+  region = scen@settings@region
+  ) |> as.data.table()
+
+CSHARE_EGAS <- newConstraint(
+      name = "CSHARE_EGAS",
+      eq = "<=",
+      for.each = data.frame(
+        year = cn_dim$year,
+        region = cn_dim$region,
+        tech = "EGAS",
+        comm = "ELC"
+      ),
+      tr1 = list(
+        variable = "vTechOut", 
+        for.each = data.frame(
+          year = cn_dim$year,
+          region = cn_dim$region,
+          tech = "EGAS",
+          comm = "ELC"
+        ),
+        for.sum = list(
+          slice = NA
+        ),
+        mult = 1
+      ),
+      tr2 = list(
+        variable = "vTechOutTot",
+        for.each = data.frame(
+          year = cn_dim$year,
+          region = cn_dim$region,
+          comm = "ELC"
+        ),
+        for.sum = list(
+          slice = NA
+        ),
+        mult = -0.5
+      ),
+      rhs = data.frame(
+        # year = cn_dim$year,
+        # region = cn_dim$region,
+        # tech = "EGAS",
+        rhs = 1e-20
+      )
+    )
+
+scen_CSHARE <- interpolate_model(
+  mdl, CSHARE_EGAS,
+  name = "CSHARE_EGAS"
+)
+
+scen_CSHARE <- write_sc(
+  # scen,
+  scen_CSHARE,
+  solver = GAMS,
+  # solver = GAMS_csv,
+  # solver = GAMS_simplex,
+  # solver = GAMS_barrier,
+  tmp.dir = "tmp/solwork/UTOPIA_CSHARE"
+)
+scen_CSHARE@misc$tmp.dir # directory
+
+scen_CSHARE <- solve(scen_CSHARE, wait = F)
+scen_CSHARE <- read(scen_CSHARE)
+
+```
+

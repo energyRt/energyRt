@@ -844,11 +844,77 @@ mTechInpComm:
   interpolation: back.inter.forth
   colName: ''
   class: technology
+# technology and commodity have the same timeframe
+mTechInpCommSameSlice:
+  name: mTechInpCommSameSlice
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+# technology and commodity have different timeframes (used in aggregations):
+mTechInpCommAgg:
+  name: mTechInpCommAgg
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechInpCommAggSlice:
+  name: mTechInpCommAggSlice
+  dimSets:
+  - tech
+  - comm
+  - slice  # comm-timeframe (parent-slice)
+  - slicep # tech-timeframe (child-slice)
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
 mTechOutComm:
   name: mTechOutComm
   dimSets:
   - tech
   - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechOutCommSameSlice:
+  name: mTechOutCommSameSlice
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechOutCommAgg:
+  name: mTechOutCommAgg
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechOutCommAggSlice:
+  name: mTechOutCommAggSlice
+  dimSets:
+  - tech
+  - comm
+  - slice  # comm-timeframe (parent-slice)
+  - slicep # tech-timeframe (child-slice)
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
@@ -874,11 +940,75 @@ mTechAInp:
   interpolation: back.inter.forth
   colName: ''
   class: technology
+mTechAInpCommSameSlice:
+  name: mTechAInpCommSameSlice
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechAInpCommAgg:
+  name: mTechAInpCommAgg
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechAInpCommAggSlice:
+  name: mTechAInpCommAggSlice
+  dimSets:
+  - tech
+  - comm
+  - slice  # comm-timeframe (parent-slice)
+  - slicep # tech-timeframe (child-slice)
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
 mTechAOut:
   name: mTechAOut
   dimSets:
   - tech
   - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechAOutCommSameSlice:
+  name: mTechAOutCommSameSlice
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechAOutCommAgg:
+  name: mTechAOutCommAgg
+  dimSets:
+  - tech
+  - comm
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechAOutCommAggSlice:
+  name: mTechAOutCommAggSlice
+  dimSets:
+  - tech
+  - comm
+  - slice  # comm-timeframe (parent-slice)
+  - slicep # tech-timeframe (child-slice)
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
@@ -3093,6 +3223,31 @@ mvTechInp:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
+#####
+# mvTechInpCommSameSlice:
+#   name: mvTechInpCommSameSlice
+#   dimSets:
+#   - tech
+#   - comm
+#   - region
+#   - year
+#   - slice
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+# mvTechInpCommAggSlice:
+#   name: mvTechInpCommAggSlice
+#   dimSets:
+#   - tech
+#   - comm
+#   - region
+#   - year
+#   - slice
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
 mvTechOut:
   name: mvTechOut
   dimSets:
@@ -3276,6 +3431,43 @@ mvStorageStore:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
+meqStorageStore:
+  name: meqStorageStore
+  dimSets:
+  - stg
+  - comm
+  - region
+  - year
+  - slicep # preceeding
+  - slice
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+# meqStorageStorePS:
+#   name: meqStorageStorePS
+#   dimSets:
+#   - stg
+#   - comm
+#   - region
+#   - year
+#   - slice
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+# meqStorageStoreFY:
+#   name: meqStorageStoreFY
+#   dimSets:
+#   - stg
+#   - comm
+#   - region
+#   - year
+#   - slice
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
 mvTradeIr:
   name: mvTradeIr
   dimSets:

@@ -370,8 +370,11 @@
     if (substr(tmp, 1, 4) == "sum(") {
       rs <- paste0(rs, "sum", .handle.sum.glpk(substr(tmp, 4, nchar(tmp))))
       tmp <- ""
-    } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
-      a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
+    # } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
+    #   a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
+    # changing pattern to include scientific numbers
+    } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
+      a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {
