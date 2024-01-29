@@ -1,0 +1,89 @@
+url: https://energyRt.org
+
+title: energyRt
+
+development:
+  mode: unreleased
+  version_label: info
+
+template:
+  params:
+    ganalytics: G-CYBYJ238Q5
+    bootswatch: yeti
+#    bootswatch: cerulean
+#    bootswatch: cosmo
+
+reference:
+- title: Classes
+  desc:  Data structures of the key model components.
+  contents:
+  - calendar-class
+  - commodity-class
+  - demand-class
+  - supply-class
+  - technology-class
+  - storage-class
+  - trade-class
+  - import-class
+  - export-class
+  - ends_with("class")
+
+- title: Building a model
+  desc:  Functions to create model components.
+  contents:
+  - starts_with("new")
+  - starts_with("make_")
+  - matches("initialize")
+  - matches("update")
+  - starts_with("add")
+
+- title: Configuration and Settings
+  desc:  Model configuration and scenario settings
+  contents:
+  - ends_with("onfig")
+  - ends_with("ettings")
+  - ends_with("alendar")
+  - ends_with("orizon")
+
+- title: Solving
+  contents:
+  - starts_with("interpolate")
+  - starts_with("write")
+  - starts_with("read")
+  - starts_with("solve")
+
+- title: Data manimulation
+  contents:
+  - matches("convert")
+  - matches("data")
+  - matches("find")
+  - matches("rename")
+  - matches("revalue")
+  - matches("size")
+  - matches("hour2HOUR")
+  - matches("yday2YDAY")
+
+- title: Visualisation
+  contents:
+  - matches("draw")
+
+- title: Validation
+  contents:
+  - starts_with("check")
+
+- title: energyRt options and settings
+  contents:
+  - starts_with("set")
+
+
+# - title: All other
+#   contents: lacks_concepts("none")
+
+footer:
+  structure:
+    left: package
+    right: built_with
+
+home:
+  sidebar:
+    structure: [links, license, community, citation, dev]

@@ -21,16 +21,16 @@ print.commodity <- function(x) {
   }
   cat("Name: ", x@name, "\n")
   # if (x@type != '') cat('type: ', x@type, '\n')
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   # if (x@origin != '') cat('Region of origin: ',x@origin, '\n')
   if (!is.null(x@misc$color)) cat("color: ", x@misc$color, "\n")
 
   g <- getClass("commodity")
-  zz <- names(g@slots)[sapply(names(g@slots), function(z) {
-    g@slots[[z]] ==
+  yy <- names(g@slots)[sapply(names(g@slots), function(y) {
+    g@slots[[y]] ==
       "data.frame"
   })]
-  for (i in zz) if_print_data_frame(x, i)
+  for (i in yy) if_print_data_frame(x, i)
 }
 
 print.demand <- function(x) {
@@ -43,14 +43,14 @@ print.demand <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   cat("Commodity: ", x@commodity, "\n")
   g <- getClass("demand")
-  zz <- names(g@slots)[sapply(names(g@slots), function(z) {
-    g@slots[[z]] ==
+  yy <- names(g@slots)[sapply(names(g@slots), function(y) {
+    g@slots[[y]] ==
       "data.frame"
   })]
-  for (i in zz) if_print_data_frame(x, i)
+  for (i in yy) if_print_data_frame(x, i)
 }
 
 
@@ -65,13 +65,13 @@ print.equation <- function(x) {
     }
   }
   cat("Name: ", x@name, ", eq: ", as.character(x@eq), ", defVal: ", x@defVal, "\n", sep = "")
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   g <- getClass("equation")
-  zz <- names(g@slots)[sapply(names(g@slots), function(z) {
-    g@slots[[z]] ==
+  yy <- names(g@slots)[sapply(names(g@slots), function(y) {
+    g@slots[[y]] ==
       "data.frame"
   })]
-  for (i in zz) if_print_data_frame(x, i)
+  for (i in yy) if_print_data_frame(x, i)
   for (i in seq_along(x@lhs)) {
     cat("Term ", i, ":\n", sep = "")
     print(x@lhs[[i]])
@@ -90,11 +90,11 @@ print.summand <- function(x) {
   }
   cat("variable: ", x@variable, ", defVal: ", x@defVal, "\n", sep = "")
   g <- getClass("summand")
-  zz <- names(g@slots)[sapply(names(g@slots), function(z) {
-    g@slots[[z]] ==
+  yy <- names(g@slots)[sapply(names(g@slots), function(y) {
+    g@slots[[y]] ==
       "data.frame"
   })]
-  for (i in zz) if_print_data_frame(x, i)
+  for (i in yy) if_print_data_frame(x, i)
   if (length(x@for.sum) != 0) {
     cat("for.sum set:\n")
     print(x@for.sum)
@@ -112,8 +112,8 @@ print.model <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
-  print(x@sysInfo)
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
+  print(x@config)
   if (length(x@data) != 0) {
     for (i in 1:length(x@data)) {
       cat("Repository ", i, "(", class(x@data[[i]]), "):\n", sep = "")
@@ -126,24 +126,24 @@ print.model <- function(x) {
 print.region <- function(x) {
   cat("Name: ", x@name, "\n")
   # if (x@type != '') cat('type: ', x@type, '\n')
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   if (!is.null(x@misc$color)) cat("color: ", x@misc$color, "\n")
 }
 
 #------------------------------------------------------------------------------
-print.repository <- function(x) {
-  cat("Name: ", x@name, "\n")
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
-  for (i in seq(along = x@data)) {
-    cat(class(x@data[[i]]), " ", i, ":\n", sep = "")
-    print(x@data[[i]])
-  }
-}
-
+# print.repository <- function(x) {
+#   cat("Name: ", x@name, "\n")
+#   if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
+#   for (i in seq(along = x@data)) {
+#     cat(class(x@data[[i]]), " ", i, ":\n", sep = "")
+#     print(x@data[[i]])
+#   }
+# }
+#
 #------------------------------------------------------------------------------
 print.scenario <- function(x) {
   cat("Name: ", x@name, "\n")
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   if (!is.null(x@model)) {
     cat("Model:\n")
     print(x@model)
@@ -178,16 +178,16 @@ print.supply <- function(x) {
     }
   }
   cat("Name: ", x@name, "\n")
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   cat("Commodity: ", x@commodity, "\n")
   # cat('Reserve: ', x@reserve, '\n')
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
   g <- getClass("supply")
-  zz <- names(g@slots)[sapply(names(g@slots), function(z) {
-    g@slots[[z]] ==
+  yy <- names(g@slots)[sapply(names(g@slots), function(y) {
+    g@slots[[y]] ==
       "data.frame"
   })]
-  for (i in zz) if_print_data_frame(x, i)
+  for (i in yy) if_print_data_frame(x, i)
 }
 
 #------------------------------------------------------------------------------
@@ -202,15 +202,15 @@ print.technology <- function(x, ...) {
   }
   cat("Name: ", x@name, "\n")
   # if (x@type!='') cat('type: ', x@type, '\n')
-  if (length(x@description) != 0 && x@description != "") cat("description: ", x@description, "\n")
+  if (length(x@desc) != 0 && x@desc != "") cat("desc: ", x@desc, "\n")
   if (x@cap2act != "") cat("cap2act: ", x@cap2act, "\n")
   if (!is.null(x@region)) cat('region: "', paste(x@region, collapse = '", "'), '"\n', sep = "")
-  # if(!is.null(x@reporting_years)) cat('reporting years: ', x@reporting_years, '\n')
-  for (i in energyRt:::.technology_data_frame()) if_print_data_frame(x, i)
+  # if(!is.null(x@reporting_years)) cat('reporting period: ', x@reporting_years, '\n')
+  for (i in .technology_data_frame()) if_print_data_frame(x, i)
 }
 
 #------------------------------------------------------------------------------
-print.sysInfo <- function(x) {
+print.config <- function(x) {
   # print model
   if_print_data_frame <- function(x, sl) {
     if (nrow(slot(x, sl)) != 0) {
@@ -219,14 +219,14 @@ print.sysInfo <- function(x) {
       cat("\n")
     }
   }
-  for (i in c("region", "year", "milestone", "slice")) {
-    if (is.null(slot(x, i))) {
-      cat("There is no ", i, "\n", sep = "")
-    } else {
-      cat(i, ":\n", sep = "")
-      print(slot(x, i))
-    }
-  }
+  # for (i in c("region", "horizon")) {
+  #   if (is.null(slot(x, i))) {
+  #     # cat("There is no ", i, "\n", sep = "")
+  #   } else {
+  #     cat(i, ":\n", sep = "")
+  #     print(slot(x, i))
+  #   }
+  # }
   if_print_data_frame(x, "debug")
   if_print_data_frame(x, "discount")
   # if_print_data_frame(x, 'tax')
