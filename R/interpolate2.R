@@ -217,8 +217,10 @@ fmEmisCommReg <- function(m, mCommReg = NULL) {
   }
 
   if (is.null(mCommReg)) return(a)
-  a <- a %>% left_join(mCommReg, by = "comm") %>% select(-comm) %>%
-    rename(comm = comm1) %>% unique()
+  suppressMessages({
+    a <- a %>% left_join(mCommReg, by = "comm") %>% select(-comm) %>%
+      rename(comm = comm1) %>% unique()
+  })
   a
 }
 

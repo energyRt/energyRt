@@ -1008,7 +1008,9 @@ write.sc <- write_sc
       x <- merge0(dregionyear, mCommSlice) %>%
         inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
         unique()
-      y <- anti_join(x, mvBalance)
+      suppressMessages({
+        y <- anti_join(x, mvBalance)
+      })
       yc <- y$comm %>% unique()
       warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
       rm(x, y, yc)

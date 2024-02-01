@@ -523,12 +523,19 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   )
 
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
+  # browser()
   for (i in names(scen@modInp@parameters)) {
     if (scen@modInp@parameters[[i]]@misc$nValues != -1) {
-      scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
-        seq(length.out = scen@modInp@parameters[[i]]@misc$nValues), ,
-        drop = FALSE
-      ]
+      # scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
+      #   seq(length.out = scen@modInp@parameters[[i]]@misc$nValues), ,
+      #   drop = FALSE
+      # ]
+      # nrow_i <-
+      scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data |>
+        slice_head(n = min(nrow(.data),
+                           scen@modInp@parameters[[i]]@misc$nValues,
+                           na.rm = TRUE)
+                   )
     }
   }
   scen@settings@sourceCode <- .modelCode
@@ -748,6 +755,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 
 .unique_set <- function(obj) {
   if (obj@misc$nValues != -1) {
+    # browser()
     obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
     obj@data <- obj@data[!duplicated(obj@data), , drop = FALSE]
   }
@@ -1143,7 +1151,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
 }
 
-# Check for unknown sets
+# unrecognized sets ####
 .check_sets <- function(scen) {
   lsets <- lapply(scen@modInp@parameters, function(x) {
     if (x@type == "set") .get_data_slot(x)[[1]]
@@ -1176,6 +1184,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
         unq <- unique(tmp[[ss]])
         fl <- !(unq %in% lsets[[ss]])
         if (any(fl)) {
+          # isTRUE(options("en_debug")) browser()
           err_dtf <- rbind(err_dtf,
                            data.table(name = prm@name, set = ss, value = unq[fl]
                                       )
@@ -1196,12 +1205,18 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     }
   }
   if (length(int_err) != 0) {
-    stop(paste0('Internal error. Unknown set "',
-                paste0(int_err, collapse = '", "'), '"'))
+    err_msg0 <- paste0('Internal error. Unknown set "',
+                  paste0(int_err, collapse = '", "'), '"')
+    if (isFALSE(getOption("en.debug"))) {
+      stop(err_msg0)
+    } else {
+      message(err_msg0)
+      browser()
+    }
   }
   if (!is.null(err_dtf)) {
     assign("unknown_sets", err_dtf, globalenv())
-    browser()
+    # isTRUE(options("en_debug")) browser()
     err_msg <- c(
       "Unknown sets (see unknown_sets in .globalenv)\n",
       paste0(capture.output(print(head(err_dtf))), collapse = "\n")
@@ -1210,13 +1225,19 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       err_msg <- c(err_msg, paste0("\n", nrow(err_dtf) - nrow(head(err_dtf)),
                                    " row(s) was ommited"))
     }
-    stop(err_msg)
+
+    if (!isTRUE(getOption("en.debug"))) {
+      stop(err_msg)
+    } else {
+      message(err_msg)
+    }
   }
   if (!is.null(error_duplicated_value)) {
     assign("error_duplicated_value", error_duplicated_value, globalenv())
     err_msg <- c(
-      "There is (are) duplicated values (see error_duplicated_value in globalenv)\n",
-      paste0(capture.output(print(head(error_duplicated_value))), collapse = "\n")
+      "Duplicated sets/values (see error_duplicated_value in globalenv)\n",
+      paste0(capture.output(print(head(error_duplicated_value))),
+             collapse = "\n")
     )
     if (nrow(head(error_duplicated_value)) != nrow(error_duplicated_value)) {
       err_msg <- c(err_msg, paste0("\n",
@@ -1224,7 +1245,12 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
                                      nrow(head(error_duplicated_value)),
                                    " row(s) was ommited"))
     }
-    stop(err_msg)
+    # stop(err_msg)
+    if (isFALSE(getOption("en.debug"))) {
+      stop(err_msg)
+    } else {
+      message(err_msg)
+    }
   }
 }
 

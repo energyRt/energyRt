@@ -3103,9 +3103,11 @@ setMethod(
   }
   if (any(!fl)) {
     # if (obj@name == "ECCG") browser()
-    dend <- dend |> filter(!fl) |> select(-year) |>
-      left_join(obj@end[!fl, ]) |> rename(year = end) |>
-      rbind(filter(dend, fl))
+    suppressMessages({
+      dend <- dend |> filter(!fl) |> select(-year) |>
+        left_join(obj@end[!fl, ]) |> rename(year = end) |>
+        rbind(filter(dend, fl))
+    })
     # dend[obj@end[!fl, "region"], "year"] <- obj@end[!fl, "end"]
   }
   dend <- dend[!is.na(dend$year), , drop = FALSE]
@@ -3181,7 +3183,9 @@ merge0 <- function(x, y,
   y <- .force_year_class_df(y)
   x <- .force_year_class_df(x)
   # xy <- merge(x, y)
-  xy <- dplyr::cross_join(x, y) # !!! rewrite
+  suppressMessages({
+    xy <- dplyr::cross_join(x, y) # !!! rewrite
+  })
   # colnames(xy) <- c(colnames(x), colnames(y)) # ???
   # return(as.data.table(xy))
   return(as.data.table(xy))

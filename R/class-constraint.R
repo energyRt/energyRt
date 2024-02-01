@@ -243,6 +243,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
   # browser()
+  # if (stm@name == "mCnsCESR_5_2030_4") browser()
+  # if (grepl("CESR_5_2030", stm@name)) browser()
   # !!! add interpolation patch here? or in the calling function? !!!
   # if (nrow(stm@for.each) > 0) {
   #   .interpolation0(obj = stm@rhs, parameter = "rhs", defVal = stm@defVal,
@@ -256,7 +258,20 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     stop(paste0('Constraint "', stm@name, '" error: ', x))
   }
   get.all.child <- function(x) {
-    unique(c(x, c(approxim$calendar@slice_ancestry[approxim$calendar@slice_ancestry$parent %in% x, "child"])))
+    #!!! Rewrite
+    unique(
+      c(x,
+        c(
+          # approxim$calendar@slice_ancestry[
+          #   approxim$calendar@slice_ancestry$parent %in% x,
+          #   "child"]
+          filter(
+            approxim$calendar@slice_ancestry,
+            approxim$calendar@slice_ancestry$parent %in% x
+          )[["child"]]
+        )
+      )
+    )
   }
   # all.set contain all set for for.each & lhs
   # Estimate is need sum for for.each
@@ -458,16 +473,28 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
   res$equation <- paste0(res$equation, ".. ")
 
   # Add eq
-  res$equation <- paste0(res$equation, " ### ", c("==" = "=e=", ">=" = "=g=", "<=" = "=l=")[as.character(stm@eq)], " ")
+  res$equation <- paste0(
+    res$equation,
+    " ### ",
+    c("==" = "=e=", ">=" = "=g=", "<=" = "=l=")[as.character(stm@eq)],
+    " "
+    )
   # Add rhs
-  if (nrow(stm@rhs) != 0 && (any(stm@rhs$rhs != 0) || (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
+  if (nrow(stm@rhs) != 0 &&
+      (any(stm@rhs$rhs != 0) ||
+       (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
     # Complicated rhs
     # Generate approxim
-    approxim2 <- approxim[unique(c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)], "solver", "year"))]
+    approxim2 <-
+      approxim[unique(
+        c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)],
+          "solver", "year")
+        )]
     if (any(names(approxim2) == "slice")) {
       approxim2$slice <- approxim2$calendar@slice_share$slice
     }
-    fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
+    fl <- (all.set$for.each & !is.na(all.set$new.map) &
+             all.set$set %in% colnames(stm@rhs))
     need.set <- all.set[fl, , drop = FALSE]
     for (j in seq_len(nrow(need.set))) {
       approxim2[[need.set[j, "set"]]] <- set.map[[need.set[j, "new.map"]]]
@@ -492,7 +519,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     # yy[apply(select(yy, all_of(n1)), 1, paste0, collapse = "##") %in%
     #     apply(select(stm@for.each, all_of(n1)), 1, paste0, collapse = "##"),]
     # same using dplyr
-    yy <- yy |> right_join(select(stm@for.each, all_of(n1)))
+    suppressMessages({
+      yy <- yy |> right_join(select(stm@for.each, all_of(n1)))
+    })
 
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     # Add mult
@@ -570,16 +599,20 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
             for (j in nslc) {
               approxim2[[j]] <- approxim[[j]]
             }
-            if (any(nslc == "slice")) approxim2$slice <- approxim$calendar@slice_share$slice
+            if (any(nslc == "slice")) {
+              approxim2$slice <- approxim$calendar@slice_share$slice
+            }
           }
         }
       }
       approxim2$fullsets <- approxim$fullsets
 
-      xx <- newParameter(paste0("pCnsMult", stm@name, "_", i), need.set, "numpar",
-        defVal = stm@lhs[[i]]@defVal,
-        interpolation = "back.inter.forth"
-      )
+      xx <- newParameter(paste0("pCnsMult", stm@name, "_", i),
+                         need.set,
+                         "numpar",
+                         defVal = stm@lhs[[i]]@defVal,
+                         interpolation = "back.inter.forth"
+                         )
       prec@parameters[[xx@name]] <-
         .dat2par(xx, .interp_numpar(stm@lhs[[i]]@mult, "value", xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
