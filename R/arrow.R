@@ -41,7 +41,7 @@ save_scenario <- function(
     # cat("Use 'overwrite = TRUE' to overwrite.\n")
     return(scen)
   }
-  
+
   tictoc::tic("save_scenario")
   # clean directories
   if (clean_start) {
@@ -527,7 +527,7 @@ get_lazy_dim_names <- function(obj, slot = NULL, element = NULL,
                                path = NULL) {
   # returns dim and names of the object's slot if available
   # browser()
-  # if (obj@name == "meqLECActivity") browser()
+  # if (obj@name == "pTechStock") browser()
   ll <- list(
     dim = NULL,
     names = NULL
@@ -550,14 +550,17 @@ get_lazy_dim_names <- function(obj, slot = NULL, element = NULL,
   # not inMemory object
   if (is.null(path)) path <- getObjPath(obj)
   stopifnot(!is.null(path))
+  # browser() !!! Add path check
+
   if (!is.null(slot) && !.hasSlot(obj, slot)) {
     return(ll) # no data
   }
   # browser()
   if (inherits(obj, "parameter")) {
     ll$dim <- obj@misc$onDisk[[slot]]$dim
-    ll$names <- obj@dimSets
-  } else if  (inherits(obj, "modOut")) {
+    # ll$names <- obj@dimSets
+    ll$names <- slot(obj, slot) |> colnames()
+  } else if (inherits(obj, "modOut")) {
     # browser()
     ll$dim <- obj@misc$onDisk[[slot]][[element]]$dim
     ll$names <- slot(obj, slot)[[element]] |> colnames()
@@ -703,11 +706,11 @@ if (F) {
 #'
 #' @examples
 load_scenario <- function(
-    path, 
-    name = NULL, 
-    env = .scen, 
+    path,
+    name = NULL,
+    env = .scen,
     overwrite = FALSE,
-    ignore_errors = FALSE, 
+    ignore_errors = FALSE,
     verbose = TRUE) {
   if (!file.exists(path) & !dir.exists(path)) {
     msg <- paste0("File or directory '", path, "' does not exist")
@@ -821,20 +824,20 @@ get_element <- function(obj, element) {
   } else {
     return(obj[[element]])
   }
-}  
+}
 
 
 # compare_slots <- function(obj1, obj2) {
-#   
+#
 # }
 
 if (F) {
   x <- scen_BASE@modOut@variables
   y <- obj2mem(scen_ondisk@modOut)@variables
-  
+
   object.size(x)
   object.size(y)
-  
+
   for (i in names(x)) {
     if (!all(dim(x[[i]]) == dim(y[[i]]))) {
       print(i)
@@ -844,8 +847,8 @@ if (F) {
       compare::compare(x[[i]], y[[i]], allowAll = TRUE)$result
       )
   }
-  
+
   scen_inmem <- obj2mem(scen_ondisk)
-  
+
 }
 

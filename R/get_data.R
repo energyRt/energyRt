@@ -18,12 +18,12 @@ getData <- function(...) UseMethod("getData")
 #' @export
 findData <- function(scen, dataType = c("parameters", "variables"),
                      setsNames_ = NULL, valueColumn = TRUE,
-                     allSets = TRUE, 
+                     allSets = TRUE,
                      ignore.case = FALSE,
                      # anyOfTheSets = !allSets,
                      add_weights = "auto",
                      dropEmpty = TRUE,
-                     dfDim = TRUE, 
+                     dfDim = TRUE,
                      dfNames = TRUE,
                      asMatrix = FALSE) {
   ll <- lt <- list()
@@ -46,6 +46,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
       #     names = names(qu)
       #   )
       # }
+      qu
     })
   }
   # browser()
@@ -167,6 +168,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                     scenNameInList = as.logical(length(scen) - 1),
                     verbose = FALSE) {
   # if (name == "vObjective") browser()
+  # browser()
   arg <- list(...)
   argnam <- names(arg)
   stopifnot(!any(duplicated(argnam)))
@@ -301,9 +303,13 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       } else {
         for (pv in pvNames) { # selected pars/vars
           if (datype == "parameters") {
+            # browser()
             dat <- get_lazy_data(scen[[s]]@modInp@parameters[[pv]],
-                                 slot = "data") |>
-              collect() # temporary. ToDo: rewrite filter-algo for lazy-data
+                                 slot = "data")
+            if (!is.null(dat)) {
+              dat <- dat |> collect()
+            }
+            # temporary. ToDo: rewrite filter-algo for lazy-data
             # if (!is.null(scen[[sc]]@modInp@parameters[[pv]])) {
             # if (!is.null(qu) {
               # dat <- scen[[sc]]@modInp@parameters[[pv]]@data

@@ -171,6 +171,7 @@ get_gdxlib_path <- function() {
            'interpolation parameter fullsets must be TRUE')
     }
     # Generate gdx
+    # browser()
     .write_gdx_list(
       dat = .get_scen_data(scen),
       gdxName = paste0(arg$tmp.dir, "input/data.gdx")
@@ -540,6 +541,7 @@ get_gdxlib_path <- function() {
 
 # GDX exchange ####
 .get_scen_data <- function(scen) {
+  # browser()
   all_factor <- function(x) {
     for (i in colnames(x)[colnames(x) != "value"]) {
       x[[i]] <- factor(x[[i]])
@@ -650,7 +652,7 @@ get_gdxlib_path <- function() {
   #     options(en_gdxlib_loaded = TRUE)
   #   }
   # }
-
+  # browser()
   cat(" data.gdx ")
   nms <- names(dat)
   max_length <- max(nchar(nms))
@@ -662,6 +664,8 @@ get_gdxlib_path <- function() {
     x <- c(x, list(.df2uels(data.frame(dat[[i]]), i)))
   }
   # gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
+  # browser()
+  # !!!ToDo: add check for NAs
   wgdx(gdxName = gdxName, x, squeeze = FALSE)
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")

@@ -281,3 +281,75 @@ fact2char <- function(df, asTibble = TRUE) {
   if (asTibble) {df <- as_tibble(df)}
   df
 }
+
+#' Switch on/off and select/customize progress bar
+#'
+#' @param type character, type of the progress bar to display. Existing options:
+#' "bw", "default", "cli", "progress".
+#' @param use_bar logical, the progress bar is visible if `TRUE`.
+#' @param clear logical, sets `progressr.clear` global option. If `TRUE`, all outout from the progress bar will be cleared.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+set_progress_bar <- function(type = "bw", use_bar = TRUE, clear = FALSE) {
+  progressr::handlers(global = use_bar)
+  options(progressr.clear = clear)
+  if (type == "bw") {
+    progressr::handlers(
+      progressr::handler_pbcol(
+        # adjust = 1.0,
+        # complete = function(s) cli::bg_br_green(cli::col_br_black(s)),
+        complete = function(s) cli::bg_black(cli::col_white(s)),
+        # complete = function(s) cli::bg_br_black(cli::col_silver(s)),
+        incomplete = function(s) cli::bg_none(cli::col_grey(s))
+        # incomplete = function(s) cli::bg_black(cli::col_white(s))
+      )
+    )
+  } else if (type == "default") {
+    progressr::handlers("txtprogressbar")
+  } else if (type == "pbcol") {
+    progressr::handlers(
+      progressr::handler_pbcol(
+        adjust = 1.0,
+        complete = function(s) cli::bg_red(cli::col_black(s)),
+        incomplete = function(s) cli::bg_cyan(cli::col_black(s))
+      )
+    )
+  } else if (type == "cli") {
+    progressr::handlers("cli")
+  } else if (type == "progress") {
+    progressr::handlers("progress")
+  } else {
+    warning(
+      "Unrecognized 'type' \n",
+      "See `https://progressr.futureverse.org/` for detailed customization.")
+  }
+}
+
+
+#' Set or get directory for/with scenarios
+#'
+#' @param path
+#'
+#' @family options
+#' @return
+#' @export
+#'
+#' @examples
+set_scenarios_path <- function(path = NULL) {
+  options(en_scenarios_path = path)
+}
+
+
+#' @family options
+#' @export
+#' @examples
+#' # get_gams_path()
+get_scenarios_path <- function() {
+  getOption("en_scenarios_path")
+}
+
+# merge_paths <- function(path1, path2)
+

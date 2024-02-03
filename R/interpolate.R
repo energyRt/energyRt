@@ -25,9 +25,10 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # browser()
   obj <- object
   arg <- list(...)
+  tictoc::tic()
 
   interpolation_start_time <- proc.time()[3]
-  if (is.null(arg$echo)) arg$echo <- TRUE
+  if (is.null(arg$echo)) arg$echo <- FALSE
 
   if (class(obj) == "model") {
     scen <- new("scenario")
@@ -41,6 +42,8 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     stop('Interpolation is not available for class: "', class(obj), '"')
   }
 
+
+  # tictoc::toc()
   if (!is.null(arg$name)) {scen@name <- arg$name; arg$name <- NULL}
   if (!is.null(arg$desc)) {scen@desc <- arg$desc; arg$desc <- NULL}
   if (!is.null(arg$path)) {scen@path <- arg$path; arg$path <- NULL}
@@ -48,6 +51,14 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@inMemory <- arg$inMemory;
     arg$inMemory <- NULL
   }
+  cat("model: '", object@name, "'\n", sep = "")
+  cat("scenario: '", scen@name, "'\n", sep = "")
+  if (!(scen@desc == "")) cat("        '", arg$desc, "'\n", sep = "")
+  if (!is.null(scen@path) || !scen@inMemory) {
+    cat("path: ", scen@path, "\n", sep = "")
+    cat("inMemory: ", scen@inMemory, "\n", sep = "")
+  }
+
   # if (is.null(arg$startYear) != is.null(arg$fixTo)) {
   #   stop("startYear && fixTo have to define both (or not define both")
   # }
@@ -62,6 +73,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@model <- .add_repository(scen@model, arg$data) # !!! use add instead?
     arg$data <- NULL
   }
+  # tictoc::toc()
   carg <- sapply(arg, function(x) class(x)[1])
   # check if there are more repositories
   ii <- carg == "repository"
@@ -80,6 +92,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     arg[ii] <- NULL; carg <- carg[!ii]
   }
   # check if `...` has `settings` object
+  # tictoc::toc()
   ii <- carg %in% "settings"
   if (any(ii)) {
     if (sum(ii) > 1) {
@@ -89,6 +102,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@settings <- arg[ii][[1]]
     arg[ii] <- NULL; carg <- carg[!ii]
   }
+  # tictoc::toc()
   # browser()
   # check if `...` has `calendar` object
   ii <- carg %in% "calendar"
@@ -103,6 +117,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       sum(scen@settings@calendar@timetable$share)
     arg[ii] <- NULL; carg <- carg[!ii]
   }
+  # tictoc::toc()
   # check if `...` has `horizon` object
   ii <- carg %in% "horizon"
   if (any(ii)) {
@@ -120,7 +135,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   #   unique()
   # sett_slots[sett_slots %in% c("name", "desc", "misc")] <- NULL
   # !!! currently one-by-one
-
+  # tictoc::toc()
   if (!is.null(arg$region)) {
     stop("Regions must be defined before the interpolation")
     scen@settings@region <- arg$region
@@ -152,7 +167,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       desc = scen@settings@horizon@desc
     )
   }
-
+  # tictoc::toc()
   # other parameters
   if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
   if (is.null(arg$verbose)) arg$verbose <- 0
@@ -164,7 +179,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@misc$table_format <- "data.table"
     # set_table_format(scen@misc$table_format)
   }
-
+  # tictoc::toc(); tictoc::tic()
   ### Interpolation
   scen@modInp <- new("modInp")
   ## Fill basic sets
@@ -197,7 +212,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # scen@modInp@parameters[["horizon"]] <-
   #   .dat2par(scen@modInp@parameters[["horizon"]],
   #            scen@settings@horizon@period)
-
+  # tictoc::toc(); tictoc::tic()
   scen@modInp@parameters[["year"]] <-
     .dat2par(scen@modInp@parameters[["year"]],
              scen@settings@horizon@intervals$mid)
@@ -230,7 +245,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # browser()
   # scen@settings@timeframe <- .init_slice(scen@settings@timeframe)
   # browser()
-
+  # tictoc::toc(); tictoc::tic()
   if (mean(scen@settings@yearFraction$fraction) != 1.) {
     # filter out unused slices
     # browser()
@@ -242,6 +257,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       " Hourly (or lower slice level) variables have not been scaled,",
       " their annual sum will be different from their annual aggregates."
     )
+    cat("Subsetting time-slices\n")
     scen@model@data <- subset_slices_repo(
       repo = scen@model@data,
       yearFraction = mean(scen@settings@yearFraction$fraction),
@@ -315,17 +331,21 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   if (!is.null(arg$trim) && arg$trim) {
     ## Trim before interpolation
     par_name <- grep("^p", names(scen@modInp@parameters), value = TRUE)
-    par_name <- par_name[!(par_name %in%
-                             c("pEmissionFactor", "pTechEmisComm", "pDiscount"))]
+    par_name <- par_name[
+      !(par_name %in% c("pEmissionFactor", "pTechEmisComm", "pDiscount"))
+      ]
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
-      rep_class <- rbind(rep_class, data.table(
-        repos = rep(i, length(scen@model@data[[i]]@data)),
-        class = sapply(scen@model@data[[i]]@data, class),
-        name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
-        stringsAsFactors = FALSE
-      ))
+      rep_class <- rbind(
+        rep_class,
+        data.table(
+          repos = rep(i, length(scen@model@data[[i]]@data)),
+          class = sapply(scen@model@data[[i]]@data, class),
+          name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
+          stringsAsFactors = FALSE
+          )
+        )
     }
     # Trim data
     for (pr in par_name) {
@@ -425,7 +445,8 @@ interpolate_model <- function(object, ...) { #- returns class scenario
            function(x) .get_data_slot(x)[[1]])
 
   ## interpolate data by year, slice, ...
-  if (arg$echo) cat("Interpolation: ")
+  # if (arg$echo) cat("Interpolation: \n")
+  cat("Interpolating parameters\n")
   interpolation_count <- .get_objects_count(scen) + 46
   len_name <- .get_objects_len_name(scen)
   if (arg$n.threads == 1) {
@@ -434,7 +455,8 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     #   interpolation_count = interpolation_count, len_name = len_name
     # )
   } else {
-    warning("Multiple threads are not implemented yet, ignoring `n.threads` parameter")
+    warning("Multiple threads are not implemented yet,
+            ignoring `n.threads` parameter")
     # use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
     # # require(parallel)
     # cl <- makeCluster(arg$n.threads)
@@ -457,12 +479,16 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   scen@modInp@parameters$mvDemInp <- .unique_set(scen@modInp@parameters$mvDemInp)
 
   # browser()
+  # Check for unknown set in model and duplicated set
+  .check_sets(scen)
   # Check for unknown set in constraints
   .check_constraint(scen)
   # Check for unknown weather
   .check_weather(scen)
-  # Check for unknown set in model and duplicated set
-  .check_sets(scen)
+  # # Check for unknown set in model and duplicated set
+  # .check_sets(scen)
+
+  #!!!ToDo: add NA checks for sets
 
   # Tune for LEC
   # if (length(scen@model@LECdata) != 0) {
@@ -543,20 +569,22 @@ interpolate_model <- function(object, ...) { #- returns class scenario
 
   # Check parameters
   scen <- .check_scen_par(scen)
-  if (arg$echo) cat(" ", round(proc.time()[3] - interpolation_start_time, 2), "s\n")
-
+  # if (arg$echo) cat(" ", round(proc.time()[3] - interpolation_start_time, 2), "s\n")
+  # cat("\n")
+  tictoc::toc()
   invisible(scen)
 }
 
-#' @param object object of class model or scenario
+
+#' Interpolate model
 #'
-#' @param ...
+#' @param object model or scenario type of object.
 #'
-#' @rdname interpolate
-#' @family interpolate model
-#' @method interpolate model
-#'
+#' @return scenario object with enclosed model (slot `@model`) and interpolated parameters (slot `@modInp`).
 #' @export
+#' @family interpolate model
+#'
+#' @examples
 setMethod("interpolate", signature(object = "model"),
   function(object, ...) {
     interpolate_model(object, ...)
@@ -610,9 +638,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
 
   if (inherits(repo, "list")) {
+    # list of repositories
     repo <- lapply(repo, function(o) {
       subset_slices_repo(o, yearFraction, keep_slices)
     })
+    return(repo)
   }
   # stopifnot(inherits(repo, c("repository")))
   # if (repo)
@@ -621,20 +651,27 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   # i <- 19
   # browser()
   if (inherits(repo, c("repository"))) {
+    cat(" Repository '", repo@name, "'\n", sep = "")
     x <- repo@data
   } else {
-    x <- repo
+    # x <- repo
+    # browser()
+    stop("Unrecognized class of object in the repository.")
   }
-
+  p <- progressr::progressor(
+    along = names(x)
+    # message = paste(" Repository '", repo@name, "'\n", sep = "")
+  )
   for (i in 1:length(x)) {
     # print(i)
     obj <- x[[i]]
+    p(obj@name)
     if (inherits(obj, c("repository"))) {
-      # obj <- fract_year_adj_repo(obj, subset_hours, check)
+      # nested repository - should not be here, check repo@misc$permit
+      stop("Nested repositories are not supported. ", obj@name,
+           " is a part of another repository.")
       subset_slices_repo(obj, yearFraction, keep_slices)
     } else {
-      # print(obj@name)
-      # obj <- fract_year_adj(obj, subset_hours, check)
       obj <- subset_slices(obj, yearFraction, keep_slices)
     }
     x[[i]] <- obj
@@ -903,7 +940,9 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 
 # Implement add0 for all parameters
 .add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim,
-                             interpolation_start_time, interpolation_count, len_name) {
+                             interpolation_start_time, interpolation_count,
+                             len_name) {
+  # browser()
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data,
                                                function(x) length(x@data)),
@@ -917,13 +956,17 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   # Fill DB main data
   tmlg <- 0
   mnch <- 0
-  cat(rep(" ", len_name), sep = "")
+  # cat(rep(" ", len_name), sep = "")
   k <- 0
   time.log.nm <- rep(NA, num_classes_for_progrees_bar)
   time.log.tm <- rep(NA, num_classes_for_progrees_bar)
   mdinp <- list()
   for (i in seq(along = scen@model@data)) {
+    cat(" Repository '", names(scen@model@data)[i], "'\n", sep = "")
+    nm <- names(scen@model@data[[i]]@data)
+    p <- progressr::progressor(along = nm)
     for (j in seq(along = scen@model@data[[i]]@data)) {
+      p(nm[j])
       k <- k + 1
       if (k %% max.thread == n.thread) {
         tmlg <- tmlg + 1
@@ -1002,9 +1045,9 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE
   )
   # if (arg$echo) cat(' ')
-  if (arg$echo) {
-    .remove_char(len_name)
-  }
+  # if (arg$echo) {
+  #   .remove_char(len_name)
+  # }
   scen
 }
 
@@ -1059,7 +1102,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     length_out <- 0
   }
   jj <- paste0(jj, paste0(rep(" ", length_out), collapse = ""))
-  cat(rep_len("\b", len_name), jj, sep = "") # , rep(' ', 100), rep('\b', 100)
+  # cat(rep_len("\b", len_name), jj, sep = "") # , rep(' ', 100), rep('\b', 100)
 }
 
 .remove_char <- function(x) {
@@ -1073,6 +1116,8 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 
 
 .check_constraint <- function(scen) {
+  cat("Validating constraints\n")
+  # browser()
   # Collect sets data
   sets <- list()
   for (ss in c(
@@ -1088,7 +1133,10 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       tmp <- data.table(value = have, stringsAsFactors = FALSE)
       tmp$slot <- slt
       tmp$constraint <- cns
-      return(rbind(err_msg, tmp[, c("constraint", "slot", "value"), drop = FALSE]))
+      return(rbind(err_msg,
+                   tmp[, c("constraint", "slot", "value"), drop = FALSE]
+                   )
+             )
     }
     return(err_msg)
   }
@@ -1096,11 +1144,25 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   sets$lead.year <- sets$year
   err_msg <- NULL
   # Check sets in constraints
+  # cat(" Repository ", names(scen@model@data)[i], "\n")
+  # nm <- names(scen@model@data)
+  # p <- progressr::progressor(along = nm)
   for (i in seq_along(scen@model@data)) {
-    for (j in seq_along(scen@model@data[[i]]@data)[
-      sapply(scen@model@data[[i]]@data, class) == "constraint"]) {
+    cat(" Repository '", names(scen@model@data)[i], "'\n", sep = "")
+    ii <- sapply(scen@model@data[[i]]@data, class) == "constraint"
+    nn <- seq_along(scen@model@data[[i]]@data)[ii]
+    if (length(nn) > 0) {
+      # cat(" Repository ", names(scen@model@data)[i], "\n")
+      # browser()
+      p <- progressr::progressor(along = nn)
+    }
+    # nm <- names(scen@model@data[[i]]@data)
+    for (j in nn) {
+    # for (j in seq_along(scen@model@data[[i]]@data)[
+    #   sapply(scen@model@data[[i]]@data, class) == "constraint"]) {
       # browser()
       tmp <- scen@model@data[[i]]@data[[j]]
+      p(tmp@name)
       for (k in colnames(tmp@rhs)) {
         if (k != "value" && k != "year") {
           err_msg <- add_to_err(err_msg, cns = tmp@name, slt = "rhs",
@@ -1128,31 +1190,45 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   if (!is.null(err_msg) && nrow(err_msg) > 0) {
     nn <- capture.output(err_msg)
     # print(err_msg); stop("Unknow sets in constrint(s)")
+    try({
+      err_msg0 <- err_msg |>
+        lapply(function(x) {head(unique(x), 3)}) |>
+        paste(collapse = "\n   ")
+      err_msg0 <- c("   ", err_msg0, "\n...\n",
+                    "See 'scen@misc$dropped_data' for details."
+                    )
+    })
     # browser()
-    warning("Unused (ignored) sets in constraints: ", err_msg)
+    warning("\nUnused (ignored) sets in constraints: \n", head(err_msg0))
   }
 }
 
 .check_weather <- function(scen) {
+  cat("Validating weather-sets\n")
   weather <- scen@modInp@parameters$weather@data$weather
   err_msg <- list()
   pars <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) {
     !is.null(x@data$weather) &&
       nrow(x@data) != 0
   })]
+  # browser()
+  p <- progressr::progressor(along = pars)
   for (pr in pars) {
+    p(pr)
     tmp <- scen@modInp@parameters[[pr]]@data
-    tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather), , drop = FALSE]
+    tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather), ,
+               drop = FALSE]
     if (nrow(tmp) != 0) err_msg[[pr]] <- tmp
   }
   if (length(err_msg) != 0) {
     nn <- capture.output(err_msg)
-    stop(paste0("There unknow weather in parameters\n", paste0(nn, collapse = "\n")))
+    stop(paste0("Unknow 'weather' set in parameters\n", paste0(nn, collapse = "\n")))
   }
 }
 
 # unrecognized sets ####
 .check_sets <- function(scen) {
+  cat("Validating sets\n")
   lsets <- lapply(scen@modInp@parameters, function(x) {
     if (x@type == "set") .get_data_slot(x)[[1]]
   })
@@ -1174,7 +1250,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   err_dtf <- NULL
   int_err <- NULL
 
+  nm <- names(scen@modInp@parameters)
+  p <- progressr::progressor(along = nm)
   for (prm in scen@modInp@parameters) {
+    p(prm@name)
+    # if (grepl("CESR_.+_4", prm@name)) browser()
     if (!all(prm@dimSets %in% names(lsets))) {
       int_err <- unique(c(int_err, prm@dimSets[!(prm@dimSets %in% names(lsets))]))
     } else {
@@ -1208,6 +1288,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     err_msg0 <- paste0('Internal error. Unknown set "',
                   paste0(int_err, collapse = '", "'), '"')
     if (isFALSE(getOption("en.debug"))) {
+      message("Use 'option(en.debug = TRUE)' to ignore this error")
       stop(err_msg0)
     } else {
       message(err_msg0)
@@ -1223,10 +1304,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     )
     if (nrow(head(err_dtf)) != nrow(err_dtf)) {
       err_msg <- c(err_msg, paste0("\n", nrow(err_dtf) - nrow(head(err_dtf)),
-                                   " row(s) was ommited"))
+                                   " row(s) dropped"))
     }
 
     if (!isTRUE(getOption("en.debug"))) {
+      message("Use 'option(en.debug = TRUE)' to ignore this error")
       stop(err_msg)
     } else {
       message(err_msg)
@@ -1243,10 +1325,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       err_msg <- c(err_msg, paste0("\n",
                                    nrow(error_duplicated_value) -
                                      nrow(head(error_duplicated_value)),
-                                   " row(s) was ommited"))
+                                   " row(s) dropped"))
     }
     # stop(err_msg)
     if (isFALSE(getOption("en.debug"))) {
+      message("Use 'option(en.debug = TRUE)' to ignore this error")
       stop(err_msg)
     } else {
       message(err_msg)

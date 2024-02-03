@@ -333,7 +333,7 @@ setMethod(
 .get_data_slot <- function(obj) {
   if (obj@misc$nValues != -1) { # reserved for???
     # obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
-    ii <- seq(length.out = obj@misc$nValues)
+    ii <- seq(length.out = min(nrow(obj@data), obj@misc$nValues))
     return(obj@data[ii, , drop = FALSE])
   } else {
     obj@data
@@ -344,7 +344,7 @@ setMethod(
 # setMethod('.drop_set_value', signature(obj = 'parameter', dimSets = "character", value = "character"),
 .drop_set_value <- function(obj, dimSets, value) {
   # !!! better name? value -> ? dimSets -> dimSet?
-  browser()
+  # browser()
   if (length(dimSets) != 1 || all(dimSets != obj@dimSets)) {
     stop(
       "Inconsistent sets in parameter ", obj@name,

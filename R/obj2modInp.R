@@ -142,13 +142,16 @@ setMethod(".obj2modInp", signature(
   if (length(wth@timeframe) == 0 && length(approxim$calendar@slices_in_frame) > 1) {
     stop("Slot weather@timeframe is empty, it should have information about slice level")
   }
-  if (length(wth@timeframe) == 0) wth@timeframe <- names(approxim$calendar@slices_in_frame)[1]
+  if (length(wth@timeframe) == 0) {
+    wth@timeframe <- names(approxim$calendar@slices_in_frame)[1]
+  }
   approxim <- .fix_approximation_list(approxim, lev = wth@timeframe)
   # region fix
   if (length(wth@region) != 0) {
     approxim$region <- approxim$region[approxim$region %in% wth@region]
   }
   wth@region <- approxim$region
+  # browser()
   wth <- .filter_data_in_slots(wth, approxim$region, "region")
   wth <- .disaggregateSliceLevel(wth, approxim)
   obj@parameters[["pWeather"]]@defVal <- wth@defVal

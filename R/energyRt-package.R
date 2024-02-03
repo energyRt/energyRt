@@ -20,6 +20,7 @@
 #' @importFrom dplyr all_of
 #' @importFrom dplyr any_of
 #' @importFrom dplyr arrange
+#' @importFrom dplyr collect
 #' @importFrom dplyr filter
 #' @importFrom dplyr full_join
 #' @importFrom dplyr if_else

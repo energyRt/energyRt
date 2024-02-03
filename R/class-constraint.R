@@ -244,6 +244,7 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
 .getSetEquation <- function(prec, stm, approxim) {
   # browser()
   # if (stm@name == "mCnsCESR_5_2030_4") browser()
+  # if (grepl("CESR_", stm@name)) browser()
   # if (grepl("CESR_5_2030", stm@name)) browser()
   # !!! add interpolation patch here? or in the calling function? !!!
   # if (nrow(stm@for.each) > 0) {
