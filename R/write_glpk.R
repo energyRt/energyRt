@@ -373,18 +373,21 @@
     # } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
     #   a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
     # changing pattern to include scientific numbers
-    } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
-      a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+    } else if (any(grep("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])",
+                        tmp))) {
+      a3 <- gsub("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])", "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {
       a1 <- sub("^[[:alnum:]_]*", "", tmp)
       vrb <- substr(tmp, 1, nchar(tmp) - nchar(a1))
       a2 <- .get.bracket.glpk(a1)
-      arg <- paste0(.aliasName(strsplit(gsub("[() ]", "", a2$beg), ",")[[1]]), collapse = ", ")
+      arg <- paste0(.aliasName(strsplit(gsub("[() ]", "", a2$beg), ",")[[1]]),
+                    collapse = ", ")
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == "$") {
         rs <- paste0(
-          rs, "sum{FORIF: (", arg, ") in ", gsub("([$]|[(].*)", "", a2$end), "} (", vrb, "[", arg, "])",
+          rs, "sum{FORIF: (", arg, ") in ", gsub("([$]|[(].*)", "", a2$end),
+          "} (", vrb, "[", arg, "])",
           .eqt.to.glpk(gsub("^[^)]*[)]", "", a2$end))
         )
         tmp <- ""

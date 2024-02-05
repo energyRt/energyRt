@@ -1,0 +1,9 @@
+
+energyRt 0.11.11.9000 @dev (Feb 04 2024)
+BUG FIXES
+* fixed duplicated columns in getData when arrow used
+* error handle in read_results when model is not solved
+* custom constraints translation to JuMP, Python, MathProg (still unstable)
+
+NEW FEATURES
+* added progress bar tools

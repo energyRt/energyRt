@@ -347,12 +347,23 @@ if (F) {
 }
 
 rename_duplicated_sets <- function(x) {
-  # x <- table
+  # x - table
+  # browser()
   stopifnot(inherits(x, "data.frame"))
   nm <- colnames(x)
+  # nm <- c("a", "b", "c", "b", "b", "a", "a", "a")
   ii <- duplicated(nm)
   if (any(ii)) {
-    nm[ii] <- paste0(nm[ii], "2")
+    all_sets <- unique(nm)
+    # !!! add check for numeric endings !!!
+    # nm <- c("a", "b", "c", "b2", "b", "a", "a5", "a")
+    for (s in all_sets) {
+      jj <- nm %in% s
+      if (length(nm[jj]) > 1) {
+        nm2 <- c(s, paste0(s, seq(2, length(nm[jj]))))
+        nm[jj] <- nm2
+      }
+    }
     colnames(x) <- nm
   }
   x

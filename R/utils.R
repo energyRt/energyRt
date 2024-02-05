@@ -286,16 +286,18 @@ fact2char <- function(df, asTibble = TRUE) {
 #'
 #' @param type character, type of the progress bar to display. Existing options:
 #' "bw", "default", "cli", "progress".
-#' @param use_bar logical, the progress bar is visible if `TRUE`.
+#' @param show logical, the progress bar is visible if `TRUE`.
 #' @param clear logical, sets `progressr.clear` global option. If `TRUE`, all outout from the progress bar will be cleared.
 #'
+#' @rdname progress
 #' @return
 #' @export
 #'
 #' @examples
-set_progress_bar <- function(type = "bw", use_bar = TRUE, clear = FALSE) {
-  progressr::handlers(global = use_bar)
+set_progress_bar <- function(type = "bw", show = TRUE, clear = FALSE) {
+  progressr::handlers(global = show)
   options(progressr.clear = clear)
+  if (is.null(type)) return(invisible(NULL))
   if (type == "bw") {
     progressr::handlers(
       progressr::handler_pbcol(
@@ -323,9 +325,18 @@ set_progress_bar <- function(type = "bw", use_bar = TRUE, clear = FALSE) {
     progressr::handlers("progress")
   } else {
     warning(
-      "Unrecognized 'type' \n",
+      "Unrecognized 'type = ", type, "'\n",
       "See `https://progressr.futureverse.org/` for detailed customization.")
   }
+}
+
+
+#' @rdname progress
+#' @export
+#'
+#' @examples
+show_progress_bar <- function(show = TRUE) {
+  set_progress_bar(type = NULL, show = show)
 }
 
 

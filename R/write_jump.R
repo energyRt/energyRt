@@ -535,8 +535,11 @@ names(.alias_set) <- .set_al
     # } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
     #   a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
     # changing pattern to include scientific numbers
-    } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
-      a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+      # "+ sum(techp$(mCnsBASN_battery_moderate_0_cn_4(techp) and mTechNew(techp, region, year)), -1 * vTechNewCap(techp, region, year)) =e= 1e-20;"
+    # } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
+    #   a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+    } else if (any(grep("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])", tmp))) {
+      a3 <- gsub("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])", "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {

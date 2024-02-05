@@ -2,15 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{set_progress_bar}
 \alias{set_progress_bar}
+\alias{show_progress_bar}
 \title{Switch on/off and select/customize progress bar}
 \usage{
-set_progress_bar(type = "bw", use_bar = TRUE, clear = FALSE)
+set_progress_bar(type = "bw", show = TRUE, clear = FALSE)
+
+show_progress_bar(show = TRUE)
 }
 \arguments{
 \item{type}{character, type of the progress bar to display. Existing options:
 "bw", "default", "cli", "progress".}
 
-\item{use_bar}{logical, the progress bar is visible if `TRUE`.}
+\item{show}{logical, the progress bar is visible if `TRUE`.}
 
 \item{clear}{logical, sets `progressr.clear` global option. If `TRUE`, all outout from the progress bar will be cleared.}
 }

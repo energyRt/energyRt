@@ -33,10 +33,22 @@ read_solution <- function(obj, ...) {
     }
   }
   # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
-  vrb_list <- arg$readOutputFunction(
-    paste(arg$tmp.dir, "/output/variable_list.csv", sep = ""),
-    stringsAsFactors = FALSE
-  )$value
+  var_file <- paste(arg$tmp.dir, "/output/variable_list.csv", sep = "")
+  vrb_list <- try({
+    arg$readOutputFunction(
+      var_file,
+      stringsAsFactors = FALSE
+      )$value
+  })
+  if (inherits(vrb_list, "try-error")) {
+    msg <- paste0("Solution files not found\n", var_file)
+    if (!is.null(arg$stop_on_error) && arg$stop_on_error) {
+      stop(msg)
+    } else {
+      message(msg)
+      return(invisible(obj))
+    }
+  }
   if (file.exists(paste(arg$tmp.dir, "/output/variable_list2.csv", sep = ""))) {
     vrb_list2 <- arg$readOutputFunction(
       paste(arg$tmp.dir, "/output/variable_list2.csv", sep = ""),

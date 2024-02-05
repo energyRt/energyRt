@@ -351,7 +351,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
               if (verbose) cat("   ", pv, " has no data.\n")
             }
           }
-          # browser()
+          if (anyDuplicatedSets(dat)) dat <- rename_duplicated_sets(dat)
           dkk <- dat |> collect() |> filter(kk)
           if (!is.null(dkk) && nrow(dkk) > 0) {
             nkk <- sum(kk)
@@ -964,3 +964,4 @@ getObjects <- function(obj, class = c(), regex = NULL, ...) {
 getObjects_ <- function(obj, class = c(), ...) {
   .getNames(obj, cls = class, regex = TRUE, ...)
 }
+
