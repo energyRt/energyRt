@@ -1,20 +1,23 @@
 #' An S4 class to represent inter-regional trade
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot commodity character.
-#' @slot routes data.frame.
-#' @slot trade data.frame.
-#' @slot aux data.frame.
-#' @slot aeff data.frame.
-#' @slot invcost data.frame.
-#' @slot olife numeric.
-#' @slot start numeric.
-#' @slot end numeric.
-#' @slot stock data.frame.
-#' @slot capacityVariable logical.
-#' @slot cap2act numeric.
-#' @slot misc list.
+#' @slot name character. Short name of the trade object, used in sets.
+#' @slot desc character. Description of the trade object.
+#' @slot commodity character. The traded commodity short name.
+#' @slot routes data.frame. Source and destination regions. For bivariate trade define both directions.
+#' @slot trade data.frame. Technical parameters of trade.
+#' @slot aux data.frame. Auxiliary commodity of trade.
+#' @slot aeff data.frame. Auxiliary commodity efficiency parameters.
+#' @slot invcost data.frame. Investment cost, used when capacityVariable is TRUE.
+#' @slot olife numeric. Operational life of the trade object.
+#' @slot start numeric. Start year when the trade-type of process is available for investment.
+#' @slot end numeric. End year when the trade-type of process is available for investment.
+#' @slot stock data.frame. Capacity stock of the trade object.
+#' @slot capacityVariable logical. If TRUE, the capacity variable of the trade object is used. If FALSE, the capacity is defined by availability parameters (`ava.*`) in the trade-flow units.
+#' @slot cap2act numeric. Capacity to activity ratio.
+#' @slot misc list. Additional information.
+#' @slot fixom data.frame. (not implemented!) Fixed operation and maintenance costs.
+#' @slot varom data.frame. (not implemented!) Variable operation and maintenance costs.
+#' @slot capacity data.frame. (not implemented!) Capacity parameters of the trade object.
 #'
 #' @include class-storage.R
 #'
@@ -33,12 +36,13 @@ setClass("trade",
     aux = "data.frame", #
     aeff = "data.frame", #  Commodity efficiency
     invcost = "data.frame",
-    # fixom = "data.frame", # !!!ToDo: add fixom
-    # varom = "data.frame", # !!!ToDO: add varom
+    fixom = "data.frame", # !!!ToDo: add fixom
+    varom = "data.frame", # !!!ToDO: add varom
     olife = "numeric",
     start = "numeric",
     end = "numeric",
-    stock = "data.frame",
+    stock = "data.frame", # !!!ToDo: deprecate (move to @capacity)
+    capacity = "data.frame", # !!!ToDo: not implemented yet
     capacityVariable = "logical",
     cap2act = "numeric", #
     misc = "list"
@@ -62,23 +66,49 @@ setClass("trade",
       ava.up = numeric(),
       ava.fx = numeric(),
       ava.lo = numeric(),
-      cost = numeric(),
-      markup = numeric(),
+      cost = numeric(), # !!!ToDo: move to varom
+      markup = numeric(), # !!!ToDo: move to varom
       teff = numeric(),
+      stringsAsFactors = FALSE
+    ),
+    fixom = data.frame(
+      region = character(),
+      year = integer(),
+      fixom = numeric(), # only if capacityVariable == TRUE
+      stringsAsFactors = FALSE
+    ),
+    varom = data.frame(
+      src = character(),
+      dst = character(),
+      year = integer(),
+      varom = numeric(),
       stringsAsFactors = FALSE
     ),
     invcost = data.frame(
       region = character(),
       year = integer(),
       invcost = numeric(),
+      wacc = numeric(),
       stringsAsFactors = FALSE
     ),
-    olife = Inf, # change to data.frame for consistency?
-    start = -Inf, # change to data.frame for consistency?
-    end = Inf, # change to data.frame for consistency?
+    olife = Inf, # !!!ToDo: change to data.frame for consistency
+    start = -Inf, # !!!ToDo: change to data.frame for consistency
+    end = Inf, # !!!ToDo: change to data.frame for consistency
     stock = data.frame(
       year = integer(),
       stock = numeric(),
+      stringsAsFactors = FALSE
+    ),
+    capacity = data.frame(
+      region = character(),
+      year = integer(),
+      stock = numeric(),
+      cap.lo = numeric(),
+      cap.up = numeric(),
+      cap.fx = numeric(),
+      ncap.lo = numeric(),
+      ncap.up = numeric(),
+      ncap.fx = numeric(),
       stringsAsFactors = FALSE
     ),
     capacityVariable = FALSE,

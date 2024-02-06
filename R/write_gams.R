@@ -13,6 +13,15 @@
 #' # set_gams_path("C:/GAMS/win64/32.2/")
 #'
 set_gams_path <- function(path = NULL) {
+  # browser()
+  if (!is.null(path) & path != "") {
+    # if (!file.exists(path)) {
+    #   stop(paste0('The path "', path, '" does not exist.'))
+    # }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
   options(en_gams_path = path)
 }
 
@@ -336,7 +345,9 @@ get_gdxlib_path <- function() {
   close(zz_costs)
   .write_inc_files(arg, scen, ".gms")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- "gams energyRt.gms"
+    scen@settings@solver$cmdline <-
+      paste0(get_gams_path(), "gams energyRt.gms")
+      # "gams energyRt.gms"
   }
   scen@settings@solver$code <- c(
     "energyRt.gms", "output.gms", "inc_constraints.gms",

@@ -247,6 +247,8 @@ Create object of class `technology`.
 \item{\code{region}}{character vector of regions where the technology exist or can be installed.}
 
 \item{\code{misc}}{list with any miscellaneous information.}
+
+\item{\code{capacity}}{data.frame (not implemented!) Capacity parameters of the technology.}
 }}
 
 \concept{technology}
