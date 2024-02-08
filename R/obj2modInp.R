@@ -1620,16 +1620,23 @@ setMethod(
       pTechAfc <- NULL
     }
     # Stock & Capacity
-    stock_exist <- .interp_numpar(tech@stock, "stock",
-                                       obj@parameters[["pTechStock"]], approxim,
-                                       "tech", tech@name)
+    stock_exist <- .interp_numpar(
+      tech@stock,
+      "stock",
+      obj@parameters[["pTechStock"]],
+      approxim,
+      "tech",
+      tech@name
+    )
     obj@parameters[["pTechStock"]] <-
       .dat2par(obj@parameters[["pTechStock"]], stock_exist)
-    olife <- .interp_numpar(tech@olife, "olife",
-                                 obj@parameters[["pTechOlife"]], approxim,
-                                 "tech", tech@name
-                                 # , removeDefault = FALSE
-                                 )
+
+    olife <- .interp_numpar(
+      tech@olife, "olife",
+      obj@parameters[["pTechOlife"]], approxim,
+      "tech", tech@name
+      # , removeDefault = FALSE
+    )
     obj@parameters[["pTechOlife"]] <-
       .dat2par(obj@parameters[["pTechOlife"]], olife)
     # browser() # check warning msg
@@ -1687,8 +1694,9 @@ setMethod(
       pTechEac <- salv_data[, c("tech", "region", "year", "value")]
       co <- c(obj@parameters[["pTechEac"]]@dimSets, "value")
       obj@parameters[["pTechEac"]] <-
-        .dat2par(obj@parameters[["pTechEac"]], unique(select(pTechEac, all_of(co))))
-            # unique(pTechEac[, c(obj@parameters[["pTechEac"]]@dimSets, "value")]))
+        .dat2par(obj@parameters[["pTechEac"]],
+                 unique(select(pTechEac, all_of(co))))
+        # unique(pTechEac[, c(obj@parameters[["pTechEac"]]@dimSets, "value")]))
     }
     pTechAf <- .interp_bounds(tech@af, "af",
       obj@parameters[["pTechAf"]], approxim, "tech", tech@name,
@@ -1709,13 +1717,16 @@ setMethod(
         remValueUp = Inf,
         remValueLo = 0
       )
-      obj@parameters[["pTechAfs"]] <- .dat2par(obj@parameters[["pTechAfs"]], pTechAfs)
+      obj@parameters[["pTechAfs"]] <-
+        .dat2par(obj@parameters[["pTechAfs"]], pTechAfs)
     } else {
       pTechAfs <- NULL
     }
 
     approxim_comm[["comm"]] <-
-      rownames(ctype$comm)[ctype$comm$type == "input" & is.na(ctype$comm[, "group"])]
+      rownames(ctype$comm)[
+        ctype$comm$type == "input" & is.na(ctype$comm[, "group"])
+        ]
     if (length(approxim_comm[["comm"]]) != 0) {
       pTechCinp2use <- .interp_numpar(
         tech@ceff, "cinp2use",

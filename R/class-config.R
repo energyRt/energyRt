@@ -49,6 +49,8 @@ setClass("config",
       region = character(),
       year = integer(),
       discount = numeric(),
+      wacc = numeric(),
+      # sdr = numeric(),
       stringsAsFactors = FALSE
     ),
     region = NULL,
