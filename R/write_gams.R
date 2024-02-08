@@ -174,7 +174,7 @@ get_gdxlib_path <- function() {
   cat(scen@settings@sourceCode[["GAMS_output"]], sep = "\n", file = zz_output)
   close(zz_output)
   zz_data_gms <- file(paste(arg$tmp.dir, "/data.gms", sep = ""), "w")
-  if (scen@settings@solver$export_format == "gdx") {
+  if (grepl("gdx", scen@settings@solver$export_format, ignore.case = TRUE)) {
     if (!scen@status$fullsets) {
       stop('for export_format = "gdx", ',
            'interpolation parameter fullsets must be TRUE')

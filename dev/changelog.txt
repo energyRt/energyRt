@@ -1,3 +1,13 @@
+energyRt 0.11.13.9000 @dev (Feb 05 2024)
+BUG FIXES
+* early.retirement interpolation error (dplyr, NULL object) fixed in `technology` class
+
+OTHER CHANGES
+* export/import format for "gdx" ignores case.
+
+NEW FEATURES
+* added functions to set/get python and julia paths
+
 energyRt 0.11.12.9000 @dev (Feb 05 2024)
 NEW FEATURES
 * added (reserved, not implemented) `@capacity` slots to `technology`, `storage`, and `trade` classes for futher implementation of additional parameters and constraints, including bounds on total capacity, new capacity, and individual weighted average cost of capital (WACC) for each technology, storage, and trade (a column in the @invcost slot). The @stock slot is to be deprecated in the future, moving the `stock` column to the @capacity slots.

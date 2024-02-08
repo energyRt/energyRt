@@ -1,3 +1,29 @@
+#' Set or get python installation path to be used to solve models
+#'
+#' @param path character path to the python installation. If NULL, the global operation path is used.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+set_python_path <- function(path = NULL) {
+  # browser()
+  if (!is.null(path) & path != "") {
+    # if (!file.exists(path)) {
+    #   stop(paste0('The path "', path, '" does not exist.'))
+    # }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options(en_python_path = path)
+}
+
+#' @export
+get_python_path <- function() {
+  getOption("en_python_path")
+}
+
 # Functions to write PYOMO model and data files
 .write_model_PYOMO <- function(arg, scen) {
   # browser()
@@ -264,7 +290,8 @@
   close(zz_modout)
   .write_inc_files(arg, scen, ".py")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- "python energyRt.py"
+    scen@settings@solver$cmdline <- 
+      paste0(get_python_path(), "python energyRt.py")
   }
   scen@settings@solver$code <- c(
     "energyRt.py", "output.py", "inc_constraints.py",

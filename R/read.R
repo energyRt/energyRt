@@ -81,7 +81,8 @@ read_solution <- function(obj, ...) {
   if (is.null(scen@settings@solver$import_format)) {
     scen@settings@solver$import_format <- "csv" # !!! workaround
   }
-  if (scen@settings@solver$import_format == "gdx") {
+  # browser()
+  if (grepl("^gdx$", scen@settings@solver$import_format, ignore.case = TRUE)) {
     # .check_load_gdxlib()
     .check_load_gdxtools()
     # Read variables gdx

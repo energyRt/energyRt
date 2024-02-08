@@ -1620,6 +1620,7 @@ setMethod(
       pTechAfc <- NULL
     }
     # Stock & Capacity
+    # browser()
     stock_exist <- .interp_numpar(tech@stock, "stock",
                                        obj@parameters[["pTechStock"]], approxim,
                                        "tech", tech@name)
@@ -1888,16 +1889,24 @@ setMethod(
     obj@parameters[["pTechVarom"]] <- .dat2par(obj@parameters[["pTechVarom"]], pTechVarom)
 
     ## Move from reduce
+    # browser()
     mTechNew <- dd0$new
     mTechSpan <- dd0$span
     pTechOlife <- olife
     if (tech@early.retirement) {
-      obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
-        obj@parameters[["mvTechRetiredStock"]],
+      if (!is.null(stock_exist)) {
+        stock_exists <- stock_exist |>
+          filter(value != 0) |>
+          select(-any_of("value"))
+        # browser()
+        obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
+          obj@parameters[["mvTechRetiredStock"]], stock_exists)
+      }
+
         # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
-        select(filter(stock_exist, value != 0), -any_of("value"))
+        # select(filter(stock_exist, value != 0), -any_of("value"))
         # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
-      )
+      # )
     }
     # browser()
     if (nrow(dd0$new) > 0 && tech@early.retirement) {
