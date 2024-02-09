@@ -626,6 +626,48 @@ write.sc <- write_sc
     }
     rm(mTechNewCapUp)
   }
+  
+  if (prec@parameters[["pStorageCap"]]@data %>% nrow() > 0) {
+    mStorageCap <- prec@parameters[["pStorageCap"]]@data |>
+      inner_join(prec@parameters[["mStorageSpan"]]@data) |>
+      # select(-value) |>
+      unique()
+    mStorageCapLo <- filter(mStorageCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mStorageCapLo) && nrow(mStorageCapLo) > 0) {
+      prec@parameters[["mStorageCapLo"]] <-
+        .dat2par(prec@parameters[["mStorageCapLo"]], mStorageCapLo)
+    }
+    rm(mStorageCapLo)
+    mStorageCapUp <- filter(mStorageCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mStorageCapUp) && nrow(mStorageCapUp) > 0) {
+      prec@parameters[["mStorageCapUp"]] <-
+        .dat2par(prec@parameters[["mStorageCapUp"]], mStorageCapUp)
+    }
+    rm(mStorageCapUp)
+  }
+
+  if (prec@parameters[["pTradeCap"]]@data %>% nrow() > 0) {
+    mTradeCap <- prec@parameters[["pTradeCap"]]@data |>
+      inner_join(prec@parameters[["mTradeSpan"]]@data) |>
+      # select(-value) |>
+      unique()
+    mTradeCapLo <- filter(mTradeCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTradeCapLo) && nrow(mTradeCapLo) > 0) {
+      prec@parameters[["mTradeCapLo"]] <-
+        .dat2par(prec@parameters[["mTradeCapLo"]], mTradeCapLo)
+    }
+    rm(mTradeCapLo)
+    mTradeCapUp <- filter(mTradeCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTradeCapUp) && nrow(mTradeCapUp) > 0) {
+      prec@parameters[["mTradeCapUp"]] <-
+        .dat2par(prec@parameters[["mTradeCapUp"]], mTradeCapUp)
+    }
+    rm(mTradeCapUp)
+  }
 
   # mTechCapUp <- prec@parameters[["pTechCap"]]@data |>
   #   inner_join(prec@parameters[["mTechSpan"]]@data) |>

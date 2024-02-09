@@ -344,6 +344,11 @@ mStorageCout2AInp(stg, comm, region, year, slice)
 mStorageCap2AInp(stg, comm, region, year, slice)
 mStorageNCap2AInp(stg, comm, region, year, slice)
 
+mStorageCapLo(stg, region, year)
+mStorageCapUp(stg, region, year)
+mStorageNewCapLo(stg, region, year)
+mStorageNewCapUp(stg, region, year)
+
 mvTradeIr(trade, comm, region, region, year, slice)
 mTradeIrCsrc2Ainp(trade, comm, region, region, year, slice)
 mTradeIrCdst2Ainp(trade, comm, region, region, year, slice)
@@ -354,6 +359,11 @@ mvTradeRowCost(region, year)
 mvTradeIrCost(region, year)
 mvTotalCost(region, year)
 mvTotalUserCosts(region, year)
+
+mTradeCapLo(trade, year)
+mTradeCapUp(trade, year)
+mTradeNewCapLo(trade, year)
+mTradeNewCapUp(trade, year)
 ;
 
 * Endogenous variables
@@ -973,10 +983,10 @@ eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, co
 *** Capacity and costs equations
 ********************************************************************************
 Equation
-* Capacity equation
-eqTechCap(tech, region, year)       Technology capacity
-eqTechCapUp(tech, region, year)       Technology capacity
-eqTechCapLo(tech, region, year)       Technology capacity
+* Capacity equations
+eqTechCap(tech, region, year)        Technology capacity
+eqTechCapLo(tech, region, year)      Technology capacity lower bound
+eqTechCapUp(tech, region, year)      Technology capacity upper bound
 eqTechNewCapLo(tech, region, year)
 eqTechNewCapUp(tech, region, year)
 eqTechRetiredNewCap(tech, region, year)  Retirement of new capacity
@@ -988,7 +998,7 @@ eqTechInv(tech, region, year)       Technology overnight investment costs
 eqTechOMCost(tech, region, year)    Technology O&M costs
 ;
 
-* Capacity equation
+* Capacity equations
 eqTechCap(tech, region, year)$mTechSpan(tech, region, year)..
          vTechCap(tech, region, year)
          =e=
@@ -1031,7 +1041,7 @@ eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
                          vTechRetiredNewCap(tech, region, year, yearp)
          ) =l= vTechNewCap(tech, region, year);
 
-* Stock retired eqution
+* Stock retired equation
 eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)..
          vTechRetiredStock(tech, region, year) =l= pTechStock(tech, region, year);
 
@@ -1213,7 +1223,7 @@ eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
 ********************************************************************************
 *** Input & Output
 ********************************************************************************
-Equation
+Equations
 eqStorageStore(stg, comm, region, year, slicep, slice)  Storage level
 *eqStorageStorePS(stg, comm, region, year, slice)  Storage level of parent-slice storage cycle
 *eqStorageStoreFY(stg, comm, region, year, slice)  Storage level of full-year storage cycle
@@ -1344,8 +1354,12 @@ eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region
 *** Capacity and costs for storage
 ********************************************************************************
 Equation
-* Capacity equation
+* Capacity equations
 eqStorageCap(stg, region, year)     Storage capacity
+eqStorageCapLo(stg, region, year)     Storage capacity lower bound
+eqStorageCapUp(stg, region, year)     Storage capacity upper bound
+eqStorageNewCapLo(stg, region, year)  Storage new capacity lower bound
+eqStorageNewCapUp(stg, region, year)  Storage new capacity upper bound
 * Investment equation
 eqStorageInv(stg, region, year)     Storage overnight investment costs
 eqStorageEac(stg, region, year)     Storage equivalent annual cost
@@ -1370,6 +1384,18 @@ eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)..
                  ),
                  pPeriodLen(yearp) * vStorageNewCap(stg, region, yearp)
          );
+
+eqStorageCapLo(stg, region, year)$mStorageCapLo(stg, region, year)..
+         vStorageCap(stg, region, year) =g= pStorageCapLo(stg, region, year);
+
+eqStorageCapUp(stg, region, year)$mStorageCapUp(stg, region, year)..
+          vStorageCap(stg, region, year) =l= pStorageCapUp(stg, region, year);
+
+eqStorageNewCapLo(stg, region, year)$mStorageNewCapLo(stg, region, year)..
+          vStorageNewCap(stg, region, year) =g= pStorageNewCapLo(stg, region, year);
+
+eqStorageNewCapUp(stg, region, year)$mStorageNewCapUp(stg, region, year)..
+          vStorageNewCap(stg, region, year) =l= pStorageNewCapUp(stg, region, year);
 
 * Investment equation
 eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)..
@@ -1439,6 +1465,10 @@ eqImportRowLo(imp, comm, region, year, slice)     Import of ROW lower constraint
 eqImportRowAccumulated(imp, comm)                 Cumulative import from ROW
 eqImportRowResUp(imp, comm)                       Cumulative import from ROW upper constraint
 eqTradeCap(trade, year)                           Trade capacity
+eqTradeCapLo(trade, year)                         Trade capacity lower bound
+eqTradeCapUp(trade, year)                         Trade capacity upper bound
+eqTradeNewCapLo(trade, year)                      Trade new capacity lower bound
+eqTradeNewCapUp(trade, year)                      Trade new capacity upper bound
 eqTradeInv(trade, region, year)                   Trade overnight investment costs
 eqTradeEac(trade, region, year)                   Trade equivalent annual costs
 eqTradeCapFlow(trade, comm, year, slice)          Trade capacity to activity
@@ -1575,7 +1605,6 @@ eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
         )
     );
 
-
 eqExportRowUp(expp, comm, region, year, slice)$mExportRowUp(expp, comm, region, year, slice)..
   vExportRow(expp, comm, region, year, slice)
   =l=
@@ -1615,7 +1644,7 @@ eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm).. vImportRowAccum
 *** Trade IR capacity equations
 ********************************************************************************
 
-* Capacity equation
+* Activity equation
 eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slice)..
          pSliceShare(slice) * pTradeCap2Act(trade) * vTradeCap(trade, year) =g=
                  sum((src, dst)$mvTradeIr(trade, comm, src, dst, year, slice), vTradeIr(trade, comm, src, dst, year, slice));
@@ -1627,6 +1656,18 @@ eqTradeCap(trade, year)$mTradeSpan(trade, year)..
          pTradeStock(trade, year) +
          sum(yearp$(mTradeNew(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
             (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))), pPeriodLen(yearp) * vTradeNewCap(trade, yearp));
+
+eqTradeCapLo(trade, year)$mTradeCapLo(trade, year)..
+         vTradeCap(trade, year) =g= pTradeCapLo(trade, year);
+
+eqTradeCapUp(trade, year)$mTradeCapUp(trade, year)..
+          vTradeCap(trade, year) =l= pTradeCapUp(trade, year);
+
+eqTradeNewCapLo(trade, year)$mTradeNewCapLo(trade, year)..
+          vTradeNewCap(trade, year) =g= pTradeNewCapLo(trade, year);
+
+eqTradeNewCapUp(trade, year)$mTradeNewCapUp(trade, year)..
+          vTradeNewCap(trade, year) =l= pTradeNewCapUp(trade, year);
 
 * Investment equation
 eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)..

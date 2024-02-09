@@ -40,7 +40,8 @@ m <- newModel(
 getHorizon(m)
 
 show_progress_bar(FALSE)
-scen <- solve(m, solver = "glpk")
+scen <- solve(m, solver = solver_options$gams_gdx_cplex, 
+              tmp.dir = "tmp/mod_one_ret1")
 scen
 getData(scen, "vTechCap")
 getData(scen, name_ = "cost")

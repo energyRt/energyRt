@@ -3957,8 +3957,8 @@ pTechCap:
   - 0.0
   - .inf
   interpolation:
-  - back.inter.forth
-  - back.inter.forth
+  - inter.forth
+  - inter.forth
   colName:
   - cap.lo
   - cap.up
@@ -3988,8 +3988,8 @@ pTechNewCap:
   - 0.0
   - .inf
   interpolation:
-  - back.inter.forth
-  - back.inter.forth
+  - inter.forth
+  - inter.forth
   colName:
   - ncap.lo
   - ncap.up
@@ -4008,72 +4008,124 @@ mTechNewCapUp:
   - region
   - year
   type: map
-# pStorageCap:
-#   name: pStorageCap
-#   dimSets:
-#   - stg
-#   - region
-#   - year
-#   type: bounds
-#   defVal:
-#   - 0.0
-#   - .inf
-#   interpolation:
-#   - back.inter.forth
-#   - back.inter.forth
-#   colName:
-#   - cap.lo
-#   - cap.up
-#   class: storage
-# pStorageNewCap:
-#   name: pStorageNewCap
-#   dimSets:
-#   - stg
-#   - region
-#   - year
-#   type: bounds
-#   defVal:
-#   - 0.0
-#   - .inf
-#   interpolation:
-#   - back.inter.forth
-#   - back.inter.forth
-#   colName:
-#   - ncap.lo
-#   - ncap.up
-#   class: storage
-# pTradeCap:
-#   name: pTradeCap
-#   dimSets:
-#   - trade
-#   - year
-#   type: bounds
-#   defVal:
-#   - 0.0
-#   - .inf
-#   interpolation:
-#   - back.inter.forth
-#   - back.inter.forth
-#   colName:
-#   - cap.lo
-#   - cap.up
-#   class: trade
-# pTradeNewCap:
-#   name: pTradeNewCap
-#   dimSets:
-#   - trade
-#   - year
-#   type: bounds
-#   defVal:
-#   - 0.0
-#   - .inf
-#   interpolation:
-#   - back.inter.forth
-#   - back.inter.forth
-#   colName:
-#   - ncap.lo
-#   - ncap.up
-#   class: trade
+pStorageCap:
+  name: pStorageCap
+  dimSets:
+  - stg
+  - region
+  - year
+  type: bounds
+  defVal:
+  - 0.0
+  - .inf
+  interpolation:
+  - inter.forth
+  - inter.forth
+  colName:
+  - cap.lo
+  - cap.up
+  class: storage
+mStorageCapLo:
+  name: mStorageCapLo
+  dimSets:
+  - stg
+  - region
+  - year
+  type: map
+mStorageCapUp:
+  name: mStorageCapUp
+  dimSets:
+  - stg
+  - region
+  - year
+  type: map
+pStorageNewCap:
+  name: pStorageNewCap
+  dimSets:
+  - stg
+  - region
+  - year
+  type: bounds
+  defVal:
+  - 0.0
+  - .inf
+  interpolation:
+  - inter.forth
+  - inter.forth
+  colName:
+  - ncap.lo
+  - ncap.up
+  class: storage
+mStorageNewCapLo:
+  name: mStorageNewCapLo
+  dimSets:
+  - stg
+  - region
+  - year
+  type: map
+mStorageNewCapUp:
+  name: mStorageNewCapUp
+  dimSets:
+  - stg
+  - region
+  - year
+  type: map
+pTradeCap:
+  name: pTradeCap
+  dimSets:
+  - trade
+  - year
+  type: bounds
+  defVal:
+  - 0.0
+  - .inf
+  interpolation:
+  - inter.forth
+  - inter.forth
+  colName:
+  - cap.lo
+  - cap.up
+  class: trade
+mTradeCapLo:
+  name: mTradeCapLo
+  dimSets:
+  - trade
+  - year
+  type: map
+mTradeCapUp:
+  name: mTradeCapUp
+  dimSets:
+  - trade
+  - year
+  type: map
+pTradeNewCap:
+  name: pTradeNewCap
+  dimSets:
+  - trade
+  - year
+  type: bounds
+  defVal:
+  - 0.0
+  - .inf
+  interpolation:
+  - inter.forth
+  - inter.forth
+  colName:
+  - ncap.lo
+  - ncap.up
+  class: trade
+mTradeNewCapLo:
+  name: mTradeNewCapLo
+  dimSets:
+  - trade
+  - year
+  type: map
+mTradeNewCapUp:
+  name: mTradeNewCapUp
+  dimSets:
+  - trade
+  - year
+  type: map
 pTradeFixom:
   name: pTradeFixom
   dimSets:

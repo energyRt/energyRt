@@ -850,7 +850,22 @@ setMethod(
       .dat2par(obj@parameters[["pStorageStock"]], stock_exist)
     invcost <- .interp_numpar(stg@invcost, "invcost",
                               obj@parameters[["pStorageInvcost"]],
-                              approxim, "stg", stg@name)
+                              approxim, "stg", stg@name,
+                              remValueLow = 0, remValueUp = Inf)
+
+    if (nrow(stg@capacity) > 0) {
+      # pTechCap
+      pStorageCap <- .interp_bounds(stg@capacity, "cap",
+                                    obj@parameters[["pStorageCap"]],
+                                    approxim, "stg", stg@name)
+      obj@parameters[["pStorageCap"]] <-
+        .dat2par(obj@parameters[["pStorageCap"]], pStorageCap)
+
+      pStorageNewCap <- .interp_bounds(stg@capacity, "ncap",
+                                       obj@parameters[["pStorageNewCap"]],
+                                       approxim, "stg", stg@name)
+    }
+
     obj@parameters[["pStorageInvcost"]] <- .dat2par(obj@parameters[["pStorageInvcost"]], invcost)
 
 
@@ -1639,6 +1654,7 @@ setMethod(
       )
       obj@parameters[["pTechCap"]] <-
         .dat2par(obj@parameters[["pTechCap"]], pTechCap)
+        rm(pTechCap)
 
       pTechNewCap <- .interp_bounds(
         tech@capacity, "ncap",
@@ -1647,6 +1663,7 @@ setMethod(
       )
       obj@parameters[["pTechNewCap"]] <-
         .dat2par(obj@parameters[["pTechNewCap"]], pTechNewCap)
+        rm(pTechNewCap)
     }
 
     olife <- .interp_numpar(
@@ -2802,6 +2819,23 @@ setMethod(
                                     "trade", trd@name)
       obj@parameters[["pTradeStock"]] <-
         .dat2par(obj@parameters[["pTradeStock"]], stock_exist)
+
+      if (nrow(trd@capacity) > 0) {
+        pTradeCap <- .interp_numpar(trd@capacity, "cap",
+                                    obj@parameters[["pTradeCap"]], approxim,
+                                    "trade", trd@name)
+        obj@parameters[["pTradeCap"]] <-
+          .dat2par(obj@parameters[["pTradeCap"]], pTradeCap)
+        rm(pTradeCap)
+
+        pTradeNewCap <- .interp_numpar(trd@capacity, "ncap",
+                                       obj@parameters[["pTradeNewCap"]], approxim,
+                                       "trade", trd@name)
+        obj@parameters[["pTradeNewCap"]] <-
+          .dat2par(obj@parameters[["pTradeNewCap"]], pTradeNewCap)
+        rm(pTradeNewCap)
+      }
+
       obj@parameters[["pTradeOlife"]] <- .dat2par(
         obj@parameters[["pTradeOlife"]],
         data.table(trade = trd@name, value = trd@olife, stringsAsFactors = FALSE)
