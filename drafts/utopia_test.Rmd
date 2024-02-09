@@ -66,7 +66,7 @@ mysolver <- "GLPK"
 # Load required packages
 # devtools::install_github("energyRt/energyRt", ref = "dev")
 # library(energyRt)
-# devtools::load_all(".")
+devtools::load_all(".")
 library(scales)
 library(sf)
 library(tidyverse)
@@ -74,9 +74,9 @@ library(lubridate)
 library(data.table)
 # source("~/R/solver_options_generic.R")
 
-if (T) { 
+if (F) { 
   # GAMS customization (if installed)
-  set_gams_path("C:/GAMS/win64/32.2") 
+  set_gams_path("C:/GAMS/win64/32.2")
   set_gdxlib_path("C:/GAMS/35") # in the case of using different version 
   
   GAMS <- list(
@@ -1267,15 +1267,22 @@ mdl@config@horizon
 ## "BASE": traditional techs, no trade
 ```{r BASE, eval=T, echo=T}
 # source("~/R/IDEEA.dev/data-raw/solver_options.R")
+# set_gams_path("/Applications/GAMS25.1/sysdir")
+# get_gams_path()
+# set_gdxlib_path("/Library/Frameworks/GAMS.framework/Versions/45/Resources/")
+# get_gdxlib_path()
 # Four alternative languages to solve the model
 # scen_BASE <- solve(mdl, "BASE",
+# show_progress_bar()
+set_progress_bar("progress")
 scen_BASE <- solve(mdl, "BASE",
   # tmp.path = "C:/solwork",
   # solver = mysolver,
   # solver = "GLPK",
   # solver = GAMS_csv,
   # solver = GAMS_simplex,
-  solver = GAMS,
+  solver = solver_options$gams_gdx_cplex,
+    # solver = solver_options$gams_csv_cplex,
   # tmp.name = "UTOPIA_BASE_test",
   tmp.del = F
 )
@@ -1301,7 +1308,7 @@ scen_BASE_gams <- solve(add(mdl),
   name = "BASE_gams",
   # tmp.path = "C:/solwork",
   # solver = "GAMS",
-  solver = GAMS_csv,
+  solver = solver_options$gams_gdx_cplex,
   # solver = GAMS,
   # solver = list(
     # lang = "GAMS"
@@ -1355,6 +1362,7 @@ getData(list(
 ```
 
 ```{r, include=T, eval=T, echo=T}
+set_progress_bar("cli")
 scen_BASE_int <- interpolate_model(
   mdl, # , TRBD_ELC_ALL, WWIN, WSOL, EWIN, ESOL, STGELC),
   name = "BASE"
@@ -1364,14 +1372,13 @@ scen_BASE_gams <- write_sc(
   # scen,
   scen_BASE_int,
   # solver = "GAMS",
-  solver = GAMS,
+  solver = solver_options$gams_gdx_cplex,
   # solver = GAMS_simplex,
   # solver = GAMS_barrier,
   tmp.dir = "solwork/UTOPIA-tmp/"
   # tmp.dir = "tmp/solwork/UTOPIA_BASE_GAMS_test"
 )
 scen_BASE_gams@misc$tmp.dir # directory
-
 
 scen_BASE_py <- write_sc(scen_BASE_int,
   # solver = "PYOMO",
@@ -1384,6 +1391,7 @@ scen_BASE_glpk <- write_sc(scen_BASE_int,
   solver = "GLPK",
   tmp.dir = "solwork/UTOPIA_BASE_GLPK_debug"
 )
+# Rglpk::Rglpk_read_file("solwork/UTOPIA_BASE_GLPK_debug/energyRt.mod")
 
 scen_BASE_jl <- write_sc(scen_BASE_int,
   solver = list(
@@ -1396,7 +1404,7 @@ scen_BASE_jl <- write_sc(scen_BASE_int,
 ## Solving the model
 solve(scen_BASE_gams, wait = F)
 solve(scen_BASE_py, wait = FALSE)
-solve(scen_BASE_glpk, wait = FALSE)
+solve(scen_BASE_glpk, wait = FALSE, intern = FALSE)
 solve(scen_BASE_jl, wait = T)
 
 ## Read solution (wait until solved)

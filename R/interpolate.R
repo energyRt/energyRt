@@ -807,6 +807,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 .read_default_data <- function(prec, ss) {
   for (i in seq(along = prec@parameters)) {
     # assign('test', prec@parameters[[i]], globalenv())
+    # if (i == 342) browser()
     if (any(prec@parameters[[i]]@inClass$colName != "")) {
       prec@parameters[[i]]@defVal <-
         as.numeric(ss@defVal[1, prec@parameters[[i]]@inClass$colName])

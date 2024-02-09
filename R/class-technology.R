@@ -355,6 +355,7 @@ setClass("technology",
       year = integer(),
       invcost = numeric(),
       wacc = numeric(),
+      retcost = numeric(),
       stringsAsFactors = FALSE
     ),
     start = data.frame(

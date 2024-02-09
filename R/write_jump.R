@@ -1,3 +1,29 @@
+#' Set the path to Julia installation
+#'
+#' @param path character. Path to Julia installation. If NULL, the system path is returned.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+set_julia_path <- function(path = NULL) {
+  # browser()
+  if (!is.null(path) & path != "") {
+    # if (!file.exists(path)) {
+    #   stop(paste0('The path "', path, '" does not exist.'))
+    # }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options(en_julia_path = path)
+}
+
+#' @export
+get_julia_path <- function() {
+  getOption("en_julia_path")
+}
+
 # Functions to write Julia/JuMP model and data files
 .write_model_JuMP <- function(arg, scen) {
   run_code <- scen@settings@sourceCode[["JuMP"]]
@@ -195,7 +221,9 @@
   close(zz_modout)
   .write_inc_files(arg, scen, ".jl")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- "julia energyRt.jl"
+    scen@settings@solver$cmdline <- 
+      paste0(get_julia_path(), "julia energyRt.jl")
+      # "julia energyRt.jl"
   }
   scen@settings@solver$code <- c(
     "energyRt.jl", "output.jl", "inc_constraints.jl",

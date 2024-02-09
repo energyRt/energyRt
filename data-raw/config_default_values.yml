@@ -90,3 +90,7 @@ wcinp.up: 0.0
 wcout.lo: 0.0
 wcout.up: 0.0
 wval: 0.0
+cap.lo: 0.0
+cap.up: .inf
+ncap.lo: 0.0
+ncap.up: .inf

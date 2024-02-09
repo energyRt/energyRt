@@ -153,6 +153,10 @@ pTechAfsUp(tech, region, year, slice)               Upper bound on availability 
 pTechAfcLo(tech, comm, region, year, slice)         Lower bound for commodity output
 pTechAfcUp(tech, comm, region, year, slice)         Upper bound for commodity output
 pTechStock(tech, region, year)                      Technology capacity stock
+pTechCapUp(tech, region, year)                      Upper bound on technology capacity
+pTechCapLo(tech, region, year)                      Lower bound on technology capacity
+pTechNewCapUp(tech, region, year)                   Upper bound on new technology capacity
+pTechNewCapLo(tech, region, year)                   Lower bound on new technology capacity
 pTechCap2act(tech)                                  Technology capacity units to activity units conversion factor
 pTechCvarom(tech, comm, region, year, slice)        Commodity-specific variable costs (per unit of commodity input or output)
 pTechAvarom(tech, comm, region, year, slice)        Auxilary Commodity-specific variable costs (per unit of commodity input or output)
@@ -196,6 +200,10 @@ pStorageInpEff(stg, comm, region, year, slice)      Storage input efficiency
 pStorageOutEff(stg, comm, region, year, slice)      Storage output efficiency
 pStorageStgEff(stg, comm, region, year, slice)      Storage time-efficiency (annual)
 pStorageStock(stg, region, year)                    Storage capacity stock
+pStorageCapUp(stg, region, year)                    Upper bound on storage capacity
+pStorageCapLo(stg, region, year)                    Lower bound on storage capacity
+pStorageNewCapUp(stg, region, year)                 Upper bound on new storage capacity
+pStorageNewCapLo(stg, region, year)                 Lower bound on new storage capacity
 pStorageOlife(stg, region)                          Storage operational life
 pStorageCostStore(stg, region, year, slice)         Storing costs per stored amount (annual)
 pStorageCostInp(stg, region, year, slice)           Storage input costs
@@ -244,9 +252,15 @@ pImportRowUp(imp, region, year, slice)               Upper bount on import from 
 pImportRowLo(imp, region, year, slice)               Lower bound on import from ROW
 pImportRowPrice(imp, region, year, slice)            Import prices from ROW
 pTradeStock(trade, year)                             Existing capacity
+pTradeCapUp(trade, year)                             Upper bound on trade capacity
+pTradeCapLo(trade, year)                             Lower bound on trade capacity
+pTradeNewCapUp(trade, year)                          Upper bound on new trade capacity
+pTradeNewCapLo(trade, year)                          Lower bound on new trade capacity
 pTradeOlife(trade)                                   Operational life
 pTradeInvcost(trade, region, year)                   Overnight investment costs
 pTradeEac(trade, region, year)                       Equivalent annual costs
+pTradeFixom(trade, year)                             Fixed O&M costs
+pTradeVarom(trade, region, region, year, slice)      Variable O&M costs
 pTradeCap2Act(trade)                                 Capacity to activity factor
 ;
 
@@ -309,6 +323,11 @@ mvInp2Lo(comm, region, year, slice, slice)
 mvOut2Lo(comm, region, year, slice, slice)
 mInpSub(comm, region, year, slice)
 mOutSub(comm, region, year, slice)
+
+mTechCapLo(tech, region, year)
+mTechCapUp(tech, region, year)
+mTechNewCapLo(tech, region, year)
+mTechNewCapUp(tech, region, year)
 
 mvStorageAInp(stg, comm, region, year, slice)
 mvStorageAOut(stg, comm, region, year, slice)
@@ -956,6 +975,10 @@ eqTechAfcInpUp(tech, region, comm, year, slice)$meqTechAfcInpUp(tech, region, co
 Equation
 * Capacity equation
 eqTechCap(tech, region, year)       Technology capacity
+eqTechCapUp(tech, region, year)       Technology capacity
+eqTechCapLo(tech, region, year)       Technology capacity
+eqTechNewCapLo(tech, region, year)
+eqTechNewCapUp(tech, region, year)
 eqTechRetiredNewCap(tech, region, year)  Retirement of new capacity
 eqTechRetiredStock(tech, region, year)  Retirement of stock
 eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
@@ -989,6 +1012,19 @@ eqTechCap(tech, region, year)$mTechSpan(tech, region, year)..
                        )
                  )
          );
+
+eqTechCapLo(tech, region, year)$mTechCapLo(tech, region, year)..
+        vTechCap(tech, region, year) =g= pTechCapLo(tech, region, year);
+
+eqTechCapUp(tech, region, year)$mTechCapUp(tech, region, year)..
+        vTechCap(tech, region, year) =l= pTechCapUp(tech, region, year);
+
+eqTechNewCapLo(tech, region, year)$mTechNewCapLo(tech, region, year)..
+        vTechNewCap(tech, region, year) =g= pTechNewCapLo(tech, region, year);
+
+eqTechNewCapUp(tech, region, year)$mTechNewCapUp(tech, region, year)..
+        vTechNewCap(tech, region, year) =l= pTechNewCapUp(tech, region, year);
+
 
 eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)..
     sum(yearp$mvTechRetiredNewCap(tech, region, year, yearp),
@@ -1508,6 +1544,11 @@ eqCostRowTrade(region, year)$mvTradeRowCost(region, year)..
 eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
   vTradeIrCost(region, year)
   =e=
+* Fixed O&M
+  sum(trade$mTradeCapacityVariable(trade),
+      pTradeFixom(trade, year) * vTradeCap(trade, year)
+  )
+  +
 * Eac
   sum(trade$mTradeEac(trade, region, year),
       vTradeEac(trade, region, year)
@@ -1872,6 +1913,8 @@ eqCost(region, year)$mvTotalCost(region, year)..
         vTotalCost(region, year)
         =e=
         sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year))
+*        + .01 * sum(tech, vTechRetiredStock(tech, region, year))
+*        + .01 * sum((tech, yearp), vTechRetiredNewCap(tech, region, yearp, year))
         + sum(tech$mTechOMCost(tech, region, year), vTechOMCost(tech, region, year))
         + sum(sup$mvSupCost(sup, region, year), vSupCost(sup, region, year))
         + sum((comm, slice)$mDummyImport(comm, region, year, slice),

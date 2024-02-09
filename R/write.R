@@ -557,6 +557,7 @@ write.sc <- write_sc
     inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region")) %>%
     unique()
   # mTechEmsFuel ####
+  # browser()
   .interpolation_message("mTechEmsFuel", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
@@ -577,6 +578,59 @@ write.sc <- write_sc
           )
         )
       )
+
+  # browser()
+  if (nrow(prec@parameters[["pTechCap"]]@data) > 0) {
+    suppressMessages({
+      mTechCap <- prec@parameters[["pTechCap"]]@data |>
+        inner_join(prec@parameters[["mTechSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTechCapLo <- filter(mTechCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTechCapLo) && nrow(mTechCapLo) > 0) {
+      prec@parameters[["mTechCapLo"]] <-
+        .dat2par(prec@parameters[["mTechCapLo"]], mTechCapLo)
+    }
+    rm(mTechCapLo)
+    mTechCapUp <- filter(mTechCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTechCapUp) && nrow(mTechCapUp) > 0) {
+      prec@parameters[["mTechCapUp"]] <-
+        .dat2par(prec@parameters[["mTechCapUp"]], mTechCapUp)
+    }
+    rm(mTechCapUp)
+  }
+
+  if (nrow(prec@parameters[["pTechNewCap"]]@data) > 0) {
+    # browser()
+    suppressMessages({
+      mTechNewCap <- prec@parameters[["pTechNewCap"]]@data |>
+        inner_join(prec@parameters[["mTechNew"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTechNewCapLo <- filter(mTechNewCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTechNewCapLo) && nrow(mTechNewCapLo) > 0) {
+      prec@parameters[["mTechNewCapLo"]] <-
+        .dat2par(prec@parameters[["mTechNewCapLo"]], mTechNewCapLo)
+    }
+    rm(mTechNewCapLo)
+    mTechNewCapUp <- filter(mTechNewCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTechNewCapUp) && nrow(mTechNewCapUp) > 0) {
+      prec@parameters[["mTechNewCapUp"]] <-
+        .dat2par(prec@parameters[["mTechNewCapUp"]], mTechNewCapUp)
+    }
+    rm(mTechNewCapUp)
+  }
+
+  # mTechCapUp <- prec@parameters[["pTechCap"]]@data |>
+  #   inner_join(prec@parameters[["mTechSpan"]]@data) |>
+  #   unique()
+
   # mDummyImport ####
   .interpolation_message("mDummyImport", rest, interpolation_count,
                          interpolation_start_time, len_name)

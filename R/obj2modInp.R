@@ -1,6 +1,5 @@
 # setGeneric(".obj2modInp",
 #            function(obj, app, approxim) standardGeneric(".obj2modInp"))
-
 # =============================================================================#
 # Add commodity ####
 # =============================================================================#
@@ -1631,6 +1630,25 @@ setMethod(
     obj@parameters[["pTechStock"]] <-
       .dat2par(obj@parameters[["pTechStock"]], stock_exist)
 
+    if (nrow(tech@capacity) > 0) {
+      # browser()
+      pTechCap <- .interp_bounds(
+        tech@capacity, "cap",
+        obj@parameters[["pTechCap"]], approxim, "tech", tech@name,
+        remValueUp = Inf, remValueLo = 0
+      )
+      obj@parameters[["pTechCap"]] <-
+        .dat2par(obj@parameters[["pTechCap"]], pTechCap)
+
+      pTechNewCap <- .interp_bounds(
+        tech@capacity, "ncap",
+        obj@parameters[["pTechNewCap"]], approxim, "tech", tech@name,
+        remValueUp = Inf, remValueLo = 0
+      )
+      obj@parameters[["pTechNewCap"]] <-
+        .dat2par(obj@parameters[["pTechNewCap"]], pTechNewCap)
+    }
+
     olife <- .interp_numpar(
       tech@olife, "olife",
       obj@parameters[["pTechOlife"]], approxim,
@@ -1893,22 +1911,36 @@ setMethod(
       obj@parameters[["pTechCap2act"]],
       data.table(tech = tech@name, value = tech@cap2act)
     )
-    pTechFixom <- .interp_numpar(tech@fixom, "fixom", obj@parameters[["pTechFixom"]], approxim, "tech", tech@name)
-    obj@parameters[["pTechFixom"]] <- .dat2par(obj@parameters[["pTechFixom"]], pTechFixom)
-    pTechVarom <- .interp_numpar(tech@varom, "varom", obj@parameters[["pTechVarom"]], approxim, "tech", tech@name)
-    obj@parameters[["pTechVarom"]] <- .dat2par(obj@parameters[["pTechVarom"]], pTechVarom)
+    pTechFixom <- .interp_numpar(tech@fixom, "fixom",
+                                 obj@parameters[["pTechFixom"]],
+                                 approxim, "tech", tech@name)
+    obj@parameters[["pTechFixom"]] <-
+      .dat2par(obj@parameters[["pTechFixom"]], pTechFixom)
+    pTechVarom <- .interp_numpar(tech@varom, "varom",
+                                 obj@parameters[["pTechVarom"]],
+                                 approxim, "tech", tech@name)
+    obj@parameters[["pTechVarom"]] <-
+      .dat2par(obj@parameters[["pTechVarom"]], pTechVarom)
 
     ## Move from reduce
+    # browser()
     mTechNew <- dd0$new
     mTechSpan <- dd0$span
     pTechOlife <- olife
     if (tech@early.retirement) {
-      obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
-        obj@parameters[["mvTechRetiredStock"]],
+      if (!is.null(stock_exist)) {
+        stock_exists <- stock_exist |>
+          filter(value != 0) |>
+          select(-any_of("value"))
+        # browser()
+        obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
+          obj@parameters[["mvTechRetiredStock"]], stock_exists)
+      }
+
         # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
-        select(filter(stock_exist, value != 0), -any_of("value"))
+        # select(filter(stock_exist, value != 0), -any_of("value"))
         # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
-      )
+      # )
     }
     # browser()
     if (nrow(dd0$new) > 0 && tech@early.retirement) {
@@ -2646,6 +2678,7 @@ setMethod(
         approxim = approxim_srcdst, "trade", trd@name
       )
     )
+
     # pTradeIr
     pTradeIr <- .interp_bounds2(trd@trade,
       parameter = "ava",
@@ -2889,6 +2922,15 @@ setMethod(
                 any_of(c(obj@parameters[["pTradeEac"]]@dimSets, "value")))
               ))
       }
+    }
+    if (nrow(trd@fixom) > 0) {
+      # browser()
+      pTradeFixom <- .interp_numpar(trd@fixom, "fixom",
+                                    obj@parameters[["pTradeFixom"]],
+                                    approxim, "trade", trd@name)
+      # !!! duplicated values after the interpolation - check !!!
+      obj@parameters[["pTradeFixom"]] <-
+        .dat2par(obj@parameters[["pTradeFixom"]], unique(pTradeFixom))
     }
     ####
     mTradeIr <- merge0(mTradeRoutes, mTradeSlice)

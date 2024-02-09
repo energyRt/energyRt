@@ -401,6 +401,7 @@ setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
           # show.output.on.console = arg$show.output.on.console
         )
       } else {
+        # browser()
         rs <- system(paste(scen@settings@solver$cmdline),
           # invisible = arg$invisible,
           wait = arg$wait

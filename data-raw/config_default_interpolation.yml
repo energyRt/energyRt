@@ -72,6 +72,10 @@ stg2aout: back.inter.forth
 stgcost: back.inter.forth
 stgeff: back.inter.forth
 stock: back.inter.forth
+cap.lo: inter.forth
+cap.up: inter.forth
+ncap.lo: inter.forth
+ncap.up: inter.forth
 subs: inter.forth
 tax: inter.forth
 teff: back.inter.forth

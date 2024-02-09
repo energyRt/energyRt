@@ -580,6 +580,28 @@ model.eqTechCap = Constraint(
         )
     ),
 )
+# eqTechCapLo(tech, region, year)$mTechCapLo(tech, region, year)
+model.eqTechCapLo = Constraint(
+    model.mTechCapLo,
+    rule=lambda model, t, r, y: model.vTechCap[t, r, y] >= model.pTechCapLo[t, r, y],
+)
+# eqTechCapUp(tech, region, year)$mTechCapUp(tech, region, year)
+model.eqTechCapUp = Constraint(
+    model.mTechCapUp,
+    rule=lambda model, t, r, y: model.vTechCap[t, r, y] <= model.pTechCapUp[t, r, y],
+)
+# eqTechNewCapLo(tech, region, year)$mTechNewCapLo(tech, region, year)
+model.eqTechNewCapLo = Constraint(
+    model.mTechNewCapLo,
+    rule=lambda model, t, r, y: model.vTechNewCap[t, r, y]
+    >= model.pTechNewCapLo[t, r, y],
+)
+# eqTechNewCapUp(tech, region, year)$mTechNewCapUp(tech, region, year)
+model.eqTechNewCapUp = Constraint(
+    model.mTechNewCapUp,
+    rule=lambda model, t, r, y: model.vTechNewCap[t, r, y]
+    <= model.pTechNewCapUp[t, r, y],
+)
 # eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
 model.eqTechRetiredNewCap = Constraint(
     model.meqTechRetiredNewCap,
@@ -1137,6 +1159,11 @@ model.eqCostIrTrade = Constraint(
     model.mvTradeIrCost,
     rule=lambda model, r, y: model.vTradeIrCost[r, y]
     == sum(
+        model.pTradeFixom[t1, y] * model.vTradeCap[t1, y]
+        for t1 in model.trade
+        if t1 in model.mTradeCapacityVariable
+    )
+    + sum(
         model.vTradeEac[t1, r, y] for t1 in model.trade if (t1, r, y) in model.mTradeEac
     )
     + sum(
