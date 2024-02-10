@@ -86,7 +86,6 @@ Collate:
     'print.R'
     'read.R'
     'solve.R'
-    'solver_options.R'
     'start_msg.R'
     'utils-pipe.R'
     'write.R'

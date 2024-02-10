@@ -83,6 +83,6 @@ newDemand <- function(
 #' @keywords demand update
 #' @export
 setMethod("update", signature(object = "demand"), function(object, ...) {
-  .data2slots("storage", object, ...)
+  .data2slots("demand", object, ...)
 })
 

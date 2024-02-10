@@ -1,3 +1,5 @@
+library(tidyverse)
+library(data.table)
 # one input, one output, efficiency = 1
 INP <- newCommodity("INP", desc = "input")
 OUT <- newCommodity("OUT", desc = "output")
@@ -50,13 +52,13 @@ getData(scen, name_ = "eac")
 getData(scen, name_ = "dem")
 
 # Early retirement
-m@config@early.retirement <- TRUE
-TECH1 <- update(TECH, early.retirement = TRUE, name = "TECH1",
-                stock = data.frame(stock = c(rep(50, 5), 0),
+m@config@optimizeRetirement <- TRUE
+TECH1 <- update(TECH, optimizeRetirement = TRUE, name = "TECH1",
+                capacity = data.frame(stock = c(rep(50, 5), 0),
                                    year = 2010:2015),
                 end = list(end = 2000),
                 invcost = list(invcost = 110, retcost = 1))
-TECH2 <- update(TECH, early.retirement = TRUE, name = "TECH2",
+TECH2 <- update(TECH, optimizeRetirement = TRUE, name = "TECH2",
                 invcost = list(invcost = 10, retcost = 1),
                 fixom = list(fixom = 0),
                 start = list(start = 2012)
@@ -75,10 +77,10 @@ m <- newModel(
   horizon = newHorizon(2010:2025),
   discount = 0,
   region = "ONE",
-  early.retirement = TRUE
+  optimizeRetirement = TRUE
 )
 getHorizon(m)
-m@config@early.retirement
+m@config@optimizeRetirement
 
 scen_ret <- interpolate(m)
 scen_ret <- write_sc(scen_ret,
@@ -118,6 +120,6 @@ ggplot(vTechCap) +
 getData(scen_ret3, name_ = "NewCap", drop.zeros = TRUE)
 getData(scen_ret3, name_ = "retire", drop.zeros = TRUE)
 
-scen_ret3 <- solve(m, solver = solver_options$pyomo_cplex,
+scen_ret3 <- solve(m, solver = solver_options$pyomo_cbc,
                    tmp.dir = "tmp/mod_one_ret_py", tmp.del = F)
 

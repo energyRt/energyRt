@@ -1612,7 +1612,7 @@ eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
   sum(trade$mTradeEac(trade, region, year),
       vTradeEac(trade, region, year)
   )
-* Import
+* Import (IR)
   + sum((trade, src)$mTradeRoutes(trade, src, region),
         sum(comm$mTradeComm(trade, comm),
             sum(slice$mTradeSlice(trade, slice),
@@ -1623,7 +1623,7 @@ eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
             )
         )
     )
-* Export
+* Export (IR)
   - sum((trade, dst)$mTradeRoutes(trade, region, dst),
         sum(comm$mTradeComm(trade, comm),
             sum(slice$mTradeSlice(trade, slice),

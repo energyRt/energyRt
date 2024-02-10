@@ -63,6 +63,17 @@ add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
     # arg <- arg[-fl]
     arg <- list_flatten(arg, name_spec = "{inner}")
   }
+  ## Calendar from solve must be added to interpolate
+  arg_classes <- sapply(arg, class)
+  # if (any(arg_classes == "calendar")) {
+  #   if (length(arg_classes[arg_classes == "calendar"]) > 1) {
+  #     stop("Only one calendar object is allowed")
+  #   }
+  #   obj@data$calendar <- arg[arg_classes == "calendar"]
+  #   arg <- arg[arg_classes != "calendar"]
+  # }
+
+  ## Add to repository
   if (any(!(sapply(arg, class) %in% c(cls, 'repository')))) {
     stop(paste('Unknown class "', paste(unique(sapply(arg, class)[
       !(sapply(arg, class) %in% c(cls, 'repository'))]), collapse = '", "'),
