@@ -182,6 +182,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # tictoc::toc(); tictoc::tic()
   ### Interpolation
   scen@modInp <- new("modInp")
+  # browser()
   ## Fill basic sets
   # Fill year
   if (!is.null(arg$year)) { #
@@ -426,7 +427,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
 
   # Update early retirement parameter
   # browser()
-  if (!scen@settings@early.retirement) {
+  if (!scen@settings@optimizeRetirement) {
     scen <- .remove_early_retirment(scen)
   }
   approxim$debug <- scen@settings@debug
@@ -556,9 +557,9 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       #   seq(length.out = scen@modInp@parameters[[i]]@misc$nValues), ,
       #   drop = FALSE
       # ]
-      # nrow_i <-
+      nrow_i <- scen@modInp@parameters[[i]]@data |> nrow()
       scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data |>
-        slice_head(n = min(nrow(.data),
+        slice_head(n = min(nrow_i,
                            scen@modInp@parameters[[i]]@misc$nValues,
                            na.rm = TRUE)
                    )
@@ -718,7 +719,10 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     "pExportRowRes", "pExportRow",
     # "pExportRowPrice",
     "pImportRowRes", "pImportRow",
-    "pImportRow"
+    "pImportRow",
+    "pTechRet", "pTechCap", "pTechNewCap",
+    "pStorageRet", "pStorageCap", "pStorageNewCap",
+    "pTradeRet", "pTradeCap", "pTradeNewCap"
     # "pImportRowPrice"
   ))
   msg_small_err <- NULL
@@ -734,8 +738,10 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
                                                drop = FALSE])))
 
         if (nrow(tmp) > 10) {
-          msg <- c(msg, paste0("Show only first 10 errors data, from ",
-                               nrow(tmp), "\n"))
+          msg <- c(msg,
+                   paste0("Showing only the first 10 errors in data, from ",
+                          nrow(tmp), "\n")
+                   )
         }
         stop(paste0(msg, collapse = "\n"))
       } else {
@@ -748,7 +754,8 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
   if (length(msg_small_err) > 0) {
     warning(paste0(
-      "There small negative value (abs(err) < 1e-7) in parameter", "s"[length(msg_small_err) > 1], ': "',
+      "There small negative value (abs(err) < 1e-7) in parameter",
+      "s"[length(msg_small_err) > 1], ': "',
       paste0(msg_small_err, collapse = '", "'), '". Assigned as zerro.'
     ))
   }
@@ -763,8 +770,16 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     tmp <- merge(tmp, mTechSpan)
     tmp_lo <- merge(tmp[tmp$type == "lo", , drop = FALSE], mTechGroupComm)
     tmp_up <- merge(tmp[tmp$type == "up", , drop = FALSE], mTechGroupComm)
-    tmp_lo <- aggregate(tmp_lo[, "value", drop = FALSE], tmp_lo[, !(colnames(tmp_lo) %in% c("type", "comm", "value")), drop = FALSE], sum)
-    tmp_up <- aggregate(tmp_up[, "value", drop = FALSE], tmp_up[, !(colnames(tmp_up) %in% c("type", "comm", "value")), drop = FALSE], sum)
+    tmp_lo <- aggregate(
+      tmp_lo[, "value", drop = FALSE],
+      tmp_lo[, !(colnames(tmp_lo) %in% c("type", "comm", "value")),
+             drop = FALSE],
+      sum)
+      tmp_up <- aggregate(
+      tmp_up[, "value", drop = FALSE],
+      tmp_up[, !(colnames(tmp_up) %in% c("type", "comm", "value")),
+             drop = FALSE],
+      sum)
     if (any(tmp_lo$value > 1) || any(tmp_up$value < 1)) {
       tech_wrong_lo <- tmp_lo[tmp_lo$value > 1, , drop = FALSE]
       tech_wrong_up <- tmp_up[tmp_up$value < 1, , drop = FALSE]
@@ -772,17 +787,21 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       assign("tech_wrong_lo", tech_wrong_lo, globalenv())
       assign("tech_wrong_up", tech_wrong_up, globalenv())
       stop(paste0(
-        "There are wrong share (sum of up less than one or sum of lo large than one)  (wrong data in data frame tech_wrong_lo and tech_wrong_up)",
+        "Error in share (sum of up < 1 or sum of lo > 1)",
+        "(see `tech_wrong_lo` and `tech_wrong_up`)",
         ' for technology "', paste0(tech_wrong, collapse = '", "'), '"'
       ))
     }
     fl <- colnames(tmp)[!(colnames(tmp) %in% c("type"))]
-    tmp_cmd <- merge(tmp[tmp$type == "lo", fl, drop = FALSE], tmp[tmp$type == "up", fl, drop = FALSE], by = fl[fl != "value"])
+    tmp_cmd <- merge(tmp[tmp$type == "lo", fl, drop = FALSE],
+                     tmp[tmp$type == "up", fl, drop = FALSE],
+                     by = fl[fl != "value"])
     if (any(tmp_cmd$value.x > tmp_cmd$value.y)) {
       tech_wrong <- tmp_cmd[tmp_cmd$value.x > tmp_cmd$value.y, , drop = FALSE]
       assign("tech_wrong", tech_wrong, globalenv())
       stop(paste0(
-        'There are wrong share (for tuple (tech, comm, region, year, slice) lo share large than up) (wrong data in data frame tech_wrong) for technology "',
+        'Error in share data (tuple (tech, comm, region, year, slice) lo",
+        " share > up), see `tech_wrong`"',
         paste0(unique(tech_wrong$tech), collapse = '", "'), '"'
       ))
     }
@@ -808,6 +827,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   for (i in seq(along = prec@parameters)) {
     # assign('test', prec@parameters[[i]], globalenv())
     # if (i == 342) browser()
+    # if (prec@parameters[[i]]@name == "pTechRet") browser() # DEBUG
     if (any(prec@parameters[[i]]@inClass$colName != "")) {
       prec@parameters[[i]]@defVal <-
         as.numeric(ss@defVal[1, prec@parameters[[i]]@inClass$colName])
@@ -923,7 +943,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   scen <- .apply_to_code_ret_scen(
     scen = scen, clss = "technology",
     func = function(x) {
-      x@early.retirement <- FALSE
+      x@optimizeRetirement <- FALSE
       x
     }
   )
@@ -1354,8 +1374,11 @@ withinHorizon <- function(obj, settings) {
   ret <- NULL # return NULL if not applicable to the object
   # check stock
   sn <- slotNames(obj)
-  if (any(sn == "stock")) {
-    stock <- obj@stock # !!! add check for interpolation rule or interpolate first
+  if (any(sn == "capacity")) {
+    stock <- obj@capacity |>
+      select(any_of(c("region", "year")), stock) |>
+      filter(!is.na(stock)) |> unique()
+    # stock <- obj@stock # !!! add check for interpolation rule or interpolate first
     if (nrow(stock) > 0) {
       if (all(is.na(stock$year))) return(TRUE) # years are not defined
       if (any(stock$year >= min(yrs)) && any(stock$stock[!is.na(stock$stock)] > 0)) {

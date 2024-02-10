@@ -1,3 +1,20 @@
+energyRt 0.11.14.9000 @dev (Feb 09 2024)
+
+BREAKING CHANGES
+* @stock slot is depreciated, parameter `stock` moved to @capacity slot
+* trade@trade$cost is renamed and moved to trade@varom$varom
+* trade@start, @end, @olife changed from numeric to data.frame format for consistency across classes
+* early.retirement is renamed to optimizeRetirement
+
+NEW FEATURES
+* added new parameters @capacity cap.up, cap.lo, ncap.up, ncap.lo, ret.up, ret.lo constraints on capacity, new capacity, retirement for technology, storage, and trade. (retirement is not implemented yet for storage and trade.)
+* added trade@fixom slot and parameter
+* added trade@varom slot with varom (renamed `cost`) and markup (from @trade slot) parameters
+* added tech@invcost@retcost - costs of early retirement of stock and new installations
+
+STARTED/RESERVED/NOT IMPLEMENTED
+* added early (optimized / endogenous) retirement of stock and new installations in storage and trade classes.
+
 energyRt 0.11.13.9000 @dev (Feb 05 2024)
 BUG FIXES
 * early.retirement interpolation error (dplyr, NULL object) fixed in `technology` class

@@ -142,6 +142,7 @@ pTechFixom(tech, region, year)                      Fixed Operating and maintena
 pTechVarom(tech, region, year, slice)               Variable O&M costs (per unit of acticity)
 pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
 pTechEac(tech, region, year)                        Equivalent annual (investment) cost
+pTechRetCost(tech, region, year)                    Early retirement costs
 pTechShareLo(tech, comm, region, year, slice)       Lower bound of the share of the commodity in total group input or output
 pTechShareUp(tech, comm, region, year, slice)       Upper bound of the share of the commodity in total group input or output
 pTechAfLo(tech, region, year, slice)                Lower bound on availability factor by slices
@@ -157,6 +158,8 @@ pTechCapUp(tech, region, year)                      Upper bound on technology ca
 pTechCapLo(tech, region, year)                      Lower bound on technology capacity
 pTechNewCapUp(tech, region, year)                   Upper bound on new technology capacity
 pTechNewCapLo(tech, region, year)                   Lower bound on new technology capacity
+pTechRetUp(tech, region, year)                      Upper bound on early retirement
+pTechRetLo(tech, region, year)                      Lower bound on early retirement
 pTechCap2act(tech)                                  Technology capacity units to activity units conversion factor
 pTechCvarom(tech, comm, region, year, slice)        Commodity-specific variable costs (per unit of commodity input or output)
 pTechAvarom(tech, comm, region, year, slice)        Auxilary Commodity-specific variable costs (per unit of commodity input or output)
@@ -204,6 +207,8 @@ pStorageCapUp(stg, region, year)                    Upper bound on storage capac
 pStorageCapLo(stg, region, year)                    Lower bound on storage capacity
 pStorageNewCapUp(stg, region, year)                 Upper bound on new storage capacity
 pStorageNewCapLo(stg, region, year)                 Lower bound on new storage capacity
+pStorageRetUp(stg, region, year)                    Upper bound on early retirement
+pStorageRetLo(stg, region, year)                    Lower bound on early retirement
 pStorageOlife(stg, region)                          Storage operational life
 pStorageCostStore(stg, region, year, slice)         Storing costs per stored amount (annual)
 pStorageCostInp(stg, region, year, slice)           Storage input costs
@@ -211,6 +216,7 @@ pStorageCostOut(stg, region, year, slice)           Storage output costs
 pStorageFixom(stg, region, year)                    Storage fixed O&M costs
 pStorageInvcost(stg, region, year)                  Storage investment costs
 pStorageEac(stg, region, year)                      Storage equivalent annual costs
+pStorageRetCost(stg, region, year)                  Storage early retirement costs
 pStorageCap2stg(stg)                                Storage capacity units to activity units conversion factor
 pStorageAfLo(stg, region, year, slice)              Storage availability factor lower bound (minimum charge level)
 pStorageAfUp(stg, region, year, slice)              Storage availability factor upper bound (maximum charge level)
@@ -256,9 +262,12 @@ pTradeCapUp(trade, year)                             Upper bound on trade capaci
 pTradeCapLo(trade, year)                             Lower bound on trade capacity
 pTradeNewCapUp(trade, year)                          Upper bound on new trade capacity
 pTradeNewCapLo(trade, year)                          Lower bound on new trade capacity
+pTradeRetUp(trade, year)                             Upper bound on early retirement
+pTradeRetLo(trade, year)                             Lower bound on early retirement
 pTradeOlife(trade)                                   Operational life
 pTradeInvcost(trade, region, year)                   Overnight investment costs
 pTradeEac(trade, region, year)                       Equivalent annual costs
+pTradeRetCost(trade, region, year)                   Early retirement costs
 pTradeFixom(trade, year)                             Fixed O&M costs
 pTradeVarom(trade, region, region, year, slice)      Variable O&M costs
 pTradeCap2Act(trade)                                 Capacity to activity factor
@@ -328,6 +337,8 @@ mTechCapLo(tech, region, year)
 mTechCapUp(tech, region, year)
 mTechNewCapLo(tech, region, year)
 mTechNewCapUp(tech, region, year)
+mTechRetLo(tech, region, year)
+mTechRetUp(tech, region, year)
 
 mvStorageAInp(stg, comm, region, year, slice)
 mvStorageAOut(stg, comm, region, year, slice)
@@ -348,6 +359,8 @@ mStorageCapLo(stg, region, year)
 mStorageCapUp(stg, region, year)
 mStorageNewCapLo(stg, region, year)
 mStorageNewCapUp(stg, region, year)
+mStorageRetLo(stg, region, year)
+mStorageRetUp(stg, region, year)
 
 mvTradeIr(trade, comm, region, region, year, slice)
 mTradeIrCsrc2Ainp(trade, comm, region, region, year, slice)
@@ -364,6 +377,8 @@ mTradeCapLo(trade, year)
 mTradeCapUp(trade, year)
 mTradeNewCapLo(trade, year)
 mTradeNewCapUp(trade, year)
+mTradeRetLo(trade, year)
+mTradeRetUp(trade, year)
 ;
 
 * Endogenous variables
@@ -371,7 +386,9 @@ positive variables
 *@ mTechNew(tech, region, year)
 vTechNewCap(tech, region, year)                      New capacity
 *@ mvTechRetiredStock(tech, region, year)
-vTechRetiredStock(tech, region, year)                Early retired stock
+vTechRetiredStockCum(tech, region, year)                Early retired stock
+*@ mvTechRetiredStock(tech, region, year)
+vTechRetiredStockDiff(tech, region, year)            Early retired stock
 *@ mvTechRetiredNewCap(tech, region, year, year)
 vTechRetiredNewCap(tech, region, year, year)         Early retired new capacity
 * Activity and intput-output
@@ -990,7 +1007,8 @@ eqTechCapUp(tech, region, year)      Technology capacity upper bound
 eqTechNewCapLo(tech, region, year)
 eqTechNewCapUp(tech, region, year)
 eqTechRetiredNewCap(tech, region, year)  Retirement of new capacity
-eqTechRetiredStock(tech, region, year)  Retirement of stock
+eqTechRetiredStock(tech, region, year)  Retirement of stock accumulated
+eqTechRetiredStockDiff(tech, region, year)  Retirement of stock
 eqTechEac(tech, region, year)       Technology Equivalent Annual Cost (EAC)
 * Investment equation
 eqTechInv(tech, region, year)       Technology overnight investment costs
@@ -1003,7 +1021,7 @@ eqTechCap(tech, region, year)$mTechSpan(tech, region, year)..
          vTechCap(tech, region, year)
          =e=
          pTechStock(tech, region, year) -
-         vTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year) +
+         vTechRetiredStockCum(tech, region, year)$mvTechRetiredStock(tech, region, year) +
          sum(yearp$(mTechNew(tech, region, yearp)
                     and
                     ordYear(year) >= ordYear(yearp)
@@ -1043,8 +1061,14 @@ eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
 
 * Stock retired equation
 eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)..
-         vTechRetiredStock(tech, region, year) =l= pTechStock(tech, region, year);
+         vTechRetiredStockCum(tech, region, year) =l= pTechStock(tech, region, year);
 
+eqTechRetiredStockDiff(tech, region, year)$mvTechRetiredStock(tech, region, year)..
+         vTechRetiredStockDiff(tech, region, year) =e=
+         vTechRetiredStockCum(tech, region, year) -
+         sum(yearp$mMilestoneNext(yearp, year),
+             vTechRetiredStockCum(tech, region, yearp)
+          );
 
 
 * EAC equation
@@ -1574,9 +1598,14 @@ eqCostRowTrade(region, year)$mvTradeRowCost(region, year)..
 eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
   vTradeIrCost(region, year)
   =e=
-* Fixed O&M
-  sum(trade$mTradeCapacityVariable(trade),
-      pTradeFixom(trade, year) * vTradeCap(trade, year)
+* Fixed O&M of stock (!!! check mTradeSpan when not mTradeCapacityVariable)
+  sum(trade$mTradeSpan(trade, year),
+      pTradeFixom(trade, year) * pTradeStock(trade, year)
+  )
+  +
+* Fixed O&M of new installations
+  sum(trade$(mTradeSpan(trade, year) and mTradeCapacityVariable(trade)),
+      pTradeFixom(trade, year) * (vTradeCap(trade, year) - pTradeStock(trade, year))
   )
   +
 * Eac
@@ -1954,8 +1983,15 @@ eqCost(region, year)$mvTotalCost(region, year)..
         vTotalCost(region, year)
         =e=
         sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year))
-*        + .01 * sum(tech, vTechRetiredStock(tech, region, year))
-*        + .01 * sum((tech, yearp), vTechRetiredNewCap(tech, region, yearp, year))
+* endogenous (forced/early) retirement costs
+        + sum(tech$mvTechRetiredStock(tech, region, year),
+              pTechRetCost(tech, region, year) * (
+                vTechRetiredStockDiff(tech, region, year) +
+                sum(yearp$mvTechRetiredNewCap(tech, region, yearp, year),
+                vTechRetiredNewCap(tech, region, yearp, year))
+              ))
+        + sum((tech, yearp)$mvTechRetiredNewCap(tech, region, yearp, year),
+              pTechRetCost(tech, region, year) * vTechRetiredNewCap(tech, region, yearp, year))
         + sum(tech$mTechOMCost(tech, region, year), vTechOMCost(tech, region, year))
         + sum(sup$mvSupCost(sup, region, year), vSupCost(sup, region, year))
         + sum((comm, slice)$mDummyImport(comm, region, year, slice),

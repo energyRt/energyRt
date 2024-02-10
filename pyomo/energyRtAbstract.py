@@ -34,7 +34,10 @@ model.vTradeCost = Var(model.mvTradeCost, doc="Total trade costs")
 model.vTradeRowCost = Var(model.mvTradeRowCost, doc="Trade with ROW costs")
 model.vTradeIrCost = Var(model.mvTradeIrCost, doc="Interregional trade costs")
 model.vTechNewCap = Var(model.mTechNew, domain=pyo.NonNegativeReals, doc="New capacity")
-model.vTechRetiredStock = Var(
+model.vTechRetiredStockCum = Var(
+    model.mvTechRetiredStock, domain=pyo.NonNegativeReals, doc="Early retired stock"
+)
+model.vTechRetiredStockDiff = Var(
     model.mvTechRetiredStock, domain=pyo.NonNegativeReals, doc="Early retired stock"
 )
 model.vTechRetiredNewCap = Var(
@@ -555,7 +558,11 @@ model.eqTechCap = Constraint(
     model.mTechSpan,
     rule=lambda model, t, r, y: model.vTechCap[t, r, y]
     == model.pTechStock[t, r, y]
-    - (model.vTechRetiredStock[t, r, y] if (t, r, y) in model.mvTechRetiredStock else 0)
+    - (
+        model.vTechRetiredStockCum[t, r, y]
+        if (t, r, y) in model.mvTechRetiredStock
+        else 0
+    )
     + sum(
         model.pPeriodLen[yp]
         * (
@@ -615,8 +622,19 @@ model.eqTechRetiredNewCap = Constraint(
 # eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
 model.eqTechRetiredStock = Constraint(
     model.mvTechRetiredStock,
-    rule=lambda model, t, r, y: model.vTechRetiredStock[t, r, y]
+    rule=lambda model, t, r, y: model.vTechRetiredStockCum[t, r, y]
     <= model.pTechStock[t, r, y],
+)
+# eqTechRetiredStockDiff(tech, region, year)$mvTechRetiredStock(tech, region, year)
+model.eqTechRetiredStockDiff = Constraint(
+    model.mvTechRetiredStock,
+    rule=lambda model, t, r, y: model.vTechRetiredStockDiff[t, r, y]
+    == model.vTechRetiredStockCum[t, r, y]
+    - sum(
+        model.vTechRetiredStockCum[t, r, yp]
+        for yp in model.year
+        if (yp, y) in model.mMilestoneNext
+    ),
 )
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(
@@ -1010,6 +1028,30 @@ model.eqStorageCap = Constraint(
         )
     ),
 )
+# eqStorageCapLo(stg, region, year)$mStorageCapLo(stg, region, year)
+model.eqStorageCapLo = Constraint(
+    model.mStorageCapLo,
+    rule=lambda model, st1, r, y: model.vStorageCap[st1, r, y]
+    >= model.pStorageCapLo[st1, r, y],
+)
+# eqStorageCapUp(stg, region, year)$mStorageCapUp(stg, region, year)
+model.eqStorageCapUp = Constraint(
+    model.mStorageCapUp,
+    rule=lambda model, st1, r, y: model.vStorageCap[st1, r, y]
+    <= model.pStorageCapUp[st1, r, y],
+)
+# eqStorageNewCapLo(stg, region, year)$mStorageNewCapLo(stg, region, year)
+model.eqStorageNewCapLo = Constraint(
+    model.mStorageNewCapLo,
+    rule=lambda model, st1, r, y: model.vStorageNewCap[st1, r, y]
+    >= model.pStorageNewCapLo[st1, r, y],
+)
+# eqStorageNewCapUp(stg, region, year)$mStorageNewCapUp(stg, region, year)
+model.eqStorageNewCapUp = Constraint(
+    model.mStorageNewCapUp,
+    rule=lambda model, st1, r, y: model.vStorageNewCap[st1, r, y]
+    <= model.pStorageNewCapUp[st1, r, y],
+)
 # eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)
 model.eqStorageInv = Constraint(
     model.mStorageNew,
@@ -1159,9 +1201,14 @@ model.eqCostIrTrade = Constraint(
     model.mvTradeIrCost,
     rule=lambda model, r, y: model.vTradeIrCost[r, y]
     == sum(
-        model.pTradeFixom[t1, y] * model.vTradeCap[t1, y]
+        model.pTradeFixom[t1, y] * model.pTradeStock[t1, y]
         for t1 in model.trade
-        if t1 in model.mTradeCapacityVariable
+        if (t1, y) in model.mTradeSpan
+    )
+    + sum(
+        model.pTradeFixom[t1, y] * (model.vTradeCap[t1, y] - model.pTradeStock[t1, y])
+        for t1 in model.trade
+        if ((t1, y) in model.mTradeSpan and t1 in model.mTradeCapacityVariable)
     )
     + sum(
         model.vTradeEac[t1, r, y] for t1 in model.trade if (t1, r, y) in model.mTradeEac
@@ -1302,6 +1349,26 @@ model.eqTradeCap = Constraint(
             )
         )
     ),
+)
+# eqTradeCapLo(trade, year)$mTradeCapLo(trade, year)
+model.eqTradeCapLo = Constraint(
+    model.mTradeCapLo,
+    rule=lambda model, t1, y: model.vTradeCap[t1, y] >= model.pTradeCapLo[t1, y],
+)
+# eqTradeCapUp(trade, year)$mTradeCapUp(trade, year)
+model.eqTradeCapUp = Constraint(
+    model.mTradeCapUp,
+    rule=lambda model, t1, y: model.vTradeCap[t1, y] <= model.pTradeCapUp[t1, y],
+)
+# eqTradeNewCapLo(trade, year)$mTradeNewCapLo(trade, year)
+model.eqTradeNewCapLo = Constraint(
+    model.mTradeNewCapLo,
+    rule=lambda model, t1, y: model.vTradeNewCap[t1, y] >= model.pTradeNewCapLo[t1, y],
+)
+# eqTradeNewCapUp(trade, year)$mTradeNewCapUp(trade, year)
+model.eqTradeNewCapUp = Constraint(
+    model.mTradeNewCapUp,
+    rule=lambda model, t1, y: model.vTradeNewCap[t1, y] <= model.pTradeNewCapUp[t1, y],
 )
 # eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)
 model.eqTradeInv = Constraint(
@@ -1662,6 +1729,25 @@ model.eqCost = Constraint(
     model.mvTotalCost,
     rule=lambda model, r, y: model.vTotalCost[r, y]
     == sum(model.vTechEac[t, r, y] for t in model.tech if (t, r, y) in model.mTechEac)
+    + sum(
+        model.pTechRetCost[t, r, y]
+        * (
+            model.vTechRetiredStockDiff[t, r, y]
+            + sum(
+                model.vTechRetiredNewCap[t, r, yp, y]
+                for yp in model.year
+                if (t, r, yp, y) in model.mvTechRetiredNewCap
+            )
+        )
+        for t in model.tech
+        if (t, r, y) in model.mvTechRetiredStock
+    )
+    + sum(
+        model.pTechRetCost[t, r, y] * model.vTechRetiredNewCap[t, r, yp, y]
+        for t in model.tech
+        for yp in model.year
+        if (t, r, yp, y) in model.mvTechRetiredNewCap
+    )
     + sum(
         model.vTechOMCost[t, r, y] for t in model.tech if (t, r, y) in model.mTechOMCost
     )

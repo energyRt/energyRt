@@ -38,13 +38,14 @@ setClass("trade",
     invcost = "data.frame",
     fixom = "data.frame", # !!!ToDo: add fixom
     varom = "data.frame", # !!!ToDO: add varom
-    olife = "numeric",
-    start = "numeric",
-    end = "numeric",
-    stock = "data.frame", # !!!ToDo: deprecate (move to @capacity)
+    olife = "data.frame",
+    start = "data.frame",
+    end = "data.frame",
+    # stock = "data.frame", # !!!ToDo: deprecate (move to @capacity)
     capacity = "data.frame", # !!!ToDo: not implemented yet
     capacityVariable = "logical",
     cap2act = "numeric", #
+    optimizeRetirement = "logical", # !!!ToDo: add early retirement
     misc = "list"
   ),
   # Default values and structure of slots
@@ -54,8 +55,8 @@ setClass("trade",
     desc = "",
     commodity = NULL, #
     routes = data.frame(
-      src        = character(),
-      dst        = character(),
+      src = character(),
+      dst = character(),
       stringsAsFactors = FALSE
     ),
     trade = data.frame(
@@ -66,15 +67,15 @@ setClass("trade",
       ava.up = numeric(),
       ava.fx = numeric(),
       ava.lo = numeric(),
-      cost = numeric(), # !!!ToDo: move to varom
-      markup = numeric(), # !!!ToDo: move to varom
+      # cost = numeric(), # !!!ToDo: move to varom
+      # markup = numeric(), # !!!ToDo: move to varom
       teff = numeric(),
       stringsAsFactors = FALSE
     ),
     fixom = data.frame(
       region = character(),
       year = integer(),
-      fixom = numeric(), # only if capacityVariable == TRUE
+      fixom = numeric(),
       stringsAsFactors = FALSE
     ),
     varom = data.frame(
@@ -82,6 +83,7 @@ setClass("trade",
       dst = character(),
       year = integer(),
       varom = numeric(),
+      markup = numeric(),
       stringsAsFactors = FALSE
     ),
     invcost = data.frame(
@@ -89,18 +91,34 @@ setClass("trade",
       year = integer(),
       invcost = numeric(),
       wacc = numeric(),
+      retcost = numeric(),
       stringsAsFactors = FALSE
     ),
-    olife = Inf, # !!!ToDo: change to data.frame for consistency
-    start = -Inf, # !!!ToDo: change to data.frame for consistency
-    end = Inf, # !!!ToDo: change to data.frame for consistency
-    stock = data.frame(
+    # olife = Inf, # !!!ToDo: change to data.frame for consistency
+    # start = -Inf, # !!!ToDo: change to data.frame for consistency
+    # end = Inf, # !!!ToDo: change to data.frame for consistency
+    olife = data.frame(
       year = integer(),
-      stock = numeric(),
+      olife = integer(),
       stringsAsFactors = FALSE
     ),
+    start = data.frame(
+      # start = integer(),
+      start = -Inf, # temporary, ToDO: similar to other processes
+      stringsAsFactors = FALSE
+    ),
+    end = data.frame(
+      # end = integer(),
+      end = Inf,  # temporary, ToDO: similar to other processes
+      stringsAsFactors = FALSE
+    ),
+    # stock = data.frame(
+    #   year = integer(),
+    #   stock = numeric(),
+    #   stringsAsFactors = FALSE
+    # ),
     capacity = data.frame(
-      region = character(),
+      # region = character(),
       year = integer(),
       stock = numeric(),
       cap.lo = numeric(),
@@ -109,6 +127,9 @@ setClass("trade",
       ncap.lo = numeric(),
       ncap.up = numeric(),
       ncap.fx = numeric(),
+      ret.lo = numeric(),
+      ret.up = numeric(),
+      ret.fx = numeric(),
       stringsAsFactors = FALSE
     ),
     capacityVariable = FALSE,
@@ -131,6 +152,7 @@ setClass("trade",
       stringsAsFactors = FALSE
     ),
     cap2act = 1, #
+    optimizeRetirement = FALSE,
     misc = list()
   ),
   S3methods = FALSE

@@ -20,7 +20,7 @@ Class (S4) to represent default model configuration.
 
 \item{\code{discountFirstYear}}{logical, if TRUE, the discounting starts from the beginning of the year}
 
-\item{\code{early.retirement}}{currently ignored}
+\item{\code{optimizeRetirement}}{currently ignored}
 
 \item{\code{defVal}}{data.frame with default values of parameters (energyRt:::.defVal)}
 

@@ -2488,7 +2488,7 @@ pDiscount:
   - region
   - year
   type: numpar
-  defVal: 0.1
+  defVal: 0.0
   interpolation: back.inter.forth
   colName: discount
   class: config
@@ -2498,7 +2498,7 @@ pDiscountFactor:
   - region
   - year
   type: numpar
-  defVal: 0.0
+  defVal: 1.0
   interpolation: back.inter.forth
   colName: ''
 pDiscountFactorMileStone:
@@ -4008,6 +4008,48 @@ mTechNewCapUp:
   - region
   - year
   type: map
+pTechRet:
+  name: pTechRet
+  dimSets:
+  - tech
+  - region
+  - year
+  type: bounds
+  defVal:
+  - 0.0
+  - .inf
+  interpolation:
+  - inter.forth
+  - inter.forth
+  colName:
+  - ret.lo
+  - ret.up
+  class: technology
+mTechRetLo:
+  name: mTechRetLo
+  dimSets:
+  - tech
+  - region
+  - year
+  type: map
+mTechRetUp:
+  name: mTechRetUp
+  dimSets:
+  - tech
+  - region
+  - year
+  type: map
+pTechRetCost:
+  name: pTechRetCost
+  dimSets:
+  - tech
+  - region
+  - year
+  type: numpar
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: retcost
+  class: technology
 pStorageCap:
   name: pStorageCap
   dimSets:
@@ -4070,6 +4112,48 @@ mStorageNewCapUp:
   - region
   - year
   type: map
+pStorageRet:
+  name: pStorageRet
+  dimSets:
+  - stg
+  - region
+  - year
+  type: bounds
+  defVal:
+  - 0.0
+  - .inf
+  interpolation:
+  - inter.forth
+  - inter.forth
+  colName:
+  - ret.lo
+  - ret.up
+  class: storage
+mStorageRetLo:
+  name: mStorageRetLo
+  dimSets:
+  - stg
+  - region
+  - year
+  type: map
+mStorageRetUp:
+  name: mStorageRetUp
+  dimSets:
+  - stg
+  - region
+  - year
+  type: map
+pStorageRetCost:
+  name: pStorageRetCost
+  dimSets:
+  - stg
+  - region
+  - year
+  type: numpar
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: retcost
+  class: storage
 pTradeCap:
   name: pTradeCap
   dimSets:
@@ -4135,6 +4219,45 @@ pTradeFixom:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: fixom
+  class: trade
+pTradeRet:
+  name: pTradeRet
+  dimSets:
+  - trade
+  - year
+  type: bounds
+  defVal:
+  - 0.0
+  - .inf
+  interpolation:
+  - inter.forth
+  - inter.forth
+  colName:
+  - ret.lo
+  - ret.up
+  class: trade
+mTradeRetLo:
+  name: mTradeRetLo
+  dimSets:
+  - trade
+  - year
+  type: map
+mTradeRetUp:
+  name: mTradeRetUp
+  dimSets:
+  - trade
+  - year
+  type: map
+pTradeRetCost:
+  name: pTradeRetCost
+  dimSets:
+  - trade
+  - region
+  - year
+  type: numpar
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: retcost
   class: trade
 # pTradeVarom:
 #   name: pTradeVarom

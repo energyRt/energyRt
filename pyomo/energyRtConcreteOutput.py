@@ -222,11 +222,11 @@ for t, r, y in mTechNew:
             + "\n"
         )
 f.close()
-flist.write("vTechRetiredStock\n")
-f = open("output/vTechRetiredStock.csv", "w")
+flist.write("vTechRetiredStockCum\n")
+f = open("output/vTechRetiredStockCum.csv", "w")
 f.write("tech,region,year,value\n")
 for t, r, y in mvTechRetiredStock:
-    if model.vTechRetiredStock[(t, r, y)].value != 0:
+    if model.vTechRetiredStockCum[(t, r, y)].value != 0:
         f.write(
             str(t)
             + ","
@@ -234,7 +234,23 @@ for t, r, y in mvTechRetiredStock:
             + ","
             + str(y)
             + ","
-            + str(model.vTechRetiredStock[(t, r, y)].value)
+            + str(model.vTechRetiredStockCum[(t, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vTechRetiredStockDiff\n")
+f = open("output/vTechRetiredStockDiff.csv", "w")
+f.write("tech,region,year,value\n")
+for t, r, y in mvTechRetiredStock:
+    if model.vTechRetiredStockDiff[(t, r, y)].value != 0:
+        f.write(
+            str(t)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vTechRetiredStockDiff[(t, r, y)].value)
             + "\n"
         )
 f.close()

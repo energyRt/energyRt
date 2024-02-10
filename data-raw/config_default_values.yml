@@ -36,7 +36,7 @@ csrc2ainp: 0.0
 csrc2aout: 0.0
 cvarom: 0.0
 dem: 0.0
-discount: 0.1
+discount: 0.0
 dummyExport: .inf
 dummyImport: .inf
 emis: 0.0
@@ -94,3 +94,6 @@ cap.lo: 0.0
 cap.up: .inf
 ncap.lo: 0.0
 ncap.up: .inf
+ret.lo: 0.0
+ret.up: .inf
+retcost: 0.0

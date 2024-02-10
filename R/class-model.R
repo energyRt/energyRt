@@ -21,7 +21,7 @@ setClass("model",
     data = "list",
     config = "config",
     # LECdata = "list",
-    # early.retirement = "logical",
+    # optimizeRetirement = "logical",
     misc = "list"
   ),
   prototype(
@@ -30,7 +30,7 @@ setClass("model",
     data = list(),
     config = new("config"),
     # LECdata = list(),
-    # early.retirement = FALSE,
+    # optimizeRetirement = FALSE,
     misc = list()
   ),
   S3methods = FALSE

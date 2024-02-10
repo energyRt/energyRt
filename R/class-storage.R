@@ -140,7 +140,7 @@ setClass("storage",
     start = "data.frame",
     end = "data.frame",
     olife = "data.frame", #
-    stock = "data.frame", #
+    # stock = "data.frame", #
     capacity = "data.frame", #
     charge = "data.frame", #
     seff = "data.frame", #
@@ -152,6 +152,7 @@ setClass("storage",
     fullYear = "logical",
     cap2stg = "numeric", # cap2stg cinp
     weather = "data.frame", # weather condisions multiplier
+    optimizeRetirement = "logical",
     misc = "list" #
   ),
   prototype(
@@ -248,14 +249,15 @@ setClass("storage",
       year = integer(),
       invcost = numeric(),
       wacc = numeric(),
+      retcost = numeric(),
       stringsAsFactors = FALSE
     ),
-    stock = data.frame(
-      region = character(),
-      year = integer(),
-      stock = numeric(),
-      stringsAsFactors = FALSE
-    ),
+    # stock = data.frame(
+    #   region = character(),
+    #   year = integer(),
+    #   stock = numeric(),
+    #   stringsAsFactors = FALSE
+    # ),
     capacity = data.frame(
       region = character(),
       year = integer(),
@@ -266,6 +268,9 @@ setClass("storage",
       ncap.lo = numeric(),
       ncap.up = numeric(),
       ncap.fx = numeric(),
+      ret.lo = numeric(),
+      ret.up = numeric(),
+      ret.fx = numeric(),
       stringsAsFactors = FALSE
     ),
     cap2stg = 1,
@@ -284,6 +289,7 @@ setClass("storage",
       wcout.up = numeric(),
       stringsAsFactors = FALSE
     ),
+    optimizeRetirement = FALSE,
     misc = list()
   ),
   S3methods = FALSE

@@ -31,6 +31,7 @@
 #' @importFrom dplyr rename
 #' @importFrom dplyr right_join
 #' @importFrom dplyr select
+#' @importFrom dplyr slice_head
 #' @importFrom dplyr summarize
 #' @importFrom generics interpolate
 #' @importFrom purrr list_flatten

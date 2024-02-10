@@ -627,6 +627,29 @@ write.sc <- write_sc
     rm(mTechNewCapUp)
   }
   
+  if (nrow(prec@parameters[["pTechRet"]]@data) > 0) {
+    suppressMessages({
+      mTechRet <- prec@parameters[["pTechRet"]]@data |>
+        inner_join(prec@parameters[["mTechSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTechRetLo <- filter(mTechRet, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTechRetLo) && nrow(mTechRetLo) > 0) {
+      prec@parameters[["mTechRetLo"]] <-
+        .dat2par(prec@parameters[["mTechRetLo"]], mTechRetLo)
+    }
+    rm(mTechRetLo)
+    mTechRetUp <- filter(mTechRet, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTechRetUp) && nrow(mTechRetUp) > 0) {
+      prec@parameters[["mTechRetUp"]] <-
+        .dat2par(prec@parameters[["mTechRetUp"]], mTechRetUp)
+    }
+    rm(mTechRetUp)
+  }
+
   if (prec@parameters[["pStorageCap"]]@data %>% nrow() > 0) {
     mStorageCap <- prec@parameters[["pStorageCap"]]@data |>
       inner_join(prec@parameters[["mStorageSpan"]]@data) |>
@@ -648,11 +671,59 @@ write.sc <- write_sc
     rm(mStorageCapUp)
   }
 
-  if (prec@parameters[["pTradeCap"]]@data %>% nrow() > 0) {
-    mTradeCap <- prec@parameters[["pTradeCap"]]@data |>
-      inner_join(prec@parameters[["mTradeSpan"]]@data) |>
-      # select(-value) |>
-      unique()
+  if (nrow(prec@parameters[["pStorageNewCap"]]@data) > 0) {
+    suppressMessages({
+      mStorageNewCap <- prec@parameters[["pStorageNewCap"]]@data |>
+        inner_join(prec@parameters[["mStorageNew"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mStorageNewCapLo <- filter(mStorageNewCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mStorageNewCapLo) && nrow(mStorageNewCapLo) > 0) {
+      prec@parameters[["mStorageNewCapLo"]] <-
+        .dat2par(prec@parameters[["mStorageNewCapLo"]], mStorageNewCapLo)
+    }
+    rm(mStorageNewCapLo)
+    mStorageNewCapUp <- filter(mStorageNewCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mStorageNewCapUp) && nrow(mStorageNewCapUp) > 0) {
+      prec@parameters[["mStorageNewCapUp"]] <-
+        .dat2par(prec@parameters[["mStorageNewCapUp"]], mStorageNewCapUp)
+    }
+    rm(mStorageNewCapUp)
+  }
+
+  if(nrow(prec@parameters[["pStorageRet"]]@data) > 0) {
+    suppressMessages({
+      mStorageRet <- prec@parameters[["pStorageRet"]]@data |>
+        inner_join(prec@parameters[["mStorageSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mStorageRetLo <- filter(mStorageRet, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mStorageRetLo) && nrow(mStorageRetLo) > 0) {
+      prec@parameters[["mStorageRetLo"]] <-
+        .dat2par(prec@parameters[["mStorageRetLo"]], mStorageRetLo)
+    }
+    rm(mStorageRetLo)
+    mStorageRetUp <- filter(mStorageRet, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mStorageRetUp) && nrow(mStorageRetUp) > 0) {
+      prec@parameters[["mStorageRetUp"]] <-
+        .dat2par(prec@parameters[["mStorageRetUp"]], mStorageRetUp)
+    }
+    rm(mStorageRetUp)
+  }
+
+  if (nrow(prec@parameters[["pTradeCap"]]@data) > 0) {
+    suppressMessages({
+      mTradeCap <- prec@parameters[["pTradeCap"]]@data |>
+        inner_join(prec@parameters[["mTradeSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
     mTradeCapLo <- filter(mTradeCap, type == "lo") |>
       select(-type, -value)
     if (!is.null(mTradeCapLo) && nrow(mTradeCapLo) > 0) {
@@ -669,10 +740,29 @@ write.sc <- write_sc
     rm(mTradeCapUp)
   }
 
-  # mTechCapUp <- prec@parameters[["pTechCap"]]@data |>
-  #   inner_join(prec@parameters[["mTechSpan"]]@data) |>
-  #   unique()
-
+  if (nrow(prec@parameters[["pTradeRet"]]@data) > 0) {
+    suppressMessages({
+      mTradeRet <- prec@parameters[["pTradeRet"]]@data |>
+        inner_join(prec@parameters[["mTradeSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTradeRetLo <- filter(mTradeRet, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTradeRetLo) && nrow(mTradeRetLo) > 0) {
+      prec@parameters[["mTradeRetLo"]] <-
+        .dat2par(prec@parameters[["mTradeRetLo"]], mTradeRetLo)
+    }
+    rm(mTradeRetLo)
+    mTradeRetUp <- filter(mTradeRet, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTradeRetUp) && nrow(mTradeRetUp) > 0) {
+      prec@parameters[["mTradeRetUp"]] <-
+        .dat2par(prec@parameters[["mTradeRetUp"]], mTradeRetUp)
+    }
+    rm(mTradeRetUp)
+  }
+  
   # mDummyImport ####
   .interpolation_message("mDummyImport", rest, interpolation_count,
                          interpolation_start_time, len_name)

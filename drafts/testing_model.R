@@ -19,7 +19,7 @@ TECH <- newTechnology(
   desc = "technology",
   input = list(comm = "INP"),
   output = list(comm = "OUT"),
-  invcost = list(invcost = 100),
+  invcost = list(invcost = 100, retcost = 5),
   fixom = list(fixom = 10),
   varom = list(varom = 1),
   olife = list(olife = 10)
@@ -40,7 +40,7 @@ m <- newModel(
 getHorizon(m)
 
 show_progress_bar(FALSE)
-scen <- solve(m, solver = solver_options$gams_gdx_cplex, 
+scen <- solve(m, solver = solver_options$gams_gdx_cplex,
               tmp.dir = "tmp/mod_one_ret1")
 scen
 getData(scen, "vTechCap")
@@ -52,16 +52,22 @@ getData(scen, name_ = "dem")
 # Early retirement
 m@config@early.retirement <- TRUE
 TECH1 <- update(TECH, early.retirement = TRUE, name = "TECH1",
-                stock = data.frame(stock = c(rep(10, 5), 0),
+                stock = data.frame(stock = c(rep(50, 5), 0),
                                    year = 2010:2015),
-                invcost = list(invcost = 110))
+                end = list(end = 2000),
+                invcost = list(invcost = 110, retcost = 1))
 TECH2 <- update(TECH, early.retirement = TRUE, name = "TECH2",
-                invcost = list(invcost = 10),
+                invcost = list(invcost = 10, retcost = 1),
                 fixom = list(fixom = 0),
                 start = list(start = 2012)
                 )
 
 repo_ret <- add(repo_one, TECH1, TECH2)
+
+if (F) {
+  source("~/R/energyRt/data-raw/DATASET.R")
+  devtools::load_all(".")
+}
 
 m <- newModel(
   name = "ONE",
@@ -80,7 +86,7 @@ scen_ret <- write_sc(scen_ret,
                     tmp.dir = "tmp/mod_one_ret")
 scen_ret <- solve(scen_ret)
 scen_ret <- read(scen_ret)
-
+scen_ret
 
 # scen_ret <- solve(
 #   m,
@@ -90,12 +96,14 @@ scen_ret
 getData(scen_ret, "vTechCap", drop.zeros = TRUE)
 getData(scen_ret, name_ = "NewCap", drop.zeros = TRUE)
 getData(scen_ret, name_ = "retire", drop.zeros = TRUE)
+getData(scen_ret, name_ = "vTechCap", drop.zeros = TRUE, merge = T) |>
+  pivot_wider(names_from = tech)
+getData(scen_ret, name_ = "stock", drop.zeros = TRUE)
 getData(scen_ret, name_ = "dem")
 vTechCap <- getData(scen_ret, "vTechCap", drop.zeros = TRUE, merge = T) |>
   as.data.table()
 ggplot(vTechCap) +
   geom_bar(aes(year, value, fill = tech), stat = "identity")
-
 
 ## Capacity limit
 TECH2 <- update(TECH2, capacity = list(cap.up = 50, ncap.up = 10))

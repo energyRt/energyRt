@@ -19,7 +19,11 @@
   # print()
   # browser()
   if (parameter == "DEBUG") browser() # DEBUG
-  if (length(defVal) != 1) stop("defVal value is not defined")
+  if (length(defVal) != 1 || is.na(defVal) || is.null(defVal)) {
+    browser()
+    stop("defVal value is not defined")
+  }
+  # browser()
   if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
 
   # Get slice
@@ -490,6 +494,7 @@
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     remValueUp = NULL, remValueLo = NULL) {
+  # browser()
   has_year_col <- any(colnames(dtf) == "year")
   if (!is.null(mtp@misc$not_need_interpolate)) {
     # dtf <- dtf[, !(colnames(dtf) %in% mtp@misc$not_need_interpolate), drop = FALSE]

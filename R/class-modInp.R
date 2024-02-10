@@ -48,6 +48,7 @@ setMethod("initialize", "modInp", function(.Object) {
   for (i in 1:length(ob)) {
     nm <- ob[[i]]$name
     # if (nm == "DEBUG") browser() # DEBUG
+    # if (nm == "pTechRet") browser() # DEBUG
     if (ob[[i]]$type == "set") {
       # browser()
       x[[nm]] <- newSet(nm)
@@ -69,6 +70,7 @@ setMethod("initialize", "modInp", function(.Object) {
       )
     }
   }
+  # browser()
   .Object@parameters <- x
   return(.Object)
 })

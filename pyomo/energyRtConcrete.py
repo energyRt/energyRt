@@ -86,7 +86,10 @@ model.vTradeCost = Var(mvTradeCost, doc="Total trade costs")
 model.vTradeRowCost = Var(mvTradeRowCost, doc="Trade with ROW costs")
 model.vTradeIrCost = Var(mvTradeIrCost, doc="Interregional trade costs")
 model.vTechNewCap = Var(mTechNew, domain=pyo.NonNegativeReals, doc="New capacity")
-model.vTechRetiredStock = Var(
+model.vTechRetiredStockCum = Var(
+    mvTechRetiredStock, domain=pyo.NonNegativeReals, doc="Early retired stock"
+)
+model.vTechRetiredStockDiff = Var(
     mvTechRetiredStock, domain=pyo.NonNegativeReals, doc="Early retired stock"
 )
 model.vTechRetiredNewCap = Var(
@@ -838,7 +841,7 @@ model.eqTechCap = Constraint(
     mTechSpan,
     rule=lambda model, t, r, y: model.vTechCap[t, r, y]
     == pTechStock.get((t, r, y))
-    - (model.vTechRetiredStock[t, r, y] if (t, r, y) in mvTechRetiredStock else 0)
+    - (model.vTechRetiredStockCum[t, r, y] if (t, r, y) in mvTechRetiredStock else 0)
     + sum(
         pPeriodLen.get((yp))
         * (
@@ -964,8 +967,28 @@ if verbose:
 sys.stdout.flush()
 model.eqTechRetiredStock = Constraint(
     mvTechRetiredStock,
-    rule=lambda model, t, r, y: model.vTechRetiredStock[t, r, y]
+    rule=lambda model, t, r, y: model.vTechRetiredStockCum[t, r, y]
     <= pTechStock.get((t, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTechRetiredStockDiff(tech, region, year)$mvTechRetiredStock(tech, region, year)
+if verbose:
+    print("eqTechRetiredStockDiff ", end="")
+sys.stdout.flush()
+model.eqTechRetiredStockDiff = Constraint(
+    mvTechRetiredStock,
+    rule=lambda model, t, r, y: model.vTechRetiredStockDiff[t, r, y]
+    == model.vTechRetiredStockCum[t, r, y]
+    - sum(
+        model.vTechRetiredStockCum[t, r, yp] for yp in year if (yp, y) in mMilestoneNext
+    ),
 )
 if verbose:
     print(
@@ -1620,6 +1643,74 @@ if verbose:
         " s)",
         sep="",
     )
+# eqStorageCapLo(stg, region, year)$mStorageCapLo(stg, region, year)
+if verbose:
+    print("eqStorageCapLo ", end="")
+sys.stdout.flush()
+model.eqStorageCapLo = Constraint(
+    mStorageCapLo,
+    rule=lambda model, st1, r, y: model.vStorageCap[st1, r, y]
+    >= pStorageCapLo.get((st1, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqStorageCapUp(stg, region, year)$mStorageCapUp(stg, region, year)
+if verbose:
+    print("eqStorageCapUp ", end="")
+sys.stdout.flush()
+model.eqStorageCapUp = Constraint(
+    mStorageCapUp,
+    rule=lambda model, st1, r, y: model.vStorageCap[st1, r, y]
+    <= pStorageCapUp.get((st1, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqStorageNewCapLo(stg, region, year)$mStorageNewCapLo(stg, region, year)
+if verbose:
+    print("eqStorageNewCapLo ", end="")
+sys.stdout.flush()
+model.eqStorageNewCapLo = Constraint(
+    mStorageNewCapLo,
+    rule=lambda model, st1, r, y: model.vStorageNewCap[st1, r, y]
+    >= pStorageNewCapLo.get((st1, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqStorageNewCapUp(stg, region, year)$mStorageNewCapUp(stg, region, year)
+if verbose:
+    print("eqStorageNewCapUp ", end="")
+sys.stdout.flush()
+model.eqStorageNewCapUp = Constraint(
+    mStorageNewCapUp,
+    rule=lambda model, st1, r, y: model.vStorageNewCap[st1, r, y]
+    <= pStorageNewCapUp.get((st1, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
 # eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)
 if verbose:
     print("eqStorageInv ", end="")
@@ -1863,9 +1954,14 @@ model.eqCostIrTrade = Constraint(
     mvTradeIrCost,
     rule=lambda model, r, y: model.vTradeIrCost[r, y]
     == sum(
-        pTradeFixom.get((t1, y)) * model.vTradeCap[t1, y]
+        pTradeFixom.get((t1, y)) * pTradeStock.get((t1, y))
         for t1 in trade
-        if t1 in mTradeCapacityVariable
+        if (t1, y) in mTradeSpan
+    )
+    + sum(
+        pTradeFixom.get((t1, y)) * (model.vTradeCap[t1, y] - pTradeStock.get((t1, y)))
+        for t1 in trade
+        if ((t1, y) in mTradeSpan and t1 in mTradeCapacityVariable)
     )
     + sum(model.vTradeEac[t1, r, y] for t1 in trade if (t1, r, y) in mTradeEac)
     + sum(
@@ -2114,6 +2210,70 @@ model.eqTradeCap = Constraint(
             )
         )
     ),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTradeCapLo(trade, year)$mTradeCapLo(trade, year)
+if verbose:
+    print("eqTradeCapLo ", end="")
+sys.stdout.flush()
+model.eqTradeCapLo = Constraint(
+    mTradeCapLo,
+    rule=lambda model, t1, y: model.vTradeCap[t1, y] >= pTradeCapLo.get((t1, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTradeCapUp(trade, year)$mTradeCapUp(trade, year)
+if verbose:
+    print("eqTradeCapUp ", end="")
+sys.stdout.flush()
+model.eqTradeCapUp = Constraint(
+    mTradeCapUp,
+    rule=lambda model, t1, y: model.vTradeCap[t1, y] <= pTradeCapUp.get((t1, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTradeNewCapLo(trade, year)$mTradeNewCapLo(trade, year)
+if verbose:
+    print("eqTradeNewCapLo ", end="")
+sys.stdout.flush()
+model.eqTradeNewCapLo = Constraint(
+    mTradeNewCapLo,
+    rule=lambda model, t1, y: model.vTradeNewCap[t1, y] >= pTradeNewCapLo.get((t1, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTradeNewCapUp(trade, year)$mTradeNewCapUp(trade, year)
+if verbose:
+    print("eqTradeNewCapUp ", end="")
+sys.stdout.flush()
+model.eqTradeNewCapUp = Constraint(
+    mTradeNewCapUp,
+    rule=lambda model, t1, y: model.vTradeNewCap[t1, y] <= pTradeNewCapUp.get((t1, y)),
 )
 if verbose:
     print(
@@ -2644,6 +2804,25 @@ model.eqCost = Constraint(
     mvTotalCost,
     rule=lambda model, r, y: model.vTotalCost[r, y]
     == sum(model.vTechEac[t, r, y] for t in tech if (t, r, y) in mTechEac)
+    + sum(
+        pTechRetCost.get((t, r, y))
+        * (
+            model.vTechRetiredStockDiff[t, r, y]
+            + sum(
+                model.vTechRetiredNewCap[t, r, yp, y]
+                for yp in year
+                if (t, r, yp, y) in mvTechRetiredNewCap
+            )
+        )
+        for t in tech
+        if (t, r, y) in mvTechRetiredStock
+    )
+    + sum(
+        pTechRetCost.get((t, r, y)) * model.vTechRetiredNewCap[t, r, yp, y]
+        for t in tech
+        for yp in year
+        if (t, r, yp, y) in mvTechRetiredNewCap
+    )
     + sum(model.vTechOMCost[t, r, y] for t in tech if (t, r, y) in mTechOMCost)
     + sum(model.vSupCost[s1, r, y] for s1 in sup if (s1, r, y) in mvSupCost)
     + sum(

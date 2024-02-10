@@ -1,6 +1,6 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-"energyRt version: 0.11.13-dev (2024-02-07)\n",
+"energyRt version: 0.11.14-dev (2024-02-09)\n",
 "======================== WARNING ==========================\n",
 "The package is currently in preparation for its first release
 and publication on CRAN. The names, behavior, meaning of
@@ -12,9 +12,11 @@ Thanks for testing and for your patience.
 Please report bugs, issues or suggest improvements here:
     https://github.com/energyRt/energyRt/issues\n",
 "-----------------------------------------------------------\n",
-'For older models install `0.01.25.9000` (2022-12-05) version:\n',
-'remotes::install_github("energyRt/energyRt", \n',
-'                        ref = "master-snapshot-2022-dec")\n',
+'THIS VERSION HAS BREAKING CHANGES:                         \n',
+'  renamed @stock slot -> @capacity,                        \n',
+'  added (often used) constraints on capacity, and other.   \n',
+'  Details: \n',
+'  https://github.com/energyRt/energyRt/blob/dev/dev/changelog.txt\n',
 "===========================================================")
 
   # options

@@ -1,5 +1,9 @@
-println("Julia v", VERSION)
-println("Executing energyRt model in Julia/JuMP")
+print(
+    "Julia v",
+    VERSION,
+    "
+",
+)
 using Dates
 include("inc1.jl")
 flog = open("output/log.csv", "w")
@@ -10,15 +14,12 @@ println(
     Dates.format(now(), "yyyy-mm-dd HH:MM:SS"),
     "\"",
 )
-println("Starting time ", Dates.format(now(), "HH:MM:SS"))
+println("start ", Dates.format(now(), "HH:MM:SS"))
 using JuMP
 println(flog, "\"load data\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
-println("Reading data")
 include("data.jl")
 include("inc2.jl")
-println("Building JuMP model")
 model = Model();
-print("variables... ")
 @variable(model, vTechInv[mTechInv]);
 @variable(model, vTechEac[mTechEac]);
 @variable(model, vTechOMCost[mTechOMCost]);
@@ -35,7 +36,8 @@ print("variables... ")
 @variable(model, vTradeRowCost[mvTradeRowCost]);
 @variable(model, vTradeIrCost[mvTradeIrCost]);
 @variable(model, vTechNewCap[mTechNew] >= 0);
-@variable(model, vTechRetiredStock[mvTechRetiredStock] >= 0);
+@variable(model, vTechRetiredStockCum[mvTechRetiredStock] >= 0);
+@variable(model, vTechRetiredStockDiff[mvTechRetiredStock] >= 0);
 @variable(model, vTechRetiredNewCap[mvTechRetiredNewCap] >= 0);
 @variable(model, vTechCap[mTechSpan] >= 0);
 @variable(model, vTechAct[mvTechAct] >= 0);
@@ -82,8 +84,6 @@ print("variables... ")
 @variable(model, vTradeEac[mTradeEac] >= 0);
 @variable(model, vTradeNewCap[mTradeNew] >= 0);
 @variable(model, vTotalUserCosts[mvTotalUserCosts] >= 0);
-print(Dates.format(now(), "HH:MM:SS"), "\n")
-print("constraints... ")
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 print("eqTechSng2Sng(tech, region, comm, commp, year, slice)...")
 @constraint(
@@ -1101,7 +1101,7 @@ print("eqTechCap(tech, region, year)...")
             pTechStockDef
         end
     ) - (if (t, r, y) in mvTechRetiredStock
-        vTechRetiredStock[(t, r, y)]
+        vTechRetiredStockCum[(t, r, y)]
     else
         0
     end) + sum(
@@ -1137,6 +1137,82 @@ print(
     "
 ",
 )
+# eqTechCapLo(tech, region, year)$mTechCapLo(tech, region, year)
+print("eqTechCapLo(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechCapLo],
+    vTechCap[(t, r, y)] >= (
+        if haskey(pTechCapLo, (t, r, y))
+            pTechCapLo[(t, r, y)]
+        else
+            pTechCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechCapUp(tech, region, year)$mTechCapUp(tech, region, year)
+print("eqTechCapUp(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechCapUp],
+    vTechCap[(t, r, y)] <= (
+        if haskey(pTechCapUp, (t, r, y))
+            pTechCapUp[(t, r, y)]
+        else
+            pTechCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechNewCapLo(tech, region, year)$mTechNewCapLo(tech, region, year)
+print("eqTechNewCapLo(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechNewCapLo],
+    vTechNewCap[(t, r, y)] >= (
+        if haskey(pTechNewCapLo, (t, r, y))
+            pTechNewCapLo[(t, r, y)]
+        else
+            pTechNewCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechNewCapUp(tech, region, year)$mTechNewCapUp(tech, region, year)
+print("eqTechNewCapUp(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechNewCapUp],
+    vTechNewCap[(t, r, y)] <= (
+        if haskey(pTechNewCapUp, (t, r, y))
+            pTechNewCapUp[(t, r, y)]
+        else
+            pTechNewCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
 # eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
 print("eqTechRetiredNewCap(tech, region, year)...")
 @constraint(
@@ -1158,13 +1234,28 @@ print("eqTechRetiredStock(tech, region, year)...")
 @constraint(
     model,
     [(t, r, y) in mvTechRetiredStock],
-    vTechRetiredStock[(t, r, y)] <= (
+    vTechRetiredStockCum[(t, r, y)] <= (
         if haskey(pTechStock, (t, r, y))
             pTechStock[(t, r, y)]
         else
             pTechStockDef
         end
     )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechRetiredStockDiff(tech, region, year)$mvTechRetiredStock(tech, region, year)
+print("eqTechRetiredStockDiff(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mvTechRetiredStock],
+    vTechRetiredStockDiff[(t, r, y)] ==
+    vTechRetiredStockCum[(t, r, y)] -
+    sum(vTechRetiredStockCum[(t, r, yp)] for yp in year if (yp, y) in mMilestoneNext)
 );
 print(
     " ",
@@ -2198,6 +2289,82 @@ print(
     "
 ",
 )
+# eqStorageCapLo(stg, region, year)$mStorageCapLo(stg, region, year)
+print("eqStorageCapLo(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageCapLo],
+    vStorageCap[(st1, r, y)] >= (
+        if haskey(pStorageCapLo, (st1, r, y))
+            pStorageCapLo[(st1, r, y)]
+        else
+            pStorageCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqStorageCapUp(stg, region, year)$mStorageCapUp(stg, region, year)
+print("eqStorageCapUp(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageCapUp],
+    vStorageCap[(st1, r, y)] <= (
+        if haskey(pStorageCapUp, (st1, r, y))
+            pStorageCapUp[(st1, r, y)]
+        else
+            pStorageCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqStorageNewCapLo(stg, region, year)$mStorageNewCapLo(stg, region, year)
+print("eqStorageNewCapLo(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageNewCapLo],
+    vStorageNewCap[(st1, r, y)] >= (
+        if haskey(pStorageNewCapLo, (st1, r, y))
+            pStorageNewCapLo[(st1, r, y)]
+        else
+            pStorageNewCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqStorageNewCapUp(stg, region, year)$mStorageNewCapUp(stg, region, year)
+print("eqStorageNewCapUp(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageNewCapUp],
+    vStorageNewCap[(st1, r, y)] <= (
+        if haskey(pStorageNewCapUp, (st1, r, y))
+            pStorageNewCapUp[(st1, r, y)]
+        else
+            pStorageNewCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
 # eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)
 print("eqStorageInv(stg, region, year)...")
 @constraint(
@@ -2495,7 +2662,38 @@ print("eqCostIrTrade(region, year)...")
     model,
     [(r, y) in mvTradeIrCost],
     vTradeIrCost[(r, y)] ==
-    sum(vTradeEac[(t1, r, y)] for t1 in trade if (t1, r, y) in mTradeEac) + sum(
+    sum(
+        (
+            if haskey(pTradeFixom, (t1, y))
+                pTradeFixom[(t1, y)]
+            else
+                pTradeFixomDef
+            end
+        ) * (
+            if haskey(pTradeStock, (t1, y))
+                pTradeStock[(t1, y)]
+            else
+                pTradeStockDef
+            end
+        ) for t1 in trade if (t1, y) in mTradeSpan
+    ) +
+    sum(
+        (
+            if haskey(pTradeFixom, (t1, y))
+                pTradeFixom[(t1, y)]
+            else
+                pTradeFixomDef
+            end
+        ) * (vTradeCap[(t1, y)] - (
+            if haskey(pTradeStock, (t1, y))
+                pTradeStock[(t1, y)]
+            else
+                pTradeStockDef
+            end
+        )) for t1 in trade if ((t1, y) in mTradeSpan && t1 in mTradeCapacityVariable)
+    ) +
+    sum(vTradeEac[(t1, r, y)] for t1 in trade if (t1, r, y) in mTradeEac) +
+    sum(
         sum(
             sum(
                 (
@@ -2771,6 +2969,82 @@ print("eqTradeCap(trade, year)...")
                 ) + ordYear[(yp)] || t1 in mTradeOlifeInf
             )
         )
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeCapLo(trade, year)$mTradeCapLo(trade, year)
+print("eqTradeCapLo(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeCapLo],
+    vTradeCap[(t1, y)] >= (
+        if haskey(pTradeCapLo, (t1, y))
+            pTradeCapLo[(t1, y)]
+        else
+            pTradeCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeCapUp(trade, year)$mTradeCapUp(trade, year)
+print("eqTradeCapUp(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeCapUp],
+    vTradeCap[(t1, y)] <= (
+        if haskey(pTradeCapUp, (t1, y))
+            pTradeCapUp[(t1, y)]
+        else
+            pTradeCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeNewCapLo(trade, year)$mTradeNewCapLo(trade, year)
+print("eqTradeNewCapLo(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeNewCapLo],
+    vTradeNewCap[(t1, y)] >= (
+        if haskey(pTradeNewCapLo, (t1, y))
+            pTradeNewCapLo[(t1, y)]
+        else
+            pTradeNewCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeNewCapUp(trade, year)$mTradeNewCapUp(trade, year)
+print("eqTradeNewCapUp(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeNewCapUp],
+    vTradeNewCap[(t1, y)] <= (
+        if haskey(pTradeNewCapUp, (t1, y))
+            pTradeNewCapUp[(t1, y)]
+        else
+            pTradeNewCapUpDef
+        end
     )
 );
 print(
@@ -3459,6 +3733,30 @@ print("eqCost(region, year)...")
     [(r, y) in mvTotalCost],
     vTotalCost[(r, y)] ==
     sum(vTechEac[(t, r, y)] for t in tech if (t, r, y) in mTechEac) +
+    sum(
+        (
+            if haskey(pTechRetCost, (t, r, y))
+                pTechRetCost[(t, r, y)]
+            else
+                pTechRetCostDef
+            end
+        ) * (
+            vTechRetiredStockDiff[(t, r, y)] + sum(
+                vTechRetiredNewCap[(t, r, yp, y)] for
+                yp in year if (t, r, yp, y) in mvTechRetiredNewCap
+            )
+        ) for t in tech if (t, r, y) in mvTechRetiredStock
+    ) +
+    sum(
+        (
+            if haskey(pTechRetCost, (t, r, y))
+                pTechRetCost[(t, r, y)]
+            else
+                pTechRetCostDef
+            end
+        ) * vTechRetiredNewCap[(t, r, yp, y)] for t in tech for
+        yp in year if (t, r, yp, y) in mvTechRetiredNewCap
+    ) +
     sum(vTechOMCost[(t, r, y)] for t in tech if (t, r, y) in mTechOMCost) +
     sum(vSupCost[(s1, r, y)] for s1 in sup if (s1, r, y) in mvSupCost) +
     sum(

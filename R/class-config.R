@@ -6,7 +6,7 @@
 #' @slot horizon class horizon with the model time parameters
 #' @slot discount data frame with discount rates by region and year
 #' @slot discountFirstYear logical, if TRUE, the discounting starts from the beginning of the year
-#' @slot early.retirement currently ignored
+#' @slot optimizeRetirement currently ignored
 #' @slot defVal data.frame with default values of parameters (energyRt:::.defVal)
 #' @slot interpolation data.frame with interpolation rules (energyRt:::.defInt)
 #' @slot debug data.frame to define artificial (dummy) variables to debug model infeasibility
@@ -27,7 +27,7 @@ setClass("config",
     # yearFraction = "data.frame",
     discount = "data.frame",
     discountFirstYear = "logical",
-    early.retirement = "logical",
+    optimizeRetirement = "logical",
     defVal = "data.frame",
     interpolation = "data.frame",
     debug = "data.frame",
@@ -59,7 +59,7 @@ setClass("config",
     calendar = newCalendar(),
     # slice = new("slice"),
     discountFirstYear = FALSE,
-    early.retirement = FALSE,
+    optimizeRetirement = FALSE,
     defVal = data.frame(),
     interpolation = data.frame(),
     # defVal = as.data.frame(.defVal, stringsAsFactors = FALSE),

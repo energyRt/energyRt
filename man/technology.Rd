@@ -22,7 +22,7 @@ newTechnology(
   af = data.frame(),
   afs = data.frame(),
   weather = data.frame(),
-  stock = data.frame(),
+  capacity = data.frame(),
   invcost = data.frame(),
   fixom = data.frame(),
   varom = data.frame(),
@@ -32,8 +32,7 @@ newTechnology(
   end = data.frame(),
   timeframe = character(),
   fullYear = TRUE,
-  early.retirement = FALSE,
-  upgrade.technology = character(),
+  optimizeRetirement = FALSE,
   misc = list()
 )
 
@@ -236,7 +235,7 @@ Create object of class `technology`.
  \item{stock}{numeric, predefined existing of future capacity of the technology (in units of capacity), NA means default value (0)}
 }}
 
-\item{\code{early.retirement}}{logical. Currently ignored.}
+\item{\code{optimizeRetirement}}{logical. Currently ignored.}
 
 \item{\code{upgrade.technology}}{character. Currently ignored.}
 
