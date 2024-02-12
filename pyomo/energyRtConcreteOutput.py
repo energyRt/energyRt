@@ -238,11 +238,11 @@ for t, r, y in mvTechRetiredStock:
             + "\n"
         )
 f.close()
-flist.write("vTechRetiredStockDiff\n")
-f = open("output/vTechRetiredStockDiff.csv", "w")
+flist.write("vTechRetiredStock\n")
+f = open("output/vTechRetiredStock.csv", "w")
 f.write("tech,region,year,value\n")
 for t, r, y in mvTechRetiredStock:
-    if model.vTechRetiredStockDiff[(t, r, y)].value != 0:
+    if model.vTechRetiredStock[(t, r, y)].value != 0:
         f.write(
             str(t)
             + ","
@@ -250,7 +250,7 @@ for t, r, y in mvTechRetiredStock:
             + ","
             + str(y)
             + ","
-            + str(model.vTechRetiredStockDiff[(t, r, y)].value)
+            + str(model.vTechRetiredStock[(t, r, y)].value)
             + "\n"
         )
 f.close()
@@ -940,18 +940,13 @@ for c, r, y, s in mvTradeIrAOutTot:
             + "\n"
         )
 f.close()
-flist.write("vExportRowAccumulated\n")
-f = open("output/vExportRowAccumulated.csv", "w")
+flist.write("vExportRowCum\n")
+f = open("output/vExportRowCum.csv", "w")
 f.write("expp,comm,value\n")
 for e, c in mExpComm:
-    if model.vExportRowAccumulated[(e, c)].value != 0:
+    if model.vExportRowCum[(e, c)].value != 0:
         f.write(
-            str(e)
-            + ","
-            + str(c)
-            + ","
-            + str(model.vExportRowAccumulated[(e, c)].value)
-            + "\n"
+            str(e) + "," + str(c) + "," + str(model.vExportRowCum[(e, c)].value) + "\n"
         )
 f.close()
 flist.write("vExportRow\n")
@@ -974,18 +969,13 @@ for e, c, r, y, s in mExportRow:
             + "\n"
         )
 f.close()
-flist.write("vImportRowAccumulated\n")
-f = open("output/vImportRowAccumulated.csv", "w")
+flist.write("vImportRowCum\n")
+f = open("output/vImportRowCum.csv", "w")
 f.write("imp,comm,value\n")
 for i, c in mImpComm:
-    if model.vImportRowAccumulated[(i, c)].value != 0:
+    if model.vImportRowCum[(i, c)].value != 0:
         f.write(
-            str(i)
-            + ","
-            + str(c)
-            + ","
-            + str(model.vImportRowAccumulated[(i, c)].value)
-            + "\n"
+            str(i) + "," + str(c) + "," + str(model.vImportRowCum[(i, c)].value) + "\n"
         )
 f.close()
 flist.write("vImportRow\n")

@@ -37,7 +37,7 @@ model = Model();
 @variable(model, vTradeIrCost[mvTradeIrCost]);
 @variable(model, vTechNewCap[mTechNew] >= 0);
 @variable(model, vTechRetiredStockCum[mvTechRetiredStock] >= 0);
-@variable(model, vTechRetiredStockDiff[mvTechRetiredStock] >= 0);
+@variable(model, vTechRetiredStock[mvTechRetiredStock] >= 0);
 @variable(model, vTechRetiredNewCap[mvTechRetiredNewCap] >= 0);
 @variable(model, vTechCap[mTechSpan] >= 0);
 @variable(model, vTechAct[mvTechAct] >= 0);
@@ -75,9 +75,9 @@ model = Model();
 @variable(model, vTradeIrAInpTot[mvTradeIrAInpTot] >= 0);
 @variable(model, vTradeIrAOut[mvTradeIrAOut] >= 0);
 @variable(model, vTradeIrAOutTot[mvTradeIrAOutTot] >= 0);
-@variable(model, vExportRowAccumulated[mExpComm] >= 0);
+@variable(model, vExportRowCum[mExpComm] >= 0);
 @variable(model, vExportRow[mExportRow] >= 0);
-@variable(model, vImportRowAccumulated[mImpComm] >= 0);
+@variable(model, vImportRowCum[mImpComm] >= 0);
 @variable(model, vImportRow[mImportRow] >= 0);
 @variable(model, vTradeCap[mTradeSpan] >= 0);
 @variable(model, vTradeInv[mTradeEac] >= 0);
@@ -1229,8 +1229,8 @@ print(
     "
 ",
 )
-# eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
-print("eqTechRetiredStock(tech, region, year)...")
+# eqTechRetiredStockCum(tech, region, year)$mvTechRetiredStock(tech, region, year)
+print("eqTechRetiredStockCum(tech, region, year)...")
 @constraint(
     model,
     [(t, r, y) in mvTechRetiredStock],
@@ -1248,12 +1248,12 @@ print(
     "
 ",
 )
-# eqTechRetiredStockDiff(tech, region, year)$mvTechRetiredStock(tech, region, year)
-print("eqTechRetiredStockDiff(tech, region, year)...")
+# eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
+print("eqTechRetiredStock(tech, region, year)...")
 @constraint(
     model,
     [(t, r, y) in mvTechRetiredStock],
-    vTechRetiredStockDiff[(t, r, y)] ==
+    vTechRetiredStock[(t, r, y)] ==
     vTechRetiredStockCum[(t, r, y)] -
     sum(vTechRetiredStockCum[(t, r, yp)] for yp in year if (yp, y) in mMilestoneNext)
 );
@@ -1503,8 +1503,8 @@ print(
     "
 ",
 )
-# eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)
-print("eqSupTotal(sup, comm, region)...")
+# eqSupReserve(sup, comm, region)$mvSupReserve(sup, comm, region)
+print("eqSupReserve(sup, comm, region)...")
 @constraint(
     model,
     [(s1, c, r) in mvSupReserve],
@@ -1620,8 +1620,8 @@ print(
     "
 ",
 )
-# eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
-print("eqAggOut(comm, region, year, slice)...")
+# eqAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
+print("eqAggOutTot(comm, region, year, slice)...")
 @constraint(
     model,
     [(c, r, y, s) in mAggOut],
@@ -2502,8 +2502,8 @@ print(
     "
 ",
 )
-# eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)
-print("eqImport(comm, dst, year, slice)...")
+# eqImportTot(comm, dst, year, slice)$mImport(comm, dst, year, slice)
+print("eqImportTot(comm, dst, year, slice)...")
 @constraint(
     model,
     [(c, dst, y, s) in mImport],
@@ -2526,11 +2526,24 @@ print("eqImport(comm, dst, year, slice)...")
                 end
             ) for src in region if (t1, src, dst) in mTradeRoutes
         ) for t1 in trade if (t1, c) in mTradeComm
-    ) + sum((if (i, c, dst, y, s) in mImportRow
+    ) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    ) +
+    sum((if (i, c, dst, y, s) in mImportRow
         vImportRow[(i, c, dst, y, s)]
     else
         0
-    end) for i in imp if (i, c) in mImpComm)
+    end) for i in imp if (i, c) in mImpComm) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    )
 );
 print(
     " ",
@@ -2538,8 +2551,8 @@ print(
     "
 ",
 )
-# eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)
-print("eqExport(comm, src, year, slice)...")
+# eqExportTot(comm, src, year, slice)$mExport(comm, src, year, slice)
+print("eqExportTot(comm, src, year, slice)...")
 @constraint(
     model,
     [(c, src, y, s) in mExport],
@@ -2552,11 +2565,24 @@ print("eqExport(comm, src, year, slice)...")
                 0
             end) for dst in region if (t1, src, dst) in mTradeRoutes
         ) for t1 in trade if (t1, c) in mTradeComm
-    ) + sum((if (e, c, src, y, s) in mExportRow
+    ) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    ) +
+    sum((if (e, c, src, y, s) in mExportRow
         vExportRow[(e, c, src, y, s)]
     else
         0
-    end) for e in expp if (e, c) in mExpComm)
+    end) for e in expp if (e, c) in mExpComm) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    )
 );
 print(
     " ",
@@ -2637,7 +2663,15 @@ print("eqCostRowTrade(region, year)...")
             else
                 pImportRowPriceDef
             end
-        ) * vImportRow[(i, c, r, y, s)] for i in imp for c in comm for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vImportRow[(i, c, r, y, s)] for i in imp for c in comm for
         s in slice if (i, c, r, y, s) in mImportRow
     ) - sum(
         (
@@ -2646,7 +2680,15 @@ print("eqCostRowTrade(region, year)...")
             else
                 pExportRowPriceDef
             end
-        ) * vExportRow[(e, c, r, y, s)] for e in expp for c in comm for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vExportRow[(e, c, r, y, s)] for e in expp for c in comm for
         s in slice if (e, c, r, y, s) in mExportRow
     )
 );
@@ -2713,7 +2755,15 @@ print("eqCostIrTrade(region, year)...")
                                         pTradeIrMarkupDef
                                     end
                                 )
-                            ) * vTradeIr[(t1, c, src, r, y, s)]
+                            ) *
+                            vTradeIr[(t1, c, src, r, y, s)] *
+                            (
+                                if haskey(pSliceWeight, (s))
+                                    pSliceWeight[(s)]
+                                else
+                                    pSliceWeightDef
+                                end
+                            )
                         )
                     else
                         0
@@ -2728,12 +2778,28 @@ print("eqCostIrTrade(region, year)...")
                     if (t1, c, r, dst, y, s) in mvTradeIr
                         (
                             (
-                                if haskey(pTradeIrMarkup, (t1, r, dst, y, s))
-                                    pTradeIrMarkup[(t1, r, dst, y, s)]
+                                (
+                                    if haskey(pTradeIrCost, (t1, r, dst, y, s))
+                                        pTradeIrCost[(t1, r, dst, y, s)]
+                                    else
+                                        pTradeIrCostDef
+                                    end
+                                ) + (
+                                    if haskey(pTradeIrMarkup, (t1, r, dst, y, s))
+                                        pTradeIrMarkup[(t1, r, dst, y, s)]
+                                    else
+                                        pTradeIrMarkupDef
+                                    end
+                                )
+                            ) *
+                            vTradeIr[(t1, c, r, dst, y, s)] *
+                            (
+                                if haskey(pSliceWeight, (s))
+                                    pSliceWeight[(s)]
                                 else
-                                    pTradeIrMarkupDef
+                                    pSliceWeightDef
                                 end
-                            ) * vTradeIr[(t1, c, r, dst, y, s)]
+                            )
                         )
                     else
                         0
@@ -2787,19 +2853,27 @@ print(
     "
 ",
 )
-# eqExportRowCumulative(expp, comm)$mExpComm(expp, comm)
-print("eqExportRowCumulative(expp, comm)...")
+# eqExportRowCum(expp, comm)$mExpComm(expp, comm)
+print("eqExportRowCum(expp, comm)...")
 @constraint(
     model,
     [(e, c) in mExpComm],
-    vExportRowAccumulated[(e, c)] == sum(
+    vExportRowCum[(e, c)] == sum(
         (
             if haskey(pPeriodLen, (y))
                 pPeriodLen[(y)]
             else
                 pPeriodLenDef
             end
-        ) * vExportRow[(e, c, r, y, s)] for r in region for y in year for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vExportRow[(e, c, r, y, s)] for r in region for y in year for
         s in slice if (e, c, r, y, s) in mExportRow
     )
 );
@@ -2809,12 +2883,12 @@ print(
     "
 ",
 )
-# eqExportRowResUp(expp, comm)$mExportRowAccumulatedUp(expp, comm)
+# eqExportRowResUp(expp, comm)$mExportRowCumUp(expp, comm)
 print("eqExportRowResUp(expp, comm)...")
 @constraint(
     model,
-    [(e, c) in mExportRowAccumulatedUp],
-    vExportRowAccumulated[(e, c)] <= (
+    [(e, c) in mExportRowCumUp],
+    vExportRowCum[(e, c)] <= (
         if haskey(pExportRowRes, (e))
             pExportRowRes[(e)]
         else
@@ -2866,19 +2940,27 @@ print(
     "
 ",
 )
-# eqImportRowAccumulated(imp, comm)$mImpComm(imp, comm)
-print("eqImportRowAccumulated(imp, comm)...")
+# eqImportRowCum(imp, comm)$mImpComm(imp, comm)
+print("eqImportRowCum(imp, comm)...")
 @constraint(
     model,
     [(i, c) in mImpComm],
-    vImportRowAccumulated[(i, c)] == sum(
+    vImportRowCum[(i, c)] == sum(
         (
             if haskey(pPeriodLen, (y))
                 pPeriodLen[(y)]
             else
                 pPeriodLenDef
             end
-        ) * vImportRow[(i, c, r, y, s)] for r in region for y in year for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vImportRow[(i, c, r, y, s)] for r in region for y in year for
         s in slice if (i, c, r, y, s) in mImportRow
     )
 );
@@ -2888,12 +2970,12 @@ print(
     "
 ",
 )
-# eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm)
+# eqImportRowResUp(imp, comm)$mImportRowCumUp(imp, comm)
 print("eqImportRowResUp(imp, comm)...")
 @constraint(
     model,
-    [(i, c) in mImportRowAccumulatedUp],
-    vImportRowAccumulated[(i, c)] <= (
+    [(i, c) in mImportRowCumUp],
+    vImportRowCum[(i, c)] <= (
         if haskey(pImportRowRes, (i))
             pImportRowRes[(i)]
         else
@@ -3300,13 +3382,7 @@ print("eqOutTot(comm, region, year, slice)...")
     else
         0
     end) +
-    (
-        if haskey(pSliceWeight, (s))
-            pSliceWeight[(s)]
-        else
-            pSliceWeightDef
-        end
-    ) * (if (c, r, y, s) in mAggOut
+    (if (c, r, y, s) in mAggOut
         vAggOutTot[(c, r, y, s)]
     else
         0
@@ -3370,13 +3446,7 @@ print("eqOut2Lo(comm, region, year, slice)...")
     else
         0
     end) +
-    (
-        if haskey(pSliceWeight, (s))
-            pSliceWeight[(s)]
-        else
-            pSliceWeightDef
-        end
-    ) * (if (c, r, y, s) in mAggOut
+    (if (c, r, y, s) in mAggOut
         vAggOutTot[(c, r, y, s)]
     else
         0
@@ -3425,7 +3495,13 @@ print("eqInpTot(comm, region, year, slice)...")
     else
         0
     end) +
-    (if (c, r, y, s) in mDummyExport
+    (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    ) * (if (c, r, y, s) in mDummyExport
         vDummyExport[(c, r, y, s)]
     else
         0
@@ -3741,7 +3817,7 @@ print("eqCost(region, year)...")
                 pTechRetCostDef
             end
         ) * (
-            vTechRetiredStockDiff[(t, r, y)] + sum(
+            vTechRetiredStock[(t, r, y)] + sum(
                 vTechRetiredNewCap[(t, r, yp, y)] for
                 yp in year if (t, r, yp, y) in mvTechRetiredNewCap
             )
@@ -3907,13 +3983,13 @@ print("eqObjective...")
 @constraint(
     model,
     vObjective == sum(
-        vTotalCost[(r, y)] * (
+        (
             if haskey(pDiscountFactorMileStone, (r, y))
                 pDiscountFactorMileStone[(r, y)]
             else
                 pDiscountFactorMileStoneDef
             end
-        ) for r in region for y in year if (r, y) in mvTotalCost
+        ) * vTotalCost[(r, y)] for r in region for y in year if (r, y) in mvTotalCost
     )
 );
 print(

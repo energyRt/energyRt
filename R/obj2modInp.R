@@ -254,8 +254,8 @@ setMethod(".obj2modInp", signature(
   }
   if (!is.null(pExportRowRes)) {
     pExportRowRes$comm <- exp@commodity
-    obj@parameters[["mExportRowAccumulatedUp"]] <- .dat2par(
-      obj@parameters[["mExportRowAccumulatedUp"]],
+    obj@parameters[["mExportRowCumUp"]] <- .dat2par(
+      obj@parameters[["mExportRowCumUp"]],
       pExportRowRes[pExportRowRes$value != Inf, c("expp", "comm"), drop = FALSE]
     )
   }
@@ -351,8 +351,8 @@ setMethod(
     }
     if (!is.null(pImportRowRes)) {
       pImportRowRes$comm <- exp@commodity
-      obj@parameters[["mImportRowAccumulatedUp"]] <- .dat2par(
-        obj@parameters[["mImportRowAccumulatedUp"]],
+      obj@parameters[["mImportRowCumUp"]] <- .dat2par(
+        obj@parameters[["mImportRowCumUp"]],
         pImportRowRes[pImportRowRes$value != Inf, c("expp", "comm"),
                       drop = FALSE]
       )
@@ -685,8 +685,13 @@ setMethod(
       obj@parameters[["mStorageComm"]],
       data.table(stg = stg@name, comm = stg@commodity)
     )
-    olife <- .interp_numpar(
-      stg@olife, "olife",
+
+
+    if (nrow(stg@olife) > 1) {
+      stop("Operational life (`olife`) of storage object is accepting only one value. Year-dimension is reserved for future implementation, currently ignored.")
+    }
+      olife <- .interp_numpar(
+      select(stg@olife, -any_of("year")), "olife",
       obj@parameters[["pStorageOlife"]],
       approxim, "stg", stg@name
       # removeDefault = FALSE
@@ -2875,8 +2880,11 @@ setMethod(
           .dat2par(obj@parameters[["pTradeNewCap"]], pTradeNewCap)
         rm(pTradeNewCap)
       }
-
-      pTradeOlife <- .interp_numpar(trd@olife, "olife",
+      # browser()
+      if (nrow(trd@olife) > 1) {
+        stop("Operational life (`olife`) of trade object is accepting only one value. Year-dimension is reserved for future implementation, currently ignored.")
+      }
+      pTradeOlife <- .interp_numpar(select(trd@olife, -any_of("year")), "olife",
                                     obj@parameters[["pTradeOlife"]], approxim,
                                     "trade", trd@name)
       obj@parameters[["pTradeOlife"]] <- .dat2par(

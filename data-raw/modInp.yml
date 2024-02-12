@@ -2819,8 +2819,8 @@ mExportRowUp:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
-mImportRowAccumulatedUp:
-  name: mImportRowAccumulatedUp
+mImportRowCumUp:
+  name: mImportRowCumUp
   dimSets:
   - imp
   - comm
@@ -2828,8 +2828,8 @@ mImportRowAccumulatedUp:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
-mExportRowAccumulatedUp:
-  name: mExportRowAccumulatedUp
+mExportRowCumUp:
+  name: mExportRowCumUp
   dimSets:
   - expp
   - comm

@@ -374,19 +374,19 @@ setMethod("read", "scenario", read_solution)
   for (i in names(scen@misc$data.before)) {
     scen@modOut@variables[[i]] <- rbind(scen@modOut@variables[[i]], scen@misc$data.before[[i]])
   }
-  # Correct RowTradeAccumulated
-  if (nrow(scen@modOut@variables$vExportRowAccumulated) > 0) {
-    scen@modOut@variables$vExportRowAccumulated <- aggregate(
-      scen@modOut@variables$vExportRowAccumulated[, "value", drop = FALSE],
-      scen@modOut@variables$vExportRowAccumulated[, c("expp", "comm"),
+  # Correct RowTradeCum #!!! ToDO: ??? check
+  if (nrow(scen@modOut@variables$vExportRowCum) > 0) {
+    scen@modOut@variables$vExportRowCum <- aggregate(
+      scen@modOut@variables$vExportRowCum[, "value", drop = FALSE],
+      scen@modOut@variables$vExportRowCum[, c("expp", "comm"),
         drop = FALSE
       ], sum
     )
   }
-  if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0) {
-    scen@modOut@variables$vImportRowAccumulated <- aggregate(
-      scen@modOut@variables$vImportRowAccumulated[, "value", drop = FALSE],
-      scen@modOut@variables$vImportRowAccumulated[, c("imp", "comm"), drop = FALSE], sum
+  if (nrow(scen@modOut@variables$vImportRowCum) > 0) {
+    scen@modOut@variables$vImportRowCum <- aggregate(
+      scen@modOut@variables$vImportRowCum[, "value", drop = FALSE],
+      scen@modOut@variables$vImportRowCum[, c("imp", "comm"), drop = FALSE], sum
     )
   }
   scen

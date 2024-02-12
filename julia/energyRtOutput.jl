@@ -240,23 +240,23 @@ for (t, r, y) in mvTechRetiredStock
 end;
 close(fvTechRetiredStockCum);
 
-fvTechRetiredStockDiff = open("output/vTechRetiredStockDiff.csv", "w");
-println(fvTechRetiredStockDiff, "tech,region,year,value");
+fvTechRetiredStock = open("output/vTechRetiredStock.csv", "w");
+println(fvTechRetiredStock, "tech,region,year,value");
 for (t, r, y) in mvTechRetiredStock
-    if JuMP.value(vTechRetiredStockDiff[(t, r, y)]) != 0
+    if JuMP.value(vTechRetiredStock[(t, r, y)]) != 0
         println(
-            fvTechRetiredStockDiff,
+            fvTechRetiredStock,
             t,
             ",",
             r,
             ",",
             y,
             ",",
-            JuMP.value(vTechRetiredStockDiff[(t, r, y)]),
+            JuMP.value(vTechRetiredStock[(t, r, y)]),
         )
     end
 end;
-close(fvTechRetiredStockDiff);
+close(fvTechRetiredStock);
 
 fvTechRetiredNewCap = open("output/vTechRetiredNewCap.csv", "w");
 println(fvTechRetiredNewCap, "tech,region,year,yearp,value");
@@ -967,21 +967,14 @@ for (c, r, y, s) in mvTradeIrAOutTot
 end;
 close(fvTradeIrAOutTot);
 
-fvExportRowAccumulated = open("output/vExportRowAccumulated.csv", "w");
-println(fvExportRowAccumulated, "expp,comm,value");
+fvExportRowCum = open("output/vExportRowCum.csv", "w");
+println(fvExportRowCum, "expp,comm,value");
 for (e, c) in mExpComm
-    if JuMP.value(vExportRowAccumulated[(e, c)]) != 0
-        println(
-            fvExportRowAccumulated,
-            e,
-            ",",
-            c,
-            ",",
-            JuMP.value(vExportRowAccumulated[(e, c)]),
-        )
+    if JuMP.value(vExportRowCum[(e, c)]) != 0
+        println(fvExportRowCum, e, ",", c, ",", JuMP.value(vExportRowCum[(e, c)]))
     end
 end;
-close(fvExportRowAccumulated);
+close(fvExportRowCum);
 
 fvExportRow = open("output/vExportRow.csv", "w");
 println(fvExportRow, "expp,comm,region,year,slice,value");
@@ -1005,21 +998,14 @@ for (e, c, r, y, s) in mExportRow
 end;
 close(fvExportRow);
 
-fvImportRowAccumulated = open("output/vImportRowAccumulated.csv", "w");
-println(fvImportRowAccumulated, "imp,comm,value");
+fvImportRowCum = open("output/vImportRowCum.csv", "w");
+println(fvImportRowCum, "imp,comm,value");
 for (i, c) in mImpComm
-    if JuMP.value(vImportRowAccumulated[(i, c)]) != 0
-        println(
-            fvImportRowAccumulated,
-            i,
-            ",",
-            c,
-            ",",
-            JuMP.value(vImportRowAccumulated[(i, c)]),
-        )
+    if JuMP.value(vImportRowCum[(i, c)]) != 0
+        println(fvImportRowCum, i, ",", c, ",", JuMP.value(vImportRowCum[(i, c)]))
     end
 end;
-close(fvImportRowAccumulated);
+close(fvImportRowCum);
 
 fvImportRow = open("output/vImportRow.csv", "w");
 println(fvImportRow, "imp,comm,region,year,slice,value");
@@ -1107,7 +1093,7 @@ println(vrb_list, "vTradeRowCost");
 println(vrb_list, "vTradeIrCost");
 println(vrb_list, "vTechNewCap");
 println(vrb_list, "vTechRetiredStockCum");
-println(vrb_list, "vTechRetiredStockDiff");
+println(vrb_list, "vTechRetiredStock");
 println(vrb_list, "vTechRetiredNewCap");
 println(vrb_list, "vTechCap");
 println(vrb_list, "vTechAct");
@@ -1145,9 +1131,9 @@ println(vrb_list, "vTradeIrAInp");
 println(vrb_list, "vTradeIrAInpTot");
 println(vrb_list, "vTradeIrAOut");
 println(vrb_list, "vTradeIrAOutTot");
-println(vrb_list, "vExportRowAccumulated");
+println(vrb_list, "vExportRowCum");
 println(vrb_list, "vExportRow");
-println(vrb_list, "vImportRowAccumulated");
+println(vrb_list, "vImportRowCum");
 println(vrb_list, "vImportRow");
 println(vrb_list, "vTradeCap");
 println(vrb_list, "vTradeInv");

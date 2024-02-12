@@ -1,18 +1,18 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-"energyRt version: 0.11.14-dev (2024-02-09)\n",
+"energyRt version: 0.11.15-dev (2024-02-11)\n",
 "======================== WARNING ==========================\n",
 "The package is currently in preparation for its first release
-and publication on CRAN. The names, behavior, meaning of
-functions, methods, parameters are being reviewed and
-may be changed in order to improve the readability and
+and publication on CRAN. The names, behavior, and meaning of
+functions, methods, and parameters are being reviewed and
+might be changed to improve the readability and
 transparency of the code, consistency with other libraries,
 functionality and features of the final product.
-Thanks for testing and for your patience.
+Thanks for testing and your patience.
 Please report bugs, issues or suggest improvements here:
     https://github.com/energyRt/energyRt/issues\n",
 "-----------------------------------------------------------\n",
-'THIS VERSION HAS BREAKING CHANGES:                         \n',
+' BREAKING CHANGES:                                         \n',
 '  renamed @stock slot -> @capacity,                        \n',
 '  added (often used) constraints on capacity, and other.   \n',
 '  Details: \n',

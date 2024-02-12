@@ -35,7 +35,8 @@ repo_one <- newRepository(
 m <- newModel(
   name = "ONE",
   data = repo_one,
-  horizon = newHorizon(2010, 1),
+  horizon = newHorizon(2010:2025, intervals = rep(1, 20)),
+  # horizon = newHorizon(2010:2025, intervals = c(rep(5, 5))),
   discount = 0,
   region = "ONE"
   )
@@ -45,11 +46,20 @@ show_progress_bar(FALSE)
 scen <- solve(m, solver = solver_options$gams_gdx_cplex,
               tmp.dir = "tmp/mod_one_ret1")
 scen
+# scen0
 getData(scen, "vTechCap")
-getData(scen, name_ = "cost")
+getData(scen, name_ = "cost|eac|inv")
 getData(scen, name_ = "inv")
 getData(scen, name_ = "eac")
 getData(scen, name_ = "dem")
+
+# sns <- list(ONE = scen0, FIVE = scen)
+# getData(sns, "vTechOMCost", merge = T) |>
+#   pivot_wider(names_from = scenario)
+#
+# getData(sns, "vTotalCost", merge = T) |>
+#   pivot_wider(names_from = scenario)
+
 
 # Early retirement
 m@config@optimizeRetirement <- TRUE
@@ -67,6 +77,7 @@ TECH2 <- update(TECH, optimizeRetirement = TRUE, name = "TECH2",
 repo_ret <- add(repo_one, TECH1, TECH2)
 
 if (F) {
+  source("tmp/settings.r")
   source("~/R/energyRt/data-raw/DATASET.R")
   devtools::load_all(".")
 }

@@ -10,7 +10,7 @@
 .variable_mapping = list(
   vTechNewCap = "vTechNewCap( tech , region , year ) $ mTechNew( tech , region , year )",
   vTechRetiredStockCum = "vTechRetiredStockCum( tech , region , year ) $ mvTechRetiredStock( tech , region , year )",
-  vTechRetiredStockDiff = "vTechRetiredStockDiff( tech , region , year ) $ mvTechRetiredStock( tech , region , year )",
+  vTechRetiredStock = "vTechRetiredStock( tech , region , year ) $ mvTechRetiredStock( tech , region , year )",
   vTechRetiredNewCap = "vTechRetiredNewCap( tech , region , year , year ) $ mvTechRetiredNewCap( tech , region , year , year )",
   vTechCap = "vTechCap( tech , region , year ) $ mTechSpan( tech , region , year )",
   vTechAct = "vTechAct( tech , region , year , slice ) $ mvTechAct( tech , region , year , slice )",
@@ -60,9 +60,9 @@
   vTradeIrAInpTot = "vTradeIrAInpTot( comm , region , year , slice ) $ mvTradeIrAInpTot( comm , region , year , slice )",
   vTradeIrAOut = "vTradeIrAOut( trade , comm , region , year , slice ) $ mvTradeIrAOut( trade , comm , region , year , slice )",
   vTradeIrAOutTot = "vTradeIrAOutTot( comm , region , year , slice ) $ mvTradeIrAOutTot( comm , region , year , slice )",
-  vExportRowAccumulated = "vExportRowAccumulated( expp , comm ) $ mExpComm( expp , comm )",
+  vExportRowCum = "vExportRowCum( expp , comm ) $ mExpComm( expp , comm )",
   vExportRow = "vExportRow( expp , comm , region , year , slice ) $ mExportRow( expp , comm , region , year , slice )",
-  vImportRowAccumulated = "vImportRowAccumulated( imp , comm ) $ mImpComm( imp , comm )",
+  vImportRowCum = "vImportRowCum( imp , comm ) $ mImpComm( imp , comm )",
   vImportRow = "vImportRow( imp , comm , region , year , slice ) $ mImportRow( imp , comm , region , year , slice )",
   vTradeCost = "vTradeCost( region , year ) $ mvTradeCost( region , year )",
   vTradeRowCost = "vTradeRowCost( region , year ) $ mvTradeRowCost( region , year )",
@@ -81,21 +81,21 @@
   vTechInv = "Overnight investment costs",
   vTechEac = "Annualized investment costs",
   vTechOMCost = "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)",
-  vSupCost = "Supply costs",
-  vEmsFuelTot = "Total emissions from fuels combustion",
-  vBalance = "Net commodity balance",
-  vTotalCost = "Regional annual total costs",
+  vSupCost = "Supply costs (weighted)",
+  vEmsFuelTot = "Total emissions from fuels combustion (technologies) (weighted)",
+  vBalance = "Net commodity balance (all sources) (weighted)",
+  vTotalCost = "Regional annual total costs (weighted)",
   vObjective = "Objective costs",
   vTaxCost = "Total tax levies (tax costs)",
   vSubsCost = "Total subsidies (substracted from costs)",
-  vAggOutTot = "Aggregated commodity output",
-  vStorageOMCost = "Storage O&M costs",
-  vTradeCost = "Total trade costs",
-  vTradeRowCost = "Trade with ROW costs",
-  vTradeIrCost = "Interregional trade costs",
+  vAggOutTot = "Aggregated commodity output (weighted)",
+  vStorageOMCost = "Storage O&M costs (weighted)",
+  vTradeCost = "Total trade costs (weighted)",
+  vTradeRowCost = "Trade with ROW costs (weighted)",
+  vTradeIrCost = "Interregional trade costs (weighted)",
   vTechNewCap = "New capacity",
   vTechRetiredStockCum = "Early retired stock",
-  vTechRetiredStockDiff = "Early retired stock",
+  vTechRetiredStock = "Early retired stock",
   vTechRetiredNewCap = "Early retired new capacity",
   vTechCap = "Total capacity of the technology",
   vTechAct = "Activity level of technology",
@@ -104,17 +104,17 @@
   vTechAInp = "Auxiliary commodity input",
   vTechAOut = "Auxiliary commodity output",
   vSupOut = "Output of supply",
-  vSupReserve = "Total (accumulated) supply",
+  vSupReserve = "Cumulative supply (weighted)",
   vDemInp = "Input to demand",
-  vOutTot = "Total commodity output (consumption is not substracted)",
-  vInpTot = "Total commodity input",
+  vOutTot = "Total commodity output (all processes) (weighted)",
+  vInpTot = "Total commodity input (all processes) (weighted)",
   vInp2Lo = "Desagregation of slices for input parent to (grand)child",
   vOut2Lo = "Desagregation of slices for output parent to (grand)child",
-  vSupOutTot = "Total commodity supply",
-  vTechInpTot = "Total commodity input to technologies",
-  vTechOutTot = "Total commodity output from technologies",
-  vStorageInpTot = "Total commodity input to storage",
-  vStorageOutTot = "Total commodity output from storage",
+  vSupOutTot = "Total commodity supply (weighted)",
+  vTechInpTot = "Total commodity (main & aux) input to technologies (weighted)",
+  vTechOutTot = "Total commodity (main & aux) output from technologies (weighted)",
+  vStorageInpTot = "Total commodity (main & aux) input to storage (weighted)",
+  vStorageOutTot = "Total commodity (main & aux) output from storage (weighted)",
   vStorageAInp = "Aux-commodity input to storage",
   vStorageAOut = "Aux-commodity input from storage",
   vDummyImport = "Dummy import (for debugging)",
@@ -126,16 +126,16 @@
   vStorageEac = "Storage EAC investments",
   vStorageCap = "Storage capacity",
   vStorageNewCap = "Storage new capacity",
-  vImportTot = "Total regional import (Ir + ROW)",
-  vExportTot = "Total regional export (Ir + ROW)",
+  vImportTot = "Total regional import (Ir + ROW) (weighted)",
+  vExportTot = "Total regional export (Ir + ROW) (weighted)",
   vTradeIr = "Total physical trade flows between regions",
   vTradeIrAInp = "Trade auxilari input",
-  vTradeIrAInpTot = "Trade total auxilari input",
+  vTradeIrAInpTot = "Trade total auxilari input (weighted)",
   vTradeIrAOut = "Trade auxilari output",
-  vTradeIrAOutTot = "Trade auxilari output total",
-  vExportRowAccumulated = "Accumulated export to ROW",
+  vTradeIrAOutTot = "Trade auxilari output total (weighted)",
+  vExportRowCum = "Cumulative export to ROW",
   vExportRow = "Export to ROW",
-  vImportRowAccumulated = "Accumulated import from ROW",
+  vImportRowCum = "Cumulative import from ROW",
   vImportRow = "Import from ROW",
   vTradeCap = "Trade capacity",
   vTradeInv = "Investment in trade capacity (overnight)",
@@ -174,20 +174,20 @@
   eqTechNewCapLo = "",
   eqTechNewCapUp = "",
   eqTechRetiredNewCap = "Retirement of new capacity",
-  eqTechRetiredStock = "Retirement of stock accumulated",
-  eqTechRetiredStockDiff = "Retirement of stock",
+  eqTechRetiredStockCum = "Retirement of stock cumulative",
+  eqTechRetiredStock = "Retirement of stock",
   eqTechEac = "Technology Equivalent Annual Cost (EAC)",
   eqTechInv = "Technology overnight investment costs",
-  eqTechOMCost = "Technology O&M costs",
+  eqTechOMCost = "Technology O&M costs (weighted)",
   eqSupAvaUp = "Supply availability upper bound",
   eqSupAvaLo = "Supply availability lower bound",
-  eqSupTotal = "Accumulated supply",
-  eqSupReserveUp = "Total reserve upper value",
-  eqSupReserveLo = "Total reserve lower value",
-  eqSupCost = "Total supply costs",
+  eqSupReserve = "Cumulative supply (use of reserve)",
+  eqSupReserveUp = "Cumulative supply upper constraint",
+  eqSupReserveLo = "Cumulative supply lower constraint",
+  eqSupCost = "Supply costs",
   eqDemInp = "Demand equation",
-  eqAggOut = "Aggregating commodity output",
-  eqEmsFuelTot = "Emissions from commodity consumption (i.e. fuels combustion)",
+  eqAggOutTot = "Aggregating-commodity output (weighted)",
+  eqEmsFuelTot = "Total emissions from commodity consumption (weighted)",
   eqStorageStore = "Storage level",
   eqStorageAfLo = "Storage availability factor lower",
   eqStorageAfUp = "Storage availability factor upper",
@@ -206,8 +206,8 @@
   eqStorageInv = "Storage overnight investment costs",
   eqStorageEac = "Storage equivalent annual cost",
   eqStorageCost = "Storage total costs",
-  eqImport = "Import equation",
-  eqExport = "Export equation",
+  eqImportTot = "Import equation (Ir & ROW)",
+  eqExportTot = "Export equation (Ir & ROW)",
   eqTradeFlowUp = "Trade upper bound",
   eqTradeFlowLo = "Trade lower bound",
   eqCostTrade = "Total trade costs",
@@ -215,11 +215,11 @@
   eqCostIrTrade = "Costs of import",
   eqExportRowUp = "Export to ROW upper constraint",
   eqExportRowLo = "Export to ROW lower constraint",
-  eqExportRowCumulative = "Cumulative export to ROW",
+  eqExportRowCum = "Cumulative export to ROW",
   eqExportRowResUp = "Cumulative export to ROW upper constraint",
   eqImportRowUp = "Import from ROW upper constraint",
   eqImportRowLo = "Import of ROW lower constraint",
-  eqImportRowAccumulated = "Cumulative import from ROW",
+  eqImportRowCum = "Cumulative import from ROW",
   eqImportRowResUp = "Cumulative import from ROW upper constraint",
   eqTradeCap = "Trade capacity",
   eqTradeCapLo = "Trade capacity lower bound",
@@ -246,10 +246,10 @@
   eqTechOutTot = "Technology total output",
   eqStorageInpTot = "Storage total input",
   eqStorageOutTot = "Storage total output",
-  eqCost = "Total costs",
-  eqTaxCost = "Commodity taxes",
-  eqSubsCost = "Commodity subsidy",
-  eqObjective = "Objective equation",
+  eqCost = "Total costs (weighted)",
+  eqTaxCost = "Commodity taxes (weighted)",
+  eqSubsCost = "Commodity subsidy (weighted)",
+  eqObjective = "Objective equation NPV of total costs",
   eqLECActivity = "levelized costs (auxiliary equation)");
 #########################
 # equation set
@@ -283,19 +283,19 @@
   eqTechNewCapLo = c("tech", "region", "year"),
   eqTechNewCapUp = c("tech", "region", "year"),
   eqTechRetiredNewCap = c("tech", "region", "year"),
+  eqTechRetiredStockCum = c("tech", "region", "year"),
   eqTechRetiredStock = c("tech", "region", "year"),
-  eqTechRetiredStockDiff = c("tech", "region", "year"),
   eqTechEac = c("tech", "region", "year"),
   eqTechInv = c("tech", "region", "year"),
   eqTechOMCost = c("tech", "region", "year"),
   eqSupAvaUp = c("sup", "comm", "region", "year", "slice"),
   eqSupAvaLo = c("sup", "comm", "region", "year", "slice"),
-  eqSupTotal = c("sup", "comm", "region"),
+  eqSupReserve = c("sup", "comm", "region"),
   eqSupReserveUp = c("sup", "comm", "region"),
   eqSupReserveLo = c("sup", "comm", "region"),
   eqSupCost = c("sup", "region", "year"),
   eqDemInp = c("comm", "region", "year", "slice"),
-  eqAggOut = c("comm", "region", "year", "slice"),
+  eqAggOutTot = c("comm", "region", "year", "slice"),
   eqEmsFuelTot = c("comm", "region", "year", "slice"),
   eqStorageStore = c("stg", "comm", "region", "year", "slicep", "slice"),
   eqStorageAfLo = c("stg", "comm", "region", "year", "slice"),
@@ -315,8 +315,8 @@
   eqStorageInv = c("stg", "region", "year"),
   eqStorageEac = c("stg", "region", "year"),
   eqStorageCost = c("stg", "region", "year"),
-  eqImport = c("comm", "region", "year", "slice"),
-  eqExport = c("comm", "region", "year", "slice"),
+  eqImportTot = c("comm", "region", "year", "slice"),
+  eqExportTot = c("comm", "region", "year", "slice"),
   eqTradeFlowUp = c("trade", "comm", "region", "region", "year", "slice"),
   eqTradeFlowLo = c("trade", "comm", "region", "region", "year", "slice"),
   eqCostTrade = c("region", "year"),
@@ -324,11 +324,11 @@
   eqCostIrTrade = c("region", "year"),
   eqExportRowUp = c("expp", "comm", "region", "year", "slice"),
   eqExportRowLo = c("expp", "comm", "region", "year", "slice"),
-  eqExportRowCumulative = c("expp", "comm"),
+  eqExportRowCum = c("expp", "comm"),
   eqExportRowResUp = c("expp", "comm"),
   eqImportRowUp = c("imp", "comm", "region", "year", "slice"),
   eqImportRowLo = c("imp", "comm", "region", "year", "slice"),
-  eqImportRowAccumulated = c("imp", "comm"),
+  eqImportRowCum = c("imp", "comm"),
   eqImportRowResUp = c("imp", "comm"),
   eqTradeCap = c("trade", "year"),
   eqTradeCapLo = c("trade", "year"),
@@ -413,8 +413,8 @@
   pSupCost = "Costs of supply (price per unit)",
   pSupAvaUp = "Upper bound for supply",
   pSupAvaLo = "Lower bound for supply",
-  pSupReserveUp = "Upper constraint on accumulated supply",
-  pSupReserveLo = "Lower constraint on accumulated supply",
+  pSupReserveUp = "Upper constraint on cumulative supply",
+  pSupReserveLo = "Lower constraint on cumulative supply",
   pDemand = "Exogenous demand",
   pEmissionFactor = "Emission factor",
   pDummyImportCost = "Dummy costs parameters (for debugging)",
@@ -458,8 +458,8 @@
   pStorageCoutLo = "Storage output lower bound",
   pStorageNCap2Stg = "Initial storage charge level for new investment",
   pStorageCharge = "Initial storage charge level for stock",
-  pStorageStg2AInp = "Storage accumulated volume to auxilary input",
-  pStorageStg2AOut = "Storage accumulated volume output",
+  pStorageStg2AInp = "Storage level to auxilary input",
+  pStorageStg2AOut = "Storage level output",
   pStorageCinp2AInp = "Storage input to auxilary input",
   pStorageCinp2AOut = "Storage input to auxilary output",
   pStorageCout2AInp = "Storage output to auxilary input",
@@ -477,11 +477,11 @@
   pTradeIrCsrc2Aout = "Auxiliary output commodity in source region",
   pTradeIrCdst2Ainp = "Auxiliary input commodity in destination region",
   pTradeIrCdst2Aout = "Auxiliary output commodity in destination region",
-  pExportRowRes = "Upper bound on accumulated export to ROW",
+  pExportRowRes = "Upper bound on cumulative export to ROW",
   pExportRowUp = "Upper bound on export to ROW",
   pExportRowLo = "Lower bound on export to ROW",
   pExportRowPrice = "Export prices to ROW",
-  pImportRowRes = "Upper bound on accumulated import to ROW",
+  pImportRowRes = "Upper bound on cumulative import to ROW",
   pImportRowUp = "Upper bount on import from ROW",
   pImportRowLo = "Lower bound on import from ROW",
   pImportRowPrice = "Import prices from ROW",
@@ -702,19 +702,19 @@
   eqTechNewCapLo = "mTechNewCapLo(tech, region, year)",
   eqTechNewCapUp = "mTechNewCapUp(tech, region, year)",
   eqTechRetiredNewCap = "meqTechRetiredNewCap(tech, region, year)",
+  eqTechRetiredStockCum = "mvTechRetiredStock(tech, region, year)",
   eqTechRetiredStock = "mvTechRetiredStock(tech, region, year)",
-  eqTechRetiredStockDiff = "mvTechRetiredStock(tech, region, year)",
   eqTechEac = "mTechEac(tech, region, year)",
   eqTechInv = "mTechInv(tech, region, year)",
   eqTechOMCost = "mTechOMCost(tech, region, year)",
   eqSupAvaUp = "mSupAvaUp(sup, comm, region, year, slice)",
   eqSupAvaLo = "meqSupAvaLo(sup, comm, region, year, slice)",
-  eqSupTotal = "mvSupReserve(sup, comm, region)",
+  eqSupReserve = "mvSupReserve(sup, comm, region)",
   eqSupReserveUp = "mSupReserveUp(sup, comm, region)",
   eqSupReserveLo = "meqSupReserveLo(sup, comm, region)",
   eqSupCost = "mvSupCost(sup, region, year)",
   eqDemInp = "mvDemInp(comm, region, year, slice)",
-  eqAggOut = "mAggOut(comm, region, year, slice)",
+  eqAggOutTot = "mAggOut(comm, region, year, slice)",
   eqEmsFuelTot = "mEmsFuelTot(comm, region, year, slice)",
   eqStorageStore = "meqStorageStore(stg, comm, region, year, slicep, slice)",
   eqStorageAfLo = "meqStorageAfLo(stg, comm, region, year, slice)",
@@ -734,8 +734,8 @@
   eqStorageInv = "mStorageNew(stg, region, year)",
   eqStorageEac = "mStorageEac(stg, region, year)",
   eqStorageCost = "mStorageOMCost(stg, region, year)",
-  eqImport = "mImport(comm, dst, year, slice)",
-  eqExport = "mExport(comm, src, year, slice)",
+  eqImportTot = "mImport(comm, dst, year, slice)",
+  eqExportTot = "mExport(comm, src, year, slice)",
   eqTradeFlowUp = "meqTradeFlowUp(trade, comm, src, dst, year, slice)",
   eqTradeFlowLo = "meqTradeFlowLo(trade, comm, src, dst, year, slice)",
   eqCostTrade = "mvTradeCost(region, year)",
@@ -743,12 +743,12 @@
   eqCostIrTrade = "mvTradeIrCost(region, year)",
   eqExportRowUp = "mExportRowUp(expp, comm, region, year, slice)",
   eqExportRowLo = "meqExportRowLo(expp, comm, region, year, slice)",
-  eqExportRowCumulative = "mExpComm(expp, comm)",
-  eqExportRowResUp = "mExportRowAccumulatedUp(expp, comm)",
+  eqExportRowCum = "mExpComm(expp, comm)",
+  eqExportRowResUp = "mExportRowCumUp(expp, comm)",
   eqImportRowUp = "mImportRowUp(imp, comm, region, year, slice)",
   eqImportRowLo = "meqImportRowLo(imp, comm, region, year, slice)",
-  eqImportRowAccumulated = "mImpComm(imp, comm) vImportRowAccumulated(imp, comm) =e=",
-  eqImportRowResUp = "mImportRowAccumulatedUp(imp, comm) vImportRowAccumulated(imp, comm) =l= pImportRowRes(imp);",
+  eqImportRowCum = "mImpComm(imp, comm) ",
+  eqImportRowResUp = "mImportRowCumUp(imp, comm) ",
   eqTradeCap = "mTradeSpan(trade, year)",
   eqTradeCapLo = "mTradeCapLo(trade, year)",
   eqTradeCapUp = "mTradeCapUp(trade, year)",
@@ -964,10 +964,10 @@
   mvTradeIrAOutTot = "",
   mImportRow = "",
   mImportRowUp = "",
-  mImportRowAccumulatedUp = "",
+  mImportRowCumUp = "",
   mExportRow = "",
   mExportRowUp = "",
-  mExportRowAccumulatedUp = "",
+  mExportRowCumUp = "",
   mExport = "",
   mImport = "",
   mStorageInpTot = "",
@@ -1221,10 +1221,10 @@
   mvTradeIrAOutTot = c("comm", "region", "year", "slice"),
   mImportRow = c("imp", "comm", "region", "year", "slice"),
   mImportRowUp = c("imp", "comm", "region", "year", "slice"),
-  mImportRowAccumulatedUp = c("imp", "comm"),
+  mImportRowCumUp = c("imp", "comm"),
   mExportRow = c("expp", "comm", "region", "year", "slice"),
   mExportRowUp = c("expp", "comm", "region", "year", "slice"),
-  mExportRowAccumulatedUp = c("expp", "comm"),
+  mExportRowCumUp = c("expp", "comm"),
   mExport = c("comm", "region", "year", "slice"),
   mImport = c("comm", "region", "year", "slice"),
   mStorageInpTot = c("comm", "region", "year", "slice"),
@@ -1357,9 +1357,9 @@
 .equation_variable[56, ] <- c("eqTechNewCapUp", "vTechNewCap")
 .equation_variable[57, ] <- c("eqTechRetiredNewCap", "vTechNewCap")
 .equation_variable[58, ] <- c("eqTechRetiredNewCap", "vTechRetiredNewCap")
-.equation_variable[59, ] <- c("eqTechRetiredStock", "vTechRetiredStockCum")
-.equation_variable[60, ] <- c("eqTechRetiredStockDiff", "vTechRetiredStockCum")
-.equation_variable[61, ] <- c("eqTechRetiredStockDiff", "vTechRetiredStockDiff")
+.equation_variable[59, ] <- c("eqTechRetiredStockCum", "vTechRetiredStockCum")
+.equation_variable[60, ] <- c("eqTechRetiredStock", "vTechRetiredStockCum")
+.equation_variable[61, ] <- c("eqTechRetiredStock", "vTechRetiredStock")
 .equation_variable[62, ] <- c("eqTechEac", "vTechEac")
 .equation_variable[63, ] <- c("eqTechEac", "vTechNewCap")
 .equation_variable[64, ] <- c("eqTechEac", "vTechRetiredNewCap")
@@ -1374,15 +1374,15 @@
 .equation_variable[73, ] <- c("eqTechOMCost", "vTechAOut")
 .equation_variable[74, ] <- c("eqSupAvaUp", "vSupOut")
 .equation_variable[75, ] <- c("eqSupAvaLo", "vSupOut")
-.equation_variable[76, ] <- c("eqSupTotal", "vSupOut")
-.equation_variable[77, ] <- c("eqSupTotal", "vSupReserve")
+.equation_variable[76, ] <- c("eqSupReserve", "vSupOut")
+.equation_variable[77, ] <- c("eqSupReserve", "vSupReserve")
 .equation_variable[78, ] <- c("eqSupReserveUp", "vSupReserve")
 .equation_variable[79, ] <- c("eqSupReserveLo", "vSupReserve")
 .equation_variable[80, ] <- c("eqSupCost", "vSupCost")
 .equation_variable[81, ] <- c("eqSupCost", "vSupOut")
 .equation_variable[82, ] <- c("eqDemInp", "vDemInp")
-.equation_variable[83, ] <- c("eqAggOut", "vAggOutTot")
-.equation_variable[84, ] <- c("eqAggOut", "vOutTot")
+.equation_variable[83, ] <- c("eqAggOutTot", "vAggOutTot")
+.equation_variable[84, ] <- c("eqAggOutTot", "vOutTot")
 .equation_variable[85, ] <- c("eqEmsFuelTot", "vEmsFuelTot")
 .equation_variable[86, ] <- c("eqEmsFuelTot", "vTechInp")
 .equation_variable[87, ] <- c("eqStorageStore", "vStorageAInp")
@@ -1430,12 +1430,12 @@
 .equation_variable[129, ] <- c("eqStorageCost", "vStorageOut")
 .equation_variable[130, ] <- c("eqStorageCost", "vStorageStore")
 .equation_variable[131, ] <- c("eqStorageCost", "vStorageCap")
-.equation_variable[132, ] <- c("eqImport", "vImportTot")
-.equation_variable[133, ] <- c("eqImport", "vTradeIr")
-.equation_variable[134, ] <- c("eqImport", "vImportRow")
-.equation_variable[135, ] <- c("eqExport", "vExportTot")
-.equation_variable[136, ] <- c("eqExport", "vTradeIr")
-.equation_variable[137, ] <- c("eqExport", "vExportRow")
+.equation_variable[132, ] <- c("eqImportTot", "vImportTot")
+.equation_variable[133, ] <- c("eqImportTot", "vTradeIr")
+.equation_variable[134, ] <- c("eqImportTot", "vImportRow")
+.equation_variable[135, ] <- c("eqExportTot", "vExportTot")
+.equation_variable[136, ] <- c("eqExportTot", "vTradeIr")
+.equation_variable[137, ] <- c("eqExportTot", "vExportRow")
 .equation_variable[138, ] <- c("eqTradeFlowUp", "vTradeIr")
 .equation_variable[139, ] <- c("eqTradeFlowLo", "vTradeIr")
 .equation_variable[140, ] <- c("eqCostTrade", "vTradeCost")
@@ -1450,14 +1450,14 @@
 .equation_variable[149, ] <- c("eqCostIrTrade", "vTradeEac")
 .equation_variable[150, ] <- c("eqExportRowUp", "vExportRow")
 .equation_variable[151, ] <- c("eqExportRowLo", "vExportRow")
-.equation_variable[152, ] <- c("eqExportRowCumulative", "vExportRowAccumulated")
-.equation_variable[153, ] <- c("eqExportRowCumulative", "vExportRow")
-.equation_variable[154, ] <- c("eqExportRowResUp", "vExportRowAccumulated")
+.equation_variable[152, ] <- c("eqExportRowCum", "vExportRowCum")
+.equation_variable[153, ] <- c("eqExportRowCum", "vExportRow")
+.equation_variable[154, ] <- c("eqExportRowResUp", "vExportRowCum")
 .equation_variable[155, ] <- c("eqImportRowUp", "vImportRow")
 .equation_variable[156, ] <- c("eqImportRowLo", "vImportRow")
-.equation_variable[157, ] <- c("eqImportRowAccumulated", "vImportRowAccumulated")
-.equation_variable[158, ] <- c("eqImportRowAccumulated", "vImportRow")
-.equation_variable[159, ] <- c("eqImportRowResUp", "vImportRowAccumulated")
+.equation_variable[157, ] <- c("eqImportRowCum", "vImportRowCum")
+.equation_variable[158, ] <- c("eqImportRowCum", "vImportRow")
+.equation_variable[159, ] <- c("eqImportRowResUp", "vImportRowCum")
 .equation_variable[160, ] <- c("eqTradeCap", "vTradeIr")
 .equation_variable[161, ] <- c("eqTradeCap", "vTradeCap")
 .equation_variable[162, ] <- c("eqTradeCapLo", "vTradeCap")
@@ -1537,7 +1537,7 @@
 .equation_variable[236, ] <- c("eqCost", "vSubsCost")
 .equation_variable[237, ] <- c("eqCost", "vStorageOMCost")
 .equation_variable[238, ] <- c("eqCost", "vTradeCost")
-.equation_variable[239, ] <- c("eqCost", "vTechRetiredStockDiff")
+.equation_variable[239, ] <- c("eqCost", "vTechRetiredStock")
 .equation_variable[240, ] <- c("eqCost", "vTechRetiredNewCap")
 .equation_variable[241, ] <- c("eqCost", "vDummyImport")
 .equation_variable[242, ] <- c("eqCost", "vDummyExport")

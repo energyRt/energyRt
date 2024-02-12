@@ -251,12 +251,9 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     # filter out unused slices
     # browser()
     warning(
-      "Solving for a fraction of a year, status: experimental. ",
-      "Currently only capacity and some totals (`vOutTot` and `vEmsFuelTot`)",
-      " variables have been scaled (using the given yearFraction parameter)",
-      " to represent annual values of capacity, total output, and emissions.",
-      " Hourly (or lower slice level) variables have not been scaled,",
-      " their annual sum will be different from their annual aggregates."
+      "Solving for a fraction of a year.\n",
+      "Variables without slice dimension scaled to the annual level using weights.",
+      "The solution might differ from the whole-year optimization."
     )
     cat("Subsetting time-slices\n")
     scen@model@data <- subset_slices_repo(

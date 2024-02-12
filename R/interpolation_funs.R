@@ -386,7 +386,8 @@
     # removeDefault = TRUE, # not used
     # remValue = NULL, # not used
     all.val = FALSE) {
-  if (parameter == "pSupCost") browser() # DEBUG
+  # cat(parameter, "\n")
+  # if (parameter == "olife") browser() # DEBUG
   has_year_col <- any(colnames(dtf) == "year")
   if (approxim$fullsets && mtp@defVal != 0 && mtp@defVal != Inf) all.val <- TRUE
   if (!all.val && nrow(dtf) == 0) {

@@ -132,7 +132,7 @@ setClass("trade",
       ret.fx = numeric(),
       stringsAsFactors = FALSE
     ),
-    capacityVariable = FALSE,
+    capacityVariable = TRUE,
     aux = data.frame(
       acomm = character(),
       unit = character(),

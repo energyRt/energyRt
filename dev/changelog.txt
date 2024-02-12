@@ -1,5 +1,32 @@
-energyRt 0.11.14.9000 @dev (Feb 09 2024)
+energyRt 0.11.15.9000 @dev (Feb 11 2024)
+BREAKING CHANGES
+# RENAMINGs:
+* eqSupTotal -> eqSupReserve
+* eqExport -> eqExportTot
+* eqImport -> eqImportTot
+* eqExportRowCumulative -> eqExportRowCum
+* eqImportRowCumulative -> eqImportRowCum
+* vExportRowAccumulated -> vExportRowCum
+* vImportRowAccumulated -> vImportRowCum
+* eqAggOut -> eqAggOutTot
+* vImportRowAccumulated -> vImportRowCum
+* eqImportRowAccumulated -> eqImportRowCum
+* mExportRowAccumulatedUp -> mExportRowCumUp
+* mExportRowAccumulatedLo -> mExportRowCumLo
 
+BUG FIXES
+* added missing (?? - tests in progress) `pTradeIrCost(trade, region, dst, year, slice)` in "Export (IR)" part of 'eqCostIrTrade(region, year)'
+* Subsetting of time-slices has been debugged and tested. The subsetting returns the same objective in simple models with no differences in load across subset and full time-slices set. Totals and costs variables are weighted by the sample weights. The rule of thumb in applying the sample weights:
+ - all variables without slice dimension are weighted by the sample weights where nessessary (invcost, fixcost, eac are in annual timeframe and don't have to be weighted)
+ - all variables with "Tot", "Total", "Accumulated", "Cum" indicate that the weights have been applied
+ - all costs aggregates are weighted (== no slice dimension)
+
+ToDo:
+ * Check vAggOutTot: add vAggOut?
+ * Validate eqStorageClean: validate t or t-1
+
+
+energyRt 0.11.14.9000 @dev (Feb 09 2024)
 BREAKING CHANGES
 * @stock slot is depreciated, parameter `stock` moved to @capacity slot
 * trade@trade$cost is renamed and moved to trade@varom$varom
