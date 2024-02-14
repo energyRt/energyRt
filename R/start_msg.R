@@ -1,6 +1,6 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-"energyRt version: 0.11.15-dev (2024-02-11)\n",
+"energyRt version: 0.11.16-dev (2024-02-13)\n",
 "======================== WARNING ==========================\n",
 "The package is currently in preparation for its first release
 and publication on CRAN. The names, behavior, and meaning of

@@ -188,4 +188,12 @@ setMethod("newTrade", signature(name = "character"),
   trd
 })
 
-
+#' @rdname update
+#' @name update
+#'
+#' @family trade update
+#' @keywords trade update
+#' @export
+setMethod("update", signature(object = "trade"), function(object, ...) {
+  .data2slots("trade", object, ...)
+})

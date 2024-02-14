@@ -3034,7 +3034,8 @@ setMethod(
     ####
     mTradeIr <- merge0(mTradeRoutes, mTradeSlice)
     if (trd@capacityVariable) {
-      mTradeIr <- merge0(mTradeIr, mTradeSpan)
+      # mTradeIr <- merge0(mTradeIr, mTradeSpan)
+      mTradeIr <- merge0(mTradeIr, obj@parameters[["mTradeSpan"]]@data)
     } else {
       mTradeIr <- merge0(mTradeIr, list(year = approxim$mileStoneYears))
     }

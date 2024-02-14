@@ -79,13 +79,21 @@ setClass(
 #'              start = c(2030, 2032, 2035),
 #'              mid =   c(2031, 2033, 2037),
 #'              end =   c(2032, 2034, 2040)))
-newHorizon <- function(period = NULL, intervals = NULL, desc = NULL,
+newHorizon <- function(period = NULL,
+                       intervals = NULL,
+                       desc = NULL,
+                       mid_is_end = FALSE,
+                       mid_is_start = FALSE,
                        force_BY_interval_to_1_year = T, ...) {
   # browser()
   h <- new("horizon") # !!! update .data2slots for this class
   if (!is.null(desc)) {
     stopifnot(is.character(desc))
     h@desc <- as.character(desc)
+  }
+
+  if (mid_is_end & mid_is_start) {
+    stop("Only one of parameters 'mid_is_end' and  'mid_is_start' can be TRUE")
   }
 
   if (!is.null(period)) {
@@ -140,6 +148,8 @@ newHorizon <- function(period = NULL, intervals = NULL, desc = NULL,
         as.integer()
       period <- period[period >= min(int_range) & period <= max(int_range)]
       h@period <- period
+      if (mid_is_end) intervals$mid <- intervals$end
+      if (mid_is_start) intervals$mid <- intervals$start
       h@intervals <- intervals
       return(h)
     }
@@ -150,6 +160,8 @@ newHorizon <- function(period = NULL, intervals = NULL, desc = NULL,
       end = as.integer(period)
     )
     h@period <- period
+    if (mid_is_end) intervals$mid <- intervals$end
+    if (mid_is_start) intervals$mid <- intervals$start
     h@intervals <- intervals
     return(h) # one year steps
   } else if (is.null(period)) { # no data
@@ -186,6 +198,8 @@ newHorizon <- function(period = NULL, intervals = NULL, desc = NULL,
     .check_intervals(intervals) # double-check
   }
   h@period <- period
+  if (mid_is_end) intervals$mid <- intervals$end
+  if (mid_is_start) intervals$mid <- intervals$start
   h@intervals <- intervals
   # h <- .data2slots("period", x = "", period = period, intervals = intervals)
   return(h)
