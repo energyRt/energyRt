@@ -26,14 +26,15 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   obj <- object
   arg <- list(...)
   tictoc::tic()
-
+  # browser()
   interpolation_start_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- FALSE
 
   if (class(obj) == "model") {
     scen <- new("scenario")
+    # scen <- newScenario()
     scen@model <- obj
-    scen@name <- "Default scenario name"
+    scen@name <- paste("scen", obj@name, sep = "_")
     scen@desc <- ""
     scen@settings <- .config_to_settings(obj@config) # import model settings
   } else if (class(obj) == "scenario") {
@@ -42,8 +43,16 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     stop('Interpolation is not available for class: "', class(obj), '"')
   }
 
-
   # tictoc::toc()
+  if (!is.null(arg$overwrite)) {
+    overwrite <- arg$overwrite; arg$overwrite <- NULL
+  } else {
+    overwrite <- FALSE
+  }
+  if (isTRUE(arg$force)) { # force interpolation of interpolated model
+    scen@status$interpolated <- FALSE
+    arg$force <- NULL
+  }
   if (!is.null(arg$name)) {scen@name <- arg$name; arg$name <- NULL}
   if (!is.null(arg$desc)) {scen@desc <- arg$desc; arg$desc <- NULL}
   if (!is.null(arg$path)) {scen@path <- arg$path; arg$path <- NULL}
@@ -59,9 +68,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     cat("inMemory: ", scen@inMemory, "\n", sep = "")
   }
 
-  # if (is.null(arg$startYear) != is.null(arg$fixTo)) {
-  #   stop("startYear && fixTo have to define both (or not define both")
-  # }
+  # repository ############################################
   if (!is.null(arg$repository)) {
     if (!is.null(arg$data))
       stop("Only one of arguments 'repository' or 'data' can be used.",
@@ -69,20 +76,26 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@model <- .add_repository(scen@model, arg$repository) # !!! use add?
     arg$repository <- NULL
   }
+  # data ############################################
   if (!is.null(arg$data)) {
     scen@model <- .add_repository(scen@model, arg$data) # !!! use add instead?
     arg$data <- NULL
+    scen@status$interpolated <- FALSE
   }
-  # tictoc::toc()
+
   carg <- sapply(arg, function(x) class(x)[1])
-  # check if there are more repositories
+  # more repositories ############################################
+  # check if there are more repositories to add
   ii <- carg == "repository"
   if (any(ii)) {
     for (ob in arg[ii]) {
-      scen@model <- add(scen@model, ob)
+      scen@model <- add(scen@model, ob, overwrite = overwrite)
     }
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
+  
+  # "bricks" ############################################
   # check if there are any objects to add to a repository
   repo_objs <- newRepository("")@permit
   ii <- carg %in% repo_objs
@@ -90,9 +103,27 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen_repo <- newRepository(name = paste0(scen@name, "_repo"), arg[ii])
     scen@model <- add(scen@model, scen_repo); rm(scen_repo)
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
-  # check if `...` has `settings` object
-  # tictoc::toc()
+  
+  # config ############################################
+  ii <- carg %in% "config"
+  if (any(ii)) {
+    if (sum(ii) > 1) {
+      stop("Two or more 'config' objects found in 'interpolation' arguments.",
+           call. = FALSE)
+    }
+    if (any(carg %in% "settings") || !is.null(arg@settings)) {
+      stop("Both 'config' and 'settings' objects found in 'interpolation' arguments.",
+           "Only one of them can be used in 'interpolation' arguments.",
+           call. = FALSE)
+    }
+    scen@settings <- .config_to_settings(arg[ii][[1]])
+    arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
+  }
+  
+  # settings ############################################
   ii <- carg %in% "settings"
   if (any(ii)) {
     if (sum(ii) > 1) {
@@ -101,10 +132,10 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     }
     scen@settings <- arg[ii][[1]]
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
-  # tictoc::toc()
-  # browser()
-  # check if `...` has `calendar` object
+  
+  # calendar ############################################
   ii <- carg %in% "calendar"
   if (any(ii)) {
     if (sum(ii) > 1) {
@@ -116,40 +147,89 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@settings@yearFraction$fraction <-
       sum(scen@settings@calendar@timetable$share)
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
-  # tictoc::toc()
-  # check if `...` has `horizon` object
+  
+  # horizon ############################################
   ii <- carg %in% "horizon"
   if (any(ii)) {
     if (sum(ii) > 1) {
       stop("Two or more 'horizon' objects found in 'interpolation' arguments.",
            call. = FALSE)
     }
+    # browser()
     scen <- setHorizon(scen, arg[ii][[1]])
     # scen@settings <- arg[ii]
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
+  
+  # SETTINGS slots ############################################
   # check if `...` has data for `settings` or `horizon` parameters
   # ToDo: rewrite with 'add' once implemented for settings/horizon
-  # sett_slots <- unique(c(slotNames("settings"), slotNames("horizon"))) %>%
-  #   unique()
-  # sett_slots[sett_slots %in% c("name", "desc", "misc")] <- NULL
   # !!! currently one-by-one
-  # tictoc::toc()
-  if (!is.null(arg$region)) {
-    stop("Regions must be defined before the interpolation")
-    scen@settings@region <- arg$region
-    arg$region <- NULL
+  # discountFirstYear ############################################
+  if (any(names(arg) %in% "discountFirstYear")) {
+    scen@settings@discountFirstYear <- arg$discountFirstYear
+    arg$discountFirstYear <- NULL
+    scen@status$interpolated <- FALSE
   }
+  # optimizeRetirement ############################################
+  if (any(names(arg) %in% "optimizeRetirement")) {
+    scen@settings@optimizeRetirement <- arg$optimizeRetirement
+    arg$optimizeRetirement <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # defValue ############################################
+  if (any(names(arg) %in% "defValue")) {
+    scen@settings@defValue <- arg$defValue
+    arg$defValue <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # interpolation ############################################
+  if (any(names(arg) %in% "interpolation")) {
+    scen@settings@interpolation <- arg$interpolation
+    arg$interpolation <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # debug ############################################
+  if (any(names(arg) %in% "debug")) {
+    scen@settings@debug <- arg$debug
+    arg$debug <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # discount ############################################
   if (!is.null(arg$discount)) {
     scen@settings@discount <- arg$discount
     arg$discount <- NULL
+    scen@status$interpolated <- FALSE
   }
+  # solver ############################################
+  if (!is.null(arg$solver)) {
+    if (is.character(arg$solver)) {
+      if (length(arg$solver) > 1) {
+        stop("Solver must be a list or a single string.")
+      }
+      arg$solver <- list(nane = arg$solver, lang = arg$solver)
+    }
+    scen@settings@solver <- arg$solver
+    arg$solver <- NULL
+    # scen@status$interpolated <- FALSE
+  }
+  # *DEPRICIATED ############################################
+  # year
   if (!is.null(arg$year)) {
     stop("\nThe 'year' argument is depreciated. \nUse 'period' ",
          "to set planning (optimization) period.  \n",
          "See ?horizon and ?settings for help", call. = FALSE)
   }
+  # region
+  if (!is.null(arg$region)) {
+    stop("Regions must be defined before the interpolation")
+    scen@settings@region <- arg$region
+    arg$region <- NULL
+  }
+  # HORIZON slots ############################################
   if (!is.null(arg$period) | !is.null(arg$intervals)) {
     if (!is.null(arg$period)) {
       upd_period <- arg$period
@@ -166,9 +246,19 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       intervals = upd_intervals,
       desc = scen@settings@horizon@desc
     )
+    scen@status$interpolated <- FALSE
   }
+  
+  # INTERPOLATE ############################################
+  # Check if the interpolation is needed
+  if (scen@status$interpolated) {
+    message("The scenario is already interpolated. Use 'force = TRUE' ",
+            "to re-interpolate the scenario.")
+    return(invisible(scen))
+  }
+  
   # tictoc::toc()
-  # other parameters
+  # other interpolation parameters
   if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
   if (is.null(arg$verbose)) arg$verbose <- 0
   if (!is.null(arg$table_format)) { # !!! draft, not actual

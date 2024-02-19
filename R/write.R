@@ -1,6 +1,6 @@
 #' Write scenario object as a Python, Julia, GAMS, or MathProg script with data files to a directory
 #'
-#' @param x scenario object, must be interpolated
+#' @param scen scenario object, must be interpolated
 #' @param tmp.dir character, path
 #' @param solver list of character with solver specification.
 #' @param ... additional solver parameters
@@ -9,8 +9,8 @@
 #' @seealso [solve()] to run the script, solve the scenario. [read_solution] to read model solution.
 #'
 #' @export
-write_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
-  scen <- x
+write_script <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
+  # scen <- obj
   if (is.null(tmp.dir)) {
     if (!is.null(scen@misc$tmp.dir)) {
       tmp.dir <- scen@misc$tmp.dir
@@ -23,7 +23,7 @@ write_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
   scen@misc$tmp.dir <- tmp.dir
   if (F) {} # check if the scenario is interpolated
   if (is.null(solver)) solver <- scen@solver
-  .solver_solve(scen, tmp.dir = tmp.dir, solver = solver, ...,
+  .executeScenario(scen, tmp.dir = tmp.dir, solver = solver, ...,
                 run = FALSE, write = TRUE)
 }
 
@@ -122,7 +122,7 @@ write.sc <- write_sc
   if (is.null(scen@settings@solver$inc_solver) && is.null(scen@settings@solver$solver)) {
     scen@settings@solver$inc_solver <- def_inc_solver
   }
-  fn <- file(paste0(arg$tmp.dir, "inc_solver", type), "w")
+  fn <- file(file.path(arg$tmp.dir, paste0("inc_solver", type)), "w")
   cat(scen@settings@solver$inc_solver, file = fn, sep = "\n")
   close(fn)
 }
@@ -146,12 +146,12 @@ write.sc <- write_sc
     }
   }
   for (i in 1:5) {
-    fn <- file(paste0(arg$tmp.dir, "inc", i, type), "w")
+    fn <- file(file.path(arg$tmp.dir, paste0("inc", i, type)), "w")
     cat(scen@settings@solver[[paste0("inc", i)]], sep = "\n", file = fn)
     close(fn)
   }
   for (i in names(scen@settings@solver$files)) {
-    fn <- file(paste0(arg$tmp.dir, i), "w")
+    fn <- file(file.path(arg$tmp.dir, i), "w")
     cat(scen@settings@solver$files[[i]], sep = "\n", file = fn)
     close(fn)
   }

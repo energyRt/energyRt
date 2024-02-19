@@ -9,25 +9,40 @@
 \usage{
 solve_model(
   obj,
-  name = paste("scen", obj@name, sep = "_"),
+  name = NULL,
   solver = NULL,
+  path = NULL,
   tmp.dir = NULL,
   tmp.del = TRUE,
+  force = FALSE,
   ...
 )
 
 \S4method{solve}{model,character}(a, b, ...)
 
-solve_scenario(obj = NULL, tmp.dir = NULL, solver = NULL, ...)
+solve_scenario(
+  obj,
+  name = obj@name,
+  solver = obj@settings@solver,
+  path = obj@path,
+  tmp.dir = obj@misc$tmp.dir,
+  tmp.del = FALSE,
+  force = FALSE,
+  ...
+)
 
 \S4method{solve}{scenario,character}(a, b, ...)
 }
 \arguments{
-\item{obj}{model object}
+\item{obj}{model or scenario object}
 
 \item{name}{character name of scenario to return}
 
 \item{solver}{a character or list with solver settings}
+
+\item{tmp.dir}{character path to temporary directory}
+
+\item{tmp.del}{logical delete temporary directory after the run}
 
 \item{...}{}
 }

@@ -338,9 +338,17 @@ newModel <- function(name = "", desc = "", ...) {
 #' @rdname newModel
 #' @export
 setMethod("setHorizon", signature(obj = "model"),
-  # signature(obj = "model", horizon = "numeric", intervals = "ANY"),
-  function(obj, horizon, intervals) {
-    obj@config <- setHorizon(obj@config, horizon, intervals)
+  # signature(obj = "model", period = "numeric", intervals = "numeric"),
+  function(obj, ...) {
+    args <- list(...)
+    # browser()
+    has_h <- sapply(args, function(x) inherits(x, "horizon"))
+    if (any(has_h)) {
+      if (sum(has_h) > 1) stop('Two or more "horizon" objects found.')
+      obj@config@horizon <- args[has_h]
+    } else {
+      obj@config <- setHorizon(obj@config, ...)
+    }
     obj
   }
 )

@@ -22,12 +22,18 @@ An S4 class to represent scenario, an interpolated and/or solved model.
 
 \item{\code{modOut}}{modOut.}
 
-\item{\code{source}}{list.}
-
-\item{\code{solver}}{list.}
-
 \item{\code{status}}{list.}
 
 \item{\code{misc}}{list.}
+
+\item{\code{name}}{}
+
+\item{\code{desc}}{}
+
+\item{\code{model}}{}
+
+\item{\code{inMemory}}{}
+
+\item{\code{path}}{}
 }}
 

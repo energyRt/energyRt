@@ -105,7 +105,8 @@ setMethod("setCalendar", signature(obj = "config"), function(obj, ...) {
 #' @param horizon .
 #'
 #' @export
-setMethod("setHorizon", signature(obj = "config"), function(obj, period, ...) {
+setMethod(
+  "setHorizon", signature(obj = "config"), function(obj, period, ...) {
     # browser()
     # obj@horizon <- milestoneYears(start, interval)
     # obj@year <- min(obj@horizon@intervals$start):max(obj@horizon@intervals$end)

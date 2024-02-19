@@ -1,5 +1,6 @@
 ## Python/Pyomo
 Pyomo <- list(
+  name = "pyomo",
   lang = "PYOMO",
   export_format = "SQLite",
   # solver = "cplex"
@@ -7,43 +8,52 @@ Pyomo <- list(
   solver = "cbc"
 )
 
-pyomo_cbc <- Pyomo
+pyomo_cbc <- Pyomo; pyomo_cbc$name <- "pyomo_cbc"
 
 pyomo_cplex <- Pyomo
-pyomo_cplex$solver <- "cplex"
+pyomo_cplex$solver <- "cplex"; pyomo_cplex$name <- "pyomo_cplex"
 
-pyomo_cplex_barrier <- pyomo_cplex
+pyomo_cplex_barrier <- pyomo_cplex; pyomo_cplex_barrier$name <- "pyomo_cplex_barrier"
 pyomo_cplex_barrier$inc4 <- {
 "opt.options['lpmethod'] = 4
 opt.options['solutiontype'] = 2"}
 
-pyomo_glpk <- Pyomo
+pyomo_glpk <- Pyomo; pyomo_glpk$name <- "pyomo_glpk"
 pyomo_glpk$solver <- "glpk"
 
 
 ## Julia/JuMP ####
 julia_cbc <- list(
+  name = "julia_cbc",
   lang = "JuMP",
   solver = "Cbc"
 )
 
+julia_glpk <- list(
+  name = "julia_glpk",
+  lang = "JuMP",
+  solver = "GLPK"
+)
+
 julia_cplex <- list(
+  name = "julia_cplex",
   lang = "JuMP",
   solver = "CPLEX"
 )
 
-julia_cplex_barrier <- julia_cplex
+julia_cplex_barrier <- julia_cplex; julia_cplex_barrier$name <- "julia_cplex_barrier"
 julia_cplex_barrier$inc3 <- {'
 set_optimizer_attribute(model, "CPXPARAM_LPMethod", 4) # barrier CPX_ALG_BARRIER
 set_optimizer_attribute(model, "CPXPARAM_SolutionType", 2) # CPX_NONBASIC_SOLN'}
 
 julia_highs <- list(
+  name = "julia_highs",
   lang = "JuMP",
   solver = "HiGHS"
 )
 
-
-julia_highs$inc3 <- c({
+julia_highs_barrier <- julia_highs; julia_highs_barrier$name <- "julia_highs_barrier"
+julia_highs_barrier$inc3 <- c({
 '# HiGHS options in JuMP/Julia
 # Uncomment options to use
 set_optimizer_attribute(model, "presolve", "on")
@@ -67,25 +77,28 @@ set_optimizer_attribute(model, "run_crossover", "off") # polishing the solution
 })
 
 ## GLPK
-glpk <- list(lang = "GLPK")
+glpk <- list(name = "glpk", lang = "GLPK")
 
 ## GAMS
-gams_path <- getOption("en_gams_path")
-gams_cmd_line <- file.path(gams_path, "gams.exe energyRt.gms")
+# gams_path <- options::opt("gams_path")
+# gams_cmd_line <- file.path(gams_path, "gams.exe energyRt.gms")
 
 gams_cplex <- list(
+  name = "gams_cplex",
   lang = "GAMS",
   solver = "CPLEX"
 )
 
 gams_gdx_cplex <- list(
+  name = "gams_gdx_cplex",
   lang = "GAMS",
   import_format = "GDX",
   export_format = "GDX",
   solver = "CPLEX"
 )
 
-gams_gdx_cplex_barrier <- gams_gdx_cplex
+gams_gdx_cplex_barrier <- gams_gdx_cplex; 
+gams_gdx_cplex_barrier$name <- "gams_gdx_cplex_barrier"
 gams_gdx_cplex_barrier$inc3 <- {"
 *energyRt.holdfixed = 1;
 *energyRt.dictfile = 0;
@@ -151,7 +164,8 @@ $offecho
 "}
 
 
-gams_gdx_cplex_parallel <- gams_gdx_cplex
+gams_gdx_cplex_parallel <- gams_gdx_cplex; 
+gams_gdx_cplex_parallel$name <- "gams_gdx_cplex_parallel"
 gams_gdx_cplex_parallel$inc3 <- {
 "
 *energyRt.holdfixed = 1;
@@ -199,11 +213,13 @@ $offecho
 "} # GAMS options ####
 
 gams_cbc <- list(
+  name = "gams_cbc",
   lang = "GAMS",
   solver = "CBC"
 )
 
 gams_gdx_cbc <- list(
+  name = "gams_gdx_cbc",
   lang = "GAMS",
   import_format = "GDX",
   export_format = "GDX",
@@ -219,6 +235,8 @@ solver_options <- list(
   julia_cplex = julia_cplex,
   julia_cplex_barrier = julia_cplex_barrier,
   julia_highs = julia_highs,
+  julia_highs_barrier = julia_highs_barrier,
+  julia_glpk = julia_glpk,
   glpk = glpk,
   gams_csv_cplex = gams_cplex,
   gams_gdx_cplex = gams_gdx_cplex,

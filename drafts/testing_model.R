@@ -42,9 +42,13 @@ m <- newModel(
   )
 getHorizon(m)
 
-show_progress_bar(FALSE)
-scen <- solve(m, solver = solver_options$gams_gdx_cplex,
-              tmp.dir = "tmp/mod_one_ret1")
+show_progress_bar(T)
+scen <- solve_model(
+  m, 
+  solver = solver_options$gams_gdx_cplex,
+  horizon = newHorizon(2010:2025, intervals = rep(1, 2))
+  # tmp.dir = "tmp/mod_one_ret1"
+  )
 scen
 # scen0
 getData(scen, "vTechCap")
@@ -95,9 +99,12 @@ m@config@optimizeRetirement
 
 scen_ret <- interpolate(m)
 scen_ret <- write_sc(scen_ret,
-                    solver = solver_options$gams_gdx_cplex,
-                    tmp.dir = "tmp/mod_one_ret")
+                    solver = solver_options$gams_gdx_cplex
+                    # tmp.dir = "tmp/mod_one_ret"
+                    )
 scen_ret <- solve(scen_ret)
+scen_ret <- solve(scen_ret, force = TRUE)
+
 scen_ret <- read(scen_ret)
 scen_ret
 
@@ -133,4 +140,12 @@ getData(scen_ret3, name_ = "retire", drop.zeros = TRUE)
 
 scen_ret3 <- solve(m, solver = solver_options$pyomo_cbc,
                    tmp.dir = "tmp/mod_one_ret_py", tmp.del = F)
+# scen_ret3 <- read(scen_ret3)
+scen_ret3 <- solve(m, solver = solver_options$julia_glpk,
+                   tmp.dir = "tmp/mod_one_ret_jl", tmp.del = F)
+scen_ret3 <- solve(m, solver = solver_options$julia_highs,
+                   tmp.dir = "tmp/mod_one_ret_jl", tmp.del = F)
 
+a <- solve(m, solver = solver_options$pyomo_glpk)
+a
+a <- solve(m, solver = solver_options$glpk)                   

@@ -5,12 +5,16 @@
 #' @slot model model. Model object.
 # @slot subset
 #' @slot settings settings. 
+#'
 #' @slot modInp modInp object.
 #' @slot modOut modOut.
-#' @slot source list.
-#' @slot solver list.
 #' @slot status list.
 #' @slot misc list.
+#' @slot name 
+#' @slot desc 
+#' @slot model 
+#' @slot inMemory 
+#' @slot path 
 #'
 #' @include class-modOut.R class-settings.R
 #'
@@ -56,6 +60,52 @@ setMethod("initialize", "scenario", function(.Object, ...) {
   .Object
 })
 
+#' Generate a new scenario object
+#'
+#' @param name character. Name of the scenario.
+#' @param path character. Path to the scenario directory.
+#' @param ... 
+#' @param env_name name of the environment to assign the scenario in.
+#' @param registry optional registry object to register the scenario.
+#' @param replace logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+newScenario <- function(
+    name, 
+    model = NULL,
+    path = file.path(get_scenarios_dir(), name),
+    ...,
+    env_name = ".scen", 
+    registry = get_registry(),
+    replace = FALSE
+) {
+  # browser()
+  scen <- new("scenario")
+  scen@name <- name
+  if (!is.null(path)) {
+    scen@path <- path
+  }
+  if (!is.null(registry)) {
+    if (registry$has_entry(name, ...)) {
+      if (replace) {
+        registry$delete_entry(name, ...)
+      } else {
+        cat("Scenario ", name, " already exists in the registry.\n")
+        return(invisible(FALSE))
+      }
+    }
+    register(scen, registry, ..., env = env_name)
+    cat("Scenario ", name, " created in ", env_name, 
+        " environment and registered.\n")
+    return(invisible(TRUE))
+  } else {
+    return(scen)
+  }
+}
+
 # summary <- function(...) UseMethod("summary")
 
 summary.scenario <- function(object, ...) {
@@ -63,7 +113,7 @@ summary.scenario <- function(object, ...) {
   scen <- object
   cat("Scenario:", scen@name, "\n")
   cat("desc:", scen@desc, "\n")
-  cat("Model:", scen@model@name, "\n")
+  if (!is.null(scen@model)) cat("Model:", scen@model@name, "\n")
   cat("Interpolated:", scen@status$interpolated, "\n")
   cat("path:", scen@path, "\n")
   if (scen@status$interpolated) {
@@ -107,15 +157,39 @@ setMethod("show", "scenario", function(object) summary(object))
 
 #' @export
 setMethod("setHorizon", signature(obj = "scenario"),
-  function(obj, period, intervals) {
-    obj@model <- setHorizon(obj@model, period, intervals)
+  function(obj, ...) {
+    args <- list(...)
+    has_h <- sapply(list, function(x) inherits(x, "horizon"))
+    if (any(has_h)) {
+      if (sum(has_h) > 1) stop("Only one horizon object is allowed.")
+      obj@settings <- setHorizon(obj@settings, args[[which(has_h)]])
+    }
+    if (!is.null(args$period) || !is.null(args$intervals)) {
+      if (is.null(args$period) && is.null(args$intervals)) {
+          stop("Both 'period' and 'intervals' parameters must be provided.")
+      } 
+      obj@settings <- setHorizon(obj@settings, args$period, args$intervals)
+    }
     obj
   }
 )
 
+# @export
+# setMethod(
+#   "setHorizon", 
+#   signature(obj = "scenario", horizon = "horizon"),
+#   function(obj, horizon) {
+#     # obj@model <- setHorizon(obj@model, period, intervals)
+#     browser()
+#     obj
+#   }
+# )
+
 #' @export
 setMethod("getHorizon", signature(obj = "scenario"), function(obj) {
-  getHorizon(obj@model)
+  # getHorizon(obj@model)
+  obj@settings@horizon
+  # browser()
 })
 
 # .modelCode <- list(
