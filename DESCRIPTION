@@ -32,7 +32,9 @@ Imports:
     arrow,
     progressr,
     tictoc,
-    cli
+    cli,
+    reticulate,
+    registry
 Suggests: 
     gdxrrw,
     gdxtools,
@@ -78,6 +80,7 @@ Collate:
     'draw.R'
     'energyRt-package.R'
     'get_data.R'
+    'install.R'
     'interpolate.R'
     'interpolate2.R'
     'interpolate_new.R'
@@ -85,6 +88,7 @@ Collate:
     'obj2modInp.R'
     'print.R'
     'read.R'
+    'registry.R'
     'solve.R'
     'start_msg.R'
     'utils-pipe.R'
