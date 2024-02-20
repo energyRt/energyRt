@@ -22,7 +22,7 @@ Please report bugs, issues or suggest improvements here:
   # options(en.verbose = TRUE)
   # options(en.progress_bar = TRUE)
   options(progressr.clear = FALSE)
-  # options(en.scenarios_dir = "scenarios/")
+  # options(en.scenarios_path = "scenarios/")
 
   # progressr::handlers("cli")
   # progressr::handlers("pbcol")

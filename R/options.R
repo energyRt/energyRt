@@ -15,12 +15,12 @@ options::define_option(
 
 #' @export
 get_default_solver <- function() {
-  options::get("solver")
+  options::opt("solver")
 }
 
 #' @export
 set_default_solver <- function(solver) {
-  options::set("solver", solver)
+  options::opt_set("solver", solver)
 }
 
 # GAMS ####
@@ -96,17 +96,16 @@ options::define_option(
   # envvar_name = "PROGRESS_BAR"
 )
 
-# scenarios_dir ####
+# scenarios_path ####
 options::define_option(
-  "scenarios_dir",
-  desc = "Directory to store scenarios.",
+  "scenarios_path",
+  desc = "Path to scenarios directory.",
   default = "scenarios/",
-  option_name = "scenarios_dir"
-  # envvar_name = "SCENARIOS_DIR"
+  option_name = "scenarios_path"
 )
 
-get_scenarios_dir <- function() {
-  options::opt("scenarios_dir")
+get_scenarios_path <- function() {
+  options::opt("scenarios_path")
 }
 
 isVerbose <- function(level = 1) {

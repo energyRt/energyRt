@@ -347,19 +347,22 @@ show_progress_bar <- function(show = TRUE) {
 #' @family options
 #' @return
 #' @export
+#' @rdname options
 #'
 #' @examples
 set_scenarios_path <- function(path = NULL) {
-  options(en_scenarios_path = path)
+  options::opt_set("scenarios_path", path)
+  # options(en_scenarios_path = path)
 }
 
 
 #' @family options
 #' @export
 #' @examples
-#' # get_gams_path()
+#' @rdname options
 get_scenarios_path <- function() {
-  getOption("en_scenarios_path")
+  options::opt("scenarios_path")
+  # getOption("en_scenarios_path")
 }
 
 # merge_paths <- function(path1, path2)

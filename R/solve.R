@@ -83,6 +83,8 @@ solve_model <- function(
   scen <- do.call(interpolate, c(list(object = obj), arg[ii]))
   # scen <- interpolate(obj, arg[ii])
   # the remaining objects will be passed to .executeScenario
+  
+  # browser()
 
   arg <- arg[!ii]
   arg$interpolate <- FALSE
@@ -125,6 +127,7 @@ solve_model <- function(
       arg$read.solution <- FALSE
     }
   }
+  # browser()
   scen <- do.call(.executeScenario, arg)
   # scen <- .executeScenario(scen,
   #   name = name, solver = solver,
@@ -299,8 +302,8 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
 
   # if (isTRUE(arg[["tmp.del"]]) && is.null(arg[["tmp.dir"]])) {
   if (isTRUE(arg[["tmp.del"]])) {
-    arg[["tmp.dir"]] <-  format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
-    return(arg)
+    arg[["tmp.name"]] <-  format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
+    # return(arg)
   }
 
   # 2. scen@misc$tmp.dir is given
@@ -322,7 +325,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
     tmp.path <- gsub("[\\/]+", "/", tmp.path)
   }
   if (is.null(tmp.path) || length(tmp.path) == 0) {
-    tmp.path <- file.path(get_scenarios_dir(), "solver", scen@name)
+    tmp.path <- file.path(get_scenarios_path(), scen@name, "solver")
     # if (!is.null(arg[["solver"]])) {
     #   tmp.path <- file.path(tmp.path, arg[["solver"]]$name)
     # }
@@ -427,7 +430,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   #   # temporary - will be depreciated
   #   arg$dir.result <- arg$tmp.dir
   # }
-
+  # browser()
   arg <- get_tmp_dir(scen, arg)
 
   if (is.null(scen)) {
@@ -454,18 +457,31 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   # arg$dir.result <- arg$tmp.dir
 
   # interpolate
+  # browser()
   if (interpolate) {
     scen <- energyRt::interpolate(scen, ...)
     arg$write <- TRUE
+    interpolate <- FALSE
+    arg$interpolate <- FALSE
   }
 
   # write
   # browser()
   # dir.create(arg$tmp.dir, recursive = TRUE, showWarnings = FALSE)
   # if (arg$open.folder) shell.exec(arg$tmp.dir)
-
+  if (is.null(arg$tmp.dir) || length(arg$tmp.dir) == 0) {
+    stop("tmp.dir is not specified")
+  }
+  if (!isTRUE(arg$write) & !dir.exists(arg$tmp.dir)) {
+    stop(paste(
+      "tmp.dir does not exist:\n  ", 
+      arg$tmp.dir, "\n  ",
+      "hint: run 'write_script' for the specified solver and 'tmp.dir'"
+      ))
+  }
   if (arg$write) {
     dir.create(arg$tmp.dir, recursive = TRUE, showWarnings = FALSE)
+    if (arg$echo) cat("Solver directory: ", arg$tmp.dir, "\n")
     if (arg$echo) cat("Writing files: ")
     solver_solver_time <- proc.time()[3]
     if (any(grep("^gams$", scen@settings@solver$lang, ignore.case = TRUE))) {

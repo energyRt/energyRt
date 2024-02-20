@@ -144,7 +144,7 @@ get_entry_object <- function(name, registry = get_registry(), ...) {
 if (F) {
   ls(pattern = "scen_")
   # set_scenario_path("scenarios")
-  get_scenarios_dir()
+  get_scenarios_path()
 
   # SCEN <- newRegistry(class = "scenario")
   newRegistry(name = "SCEN")

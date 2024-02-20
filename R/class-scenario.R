@@ -76,7 +76,7 @@ setMethod("initialize", "scenario", function(.Object, ...) {
 newScenario <- function(
     name, 
     model = NULL,
-    path = file.path(get_scenarios_dir(), name),
+    path = file.path(get_scenarios_path(), name),
     ...,
     env_name = ".scen", 
     registry = get_registry(),

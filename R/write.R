@@ -21,8 +21,13 @@ write_script <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
       stop('Either "tmp.dir" or "scenario@path" must be set')
   }
   scen@misc$tmp.dir <- tmp.dir
-  if (F) {} # check if the scenario is interpolated
-  if (is.null(solver)) solver <- scen@solver
+  if(!isTRUE(scen@status$interpolated)) {
+    stop("Scenario must be interpolated before writing the script.")
+  }
+  # browser()
+  if (is.null(solver)) solver <- scen@settings@solver
+  if (is.null(solver)) solver <- get_default_solver()
+  if (is.null(solver)) stop("Solver must be specified.")
   .executeScenario(scen, tmp.dir = tmp.dir, solver = solver, ...,
                 run = FALSE, write = TRUE)
 }
