@@ -1,3 +1,13 @@
+energyRt 0.11.17.9000 @dev (Feb 18 2024)
+
+NEW FEATURES
+* added options to control the package behavior (in development)
+* initiated class `registry` to store information about scenarios, models, and repositories, and call them by name eventually (in development)
+* added `newScenario` function to create a new scenario and register it in a `registry` (in development)
+
+OTHER
+* changed/improved the behaviour of `solve` and `interpolate` methods to unify their behavior, including `tmp.dir` that is managed by a function.
+
 energyRt 0.11.15.9000 @dev (Feb 11 2024)
 BREAKING CHANGES
 # RENAMINGs:

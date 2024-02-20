@@ -9,19 +9,21 @@
 set_julia_path <- function(path = NULL) {
   # browser()
   if (!is.null(path) & path != "") {
-    # if (!file.exists(path)) {
-    #   stop(paste0('The path "', path, '" does not exist.'))
-    # }
+    if (!file.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'))
+    }
     if (!grepl("\\/$", path)) {
       path <- paste0(path, "/")
     }
   }
-  options(en_julia_path = path)
+  options::opt_set("julia_path", path, env = "energyRt")
+  # options(julia_path = path)
 }
 
 #' @export
 get_julia_path <- function() {
-  getOption("en_julia_path")
+  options::opt("julia_path", env = "energyRt")
+  # getOption("julia_path")
 }
 
 # Functions to write Julia/JuMP model and data files
@@ -119,10 +121,10 @@ get_julia_path <- function() {
       }
     }
   }
-  dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
-  zz_data_julia <- file(paste(arg$tmp.dir, "/data.jl", sep = ""), "w")
-  zz_data_constr <- file(paste(arg$tmp.dir, "/inc_constraints.jl", sep = ""), "w")
-  zz_data_costs <- file(paste(arg$tmp.dir, "/inc_costs.jl", sep = ""), "w")
+  dir.create(file.path(arg$tmp.dir, "output"), showWarnings = FALSE)
+  zz_data_julia <- file(file.path(arg$tmp.dir, "data.jl"), "w")
+  zz_data_constr <- file(file.path(arg$tmp.dir, "inc_constraints.jl"), "w")
+  zz_data_costs <- file(file.path(arg$tmp.dir, "/inc_costs.jl"), "w")
 
   .write_inc_solver(
     scen, arg,
@@ -159,7 +161,7 @@ get_julia_path <- function() {
     if (is.data.table(x)) as.data.frame(x) else x
     })
 
-  save("dat", file = paste0(arg$tmp.dir, "data.RData"))
+  save("dat", file = file.path(arg$tmp.dir, "data.RData"))
 
   cat('using RData\nusing DataFrames\ndt = load("data.RData")["dat"]\n',
     sep = "\n", file = zz_data_julia
@@ -181,7 +183,7 @@ get_julia_path <- function() {
   }
   close(zz_data_julia)
   # Mod begin
-  zz_mod <- file(paste(arg$tmp.dir, "/energyRt.jl", sep = ""), "w")
+  zz_mod <- file(file.path(arg$tmp.dir, "energyRt.jl"), "w")
   nobj <- grep("^[@]objective", run_code)[1] - 1
   cat(run_code[1:nobj], sep = "\n", file = zz_mod)
   # Add constraint
@@ -216,7 +218,7 @@ get_julia_path <- function() {
   close(zz_data_costs)
   cat(run_code[-(1:nobj)], sep = "\n", file = zz_mod)
   close(zz_mod)
-  zz_modout <- file(paste(arg$tmp.dir, "/output.jl", sep = ""), "w")
+  zz_modout <- file(file.path(arg$tmp.dir, "/output.jl"), "w")
   cat(run_codeout, sep = "\n", file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".jl")

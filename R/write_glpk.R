@@ -1,3 +1,33 @@
+
+
+#' @title Set the path to the GLPK library
+#'
+#' @param path character. Path to the GLPK library with `glpsol.*` executable.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' set_glpk_path("/usr/local/bin/glpk") # Linux & Mac
+#' set_glpk_path("C:/Program Files/glpk/bin") # Windows
+#' get_glpk_path()
+set_glpk_path <- function(path = NULL) {
+  if (!is.null(path) & path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options::opt_set("glpk_path", path, env = "energyRt")
+}
+
+#' @export
+get_glpk_path <- function() {
+  options::opt("glpk_path")
+}
+
 # MathProg GLPK (& MathProg with CBC) ####
 .write_model_GLPK_CBC <- function(arg, scen) {
   run_code <- scen@settings@sourceCode[["GLPK"]]

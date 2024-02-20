@@ -18,6 +18,14 @@ pyomo_cplex$solver <- "cplex"
 
 pyomo_cplex_barrier <- pyomo_cplex
 pyomo_cplex_barrier$name <- "pyomo_cplex_barrier"
+
+pyomo_cbc <- Pyomo; pyomo_cbc$name <- "pyomo_cbc"
+
+pyomo_cplex <- Pyomo
+pyomo_cplex$solver <- "cplex"; pyomo_cplex$name <- "pyomo_cplex"
+
+pyomo_cplex_barrier <- pyomo_cplex;
+pyomo_cplex_barrier$name <- "pyomo_cplex_barrier"
 pyomo_cplex_barrier$inc4 <- {
 "opt.options['lpmethod'] = 4
 opt.options['solutiontype'] = 2"}
@@ -32,6 +40,12 @@ julia_cbc <- list(
   name = "julia_cbc",
   lang = "JuMP",
   solver = "Cbc"
+)
+
+julia_glpk <- list(
+  name = "julia_glpk",
+  lang = "JuMP",
+  solver = "GLPK"
 )
 
 julia_cplex <- list(
@@ -52,7 +66,6 @@ julia_highs <- list(
   solver = "HiGHS"
 )
 
-# julia_highs_barrier <-
 
 julia_highs_barrier <- julia_highs
 julia_highs_barrier$name <- "julia_highs_barrier"
@@ -66,25 +79,44 @@ set_optimizer_attribute(model, "presolve", "on")
 set_optimizer_attribute(model, "solver", "ipm") # barrier "Interior Point Method"
 # set_optimizer_attribute(model, "ipm_optimality_tolerance", 1e-5) #
 set_optimizer_attribute(model, "run_crossover", "off") # polishing the solution
-
-# Simplex
-#set_attribute(model, "solver", "simplex")
-#set_attribute(model, "simplex_strategy", "on")
-
-# Parallel Dual simplex
-#set_attribute(model, "solver", "choose")
-#set_attribute(model, "parallel", "on")
-#set_attribute(model, "threads", 12)
-#set_attribute(model, "simplex_max_concurrency", 8)
 '
 })
+
+julia_highs_simplex <- julia_highs
+julia_highs_simplex$name <- "julia_highs_simplex"
+julia_highs_simplex$inc3 <- c({
+'# HiGHS options in JuMP/Julia
+# Uncomment options to use
+set_optimizer_attribute(model, "presolve", "on")
+# set_attribute(model, "time_limit", 3600.0)
+
+# Simplex
+set_attribute(model, "solver", "simplex")
+set_attribute(model, "simplex_strategy", "on")
+'})
+
+julia_highs_parallel <- julia_highs
+julia_highs_parallel$name <- "julia_highs_simplex"
+julia_highs_parallel$inc3 <- c({
+'# HiGHS options in JuMP/Julia
+# Uncomment options to use
+set_optimizer_attribute(model, "presolve", "on")
+# set_attribute(model, "time_limit", 3600.0)
+
+# Parallel Dual simplex
+set_attribute(model, "solver", "choose")
+set_attribute(model, "parallel", "on")
+set_attribute(model, "threads", 12)
+set_attribute(model, "simplex_max_concurrency", 8)
+'})
+
 
 ## GLPK
 glpk <- list(name = "glpk", lang = "GLPK")
 
 ## GAMS
-gams_path <- getOption("en_gams_path")
-gams_cmd_line <- file.path(gams_path, "gams.exe energyRt.gms")
+# gams_path <- options::opt("gams_path")
+# gams_cmd_line <- file.path(gams_path, "gams.exe energyRt.gms")
 
 gams_cplex <- list(
   name = "gams_cplex",
@@ -168,7 +200,7 @@ $offecho
 
 
 gams_gdx_cplex_parallel <- gams_gdx_cplex
-gams_gdx_cplex_parallel$name <- gams_gdx_cplex_parallel
+gams_gdx_cplex_parallel$name <- "gams_gdx_cplex_parallel"
 gams_gdx_cplex_parallel$inc3 <- {
 "
 *energyRt.holdfixed = 1;
@@ -230,16 +262,23 @@ gams_gdx_cbc <- list(
 )
 
 solver_options <- list(
+  # GLPK
+  glpk = glpk,
+  # Python/Pyomo
   pyomo_cbc = pyomo_cbc,
   pyomo_cplex = pyomo_cplex,
   pyomo_cplex_barrier = pyomo_cplex_barrier,
   pyomo_glpk = pyomo_glpk,
+  # julia
   julia_cbc = julia_cbc,
   julia_cplex = julia_cplex,
   julia_cplex_barrier = julia_cplex_barrier,
   julia_highs = julia_highs,
   julia_highs_barrier = julia_highs_barrier,
-  glpk = glpk,
+  julia_glpk = julia_glpk,
+  julia_highs_simplex = julia_highs_simplex,
+  julia_highs_parallel = julia_highs_parallel,
+  # GAMS
   gams_csv_cplex = gams_cplex,
   gams_gdx_cplex = gams_gdx_cplex,
   gams_gdx_cplex_barrier = gams_gdx_cplex_barrier,

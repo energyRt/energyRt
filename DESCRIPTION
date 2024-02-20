@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
-Version: 0.11.16.9000
-Date: 2024-02-13
+Version: 0.11.17.9000
+Date: 2024-02-18
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -34,7 +34,10 @@ Imports:
     tictoc,
     cli,
     reticulate,
-    registry
+    registry,
+    zoo,
+    registry,
+    options
 Suggests: 
     gdxrrw,
     gdxtools,
@@ -48,6 +51,7 @@ VignetteBuilder: knitr
 LazyData: true
 Encoding: UTF-8
 Collate: 
+    'options.R'
     'generics.R'
     'class-calendar.R'
     'class-commodity.R'
