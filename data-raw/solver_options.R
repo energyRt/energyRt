@@ -92,11 +92,11 @@ set_optimizer_attribute(model, "presolve", "on")
 
 # Simplex
 set_attribute(model, "solver", "simplex")
-set_attribute(model, "simplex_strategy", "on")
+#set_attribute(model, "simplex_strategy", "on")
 '})
 
 julia_highs_parallel <- julia_highs
-julia_highs_parallel$name <- "julia_highs_simplex"
+julia_highs_parallel$name <- "julia_highs_parallel"
 julia_highs_parallel$inc3 <- c({
 '# HiGHS options in JuMP/Julia
 # Uncomment options to use
@@ -106,7 +106,7 @@ set_optimizer_attribute(model, "presolve", "on")
 # Parallel Dual simplex
 set_attribute(model, "solver", "choose")
 set_attribute(model, "parallel", "on")
-set_attribute(model, "threads", 12)
+set_attribute(model, "threads", 8)
 set_attribute(model, "simplex_max_concurrency", 8)
 '})
 

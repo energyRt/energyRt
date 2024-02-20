@@ -59,6 +59,16 @@ options::define_option(
   envvar_name = "JULIA_PATH"
 )
 
+# # GLPK ####
+options::define_option(
+  "glpk_path",
+  desc = "Path to GLPK executable.",
+  default = NULL,
+  option_name = "glpk_path",
+  envvar_name = "glpk_path"
+)
+
+
 # verbose ####
 options::define_option(
   "verbose",
@@ -124,7 +134,7 @@ options::define_option(
 )
 
 set_default_registry <- function(
-    obj_name = "registry", 
+    obj_name = "registry",
     env_name = ".scen"
   ) {
     registry = list(name = obj_name, env = env_name)

@@ -223,9 +223,15 @@ get_julia_path <- function() {
   close(zz_modout)
   .write_inc_files(arg, scen, ".jl")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- 
-      paste0(get_julia_path(), "julia energyRt.jl")
-      # "julia energyRt.jl"
+    # scen@settings@solver$cmdline <-
+    #   paste0(get_julia_path(), "julia energyRt.jl")
+    #   # "julia energyRt.jl"
+    fpath <- get_julia_path()
+    if (!is.null(fpath)) {
+      scen@settings@solver$cmdline <- file.path(fpath, "julia energyRt.jl")
+    } else {
+      scen@settings@solver$cmdline <- "julia energyRt.jl"
+    }
   }
   scen@settings@solver$code <- c(
     "energyRt.jl", "output.jl", "inc_constraints.jl",

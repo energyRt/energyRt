@@ -210,7 +210,8 @@ get_gdxlib_path <- function() {
     for (j in c("set", "map", "numpar", "bounds")) {
       for (i in names(scen@modInp@parameters)) {
         if (scen@modInp@parameters[[i]]@type == j) {
-          zz_data_tmp <- file(file.path(arg$tmp.dir, "/input/", i, ".gms"), "w")
+          zz_data_tmp <- file(file.path(arg$tmp.dir,
+                                        paste0("input/", i, ".gms")), "w")
           cat(.toGams(scen@modInp@parameters[[i]]), sep = "\n",
               file = zz_data_tmp)
           close(zz_data_tmp)
@@ -346,9 +347,12 @@ get_gdxlib_path <- function() {
   close(zz_costs)
   .write_inc_files(arg, scen, ".gms")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <-
-      paste0(get_gams_path(), "gams energyRt.gms")
-      # "gams energyRt.gms"
+    fpath <- get_gams_path()
+    if (is.null(fpath)) {
+      scen@settings@solver$cmdline <- "gams energyRt.gms"
+    } else {
+      scen@settings@solver$cmdline <- file.path(fpath, "gams energyRt.gms")
+    }
   }
   scen@settings@solver$code <- c(
     "energyRt.gms", "output.gms", "inc_constraints.gms",

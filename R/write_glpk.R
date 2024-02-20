@@ -148,6 +148,10 @@ get_glpk_path <- function() {
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
     if (toupper(scen@settings@solver$lang) == "GLPK") {
       scen@settings@solver$cmdline <- "glpsol -m energyRt.mod -d energyRt.dat"
+      if (!is.null(get_glpk_path())) {
+        scen@settings@solver$cmdline <-
+          file.path(get_glpk_path(), scen@settings@solver$cmdline)
+      }
     } else {
       scen@settings@solver$cmdline <- "cbc energyRt.mod%energyRt.dat -solve"
     }

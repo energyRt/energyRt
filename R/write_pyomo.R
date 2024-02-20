@@ -291,8 +291,12 @@ get_python_path <- function() {
   close(zz_modout)
   .write_inc_files(arg, scen, ".py")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- 
-      file.path(get_python_path(), "python energyRt.py")
+    fpath <- get_python_path()
+    if (!is.null(fpath)) {
+      scen@settings@solver$cmdline <- file.path(fpath, "python energyRt.py")
+    } else {
+      scen@settings@solver$cmdline <- "python energyRt.py"
+    }
   }
   scen@settings@solver$code <- c(
     "energyRt.py", "output.py", "inc_constraints.py",
