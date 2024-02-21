@@ -6,7 +6,7 @@ source("~/.ideea/settings.R")
 
 h10 <- make_timetable(
   struct = list(
-    ANNUAL = "ANNUAL", 
+    ANNUAL = "ANNUAL",
     HOUR = paste0("h", 0:9))
 )
 
@@ -27,7 +27,7 @@ SUP_INP <- newSupply(
 )
 
 TECH <- newTechnology(
-  name = "TECH", 
+  name = "TECH",
   input = list(comm = "INP"),
   output = list(comm = "OUT"),
   invcost = list(invcost = 100),

@@ -39,14 +39,14 @@ solve_model <- function(
 
   if (!inherits(obj, c("model", "scenario")))
     stop("The first argument must be either model or scenario object")
-  
+
   arg <- list(..., name = name)
               # name = name, solver = solver, path = path,
               # tmp.del = tmp.del, tmp.dir = tmp.dir)
   # if (!is.null(arg$name)) name <- arg$name
   if (is.null(arg$tmp.del)) arg$tmp.del <- TRUE
   if (is.null(arg$force)) arg$force <- FALSE
-  
+
   # browser()
 
   if (inherits(obj, "scenario")) {
@@ -88,12 +88,12 @@ solve_model <- function(
     (sapply(arg, function(x) class(x)[1]) %in% c(
     c(obj_to_interpolate, "list"))
     )
-  
+
   # browser()
   # Interpolate if necessary
   scen <- do.call(interpolate, c(list(object = obj), arg[ii]))
   # scen <- interpolate(obj, arg[ii])
-  
+
   # browser()
 
   # the remaining objects will be passed to .executeScenario
@@ -154,6 +154,7 @@ solve_model <- function(
 # a function to use in solve methods
 solve.model <- function(a, b, ...) {
   arg <- list(...)
+  # browser()
   if (missing(b)) {
     if (!is.null(arg$name)) {
       b <- arg$name
@@ -211,15 +212,15 @@ solve_scenario <- function(
   if (is_empty(arg$tmp.del)) arg$tmp.del <- FALSE
   if (is_empty(arg$force)) arg$force <- FALSE
   arg$obj <- obj
-  
+
   do.call(solve_model, arg)
 
   # solve_model(obj,
-  #             name = name, 
-  #             solver = obj@settings@solver, 
+  #             name = name,
+  #             solver = obj@settings@solver,
   #             path = obj@path,
-  #             tmp.dir = obj@misc$tmp.dir, 
-  #             tmp.del = FALSE, 
+  #             tmp.dir = obj@misc$tmp.dir,
+  #             tmp.del = FALSE,
   #             force = FALSE,
   #             ...)
 }
@@ -282,7 +283,8 @@ solve.scenario <- function(a, b, ...) {
   if (!is.null(arg$obj)) stop("'obj' is 'a' argument in `solve(a, b, ..)` method")
   if (!is.null(arg$name)) stop("'name' is 'b' argument in `solve(a, b, ..)` method")
   arg$obj <- a
-  if (!is.null(b)) arg$name <- b
+  if (!is.null(b)) arg$name <- b else arg$name <- arg$obj@name
+  if (is_empty(arg[["run"]])) arg$run <- TRUE
   do.call(solve_scenario, arg)
 }
 
@@ -406,54 +408,60 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   # tmp.del delete results
   # browser()
   arg <- list(...)
-  if (is_empty(arg[["tmp.dir"]])) arg[["tmp.dir"]] <- NULL
-  if (is_empty(arg[["solver"]])) arg[["solver"]] <- NULL
+  # if (is_empty(arg[["tmp.dir"]])) arg[["tmp.dir"]] <- NULL
+  # if (is_empty(arg[["solver"]])) arg[["solver"]] <- NULL
   if (is_empty(arg[["read.solution"]])) arg[["read.solution"]] <- FALSE
   if (is_empty(arg[["write"]])) arg[["write"]] <- FALSE
-  
+
   # arg <- get_tmp_dir(scen, arg)
   # if (is.null(arg$tmp.dir)) {
   #   browser()
   #   stop("tmp.dir is not specified")
   # }
-  if (is.null(arg$echo)) arg$echo <- TRUE
-  if (is.null(arg$solver)) {
-    if (is.null(scen@settings@solver)) {
+  # browser()
+  if (is_empty(arg$echo)) arg$echo <- TRUE
+  if (is_empty(arg$solver)) {
+    if (is_empty(scen@settings@solver)) {
       # arg$solver <- list(lang = "PYOMO")
       arg$solver <- get_default_solver()
+      scen@settings@solver <- arg$solver
     } else {
       arg$solver <- scen@settings@solver
     }
     # scen@settings@solver <- list(lang = "PYOMO")
   } else if (is.character(arg$solver)) {
     scen@settings@solver <- list(name = arg$solver, lang = arg$solver)
+    arg$solver <- scen@settings@solver
   } else if (is.list(arg$solver)) {
     scen@settings@solver <- arg$solver
   }
-  if (is.null(arg$open.folder)) arg$open.folder <- FALSE
-  if (is.null(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
+  if (!identical(scen@settings@solver, arg$solver)) browser() #!!! Debug
+  if (is_empty(arg$open.folder)) arg$open.folder <- FALSE
+  if (is_empty(arg$show.output.on.console)) arg$show.output.on.console <- FALSE
   # if (is.null(arg$invisible)) arg$invisible <- FALSE
-  if (is.null(arg$read.solution)) arg$read.solution <- TRUE
-  if (is.null(arg$tmp.del)) arg$tmp.del <- arg$read.solution
+  if (is_empty(arg$read.solution)) arg$read.solution <- TRUE
+  if (is_empty(arg$tmp.del)) arg$tmp.del <- arg$read.solution
   # arg$write <- write
-  if (is.null(arg$wait)) {
-    if (is.null(scen@settings@solver$wait)) {
+  if (is_empty(arg$wait)) {
+    if (is_empty(scen@settings@solver$wait)) {
       arg$wait <- TRUE
     } else {
       arg$wait <- scen@settings@solver$wait
     }
-  } else if (is.null(arg$invisible)) arg$invisible <- arg$wait
+  } else if (is_empty(arg$invisible)) {
+    arg$invisible <- arg$wait
+  }
   scen@settings@solver$wait <- arg$wait
-  if (is.null(arg$invisible)) {
-    if (is.null(scen@settings@solver$invisible)) {
+  if (is_empty(arg$invisible)) {
+    if (is_empty(scen@settings@solver$invisible)) {
       arg$invisible <- TRUE
     } else {
       arg$invisible <- scen@settings@solver$invisible
     }
   }
   scen@settings@solver$invisible <- arg$invisible
-  if (is.null(arg$run)) arg$run <- TRUE
-  if (is.null(arg$n.threads)) arg$n.threads <- 1
+  if (is_empty(arg$run)) arg$run <- TRUE
+  if (is_empty(arg$n.threads)) arg$n.threads <- 1
 
   # if (is.null(arg$onefile)) arg$onefile <- FALSE
   # if (!is.null(arg$dir.result)) {
@@ -511,7 +519,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   }
   if (!isTRUE(arg$write) & !dir.exists(arg$tmp.dir)) {
     stop(paste(
-      "tmp.dir does not exist:\n  ", 
+      "tmp.dir does not exist:\n  ",
       arg$tmp.dir, "\n  ",
       "hint: run 'write_script' for the specified solver and 'tmp.dir'"
       ))
@@ -560,6 +568,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
       cat(round(proc.time()[3] - solver_solver_time, 2), "s\n", sep = "")
       flush.console()
     }
+    scen@status$script <- TRUE
   }
   # browser()
   if (isTRUE(arg$run)) .call_solver(arg, scen)
