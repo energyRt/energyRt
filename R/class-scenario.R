@@ -47,6 +47,7 @@ setClass("scenario",
     # solver = list(),
     status = list(
       interpolated = FALSE,
+      script = FALSE,
       optimal = FALSE
     ),
     inMemory = TRUE,
@@ -159,10 +160,11 @@ setMethod("show", "scenario", function(object) summary(object))
 setMethod("setHorizon", signature(obj = "scenario"),
   function(obj, ...) {
     args <- list(...)
-    has_h <- sapply(list, function(x) inherits(x, "horizon"))
+    has_h <- sapply(args, function(x) inherits(x, "horizon"))
+    # browser()
     if (any(has_h)) {
       if (sum(has_h) > 1) stop("Only one horizon object is allowed.")
-      obj@settings <- setHorizon(obj@settings, args[[which(has_h)]])
+      obj@settings@horizon <- args[[which(has_h)]]
     }
     if (!is.null(args$period) || !is.null(args$intervals)) {
       if (is.null(args$period) && is.null(args$intervals)) {

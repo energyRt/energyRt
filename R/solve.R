@@ -22,16 +22,16 @@ solve_model <- function(
     obj,
     name = NULL,
     # name = paste("scen", obj@name, sep = "_"),
-    solver = NULL,
+    # solver = NULL,
     # tmp.path = file.path(getwd(), "/solwork"),
     # tmp.time = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
     # tmp.name = paste(solver, obj@name, name, tmp.time, sep = "_"),
-    path = NULL,
+    # path = NULL,
     # sol.dir = NULL,
     # sol.del = TRUE,
-    tmp.dir = NULL,
-    tmp.del = TRUE,
-    force = FALSE,
+    # tmp.dir = NULL,
+    # tmp.del = TRUE,
+    # force = FALSE,
     ...) {
   # 'solve*' return a scenario object, objects from '...' are either
   # passed to 'interpolate' or used to overwrite the newly created
@@ -39,11 +39,20 @@ solve_model <- function(
 
   if (!inherits(obj, c("model", "scenario")))
     stop("The first argument must be either model or scenario object")
+  
+  arg <- list(..., name = name)
+              # name = name, solver = solver, path = path,
+              # tmp.del = tmp.del, tmp.dir = tmp.dir)
+  # if (!is.null(arg$name)) name <- arg$name
+  if (is.null(arg$tmp.del)) arg$tmp.del <- TRUE
+  if (is.null(arg$force)) arg$force <- FALSE
+  
+  # browser()
 
   if (inherits(obj, "scenario")) {
     # stop("The first argument must be a model object")
     if (obj@status$optimal) {
-      if (!force) {
+      if (!arg$force) {
         message(
           "The scenario is already solved to optimal.\n",
           "Use 'force = TRUE' to solve it again.\n",
@@ -51,14 +60,14 @@ solve_model <- function(
         return(obj)
       } else {
         # message(".")
-        if (is.null(name)) name <- obj@name
+        if (is.null(arg$name)) arg$name <- obj@name
       }
     }
   }
 
-  if (is.null(name)) name <- paste("scen", obj@name, sep = "_")
-  arg <- list(..., name = name, solver = solver, path = path,
-              tmp.del = tmp.del, tmp.dir = tmp.dir)
+  if (is.null(arg$name)) arg$name <- paste("scen", obj@name, sep = "_")
+  # arg <- list(..., name = name, solver = solver, path = path,
+  #             tmp.del = tmp.del, tmp.dir = tmp.dir)
 
   # Filter from '...' objects to pass to 'interpolate'
   obj_to_interpolate <- c(
@@ -69,6 +78,7 @@ solve_model <- function(
   ii <- names(arg) %in% c(
     obj_to_interpolate, "data",
     "name", "desc", "misc", "inMemory", "path", # scenario
+    "force",
     # settings
     "discountFirstYear", "optimizeRetirement", "defVal", "interpolation",
     "debug", "sourceCode", "region"
@@ -78,38 +88,42 @@ solve_model <- function(
     (sapply(arg, function(x) class(x)[1]) %in% c(
     c(obj_to_interpolate, "list"))
     )
-
+  
+  # browser()
   # Interpolate if necessary
   scen <- do.call(interpolate, c(list(object = obj), arg[ii]))
   # scen <- interpolate(obj, arg[ii])
-  # the remaining objects will be passed to .executeScenario
   
   # browser()
 
-  arg <- arg[!ii]
+  # the remaining objects will be passed to .executeScenario
+  arg <- c(arg[!ii], arg["solver"], arg["force"])
   arg$interpolate <- FALSE
+  arg$write <- !scen@status$script
 
   # get name for the tmp.dir
   arg$name <- scen@name
-  arg$solver <- solver
+  # arg$solver <- solver
   arg <- get_tmp_dir(scen, arg)
-  tmp.dir <- arg$tmp.dir
-  tmp.del <- arg$tmp.del
+  # tmp.dir <- arg$tmp.dir
+  # tmp.del <- arg$tmp.del
 
   # Run the scenario
   solve.time.start <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- TRUE
 
-  if (is.null(name)) {
+  if (is.null(arg$name)) {
     name <- paste("scen", obj@name, sep = "_")
     warning('Scenario name is not specified, using default name: ',
-            name)
+            arg$name)
   }
-  if (is.null(tmp.dir) || tmp.dir == "") {
-    stop("Incorrect directory tmp.dir: ", tmp.dir)
+  # browser()
+  # if (is.null(arg$tmp.dir) || arg$tmp.dir == "") {
+  if (is_empty(arg$tmp.dir)) {
+    stop("Incorrect directory tmp.dir: ", arg$tmp.dir)
   }
   if (isTRUE(arg$echo)) {
-    tmp.msg <- sub(getwd(), "", tmp.dir)
+    tmp.msg <- sub(getwd(), "", arg$tmp.dir)
     cat("Scenario directory: ", tmp.msg, "\n")
     cat("Starting time: ", format(Sys.time()), "\n")
   }
@@ -133,7 +147,7 @@ solve_model <- function(
   #   name = name, solver = solver,
   #   tmp.dir = tmp.dir, tmp.del = tmp.del, ..., read.solution = TRUE
   # )
-  if (tmp.del) unlink(tmp.dir, recursive = TRUE)
+  if (arg$tmp.del) unlink(arg$tmp.dir, recursive = TRUE)
   scen
 }
 
@@ -154,6 +168,7 @@ solve.model <- function(a, b, ...) {
   if (!is.null(b)) arg$name <- b
   arg$interpolate <- TRUE
   arg$write <- TRUE
+  # browser()
   do.call(solve_model, arg)
 }
 
@@ -176,24 +191,37 @@ setMethod("solve", signature(a = "model", b = "missing"), solve.model)
 solve_scenario <- function(
     obj,
     name = obj@name,
-    solver = obj@settings@solver,
-    path = obj@path,
-    tmp.dir = obj@misc$tmp.dir,
-    tmp.del = FALSE,
-    force = FALSE,
+    # solver = obj@settings@solver,
+    # path = obj@path,
+    # tmp.dir = obj@misc$tmp.dir,
+    # tmp.del = FALSE,
+    # force = FALSE,
     ...) {
   # browser()
+  arg <- list(name = name, ...)
   if (obj@status$optimal) {
-    if (!force) {
+    if (isFALSE(arg$force)) {
       message("The scenario is already solved to optimal.\nUse 'force = TRUE' to solve it again")
       return(obj)
     }
   }
+  if (is_empty(arg$solver)) arg$solver <- obj@settings@solver
+  if (is_empty(arg$path)) arg$path <- obj@path
+  if (is_empty(arg$tmp.dir)) arg$tmp.dir <- obj@misc$tmp.dir
+  if (is_empty(arg$tmp.del)) arg$tmp.del <- FALSE
+  if (is_empty(arg$force)) arg$force <- FALSE
+  arg$obj <- obj
+  
+  do.call(solve_model, arg)
 
-  solve_model(obj,
-              name = name, solver = solver, path = path,
-              tmp.dir = tmp.dir, tmp.del = tmp.del, force = force,
-              ...)
+  # solve_model(obj,
+  #             name = name, 
+  #             solver = obj@settings@solver, 
+  #             path = obj@path,
+  #             tmp.dir = obj@misc$tmp.dir, 
+  #             tmp.del = FALSE, 
+  #             force = FALSE,
+  #             ...)
 }
 
 
@@ -248,6 +276,7 @@ solve_scenario <- function(
 
 # a function to use in solve methods
 solve.scenario <- function(a, b, ...) {
+  # browser()
   if (missing(b)) b <- NULL
   arg <- list(...)
   if (!is.null(arg$obj)) stop("'obj' is 'a' argument in `solve(a, b, ..)` method")
@@ -308,10 +337,11 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
 
   # 2. scen@misc$tmp.dir is given
   if (!is.null(scen)) {
-    if (!is.null(scen@misc$tmp.dir) && length(scen@misc$tmp.dir) > 0) {
+    # if (!is.null(scen@misc$tmp.dir) && length(scen@misc$tmp.dir) > 0) {
+    if (!is_empty(scen@misc$tmp.dir)) {
       arg[["tmp.dir"]] <- scen@misc$tmp.dir
       return(arg)
-    } else if (!is.null(scen@path)) {
+    } else if (!is_empty(scen@path)) {
       tmp.path <- scen@path
       # return(arg)
     }
@@ -319,28 +349,34 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
 
   # 3. tmp.path + tmp.name
   # tmp.path
-  if (!is.null(arg[["tmp.path"]])) {
+  if (!is_empty(arg[["tmp.path"]])) {
     tmp.path <- arg[["tmp.path"]]
     arg[["tmp.path"]] <- NULL
     tmp.path <- gsub("[\\/]+", "/", tmp.path)
   }
-  if (is.null(tmp.path) || length(tmp.path) == 0) {
-    tmp.path <- file.path(get_scenarios_path(), scen@name, "solver")
+  # if (is.null(tmp.path) || length(tmp.path) == 0) {
+  if (is_empty(tmp.path)) {
+    tmp.path <- file.path(get_scenarios_path(), scen@name, "script")
     # if (!is.null(arg[["solver"]])) {
     #   tmp.path <- file.path(tmp.path, arg[["solver"]]$name)
     # }
   }
 
   # tmp.name
-  if (!is.null(arg[["tmp.name"]])) {
+  if (!is_empty(arg[["tmp.name"]])) {
     tmp.name <- arg[["tmp.name"]]
     arg[["tmp.name"]] <- NULL
-  } else if (!is.null(arg[["solver"]]) && !is.null(arg[["solver"]]$name)) {
-    tmp.name <- arg[["solver"]]$name
-  } else if (isTRUE(arg[["tmp.del"]])) {
-    tmp.name <- format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
+  } else if (!is_empty(arg[["solver"]])) {
+    if (!is_empty(arg[["solver"]]$name)) {
+      tmp.name <- arg[["solver"]]$name
+    } else {
+      tmp.name <- paste(arg[["solver"]]$lang, arg[["solver"]]$solver, sep = "_")
+    }
+  # } else if (isTRUE(arg[["tmp.del"]])) {
+    # tmp.name <- format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
   } else {
-    tmp.name <- NULL
+    # tmp.name <- NULL
+    tmp.name <- format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
   }
 
   tmp.dir <- file.path(tmp.path, tmp.name)
@@ -352,12 +388,13 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
 ####### Internal functions ##########
 .executeScenario <- function(
     scen,
-    tmp.dir = NULL,
-    solver = NULL,
-    ...,
-    interpolate = FALSE,
-    read.solution = FALSE,
-    write = FALSE) {
+    # tmp.dir = NULL,
+    # solver = NULL,
+    ...
+    # interpolate = FALSE,
+    # read.solution = FALSE,
+    # write = FALSE
+    ) {
   # - solves scen, interpolate if required (NULL), force (TRUE), or no interpolation (FALSE, error if not interpolated)
   ## arguments
   # tmp.dir - solver working directory
@@ -368,12 +405,12 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   # read.solution = TRUE read result
   # tmp.del delete results
   # browser()
-  arg <- list(
-    tmp.dir = tmp.dir, solver = solver,
-    read.solution = read.solution,
-    write = write,
-    ...
-  )
+  arg <- list(...)
+  if (is_empty(arg[["tmp.dir"]])) arg[["tmp.dir"]] <- NULL
+  if (is_empty(arg[["solver"]])) arg[["solver"]] <- NULL
+  if (is_empty(arg[["read.solution"]])) arg[["read.solution"]] <- FALSE
+  if (is_empty(arg[["write"]])) arg[["write"]] <- FALSE
+  
   # arg <- get_tmp_dir(scen, arg)
   # if (is.null(arg$tmp.dir)) {
   #   browser()
@@ -434,7 +471,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   arg <- get_tmp_dir(scen, arg)
 
   if (is.null(scen)) {
-    if (interpolate | arg$write) {
+    if (arg$interpolate | arg$write) {
       stop("scenario object not found")
     }
   } else {
@@ -458,10 +495,10 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
 
   # interpolate
   # browser()
-  if (interpolate) {
+  if (isTRUE(arg$interpolate)) {
     scen <- energyRt::interpolate(scen, ...)
     arg$write <- TRUE
-    interpolate <- FALSE
+    # interpolate <- FALSE
     arg$interpolate <- FALSE
   }
 
