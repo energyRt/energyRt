@@ -654,6 +654,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   }
   scen@settings@sourceCode <- .modelCode
   scen@status$interpolated <- TRUE
+  scen@status$script <- FALSE
 
   # Check parameters
   scen <- .check_scen_par(scen)
