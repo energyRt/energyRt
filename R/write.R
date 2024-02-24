@@ -11,25 +11,29 @@
 #' @export
 write_script <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
   # scen <- obj
-  if (is.null(tmp.dir)) {
-    if (!is.null(scen@misc$tmp.dir)) {
-      tmp.dir <- scen@misc$tmp.dir
-    } else if (!is.null(scen@path)) {
-      tmp.dir <- file.path(scen@path, "script", solver$lang, solver$solver)
-    }
-    if (is.null(tmp.dir))
-      stop('Either "tmp.dir" or "scenario@path" must be set')
-  }
-  scen@misc$tmp.dir <- tmp.dir
-  if(!isTRUE(scen@status$interpolated)) {
+  # if (is.null(tmp.dir)) {
+  #   # get_tmp_dir(scen, list(tmp.dir = tmp.dir, solver = solver, ...))
+  #   browser()
+  #   if (!is.null(scen@misc$tmp.dir)) {
+  #     tmp.dir <- scen@misc$tmp.dir
+  #   } else if (!is.null(scen@path)) {
+  #     tmp.dir <- file.path(scen@path, "script", solver$lang, solver$solver)
+  #   }
+  #   if (is.null(tmp.dir))
+  #     stop('Either "tmp.dir" or "scenario@path" must be set')
+  # }
+  # scen@misc$tmp.dir <- tmp.dir
+  if (!isTRUE(scen@status$interpolated)) {
     stop("Scenario must be interpolated before writing the script.")
   }
   # browser()
-  if (is.null(solver)) solver <- scen@settings@solver
-  if (is.null(solver)) solver <- get_default_solver()
-  if (is.null(solver)) stop("Solver must be specified.")
-  .executeScenario(scen, tmp.dir = tmp.dir, solver = solver, ...,
-                run = FALSE, write = TRUE)
+  # if (is.null(solver)) solver <- scen@settings@solver
+  # if (is.null(solver)) solver <- get_default_solver()
+  # if (is.null(solver)) stop("Solver must be specified.")
+  # arg <- list()
+  .executeScenario(scen,
+                   tmp.dir = tmp.dir, solver = solver,
+                   run = FALSE, write = TRUE, ...)
 }
 
 #' @export
@@ -631,7 +635,7 @@ write.sc <- write_sc
     }
     rm(mTechNewCapUp)
   }
-  
+
   if (nrow(prec@parameters[["pTechRet"]]@data) > 0) {
     suppressMessages({
       mTechRet <- prec@parameters[["pTechRet"]]@data |>
@@ -767,7 +771,7 @@ write.sc <- write_sc
     }
     rm(mTradeRetUp)
   }
-  
+
   # mDummyImport ####
   .interpolation_message("mDummyImport", rest, interpolation_count,
                          interpolation_start_time, len_name)

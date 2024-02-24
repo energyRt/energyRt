@@ -344,7 +344,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
       arg[["tmp.dir"]] <- scen@misc$tmp.dir
       return(arg)
     } else if (!is_empty(scen@path)) {
-      tmp.path <- scen@path
+      tmp.path <- file.path(scen@path, "script")
       # return(arg)
     }
   }
