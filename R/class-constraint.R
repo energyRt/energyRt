@@ -486,10 +486,11 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
        (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
     # Complicated rhs
     # Generate approxim
+    # browser()
     approxim2 <-
       approxim[unique(
         c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)],
-          "solver", "year")
+          "solver", "year", "calendar")
         )]
     if (any(names(approxim2) == "slice")) {
       approxim2$slice <- approxim2$calendar@slice_share$slice

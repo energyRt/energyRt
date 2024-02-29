@@ -341,6 +341,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   if (!is.null(scen)) {
     # if (!is.null(scen@misc$tmp.dir) && length(scen@misc$tmp.dir) > 0) {
     if (!is_empty(scen@misc$tmp.dir)) {
+      # !!! ToDO: add a check if the solver has changed !!!
       arg[["tmp.dir"]] <- scen@misc$tmp.dir
       return(arg)
     } else if (!is_empty(scen@path)) {
