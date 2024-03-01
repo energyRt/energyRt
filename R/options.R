@@ -157,3 +157,11 @@ get_registry <- function() {
   get(r$name, envir = get(r$env))
 }
 
+# save global settings
+# sys_dir <- "~/.energyRt"
+# dir.create(sys_dir)
+# dir.exists(sys_dir)
+# write_lines(c(
+#   'energyRt::set_gams_path("...")',
+#   'energyRt::set_gdxlib_path("...")'
+# ), file = file.path(sys_dir, "settings.R"))

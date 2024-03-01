@@ -596,7 +596,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
         if (arg$invisible) {
           cmd <- ""
         } else {
-          cmd <- "cmd /k"
+          cmd <- if_else(interactive(),  "cmd /k", "")
         }
         rs <- system(paste(cmd, scen@settings@solver$cmdline), #' gams energyRt.gms', arg$gamsCompileParameter),
           invisible = arg$invisible, wait = arg$wait

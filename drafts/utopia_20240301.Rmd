@@ -41,6 +41,7 @@ knitr::opts_chunk$set(
 \pagebreak
 
 # Intoduction
+*[The text and parts of code might be obsolete - the update is in progress]*  
 This tutorial demonstrates the application of `energyRt` package to develop a **Reference Energy System** (RES, or  **Energy system optimization**) model and conduct standard analysis, i.e. run scenarios, optimize several alternative development pathways of the simplified energy system. The initial (base-year) structure of the discussed below example of RES is flexible. The following features can be easily adjusted:  
   * number of regions and the model GIS-info (the *map*),  
   * the model horizon and annual time-steps ("milestone years"),  
@@ -320,15 +321,15 @@ head(dem)
 sum(dem$GWh)
 
 # Check by aggregating back to annual numbers
-dem %>%
-  group_by(region) %>%
-  summarise(GWh_agg = sum(GWh)) %>%
+dem |>
+  group_by(region) |>
+  summarise(GWh_agg = sum(GWh)) |>
   mutate(GWh_a = elc_dem_a$GWh)
 
 # Add month and hour for plots
 # dem$month <- month.abb[as.numeric(substr(dem$slice, 2, 3))]
 # dem$hour <- as.integer(substr(dem$slice, 6, 7))
-dem <- left_join(dem, select(slc, MONTH, HOUR, slice, share), by = "slice") %>%
+dem <- left_join(dem, select(slc, MONTH, HOUR, slice, share), by = "slice") |>
   rename(month = MONTH)
 dem$hour <- as.numeric(as.factor(dem$HOUR))
 
@@ -352,8 +353,8 @@ elc_dem_2055 <- dem
 elc_dem_2055$year <- 2055 # The model horizon
 elc_dem_2055$GWh <- dem$GWh * 3 # and 3-times by 2055
 
-elc_dem <- dem %>%
-  bind_rows(elc_dem_2030) %>%
+elc_dem <- dem |>
+  bind_rows(elc_dem_2030) |>
   bind_rows(elc_dem_2055)
 
 # The model units in PJ, converting...
@@ -361,15 +362,15 @@ elc_dem$PJ <- convert("GWh", "PJ", elc_dem$GWh)
 elc_dem$region <- as.character(elc_dem$region)
 
 # a <- (load("~/R/energyRt/solwork/UTOPIA_BASE_Julia/data.RData"))
-# dat$pDemand %>% as.data.table()
+# dat$pDemand |> as.data.table()
 # scen_BASE_int@modInp@parameters$pDemand@data
-# scen_BASE_int@modInp@parameters$pDemand@data <- dat$pDemand %>%
+# scen_BASE_int@modInp@parameters$pDemand@data <- dat$pDemand |>
   # as.data.table()
 
 # replace data for banchmarking
-# elc_dem <- elc_dem %>% 
-#   left_join(select(dat$pDemand, region, year, slice, value)) %>%
-#   mutate(PJ = value) %>% select(-value)
+# elc_dem <- elc_dem |> 
+#   left_join(select(dat$pDemand, region, year, slice, value)) |>
+#   mutate(PJ = value) |> select(-value)
 
 DEM_ELC <- newDemand(
   name = "DEM_ELC",
@@ -955,20 +956,20 @@ dimnames(trd_nbr) <- list(reg_names, reg_names)
 We can visualize the open trade routes over the map.  
 ```{r trade_map, fig.cap="Trade routes."}
 # Data frame of trade routes
-trd_dt <- trd_nbr %>%
-  as.data.frame.table(stringsAsFactors = F) %>% 
-  filter(Freq) %>% 
-  distinct() %>%
+trd_dt <- trd_nbr |>
+  as.data.frame.table(stringsAsFactors = F) |> 
+  filter(Freq) |> 
+  distinct() |>
   rename(src = 1, dst = 2, trd = 3)
 
 # Map inter-region trade routes
 reg_centers <- sf::st_drop_geometry(gis)
-trd_rou <- left_join(trd_dt, reg_centers, by = c("src" = "region")) %>%
-  left_join(reg_centers, by = c("dst" = "region")) %>%
+trd_rou <- left_join(trd_dt, reg_centers, by = c("src" = "region")) |>
+  left_join(reg_centers, by = c("dst" = "region")) |>
   rename(
     xsrc = x.x, ysrc = y.x,
     xdst = x.y, ydst = y.y
-  ) %>%
+  ) |>
   as_tibble()
 
 # a <- value
@@ -1124,7 +1125,7 @@ GASIMP <- newImport(
 
 ## The model
 ```{r UTOPIA_model}
-repo <- newRepository("utopia_repository") %>% 
+repo <- newRepository("utopia_repository") |> 
   add(
     # Commodities
     ELC, # electricity
@@ -1158,7 +1159,7 @@ mdl <- newModel("UTOPIA",
   calendar = newCalendar(make_timetable(timeslices)),
   repository = repo
 )
-mdl@data %>% class()
+mdl@data |> class()
 mdl@data
 ```
 
@@ -1208,11 +1209,12 @@ get_default_solver()
 set_progress_bar("progress")
 ```
 
+
 # Scenarios
 
 ## "BASE" or "Reference"
 ```{r BASE, eval=T, echo=T}
-# set_progress_bar("progress")
+set_progress_bar("progress")
 scen_BASE <- solve(mdl, "BASE",
   # solver = solver_options$glpk, # default is used if not specified
   tmp.del = FALSE # to keep the solver directory after the run
@@ -1252,20 +1254,36 @@ scen_BASE_jl <- solve(add(mdl),
 )
 summary(scen_BASE_jl)
 
-getData(list(
-  scen_BASE,
-  scen_BASE_glpk,
-  scen_BASE_jl,
-  scen_BASE_py,
-  scen_BASE_gams), 
-  name = "vObjective", merge = TRUE)
+getData(
+  list(
+    scen_BASE,
+    scen_BASE_glpk,
+    scen_BASE_jl,
+    scen_BASE_py,
+    scen_BASE_gams
+    ), 
+  name = "vObjective", 
+  merge = TRUE)
+```
+
+```{r, results='asis', echo=FALSE}
+getData(
+  list(
+    scen_BASE,
+    scen_BASE_glpk,
+    scen_BASE_jl,
+    scen_BASE_py,
+    scen_BASE_gams
+    ), 
+  name = "vObjective", 
+  merge = TRUE) |>
+  knitr::kable()
 
 ```
 
-
 ### Alternative routine: interpolate, write, solve, read
 ```{r, include=T, eval=T, echo=T}
-# set_progress_bar("bw")
+set_progress_bar("bw")
 
 # Step 1: Interpolation of the model/scenario parameters
 scen_BASE_int <- interpolate(
@@ -1318,18 +1336,31 @@ getData(list(
   Python = scen_BASE_py,
   GAMS = scen_BASE_gams
   ), 
-  name = "vObjective", merge = TRUE
-  )
+  name = "vObjective", merge = TRUE)
 ```
+
+
+```{r, results='asis', echo=FALSE}
+getData(list(
+  GLPK = scen_BASE_glpk,
+  Julia = scen_BASE_jl,
+  Python = scen_BASE_py,
+  GAMS = scen_BASE_gams
+  ), 
+  name = "vObjective", merge = TRUE
+  ) |>
+  knitr::kable()
+```
+
 
 ## CO2 cap
 Set CO2 cap for the country
-```{r, eval=FALSE}
-emis_co2 <- getData(scen_BASE, "vBalance", comm = "CO2", merge = T) %>%
-  group_by(scenario, comm, year) %>%
+```{r, eval=TRUE}
+emis_co2 <- getData(scen_BASE, "vBalance", comm = "CO2", merge = T) |>
+  group_by(scenario, comm, year) |>
   summarize(value = sum(value, na.rm = T), .groups = "drop")
 emis_co2
-emis_co2_2030 <- emis_co2 %>% filter(year == 2030)
+emis_co2_2030 <- emis_co2 |> filter(year == 2030)
 
 CO2CAP <- newConstraint(
   name = "CO2CAP",
@@ -1368,15 +1399,15 @@ CO2EXP <- newExport(
   exp = list(price = -10000)
 )
 
-
-# set_progress_bar(show = T)
+set_progress_bar(show = T)
 scen_CO2CAP <- solve_model(
   mdl, 
   name = "CO2CAP",
   CO2CAP,
   # CO2CAP2,
   CO2EXP,
-  tmp.del = F
+  tmp.del = F, 
+  wait = TRUE
 )
 getHorizon(scen_CO2CAP)
 summary(scen_CO2CAP)
@@ -1384,16 +1415,25 @@ scen_CO2CAP@misc$tmp.dir
 scen_CO2CAP@model@data[[2]]$CO2CAP
 scen_CO2CAP@modInp@parameters$pCnsRhsCO2CAP
 
-getData(scen_CO2CAP, "vBalance", comm = "CO2", merge = T) %>%
-  group_by(scenario, comm, year) %>%
+getData(list(scen_BASE, scen_CO2CAP), 
+        "vBalance", comm = "CO2", merge = T) |>
+  group_by(scenario, comm, year) |>
   summarize(value = sum(value, na.rm = T))
 
-getData(scen_CO2CAP, "vEmsFuelTot", comm = "CO2", merge = T) %>%
-  group_by(scenario, comm, year) %>%
-  summarize(value = sum(value, na.rm = T))
+getData(scen_CO2CAP, "vEmsFuelTot", comm = "CO2", merge = T) |>
+  group_by(scenario, comm, year) |>
+  summarize(value = sum(value, na.rm = T)) 
 
-getData(scen_CO2CAP, "vExportRow", comm = "CO2", merge = T) 
+getData(scen_CO2CAP, "vExportRow", comm = "CO2", merge = T)  
 
 ```
 
+```{r, results='asis', echo=FALSE}
+getData(list(scen_BASE, scen_CO2CAP), 
+        "vBalance", comm = "CO2", merge = T) |>
+  group_by(scenario, comm, year) |>
+  summarize(value = sum(value, na.rm = T), .groups = "drop") |>
+  pivot_wider(names_from = "scenario") |>
+  knitr::kable()
+```
 tbc...

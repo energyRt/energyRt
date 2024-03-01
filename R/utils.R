@@ -295,7 +295,7 @@ fact2char <- function(df, asTibble = TRUE) {
 #'
 #' @examples
 set_progress_bar <- function(type = "bw", show = TRUE, clear = FALSE) {
-  progressr::handlers(global = show)
+  if (interactive()) progressr::handlers(global = show)
   options(progressr.clear = clear)
   if (is.null(type)) return(invisible(NULL))
   if (type == "bw") {
@@ -336,7 +336,7 @@ set_progress_bar <- function(type = "bw", show = TRUE, clear = FALSE) {
 #'
 #' @examples
 show_progress_bar <- function(show = TRUE) {
-  set_progress_bar(type = NULL, show = show)
+  if (interactive()) set_progress_bar(type = NULL, show = show)
 }
 
 
