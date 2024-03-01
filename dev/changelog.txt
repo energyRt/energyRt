@@ -1,3 +1,13 @@
+energyRt 0.11.18-22 @dev (Mar 1 2024)
+
+BUG FIXES
+* several minor bug fixes and improvements in the `solve` methods
+* added missing interpolation of constraints when given years are beyond the model horizon. Still, a temporary patch, the interpolation routine is to be rewritten in the future, with focus on arrow and dplyr packages.
+* Utopia updated to the recent version of the package. More changes are comming.
+
+OTHER
+* tests using 'testthat' package are initiated and in progress.
+
 energyRt 0.11.17.9000 @dev (Feb 18 2024)
 
 NEW FEATURES

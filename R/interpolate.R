@@ -1546,15 +1546,29 @@ interpolate_slot <- function(
     year_seq = NULL,
     val = "value"
 ) {
-  if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
-  x %>%
-    group_by(
-      across(any_of(keys))
-    ) %>%
-    complete(year = year_seq) %>%
-    mutate(
-      {{val}} := zoo::na.approx(.data[[val]], x = year)
-    ) %>%
+  # browser()
+  if (!is.null(x$year)) {
+    # year_seq = full_seq(c(x$year, year_seq), 1)
+    if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
+    x <- x %>%
+      group_by(
+        across(any_of(keys))
+      ) %>%
+      complete(year = year_seq) |>
+      ungroup()
+    if (!is.null(val) && !is.na(val)) {
+      x <- x %>%
+        mutate(
+          {{val}} := zoo::na.approx(.data[[val]], x = year)
+        )
+    }
+  }
+  # if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
+    # 
+    # mutate(
+    #   {{val}} := zoo::na.approx(.data[[val]], x = year)
+    # ) %>%
     # as.data.table() %>%
-    ungroup()
+    # ungroup()
+  x
 }

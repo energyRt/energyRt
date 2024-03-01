@@ -208,9 +208,9 @@ solve_scenario <- function(
   }
   if (is_empty(arg$solver)) arg$solver <- obj@settings@solver
   if (is_empty(arg$path)) arg$path <- obj@path
-  if (is_empty(arg$tmp.dir)) arg$tmp.dir <- obj@misc$tmp.dir
   if (is_empty(arg$tmp.del)) arg$tmp.del <- FALSE
   if (is_empty(arg$force)) arg$force <- FALSE
+  if (is_empty(arg$tmp.dir)) arg <- get_tmp_dir(obj, arg)
   arg$obj <- obj
 
   do.call(solve_model, arg)
@@ -336,15 +336,18 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
     arg[["tmp.name"]] <-  format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
     # return(arg)
   }
-
+  # browser()
   # 2. scen@misc$tmp.dir is given
   if (!is.null(scen)) {
     # if (!is.null(scen@misc$tmp.dir) && length(scen@misc$tmp.dir) > 0) {
     if (!is_empty(scen@misc$tmp.dir)) {
-      # !!! ToDO: add a check if the solver has changed !!!
-      arg[["tmp.dir"]] <- scen@misc$tmp.dir
-      return(arg)
-    } else if (!is_empty(scen@path)) {
+      # browser()
+      if (identical(scen@misc$tmp.dir, arg[["solver"]]$name)) {
+        arg[["tmp.dir"]] <- scen@misc$tmp.dir
+        return(arg)
+      }
+    }
+    if (!is_empty(scen@path)) {
       tmp.path <- file.path(scen@path, "script")
       # return(arg)
     }

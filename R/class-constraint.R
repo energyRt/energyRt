@@ -248,11 +248,18 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
   # if (grepl("CESR_5_2030", stm@name)) browser()
   # !!! add interpolation patch here? or in the calling function? !!!
   # if (nrow(stm@for.each) > 0) {
-  #   .interpolation0(obj = stm@rhs, parameter = "rhs", defVal = stm@defVal,
-  #
-  #                   arg = list(approxim = approxim)
-  #                   )
-  # }
+    # .interpolation0(stm@rhs, parameter = "rhs", defVal = stm@defVal,
+    #                 arg = list(approxim = approxim)
+    #                 )
+  
+  # temporary fix for constraints interpolation: expanding year set
+  # works only for year set and if no NA values in the set
+  if (!is.null(stm@rhs$year) && !any(is.na(stm@rhs$year))) {
+    stm@rhs <- interpolate_slot(stm@rhs, val = "rhs")
+  }
+  if (!is.null(stm@for.each$year) && !any(is.na(stm@for.each$year))) {
+    stm@for.each <- interpolate_slot(stm@for.each, val = NULL)
+  }
 
   # !!! end
   stop.constr <- function(x) {

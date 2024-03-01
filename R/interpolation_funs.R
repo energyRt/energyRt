@@ -18,7 +18,7 @@
   # Remove not used approxim
   # print()
   # browser()
-  if (parameter == "DEBUG") browser() # DEBUG
+  # if (parameter == "rhs") browser() # DEBUG
   if (length(defVal) != 1 || is.na(defVal) || is.null(defVal)) {
     browser()
     stop("defVal value is not defined")
