@@ -101,11 +101,11 @@ Certainly, any other map in `SpatialPolygonsDataFrame` (spdf) format and with sa
 ```{r Utopia_map, fig.cap="The selected map for the Utopia model."}
 # data("utopia_honeycomb") # , package = "energyRt")
 gis <- utopia$map$honeycomb
-gis <- gis[1:7, ]
+gis <- gis[1:7,]
 
 # Often used parameters
-(reg_names <- as.character(gis$region)) # Region names
-(nreg <- length(reg_names)) # Number of regions
+reg_names <- as.character(gis$region); reg_names # Region names
+nreg <- length(reg_names); nreg # Number of regions
 ```
    
 ## Mapping with ggplot
@@ -1011,15 +1011,17 @@ For electric power sector model, we can potentially consider trades as dispatch,
 # Define trade losses
 trd_dt$distance_km <- 0.
 for (i in 1:dim(trd_dt)[1]) {
+  # stop()
   rg_dst <- trd_dt$dst[i]
   rg_src <- trd_dt$src[i]
   # lab_dst <- reg_centers[rg_dst, 2:3]
   # lab_src <- reg_centers[rg_src, 2:3]
   lab_dst <- reg_centers[reg_centers$region == rg_dst, c("x", "y")]
   lab_src <- reg_centers[reg_centers$region == rg_src, c("x", "y")]
-  trd_dt$distance_km[i] <- raster::pointDistance(
-    lab_src, lab_dst, T
-  ) / 1e3
+  trd_dt$distance_km[i] <- st_distance(
+    st_point(unlist(lab_src)),
+    st_point(unlist(lab_dst))
+  ) # no projection is given ("Utopia!") units are arbitrary
 }
 
 # Assume losses 5% per 1000 km
@@ -1376,21 +1378,12 @@ CO2CAP <- newConstraint(
   rhs = data.frame(
     year = c(2030, 2060),
     rhs = round(emis_co2_2030$value, -3) * c(1, .1)
-  )
+  ),
+  defVal = Inf
 )
 CO2CAP@rhs
-
-# alternative way to define the constraint, using newConstraintS
-CO2CAP2 <- newConstraintS(
-  "CO2CAP2", 
-  type = "balance",
-  eq = "<=",
-  for.each = list(year = c(2030:2060), comm = "CO2"),
-  rhs = data.frame(
-    year = c(2030:2060),
-    rhs = 1e4
-  )
-)
+CO2CAP@defVal
+CO2CAP@interpolation
 
 CO2EXP <- newExport(
   name = "CO2EXP", 
@@ -1404,7 +1397,6 @@ scen_CO2CAP <- solve_model(
   mdl, 
   name = "CO2CAP",
   CO2CAP,
-  # CO2CAP2,
   CO2EXP,
   tmp.del = F, 
   wait = TRUE
