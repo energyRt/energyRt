@@ -9,4 +9,7 @@
 library(testthat)
 library(energyRt)
 
-test_check("energyRt")
+tst <- devtools::test()
+# tst |> class()
+# tst |> str()
+# test_check("energyRt", reporter = tst)

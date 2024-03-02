@@ -2,7 +2,7 @@
 # Config/testthat/parallel: true
 # usethis::edit_r_environ()
 # TESTTHAT_CPUS=4
-source("~/.ideea/settings.R")
+source("~/.energyRt/settings.R")
 
 h10 <- make_timetable(
   struct = list(
@@ -98,3 +98,4 @@ test_that("ONE_gams_gdx_cplex", {
   vObj <- getData(scen, "vObjective", merge = TRUE)$value
   expect_equal(vObjective, vObj)
 })
+

@@ -2,18 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{set_scenarios_path}
 \alias{set_scenarios_path}
+\alias{get_scenarios_path}
 \title{Set or get directory for/with scenarios}
 \usage{
 set_scenarios_path(path = NULL)
+
+get_scenarios_path()
 }
 \arguments{
 \item{path}{}
 }
 \description{
 Set or get directory for/with scenarios
-}
-\seealso{
-Other options: 
-\code{\link{get_scenarios_path}()}
 }
 \concept{options}

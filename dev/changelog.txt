@@ -1,3 +1,14 @@
+energyRt 0.11.18-23 @dev (Mar 3 2024)
+BREAKING CHANGES:
+* `constraint-class` got `@interpolation` slot to override default interpolation of `rhs` parameter (as well as `for.each`). The newConstraint function is updating accordingly.
+* changed default interpolation rule for constraints to `inter` (`back.inter.forth` previously).
+* changed default value (defVal) - it is recomended to specify default value when it is created. If not specified, Inf or zero is used, based on the equation/inequality type.
+* temporary fix: to avoid dropping zeros during current interpolation of constraint@rhs (known issue), zeros are authoreplaced by small numbers (1e-20) - will be resolved in new interpolation routine.
+
+OTHER
+* adjusted behaviour of default tmp.dir in `solve` when no path is given.
+* UTOPIA example - some updates, dropping 'raster' dependency in favour of 'sf'.
+
 energyRt 0.11.18-22 @dev (Mar 1 2024)
 
 BUG FIXES

@@ -67,7 +67,7 @@ rampup: back.inter.forth
 res.lo: back.inter.forth
 res.up: back.inter.forth
 reserve: back.inter.forth
-rhs: back.inter.forth
+rhs: inter
 share.lo: back.inter.forth
 share.up: back.inter.forth
 stg2ainp: back.inter.forth

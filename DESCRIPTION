@@ -2,7 +2,7 @@ Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
 Version: 0.11.23.9000
-Date: 2024-03-01
+Date: 2024-03-02
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -51,6 +51,7 @@ VignetteBuilder: knitr
 LazyData: true
 Encoding: UTF-8
 Collate: 
+    'defaults.R'
     'options.R'
     'generics.R'
     'class-calendar.R'
@@ -103,4 +104,3 @@ Collate:
     'write_pyomo.R'
 Config/testthat/edition: 3
 Config/testthat/parallel: false
-

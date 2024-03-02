@@ -69,6 +69,25 @@ solve_model <- function(
   # arg <- list(..., name = name, solver = solver, path = path,
   #             tmp.del = tmp.del, tmp.dir = tmp.dir)
 
+  # arg$solver <- solver
+  # browser()
+  if (is.null(arg$solver)) {
+    # if (inherits(obj, "model") && !is.null(obj@config@solver)) {
+    #   arg$solver <- obj@config@solver
+    # } else
+    if (inherits(obj, "scenario") && !is.null(obj@settings@solver)) {
+      arg$solver <- obj@settings@solver
+    } else {
+      arg$solver <- get_default_solver()
+    }
+  }
+  if (is.null(arg$path)) {
+    if (inherits(obj, "scenario") && !is.null(obj@path)) {
+      arg$path <- obj@path
+    } else {
+      arg$path <- file.path(get_scenarios_path(), arg$name)
+    }
+  }
   # Filter from '...' objects to pass to 'interpolate'
   obj_to_interpolate <- c(
     "repository", "list", newRepository("")@permit, # model data
@@ -97,13 +116,13 @@ solve_model <- function(
   # browser()
 
   # the remaining objects will be passed to .executeScenario
-  arg <- c(arg[!ii], arg["solver"], arg["force"])
+  arg <- c(arg[!ii], arg["solver"], force = arg[["force"]])
   arg$interpolate <- FALSE
   arg$write <- !scen@status$script
 
   # get name for the tmp.dir
   arg$name <- scen@name
-  # arg$solver <- solver
+
   arg <- get_tmp_dir(scen, arg)
   # tmp.dir <- arg$tmp.dir
   # tmp.del <- arg$tmp.del
@@ -124,7 +143,7 @@ solve_model <- function(
   }
   if (isTRUE(arg$echo)) {
     tmp.msg <- sub(getwd(), "", arg$tmp.dir)
-    cat("Scenario directory: ", tmp.msg, "\n")
+    cat("Solver directory: ", tmp.msg, "\n")
     cat("Starting time: ", format(Sys.time()), "\n")
   }
   # scen <- interpolate(obj, name = name)
@@ -206,11 +225,11 @@ solve_scenario <- function(
       return(obj)
     }
   }
-  if (is_empty(arg$solver)) arg$solver <- obj@settings@solver
-  if (is_empty(arg$path)) arg$path <- obj@path
+  # if (is_empty(arg$solver)) arg$solver <- obj@settings@solver
+  # if (is_empty(arg$path)) arg$path <- obj@path
   if (is_empty(arg$tmp.del)) arg$tmp.del <- FALSE
-  if (is_empty(arg$force)) arg$force <- FALSE
-  if (is_empty(arg$tmp.dir)) arg <- get_tmp_dir(obj, arg)
+  # if (is_empty(arg$force)) arg$force <- FALSE
+  # if (is_empty(arg$tmp.dir)) arg <- get_tmp_dir(obj, arg)
   arg$obj <- obj
 
   do.call(solve_model, arg)
@@ -342,9 +361,13 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
     # if (!is.null(scen@misc$tmp.dir) && length(scen@misc$tmp.dir) > 0) {
     if (!is_empty(scen@misc$tmp.dir)) {
       # browser()
-      if (identical(scen@misc$tmp.dir, arg[["solver"]]$name)) {
-        arg[["tmp.dir"]] <- scen@misc$tmp.dir
-        return(arg)
+      if (identical(basename(scen@misc$tmp.dir), arg[["solver"]]$name)) {
+        if (!is.null(scen@misc$tmp.dir)) {
+          arg[["tmp.dir"]] <- scen@misc$tmp.dir
+        # } else {
+        #   arg[["tmp.dir"]] <- get_
+          return(arg)
+        }
       }
     }
     if (!is_empty(scen@path)) {

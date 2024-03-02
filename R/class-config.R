@@ -75,8 +75,8 @@ setClass("config",
 )
 setMethod("initialize", "config", function(.Object, ...) {
   if (!exists(".defVal")) load("R/sysdata.rda")
-  .Object@defVal <- as.data.frame(.defVal, stringsAsFactors = FALSE)
-  .Object@interpolation <- as.data.frame(.defInt, stringsAsFactors = FALSE)
+  .Object@defVal <- as.data.frame(energyRt:::.defVal, stringsAsFactors = FALSE)
+  .Object@interpolation <- as.data.frame(energyRt:::.defInt, stringsAsFactors = FALSE)
   .Object
 })
 

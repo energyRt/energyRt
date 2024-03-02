@@ -29,7 +29,7 @@
 #' @slot next_in_year data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.
 #' @slot misc list with additional data and calculated mappings.
 #'
-#' @include generics.R
+#' @include generics.R defaults.R
 #' @rdname calendar
 #' @export
 setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, schedule

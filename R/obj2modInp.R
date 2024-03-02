@@ -2890,7 +2890,8 @@ setMethod(
       obj@parameters[["pTradeOlife"]] <- .dat2par(
         obj@parameters[["pTradeOlife"]], pTradeOlife)
       if (is.null(pTradeOlife)) {
-        pTradeOlife <- data.table(trade = trd@name, value = .defVal$olife)
+        pTradeOlife <- data.table(trade = trd@name,
+                                  value = energyRt:::.defVal$olife)
       }
         # data.table(trade = trd@name, value = trd@olife, stringsAsFactors = FALSE))
       invest_years <- approxim$mileStoneYears
