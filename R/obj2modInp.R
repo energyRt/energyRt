@@ -2172,10 +2172,16 @@ setMethod(
       meqTechGrp2Grp <- NULL
     }
     if (!is.null(mTechInpGroup) || !is.null(mTechOutGroup)) {
-      mpTechShareLo <- pTechShare %>%
-        select(filter(type == "lo" & value > 0), -value)
+      browser()
+      mpTechShareLo <- pTechShare |>
+        filter(type == "lo" & value > 0) |> 
+        select(-any_of(c("value", "type")))
       # mpTechShareUp <- pTechShare[pTechShare$type == "up" & pTechShare$value < 1,
       #                             colnames(pTechShare) != "value"]
+      mpTechShareUp <- pTechShare |>
+        filter(type == "up" & value > 0) |> 
+        select(-any_of(c("value", "type")))
+      
     } else {
       mpTechShareUp <- NULL
       mpTechShareLo <- NULL
@@ -2252,10 +2258,13 @@ setMethod(
       meqTechSng2Sng <- NULL
     }
     if (!is.null(mpTechShareLo) && !is.null(techGroupOut)) {
+      browser()
       meqTechShareOutLo <- merge0(mpTechShareLo, techGroupOut)
       obj@parameters[["meqTechShareOutLo"]] <- .dat2par(
         obj@parameters[["meqTechShareOutLo"]],
-        meqTechShareOutLo[, obj@parameters[["meqTechShareOutLo"]]@dimSets]
+        select(meqTechShareOutLo, 
+               all_of(obj@parameters[["meqTechShareOutLo"]]@dimSets)
+               )
       )
     } else {
       meqTechShareOutLo <- NULL
@@ -2264,7 +2273,11 @@ setMethod(
       meqTechShareOutUp <- merge0(mpTechShareUp, techGroupOut)
       obj@parameters[["meqTechShareOutUp"]] <- .dat2par(
         obj@parameters[["meqTechShareOutUp"]],
-        meqTechShareOutUp[, obj@parameters[["meqTechShareOutUp"]]@dimSets]
+        select(
+          meqTechShareOutUp, 
+          all_of(obj@parameters[["meqTechShareOutUp"]]@dimSets)
+          )
+        # meqTechShareOutUp[, obj@parameters[["meqTechShareOutUp"]]@dimSets]
       )
     } else {
       meqTechShareOutUp <- NULL
@@ -2273,7 +2286,11 @@ setMethod(
       meqTechShareInpLo <- merge0(mpTechShareLo, techGroupInp)
       obj@parameters[["meqTechShareInpLo"]] <- .dat2par(
         obj@parameters[["meqTechShareInpLo"]],
-        meqTechShareInpLo[, obj@parameters[["meqTechShareInpLo"]]@dimSets]
+        select(
+          meqTechShareInpLo, 
+          all_of(obj@parameters[["meqTechShareInpLo"]]@dimSets)
+          )
+        # meqTechShareInpLo[, obj@parameters[["meqTechShareInpLo"]]@dimSets]
       )
     } else {
       meqTechShareInpLo <- NULL
@@ -2282,7 +2299,11 @@ setMethod(
       meqTechShareInpUp <- merge0(mpTechShareUp, techGroupInp)
       obj@parameters[["meqTechShareInpUp"]] <- .dat2par(
         obj@parameters[["meqTechShareInpUp"]],
-        meqTechShareInpUp[, obj@parameters[["meqTechShareInpUp"]]@dimSets]
+        # meqTechShareInpUp[, obj@parameters[["meqTechShareInpUp"]]@dimSets]
+        select(
+          meqTechShareInpUp, 
+          all_of(obj@parameters[["meqTechShareInpUp"]]@dimSets)
+          )
       )
     } else {
       meqTechShareInpUp <- NULL
