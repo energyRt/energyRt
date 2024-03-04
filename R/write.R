@@ -1232,16 +1232,16 @@ write.sc <- write_sc
   )
   mvOutTot <- mvOutTot[!duplicated(mvOutTot), ]
   mvOutTot <- merge0(mvOutTot, mCommSlice) %>% unique()
-  if (T) { # check
-    # mvOutTot <-
-    dim_mvOutTot <- mvOutTot %>%
-      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-      unique() %>% dim()
-    if (!all(dim_mvOutTot == dim(mvOutTot))) browser() # Debug
-  }
+  # if (T) { # check
+  #   # moved below with an adjustment for 'mAggregateFactor'
+  #   dim_mvOutTot <- mvOutTot %>%
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #     unique() %>% dim()
+  #   if (!all(dim_mvOutTot == dim(mvOutTot))) browser() # Debug
+  # }
   prec@parameters[["mvOutTot"]] <-
     .dat2par(prec@parameters[["mvOutTot"]], mvOutTot)
-  rm(mvOutTot)
+  # rm(mvOutTot) # moved below
   # mvBalance ####
   .interpolation_message("mvBalance", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -1300,11 +1300,29 @@ write.sc <- write_sc
   if (nrow(tmp)) {
     tmp$value <- NULL
     colnames(tmp)[2] <- "comm.1"
-    prec@parameters[["mAggregateFactor"]] <- .dat2par(prec@parameters[["mAggregateFactor"]], tmp)
+    prec@parameters[["mAggregateFactor"]] <-
+      .dat2par(prec@parameters[["mAggregateFactor"]], tmp)
   }
   cat(bacs, paste0(rep(" ", len_name), collapse = ""), bacs)
+  # mvOutTot |>
+  #   filter(comm %in% prec@parameters[["mAggregateFactor"]]@data$comm.1) |>
+  #   arrange(comm, year) |>
+  #   left_join(prec@parameters[["mCommSlice"]]@data, by = c("comm", "slice")) |>
+  # if (T) { # check
+  #   # mvOutTot <-
+  #   dim_mvOutTot <- mvOutTot %>%
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #     unique() %>% dim()
+  #   if (!all(dim_mvOutTot == dim(
+  #     filter(mvOutTot, !(comm %in% prec@parameters$mAggregateFactor@data$comm))
+  #     ))) browser() # Debug
+  # }
+  rm(mvOutTot)
   prec
 }
+
+# browser()
+
 
 # Sets, parameters, + to use in write_* and interpolation functions ####
 .set_al <- c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "sup", "weather", "region", "year", "slice", "group", "comm", "cns", "stgp", "tradep", "exppp", "impp", "techp", "demp", "supp", "weatherp", "regionp", "yearp", "slicep", "groupp", "commp", "cnsp", "stge", "tradee", "exppe", "impe", "teche", "deme", "supe", "weathere", "regione", "yeare", "slicee", "groupe", "comme", "cnse", "stgn", "traden", "exppn", "impn", "techn", "demn", "supn", "weathern", "regionn", "yearn", "slicen", "groupn", "commn", "cnsn", "src", "dst")

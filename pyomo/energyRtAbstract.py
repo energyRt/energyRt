@@ -798,7 +798,7 @@ model.eqAggOutTot = Constraint(
     == sum(
         model.pAggregateFactor[c, cp]
         * sum(
-            model.vOutTot[cp, r, y, sp]
+            (model.vOutTot[cp, r, y, sp] if (cp, r, y, sp) in model.mvOutTot else 0)
             for sp in model.slice
             if (
                 (c, r, y, sp) in model.mvOutTot
