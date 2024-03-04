@@ -1085,7 +1085,7 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
                      )
                     ),
 *              pYearFraction(year) *
-              pTechEac(tech, region, yearp) 
+              pTechEac(tech, region, yearp)
               * pPeriodLen(yearp)
               * (
                 vTechNewCap(tech, region, yearp)
@@ -1223,7 +1223,7 @@ eqAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)..
                            mSliceParentChildE(slice, slicep)
                            and mCommSlice(commp, slicep)
                            ),
-                    vOutTot(commp, region, year, slicep)
+                    vOutTot(commp, region, year, slicep)$mvOutTot(commp, region, year, slicep)
                     )
             );
 
@@ -1407,7 +1407,7 @@ eqStorageCap(stg, region, year)$mStorageSpan(stg, region, year)..
                     and
                      mStorageNew(stg, region, yearp)
                  ),
-                 pPeriodLen(yearp) * 
+                 pPeriodLen(yearp) *
                  vStorageNewCap(stg, region, yearp)
          );
 
@@ -1442,7 +1442,7 @@ eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
                     and pStorageInvcost(stg, region, yearp) <> 0
                     ),
 *                  pYearFraction(year) *
-            pStorageEac(stg, region, yearp) 
+            pStorageEac(stg, region, yearp)
             * pPeriodLen(yearp)
             * vStorageNewCap(stg, region, yearp)
          );
@@ -1624,7 +1624,7 @@ eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
                   ) * vTradeIr(trade, comm, src, region, year, slice) * pSliceWeight(slice)
                 )$mvTradeIr(trade, comm, src, region, year, slice)
             )
-        ) 
+        )
     )
 * Export (IR)
   - sum((trade, dst)$mTradeRoutes(trade, region, dst),
@@ -1665,15 +1665,15 @@ eqImportRowUp(imp, comm, region, year, slice)$mImportRowUp(imp, comm, region, ye
 eqImportRowLo(imp, comm, region, year, slice)$meqImportRowLo(imp, comm, region, year, slice)..
   vImportRow(imp, comm, region, year, slice)  =g= pImportRowLo(imp, region, year, slice);
 
-eqImportRowCum(imp, comm)$mImpComm(imp, comm).. 
-  vImportRowCum(imp, comm) 
+eqImportRowCum(imp, comm)$mImpComm(imp, comm)..
+  vImportRowCum(imp, comm)
   =e=
   sum((region, year, slice)$mImportRow(imp, comm, region, year, slice),
       pPeriodLen(year) * pSliceWeight(slice)
       * vImportRow(imp, comm, region, year, slice)
   );
 
-eqImportRowResUp(imp, comm)$mImportRowCumUp(imp, comm).. 
+eqImportRowResUp(imp, comm)$mImportRowCumUp(imp, comm)..
   vImportRowCum(imp, comm) =l= pImportRowRes(imp);
 
 
@@ -1684,7 +1684,7 @@ eqImportRowResUp(imp, comm)$mImportRowCumUp(imp, comm)..
 * Activity equation
 eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slice)..
          pSliceShare(slice) * pTradeCap2Act(trade) * vTradeCap(trade, year) =g=
-                 sum((src, dst)$mvTradeIr(trade, comm, src, dst, year, slice), 
+                 sum((src, dst)$mvTradeIr(trade, comm, src, dst, year, slice),
                      vTradeIr(trade, comm, src, dst, year, slice)
                      );
 
@@ -1694,8 +1694,8 @@ eqTradeCap(trade, year)$mTradeSpan(trade, year)..
          =e=
          pTradeStock(trade, year) +
          sum(yearp$(mTradeNew(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
-                    (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))), 
-             pPeriodLen(yearp) * 
+                    (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))),
+             pPeriodLen(yearp) *
              vTradeNewCap(trade, yearp)
              );
 
@@ -1723,8 +1723,8 @@ eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          sum(yearp$(mTradeNew(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
             (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))),
 *                pYearFraction(year) *
-                pTradeEac(trade, region, yearp) * 
-                pPeriodLen(yearp) * 
+                pTradeEac(trade, region, yearp) *
+                pPeriodLen(yearp) *
                 vTradeNewCap(trade, yearp));
 
 ********************************************************************************
@@ -1850,12 +1850,12 @@ eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)..
            )$mOutSub(comm, region, year, slice);
 
 eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
-         sum(slicep$mvOut2Lo(comm, region, year, slice, slicep), 
+         sum(slicep$mvOut2Lo(comm, region, year, slice, slicep),
              vOut2Lo(comm, region, year, slice, slicep))
          =e=
          vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
          + vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
-*         + pSliceWeight(slice) * 
+*         + pSliceWeight(slice) *
          + vAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
          + vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
          + vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)

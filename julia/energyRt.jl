@@ -1633,7 +1633,11 @@ print("eqAggOutTot(comm, region, year, slice)...")
                 pAggregateFactorDef
             end
         ) * sum(
-            vOutTot[(cp, r, y, sp)] for sp in slice if (
+            (if (cp, r, y, sp) in mvOutTot
+                vOutTot[(cp, r, y, sp)]
+            else
+                0
+            end) for sp in slice if (
                 (c, r, y, sp) in mvOutTot &&
                 (s, sp) in mSliceParentChildE &&
                 (cp, sp) in mCommSlice

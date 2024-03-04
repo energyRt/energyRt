@@ -26,6 +26,7 @@ setMethod(".obj2modInp",
   # @agg: aggregating commodity
   dd <- cmd@agg[, c("comm", "comm", "agg"), drop = FALSE]
   if (nrow(dd) > 0) {
+    # browser()
     colnames(dd) <- c("comm", "commp", "value")
     dd[, "comm"] <- cmd@name
     dd[, "value"] <- as.numeric(dd$value) # Must be removed later
@@ -47,6 +48,7 @@ setMethod(".obj2modInp",
   }
   # For slice
   # browser()
+  # !!! ToDo: Add check for aggregating commodity to be higher or the same timeframe..
   approxim <- .fix_approximation_list(approxim, comm = cmd@name)
   obj@parameters[["mCommSlice"]] <-
     .dat2par(

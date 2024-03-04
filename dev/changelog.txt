@@ -1,3 +1,8 @@
+energyRt 0.11.24 @dev (Mar 3-4 2024)
+BUG FIXES:
+Added mapping in equation eqAggOutTot, required in cases when composite commodity included different availability by year or region, and caused errors in Pyomo and Julia.
+
+
 energyRt 0.11.18-23 @dev (Mar 3 2024)
 BREAKING CHANGES:
 * `constraint-class` got `@interpolation` slot to override default interpolation of `rhs` parameter (as well as `for.each`). The newConstraint function is updating accordingly.
