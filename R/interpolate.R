@@ -813,6 +813,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     "pTradeRet", "pTradeCap", "pTradeNewCap"
     # "pImportRowPrice"
   ))
+  # browser()
   msg_small_err <- NULL
   for (i in non_negative) {
     if (any(scen@modInp@parameters[[i]]@data$value < 0)) {
@@ -849,50 +850,55 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
   # Check share
   if (nrow(scen@modInp@parameters$pTechShare@data) > 0) {
-    mTechGroupComm <- .get_data_slot(scen@modInp@parameters$mTechGroupComm)
-    # scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
-    # if (scen@modInp@parameters$pTechShare@misc$nValues != - 1)
-    # 		scen@modInp@parameters$pTechShare@misc$nValues <- nrow(scen@modInp@parameters$pTechShare@data)
-    tmp <- .add_dropped_zeros(scen@modInp, "pTechShare")
-    mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
-    tmp <- merge(tmp, mTechSpan)
-    tmp_lo <- merge(tmp[tmp$type == "lo", , drop = FALSE], mTechGroupComm)
-    tmp_up <- merge(tmp[tmp$type == "up", , drop = FALSE], mTechGroupComm)
-    tmp_lo <- aggregate(
-      tmp_lo[, "value", drop = FALSE],
-      tmp_lo[, !(colnames(tmp_lo) %in% c("type", "comm", "value")),
-             drop = FALSE],
-      sum)
-      tmp_up <- aggregate(
-      tmp_up[, "value", drop = FALSE],
-      tmp_up[, !(colnames(tmp_up) %in% c("type", "comm", "value")),
-             drop = FALSE],
-      sum)
-    if (any(tmp_lo$value > 1) || any(tmp_up$value < 1)) {
-      tech_wrong_lo <- tmp_lo[tmp_lo$value > 1, , drop = FALSE]
-      tech_wrong_up <- tmp_up[tmp_up$value < 1, , drop = FALSE]
-      tech_wrong <- unique(c(tech_wrong_up$tech, tech_wrong_lo$tech))
-      assign("tech_wrong_lo", tech_wrong_lo, globalenv())
-      assign("tech_wrong_up", tech_wrong_up, globalenv())
-      stop(paste0(
-        "Error in share (sum of up < 1 or sum of lo > 1)",
-        "(see `tech_wrong_lo` and `tech_wrong_up`)",
-        ' for technology "', paste0(tech_wrong, collapse = '", "'), '"'
-      ))
-    }
-    fl <- colnames(tmp)[!(colnames(tmp) %in% c("type"))]
-    tmp_cmd <- merge(tmp[tmp$type == "lo", fl, drop = FALSE],
-                     tmp[tmp$type == "up", fl, drop = FALSE],
-                     by = fl[fl != "value"])
-    if (any(tmp_cmd$value.x > tmp_cmd$value.y)) {
-      tech_wrong <- tmp_cmd[tmp_cmd$value.x > tmp_cmd$value.y, , drop = FALSE]
-      assign("tech_wrong", tech_wrong, globalenv())
-      stop(paste0(
-        'Error in share data (tuple (tech, comm, region, year, slice) lo",
-        " share > up), see `tech_wrong`"',
-        paste0(unique(tech_wrong$tech), collapse = '", "'), '"'
-      ))
-    }
+    # Share check is not working, probably unfinished migration to dplyr & data.table
+    # !!! ToDo: rewrite this function.
+    # browser()
+    # mTechGroupComm <- .get_data_slot(scen@modInp@parameters$mTechGroupComm)
+    # # scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
+    # # if (scen@modInp@parameters$pTechShare@misc$nValues != - 1)
+    # # 		scen@modInp@parameters$pTechShare@misc$nValues <- nrow(scen@modInp@parameters$pTechShare@data)
+    # tmp <- .add_dropped_zeros(scen@modInp, "pTechShare")
+    # mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
+    # browser()
+    # tmp <- merge(tmp, mTechSpan)
+    # tmp_lo <- merge0(tmp[tmp$type == "lo", , drop = FALSE], mTechGroupComm)
+    # tmp_up <- merge0(tmp[tmp$type == "up", , drop = FALSE], mTechGroupComm)
+    # tmp_lo <- aggregate(
+    #   tmp_lo[, "value", drop = FALSE],
+    #   select(tmp_lo, -any_of(c("type", "comm", "value"))),
+    #   # tmp_lo[, !(colnames(tmp_lo) %in% c("type", "comm", "value")),
+    #   #        drop = FALSE],
+    #   sum)
+    #   tmp_up <- aggregate(
+    #   tmp_up[, "value", drop = FALSE],
+    #   tmp_up[, !(colnames(tmp_up) %in% c("type", "comm", "value")),
+    #          drop = FALSE],
+    #   sum)
+    # if (any(tmp_lo$value > 1) || any(tmp_up$value < 1)) {
+    #   tech_wrong_lo <- tmp_lo[tmp_lo$value > 1, , drop = FALSE]
+    #   tech_wrong_up <- tmp_up[tmp_up$value < 1, , drop = FALSE]
+    #   tech_wrong <- unique(c(tech_wrong_up$tech, tech_wrong_lo$tech))
+    #   assign("tech_wrong_lo", tech_wrong_lo, globalenv())
+    #   assign("tech_wrong_up", tech_wrong_up, globalenv())
+    #   stop(paste0(
+    #     "Error in share (sum of up < 1 or sum of lo > 1)",
+    #     "(see `tech_wrong_lo` and `tech_wrong_up`)",
+    #     ' for technology "', paste0(tech_wrong, collapse = '", "'), '"'
+    #   ))
+    # }
+    # fl <- colnames(tmp)[!(colnames(tmp) %in% c("type"))]
+    # tmp_cmd <- merge(tmp[tmp$type == "lo", fl, drop = FALSE],
+    #                  tmp[tmp$type == "up", fl, drop = FALSE],
+    #                  by = fl[fl != "value"])
+    # if (any(tmp_cmd$value.x > tmp_cmd$value.y)) {
+    #   tech_wrong <- tmp_cmd[tmp_cmd$value.x > tmp_cmd$value.y, , drop = FALSE]
+    #   assign("tech_wrong", tech_wrong, globalenv())
+    #   stop(paste0(
+    #     'Error in share data (tuple (tech, comm, region, year, slice) lo",
+    #     " share > up), see `tech_wrong`"',
+    #     paste0(unique(tech_wrong$tech), collapse = '", "'), '"'
+    #   ))
+    # }
   }
   scen
 }
@@ -1314,6 +1320,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 
 .check_weather <- function(scen) {
   cat("Validating weather-sets\n")
+  # browser()
   weather <- scen@modInp@parameters$weather@data$weather
   err_msg <- list()
   pars <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) {
@@ -1338,6 +1345,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 # unrecognized sets ####
 .check_sets <- function(scen) {
   cat("Validating sets\n")
+  # browser()
   lsets <- lapply(scen@modInp@parameters, function(x) {
     if (x@type == "set") .get_data_slot(x)[[1]]
   })

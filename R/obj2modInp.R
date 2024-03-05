@@ -2174,7 +2174,7 @@ setMethod(
       meqTechGrp2Grp <- NULL
     }
     if (!is.null(mTechInpGroup) || !is.null(mTechOutGroup)) {
-      browser()
+      # browser()
       mpTechShareLo <- pTechShare |>
         filter(type == "lo" & value > 0) |> 
         select(-any_of(c("value", "type")))
@@ -2260,7 +2260,7 @@ setMethod(
       meqTechSng2Sng <- NULL
     }
     if (!is.null(mpTechShareLo) && !is.null(techGroupOut)) {
-      browser()
+      # browser()
       meqTechShareOutLo <- merge0(mpTechShareLo, techGroupOut)
       obj@parameters[["meqTechShareOutLo"]] <- .dat2par(
         obj@parameters[["meqTechShareOutLo"]],

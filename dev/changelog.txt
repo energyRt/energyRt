@@ -1,7 +1,9 @@
-energyRt 0.11.24 @dev (Mar 3-4 2024)
+energyRt 0.11.24-25 @dev (Mar 3-4 2024)
 BUG FIXES:
 Added mapping in equation eqAggOutTot, required in cases when composite commodity included different availability by year or region, and caused errors in Pyomo and Julia.
 
+OTHER:
+* muted interpolation checks for shares in grouped inputs/outputs, as it stops on errors - unfinished transition to dplyr/data.table. The checks are to be rewritten with the new interpolation routine. Shares are working in UTOPIA example, but not tested in other cases.
 
 energyRt 0.11.18-23 @dev (Mar 3 2024)
 BREAKING CHANGES:

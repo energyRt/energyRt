@@ -84,6 +84,7 @@ setMethod("initialize", "modInp", function(.Object) {
   #       values of the parameter dimension (e.g. sets)
   # name - "character", name of the parameter
   # drop_duplicates <- function(x) x[!duplicated(x), , drop = FALSE]
+  # if (name == "pTechShare") browser() # DEBUG
   drop_duplicates <- function(x) filter(x, !duplicated(x))
   sets0 <- modInp@parameters[[name]]@dimSets
   sets <- NULL
@@ -131,7 +132,7 @@ setMethod("initialize", "modInp", function(.Object) {
         ), tmp)
       }
       if (i == "slice" && any(colnames(sets) == "tech")) {
-        tmp <- merge(.get_data_slot(modInp@parameters$mTechSlice), tmp)
+        tmp <- merge0(.get_data_slot(modInp@parameters$mTechSlice), tmp)
       }
       if (i == "src") {
         aa <- .get_data_slot(modInp@parameters$mTradeSrc)
@@ -175,6 +176,7 @@ setMethod("initialize", "modInp", function(.Object) {
                                use.dplyr = FALSE) {
   # Returns data.frame filled the parameter ("name") data with added, previous dropped zeros (if any)
   # rare use - currently reserved for "fix to scenario" routines (and some excessive/double-checking use)
+  # if (name == "pTechShare") browser() # DEBUG
   tmp <- .get_default_values(modInp, name, drop.unused.values)
   # tmp$value <- 0
   dtt <- .get_data_slot(modInp@parameters[[name]])

@@ -122,7 +122,7 @@ write.sc <- write_sc
 
 .write_inc_solver <- function(scen, arg, def_inc_solver, type, templ) {
   if (!is.null(scen@settings@solver$inc_solver) && !is.null(scen@settings@solver$solver)) {
-    browser()
+    # browser()
     stop("have to define only one argument from scen@settings@solver$inc_solver & scen@settings@solver$solver")
   }
   if (!is.null(scen@settings@solver$solver)) {
