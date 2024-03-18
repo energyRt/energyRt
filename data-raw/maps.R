@@ -191,7 +191,7 @@
   eqStorageStore = "Storage level",
   eqStorageAfLo = "Storage availability factor lower",
   eqStorageAfUp = "Storage availability factor upper",
-  eqStorageClean = "Storage output vs level",
+  eqStorageClear = "Storage output vs level",
   eqStorageAInp = "Storage aux-commodity input",
   eqStorageAOut = "Storage aux-commodity output",
   eqStorageInpUp = "Storage input upper constraint",
@@ -300,7 +300,7 @@
   eqStorageStore = c("stg", "comm", "region", "year", "slicep", "slice"),
   eqStorageAfLo = c("stg", "comm", "region", "year", "slice"),
   eqStorageAfUp = c("stg", "comm", "region", "year", "slice"),
-  eqStorageClean = c("stg", "comm", "region", "year", "slice"),
+  eqStorageClear = c("stg", "comm", "region", "year", "slice"),
   eqStorageAInp = c("stg", "comm", "region", "year", "slice"),
   eqStorageAOut = c("stg", "comm", "region", "year", "slice"),
   eqStorageInpUp = c("stg", "comm", "region", "year", "slice"),
@@ -449,9 +449,9 @@
   pStorageInvcost = "Storage investment costs",
   pStorageEac = "Storage equivalent annual costs",
   pStorageRetCost = "Storage early retirement costs",
-  pStorageCap2stg = "Storage capacity units to activity units conversion factor",
-  pStorageAfLo = "Storage availability factor lower bound (minimum charge level)",
-  pStorageAfUp = "Storage availability factor upper bound (maximum charge level)",
+  pStorageCap2stg = "Storage (dis)charging capacity to accumulating capacity (to be renamed to duration)",
+  pStorageAfLo = "Storage availability factor lower bound (minimum charging level)",
+  pStorageAfUp = "Storage availability factor upper bound (maximum charging level)",
   pStorageCinpUp = "Storage input upper bound",
   pStorageCinpLo = "Storage input lower bound",
   pStorageCoutUp = "Storage output upper bound",
@@ -719,7 +719,7 @@
   eqStorageStore = "meqStorageStore(stg, comm, region, year, slicep, slice)",
   eqStorageAfLo = "meqStorageAfLo(stg, comm, region, year, slice)",
   eqStorageAfUp = "meqStorageAfUp(stg, comm, region, year, slice)",
-  eqStorageClean = "mvStorageStore(stg, comm, region, year, slice)",
+  eqStorageClear = "mvStorageStore(stg, comm, region, year, slice)",
   eqStorageAInp = "mvStorageAInp(stg, comm, region, year, slice)",
   eqStorageAOut = "mvStorageAOut(stg, comm, region, year, slice)",
   eqStorageInpUp = "meqStorageInpUp(stg, comm, region, year, slice)",
@@ -1401,8 +1401,8 @@
 .equation_variable[100, ] <- c("eqStorageAfUp", "vStorageOut")
 .equation_variable[101, ] <- c("eqStorageAfUp", "vStorageStore")
 .equation_variable[102, ] <- c("eqStorageAfUp", "vStorageNewCap")
-.equation_variable[103, ] <- c("eqStorageClean", "vStorageStore")
-.equation_variable[104, ] <- c("eqStorageClean", "vStorageCap")
+.equation_variable[103, ] <- c("eqStorageClear", "vStorageStore")
+.equation_variable[104, ] <- c("eqStorageClear", "vStorageCap")
 .equation_variable[105, ] <- c("eqStorageAInp", "vStorageStore")
 .equation_variable[106, ] <- c("eqStorageAInp", "vStorageCap")
 .equation_variable[107, ] <- c("eqStorageAOut", "vStorageOut")
