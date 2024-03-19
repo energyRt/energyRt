@@ -1847,6 +1847,7 @@ pStorageCinp:
   type: bounds
   defVal:
   - 0.0
+  # - 1. # !!! ToDo: import defaults from this file - currently see .defVal
   - .inf
   interpolation:
   - back.inter.forth
@@ -1867,6 +1868,7 @@ pStorageCout:
   type: bounds
   defVal:
   - 0.0
+  # - 1. # !!! ToDo: import defaults from this file - currently see .defVal
   - .inf
   interpolation:
   - back.inter.forth

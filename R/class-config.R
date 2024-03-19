@@ -74,7 +74,11 @@ setClass("config",
   S3methods = FALSE
 )
 setMethod("initialize", "config", function(.Object, ...) {
-  if (!exists(".defVal")) load("R/sysdata.rda")
+  # browser()
+  if (!exists(".defVal") || !exists(".modInp") || !exists(".defInt")) {
+    load("R/sysdata.rda")
+  }
+  # if (!is.null()) # add import from .defInt
   .Object@defVal <- as.data.frame(energyRt:::.defVal, stringsAsFactors = FALSE)
   .Object@interpolation <- as.data.frame(energyRt:::.defInt, stringsAsFactors = FALSE)
   .Object

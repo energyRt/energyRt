@@ -537,6 +537,7 @@
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     remValueUp = NULL, remValueLo = NULL) {
+  # if (parameter == "cout") browser()
   # browser()
   has_year_col <- any(colnames(dtf) == "year")
   if (!is.null(mtp@misc$not_need_interpolate)) {

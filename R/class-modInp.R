@@ -59,6 +59,7 @@ setMethod("initialize", "modInp", function(.Object) {
         type = ob[[i]]$type
       )
     } else {
+      # if (nm == "pStorageCout") browser()
       x[[nm]] <- newParameter(
         nm,
         ob[[i]]$dimSets,

@@ -2062,13 +2062,6 @@ print("eqStorageInpUp(stg, comm, region, year, slice)...")
             pStorageCinpUpDef
         end
     ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
-        end
-    ) *
     prod(
         (
             if haskey(pStorageWeatherCinpUp, (wth1, st1))
@@ -2104,13 +2097,6 @@ print("eqStorageInpLo(stg, comm, region, year, slice)...")
             pStorageCinpLo[(st1, c, r, y, s)]
         else
             pStorageCinpLoDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -2150,13 +2136,6 @@ print("eqStorageOutUp(stg, comm, region, year, slice)...")
             pStorageCoutUpDef
         end
     ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
-        end
-    ) *
     prod(
         (
             if haskey(pStorageWeatherCoutUp, (wth1, st1))
@@ -2192,13 +2171,6 @@ print("eqStorageOutLo(stg, comm, region, year, slice)...")
             pStorageCoutLo[(st1, c, r, y, s)]
         else
             pStorageCoutLoDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(

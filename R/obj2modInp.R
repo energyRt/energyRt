@@ -640,6 +640,7 @@ setMethod(".obj2modInp", signature(
 setMethod(
   ".obj2modInp", signature(obj = "modInp", app = "storage", approxim = "list"),
   function(obj, app, approxim) {
+    # browser()
     pStorageCout <- NULL
     pStorageCinp <- NULL
     # stg <- .upper_case(app)
@@ -757,6 +758,7 @@ setMethod(
     )
     pStorageCinp <- .interp_bounds(stg@af, "cinp", obj@parameters[["pStorageCinp"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
     obj@parameters[["pStorageCinp"]] <- .dat2par(obj@parameters[["pStorageCinp"]], pStorageCinp)
+    # browser()
     pStorageCout <- .interp_bounds(stg@af, "cout", obj@parameters[["pStorageCout"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
     obj@parameters[["pStorageCout"]] <- .dat2par(obj@parameters[["pStorageCout"]], pStorageCout)
     # Aux input/output
@@ -2176,14 +2178,14 @@ setMethod(
     if (!is.null(mTechInpGroup) || !is.null(mTechOutGroup)) {
       # browser()
       mpTechShareLo <- pTechShare |>
-        filter(type == "lo" & value > 0) |> 
+        filter(type == "lo" & value > 0) |>
         select(-any_of(c("value", "type")))
       # mpTechShareUp <- pTechShare[pTechShare$type == "up" & pTechShare$value < 1,
       #                             colnames(pTechShare) != "value"]
       mpTechShareUp <- pTechShare |>
-        filter(type == "up" & value > 0) |> 
+        filter(type == "up" & value > 0) |>
         select(-any_of(c("value", "type")))
-      
+
     } else {
       mpTechShareUp <- NULL
       mpTechShareLo <- NULL
@@ -2264,7 +2266,7 @@ setMethod(
       meqTechShareOutLo <- merge0(mpTechShareLo, techGroupOut)
       obj@parameters[["meqTechShareOutLo"]] <- .dat2par(
         obj@parameters[["meqTechShareOutLo"]],
-        select(meqTechShareOutLo, 
+        select(meqTechShareOutLo,
                all_of(obj@parameters[["meqTechShareOutLo"]]@dimSets)
                )
       )
@@ -2276,7 +2278,7 @@ setMethod(
       obj@parameters[["meqTechShareOutUp"]] <- .dat2par(
         obj@parameters[["meqTechShareOutUp"]],
         select(
-          meqTechShareOutUp, 
+          meqTechShareOutUp,
           all_of(obj@parameters[["meqTechShareOutUp"]]@dimSets)
           )
         # meqTechShareOutUp[, obj@parameters[["meqTechShareOutUp"]]@dimSets]
@@ -2289,7 +2291,7 @@ setMethod(
       obj@parameters[["meqTechShareInpLo"]] <- .dat2par(
         obj@parameters[["meqTechShareInpLo"]],
         select(
-          meqTechShareInpLo, 
+          meqTechShareInpLo,
           all_of(obj@parameters[["meqTechShareInpLo"]]@dimSets)
           )
         # meqTechShareInpLo[, obj@parameters[["meqTechShareInpLo"]]@dimSets]
@@ -2303,7 +2305,7 @@ setMethod(
         obj@parameters[["meqTechShareInpUp"]],
         # meqTechShareInpUp[, obj@parameters[["meqTechShareInpUp"]]@dimSets]
         select(
-          meqTechShareInpUp, 
+          meqTechShareInpUp,
           all_of(obj@parameters[["meqTechShareInpUp"]]@dimSets)
           )
       )
