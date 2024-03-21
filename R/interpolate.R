@@ -94,7 +94,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     arg[ii] <- NULL; carg <- carg[!ii]
     scen@status$interpolated <- FALSE
   }
-  
+
   # "bricks" ############################################
   # check if there are any objects to add to a repository
   repo_objs <- newRepository("")@permit
@@ -105,7 +105,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     arg[ii] <- NULL; carg <- carg[!ii]
     scen@status$interpolated <- FALSE
   }
-  
+
   # config ############################################
   ii <- carg %in% "config"
   if (any(ii)) {
@@ -122,7 +122,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     arg[ii] <- NULL; carg <- carg[!ii]
     scen@status$interpolated <- FALSE
   }
-  
+
   # settings ############################################
   ii <- carg %in% "settings"
   if (any(ii)) {
@@ -134,7 +134,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     arg[ii] <- NULL; carg <- carg[!ii]
     scen@status$interpolated <- FALSE
   }
-  
+
   # calendar ############################################
   ii <- carg %in% "calendar"
   if (any(ii)) {
@@ -149,7 +149,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     arg[ii] <- NULL; carg <- carg[!ii]
     scen@status$interpolated <- FALSE
   }
-  
+
   # horizon ############################################
   ii <- carg %in% "horizon"
   if (any(ii)) {
@@ -163,7 +163,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     arg[ii] <- NULL; carg <- carg[!ii]
     scen@status$interpolated <- FALSE
   }
-  
+
   # SETTINGS slots ############################################
   # check if `...` has data for `settings` or `horizon` parameters
   # ToDo: rewrite with 'add' once implemented for settings/horizon
@@ -248,7 +248,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     )
     scen@status$interpolated <- FALSE
   }
-  
+
   # INTERPOLATE ############################################
   # Check if the interpolation is needed
   if (scen@status$interpolated) {
@@ -256,7 +256,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
             "to re-interpolate the scenario.")
     return(invisible(scen))
   }
-  
+
   # tictoc::toc()
   # other interpolation parameters
   if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
@@ -1572,7 +1572,7 @@ interpolate_slot <- function(
     }
   }
   # if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
-    # 
+    #
     # mutate(
     #   {{val}} := zoo::na.approx(.data[[val]], x = year)
     # ) %>%

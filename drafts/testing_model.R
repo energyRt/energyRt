@@ -1,5 +1,6 @@
 library(tidyverse)
 library(data.table)
+library(energyRt)
 # one input, one output, efficiency = 1
 INP <- newCommodity("INP", desc = "input")
 OUT <- newCommodity("OUT", desc = "output")
@@ -44,7 +45,7 @@ getHorizon(m)
 
 show_progress_bar(T)
 scen <- solve_model(
-  m, 
+  m,
   solver = solver_options$gams_gdx_cplex,
   horizon = newHorizon(2010:2025, intervals = rep(1, 2))
   # tmp.dir = "tmp/mod_one_ret1"
@@ -148,4 +149,4 @@ scen_ret3 <- solve(m, solver = solver_options$julia_highs,
 
 a <- solve(m, solver = solver_options$pyomo_glpk)
 a
-a <- solve(m, solver = solver_options$glpk)                   
+a <- solve(m, solver = solver_options$glpk)

@@ -8,6 +8,7 @@
 
 library(testthat)
 library(energyRt)
+try(source("~/.energyRt/settings.R"))
 
 tst <- devtools::test()
 # tst |> class()

@@ -150,20 +150,26 @@ fmTechOutCommReg <- function(m, regions = NULL) {
 
   acomm_par <- names(m[[ii]][[1]]@aeff)
   param_out <- acomm_par[grepl("out$", acomm_par)]
+  # !!! temporary adding inp to avoid dropping of not-supplied commodities
+  # from balance equation
+  # param_out <- acomm_par[grepl("(out|inp)$", acomm_par)]
 
   a <- lapply(m[[ii]], function(ob) {
+    # browser()
     if (length(ob@region) > 0) {
       regs <- unique(ob@region)
     } else {
       regs <- c(NA)
     }
-
-    if (nrow(ob@aeff) > 0) {
-      acomm_out <- sapply(select(ob@aeff, any_of(param_out)), function(x) {
+    ob_aeff <- select(ob@aeff, any_of(param_out)) |>
+      # filter(!dplyr::if_all(everything(), is.na))
+      unique()
+    if (nrow(ob@aeff) > 0 & any(!is.na(ob_aeff))) {
+      acomm_not_na <- lapply(ob_aeff, function(x) {
         !is.na(x)
-      })
-      ii <- apply(acomm_out, 1, any)
-      acomm_out <- ob@aeff$acomm[ii] %>% unique()
+      }) |> as.data.frame()
+      jj <- apply(acomm_not_na, 1, any)
+      acomm_out <- ob@aeff$acomm[jj] |> unique()
     } else {
       acomm_out <- NULL
     }

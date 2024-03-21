@@ -351,7 +351,9 @@ get_gdxlib_path <- function() {
     if (is.null(fpath)) {
       scen@settings@solver$cmdline <- "gams energyRt.gms"
     } else {
-      scen@settings@solver$cmdline <- file.path(fpath, "gams energyRt.gms")
+      scen@settings@solver$cmdline <-
+        file.path(fpath, "gams energyRt.gms") |>
+        str_replace_all("//", "/")
     }
   }
   scen@settings@solver$code <- c(

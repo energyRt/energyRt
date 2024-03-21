@@ -962,8 +962,8 @@ model.eqStorageAfUp = Constraint(
         if (wth1, st1) in model.mStorageWeatherAfUp
     ),
 )
-# eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
-model.eqStorageClean = Constraint(
+# eqStorageClear(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
+model.eqStorageClear = Constraint(
     model.mvStorageStore,
     rule=lambda model, st1, c, r, y, s: (model.vStorageOut[st1, c, r, y, s])
     / (model.pStorageOutEff[st1, c, r, y, s])
@@ -973,10 +973,8 @@ model.eqStorageClean = Constraint(
 model.eqStorageInpUp = Constraint(
     model.meqStorageInpUp,
     rule=lambda model, st1, c, r, y, s: model.vStorageInp[st1, c, r, y, s]
-    <= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    <= model.vStorageCap[st1, r, y]
     * model.pStorageCinpUp[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCinpUp[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather
@@ -987,10 +985,8 @@ model.eqStorageInpUp = Constraint(
 model.eqStorageInpLo = Constraint(
     model.meqStorageInpLo,
     rule=lambda model, st1, c, r, y, s: model.vStorageInp[st1, c, r, y, s]
-    >= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    >= model.vStorageCap[st1, r, y]
     * model.pStorageCinpLo[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCinpLo[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather
@@ -1001,10 +997,8 @@ model.eqStorageInpLo = Constraint(
 model.eqStorageOutUp = Constraint(
     model.meqStorageOutUp,
     rule=lambda model, st1, c, r, y, s: model.vStorageOut[st1, c, r, y, s]
-    <= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    <= model.vStorageCap[st1, r, y]
     * model.pStorageCoutUp[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCoutUp[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather
@@ -1015,10 +1009,8 @@ model.eqStorageOutUp = Constraint(
 model.eqStorageOutLo = Constraint(
     model.meqStorageOutLo,
     rule=lambda model, st1, c, r, y, s: model.vStorageOut[st1, c, r, y, s]
-    >= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    >= model.vStorageCap[st1, r, y]
     * model.pStorageCoutLo[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCoutLo[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather

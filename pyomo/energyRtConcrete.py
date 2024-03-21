@@ -1512,11 +1512,11 @@ if verbose:
         " s)",
         sep="",
     )
-# eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
+# eqStorageClear(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
 if verbose:
-    print("eqStorageClean ", end="")
+    print("eqStorageClear ", end="")
 sys.stdout.flush()
-model.eqStorageClean = Constraint(
+model.eqStorageClear = Constraint(
     mvStorageStore,
     rule=lambda model, st1, c, r, y, s: (model.vStorageOut[st1, c, r, y, s])
     / (pStorageOutEff.get((st1, c, r, y, s)))
@@ -1537,10 +1537,8 @@ sys.stdout.flush()
 model.eqStorageInpUp = Constraint(
     meqStorageInpUp,
     rule=lambda model, st1, c, r, y, s: model.vStorageInp[st1, c, r, y, s]
-    <= pStorageCap2stg.get((st1))
-    * model.vStorageCap[st1, r, y]
+    <= model.vStorageCap[st1, r, y]
     * pStorageCinpUp.get((st1, c, r, y, s))
-    * pSliceShare.get((s))
     * prod(
         pStorageWeatherCinpUp.get((wth1, st1)) * pWeather.get((wth1, r, y, s))
         for wth1 in weather
@@ -1562,10 +1560,8 @@ sys.stdout.flush()
 model.eqStorageInpLo = Constraint(
     meqStorageInpLo,
     rule=lambda model, st1, c, r, y, s: model.vStorageInp[st1, c, r, y, s]
-    >= pStorageCap2stg.get((st1))
-    * model.vStorageCap[st1, r, y]
+    >= model.vStorageCap[st1, r, y]
     * pStorageCinpLo.get((st1, c, r, y, s))
-    * pSliceShare.get((s))
     * prod(
         pStorageWeatherCinpLo.get((wth1, st1)) * pWeather.get((wth1, r, y, s))
         for wth1 in weather
@@ -1587,10 +1583,8 @@ sys.stdout.flush()
 model.eqStorageOutUp = Constraint(
     meqStorageOutUp,
     rule=lambda model, st1, c, r, y, s: model.vStorageOut[st1, c, r, y, s]
-    <= pStorageCap2stg.get((st1))
-    * model.vStorageCap[st1, r, y]
+    <= model.vStorageCap[st1, r, y]
     * pStorageCoutUp.get((st1, c, r, y, s))
-    * pSliceShare.get((s))
     * prod(
         pStorageWeatherCoutUp.get((wth1, st1)) * pWeather.get((wth1, r, y, s))
         for wth1 in weather
@@ -1612,10 +1606,8 @@ sys.stdout.flush()
 model.eqStorageOutLo = Constraint(
     meqStorageOutLo,
     rule=lambda model, st1, c, r, y, s: model.vStorageOut[st1, c, r, y, s]
-    >= pStorageCap2stg.get((st1))
-    * model.vStorageCap[st1, r, y]
+    >= model.vStorageCap[st1, r, y]
     * pStorageCoutLo.get((st1, c, r, y, s))
-    * pSliceShare.get((s))
     * prod(
         pStorageWeatherCoutLo.get((wth1, st1)) * pWeather.get((wth1, r, y, s))
         for wth1 in weather

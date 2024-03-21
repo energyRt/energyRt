@@ -217,9 +217,11 @@ pStorageFixom(stg, region, year)                    Storage fixed O&M costs
 pStorageInvcost(stg, region, year)                  Storage investment costs
 pStorageEac(stg, region, year)                      Storage equivalent annual costs
 pStorageRetCost(stg, region, year)                  Storage early retirement costs
-pStorageCap2stg(stg)                                Storage capacity units to activity units conversion factor
-pStorageAfLo(stg, region, year, slice)              Storage availability factor lower bound (minimum charge level)
-pStorageAfUp(stg, region, year, slice)              Storage availability factor upper bound (maximum charge level)
+pStorageCap2stg(stg)                                Storage (dis)charging capacity to accumulating capacity (to be renamed to duration)
+pStorageAfLo(stg, region, year, slice)              Storage availability factor lower bound (minimum charging level)
+pStorageAfUp(stg, region, year, slice)              Storage availability factor upper bound (maximum charging level)
+*pStorageAfsLo(tech, region, year, slice)           add parameter and eq?
+*pStorageAfsUp(tech, region, year, slice)           add parameter and eq?
 pStorageCinpUp(stg, comm, region, year, slice)      Storage input upper bound
 pStorageCinpLo(stg, comm, region, year, slice)      Storage input lower bound
 pStorageCoutUp(stg, comm, region, year, slice)      Storage output upper bound
@@ -273,7 +275,7 @@ pTradeVarom(trade, region, region, year, slice)      Variable O&M costs
 pTradeCap2Act(trade)                                 Capacity to activity factor
 ;
 
-* Weather map
+* Weather mapping
 sets
 mWeatherSlice(weather, slice)
 mWeatherRegion(weather, region)
@@ -1249,12 +1251,14 @@ eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
 *** Input & Output
 ********************************************************************************
 Equations
+*eqStorageStore - rename to eqStorageLevel
 eqStorageStore(stg, comm, region, year, slicep, slice)  Storage level
 *eqStorageStorePS(stg, comm, region, year, slice)  Storage level of parent-slice storage cycle
 *eqStorageStoreFY(stg, comm, region, year, slice)  Storage level of full-year storage cycle
 eqStorageAfLo(stg, comm, region, year, slice)   Storage availability factor lower
 eqStorageAfUp(stg, comm, region, year, slice)   Storage availability factor upper
-eqStorageClean(stg, comm, region, year, slice)  Storage output vs level
+*eqStorageClean(stg, comm, region, year, slice)  Storage output vs level
+eqStorageClear(stg, comm, region, year, slice)  Storage output vs level
 eqStorageAInp(stg, comm, region, year, slice)   Storage aux-commodity input
 eqStorageAOut(stg, comm, region, year, slice)   Storage aux-commodity output
 eqStorageInpUp(stg, comm, region, year, slice)  Storage input upper constraint
@@ -1333,7 +1337,8 @@ eqStorageAfLo(stg, comm, region, year, slice)$meqStorageAfLo(stg, comm, region, 
     pStorageAfLo(stg, region, year, slice) *
       pStorageCap2stg(stg) * vStorageCap(stg, region, year)
       * prod(weather$mStorageWeatherAfLo(weather, stg),
-             pStorageWeatherAfLo(weather, stg) * pWeather(weather, region, year, slice));
+             pStorageWeatherAfLo(weather, stg)
+             * pWeather(weather, region, year, slice));
 
 eqStorageAfUp(stg, comm, region, year, slice)$meqStorageAfUp(stg, comm, region, year, slice)..
     vStorageStore(stg, comm, region, year, slice)
@@ -1341,39 +1346,52 @@ eqStorageAfUp(stg, comm, region, year, slice)$meqStorageAfUp(stg, comm, region, 
     pStorageAfUp(stg, region, year, slice) *
       pStorageCap2stg(stg) * vStorageCap(stg, region, year)
       * prod(weather$mStorageWeatherAfUp(weather, stg),
-        pStorageWeatherAfUp(weather, stg) * pWeather(weather, region, year, slice));
+             pStorageWeatherAfUp(weather, stg)
+             * pWeather(weather, region, year, slice));
 
-eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)..
-  vStorageOut(stg, comm, region, year, slice)  / pStorageOutEff(stg, comm, region, year, slice) =l=
-                 vStorageStore(stg, comm, region, year, slice);
+eqStorageClear(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)..
+  vStorageOut(stg, comm, region, year, slice) / pStorageOutEff(stg, comm, region, year, slice)
+*   * pStorageCap2stg(stg)
+   =l=
+   vStorageStore(stg, comm, region, year, slice);
 
 * Input constraints
 eqStorageInpUp(stg, comm, region, year, slice)$meqStorageInpUp(stg, comm, region, year, slice)..
   vStorageInp(stg, comm, region, year, slice) =l=
-    pStorageCap2stg(stg) * vStorageCap(stg, region, year) *
-         pStorageCinpUp(stg, comm, region, year, slice) * pSliceShare(slice) *
-         prod(weather$mStorageWeatherCinpUp(weather, stg),
-            pStorageWeatherCinpUp(weather, stg) * pWeather(weather, region, year, slice));
+*    pStorageCap2stg(stg) *
+    vStorageCap(stg, region, year) * pStorageCinpUp(stg, comm, region, year, slice)
+*         * pSliceShare(slice) *
+    * prod(weather$mStorageWeatherCinpUp(weather, stg),
+           pStorageWeatherCinpUp(weather, stg)
+           * pWeather(weather, region, year, slice));
 
 eqStorageInpLo(stg, comm, region, year, slice)$meqStorageInpLo(stg, comm, region, year, slice)..
   vStorageInp(stg, comm, region, year, slice) =g=
-    pStorageCap2stg(stg) * vStorageCap(stg, region, year) * pStorageCinpLo(stg, comm, region, year, slice) *
-    pSliceShare(slice) * prod(weather$mStorageWeatherCinpLo(weather, stg),
-       pStorageWeatherCinpLo(weather, stg) * pWeather(weather, region, year, slice));
+*    pStorageCap2stg(stg) *
+    vStorageCap(stg, region, year) * pStorageCinpLo(stg, comm, region, year, slice)
+*    * pSliceShare(slice)
+    * prod(weather$mStorageWeatherCinpLo(weather, stg),
+           pStorageWeatherCinpLo(weather, stg)
+           * pWeather(weather, region, year, slice));
 
 * Output constraints
 eqStorageOutUp(stg, comm, region, year, slice)$meqStorageOutUp(stg, comm, region, year, slice)..
   vStorageOut(stg, comm, region, year, slice) =l=
-    pStorageCap2stg(stg) * vStorageCap(stg, region, year) * pStorageCoutUp(stg, comm, region, year, slice) *
-    pSliceShare(slice)  * prod(weather$mStorageWeatherCoutUp(weather, stg),
-       pStorageWeatherCoutUp(weather, stg) * pWeather(weather, region, year, slice));
+*    pStorageCap2stg(stg) *
+    vStorageCap(stg, region, year) * pStorageCoutUp(stg, comm, region, year, slice)
+*    * pSliceShare(slice)
+    * prod(weather$mStorageWeatherCoutUp(weather, stg),
+           pStorageWeatherCoutUp(weather, stg)
+           * pWeather(weather, region, year, slice));
 
 eqStorageOutLo(stg, comm, region, year, slice)$meqStorageOutLo(stg, comm, region, year, slice)..
   vStorageOut(stg, comm, region, year, slice)  =g=
-    pStorageCap2stg(stg) * vStorageCap(stg, region, year) * pStorageCoutLo(stg, comm, region, year, slice) *
-    pSliceShare(slice) * prod(weather$mStorageWeatherCoutLo(weather, stg),
-       pStorageWeatherCoutLo(weather, stg) * pWeather(weather, region, year, slice));
-
+*    pStorageCap2stg(stg) *
+    vStorageCap(stg, region, year) * pStorageCoutLo(stg, comm, region, year, slice)
+*    * pSliceShare(slice)
+    * prod(weather$mStorageWeatherCoutLo(weather, stg),
+           pStorageWeatherCoutLo(weather, stg)
+           * pWeather(weather, region, year, slice));
 
 ********************************************************************************
 *** Capacity and costs for storage

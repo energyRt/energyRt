@@ -2029,8 +2029,8 @@ print(
     "
 ",
 )
-# eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
-print("eqStorageClean(stg, comm, region, year, slice)...")
+# eqStorageClear(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
+print("eqStorageClear(stg, comm, region, year, slice)...")
 @constraint(
     model,
     [(st1, c, r, y, s) in mvStorageStore],
@@ -2054,26 +2054,12 @@ print("eqStorageInpUp(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageInpUp],
     vStorageInp[(st1, c, r, y, s)] <=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCinpUp, (st1, c, r, y, s))
             pStorageCinpUp[(st1, c, r, y, s)]
         else
             pStorageCinpUpDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -2105,26 +2091,12 @@ print("eqStorageInpLo(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageInpLo],
     vStorageInp[(st1, c, r, y, s)] >=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCinpLo, (st1, c, r, y, s))
             pStorageCinpLo[(st1, c, r, y, s)]
         else
             pStorageCinpLoDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -2156,26 +2128,12 @@ print("eqStorageOutUp(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageOutUp],
     vStorageOut[(st1, c, r, y, s)] <=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCoutUp, (st1, c, r, y, s))
             pStorageCoutUp[(st1, c, r, y, s)]
         else
             pStorageCoutUpDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -2207,26 +2165,12 @@ print("eqStorageOutLo(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageOutLo],
     vStorageOut[(st1, c, r, y, s)] >=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCoutLo, (st1, c, r, y, s))
             pStorageCoutLo[(st1, c, r, y, s)]
         else
             pStorageCoutLoDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(

@@ -8,7 +8,7 @@
 #' @examples
 set_julia_path <- function(path = NULL) {
   # browser()
-  if (!is.null(path) & path != "") {
+  if (!is.null(path) && path != "") {
     if (!file.exists(path)) {
       stop(paste0('The path "', path, '" does not exist.'))
     }

@@ -2,7 +2,9 @@
 # Config/testthat/parallel: true
 # usethis::edit_r_environ()
 # TESTTHAT_CPUS=4
+# file.edit("~/.energyRt/settings.R")
 source("~/.energyRt/settings.R")
+get_python_path()
 
 h10 <- make_timetable(
   struct = list(
@@ -72,6 +74,24 @@ test_that("ONE_glpk", {
   vObj <- getData(scen, "vObjective", merge = TRUE)$value
   expect_equal(vObjective, vObj)
 })
+
+# test_that("ONE_pyomo_highs", {
+# not working (Windows)
+#   invisible({
+#     # scen <- solve(mod_unit, solver = solver_options$pyomo_cbc)
+#     scen_ph <- interpolate(mod_unit)
+#     pyomo_highs <- solver_options$pyomo_cbc
+#     pyomo_highs$solver <- "highspy" # not working
+#     # pyomo_highs$name <- "pyomo_highspy" # not working
+#     scen_ph <- write_sc(scen_ph, solver = pyomo_highs)
+#     scen_ph@misc$tmp.dir
+#     solve_scenario(scen_ph, force = F, wait = F, read = T)
+#     scen_ph_i <- read(scen_ph)
+#   })
+#   # scen <- solve(mod_unit, solver = solver_options$pyomo_glpk)
+#   vObj <- getData(scen, "vObjective", merge = TRUE)$value
+#   expect_equal(vObjective, vObj)
+# })
 
 test_that("ONE_pyomo_cbc", {
   invisible({
