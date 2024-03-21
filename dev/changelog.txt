@@ -1,3 +1,10 @@
+energyRt 0.11.27-28 @multi-hour-storage (Mar 2024)
+BREAKING CHANGES:
+* changed storage equations to simplify modeling and for more intuitive way of multi-hour storage modeling (thanks to @TarunSha & team). The change affects only multi-hour storage, whith @cap2stg != 1 (it is equal to 1 by default). The capacity of storage process is now defined in the capacity of 'discharge' (or generation), affects, invcost, fixom, and activity parameters & variables (for non-one-hour-storage cases).
+
+BUG FIXES:
+* Interpolation of aggregating commodity corrected to avoid error messages in some cases.
+
 energyRt 0.11.24-25 @dev (Mar 3-4 2024)
 BUG FIXES:
 Added mapping in equation eqAggOutTot, required in cases when composite commodity included different availability by year or region, and caused errors in Pyomo and Julia.

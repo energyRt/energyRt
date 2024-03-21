@@ -1193,27 +1193,28 @@ write.sc <- write_sc
   )
   mvInpTot <- mvInpTot[!duplicated(mvInpTot), ]
   mvInpTot <- merge0(mvInpTot, mCommSlice) %>% unique()
-  if (T) { # check
-    # mvInpTot <-
-    dim_mvInpTot <- mvInpTot %>%
-      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-      unique() %>% dim()
-    if (!all(dim_mvInpTot == dim(mvInpTot))) {
-     if (F) browser() # Debug
-      x <- merge0(dregionyear, mCommSlice) %>%
-        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-        unique()
-      suppressMessages({
-        y <- anti_join(x, mvBalance)
-      })
-      yc <- y$comm %>% unique()
-      warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
-      rm(x, y, yc)
-    }
-  }
+  # if (T) { # check
+  #   # mvInpTot <-
+  #   dim_mvInpTot <- mvInpTot %>%
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #     unique() %>% dim()
+  #   if (!all(dim_mvInpTot == dim(mvInpTot))) {
+  #    if (F) browser() # Debug
+  #     x <- merge0(dregionyear, mCommSlice) %>%
+  #       inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #       unique()
+  #     browser()
+  #     suppressMessages({
+  #       y <- anti_join(x, mvBalance)
+  #     })
+  #     yc <- y$comm %>% unique()
+  #     warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
+  #     rm(x, y, yc)
+  #   }
+  # }
   prec@parameters[["mvInpTot"]] <-
     .dat2par(prec@parameters[["mvInpTot"]], mvInpTot)
-  rm(mvInpTot)
+  # rm(mvInpTot)
 
   # mvOutTot ####
   .interpolation_message("mvOutTot", rest, interpolation_count,
@@ -1270,6 +1271,29 @@ write.sc <- write_sc
   #   .dat2par(prec@parameters[["mvInpTot"]], mvBalance)
   # prec@parameters[["mvOutTot"]] <-
   #   .dat2par(prec@parameters[["mvOutTot"]], mvBalance)
+
+  if (T) { # check
+    # mvInpTot <-
+    dim_mvInpTot <- mvInpTot %>%
+      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+      unique() %>% dim()
+    if (!all(dim_mvInpTot == dim(mvInpTot))) {
+      if (F) browser() # Debug
+      x <- merge0(dregionyear, mCommSlice) %>%
+        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+        unique()
+      suppressMessages({
+        y <- anti_join(x, mvBalance)
+      })
+      yc <- y$comm %>% unique()
+      # !!! ToDo: add checks for agg-commodities
+      if (length(yc) > 0) {
+        warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
+      }
+      rm(x, y, yc)
+    }
+    rm(mvInpTot)
+  }
 
   .interpolation_message("meqBalLo", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
