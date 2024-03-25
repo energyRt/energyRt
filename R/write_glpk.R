@@ -12,7 +12,8 @@
 #' set_glpk_path("C:/Program Files/glpk/bin") # Windows
 #' get_glpk_path()
 set_glpk_path <- function(path = NULL) {
-  if (!is.null(path) & path != "") {
+  # browser()
+  if (!is.null(path) && path != "") {
     if (!dir.exists(path)) {
       stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
     }

@@ -14,10 +14,10 @@
 #'
 set_gams_path <- function(path = NULL) {
   # browser()
-  if (!is.null(path) & path != "") {
-    # if (!file.exists(path)) {
-    #   stop(paste0('The path "', path, '" does not exist.'))
-    # }
+  if (!is.null(path) && path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
     if (!grepl("\\/$", path)) {
       path <- paste0(path, "/")
     }
@@ -45,6 +45,14 @@ get_gams_path <- function() {
 #' @examples
 #' # set_gdxlib("C:/GAMS/35")
 set_gdxlib_path <- function(path = NULL) {
+  if (!is.null(path) && path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
   options(gdxlib_path = path, env = "energyRt")
 }
 
