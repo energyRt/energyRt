@@ -141,7 +141,7 @@ gams_gdx_cplex_barrier$inc3 <- {"
 *option InteractiveSolver = 1;
 option iterlim = 1e9;
 option reslim = 1e7;
-option threads = 12;
+option threads = 0;
 *option LP = CPLEX;
 energyRt.OptFile = 1;
 *option savepoint = 1;
@@ -209,7 +209,7 @@ option solvelink = 0;
 *option InteractiveSolver = 1;
 option iterlim = 1e9;
 option reslim = 1e7;
-*option threads = 12;
+*option threads = 0;
 *option solvelink = 5;
 *option LP = CPLEX;
 energyRt.OptFile = 1;

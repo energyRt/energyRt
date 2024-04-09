@@ -307,7 +307,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
             dat <- get_lazy_data(scen[[s]]@modInp@parameters[[pv]],
                                  slot = "data")
             if (!is.null(dat)) {
-              dat <- dat |> collect()
+              dat <- collect(dat)
             }
             # temporary. ToDo: rewrite filter-algo for lazy-data
             # if (!is.null(scen[[sc]]@modInp@parameters[[pv]])) {
@@ -319,9 +319,13 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
             # }
           } else {
             # dat <- scen[[sc]]@modOut@variables[[pv]]
+            # browser()
             dat <- get_lazy_data(scen[[s]]@modOut, slot = "variables",
-                                 element = pv) |>
-              collect() # temporary. ToDo: rewrite filter-algo for lazy-data
+                                 element = pv)
+            if (!is.null(dat)) {
+              # temporary. ToDo: rewrite filter-algo for lazy-data
+              dat <- collect(dat)
+            }
           }
           dim1 <- dim(dat)[1]
           if (is.null(dim1)) dim1 <- 0
@@ -351,21 +355,23 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
               if (verbose) cat("   ", pv, " has no data.\n")
             }
           }
-          if (anyDuplicatedSets(dat)) dat <- rename_duplicated_sets(dat)
-          dkk <- dat |> collect() |> filter(kk)
-          if (!is.null(dkk) && nrow(dkk) > 0) {
-            nkk <- sum(kk)
-            dat <- dplyr::bind_cols(
-              data.frame(
-                scenario = rep(sc, nkk),
-                name = rep(pv, nkk)
+          if (!is.null(dat)) {
+            if (anyDuplicatedSets(dat)) dat <- rename_duplicated_sets(dat)
+            dkk <- dat |> collect() |> filter(kk)
+            if (!is.null(dkk) && nrow(dkk) > 0) {
+              nkk <- sum(kk)
+              dat <- dplyr::bind_cols(
+                data.frame(
+                  scenario = rep(sc, nkk),
+                  name = rep(pv, nkk)
                 ),
-              dkk)
-            le <- length(ll) + 1
-            nm_ll <- names(ll)
-            if (scenNameInList) nm_le <- paste(sc, pv, sep = ".") else nm_le <- pv
-            ll[[le]] <- dat
-            names(ll) <- c(nm_ll, nm_le)
+                dkk)
+              le <- length(ll) + 1
+              nm_ll <- names(ll)
+              if (scenNameInList) nm_le <- paste(sc, pv, sep = ".") else nm_le <- pv
+              ll[[le]] <- dat
+              names(ll) <- c(nm_ll, nm_le)
+            }
           }
         }
       }

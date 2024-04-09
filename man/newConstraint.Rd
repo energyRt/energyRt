@@ -10,7 +10,7 @@ newConstraint(
   eq = "==",
   rhs = data.frame(),
   for.each = NULL,
-  defVal = as.numeric(NA),
+  defVal = NULL,
   interpolation = "inter",
   replace_zerros = 1e-20,
   arg = NULL

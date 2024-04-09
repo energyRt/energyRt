@@ -1,3 +1,15 @@
+energyRt 0.11.30 @dev (Apr 2024)
+# FIXES & IMPROVEMENTS:
+* Added path-check & normalization in few cases (thanks to @AboodaA for pointing out)
+* Added a check for NULL befre collate (in getData)
+
+# FEATURES
+* added 'drop_na_colls' (dplyr-alike) function for further use
+
+energyRt 0.11.29 @multi-hour-storage (Mar 2024)
+BUG FIXES:
+* set_*_dir() fixed to accept NULL input
+
 energyRt 0.11.27-28 @multi-hour-storage (Mar 2024)
 BREAKING CHANGES:
 * changed storage equations to simplify modeling and for more intuitive way of multi-hour storage modeling (thanks to @TarunSha & team). The change affects only multi-hour storage, whith @cap2stg != 1 (it is equal to 1 by default). The capacity of storage process is now defined in the capacity of 'discharge' (or generation), affects, invcost, fixom, and activity parameters & variables (for non-one-hour-storage cases).

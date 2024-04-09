@@ -525,7 +525,8 @@ get_lazy_data <- function(obj, slot = NULL, element = NULL,
   if (!is.null(slot) && !.hasSlot(obj, slot)) {
     return(NULL)
   }
-  path <- paste(c(path, slot, element), collapse = "/") |> normalizePath()
+  path <- paste(c(path, slot, element), collapse = "/")
+  if (file.exists(path) || dir.exists(path)) path <- normalizePath(path)
   qu <- try(en_open_dataset(path), silent = T)
   if (inherits(qu, "try-error")) {
     return(NULL)

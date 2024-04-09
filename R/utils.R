@@ -367,3 +367,21 @@ get_scenarios_path <- function() {
 
 # merge_paths <- function(path1, path2)
 
+#' Drop columns in a data.frame with only NA values
+#'
+#' @description
+#' A wrapper with `dplyr` functions to drop columns with no information (all `NA` values)
+#'
+#' @param x data.frame
+#' @param unique logical, if TRUE (default), `unique()` function will be applied to the result.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+drop_na_cols <- function(x, unique = TRUE) {
+  x <- select(x, where(~ !all(is.na(.))))
+  if (unique) x <- unique(x)
+  x
+}
+

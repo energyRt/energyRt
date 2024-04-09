@@ -1,6 +1,7 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-"energyRt version: 0.11.28-dev (2024-03-21)\n",
+glue::glue('energyRt version: {packageVersion("energyRt")} ({packageDate("energyRt")})'),
+"\n",
 "======================== WARNING ==========================\n",
 "The package is currently in preparation for its first release
 and publication on CRAN. The names, behavior, and meaning of
@@ -12,8 +13,8 @@ Thanks for testing and your patience.
 Please report bugs, issues or suggest improvements here:
 https://github.com/energyRt/energyRt/issues\n",
 "-----------------------------------------------------------\n",
-"  Change log: \n",
-"  https://github.com/energyRt/energyRt/blob/dev/dev/changelog.txt\n",
+"Change log: \n",
+"https://github.com/energyRt/energyRt/blob/dev/dev/changelog.txt\n",
 "==========================================================="
   )
 
