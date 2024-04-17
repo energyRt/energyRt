@@ -125,6 +125,13 @@ register <- function(
 }
 
 #' @export
+registry.exists <- function(name, env = ".GlobalEnv") {
+  exists(name, envir = get(env))
+}
+#' @export
+registry_exists <- registry.exists
+
+#' @export
 getScenario <- function(name, registry = get_registry(), ...) {
   registry[[name]]
 }
@@ -139,7 +146,6 @@ get_entry_object <- function(name, registry = get_registry(), ...) {
   re <- registry$get_entry(name, ...)
   get(re$name, envir = re$env)[[name]]
 }
-
 
 if (F) {
   ls(pattern = "scen_")

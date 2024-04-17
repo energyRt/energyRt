@@ -94,7 +94,8 @@ newScenario <- function(
       if (replace) {
         registry$delete_entry(name, ...)
       } else {
-        cat("Scenario ", name, " already exists in the registry.\n")
+        cat("Scenario ", name, 
+            " already exists in the registry.\n")
         return(invisible(FALSE))
       }
     }

@@ -104,18 +104,22 @@ options::define_option(
   option_name = "scenarios_path"
 )
 
+#' @export
 get_scenarios_path <- function() {
   options::opt("scenarios_path")
 }
 
+#' @export
 isVerbose <- function(level = 1) {
   options::opt("verbose", env = "energyRt") >= level
 }
 
+#' @export
 set_option <- function(name, value) {
   options::set_opt(name, value, env = "energyRt")
 }
 
+#' @export
 get_option <- function(name) {
   options::get_opt(name, env = "energyRt")
 }
@@ -132,6 +136,7 @@ options::define_option(
   # envvar_name = "DEFAULT_REGISTRY"
 )
 
+#' @export
 set_default_registry <- function(
     obj_name = "registry",
     env_name = ".scen"
@@ -147,14 +152,27 @@ set_registry <- set_default_registry
 #   set_default_registry(obj_name, registry)
 # }
 
-get_default_registry <- function() {
+#' @export
+which_registry <- function() {
   options::opt("default_registry")
 }
-which_registry <- get_default_registry
+# which_registry <- get_default_registry
 
+
+#' Returns the current registry object.
+#'
+#' @return
+#' @export
 get_registry <- function() {
   r <- which_registry()
-  get(r$name, envir = get(r$env))
+  if (exists(r$name, envir = get(r$env))) {
+    rg <- get(r$name, envir = get(r$env))
+  } else {
+    rg <- newRegistry(name = r$name, registry_env = r$env)
+    # return(NULL)
+  }
+  rg
+  # get(r$name, envir = get(r$env))
 }
 
 # save global settings
