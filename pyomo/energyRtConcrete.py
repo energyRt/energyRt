@@ -39,7 +39,9 @@ con = sqlite3.connect("input/data.db")
 
 
 def read_set(name):
-    tbl = pd.read_sql_query("SELECT * from " + name, con)
+   # tbl = pd.read_sql_query("SELECT * from " + name, con)
+    query = f'SELECT * FROM "{name}"'
+    tbl = pd.read_sql_query(query, con)    
     if tbl.shape[1] > 1:
         return tbl.to_records(index=False).tolist()
     else:
@@ -47,7 +49,9 @@ def read_set(name):
 
 
 def read_dict(name):
-    tbl = pd.read_sql_query("SELECT * from " + name, con)
+    # tbl = pd.read_sql_query("SELECT * from " + name, con)
+    query = f'SELECT * FROM "{name}"'
+    tbl = pd.read_sql_query(query, con)    
     if tbl.shape[1] > 2:
         idx = pd.MultiIndex.from_frame(tbl.drop(columns="value"))
     else:

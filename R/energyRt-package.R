@@ -2,7 +2,6 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @importFrom data.table :=
 #' @importFrom data.table .BY
 #' @importFrom data.table .EACHI
 #' @importFrom data.table .GRP
@@ -10,6 +9,7 @@
 #' @importFrom data.table .N
 #' @importFrom data.table .NGRP
 #' @importFrom data.table .SD
+#' @importFrom data.table :=
 #' @importFrom data.table as.data.table
 #' @importFrom data.table data.table
 #' @importFrom data.table hour
@@ -42,6 +42,7 @@
 #' @importFrom dplyr right_join
 #' @importFrom dplyr select
 #' @importFrom dplyr slice_head
+#' @importFrom dplyr summarise
 #' @importFrom dplyr summarize
 #' @importFrom dplyr ungroup
 #' @importFrom generics interpolate
