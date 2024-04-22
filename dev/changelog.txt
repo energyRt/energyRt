@@ -1,5 +1,10 @@
 energyRt 0.11.30 @dev (Apr 2024)
 # FIXES & IMPROVEMENTS:
+* Fixed error when using pyomo/sqlite and data has 'groups' set (reserved name in sqlite)
+* Added imports from dplyr and yaml
+
+energyRt 0.11.30 @dev (Apr 2024)
+# FIXES & IMPROVEMENTS:
 * Added path-check & normalization in few cases (thanks to @AboodaA for pointing out)
 * Added a check for NULL befre collate (in getData)
 
