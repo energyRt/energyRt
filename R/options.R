@@ -116,12 +116,12 @@ isVerbose <- function(level = 1) {
 
 #' @export
 set_option <- function(name, value) {
-  options::set_opt(name, value, env = "energyRt")
+  options::opt_set(name, value, env = "energyRt")
 }
 
 #' @export
-get_option <- function(name) {
-  options::get_opt(name, env = "energyRt")
+get_option <- function(name, default = NULL) {
+  options::opt(name, default = default, env = "energyRt")
 }
 
 # default_registry ####
