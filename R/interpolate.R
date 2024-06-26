@@ -618,6 +618,106 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     filter(region %in% scen@settings@region)
   scen@modInp@parameters[["mCommReg"]] <-
     .dat2par(scen@modInp@parameters[["mCommReg"]], mCommReg)
+  # browser()
+
+  # !!!patch: update parameters (drop technologies with unavailable in regs inputs)
+  #  ToDo: take into account of other mapping and parameters in new interpolate
+  # mCommReg - filter with comm-reg dims
+  filter_comreg <- function(p, y = mCommReg) {
+    p@data <-
+      p@data |>
+      semi_join(y, by = intersect(colnames(p@data), colnames(y))) |>
+      unique()
+    p@misc$nValues <- nrow(p@data)
+    p
+  }
+  # filter with "tech-region" dims
+  y_tech_reg <- scen@modInp@parameters[["mTechInpComm"]]@data |>
+    # rbind(scen@modInp@parameters[["mTechOutComm"]]@data) |>
+    rbind(scen@modInp@parameters[["mTechAInp"]]@data) |>
+    # rbind(scen@modInp@parameters[["mTechAOut"]]@data) |>
+    unique() |>
+    right_join(mCommReg, by = "comm") |>
+    filter(!is.na(tech)) |>
+    select(-comm) |> unique()
+
+  scen@modInp@parameters[["mvTechInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechInp"]])
+  scen@modInp@parameters[["mvTechOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechOut"]], y_tech_reg)
+  scen@modInp@parameters[["mvTechAInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechAInp"]], y_tech_reg)
+  scen@modInp@parameters[["mvTechAOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechAOut"]])
+
+  # scen@modInp@parameters[["mTechInpTot"]]
+  # y_out <- scen@modInp@parameters[["mTechOutComm"]]@data |>
+  #   rbind(scen@modInp@parameters[["mTechAOut"]]@data) |>
+  #   unique() |>
+  #   right_join(mCommReg, by = "comm") |>
+  #   filter(!is.na(tech))
+
+  scen@modInp@parameters[["mTechNew"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNew"]], y_tech_reg)
+  # scen@modInp@parameters[["mTechNew"]] |> filter_comreg(y_out)
+  scen@modInp@parameters[["mTechSpan"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechSpan"]], y_tech_reg)
+  # scen@modInp@parameters[["mTechSpan"]] |> filter_comreg(y_out)
+  scen@modInp@parameters[["mvTechAct"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechAct"]], y_tech_reg)
+  scen@modInp@parameters[["mTechInv"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechInv"]], y_tech_reg)
+  scen@modInp@parameters[["mTechEac"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechEac"]], y_tech_reg)
+  scen@modInp@parameters[["mTechOMCost"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechOMCost"]], y_tech_reg)
+  scen@modInp@parameters[["mTechCapLo"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCapLo"]], y_tech_reg)
+  scen@modInp@parameters[["mTechCapUp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCapUp"]], y_tech_reg)
+  scen@modInp@parameters[["mTechNewCapLo"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNewCapLo"]], y_tech_reg)
+  scen@modInp@parameters[["mTechNewCapUp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNewCapUp"]], y_tech_reg)
+
+  # pTechEac(tech, region, year)
+  # scen@modInp@parameters[["pTechEac"]] <-
+  #   filter_comreg(scen@modInp@parameters[["pTechEac"]], y_tech_reg)
+  # scen@modInp@parameters[["pTechEac"]] <-
+  #   filter_comreg(scen@modInp@parameters[["pTechEac"]], y_inp)
+
+  # mTechAct2AInp(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechAct2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechAct2AInp"]], y_tech_reg)
+  # mTechCap2AInp(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCap2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCap2AInp"]], y_tech_reg)
+  # mTechNCap2AInp(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechNCap2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNCap2AInp"]], y_tech_reg)
+  # mTechCinp2AInp(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCinp2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCinp2AInp"]], y_tech_reg)
+  # mTechCout2AInp(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCout2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCout2AInp"]], y_tech_reg)
+  # mTechAct2AOut(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechAct2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechAct2AOut"]], y_tech_reg)
+  # mTechCap2AOut(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCap2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCap2AOut"]], y_tech_reg)
+  # mTechNCap2AOut(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechNCap2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNCap2AOut"]], y_tech_reg)
+  # mTechCinp2AOut(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCinp2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCinp2AOut"]], y_tech_reg)
+  # mTechCout2AOut(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCout2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCout2AOut"]], y_tech_reg)
+  # browser()
+  # !!! End of patch
   rm(mCommReg)
 
   # filter parameters by (comm, region)

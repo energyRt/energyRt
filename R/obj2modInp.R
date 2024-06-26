@@ -10,6 +10,7 @@ setMethod(".obj2modInp",
   # cmd <- .upper_case(app)
   # browser()
   cmd <- app
+  cmd@name <- toString(cmd@name)
   cmd <- .filter_data_in_slots(cmd, approxim$region, "region")
 
   # @emis: emissions from commodity consumption (combustion)
@@ -89,6 +90,7 @@ setMethod(".obj2modInp", signature(
 ), function(obj, app, approxim) {
   # dem <- .upper_case(app)
   dem <- app
+  dem@name <- toString(dem@name)
   if (length(dem@commodity) != 1 || is.na(dem@commodity) ||
       all(dem@commodity != approxim$all_comm)) {
     stop(paste0('Wrong commodity in demand "', dem@name, '"'))
@@ -2020,6 +2022,7 @@ setMethod(
     obj@parameters[["mvTechAct"]] <-
       .dat2par(obj@parameters[["mvTechAct"]], mvTechAct)
     # Stay only variable with non zero output
+    # browser()
     merge_table <- function(mvTechInp, pTechCinp2use) {
       if (is.null(pTechCinp2use) || nrow(pTechCinp2use) == 0) {
         return(NULL)
