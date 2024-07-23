@@ -2204,6 +2204,7 @@ setMethod(
       techGroupInp <- NULL
     }
     if (!is.null(mvTechInp) && !is.null(mTechOneComm)) {
+      # browser()
       techSingInp <- merge0(mvTechInp, mTechOneComm)
       if (!is.null(pTechCinp2use)) {
         techSingInp <- merge0(
@@ -2259,6 +2260,8 @@ setMethod(
       meqTechSng2Sng <- merge0(techSingInp, techSingOut,
                                by = c("tech", "region", "year", "slice"),
                                suffixes = c("", ".1"))
+      # filter out unavailable combinations
+      # browser()
       obj@parameters[["meqTechSng2Sng"]] <-
         .dat2par(obj@parameters[["meqTechSng2Sng"]], meqTechSng2Sng)
     } else {
@@ -2888,7 +2891,7 @@ setMethod(
                                     "trade", trd@name)
       obj@parameters[["pTradeStock"]] <-
         .dat2par(obj@parameters[["pTradeStock"]], stock_exist)
-
+      # browser()
       if (nrow(trd@capacity) > 0) {
         pTradeCap <- .interp_bounds(
           trd@capacity, "cap",

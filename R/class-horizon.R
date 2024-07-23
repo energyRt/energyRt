@@ -18,11 +18,13 @@
 setClass(
   "horizon",
   representation(
+    name = "character",
     desc = "character",
     period = "integer",
     intervals = "data.table"
   ),
   prototype(
+    name = character(),
     desc = character(),
     period = integer(),
     intervals = data.table(
@@ -84,7 +86,9 @@ newHorizon <- function(period = NULL,
                        desc = NULL,
                        mid_is_end = FALSE,
                        mid_is_start = FALSE,
-                       force_BY_interval_to_1_year = T, ...) {
+                       force_BY_interval_to_1_year = T,
+                       name = NULL,
+                       ...) {
   # browser()
   h <- new("horizon") # !!! update .data2slots for this class
   if (!is.null(desc)) {

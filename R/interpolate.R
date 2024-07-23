@@ -717,6 +717,56 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   scen@modInp@parameters[["mTechCout2AOut"]] <-
     filter_comreg(scen@modInp@parameters[["mTechCout2AOut"]], y_tech_reg)
   # browser()
+  # meqTechSng2Sng
+  scen@modInp@parameters[["meqTechSng2Sng"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechSng2Sng"]], y_tech_reg)
+  # meqTechGrp2Sng
+  scen@modInp@parameters[["meqTechGrp2Sng"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechGrp2Sng"]], y_tech_reg)
+  # meqTechSng2Grp
+  scen@modInp@parameters[["meqTechSng2Grp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechSng2Grp"]], y_tech_reg)
+  # meqTechGrp2Grp
+  scen@modInp@parameters[["meqTechGrp2Grp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechGrp2Grp"]], y_tech_reg)
+  # meqTechAfLo
+  scen@modInp@parameters[["meqTechAfLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfLo"]], y_tech_reg)
+  # meqTechAfUp
+  scen@modInp@parameters[["meqTechAfUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfUp"]], y_tech_reg)
+  # meqTechAfsLo
+  scen@modInp@parameters[["meqTechAfsLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfsLo"]], y_tech_reg)
+  # meqTechAfsUp
+  scen@modInp@parameters[["meqTechAfsUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfsUp"]], y_tech_reg)
+  # mTechRampUp
+  scen@modInp@parameters[["mTechRampUp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechRampUp"]], y_tech_reg)
+  # mTechRampDown
+  scen@modInp@parameters[["mTechRampDown"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechRampDown"]], y_tech_reg)
+  # meqTechActSng
+  scen@modInp@parameters[["meqTechActSng"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechActSng"]], y_tech_reg)
+  # meqTechActGrp
+  scen@modInp@parameters[["meqTechActGrp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechActGrp"]], y_tech_reg)
+  # meqTechAfcOutLo
+  scen@modInp@parameters[["meqTechAfcOutLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcOutLo"]], y_tech_reg)
+  # meqTechAfcOutUp
+  scen@modInp@parameters[["meqTechAfcOutUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcOutUp"]], y_tech_reg)
+  # meqTechAfcInpLo
+  scen@modInp@parameters[["meqTechAfcInpLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcInpLo"]], y_tech_reg)
+  # meqTechAfcInpUp
+  scen@modInp@parameters[["meqTechAfcInpUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcInpUp"]], y_tech_reg)
+
+  # browser()
   # !!! End of patch
   rm(mCommReg)
 
