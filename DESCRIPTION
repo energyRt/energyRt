@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
-Version: 0.11.33.9000
-Date: 2024-05-12
+Version: 0.11.37.9000
+Date: 2024-07-23
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -49,7 +49,7 @@ Suggests:
     sf,
     testthat (>= 3.0.0)
 License: AGLP-3.0
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 LazyData: true
 Encoding: UTF-8

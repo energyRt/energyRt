@@ -725,7 +725,8 @@ write.sc <- write_sc
     }
     rm(mStorageRetUp)
   }
-
+  # browser()
+  # mTradeCap ####
   if (nrow(prec@parameters[["pTradeCap"]]@data) > 0) {
     suppressMessages({
       mTradeCap <- prec@parameters[["pTradeCap"]]@data |>
@@ -748,7 +749,31 @@ write.sc <- write_sc
     }
     rm(mTradeCapUp)
   }
-
+  # browser()
+  #mTradeNewCap ####
+  if (nrow(prec@parameters[["pTradeNewCap"]]@data) > 0) {
+    suppressMessages({
+      mTradeNewCap <- prec@parameters[["pTradeNewCap"]]@data |>
+        inner_join(prec@parameters[["mTradeNew"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTradeNewCapLo <- filter(mTradeNewCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTradeNewCapLo) && nrow(mTradeNewCapLo) > 0) {
+      prec@parameters[["mTradeNewCapLo"]] <-
+        .dat2par(prec@parameters[["mTradeNewCapLo"]], mTradeNewCapLo)
+    }
+    rm(mTradeNewCapLo)
+    mTradeNewCapUp <- filter(mTradeNewCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTradeNewCapUp) && nrow(mTradeNewCapUp) > 0) {
+      prec@parameters[["mTradeNewCapUp"]] <-
+        .dat2par(prec@parameters[["mTradeNewCapUp"]], mTradeNewCapUp)
+    }
+    rm(mTradeNewCapUp)
+  }
+  # browser()
   if (nrow(prec@parameters[["pTradeRet"]]@data) > 0) {
     suppressMessages({
       mTradeRet <- prec@parameters[["pTradeRet"]]@data |>

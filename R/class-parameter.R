@@ -267,6 +267,7 @@ setMethod(
     # !!! rewrite with dplyr or data.table
     # nn <- nrow(obj@data) + 1:length(data)
     # obj@data[nn, ] <- data
+    # browser()
     obj@data <- rbindlist(list(as.data.table(obj@data), as.data.table(data)),
                           use.names = FALSE)
     if (ncol(obj@data) != 1) browser()
