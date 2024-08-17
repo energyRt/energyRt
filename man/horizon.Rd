@@ -13,6 +13,7 @@ newHorizon(
   mid_is_end = FALSE,
   mid_is_start = FALSE,
   force_BY_interval_to_1_year = T,
+  name = NULL,
   ...
 )
 }
