@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development (alpha) version
-Version: 0.11.37.9001
-Date: 2024-07-23
+Version: 0.49.0.9000
+Date: 2024-08-26
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -12,8 +12,12 @@ Authors@R:
    person(given = "Vladimir", 
           family = "Potashnikov", 
           email = "potashnikov.vu@gmail.com", 
-          role = c("aut")))
-URL: https://github.com/energyRt/energyRt
+          role = c("aut")),
+   person(given = "Tarun",
+          family = "Sharma",
+          email = "tarunsharma@ms.iitr.ac.in",
+          role = c("ctb")))
+URL: https://energyRt.org, https://github.com/energyRt/energyRt
 BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy systems modeling toolbox in R
 Depends: R (>= 4.3)

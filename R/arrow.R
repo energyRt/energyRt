@@ -424,7 +424,7 @@ if (F) {
     collect()
 }
 
-#' Is object stored on disk?
+#' Is object stored in memory?
 #'
 #' @param obj Object, checks
 #'

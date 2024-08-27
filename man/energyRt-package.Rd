@@ -24,5 +24,10 @@ Authors:
   \item Vladimir Potashnikov \email{potashnikov.vu@gmail.com}
 }
 
+Other contributors:
+\itemize{
+  \item Tarun Sharma \email{tarunsharma@ms.iitr.ac.in} [contributor]
+}
+
 }
 \keyword{internal}

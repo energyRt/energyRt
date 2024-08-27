@@ -531,6 +531,7 @@ if (F) {
     obj@timetable <- make_timetable()
   } else if (is.null(obj@timetable$weight)) {
     obj@timetable <- mutate(
+      obj@timetable,
       weight = 1 / sum(obj@timetable$share)
     )
   }
