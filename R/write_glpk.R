@@ -1,3 +1,34 @@
+
+
+#' @title Set the path to the GLPK library
+#'
+#' @param path character. Path to the GLPK library with `glpsol.*` executable.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' set_glpk_path("/usr/local/bin/glpk") # Linux & Mac
+#' set_glpk_path("C:/Program Files/glpk/bin") # Windows
+#' get_glpk_path()
+set_glpk_path <- function(path = NULL) {
+  # browser()
+  if (!is.null(path) && path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options::opt_set("glpk_path", path, env = "energyRt")
+}
+
+#' @export
+get_glpk_path <- function() {
+  options::opt("glpk_path")
+}
+
 # MathProg GLPK (& MathProg with CBC) ####
 .write_model_GLPK_CBC <- function(arg, scen) {
   run_code <- scen@settings@sourceCode[["GLPK"]]
@@ -118,6 +149,10 @@
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
     if (toupper(scen@settings@solver$lang) == "GLPK") {
       scen@settings@solver$cmdline <- "glpsol -m energyRt.mod -d energyRt.dat"
+      if (!is.null(get_glpk_path())) {
+        scen@settings@solver$cmdline <-
+          file.path(get_glpk_path(), scen@settings@solver$cmdline)
+      }
     } else {
       scen@settings@solver$cmdline <- "cbc energyRt.mod%energyRt.dat -solve"
     }
@@ -373,18 +408,21 @@
     # } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
     #   a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
     # changing pattern to include scientific numbers
-    } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
-      a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+    } else if (any(grep("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])",
+                        tmp))) {
+      a3 <- gsub("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])", "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {
       a1 <- sub("^[[:alnum:]_]*", "", tmp)
       vrb <- substr(tmp, 1, nchar(tmp) - nchar(a1))
       a2 <- .get.bracket.glpk(a1)
-      arg <- paste0(.aliasName(strsplit(gsub("[() ]", "", a2$beg), ",")[[1]]), collapse = ", ")
+      arg <- paste0(.aliasName(strsplit(gsub("[() ]", "", a2$beg), ",")[[1]]),
+                    collapse = ", ")
       if (nchar(a2$end) > 1 && substr(a2$end, 1, 1) == "$") {
         rs <- paste0(
-          rs, "sum{FORIF: (", arg, ") in ", gsub("([$]|[(].*)", "", a2$end), "} (", vrb, "[", arg, "])",
+          rs, "sum{FORIF: (", arg, ") in ", gsub("([$]|[(].*)", "", a2$end),
+          "} (", vrb, "[", arg, "])",
           .eqt.to.glpk(gsub("^[^)]*[)]", "", a2$end))
         )
         tmp <- ""

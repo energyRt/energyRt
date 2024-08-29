@@ -130,7 +130,13 @@ dir_size <- function(path) {
 }
 
 .fix_path <- function(x) {
-  gsub("[\\/]+", "/", paste0(x, "/"))
+  # gsub("[\\/]+", "/", paste0(x, "/"))
+  gsub("[\\/]+", "/", x)
+}
+
+fp <- function(...) {
+  file.path(...) |> .fix_path()
+    # normalizePath(winslash = "/", mustWork = FALSE)
 }
 
 
@@ -280,4 +286,166 @@ fact2char <- function(df, asTibble = TRUE) {
   }
   if (asTibble) {df <- as_tibble(df)}
   df
+}
+
+#' Switch on/off and select/customize progress bar
+#'
+#' @param type character, type of the progress bar to display. Existing options:
+#' "bw", "default", "cli", "progress".
+#' @param show logical, the progress bar is visible if `TRUE`.
+#' @param clear logical, sets `progressr.clear` global option. If `TRUE`, all outout from the progress bar will be cleared.
+#'
+#' @rdname progress
+#' @return
+#' @export
+#'
+#' @examples
+set_progress_bar <- function(type = "bw", show = TRUE, clear = FALSE) {
+  if (interactive()) progressr::handlers(global = show)
+  options(progressr.clear = clear)
+  if (is.null(type)) return(invisible(NULL))
+  if (type == "bw") {
+    progressr::handlers(
+      progressr::handler_pbcol(
+        # adjust = 1.0,
+        # complete = function(s) cli::bg_br_green(cli::col_br_black(s)),
+        complete = function(s) cli::bg_black(cli::col_white(s)),
+        # complete = function(s) cli::bg_br_black(cli::col_silver(s)),
+        incomplete = function(s) cli::bg_none(cli::col_grey(s))
+        # incomplete = function(s) cli::bg_black(cli::col_white(s))
+      )
+    )
+  } else if (type == "default") {
+    progressr::handlers("txtprogressbar")
+  } else if (type == "pbcol") {
+    progressr::handlers(
+      progressr::handler_pbcol(
+        adjust = 1.0,
+        complete = function(s) cli::bg_red(cli::col_black(s)),
+        incomplete = function(s) cli::bg_cyan(cli::col_black(s))
+      )
+    )
+  } else if (type == "cli") {
+    progressr::handlers("cli")
+  } else if (type == "progress") {
+    progressr::handlers("progress")
+  } else {
+    warning(
+      "Unrecognized 'type = ", type, "'\n",
+      "See `https://progressr.futureverse.org/` for detailed customization.")
+  }
+}
+
+
+#' @rdname progress
+#' @export
+#'
+#' @examples
+show_progress_bar <- function(show = TRUE) {
+  if (interactive()) set_progress_bar(type = NULL, show = show)
+}
+
+
+#' Set or get directory for/with scenarios
+#'
+#' @param path
+#'
+#' @family options
+#' @return
+#' @export
+#' @rdname options
+#'
+#' @examples
+set_scenarios_path <- function(path = NULL) {
+  options::opt_set("scenarios_path", path)
+  # options(en_scenarios_path = path)
+}
+
+
+#' @family options
+#' @export
+#' @examples
+#' @rdname options
+get_scenarios_path <- function() {
+  options::opt("scenarios_path")
+  # getOption("en_scenarios_path")
+}
+
+# merge_paths <- function(path1, path2)
+
+#' Drop columns in a data.frame with only NA values
+#'
+#' @description
+#' A wrapper with `dplyr` functions to drop columns with no information (all `NA` values)
+#'
+#' @param x data.frame
+#' @param unique logical, if TRUE (default), `unique()` function will be applied to the result.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+drop_na_cols <- function(x, unique = TRUE) {
+  x <- select(x, where(~ !all(is.na(.))))
+  if (unique) x <- unique(x)
+  x
+}
+
+#' Make a name for a scenario directory
+#' @description A function to automate the creation of a scenario directory name.
+#' Used internally in `solve*()` and `interpolate*()` functions.
+#' Also can be used to amend the name of the scenario directory and explicitly
+#' assign the directory name to save the scenario object.
+#'
+#' @param scen scenario object
+#' @param name character, name of the scenario, default is `scen@name`
+#' @param model_name character, name of the model, default is `scen@model@name`
+#' @param calendar_name character, name of the calendar, default is `scen@settings@calendar@name`
+#' @param horizon_name character, name of the horizon, default is `scen@settings@horizon@name`
+#' @param prefix character, prefix to add to the name
+#' @param suffix character, suffix to add to the name
+#' @param sep character, separator, default is `_`
+#'
+#' @return character, name of the scenario directory
+#' @export
+#'
+#' @examples
+#'
+make_scenario_dirname <- function(
+    scen,
+    name = scen@name,
+    model_name = scen@model@name,
+    calendar_name = scen@settings@calendar@name,
+    horizon_name = scen@settings@horizon@name,
+    prefix = NULL,
+    suffix = NULL,
+    sep = "_"
+  ) {
+
+  if (isTRUE(nchar(prefix) > 0)) {
+    name <- paste(prefix, name, sep = sep)
+  }
+
+  if (isTRUE(is.null(name) && nchar(name) == 0)) {
+    warning("Scenario name is empty. Using 'scenario' as a default name.")
+    name <- "scenario"
+  }
+
+  if (isTRUE(nchar(model_name) > 0)) {
+    name <- paste(name, model_name, sep = sep)
+  }
+
+  if (isTRUE(nchar(calendar_name) > 0)) {
+    name <- paste(name, calendar_name, sep = sep)
+  }
+
+  if (isTRUE(nchar(horizon_name) > 0)) {
+    name <- paste(name, horizon_name, sep = sep)
+  }
+
+  if (isTRUE(nchar(suffix) > 0)) {
+    name <- paste(name, suffix, sep = sep)
+  }
+
+  return(name)
 }

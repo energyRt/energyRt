@@ -7,29 +7,26 @@
 \alias{solve,scenario,character-method}
 \title{Functions and methods to solve model and scenario objects}
 \usage{
-solve_model(
-  obj,
-  name = paste("scen", obj@name, sep = "_"),
-  solver = NULL,
-  tmp.dir = NULL,
-  tmp.del = TRUE,
-  ...
-)
+solve_model(obj, name = NULL, ...)
 
 \S4method{solve}{model,character}(a, b, ...)
 
-solve_scenario(obj = NULL, tmp.dir = NULL, solver = NULL, ...)
+solve_scenario(obj, name = obj@name, ...)
 
 \S4method{solve}{scenario,character}(a, b, ...)
 }
 \arguments{
-\item{obj}{model object}
+\item{obj}{model or scenario object}
 
 \item{name}{character name of scenario to return}
 
+\item{...}{}
+
 \item{solver}{a character or list with solver settings}
 
-\item{...}{}
+\item{tmp.dir}{character path to temporary directory}
+
+\item{tmp.del}{logical delete temporary directory after the run}
 }
 \description{
 The function interpolates model, writes the script in a directory, runs the external software to solve the model, reads the solution results, and returns a scenario object with the solution.

@@ -10,6 +10,7 @@
 #' @examples
 #' @noRd
 .interpolation0 <- function(dtf, parameter, defVal, arg) {
+  # The function is obsolete, to be replaced
   # browser()
   # dtf <- interpolation_message$interpolation0_arg$dtf;
   # parameter <- interpolation_message$interpolation0_arg$parameter;
@@ -18,9 +19,13 @@
   # Remove not used approxim
   # print()
   # browser()
-  if (parameter == "DEBUG") browser() # DEBUG
-  if (length(defVal) != 1) stop("defVal value is not defined")
-  if (arg$approxim$fullsets && defVal != 0 && defVal != Inf) arg$all <- TRUE
+  # if (parameter == "rhs") browser() # DEBUG
+  if (length(defVal) != 1 || is.na(defVal) || is.null(defVal)) {
+    browser()
+    stop("defVal value is not defined")
+  }
+  # browser()
+  if (arg$approxim$fullsets && defVal != 0 && is.finite(defVal)) arg$all <- TRUE
 
   # Get slice
   prior <- c(
@@ -270,6 +275,7 @@
         nrow(dd) / length(approxim$year)
       ), , drop = FALSE]
     }
+    # if (parameter == "rhs") browser()
   }
   return(dd)
 }
@@ -285,8 +291,10 @@
 #'
 #' @noRd
 .interpolation <- function(dtf, parameter, defVal, ...) {
+  # new pipeline for interpolation routine is in progress
   arg <- list(...)
-  tryCatch(
+  # if (parameter == "rhs") browser()
+  dtf_int <- tryCatch(
     {
       .interpolation0(dtf, parameter, defVal, arg)
     },
@@ -305,6 +313,27 @@
       stop(cond)
     }
   )
+  # if (is.null(dtf_int)) return(dtf_int)
+  # # patch (temporary) to check/adjust interpolation horizon ####
+  # if (!is.null(dtf[["year"]]) && !any(is.na(dtf[["year"]]))) {
+  #   if (is.null(arg$rule)) stop("Interpolation rule is not set for ", parameter)
+  #   if (!grepl("back", arg$rule)) {
+  #     browser()
+  #     dtf_int <- filter(dtf_int, year >= min(dtf[["year"]]))
+  #   }
+  #   if (!grepl("forth", arg$rule)) {
+  #     dtf_int <- filter(dtf_int, year <= max(dtf[["year"]]))
+  #   }
+  #   if (!grepl("inter", arg$rule)) {
+  #     dtf_int <- filter(
+  #       dtf_int,
+  #       (year < min(dtf[["year"]])) |# 'back' if set
+  #         (year > max(dtf[["year"]])) | # 'forth' if set
+  #         (year %in% dtf[["year"]])
+  #       )
+  #   }
+  # } # patch - end
+  dtf_int
 }
 
 # setMethod(".interpolation_bound", signature(dtf = 'data.frame',
@@ -382,9 +411,10 @@
     # removeDefault = TRUE, # not used
     # remValue = NULL, # not used
     all.val = FALSE) {
-  if (parameter == "pSupCost") browser() # DEBUG
+  # cat(parameter, "\n")
+  # if (parameter == "rhs") browser() # DEBUG
   has_year_col <- any(colnames(dtf) == "year")
-  if (approxim$fullsets && mtp@defVal != 0 && mtp@defVal != Inf) all.val <- TRUE
+  if (approxim$fullsets && mtp@defVal != 0 && is.finite(mtp@defVal)) all.val <- TRUE
   if (!all.val && nrow(dtf) == 0) {
     return(NULL)
   }
@@ -404,11 +434,28 @@
     }
     dtf <- dtf[!duplicated(dtf), , drop = FALSE]
   }
-  # if (parameter == "meqLECActivity") browser()
+  # if (parameter == "pCnsRhsCO2_CAP") browser()
+  # if (parameter == "rhs") browser()
+  # dtf_year_range <- range(approxim$year)
+  # if (!is.null(dtf$year) && !any(is.na(dtf$year))) {
+  #   # if (grepl("inter", mtp@interpolation)) {
+  #     dtf_year_range <- range(dtf$year)
+  #   # } else {
+  #     # dtf_year_range <- dtf$year
+  #   # }
+  #   if (grepl("back", mtp@interpolation)) {
+  #     dtf_year_range <- range(c(min(approxim$year), dtf_year_range))
+  #   }
+  #   if (grepl("forth", mtp@interpolation)) {
+  #     dtf_year_range <- range(c(max(approxim$year), dtf_year_range))
+  #   }
+  #
+  # }
   dd <- .interpolation(dtf, parameter,
                        rule = mtp@interpolation,
                        defVal = mtp@defVal,
                        year_range = range(approxim$year),
+                       # year_range = dtf_year_range,
                        approxim = approxim, all = all.val
   )
   # if (parameter == "meqLECActivity") browser()
@@ -490,6 +537,8 @@
     dtf, parameter, mtp, approxim,
     add_set_name = NULL, add_set_value = NULL, remove_duplicate = NULL,
     remValueUp = NULL, remValueLo = NULL) {
+  # if (parameter == "cout") browser()
+  # browser()
   has_year_col <- any(colnames(dtf) == "year")
   if (!is.null(mtp@misc$not_need_interpolate)) {
     # dtf <- dtf[, !(colnames(dtf) %in% mtp@misc$not_need_interpolate), drop = FALSE]

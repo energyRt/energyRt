@@ -249,8 +249,10 @@ draw.technology <- function(
                 adj = 0, cex = .8
               )
             }
-            s1 <- share[share$comm == cmm & share$type == "up", "share"]
-            s2 <- share[share$comm == cmm & share$type == "lo", "share"]
+            # s1 <- share[share$comm == cmm & share$type == "up", "share"]
+            # s2 <- share[share$comm == cmm & share$type == "lo", "share"]
+            s1 <- share |> filter(comm == cmm & type == "up") |> pull(share)
+            s2 <- share |> filter(comm == cmm & type == "lo") |> pull(share)
             if (show_all || s1 != 1 || s2 != 0) {
               text(.27, y - .015, paste(to_format(100 * s2), "% .. ",
                 to_format(100 * s1), "%",
@@ -433,8 +435,11 @@ draw.technology <- function(
             )
           }
           if (!is.na(ccomm[cmm, "group"])) {
-            s1 <- share[share$comm == cmm & share$type == "up", "share"]
-            s2 <- share[share$comm == cmm & share$type == "lo", "share"]
+            # browser()
+            # s1 <- share[share$comm == cmm & share$type == "up", "share"]
+            # s2 <- share[share$comm == cmm & share$type == "lo", "share"]
+            s1 <- share |> filter(comm == cmm & type == "up") |> pull(share)
+            s2 <- share |> filter(comm == cmm & type == "lo") |> pull(share)
             if (show_all || s1 != 1 || s2 != 0) {
               text(.757, y - .03, paste(to_format(100 * s2), "% .. ",
                 to_format(100 * s1), "%",

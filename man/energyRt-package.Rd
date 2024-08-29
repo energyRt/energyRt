@@ -11,6 +11,7 @@ Energy systems modeling toolbox in R
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://energyRt.org}
   \item \url{https://github.com/energyRt/energyRt}
   \item Report bugs at \url{https://github.com/energyRt/energyRt/issues}
 }
@@ -22,6 +23,11 @@ Useful links:
 Authors:
 \itemize{
   \item Vladimir Potashnikov \email{potashnikov.vu@gmail.com}
+}
+
+Other contributors:
+\itemize{
+  \item Tarun Sharma \email{tarunsharma@ms.iitr.ac.in} [contributor]
 }
 
 }

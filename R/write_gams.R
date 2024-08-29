@@ -13,7 +13,17 @@
 #' # set_gams_path("C:/GAMS/win64/32.2/")
 #'
 set_gams_path <- function(path = NULL) {
-  options(en_gams_path = path)
+  # browser()
+  if (!is.null(path) && path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options::opt_set("gams_path", path, env = "energyRt")
+  # options(gams_path = path)
 }
 
 #' @rdname gams
@@ -22,7 +32,8 @@ set_gams_path <- function(path = NULL) {
 #' @examples
 #' # get_gams_path()
 get_gams_path <- function() {
-  getOption("en_gams_path")
+  options::opt("gams_path", env = "energyRt")
+  # options::opt("gams_path")
 }
 
 #' @return
@@ -34,7 +45,15 @@ get_gams_path <- function() {
 #' @examples
 #' # set_gdxlib("C:/GAMS/35")
 set_gdxlib_path <- function(path = NULL) {
-  options(en_gdxlib_path = path)
+  if (!is.null(path) && path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options(gdxlib_path = path, env = "energyRt")
 }
 
 #' @rdname gams
@@ -43,7 +62,8 @@ set_gdxlib_path <- function(path = NULL) {
 #' @examples
 #' # get_gdxlib()
 get_gdxlib_path <- function() {
-  getOption("en_gdxlib_path")
+  options::opt("gdxlib_path", env = "energyRt")
+  # options::opt("gdxlib_path")
 }
 
 .check_load_gdxlib <- function() {
@@ -55,9 +75,9 @@ get_gdxlib_path <- function() {
   }
   en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
-    lb <- getOption("en_gdxlib_path")
+    lb <- options::opt("gdxlib_path")
     if (is.null(lb)) {
-      lb <- getOption("en_gams_path")
+      lb <- options::opt("gams_path")
     }
     ix <- igdx(lb)
     if (!ix) {
@@ -78,9 +98,9 @@ get_gdxlib_path <- function() {
   xt <- require("gdxtools", warn.conflicts = FALSE, quietly = T)
   en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
-    lb <- getOption("en_gdxlib_path")
+    lb <- options::opt("gdxlib_path")
     if (is.null(lb)) {
-      lb <- getOption("en_gams_path")
+      lb <- options::opt("gams_path")
     }
     ix <- igdx(lb)
     if (!ix) {
@@ -159,21 +179,23 @@ get_gdxlib_path <- function() {
     ):length(scen@settings@sourceCode[["GAMS_output"]])],
     'execute_unload "output/output.gdx"')
   }
-  dir.create(paste(arg$tmp.dir, "/input", sep = ""), showWarnings = FALSE)
-  dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
-  zz_output <- file(paste(arg$tmp.dir, "/output.gms", sep = ""), "w")
+  dir.create(fp(arg$tmp.dir, "input"), showWarnings = FALSE)
+  dir.create(fp(arg$tmp.dir, "output"), showWarnings = FALSE)
+  # browser()
+  zz_output <- file(fp(arg$tmp.dir, "output.gms"), "w")
   cat(scen@settings@sourceCode[["GAMS_output"]], sep = "\n", file = zz_output)
   close(zz_output)
-  zz_data_gms <- file(paste(arg$tmp.dir, "/data.gms", sep = ""), "w")
-  if (scen@settings@solver$export_format == "gdx") {
+  zz_data_gms <- file(fp(arg$tmp.dir, "data.gms"), "w")
+  if (grepl("gdx", scen@settings@solver$export_format, ignore.case = TRUE)) {
     if (!scen@status$fullsets) {
       stop('for export_format = "gdx", ',
            'interpolation parameter fullsets must be TRUE')
     }
     # Generate gdx
+    # browser()
     .write_gdx_list(
       dat = .get_scen_data(scen),
-      gdxName = paste0(arg$tmp.dir, "input/data.gdx")
+      gdxName = fp(arg$tmp.dir, "input/data.gdx")
     )
 
     # Add gdx import
@@ -197,8 +219,8 @@ get_gdxlib_path <- function() {
     for (j in c("set", "map", "numpar", "bounds")) {
       for (i in names(scen@modInp@parameters)) {
         if (scen@modInp@parameters[[i]]@type == j) {
-          zz_data_tmp <- file(paste(arg$tmp.dir, "/input/", i, ".gms",
-                                    sep = ""), "w")
+          zz_data_tmp <- file(fp(arg$tmp.dir,
+                                        paste0("input/", i, ".gms")), "w")
           cat(.toGams(scen@modInp@parameters[[i]]), sep = "\n",
               file = zz_data_tmp)
           close(zz_data_tmp)
@@ -219,9 +241,8 @@ get_gdxlib_path <- function() {
   close(zz_data_gms)
   ### Model code to text
   .generate_gpr_gams_file(arg$tmp.dir)
-  fn <- file(paste(arg$tmp.dir, "/energyRt.gms", sep = ""), "w")
-  zz_constrains <- file(paste(arg$tmp.dir, "/inc_constraints.gms", sep = ""),
-                        "w")
+  fn <- file(fp(arg$tmp.dir, "energyRt.gms"), "w")
+  zz_constrains <- file(fp(arg$tmp.dir, "inc_constraints.gms"), "w")
   cat(run_code[1:grep("[$]include[[:space:]]*data.gms", run_code)], sep = "\n",
       file = fn)
   # Add parameter constraint declaration
@@ -272,7 +293,7 @@ get_gdxlib_path <- function() {
 
   # Add parameter costs declaration
   {
-    zz_costs <- file(paste(arg$tmp.dir, "/inc_costs.gms", sep = ""), "w")
+    zz_costs <- file(fp(arg$tmp.dir, "inc_costs.gms"), "w")
     mps_name <- grep("^[m]Costs", names(scen@modInp@parameters), value = TRUE)
     mps_name_def <- c("set ", paste0(mps_name, "(", sapply(
       scen@modInp@parameters[mps_name],
@@ -335,7 +356,14 @@ get_gdxlib_path <- function() {
   close(zz_costs)
   .write_inc_files(arg, scen, ".gms")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- "gams energyRt.gms"
+    fpath <- get_gams_path()
+    if (is.null(fpath)) {
+      scen@settings@solver$cmdline <- "gams energyRt.gms"
+    } else {
+      scen@settings@solver$cmdline <-
+        fp(fpath, "gams energyRt.gms") |>
+        str_replace_all("//", "/")
+    }
   }
   scen@settings@solver$code <- c(
     "energyRt.gms", "output.gms", "inc_constraints.gms",
@@ -540,6 +568,7 @@ get_gdxlib_path <- function() {
 
 # GDX exchange ####
 .get_scen_data <- function(scen) {
+  # browser()
   all_factor <- function(x) {
     for (i in colnames(x)[colnames(x) != "value"]) {
       x[[i]] <- factor(x[[i]])
@@ -639,9 +668,9 @@ get_gdxlib_path <- function() {
   # }
   # en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   # if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
-  #   lb <- getOption("en_gdxlib_path")
+  #   lb <- options::opt("gdxlib_path")
   #   if (is.null(lb)) {
-  #     lb <- getOption("en_gams_path")
+  #     lb <- options::opt("gams_path")
   #   }
   #   ix <- igdx(lb)
   #   if (!ix) {
@@ -650,7 +679,7 @@ get_gdxlib_path <- function() {
   #     options(en_gdxlib_loaded = TRUE)
   #   }
   # }
-
+  # browser()
   cat(" data.gdx ")
   nms <- names(dat)
   max_length <- max(nchar(nms))
@@ -662,6 +691,8 @@ get_gdxlib_path <- function() {
     x <- c(x, list(.df2uels(data.frame(dat[[i]]), i)))
   }
   # gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
+  # browser()
+  # !!!ToDo: add check for NAs
   wgdx(gdxName = gdxName, x, squeeze = FALSE)
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")

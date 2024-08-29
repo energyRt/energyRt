@@ -1,6 +1,6 @@
 #' Write scenario object as a Python, Julia, GAMS, or MathProg script with data files to a directory
 #'
-#' @param x scenario object, must be interpolated
+#' @param scen scenario object, must be interpolated
 #' @param tmp.dir character, path
 #' @param solver list of character with solver specification.
 #' @param ... additional solver parameters
@@ -9,22 +9,31 @@
 #' @seealso [solve()] to run the script, solve the scenario. [read_solution] to read model solution.
 #'
 #' @export
-write_script <- function(x, tmp.dir = NULL, solver = NULL, ...) {
-  scen <- x
-  if (is.null(tmp.dir)) {
-    if (!is.null(scen@misc$tmp.dir)) {
-      tmp.dir <- scen@misc$tmp.dir
-    } else if (!is.null(scen@path)) {
-      tmp.dir <- file.path(scen@path, "script", solver$lang, solver$solver)
-    }
-    if (is.null(tmp.dir))
-      stop('Either "tmp.dir" or "scenario@path" must be set')
+write_script <- function(scen, tmp.dir = NULL, solver = NULL, ...) {
+  # scen <- obj
+  # if (is.null(tmp.dir)) {
+  #   # get_tmp_dir(scen, list(tmp.dir = tmp.dir, solver = solver, ...))
+  #   browser()
+  #   if (!is.null(scen@misc$tmp.dir)) {
+  #     tmp.dir <- scen@misc$tmp.dir
+  #   } else if (!is.null(scen@path)) {
+  #     tmp.dir <- file.path(scen@path, "script", solver$lang, solver$solver)
+  #   }
+  #   if (is.null(tmp.dir))
+  #     stop('Either "tmp.dir" or "scenario@path" must be set')
+  # }
+  # scen@misc$tmp.dir <- tmp.dir
+  if (!isTRUE(scen@status$interpolated)) {
+    stop("Scenario must be interpolated before writing the script.")
   }
-  scen@misc$tmp.dir <- tmp.dir
-  if (F) {} # check if the scenario is interpolated
-  if (is.null(solver)) solver <- scen@solver
-  .solver_solve(scen, tmp.dir = tmp.dir, solver = solver, ...,
-                run = FALSE, write = TRUE)
+  # browser()
+  # if (is.null(solver)) solver <- scen@settings@solver
+  # if (is.null(solver)) solver <- get_default_solver()
+  # if (is.null(solver)) stop("Solver must be specified.")
+  # arg <- list()
+  .executeScenario(scen,
+                   tmp.dir = tmp.dir, solver = solver,
+                   run = FALSE, write = TRUE, ...)
 }
 
 #' @export
@@ -113,7 +122,7 @@ write.sc <- write_sc
 
 .write_inc_solver <- function(scen, arg, def_inc_solver, type, templ) {
   if (!is.null(scen@settings@solver$inc_solver) && !is.null(scen@settings@solver$solver)) {
-    browser()
+    # browser()
     stop("have to define only one argument from scen@settings@solver$inc_solver & scen@settings@solver$solver")
   }
   if (!is.null(scen@settings@solver$solver)) {
@@ -122,7 +131,7 @@ write.sc <- write_sc
   if (is.null(scen@settings@solver$inc_solver) && is.null(scen@settings@solver$solver)) {
     scen@settings@solver$inc_solver <- def_inc_solver
   }
-  fn <- file(paste0(arg$tmp.dir, "inc_solver", type), "w")
+  fn <- file(file.path(arg$tmp.dir, paste0("inc_solver", type)), "w")
   cat(scen@settings@solver$inc_solver, file = fn, sep = "\n")
   close(fn)
 }
@@ -146,12 +155,12 @@ write.sc <- write_sc
     }
   }
   for (i in 1:5) {
-    fn <- file(paste0(arg$tmp.dir, "inc", i, type), "w")
+    fn <- file(file.path(arg$tmp.dir, paste0("inc", i, type)), "w")
     cat(scen@settings@solver[[paste0("inc", i)]], sep = "\n", file = fn)
     close(fn)
   }
   for (i in names(scen@settings@solver$files)) {
-    fn <- file(paste0(arg$tmp.dir, i), "w")
+    fn <- file(file.path(arg$tmp.dir, i), "w")
     cat(scen@settings@solver$files[[i]], sep = "\n", file = fn)
     close(fn)
   }
@@ -557,6 +566,7 @@ write.sc <- write_sc
     inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region")) %>%
     unique()
   # mTechEmsFuel ####
+  # browser()
   .interpolation_message("mTechEmsFuel", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
@@ -577,6 +587,216 @@ write.sc <- write_sc
           )
         )
       )
+
+  # browser()
+  if (nrow(prec@parameters[["pTechCap"]]@data) > 0) {
+    suppressMessages({
+      mTechCap <- prec@parameters[["pTechCap"]]@data |>
+        inner_join(prec@parameters[["mTechSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTechCapLo <- filter(mTechCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTechCapLo) && nrow(mTechCapLo) > 0) {
+      prec@parameters[["mTechCapLo"]] <-
+        .dat2par(prec@parameters[["mTechCapLo"]], mTechCapLo)
+    }
+    rm(mTechCapLo)
+    mTechCapUp <- filter(mTechCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTechCapUp) && nrow(mTechCapUp) > 0) {
+      prec@parameters[["mTechCapUp"]] <-
+        .dat2par(prec@parameters[["mTechCapUp"]], mTechCapUp)
+    }
+    rm(mTechCapUp)
+  }
+
+  if (nrow(prec@parameters[["pTechNewCap"]]@data) > 0) {
+    # browser()
+    suppressMessages({
+      mTechNewCap <- prec@parameters[["pTechNewCap"]]@data |>
+        inner_join(prec@parameters[["mTechNew"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTechNewCapLo <- filter(mTechNewCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTechNewCapLo) && nrow(mTechNewCapLo) > 0) {
+      prec@parameters[["mTechNewCapLo"]] <-
+        .dat2par(prec@parameters[["mTechNewCapLo"]], mTechNewCapLo)
+    }
+    rm(mTechNewCapLo)
+    mTechNewCapUp <- filter(mTechNewCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTechNewCapUp) && nrow(mTechNewCapUp) > 0) {
+      prec@parameters[["mTechNewCapUp"]] <-
+        .dat2par(prec@parameters[["mTechNewCapUp"]], mTechNewCapUp)
+    }
+    rm(mTechNewCapUp)
+  }
+
+  if (nrow(prec@parameters[["pTechRet"]]@data) > 0) {
+    suppressMessages({
+      mTechRet <- prec@parameters[["pTechRet"]]@data |>
+        inner_join(prec@parameters[["mTechSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTechRetLo <- filter(mTechRet, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTechRetLo) && nrow(mTechRetLo) > 0) {
+      prec@parameters[["mTechRetLo"]] <-
+        .dat2par(prec@parameters[["mTechRetLo"]], mTechRetLo)
+    }
+    rm(mTechRetLo)
+    mTechRetUp <- filter(mTechRet, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTechRetUp) && nrow(mTechRetUp) > 0) {
+      prec@parameters[["mTechRetUp"]] <-
+        .dat2par(prec@parameters[["mTechRetUp"]], mTechRetUp)
+    }
+    rm(mTechRetUp)
+  }
+
+  if (prec@parameters[["pStorageCap"]]@data %>% nrow() > 0) {
+    mStorageCap <- prec@parameters[["pStorageCap"]]@data |>
+      inner_join(prec@parameters[["mStorageSpan"]]@data) |>
+      # select(-value) |>
+      unique()
+    mStorageCapLo <- filter(mStorageCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mStorageCapLo) && nrow(mStorageCapLo) > 0) {
+      prec@parameters[["mStorageCapLo"]] <-
+        .dat2par(prec@parameters[["mStorageCapLo"]], mStorageCapLo)
+    }
+    rm(mStorageCapLo)
+    mStorageCapUp <- filter(mStorageCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mStorageCapUp) && nrow(mStorageCapUp) > 0) {
+      prec@parameters[["mStorageCapUp"]] <-
+        .dat2par(prec@parameters[["mStorageCapUp"]], mStorageCapUp)
+    }
+    rm(mStorageCapUp)
+  }
+
+  if (nrow(prec@parameters[["pStorageNewCap"]]@data) > 0) {
+    suppressMessages({
+      mStorageNewCap <- prec@parameters[["pStorageNewCap"]]@data |>
+        inner_join(prec@parameters[["mStorageNew"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mStorageNewCapLo <- filter(mStorageNewCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mStorageNewCapLo) && nrow(mStorageNewCapLo) > 0) {
+      prec@parameters[["mStorageNewCapLo"]] <-
+        .dat2par(prec@parameters[["mStorageNewCapLo"]], mStorageNewCapLo)
+    }
+    rm(mStorageNewCapLo)
+    mStorageNewCapUp <- filter(mStorageNewCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mStorageNewCapUp) && nrow(mStorageNewCapUp) > 0) {
+      prec@parameters[["mStorageNewCapUp"]] <-
+        .dat2par(prec@parameters[["mStorageNewCapUp"]], mStorageNewCapUp)
+    }
+    rm(mStorageNewCapUp)
+  }
+
+  if(nrow(prec@parameters[["pStorageRet"]]@data) > 0) {
+    suppressMessages({
+      mStorageRet <- prec@parameters[["pStorageRet"]]@data |>
+        inner_join(prec@parameters[["mStorageSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mStorageRetLo <- filter(mStorageRet, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mStorageRetLo) && nrow(mStorageRetLo) > 0) {
+      prec@parameters[["mStorageRetLo"]] <-
+        .dat2par(prec@parameters[["mStorageRetLo"]], mStorageRetLo)
+    }
+    rm(mStorageRetLo)
+    mStorageRetUp <- filter(mStorageRet, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mStorageRetUp) && nrow(mStorageRetUp) > 0) {
+      prec@parameters[["mStorageRetUp"]] <-
+        .dat2par(prec@parameters[["mStorageRetUp"]], mStorageRetUp)
+    }
+    rm(mStorageRetUp)
+  }
+  # browser()
+  # mTradeCap ####
+  if (nrow(prec@parameters[["pTradeCap"]]@data) > 0) {
+    suppressMessages({
+      mTradeCap <- prec@parameters[["pTradeCap"]]@data |>
+        inner_join(prec@parameters[["mTradeSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTradeCapLo <- filter(mTradeCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTradeCapLo) && nrow(mTradeCapLo) > 0) {
+      prec@parameters[["mTradeCapLo"]] <-
+        .dat2par(prec@parameters[["mTradeCapLo"]], mTradeCapLo)
+    }
+    rm(mTradeCapLo)
+    mTradeCapUp <- filter(mTradeCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTradeCapUp) && nrow(mTradeCapUp) > 0) {
+      prec@parameters[["mTradeCapUp"]] <-
+        .dat2par(prec@parameters[["mTradeCapUp"]], mTradeCapUp)
+    }
+    rm(mTradeCapUp)
+  }
+  # browser()
+  #mTradeNewCap ####
+  if (nrow(prec@parameters[["pTradeNewCap"]]@data) > 0) {
+    suppressMessages({
+      mTradeNewCap <- prec@parameters[["pTradeNewCap"]]@data |>
+        inner_join(prec@parameters[["mTradeNew"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTradeNewCapLo <- filter(mTradeNewCap, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTradeNewCapLo) && nrow(mTradeNewCapLo) > 0) {
+      prec@parameters[["mTradeNewCapLo"]] <-
+        .dat2par(prec@parameters[["mTradeNewCapLo"]], mTradeNewCapLo)
+    }
+    rm(mTradeNewCapLo)
+    mTradeNewCapUp <- filter(mTradeNewCap, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTradeNewCapUp) && nrow(mTradeNewCapUp) > 0) {
+      prec@parameters[["mTradeNewCapUp"]] <-
+        .dat2par(prec@parameters[["mTradeNewCapUp"]], mTradeNewCapUp)
+    }
+    rm(mTradeNewCapUp)
+  }
+  # browser()
+  if (nrow(prec@parameters[["pTradeRet"]]@data) > 0) {
+    suppressMessages({
+      mTradeRet <- prec@parameters[["pTradeRet"]]@data |>
+        inner_join(prec@parameters[["mTradeSpan"]]@data) |>
+        # select(-value) |>
+        unique()
+    })
+    mTradeRetLo <- filter(mTradeRet, type == "lo") |>
+      select(-type, -value)
+    if (!is.null(mTradeRetLo) && nrow(mTradeRetLo) > 0) {
+      prec@parameters[["mTradeRetLo"]] <-
+        .dat2par(prec@parameters[["mTradeRetLo"]], mTradeRetLo)
+    }
+    rm(mTradeRetLo)
+    mTradeRetUp <- filter(mTradeRet, type == "up") |>
+      select(-type, -value)
+    if (!is.null(mTradeRetUp) && nrow(mTradeRetUp) > 0) {
+      prec@parameters[["mTradeRetUp"]] <-
+        .dat2par(prec@parameters[["mTradeRetUp"]], mTradeRetUp)
+    }
+    rm(mTradeRetUp)
+  }
+
   # mDummyImport ####
   .interpolation_message("mDummyImport", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -998,25 +1218,28 @@ write.sc <- write_sc
   )
   mvInpTot <- mvInpTot[!duplicated(mvInpTot), ]
   mvInpTot <- merge0(mvInpTot, mCommSlice) %>% unique()
-  if (T) { # check
-    # mvInpTot <-
-    dim_mvInpTot <- mvInpTot %>%
-      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-      unique() %>% dim()
-    if (!all(dim_mvInpTot == dim(mvInpTot))) {
-     if (F) browser() # Debug
-      x <- merge0(dregionyear, mCommSlice) %>%
-        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-        unique()
-      y <- anti_join(x, mvBalance)
-      yc <- y$comm %>% unique()
-      warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
-      rm(x, y, yc)
-    }
-  }
+  # if (T) { # check
+  #   # mvInpTot <-
+  #   dim_mvInpTot <- mvInpTot %>%
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #     unique() %>% dim()
+  #   if (!all(dim_mvInpTot == dim(mvInpTot))) {
+  #    if (F) browser() # Debug
+  #     x <- merge0(dregionyear, mCommSlice) %>%
+  #       inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #       unique()
+  #     browser()
+  #     suppressMessages({
+  #       y <- anti_join(x, mvBalance)
+  #     })
+  #     yc <- y$comm %>% unique()
+  #     warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
+  #     rm(x, y, yc)
+  #   }
+  # }
   prec@parameters[["mvInpTot"]] <-
     .dat2par(prec@parameters[["mvInpTot"]], mvInpTot)
-  rm(mvInpTot)
+  # rm(mvInpTot)
 
   # mvOutTot ####
   .interpolation_message("mvOutTot", rest, interpolation_count,
@@ -1035,16 +1258,16 @@ write.sc <- write_sc
   )
   mvOutTot <- mvOutTot[!duplicated(mvOutTot), ]
   mvOutTot <- merge0(mvOutTot, mCommSlice) %>% unique()
-  if (T) { # check
-    # mvOutTot <-
-    dim_mvOutTot <- mvOutTot %>%
-      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-      unique() %>% dim()
-    if (!all(dim_mvOutTot == dim(mvOutTot))) browser() # Debug
-  }
+  # if (T) { # check
+  #   # moved below with an adjustment for 'mAggregateFactor'
+  #   dim_mvOutTot <- mvOutTot %>%
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #     unique() %>% dim()
+  #   if (!all(dim_mvOutTot == dim(mvOutTot))) browser() # Debug
+  # }
   prec@parameters[["mvOutTot"]] <-
     .dat2par(prec@parameters[["mvOutTot"]], mvOutTot)
-  rm(mvOutTot)
+  # rm(mvOutTot) # moved below
   # mvBalance ####
   .interpolation_message("mvBalance", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -1073,6 +1296,29 @@ write.sc <- write_sc
   #   .dat2par(prec@parameters[["mvInpTot"]], mvBalance)
   # prec@parameters[["mvOutTot"]] <-
   #   .dat2par(prec@parameters[["mvOutTot"]], mvBalance)
+
+  if (T) { # check
+    # mvInpTot <-
+    dim_mvInpTot <- mvInpTot %>%
+      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+      unique() %>% dim()
+    if (!all(dim_mvInpTot == dim(mvInpTot))) {
+      if (F) browser() # Debug
+      x <- merge0(dregionyear, mCommSlice) %>%
+        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+        unique()
+      suppressMessages({
+        y <- anti_join(x, mvBalance)
+      })
+      yc <- y$comm %>% unique()
+      # !!! ToDo: add checks for agg-commodities
+      if (length(yc) > 0) {
+        warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
+      }
+      rm(x, y, yc)
+    }
+    rm(mvInpTot)
+  }
 
   .interpolation_message("meqBalLo", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
@@ -1103,11 +1349,29 @@ write.sc <- write_sc
   if (nrow(tmp)) {
     tmp$value <- NULL
     colnames(tmp)[2] <- "comm.1"
-    prec@parameters[["mAggregateFactor"]] <- .dat2par(prec@parameters[["mAggregateFactor"]], tmp)
+    prec@parameters[["mAggregateFactor"]] <-
+      .dat2par(prec@parameters[["mAggregateFactor"]], tmp)
   }
   cat(bacs, paste0(rep(" ", len_name), collapse = ""), bacs)
+  # mvOutTot |>
+  #   filter(comm %in% prec@parameters[["mAggregateFactor"]]@data$comm.1) |>
+  #   arrange(comm, year) |>
+  #   left_join(prec@parameters[["mCommSlice"]]@data, by = c("comm", "slice")) |>
+  # if (T) { # check
+  #   # mvOutTot <-
+  #   dim_mvOutTot <- mvOutTot %>%
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #     unique() %>% dim()
+  #   if (!all(dim_mvOutTot == dim(
+  #     filter(mvOutTot, !(comm %in% prec@parameters$mAggregateFactor@data$comm))
+  #     ))) browser() # Debug
+  # }
+  rm(mvOutTot)
   prec
 }
+
+# browser()
+
 
 # Sets, parameters, + to use in write_* and interpolation functions ####
 .set_al <- c("acomm", "stg", "trade", "expp", "imp", "tech", "dem", "sup", "weather", "region", "year", "slice", "group", "comm", "cns", "stgp", "tradep", "exppp", "impp", "techp", "demp", "supp", "weatherp", "regionp", "yearp", "slicep", "groupp", "commp", "cnsp", "stge", "tradee", "exppe", "impe", "teche", "deme", "supe", "weathere", "regione", "yeare", "slicee", "groupe", "comme", "cnse", "stgn", "traden", "exppn", "impn", "techn", "demn", "supn", "weathern", "regionn", "yearn", "slicen", "groupn", "commn", "cnsn", "src", "dst")

@@ -18,12 +18,12 @@ getData <- function(...) UseMethod("getData")
 #' @export
 findData <- function(scen, dataType = c("parameters", "variables"),
                      setsNames_ = NULL, valueColumn = TRUE,
-                     allSets = TRUE, 
+                     allSets = TRUE,
                      ignore.case = FALSE,
                      # anyOfTheSets = !allSets,
                      add_weights = "auto",
                      dropEmpty = TRUE,
-                     dfDim = TRUE, 
+                     dfDim = TRUE,
                      dfNames = TRUE,
                      asMatrix = FALSE) {
   ll <- lt <- list()
@@ -46,6 +46,7 @@ findData <- function(scen, dataType = c("parameters", "variables"),
       #     names = names(qu)
       #   )
       # }
+      qu
     })
   }
   # browser()
@@ -167,6 +168,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                     scenNameInList = as.logical(length(scen) - 1),
                     verbose = FALSE) {
   # if (name == "vObjective") browser()
+  # browser()
   arg <- list(...)
   argnam <- names(arg)
   stopifnot(!any(duplicated(argnam)))
@@ -301,9 +303,13 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       } else {
         for (pv in pvNames) { # selected pars/vars
           if (datype == "parameters") {
+            # browser()
             dat <- get_lazy_data(scen[[s]]@modInp@parameters[[pv]],
-                                 slot = "data") |>
-              collect() # temporary. ToDo: rewrite filter-algo for lazy-data
+                                 slot = "data")
+            if (!is.null(dat)) {
+              dat <- collect(dat)
+            }
+            # temporary. ToDo: rewrite filter-algo for lazy-data
             # if (!is.null(scen[[sc]]@modInp@parameters[[pv]])) {
             # if (!is.null(qu) {
               # dat <- scen[[sc]]@modInp@parameters[[pv]]@data
@@ -313,9 +319,13 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
             # }
           } else {
             # dat <- scen[[sc]]@modOut@variables[[pv]]
+            # browser()
             dat <- get_lazy_data(scen[[s]]@modOut, slot = "variables",
-                                 element = pv) |>
-              collect() # temporary. ToDo: rewrite filter-algo for lazy-data
+                                 element = pv)
+            if (!is.null(dat)) {
+              # temporary. ToDo: rewrite filter-algo for lazy-data
+              dat <- collect(dat)
+            }
           }
           dim1 <- dim(dat)[1]
           if (is.null(dim1)) dim1 <- 0
@@ -345,21 +355,23 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
               if (verbose) cat("   ", pv, " has no data.\n")
             }
           }
-          # browser()
-          dkk <- dat |> collect() |> filter(kk)
-          if (!is.null(dkk) && nrow(dkk) > 0) {
-            nkk <- sum(kk)
-            dat <- dplyr::bind_cols(
-              data.frame(
-                scenario = rep(sc, nkk),
-                name = rep(pv, nkk)
+          if (!is.null(dat)) {
+            if (anyDuplicatedSets(dat)) dat <- rename_duplicated_sets(dat)
+            dkk <- dat |> collect() |> filter(kk)
+            if (!is.null(dkk) && nrow(dkk) > 0) {
+              nkk <- sum(kk)
+              dat <- dplyr::bind_cols(
+                data.frame(
+                  scenario = rep(sc, nkk),
+                  name = rep(pv, nkk)
                 ),
-              dkk)
-            le <- length(ll) + 1
-            nm_ll <- names(ll)
-            if (scenNameInList) nm_le <- paste(sc, pv, sep = ".") else nm_le <- pv
-            ll[[le]] <- dat
-            names(ll) <- c(nm_ll, nm_le)
+                dkk)
+              le <- length(ll) + 1
+              nm_ll <- names(ll)
+              if (scenNameInList) nm_le <- paste(sc, pv, sep = ".") else nm_le <- pv
+              ll[[le]] <- dat
+              names(ll) <- c(nm_ll, nm_le)
+            }
           }
         }
       }
@@ -958,3 +970,4 @@ getObjects <- function(obj, class = c(), regex = NULL, ...) {
 getObjects_ <- function(obj, class = c(), ...) {
   .getNames(obj, cls = class, regex = TRUE, ...)
 }
+

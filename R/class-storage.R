@@ -102,6 +102,7 @@
 #'   \item{region}{character. Region name for wich the parameter will be specified. NA for all regions.}
 #'   \item{year}{integer. Year when the specified parameter will be actual. NA for all years.}
 #'   \item{invcost}{numeric. Overnight investment cost for the specified region and year.}
+#'   \item{wacc}{numeric. Weighted average cost of capital. If not supplied, the value is taken from the global model or scenario parameters.}
 #' }
 #' @slot fullYear logical. If TRUE, the storage technology operates between timeframes.
 #' @slot region character. Region where the storage technology is pre-installed or available for investment.
@@ -120,6 +121,7 @@
 #'  \item{wcout.fx}{numeric. Coefficient that links the weather factor with the fixed value of the output commodity availability factor.}
 #' }
 #' @slot misc list. Miscellaneous information or parameters.
+#' @slot capacity data.frame. (not implemented!) Capacity parameters of the storage technology.
 #'
 #' @include class-technology.R
 #'
@@ -138,7 +140,8 @@ setClass("storage",
     start = "data.frame",
     end = "data.frame",
     olife = "data.frame", #
-    stock = "data.frame", #
+    # stock = "data.frame", #
+    capacity = "data.frame", #
     charge = "data.frame", #
     seff = "data.frame", #
     af = "data.frame", # Availability of the resource with prices
@@ -149,6 +152,7 @@ setClass("storage",
     fullYear = "logical",
     cap2stg = "numeric", # cap2stg cinp
     weather = "data.frame", # weather condisions multiplier
+    optimizeRetirement = "logical",
     misc = "list" #
   ),
   prototype(
@@ -176,12 +180,6 @@ setClass("storage",
       year = integer(),
       slice = character(),
       charge = numeric(),
-      stringsAsFactors = FALSE
-    ),
-    stock = data.frame(
-      region = character(),
-      year = integer(),
-      stock = numeric(),
       stringsAsFactors = FALSE
     ),
     seff = data.frame(
@@ -250,6 +248,29 @@ setClass("storage",
       region = character(),
       year = integer(),
       invcost = numeric(),
+      wacc = numeric(),
+      retcost = numeric(),
+      stringsAsFactors = FALSE
+    ),
+    # stock = data.frame(
+    #   region = character(),
+    #   year = integer(),
+    #   stock = numeric(),
+    #   stringsAsFactors = FALSE
+    # ),
+    capacity = data.frame(
+      region = character(),
+      year = integer(),
+      stock = numeric(),
+      cap.lo = numeric(),
+      cap.up = numeric(),
+      cap.fx = numeric(),
+      ncap.lo = numeric(),
+      ncap.up = numeric(),
+      ncap.fx = numeric(),
+      ret.lo = numeric(),
+      ret.up = numeric(),
+      ret.fx = numeric(),
       stringsAsFactors = FALSE
     ),
     cap2stg = 1,
@@ -268,6 +289,7 @@ setClass("storage",
       wcout.up = numeric(),
       stringsAsFactors = FALSE
     ),
+    optimizeRetirement = FALSE,
     misc = list()
   ),
   S3methods = FALSE

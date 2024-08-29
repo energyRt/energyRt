@@ -1,3 +1,5 @@
+# temproary (manually created) file to store the default interpolation configuration
+# ToDO: create a function to generate this file from modInp.yml
 act2ainp: back.inter.forth
 act2aout: back.inter.forth
 af.lo: back.inter.forth
@@ -50,6 +52,7 @@ imp.up: back.inter.forth
 inpcost: back.inter.forth
 inpeff: back.inter.forth
 invcost: back.inter.forth
+retcost: back.inter.forth
 markup: back.inter.forth
 ncap2ainp: back.inter.forth
 ncap2aout: back.inter.forth
@@ -64,7 +67,7 @@ rampup: back.inter.forth
 res.lo: back.inter.forth
 res.up: back.inter.forth
 reserve: back.inter.forth
-rhs: back.inter.forth
+rhs: inter
 share.lo: back.inter.forth
 share.up: back.inter.forth
 stg2ainp: back.inter.forth
@@ -72,6 +75,12 @@ stg2aout: back.inter.forth
 stgcost: back.inter.forth
 stgeff: back.inter.forth
 stock: back.inter.forth
+cap.lo: inter.forth
+cap.up: inter.forth
+ncap.lo: inter.forth
+ncap.up: inter.forth
+ret.lo: inter.forth
+ret.up: inter.forth
 subs: inter.forth
 tax: inter.forth
 teff: back.inter.forth

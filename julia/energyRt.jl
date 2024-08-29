@@ -1,5 +1,9 @@
-println("Julia v", VERSION)
-println("Executing energyRt model in Julia/JuMP")
+print(
+    "Julia v",
+    VERSION,
+    "
+",
+)
 using Dates
 include("inc1.jl")
 flog = open("output/log.csv", "w")
@@ -10,15 +14,12 @@ println(
     Dates.format(now(), "yyyy-mm-dd HH:MM:SS"),
     "\"",
 )
-println("Starting time ", Dates.format(now(), "HH:MM:SS"))
+println("start ", Dates.format(now(), "HH:MM:SS"))
 using JuMP
 println(flog, "\"load data\",,\"", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), "\"")
-println("Reading data")
 include("data.jl")
 include("inc2.jl")
-println("Building JuMP model")
 model = Model();
-print("variables... ")
 @variable(model, vTechInv[mTechInv]);
 @variable(model, vTechEac[mTechEac]);
 @variable(model, vTechOMCost[mTechOMCost]);
@@ -35,6 +36,7 @@ print("variables... ")
 @variable(model, vTradeRowCost[mvTradeRowCost]);
 @variable(model, vTradeIrCost[mvTradeIrCost]);
 @variable(model, vTechNewCap[mTechNew] >= 0);
+@variable(model, vTechRetiredStockCum[mvTechRetiredStock] >= 0);
 @variable(model, vTechRetiredStock[mvTechRetiredStock] >= 0);
 @variable(model, vTechRetiredNewCap[mvTechRetiredNewCap] >= 0);
 @variable(model, vTechCap[mTechSpan] >= 0);
@@ -73,17 +75,15 @@ print("variables... ")
 @variable(model, vTradeIrAInpTot[mvTradeIrAInpTot] >= 0);
 @variable(model, vTradeIrAOut[mvTradeIrAOut] >= 0);
 @variable(model, vTradeIrAOutTot[mvTradeIrAOutTot] >= 0);
-@variable(model, vExportRowAccumulated[mExpComm] >= 0);
+@variable(model, vExportRowCum[mExpComm] >= 0);
 @variable(model, vExportRow[mExportRow] >= 0);
-@variable(model, vImportRowAccumulated[mImpComm] >= 0);
+@variable(model, vImportRowCum[mImpComm] >= 0);
 @variable(model, vImportRow[mImportRow] >= 0);
 @variable(model, vTradeCap[mTradeSpan] >= 0);
 @variable(model, vTradeInv[mTradeEac] >= 0);
 @variable(model, vTradeEac[mTradeEac] >= 0);
 @variable(model, vTradeNewCap[mTradeNew] >= 0);
 @variable(model, vTotalUserCosts[mvTotalUserCosts] >= 0);
-print(Dates.format(now(), "HH:MM:SS"), "\n")
-print("constraints... ")
 # eqTechSng2Sng(tech, region, comm, commp, year, slice)$meqTechSng2Sng(tech, region, comm, commp, year, slice)
 print("eqTechSng2Sng(tech, region, comm, commp, year, slice)...")
 @constraint(
@@ -391,17 +391,27 @@ print("eqTechAInp(tech, comm, region, year, slice)...")
     else
         0
     end) +
-    (if (t, c, r, y, s) in mTechCap2AInp
-        (vTechCap[(t, r, y)] * (
-            if haskey(pTechCap2AInp, (t, c, r, y, s))
-                pTechCap2AInp[(t, c, r, y, s)]
-            else
-                pTechCap2AInpDef
-            end
-        ))
-    else
-        0
-    end) +
+    (
+        if (t, c, r, y, s) in mTechCap2AInp
+            (
+                (vTechCap[(t, r, y)] * (
+                    if haskey(pTechCap2AInp, (t, c, r, y, s))
+                        pTechCap2AInp[(t, c, r, y, s)]
+                    else
+                        pTechCap2AInpDef
+                    end
+                )) / ((
+                    if haskey(pTechCap2act, (t))
+                        pTechCap2act[(t)]
+                    else
+                        pTechCap2actDef
+                    end
+                ))
+            )
+        else
+            0
+        end
+    ) +
     (if (t, c, r, y, s) in mTechNCap2AInp
         (vTechNewCap[(t, r, y)] * (
             if haskey(pTechNCap2AInp, (t, c, r, y, s))
@@ -457,17 +467,27 @@ print("eqTechAOut(tech, comm, region, year, slice)...")
     else
         0
     end) +
-    (if (t, c, r, y, s) in mTechCap2AOut
-        (vTechCap[(t, r, y)] * (
-            if haskey(pTechCap2AOut, (t, c, r, y, s))
-                pTechCap2AOut[(t, c, r, y, s)]
-            else
-                pTechCap2AOutDef
-            end
-        ))
-    else
-        0
-    end) +
+    (
+        if (t, c, r, y, s) in mTechCap2AOut
+            (
+                (vTechCap[(t, r, y)] * (
+                    if haskey(pTechCap2AOut, (t, c, r, y, s))
+                        pTechCap2AOut[(t, c, r, y, s)]
+                    else
+                        pTechCap2AOutDef
+                    end
+                )) / ((
+                    if haskey(pTechCap2act, (t))
+                        pTechCap2act[(t)]
+                    else
+                        pTechCap2actDef
+                    end
+                ))
+            )
+        else
+            0
+        end
+    ) +
     (if (t, c, r, y, s) in mTechNCap2AOut
         (vTechNewCap[(t, r, y)] * (
             if haskey(pTechNCap2AOut, (t, c, r, y, s))
@@ -546,7 +566,7 @@ print("eqTechAfLo(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfLo;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfLo; 
         init = 1
     ) <= vTechAct[(t, r, y, s)]
 );
@@ -597,7 +617,7 @@ print("eqTechAfUp(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfUp;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfUp; 
         init = 1
     )
 );
@@ -647,7 +667,7 @@ print("eqTechAfsLo(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsLo;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsLo; 
         init = 1
     ) <= sum(
         (if (t, r, y, sp) in mvTechAct
@@ -710,7 +730,7 @@ print("eqTechAfsUp(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsUp;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsUp; 
         init = 1
     )
 );
@@ -926,7 +946,7 @@ print("eqTechAfcOutLo(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo; 
         init = 1
     ) <= vTechOut[(t, c, r, y, s)]
 );
@@ -977,7 +997,7 @@ print("eqTechAfcOutUp(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp; 
         init = 1
     )
 );
@@ -1027,7 +1047,7 @@ print("eqTechAfcInpLo(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo; 
         init = 1
     ) <= vTechInp[(t, c, r, y, s)]
 );
@@ -1078,7 +1098,7 @@ print("eqTechAfcInpUp(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp; 
         init = 1
     )
 );
@@ -1101,7 +1121,7 @@ print("eqTechCap(tech, region, year)...")
             pTechStockDef
         end
     ) - (if (t, r, y) in mvTechRetiredStock
-        vTechRetiredStock[(t, r, y)]
+        vTechRetiredStockCum[(t, r, y)]
     else
         0
     end) + sum(
@@ -1137,6 +1157,82 @@ print(
     "
 ",
 )
+# eqTechCapLo(tech, region, year)$mTechCapLo(tech, region, year)
+print("eqTechCapLo(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechCapLo],
+    vTechCap[(t, r, y)] >= (
+        if haskey(pTechCapLo, (t, r, y))
+            pTechCapLo[(t, r, y)]
+        else
+            pTechCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechCapUp(tech, region, year)$mTechCapUp(tech, region, year)
+print("eqTechCapUp(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechCapUp],
+    vTechCap[(t, r, y)] <= (
+        if haskey(pTechCapUp, (t, r, y))
+            pTechCapUp[(t, r, y)]
+        else
+            pTechCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechNewCapLo(tech, region, year)$mTechNewCapLo(tech, region, year)
+print("eqTechNewCapLo(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechNewCapLo],
+    vTechNewCap[(t, r, y)] >= (
+        if haskey(pTechNewCapLo, (t, r, y))
+            pTechNewCapLo[(t, r, y)]
+        else
+            pTechNewCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechNewCapUp(tech, region, year)$mTechNewCapUp(tech, region, year)
+print("eqTechNewCapUp(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechNewCapUp],
+    vTechNewCap[(t, r, y)] <= (
+        if haskey(pTechNewCapUp, (t, r, y))
+            pTechNewCapUp[(t, r, y)]
+        else
+            pTechNewCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
 # eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
 print("eqTechRetiredNewCap(tech, region, year)...")
 @constraint(
@@ -1153,18 +1249,33 @@ print(
     "
 ",
 )
-# eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
-print("eqTechRetiredStock(tech, region, year)...")
+# eqTechRetiredStockCum(tech, region, year)$mvTechRetiredStock(tech, region, year)
+print("eqTechRetiredStockCum(tech, region, year)...")
 @constraint(
     model,
     [(t, r, y) in mvTechRetiredStock],
-    vTechRetiredStock[(t, r, y)] <= (
+    vTechRetiredStockCum[(t, r, y)] <= (
         if haskey(pTechStock, (t, r, y))
             pTechStock[(t, r, y)]
         else
             pTechStockDef
         end
     )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
+print("eqTechRetiredStock(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mvTechRetiredStock],
+    vTechRetiredStock[(t, r, y)] ==
+    vTechRetiredStockCum[(t, r, y)] -
+    sum(vTechRetiredStockCum[(t, r, yp)] for yp in year if (yp, y) in mMilestoneNext)
 );
 print(
     " ",
@@ -1367,7 +1478,7 @@ print("eqSupAvaUp(sup, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, s1) in mSupWeatherUp;
+        ) for wth1 in weather if (wth1, s1) in mSupWeatherUp; 
         init = 1
     )
 );
@@ -1402,7 +1513,7 @@ print("eqSupAvaLo(sup, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, s1) in mSupWeatherLo;
+        ) for wth1 in weather if (wth1, s1) in mSupWeatherLo; 
         init = 1
     )
 );
@@ -1412,8 +1523,8 @@ print(
     "
 ",
 )
-# eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)
-print("eqSupTotal(sup, comm, region)...")
+# eqSupReserve(sup, comm, region)$mvSupReserve(sup, comm, region)
+print("eqSupReserve(sup, comm, region)...")
 @constraint(
     model,
     [(s1, c, r) in mvSupReserve],
@@ -1529,8 +1640,8 @@ print(
     "
 ",
 )
-# eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
-print("eqAggOut(comm, region, year, slice)...")
+# eqAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
+print("eqAggOutTot(comm, region, year, slice)...")
 @constraint(
     model,
     [(c, r, y, s) in mAggOut],
@@ -1542,7 +1653,11 @@ print("eqAggOut(comm, region, year, slice)...")
                 pAggregateFactorDef
             end
         ) * sum(
-            vOutTot[(cp, r, y, sp)] for sp in slice if (
+            (if (cp, r, y, sp) in mvOutTot
+                vOutTot[(cp, r, y, sp)]
+            else
+                0
+            end) for sp in slice if (
                 (c, r, y, sp) in mvOutTot &&
                 (s, sp) in mSliceParentChildE &&
                 (cp, sp) in mCommSlice
@@ -1880,7 +1995,7 @@ print("eqStorageAfLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfLo;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfLo; 
         init = 1
     )
 );
@@ -1924,7 +2039,7 @@ print("eqStorageAfUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfUp;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfUp; 
         init = 1
     )
 );
@@ -1934,8 +2049,8 @@ print(
     "
 ",
 )
-# eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
-print("eqStorageClean(stg, comm, region, year, slice)...")
+# eqStorageClear(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
+print("eqStorageClear(stg, comm, region, year, slice)...")
 @constraint(
     model,
     [(st1, c, r, y, s) in mvStorageStore],
@@ -1959,26 +2074,12 @@ print("eqStorageInpUp(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageInpUp],
     vStorageInp[(st1, c, r, y, s)] <=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCinpUp, (st1, c, r, y, s))
             pStorageCinpUp[(st1, c, r, y, s)]
         else
             pStorageCinpUpDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -1994,7 +2095,7 @@ print("eqStorageInpUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpUp;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpUp; 
         init = 1
     )
 );
@@ -2010,26 +2111,12 @@ print("eqStorageInpLo(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageInpLo],
     vStorageInp[(st1, c, r, y, s)] >=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCinpLo, (st1, c, r, y, s))
             pStorageCinpLo[(st1, c, r, y, s)]
         else
             pStorageCinpLoDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -2045,7 +2132,7 @@ print("eqStorageInpLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpLo;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpLo; 
         init = 1
     )
 );
@@ -2061,26 +2148,12 @@ print("eqStorageOutUp(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageOutUp],
     vStorageOut[(st1, c, r, y, s)] <=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCoutUp, (st1, c, r, y, s))
             pStorageCoutUp[(st1, c, r, y, s)]
         else
             pStorageCoutUpDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -2096,7 +2169,7 @@ print("eqStorageOutUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutUp;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutUp; 
         init = 1
     )
 );
@@ -2112,26 +2185,12 @@ print("eqStorageOutLo(stg, comm, region, year, slice)...")
     model,
     [(st1, c, r, y, s) in meqStorageOutLo],
     vStorageOut[(st1, c, r, y, s)] >=
-    (
-        if haskey(pStorageCap2stg, (st1))
-            pStorageCap2stg[(st1)]
-        else
-            pStorageCap2stgDef
-        end
-    ) *
     vStorageCap[(st1, r, y)] *
     (
         if haskey(pStorageCoutLo, (st1, c, r, y, s))
             pStorageCoutLo[(st1, c, r, y, s)]
         else
             pStorageCoutLoDef
-        end
-    ) *
-    (
-        if haskey(pSliceShare, (s))
-            pSliceShare[(s)]
-        else
-            pSliceShareDef
         end
     ) *
     prod(
@@ -2147,7 +2206,7 @@ print("eqStorageOutLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutLo;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutLo; 
         init = 1
     )
 );
@@ -2190,6 +2249,82 @@ print("eqStorageCap(stg, region, year)...")
             ) &&
             (st1, r, yp) in mStorageNew
         )
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqStorageCapLo(stg, region, year)$mStorageCapLo(stg, region, year)
+print("eqStorageCapLo(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageCapLo],
+    vStorageCap[(st1, r, y)] >= (
+        if haskey(pStorageCapLo, (st1, r, y))
+            pStorageCapLo[(st1, r, y)]
+        else
+            pStorageCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqStorageCapUp(stg, region, year)$mStorageCapUp(stg, region, year)
+print("eqStorageCapUp(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageCapUp],
+    vStorageCap[(st1, r, y)] <= (
+        if haskey(pStorageCapUp, (st1, r, y))
+            pStorageCapUp[(st1, r, y)]
+        else
+            pStorageCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqStorageNewCapLo(stg, region, year)$mStorageNewCapLo(stg, region, year)
+print("eqStorageNewCapLo(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageNewCapLo],
+    vStorageNewCap[(st1, r, y)] >= (
+        if haskey(pStorageNewCapLo, (st1, r, y))
+            pStorageNewCapLo[(st1, r, y)]
+        else
+            pStorageNewCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqStorageNewCapUp(stg, region, year)$mStorageNewCapUp(stg, region, year)
+print("eqStorageNewCapUp(stg, region, year)...")
+@constraint(
+    model,
+    [(st1, r, y) in mStorageNewCapUp],
+    vStorageNewCap[(st1, r, y)] <= (
+        if haskey(pStorageNewCapUp, (st1, r, y))
+            pStorageNewCapUp[(st1, r, y)]
+        else
+            pStorageNewCapUpDef
+        end
     )
 );
 print(
@@ -2335,8 +2470,8 @@ print(
     "
 ",
 )
-# eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)
-print("eqImport(comm, dst, year, slice)...")
+# eqImportTot(comm, dst, year, slice)$mImport(comm, dst, year, slice)
+print("eqImportTot(comm, dst, year, slice)...")
 @constraint(
     model,
     [(c, dst, y, s) in mImport],
@@ -2359,11 +2494,24 @@ print("eqImport(comm, dst, year, slice)...")
                 end
             ) for src in region if (t1, src, dst) in mTradeRoutes
         ) for t1 in trade if (t1, c) in mTradeComm
-    ) + sum((if (i, c, dst, y, s) in mImportRow
+    ) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    ) +
+    sum((if (i, c, dst, y, s) in mImportRow
         vImportRow[(i, c, dst, y, s)]
     else
         0
-    end) for i in imp if (i, c) in mImpComm)
+    end) for i in imp if (i, c) in mImpComm) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    )
 );
 print(
     " ",
@@ -2371,8 +2519,8 @@ print(
     "
 ",
 )
-# eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)
-print("eqExport(comm, src, year, slice)...")
+# eqExportTot(comm, src, year, slice)$mExport(comm, src, year, slice)
+print("eqExportTot(comm, src, year, slice)...")
 @constraint(
     model,
     [(c, src, y, s) in mExport],
@@ -2385,11 +2533,24 @@ print("eqExport(comm, src, year, slice)...")
                 0
             end) for dst in region if (t1, src, dst) in mTradeRoutes
         ) for t1 in trade if (t1, c) in mTradeComm
-    ) + sum((if (e, c, src, y, s) in mExportRow
+    ) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    ) +
+    sum((if (e, c, src, y, s) in mExportRow
         vExportRow[(e, c, src, y, s)]
     else
         0
-    end) for e in expp if (e, c) in mExpComm)
+    end) for e in expp if (e, c) in mExpComm) * (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    )
 );
 print(
     " ",
@@ -2470,7 +2631,15 @@ print("eqCostRowTrade(region, year)...")
             else
                 pImportRowPriceDef
             end
-        ) * vImportRow[(i, c, r, y, s)] for i in imp for c in comm for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vImportRow[(i, c, r, y, s)] for i in imp for c in comm for
         s in slice if (i, c, r, y, s) in mImportRow
     ) - sum(
         (
@@ -2479,7 +2648,15 @@ print("eqCostRowTrade(region, year)...")
             else
                 pExportRowPriceDef
             end
-        ) * vExportRow[(e, c, r, y, s)] for e in expp for c in comm for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vExportRow[(e, c, r, y, s)] for e in expp for c in comm for
         s in slice if (e, c, r, y, s) in mExportRow
     )
 );
@@ -2495,7 +2672,38 @@ print("eqCostIrTrade(region, year)...")
     model,
     [(r, y) in mvTradeIrCost],
     vTradeIrCost[(r, y)] ==
-    sum(vTradeEac[(t1, r, y)] for t1 in trade if (t1, r, y) in mTradeEac) + sum(
+    sum(
+        (
+            if haskey(pTradeFixom, (t1, y))
+                pTradeFixom[(t1, y)]
+            else
+                pTradeFixomDef
+            end
+        ) * (
+            if haskey(pTradeStock, (t1, y))
+                pTradeStock[(t1, y)]
+            else
+                pTradeStockDef
+            end
+        ) for t1 in trade if (t1, y) in mTradeSpan
+    ) +
+    sum(
+        (
+            if haskey(pTradeFixom, (t1, y))
+                pTradeFixom[(t1, y)]
+            else
+                pTradeFixomDef
+            end
+        ) * (vTradeCap[(t1, y)] - (
+            if haskey(pTradeStock, (t1, y))
+                pTradeStock[(t1, y)]
+            else
+                pTradeStockDef
+            end
+        )) for t1 in trade if ((t1, y) in mTradeSpan && t1 in mTradeCapacityVariable)
+    ) +
+    sum(vTradeEac[(t1, r, y)] for t1 in trade if (t1, r, y) in mTradeEac) +
+    sum(
         sum(
             sum(
                 (
@@ -2515,7 +2723,15 @@ print("eqCostIrTrade(region, year)...")
                                         pTradeIrMarkupDef
                                     end
                                 )
-                            ) * vTradeIr[(t1, c, src, r, y, s)]
+                            ) *
+                            vTradeIr[(t1, c, src, r, y, s)] *
+                            (
+                                if haskey(pSliceWeight, (s))
+                                    pSliceWeight[(s)]
+                                else
+                                    pSliceWeightDef
+                                end
+                            )
                         )
                     else
                         0
@@ -2530,12 +2746,28 @@ print("eqCostIrTrade(region, year)...")
                     if (t1, c, r, dst, y, s) in mvTradeIr
                         (
                             (
-                                if haskey(pTradeIrMarkup, (t1, r, dst, y, s))
-                                    pTradeIrMarkup[(t1, r, dst, y, s)]
+                                (
+                                    if haskey(pTradeIrCost, (t1, r, dst, y, s))
+                                        pTradeIrCost[(t1, r, dst, y, s)]
+                                    else
+                                        pTradeIrCostDef
+                                    end
+                                ) + (
+                                    if haskey(pTradeIrMarkup, (t1, r, dst, y, s))
+                                        pTradeIrMarkup[(t1, r, dst, y, s)]
+                                    else
+                                        pTradeIrMarkupDef
+                                    end
+                                )
+                            ) *
+                            vTradeIr[(t1, c, r, dst, y, s)] *
+                            (
+                                if haskey(pSliceWeight, (s))
+                                    pSliceWeight[(s)]
                                 else
-                                    pTradeIrMarkupDef
+                                    pSliceWeightDef
                                 end
-                            ) * vTradeIr[(t1, c, r, dst, y, s)]
+                            )
                         )
                     else
                         0
@@ -2589,19 +2821,27 @@ print(
     "
 ",
 )
-# eqExportRowCumulative(expp, comm)$mExpComm(expp, comm)
-print("eqExportRowCumulative(expp, comm)...")
+# eqExportRowCum(expp, comm)$mExpComm(expp, comm)
+print("eqExportRowCum(expp, comm)...")
 @constraint(
     model,
     [(e, c) in mExpComm],
-    vExportRowAccumulated[(e, c)] == sum(
+    vExportRowCum[(e, c)] == sum(
         (
             if haskey(pPeriodLen, (y))
                 pPeriodLen[(y)]
             else
                 pPeriodLenDef
             end
-        ) * vExportRow[(e, c, r, y, s)] for r in region for y in year for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vExportRow[(e, c, r, y, s)] for r in region for y in year for
         s in slice if (e, c, r, y, s) in mExportRow
     )
 );
@@ -2611,12 +2851,12 @@ print(
     "
 ",
 )
-# eqExportRowResUp(expp, comm)$mExportRowAccumulatedUp(expp, comm)
+# eqExportRowResUp(expp, comm)$mExportRowCumUp(expp, comm)
 print("eqExportRowResUp(expp, comm)...")
 @constraint(
     model,
-    [(e, c) in mExportRowAccumulatedUp],
-    vExportRowAccumulated[(e, c)] <= (
+    [(e, c) in mExportRowCumUp],
+    vExportRowCum[(e, c)] <= (
         if haskey(pExportRowRes, (e))
             pExportRowRes[(e)]
         else
@@ -2668,19 +2908,27 @@ print(
     "
 ",
 )
-# eqImportRowAccumulated(imp, comm)$mImpComm(imp, comm)
-print("eqImportRowAccumulated(imp, comm)...")
+# eqImportRowCum(imp, comm)$mImpComm(imp, comm)
+print("eqImportRowCum(imp, comm)...")
 @constraint(
     model,
     [(i, c) in mImpComm],
-    vImportRowAccumulated[(i, c)] == sum(
+    vImportRowCum[(i, c)] == sum(
         (
             if haskey(pPeriodLen, (y))
                 pPeriodLen[(y)]
             else
                 pPeriodLenDef
             end
-        ) * vImportRow[(i, c, r, y, s)] for r in region for y in year for
+        ) *
+        (
+            if haskey(pSliceWeight, (s))
+                pSliceWeight[(s)]
+            else
+                pSliceWeightDef
+            end
+        ) *
+        vImportRow[(i, c, r, y, s)] for r in region for y in year for
         s in slice if (i, c, r, y, s) in mImportRow
     )
 );
@@ -2690,12 +2938,12 @@ print(
     "
 ",
 )
-# eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm)
+# eqImportRowResUp(imp, comm)$mImportRowCumUp(imp, comm)
 print("eqImportRowResUp(imp, comm)...")
 @constraint(
     model,
-    [(i, c) in mImportRowAccumulatedUp],
-    vImportRowAccumulated[(i, c)] <= (
+    [(i, c) in mImportRowCumUp],
+    vImportRowCum[(i, c)] <= (
         if haskey(pImportRowRes, (i))
             pImportRowRes[(i)]
         else
@@ -2771,6 +3019,82 @@ print("eqTradeCap(trade, year)...")
                 ) + ordYear[(yp)] || t1 in mTradeOlifeInf
             )
         )
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeCapLo(trade, year)$mTradeCapLo(trade, year)
+print("eqTradeCapLo(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeCapLo],
+    vTradeCap[(t1, y)] >= (
+        if haskey(pTradeCapLo, (t1, y))
+            pTradeCapLo[(t1, y)]
+        else
+            pTradeCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeCapUp(trade, year)$mTradeCapUp(trade, year)
+print("eqTradeCapUp(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeCapUp],
+    vTradeCap[(t1, y)] <= (
+        if haskey(pTradeCapUp, (t1, y))
+            pTradeCapUp[(t1, y)]
+        else
+            pTradeCapUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeNewCapLo(trade, year)$mTradeNewCapLo(trade, year)
+print("eqTradeNewCapLo(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeNewCapLo],
+    vTradeNewCap[(t1, y)] >= (
+        if haskey(pTradeNewCapLo, (t1, y))
+            pTradeNewCapLo[(t1, y)]
+        else
+            pTradeNewCapLoDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTradeNewCapUp(trade, year)$mTradeNewCapUp(trade, year)
+print("eqTradeNewCapUp(trade, year)...")
+@constraint(
+    model,
+    [(t1, y) in mTradeNewCapUp],
+    vTradeNewCap[(t1, y)] <= (
+        if haskey(pTradeNewCapUp, (t1, y))
+            pTradeNewCapUp[(t1, y)]
+        else
+            pTradeNewCapUpDef
+        end
     )
 );
 print(
@@ -3026,13 +3350,7 @@ print("eqOutTot(comm, region, year, slice)...")
     else
         0
     end) +
-    (
-        if haskey(pSliceWeight, (s))
-            pSliceWeight[(s)]
-        else
-            pSliceWeightDef
-        end
-    ) * (if (c, r, y, s) in mAggOut
+    (if (c, r, y, s) in mAggOut
         vAggOutTot[(c, r, y, s)]
     else
         0
@@ -3096,13 +3414,7 @@ print("eqOut2Lo(comm, region, year, slice)...")
     else
         0
     end) +
-    (
-        if haskey(pSliceWeight, (s))
-            pSliceWeight[(s)]
-        else
-            pSliceWeightDef
-        end
-    ) * (if (c, r, y, s) in mAggOut
+    (if (c, r, y, s) in mAggOut
         vAggOutTot[(c, r, y, s)]
     else
         0
@@ -3151,7 +3463,13 @@ print("eqInpTot(comm, region, year, slice)...")
     else
         0
     end) +
-    (if (c, r, y, s) in mDummyExport
+    (
+        if haskey(pSliceWeight, (s))
+            pSliceWeight[(s)]
+        else
+            pSliceWeightDef
+        end
+    ) * (if (c, r, y, s) in mDummyExport
         vDummyExport[(c, r, y, s)]
     else
         0
@@ -3459,6 +3777,30 @@ print("eqCost(region, year)...")
     [(r, y) in mvTotalCost],
     vTotalCost[(r, y)] ==
     sum(vTechEac[(t, r, y)] for t in tech if (t, r, y) in mTechEac) +
+    sum(
+        (
+            if haskey(pTechRetCost, (t, r, y))
+                pTechRetCost[(t, r, y)]
+            else
+                pTechRetCostDef
+            end
+        ) * (
+            vTechRetiredStock[(t, r, y)] + sum(
+                vTechRetiredNewCap[(t, r, yp, y)] for
+                yp in year if (t, r, yp, y) in mvTechRetiredNewCap
+            )
+        ) for t in tech if (t, r, y) in mvTechRetiredStock
+    ) +
+    sum(
+        (
+            if haskey(pTechRetCost, (t, r, y))
+                pTechRetCost[(t, r, y)]
+            else
+                pTechRetCostDef
+            end
+        ) * vTechRetiredNewCap[(t, r, yp, y)] for t in tech for
+        yp in year if (t, r, yp, y) in mvTechRetiredNewCap
+    ) +
     sum(vTechOMCost[(t, r, y)] for t in tech if (t, r, y) in mTechOMCost) +
     sum(vSupCost[(s1, r, y)] for s1 in sup if (s1, r, y) in mvSupCost) +
     sum(
@@ -3609,13 +3951,13 @@ print("eqObjective...")
 @constraint(
     model,
     vObjective == sum(
-        vTotalCost[(r, y)] * (
+        (
             if haskey(pDiscountFactorMileStone, (r, y))
                 pDiscountFactorMileStone[(r, y)]
             else
                 pDiscountFactorMileStoneDef
             end
-        ) for r in region for y in year if (r, y) in mvTotalCost
+        ) * vTotalCost[(r, y)] for r in region for y in year if (r, y) in mvTotalCost
     )
 );
 print(

@@ -30,6 +30,23 @@ usethis::use_data(model_structure, #.modelCode,
 .defInt <- yaml::read_yaml(file = "data-raw/config_default_interpolation.yml")
 .modInp <- yaml::read_yaml("data-raw/modInp.yml")
 
+readr::write_lines(c(
+  "# This file is auto-created from *.yml files inputs,",
+  "# see data-raw/DATASETS.R for details.",
+  "",
+  ".defVal <- ",
+  dput(.defVal) |> deparse() |> stringr::str_replace_all(", ", ",\n"),
+  "",
+  ".defInt <- ",
+  dput(.defInt) |> deparse() |> stringr::str_replace_all(", ", ",\n")
+  # "",
+  # ".modInp <- ",
+  # dput(.modInp) |> deparse(),
+  ),
+  file = "R/defaults.R"
+)
+styler::style_file("R/defaults.R")
+
 # all names of sets used in parameter@dimSet
 .dimSets <- c(
   "horizon", # test
@@ -46,8 +63,8 @@ usethis::use_data(model_structure, #.modelCode,
 usethis::use_data(
   .dimSets,
   .modInp,
-  .defInt,
-  .defVal,
+  # .defInt,
+  # .defVal,
   # DefVal,
   .set_dimSets,
   .set_description,

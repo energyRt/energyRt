@@ -33,10 +33,22 @@ read_solution <- function(obj, ...) {
     }
   }
   # Read basic variable list (vrb_list) and additional if user need (vrb_list2)
-  vrb_list <- arg$readOutputFunction(
-    paste(arg$tmp.dir, "/output/variable_list.csv", sep = ""),
-    stringsAsFactors = FALSE
-  )$value
+  var_file <- paste(arg$tmp.dir, "/output/variable_list.csv", sep = "")
+  vrb_list <- try({
+    arg$readOutputFunction(
+      var_file,
+      stringsAsFactors = FALSE
+      )$value
+  })
+  if (inherits(vrb_list, "try-error")) {
+    msg <- paste0("Solution files not found\n", var_file)
+    if (!is.null(arg$stop_on_error) && arg$stop_on_error) {
+      stop(msg)
+    } else {
+      message(msg)
+      return(invisible(obj))
+    }
+  }
   if (file.exists(paste(arg$tmp.dir, "/output/variable_list2.csv", sep = ""))) {
     vrb_list2 <- arg$readOutputFunction(
       paste(arg$tmp.dir, "/output/variable_list2.csv", sep = ""),
@@ -69,7 +81,8 @@ read_solution <- function(obj, ...) {
   if (is.null(scen@settings@solver$import_format)) {
     scen@settings@solver$import_format <- "csv" # !!! workaround
   }
-  if (scen@settings@solver$import_format == "gdx") {
+  # browser()
+  if (grepl("^gdx$", scen@settings@solver$import_format, ignore.case = TRUE)) {
     # .check_load_gdxlib()
     .check_load_gdxtools()
     # Read variables gdx
@@ -361,19 +374,19 @@ setMethod("read", "scenario", read_solution)
   for (i in names(scen@misc$data.before)) {
     scen@modOut@variables[[i]] <- rbind(scen@modOut@variables[[i]], scen@misc$data.before[[i]])
   }
-  # Correct RowTradeAccumulated
-  if (nrow(scen@modOut@variables$vExportRowAccumulated) > 0) {
-    scen@modOut@variables$vExportRowAccumulated <- aggregate(
-      scen@modOut@variables$vExportRowAccumulated[, "value", drop = FALSE],
-      scen@modOut@variables$vExportRowAccumulated[, c("expp", "comm"),
+  # Correct RowTradeCum #!!! ToDO: ??? check
+  if (nrow(scen@modOut@variables$vExportRowCum) > 0) {
+    scen@modOut@variables$vExportRowCum <- aggregate(
+      scen@modOut@variables$vExportRowCum[, "value", drop = FALSE],
+      scen@modOut@variables$vExportRowCum[, c("expp", "comm"),
         drop = FALSE
       ], sum
     )
   }
-  if (nrow(scen@modOut@variables$vImportRowAccumulated) > 0) {
-    scen@modOut@variables$vImportRowAccumulated <- aggregate(
-      scen@modOut@variables$vImportRowAccumulated[, "value", drop = FALSE],
-      scen@modOut@variables$vImportRowAccumulated[, c("imp", "comm"), drop = FALSE], sum
+  if (nrow(scen@modOut@variables$vImportRowCum) > 0) {
+    scen@modOut@variables$vImportRowCum <- aggregate(
+      scen@modOut@variables$vImportRowCum[, "value", drop = FALSE],
+      scen@modOut@variables$vImportRowCum[, c("imp", "comm"), drop = FALSE], sum
     )
   }
   scen

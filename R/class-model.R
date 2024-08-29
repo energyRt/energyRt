@@ -21,7 +21,7 @@ setClass("model",
     data = "list",
     config = "config",
     # LECdata = "list",
-    # early.retirement = "logical",
+    # optimizeRetirement = "logical",
     misc = "list"
   ),
   prototype(
@@ -30,7 +30,7 @@ setClass("model",
     data = list(),
     config = new("config"),
     # LECdata = list(),
-    # early.retirement = FALSE,
+    # optimizeRetirement = FALSE,
     misc = list()
   ),
   S3methods = FALSE
@@ -63,6 +63,17 @@ add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
     # arg <- arg[-fl]
     arg <- list_flatten(arg, name_spec = "{inner}")
   }
+  ## Calendar from solve must be added to interpolate
+  arg_classes <- sapply(arg, class)
+  # if (any(arg_classes == "calendar")) {
+  #   if (length(arg_classes[arg_classes == "calendar"]) > 1) {
+  #     stop("Only one calendar object is allowed")
+  #   }
+  #   obj@data$calendar <- arg[arg_classes == "calendar"]
+  #   arg <- arg[arg_classes != "calendar"]
+  # }
+
+  ## Add to repository
   if (any(!(sapply(arg, class) %in% c(cls, 'repository')))) {
     stop(paste('Unknown class "', paste(unique(sapply(arg, class)[
       !(sapply(arg, class) %in% c(cls, 'repository'))]), collapse = '", "'),
@@ -327,9 +338,17 @@ newModel <- function(name = "", desc = "", ...) {
 #' @rdname newModel
 #' @export
 setMethod("setHorizon", signature(obj = "model"),
-  # signature(obj = "model", horizon = "numeric", intervals = "ANY"),
-  function(obj, horizon, intervals) {
-    obj@config <- setHorizon(obj@config, horizon, intervals)
+  # signature(obj = "model", period = "numeric", intervals = "numeric"),
+  function(obj, ...) {
+    args <- list(...)
+    # browser()
+    has_h <- sapply(args, function(x) inherits(x, "horizon"))
+    if (any(has_h)) {
+      if (sum(has_h) > 1) stop('Two or more "horizon" objects found.')
+      obj@config@horizon <- args[has_h]
+    } else {
+      obj@config <- setHorizon(obj@config, ...)
+    }
     obj
   }
 )

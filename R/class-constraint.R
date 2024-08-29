@@ -1,13 +1,21 @@
+#' @export
+get_interpolation_rule <- function(x) {
+  stopifnot(is.character(x))
+  if (!exists(".defInt")) load("R/sysdata.rda")
+  # sapply(x, function(i) energyRt:::.defInt[[i]])
+}
+
 #' Class 'constraint'
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot eq factor.
-#' @slot for.each list.
-#' @slot rhs data.frame.
-#' @slot defVal numeric.
-#' @slot lhs list.
-#' @slot misc list.
+#' @slot name character. Name of the constrain object (will be used in GAMS, GLPK, etc. as an element in sets).
+#' @slot desc character. Description of the constraint.
+#' @slot eq factor. Type of the relation ('==' default, '<=', '>=').
+#' @slot for.each list. List with sets for which constraint will be created.
+#' @slot rhs data.frame. List or data frame with numeric values for each constraint.
+#' @slot defVal numeric. The default value for the rhs.
+#' @slot interpolation character, interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".
+#' @slot lhs list. List of summands for the left-hand side of the equation. This slot is created automatically from all unnamed arguments passed to the `newConstraint` function.
+#' @slot misc list. List of any additional information or parameters to store in the constraint object.
 #'
 #' @include class-subsidy.R
 #'
@@ -19,6 +27,7 @@ setClass("constraint",
     for.each = "data.frame",
     rhs = "data.frame",
     defVal = "numeric",
+    interpolation = "character",
     lhs = "list",
     misc = "list"
     # parameter= list() # For the future
@@ -29,7 +38,8 @@ setClass("constraint",
     eq = factor("==", levels = c(">=", "<=", "==")),
     for.each = data.frame(),
     rhs = data.frame(),
-    defVal = 0,
+    defVal = as.numeric(NA),
+    interpolation = get_interpolation_rule("rhs"),
     lhs = list(),
     # ! Misc
     misc = list()
@@ -77,68 +87,100 @@ setClass("summand",
 #' @param eq Type of the relation ('==' default, '<=', '>=')
 #' @param for.each list with sets for which constraint will be created.
 #' @param ... Left-hand side (LHS) terms of the statement - list objects with
-#' @param rhs list or data frame with named sets ()
-#' @param defVal the default value for the rhs.
+#' @param rhs a numeric value, list or data frame with sets and numeric values for each constraint. Warning: zero values will be replaced with `1e-20` to avoid ignoring them by the current interpolation algorithms.
+#' @param defVal the default value for the `rhs`.
+#' @param interpolation interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".
 #' @param arg tbc
 #'
 #' @return Object of class `constraint`.
 #'
 #' @export
 newConstraint <- function(
-    name, ...,
+    name,
+    desc = "", # desc
+    ...,
     eq = "==",
     rhs = data.frame(),
     for.each = NULL,
-    defVal = 1e-20, # temporary solution to avoid dropping default zeros during interpolation
+    defVal = NULL, # temporary solution to avoid dropping default zeros during interpolation
+    interpolation = "inter",
+    replace_zerros = 1e-20,
     arg = NULL) {
   obj <- new("constraint")
   # stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq))) {
-    stop("Wrong condition type")
+    stop("Unrecognized 'eq' parameter. Use one of: ",
+         paste0(levels(obj@eq), collapse = ", "))
   }
   obj@eq[] <- eq
+  # browser()
+  if (is.null(defVal)) {
+    message("It is advisable to define 'defVal' parameter.")
+    if (eq == "==") {
+      defVal <- 0
+    } else if (eq == "<=") {
+      defVal <- Inf
+    } else if (eq >= ">=") {
+      defVal <- 0
+    }
+  }
+
   if (is.numeric(rhs)) {
     if (length(rhs) != 1) {
-      stop(paste0("Wrong rhs parameters "))
+      stop("rhs must be a single numeric value or a data.frame with sets and numeric values for each constraint.")
     }
-    defVal <- rhs
+    if (is.na(defVal)) defVal <- rhs
     rhs <- data.frame()
   }
   if (!is.data.frame(rhs) && is.list(rhs)) {
     tmp <- sapply(rhs, length)
     if (any(tmp[1] != tmp) || is.null(names(rhs))) {
-      stop(paste0("Wrong rhs parameters "))
+      stop("Length of the list elements in 'rhs' must be identical.")
     }
     rhs <- as.data.frame(rhs, stringsAsFactors = FALSE)
   }
   if (!is.data.frame(rhs) && is.list(rhs) && length(rhs) == 1 && length(rhs[[1]]) == 1) {
-    defVal <- rhs[[1]]
+    if (is.na(defVal)) defVal <- rhs[[1]]
     rhs <- data.frame()
   }
   if (is.data.frame(rhs) && ncol(rhs) == 1 && nrow(rhs) == 1) {
-    defVal <- rhs[1, 1]
+    if (is.na(defVal)) defVal <- rhs[1, 1]
     rhs <- data.frame()
   }
-  if (is.numeric(rhs)) {
-    defVal <- rhs
-    rhs <- data.frame()
+  # if (is.numeric(rhs)) {
+  #   if (length(rhs) != 1) {
+  #     stop("rhs must be a single numeric value or a data.frame with sets and numeric values for each constraint.")
+  #   }
+  #   if (is.na(defVal)) defVal <- rhs
+  #   rhs <- data.frame()
+  # }
+  # if (!is.data.frame(rhs) && is.list(rhs)) {
+  #   xx <- sapply(rhs, length)
+  #   if (any(xx[1] != xx)) {
+  #     stop("Length of the list elements in 'rhs' must be identical.")
+  #   }
+  #   if (xx[1] >= 1) {
+  #     xx <- data.frame(stringsAsFactors = FALSE)
+  #     xx[seq_len(length(rhs[[1]])), ] <- NA
+  #     for (i in names(rhs)) xx[[i]] <- rhs[[i]]
+  #     rhs <- xx
+  #   }
+  # }
+  # Replace zero values with 1e-20 in rhs and defVal
+  if (!is.null(replace_zerros) && any(rhs$rhs == 0)) {
+    warning("Zero values in 'rhs' will be replaced with '", replace_zerros, "' to avoid ignoring them by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
+    rhs[rhs == 0] <- replace_zerros
   }
-  if (!is.data.frame(rhs) && is.list(rhs)) {
-    xx <- sapply(rhs, length)
-    if (any(xx[1] != xx)) {
-      stop(paste0("Wrong rhs parameters "))
-    }
-    if (xx[1] >= 1) {
-      xx <- data.frame(stringsAsFactors = FALSE)
-      xx[seq_len(length(rhs[[1]])), ] <- NA
-      for (i in names(rhs)) xx[[i]] <- rhs[[i]]
-      rhs <- xx
-    }
+  if (!is.null(replace_zerros) && !is.na(defVal) && defVal == 0) {
+    warning("Zero value in 'defVal' will be replaced with '", replace_zerros,"' to avoid ignoring it by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
+    defVal <- replace_zerros
   }
   # TYPE vs SET
   obj@rhs <- rhs
   obj@defVal <- defVal
   obj@name <- name
+  obj@desc <- desc
+  obj@interpolation <- interpolation
   if (!is.null(for.each)) {
     if (!is.data.frame(for.each) && is.list(for.each)) {
       tmp <- data.frame(stringsAsFactors = FALSE)
@@ -159,7 +201,7 @@ newConstraint <- function(
     } else if (is.data.frame(for.each)) {
       obj@for.each <- for.each
     } else {
-      stop("Unknown argument 'for.each'")
+      stop("Unrecognized 'for.each' parameter. Cannot build a costraint.")
     }
   }
   for (i in seq_along(arg)) {
@@ -243,20 +285,43 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
 # Calculate do equation need additional set, and add it
 .getSetEquation <- function(prec, stm, approxim) {
   # browser()
+  # if (stm@name == "CO2_CAP") browser()
+  # if (grepl("CESR_", stm@name)) browser()
+  # if (grepl("CESR_5_2030", stm@name)) browser()
   # !!! add interpolation patch here? or in the calling function? !!!
   # if (nrow(stm@for.each) > 0) {
-  #   .interpolation0(obj = stm@rhs, parameter = "rhs", defVal = stm@defVal,
-  #
-  #                   arg = list(approxim = approxim)
-  #                   )
-  # }
+    # .interpolation0(stm@rhs, parameter = "rhs", defVal = stm@defVal,
+    #                 arg = list(approxim = approxim)
+    #                 )
+
+  # temporary fix for constraints interpolation: expanding year set
+  # works only for year set and if no NA values in the set
+  if (!is.null(stm@rhs$year) && !any(is.na(stm@rhs$year))) {
+    stm@rhs <- interpolate_slot(stm@rhs, val = "rhs")
+  }
+  if (!is.null(stm@for.each$year) && !any(is.na(stm@for.each$year))) {
+    stm@for.each <- interpolate_slot(stm@for.each, val = NULL)
+  }
 
   # !!! end
   stop.constr <- function(x) {
     stop(paste0('Constraint "', stm@name, '" error: ', x))
   }
   get.all.child <- function(x) {
-    unique(c(x, c(approxim$calendar@slice_ancestry[approxim$calendar@slice_ancestry$parent %in% x, "child"])))
+    #!!! Rewrite
+    unique(
+      c(x,
+        c(
+          # approxim$calendar@slice_ancestry[
+          #   approxim$calendar@slice_ancestry$parent %in% x,
+          #   "child"]
+          filter(
+            approxim$calendar@slice_ancestry,
+            approxim$calendar@slice_ancestry$parent %in% x
+          )[["child"]]
+        )
+      )
+    )
   }
   # all.set contain all set for for.each & lhs
   # Estimate is need sum for for.each
@@ -382,7 +447,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     new.map.name <- paste0("mCns", stm@name, "_", mpp$new.map)
     new.map.name.full <- paste0(new.map.name, "(", mpp$alias, ")")
     for (i in seq_along(set.map)) {
-      prec@parameters[[new.map.name[i]]] <- addMultipleSet(newParameter(new.map.name[i], set.map.name[i], "map"), c(set.map[[i]]))
+      prec@parameters[[new.map.name[i]]] <-
+        addMultipleSet(newParameter(new.map.name[i], set.map.name[i], "map"),
+                       c(set.map[[i]]))
     }
 
     # copy new.map for lhs set that define in for each
@@ -448,9 +515,11 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     }
   }
   if (nrow(stm@for.each) > 0) {
+    # browser()
     nmn <- paste0("mCnsForEach", stm@name)
     prec@parameters[[nmn]] <- .dat2par(
-      newParameter(nmn, colnames(stm@for.each), "map"),
+      newParameter(nmn, colnames(stm@for.each), "map",
+                   interpolation = stm@interpolation),
       stm@for.each
     )
     res$equation <- paste0(res$equation, "$", nmn, "(", paste0(colnames(stm@for.each), collapse = ", "), ")")
@@ -458,25 +527,42 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
   res$equation <- paste0(res$equation, ".. ")
 
   # Add eq
-  res$equation <- paste0(res$equation, " ### ", c("==" = "=e=", ">=" = "=g=", "<=" = "=l=")[as.character(stm@eq)], " ")
+  res$equation <- paste0(
+    res$equation,
+    " ### ",
+    c("==" = "=e=", ">=" = "=g=", "<=" = "=l=")[as.character(stm@eq)],
+    " "
+    )
   # Add rhs
-  if (nrow(stm@rhs) != 0 && (any(stm@rhs$rhs != 0) || (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
+  if (nrow(stm@rhs) != 0 &&
+      (any(stm@rhs$rhs != 0) ||
+       (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
     # Complicated rhs
     # Generate approxim
-    approxim2 <- approxim[unique(c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)], "solver", "year"))]
+    # browser()
+    approxim2 <-
+      approxim[unique(
+        c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)],
+          "solver", "year", "calendar")
+        )]
     if (any(names(approxim2) == "slice")) {
       approxim2$slice <- approxim2$calendar@slice_share$slice
     }
-    fl <- (all.set$for.each & !is.na(all.set$new.map) & all.set$set %in% colnames(stm@rhs))
+    fl <- (all.set$for.each & !is.na(all.set$new.map) &
+             all.set$set %in% colnames(stm@rhs))
     need.set <- all.set[fl, , drop = FALSE]
     for (j in seq_len(nrow(need.set))) {
       approxim2[[need.set[j, "set"]]] <- set.map[[need.set[j, "new.map"]]]
     }
     approxim2$fullsets <- approxim$fullsets
     need.set0 <- for.each.set[for.each.set %in% colnames(stm@rhs)]
+    # browser()
     xx <- newParameter(paste0("pCnsRhs", stm@name), need.set0, "numpar",
       defVal = stm@defVal,
-      interpolation = "back.inter.forth", colName = "rhs"
+      # interpolation = "back.inter.forth",
+      # interpolation = .defInt[["rhs"]], #!!! ToDO: add @defInt slot
+      interpolation = stm@interpolation,
+      colName = "rhs"
     )
     # !!! Similar interpolation for LHS is needed
     # browser()
@@ -492,7 +578,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     # yy[apply(select(yy, all_of(n1)), 1, paste0, collapse = "##") %in%
     #     apply(select(stm@for.each, all_of(n1)), 1, paste0, collapse = "##"),]
     # same using dplyr
-    yy <- yy |> right_join(select(stm@for.each, all_of(n1)))
+    suppressMessages({
+      yy <- yy |> right_join(select(stm@for.each, all_of(n1)))
+    })
 
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     # Add mult
@@ -570,16 +658,22 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
             for (j in nslc) {
               approxim2[[j]] <- approxim[[j]]
             }
-            if (any(nslc == "slice")) approxim2$slice <- approxim$calendar@slice_share$slice
+            if (any(nslc == "slice")) {
+              approxim2$slice <- approxim$calendar@slice_share$slice
+            }
           }
         }
       }
       approxim2$fullsets <- approxim$fullsets
-
-      xx <- newParameter(paste0("pCnsMult", stm@name, "_", i), need.set, "numpar",
-        defVal = stm@lhs[[i]]@defVal,
-        interpolation = "back.inter.forth"
-      )
+      # browser()
+      xx <- newParameter(paste0("pCnsMult", stm@name, "_", i),
+                         need.set,
+                         "numpar",
+                         defVal = stm@lhs[[i]]@defVal, # !!! Check
+                         # interpolation = "back.inter.forth"
+                         # interpolation = .defInt[["rhs"]] # !!! Temporary fix
+                         interpolation = stm@interpolation
+                         )
       prec@parameters[[xx@name]] <-
         .dat2par(xx, .interp_numpar(stm@lhs[[i]]@mult, "value", xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {

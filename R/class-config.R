@@ -6,7 +6,7 @@
 #' @slot horizon class horizon with the model time parameters
 #' @slot discount data frame with discount rates by region and year
 #' @slot discountFirstYear logical, if TRUE, the discounting starts from the beginning of the year
-#' @slot early.retirement currently ignored
+#' @slot optimizeRetirement currently ignored
 #' @slot defVal data.frame with default values of parameters (energyRt:::.defVal)
 #' @slot interpolation data.frame with interpolation rules (energyRt:::.defInt)
 #' @slot debug data.frame to define artificial (dummy) variables to debug model infeasibility
@@ -27,7 +27,7 @@ setClass("config",
     # yearFraction = "data.frame",
     discount = "data.frame",
     discountFirstYear = "logical",
-    early.retirement = "logical",
+    optimizeRetirement = "logical",
     defVal = "data.frame",
     interpolation = "data.frame",
     debug = "data.frame",
@@ -49,6 +49,8 @@ setClass("config",
       region = character(),
       year = integer(),
       discount = numeric(),
+      wacc = numeric(),
+      # sdr = numeric(),
       stringsAsFactors = FALSE
     ),
     region = NULL,
@@ -57,7 +59,7 @@ setClass("config",
     calendar = newCalendar(),
     # slice = new("slice"),
     discountFirstYear = FALSE,
-    early.retirement = FALSE,
+    optimizeRetirement = FALSE,
     defVal = data.frame(),
     interpolation = data.frame(),
     # defVal = as.data.frame(.defVal, stringsAsFactors = FALSE),
@@ -72,9 +74,13 @@ setClass("config",
   S3methods = FALSE
 )
 setMethod("initialize", "config", function(.Object, ...) {
-  if (!exists(".defVal")) load("R/sysdata.rda")
-  .Object@defVal <- as.data.frame(.defVal, stringsAsFactors = FALSE)
-  .Object@interpolation <- as.data.frame(.defInt, stringsAsFactors = FALSE)
+  # browser()
+  if (!exists(".defVal") || !exists(".modInp") || !exists(".defInt")) {
+    load("R/sysdata.rda")
+  }
+  # if (!is.null()) # add import from .defInt
+  .Object@defVal <- as.data.frame(energyRt:::.defVal, stringsAsFactors = FALSE)
+  .Object@interpolation <- as.data.frame(energyRt:::.defInt, stringsAsFactors = FALSE)
   .Object
 })
 
@@ -103,7 +109,8 @@ setMethod("setCalendar", signature(obj = "config"), function(obj, ...) {
 #' @param horizon .
 #'
 #' @export
-setMethod("setHorizon", signature(obj = "config"), function(obj, period, ...) {
+setMethod(
+  "setHorizon", signature(obj = "config"), function(obj, period, ...) {
     # browser()
     # obj@horizon <- milestoneYears(start, interval)
     # obj@year <- min(obj@horizon@intervals$start):max(obj@horizon@intervals$end)

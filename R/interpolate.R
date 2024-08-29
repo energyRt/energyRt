@@ -25,14 +25,16 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # browser()
   obj <- object
   arg <- list(...)
-
+  tictoc::tic()
+  # browser()
   interpolation_start_time <- proc.time()[3]
-  if (is.null(arg$echo)) arg$echo <- TRUE
+  if (is.null(arg$echo)) arg$echo <- FALSE
 
   if (class(obj) == "model") {
     scen <- new("scenario")
+    # scen <- newScenario()
     scen@model <- obj
-    scen@name <- "Default scenario name"
+    scen@name <- paste("scen", obj@name, sep = "_")
     scen@desc <- ""
     scen@settings <- .config_to_settings(obj@config) # import model settings
   } else if (class(obj) == "scenario") {
@@ -41,16 +43,37 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     stop('Interpolation is not available for class: "', class(obj), '"')
   }
 
+  # tictoc::toc()
+  if (!is.null(arg$overwrite)) {
+    overwrite <- arg$overwrite; arg$overwrite <- NULL
+  } else {
+    overwrite <- FALSE
+  }
+  if (isTRUE(arg$force)) { # force interpolation of interpolated model
+    scen@status$interpolated <- FALSE
+    arg$force <- NULL
+  }
   if (!is.null(arg$name)) {scen@name <- arg$name; arg$name <- NULL}
   if (!is.null(arg$desc)) {scen@desc <- arg$desc; arg$desc <- NULL}
-  if (!is.null(arg$path)) {scen@path <- arg$path; arg$path <- NULL}
-  if (!is.null(arg$inMemory)) {
-    scen@inMemory <- arg$inMemory;
-    arg$inMemory <- NULL
-  }
-  # if (is.null(arg$startYear) != is.null(arg$fixTo)) {
-  #   stop("startYear && fixTo have to define both (or not define both")
+  #!!! browser()
+  # if (!is.null(arg$path)) {
+  #   scen@path <- arg$path; arg$path <- NULL
+  # } else {
+  #   scen@path <- fp(get_scenarios_path(), make_scenario_dirname(scen))
   # }
+  # if (!is.null(arg$inMemory)) {
+  #   scen@inMemory <- arg$inMemory;
+  #   arg$inMemory <- NULL
+  # }
+  # cat("model: '", object@name, "'\n", sep = "")
+  # cat("scenario: '", scen@name, "'\n", sep = "")
+  # if (!(scen@desc == "")) cat("        '", arg$desc, "'\n", sep = "")
+  # if (!is.null(scen@path) || !scen@inMemory) {
+  #   cat("path: ", scen@path, "\n", sep = "")
+  #   cat("inMemory: ", scen@inMemory, "\n", sep = "")
+  # }
+
+  # repository ############################################
   if (!is.null(arg$repository)) {
     if (!is.null(arg$data))
       stop("Only one of arguments 'repository' or 'data' can be used.",
@@ -58,19 +81,26 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@model <- .add_repository(scen@model, arg$repository) # !!! use add?
     arg$repository <- NULL
   }
+  # data ############################################
   if (!is.null(arg$data)) {
     scen@model <- .add_repository(scen@model, arg$data) # !!! use add instead?
     arg$data <- NULL
+    scen@status$interpolated <- FALSE
   }
+
   carg <- sapply(arg, function(x) class(x)[1])
-  # check if there are more repositories
+  # more repositories ############################################
+  # check if there are more repositories to add
   ii <- carg == "repository"
   if (any(ii)) {
     for (ob in arg[ii]) {
-      scen@model <- add(scen@model, ob)
+      scen@model <- add(scen@model, ob, overwrite = overwrite)
     }
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
+
+  # "bricks" ############################################
   # check if there are any objects to add to a repository
   repo_objs <- newRepository("")@permit
   ii <- carg %in% repo_objs
@@ -78,8 +108,27 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen_repo <- newRepository(name = paste0(scen@name, "_repo"), arg[ii])
     scen@model <- add(scen@model, scen_repo); rm(scen_repo)
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
-  # check if `...` has `settings` object
+
+  # config ############################################
+  ii <- carg %in% "config"
+  if (any(ii)) {
+    if (sum(ii) > 1) {
+      stop("Two or more 'config' objects found in 'interpolation' arguments.",
+           call. = FALSE)
+    }
+    if (any(carg %in% "settings") || !is.null(arg@settings)) {
+      stop("Both 'config' and 'settings' objects found in 'interpolation' arguments.",
+           "Only one of them can be used in 'interpolation' arguments.",
+           call. = FALSE)
+    }
+    scen@settings <- .config_to_settings(arg[ii][[1]])
+    arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
+  }
+
+  # settings ############################################
   ii <- carg %in% "settings"
   if (any(ii)) {
     if (sum(ii) > 1) {
@@ -88,9 +137,10 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     }
     scen@settings <- arg[ii][[1]]
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
-  # browser()
-  # check if `...` has `calendar` object
+
+  # calendar ############################################
   ii <- carg %in% "calendar"
   if (any(ii)) {
     if (sum(ii) > 1) {
@@ -102,39 +152,89 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@settings@yearFraction$fraction <-
       sum(scen@settings@calendar@timetable$share)
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
-  # check if `...` has `horizon` object
+
+  # horizon ############################################
   ii <- carg %in% "horizon"
   if (any(ii)) {
     if (sum(ii) > 1) {
       stop("Two or more 'horizon' objects found in 'interpolation' arguments.",
            call. = FALSE)
     }
+    # browser()
     scen <- setHorizon(scen, arg[ii][[1]])
     # scen@settings <- arg[ii]
     arg[ii] <- NULL; carg <- carg[!ii]
+    scen@status$interpolated <- FALSE
   }
+
+  # SETTINGS slots ############################################
   # check if `...` has data for `settings` or `horizon` parameters
   # ToDo: rewrite with 'add' once implemented for settings/horizon
-  # sett_slots <- unique(c(slotNames("settings"), slotNames("horizon"))) %>%
-  #   unique()
-  # sett_slots[sett_slots %in% c("name", "desc", "misc")] <- NULL
   # !!! currently one-by-one
-
-  if (!is.null(arg$region)) {
-    stop("Regions must be defined before the interpolation")
-    scen@settings@region <- arg$region
-    arg$region <- NULL
+  # discountFirstYear ############################################
+  if (any(names(arg) %in% "discountFirstYear")) {
+    scen@settings@discountFirstYear <- arg$discountFirstYear
+    arg$discountFirstYear <- NULL
+    scen@status$interpolated <- FALSE
   }
+  # optimizeRetirement ############################################
+  if (any(names(arg) %in% "optimizeRetirement")) {
+    scen@settings@optimizeRetirement <- arg$optimizeRetirement
+    arg$optimizeRetirement <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # defValue ############################################
+  if (any(names(arg) %in% "defValue")) {
+    scen@settings@defValue <- arg$defValue
+    arg$defValue <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # interpolation ############################################
+  if (any(names(arg) %in% "interpolation")) {
+    scen@settings@interpolation <- arg$interpolation
+    arg$interpolation <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # debug ############################################
+  if (any(names(arg) %in% "debug")) {
+    scen@settings@debug <- arg$debug
+    arg$debug <- NULL
+    scen@status$interpolated <- FALSE
+  }
+  # discount ############################################
   if (!is.null(arg$discount)) {
     scen@settings@discount <- arg$discount
     arg$discount <- NULL
+    scen@status$interpolated <- FALSE
   }
+  # solver ############################################
+  if (!is.null(arg$solver)) {
+    if (is.character(arg$solver)) {
+      if (length(arg$solver) > 1) {
+        stop("Solver must be a list or a single string.")
+      }
+      arg$solver <- list(nane = arg$solver, lang = arg$solver)
+    }
+    scen@settings@solver <- arg$solver
+    arg$solver <- NULL
+    # scen@status$interpolated <- FALSE
+  }
+  # *DEPRICIATED ############################################
+  # year
   if (!is.null(arg$year)) {
     stop("\nThe 'year' argument is depreciated. \nUse 'period' ",
          "to set planning (optimization) period.  \n",
          "See ?horizon and ?settings for help", call. = FALSE)
   }
+  # region
+  if (!is.null(arg$region)) {
+    stop("Regions must be defined before the interpolation")
+    scen@settings@region <- arg$region
+    arg$region <- NULL
+  }
+  # HORIZON slots ############################################
   if (!is.null(arg$period) | !is.null(arg$intervals)) {
     if (!is.null(arg$period)) {
       upd_period <- arg$period
@@ -151,9 +251,20 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       intervals = upd_intervals,
       desc = scen@settings@horizon@desc
     )
+    scen@status$interpolated <- FALSE
   }
 
-  # other parameters
+
+  # INTERPOLATE ############################################
+  # Check if the interpolation is needed
+  if (scen@status$interpolated) {
+    message("The scenario is already interpolated. Use 'force = TRUE' ",
+            "to re-interpolate the scenario.")
+    return(invisible(scen))
+  }
+
+  # tictoc::toc()
+  # other interpolation parameters
   if (is.null(arg$n.threads)) arg$n.threads <- 1 #+ 0 * detectCores()
   if (is.null(arg$verbose)) arg$verbose <- 0
   if (!is.null(arg$table_format)) { # !!! draft, not actual
@@ -164,9 +275,10 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@misc$table_format <- "data.table"
     # set_table_format(scen@misc$table_format)
   }
-
+  # tictoc::toc(); tictoc::tic()
   ### Interpolation
   scen@modInp <- new("modInp")
+  # browser()
   ## Fill basic sets
   # Fill year
   if (!is.null(arg$year)) { #
@@ -191,13 +303,33 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       intervals = rep(1, length(scen@settings@horizon@period))
     )
   }
+
+  #!!!
+  # browser()
+  if (!is.null(arg$path)) {
+    scen@path <- arg$path; arg$path <- NULL
+  } else {
+    scen@path <- fp(get_scenarios_path(), make_scenario_dirname(scen))
+  }
+  if (!is.null(arg$inMemory)) {
+    scen@inMemory <- arg$inMemory;
+    arg$inMemory <- NULL
+  }
+  cat("model: '", object@name, "'\n", sep = "")
+  cat("scenario: '", scen@name, "'\n", sep = "")
+  if (!(scen@desc == "")) cat("        '", arg$desc, "'\n", sep = "")
+  if (!is.null(scen@path) || !scen@inMemory) {
+    cat("path: ", scen@path, "\n", sep = "")
+    cat("inMemory: ", scen@inMemory, "\n", sep = "")
+  }
+
   # browser()
   #!!! Suppressed parameter
   # newParameter("horizon", dimSets = "horizon", type = "map")
   # scen@modInp@parameters[["horizon"]] <-
   #   .dat2par(scen@modInp@parameters[["horizon"]],
   #            scen@settings@horizon@period)
-
+  # tictoc::toc(); tictoc::tic()
   scen@modInp@parameters[["year"]] <-
     .dat2par(scen@modInp@parameters[["year"]],
              scen@settings@horizon@intervals$mid)
@@ -230,18 +362,16 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # browser()
   # scen@settings@timeframe <- .init_slice(scen@settings@timeframe)
   # browser()
-
+  # tictoc::toc(); tictoc::tic()
   if (mean(scen@settings@yearFraction$fraction) != 1.) {
     # filter out unused slices
     # browser()
     warning(
-      "Solving for a fraction of a year, status: experimental. ",
-      "Currently only capacity and some totals (`vOutTot` and `vEmsFuelTot`)",
-      " variables have been scaled (using the given yearFraction parameter)",
-      " to represent annual values of capacity, total output, and emissions.",
-      " Hourly (or lower slice level) variables have not been scaled,",
-      " their annual sum will be different from their annual aggregates."
+      "Solving for a fraction of a year.\n",
+      "Variables without slice dimension scaled to the annual level using weights.",
+      "The solution might differ from the whole-year optimization."
     )
+    cat("Subsetting time-slices\n")
     scen@model@data <- subset_slices_repo(
       repo = scen@model@data,
       yearFraction = mean(scen@settings@yearFraction$fraction),
@@ -315,17 +445,21 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   if (!is.null(arg$trim) && arg$trim) {
     ## Trim before interpolation
     par_name <- grep("^p", names(scen@modInp@parameters), value = TRUE)
-    par_name <- par_name[!(par_name %in%
-                             c("pEmissionFactor", "pTechEmisComm", "pDiscount"))]
+    par_name <- par_name[
+      !(par_name %in% c("pEmissionFactor", "pTechEmisComm", "pDiscount"))
+      ]
     # Get repository / class structure
     rep_class <- NULL
     for (i in seq_along(scen@model@data)) {
-      rep_class <- rbind(rep_class, data.table(
-        repos = rep(i, length(scen@model@data[[i]]@data)),
-        class = sapply(scen@model@data[[i]]@data, class),
-        name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
-        stringsAsFactors = FALSE
-      ))
+      rep_class <- rbind(
+        rep_class,
+        data.table(
+          repos = rep(i, length(scen@model@data[[i]]@data)),
+          class = sapply(scen@model@data[[i]]@data, class),
+          name = c(sapply(scen@model@data[[i]]@data, function(x) x@name)),
+          stringsAsFactors = FALSE
+          )
+        )
     }
     # Trim data
     for (pr in par_name) {
@@ -406,7 +540,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
 
   # Update early retirement parameter
   # browser()
-  if (!scen@settings@early.retirement) {
+  if (!scen@settings@optimizeRetirement) {
     scen <- .remove_early_retirment(scen)
   }
   approxim$debug <- scen@settings@debug
@@ -425,7 +559,8 @@ interpolate_model <- function(object, ...) { #- returns class scenario
            function(x) .get_data_slot(x)[[1]])
 
   ## interpolate data by year, slice, ...
-  if (arg$echo) cat("Interpolation: ")
+  # if (arg$echo) cat("Interpolation: \n")
+  cat("Interpolating parameters\n")
   interpolation_count <- .get_objects_count(scen) + 46
   len_name <- .get_objects_len_name(scen)
   if (arg$n.threads == 1) {
@@ -434,7 +569,8 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     #   interpolation_count = interpolation_count, len_name = len_name
     # )
   } else {
-    warning("Multiple threads are not implemented yet, ignoring `n.threads` parameter")
+    warning("Multiple threads are not implemented yet,
+            ignoring `n.threads` parameter")
     # use_par <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) nrow(x@data) == 0)]
     # # require(parallel)
     # cl <- makeCluster(arg$n.threads)
@@ -457,12 +593,16 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   scen@modInp@parameters$mvDemInp <- .unique_set(scen@modInp@parameters$mvDemInp)
 
   # browser()
+  # Check for unknown set in model and duplicated set
+  .check_sets(scen)
   # Check for unknown set in constraints
   .check_constraint(scen)
   # Check for unknown weather
   .check_weather(scen)
-  # Check for unknown set in model and duplicated set
-  .check_sets(scen)
+  # # Check for unknown set in model and duplicated set
+  # .check_sets(scen)
+
+  #!!!ToDo: add NA checks for sets
 
   # Tune for LEC
   # if (length(scen@model@LECdata) != 0) {
@@ -504,6 +644,156 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     filter(region %in% scen@settings@region)
   scen@modInp@parameters[["mCommReg"]] <-
     .dat2par(scen@modInp@parameters[["mCommReg"]], mCommReg)
+  # browser()
+
+  # !!!patch: update parameters (drop technologies with unavailable in regs inputs)
+  #  ToDo: take into account of other mapping and parameters in new interpolate
+  # mCommReg - filter with comm-reg dims
+  filter_comreg <- function(p, y = mCommReg) {
+    p@data <-
+      p@data |>
+      semi_join(y, by = intersect(colnames(p@data), colnames(y))) |>
+      unique()
+    p@misc$nValues <- nrow(p@data)
+    p
+  }
+  # filter with "tech-region" dims
+  y_tech_reg <- scen@modInp@parameters[["mTechInpComm"]]@data |>
+    # rbind(scen@modInp@parameters[["mTechOutComm"]]@data) |>
+    rbind(scen@modInp@parameters[["mTechAInp"]]@data) |>
+    # rbind(scen@modInp@parameters[["mTechAOut"]]@data) |>
+    unique() |>
+    right_join(mCommReg, by = "comm") |>
+    filter(!is.na(tech)) |>
+    select(-comm) |> unique()
+
+  scen@modInp@parameters[["mvTechInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechInp"]])
+  scen@modInp@parameters[["mvTechOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechOut"]], y_tech_reg)
+  scen@modInp@parameters[["mvTechAInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechAInp"]], y_tech_reg)
+  scen@modInp@parameters[["mvTechAOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechAOut"]])
+
+  # scen@modInp@parameters[["mTechInpTot"]]
+  # y_out <- scen@modInp@parameters[["mTechOutComm"]]@data |>
+  #   rbind(scen@modInp@parameters[["mTechAOut"]]@data) |>
+  #   unique() |>
+  #   right_join(mCommReg, by = "comm") |>
+  #   filter(!is.na(tech))
+
+  scen@modInp@parameters[["mTechNew"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNew"]], y_tech_reg)
+  # scen@modInp@parameters[["mTechNew"]] |> filter_comreg(y_out)
+  scen@modInp@parameters[["mTechSpan"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechSpan"]], y_tech_reg)
+  # scen@modInp@parameters[["mTechSpan"]] |> filter_comreg(y_out)
+  scen@modInp@parameters[["mvTechAct"]] <-
+    filter_comreg(scen@modInp@parameters[["mvTechAct"]], y_tech_reg)
+  scen@modInp@parameters[["mTechInv"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechInv"]], y_tech_reg)
+  scen@modInp@parameters[["mTechEac"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechEac"]], y_tech_reg)
+  scen@modInp@parameters[["mTechOMCost"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechOMCost"]], y_tech_reg)
+  scen@modInp@parameters[["mTechCapLo"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCapLo"]], y_tech_reg)
+  scen@modInp@parameters[["mTechCapUp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCapUp"]], y_tech_reg)
+  scen@modInp@parameters[["mTechNewCapLo"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNewCapLo"]], y_tech_reg)
+  scen@modInp@parameters[["mTechNewCapUp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNewCapUp"]], y_tech_reg)
+
+  # pTechEac(tech, region, year)
+  # scen@modInp@parameters[["pTechEac"]] <-
+  #   filter_comreg(scen@modInp@parameters[["pTechEac"]], y_tech_reg)
+  # scen@modInp@parameters[["pTechEac"]] <-
+  #   filter_comreg(scen@modInp@parameters[["pTechEac"]], y_inp)
+
+  # mTechAct2AInp(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechAct2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechAct2AInp"]], y_tech_reg)
+  # mTechCap2AInp(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCap2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCap2AInp"]], y_tech_reg)
+  # mTechNCap2AInp(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechNCap2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNCap2AInp"]], y_tech_reg)
+  # mTechCinp2AInp(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCinp2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCinp2AInp"]], y_tech_reg)
+  # mTechCout2AInp(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCout2AInp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCout2AInp"]], y_tech_reg)
+  # mTechAct2AOut(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechAct2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechAct2AOut"]], y_tech_reg)
+  # mTechCap2AOut(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCap2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCap2AOut"]], y_tech_reg)
+  # mTechNCap2AOut(tech, comm, region, year, slice)
+  scen@modInp@parameters[["mTechNCap2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechNCap2AOut"]], y_tech_reg)
+  # mTechCinp2AOut(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCinp2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCinp2AOut"]], y_tech_reg)
+  # mTechCout2AOut(tech, comm, comm, region, year, slice)
+  scen@modInp@parameters[["mTechCout2AOut"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechCout2AOut"]], y_tech_reg)
+  # browser()
+  # meqTechSng2Sng
+  scen@modInp@parameters[["meqTechSng2Sng"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechSng2Sng"]], y_tech_reg)
+  # meqTechGrp2Sng
+  scen@modInp@parameters[["meqTechGrp2Sng"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechGrp2Sng"]], y_tech_reg)
+  # meqTechSng2Grp
+  scen@modInp@parameters[["meqTechSng2Grp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechSng2Grp"]], y_tech_reg)
+  # meqTechGrp2Grp
+  scen@modInp@parameters[["meqTechGrp2Grp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechGrp2Grp"]], y_tech_reg)
+  # meqTechAfLo
+  scen@modInp@parameters[["meqTechAfLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfLo"]], y_tech_reg)
+  # meqTechAfUp
+  scen@modInp@parameters[["meqTechAfUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfUp"]], y_tech_reg)
+  # meqTechAfsLo
+  scen@modInp@parameters[["meqTechAfsLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfsLo"]], y_tech_reg)
+  # meqTechAfsUp
+  scen@modInp@parameters[["meqTechAfsUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfsUp"]], y_tech_reg)
+  # mTechRampUp
+  scen@modInp@parameters[["mTechRampUp"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechRampUp"]], y_tech_reg)
+  # mTechRampDown
+  scen@modInp@parameters[["mTechRampDown"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechRampDown"]], y_tech_reg)
+  # meqTechActSng
+  scen@modInp@parameters[["meqTechActSng"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechActSng"]], y_tech_reg)
+  # meqTechActGrp
+  scen@modInp@parameters[["meqTechActGrp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechActGrp"]], y_tech_reg)
+  # meqTechAfcOutLo
+  scen@modInp@parameters[["meqTechAfcOutLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcOutLo"]], y_tech_reg)
+  # meqTechAfcOutUp
+  scen@modInp@parameters[["meqTechAfcOutUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcOutUp"]], y_tech_reg)
+  # meqTechAfcInpLo
+  scen@modInp@parameters[["meqTechAfcInpLo"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcInpLo"]], y_tech_reg)
+  # meqTechAfcInpUp
+  scen@modInp@parameters[["meqTechAfcInpUp"]] <-
+    filter_comreg(scen@modInp@parameters[["meqTechAfcInpUp"]], y_tech_reg)
+
+  # browser()
+  # !!! End of patch
   rm(mCommReg)
 
   # filter parameters by (comm, region)
@@ -523,33 +813,43 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   )
 
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
+  # browser()
   for (i in names(scen@modInp@parameters)) {
     if (scen@modInp@parameters[[i]]@misc$nValues != -1) {
-      scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
-        seq(length.out = scen@modInp@parameters[[i]]@misc$nValues), ,
-        drop = FALSE
-      ]
+      # scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data[
+      #   seq(length.out = scen@modInp@parameters[[i]]@misc$nValues), ,
+      #   drop = FALSE
+      # ]
+      nrow_i <- scen@modInp@parameters[[i]]@data |> nrow()
+      scen@modInp@parameters[[i]]@data <- scen@modInp@parameters[[i]]@data |>
+        slice_head(n = min(nrow_i,
+                           scen@modInp@parameters[[i]]@misc$nValues,
+                           na.rm = TRUE)
+                   )
     }
   }
   scen@settings@sourceCode <- .modelCode
   scen@status$interpolated <- TRUE
+  scen@status$script <- FALSE
 
   # Check parameters
   scen <- .check_scen_par(scen)
-  if (arg$echo) cat(" ", round(proc.time()[3] - interpolation_start_time, 2), "s\n")
-
+  # if (arg$echo) cat(" ", round(proc.time()[3] - interpolation_start_time, 2), "s\n")
+  # cat("\n")
+  tictoc::toc()
   invisible(scen)
 }
 
-#' @param object object of class model or scenario
+
+#' Interpolate model
 #'
-#' @param ...
+#' @param object model or scenario type of object.
 #'
-#' @rdname interpolate
-#' @family interpolate model
-#' @method interpolate model
-#'
+#' @return scenario object with enclosed model (slot `@model`) and interpolated parameters (slot `@modInp`).
 #' @export
+#' @family interpolate model
+#'
+#' @examples
 setMethod("interpolate", signature(object = "model"),
   function(object, ...) {
     interpolate_model(object, ...)
@@ -603,9 +903,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
 
   if (inherits(repo, "list")) {
+    # list of repositories
     repo <- lapply(repo, function(o) {
       subset_slices_repo(o, yearFraction, keep_slices)
     })
+    return(repo)
   }
   # stopifnot(inherits(repo, c("repository")))
   # if (repo)
@@ -614,20 +916,27 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   # i <- 19
   # browser()
   if (inherits(repo, c("repository"))) {
+    cat(" Repository '", repo@name, "'\n", sep = "")
     x <- repo@data
   } else {
-    x <- repo
+    # x <- repo
+    # browser()
+    stop("Unrecognized class of object in the repository.")
   }
-
+  p <- progressr::progressor(
+    along = names(x)
+    # message = paste(" Repository '", repo@name, "'\n", sep = "")
+  )
   for (i in 1:length(x)) {
     # print(i)
     obj <- x[[i]]
+    p(obj@name)
     if (inherits(obj, c("repository"))) {
-      # obj <- fract_year_adj_repo(obj, subset_hours, check)
+      # nested repository - should not be here, check repo@misc$permit
+      stop("Nested repositories are not supported. ", obj@name,
+           " is a part of another repository.")
       subset_slices_repo(obj, yearFraction, keep_slices)
     } else {
-      # print(obj@name)
-      # obj <- fract_year_adj(obj, subset_hours, check)
       obj <- subset_slices(obj, yearFraction, keep_slices)
     }
     x[[i]] <- obj
@@ -674,9 +983,13 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     "pExportRowRes", "pExportRow",
     # "pExportRowPrice",
     "pImportRowRes", "pImportRow",
-    "pImportRow"
+    "pImportRow",
+    "pTechRet", "pTechCap", "pTechNewCap",
+    "pStorageRet", "pStorageCap", "pStorageNewCap",
+    "pTradeRet", "pTradeCap", "pTradeNewCap"
     # "pImportRowPrice"
   ))
+  # browser()
   msg_small_err <- NULL
   for (i in non_negative) {
     if (any(scen@modInp@parameters[[i]]@data$value < 0)) {
@@ -690,8 +1003,10 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
                                                drop = FALSE])))
 
         if (nrow(tmp) > 10) {
-          msg <- c(msg, paste0("Show only first 10 errors data, from ",
-                               nrow(tmp), "\n"))
+          msg <- c(msg,
+                   paste0("Showing only the first 10 errors in data, from ",
+                          nrow(tmp), "\n")
+                   )
         }
         stop(paste0(msg, collapse = "\n"))
       } else {
@@ -704,50 +1019,69 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   }
   if (length(msg_small_err) > 0) {
     warning(paste0(
-      "There small negative value (abs(err) < 1e-7) in parameter", "s"[length(msg_small_err) > 1], ': "',
+      "There small negative value (abs(err) < 1e-7) in parameter",
+      "s"[length(msg_small_err) > 1], ': "',
       paste0(msg_small_err, collapse = '", "'), '". Assigned as zerro.'
     ))
   }
   # Check share
   if (nrow(scen@modInp@parameters$pTechShare@data) > 0) {
-    mTechGroupComm <- .get_data_slot(scen@modInp@parameters$mTechGroupComm)
-    # scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
-    # if (scen@modInp@parameters$pTechShare@misc$nValues != - 1)
-    # 		scen@modInp@parameters$pTechShare@misc$nValues <- nrow(scen@modInp@parameters$pTechShare@data)
-    tmp <- .add_dropped_zeros(scen@modInp, "pTechShare")
-    mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
-    tmp <- merge(tmp, mTechSpan)
-    tmp_lo <- merge(tmp[tmp$type == "lo", , drop = FALSE], mTechGroupComm)
-    tmp_up <- merge(tmp[tmp$type == "up", , drop = FALSE], mTechGroupComm)
-    tmp_lo <- aggregate(tmp_lo[, "value", drop = FALSE], tmp_lo[, !(colnames(tmp_lo) %in% c("type", "comm", "value")), drop = FALSE], sum)
-    tmp_up <- aggregate(tmp_up[, "value", drop = FALSE], tmp_up[, !(colnames(tmp_up) %in% c("type", "comm", "value")), drop = FALSE], sum)
-    if (any(tmp_lo$value > 1) || any(tmp_up$value < 1)) {
-      tech_wrong_lo <- tmp_lo[tmp_lo$value > 1, , drop = FALSE]
-      tech_wrong_up <- tmp_up[tmp_up$value < 1, , drop = FALSE]
-      tech_wrong <- unique(c(tech_wrong_up$tech, tech_wrong_lo$tech))
-      assign("tech_wrong_lo", tech_wrong_lo, globalenv())
-      assign("tech_wrong_up", tech_wrong_up, globalenv())
-      stop(paste0(
-        "There are wrong share (sum of up less than one or sum of lo large than one)  (wrong data in data frame tech_wrong_lo and tech_wrong_up)",
-        ' for technology "', paste0(tech_wrong, collapse = '", "'), '"'
-      ))
-    }
-    fl <- colnames(tmp)[!(colnames(tmp) %in% c("type"))]
-    tmp_cmd <- merge(tmp[tmp$type == "lo", fl, drop = FALSE], tmp[tmp$type == "up", fl, drop = FALSE], by = fl[fl != "value"])
-    if (any(tmp_cmd$value.x > tmp_cmd$value.y)) {
-      tech_wrong <- tmp_cmd[tmp_cmd$value.x > tmp_cmd$value.y, , drop = FALSE]
-      assign("tech_wrong", tech_wrong, globalenv())
-      stop(paste0(
-        'There are wrong share (for tuple (tech, comm, region, year, slice) lo share large than up) (wrong data in data frame tech_wrong) for technology "',
-        paste0(unique(tech_wrong$tech), collapse = '", "'), '"'
-      ))
-    }
+    # Share check is not working, probably unfinished migration to dplyr & data.table
+    # !!! ToDo: rewrite this function.
+    # browser()
+    # mTechGroupComm <- .get_data_slot(scen@modInp@parameters$mTechGroupComm)
+    # # scen@modInp@parameters$pTechShare@data <- merge(scen@modInp@parameters$pTechShare@data, mTechGroupComm)
+    # # if (scen@modInp@parameters$pTechShare@misc$nValues != - 1)
+    # # 		scen@modInp@parameters$pTechShare@misc$nValues <- nrow(scen@modInp@parameters$pTechShare@data)
+    # tmp <- .add_dropped_zeros(scen@modInp, "pTechShare")
+    # mTechSpan <- .get_data_slot(scen@modInp@parameters$mTechSpan)
+    # browser()
+    # tmp <- merge(tmp, mTechSpan)
+    # tmp_lo <- merge0(tmp[tmp$type == "lo", , drop = FALSE], mTechGroupComm)
+    # tmp_up <- merge0(tmp[tmp$type == "up", , drop = FALSE], mTechGroupComm)
+    # tmp_lo <- aggregate(
+    #   tmp_lo[, "value", drop = FALSE],
+    #   select(tmp_lo, -any_of(c("type", "comm", "value"))),
+    #   # tmp_lo[, !(colnames(tmp_lo) %in% c("type", "comm", "value")),
+    #   #        drop = FALSE],
+    #   sum)
+    #   tmp_up <- aggregate(
+    #   tmp_up[, "value", drop = FALSE],
+    #   tmp_up[, !(colnames(tmp_up) %in% c("type", "comm", "value")),
+    #          drop = FALSE],
+    #   sum)
+    # if (any(tmp_lo$value > 1) || any(tmp_up$value < 1)) {
+    #   tech_wrong_lo <- tmp_lo[tmp_lo$value > 1, , drop = FALSE]
+    #   tech_wrong_up <- tmp_up[tmp_up$value < 1, , drop = FALSE]
+    #   tech_wrong <- unique(c(tech_wrong_up$tech, tech_wrong_lo$tech))
+    #   assign("tech_wrong_lo", tech_wrong_lo, globalenv())
+    #   assign("tech_wrong_up", tech_wrong_up, globalenv())
+    #   stop(paste0(
+    #     "Error in share (sum of up < 1 or sum of lo > 1)",
+    #     "(see `tech_wrong_lo` and `tech_wrong_up`)",
+    #     ' for technology "', paste0(tech_wrong, collapse = '", "'), '"'
+    #   ))
+    # }
+    # fl <- colnames(tmp)[!(colnames(tmp) %in% c("type"))]
+    # tmp_cmd <- merge(tmp[tmp$type == "lo", fl, drop = FALSE],
+    #                  tmp[tmp$type == "up", fl, drop = FALSE],
+    #                  by = fl[fl != "value"])
+    # if (any(tmp_cmd$value.x > tmp_cmd$value.y)) {
+    #   tech_wrong <- tmp_cmd[tmp_cmd$value.x > tmp_cmd$value.y, , drop = FALSE]
+    #   assign("tech_wrong", tech_wrong, globalenv())
+    #   stop(paste0(
+    #     'Error in share data (tuple (tech, comm, region, year, slice) lo",
+    #     " share > up), see `tech_wrong`"',
+    #     paste0(unique(tech_wrong$tech), collapse = '", "'), '"'
+    #   ))
+    # }
   }
   scen
 }
 
 .unique_set <- function(obj) {
   if (obj@misc$nValues != -1) {
+    # browser()
     obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
     obj@data <- obj@data[!duplicated(obj@data), , drop = FALSE]
   }
@@ -762,6 +1096,8 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 .read_default_data <- function(prec, ss) {
   for (i in seq(along = prec@parameters)) {
     # assign('test', prec@parameters[[i]], globalenv())
+    # if (i == 342) browser()
+    # if (prec@parameters[[i]]@name == "pTechRet") browser() # DEBUG
     if (any(prec@parameters[[i]]@inClass$colName != "")) {
       prec@parameters[[i]]@defVal <-
         as.numeric(ss@defVal[1, prec@parameters[[i]]@inClass$colName])
@@ -877,7 +1213,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   scen <- .apply_to_code_ret_scen(
     scen = scen, clss = "technology",
     func = function(x) {
-      x@early.retirement <- FALSE
+      x@optimizeRetirement <- FALSE
       x
     }
   )
@@ -895,7 +1231,9 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 
 # Implement add0 for all parameters
 .add2_nthreads_1 <- function(n.thread, max.thread, scen, arg, approxim,
-                             interpolation_start_time, interpolation_count, len_name) {
+                             interpolation_start_time, interpolation_count,
+                             len_name) {
+  # browser()
   # A couple of string for progress bar
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data,
                                                function(x) length(x@data)),
@@ -909,13 +1247,17 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   # Fill DB main data
   tmlg <- 0
   mnch <- 0
-  cat(rep(" ", len_name), sep = "")
+  # cat(rep(" ", len_name), sep = "")
   k <- 0
   time.log.nm <- rep(NA, num_classes_for_progrees_bar)
   time.log.tm <- rep(NA, num_classes_for_progrees_bar)
   mdinp <- list()
   for (i in seq(along = scen@model@data)) {
+    cat(" Repository '", names(scen@model@data)[i], "'\n", sep = "")
+    nm <- names(scen@model@data[[i]]@data)
+    p <- progressr::progressor(along = nm)
     for (j in seq(along = scen@model@data[[i]]@data)) {
+      p(nm[j])
       k <- k + 1
       if (k %% max.thread == n.thread) {
         tmlg <- tmlg + 1
@@ -994,9 +1336,9 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     time = time.log.tm[seq_len(tmlg)], stringsAsFactors = FALSE
   )
   # if (arg$echo) cat(' ')
-  if (arg$echo) {
-    .remove_char(len_name)
-  }
+  # if (arg$echo) {
+  #   .remove_char(len_name)
+  # }
   scen
 }
 
@@ -1051,7 +1393,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     length_out <- 0
   }
   jj <- paste0(jj, paste0(rep(" ", length_out), collapse = ""))
-  cat(rep_len("\b", len_name), jj, sep = "") # , rep(' ', 100), rep('\b', 100)
+  # cat(rep_len("\b", len_name), jj, sep = "") # , rep(' ', 100), rep('\b', 100)
 }
 
 .remove_char <- function(x) {
@@ -1065,6 +1407,8 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 
 
 .check_constraint <- function(scen) {
+  cat("Validating constraints\n")
+  # browser()
   # Collect sets data
   sets <- list()
   for (ss in c(
@@ -1080,7 +1424,10 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       tmp <- data.table(value = have, stringsAsFactors = FALSE)
       tmp$slot <- slt
       tmp$constraint <- cns
-      return(rbind(err_msg, tmp[, c("constraint", "slot", "value"), drop = FALSE]))
+      return(rbind(err_msg,
+                   tmp[, c("constraint", "slot", "value"), drop = FALSE]
+                   )
+             )
     }
     return(err_msg)
   }
@@ -1088,11 +1435,25 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   sets$lead.year <- sets$year
   err_msg <- NULL
   # Check sets in constraints
+  # cat(" Repository ", names(scen@model@data)[i], "\n")
+  # nm <- names(scen@model@data)
+  # p <- progressr::progressor(along = nm)
   for (i in seq_along(scen@model@data)) {
-    for (j in seq_along(scen@model@data[[i]]@data)[
-      sapply(scen@model@data[[i]]@data, class) == "constraint"]) {
+    cat(" Repository '", names(scen@model@data)[i], "'\n", sep = "")
+    ii <- sapply(scen@model@data[[i]]@data, class) == "constraint"
+    nn <- seq_along(scen@model@data[[i]]@data)[ii]
+    if (length(nn) > 0) {
+      # cat(" Repository ", names(scen@model@data)[i], "\n")
+      # browser()
+      p <- progressr::progressor(along = nn)
+    }
+    # nm <- names(scen@model@data[[i]]@data)
+    for (j in nn) {
+    # for (j in seq_along(scen@model@data[[i]]@data)[
+    #   sapply(scen@model@data[[i]]@data, class) == "constraint"]) {
       # browser()
       tmp <- scen@model@data[[i]]@data[[j]]
+      p(tmp@name)
       for (k in colnames(tmp@rhs)) {
         if (k != "value" && k != "year") {
           err_msg <- add_to_err(err_msg, cns = tmp@name, slt = "rhs",
@@ -1120,31 +1481,47 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   if (!is.null(err_msg) && nrow(err_msg) > 0) {
     nn <- capture.output(err_msg)
     # print(err_msg); stop("Unknow sets in constrint(s)")
+    try({
+      err_msg0 <- err_msg |>
+        lapply(function(x) {head(unique(x), 3)}) |>
+        paste(collapse = "\n   ")
+      err_msg0 <- c("   ", err_msg0, "\n...\n",
+                    "See 'scen@misc$dropped_data' for details."
+                    )
+    })
     # browser()
-    warning("Unused (ignored) sets in constraints: ", err_msg)
+    warning("\nUnused (ignored) sets in constraints: \n", head(err_msg0))
   }
 }
 
 .check_weather <- function(scen) {
+  cat("Validating weather-sets\n")
+  # browser()
   weather <- scen@modInp@parameters$weather@data$weather
   err_msg <- list()
   pars <- names(scen@modInp@parameters)[sapply(scen@modInp@parameters, function(x) {
     !is.null(x@data$weather) &&
       nrow(x@data) != 0
   })]
+  # browser()
+  p <- progressr::progressor(along = pars)
   for (pr in pars) {
+    p(pr)
     tmp <- scen@modInp@parameters[[pr]]@data
-    tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather), , drop = FALSE]
+    tmp <- tmp[!is.na(tmp$weather) & !(tmp$weather %in% weather), ,
+               drop = FALSE]
     if (nrow(tmp) != 0) err_msg[[pr]] <- tmp
   }
   if (length(err_msg) != 0) {
     nn <- capture.output(err_msg)
-    stop(paste0("There unknow weather in parameters\n", paste0(nn, collapse = "\n")))
+    stop(paste0("Unknow 'weather' set in parameters\n", paste0(nn, collapse = "\n")))
   }
 }
 
-# Check for unknown sets
+# unrecognized sets ####
 .check_sets <- function(scen) {
+  cat("Validating sets\n")
+  # browser()
   lsets <- lapply(scen@modInp@parameters, function(x) {
     if (x@type == "set") .get_data_slot(x)[[1]]
   })
@@ -1166,7 +1543,11 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   err_dtf <- NULL
   int_err <- NULL
 
+  nm <- names(scen@modInp@parameters)
+  p <- progressr::progressor(along = nm)
   for (prm in scen@modInp@parameters) {
+    p(prm@name)
+    # if (grepl("CESR_.+_4", prm@name)) browser()
     if (!all(prm@dimSets %in% names(lsets))) {
       int_err <- unique(c(int_err, prm@dimSets[!(prm@dimSets %in% names(lsets))]))
     } else {
@@ -1176,6 +1557,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
         unq <- unique(tmp[[ss]])
         fl <- !(unq %in% lsets[[ss]])
         if (any(fl)) {
+          # isTRUE(options("en_debug")) browser()
           err_dtf <- rbind(err_dtf,
                            data.table(name = prm@name, set = ss, value = unq[fl]
                                       )
@@ -1196,35 +1578,55 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     }
   }
   if (length(int_err) != 0) {
-    stop(paste0('Internal error. Unknown set "',
-                paste0(int_err, collapse = '", "'), '"'))
+    err_msg0 <- paste0('Internal error. Unknown set "',
+                  paste0(int_err, collapse = '", "'), '"')
+    if (isFALSE(getOption("en.debug"))) {
+      message("Use 'option(en.debug = TRUE)' to ignore this error")
+      stop(err_msg0)
+    } else {
+      message(err_msg0)
+      browser()
+    }
   }
   if (!is.null(err_dtf)) {
     assign("unknown_sets", err_dtf, globalenv())
-    browser()
+    # isTRUE(options("en_debug")) browser()
     err_msg <- c(
       "Unknown sets (see unknown_sets in .globalenv)\n",
       paste0(capture.output(print(head(err_dtf))), collapse = "\n")
     )
     if (nrow(head(err_dtf)) != nrow(err_dtf)) {
       err_msg <- c(err_msg, paste0("\n", nrow(err_dtf) - nrow(head(err_dtf)),
-                                   " row(s) was ommited"))
+                                   " row(s) dropped"))
     }
-    stop(err_msg)
+
+    if (!isTRUE(getOption("en.debug"))) {
+      message("Use 'option(en.debug = TRUE)' to ignore this error")
+      stop(err_msg)
+    } else {
+      message(err_msg)
+    }
   }
   if (!is.null(error_duplicated_value)) {
     assign("error_duplicated_value", error_duplicated_value, globalenv())
     err_msg <- c(
-      "There is (are) duplicated values (see error_duplicated_value in globalenv)\n",
-      paste0(capture.output(print(head(error_duplicated_value))), collapse = "\n")
+      "Duplicated sets/values (see error_duplicated_value in globalenv)\n",
+      paste0(capture.output(print(head(error_duplicated_value))),
+             collapse = "\n")
     )
     if (nrow(head(error_duplicated_value)) != nrow(error_duplicated_value)) {
       err_msg <- c(err_msg, paste0("\n",
                                    nrow(error_duplicated_value) -
                                      nrow(head(error_duplicated_value)),
-                                   " row(s) was ommited"))
+                                   " row(s) dropped"))
     }
-    stop(err_msg)
+    # stop(err_msg)
+    if (isFALSE(getOption("en.debug"))) {
+      message("Use 'option(en.debug = TRUE)' to ignore this error")
+      stop(err_msg)
+    } else {
+      message(err_msg)
+    }
   }
 }
 
@@ -1244,8 +1646,11 @@ withinHorizon <- function(obj, settings) {
   ret <- NULL # return NULL if not applicable to the object
   # check stock
   sn <- slotNames(obj)
-  if (any(sn == "stock")) {
-    stock <- obj@stock # !!! add check for interpolation rule or interpolate first
+  if (any(sn == "capacity")) {
+    stock <- obj@capacity |>
+      select(any_of(c("region", "year")), stock) |>
+      filter(!is.na(stock)) |> unique()
+    # stock <- obj@stock # !!! add check for interpolation rule or interpolate first
     if (nrow(stock) > 0) {
       if (all(is.na(stock$year))) return(TRUE) # years are not defined
       if (any(stock$year >= min(yrs)) && any(stock$stock[!is.na(stock$stock)] > 0)) {
@@ -1325,15 +1730,29 @@ interpolate_slot <- function(
     year_seq = NULL,
     val = "value"
 ) {
-  if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
-  x %>%
-    group_by(
-      across(any_of(keys))
-    ) %>%
-    complete(year = year_seq) %>%
-    mutate(
-      {{val}} := zoo::na.approx(.data[[val]], x = year)
-    ) %>%
+  # browser()
+  if (!is.null(x$year)) {
+    # year_seq = full_seq(c(x$year, year_seq), 1)
+    if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
+    x <- x %>%
+      group_by(
+        across(any_of(keys))
+      ) %>%
+      complete(year = year_seq) |>
+      ungroup()
+    if (!is.null(val) && !is.na(val)) {
+      x <- x %>%
+        mutate(
+          {{val}} := zoo::na.approx(.data[[val]], x = year)
+        )
+    }
+  }
+  # if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
+    #
+    # mutate(
+    #   {{val}} := zoo::na.approx(.data[[val]], x = year)
+    # ) %>%
     # as.data.table() %>%
-    ungroup()
+    # ungroup()
+  x
 }

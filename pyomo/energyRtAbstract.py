@@ -21,19 +21,29 @@ model.vTechOMCost = Var(
     model.mTechOMCost,
     doc="Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)",
 )
-model.vSupCost = Var(model.mvSupCost, doc="Supply costs")
-model.vEmsFuelTot = Var(model.mEmsFuelTot, doc="Total emissions from fuels combustion")
-model.vBalance = Var(model.mvBalance, doc="Net commodity balance")
-model.vTotalCost = Var(model.mvTotalCost, doc="Regional annual total costs")
+model.vSupCost = Var(model.mvSupCost, doc="Supply costs (weighted)")
+model.vEmsFuelTot = Var(
+    model.mEmsFuelTot,
+    doc="Total emissions from fuels combustion (technologies) (weighted)",
+)
+model.vBalance = Var(
+    model.mvBalance, doc="Net commodity balance (all sources) (weighted)"
+)
+model.vTotalCost = Var(model.mvTotalCost, doc="Regional annual total costs (weighted)")
 model.vObjective = Var(doc="Objective costs")
 model.vTaxCost = Var(model.mTaxCost, doc="Total tax levies (tax costs)")
 model.vSubsCost = Var(model.mSubCost, doc="Total subsidies (substracted from costs)")
-model.vAggOutTot = Var(model.mAggOut, doc="Aggregated commodity output")
-model.vStorageOMCost = Var(model.mStorageOMCost, doc="Storage O&M costs")
-model.vTradeCost = Var(model.mvTradeCost, doc="Total trade costs")
-model.vTradeRowCost = Var(model.mvTradeRowCost, doc="Trade with ROW costs")
-model.vTradeIrCost = Var(model.mvTradeIrCost, doc="Interregional trade costs")
+model.vAggOutTot = Var(model.mAggOut, doc="Aggregated commodity output (weighted)")
+model.vStorageOMCost = Var(model.mStorageOMCost, doc="Storage O&M costs (weighted)")
+model.vTradeCost = Var(model.mvTradeCost, doc="Total trade costs (weighted)")
+model.vTradeRowCost = Var(model.mvTradeRowCost, doc="Trade with ROW costs (weighted)")
+model.vTradeIrCost = Var(
+    model.mvTradeIrCost, doc="Interregional trade costs (weighted)"
+)
 model.vTechNewCap = Var(model.mTechNew, domain=pyo.NonNegativeReals, doc="New capacity")
+model.vTechRetiredStockCum = Var(
+    model.mvTechRetiredStock, domain=pyo.NonNegativeReals, doc="Early retired stock"
+)
 model.vTechRetiredStock = Var(
     model.mvTechRetiredStock, domain=pyo.NonNegativeReals, doc="Early retired stock"
 )
@@ -62,16 +72,18 @@ model.vTechAOut = Var(
 )
 model.vSupOut = Var(model.mSupAva, domain=pyo.NonNegativeReals, doc="Output of supply")
 model.vSupReserve = Var(
-    model.mvSupReserve, domain=pyo.NonNegativeReals, doc="Total (accumulated) supply"
+    model.mvSupReserve, domain=pyo.NonNegativeReals, doc="Cumulative supply (weighted)"
 )
 model.vDemInp = Var(model.mvDemInp, domain=pyo.NonNegativeReals, doc="Input to demand")
 model.vOutTot = Var(
     model.mvOutTot,
     domain=pyo.NonNegativeReals,
-    doc="Total commodity output (consumption is not substracted)",
+    doc="Total commodity output (all processes) (weighted)",
 )
 model.vInpTot = Var(
-    model.mvInpTot, domain=pyo.NonNegativeReals, doc="Total commodity input"
+    model.mvInpTot,
+    domain=pyo.NonNegativeReals,
+    doc="Total commodity input (all processes) (weighted)",
 )
 model.vInp2Lo = Var(
     model.mvInp2Lo,
@@ -84,27 +96,29 @@ model.vOut2Lo = Var(
     doc="Desagregation of slices for output parent to (grand)child",
 )
 model.vSupOutTot = Var(
-    model.mSupOutTot, domain=pyo.NonNegativeReals, doc="Total commodity supply"
+    model.mSupOutTot,
+    domain=pyo.NonNegativeReals,
+    doc="Total commodity supply (weighted)",
 )
 model.vTechInpTot = Var(
     model.mTechInpTot,
     domain=pyo.NonNegativeReals,
-    doc="Total commodity input to technologies",
+    doc="Total commodity (main & aux) input to technologies (weighted)",
 )
 model.vTechOutTot = Var(
     model.mTechOutTot,
     domain=pyo.NonNegativeReals,
-    doc="Total commodity output from technologies",
+    doc="Total commodity (main & aux) output from technologies (weighted)",
 )
 model.vStorageInpTot = Var(
     model.mStorageInpTot,
     domain=pyo.NonNegativeReals,
-    doc="Total commodity input to storage",
+    doc="Total commodity (main & aux) input to storage (weighted)",
 )
 model.vStorageOutTot = Var(
     model.mStorageOutTot,
     domain=pyo.NonNegativeReals,
-    doc="Total commodity output from storage",
+    doc="Total commodity (main & aux) output from storage (weighted)",
 )
 model.vStorageAInp = Var(
     model.mvStorageAInp,
@@ -144,10 +158,14 @@ model.vStorageNewCap = Var(
     model.mStorageNew, domain=pyo.NonNegativeReals, doc="Storage new capacity"
 )
 model.vImportTot = Var(
-    model.mImport, domain=pyo.NonNegativeReals, doc="Total regional import (Ir + ROW)"
+    model.mImport,
+    domain=pyo.NonNegativeReals,
+    doc="Total regional import (Ir + ROW) (weighted)",
 )
 model.vExportTot = Var(
-    model.mExport, domain=pyo.NonNegativeReals, doc="Total regional export (Ir + ROW)"
+    model.mExport,
+    domain=pyo.NonNegativeReals,
+    doc="Total regional export (Ir + ROW) (weighted)",
 )
 model.vTradeIr = Var(
     model.mvTradeIr,
@@ -160,7 +178,7 @@ model.vTradeIrAInp = Var(
 model.vTradeIrAInpTot = Var(
     model.mvTradeIrAInpTot,
     domain=pyo.NonNegativeReals,
-    doc="Trade total auxilari input",
+    doc="Trade total auxilari input (weighted)",
 )
 model.vTradeIrAOut = Var(
     model.mvTradeIrAOut, domain=pyo.NonNegativeReals, doc="Trade auxilari output"
@@ -168,16 +186,16 @@ model.vTradeIrAOut = Var(
 model.vTradeIrAOutTot = Var(
     model.mvTradeIrAOutTot,
     domain=pyo.NonNegativeReals,
-    doc="Trade auxilari output total",
+    doc="Trade auxilari output total (weighted)",
 )
-model.vExportRowAccumulated = Var(
-    model.mExpComm, domain=pyo.NonNegativeReals, doc="Accumulated export to ROW"
+model.vExportRowCum = Var(
+    model.mExpComm, domain=pyo.NonNegativeReals, doc="Cumulative export to ROW"
 )
 model.vExportRow = Var(
     model.mExportRow, domain=pyo.NonNegativeReals, doc="Export to ROW"
 )
-model.vImportRowAccumulated = Var(
-    model.mImpComm, domain=pyo.NonNegativeReals, doc="Accumulated import from ROW"
+model.vImportRowCum = Var(
+    model.mImpComm, domain=pyo.NonNegativeReals, doc="Cumulative import from ROW"
 )
 model.vImportRow = Var(
     model.mImportRow, domain=pyo.NonNegativeReals, doc="Import from ROW"
@@ -331,7 +349,10 @@ model.eqTechAInp = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * model.pTechCap2AInp[t, c, r, y, s])
+        (
+            (model.vTechCap[t, r, y] * model.pTechCap2AInp[t, c, r, y, s])
+            / (model.pTechCap2act[t])
+        )
         if (t, c, r, y, s) in model.mTechCap2AInp
         else 0
     )
@@ -361,7 +382,10 @@ model.eqTechAOut = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * model.pTechCap2AOut[t, c, r, y, s])
+        (
+            (model.vTechCap[t, r, y] * model.pTechCap2AOut[t, c, r, y, s])
+            / (model.pTechCap2act[t])
+        )
         if (t, c, r, y, s) in model.mTechCap2AOut
         else 0
     )
@@ -555,7 +579,11 @@ model.eqTechCap = Constraint(
     model.mTechSpan,
     rule=lambda model, t, r, y: model.vTechCap[t, r, y]
     == model.pTechStock[t, r, y]
-    - (model.vTechRetiredStock[t, r, y] if (t, r, y) in model.mvTechRetiredStock else 0)
+    - (
+        model.vTechRetiredStockCum[t, r, y]
+        if (t, r, y) in model.mvTechRetiredStock
+        else 0
+    )
     + sum(
         model.pPeriodLen[yp]
         * (
@@ -580,6 +608,28 @@ model.eqTechCap = Constraint(
         )
     ),
 )
+# eqTechCapLo(tech, region, year)$mTechCapLo(tech, region, year)
+model.eqTechCapLo = Constraint(
+    model.mTechCapLo,
+    rule=lambda model, t, r, y: model.vTechCap[t, r, y] >= model.pTechCapLo[t, r, y],
+)
+# eqTechCapUp(tech, region, year)$mTechCapUp(tech, region, year)
+model.eqTechCapUp = Constraint(
+    model.mTechCapUp,
+    rule=lambda model, t, r, y: model.vTechCap[t, r, y] <= model.pTechCapUp[t, r, y],
+)
+# eqTechNewCapLo(tech, region, year)$mTechNewCapLo(tech, region, year)
+model.eqTechNewCapLo = Constraint(
+    model.mTechNewCapLo,
+    rule=lambda model, t, r, y: model.vTechNewCap[t, r, y]
+    >= model.pTechNewCapLo[t, r, y],
+)
+# eqTechNewCapUp(tech, region, year)$mTechNewCapUp(tech, region, year)
+model.eqTechNewCapUp = Constraint(
+    model.mTechNewCapUp,
+    rule=lambda model, t, r, y: model.vTechNewCap[t, r, y]
+    <= model.pTechNewCapUp[t, r, y],
+)
 # eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)
 model.eqTechRetiredNewCap = Constraint(
     model.meqTechRetiredNewCap,
@@ -590,11 +640,22 @@ model.eqTechRetiredNewCap = Constraint(
     )
     <= model.vTechNewCap[t, r, y],
 )
+# eqTechRetiredStockCum(tech, region, year)$mvTechRetiredStock(tech, region, year)
+model.eqTechRetiredStockCum = Constraint(
+    model.mvTechRetiredStock,
+    rule=lambda model, t, r, y: model.vTechRetiredStockCum[t, r, y]
+    <= model.pTechStock[t, r, y],
+)
 # eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
 model.eqTechRetiredStock = Constraint(
     model.mvTechRetiredStock,
     rule=lambda model, t, r, y: model.vTechRetiredStock[t, r, y]
-    <= model.pTechStock[t, r, y],
+    == model.vTechRetiredStockCum[t, r, y]
+    - sum(
+        model.vTechRetiredStockCum[t, r, yp]
+        for yp in model.year
+        if (yp, y) in model.mMilestoneNext
+    ),
 )
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(
@@ -694,8 +755,8 @@ model.eqSupAvaLo = Constraint(
         if (wth1, s1) in model.mSupWeatherLo
     ),
 )
-# eqSupTotal(sup, comm, region)$mvSupReserve(sup, comm, region)
-model.eqSupTotal = Constraint(
+# eqSupReserve(sup, comm, region)$mvSupReserve(sup, comm, region)
+model.eqSupReserve = Constraint(
     model.mvSupReserve,
     rule=lambda model, s1, c, r: model.vSupReserve[s1, c, r]
     == sum(
@@ -736,14 +797,14 @@ model.eqDemInp = Constraint(
     rule=lambda model, c, r, y, s: model.vDemInp[c, r, y, s]
     == sum(model.pDemand[d, c, r, y, s] for d in model.dem if (d, c) in model.mDemComm),
 )
-# eqAggOut(comm, region, year, slice)$mAggOut(comm, region, year, slice)
-model.eqAggOut = Constraint(
+# eqAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
+model.eqAggOutTot = Constraint(
     model.mAggOut,
     rule=lambda model, c, r, y, s: model.vAggOutTot[c, r, y, s]
     == sum(
         model.pAggregateFactor[c, cp]
         * sum(
-            model.vOutTot[cp, r, y, sp]
+            (model.vOutTot[cp, r, y, sp] if (cp, r, y, sp) in model.mvOutTot else 0)
             for sp in model.slice
             if (
                 (c, r, y, sp) in model.mvOutTot
@@ -907,8 +968,8 @@ model.eqStorageAfUp = Constraint(
         if (wth1, st1) in model.mStorageWeatherAfUp
     ),
 )
-# eqStorageClean(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
-model.eqStorageClean = Constraint(
+# eqStorageClear(stg, comm, region, year, slice)$mvStorageStore(stg, comm, region, year, slice)
+model.eqStorageClear = Constraint(
     model.mvStorageStore,
     rule=lambda model, st1, c, r, y, s: (model.vStorageOut[st1, c, r, y, s])
     / (model.pStorageOutEff[st1, c, r, y, s])
@@ -918,10 +979,8 @@ model.eqStorageClean = Constraint(
 model.eqStorageInpUp = Constraint(
     model.meqStorageInpUp,
     rule=lambda model, st1, c, r, y, s: model.vStorageInp[st1, c, r, y, s]
-    <= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    <= model.vStorageCap[st1, r, y]
     * model.pStorageCinpUp[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCinpUp[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather
@@ -932,10 +991,8 @@ model.eqStorageInpUp = Constraint(
 model.eqStorageInpLo = Constraint(
     model.meqStorageInpLo,
     rule=lambda model, st1, c, r, y, s: model.vStorageInp[st1, c, r, y, s]
-    >= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    >= model.vStorageCap[st1, r, y]
     * model.pStorageCinpLo[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCinpLo[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather
@@ -946,10 +1003,8 @@ model.eqStorageInpLo = Constraint(
 model.eqStorageOutUp = Constraint(
     model.meqStorageOutUp,
     rule=lambda model, st1, c, r, y, s: model.vStorageOut[st1, c, r, y, s]
-    <= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    <= model.vStorageCap[st1, r, y]
     * model.pStorageCoutUp[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCoutUp[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather
@@ -960,10 +1015,8 @@ model.eqStorageOutUp = Constraint(
 model.eqStorageOutLo = Constraint(
     model.meqStorageOutLo,
     rule=lambda model, st1, c, r, y, s: model.vStorageOut[st1, c, r, y, s]
-    >= model.pStorageCap2stg[st1]
-    * model.vStorageCap[st1, r, y]
+    >= model.vStorageCap[st1, r, y]
     * model.pStorageCoutLo[st1, c, r, y, s]
-    * model.pSliceShare[s]
     * prod(
         model.pStorageWeatherCoutLo[wth1, st1] * model.pWeather[wth1, r, y, s]
         for wth1 in model.weather
@@ -987,6 +1040,30 @@ model.eqStorageCap = Constraint(
             and (st1, r, yp) in model.mStorageNew
         )
     ),
+)
+# eqStorageCapLo(stg, region, year)$mStorageCapLo(stg, region, year)
+model.eqStorageCapLo = Constraint(
+    model.mStorageCapLo,
+    rule=lambda model, st1, r, y: model.vStorageCap[st1, r, y]
+    >= model.pStorageCapLo[st1, r, y],
+)
+# eqStorageCapUp(stg, region, year)$mStorageCapUp(stg, region, year)
+model.eqStorageCapUp = Constraint(
+    model.mStorageCapUp,
+    rule=lambda model, st1, r, y: model.vStorageCap[st1, r, y]
+    <= model.pStorageCapUp[st1, r, y],
+)
+# eqStorageNewCapLo(stg, region, year)$mStorageNewCapLo(stg, region, year)
+model.eqStorageNewCapLo = Constraint(
+    model.mStorageNewCapLo,
+    rule=lambda model, st1, r, y: model.vStorageNewCap[st1, r, y]
+    >= model.pStorageNewCapLo[st1, r, y],
+)
+# eqStorageNewCapUp(stg, region, year)$mStorageNewCapUp(stg, region, year)
+model.eqStorageNewCapUp = Constraint(
+    model.mStorageNewCapUp,
+    rule=lambda model, st1, r, y: model.vStorageNewCap[st1, r, y]
+    <= model.pStorageNewCapUp[st1, r, y],
 )
 # eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)
 model.eqStorageInv = Constraint(
@@ -1037,8 +1114,8 @@ model.eqStorageCost = Constraint(
         if (st1, c) in model.mStorageComm
     ),
 )
-# eqImport(comm, dst, year, slice)$mImport(comm, dst, year, slice)
-model.eqImport = Constraint(
+# eqImportTot(comm, dst, year, slice)$mImport(comm, dst, year, slice)
+model.eqImportTot = Constraint(
     model.mImport,
     rule=lambda model, c, dst, y, s: model.vImportTot[c, dst, y, s]
     == sum(
@@ -1057,6 +1134,7 @@ model.eqImport = Constraint(
         for t1 in model.trade
         if (t1, c) in model.mTradeComm
     )
+    * model.pSliceWeight[s]
     + sum(
         (
             model.vImportRow[i, c, dst, y, s]
@@ -1065,10 +1143,11 @@ model.eqImport = Constraint(
         )
         for i in model.imp
         if (i, c) in model.mImpComm
-    ),
+    )
+    * model.pSliceWeight[s],
 )
-# eqExport(comm, src, year, slice)$mExport(comm, src, year, slice)
-model.eqExport = Constraint(
+# eqExportTot(comm, src, year, slice)$mExport(comm, src, year, slice)
+model.eqExportTot = Constraint(
     model.mExport,
     rule=lambda model, c, src, y, s: model.vExportTot[c, src, y, s]
     == sum(
@@ -1084,6 +1163,7 @@ model.eqExport = Constraint(
         for t1 in model.trade
         if (t1, c) in model.mTradeComm
     )
+    * model.pSliceWeight[s]
     + sum(
         (
             model.vExportRow[e, c, src, y, s]
@@ -1092,7 +1172,8 @@ model.eqExport = Constraint(
         )
         for e in model.expp
         if (e, c) in model.mExpComm
-    ),
+    )
+    * model.pSliceWeight[s],
 )
 # eqTradeFlowUp(trade, comm, src, dst, year, slice)$meqTradeFlowUp(trade, comm, src, dst, year, slice)
 model.eqTradeFlowUp = Constraint(
@@ -1118,14 +1199,18 @@ model.eqCostRowTrade = Constraint(
     model.mvTradeRowCost,
     rule=lambda model, r, y: model.vTradeRowCost[r, y]
     == sum(
-        model.pImportRowPrice[i, r, y, s] * model.vImportRow[i, c, r, y, s]
+        model.pImportRowPrice[i, r, y, s]
+        * model.pSliceWeight[s]
+        * model.vImportRow[i, c, r, y, s]
         for i in model.imp
         for c in model.comm
         for s in model.slice
         if (i, c, r, y, s) in model.mImportRow
     )
     - sum(
-        model.pExportRowPrice[e, r, y, s] * model.vExportRow[e, c, r, y, s]
+        model.pExportRowPrice[e, r, y, s]
+        * model.pSliceWeight[s]
+        * model.vExportRow[e, c, r, y, s]
         for e in model.expp
         for c in model.comm
         for s in model.slice
@@ -1137,6 +1222,16 @@ model.eqCostIrTrade = Constraint(
     model.mvTradeIrCost,
     rule=lambda model, r, y: model.vTradeIrCost[r, y]
     == sum(
+        model.pTradeFixom[t1, y] * model.pTradeStock[t1, y]
+        for t1 in model.trade
+        if (t1, y) in model.mTradeSpan
+    )
+    + sum(
+        model.pTradeFixom[t1, y] * (model.vTradeCap[t1, y] - model.pTradeStock[t1, y])
+        for t1 in model.trade
+        if ((t1, y) in model.mTradeSpan and t1 in model.mTradeCapacityVariable)
+    )
+    + sum(
         model.vTradeEac[t1, r, y] for t1 in model.trade if (t1, r, y) in model.mTradeEac
     )
     + sum(
@@ -1149,6 +1244,7 @@ model.eqCostIrTrade = Constraint(
                             + model.pTradeIrMarkup[t1, src, r, y, s]
                         )
                         * model.vTradeIr[t1, c, src, r, y, s]
+                        * model.pSliceWeight[s]
                     )
                     if (t1, c, src, r, y, s) in model.mvTradeIr
                     else 0
@@ -1168,8 +1264,12 @@ model.eqCostIrTrade = Constraint(
             sum(
                 (
                     (
-                        model.pTradeIrMarkup[t1, r, dst, y, s]
+                        (
+                            model.pTradeIrCost[t1, r, dst, y, s]
+                            + model.pTradeIrMarkup[t1, r, dst, y, s]
+                        )
                         * model.vTradeIr[t1, c, r, dst, y, s]
+                        * model.pSliceWeight[s]
                     )
                     if (t1, c, r, dst, y, s) in model.mvTradeIr
                     else 0
@@ -1197,23 +1297,22 @@ model.eqExportRowLo = Constraint(
     rule=lambda model, e, c, r, y, s: model.vExportRow[e, c, r, y, s]
     >= model.pExportRowLo[e, r, y, s],
 )
-# eqExportRowCumulative(expp, comm)$mExpComm(expp, comm)
-model.eqExportRowCumulative = Constraint(
+# eqExportRowCum(expp, comm)$mExpComm(expp, comm)
+model.eqExportRowCum = Constraint(
     model.mExpComm,
-    rule=lambda model, e, c: model.vExportRowAccumulated[e, c]
+    rule=lambda model, e, c: model.vExportRowCum[e, c]
     == sum(
-        model.pPeriodLen[y] * model.vExportRow[e, c, r, y, s]
+        model.pPeriodLen[y] * model.pSliceWeight[s] * model.vExportRow[e, c, r, y, s]
         for r in model.region
         for y in model.year
         for s in model.slice
         if (e, c, r, y, s) in model.mExportRow
     ),
 )
-# eqExportRowResUp(expp, comm)$mExportRowAccumulatedUp(expp, comm)
+# eqExportRowResUp(expp, comm)$mExportRowCumUp(expp, comm)
 model.eqExportRowResUp = Constraint(
-    model.mExportRowAccumulatedUp,
-    rule=lambda model, e, c: model.vExportRowAccumulated[e, c]
-    <= model.pExportRowRes[e],
+    model.mExportRowCumUp,
+    rule=lambda model, e, c: model.vExportRowCum[e, c] <= model.pExportRowRes[e],
 )
 # eqImportRowUp(imp, comm, region, year, slice)$mImportRowUp(imp, comm, region, year, slice)
 model.eqImportRowUp = Constraint(
@@ -1227,23 +1326,22 @@ model.eqImportRowLo = Constraint(
     rule=lambda model, i, c, r, y, s: model.vImportRow[i, c, r, y, s]
     >= model.pImportRowLo[i, r, y, s],
 )
-# eqImportRowAccumulated(imp, comm)$mImpComm(imp, comm)
-model.eqImportRowAccumulated = Constraint(
+# eqImportRowCum(imp, comm)$mImpComm(imp, comm)
+model.eqImportRowCum = Constraint(
     model.mImpComm,
-    rule=lambda model, i, c: model.vImportRowAccumulated[i, c]
+    rule=lambda model, i, c: model.vImportRowCum[i, c]
     == sum(
-        model.pPeriodLen[y] * model.vImportRow[i, c, r, y, s]
+        model.pPeriodLen[y] * model.pSliceWeight[s] * model.vImportRow[i, c, r, y, s]
         for r in model.region
         for y in model.year
         for s in model.slice
         if (i, c, r, y, s) in model.mImportRow
     ),
 )
-# eqImportRowResUp(imp, comm)$mImportRowAccumulatedUp(imp, comm)
+# eqImportRowResUp(imp, comm)$mImportRowCumUp(imp, comm)
 model.eqImportRowResUp = Constraint(
-    model.mImportRowAccumulatedUp,
-    rule=lambda model, i, c: model.vImportRowAccumulated[i, c]
-    <= model.pImportRowRes[i],
+    model.mImportRowCumUp,
+    rule=lambda model, i, c: model.vImportRowCum[i, c] <= model.pImportRowRes[i],
 )
 # eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slice)
 model.eqTradeCapFlow = Constraint(
@@ -1275,6 +1373,26 @@ model.eqTradeCap = Constraint(
             )
         )
     ),
+)
+# eqTradeCapLo(trade, year)$mTradeCapLo(trade, year)
+model.eqTradeCapLo = Constraint(
+    model.mTradeCapLo,
+    rule=lambda model, t1, y: model.vTradeCap[t1, y] >= model.pTradeCapLo[t1, y],
+)
+# eqTradeCapUp(trade, year)$mTradeCapUp(trade, year)
+model.eqTradeCapUp = Constraint(
+    model.mTradeCapUp,
+    rule=lambda model, t1, y: model.vTradeCap[t1, y] <= model.pTradeCapUp[t1, y],
+)
+# eqTradeNewCapLo(trade, year)$mTradeNewCapLo(trade, year)
+model.eqTradeNewCapLo = Constraint(
+    model.mTradeNewCapLo,
+    rule=lambda model, t1, y: model.vTradeNewCap[t1, y] >= model.pTradeNewCapLo[t1, y],
+)
+# eqTradeNewCapUp(trade, year)$mTradeNewCapUp(trade, year)
+model.eqTradeNewCapUp = Constraint(
+    model.mTradeNewCapUp,
+    rule=lambda model, t1, y: model.vTradeNewCap[t1, y] <= model.pTradeNewCapUp[t1, y],
 )
 # eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)
 model.eqTradeInv = Constraint(
@@ -1406,8 +1524,7 @@ model.eqOutTot = Constraint(
     * (model.vDummyImport[c, r, y, s] if (c, r, y, s) in model.mDummyImport else 0)
     + (model.vSupOutTot[c, r, y, s] if (c, r, y, s) in model.mSupOutTot else 0)
     + (model.vEmsFuelTot[c, r, y, s] if (c, r, y, s) in model.mEmsFuelTot else 0)
-    + model.pSliceWeight[s]
-    * (model.vAggOutTot[c, r, y, s] if (c, r, y, s) in model.mAggOut else 0)
+    + (model.vAggOutTot[c, r, y, s] if (c, r, y, s) in model.mAggOut else 0)
     + (model.vTechOutTot[c, r, y, s] if (c, r, y, s) in model.mTechOutTot else 0)
     + (model.vStorageOutTot[c, r, y, s] if (c, r, y, s) in model.mStorageOutTot else 0)
     + (model.vImportTot[c, r, y, s] if (c, r, y, s) in model.mImport else 0)
@@ -1440,8 +1557,7 @@ model.eqOut2Lo = Constraint(
     )
     == (model.vSupOutTot[c, r, y, s] if (c, r, y, s) in model.mSupOutTot else 0)
     + (model.vEmsFuelTot[c, r, y, s] if (c, r, y, s) in model.mEmsFuelTot else 0)
-    + model.pSliceWeight[s]
-    * (model.vAggOutTot[c, r, y, s] if (c, r, y, s) in model.mAggOut else 0)
+    + (model.vAggOutTot[c, r, y, s] if (c, r, y, s) in model.mAggOut else 0)
     + (model.vTechOutTot[c, r, y, s] if (c, r, y, s) in model.mTechOutTot else 0)
     + (model.vStorageOutTot[c, r, y, s] if (c, r, y, s) in model.mStorageOutTot else 0)
     + (model.vImportTot[c, r, y, s] if (c, r, y, s) in model.mImport else 0)
@@ -1457,7 +1573,8 @@ model.eqInpTot = Constraint(
     rule=lambda model, c, r, y, s: model.vInpTot[c, r, y, s]
     == model.pSliceWeight[s]
     * (model.vDemInp[c, r, y, s] if (c, r, y, s) in model.mvDemInp else 0)
-    + (model.vDummyExport[c, r, y, s] if (c, r, y, s) in model.mDummyExport else 0)
+    + model.pSliceWeight[s]
+    * (model.vDummyExport[c, r, y, s] if (c, r, y, s) in model.mDummyExport else 0)
     + (model.vTechInpTot[c, r, y, s] if (c, r, y, s) in model.mTechInpTot else 0)
     + (model.vStorageInpTot[c, r, y, s] if (c, r, y, s) in model.mStorageInpTot else 0)
     + (model.vExportTot[c, r, y, s] if (c, r, y, s) in model.mExport else 0)
@@ -1636,6 +1753,25 @@ model.eqCost = Constraint(
     rule=lambda model, r, y: model.vTotalCost[r, y]
     == sum(model.vTechEac[t, r, y] for t in model.tech if (t, r, y) in model.mTechEac)
     + sum(
+        model.pTechRetCost[t, r, y]
+        * (
+            model.vTechRetiredStock[t, r, y]
+            + sum(
+                model.vTechRetiredNewCap[t, r, yp, y]
+                for yp in model.year
+                if (t, r, yp, y) in model.mvTechRetiredNewCap
+            )
+        )
+        for t in model.tech
+        if (t, r, y) in model.mvTechRetiredStock
+    )
+    + sum(
+        model.pTechRetCost[t, r, y] * model.vTechRetiredNewCap[t, r, yp, y]
+        for t in model.tech
+        for yp in model.year
+        if (t, r, yp, y) in model.mvTechRetiredNewCap
+    )
+    + sum(
         model.vTechOMCost[t, r, y] for t in model.tech if (t, r, y) in model.mTechOMCost
     )
     + sum(model.vSupCost[s1, r, y] for s1 in model.sup if (s1, r, y) in model.mvSupCost)
@@ -1714,7 +1850,7 @@ model.eqSubsCost = Constraint(
 model.eqObjective = Constraint(
     rule=lambda model: model.vObjective
     == sum(
-        model.vTotalCost[r, y] * model.pDiscountFactorMileStone[r, y]
+        model.pDiscountFactorMileStone[r, y] * model.vTotalCost[r, y]
         for r in model.region
         for y in model.year
         if (r, y) in model.mvTotalCost

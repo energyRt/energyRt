@@ -10,34 +10,40 @@ An S4 class to represent inter-regional trade
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character.}
+\item{\code{name}}{character. Short name of the trade object, used in sets.}
 
-\item{\code{desc}}{character.}
+\item{\code{desc}}{character. Description of the trade object.}
 
-\item{\code{commodity}}{character.}
+\item{\code{commodity}}{character. The traded commodity short name.}
 
-\item{\code{routes}}{data.frame.}
+\item{\code{routes}}{data.frame. Source and destination regions. For bivariate trade define both directions.}
 
-\item{\code{trade}}{data.frame.}
+\item{\code{trade}}{data.frame. Technical parameters of trade.}
 
-\item{\code{aux}}{data.frame.}
+\item{\code{aux}}{data.frame. Auxiliary commodity of trade.}
 
-\item{\code{aeff}}{data.frame.}
+\item{\code{aeff}}{data.frame. Auxiliary commodity efficiency parameters.}
 
-\item{\code{invcost}}{data.frame.}
+\item{\code{invcost}}{data.frame. Investment cost, used when capacityVariable is TRUE.}
 
-\item{\code{olife}}{numeric.}
+\item{\code{olife}}{numeric. Operational life of the trade object.}
 
-\item{\code{start}}{numeric.}
+\item{\code{start}}{numeric. Start year when the trade-type of process is available for investment.}
 
-\item{\code{end}}{numeric.}
+\item{\code{end}}{numeric. End year when the trade-type of process is available for investment.}
 
-\item{\code{stock}}{data.frame.}
+\item{\code{stock}}{data.frame. Capacity stock of the trade object.}
 
-\item{\code{capacityVariable}}{logical.}
+\item{\code{capacityVariable}}{logical. If TRUE, the capacity variable of the trade object is used. If FALSE, the capacity is defined by availability parameters (`ava.*`) in the trade-flow units.}
 
-\item{\code{cap2act}}{numeric.}
+\item{\code{cap2act}}{numeric. Capacity to activity ratio.}
 
-\item{\code{misc}}{list.}
+\item{\code{misc}}{list. Additional information.}
+
+\item{\code{fixom}}{data.frame. (not implemented!) Fixed operation and maintenance costs.}
+
+\item{\code{varom}}{data.frame. (not implemented!) Variable operation and maintenance costs.}
+
+\item{\code{capacity}}{data.frame. (not implemented!) Capacity parameters of the trade object.}
 }}
 

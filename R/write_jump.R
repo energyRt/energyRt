@@ -1,3 +1,31 @@
+#' Set the path to Julia installation
+#'
+#' @param path character. Path to Julia installation. If NULL, the system path is returned.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+set_julia_path <- function(path = NULL) {
+  # browser()
+  if (!is.null(path) && path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options::opt_set("julia_path", path, env = "energyRt")
+  # options(julia_path = path)
+}
+
+#' @export
+get_julia_path <- function() {
+  options::opt("julia_path", env = "energyRt")
+  # getOption("julia_path")
+}
+
 # Functions to write Julia/JuMP model and data files
 .write_model_JuMP <- function(arg, scen) {
   run_code <- scen@settings@sourceCode[["JuMP"]]
@@ -93,10 +121,10 @@
       }
     }
   }
-  dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
-  zz_data_julia <- file(paste(arg$tmp.dir, "/data.jl", sep = ""), "w")
-  zz_data_constr <- file(paste(arg$tmp.dir, "/inc_constraints.jl", sep = ""), "w")
-  zz_data_costs <- file(paste(arg$tmp.dir, "/inc_costs.jl", sep = ""), "w")
+  dir.create(fp(arg$tmp.dir, "output"), showWarnings = FALSE)
+  zz_data_julia <- file(fp(arg$tmp.dir, "data.jl"), "w")
+  zz_data_constr <- file(fp(arg$tmp.dir, "inc_constraints.jl"), "w")
+  zz_data_costs <- file(fp(arg$tmp.dir, "/inc_costs.jl"), "w")
 
   .write_inc_solver(
     scen, arg,
@@ -133,7 +161,7 @@
     if (is.data.table(x)) as.data.frame(x) else x
     })
 
-  save("dat", file = paste0(arg$tmp.dir, "data.RData"))
+  save("dat", file = fp(arg$tmp.dir, "data.RData"))
 
   cat('using RData\nusing DataFrames\ndt = load("data.RData")["dat"]\n',
     sep = "\n", file = zz_data_julia
@@ -155,7 +183,7 @@
   }
   close(zz_data_julia)
   # Mod begin
-  zz_mod <- file(paste(arg$tmp.dir, "/energyRt.jl", sep = ""), "w")
+  zz_mod <- file(fp(arg$tmp.dir, "energyRt.jl"), "w")
   nobj <- grep("^[@]objective", run_code)[1] - 1
   cat(run_code[1:nobj], sep = "\n", file = zz_mod)
   # Add constraint
@@ -190,12 +218,20 @@
   close(zz_data_costs)
   cat(run_code[-(1:nobj)], sep = "\n", file = zz_mod)
   close(zz_mod)
-  zz_modout <- file(paste(arg$tmp.dir, "/output.jl", sep = ""), "w")
+  zz_modout <- file(fp(arg$tmp.dir, "/output.jl"), "w")
   cat(run_codeout, sep = "\n", file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".jl")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- "julia energyRt.jl"
+    # scen@settings@solver$cmdline <-
+    #   paste0(get_julia_path(), "julia energyRt.jl")
+    #   # "julia energyRt.jl"
+    fpath <- get_julia_path()
+    if (!is.null(fpath)) {
+      scen@settings@solver$cmdline <- fp(fpath, "julia energyRt.jl")
+    } else {
+      scen@settings@solver$cmdline <- "julia energyRt.jl"
+    }
   }
   scen@settings@solver$code <- c(
     "energyRt.jl", "output.jl", "inc_constraints.jl",
@@ -535,8 +571,11 @@ names(.alias_set) <- .set_al
     # } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
     #   a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
     # changing pattern to include scientific numbers
-    } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
-      a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+      # "+ sum(techp$(mCnsBASN_battery_moderate_0_cn_4(techp) and mTechNew(techp, region, year)), -1 * vTechNewCap(techp, region, year)) =e= 1e-20;"
+    # } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
+    #   a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+    } else if (any(grep("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])", tmp))) {
+      a3 <- gsub("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])", "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {

@@ -1,6 +1,7 @@
 #' An S4 class to represent technology
 #'
 #' @rdname technology
+#'
 #' @slot name character, name of technology used in sets
 #' @slot desc character, optional description of the technology for reference.
 #' @slot input main (non-auxilary) input commodities, data.frame with columns:
@@ -161,12 +162,13 @@
 #'  \item{year}{integer, year for which the stock will be specified, required, values between specified years will be interpolated.}
 #'  \item{stock}{numeric, predefined existing of future capacity of the technology (in units of capacity), NA means default value (0)}
 #' }
-#' @slot early.retirement logical. Currently ignored.
+#' @slot optimizeRetirement logical. Currently ignored.
 #' @slot upgrade.technology character. Currently ignored.
 #' @slot fullYear logical. Currently ignored.
 #' @slot timeframe character name of timeframe level the technology is operating. By default, the lowest level of commodities in the technology is applied.
 #' @slot region character vector of regions where the technology exist or can be installed.
 #' @slot misc list with any miscellaneous information.
+#' @slot capacity data.frame (not implemented!) Capacity parameters of the technology.
 #'
 #' @include class-supply.R
 #'
@@ -200,9 +202,10 @@ setClass("technology",
     start = "data.frame", #
     end = "data.frame", #
     olife = "data.frame", #
-    stock = "data.frame", #
-    early.retirement = "logical",
-    upgrade.technology = "character",
+    # stock = "data.frame", #
+    capacity = "data.frame", #
+    optimizeRetirement = "logical",
+    # upgrade.technology = "character",
     fullYear = "logical",
     timeframe = "character",
     region = "character",
@@ -351,6 +354,8 @@ setClass("technology",
       region = character(),
       year = integer(),
       invcost = numeric(),
+      wacc = numeric(),
+      retcost = numeric(),
       stringsAsFactors = FALSE
     ),
     start = data.frame(
@@ -368,14 +373,29 @@ setClass("technology",
       olife = integer(),
       stringsAsFactors = FALSE
     ),
-    stock = data.frame(
+    # stock = data.frame(
+    #   region = character(),
+    #   year = integer(),
+    #   stock = numeric(),
+    #   stringsAsFactors = FALSE
+    # ),
+    capacity = data.frame(
       region = character(),
       year = integer(),
       stock = numeric(),
+      cap.lo = numeric(),
+      cap.up = numeric(),
+      cap.fx = numeric(),
+      ncap.lo = numeric(),
+      ncap.up = numeric(),
+      ncap.fx = numeric(),
+      ret.lo = numeric(),
+      ret.up = numeric(),
+      ret.fx = numeric(),
       stringsAsFactors = FALSE
     ),
-    early.retirement = TRUE,
-    upgrade.technology = character(),
+    optimizeRetirement = TRUE,
+    # upgrade.technology = character(),
     region = character(),
     timeframe = character(),
     misc = list()
@@ -412,7 +432,8 @@ newTechnology <- function(
     af = data.frame(),
     afs = data.frame(),
     weather = data.frame(),
-    stock = data.frame(),
+    # stock = data.frame(),
+    capacity = data.frame(),
     invcost = data.frame(),
     fixom = data.frame(),
     varom = data.frame(),
@@ -422,8 +443,8 @@ newTechnology <- function(
     end = data.frame(),
     timeframe = character(),
     fullYear = TRUE,
-    early.retirement = FALSE,
-    upgrade.technology = character(),
+    optimizeRetirement = FALSE,
+    # upgrade.technology = character(),
     misc = list()) {
   # browser()
   .data2slots("technology", name,
@@ -440,7 +461,8 @@ newTechnology <- function(
     af = af,
     afs = afs,
     weather = weather,
-    stock = stock,
+    # stock = stock,
+    capacity = capacity,
     invcost = invcost,
     fixom = fixom,
     varom = varom,
@@ -450,8 +472,8 @@ newTechnology <- function(
     end = end,
     timeframe = timeframe,
     fullYear = fullYear,
-    early.retirement = early.retirement,
-    upgrade.technology = upgrade.technology,
+    optimizeRetirement = optimizeRetirement,
+    # upgrade.technology = upgrade.technology,
     misc = misc
   )
 }

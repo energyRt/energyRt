@@ -1,6 +1,5 @@
 # setGeneric(".obj2modInp",
 #            function(obj, app, approxim) standardGeneric(".obj2modInp"))
-
 # =============================================================================#
 # Add commodity ####
 # =============================================================================#
@@ -11,6 +10,7 @@ setMethod(".obj2modInp",
   # cmd <- .upper_case(app)
   # browser()
   cmd <- app
+  cmd@name <- toString(cmd@name)
   cmd <- .filter_data_in_slots(cmd, approxim$region, "region")
 
   # @emis: emissions from commodity consumption (combustion)
@@ -27,6 +27,7 @@ setMethod(".obj2modInp",
   # @agg: aggregating commodity
   dd <- cmd@agg[, c("comm", "comm", "agg"), drop = FALSE]
   if (nrow(dd) > 0) {
+    # browser()
     colnames(dd) <- c("comm", "commp", "value")
     dd[, "comm"] <- cmd@name
     dd[, "value"] <- as.numeric(dd$value) # Must be removed later
@@ -48,6 +49,7 @@ setMethod(".obj2modInp",
   }
   # For slice
   # browser()
+  # !!! ToDo: Add check for aggregating commodity to be higher or the same timeframe..
   approxim <- .fix_approximation_list(approxim, comm = cmd@name)
   obj@parameters[["mCommSlice"]] <-
     .dat2par(
@@ -88,6 +90,7 @@ setMethod(".obj2modInp", signature(
 ), function(obj, app, approxim) {
   # dem <- .upper_case(app)
   dem <- app
+  dem@name <- toString(dem@name)
   if (length(dem@commodity) != 1 || is.na(dem@commodity) ||
       all(dem@commodity != approxim$all_comm)) {
     stop(paste0('Wrong commodity in demand "', dem@name, '"'))
@@ -142,13 +145,16 @@ setMethod(".obj2modInp", signature(
   if (length(wth@timeframe) == 0 && length(approxim$calendar@slices_in_frame) > 1) {
     stop("Slot weather@timeframe is empty, it should have information about slice level")
   }
-  if (length(wth@timeframe) == 0) wth@timeframe <- names(approxim$calendar@slices_in_frame)[1]
+  if (length(wth@timeframe) == 0) {
+    wth@timeframe <- names(approxim$calendar@slices_in_frame)[1]
+  }
   approxim <- .fix_approximation_list(approxim, lev = wth@timeframe)
   # region fix
   if (length(wth@region) != 0) {
     approxim$region <- approxim$region[approxim$region %in% wth@region]
   }
   wth@region <- approxim$region
+  # browser()
   wth <- .filter_data_in_slots(wth, approxim$region, "region")
   wth <- .disaggregateSliceLevel(wth, approxim)
   obj@parameters[["pWeather"]]@defVal <- wth@defVal
@@ -252,8 +258,8 @@ setMethod(".obj2modInp", signature(
   }
   if (!is.null(pExportRowRes)) {
     pExportRowRes$comm <- exp@commodity
-    obj@parameters[["mExportRowAccumulatedUp"]] <- .dat2par(
-      obj@parameters[["mExportRowAccumulatedUp"]],
+    obj@parameters[["mExportRowCumUp"]] <- .dat2par(
+      obj@parameters[["mExportRowCumUp"]],
       pExportRowRes[pExportRowRes$value != Inf, c("expp", "comm"), drop = FALSE]
     )
   }
@@ -349,8 +355,8 @@ setMethod(
     }
     if (!is.null(pImportRowRes)) {
       pImportRowRes$comm <- exp@commodity
-      obj@parameters[["mImportRowAccumulatedUp"]] <- .dat2par(
-        obj@parameters[["mImportRowAccumulatedUp"]],
+      obj@parameters[["mImportRowCumUp"]] <- .dat2par(
+        obj@parameters[["mImportRowCumUp"]],
         pImportRowRes[pImportRowRes$value != Inf, c("expp", "comm"),
                       drop = FALSE]
       )
@@ -636,6 +642,7 @@ setMethod(".obj2modInp", signature(
 setMethod(
   ".obj2modInp", signature(obj = "modInp", app = "storage", approxim = "list"),
   function(obj, app, approxim) {
+    # browser()
     pStorageCout <- NULL
     pStorageCinp <- NULL
     # stg <- .upper_case(app)
@@ -683,8 +690,13 @@ setMethod(
       obj@parameters[["mStorageComm"]],
       data.table(stg = stg@name, comm = stg@commodity)
     )
-    olife <- .interp_numpar(
-      stg@olife, "olife",
+
+
+    if (nrow(stg@olife) > 1) {
+      stop("Operational life (`olife`) of storage object is accepting only one value. Year-dimension is reserved for future implementation, currently ignored.")
+    }
+      olife <- .interp_numpar(
+      select(stg@olife, -any_of("year")), "olife",
       obj@parameters[["pStorageOlife"]],
       approxim, "stg", stg@name
       # removeDefault = FALSE
@@ -748,6 +760,7 @@ setMethod(
     )
     pStorageCinp <- .interp_bounds(stg@af, "cinp", obj@parameters[["pStorageCinp"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
     obj@parameters[["pStorageCinp"]] <- .dat2par(obj@parameters[["pStorageCinp"]], pStorageCinp)
+    # browser()
     pStorageCout <- .interp_bounds(stg@af, "cout", obj@parameters[["pStorageCout"]], approxim, c("stg", "comm"), c(stg@name, stg@commodity))
     obj@parameters[["pStorageCout"]] <- .dat2par(obj@parameters[["pStorageCout"]], pStorageCout)
     # Aux input/output
@@ -841,16 +854,42 @@ setMethod(
     }
     # Some slice
     stock_exist <- .interp_numpar(
-      stg@stock, "stock",
+      stg@capacity, "stock",
       obj@parameters[["pStorageStock"]], approxim, "stg", stg@name
     )
     obj@parameters[["pStorageStock"]] <-
       .dat2par(obj@parameters[["pStorageStock"]], stock_exist)
-    invcost <- .interp_numpar(stg@invcost, "invcost",
-                              obj@parameters[["pStorageInvcost"]],
-                              approxim, "stg", stg@name)
-    obj@parameters[["pStorageInvcost"]] <- .dat2par(obj@parameters[["pStorageInvcost"]], invcost)
 
+    invcost <- .interp_numpar(
+      stg@invcost, "invcost",
+      obj@parameters[["pStorageInvcost"]],
+      approxim, "stg", stg@name
+    )
+    obj@parameters[["pStorageInvcost"]] <-
+      .dat2par(obj@parameters[["pStorageInvcost"]], invcost)
+
+    if (nrow(stg@capacity) > 0) {
+      # pTechCap
+      pStorageCap <- .interp_bounds(stg@capacity, "cap",
+                                    obj@parameters[["pStorageCap"]],
+                                    approxim, "stg", stg@name,
+                                    remValueLo = 0, remValueUp = Inf)
+      obj@parameters[["pStorageCap"]] <-
+        .dat2par(obj@parameters[["pStorageCap"]], pStorageCap)
+
+      pStorageNewCap <- .interp_bounds(stg@capacity, "ncap",
+                                       obj@parameters[["pStorageNewCap"]],
+                                       approxim, "stg", stg@name)
+      obj@parameters[["pStorageNewCap"]] <-
+        .dat2par(obj@parameters[["pStorageNewCap"]], pStorageNewCap)
+
+      pStorageRet <- .interp_bounds(stg@capacity, "ret",
+                                    obj@parameters[["pStorageRet"]],
+                                    approxim, "stg", stg@name,
+                                    remValueLo = 0, remValueUp = Inf)
+      obj@parameters[["pStorageRet"]] <-
+        .dat2par(obj@parameters[["pStorageRet"]], pStorageRet)
+    }
 
     # browser()
     dd0 <- .start_end_fix(approxim, stg, "stg", stock_exist)
@@ -1617,16 +1656,54 @@ setMethod(
       pTechAfc <- NULL
     }
     # Stock & Capacity
-    stock_exist <- .interp_numpar(tech@stock, "stock",
-                                       obj@parameters[["pTechStock"]], approxim,
-                                       "tech", tech@name)
+    stock_exist <- .interp_numpar(
+      tech@capacity,
+      "stock",
+      obj@parameters[["pTechStock"]],
+      approxim,
+      "tech",
+      tech@name
+    )
     obj@parameters[["pTechStock"]] <-
       .dat2par(obj@parameters[["pTechStock"]], stock_exist)
-    olife <- .interp_numpar(tech@olife, "olife",
-                                 obj@parameters[["pTechOlife"]], approxim,
-                                 "tech", tech@name
-                                 # , removeDefault = FALSE
-                                 )
+
+    if (nrow(tech@capacity) > 0) {
+      # browser()
+      pTechCap <- .interp_bounds(
+        tech@capacity, "cap",
+        obj@parameters[["pTechCap"]], approxim, "tech", tech@name,
+        remValueUp = Inf, remValueLo = 0
+      )
+      obj@parameters[["pTechCap"]] <-
+        .dat2par(obj@parameters[["pTechCap"]], pTechCap)
+        rm(pTechCap)
+
+      pTechNewCap <- .interp_bounds(
+        tech@capacity, "ncap",
+        obj@parameters[["pTechNewCap"]], approxim, "tech", tech@name,
+        remValueUp = Inf, remValueLo = 0
+      )
+      obj@parameters[["pTechNewCap"]] <-
+        .dat2par(obj@parameters[["pTechNewCap"]], pTechNewCap)
+        rm(pTechNewCap)
+
+      # browser()
+      pTechRet <- .interp_bounds(
+        tech@capacity, "ret",
+        obj@parameters[["pTechRet"]], approxim, "tech", tech@name,
+        remValueUp = Inf, remValueLo = 0
+      )
+      obj@parameters[["pTechRet"]] <-
+        .dat2par(obj@parameters[["pTechRet"]], pTechRet)
+        rm(pTechRet)
+    }
+
+    olife <- .interp_numpar(
+      tech@olife, "olife",
+      obj@parameters[["pTechOlife"]], approxim,
+      "tech", tech@name
+      # , removeDefault = FALSE
+    )
     obj@parameters[["pTechOlife"]] <-
       .dat2par(obj@parameters[["pTechOlife"]], olife)
     # browser() # check warning msg
@@ -1652,6 +1729,15 @@ setMethod(
       obj@parameters[["mTechEac"]] <-
         .dat2par(obj@parameters[["mTechEac"]], dd0$eac)
     }
+    # browser()
+    retcost <- .interp_numpar(tech@invcost, "retcost",
+                              obj@parameters[["pTechRetCost"]], approxim,
+                              "tech", tech@name)
+    if (!is.null(retcost)) {
+      obj@parameters[["pTechRetCost"]] <-
+        .dat2par(obj@parameters[["pTechRetCost"]], retcost)
+    }
+
     # browser()
     obj@parameters[["mTechSpan"]] <-
       .dat2par(obj@parameters[["mTechSpan"]], dd0$span)
@@ -1684,8 +1770,9 @@ setMethod(
       pTechEac <- salv_data[, c("tech", "region", "year", "value")]
       co <- c(obj@parameters[["pTechEac"]]@dimSets, "value")
       obj@parameters[["pTechEac"]] <-
-        .dat2par(obj@parameters[["pTechEac"]], unique(select(pTechEac, all_of(co))))
-            # unique(pTechEac[, c(obj@parameters[["pTechEac"]]@dimSets, "value")]))
+        .dat2par(obj@parameters[["pTechEac"]],
+                 unique(select(pTechEac, all_of(co))))
+        # unique(pTechEac[, c(obj@parameters[["pTechEac"]]@dimSets, "value")]))
     }
     pTechAf <- .interp_bounds(tech@af, "af",
       obj@parameters[["pTechAf"]], approxim, "tech", tech@name,
@@ -1706,13 +1793,16 @@ setMethod(
         remValueUp = Inf,
         remValueLo = 0
       )
-      obj@parameters[["pTechAfs"]] <- .dat2par(obj@parameters[["pTechAfs"]], pTechAfs)
+      obj@parameters[["pTechAfs"]] <-
+        .dat2par(obj@parameters[["pTechAfs"]], pTechAfs)
     } else {
       pTechAfs <- NULL
     }
 
     approxim_comm[["comm"]] <-
-      rownames(ctype$comm)[ctype$comm$type == "input" & is.na(ctype$comm[, "group"])]
+      rownames(ctype$comm)[
+        ctype$comm$type == "input" & is.na(ctype$comm[, "group"])
+        ]
     if (length(approxim_comm[["comm"]]) != 0) {
       pTechCinp2use <- .interp_numpar(
         tech@ceff, "cinp2use",
@@ -1760,17 +1850,17 @@ setMethod(
     } else {
       pTechCinp2ginp <- NULL
     }
-    if (tech@early.retirement) {
+    if (tech@optimizeRetirement) {
       obj@parameters[["mTechRetirement"]] <-
         .dat2par(obj@parameters[["mTechRetirement"]], data.table(tech = tech@name))
     }
-    if (length(tech@upgrade.technology) != 0) {
-      obj@parameters[["mTechUpgrade"]] <- .dat2par(
-        obj@parameters[["mTechUpgrade"]],
-        data.table(tech = rep(tech@name, length(tech@upgrade.technology)),
-                   techp = tech@upgrade.technology)
-      )
-    }
+    # if (length(tech@upgrade.technology) != 0) {
+    #   obj@parameters[["mTechUpgrade"]] <- .dat2par(
+    #     obj@parameters[["mTechUpgrade"]],
+    #     data.table(tech = rep(tech@name, length(tech@upgrade.technology)),
+    #                techp = tech@upgrade.technology)
+    #   )
+    # }
     cmm <- rownames(ctype$comm)[ctype$comm$type == "input"]
     if (length(cmm) != 0) {
       mTechInpComm <- data.table(tech = rep(tech@name, length(cmm)), comm = cmm)
@@ -1879,25 +1969,39 @@ setMethod(
       obj@parameters[["pTechCap2act"]],
       data.table(tech = tech@name, value = tech@cap2act)
     )
-    pTechFixom <- .interp_numpar(tech@fixom, "fixom", obj@parameters[["pTechFixom"]], approxim, "tech", tech@name)
-    obj@parameters[["pTechFixom"]] <- .dat2par(obj@parameters[["pTechFixom"]], pTechFixom)
-    pTechVarom <- .interp_numpar(tech@varom, "varom", obj@parameters[["pTechVarom"]], approxim, "tech", tech@name)
-    obj@parameters[["pTechVarom"]] <- .dat2par(obj@parameters[["pTechVarom"]], pTechVarom)
+    pTechFixom <- .interp_numpar(tech@fixom, "fixom",
+                                 obj@parameters[["pTechFixom"]],
+                                 approxim, "tech", tech@name)
+    obj@parameters[["pTechFixom"]] <-
+      .dat2par(obj@parameters[["pTechFixom"]], pTechFixom)
+    pTechVarom <- .interp_numpar(tech@varom, "varom",
+                                 obj@parameters[["pTechVarom"]],
+                                 approxim, "tech", tech@name)
+    obj@parameters[["pTechVarom"]] <-
+      .dat2par(obj@parameters[["pTechVarom"]], pTechVarom)
 
     ## Move from reduce
+    # browser()
     mTechNew <- dd0$new
     mTechSpan <- dd0$span
     pTechOlife <- olife
-    if (tech@early.retirement) {
-      obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
-        obj@parameters[["mvTechRetiredStock"]],
+    if (tech@optimizeRetirement) {
+      if (!is.null(stock_exist)) {
+        stock_exists <- stock_exist |>
+          filter(value != 0) |>
+          select(-any_of("value"))
+        # browser()
+        obj@parameters[["mvTechRetiredStock"]] <- .dat2par(
+          obj@parameters[["mvTechRetiredStock"]], stock_exists)
+      }
+
         # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
-        select(filter(stock_exist, value != 0), -any_of("value"))
+        # select(filter(stock_exist, value != 0), -any_of("value"))
         # stock_exist[stock_exist$value != 0, colnames(stock_exist) != "value"]
-      )
+      # )
     }
     # browser()
-    if (nrow(dd0$new) > 0 && tech@early.retirement) {
+    if (nrow(dd0$new) > 0 && tech@optimizeRetirement) {
       obj@parameters[["meqTechRetiredNewCap"]] <- .dat2par(obj@parameters[["meqTechRetiredNewCap"]], mTechNew)
 
 
@@ -1918,6 +2022,7 @@ setMethod(
     obj@parameters[["mvTechAct"]] <-
       .dat2par(obj@parameters[["mvTechAct"]], mvTechAct)
     # Stay only variable with non zero output
+    # browser()
     merge_table <- function(mvTechInp, pTechCinp2use) {
       if (is.null(pTechCinp2use) || nrow(pTechCinp2use) == 0) {
         return(NULL)
@@ -2074,10 +2179,16 @@ setMethod(
       meqTechGrp2Grp <- NULL
     }
     if (!is.null(mTechInpGroup) || !is.null(mTechOutGroup)) {
-      mpTechShareLo <- pTechShare %>%
-        select(filter(type == "lo" & value > 0), -value)
+      # browser()
+      mpTechShareLo <- pTechShare |>
+        filter(type == "lo" & value > 0) |>
+        select(-any_of(c("value", "type")))
       # mpTechShareUp <- pTechShare[pTechShare$type == "up" & pTechShare$value < 1,
       #                             colnames(pTechShare) != "value"]
+      mpTechShareUp <- pTechShare |>
+        filter(type == "up" & value > 0) |>
+        select(-any_of(c("value", "type")))
+
     } else {
       mpTechShareUp <- NULL
       mpTechShareLo <- NULL
@@ -2093,6 +2204,7 @@ setMethod(
       techGroupInp <- NULL
     }
     if (!is.null(mvTechInp) && !is.null(mTechOneComm)) {
+      # browser()
       techSingInp <- merge0(mvTechInp, mTechOneComm)
       if (!is.null(pTechCinp2use)) {
         techSingInp <- merge0(
@@ -2148,16 +2260,21 @@ setMethod(
       meqTechSng2Sng <- merge0(techSingInp, techSingOut,
                                by = c("tech", "region", "year", "slice"),
                                suffixes = c("", ".1"))
+      # filter out unavailable combinations
+      # browser()
       obj@parameters[["meqTechSng2Sng"]] <-
         .dat2par(obj@parameters[["meqTechSng2Sng"]], meqTechSng2Sng)
     } else {
       meqTechSng2Sng <- NULL
     }
     if (!is.null(mpTechShareLo) && !is.null(techGroupOut)) {
+      # browser()
       meqTechShareOutLo <- merge0(mpTechShareLo, techGroupOut)
       obj@parameters[["meqTechShareOutLo"]] <- .dat2par(
         obj@parameters[["meqTechShareOutLo"]],
-        meqTechShareOutLo[, obj@parameters[["meqTechShareOutLo"]]@dimSets]
+        select(meqTechShareOutLo,
+               all_of(obj@parameters[["meqTechShareOutLo"]]@dimSets)
+               )
       )
     } else {
       meqTechShareOutLo <- NULL
@@ -2166,7 +2283,11 @@ setMethod(
       meqTechShareOutUp <- merge0(mpTechShareUp, techGroupOut)
       obj@parameters[["meqTechShareOutUp"]] <- .dat2par(
         obj@parameters[["meqTechShareOutUp"]],
-        meqTechShareOutUp[, obj@parameters[["meqTechShareOutUp"]]@dimSets]
+        select(
+          meqTechShareOutUp,
+          all_of(obj@parameters[["meqTechShareOutUp"]]@dimSets)
+          )
+        # meqTechShareOutUp[, obj@parameters[["meqTechShareOutUp"]]@dimSets]
       )
     } else {
       meqTechShareOutUp <- NULL
@@ -2175,7 +2296,11 @@ setMethod(
       meqTechShareInpLo <- merge0(mpTechShareLo, techGroupInp)
       obj@parameters[["meqTechShareInpLo"]] <- .dat2par(
         obj@parameters[["meqTechShareInpLo"]],
-        meqTechShareInpLo[, obj@parameters[["meqTechShareInpLo"]]@dimSets]
+        select(
+          meqTechShareInpLo,
+          all_of(obj@parameters[["meqTechShareInpLo"]]@dimSets)
+          )
+        # meqTechShareInpLo[, obj@parameters[["meqTechShareInpLo"]]@dimSets]
       )
     } else {
       meqTechShareInpLo <- NULL
@@ -2184,7 +2309,11 @@ setMethod(
       meqTechShareInpUp <- merge0(mpTechShareUp, techGroupInp)
       obj@parameters[["meqTechShareInpUp"]] <- .dat2par(
         obj@parameters[["meqTechShareInpUp"]],
-        meqTechShareInpUp[, obj@parameters[["meqTechShareInpUp"]]@dimSets]
+        # meqTechShareInpUp[, obj@parameters[["meqTechShareInpUp"]]@dimSets]
+        select(
+          meqTechShareInpUp,
+          all_of(obj@parameters[["meqTechShareInpUp"]]@dimSets)
+          )
       )
     } else {
       meqTechShareInpUp <- NULL
@@ -2632,6 +2761,7 @@ setMethod(
         approxim = approxim_srcdst, "trade", trd@name
       )
     )
+
     # pTradeIr
     pTradeIr <- .interp_bounds2(trd@trade,
       parameter = "ava",
@@ -2745,29 +2875,66 @@ setMethod(
                                 obj@parameters[["pTradeInvcost"]], approxim,
                                 "trade", trd@name)
       invcost <- invcost[invcost$value != 0, , drop = FALSE]
+      # browser()
+      stopifnot(nrow(trd@start) == 1)
+      stopifnot(nrow(trd@end) == 1)
       if (!is.null(invcost$year)) {
-        invcost <- invcost[trd@start <= invcost$year & invcost$year <= trd@end, ,
-                           drop = FALSE]
+        invcost <- invcost |>
+          filter(year >= trd@start$start[1] & year <= trd@end$end[1])
+        # invcost <- invcost[trd@start$start <= invcost$year & invcost$year <= trd@end$end, ,
+        #                    drop = FALSE]
+
       }
       if (!is.null(invcost) && nrow(invcost) == 0) invcost <- NULL
-      stock_exist <- .interp_numpar(trd@stock, "stock",
+      stock_exist <- .interp_numpar(trd@capacity, "stock",
                                     obj@parameters[["pTradeStock"]], approxim,
                                     "trade", trd@name)
       obj@parameters[["pTradeStock"]] <-
         .dat2par(obj@parameters[["pTradeStock"]], stock_exist)
+      # browser()
+      if (nrow(trd@capacity) > 0) {
+        pTradeCap <- .interp_bounds(
+          trd@capacity, "cap",
+          obj@parameters[["pTradeCap"]], approxim,
+          "trade", trd@name, remValueUp = Inf, remValueLo = 0
+          )
+        obj@parameters[["pTradeCap"]] <-
+          .dat2par(obj@parameters[["pTradeCap"]], pTradeCap)
+        rm(pTradeCap)
+
+        pTradeNewCap <- .interp_bounds(
+          trd@capacity, "ncap",
+          obj@parameters[["pTradeNewCap"]], approxim,
+          "trade", trd@name, remValueUp = Inf, remValueLo = 0
+        )
+        obj@parameters[["pTradeNewCap"]] <-
+          .dat2par(obj@parameters[["pTradeNewCap"]], pTradeNewCap)
+        rm(pTradeNewCap)
+      }
+      # browser()
+      if (nrow(trd@olife) > 1) {
+        stop("Operational life (`olife`) of trade object is accepting only one value. Year-dimension is reserved for future implementation, currently ignored.")
+      }
+      pTradeOlife <- .interp_numpar(select(trd@olife, -any_of("year")), "olife",
+                                    obj@parameters[["pTradeOlife"]], approxim,
+                                    "trade", trd@name)
       obj@parameters[["pTradeOlife"]] <- .dat2par(
-        obj@parameters[["pTradeOlife"]],
-        data.table(trade = trd@name, value = trd@olife, stringsAsFactors = FALSE)
-      )
-      possible_invest_year <- approxim$mileStoneYears
-      possible_invest_year <- possible_invest_year[
-        trd@start <= possible_invest_year & possible_invest_year <= trd@end
+        obj@parameters[["pTradeOlife"]], pTradeOlife)
+      if (is.null(pTradeOlife)) {
+        pTradeOlife <- data.table(trade = trd@name,
+                                  value = energyRt:::.defVal$olife)
+      }
+        # data.table(trade = trd@name, value = trd@olife, stringsAsFactors = FALSE))
+      invest_years <- approxim$mileStoneYears
+      invest_years <- invest_years[
+        trd@start$start[1] <= invest_years &
+          invest_years <= trd@end$end[1]
         ]
-      if (length(possible_invest_year) > 0) {
+      if (length(invest_years) > 0) {
         obj@parameters[["mTradeNew"]] <- .dat2par(
           obj@parameters[["mTradeNew"]],
-          data.table(trade = rep(trd@name, length(possible_invest_year)),
-                     year = possible_invest_year,
+          data.table(trade = rep(trd@name, length(invest_years)),
+                     year = invest_years,
                      stringsAsFactors = FALSE)
         )
       }
@@ -2778,23 +2945,33 @@ setMethod(
         }
         return(min(x))
       }
-      if (trd@olife == Inf) {
+      trd_stock <- trd@capacity |>
+        select(any_of(c("year", "region", "src", "dst")), stock) |>
+        filter(!is.na(stock)) |>
+        unique()
+      # browser()
+      # if (trd@olife == Inf) {
+      if (!is.null(pTradeOlife) && is.infinite(pTradeOlife$value)) {
         trade_eac <- unique(
-          approxim$year[min0(possible_invest_year) <= approxim$year]
+          approxim$year[min0(invest_years) <= approxim$year]
           )
-        trade_span <- unique(c(trd@stock$year, trade_eac))
+        trade_span <- unique(c(trd_stock$year, trade_eac))
         obj@parameters[["mTradeOlifeInf"]] <-
           .dat2par(obj@parameters[["mTradeOlifeInf"]],
                    data.table(trade = trd@name))
       } else {
         trade_eac <- unique(c(sapply(
-          possible_invest_year,
+          invest_years,
           function(x) {
-            approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]
+            # approxim$year[x <= approxim$year & approxim$year <= x + trd@olife]
+            approxim$year[
+              x <= approxim$year & approxim$year <= x + pTradeOlife$value
+            ]
           }
         ), recursive = TRUE))
-        trade_span <- unique(c(trd@stock$year, trade_eac))
+        trade_span <- unique(c(trd_stock$year, trade_eac))
       }
+      # browser()
       trade_eac <- trade_eac[trade_eac %in% approxim$mileStoneYears]
       trade_span <- trade_span[trade_span %in% approxim$mileStoneYears]
       if (length(trade_span) > 0) {
@@ -2817,7 +2994,7 @@ setMethod(
         if (any(!(obj@parameters[["mTradeInv"]]@dimSets %in%
                   colnames(invcost)))) {
           if (is.null(invcost$year)) {
-            invcost <- merge0(invcost, list(year = possible_invest_year))
+            invcost <- merge0(invcost, list(year = invest_years))
           }
           if (is.null(invcost$region)) {
             invcost <- merge0(invcost, approxim["region"])
@@ -2850,7 +3027,8 @@ setMethod(
         salv_data$value[is.na(salv_data$value)] <- 0
         salv_data$discount <- salv_data$value
         salv_data$value <- NULL
-        salv_data$olife <- trd@olife
+        # salv_data$olife <- trd@olife
+        salv_data$olife <- pTradeOlife$value
         # EAC
         salv_data$eac <- salv_data$invcost / salv_data$olife
         fl <- (salv_data$discount != 0 & salv_data$olife != Inf)
@@ -2876,10 +3054,20 @@ setMethod(
               ))
       }
     }
+    if (nrow(trd@fixom) > 0) {
+      # browser()
+      pTradeFixom <- .interp_numpar(trd@fixom, "fixom",
+                                    obj@parameters[["pTradeFixom"]],
+                                    approxim, "trade", trd@name)
+      # !!! duplicated values after the interpolation - check !!!
+      obj@parameters[["pTradeFixom"]] <-
+        .dat2par(obj@parameters[["pTradeFixom"]], unique(pTradeFixom))
+    }
     ####
     mTradeIr <- merge0(mTradeRoutes, mTradeSlice)
     if (trd@capacityVariable) {
-      mTradeIr <- merge0(mTradeIr, mTradeSpan)
+      # mTradeIr <- merge0(mTradeIr, mTradeSpan)
+      mTradeIr <- merge0(mTradeIr, obj@parameters[["mTradeSpan"]]@data)
     } else {
       mTradeIr <- merge0(mTradeIr, list(year = approxim$mileStoneYears))
     }
@@ -3103,9 +3291,11 @@ setMethod(
   }
   if (any(!fl)) {
     # if (obj@name == "ECCG") browser()
-    dend <- dend |> filter(!fl) |> select(-year) |>
-      left_join(obj@end[!fl, ]) |> rename(year = end) |>
-      rbind(filter(dend, fl))
+    suppressMessages({
+      dend <- dend |> filter(!fl) |> select(-year) |>
+        left_join(obj@end[!fl, ]) |> rename(year = end) |>
+        rbind(filter(dend, fl))
+    })
     # dend[obj@end[!fl, "region"], "year"] <- obj@end[!fl, "end"]
   }
   dend <- dend[!is.na(dend$year), , drop = FALSE]
@@ -3181,7 +3371,9 @@ merge0 <- function(x, y,
   y <- .force_year_class_df(y)
   x <- .force_year_class_df(x)
   # xy <- merge(x, y)
-  xy <- dplyr::cross_join(x, y) # !!! rewrite
+  suppressMessages({
+    xy <- dplyr::cross_join(x, y) # !!! rewrite
+  })
   # colnames(xy) <- c(colnames(x), colnames(y)) # ???
   # return(as.data.table(xy))
   return(as.data.table(xy))

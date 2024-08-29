@@ -1,3 +1,30 @@
+#' Set or get python installation path to be used to solve models
+#'
+#' @param path character path to the python installation. If NULL, the global operation path is used.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+set_python_path <- function(path = NULL) {
+  # browser()
+  if (!is.null(path) && path != "") {
+    if (!dir.exists(path)) {
+      stop(paste0('The path "', path, '" does not exist.'), call. = FALSE)
+    }
+    if (!grepl("\\/$", path)) {
+      path <- paste0(path, "/")
+    }
+  }
+  options::opt_set("python_path", path, env = "energyRt")
+  # options(python_path = path)
+}
+
+#' @export
+get_python_path <- function() {
+  options::opt("python_path", env = "energyRt")
+}
+
 # Functions to write PYOMO model and data files
 .write_model_PYOMO <- function(arg, scen) {
   # browser()
@@ -97,8 +124,8 @@
       }
     }
   }
-  dir.create(paste(arg$tmp.dir, "/input", sep = ""), showWarnings = FALSE)
-  dir.create(paste(arg$tmp.dir, "/output", sep = ""), showWarnings = FALSE)
+  dir.create(fp(arg$tmp.dir, "input"), showWarnings = FALSE)
+  dir.create(fp(arg$tmp.dir, "output"), showWarnings = FALSE)
   # if (!is.null(scen@settings@solver$SQLite) && scen@settings@solver$SQLite) {
   if (is.null(scen@settings@solver$export_format)) {
     SQLite <- FALSE
@@ -110,19 +137,19 @@
     ### Generate SQLite file
     .write_sqlite_list(
       dat = .get_scen_data(scen),
-      sqlFile = paste0(arg$tmp.dir, "input/data.db")
+      sqlFile = fp(arg$tmp.dir, "input/data.db")
     )
   }
   .write_inc_solver(scen, arg, "opt = SolverFactory('cplex');", ".py", "cplex")
   # Add constraint
-  zz_mod <- file(paste(arg$tmp.dir, "/energyRt.py", sep = ""), "w")
-  zz_constr <- file(paste(arg$tmp.dir, "/inc_constraints.py", sep = ""), "w")
-  zz_costs <- file(paste(arg$tmp.dir, "/inc_costs.py", sep = ""), "w")
+  zz_mod <- file(fp(arg$tmp.dir, "/energyRt.py"), "w")
+  zz_constr <- file(fp(arg$tmp.dir, "/inc_constraints.py"), "w")
+  zz_costs <- file(fp(arg$tmp.dir, "/inc_costs.py"), "w")
   npar <- grep("^##### decl par #####", run_code)[1]
   cat(run_code[1:npar], sep = "\n", file = zz_mod)
   if (!AbstractModel) {
     cat('exec(open("data.py").read())\n', file = zz_mod)
-    zz_inp_file <- file(paste0(arg$tmp.dir, "data.py"), "w")
+    zz_inp_file <- file(fp(arg$tmp.dir, "data.py"), "w")
   }
   if (AbstractModel) {
     f1 <- grep("^m(Costs|Cns)", names(scen@modInp@parameters), invert = TRUE)
@@ -146,7 +173,7 @@
     }
   }
   if (AbstractModel) {
-    zz_data_pyomo <- file(paste(arg$tmp.dir, "data.dat", sep = ""), "w")
+    zz_data_pyomo <- file(fp(arg$tmp.dir, "data.dat"), "w")
   }
   file_w <- c()
   for (j in c("set", "map", "numpar", "bounds")) {
@@ -196,7 +223,7 @@
               tfl <- paste0("input/", scen@modInp@parameters[[i]]@name, ".py")
               cat(paste0('exec(open("', tfl, '").read())\n'),
                   file = zz_inp_file)
-              zz_tfl <- file(paste0(arg$tmp.dir, tfl), "w")
+              zz_tfl <- file(fp(arg$tmp.dir, tfl), "w")
               cat(.toPyomo(scen@modInp@parameters[[i]]),
                 sep = "\n", file = zz_tfl
               )
@@ -259,12 +286,17 @@
   close(zz_mod)
   close(zz_constr)
   close(zz_costs)
-  zz_modout <- file(paste(arg$tmp.dir, "/output.py", sep = ""), "w")
+  zz_modout <- file(fp(arg$tmp.dir, "/output.py"), "w")
   cat(run_codeout, sep = "\n", file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".py")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
-    scen@settings@solver$cmdline <- "python energyRt.py"
+    fpath <- get_python_path()
+    if (!is.null(fpath)) {
+      scen@settings@solver$cmdline <- fp(fpath, "python energyRt.py")
+    } else {
+      scen@settings@solver$cmdline <- "python energyRt.py"
+    }
   }
   scen@settings@solver$code <- c(
     "energyRt.py", "output.py", "inc_constraints.py",
@@ -562,6 +594,7 @@
 
 ## Function
 .get_pyomo_loop_fast <- function(set_loop, set_cond, add_cond = NULL) {
+  # if (any(grep('', c(set_loop, set_cond)))) browser()
   if (!is.null(set_cond) && substr(set_cond, 1, 1) == "(") {
     set_cond <- sub("^[(]", "", sub("[)]$", "", set_cond))
   }
@@ -593,7 +626,7 @@
 #   .fremset[x]
 # }
 .generate_loop_pyomo <- function(set_num, set_loop) {
-  # if (any(grep('mCnsuseElc2018Coa1_3', c(set_loop, set_num)))) browser()
+  # if (any(grep('', c(set_loop, set_num)))) browser()
 
   # Consdition split and divet by subset
   while (!is.null(set_loop) && substr(set_loop, 1, 1) == "(" &&
@@ -621,7 +654,7 @@
   )
   if (length(cnd_slice) != 0) {
     fl <- (sapply(cnd_slice, length) == 1)
-    if (any(fl)) {
+    if (any(fl)) { #!!! Check !!!
       ff <- c(cnd_slice[fl], recursive = TRUE)
       ff <- ff[!duplicated(ff)]
       names(ff) <- gsub("[.].*", "", names(ff))
@@ -652,6 +685,7 @@
 }
 
 .get_pyomo_loop_fast2 <- function(tx) {
+  # if (any(grep('', tx))) browser()
   if (any(grep("[$]", tx))) {
     beg <- gsub("[$].*", "", tx)
     end <- substr(tx, nchar(beg) + 2, nchar(tx))
@@ -663,6 +697,7 @@
 }
 
 .get.bracket.pyomo <- function(tmp) {
+  # if (any(grep('', tmp))) browser()
   brk0 <- gsub("[^)(]", "", tmp)
   brk <- cumsum(c("(" = 1, ")" = -1)[strsplit(brk0, "")[[1]]])
   k <- seq_along(brk)[brk == 0][1]
@@ -673,6 +708,7 @@
 }
 
 .handle.sum.pyomo <- function(tmp) {
+  # if (any(grep('', tmp))) browser()
   hh <- .get.bracket.pyomo(tmp)
   a1 <- sub("^[(]", "", sub("[)]$", "", hh$beg))
   a2 <- a1
@@ -689,6 +725,7 @@
   )
 }
 .eqt.to.pyomo <- function(tmp) {
+  # if (any(grep('', tmp))) browser()
   # browser()
   rs <- ""
   while (nchar(tmp) != 0) {
@@ -699,8 +736,14 @@
     # } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
     #   a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
     # changing pattern to include scientific numbers
-    } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
-      a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+    # } else if (any(grep("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)", tmp))) {
+    #   a3 <- gsub("^([-+]?\\d+\\.?\\d*([eE][-+]?\\d+)?)*", "", tmp)
+    # the pattern doesn't match:
+    # "+ sum(techp$(mCnsBASN_battery_moderate_0_cn_4(techp) and mTechNew(techp, region, year)), -1 * vTechNewCap(techp, region, year)) =e= 1e-20;"
+    } else if (any(grep("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])",
+                        tmp))) {
+      a3 <- gsub("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])",
+                 "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {
@@ -745,6 +788,7 @@
 
 # equation declaration
 .equation.from.gams.to.pyomo <- function(eqt) {
+  # if (any(grep('', eqt))) browser()
   declaration <- gsub("[.][.].*", "", eqt)
   rs <- paste0("model.", gsub("[$.(].*", "", eqt), " = Constraint(")
 
@@ -821,7 +865,7 @@
 #   .fremset[x]
 # }
 .generate_loop_pyomo.jump <- function(set_num, set_loop) {
-  # if (any(grep('mCnsuseElc2018Coa1_3', c(set_loop, set_num)))) browser()
+  # if (any(grep('', c(set_loop, set_num)))) browser()
 
   # Consdition split and divet by subset
   while (!is.null(set_loop) && substr(set_loop, 1, 1) == "(" &&
@@ -916,6 +960,7 @@
 }
 
 .eqt.to.pyomo.jump <- function(tmp) {
+  # browser()
   rs <- ""
   while (nchar(tmp) != 0) {
     tmp <- gsub("^[ ]*", "", tmp)
@@ -924,6 +969,9 @@
       tmp <- ""
     } else if (any(grep("^([.[:digit:]]|[+]|[-]|[ ]|[*])", tmp))) {
       a3 <- gsub("^([.[:digit:]_]|[+]|[-]|[ ]|[*])*", "", tmp)
+    # } else if (any(grep("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])",
+    #                     tmp))) {
+    #   a3 <- gsub("^([.[:digit:]_]([eE][-+]?\\d+)?|[+]\\s*|[-]\\s*|[ ]|[*])", "", tmp)
       rs <- paste0(rs, substr(tmp, 1, nchar(tmp) - nchar(a3)))
       tmp <- a3
     } else if (substr(tmp, 1, 1) %in% c("m", "v", "p")) {

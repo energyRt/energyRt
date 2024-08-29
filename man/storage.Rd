@@ -126,6 +126,7 @@ Storage type of technological processes with accumulating capacity of a commodit
   \item{region}{character. Region name for wich the parameter will be specified. NA for all regions.}
   \item{year}{integer. Year when the specified parameter will be actual. NA for all years.}
   \item{invcost}{numeric. Overnight investment cost for the specified region and year.}
+  \item{wacc}{numeric. Weighted average cost of capital. If not supplied, the value is taken from the global model or scenario parameters.}
 }}
 
 \item{\code{fullYear}}{logical. If TRUE, the storage technology operates between timeframes.}
@@ -149,6 +150,8 @@ Storage type of technological processes with accumulating capacity of a commodit
 }}
 
 \item{\code{misc}}{list. Miscellaneous information or parameters.}
+
+\item{\code{capacity}}{data.frame. (not implemented!) Capacity parameters of the storage technology.}
 }}
 
 \concept{process}

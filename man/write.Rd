@@ -6,14 +6,14 @@
 \alias{write.sc}
 \title{Write scenario object as a Python, Julia, GAMS, or MathProg script with data files to a directory}
 \usage{
-write_script(x, tmp.dir = NULL, solver = NULL, ...)
+write_script(scen, tmp.dir = NULL, solver = NULL, ...)
 
 write_sc(x, tmp.dir = NULL, solver = NULL, ...)
 
 write.sc(x, tmp.dir = NULL, solver = NULL, ...)
 }
 \arguments{
-\item{x}{scenario object, must be interpolated}
+\item{scen}{scenario object, must be interpolated}
 
 \item{tmp.dir}{character, path}
 

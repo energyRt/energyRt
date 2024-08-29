@@ -10,20 +10,22 @@ Class 'constraint'
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character.}
+\item{\code{name}}{character. Name of the constrain object (will be used in GAMS, GLPK, etc. as an element in sets).}
 
-\item{\code{desc}}{character.}
+\item{\code{desc}}{character. Description of the constraint.}
 
-\item{\code{eq}}{factor.}
+\item{\code{eq}}{factor. Type of the relation ('==' default, '<=', '>=').}
 
-\item{\code{for.each}}{list.}
+\item{\code{for.each}}{list. List with sets for which constraint will be created.}
 
-\item{\code{rhs}}{data.frame.}
+\item{\code{rhs}}{data.frame. List or data frame with numeric values for each constraint.}
 
-\item{\code{defVal}}{numeric.}
+\item{\code{defVal}}{numeric. The default value for the rhs.}
 
-\item{\code{lhs}}{list.}
+\item{\code{interpolation}}{character, interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".}
 
-\item{\code{misc}}{list.}
+\item{\code{lhs}}{list. List of summands for the left-hand side of the equation. This slot is created automatically from all unnamed arguments passed to the `newConstraint` function.}
+
+\item{\code{misc}}{list. List of any additional information or parameters to store in the constraint object.}
 }}
 

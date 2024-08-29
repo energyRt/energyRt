@@ -16,6 +16,8 @@ dev/
 ^tmp$
 drafts/
 depreciated/
+scenarios/
+^scenarios$
 
 
 

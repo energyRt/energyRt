@@ -1,3 +1,5 @@
+#' @include options.R
+
 # S3 methods from R base (and to avoid conflicts with other libraries)
 # write <- function(x, ...) UseMethod("write") # conflicts with base::write
 
@@ -13,6 +15,7 @@ setGeneric("interpolate", function(object, ...) UseMethod("interpolate"))
 
 # energyRt methods (exported)
 setGeneric("setHorizon", function(obj, ...) standardGeneric("setHorizon"))
+# setGeneric("setHorizon", function(obj, horizon, ...) standardGeneric("setHorizon"))
 setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
 setGeneric("setCalendar", function(obj, ...) standardGeneric("setCalendar"))
 setGeneric("getCalendar", function(obj) standardGeneric("getCalendar"))

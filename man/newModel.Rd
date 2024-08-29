@@ -8,7 +8,7 @@
 \usage{
 newModel(name = "", desc = "", ...)
 
-\S4method{setHorizon}{model}(obj, horizon, intervals)
+\S4method{setHorizon}{model}(obj, ...)
 
 \S4method{getHorizon}{model}(obj)
 }
