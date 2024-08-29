@@ -1,90 +1,86 @@
-## energyRt: energy systems modeling toolbox in R
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
 
-[**documentation in progress.**](https://energyrt.github.io/book/)
+## energyRt: energy systems modeling tools in R
 
-## Installing the package:  
-stable version (for models built before Aug-2023):  
-`remotes::install_github("energyRt/energyRt")` 
+**energyRt** (*energy* system modeling *R-t*oolbox /ˈɛnərdʒi ɑrt/) is a
+set of classes, methods, and functions that define a macro-language for
+energy system modeling within the R environment. This package offers a
+high-level, user-friendly interface that simplifies the development and
+analysis of complex energy models. By abstracting much of the underlying
+complexity, **energyRt** allows users to concentrate on strategic and
+analytical aspects rather than the technical details of coding.
 
-development (not consistent with the 'stable', current models):   
-`remotes::install_github("energyRt/energyRt", ref = "dev")` 
+**Key Features:**
 
-> **⚠️ Warning**   
-*`energyRt`* is currently in preparation for its first release and publication on CRAN. Names, behavior, meaning of functions, methods, and parameters are being reviewed and may be changed in order to improve the readability and transparency of the code, consistency with other libraries, functionality and features of the final product. Thanks for testing and for your patience. Please report bugs, issues or suggest improvements here: <https://github.com/energyRt/energyRt/issues>
+-   **User-Friendly Interface: energyRt** enables users to define energy
+    systems, input data, and configure scenarios using intuitive,
+    domain-specific commands. It is designed to be accessible for both
+    experienced modelers and those new to the field.
+-   **Seamless R Integration:** The package integrates seamlessly with
+    R’s extensive ecosystem of packages, allowing users to utilize
+    powerful data handling and visualization tools within their energy
+    modeling projects.
+-   The **energyRt** optimization
+    [model](https://energyrt.github.io/book/model.html) is implemented
+    in four widely-used mathematical programming languages, both
+    proprietary and open-source: [GAMS](http://www.gams.com/),
+    [GLPK/Mathprog](https://www.gnu.org/software/glpk/),
+    [Python/Pyomo](http://www.pyomo.org/),
+    [Julia/JuMP](http://www.juliaopt.org/JuMP.jl/stable/). The package
+    is designed to work seamlessly with any of these versions, allowing
+    users to solve models using their preferred software while ensuring
+    consistent and equivalent results across all platforms.
+-   **Modular Model Construction: energyRt** supports the construction
+    of models in a modular fashion, enabling incremental development,
+    individual component testing, and code reuse across different
+    projects. This modularity, combined with R’s interactive
+    environment, promotes an iterative approach to modeling where
+    assumptions can be tested, and results explored in real-time.
+-   **Applications: energyRt** is designed to facilitate the creation of
+    sophisticated energy system models, offering both flexibility and
+    depth for detailed analysis. It is an essential tool for
+    researchers, policymakers, and industry professionals engaged in
+    long-term energy system planning, energy transition, and
+    decarbonization efforts.
 
-**energyRt** is a package for [R](https://www.r-project.org/) to develop Reference Energy System (RES) models (also known as Capacity Expansion Models (CEM), or "Bottom-Up" technological energy models), and analyze energy-technologies.
-
-**energyRt** package provides tools to formulate the main "bricks" of an energy system model in **R**, and solve the model with one of the mainstream mathematical programming languages:\
-\* [GAMS](http://www.gams.com/),\
-\* [GLPK/Mathprog](https://www.gnu.org/software/glpk/),\
-\* [Python/Pyomo](http://www.pyomo.org/),\
-\* [Julia/JuMP](http://www.juliaopt.org/JuMP.jl/stable/).
-
-The RES/CEM model has similarities with [TIMES/MARKAL](http://iea-etsap.org/web/tools.asp), [OSeMOSYS](http://www.osemosys.org/), but has its own specifics, f.i. definition of technologies.
-
-**energyRt** package is a set of *classes*, *methods*, and *functions* in [R](https://www.r-project.org/) which are designed to:\
-- handle data, assist in defining RES models,\
-- helps to analyze data, check for errors and bugs before parsing it into solver,\
-- parses your dataset to GAMS or GLPK or Python/Pyomo or Julia/JuMP and runs them to solve the model,\
-- reads the solution and imports results back to R,\
-- assists with an analysis of results and reporting.
-
-### Motivation
-
--   minimize time of development and application of RES/BottomUp models,
--   boost learning curve in energy modeling,
--   improve transparency and understanding of energy models,
--   use power of open-source to improve energy models and their application,
--   making reproducible research (see [Reproducible Research with R and R Studio] (<https://github.com/christophergandrud/Rep-Res-Book>) by @christophergandrud and/or [Dynamic Documents with R and knitr] (<https://github.com/yihui/knitr-book>) by @yihui) accessible in RES-modeling,
--   integration with other models and software.
+Documentation in progress: <https://energyrt.github.io/book/>
 
 ### Development status
 
-The current functionality allows development of multi-regional RES models from basic to well advanced level of complexity, including multiple regions, exogenous or endogenous interregional trade routes (for example, electricity grid), multilevel/nested time-slices, as well as flexible definition of technologies, storages. The package documentation is in development. By now, the best way to test the functionality of the package is to check fully functional examples of the model (see *Examples* bellow).
+**energyRt** is currently in preparation for its first release and
+publication on [CRAN](https://cran.r-project.org/). The major milestone
+for the package is the version **v0.50** (*"half-way-there"*), a proof
+of concept with a full-featured and efficient model written in four
+math-prog languages, with R-interface for the model design, processing
+results, and producing reports. This version will have frozen model
+code, classes and methods. Any updates will address only potential fixes
+and new features with minimal impact on already existing modeling
+projects.
+
+Further development, versions starting from **v0.9** towards the
+**v1.0** will have fully reviewed model and classes with the goal to
+further increase efficiency, reduce memory footprint and computational
+burden for both the model and its R interface, and significantly extend
+features.
 
 ## Installation
 
-### Prerequisites
+Assuming that R is already installed (if not, please download and
+install from <https://www.r-project.org/>), we also recommend RStudio
+(<https://www.rstudio.com/>), a powerful IDE (Integrated Development
+Environment) for R. The installation of the package is done via the
+`pak` or `remotes` packages:
 
-#### R and RStudio
+`pak::pkg_install("energyRt/energyRt@v0.5")`\
+or\
+`remotes::install_github("energyRt/energyRt", ref = "v0.5")`
 
-Assuming that R is already installed (if not, please download and install from <https://www.r-project.org/>), we also recommend RStudio (<https://www.rstudio.com/>), a powerful IDE (Integrated Development Environment) for R. It simplifies usage of R, provides number of features such as reproducible research (integration with Markdown, Sweave), integration with version control (github, svn).
-
-#### GAMS or GLPK or Python or Julia to solve the model
-
-The cost-minimising linear programming model (the set of equation for LP problem), emboddied into *energyRt* package requires additional software to solve it. Currently *energyRt* model code is written in several languages *GAMS*, *GLPK*, *Python/Pyomo*, *Julia/Jump*. At least one of them is required to solve the model.
-
-The General Algebraic Modeling System (*GAMS*, <http://gams.com/>) is a powerful proprietary modeling system. Suitable LP solvers: CBC (included in the basic GAMS version, very powerful open source solver) or CPLEX. Others LP solvers have not been tested, but may work as well.
-
-GAMS path should be also added to the environmental variables in your operating system.
-
-*GLPK* is an open source Linear Programming Kit which includes powerful LP and MIP solver, and basic language for creating mathematical programming models (Mathprog or GMPL -- for details see <https://en.wikibooks.org/wiki/GLPK/GMPL_%28MathProg%29>)
-
-GLPK/GMPL is an open source alternative to GAMS, but only for LP and MIP problems. GLPK/GMPL is a bit slower than GAMS for small models, and significantly slower for large models, partially because of the slower Mathprog (GMPL) language processor.
-
-##### Installing GLPK on PC/Windows systems
-
-Download GLPK binaries for Windows: <https://sourceforge.net/projects/winglpk/> Follow the installation instructions, and add the path to the Windows environment variables.
-
-##### Installing GLPK on Mac systems
-
-You can install GLPK on a Mac using Homebrew or MacPorts:
-`brew install glpk`
-or
-`sudo port install glpk`
-
-Response from `glpsol` will be an indicator of successful installation.
-
-See: <http://brew.sh/> and <https://github.com/Homebrew/homebrew-science> for details.
-
-##### Installing Pythom/Pyomo
-
-Please folow one of the standard procedures to install Python, make it available in your system's terminal/cmd, install Pyomo package and LP solver(s). CPLEX or Gurobi are recommended for large scale models.
-
-##### Installing Julia/JuMP
-
-Similarly, follow the standard procedure of installing Julia and JuMP package, as well as the solvers and links to the solvers. 
-
-*Currently Julia/JuMP version of energyRt is suitable for small-scale models and is recommended for testing only, the code for large-scale models is in progress.*
-
-
+The next step would be to install at least one of the solvers: GAMS,
+GLPK, Python/Pyomo, Julia/JuMP. Please refer to the respective websites
+for installation instructions. More detaileds is available on the
+[IDEEA](https://ideea-model.github.io/IDEEA/articles/install.html) model
+website, a project based on the **energyRt** package.

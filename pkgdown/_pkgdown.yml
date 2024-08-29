@@ -107,7 +107,7 @@ reference:
 - title: energyRt options and settings
   contents:
   - starts_with("set")
-
+  - matches("make_scenario_dirname")
 
 # - title: All other
 #   contents: lacks_concepts("none")

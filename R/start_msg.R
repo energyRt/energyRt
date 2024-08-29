@@ -16,6 +16,13 @@
   # progressr::handlers("progress")
   # progressr::handlers(global = TRUE)
 
+  # load global settings if exist
+  if (file.exists("~/.energyRt.R")) {
+    try({
+      source("~/.energyRt.R")
+    })
+  }
+
   # environments
   .initiate_env <- function(e) {
     if (!exists(e, envir = .GlobalEnv)) {

@@ -9,10 +9,10 @@
 newHorizon(
   period = NULL,
   intervals = NULL,
-  desc = NULL,
   mid_is_end = FALSE,
   mid_is_start = FALSE,
   force_BY_interval_to_1_year = T,
+  desc = NULL,
   name = NULL,
   ...
 )
@@ -22,9 +22,9 @@ newHorizon(
 
 \item{intervals}{(optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.}
 
-\item{desc}{character, a comment or description.}
-
 \item{force_BY_interval_to_1_year}{logical, if TRUE (default), the base-year (first) interval will be forced to one year.}
+
+\item{desc}{character, a comment or description.}
 
 \item{...}{ignored}
 }

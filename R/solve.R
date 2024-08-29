@@ -23,7 +23,7 @@ solve_model <- function(
     name = NULL,
     # name = paste("scen", obj@name, sep = "_"),
     # solver = NULL,
-    # tmp.path = file.path(getwd(), "/solwork"),
+    # tmp.path = fp(getwd(), "/solwork"),
     # tmp.time = format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
     # tmp.name = paste(solver, obj@name, name, tmp.time, sep = "_"),
     # path = NULL,
@@ -82,10 +82,15 @@ solve_model <- function(
     }
   }
   if (is.null(arg$path)) {
-    if (inherits(obj, "scenario") && !is.null(obj@path)) {
-      arg$path <- obj@path
+    if (inherits(obj, "scenario")) {
+      if (is_empty(obj@path)) {
+        arg$path <- fp(get_scenarios_path(), make_scenario_dirname(obj))
+      } else {
+        arg$path <- obj@path
+      }
     } else {
-      arg$path <- file.path(get_scenarios_path(), arg$name)
+      # arg$path <- fp(get_scenarios_path(), arg$name)
+      arg$path <- NULL
     }
   }
   # Filter from '...' objects to pass to 'interpolate'
@@ -338,7 +343,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   # tmp.dir - full path to the directory for the solver's files
     # tmp.path - path where the tmp.dir will be created
     # tmp.name - name of the directory for the solver's files
-    # tmp.dir == file.path(tmp.path, tmp.name)
+    # tmp.dir == fp(tmp.path, tmp.name)
   # tmp.del - if TRUE, the tmp.dir will be deleted after the scenario is solved
   # return: arg with tmp.dir and tmp.del
   # browser()
@@ -371,7 +376,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
       }
     }
     if (!is_empty(scen@path)) {
-      tmp.path <- file.path(scen@path, "script")
+      tmp.path <- fp(scen@path, "script")
       # return(arg)
     }
   }
@@ -385,9 +390,9 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   }
   # if (is.null(tmp.path) || length(tmp.path) == 0) {
   if (is_empty(tmp.path)) {
-    tmp.path <- file.path(get_scenarios_path(), scen@name, "script")
+    tmp.path <- fp(get_scenarios_path(), scen@name, "script")
     # if (!is.null(arg[["solver"]])) {
-    #   tmp.path <- file.path(tmp.path, arg[["solver"]]$name)
+    #   tmp.path <- fp(tmp.path, arg[["solver"]]$name)
     # }
   }
 
@@ -408,7 +413,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
     tmp.name <- format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = "UTC")
   }
 
-  tmp.dir <- file.path(tmp.path, tmp.name)
+  tmp.dir <- fp(tmp.path, tmp.name)
   tmp.dir <- gsub("[\\/]+", "/", tmp.dir)
   arg[["tmp.dir"]] <- tmp.dir
   return(arg)
@@ -518,8 +523,8 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
   # if (!is.null(scen)) scen@misc$tmp.dir <- .fix_path(scen@misc$tmp.dir)
 
   # if (is.null(arg$tmp.dir)) {
-  #   arg$tmp.dir <- .file.path(
-  #     file.path(getwd(), "solwork"),
+  #   arg$tmp.dir <- .fp(
+  #     fp(getwd(), "solwork"),
   #     paste(arg$solver$lang, tmp_name, # scen@name,
   #       format(Sys.time(), "%Y%m%d%H%M%S%Z", tz = Sys.timezone()),
   #       sep = "_"
@@ -589,7 +594,7 @@ get_tmp_dir <- function(scen = NULL, arg = NULL) {
       name = paste0("code", seq_along(scen@settings@solver$code)),
       value = scen@settings@solver$code, stringsAsFactors = FALSE
     ))
-    write.csv(tmp, file = file.path(arg$tmp.dir, "solver"), row.names = FALSE)
+    write.csv(tmp, file = fp(arg$tmp.dir, "solver"), row.names = FALSE)
 
     if (arg$echo) {
       cat(round(proc.time()[3] - solver_solver_time, 2), "s\n", sep = "")

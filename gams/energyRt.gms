@@ -797,7 +797,7 @@ eqTechAInp(tech, comm, region, year, slice)$mvTechAInp(tech, comm, region, year,
   (vTechAct(tech, region, year, slice) *
     pTechAct2AInp(tech, comm, region, year, slice))$mTechAct2AInp(tech, comm, region, year, slice) +
   (vTechCap(tech, region, year) *
-    pTechCap2AInp(tech, comm, region, year, slice))$mTechCap2AInp(tech, comm, region, year, slice) +
+    pTechCap2AInp(tech, comm, region, year, slice) / pTechCap2act(tech))$mTechCap2AInp(tech, comm, region, year, slice) +
   (vTechNewCap(tech, region, year) *
     pTechNCap2AInp(tech, comm, region, year, slice))$mTechNCap2AInp(tech, comm, region, year, slice) +
   sum(commp$mTechCinp2AInp(tech, comm, commp, region, year, slice),
@@ -812,7 +812,7 @@ eqTechAOut(tech, comm, region, year, slice)$mvTechAOut(tech, comm, region, year,
   (vTechAct(tech, region, year, slice) *
     pTechAct2AOut(tech, comm, region, year, slice))$mTechAct2AOut(tech, comm, region, year, slice) +
   (vTechCap(tech, region, year) *
-    pTechCap2AOut(tech, comm, region, year, slice))$mTechCap2AOut(tech, comm, region, year, slice) +
+    pTechCap2AOut(tech, comm, region, year, slice) / pTechCap2act(tech))$mTechCap2AOut(tech, comm, region, year, slice) +
   (vTechNewCap(tech, region, year) *
     pTechNCap2AOut(tech, comm, region, year, slice))$mTechNCap2AOut(tech, comm, region, year, slice) +
   sum(commp$mTechCinp2AOut(tech, comm, commp, region, year, slice),

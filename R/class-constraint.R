@@ -96,7 +96,9 @@ setClass("summand",
 #'
 #' @export
 newConstraint <- function(
-    name, ...,
+    name,
+    desc = "", # desc
+    ...,
     eq = "==",
     rhs = data.frame(),
     for.each = NULL,
@@ -177,6 +179,7 @@ newConstraint <- function(
   obj@rhs <- rhs
   obj@defVal <- defVal
   obj@name <- name
+  obj@desc <- desc
   obj@interpolation <- interpolation
   if (!is.null(for.each)) {
     if (!is.data.frame(for.each) && is.list(for.each)) {

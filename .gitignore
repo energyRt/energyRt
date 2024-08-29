@@ -16,3 +16,9 @@ solwork
 Meta
 #docs
 scenarios/
+inst/doc
+.archive/
+dev/
+drafts/
+.formatted/
+.unformatted/

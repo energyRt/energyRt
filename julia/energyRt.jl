@@ -391,17 +391,27 @@ print("eqTechAInp(tech, comm, region, year, slice)...")
     else
         0
     end) +
-    (if (t, c, r, y, s) in mTechCap2AInp
-        (vTechCap[(t, r, y)] * (
-            if haskey(pTechCap2AInp, (t, c, r, y, s))
-                pTechCap2AInp[(t, c, r, y, s)]
-            else
-                pTechCap2AInpDef
-            end
-        ))
-    else
-        0
-    end) +
+    (
+        if (t, c, r, y, s) in mTechCap2AInp
+            (
+                (vTechCap[(t, r, y)] * (
+                    if haskey(pTechCap2AInp, (t, c, r, y, s))
+                        pTechCap2AInp[(t, c, r, y, s)]
+                    else
+                        pTechCap2AInpDef
+                    end
+                )) / ((
+                    if haskey(pTechCap2act, (t))
+                        pTechCap2act[(t)]
+                    else
+                        pTechCap2actDef
+                    end
+                ))
+            )
+        else
+            0
+        end
+    ) +
     (if (t, c, r, y, s) in mTechNCap2AInp
         (vTechNewCap[(t, r, y)] * (
             if haskey(pTechNCap2AInp, (t, c, r, y, s))
@@ -457,17 +467,27 @@ print("eqTechAOut(tech, comm, region, year, slice)...")
     else
         0
     end) +
-    (if (t, c, r, y, s) in mTechCap2AOut
-        (vTechCap[(t, r, y)] * (
-            if haskey(pTechCap2AOut, (t, c, r, y, s))
-                pTechCap2AOut[(t, c, r, y, s)]
-            else
-                pTechCap2AOutDef
-            end
-        ))
-    else
-        0
-    end) +
+    (
+        if (t, c, r, y, s) in mTechCap2AOut
+            (
+                (vTechCap[(t, r, y)] * (
+                    if haskey(pTechCap2AOut, (t, c, r, y, s))
+                        pTechCap2AOut[(t, c, r, y, s)]
+                    else
+                        pTechCap2AOutDef
+                    end
+                )) / ((
+                    if haskey(pTechCap2act, (t))
+                        pTechCap2act[(t)]
+                    else
+                        pTechCap2actDef
+                    end
+                ))
+            )
+        else
+            0
+        end
+    ) +
     (if (t, c, r, y, s) in mTechNCap2AOut
         (vTechNewCap[(t, r, y)] * (
             if haskey(pTechNCap2AOut, (t, c, r, y, s))
@@ -546,7 +566,7 @@ print("eqTechAfLo(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfLo;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfLo; 
         init = 1
     ) <= vTechAct[(t, r, y, s)]
 );
@@ -597,7 +617,7 @@ print("eqTechAfUp(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfUp;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfUp; 
         init = 1
     )
 );
@@ -647,7 +667,7 @@ print("eqTechAfsLo(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsLo;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsLo; 
         init = 1
     ) <= sum(
         (if (t, r, y, sp) in mvTechAct
@@ -710,7 +730,7 @@ print("eqTechAfsUp(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsUp;
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsUp; 
         init = 1
     )
 );
@@ -926,7 +946,7 @@ print("eqTechAfcOutLo(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo; 
         init = 1
     ) <= vTechOut[(t, c, r, y, s)]
 );
@@ -977,7 +997,7 @@ print("eqTechAfcOutUp(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp; 
         init = 1
     )
 );
@@ -1027,7 +1047,7 @@ print("eqTechAfcInpLo(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo; 
         init = 1
     ) <= vTechInp[(t, c, r, y, s)]
 );
@@ -1078,7 +1098,7 @@ print("eqTechAfcInpUp(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp;
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp; 
         init = 1
     )
 );
@@ -1458,7 +1478,7 @@ print("eqSupAvaUp(sup, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, s1) in mSupWeatherUp;
+        ) for wth1 in weather if (wth1, s1) in mSupWeatherUp; 
         init = 1
     )
 );
@@ -1493,7 +1513,7 @@ print("eqSupAvaLo(sup, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, s1) in mSupWeatherLo;
+        ) for wth1 in weather if (wth1, s1) in mSupWeatherLo; 
         init = 1
     )
 );
@@ -1975,7 +1995,7 @@ print("eqStorageAfLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfLo;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfLo; 
         init = 1
     )
 );
@@ -2019,7 +2039,7 @@ print("eqStorageAfUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfUp;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfUp; 
         init = 1
     )
 );
@@ -2075,7 +2095,7 @@ print("eqStorageInpUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpUp;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpUp; 
         init = 1
     )
 );
@@ -2112,7 +2132,7 @@ print("eqStorageInpLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpLo;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpLo; 
         init = 1
     )
 );
@@ -2149,7 +2169,7 @@ print("eqStorageOutUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutUp;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutUp; 
         init = 1
     )
 );
@@ -2186,7 +2206,7 @@ print("eqStorageOutLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutLo;
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutLo; 
         init = 1
     )
 );

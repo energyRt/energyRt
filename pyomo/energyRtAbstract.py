@@ -349,7 +349,10 @@ model.eqTechAInp = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * model.pTechCap2AInp[t, c, r, y, s])
+        (
+            (model.vTechCap[t, r, y] * model.pTechCap2AInp[t, c, r, y, s])
+            / (model.pTechCap2act[t])
+        )
         if (t, c, r, y, s) in model.mTechCap2AInp
         else 0
     )
@@ -379,7 +382,10 @@ model.eqTechAOut = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * model.pTechCap2AOut[t, c, r, y, s])
+        (
+            (model.vTechCap[t, r, y] * model.pTechCap2AOut[t, c, r, y, s])
+            / (model.pTechCap2act[t])
+        )
         if (t, c, r, y, s) in model.mTechCap2AOut
         else 0
     )

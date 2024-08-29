@@ -182,4 +182,4 @@ get_registry <- function() {
 # write_lines(c(
 #   'energyRt::set_gams_path("...")',
 #   'energyRt::set_gdxlib_path("...")'
-# ), file = file.path(sys_dir, "settings.R"))
+# ), file = fp(sys_dir, "settings.R"))

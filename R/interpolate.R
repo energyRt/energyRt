@@ -55,18 +55,23 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   }
   if (!is.null(arg$name)) {scen@name <- arg$name; arg$name <- NULL}
   if (!is.null(arg$desc)) {scen@desc <- arg$desc; arg$desc <- NULL}
-  if (!is.null(arg$path)) {scen@path <- arg$path; arg$path <- NULL}
-  if (!is.null(arg$inMemory)) {
-    scen@inMemory <- arg$inMemory;
-    arg$inMemory <- NULL
-  }
-  cat("model: '", object@name, "'\n", sep = "")
-  cat("scenario: '", scen@name, "'\n", sep = "")
-  if (!(scen@desc == "")) cat("        '", arg$desc, "'\n", sep = "")
-  if (!is.null(scen@path) || !scen@inMemory) {
-    cat("path: ", scen@path, "\n", sep = "")
-    cat("inMemory: ", scen@inMemory, "\n", sep = "")
-  }
+  #!!! browser()
+  # if (!is.null(arg$path)) {
+  #   scen@path <- arg$path; arg$path <- NULL
+  # } else {
+  #   scen@path <- fp(get_scenarios_path(), make_scenario_dirname(scen))
+  # }
+  # if (!is.null(arg$inMemory)) {
+  #   scen@inMemory <- arg$inMemory;
+  #   arg$inMemory <- NULL
+  # }
+  # cat("model: '", object@name, "'\n", sep = "")
+  # cat("scenario: '", scen@name, "'\n", sep = "")
+  # if (!(scen@desc == "")) cat("        '", arg$desc, "'\n", sep = "")
+  # if (!is.null(scen@path) || !scen@inMemory) {
+  #   cat("path: ", scen@path, "\n", sep = "")
+  #   cat("inMemory: ", scen@inMemory, "\n", sep = "")
+  # }
 
   # repository ############################################
   if (!is.null(arg$repository)) {
@@ -249,6 +254,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@status$interpolated <- FALSE
   }
 
+
   # INTERPOLATE ############################################
   # Check if the interpolation is needed
   if (scen@status$interpolated) {
@@ -297,6 +303,26 @@ interpolate_model <- function(object, ...) { #- returns class scenario
       intervals = rep(1, length(scen@settings@horizon@period))
     )
   }
+
+  #!!!
+  # browser()
+  if (!is.null(arg$path)) {
+    scen@path <- arg$path; arg$path <- NULL
+  } else {
+    scen@path <- fp(get_scenarios_path(), make_scenario_dirname(scen))
+  }
+  if (!is.null(arg$inMemory)) {
+    scen@inMemory <- arg$inMemory;
+    arg$inMemory <- NULL
+  }
+  cat("model: '", object@name, "'\n", sep = "")
+  cat("scenario: '", scen@name, "'\n", sep = "")
+  if (!(scen@desc == "")) cat("        '", arg$desc, "'\n", sep = "")
+  if (!is.null(scen@path) || !scen@inMemory) {
+    cat("path: ", scen@path, "\n", sep = "")
+    cat("inMemory: ", scen@inMemory, "\n", sep = "")
+  }
+
   # browser()
   #!!! Suppressed parameter
   # newParameter("horizon", dimSets = "horizon", type = "map")

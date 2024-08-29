@@ -11,6 +11,7 @@ Energy systems modeling toolbox in R
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://energyRt.org}
   \item \url{https://github.com/energyRt/energyRt}
   \item Report bugs at \url{https://github.com/energyRt/energyRt/issues}
 }

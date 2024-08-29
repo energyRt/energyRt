@@ -6,6 +6,7 @@
 \usage{
 newConstraint(
   name,
+  desc = "",
   ...,
   eq = "==",
   rhs = data.frame(),

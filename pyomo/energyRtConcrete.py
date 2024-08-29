@@ -39,9 +39,9 @@ con = sqlite3.connect("input/data.db")
 
 
 def read_set(name):
-   # tbl = pd.read_sql_query("SELECT * from " + name, con)
+    # tbl = pd.read_sql_query("SELECT * from " + name, con)
     query = f'SELECT * FROM "{name}"'
-    tbl = pd.read_sql_query(query, con)    
+    tbl = pd.read_sql_query(query, con)
     if tbl.shape[1] > 1:
         return tbl.to_records(index=False).tolist()
     else:
@@ -51,7 +51,7 @@ def read_set(name):
 def read_dict(name):
     # tbl = pd.read_sql_query("SELECT * from " + name, con)
     query = f'SELECT * FROM "{name}"'
-    tbl = pd.read_sql_query(query, con)    
+    tbl = pd.read_sql_query(query, con)
     if tbl.shape[1] > 2:
         idx = pd.MultiIndex.from_frame(tbl.drop(columns="value"))
     else:
@@ -483,7 +483,10 @@ model.eqTechAInp = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * pTechCap2AInp.get((t, c, r, y, s)))
+        (
+            (model.vTechCap[t, r, y] * pTechCap2AInp.get((t, c, r, y, s)))
+            / (pTechCap2act.get((t)))
+        )
         if (t, c, r, y, s) in mTechCap2AInp
         else 0
     )
@@ -524,7 +527,10 @@ model.eqTechAOut = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * pTechCap2AOut.get((t, c, r, y, s)))
+        (
+            (model.vTechCap[t, r, y] * pTechCap2AOut.get((t, c, r, y, s)))
+            / (pTechCap2act.get((t)))
+        )
         if (t, c, r, y, s) in mTechCap2AOut
         else 0
     )

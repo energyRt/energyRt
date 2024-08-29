@@ -124,8 +124,8 @@ get_python_path <- function() {
       }
     }
   }
-  dir.create(file.path(arg$tmp.dir, "input"), showWarnings = FALSE)
-  dir.create(file.path(arg$tmp.dir, "output"), showWarnings = FALSE)
+  dir.create(fp(arg$tmp.dir, "input"), showWarnings = FALSE)
+  dir.create(fp(arg$tmp.dir, "output"), showWarnings = FALSE)
   # if (!is.null(scen@settings@solver$SQLite) && scen@settings@solver$SQLite) {
   if (is.null(scen@settings@solver$export_format)) {
     SQLite <- FALSE
@@ -137,19 +137,19 @@ get_python_path <- function() {
     ### Generate SQLite file
     .write_sqlite_list(
       dat = .get_scen_data(scen),
-      sqlFile = file.path(arg$tmp.dir, "input/data.db")
+      sqlFile = fp(arg$tmp.dir, "input/data.db")
     )
   }
   .write_inc_solver(scen, arg, "opt = SolverFactory('cplex');", ".py", "cplex")
   # Add constraint
-  zz_mod <- file(file.path(arg$tmp.dir, "/energyRt.py"), "w")
-  zz_constr <- file(file.path(arg$tmp.dir, "/inc_constraints.py"), "w")
-  zz_costs <- file(file.path(arg$tmp.dir, "/inc_costs.py"), "w")
+  zz_mod <- file(fp(arg$tmp.dir, "/energyRt.py"), "w")
+  zz_constr <- file(fp(arg$tmp.dir, "/inc_constraints.py"), "w")
+  zz_costs <- file(fp(arg$tmp.dir, "/inc_costs.py"), "w")
   npar <- grep("^##### decl par #####", run_code)[1]
   cat(run_code[1:npar], sep = "\n", file = zz_mod)
   if (!AbstractModel) {
     cat('exec(open("data.py").read())\n', file = zz_mod)
-    zz_inp_file <- file(file.path(arg$tmp.dir, "data.py"), "w")
+    zz_inp_file <- file(fp(arg$tmp.dir, "data.py"), "w")
   }
   if (AbstractModel) {
     f1 <- grep("^m(Costs|Cns)", names(scen@modInp@parameters), invert = TRUE)
@@ -173,7 +173,7 @@ get_python_path <- function() {
     }
   }
   if (AbstractModel) {
-    zz_data_pyomo <- file(file.path(arg$tmp.dir, "data.dat"), "w")
+    zz_data_pyomo <- file(fp(arg$tmp.dir, "data.dat"), "w")
   }
   file_w <- c()
   for (j in c("set", "map", "numpar", "bounds")) {
@@ -223,7 +223,7 @@ get_python_path <- function() {
               tfl <- paste0("input/", scen@modInp@parameters[[i]]@name, ".py")
               cat(paste0('exec(open("', tfl, '").read())\n'),
                   file = zz_inp_file)
-              zz_tfl <- file(file.path(arg$tmp.dir, tfl), "w")
+              zz_tfl <- file(fp(arg$tmp.dir, tfl), "w")
               cat(.toPyomo(scen@modInp@parameters[[i]]),
                 sep = "\n", file = zz_tfl
               )
@@ -286,14 +286,14 @@ get_python_path <- function() {
   close(zz_mod)
   close(zz_constr)
   close(zz_costs)
-  zz_modout <- file(file.path(arg$tmp.dir, "/output.py"), "w")
+  zz_modout <- file(fp(arg$tmp.dir, "/output.py"), "w")
   cat(run_codeout, sep = "\n", file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".py")
   if (is.null(scen@settings@solver$cmdline) || scen@settings@solver$cmdline == "") {
     fpath <- get_python_path()
     if (!is.null(fpath)) {
-      scen@settings@solver$cmdline <- file.path(fpath, "python energyRt.py")
+      scen@settings@solver$cmdline <- fp(fpath, "python energyRt.py")
     } else {
       scen@settings@solver$cmdline <- "python energyRt.py"
     }

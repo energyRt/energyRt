@@ -83,10 +83,10 @@ setClass(
 #'              end =   c(2032, 2034, 2040)))
 newHorizon <- function(period = NULL,
                        intervals = NULL,
-                       desc = NULL,
                        mid_is_end = FALSE,
                        mid_is_start = FALSE,
                        force_BY_interval_to_1_year = T,
+                       desc = NULL,
                        name = NULL,
                        ...) {
   # browser()
@@ -95,7 +95,10 @@ newHorizon <- function(period = NULL,
     stopifnot(is.character(desc))
     h@desc <- as.character(desc)
   }
-
+  if (!is.null(name)) {
+    stopifnot(is.character(name))
+    h@name <- as.character(name)
+  }
   if (mid_is_end & mid_is_start) {
     stop("Only one of parameters 'mid_is_end' and  'mid_is_start' can be TRUE")
   }
