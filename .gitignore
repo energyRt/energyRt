@@ -11,12 +11,10 @@ solwork/
 solwork
 \.vs/
 \.git/
-*.html
 #doc
 Meta
 #docs
 scenarios/
-inst/doc
 .archive/
 drafts/
 .formatted/
