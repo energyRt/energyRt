@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 ## energyRt: energy systems modeling tools in R
 
 **energyRt** (*energy* system modeling *R-t*oolbox /ˈɛnərdʒi ɑrt/) is a
