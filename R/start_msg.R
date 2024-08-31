@@ -1,6 +1,6 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-    glue::glue('energyRt version: {packageVersion("energyRt")} ({packageDate("energyRt")})'),
+    glue::glue('energyRt version: {packageVersion("energyRt")}-beta ({packageDate("energyRt")})'),
     "\n"
     )
 

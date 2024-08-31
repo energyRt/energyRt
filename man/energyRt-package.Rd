@@ -4,7 +4,7 @@
 \name{energyRt-package}
 \alias{energyRt}
 \alias{energyRt-package}
-\title{energyRt: Energy systems modeling toolbox in R, development (alpha) version}
+\title{energyRt: Energy systems modeling toolbox in R, development version}
 \description{
 Energy systems modeling toolbox in R
 }

@@ -3,7 +3,8 @@ pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   articles/model: model.html
-last_built: 2024-08-26T16:10Z
+  utopia: utopia.html
+last_built: 2024-08-31T14:35Z
 urls:
   reference: https://energyRt.org/reference
   article: https://energyRt.org/articles
