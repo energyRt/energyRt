@@ -566,7 +566,7 @@ print("eqTechAfLo(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfLo; 
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfLo;
         init = 1
     ) <= vTechAct[(t, r, y, s)]
 );
@@ -617,7 +617,7 @@ print("eqTechAfUp(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfUp; 
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfUp;
         init = 1
     )
 );
@@ -667,7 +667,7 @@ print("eqTechAfsLo(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsLo; 
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsLo;
         init = 1
     ) <= sum(
         (if (t, r, y, sp) in mvTechAct
@@ -730,7 +730,7 @@ print("eqTechAfsUp(tech, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsUp; 
+        ) for wth1 in weather if (wth1, t) in mTechWeatherAfsUp;
         init = 1
     )
 );
@@ -946,7 +946,7 @@ print("eqTechAfcOutLo(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo; 
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo;
         init = 1
     ) <= vTechOut[(t, c, r, y, s)]
 );
@@ -997,7 +997,7 @@ print("eqTechAfcOutUp(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp; 
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp;
         init = 1
     )
 );
@@ -1047,7 +1047,7 @@ print("eqTechAfcInpLo(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo; 
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcLo;
         init = 1
     ) <= vTechInp[(t, c, r, y, s)]
 );
@@ -1098,7 +1098,7 @@ print("eqTechAfcInpUp(tech, region, comm, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp; 
+        ) for wth1 in weather if (wth1, t, c) in mTechWeatherAfcUp;
         init = 1
     )
 );
@@ -1276,6 +1276,58 @@ print("eqTechRetiredStock(tech, region, year)...")
     vTechRetiredStock[(t, r, y)] ==
     vTechRetiredStockCum[(t, r, y)] -
     sum(vTechRetiredStockCum[(t, r, yp)] for yp in year if (yp, y) in mMilestoneNext)
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechRetUp(tech, region, year)$mTechRetUp(tech, region, year)
+print("eqTechRetUp(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechRetUp],
+    (if (t, r, y) in mvTechRetiredStock
+        vTechRetiredStock[(t, r, y)]
+    else
+        0
+    end) + sum(
+        vTechRetiredNewCap[(t, r, y, yp)] for
+        yp in year if (t, r, y, yp) in mvTechRetiredNewCap
+    ) <= (
+        if haskey(pTechRetUp, (t, r, y))
+            pTechRetUp[(t, r, y)]
+        else
+            pTechRetUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechRetLo(tech, region, year)$mTechRetLo(tech, region, year)
+print("eqTechRetLo(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechRetLo],
+    (if (t, r, y) in mvTechRetiredStock
+        vTechRetiredStock[(t, r, y)]
+    else
+        0
+    end) + sum(
+        vTechRetiredNewCap[(t, r, y, yp)] for
+        yp in year if (t, r, y, yp) in mvTechRetiredNewCap
+    ) >= (
+        if haskey(pTechRetLo, (t, r, y))
+            pTechRetLo[(t, r, y)]
+        else
+            pTechRetLoDef
+        end
+    )
 );
 print(
     " ",
@@ -1478,7 +1530,7 @@ print("eqSupAvaUp(sup, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, s1) in mSupWeatherUp; 
+        ) for wth1 in weather if (wth1, s1) in mSupWeatherUp;
         init = 1
     )
 );
@@ -1513,7 +1565,7 @@ print("eqSupAvaLo(sup, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, s1) in mSupWeatherLo; 
+        ) for wth1 in weather if (wth1, s1) in mSupWeatherLo;
         init = 1
     )
 );
@@ -1995,7 +2047,7 @@ print("eqStorageAfLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfLo; 
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfLo;
         init = 1
     )
 );
@@ -2039,7 +2091,7 @@ print("eqStorageAfUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfUp; 
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherAfUp;
         init = 1
     )
 );
@@ -2095,7 +2147,7 @@ print("eqStorageInpUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpUp; 
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpUp;
         init = 1
     )
 );
@@ -2132,7 +2184,7 @@ print("eqStorageInpLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpLo; 
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCinpLo;
         init = 1
     )
 );
@@ -2169,7 +2221,7 @@ print("eqStorageOutUp(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutUp; 
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutUp;
         init = 1
     )
 );
@@ -2206,7 +2258,7 @@ print("eqStorageOutLo(stg, comm, region, year, slice)...")
             else
                 pWeatherDef
             end
-        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutLo; 
+        ) for wth1 in weather if (wth1, st1) in mStorageWeatherCoutLo;
         init = 1
     )
 );
@@ -3784,12 +3836,7 @@ print("eqCost(region, year)...")
             else
                 pTechRetCostDef
             end
-        ) * (
-            vTechRetiredStock[(t, r, y)] + sum(
-                vTechRetiredNewCap[(t, r, yp, y)] for
-                yp in year if (t, r, yp, y) in mvTechRetiredNewCap
-            )
-        ) for t in tech if (t, r, y) in mvTechRetiredStock
+        ) * (vTechRetiredStock[(t, r, y)]) for t in tech if (t, r, y) in mvTechRetiredStock
     ) +
     sum(
         (
