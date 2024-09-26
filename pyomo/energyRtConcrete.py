@@ -1024,6 +1024,54 @@ if verbose:
         " s)",
         sep="",
     )
+# eqTechRetUp(tech, region, year)$mTechRetUp(tech, region, year)
+if verbose:
+    print("eqTechRetUp ", end="")
+sys.stdout.flush()
+model.eqTechRetUp = Constraint(
+    mTechRetUp,
+    rule=lambda model, t, r, y: (
+        model.vTechRetiredStock[t, r, y] if (t, r, y) in mvTechRetiredStock else 0
+    )
+    + sum(
+        model.vTechRetiredNewCap[t, r, y, yp]
+        for yp in year
+        if (t, r, y, yp) in mvTechRetiredNewCap
+    )
+    <= pTechRetUp.get((t, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTechRetLo(tech, region, year)$mTechRetLo(tech, region, year)
+if verbose:
+    print("eqTechRetLo ", end="")
+sys.stdout.flush()
+model.eqTechRetLo = Constraint(
+    mTechRetLo,
+    rule=lambda model, t, r, y: (
+        model.vTechRetiredStock[t, r, y] if (t, r, y) in mvTechRetiredStock else 0
+    )
+    + sum(
+        model.vTechRetiredNewCap[t, r, y, yp]
+        for yp in year
+        if (t, r, y, yp) in mvTechRetiredNewCap
+    )
+    >= pTechRetLo.get((t, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 if verbose:
     print("eqTechEac ", end="")
@@ -2833,15 +2881,7 @@ model.eqCost = Constraint(
     rule=lambda model, r, y: model.vTotalCost[r, y]
     == sum(model.vTechEac[t, r, y] for t in tech if (t, r, y) in mTechEac)
     + sum(
-        pTechRetCost.get((t, r, y))
-        * (
-            model.vTechRetiredStock[t, r, y]
-            + sum(
-                model.vTechRetiredNewCap[t, r, yp, y]
-                for yp in year
-                if (t, r, yp, y) in mvTechRetiredNewCap
-            )
-        )
+        pTechRetCost.get((t, r, y)) * (model.vTechRetiredStock[t, r, y])
         for t in tech
         if (t, r, y) in mvTechRetiredStock
     )

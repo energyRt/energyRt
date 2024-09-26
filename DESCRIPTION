@@ -1,14 +1,14 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development version
-Version: 0.50.0
-Date: 2024-08-31
+Version: 0.50.1
+Date: 2024-09-25
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
-          email = "olugovoy@gmail.com", 
+          email = "olugovoy@optimalsolution.dev", 
           role = c("aut", "cre"), 
-          comment = ""), 
+          comment = c(ORCID = "0000-0001-5546-9875")), 
    person(given = "Vladimir", 
           family = "Potashnikov", 
           email = "potashnikov.vu@gmail.com", 
@@ -16,7 +16,8 @@ Authors@R:
    person(given = "Tarun",
           family = "Sharma",
           email = "tarunsharma@ms.iitr.ac.in",
-          role = c("ctb")))
+          role = c("ctb"),
+          comment = c(ORCID = "0000-0003-3636-2858")))
 URL: https://energyRt.org, https://github.com/energyRt/energyRt
 BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy systems modeling toolbox in R
@@ -52,7 +53,7 @@ Suggests:
     rmarkdown,
     sf,
     testthat (>= 3.0.0)
-License: AGLP-3.0
+License: AGPL (>= 3)
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 LazyData: true

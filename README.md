@@ -69,9 +69,9 @@ install from <https://www.r-project.org/>), we also recommend RStudio
 Environment) for R. The installation of the package is done via the
 `pak` or `remotes` packages:
 
-`pak::pkg_install("energyRt/energyRt@v0.5")`\
+`pak::pkg_install("energyRt/energyRt@v0.50")`\
 or\
-`remotes::install_github("energyRt/energyRt", ref = "v0.5")`
+`remotes::install_github("energyRt/energyRt", ref = "v0.50")`
 
 The next step would be to install at least one of the solvers: GAMS,
 GLPK, Python/Pyomo, Julia/JuMP. Please refer to the respective websites
