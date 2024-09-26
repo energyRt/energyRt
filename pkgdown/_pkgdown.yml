@@ -1,11 +1,17 @@
 url: https://energyRt.org
 template:
   bootstrap: 5
-  bootswatch: flatly
+  light-switch: true
+  bslib:
+    bootswatch: flatly
+    pkgdown-navbar-bg: '#2C3E50'
   # bootswatch: sandstone
   # bootswatch: spacelab
   # bootswatch: lux
-  # light-switch: true
+  # navbar:
+    # bg: dark
+    # fg: dark
+    # bg: primary
   # params:
   #   ganalytics: G-CYBYJ238Q5
   includes:
@@ -25,13 +31,13 @@ template:
 
 title: energyRt
 
-# development:
-#   mode: unreleased
-#   version_label: info
-
 development:
-  mode: auto
-  version_label: info
+  mode: unreleased
+  version_label: danger
+
+# development:
+#   mode: auto
+#   version_label: info
 
 reference:
 - title: Classes
