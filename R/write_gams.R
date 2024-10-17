@@ -67,11 +67,18 @@ get_gdxlib_path <- function() {
 }
 
 .check_load_gdxlib <- function() {
-  rw <- require("gdxrrw")
+  # rw <- require("gdxrrw")
+  # if (!rw) {
+  #   stop('"gdxrrw" package has not been found. ',
+  #        'It is required for writing and reading "*.gdx" files.\n',
+  #        'Check: "https://github.com/GAMS-dev/gdxrrw"')
+  # }
+  rw <- requireNamespace("gdxtools", quietly = TRUE)
   if (!rw) {
-    stop('"gdxrrw" package has not been found. ',
-         'It is required for writing and reading "*.gdx" files.\n',
-         'Check: "https://github.com/GAMS-dev/gdxrrw"')
+    stop('"gdxtools" package has not been found. ',
+         'It is required for reading "*.gdx" files.\n',
+         'To install: pak::pkg_install("lolow/gdxtools")'
+         )
   }
   en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
@@ -95,7 +102,7 @@ get_gdxlib_path <- function() {
          'It is required for reading "*.gdx" files.\n',
          'To install: "https://github.com/lolow/gdxtools".')
   }
-  xt <- require("gdxtools", warn.conflicts = FALSE, quietly = T)
+  xt <- requireNamespace("gdxtools", quietly = TRUE)
   en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
     lb <- options::opt("gdxlib_path")
@@ -697,7 +704,7 @@ get_gdxlib_path <- function() {
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")
   cat(rep(" ", max_length + 3), sep = "")
-  cat(wipe, wipe, "\b, ", utils:::format.object_size(file.size(gdxName), "auto"),
+  cat(wipe, wipe, "\b, ", utils::format.object_size(file.size(gdxName), "auto"),
       ", ", sep = "")
 }
 
@@ -723,7 +730,7 @@ get_gdxlib_path <- function() {
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")
   cat(rep(" ", max_length + 3), sep = "")
-  cat(wipe, wipe, "\b, ", utils:::format.object_size(file.size(sqlFile), "auto"),
+  cat(wipe, wipe, "\b, ", utils::format.object_size(file.size(sqlFile), "auto"),
       ", ", sep = "")
   # cat(format(round(Sys.time() - tStart), 1))
 }

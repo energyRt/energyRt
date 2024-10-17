@@ -51,7 +51,7 @@ nonchar_in_sets <- function(x) {
   y[unlist(y)]
 }
 # nonchar_in_sets(scen_BASE_int@modInp@set)
-# scen_BASE_int@modInp@set$year %>% class()
+# scen_BASE_int@modInp@set$year |> class()
 
 
 #' Size of an object

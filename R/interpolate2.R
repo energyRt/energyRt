@@ -31,12 +31,12 @@ if (F) {
 
 expand_regions <- function(x, regions = NULL) {
   # browser()
-  b <- x %>%
-    filter(is.na(region)) %>%
-    select(-region) %>%
+  b <- x |>
+    filter(is.na(region)) |>
+    select(-region) |>
     expand_grid(region = regions)
-  x %>%
-    filter(!is.na(region)) %>%
+  x |>
+    filter(!is.na(region)) |>
     rbind(b)
 }
 
@@ -51,7 +51,7 @@ fmSupCommReg <- function(m, regions = NULL) {
       regs <- NA # @reserves & @availability values might be restrictive, not checking
     }
     data.table(sup = ob@name, comm = ob@commodity, region = regs)
-    }) %>%
+    }) |>
     rbindlist()
   if (is.null(a)) {
     a <- data.table(sup = "", comm = "", region = "")[0,]
@@ -59,12 +59,12 @@ fmSupCommReg <- function(m, regions = NULL) {
   if (is.null(regions)) return(a)
   # expand
   expand_regions(a, regions)
-  # b <- a %>%
-  #   filter(is.na(region)) %>%
-  #   select(-region) %>%
+  # b <- a |>
+  #   filter(is.na(region)) |>
+  #   select(-region) |>
   #   expand_grid(region = regions)
-  # a %>%
-  #   filter(!is.na(region)) %>%
+  # a |>
+  #   filter(!is.na(region)) |>
   #   rbind(b)
 }
 
@@ -72,9 +72,9 @@ if (F) {
   fmSupCommReg(m)
   fmSupCommReg(m)
   a <- fmSupCommReg(m)
-  fmSupCommReg(m, regions = paste0("R", 1:7)) %>% arrange(sup)
+  fmSupCommReg(m, regions = paste0("R", 1:7)) |> arrange(sup)
   fmSupCommReg(m)
-  fmSupCommReg(m, regions = paste0("R", 1:7)) %>% arrange(sup)
+  fmSupCommReg(m, regions = paste0("R", 1:7)) |> arrange(sup)
 }
 
 fmImpCommReg <- function(m, regions = NULL) {
@@ -91,7 +91,7 @@ fmImpCommReg <- function(m, regions = NULL) {
       }
     }
     data.table(imp = ob@name, comm = ob@commodity, region = regs)
-  }) %>%
+  }) |>
     rbindlist()
   if (is.null(a)) {
     a <- data.table(imp = "", comm = "", region = "")[0,]
@@ -105,9 +105,9 @@ fmImpCommReg <- function(m, regions = NULL) {
 if (F) {
   mImpCommReg(m)
   fmImpCommReg(m)
-  mImpCommReg(m, regions = paste0("R", 1:7)) %>% arrange()
+  mImpCommReg(m, regions = paste0("R", 1:7)) |> arrange()
   mSupCommReg(m)
-  mSupCommReg(m, regions = paste0("R", 1:7)) %>% arrange()
+  mSupCommReg(m, regions = paste0("R", 1:7)) |> arrange()
 }
 
 fmTradeCommReg <- function(m, regions = NULL) {
@@ -124,7 +124,7 @@ fmTradeCommReg <- function(m, regions = NULL) {
       }
     }
     data.table(trade = ob@name, comm = ob@commodity, region = regs)
-    }) %>%
+    }) |>
     rbindlist()
   if (is.null(a)) {
     a <- data.table(trade = "", comm = "", region = "")[0,]
@@ -138,9 +138,9 @@ fmTradeCommReg <- function(m, regions = NULL) {
 if (F) {
   mTradeCommReg(m)
   mTradeCommReg(m)
-  mTradeCommReg(m, regions = paste0("R", 1:7)) %>% arrange()
+  mTradeCommReg(m, regions = paste0("R", 1:7)) |> arrange()
   mSupCommReg(m)
-  mSupCommReg(m, regions = paste0("R", 1:7)) %>% arrange()
+  mSupCommReg(m, regions = paste0("R", 1:7)) |> arrange()
 }
 
 fmTechOutCommReg <- function(m, regions = NULL) {
@@ -185,7 +185,7 @@ fmTechOutCommReg <- function(m, regions = NULL) {
       ),
       region = regs
     )
-    }) %>%
+    }) |>
     rbindlist()
   if (is.null(a)) {
     a <- data.table(tech = "", comm = "", region = "")[0,]
@@ -198,9 +198,9 @@ fmTechOutCommReg <- function(m, regions = NULL) {
 
 if (F) {
   mTechOutCommReg(m)
-  mTechOutCommReg(m, regions = paste0("R", 1:7)) %>% arrange()
+  mTechOutCommReg(m, regions = paste0("R", 1:7)) |> arrange()
   mTechOutCommReg(m)
-  mTechOutCommReg(m, regions = paste0("R", 1:7)) %>% arrange()
+  mTechOutCommReg(m, regions = paste0("R", 1:7)) |> arrange()
 }
 
 
@@ -216,7 +216,7 @@ fmEmisCommReg <- function(m, mCommReg = NULL) {
       comm = ob@name,
       comm1 = ob@emis$comm
     )
-  }) %>%
+  }) |>
     rbindlist()
   if (is.null(a) || nrow(a) == 0) {
     a <- data.table(comm = "", comm1 = "")[0,]
@@ -224,29 +224,29 @@ fmEmisCommReg <- function(m, mCommReg = NULL) {
 
   if (is.null(mCommReg)) return(a)
   suppressMessages({
-    a <- a %>% left_join(mCommReg, by = "comm") %>% select(-comm) %>%
-      rename(comm = comm1) %>% unique()
+    a <- a |> left_join(mCommReg, by = "comm") |> select(-comm) |>
+      rename(comm = comm1) |> unique()
   })
   a
 }
 
 if (F) {
   mEmisCommReg(m)
-  # mEmisCommReg(m) %>% arrange()
+  # mEmisCommReg(m) |> arrange()
   mEmisCommReg(m)
-  # mEmisCommReg(m, mCommReg = ) %>% arrange()
+  # mEmisCommReg(m, mCommReg = ) |> arrange()
 }
 
 fmCommReg <- function(m, regions = NULL) {
   # browser()
-  a <- fmSupCommReg(m, regions) %>% select(-sup) %>% unique()
-  a <- fmImpCommReg(m, regions) %>% select(-imp) %>%
-    rbind(a) %>% unique()
-  a <- fmTradeCommReg(m, regions) %>% select(-trade) %>%
-    rbind(a) %>% unique()
-  a <- fmTechOutCommReg(m, regions) %>% select(-tech) %>%
-    rbind(a) %>% unique()
-  a <- fmEmisCommReg(m, mCommReg = a) %>% rbind(a) %>% unique()
+  a <- fmSupCommReg(m, regions) |> select(-sup) |> unique()
+  a <- fmImpCommReg(m, regions) |> select(-imp) |>
+    rbind(a) |> unique()
+  a <- fmTradeCommReg(m, regions) |> select(-trade) |>
+    rbind(a) |> unique()
+  a <- fmTechOutCommReg(m, regions) |> select(-tech) |>
+    rbind(a) |> unique()
+  a <- fmEmisCommReg(m, mCommReg = a) |> rbind(a) |> unique()
   return(a)
 }
 
@@ -254,23 +254,23 @@ if (F) {
   fmCommReg(m, regions)
 
   # ...
-  x <- merge0(dregionyear, mCommSlice) %>%
-    inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  x <- merge0(dregionyear, mCommSlice) |>
+    inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
     unique()
   dim(x); dim(mvBalance)
   y <- anti_join(x, mvBalance)
-  y$comm %>% unique()
+  y$comm |> unique()
 
   ###
-  prec@parameters[["mvInpTot"]]@data %>% filter(comm == "CASO_batteries_1_comm")
-  prec@parameters[["mvOutTot"]]@data %>% filter(comm == "CASO_batteries_1_comm")
-  prec@parameters[["mCommReg"]]@data %>% filter(comm == "CASO_batteries_1_comm")
-  .get_data_slot(prec@parameters$mStorageOutTot) %>% filter(comm == "CASO_batteries_1_comm")
-  .get_data_slot(prec@parameters$mTechOutTot) %>% filter(comm == "CASO_batteries_1_comm")
-  prec@parameters[["mvOutTot"]]@data %>% filter(comm == "CASO_batteries_1_comm")
-  grepl("CASO_batteries", prec@set$tech) %>% any()
-  grepl("CASO_batteries_1", prec@set$stg) %>% any()
-  grepl("CASO_batteries_1", prec@set$comm) %>% any()
+  prec@parameters[["mvInpTot"]]@data |> filter(comm == "CASO_batteries_1_comm")
+  prec@parameters[["mvOutTot"]]@data |> filter(comm == "CASO_batteries_1_comm")
+  prec@parameters[["mCommReg"]]@data |> filter(comm == "CASO_batteries_1_comm")
+  .get_data_slot(prec@parameters$mStorageOutTot) |> filter(comm == "CASO_batteries_1_comm")
+  .get_data_slot(prec@parameters$mTechOutTot) |> filter(comm == "CASO_batteries_1_comm")
+  prec@parameters[["mvOutTot"]]@data |> filter(comm == "CASO_batteries_1_comm")
+  grepl("CASO_batteries", prec@set$tech) |> any()
+  grepl("CASO_batteries_1", prec@set$stg) |> any()
+  grepl("CASO_batteries_1", prec@set$comm) |> any()
 
   mod_2040@data$repo$CASO_batteries_1
   mod_2040@data$repo$CASO_batteries_1_charger

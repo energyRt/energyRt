@@ -169,7 +169,7 @@ make_timetable <- function(struct = list(ANNUAL = "ANNUAL"),
     dtf$share <- (dtf$share / sum(dtf$share) * year_fraction)
   }
 
-  x <- select(dtf, if_else(ncol(dtf) > 2, 2, 1):share, -share) %>%
+  x <- select(dtf, if_else(ncol(dtf) > 2, 2, 1):share, -share) |>
     tidyr::unite(slice)
   dtf <- mutate(dtf, slice = x$slice, .before = "share")
   # browser()
@@ -254,8 +254,8 @@ if (F) {
 
   cal <- make_timetable(timeslices3)
   cal_subset <- cal[grepl("h0[12]", HOUR)]
-  cal$share %>% sum()
-  cal_subset$share %>% sum()
+  cal$share |> sum()
+  cal_subset$share |> sum()
   newCalendar(cal_subset, year_fraction = sum(cal_subset$share))
 }
 
@@ -337,7 +337,7 @@ if (F) {
     stop("The time-slices data.table must have `share` column")
   }
   # rcs <- colnames(dtf)[-ncol(dtf)]
-  rcs <- select(dtf, -share) %>% colnames()
+  rcs <- select(dtf, -share) |> colnames()
   if (anyDuplicated(rcs)) {
     stop(paste('duplicated slice levels: "',
       paste(unique(rcs[duplicated(rcs)]), collapse = '", "'), '"',
@@ -538,7 +538,7 @@ if (F) {
   # validate the timetable
   .check_timetable(obj@timetable, year_fraction = year_fraction)
   # obj@misc <- list()
-  dtf <- obj@timetable %>% select(-any_of(c("slice")))
+  dtf <- obj@timetable |> select(-any_of(c("slice")))
 
   # timeframe_rank / levels
   d <- select(dtf, -any_of(c("share", "year", "slice", "weight")))
@@ -579,7 +579,7 @@ if (F) {
 
   # @structure
   # browser()
-  nframes <- select(obj@timetable, 1:slice, -slice) %>% ncol()
+  nframes <- select(obj@timetable, 1:slice, -slice) |> ncol()
   fnames <- names(obj@slices_in_frame)
   if (nframes > 2) {
     tmp <- nchar(obj@slice_share$slice) -
@@ -597,7 +597,7 @@ if (F) {
   } else if (nframes == 2) {
     obj@timeframes <- list()
     obj@timeframes[[fnames[1]]] <- fnames[1]
-    obj@timeframes[[fnames[2]]] <- obj@timetable[[fnames[2]]] #%>% sort()
+    obj@timeframes[[fnames[2]]] <- obj@timetable[[fnames[2]]] #|> sort()
   } else {
     stop("Empty timeframes / timeslices")
   }
@@ -615,7 +615,7 @@ if (F) {
     obj@slice_family <- obj@slice_family[0, , drop = FALSE]
     obj@slice_ancestry <- obj@slice_ancestry[0, , drop = FALSE]
   } else {
-    obj@slice_family <- obj@slice_family[0, ] %>% as.data.frame()
+    obj@slice_family <- obj@slice_family[0, ] |> as.data.frame()
     # obj@slice_family$lev <- numeric()
     obj@slice_family[1:(nrow(obj@slice_share) - 1), ] <- NA
     i <- 1
@@ -761,13 +761,13 @@ if (F) {
   if (class(app) == "technology") slt <- slt[slt != "afs"]
   for (ss in slt) {
     if (any(colnames(slot(app, ss)) == "slice")) {
-      tmp <- slot(app, ss) %>% as.data.frame() # !!! rewrite
+      tmp <- slot(app, ss) |> as.data.frame() # !!! rewrite
       fl <- (!is.na(tmp$slice) & !(tmp$slice %in% approxim$slice)) # !!! @calendar?
       if (any(fl)) {
         mark_col <- (sapply(tmp, is.character) | colnames(tmp) == "year")
         mark_coli <- colnames(tmp)[mark_col]
-        t1 <- tmp[fl, , drop = FALSE] %>% as.data.frame() # !!! rewrite
-        t2 <- tmp[!fl, , drop = FALSE] %>% as.data.frame() # !!! rewrite
+        t1 <- tmp[fl, , drop = FALSE] |> as.data.frame() # !!! rewrite
+        t2 <- tmp[!fl, , drop = FALSE] |> as.data.frame() # !!! rewrite
         # Sort from lowest level to largest
         ff <- approxim$parent_child$parent[
           !duplicated(approxim$parent_child$parent)
@@ -791,18 +791,18 @@ if (F) {
           # ll <- approxim$parent_child[
           #   approxim$parent_child$parent == t1[i, "slice"], "child"
           # ]
-          ll <- approxim$parent_child %>%
-            filter(parent == t1$slice[i]) %>%
-            select(child) %>% purrr::simplify()
+          ll <- approxim$parent_child |>
+            filter(parent == t1$slice[i]) |>
+            select(child) |> purrr::simplify()
 
           t0 <- t1[rep(i, length(ll)), , drop = FALSE]
           t0$slice <- ll
           # tes <- t0[, mark_coli, drop = FALSE]
-          tes <- select(t0, all_of(mark_coli)) %>% as.matrix()
+          tes <- select(t0, all_of(mark_coli)) |> as.matrix()
           tes[is.na(tes)] <- "-"
           z1 <- apply(tes, 1, paste0, collapse = "##")
           # tes <- t2[, mark_coli, drop = FALSE]
-          tes <- select(t2, all_of(mark_coli)) %>% as.matrix()
+          tes <- select(t2, all_of(mark_coli)) |> as.matrix()
           tes[is.na(tes)] <- "-"
           z2 <- apply(tes, 1, paste0, collapse = "##")
           # If there are the same row, after splititng

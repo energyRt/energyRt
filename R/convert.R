@@ -80,11 +80,11 @@ setGeneric("add_to_convert", function(type, unit, coef, ...) {
 #' @export
 #'
 #' @examples
-#' do not run
+#' ## Not run:
 #' convert_data$base$Currency
 #' add_to_convert("Currency", unit = "JPY", coef = 140)
 #' convert_data$base$Currency
-#'
+#' ## End(Not run)
 setMethod(
   "add_to_convert",
   signature(

@@ -42,7 +42,7 @@ setMethod("initialize", "modInp", function(.Object) {
   # browser()
   # x <- .Object@parameters
   x <- list()
-  # .dimSets <- c("horizon", .dimSets) %>% unique() #!!! test
+  # .dimSets <- c("horizon", .dimSets) |> unique() #!!! test
   # x[["horizon"]] <- newSet("horizon")
   ob <- .modInp
   for (i in 1:length(ob)) {
@@ -206,7 +206,7 @@ setMethod("initialize", "modInp", function(.Object) {
     gg <- dtt
   }
   # gg[!duplicated(gg[, colnames(gg) != "value"]), , drop = FALSE]
-  ii <- gg %>% select(-value) %>% duplicated()
+  ii <- gg |> select(-value) |> duplicated()
   filter(gg, !ii)
 }
 

@@ -1,223 +1,89 @@
+# class ######################################################################
 #' An S4 class to represent technology
 #'
-#' @rdname technology
+#' @name technology-class
+#' @aliases class-technology
 #'
-#' @slot name character, name of technology used in sets
-#' @slot desc character, optional description of the technology for reference.
-#' @slot input main (non-auxilary) input commodities, data.frame with columns:
-#' \describe{
-#'   \item{comm}{character, name of input commodity}
-#'   \item{unit}{character, unit of the input commodity}
-#'   \item{group}{character, name of input group for input commodities-substitutes}
-#'   \item{combustion}{numeric, combustion factor from 0 to 1 (default 1) to calculate emissions from fuels combustion (commodities intermediate consumption, more broadly)}
-#' }
-#' @slot output main (non-auxilary) output commodities, data.frame with columns:
-#' \describe{
-#'   \item{comm}{character, name of output commodity}
-#'   \item{unit}{character, unit of the output commodity}
-#'   \item{group}{character, name of output group for output commodities-substitutes}
-#' }
-#' @slot aux auxilary commodities, both input and output, data.frame with columns:
-#' \describe{
-#'   \item{acomm}{character, name of auxilary commodity}
-#'   \item{unit}{character, unit of the auxilary commodity}
-#' }
-#' @slot units key units of the process activity and capacity. data.frame with columns:
-#' \describe{
-#'   \item{capacity}{character, name of capacity unit}
-#'   \item{use}{character, name of use unit}
-#'   \item{activity}{character, name of activity unit}
-#'   \item{costs}{character, name of cost unit}
-#' }
-#' @slot group optional details for groups, data.frame with columns:
-#' \describe{
-#'   \item{group}{character, name of group}
-#'   \item{desc}{character, optional description of the group}
-#'   \item{unit}{character, optional unit of the group}
-#' }
-#' @slot cap2act numeric. Capacity to activity ratio. Default 1. Specifies how much product (output) will be produced per unit of capacity.
-#' @slot geff input-group efficiency parameter, data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{slice}{character, name of slice for which the parameter will be applied, NA for every slice}
-#'  \item{group}{character, name of group for which the parameter will be applied, required}
-#'  \item{ginp2use}{numeric, group input to use ratio, NA means no changes of default value}
-#' }
-#' @slot ceff commodity-related efficiency parameters, data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{slice}{character, name of slice for which the parameter will be applied, NA for every slice}
-#'  \item{comm}{character, name of commodity for which the parameter will be applied, required}
-#'  \item{cinp2use}{numeric, commodity input to use parameter, NA means default value}
-#'  \item{use2cact}{numeric, use to commodity activity parameter, NA means default value}
-#'  \item{cact2cout}{numeric, commodity activity to commodity output parameter, NA means default value (1)}
-#'  \item{cinp2ginp}{numeric, commodity input to group input parameter, NA means default value (1)}
-#'  \item{share.lo}{numeric, lower bound on a share of commodity within a group, NA means default value(0) or fixed value if specified}
-#'  \item{share.up}{numeric, upper bound on a share of commodity within a group, NA means default value(1) or fixed value if specified}
-#'  \item{share.fx}{numeric, fixed share of commodity within a group, NA ignored}
-#'  \item{afc.lo}{numeric, lower bound on the physical value of the commodity, NA ignored}
-#'  \item{afc.up}{numeric, upper bound on the physical value of the commodity, NA ignored}
-#'  \item{afc.fx}{numeric, fixed physical value of the commodity, NA ignored}
-#' }
-#' @slot aeff auxilary-commodity-related efficiency parameters, data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{slice}{character, name of slice for which the parameter will be applied, NA for every slice}
-#'  \item{acomm}{character, name of auxilary commodity for which the parameter will be applied, required}
-#'  \item{cinp2ainp}{numeric, main commodity input to auxilary commodity input parameter, NA ignored}
-#'  \item{cinp2aout}{numeric, main commodity input to auxilary commodity output parameter, NA ignored}
-#'  \item{cout2ainp}{numeric, main commodity output to auxilary commodity input parameter, NA ignored}
-#'  \item{cout2aout}{numeric, main commodity output to auxilary commodity output parameter, NA ignored}
-#'  \item{act2ainp}{numeric, technology activity to auxilary commodity input parameter, NA ignored}
-#'  \item{act2aout}{numeric, technology activity to auxilary commodity output parameter, NA ignored}
-#'  \item{cap2ainp}{numeric, technology capacity to auxilary commodity input parameter, NA ignored}
-#'  \item{cap2aout}{numeric, technology capacity to auxilary commodity output parameter, NA ignored}
-#'  \item{ncap2ainp}{numeric, technology new capacity to auxilary commodity input parameter, NA ignored}
-#'  \item{ncap2aout}{numeric, technology new capacity to auxilary commodity output parameter, NA ignored}
-#'  \item{stg2ainp}{(!!!not implemented!!!) numeric, technology storage level to auxilary commodity input parameter, NA ignored}
-#'  \item{stg2aout}{(!!!not implemented!!!) numeric, technology storage level to auxilary commodity output parameter, NA ignored}
-#'  \item{sinp2ainp}{(!!!not implemented!!!) numeric, technology storage input to auxilary commodity input parameter, NA ignored}
-#'  \item{sinp2aout}{(!!!not implemented!!!) numeric, technology storage input to auxilary commodity output parameter, NA ignored}
-#'  \item{sout2ainp}{(!!!not implemented!!!) numeric, technology storage output to auxilary commodity input parameter, NA ignored}
-#'  \item{sout2aout}{(!!!not implemented!!!) numeric, technology storage output to auxilary commodity output parameter, NA ignored}
-#'  }
-#' @slot af timeslice-level availability factor parameters, data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{slice}{character, name of slice for which the parameter will be applied, NA for every time-slice of the technology timeframe}
-#'  \item{af.lo}{numeric, lower bound on the availability factor, NA means default value (0) or fixed value if specified}
-#'  \item{af.up}{numeric, upper bound on the availability factor, NA means default value (1) or fixed value if specified}
-#'  \item{af.fx}{numeric, fixed availability factor, NA ignored}
-#'  \item{rampup}{numeric, ramp-up time constraint, NA ignored}
-#'  \item{rampdown}{numeric, ramp-down time constraint, NA ignored}
-#'  }
-#' @slot afs timeframe level (or group of slices) availability factor constraints, data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{slice}{character, name of the timeframe for which the parameter will be applied, requires, NA will return an error}
-#'  \item{afs.lo}{numeric, lower bound on the availability factor for the timeframe, NA means default value (0) or fixed value if specified}
-#'  \item{afs.up}{numeric, upper bound on the availability factor for the timeframe, NA means default value (1) or fixed value if specified}
-#'  \item{afs.fx}{numeric, fixed availability factor for the timeframe, NA ignored}
-#'  }
-#' @slot weather external ("weather") factors affecting the technology availability paramaters, data.frame with columns:
-#' \describe{
-#'  \item{weather}{character, name of the applied weather factor, required}
-#'  \item{comm}{character, name of the commodity with specified `afc.*` affected by the weather factor, required}
-#'  \item{wafc.lo}{numeric, multiplying coefficient to the lower bound on the commodity availability parameter `afc.lo`, NAs ignored of fixed values used}
-#'  \item{wafc.up}{numeric, multiplying coefficient to the upper bound on the commodity availability parameter `afc.up`, NAs ignored of fixed values used}
-#'  \item{wafc.fx}{numeric, multiplying coefficient to the fixed value of the commodity availability parameter `afc.fx`, NAs ignored of fixed values used}
-#'  \item{waf.lo}{numeric, multiplying coefficient to the lower bound on the availability factor parameter `af.lo`, NAs ignored of fixed values used}
-#'  \item{waf.up}{numeric, multiplying coefficient to the upper bound on the availability factor parameter `af.up`, NAs ignored of fixed values used}
-#'  \item{waf.fx}{numeric, multiplying coefficient to the fixed value on the availability factor parameter `af.fx`, NAs ignored of fixed values used}
-#'  \item{wafs.up}{numeric, multiplying coefficient to the upper bound on the availability factor parameter `afs.up`, NAs ignored of fixed values used}
-#'  \item{wafs.lo}{numeric, multiplying coefficient to the lower bound on the availability factor parameter `afs.lo`, NAs ignored of fixed values used}
-#'  \item{wafs.fx}{numeric, multiplying coefficient to the fixed value on the availability factor parameter `afs.fx`, NAs ignored of fixed values used}
-#'  }
-#' @slot fixom fixed operational and maintenance cost (per unit of capacity a year), data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of the region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{fixom}{numeric, fixed operational and maintannance cost, NA means default value (0)}
-#'  }
-#' @slot varom variable operational and maintenance cost (per unit of activity or commodity), data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of the region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{slice}{character, name of the time-slice or (grand-)parent timeframe for which the parameter will be applied, NA for every time-slice of the technology timeframe}
-#'  \item{varom}{numeric, variable operational and maintannance cost per unit of activity, NA means default value (0)}
-#'  \item{comm}{character, name of the commodity for which the parameter will be applied, required for `cvarom` parameter}
-#'  \item{cvarom}{numeric, variable operational and maintannance cost per unit of commodity, NA means default value (0)}
-#'  \item{acomm}{character, name of the auxilary commodity for which the `avarom` will be applied, required for `avarom` parameter}
-#'  \item{avarom}{numeric, variable operational and maintannance cost per unit of auxilary commodity, NA means default value (0)}
-#' }
-#' @slot invcost total overnight investment costs of the project (per unit of capacity), data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of the region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the parameter will be applied, NA for every year}
-#'  \item{invcost}{numeric, total overnight investment costs of the project (per unit of capacity), NA means default value (0)}
-#' }
-#' @slot start the first year the technology can be installed, data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of the region for which the parameter will be applied, NA for every region}
-#'  \item{start}{integer, the first year the technology can be installed, NA means all years of the model horizon}
-#' }
-#' @slot end the last year the technology can be installed, data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of the region for which the parameter will be applied, NA means default value (-Inf)}
-#'  \item{end}{integer, the last year the technology can be installed, NA means default value (Inf)}
-#' }
-#' @slot olife operational life of the installed technology (in years), data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of the region for which the parameter will be applied, NA for every region}
-#'  \item{olife}{integer, operational life of the installed technology (in years), NA means default value (1)}
-#' }
-#' @slot stock predefined stock of the installed technology (in units of capacity), data.frame with columns:
-#' \describe{
-#'  \item{region}{character, name of the region for which the parameter will be applied, NA for every region}
-#'  \item{year}{integer, year for which the stock will be specified, required, values between specified years will be interpolated.}
-#'  \item{stock}{numeric, predefined existing of future capacity of the technology (in units of capacity), NA means default value (0)}
-#' }
-#' @slot optimizeRetirement logical. Currently ignored.
-#' @slot upgrade.technology character. Currently ignored.
-#' @slot fullYear logical. Currently ignored.
-#' @slot timeframe character name of timeframe level the technology is operating. By default, the lowest level of commodities in the technology is applied.
-#' @slot region character vector of regions where the technology exist or can be installed.
-#' @slot misc list with any miscellaneous information.
-#' @slot capacity data.frame (not implemented!) Capacity parameters of the technology.
+#' @description
+#' Technology of a technological process in the model is used to convert input
+#' commodities into output commodities with consumption or production of auxiliary
+#' commodities linked to other parameters or variables of the technology.
+#' A broad set of parameters provides flexibility to model various technological
+#' processes, including efficiency, availability, costs, and exogenous
+#' shocks (weather factors).
 #'
+#' @slot name `r get_slot_info("technology", "name")`
+#' @slot desc `r get_slot_info("technology", "desc")`
+#' @slot input `r get_slot_info("technology", "input")`
+#' @slot output `r get_slot_info("technology", "output")`
+#' @slot aux `r get_slot_info("technology", "aux")`
+#' @slot units `r get_slot_info("technology", "units")`
+#' @slot group `r get_slot_info("technology", "group")`
+#' @slot cap2act `r get_slot_info("technology", "cap2act")`
+#' @slot geff `r get_slot_info("technology", "geff")`
+#' @slot ceff `r get_slot_info("technology", "ceff")`
+#' @slot aeff `r get_slot_info("technology", "aeff")`
+#' @slot af `r get_slot_info("technology", "af")`
+#' @slot afs `r get_slot_info("technology", "afs")`
+#' @slot weather `r get_slot_info("technology", "weather")`
+#' @slot fixom `r get_slot_info("technology", "fixom")`
+#' @slot varom `r get_slot_info("technology", "varom")`
+#' @slot invcost `r get_slot_info("technology", "invcost")`
+#' @slot start `r get_slot_info("technology", "start")`
+#' @slot end `r get_slot_info("technology", "end")`
+#' @slot olife `r get_slot_info("technology", "olife")`
+#' @slot capacity `r get_slot_info("technology", "capacity")`
+#' @slot optimizeRetirement `r get_slot_info("technology", "optimizeRetirement")`
+#' @slot fullYear `r get_slot_info("technology", "fullYear")`
+#' @slot timeframe `r get_slot_info("technology", "timeframe")`
+#' @slot region `r get_slot_info("technology", "region")`
+#' @slot misc `r get_slot_info("technology", "misc")`
+#'
+#' @rdname class-technology
 #' @include class-supply.R
-#'
-#' @family technology
-#'
+#' @family technology, process
 #' @export
-#'
 setClass("technology",
   representation(
     # General information
-    name = "character", # Short name
-    desc = "character", # desc
-    input = "data.frame", #
-    output = "data.frame", #
-    aux = "data.frame", #
-    units = "data.frame", #
-    group = "data.frame", # groups units
-    cap2act = "numeric", #
+    name = "character",
+    desc = "character",
+    input = "data.frame",
+    output = "data.frame",
+    aux = "data.frame",
+    units = "data.frame",
+    group = "data.frame",
+    cap2act = "numeric",
     # Performance parameters
-    geff = "data.frame", #
-    ceff = "data.frame", #
-    aeff = "data.frame", #
-    af = "data.frame", #
-    afs = "data.frame", #
-    weather = "data.frame", #
+    geff = "data.frame",
+    ceff = "data.frame",
+    aeff = "data.frame",
+    af = "data.frame",
+    afs = "data.frame",
+    weather = "data.frame",
     # Costs
-    fixom = "data.frame", #
-    varom = "data.frame", #
-    invcost = "data.frame", #
+    fixom = "data.frame",
+    varom = "data.frame",
+    invcost = "data.frame",
     # Market
-    start = "data.frame", #
-    end = "data.frame", #
-    olife = "data.frame", #
-    # stock = "data.frame", #
-    capacity = "data.frame", #
+    start = "data.frame",
+    end = "data.frame",
+    olife = "data.frame",
+    capacity = "data.frame",
     optimizeRetirement = "logical",
     # upgrade.technology = "character",
     fullYear = "logical",
     timeframe = "character",
     region = "character",
     misc = "list"
-  ), #
+  ),
   prototype(
     name = "",
     desc = "",
     input = data.frame(
       comm = character(),
       unit = character(),
-      group = character(), # may be factor or character?
+      group = character(),
       combustion = numeric(),
       stringsAsFactors = FALSE
     ),
@@ -373,12 +239,6 @@ setClass("technology",
       olife = integer(),
       stringsAsFactors = FALSE
     ),
-    # stock = data.frame(
-    #   region = character(),
-    #   year = integer(),
-    #   stock = numeric(),
-    #   stringsAsFactors = FALSE
-    # ),
     capacity = data.frame(
       region = character(),
       year = integer(),
@@ -408,15 +268,112 @@ setMethod("initialize", "technology", function(.Object, ...) {
   .Object
 })
 
-#' Create object of class `technology`.
+# constructor ###############################################################
+#' @title Create a new "technology" object.
+#' @name newTechnology
+#' @description
+#' This function initializes and returns an S4 object of class `technology`,
+#' representing a specific technology with given attributes.
+#'
+#' @param name `r get_slot_info("technology", "name")`
+#' @param desc `r get_slot_info("technology", "desc")`
+#' @param input `r get_slot_info("technology", "input")`
+#' @param output `r get_slot_info("technology", "output")`
+#' @param group `r get_slot_info("technology", "group")`
+#' @param aux `r get_slot_info("technology", "aux")`
+#' @param units `r get_slot_info("technology", "units")`
+#' @param cap2act `r get_slot_info("technology", "cap2act")`
+#' @param geff `r get_slot_info("technology", "geff")`
+#' @param ceff `r get_slot_info("technology", "ceff")`
+#' @param aeff `r get_slot_info("technology", "aeff")`
+#' @param af `r get_slot_info("technology", "af")`
+#' @param afs `r get_slot_info("technology", "afs")`
+#' @param weather `r get_slot_info("technology", "weather")`
+#' @param capacity `r get_slot_info("technology", "capacity")`
+#' @param invcost `r get_slot_info("technology", "invcost")`
+#' @param fixom `r get_slot_info("technology", "fixom")`
+#' @param varom `r get_slot_info("technology", "varom")`
+#' @param olife `r get_slot_info("technology", "olife")`
+#' @param region `r get_slot_info("technology", "region")`
+#' @param start `r get_slot_info("technology", "start")`
+#' @param end `r get_slot_info("technology", "end")`
+#' @param timeframe `r get_slot_info("technology", "timeframe")`
+#' @param fullYear `r get_slot_info("technology", "fullYear")`
+#' @param optimizeRetirement `r get_slot_info("technology", "optimizeRetirement")`
+#' @param misc `r get_slot_info("technology", "misc")`
 #'
 #' @family technology, process
 #' @rdname technology
 #'
-#' @return an object of class technology.
+#' @return An object of class technology.
 #' @export
 #'
 #' @examples
+#' ECOAL <- newTechnology(
+#'   name = "ECOAL", # name, used in sets, no white spaces or special characters
+#'   desc = "Generic coal power plant", # any description of the technology
+#'   input = data.frame(
+#'     comm = "COAL", # name of input commodity
+#'     unit = "MMBtu", # unit of the input commodity
+#'     combustion = 1 # combustion factor from 0 to 1 (default 1) to calculate emissions from fuels combustion (commodities intermediate consumption, more broadly)
+#'   ),
+#'   output = data.frame(
+#'     comm = "ELC", # name of output commodity
+#'     unit = "MWh" # unit of the output commodity
+#'   ),
+#'   aux = data.frame(
+#'     acomm = c("NOx", "SO2", "Hg"), # names of auxilary commodities
+#'     unit = c("kg", "kg", "g") # units
+#'   ),
+#'   cap2act = 8760, # Capacity to activity ration: 8760 MWh output a year per MW of capacity
+#'   ceff = data.frame( # efficiency parameters for the main commodities
+#'      comm = "COAL",
+#'      # efficiency, 1/10 MWh per MMBtu, inverse heat rate
+#'      # check: 1 / convert(10, "MMBtu", "MWh") ~= 34% efficiency
+#'      cinp2use = 1/10
+#'    ),
+#'    aeff = data.frame( # paramaters for the auxilary commodities
+#'       acomm = c("NOx", "SO2", "Hg"),
+#'       act2aout = c(0.1, 0.2, 0.3) # (arbitrary) emission factors, linkid to activity
+#'    ),
+#'    af = data.frame( # availability (capacity) factor by time slices
+#'       af.up = 0.95 # maximum 95% per hour
+#'    ),
+#'    afs = data.frame( # availability factor by timeframes
+#'       slice = "ANNUAL", # annual availability factor
+#'       afs.lo = 0.40, # at least 40% per year
+#'       afs.up = 0.85 # maximum 85% per year
+#'    ),
+#'    fixom = data.frame( # fixed operational and maintenance cost
+#'       region = c("R1", "R2", NA), # regions, NA - all other regions
+#'       fixom = c(100, 200, 150) # MW a year
+#'    ),
+#'    varom = data.frame( # variable operational and maintenance cost
+#'       region = c("R1", "R2"), # regions
+#'       varom = c(1, 2) # $1 and $2 per MWh
+#'    ),
+#'    invcost = data.frame( # investment cost
+#'       year = c(2020, 2030, 2040), # to differenciate by years
+#'       invcost = c(1000, 900, 800) # $1000, $900, $800 per MW
+#'    ),
+#'    start = data.frame( # start year
+#'       start = 2020 # can be installed from 2020
+#'    ),
+#'    end = data.frame( # end year
+#'       end = 2040 # can be installed until 2040
+#'    ),
+#'    olife = data.frame( # operational life
+#'       olife = 30 # years
+#'    ),
+#'    capacity = data.frame( # existing capacity
+#'       year = c(2020, 2030, 2040), # to differenciate by years
+#'       region = c("R1"), # exists only in R1
+#'       stock = c(300, 200, 100) # age-based exogenous retirement
+#'    ),
+#'    region = c("R1", "R2", "R5", "R7"), # regions where the technology can be installed
+#'  )
+#'  draw(ECOAL)
+#'
 newTechnology <- function(
     name = "",
     desc = "",
@@ -446,7 +403,6 @@ newTechnology <- function(
     optimizeRetirement = FALSE,
     # upgrade.technology = character(),
     misc = list()) {
-  # browser()
   .data2slots("technology", name,
     desc = desc,
     input = input,
@@ -461,7 +417,6 @@ newTechnology <- function(
     af = af,
     afs = afs,
     weather = weather,
-    # stock = stock,
     capacity = capacity,
     invcost = invcost,
     fixom = fixom,
@@ -478,6 +433,8 @@ newTechnology <- function(
   )
 }
 
+# methods ###################################################################
+#' @title Update a "technology" object.
 #' @param object object of class technology
 #'
 #' @param ... slot-names with data to update (see `newTechnology`)
@@ -490,6 +447,7 @@ setMethod("update", "technology", function(object, ...) {
   .data2slots("technology", object, ...)
 })
 
+# internal functions ########################################################
 # get names of data.frame slots
 .technology_data_frame <- function() {
   # get technology slot data.frame names

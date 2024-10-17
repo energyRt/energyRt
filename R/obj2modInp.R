@@ -213,8 +213,8 @@ setMethod(".obj2modInp", signature(
 
   mExportRow <- merge0(merge0(mExpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
   if (!is.null(pExportRow) && nrow(pExportRow) != 0) {
-    pExportRow2 <- pExportRow %>%
-      filter(type == "up" & value == 0) %>%
+    pExportRow2 <- pExportRow |>
+      filter(type == "up" & value == 0) |>
       select(any_of(colnames(mExportRow)))
     # pExportRow2 <- pExportRow[pExportRow$type == "up" & pExportRow$value == 0,
     #                           colnames(pExportRow) %in% colnames(mExportRow),
@@ -228,8 +228,8 @@ setMethod(".obj2modInp", signature(
   mExportRow$comm <- exp@commodity
   obj@parameters[["mExportRow"]] <- .dat2par(obj@parameters[["mExportRow"]], mExportRow)
   if (!is.null(pExportRow) && any(pExportRow$type == "up" & pExportRow$value != Inf & pExportRow$value != 0)) {
-    mExportRowUp <- pExportRow %>%
-      filter(type == "up" & value != Inf & value != 0) %>%
+    mExportRowUp <- pExportRow |>
+      filter(type == "up" & value != Inf & value != 0) |>
       select(any_of(obj@parameters[["mExportRowUp"]]@dimSets))
     # mExportRowUp <- pExportRow[
     #   pExportRow$type == "up" & pExportRow$value != Inf & pExportRow$value != 0,
@@ -241,8 +241,8 @@ setMethod(".obj2modInp", signature(
     }
     obj@parameters[["mExportRowUp"]] <-
       .dat2par(obj@parameters[["mExportRowUp"]], mExportRowUp)
-    meqExportRowLo <- pExportRow %>%
-      filter(type == "lo" & value != 0) %>%
+    meqExportRowLo <- pExportRow |>
+      filter(type == "lo" & value != 0) |>
       select(any_of(obj@parameters[["meqExportRowLo"]]@dimSets))
     # pExportRow[pExportRow$type == "lo" & pExportRow$value != 0,
       #            colnames(pExportRow) %in% obj@parameters[["meqExportRowLo"]]@dimSets,
@@ -311,8 +311,8 @@ setMethod(
     obj@parameters[["pImportRow"]] <- .dat2par(obj@parameters[["pImportRow"]], pImportRow)
     mImportRow <- merge0(merge0(mImpSlice, list(region = approxim$region)), list(year = approxim$mileStoneYears))
     if (!is.null(pImportRow) && nrow(pImportRow) != 0) {
-      pImportRow2 <- pImportRow %>%
-        filter(type == "up" & value == 0) %>%
+      pImportRow2 <- pImportRow |>
+        filter(type == "up" & value == 0) |>
         select(any_of(colnames(mImportRow)))
       # pImportRow[pImportRow$type == "up" & pImportRow$value == 0,
         #            colnames(pImportRow) %in% colnames(mImportRow), drop = FALSE]
@@ -325,8 +325,8 @@ setMethod(
     mImportRow$comm <- imp@commodity
     obj@parameters[["mImportRow"]] <- .dat2par(obj@parameters[["mImportRow"]], mImportRow)
     if (!is.null(pImportRow)) {
-      mImportRowUp <- pImportRow %>%
-        filter(type == "up" & value != Inf & value != 0) %>%
+      mImportRowUp <- pImportRow |>
+        filter(type == "up" & value != Inf & value != 0) |>
         select(any_of(obj@parameters[["mImportRowUp"]]@dimSets))
       # pImportRow[
         #   pImportRow$type == "up" & pImportRow$value != Inf & pImportRow$value != 0,
@@ -337,8 +337,8 @@ setMethod(
         mImportRowUp <- merge0(mImportRow, mImportRowUp)
       }
       obj@parameters[["mImportRowUp"]] <- .dat2par(obj@parameters[["mImportRowUp"]], mImportRowUp)
-      meqImportRowLo <- pImportRow %>%
-        filter(type == "lo" & value != 0) %>%
+      meqImportRowLo <- pImportRow |>
+        filter(type == "lo" & value != 0) |>
         select(any_of(obj@parameters[["meqImportRowLo"]]@dimSets))
       # meqImportRowLo <- pImportRow[
       #   pImportRow$type == "lo" & pImportRow$value != 0,
@@ -1088,11 +1088,11 @@ setMethod(
           atmp <- aout_tmp[[gsub("^m", "p", i)]]
           if (any(grep("Out$", i))) {
             # atmp <- atmp[, colnames(atmp) %in% colnames(mvStorageAOut), drop = FALSE]
-            atmp <- atmp %>% select(any_of(colnames(mvStorageAOut)))
+            atmp <- atmp |> select(any_of(colnames(mvStorageAOut)))
             if (ncol(atmp) != 5) atmp <- merge0(atmp, mvStorageAOut)
           } else {
             # atmp <- atmp[, colnames(atmp) %in% colnames(mvStorageAInp), drop = FALSE]
-            atmp <- atmp %>% select(any_of(colnames(mvStorageAInp)))
+            atmp <- atmp |> select(any_of(colnames(mvStorageAInp)))
             if (ncol(atmp) != 5) atmp <- merge0(atmp, mvStorageAInp)
           }
           obj@parameters[[i]] <- .dat2par(obj@parameters[[i]], atmp)
@@ -1104,7 +1104,7 @@ setMethod(
       # browser()
       # jjs <- intersect(names(x), names(y))
       ex_cols <- c("value", "type")
-      x <- filter(x, type == 'up' & value == Inf) %>% select(-any_of(ex_cols))
+      x <- filter(x, type == 'up' & value == Inf) |> select(-any_of(ex_cols))
       y <- select(y, -any_of(ex_cols))
       ii <- duplicated(bind_rows(y, x))[1:nrow(y)]
       y <- filter(y, !ii)
@@ -1113,7 +1113,7 @@ setMethod(
       # rbind(
       #   select(filter(x, type == "up", x$value == Inf), any_of(jjs)),
       #   select(y, any_of(jjs))
-      #   ) %>% unique()
+      #   ) |> unique()
 
       # x <- x[x$type == "up" & x$value == Inf, ]
       # r <- try(y[(!duplicated(rbind(y, select(x, -value))))[1:nrow(y)], ])
@@ -1265,14 +1265,14 @@ setMethod(".obj2modInp",
     if (is.null(pSupAva)) {
       zero_ava_up <- NULL
     } else {
-      zero_ava_up <- pSupAva %>%
-        filter(value == 0, type == "up") %>%
+      zero_ava_up <- pSupAva |>
+        filter(value == 0, type == "up") |>
         select(-any_of("value"))
       # browser()
     }
     # mSupAva <- merge0(merge0(mSupSpan, list(comm = sup@commodity, year = approxim$mileStoneYears)), mSupSlice)
-    mSupAva <- mSupSpan %>%
-      merge0(list(comm = sup@commodity, year = approxim$mileStoneYears)) %>%
+    mSupAva <- mSupSpan |>
+      merge0(list(comm = sup@commodity, year = approxim$mileStoneYears)) |>
       merge0(mSupSlice)
 
     if (!is.null(zero_ava_up) && nrow(zero_ava_up) != 0) {
@@ -1281,19 +1281,19 @@ setMethod(".obj2modInp",
         #   mSupAva[(!duplicated(
         #     rbind(mSupAva, zero_ava_up[, colnames(mSupAva)]),
         #     fromLast = TRUE))[1:nrow(mSupAva)], ]
-        ii <- mSupAva %>%
-          rbind(select(zero_ava_up, all_of(colnames(mSupAva)))) %>%
+        ii <- mSupAva |>
+          rbind(select(zero_ava_up, all_of(colnames(mSupAva)))) |>
           duplicated(fromLast = TRUE)
           # filter(n() <= nrow(mSupAva))
         ii <- ii[1:nrow(mSupAva)]
         mSupAva <- mSupAva[!ii,]
       } else {
         # mSupAva <- mSupAva[(!duplicated(rbind(mSupAva, merge0(mSupAva, zero_ava_up[, colnames(zero_ava_up) %in% colnames(mSupAva), drop = FALSE])[, colnames(mSupAva)]), fromLast = TRUE))[1:nrow(mSupAva)], ]
-        ii <- mSupAva %>%
+        ii <- mSupAva |>
           rbind(
             merge0(mSupAva, select(zero_ava_up, any_of(colnames(mSupAva))))
-            ) %>%
-          select(all_of(colnames(mSupAva))) %>%
+            ) |>
+          select(all_of(colnames(mSupAva))) |>
           duplicated(fromLast = TRUE)
         ii <- ii[1:nrow(mSupAva)] # ???
         mSupAva <- mSupAva[!ii,]
@@ -1389,15 +1389,15 @@ setMethod(".obj2modInp",
       obj@parameters[["mSupWeatherLo"]] <-
         .dat2par(obj@parameters[["mSupWeatherLo"]], tmp$maplo)
     }
-    t1 <- mSupAva[, c("sup", "region", "year")] %>% unique()
+    t1 <- mSupAva[, c("sup", "region", "year")] |> unique()
     # t1 <- t1[!duplicated(t1), ]
     # t2 <- pSupCost[pSupCost$value != 0, colnames(pSupCost)[colnames(pSupCost) %in% c("sup", "region", "year")], drop = FALSE]
     # t2 <- t2[!duplicated(t2), , drop = FALSE]
     # browser()
     .null_to_empty_param("pSupCost", obj@parameters)
-    t2 <- pSupCost %>%
-      filter(value != 0) %>%
-      select(any_of(c("sup", "region", "year"))) %>%
+    t2 <- pSupCost |>
+      filter(value != 0) |>
+      select(any_of(c("sup", "region", "year"))) |>
       unique()
     if (!is.null(t2) && ncol(t2) != 3) {
       browser()
@@ -1420,30 +1420,30 @@ setMethod(".obj2modInp",
   #           drop = FALSE]
   # colnames(f1)[1] <- "value"
   c_nm <- paste0(val, ".up")
-  ii <- select(dtf, all_of(c_nm))[[1]] %>% is.na()
-  f1 <- dtf %>%
-    filter(!ii) %>%
-    select(all_of(c(c_nm, "weather", sets))) %>%
+  ii <- select(dtf, all_of(c_nm))[[1]] |> is.na()
+  f1 <- dtf |>
+    filter(!ii) |>
+    select(all_of(c(c_nm, "weather", sets))) |>
     rename(value = all_of(c_nm))
   # f2 <- dtf[!is.na(dtf[, paste0(val, ".fx")]),
   #           c(paste0(val, ".fx"), "weather", sets),
   #           drop = FALSE]
   # colnames(f2)[1] <- "value"
   c_nm <- paste0(val, ".fx")
-  ii <- select(dtf, all_of(c_nm))[[1]] %>% is.na()
-  f2 <- dtf %>%
-    filter(!ii) %>%
-    select(all_of(c(c_nm, "weather", sets))) %>%
+  ii <- select(dtf, all_of(c_nm))[[1]] |> is.na()
+  f2 <- dtf |>
+    filter(!ii) |>
+    select(all_of(c(c_nm, "weather", sets))) |>
     rename(value = all_of(c_nm))
   # f3 <- dtf[!is.na(dtf[, paste0(val, ".lo")]),
   #           c(paste0(val, ".lo"), "weather", sets),
   #           drop = FALSE]
   # colnames(f3)[1] <- "value"
   c_nm <- paste0(val, ".lo")
-  ii <- select(dtf, all_of(c_nm))[[1]] %>% is.na()
-  f3 <- dtf %>%
-    filter(!ii) %>%
-    select(all_of(c(c_nm, "weather", sets))) %>%
+  ii <- select(dtf, all_of(c_nm))[[1]] |> is.na()
+  f3 <- dtf |>
+    filter(!ii) |>
+    select(all_of(c(c_nm, "weather", sets))) |>
     rename(value = all_of(c_nm))
   rs <- list(par = NULL)
   if (nrow(f1) + nrow(f2) != 0) {
@@ -1501,13 +1501,13 @@ setMethod(".obj2modInp",
     } else {
       SliceNext <- obj@parameters[["mSliceNext"]]@data
     }
-    mTechRampUp <- left_join(mTechRampUp, SliceNext, by = "slice") %>%
+    mTechRampUp <- left_join(mTechRampUp, SliceNext, by = "slice") |>
       select(all_of(obj@parameters[[mname]]@dimSets))
 
     # tech_name <- tech@name
-      # mTechRampSliceNext <- mTechRampSliceNext %>%
-      #   mutate(tech = tech_name, .before = 1) %>%
-      #   merge0(mvTechAct) %>%
+      # mTechRampSliceNext <- mTechRampSliceNext |>
+      #   mutate(tech = tech_name, .before = 1) |>
+      #   merge0(mvTechAct) |>
         # select(all_of(obj@parameters[["mTechRampSliceNext"]]@dimSets))
       # obj@parameters[["mTechRampSliceNext"]] <-
       #   .dat2par(obj@parameters[["mTechRampSliceNext"]], mTechRampSliceNext)
@@ -1540,7 +1540,7 @@ setMethod(".obj2modInp",
     #   x <- obj@parameters[["mSliceNext"]]@data
     # }
     # tech_name <- tech@name
-    # x <- mutate(x, tech = tech_name, .before = 1) %>%
+    # x <- mutate(x, tech = tech_name, .before = 1) |>
     #   merge0(mact)
     # obj@parameters[["mTechFullYear"]]@data
     # obj@parameters[["mSliceFYearNext"]]@data
@@ -2063,7 +2063,7 @@ setMethod(
       obj@parameters[["mvTechOut"]] <-
         .dat2par(obj@parameters[["mvTechOut"]], mvTechOut)
       # browser()
-      # mvTechOutS <- mvTechOut %>%
+      # mvTechOutS <- mvTechOut |>
       #   left_join()
 
     } else {
@@ -2402,16 +2402,16 @@ setMethod(
           #   pTechAfc$value != Inf & pTechAfc$type == "up",
           #   colnames(pTechAfc) %in%  obj@parameters[["meqTechAfcOutLo"]]@dimSets,
           #   drop = FALSE]
-          pTechAfc <- pTechAfc %>%
-            filter(value != Inf, type == "up") %>%
+          pTechAfc <- pTechAfc |>
+            filter(value != Inf, type == "up") |>
             select(any_of(obj@parameters[["meqTechAfcOutLo"]]@dimSets))
         } else {
           # pTechAfc <- pTechAfc[
           #   pTechAfc$value != 0 & pTechAfc$type == "lo",
           #   colnames(pTechAfc) %in% obj@parameters[["meqTechAfcOutLo"]]@dimSets,
           #   drop = FALSE]
-          pTechAfc <- pTechAfc %>%
-            filter(value != 0 & type == "lo") %>%
+          pTechAfc <- pTechAfc |>
+            filter(value != 0 & type == "lo") |>
             select(any_of(obj@parameters[["meqTechAfcOutLo"]]@dimSets))
         }
         if (nrow(pTechAfc) == 0) {
@@ -2517,9 +2517,9 @@ setMethod(
     #     mTechRampSliceNext <- obj@parameters[["mSliceNext"]]@data
     #   }
     #   tech_name <- tech@name
-    #   mTechRampSliceNext <- mTechRampSliceNext %>%
-    #     mutate(tech = tech_name, .before = 1) %>%
-    #     merge0(mvTechAct) %>%
+    #   mTechRampSliceNext <- mTechRampSliceNext |>
+    #     mutate(tech = tech_name, .before = 1) |>
+    #     merge0(mvTechAct) |>
     #     select(all_of(obj@parameters[["mTechRampSliceNext"]]@dimSets))
     #   obj@parameters[["mTechRampSliceNext"]] <-
     #     .dat2par(obj@parameters[["mTechRampSliceNext"]], mTechRampSliceNext)
@@ -2639,7 +2639,7 @@ setMethod(
         # tmp[nn, "dst"] <- kk$dst
         tmp$src[nn] <- kk$src
         tmp$dst[nn] <- kk$dst
-        tmp <- tmp %>% filter(-fl)
+        tmp <- tmp |> filter(-fl)
       }
       rownames(tmp) <- NULL
       tmp
@@ -2664,7 +2664,7 @@ setMethod(
       dtf$dst <- NULL
       # dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
       jj <- colnames(dtf)[c(ncol(dtf), 2:ncol(dtf) - 1)]
-      dtf <- dtf %>% select(all_of(jj))
+      dtf <- dtf |> select(all_of(jj))
       dd <- .interp_numpar(dtf, approxim = approxim,
                            parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) {
@@ -2694,11 +2694,11 @@ setMethod(
       }
       if (nrow(dtf) != 0) {
         # clo <- dtf[, paste0(parameter, ".lo")]
-        clo <- dtf %>% select(all_of(paste0(parameter, ".lo")))
+        clo <- dtf |> select(all_of(paste0(parameter, ".lo")))
         # cup <- dtf[, paste0(parameter, ".up")]
-        cup <- dtf %>% select(all_of(paste0(parameter, ".up")))
+        cup <- dtf |> select(all_of(paste0(parameter, ".up")))
         # cfx <- dtf[, paste0(parameter, ".fx")]
-        cfx <- dtf %>% select(all_of(paste0(parameter, ".fx")))
+        cfx <- dtf |> select(all_of(paste0(parameter, ".fx")))
         # dtf[, paste0(parameter, c(".up", ".fx", ".lo"))] <- NA
         # dtf <- mutate_at(dtf, # superseded
         #                  .vars = paste0(parameter, c(".up", ".fx", ".lo")),
@@ -2724,7 +2724,7 @@ setMethod(
       dtf$dst <- NULL
       dtf_nms <- colnames(dtf)[c(ncol(dtf), 2:ncol(dtf) - 1)]
       # dtf <- dtf[, c(ncol(dtf), 2:ncol(dtf) - 1), drop = FALSE]
-      dtf <- dtf %>% select(all_of(dtf_nms))
+      dtf <- dtf |> select(all_of(dtf_nms))
       dd <- .interp_bounds(dtf, approxim = approxim,
                            parameter = parameter, ...)
       if (is.null(dd) || nrow(dd) == 0) {
@@ -2922,7 +2922,7 @@ setMethod(
         obj@parameters[["pTradeOlife"]], pTradeOlife)
       if (is.null(pTradeOlife)) {
         pTradeOlife <- data.table(trade = trd@name,
-                                  value = energyRt:::.defVal$olife)
+                                  value = .defVal$olife)
       }
         # data.table(trade = trd@name, value = trd@olife, stringsAsFactors = FALSE))
       invest_years <- approxim$mileStoneYears
@@ -3009,11 +3009,11 @@ setMethod(
         invcost$value <- NULL
         if (length(trade_eac) > 0) {
           # browser()
-          # mTradeEac <- merge(unique(invcost$region), trade_eac) %>%
+          # mTradeEac <- merge(unique(invcost$region), trade_eac) |>
             # as.data.table()
           mTradeEac <- expand_grid(
             region = unique(invcost$region),
-            year = trade_eac) %>%
+            year = trade_eac) |>
             as.data.table()
           mTradeEac$trade <- trd@name
           # mTradeEac$region <- as.character(mTradeEac$x)
@@ -3359,15 +3359,15 @@ merge0 <- function(x, y,
   # assign('x', x, globalenv()) assign('y', y, globalenv())
   if (length(by) != 0) {
     # browser()
-    y <- as.data.table(y) %>% .force_year_class_df()
-    x <- as.data.table(x) %>% .force_year_class_df()
+    y <- as.data.table(y) |> .force_year_class_df()
+    x <- as.data.table(x) |> .force_year_class_df()
     xy <- merge(x, y, by = by, ..., allow.cartesian = TRUE)
     # return(as.data.table(xy)) # debug pDiscountFactorMileStone
     return(xy)
   }
   # browser()
-  # y <- as.data.table(y) %>% .force_year_class_df()
-  # x <- as.data.table(x) %>% .force_year_class_df()
+  # y <- as.data.table(y) |> .force_year_class_df()
+  # x <- as.data.table(x) |> .force_year_class_df()
   y <- .force_year_class_df(y)
   x <- .force_year_class_df(x)
   # xy <- merge(x, y)
@@ -3450,7 +3450,7 @@ merge0 <- function(x, y,
   # approxim$parent_child <-
   #   approxim$parent_child[approxim$parent_child$child %in% approxim$slice, ,
   #                         drop = FALSE]
-  approxim$parent_child <- approxim$parent_child %>%
+  approxim$parent_child <- approxim$parent_child |>
     filter(child %in% approxim$slice)
   approxim
 }

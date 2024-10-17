@@ -366,11 +366,11 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   if (mean(scen@settings@yearFraction$fraction) != 1.) {
     # filter out unused slices
     # browser()
-    warning(
-      "Solving for a fraction of a year.\n",
-      "Variables without slice dimension scaled to the annual level using weights.",
-      "The solution might differ from the whole-year optimization."
-    )
+    # warning(
+    #   "Solving for a fraction of a year.\n",
+    #   "Variables without slice dimension scaled to the annual level using weights.",
+    #   "The solution might differ from the whole-year optimization."
+    # )
     cat("Subsetting time-slices\n")
     scen@model@data <- subset_slices_repo(
       repo = scen@model@data,
@@ -417,14 +417,14 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   approxim$ry <- merge0(
     data.table(region = approxim$region, stringsAsFactors = FALSE),
     data.table(year = approxim$mileStoneYears, stringsAsFactors = FALSE)
-  ) %>% as.data.table
+  ) |> as.data.table()
   approxim$rys <- merge0(
     approxim$ry,
     data.table(
       slice = approxim$calendar@slice_share$slice,
       stringsAsFactors = FALSE
     )
-  ) %>% as.data.table()
+  ) |> as.data.table()
   approxim$ry <- as.data.table(approxim$ry)
   approxim$rys <- as.data.table(approxim$rys)
 
@@ -496,7 +496,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
             slt)
           if (nrow(tbl) > 0) {
             # need_col <- need_col[apply(is.na(tbl[apply(!is.na(tbl[, val_col, drop = FALSE]), 1, any), need_col, drop = FALSE]), 2, all)]
-            # tb_nna <- tbl %>% select(all_of(val_col))
+            # tb_nna <- tbl |> select(all_of(val_col))
             if (anyDuplicated(colnames(val_col))) browser() # mappings check
             ii <- apply(!is.na(select(all_of(val_col))), 1, any)
             ii <- apply(is.na(filter(tbl, ii)), 2, all)
@@ -635,12 +635,12 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # allpar <- c(allpar, "mSupAva") # add sup with default/missing data
   # mCommReg <- lapply(scen@modInp@parameters[allpar], function(x) {
   #   if (!all(c("comm", "region") %in% x@dimSets)) return(NULL)
-  #   select(x@data, comm, region) %>% unique()
-  # }) %>%
-  #   rbindlist() %>%
+  #   select(x@data, comm, region) |> unique()
+  # }) |>
+  #   rbindlist() |>
   #   unique()
   # browser()
-  mCommReg <- fmCommReg(scen@model, scen@settings@region) %>%
+  mCommReg <- fmCommReg(scen@model, scen@settings@region) |>
     filter(region %in% scen@settings@region)
   scen@modInp@parameters[["mCommReg"]] <-
     .dat2par(scen@modInp@parameters[["mCommReg"]], mCommReg)
@@ -799,7 +799,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # filter parameters by (comm, region)
   filter_params <- c("pDummyExportCost", "pDummyImportCost")
   for (p in filter_params) {
-    d <- scen@modInp@parameters[[p]]@data %>%
+    d <- scen@modInp@parameters[[p]]@data |>
       inner_join(scen@modInp@parameters[["mCommReg"]]@data,
                  by = c("comm", "region"))
     scen@modInp@parameters[[p]]@data <- scen@modInp@parameters[[p]]@data[0,]
@@ -887,7 +887,7 @@ subset_slices <- function(obj, yearFraction = 1, keep_slices = NULL) {
   # summary(ii)
   for (s in slot_names[ii]) {
     # stop()
-    slot(obj, s) <- slot(obj, s) %>%
+    slot(obj, s) <- slot(obj, s) |>
       filter(slice %in% keep_slices)
   }
   #
@@ -1552,7 +1552,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
       int_err <- unique(c(int_err, prm@dimSets[!(prm@dimSets %in% names(lsets))]))
     } else {
       # tmp <- .get_data_slot(prm)[, prm@dimSets, drop = FALSE]
-      tmp <- .get_data_slot(prm) %>% select(prm@dimSets)
+      tmp <- .get_data_slot(prm) |> select(prm@dimSets)
       for (ss in prm@dimSets) {
         unq <- unique(tmp[[ss]])
         fl <- !(unq %in% lsets[[ss]])
@@ -1565,7 +1565,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
         }
       }
       # tmp <- .get_data_slot(prm)[, colnames(prm@data) != "value", drop = FALSE]
-      tmp <- .get_data_slot(prm) %>% select(-any_of("value"))
+      tmp <- .get_data_slot(prm) |> select(-any_of("value"))
       tmp <- tmp[duplicated(tmp), , drop = FALSE]
       # tmp <- filter(duplicated(tmp)) # need if_empty check
       if (nrow(tmp) != 0) {
@@ -1734,14 +1734,14 @@ interpolate_slot <- function(
   if (!is.null(x$year)) {
     # year_seq = full_seq(c(x$year, year_seq), 1)
     if (is.null(year_seq)) year_seq = full_seq(x$year, 1)
-    x <- x %>%
+    x <- x |>
       group_by(
         across(any_of(keys))
-      ) %>%
+      ) |>
       complete(year = year_seq) |>
       ungroup()
     if (!is.null(val) && !is.na(val)) {
-      x <- x %>%
+      x <- x |>
         mutate(
           {{val}} := zoo::na.approx(.data[[val]], x = year)
         )
@@ -1751,8 +1751,8 @@ interpolate_slot <- function(
     #
     # mutate(
     #   {{val}} := zoo::na.approx(.data[[val]], x = year)
-    # ) %>%
-    # as.data.table() %>%
+    # ) |>
+    # as.data.table() |>
     # ungroup()
   x
 }

@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development version
-Version: 0.50.1
-Date: 2024-09-25
+Version: 0.50.2
+Date: 2024-10-15
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -23,36 +23,39 @@ BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy systems modeling toolbox in R
 Depends: R (>= 4.3)
 Imports: 
+    methods,
+    generics,
     data.table,
     DBI,
     RSQLite,
-    magrittr,
     tibble,
     tidyr,
     dplyr,
     dtplyr,
-    ggplot2,
     rlang,
+    stringr,
+    lubridate,
     purrr,
     arrow,
     progressr,
     tictoc,
     cli,
-    reticulate,
-    registry,
     zoo,
     registry,
     options (>= 0.2.0),
-    stringr,
-    lubridate,
-    yaml
+    glue,
+    plyr
 Suggests: 
-    gdxrrw,
+    pak,
     gdxtools,
     knitr,
     rmarkdown,
     sf,
-    testthat (>= 3.0.0)
+    yaml,
+    ggplot2,
+    testthat (>= 3.0.0),
+    devtools
+SystemRequirements: Julia (>= 1.6) with JuMP or Python (>= 3.7) with Pyomo or GAMS (>= 24.9) or GLPK (>= 4.0)
 License: AGPL (>= 3)
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
@@ -60,6 +63,7 @@ LazyData: true
 Encoding: UTF-8
 Collate: 
     'defaults.R'
+    'docs.R'
     'options.R'
     'generics.R'
     'class-calendar.R'
@@ -105,7 +109,6 @@ Collate:
     'solve.R'
     'start_msg.R'
     'timeslices.R'
-    'utils-pipe.R'
     'write.R'
     'write_gams.R'
     'write_glpk.R'
@@ -113,3 +116,4 @@ Collate:
     'write_pyomo.R'
 Config/testthat/edition: 3
 Config/testthat/parallel: false
+Roxygen: list(markdown = TRUE)

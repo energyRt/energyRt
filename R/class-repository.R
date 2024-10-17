@@ -64,10 +64,10 @@ newRepository <- function(name = "default_repository", ...) {
 }
 
 if (F) {
-  newRepository() #%>% print()
-  newRepository("repo", ELC, GAS) #%>% print()
-  newRepository("repo", ELC, GAS, ECOA) %>% print()
-  newRepository("repo", ELC, GAS, ECOA, TRBD_ELC) %>% print()
+  newRepository() #|> print()
+  newRepository("repo", ELC, GAS) #|> print()
+  newRepository("repo", ELC, GAS, ECOA) |> print()
+  newRepository("repo", ELC, GAS, ECOA, TRBD_ELC) |> print()
 
 }
   # nn <- rep(FALSE, length(arg)) # imported args
@@ -180,12 +180,12 @@ setMethod("summary", signature(object = "repository"), function(object, ...) {
 #' @export
 setMethod("add", signature("repository"), function(obj, ..., overwrite = FALSE) {
   # browser()
-  arg = list(...) %>% unlist()
+  arg = list(...) |> unlist()
   if (is_empty(arg)) return(obj)
   arg <- sapply(arg, function(x) {
     if (class(x)[1] == "repository") return(x@data)
     x
-  }) %>% list_flatten()
+  }) |> list_flatten()
   ii <- sapply(arg, function(x) class(x)[1] %in% obj@permit)
   for (ob in arg[ii]) {
     if (!is.null(obj@data[[ob@name]]) && !overwrite) {

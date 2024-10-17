@@ -337,12 +337,12 @@ if (F) {
   isInMemory(scen_ondisk)
   size(scen)
   size(scen_ondisk)
-  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size %>% sum()
+  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size |> sum()
   scen_ondisk2 <- obj2disk(scen_ondisk, fp("scenarios", scen@name),
     verbose = T
   )
   isInMemory(scen_ondisk2)
-  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size %>% sum()
+  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size |> sum()
   # obj2disk(scen@modOut, fp("scenarios", scen@name), verbose = T)
 }
 
@@ -380,7 +380,7 @@ en_open_dataset <- function(path, format = NULL, engine = "arrow") {
   # if (basename(path) == "vObjective") browser()
   # identify format
   ff <- list.files(path)
-  ext <- tools::file_ext(ff) %>% unique()
+  ext <- tools::file_ext(ff) |> unique()
   if (is.null(format)) {
     if (all(ext %in% "csv")) {
       format <- "csv"
@@ -598,16 +598,16 @@ if (F) {
     InMemory = F,
     path = "scenarios/base"
   ) |>
-    collect() %>%
+    collect() |>
     as.data.table()
 
-  get_lazy_data(scen@modOut@variables, element = "vObjective", InMemory = T) %>%
+  get_lazy_data(scen@modOut@variables, element = "vObjective", InMemory = T) |>
     collect()
   get_lazy_data(scen@modOut@variables,
     element = "vObjective",
     InMemory = F,
     path = "scenarios/base/variables"
-  ) %>%
+  ) |>
     collect()
 }
 
@@ -696,9 +696,9 @@ if (F) {
   mi@misc
 }
 
-load_scenario <- function(path, inMemory = FALSE) {
-
-}
+# load_scenario <- function(path, inMemory = FALSE) {
+#
+# }
 
 if (F) {
   findData(scen, "")

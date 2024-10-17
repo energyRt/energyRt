@@ -8,9 +8,11 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' set_glpk_path("/usr/local/bin/glpk") # Linux & Mac
 #' set_glpk_path("C:/Program Files/glpk/bin") # Windows
 #' get_glpk_path()
+#' }
 set_glpk_path <- function(path = NULL) {
   # browser()
   if (!is.null(path) && path != "") {
@@ -211,7 +213,7 @@ get_glpk_path <- function() {
     gg <- obj@data
     gg <- gg[gg$type == "lo", , drop = FALSE]
     # gg <- gg[, colnames(gg) != "type"]
-    gg <- gg %>% select(-any_of("type"))
+    gg <- gg |> select(-any_of("type"))
     if (nrow(gg) == 0) { #  || all(gg$value[1] == gg$value)
       if (nrow(gg) == 0) dd <- obj@defVal[1] else dd <- gg$value[1]
       if (dd == Inf) dd <- 0
@@ -235,7 +237,7 @@ get_glpk_path <- function() {
     gg <- obj@data
     gg <- gg[gg$type == "up", , drop = FALSE]
     # gg <- gg[, colnames(gg) != "type"]
-    gg <- gg %>% select(-any_of("type"))
+    gg <- gg |> select(-any_of("type"))
     if (nrow(gg) == 0) { #  || all(gg$value[1] == gg$value)
       if (nrow(gg) == 0) dd <- obj@defVal[2] else dd <- gg$value[1]
       if (dd == Inf) dd <- 0
