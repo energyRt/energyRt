@@ -18,8 +18,27 @@ drafts/
 depreciated/
 scenarios/
 ^scenarios$
+dev/
 
+^gams$
+^julia$
+^glpk$
+^pyomo$
+^drafts$
+^scenarios$
+vignettes/scenarios/
+tmp/
+.archive$
+.formatted$
+.unformatted$
+\.~gm$
+\.log$
+\.lst$
+\.~gm$
+\.lxi$
 
+\.vs$
+depreciated/*
+dev/*
 
-
-
+^LICENSE\.md$

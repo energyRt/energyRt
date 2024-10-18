@@ -28,7 +28,7 @@ save_scenario <- function(
     verbose = TRUE) {
   # identify directories
   if (is.null(path)) {
-    scen@path <- file.path("scenarios", scen@name)
+    scen@path <- fp("scenarios", scen@name)
     message("Scenarios directory: ", scen@path)
   } else {
     scen@path <- path
@@ -49,7 +49,7 @@ save_scenario <- function(
     if (write_log) {
       ff <- list.files(scen@path, include.dirs = TRUE)
       ff <- ff[!(ff == "logfile.csv")]
-      clear_status <- unlink(file.path(scen@path, ff),
+      clear_status <- unlink(fp(scen@path, ff),
         recursive = TRUE,
         force = TRUE
       )
@@ -61,7 +61,7 @@ save_scenario <- function(
       }
       rm(ff)
     } else {
-      clear_status <- unlink(file.path(scen@path),
+      clear_status <- unlink(fp(scen@path),
         force = TRUE,
         recursive = TRUE
       )
@@ -76,11 +76,11 @@ save_scenario <- function(
   }
 
   # write format and log
-  format_file <- file.path(scen@path, "format")
+  format_file <- fp(scen@path, "format")
   write(format, format_file, append = FALSE)
-  class_file <- file.path(scen@path, "class")
+  class_file <- fp(scen@path, "class")
   write(class(scen), class_file, append = FALSE)
-  log_file <- (file.path(scen@path, "logfile.csv"))
+  log_file <- (fp(scen@path, "logfile.csv"))
   write(paste(lubridate::now(tzone = "UTC"), "format", format, sep = ","),
     file = log_file, append = TRUE
   )
@@ -99,7 +99,7 @@ save_scenario <- function(
     verbose = verbose
   )
   # message("Saving the thinned scenario object")
-  save(scen, file = file.path(scen@path, "scen.RData"))
+  save(scen, file = fp(scen@path, "scen.RData"))
   cat("Scenario '", scen@name, "' saved in '", scen@path, "'\n", sep = "")
   dirsize <- dir_size(scen@path)
   cat("Directory size: ", round(dirsize / 1024^2, 2), " MB\n", sep = "")
@@ -114,7 +114,7 @@ if (F) {
   getObjPath(scen)
   scen_ondisk <- save_scenario(
     scen = scen,
-    path = file.path("tmp/scenarios", scen@name),
+    path = fp("tmp/scenarios", scen@name),
     verbose = T
   )
   isInMemory(scen_ondisk)
@@ -148,8 +148,8 @@ data2disk <- function(obj, path = NULL, format = "parquet", verbose = FALSE) {
     if (anyDuplicatedSets(obj)) obj <- rename_duplicated_sets(obj)
     dir.create(path, recursive = T, showWarnings = F)
     arrow::write_dataset(obj, path = path, format = format)
-    # write(format, file = file.path(path, "format"), append = FALSE)
-    # write(obj_class, file = file.path(path, "class"), append = FALSE)
+    # write(format, file = fp(path, "format"), append = FALSE)
+    # write(obj_class, file = fp(path, "class"), append = FALSE)
     return(invisible(TRUE))
   } else if (inherits(obj, c("character", "numeric", "logical"))) {
     # if (verbose) cat(path, "csv", "\n")
@@ -158,11 +158,11 @@ data2disk <- function(obj, path = NULL, format = "parquet", verbose = FALSE) {
     # browser()
     obj <- as.data.table(obj)
     data.table::setnames(obj, old = "obj", new = basename(path))
-    # fwrite(obj, file = file.path(path, "obj.csv"))
+    # fwrite(obj, file = fp(path, "obj.csv"))
     dir.create(path, recursive = T, showWarnings = F)
     arrow::write_dataset(obj, path = path, format = "csv")
-    # write(obj_class, file = file.path(path, "class"), append = FALSE)
-    # write("csv", file = file.path(path, "format"), append = FALSE)
+    # write(obj_class, file = fp(path, "class"), append = FALSE)
+    # write("csv", file = fp(path, "format"), append = FALSE)
     return(invisible(TRUE))
   }
   return(FALSE)
@@ -203,7 +203,7 @@ obj2disk <- function(
         # cat("slot ", s, ": \n", sep = "")
         slot(obj, s) <- obj2disk(
           slot(obj, s),
-          path = file.path(path, s),
+          path = fp(path, s),
           format = format,
           verbose = verbose
         )
@@ -239,7 +239,7 @@ obj2disk <- function(
             # cat("\n", s, i, "\n")
             slot(obj, s)[[i]] <- obj2disk(
               slot(obj, s)[[i]],
-              path = file.path(path, s, i),
+              path = fp(path, s, i),
               save_not_S4 = TRUE,
               format = format,
               verbose = verbose
@@ -257,7 +257,7 @@ obj2disk <- function(
               xs <- data2disk(
                 # !!! check why not all data.frames are data.tables
                 obj = as.data.table(slot(obj, s)[[i]]),
-                path = file.path(path, s, i),
+                path = fp(path, s, i),
                 format = format,
                 verbose = verbose
               )
@@ -267,7 +267,7 @@ obj2disk <- function(
                 # browser()
                 slot(obj, s)[[i]] <- reset_slot(slot(obj, s)[[i]])
                 # slot(obj, s) <- setObjPath(slot(obj, s),
-                # path = file.path(path, s))
+                # path = fp(path, s))
               }
             }
           }
@@ -282,7 +282,7 @@ obj2disk <- function(
         if (save_i) {
           xs <- data2disk(
             obj = slot(obj, s),
-            path = file.path(path, s),
+            path = fp(path, s),
             format = format,
             verbose = verbose
           )
@@ -291,7 +291,7 @@ obj2disk <- function(
             # browser()
             # store dim
             slot(obj, s) <- reset_slot(slot(obj, s))
-            obj <- setObjPath(obj, path = file.path(path))
+            obj <- setObjPath(obj, path = fp(path))
           }
         }
       }
@@ -299,7 +299,7 @@ obj2disk <- function(
   } else if (save_not_S4) {
     x <- data2disk(
       obj = obj,
-      path = file.path(path),
+      path = fp(path),
       format = format, verbose = verbose
     )
     if (x) {
@@ -332,18 +332,18 @@ reset_slot <- function(x) {
 if (F) {
   isOnDisk(scen)
   isInMemory(scen)
-  scen_ondisk <- obj2disk(scen, file.path("scenarios", scen@name), verbose = F)
+  scen_ondisk <- obj2disk(scen, fp("scenarios", scen@name), verbose = F)
   isOnDisk(scen_ondisk)
   isInMemory(scen_ondisk)
   size(scen)
   size(scen_ondisk)
-  fs::dir_info(file.path("scenarios", scen@name), recurse = T)$size %>% sum()
-  scen_ondisk2 <- obj2disk(scen_ondisk, file.path("scenarios", scen@name),
+  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size |> sum()
+  scen_ondisk2 <- obj2disk(scen_ondisk, fp("scenarios", scen@name),
     verbose = T
   )
   isInMemory(scen_ondisk2)
-  fs::dir_info(file.path("scenarios", scen@name), recurse = T)$size %>% sum()
-  # obj2disk(scen@modOut, file.path("scenarios", scen@name), verbose = T)
+  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size |> sum()
+  # obj2disk(scen@modOut, fp("scenarios", scen@name), verbose = T)
 }
 
 rename_duplicated_sets <- function(x) {
@@ -380,7 +380,7 @@ en_open_dataset <- function(path, format = NULL, engine = "arrow") {
   # if (basename(path) == "vObjective") browser()
   # identify format
   ff <- list.files(path)
-  ext <- tools::file_ext(ff) %>% unique()
+  ext <- tools::file_ext(ff) |> unique()
   if (is.null(format)) {
     if (all(ext %in% "csv")) {
       format <- "csv"
@@ -424,7 +424,7 @@ if (F) {
     collect()
 }
 
-#' Is object stored on disk?
+#' Is object stored in memory?
 #'
 #' @param obj Object, checks
 #'
@@ -598,16 +598,16 @@ if (F) {
     InMemory = F,
     path = "scenarios/base"
   ) |>
-    collect() %>%
+    collect() |>
     as.data.table()
 
-  get_lazy_data(scen@modOut@variables, element = "vObjective", InMemory = T) %>%
+  get_lazy_data(scen@modOut@variables, element = "vObjective", InMemory = T) |>
     collect()
   get_lazy_data(scen@modOut@variables,
     element = "vObjective",
     InMemory = F,
     path = "scenarios/base/variables"
-  ) %>%
+  ) |>
     collect()
 }
 
@@ -696,9 +696,9 @@ if (F) {
   mi@misc
 }
 
-load_scenario <- function(path, inMemory = FALSE) {
-
-}
+# load_scenario <- function(path, inMemory = FALSE) {
+#
+# }
 
 if (F) {
   findData(scen, "")
@@ -732,7 +732,7 @@ load_scenario <- function(
   }
   finf <- file.info(path)
   if (finf$isdir) {
-    path <- file.path(path, "scen.RData")
+    path <- fp(path, "scen.RData")
     if (!file.exists(path)) {
       msg <- paste0("Scenario file '", path, "' has not been found.")
       if (!ignore_errors) stop(msg)
@@ -804,7 +804,7 @@ obj2mem <- function(obj, verbose = TRUE) {
   if (length(sls) == 0) browser()
   obj_pth <- getObjPath(obj)
   for (s in sls) {
-    pth <- file.path(obj_pth, s)
+    pth <- fp(obj_pth, s)
     if (isS4(slot(obj, s))) {
       # cat(getObjPath(slot(obj, s)), "\n")
       slot(obj, s) <- obj2mem(slot(obj, s))
@@ -815,7 +815,7 @@ obj2mem <- function(obj, verbose = TRUE) {
           slot(obj, s)[[i]] <- obj2mem(slot(obj, s)[[i]])
         } else {
           if (obj@misc$onDisk[[s]][[i]]$dim[1] == 0) next
-          pth2 <- file.path(pth, i)
+          pth2 <- fp(pth, i)
           if(verbose) cat(pth2, "\n")
           slot(obj, s)[[i]] <- en_open_dataset(pth2) |> collect()}
       }

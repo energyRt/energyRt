@@ -15,7 +15,9 @@ size(
 )
 }
 \arguments{
-\item{x}{- any R object}
+\item{x}{\itemize{
+\item any R object
+}}
 
 \item{asNumeric}{}
 }

@@ -112,6 +112,7 @@ if (F) {
 #' tsl2dtm(tsl[3:4], year = 1900)
 tsl2dtm <- function(tsl, format = tsl_guess_format(tsl), tmz = "UTC",
                     year = NULL, mday = NULL) {
+  # browser()
   if (is.null(format)) return(NULL)
   y <- NULL; m <- NULL; d <- NULL; h <- NULL
   if (grepl("y", format)) y <- tsl2year(tsl)

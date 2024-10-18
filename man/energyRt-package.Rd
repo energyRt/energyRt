@@ -4,24 +4,30 @@
 \name{energyRt-package}
 \alias{energyRt}
 \alias{energyRt-package}
-\title{energyRt: Energy systems modeling toolbox in R, development (alpha) version}
+\title{energyRt: Energy systems modeling toolbox in R, development version}
 \description{
 Energy systems modeling toolbox in R
 }
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://energyRt.org}
   \item \url{https://github.com/energyRt/energyRt}
   \item Report bugs at \url{https://github.com/energyRt/energyRt/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Oleg Lugovoy \email{olugovoy@gmail.com}
+\strong{Maintainer}: Oleg Lugovoy \email{olugovoy@optimalsolution.dev} (\href{https://orcid.org/0000-0001-5546-9875}{ORCID})
 
 Authors:
 \itemize{
   \item Vladimir Potashnikov \email{potashnikov.vu@gmail.com}
+}
+
+Other contributors:
+\itemize{
+  \item Tarun Sharma \email{tarunsharma@ms.iitr.ac.in} (\href{https://orcid.org/0000-0003-3636-2858}{ORCID}) [contributor]
 }
 
 }

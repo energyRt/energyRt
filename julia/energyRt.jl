@@ -391,17 +391,27 @@ print("eqTechAInp(tech, comm, region, year, slice)...")
     else
         0
     end) +
-    (if (t, c, r, y, s) in mTechCap2AInp
-        (vTechCap[(t, r, y)] * (
-            if haskey(pTechCap2AInp, (t, c, r, y, s))
-                pTechCap2AInp[(t, c, r, y, s)]
-            else
-                pTechCap2AInpDef
-            end
-        ))
-    else
-        0
-    end) +
+    (
+        if (t, c, r, y, s) in mTechCap2AInp
+            (
+                (vTechCap[(t, r, y)] * (
+                    if haskey(pTechCap2AInp, (t, c, r, y, s))
+                        pTechCap2AInp[(t, c, r, y, s)]
+                    else
+                        pTechCap2AInpDef
+                    end
+                )) / ((
+                    if haskey(pTechCap2act, (t))
+                        pTechCap2act[(t)]
+                    else
+                        pTechCap2actDef
+                    end
+                ))
+            )
+        else
+            0
+        end
+    ) +
     (if (t, c, r, y, s) in mTechNCap2AInp
         (vTechNewCap[(t, r, y)] * (
             if haskey(pTechNCap2AInp, (t, c, r, y, s))
@@ -457,17 +467,27 @@ print("eqTechAOut(tech, comm, region, year, slice)...")
     else
         0
     end) +
-    (if (t, c, r, y, s) in mTechCap2AOut
-        (vTechCap[(t, r, y)] * (
-            if haskey(pTechCap2AOut, (t, c, r, y, s))
-                pTechCap2AOut[(t, c, r, y, s)]
-            else
-                pTechCap2AOutDef
-            end
-        ))
-    else
-        0
-    end) +
+    (
+        if (t, c, r, y, s) in mTechCap2AOut
+            (
+                (vTechCap[(t, r, y)] * (
+                    if haskey(pTechCap2AOut, (t, c, r, y, s))
+                        pTechCap2AOut[(t, c, r, y, s)]
+                    else
+                        pTechCap2AOutDef
+                    end
+                )) / ((
+                    if haskey(pTechCap2act, (t))
+                        pTechCap2act[(t)]
+                    else
+                        pTechCap2actDef
+                    end
+                ))
+            )
+        else
+            0
+        end
+    ) +
     (if (t, c, r, y, s) in mTechNCap2AOut
         (vTechNewCap[(t, r, y)] * (
             if haskey(pTechNCap2AOut, (t, c, r, y, s))
@@ -1256,6 +1276,58 @@ print("eqTechRetiredStock(tech, region, year)...")
     vTechRetiredStock[(t, r, y)] ==
     vTechRetiredStockCum[(t, r, y)] -
     sum(vTechRetiredStockCum[(t, r, yp)] for yp in year if (yp, y) in mMilestoneNext)
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechRetUp(tech, region, year)$mTechRetUp(tech, region, year)
+print("eqTechRetUp(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechRetUp],
+    (if (t, r, y) in mvTechRetiredStock
+        vTechRetiredStock[(t, r, y)]
+    else
+        0
+    end) + sum(
+        vTechRetiredNewCap[(t, r, y, yp)] for
+        yp in year if (t, r, y, yp) in mvTechRetiredNewCap
+    ) <= (
+        if haskey(pTechRetUp, (t, r, y))
+            pTechRetUp[(t, r, y)]
+        else
+            pTechRetUpDef
+        end
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechRetLo(tech, region, year)$mTechRetLo(tech, region, year)
+print("eqTechRetLo(tech, region, year)...")
+@constraint(
+    model,
+    [(t, r, y) in mTechRetLo],
+    (if (t, r, y) in mvTechRetiredStock
+        vTechRetiredStock[(t, r, y)]
+    else
+        0
+    end) + sum(
+        vTechRetiredNewCap[(t, r, y, yp)] for
+        yp in year if (t, r, y, yp) in mvTechRetiredNewCap
+    ) >= (
+        if haskey(pTechRetLo, (t, r, y))
+            pTechRetLo[(t, r, y)]
+        else
+            pTechRetLoDef
+        end
+    )
 );
 print(
     " ",
@@ -3764,12 +3836,7 @@ print("eqCost(region, year)...")
             else
                 pTechRetCostDef
             end
-        ) * (
-            vTechRetiredStock[(t, r, y)] + sum(
-                vTechRetiredNewCap[(t, r, yp, y)] for
-                yp in year if (t, r, yp, y) in mvTechRetiredNewCap
-            )
-        ) for t in tech if (t, r, y) in mvTechRetiredStock
+        ) * (vTechRetiredStock[(t, r, y)]) for t in tech if (t, r, y) in mvTechRetiredStock
     ) +
     sum(
         (

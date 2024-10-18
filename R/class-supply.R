@@ -13,9 +13,28 @@
 #'
 #' @include class-demand.R
 #'
-#' @return
+#' @return supply object with given specifications.
 #' @export
-#'
+#' @examples
+#' SUP_COA <- newSupply(
+#'    name = "SUP_COA",
+#'    desc = "Coal supply",
+#'    commodity = "COA",
+#'    unit = "PJ",
+#'    reserve = data.frame(
+#'       region = c("R1", "R2", "R3"),
+#'       res.up = c(2e5, 1e4, 3e6) # total reserves/deposits
+#'    ),
+#'    availability = data.frame(
+#'       region = c("R1", "R2", "R3"),
+#'       year = NA_integer_,
+#'       slice = "ANNUAL",
+#'       ava.up = c(1e3, 1e2, 2e2), # annual availability
+#'       cost = c(10, 20, 30) # cost of the resource (currency per unit)
+#'    ),
+#'    region = c("R1", "R2", "R3")
+#'  )
+#' class(SUP_COA)
 setClass("supply",
   representation(
     name = "character",

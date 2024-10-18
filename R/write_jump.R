@@ -121,10 +121,10 @@ get_julia_path <- function() {
       }
     }
   }
-  dir.create(file.path(arg$tmp.dir, "output"), showWarnings = FALSE)
-  zz_data_julia <- file(file.path(arg$tmp.dir, "data.jl"), "w")
-  zz_data_constr <- file(file.path(arg$tmp.dir, "inc_constraints.jl"), "w")
-  zz_data_costs <- file(file.path(arg$tmp.dir, "/inc_costs.jl"), "w")
+  dir.create(fp(arg$tmp.dir, "output"), showWarnings = FALSE)
+  zz_data_julia <- file(fp(arg$tmp.dir, "data.jl"), "w")
+  zz_data_constr <- file(fp(arg$tmp.dir, "inc_constraints.jl"), "w")
+  zz_data_costs <- file(fp(arg$tmp.dir, "/inc_costs.jl"), "w")
 
   .write_inc_solver(
     scen, arg,
@@ -161,7 +161,7 @@ get_julia_path <- function() {
     if (is.data.table(x)) as.data.frame(x) else x
     })
 
-  save("dat", file = file.path(arg$tmp.dir, "data.RData"))
+  save("dat", file = fp(arg$tmp.dir, "data.RData"))
 
   cat('using RData\nusing DataFrames\ndt = load("data.RData")["dat"]\n',
     sep = "\n", file = zz_data_julia
@@ -183,7 +183,7 @@ get_julia_path <- function() {
   }
   close(zz_data_julia)
   # Mod begin
-  zz_mod <- file(file.path(arg$tmp.dir, "energyRt.jl"), "w")
+  zz_mod <- file(fp(arg$tmp.dir, "energyRt.jl"), "w")
   nobj <- grep("^[@]objective", run_code)[1] - 1
   cat(run_code[1:nobj], sep = "\n", file = zz_mod)
   # Add constraint
@@ -218,7 +218,7 @@ get_julia_path <- function() {
   close(zz_data_costs)
   cat(run_code[-(1:nobj)], sep = "\n", file = zz_mod)
   close(zz_mod)
-  zz_modout <- file(file.path(arg$tmp.dir, "/output.jl"), "w")
+  zz_modout <- file(fp(arg$tmp.dir, "/output.jl"), "w")
   cat(run_codeout, sep = "\n", file = zz_modout)
   close(zz_modout)
   .write_inc_files(arg, scen, ".jl")
@@ -228,7 +228,7 @@ get_julia_path <- function() {
     #   # "julia energyRt.jl"
     fpath <- get_julia_path()
     if (!is.null(fpath)) {
-      scen@settings@solver$cmdline <- file.path(fpath, "julia energyRt.jl")
+      scen@settings@solver$cmdline <- fp(fpath, "julia energyRt.jl")
     } else {
       scen@settings@solver$cmdline <- "julia energyRt.jl"
     }

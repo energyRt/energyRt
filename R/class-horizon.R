@@ -83,10 +83,10 @@ setClass(
 #'              end =   c(2032, 2034, 2040)))
 newHorizon <- function(period = NULL,
                        intervals = NULL,
-                       desc = NULL,
                        mid_is_end = FALSE,
                        mid_is_start = FALSE,
                        force_BY_interval_to_1_year = T,
+                       desc = NULL,
                        name = NULL,
                        ...) {
   # browser()
@@ -95,14 +95,17 @@ newHorizon <- function(period = NULL,
     stopifnot(is.character(desc))
     h@desc <- as.character(desc)
   }
-
+  if (!is.null(name)) {
+    stopifnot(is.character(name))
+    h@name <- as.character(name)
+  }
   if (mid_is_end & mid_is_start) {
     stop("Only one of parameters 'mid_is_end' and  'mid_is_start' can be TRUE")
   }
 
   if (!is.null(period)) {
     .check_integer(period, ": period")
-    period <- min(period):max(period) %>% as.integer()
+    period <- min(period):max(period) |> as.integer()
   }
 
   if (!is.null(intervals)) {
@@ -110,9 +113,9 @@ newHorizon <- function(period = NULL,
       .check_intervals(intervals)
       intervals <- as.data.table(intervals)
       intervals <- intervals[order(start)]
-      int_range <- as.list(intervals) %>%
-        unlist() %>%
-        range() %>%
+      int_range <- as.list(intervals) |>
+        unlist() |>
+        range() |>
         as.integer()
       # next step: merge the data.frame with `period`
     } else if (is.numeric(intervals)) {
@@ -144,11 +147,11 @@ newHorizon <- function(period = NULL,
         intervals$end[nr] <- max(period)
         intervals$mid[nr] <- round(mean(intervals$start[nr], intervals$end[nr]))
       }
-      int_range <- intervals %>%
-        as.list() %>%
-        unlist() %>%
-        as.vector() %>%
-        range() %>%
+      int_range <- intervals |>
+        as.list() |>
+        unlist() |>
+        as.vector() |>
+        range() |>
         as.integer()
       period <- period[period >= min(int_range) & period <= max(int_range)]
       h@period <- period
@@ -173,12 +176,12 @@ newHorizon <- function(period = NULL,
   }
 
   if (is.null(period)) {
-    period <- min(int_range):max(int_range) %>% as.integer()
+    period <- min(int_range):max(int_range) |> as.integer()
   } else { # merge `period` vector with `intervals` data.table
     period <- seq(max(min(int_range), min(period)),
       min(max(int_range), max(period)),
       by = 1L
-    ) %>% as.integer()
+    ) |> as.integer()
     intervals <- intervals[start >= min(period) & end <= max(period), ]
   }
 

@@ -349,7 +349,10 @@ model.eqTechAInp = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * model.pTechCap2AInp[t, c, r, y, s])
+        (
+            (model.vTechCap[t, r, y] * model.pTechCap2AInp[t, c, r, y, s])
+            / (model.pTechCap2act[t])
+        )
         if (t, c, r, y, s) in model.mTechCap2AInp
         else 0
     )
@@ -379,7 +382,10 @@ model.eqTechAOut = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * model.pTechCap2AOut[t, c, r, y, s])
+        (
+            (model.vTechCap[t, r, y] * model.pTechCap2AOut[t, c, r, y, s])
+            / (model.pTechCap2act[t])
+        )
         if (t, c, r, y, s) in model.mTechCap2AOut
         else 0
     )
@@ -650,6 +656,32 @@ model.eqTechRetiredStock = Constraint(
         for yp in model.year
         if (yp, y) in model.mMilestoneNext
     ),
+)
+# eqTechRetUp(tech, region, year)$mTechRetUp(tech, region, year)
+model.eqTechRetUp = Constraint(
+    model.mTechRetUp,
+    rule=lambda model, t, r, y: (
+        model.vTechRetiredStock[t, r, y] if (t, r, y) in model.mvTechRetiredStock else 0
+    )
+    + sum(
+        model.vTechRetiredNewCap[t, r, y, yp]
+        for yp in model.year
+        if (t, r, y, yp) in model.mvTechRetiredNewCap
+    )
+    <= model.pTechRetUp[t, r, y],
+)
+# eqTechRetLo(tech, region, year)$mTechRetLo(tech, region, year)
+model.eqTechRetLo = Constraint(
+    model.mTechRetLo,
+    rule=lambda model, t, r, y: (
+        model.vTechRetiredStock[t, r, y] if (t, r, y) in model.mvTechRetiredStock else 0
+    )
+    + sum(
+        model.vTechRetiredNewCap[t, r, y, yp]
+        for yp in model.year
+        if (t, r, y, yp) in model.mvTechRetiredNewCap
+    )
+    >= model.pTechRetLo[t, r, y],
 )
 # eqTechEac(tech, region, year)$mTechEac(tech, region, year)
 model.eqTechEac = Constraint(
@@ -1747,15 +1779,7 @@ model.eqCost = Constraint(
     rule=lambda model, r, y: model.vTotalCost[r, y]
     == sum(model.vTechEac[t, r, y] for t in model.tech if (t, r, y) in model.mTechEac)
     + sum(
-        model.pTechRetCost[t, r, y]
-        * (
-            model.vTechRetiredStock[t, r, y]
-            + sum(
-                model.vTechRetiredNewCap[t, r, yp, y]
-                for yp in model.year
-                if (t, r, yp, y) in model.mvTechRetiredNewCap
-            )
-        )
+        model.pTechRetCost[t, r, y] * (model.vTechRetiredStock[t, r, y])
         for t in model.tech
         if (t, r, y) in model.mvTechRetiredStock
     )

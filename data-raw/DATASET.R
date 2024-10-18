@@ -59,6 +59,77 @@ styler::style_file("R/defaults.R")
 
 # DefVal <- .defVal
 
+# Roxygen docs ####
+# write/edit .yaml files in data-raw/
+yaml_to_df <- function(yaml_content) {
+
+  # Recursive helper function to process slots and extract relevant information
+  process_slot <- function(class_name, slot_name, slot_data) {
+    result <- list()
+
+    # Extract common attributes: description and type
+    description <- slot_data$description
+    slot_type <- slot_data$type
+
+    # Handle data.frame type with nested columns
+    if (slot_type == "data.frame" && !is.null(slot_data$columns)) {
+      # Process columns for data.frame
+      for (col_name in names(slot_data$columns)) {
+        col_data <- slot_data$columns[[col_name]]
+        result[[length(result) + 1]] <- tibble(
+          class = class_name,
+          slotname = slot_name,
+          description = description,
+          type = slot_type,
+          col.name = col_name,
+          col.type = col_data$type,
+          col.description = col_data$description
+        )
+      }
+    } else {
+      # Non data.frame slot, populate basic fields
+      result[[length(result) + 1]] <- tibble(
+        class = class_name,
+        slotname = slot_name,
+        description = description,
+        type = slot_type,
+        col.name = NA,
+        col.type = NA,
+        col.description = NA
+      )
+    }
+
+    return(bind_rows(result))
+  }
+
+  # Parse the YAML content using yaml::read_yaml
+  parsed_yaml <- yaml::read_yaml(yaml_content)
+
+  # Initialize an empty list to store results
+  all_results <- list()
+
+  # Extracting the 'technology' directly (as 'class')
+  for (tech_name in names(parsed_yaml$class)) {
+    tech_data <- parsed_yaml$class[[tech_name]]
+
+    # Process each slot within the technology
+    for (slot_name in names(tech_data)) {
+      slot_data <- tech_data[[slot_name]]
+
+      # Call process_slot for each item
+      all_results[[length(all_results) + 1]] <- process_slot("technology", slot_name, slot_data)
+    }
+  }
+
+  # Combine all results into a single DataFrame
+  final_df <- bind_rows(all_results)
+
+  return(final_df)
+}
+
+# classes
+.classes <- yaml_to_df("data-raw/classes.yml") |> as.data.frame()
+
 # .set_set,
 usethis::use_data(
   .dimSets,
@@ -66,6 +137,7 @@ usethis::use_data(
   # .defInt,
   # .defVal,
   # DefVal,
+  .classes,
   .set_dimSets,
   .set_description,
   .parameter_set,

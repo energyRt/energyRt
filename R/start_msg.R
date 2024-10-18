@@ -1,22 +1,10 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-glue::glue('energyRt version: {packageVersion("energyRt")} ({packageDate("energyRt")})'),
-"\n",
-"======================== WARNING ==========================\n",
-"The package is currently in preparation for its first release
-and publication on CRAN. The names, behavior, and meaning of
-functions, methods, and parameters are being reviewed and
-might be changed to improve the readability and
-transparency of the code, consistency with other libraries,
-functionality and features of the final product.
-Thanks for testing and your patience.
-Please report bugs, issues or suggest improvements here:
-https://github.com/energyRt/energyRt/issues\n",
-"-----------------------------------------------------------\n",
-"Change log: \n",
-"https://github.com/energyRt/energyRt/blob/dev/dev/changelog.txt\n",
-"==========================================================="
-  )
+    glue::glue('energyRt {utils::packageVersion("energyRt")}-dev ({utils::packageDate("energyRt")})'),
+    "\nDevelopment version, please report bugs/issues:",
+    "\nhttps://github.com/energyRt/energyRt/issues",
+    "\nStable 'beta': pak::pkg_install('energyRt/energyRt@v0.50')"
+    )
 
   # options
   # options(en.debug = FALSE)
@@ -29,6 +17,13 @@ https://github.com/energyRt/energyRt/issues\n",
   # progressr::handlers("pbcol")
   # progressr::handlers("progress")
   # progressr::handlers(global = TRUE)
+
+  # load global settings if exist
+  if (file.exists("~/.energyRt.R")) {
+    try({
+      source("~/.energyRt.R")
+    })
+  }
 
   # environments
   .initiate_env <- function(e) {

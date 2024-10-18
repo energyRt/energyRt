@@ -1,3 +1,4 @@
+#' @include docs.R
 # @eval options::as_roxygen_docs()
 
 # solver ####
@@ -161,7 +162,7 @@ which_registry <- function() {
 
 #' Returns the current registry object.
 #'
-#' @return
+#' @return The current registry object.
 #' @export
 get_registry <- function() {
   r <- which_registry()
@@ -182,4 +183,4 @@ get_registry <- function() {
 # write_lines(c(
 #   'energyRt::set_gams_path("...")',
 #   'energyRt::set_gdxlib_path("...")'
-# ), file = file.path(sys_dir, "settings.R"))
+# ), file = fp(sys_dir, "settings.R"))

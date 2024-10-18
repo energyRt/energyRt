@@ -39,9 +39,9 @@ con = sqlite3.connect("input/data.db")
 
 
 def read_set(name):
-   # tbl = pd.read_sql_query("SELECT * from " + name, con)
+    # tbl = pd.read_sql_query("SELECT * from " + name, con)
     query = f'SELECT * FROM "{name}"'
-    tbl = pd.read_sql_query(query, con)    
+    tbl = pd.read_sql_query(query, con)
     if tbl.shape[1] > 1:
         return tbl.to_records(index=False).tolist()
     else:
@@ -51,7 +51,7 @@ def read_set(name):
 def read_dict(name):
     # tbl = pd.read_sql_query("SELECT * from " + name, con)
     query = f'SELECT * FROM "{name}"'
-    tbl = pd.read_sql_query(query, con)    
+    tbl = pd.read_sql_query(query, con)
     if tbl.shape[1] > 2:
         idx = pd.MultiIndex.from_frame(tbl.drop(columns="value"))
     else:
@@ -483,7 +483,10 @@ model.eqTechAInp = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * pTechCap2AInp.get((t, c, r, y, s)))
+        (
+            (model.vTechCap[t, r, y] * pTechCap2AInp.get((t, c, r, y, s)))
+            / (pTechCap2act.get((t)))
+        )
         if (t, c, r, y, s) in mTechCap2AInp
         else 0
     )
@@ -524,7 +527,10 @@ model.eqTechAOut = Constraint(
         else 0
     )
     + (
-        (model.vTechCap[t, r, y] * pTechCap2AOut.get((t, c, r, y, s)))
+        (
+            (model.vTechCap[t, r, y] * pTechCap2AOut.get((t, c, r, y, s)))
+            / (pTechCap2act.get((t)))
+        )
         if (t, c, r, y, s) in mTechCap2AOut
         else 0
     )
@@ -1009,6 +1015,54 @@ model.eqTechRetiredStock = Constraint(
     - sum(
         model.vTechRetiredStockCum[t, r, yp] for yp in year if (yp, y) in mMilestoneNext
     ),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTechRetUp(tech, region, year)$mTechRetUp(tech, region, year)
+if verbose:
+    print("eqTechRetUp ", end="")
+sys.stdout.flush()
+model.eqTechRetUp = Constraint(
+    mTechRetUp,
+    rule=lambda model, t, r, y: (
+        model.vTechRetiredStock[t, r, y] if (t, r, y) in mvTechRetiredStock else 0
+    )
+    + sum(
+        model.vTechRetiredNewCap[t, r, y, yp]
+        for yp in year
+        if (t, r, y, yp) in mvTechRetiredNewCap
+    )
+    <= pTechRetUp.get((t, r, y)),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTechRetLo(tech, region, year)$mTechRetLo(tech, region, year)
+if verbose:
+    print("eqTechRetLo ", end="")
+sys.stdout.flush()
+model.eqTechRetLo = Constraint(
+    mTechRetLo,
+    rule=lambda model, t, r, y: (
+        model.vTechRetiredStock[t, r, y] if (t, r, y) in mvTechRetiredStock else 0
+    )
+    + sum(
+        model.vTechRetiredNewCap[t, r, y, yp]
+        for yp in year
+        if (t, r, y, yp) in mvTechRetiredNewCap
+    )
+    >= pTechRetLo.get((t, r, y)),
 )
 if verbose:
     print(
@@ -2827,15 +2881,7 @@ model.eqCost = Constraint(
     rule=lambda model, r, y: model.vTotalCost[r, y]
     == sum(model.vTechEac[t, r, y] for t in tech if (t, r, y) in mTechEac)
     + sum(
-        pTechRetCost.get((t, r, y))
-        * (
-            model.vTechRetiredStock[t, r, y]
-            + sum(
-                model.vTechRetiredNewCap[t, r, yp, y]
-                for yp in year
-                if (t, r, yp, y) in mvTechRetiredNewCap
-            )
-        )
+        pTechRetCost.get((t, r, y)) * (model.vTechRetiredStock[t, r, y])
         for t in tech
         if (t, r, y) in mvTechRetiredStock
     )

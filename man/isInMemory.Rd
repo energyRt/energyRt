@@ -2,7 +2,7 @@
 % Please edit documentation in R/arrow.R
 \name{isInMemory}
 \alias{isInMemory}
-\title{Is object stored on disk?}
+\title{Is object stored in memory?}
 \usage{
 isInMemory(obj)
 }
@@ -10,5 +10,5 @@ isInMemory(obj)
 \item{obj}{Object, checks}
 }
 \description{
-Is object stored on disk?
+Is object stored in memory?
 }

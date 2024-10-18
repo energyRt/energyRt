@@ -6,6 +6,9 @@
 \usage{
 get_registry()
 }
+\value{
+The current registry object.
+}
 \description{
 Returns the current registry object.
 }

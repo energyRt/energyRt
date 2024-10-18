@@ -7,7 +7,7 @@
 newScenario(
   name,
   model = NULL,
-  path = file.path(get_scenarios_path(), name),
+  path = fp(get_scenarios_path(), name),
   ...,
   env_name = ".scen",
   registry = get_registry(),

@@ -6,6 +6,7 @@
 \usage{
 newConstraint(
   name,
+  desc = "",
   ...,
   eq = "==",
   rhs = data.frame(),
@@ -23,18 +24,18 @@ newConstraint(
 
 \item{eq}{Type of the relation ('==' default, '<=', '>=')}
 
-\item{rhs}{a numeric value, list or data frame with sets and numeric values for each constraint. Warning: zero values will be replaced with `1e-20` to avoid ignoring them by the current interpolation algorithms.}
+\item{rhs}{a numeric value, list or data frame with sets and numeric values for each constraint. Warning: zero values will be replaced with \code{1e-20} to avoid ignoring them by the current interpolation algorithms.}
 
 \item{for.each}{list with sets for which constraint will be created.}
 
-\item{defVal}{the default value for the `rhs`.}
+\item{defVal}{the default value for the \code{rhs}.}
 
 \item{interpolation}{interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".}
 
 \item{arg}{tbc}
 }
 \value{
-Object of class `constraint`.
+Object of class \code{constraint}.
 }
 \description{
 Create (equality or inequality) constraint object

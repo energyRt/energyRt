@@ -1,17 +1,43 @@
 url: https://energyRt.org
+template:
+  bootstrap: 5
+  light-switch: true
+  bslib:
+    bootswatch: flatly
+    pkgdown-navbar-bg: '#2C3E50'
+  # bootswatch: sandstone
+  # bootswatch: spacelab
+  # bootswatch: lux
+  # navbar:
+    # bg: dark
+    # fg: dark
+    # bg: primary
+  # params:
+  #   ganalytics: G-CYBYJ238Q5
+  includes:
+    in_header: |
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-CYBYJ238Q5"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CYBYJ238Q5');
+      </script>
+
+# navbar:
+#   bg: primary
 
 title: energyRt
 
 development:
   mode: unreleased
-  version_label: info
+  version_label: danger
 
-template:
-  params:
-    ganalytics: G-CYBYJ238Q5
-    bootswatch: yeti
-#    bootswatch: cerulean
-#    bootswatch: cosmo
+# development:
+#   mode: auto
+#   version_label: info
 
 reference:
 - title: Classes
@@ -62,6 +88,19 @@ reference:
   - matches("size")
   - matches("hour2HOUR")
   - matches("yday2YDAY")
+  - matches("tsl2dtm")
+  - matches("dtm2tsl")
+  - matches("tsl_formats")
+  - matches("tsl_guess_format")
+  - matches("drop_na_cols")
+
+  - matches("obj2mem")
+  - matches("isInMemory")
+  - matches("register")
+  - matches("get_registry")
+  - matches("save_scenario")
+  - matches("load_scenario")
+
 
 - title: Visualisation
   contents:
@@ -74,7 +113,11 @@ reference:
 - title: energyRt options and settings
   contents:
   - starts_with("set")
+  - matches("make_scenario_dirname")
 
+- title: utils
+  contents:
+  - matches("en_install_julia_pkgs")
 
 # - title: All other
 #   contents: lacks_concepts("none")

@@ -18,16 +18,16 @@ make_timetable(
 \arguments{
 \item{timetable}{data.frame with the calendar structure.}
 
-\item{year_fraction}{numeric scalar, used for validation or calculation (if missing) of the `share` column in the given `timetable`. The default value is `1L` meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to `NULL` will drop the validation.}
+\item{year_fraction}{numeric scalar, used for validation or calculation (if missing) of the \code{share} column in the given \code{timetable}. The default value is \code{1L} meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to \code{NULL} will drop the validation.}
 
-\item{...}{optional `name`, `desc`, strings, character `default_timeframe`, and list `misc` with any relevant content. All other arguments will be ignored.}
+\item{...}{optional \code{name}, \code{desc}, strings, character \code{default_timeframe}, and list \code{misc} with any relevant content. All other arguments will be ignored.}
 
 \item{struct}{named list of timeframes with sets of timeslices and optional shares of every slice or frame in the nest}
 
-\item{warn}{logical, if TRUE, warning will be issued if `ANNUAL` level does not exists in the given structure. The level will be auto-created to complete the time-structure.}
+\item{warn}{logical, if TRUE, warning will be issued if \code{ANNUAL} level does not exists in the given structure. The level will be auto-created to complete the time-structure.}
 }
 \value{
-an object of class `calendar` with the specified structure.
+an object of class \code{calendar} with the specified structure.
 
 an data.frame with the specified structure.
 }
@@ -48,14 +48,14 @@ of individual elements.}
 \item{\code{timetable}}{data.frame with levels of timeframes in the named columns,
 and number of rows equal to the total number of time-slices on the lowest level. Every timeframe is a set of timeslices ("slices") - a named fragment of time with a year-share. Timeframes have nested structure. Though every slice may have different sub-slices (similar to the real-world calendar).
 \describe{
-  \item{ANNUAL}{character, annual, the top level of timeframes}
-  \item{TIMEFRAME2}{character, (optional) first subannual level of timeframes}
-  \item{TIMEFRAME3}{character, (optional) second subannual level of timeframes}
-  \item{...}{character, (optional) further subannual levels of timeframes}
-  \item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `{SLICE2}_{SLICE3}...`}
+\item{ANNUAL}{character, annual, the top level of timeframes}
+\item{TIMEFRAME2}{character, (optional) first subannual level of timeframes}
+\item{TIMEFRAME3}{character, (optional) second subannual level of timeframes}
+\item{...}{character, (optional) further subannual levels of timeframes}
+\item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: \verb{\{SLICE2\}_\{SLICE3\}...}}
 }}
 
-\item{\code{year_fraction}}{numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of `timetable$share` or used default value (1).}
+\item{\code{year_fraction}}{numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of \code{timetable$share} or used default value (1).}
 
 \item{\code{slice_share}}{two column data.frame with slices from all levels
 with their individual share in a year.}
@@ -66,11 +66,11 @@ with their individual share in a year.}
 
 \item{\code{slices_in_frame}}{(!!! to depreciate)}
 
-\item{\code{slice_family}}{data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.}
+\item{\code{slice_family}}{data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the \verb{@timetable}.}
 
-\item{\code{next_in_timeframe}}{data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.}
+\item{\code{next_in_timeframe}}{data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the \verb{@timetable}.}
 
-\item{\code{next_in_year}}{data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.}
+\item{\code{next_in_year}}{data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the \verb{@timetable}.}
 
 \item{\code{misc}}{list with additional data and calculated mappings.}
 }}
