@@ -41,6 +41,7 @@ analytical aspects rather than the technical details of coding.
     long-term energy system planning, energy transition, and
     decarbonization efforts.
 
+The package website: <https://energyrt.org>\
 Documentation in progress: <https://energyrt.github.io/book/>
 
 ### Development status
