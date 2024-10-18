@@ -7,7 +7,7 @@
 check_name(x)
 }
 \arguments{
-\item{x}{character, name of an object of `energyRt`}
+\item{x}{character, name of an object of \code{energyRt}}
 }
 \value{
 logical, TRUE if the name is valid.

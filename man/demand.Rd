@@ -35,14 +35,30 @@ An S4 class to declare a demand in the model
 
 \item{\code{dem}}{specification of the demand, a data.frame with columns:
 \describe{
-  \item{region}{character. Name of the region for which the demand will be specified. NA for every regions}'
-  \item{year}{integer. Year of the demand. NA for every year.}
-  \item{slice}{character. Name of the slice for which the demand will be specified. NA for every slice.}
-  \item{dem}{numeric. Value of the demand.}
+\item{region}{character. Name of the region for which the demand will be specified. NA for every regions}'
+\item{year}{integer. Year of the demand. NA for every year.}
+\item{slice}{character. Name of the slice for which the demand will be specified. NA for every slice.}
+\item{dem}{numeric. Value of the demand.}
 }}
 
-\item{\code{region}}{character. Optional name of region to narrow the specification of the demand in the case of used NAs. Error will be returned if specified regions in `@dem` are not mensioned in the `@region` slot (if the slot is not empty).}
+\item{\code{region}}{character. Optional name of region to narrow the specification of the demand in the case of used NAs. Error will be returned if specified regions in \verb{@dem} are not mensioned in the \verb{@region} slot (if the slot is not empty).}
 
 \item{\code{misc}}{list. Optional list of additional information.}
 }}
 
+\examples{
+DSTEEL <- newDemand(
+ name = "DSTEEL",
+ desc = "Steel demand",
+ commodity = "STEEL",
+ unit = "Mt",
+ dem = data.frame(
+    region = "UTOPIA", # NA for every region
+    year = c(2020, 2030, 2050),
+    slice = "ANNUAL",
+    dem = c(100, 200, 300)
+ ),
+ region = "UTOPIA", # optional, to narrow the specification of the demand
+ )
+
+}

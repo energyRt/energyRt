@@ -18,5 +18,5 @@ read_solution(obj, ...)
 The function and method read outputs of solved model/scenario and return the scenario object populated with variables data.
 }
 \seealso{
-[solve()] to run the script, solve the scenario. [write_sc()] to read
+\code{\link[=solve]{solve()}} to run the script, solve the scenario. \code{\link[=write_sc]{write_sc()}} to read
 }

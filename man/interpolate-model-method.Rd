@@ -10,7 +10,7 @@
 \item{object}{model or scenario type of object.}
 }
 \value{
-scenario object with enclosed model (slot `@model`) and interpolated parameters (slot `@modInp`).
+scenario object with enclosed model (slot \verb{@model}) and interpolated parameters (slot \verb{@modInp}).
 }
 \description{
 Interpolate model

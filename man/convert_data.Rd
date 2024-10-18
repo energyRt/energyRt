@@ -3,7 +3,7 @@
 \docType{data}
 \name{convert_data}
 \alias{convert_data}
-\title{Basic units conversion database for `convert` methods}
+\title{Basic units conversion database for \code{convert} methods}
 \format{
 An object of class \code{list} of length 1.
 }
@@ -11,6 +11,6 @@ An object of class \code{list} of length 1.
 convert_data
 }
 \description{
-Basic units conversion database for `convert` methods
+Basic units conversion database for \code{convert} methods
 }
 \keyword{datasets}

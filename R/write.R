@@ -191,7 +191,7 @@ write.sc <- write_sc
     # browser()
     # x <- x[, set, drop = FALSE]
     if (!missing(set)) {
-      x <- select(x, all_of(set)) %>% relocate(all_of(set))
+      x <- select(x, all_of(set)) |> relocate(all_of(set))
     }
     x[!duplicated(x), , drop = FALSE]
   }
@@ -240,9 +240,9 @@ write.sc <- write_sc
   # allpar <- names(prec@parameters); allpar <- allpar[grepl("^p", allpar)]
   # comreg <- lapply(prec@parameters[allpar], function(x) {
   #   if (!all(c("comm", "region") %in% x@dimSets)) return(NULL)
-  #   select(x@data, comm, region) %>% unique()
-  # }) %>%
-  #   rbindlist() %>%
+  #   select(x@data, comm, region) |> unique()
+  # }) |>
+  #   rbindlist() |>
   #   unique()
   # prec@parameters[["mCommReg"]] <-
   #   .dat2par(prec@parameters[["mCommReg"]], comreg)
@@ -255,10 +255,10 @@ write.sc <- write_sc
   l1 <- merge0(.get_data_slot(prec@parameters$comm),
                .get_data_slot(prec@parameters$slice))
   # l2 <- merge0(mCommSlice, mSliceParentChildE)[, c("comm", "slice", "slicep")]
-  l2 <- merge0(mCommSlice, mSliceParentChildE) %>%
+  l2 <- merge0(mCommSlice, mSliceParentChildE) |>
     select(all_of(c("comm", "slice", "slicep")))
   # l3 <- l2[!duplicated(l2[, c("comm", "slicep")]), c("comm", "slicep")]
-  l3 <- l2 %>% select(all_of(c("comm", "slicep"))) %>% unique() %>%
+  l3 <- l2 |> select(all_of(c("comm", "slicep"))) |> unique() |>
     rename(slice = slicep)
   # colnames(l3)[2] <- "slice"
   l3 <- rbind(l1, l3)
@@ -303,21 +303,21 @@ write.sc <- write_sc
   # browser()
   # mvTechOutS ####
   # finish: mTechCommSliceSliceP
-  # mvTechOutS <- prec@parameters[["mvTechOut"]]@data %>%
-  #   rename(slicep = slice) %>%
+  # mvTechOutS <- prec@parameters[["mvTechOut"]]@data |>
+  #   rename(slicep = slice) |>
   #   left_join(prec@parameters[["mCommSliceOrParent"]]@data,
-  #             by = c("comm", "slicep")) %>%
-  #   select(all_of(prec@parameters[["mvTechOutS"]]@dimSets)) %>%
+  #             by = c("comm", "slicep")) |>
+  #   select(all_of(prec@parameters[["mvTechOutS"]]@dimSets)) |>
   #   unique()
   # prec@parameters[["mvTechOutS"]] <-
   #   .dat2par(prec@parameters[["mvTechOutS"]], mvTechOutS)
   #
   # mvTechAOutS ####
-  # mvTechAOutS <- prec@parameters[["mvTechAOut"]]@data %>%
-  #   rename(slicep = slice) %>%
+  # mvTechAOutS <- prec@parameters[["mvTechAOut"]]@data |>
+  #   rename(slicep = slice) |>
   #   left_join(prec@parameters[["mCommSliceOrParent"]]@data,
-  #             by = c("comm", "slicep")) %>%
-  #   select(all_of(prec@parameters[["mvTechAOutS"]]@dimSets)) %>%
+  #             by = c("comm", "slicep")) |>
+  #   select(all_of(prec@parameters[["mvTechAOutS"]]@dimSets)) |>
   #   unique()
   # prec@parameters[["mvTechAOutS"]] <-
   #   .dat2par(prec@parameters[["mvTechAOutS"]], mvTechAOutS)
@@ -326,32 +326,32 @@ write.sc <- write_sc
   # ! mTechCommSliceSliceP, mTechCommOutSliceSliceP, mTechCommAOutSliceSliceP
   # ! have been dropped due to large size in models with many commodities
   # new map for eqTechOutTot
-  # mTechCommSliceSliceP <- prec@parameters[["mTechSlice"]]@data %>%
-  #   rename(slicep = slice) %>%
-  #   left_join(mCommSliceOrParent, by = c("slicep")) %>%
-  #   select(all_of(prec@parameters[["mTechCommSliceSliceP"]]@dimSets)) %>%
+  # mTechCommSliceSliceP <- prec@parameters[["mTechSlice"]]@data |>
+  #   rename(slicep = slice) |>
+  #   left_join(mCommSliceOrParent, by = c("slicep")) |>
+  #   select(all_of(prec@parameters[["mTechCommSliceSliceP"]]@dimSets)) |>
   #   unique()
   # prec@parameters[["mTechCommSliceSliceP"]] <-
   #   .dat2par(prec@parameters[["mTechCommSliceSliceP"]], mTechCommSliceSliceP)
   # # browser()
   #
-  # mTechCommOutSliceSliceP <- prec@parameters[["mvTechOut"]]@data %>%
-  #   # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
-  #   rename(slicep = slice) %>%
-  #   select(-region, -year) %>% unique() %>%
-  #   left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
-  #   select(all_of(prec@parameters[["mTechCommOutSliceSliceP"]]@dimSets)) %>%
+  # mTechCommOutSliceSliceP <- prec@parameters[["mvTechOut"]]@data |>
+  #   # bind_rows(prec@parameters[["mvTechAOut"]]@data) |>
+  #   rename(slicep = slice) |>
+  #   select(-region, -year) |> unique() |>
+  #   left_join(mCommSliceOrParent, by = c("comm", "slicep")) |>
+  #   select(all_of(prec@parameters[["mTechCommOutSliceSliceP"]]@dimSets)) |>
   #   unique()
   # prec@parameters[["mTechCommOutSliceSliceP"]] <-
   #   .dat2par(prec@parameters[["mTechCommOutSliceSliceP"]],
   #            mTechCommOutSliceSliceP)
   #
-  # mTechCommAOutSliceSliceP <- prec@parameters[["mvTechAOut"]]@data %>%
-  #   # bind_rows(prec@parameters[["mvTechAOut"]]@data) %>%
-  #   rename(slicep = slice) %>%
-  #   select(-region, -year) %>% unique() %>%
-  #   left_join(mCommSliceOrParent, by = c("comm", "slicep")) %>%
-  #   select(all_of(prec@parameters[["mTechCommAOutSliceSliceP"]]@dimSets)) %>%
+  # mTechCommAOutSliceSliceP <- prec@parameters[["mvTechAOut"]]@data |>
+  #   # bind_rows(prec@parameters[["mvTechAOut"]]@data) |>
+  #   rename(slicep = slice) |>
+  #   select(-region, -year) |> unique() |>
+  #   left_join(mCommSliceOrParent, by = c("comm", "slicep")) |>
+  #   select(all_of(prec@parameters[["mTechCommAOutSliceSliceP"]]@dimSets)) |>
   #   unique()
   # prec@parameters[["mTechCommAOutSliceSliceP"]] <-
   #   .dat2par(prec@parameters[["mTechCommAOutSliceSliceP"]],
@@ -443,9 +443,9 @@ write.sc <- write_sc
   mTechInpTot <- rbind(
     select(.get_data_slot(prec@parameters$mvTechInp), -any_of("tech")),
     select(.get_data_slot(prec@parameters$mvTechAInp), -any_of("tech"))
-  ) %>%
-    reduce.sect() %>%
-    reduce_total_map() %>%
+  ) |>
+    reduce.sect() |>
+    reduce_total_map() |>
     inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region"))
   prec@parameters[["mTechInpTot"]] <-
     .dat2par(prec@parameters[["mTechInpTot"]], mTechInpTot)
@@ -458,9 +458,9 @@ write.sc <- write_sc
   mTechOutTot <- rbind(
     select(.get_data_slot(prec@parameters$mvTechOut), -any_of("tech")),
     select(.get_data_slot(prec@parameters$mvTechAOut), -any_of("tech"))
-  ) %>%
-    reduce.sect() %>%
-    reduce_total_map() %>%
+  ) |>
+    reduce.sect() |>
+    reduce_total_map() |>
     inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region"))
   prec@parameters[["mTechOutTot"]] <-
     .dat2par(prec@parameters[["mTechOutTot"]], mTechOutTot)
@@ -562,8 +562,8 @@ write.sc <- write_sc
     tmp1, tmp, by = "commp"
     )[, c("tech", "comm", "commp", "region", "year", "slice")]
   # tmp <- tmp[!duplicated(tmp), , drop = FALSE]
-  tmp <- tmp %>%
-    inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region")) %>%
+  tmp <- tmp |>
+    inner_join(prec@parameters[["mCommReg"]]@data, by = c("comm", "region")) |>
     unique()
   # mTechEmsFuel ####
   # browser()
@@ -659,7 +659,7 @@ write.sc <- write_sc
     rm(mTechRetUp)
   }
 
-  if (prec@parameters[["pStorageCap"]]@data %>% nrow() > 0) {
+  if (prec@parameters[["pStorageCap"]]@data |> nrow() > 0) {
     mStorageCap <- prec@parameters[["pStorageCap"]]@data |>
       inner_join(prec@parameters[["mStorageSpan"]]@data) |>
       # select(-value) |>
@@ -812,7 +812,7 @@ write.sc <- write_sc
       }
     }
     # x[x$value != Inf, -ncol(x)]
-    x %>% filter(value != Inf) %>% select(-last_col())
+    x |> filter(value != Inf) |> select(-last_col())
   }
   # browser()
   prec@parameters[["mDummyImport"]] <-
@@ -887,7 +887,7 @@ write.sc <- write_sc
   colnames(mExportRowSubTmp)[4] <- "slice.1"
   mExportRowSubSlice <- merge0(mExportRowSubTmp, mCommSliceOrParent2)
   # mExportRowSub <- mExportRowSubSlice[, colnames(mExportRowSubSlice) != "slice.1"]
-  mExportRowSub <- mExportRowSubSlice %>% select(-any_of("slice.1"))
+  mExportRowSub <- mExportRowSubSlice |> select(-any_of("slice.1"))
   mExportRowSub <- mExportRowSub[!duplicated(mExportRowSub), ]
   .interpolation_message("mExport", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -917,7 +917,7 @@ write.sc <- write_sc
   colnames(mImportRowSubTmp)[4] <- "slice.1"
   mImportRowSubSlice <- merge0(mImportRowSubTmp, mCommSliceOrParent2)
   # mImportRowSub <- mImportRowSubSlice[, colnames(mImportRowSubSlice) != "slice.1"]
-  mImportRowSub <- mImportRowSubSlice %>% select(-any_of("slice.1"))
+  mImportRowSub <- mImportRowSubSlice |> select(-any_of("slice.1"))
   mImportRowSub <- mImportRowSub[!duplicated(mImportRowSub), ]
   .interpolation_message("mImport", rest, interpolation_count,
                          interpolation_start_time, len_name)
@@ -1152,7 +1152,7 @@ write.sc <- write_sc
     xx <- .get_data_slot(prec@parameters[[x]])
     # xx <- unique(xx[, colnames(xx) %in% c("region", "year"), drop = FALSE])
     if (sum(colnames(xx) %in% c("region", "year")) > 2) browser() # rewrite for multiple columns
-    xx <- select(xx, any_of(c("region", "year"))) %>% unique()
+    xx <- select(xx, any_of(c("region", "year"))) |> unique()
     if (nrow(xx) == nrow(dregionyear) || ncol(xx) == 0) {
       return(dregionyear)
     }
@@ -1217,22 +1217,22 @@ write.sc <- write_sc
     .get_data_slot(prec@parameters$mInpSub)
   )
   mvInpTot <- mvInpTot[!duplicated(mvInpTot), ]
-  mvInpTot <- merge0(mvInpTot, mCommSlice) %>% unique()
+  mvInpTot <- merge0(mvInpTot, mCommSlice) |> unique()
   # if (T) { # check
   #   # mvInpTot <-
-  #   dim_mvInpTot <- mvInpTot %>%
-  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-  #     unique() %>% dim()
+  #   dim_mvInpTot <- mvInpTot |>
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
+  #     unique() |> dim()
   #   if (!all(dim_mvInpTot == dim(mvInpTot))) {
   #    if (F) browser() # Debug
-  #     x <- merge0(dregionyear, mCommSlice) %>%
-  #       inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+  #     x <- merge0(dregionyear, mCommSlice) |>
+  #       inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
   #       unique()
   #     browser()
   #     suppressMessages({
   #       y <- anti_join(x, mvBalance)
   #     })
-  #     yc <- y$comm %>% unique()
+  #     yc <- y$comm |> unique()
   #     warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
   #     rm(x, y, yc)
   #   }
@@ -1257,12 +1257,12 @@ write.sc <- write_sc
     .get_data_slot(prec@parameters$mOutSub)
   )
   mvOutTot <- mvOutTot[!duplicated(mvOutTot), ]
-  mvOutTot <- merge0(mvOutTot, mCommSlice) %>% unique()
+  mvOutTot <- merge0(mvOutTot, mCommSlice) |> unique()
   # if (T) { # check
   #   # moved below with an adjustment for 'mAggregateFactor'
-  #   dim_mvOutTot <- mvOutTot %>%
-  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-  #     unique() %>% dim()
+  #   dim_mvOutTot <- mvOutTot |>
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
+  #     unique() |> dim()
   #   if (!all(dim_mvOutTot == dim(mvOutTot))) browser() # Debug
   # }
   prec@parameters[["mvOutTot"]] <-
@@ -1274,20 +1274,20 @@ write.sc <- write_sc
   rest <- rest + 1
   mvBalance <- rbind(
     prec@parameters[["mvInpTot"]]@data,
-    prec@parameters[["mvOutTot"]]@data) %>%
+    prec@parameters[["mvOutTot"]]@data) |>
     unique()
   # mvBalance <- mvBalance[!duplicated(mvBalance), ]
   if (T) { # check
-    dim_mvBalance <- merge0(dregionyear, mCommSlice) %>%
-      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-      unique() %>% dim()
+    dim_mvBalance <- merge0(dregionyear, mCommSlice) |>
+      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
+      unique() |> dim()
     if (!all(dim_mvBalance == dim(mvBalance))) {
       # browser() # !!! Debug
-      x <- merge0(dregionyear, mCommSlice) %>%
-        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+      x <- merge0(dregionyear, mCommSlice) |>
+        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
         unique()
       y <- anti_join(x, mvBalance)
-      y$comm %>% unique() # check
+      y$comm |> unique() # check
     }
   }
   prec@parameters[["mvBalance"]] <-
@@ -1299,18 +1299,18 @@ write.sc <- write_sc
 
   if (T) { # check
     # mvInpTot <-
-    dim_mvInpTot <- mvInpTot %>%
-      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-      unique() %>% dim()
+    dim_mvInpTot <- mvInpTot |>
+      inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
+      unique() |> dim()
     if (!all(dim_mvInpTot == dim(mvInpTot))) {
       if (F) browser() # Debug
-      x <- merge0(dregionyear, mCommSlice) %>%
-        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
+      x <- merge0(dregionyear, mCommSlice) |>
+        inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
         unique()
       suppressMessages({
         y <- anti_join(x, mvBalance)
       })
-      yc <- y$comm %>% unique()
+      yc <- y$comm |> unique()
       # !!! ToDo: add checks for agg-commodities
       if (length(yc) > 0) {
         warning("Dropped commodities: ", paste(yc, collapse = ", ", sep = ""))
@@ -1359,9 +1359,9 @@ write.sc <- write_sc
   #   left_join(prec@parameters[["mCommSlice"]]@data, by = c("comm", "slice")) |>
   # if (T) { # check
   #   # mvOutTot <-
-  #   dim_mvOutTot <- mvOutTot %>%
-  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) %>%
-  #     unique() %>% dim()
+  #   dim_mvOutTot <- mvOutTot |>
+  #     inner_join(prec@parameters$mCommReg@data, by = c("comm", "region")) |>
+  #     unique() |> dim()
   #   if (!all(dim_mvOutTot == dim(
   #     filter(mvOutTot, !(comm %in% prec@parameters$mAggregateFactor@data$comm))
   #     ))) browser() # Debug

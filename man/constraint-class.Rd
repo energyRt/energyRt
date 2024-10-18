@@ -24,7 +24,7 @@ Class 'constraint'
 
 \item{\code{interpolation}}{character, interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".}
 
-\item{\code{lhs}}{list. List of summands for the left-hand side of the equation. This slot is created automatically from all unnamed arguments passed to the `newConstraint` function.}
+\item{\code{lhs}}{list. List of summands for the left-hand side of the equation. This slot is created automatically from all unnamed arguments passed to the \code{newConstraint} function.}
 
 \item{\code{misc}}{list. List of any additional information or parameters to store in the constraint object.}
 }}

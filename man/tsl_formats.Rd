@@ -7,9 +7,9 @@
 \format{
 A character vector with formats:
 \describe{
-  \item{d365}{daily time-slices, 365 a year (leap year's 366th day is disregarded)}
-  \item{d365_h24}{time slices with year-day numbers and hours, 8760 in total}
-  ...
+\item{d365}{daily time-slices, 365 a year (leap year's 366th day is disregarded)}
+\item{d365_h24}{time slices with year-day numbers and hours, 8760 in total}
+...
 }
 }
 \usage{

@@ -6,11 +6,11 @@
 # * https://r-pkgs.org/testing-design.html#sec-tests-files-overview
 # * https://testthat.r-lib.org/articles/special-files.html
 
-library(testthat)
-library(energyRt)
-try(source("~/.energyRt/settings.R"))
+# library(testthat)
+# library(energyRt)
+# try(source("~/.energyRt/settings.R"))
 
-tst <- devtools::test()
+# tst <- devtools::test()
 # tst |> class()
 # tst |> str()
 # test_check("energyRt", reporter = tst)

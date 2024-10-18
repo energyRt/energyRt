@@ -140,7 +140,7 @@ setMethod("initialize", signature = "parameter",
 
     if (type == "bounds") dimSets <- c(dimSets, "type")
     if (any(type == c("numpar", "bounds"))) dimSets <- c(dimSets, "value")
-    .Object@data <- data[, dimSets, drop = FALSE] %>% as.data.table
+    .Object@data <- data[, dimSets, drop = FALSE] |> as.data.table()
     # .Object@data <- select(data, all_of(dimSets)) #!!! drops duplicated columns
     if (any(!is_null(inClass), !is_null(cls), !is_null(slot),
              !is_null(colName) && any(colName != ""))) {
@@ -152,7 +152,7 @@ setMethod("initialize", signature = "parameter",
       } else {
         # message("initialize parameter: unfinished translation: ",
         #         name, " ", cls, " ", slot, " ", colName) # debug
-      .Object@inClass <- .Object@inClass %>%
+      .Object@inClass <- .Object@inClass |>
         add_row(
           class = cls,
           slot = slot,
@@ -355,7 +355,7 @@ setMethod(
   # obj@data <- obj@data[!(obj@data[, dimSets] %in% value), , drop = FALSE]
   ii <- obj@data[[dimSets]] %in% value
   if (length(dimSets) > 1) browser() # check filter below
-  obj@data <- obj@data %>% filter(!ii)
+  obj@data <- obj@data |> filter(!ii)
   obj
 }
 

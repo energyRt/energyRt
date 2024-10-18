@@ -51,7 +51,7 @@ nonchar_in_sets <- function(x) {
   y[unlist(y)]
 }
 # nonchar_in_sets(scen_BASE_int@modInp@set)
-# scen_BASE_int@modInp@set$year %>% class()
+# scen_BASE_int@modInp@set$year |> class()
 
 
 #' Size of an object
@@ -130,7 +130,13 @@ dir_size <- function(path) {
 }
 
 .fix_path <- function(x) {
-  gsub("[\\/]+", "/", paste0(x, "/"))
+  # gsub("[\\/]+", "/", paste0(x, "/"))
+  gsub("[\\/]+", "/", x)
+}
+
+fp <- function(...) {
+  file.path(...) |> .fix_path()
+    # normalizePath(winslash = "/", mustWork = FALSE)
 }
 
 
@@ -385,3 +391,61 @@ drop_na_cols <- function(x, unique = TRUE) {
   x
 }
 
+#' Make a name for a scenario directory
+#' @description A function to automate the creation of a scenario directory name.
+#' Used internally in `solve*()` and `interpolate*()` functions.
+#' Also can be used to amend the name of the scenario directory and explicitly
+#' assign the directory name to save the scenario object.
+#'
+#' @param scen scenario object
+#' @param name character, name of the scenario, default is `scen@name`
+#' @param model_name character, name of the model, default is `scen@model@name`
+#' @param calendar_name character, name of the calendar, default is `scen@settings@calendar@name`
+#' @param horizon_name character, name of the horizon, default is `scen@settings@horizon@name`
+#' @param prefix character, prefix to add to the name
+#' @param suffix character, suffix to add to the name
+#' @param sep character, separator, default is `_`
+#'
+#' @return character, name of the scenario directory
+#' @export
+#'
+#' @examples
+#'
+make_scenario_dirname <- function(
+    scen,
+    name = scen@name,
+    model_name = scen@model@name,
+    calendar_name = scen@settings@calendar@name,
+    horizon_name = scen@settings@horizon@name,
+    prefix = NULL,
+    suffix = NULL,
+    sep = "_"
+  ) {
+
+  if (isTRUE(nchar(prefix) > 0)) {
+    name <- paste(prefix, name, sep = sep)
+  }
+
+  if (isTRUE(is.null(name) && nchar(name) == 0)) {
+    warning("Scenario name is empty. Using 'scenario' as a default name.")
+    name <- "scenario"
+  }
+
+  if (isTRUE(nchar(model_name) > 0)) {
+    name <- paste(name, model_name, sep = sep)
+  }
+
+  if (isTRUE(nchar(calendar_name) > 0)) {
+    name <- paste(name, calendar_name, sep = sep)
+  }
+
+  if (isTRUE(nchar(horizon_name) > 0)) {
+    name <- paste(name, horizon_name, sep = sep)
+  }
+
+  if (isTRUE(nchar(suffix) > 0)) {
+    name <- paste(name, suffix, sep = sep)
+  }
+
+  return(name)
+}

@@ -9,8 +9,8 @@ drop_na_cols(x, unique = TRUE)
 \arguments{
 \item{x}{data.frame}
 
-\item{unique}{logical, if TRUE (default), `unique()` function will be applied to the result.}
+\item{unique}{logical, if TRUE (default), \code{unique()} function will be applied to the result.}
 }
 \description{
-A wrapper with `dplyr` functions to drop columns with no information (all `NA` values)
+A wrapper with \code{dplyr} functions to drop columns with no information (all \code{NA} values)
 }

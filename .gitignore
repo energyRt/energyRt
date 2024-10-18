@@ -11,8 +11,15 @@ solwork/
 solwork
 \.vs/
 \.git/
-*.html
 #doc
 Meta
 #docs
 scenarios/
+.archive/
+drafts/
+.formatted/
+.unformatted/
+*.log
+*.lst
+*.~gm
+*.lxi

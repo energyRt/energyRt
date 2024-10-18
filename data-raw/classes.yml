@@ -1,0 +1,444 @@
+################################################################################
+# Description of slots in classes to use in documentation functions ############
+# Edit this then run `DATASET.R` to update the .classes data.frame for docs ####
+# technology ###################################################################
+class:
+  technology:
+    name:
+      type: character
+      description: Name of the technology, used in sets.
+    desc:
+      type: character
+      description: Optional description of the technology for reference.
+    input:
+      type: data.frame
+      description: Main commodities input. Main commodities are linked to the process capacity and activity. Their parameters are defined in the `ceff` slot.
+      columns:
+        comm:
+          type: character
+          description: Name of the input commodity.
+        unit:
+          type: character
+          description: Unit of the input commodity.
+        group:
+          type: character
+          description: Name of input-commodities-group.
+        combustion:
+          type: numeric
+          description: >
+            combustion factor from 0 to 1 (default 1) to calculate emissions
+            from fuels combustion (commodities intermediate consumption, more broadly)
+    output:
+      type: data.frame
+      description: Main commodities output. Main commodities are linked to the process capacity and activity. Their parameters are defined in the `ceff` slot.
+      columns:
+        comm:
+          type: character
+          description: Name of the output commodity.
+        unit:
+          type: character
+          description: Unit of the output commodity.
+        group:
+          type: character
+          description: Name of output-commodities-group.
+    aux:
+      type: data.frame
+      description: Auxilary commodities, both input and output, their parameters are defined in the `aeff` slot.
+      columns:
+        acomm:
+          type: character
+          description: Name of the auxilary commodity.
+        unit:
+          type: character
+          description: Unit of the auxilary commodity.
+    units:
+      type: data.frame
+      description: Key units of the process activity and capacity (for reference).
+      columns:
+        capacity:
+          type: character
+          description: Unit of capacity
+        use:
+          type: character
+          description: Unit of 'use' (grouped input) if applicable.
+        activity:
+          type: character
+          description: Unit of activity variable of the technology.
+        costs:
+          type: character
+          description: Currency of costs variable of the technology.
+    group:
+      type: data.frame
+      description: Details for commodity groups if defined in input and output slots (for reference).
+      columns:
+        group:
+          type: character
+          description: Name of the group. Must match the group names in the input and output slots.
+        desc:
+          type: character
+          description: Description of the group.
+        unit:
+          type: character
+          description: Unit of the group.
+    cap2act:
+      type: numeric
+      description: Capacity to activity ratio. Default is 1. Specifies how much product (activity, or output commodity if identical) will be produced per unit of capacity.
+    geff:
+      type: data.frame
+      description: Input-commodity-group efficiency parameters.
+      columns:
+        region:
+          type: character
+          description: Name of region to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Name of slice to apply the parameter, NA for every slice.
+        group:
+          type: character
+          description: Name of group to apply the parameter. Required, must match the group names in the input and output slots.
+        ginp2use:
+          type: numeric
+          description: Group-input-to-use coefficient, default is 1.
+    ceff:
+      type: data.frame
+      description: Main commodity and activity efficiency parameters.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Name of slice to apply the parameter, NA for every slice.
+        comm:
+          type: character
+          description: Name of commodity to apply the parameter, different parameters require specification either input or output commodity.
+        cinp2use:
+          type: numeric
+          description: Commodity-input-to-use coefficient, default is 1.
+        use2cact:
+          type: numeric
+          description: Use-to-commodity-activity coefficient, default is 1.
+        cact2cout:
+          type: numeric
+          description: Commodity-activity-to-commodity-output coefficient, default is 1.
+        cinp2ginp:
+          type: numeric
+          description: Commodity-input-to-group-input coefficient, default is 1.
+        share.lo:
+          type: numeric
+          description: Lower bound on a share of commodity within a group, default is 0.
+        share.up:
+          type: numeric
+          description: Upper bound on a share of commodity within a group, default is 1.
+        share.fx:
+          type: numeric
+          description: Fixed share of commodity within a group, ignored if NA. This parameter overrides `share.lo` and `share.up`.
+        afc.lo:
+          type: numeric
+          description: Lower bound on the physical value of the commodity, ignored if NA.
+        afc.up:
+          type: numeric
+          description: Upper bound on the physical value of the commodity, ignored if NA.
+        afc.fx:
+          type: numeric
+          description: Fixed physical value of the commodity, ignored if NA. This parameter overrides `afc.lo` and `afc.up`.
+    aeff:
+      type: data.frame
+      description: Parameters linking main commodities, activities, and capacities to auxiliary commodities.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Name of slice to apply the parameter, NA for every slice.
+        acomm:
+          type: character
+          description: Name of auxilary commodity to apply the parameter.
+        cinp2ainp:
+          type: numeric
+          description: Main-commodity-input-to-auxilary-commodity-input coefficient, ignored if NA.
+        cinp2aout:
+          type: numeric
+          description: Main-commodity-input-to-auxilary-commodity-output coefficient, ignored if NA.
+        cout2ainp:
+          type: numeric
+          description: Main-commodity-output-to-auxilary-commodity-input coefficient, ignored if NA.
+        cout2aout:
+          type: numeric
+          description: Main-commodity-output-to-auxilary-commodity-output coefficient, ignored if NA.
+        act2ainp:
+          type: numeric
+          description: Technology-activity-to-auxilary-commodity-input coefficient, ignored if NA.
+        act2aout:
+          type: numeric
+          description: Technology-activity-to-auxilary-commodity-output coefficient, ignored if NA.
+        cap2ainp:
+          type: numeric
+          description: Technology-capacity-to-auxilary-commodity-input coefficient, ignored if NA.
+        cap2aout:
+          type: numeric
+          description: Technology-capacity-to-auxilary-commodity-output coefficient, ignored if NA.
+        ncap2ainp:
+          type: numeric
+          description: Technology-new-capacity-to-auxilary-commodity-input-coefficient, ignored if NA.
+        ncap2aout:
+          type: numeric
+          description: Technology-new-capacity-to-auxilary-commodity-output coefficient, ignored if NA.
+    af:
+      type: data.frame
+      description: Timeslice-level availability factor parameters.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Name of slice to apply the parameter, NA for every slice.
+        af.lo:
+          type: numeric
+          description: Lower bound on the availability factor, default is 0.
+        af.up:
+          type: numeric
+          description: Upper bound on the availability factor, default is 1.
+        af.fx:
+          type: numeric
+          description: Fixed availability factor, ignored if NA. This parameter overrides `af.lo` and `af.up`.
+        rampup:
+          type: numeric
+          description: Ramping-up time constraint RHS value, ignored if NA. Depends on the technology timeframe.
+        rampdown:
+          type: numeric
+          description: Ramping-down time constraint RHS value, ignored if NA. Depends on the technology timeframe.
+    afs:
+      type: data.frame
+      description: Timeframe-level availability factor constraints.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Name of slice to apply the parameter, required.
+        afs.lo:
+          type: numeric
+          description: Lower bound on the availability factor for the timeframe, default is 0.
+        afs.up:
+          type: numeric
+          description: Upper bound on the availability factor for the timeframe, default is 1.
+        afs.fx:
+          type: numeric
+          description: Fixed availability factor for the timeframe, ignored if NA. This parameter overrides `afs.lo` and `afs.up`.
+    weather:
+      type: data.frame
+      description: Parameters linking `weather factors` (external shocks specified by `weather` class) to the availability parameters `af`, `afs`, and `afc`.
+      columns:
+        weather:
+          type: character
+          description: Name of the applied weather factor, required, must match the weather factor names in a `weather` class in the model.
+        comm:
+          type: character
+          description: Name of the commodity with specified `afc.*` to be affected by the weather factor, required if `afc.*` parameters are specified.
+        wafc.lo:
+          type: numeric
+          description: Multiplying coefficient to the lower bound on the commodity availability parameter `afc.lo`, ignored if NA.
+        wafc.up:
+          type: numeric
+          description: Multiplying coefficient to the upper bound on the commodity availability parameter `afc.up`, ignored if NA.
+        wafc.fx:
+          type: numeric
+          description: Multiplying coefficient to the fixed value of the commodity availability parameter `afc.fx`, ignored if NA. This parameter overrides `wafc.lo` and `wafc.up`.
+        waf.lo:
+          type: numeric
+          description: Multiplying coefficient to the lower bound on the availability factor parameter `af.lo`, ignored if NA.
+        waf.up:
+          type: numeric
+          description: Multiplying coefficient to the upper bound on the availability factor parameter `af.up`, ignored if NA.
+        waf.fx:
+          type: numeric
+          description: Multiplying coefficient to the fixed value on the availability factor parameter `af.fx`, ignored if NA. This parameter overrides `waf.lo` and `waf.up`.
+        wafs.up:
+          type: numeric
+          description: Multiplying coefficient to the upper bound on the availability factor parameter `afs.up`, ignored if NA.
+        wafs.lo:
+          type: numeric
+          description: Multiplying coefficient to the lower bound on the availability factor parameter `afs.lo`, ignored if NA.
+        wafs.fx:
+          type: numeric
+          description: Multiplying coefficient to the fixed value on the availability factor parameter `afs.fx`, ignored if NA. This parameter overrides `wafs.lo` and `wafs.up`.
+    fixom:
+      type: data.frame
+      description: Fixed operational and maintenance cost (per unit of capacity a year).
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        fixom:
+          type: numeric
+          description: Fixed operational and maintenance cost, default is 0.
+    varom:
+      type: data.frame
+      description: Variable operational and maintenance cost (per unit of activity or commodity).
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Name of the time-slice or (grand-)parent timeframe to apply the parameter, NA for every time-slice of the technology timeframe.
+        varom:
+          type: numeric
+          description: Variable operational and maintenance cost per unit of activity, default is 0.
+        comm:
+          type: character
+          description: Name of the commodity for which the parameter will be applied, required for `cvarom` parameter.
+        cvarom:
+          type: numeric
+          description: Variable operational and maintenance cost per unit of commodity, default is 0.
+        acomm:
+          type: character
+          description: Name of the auxilary commodity for which the `avarom` will be applied, required for `avarom` parameter.
+        avarom:
+          type: numeric
+          description: Variable operational and maintenance cost per unit of auxilary commodity, default is 0.
+    invcost:
+      type: data.frame
+      description: Total overnight investment costs of the project (per unit of capacity).
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        invcost:
+          type: numeric
+          description: Total overnight investment costs of the project (per unit of capacity), default is 0.
+        wacc:
+          type: numeric
+          description: Weighted average cost of capital, (currently ignored).
+          retcost:
+            type: numeric
+            description: Costs of early retirement of the technology, default is 0.
+    start:
+      type: data.frame
+      description: The first year the technology can be installed.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        start:
+          type: integer
+          description: The first year the technology can be installed, NA means all years of the modeled horizon.
+    end:
+      type: data.frame
+      description: The last year the technology can be installed.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        end:
+          type: integer
+          description: The last year the technology can be installed, default is Inf.
+    olife:
+      type: data.frame
+      description: Operational life of the installed technology (in years).
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        olife:
+          type: integer
+          description: Operational life of the technology if installed during optimization, in years, default is 1.
+    capacity:
+      type: data.frame
+      description: Capacity of the installed technology (in units of capacity).
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, required, values between specified years will be interpolated.
+        stock:
+          type: numeric
+          description: >
+            Predefined capacity of the technology in units of capacity, default is 0.
+            This parameter also defines the exogenous capacity retirement (age-based),
+            or exogenous capacity additions, not optimized by the model, and not included in investment costs.
+        cap.lo:
+          type: numeric
+          description: Lower bound on the total capacity (preexisting stock and new installations), ignored if NA.
+        cap.up:
+          type: numeric
+          description: Upper bound on the total capacity (preexisting stock and new installations), ignored if NA.
+        cap.fx:
+          type: numeric
+          description: Fixed total capacity (preexisting stock and new installations), ignored if NA. This parameter overrides `cap.lo` and `cap.up`.
+        ncap.lo:
+          type: numeric
+          description: Lower bound on the new capacity (new installations), ignored if NA.
+        ncap.up:
+          type: numeric
+          description: Upper bound on the new capacity (new installations), ignored if NA.
+        ncap.fx:
+          type: numeric
+          description: Fixed new capacity (new installations), ignored if NA. This parameter overrides `ncap.lo` and `ncap.up`.
+        ret.lo:
+          type: numeric
+          description: Lower bound on the capacity retirement (age-based), ignored if NA.
+        ret.up:
+          type: numeric
+          description: Upper bound on the capacity retirement (age-based), ignored if NA.
+        ret.fx:
+          type: numeric
+          description: Fixed capacity retirement (age-based), ignored if NA. This parameter overrides `ret.lo` and `ret.up`.
+    optimizeRetirement:
+      type: logical
+      description: >
+        Incidates if the retirement of the technology should be optimized.
+        Also requires the same parameter in the `model` or `scenario` class to be set to TRUE to be effective.
+    fullYear:
+      type: logical
+      description: >
+        Incidates if the technology is operating on a full-year basis. Used in storages. currently ignored for technologies.
+    timeframe:
+      type: character
+      description: >
+        Name of timeframe level the technology is operating. By default,
+        the lowest level of timeframe of commodities used in the technology is applied.
+    region:
+      type: character
+      description: >
+        Vector of regions where the technology exists or can be installed.
+        Optional. If not specified, the technology is applied to all regions.
+        If specified, must include all regions used in other slots.
+    misc:
+      type: list
+      description: >
+        List of additional parameters that are not used in the model but can be used
+        for reference or user-defined functions. For example, links to the source
+        of the technology data, or other metadata.
+
+

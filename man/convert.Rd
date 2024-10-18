@@ -27,24 +27,24 @@
 
 \item{x}{numeric vector with data to convert}
 
-\item{database}{character name of a database with units (`base` by default, other options are not implemented yet).}
+\item{database}{character name of a database with units (\code{base} by default, other options are not implemented yet).}
 
 \item{...}{currently ignored}
 
 \item{type}{character, type of the unit (one of "Energy", "Power", "Mass", "Time", "Length", "Area", "Pressure", "Density", "Volume", "Flow Rates", "Currency").}
 
-\item{unit}{character, the name of the new unit to add to the `database`.}
+\item{unit}{character, the name of the new unit to add to the \code{database}.}
 
-\item{coef}{numeric, convert factor to the base unit of this type (see the first column of `convert_data[[database]][[type]]`).}
+\item{coef}{numeric, convert factor to the base unit of this type (see the first column of \code{convert_data[[database]][[type]]}).}
 
 \item{alias}{character vector, alternative name(s) for the same unit.}
 
-\item{SI_prefixes}{logical, can be used with `SI` prefixes, FALSE by default.}
+\item{SI_prefixes}{logical, can be used with \code{SI} prefixes, FALSE by default.}
 }
 \value{
 numeric vector with converted values
 
-updated `convert_data` in the `.GlobalEnv`, the values will not update the package data.
+updated \code{convert_data} in the \code{.GlobalEnv}, the values will not update the package data.
 }
 \description{
 Convert units
@@ -60,9 +60,9 @@ convert(1000, "kWh", "MWh")
 convert("kWh", "MJ")
 convert(1, "kWh/kg", "MJ/t")
 convert(5, "cents/kWh", "USD/MWh")
-do not run
+## Not run:
 convert_data$base$Currency
 add_to_convert("Currency", unit = "JPY", coef = 140)
 convert_data$base$Currency
-
+## End(Not run)
 }

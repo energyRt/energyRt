@@ -56,6 +56,20 @@ setMethod("initialize", "demand", function(.Object, ...) {
 #' @export
 #'
 #' @examples
+#' DSTEEL <- newDemand(
+#'  name = "DSTEEL",
+#'  desc = "Steel demand",
+#'  commodity = "STEEL",
+#'  unit = "Mt",
+#'  dem = data.frame(
+#'     region = "UTOPIA", # NA for every region
+#'     year = c(2020, 2030, 2050),
+#'     slice = "ANNUAL",
+#'     dem = c(100, 200, 300)
+#'  ),
+#'  region = "UTOPIA", # optional, to narrow the specification of the demand
+#'  )
+#'
 newDemand <- function(
     name = "",
     desc = character(),

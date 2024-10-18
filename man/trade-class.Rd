@@ -34,7 +34,7 @@ An S4 class to represent inter-regional trade
 
 \item{\code{stock}}{data.frame. Capacity stock of the trade object.}
 
-\item{\code{capacityVariable}}{logical. If TRUE, the capacity variable of the trade object is used. If FALSE, the capacity is defined by availability parameters (`ava.*`) in the trade-flow units.}
+\item{\code{capacityVariable}}{logical. If TRUE, the capacity variable of the trade object is used. If FALSE, the capacity is defined by availability parameters (\verb{ava.*}) in the trade-flow units.}
 
 \item{\code{cap2act}}{numeric. Capacity to activity ratio.}
 

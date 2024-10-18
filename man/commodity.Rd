@@ -17,6 +17,35 @@ newCommodity(
   misc = list()
 )
 }
+\arguments{
+\item{name}{character, a short name used in sets, no white spaces or special characters}
+
+\item{desc}{character, a description of the commodity}
+
+\item{limtype}{character or factor, the limit type of the commodity
+in balance equation ("LO" by default, meaning that the level of commodity in
+the model is satisfied with the lower bound)}
+
+\item{timeframe}{character, the default time-frame this commodity operates
+in the model (the lowest timeframe used by default)}
+
+\item{unit}{character, the physical unit of the commodity used in the model,
+currently for information only.}
+
+\item{agg}{data.frame, if the commodity is an aggregation of several commodities,
+this data.frame contains the aggregation parameters of the listed commodities
+into the \code{name} commodity.}
+
+\item{emis}{data.frame, emission factors of the commodity, if the commodity
+is consumed by a technology with combustion parameter > 0, the listed in the
+slot commodities will be emitted.}
+
+\item{misc}{list, a list with miscellaneous information to store.
+#'}
+}
+\value{
+commodity object
+}
 \description{
 An S4 class to represent a commodity
 
@@ -36,17 +65,17 @@ Create class commodity
 
 \item{\code{emis}}{data.frame with emissions factors, columns:
 \describe{
- \item{comm}{character string, name of the commodity}
- \item{unit}{character string, unit of the emission factor}
- \item{emis}{numeric, emission factor, applied to the consumed commodity (`@name`) by a technology with combustion parameter > 0, to calculate emissions of the commodity specified in the slot (`@emis$comm`).}
+\item{comm}{character string, name of the commodity}
+\item{unit}{character string, unit of the emission factor}
+\item{emis}{numeric, emission factor, applied to the consumed commodity (\verb{@name}) by a technology with combustion parameter > 0, to calculate emissions of the commodity specified in the slot (\verb{@emis$comm}).}
 }}
 
 \item{\code{agg}}{data.frame with aggregation parameters of several commodities
-into the `@name` commodity, with columns:
+into the \verb{@name} commodity, with columns:
 \describe{
- \item{comm}{character string, name of the commodity being aggregated}
- \item{unit}{numeric, unit of the commodity being aggregated}
- \item{agg}{numeric, aggregation parameter, applied to the commodity specified in the slot (`@agg$comm`) to calculate the `@name` commodity.}
+\item{comm}{character string, name of the commodity being aggregated}
+\item{unit}{numeric, unit of the commodity being aggregated}
+\item{agg}{numeric, aggregation parameter, applied to the commodity specified in the slot (\verb{@agg$comm}) to calculate the \verb{@name} commodity.}
 }}
 
 \item{\code{misc}}{list with miscellaneous information to store}

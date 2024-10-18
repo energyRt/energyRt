@@ -32,5 +32,5 @@ solve_scenario(obj, name = obj@name, ...)
 The function interpolates model, writes the script in a directory, runs the external software to solve the model, reads the solution results, and returns a scenario object with the solution.
 }
 \seealso{
-[read_solution()]
+\code{\link[=read_solution]{read_solution()}}
 }

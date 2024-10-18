@@ -7,13 +7,15 @@
 set_glpk_path(path = NULL)
 }
 \arguments{
-\item{path}{character. Path to the GLPK library with `glpsol.*` executable.}
+\item{path}{character. Path to the GLPK library with \verb{glpsol.*} executable.}
 }
 \description{
 Set the path to the GLPK library
 }
 \examples{
+\dontrun{
 set_glpk_path("/usr/local/bin/glpk") # Linux & Mac
 set_glpk_path("C:/Program Files/glpk/bin") # Windows
 get_glpk_path()
+}
 }

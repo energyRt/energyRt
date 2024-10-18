@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_data.R
 \name{findData}
 \alias{findData}
-\title{Performs search for available data in _scenario_ object.}
+\title{Performs search for available data in \emph{scenario} object.}
 \usage{
 findData(
   scen,
@@ -19,7 +19,7 @@ findData(
 )
 }
 \arguments{
-\item{scen}{object _scenario_ with model solution.}
+\item{scen}{object \emph{scenario} with model solution.}
 
 \item{dataType}{type of data to lok for (currently only "parameters" and "variables").}
 
@@ -27,21 +27,21 @@ findData(
 
 \item{valueColumn}{logical, if TRUE will return variables and parameters with 'value' column (to filter sets and mappings).}
 
-\item{allSets}{logical, if TRUE _and_ operator should be used in search the sets, _or_ will be used if FALSE.}
+\item{allSets}{logical, if TRUE \emph{and} operator should be used in search the sets, \emph{or} will be used if FALSE.}
 
 \item{ignore.case}{grepl parameter for matching names.}
 
 \item{dropEmpty}{logical, if TRUE drops parameters and variables with zero length.}
 
-\item{dfDim}{logical, if TRUE returns dimension _dim_.}
+\item{dfDim}{logical, if TRUE returns dimension \emph{dim}.}
 
 \item{dfNames}{logical, when TRUE returns names of the data frame column.}
 
 \item{asMatrix}{return results as a matrix (not implemented).}
 }
 \value{
-list with variables and parameters name, each includes _dim_ and _names_ character vectors.
+list with variables and parameters name, each includes \emph{dim} and \emph{names} character vectors.
 }
 \description{
-Performs search for available data in _scenario_ object.
+Performs search for available data in \emph{scenario} object.
 }

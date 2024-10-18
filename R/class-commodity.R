@@ -63,8 +63,24 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 })
 
 #' Create class commodity
-#'
-#' @return
+#' @param name character, a short name used in sets, no white spaces or special characters
+#' @param desc character, a description of the commodity
+#' @param limtype character or factor, the limit type of the commodity
+#' in balance equation ("LO" by default, meaning that the level of commodity in
+#' the model is satisfied with the lower bound)
+#' @param timeframe character, the default time-frame this commodity operates
+#' in the model (the lowest timeframe used by default)
+#' @param unit character, the physical unit of the commodity used in the model,
+#' currently for information only.
+#' @param agg data.frame, if the commodity is an aggregation of several commodities,
+#' this data.frame contains the aggregation parameters of the listed commodities
+#' into the `name` commodity.
+#' @param emis data.frame, emission factors of the commodity, if the commodity
+#' is consumed by a technology with combustion parameter > 0, the listed in the
+#' slot commodities will be emitted.
+#' @param misc list, a list with miscellaneous information to store.
+#' #'
+#' @return commodity object
 #' @export
 #'
 #' @rdname commodity
