@@ -2,7 +2,6 @@
 #' An S4 class to represent technology
 #'
 #' @name technology-class
-#' @aliases class-technology
 #'
 #' @description
 #' Technology of a technological process in the model is used to convert input
@@ -41,7 +40,7 @@
 #'
 #' @rdname class-technology
 #' @include class-supply.R
-#' @family technology, process
+#' @family technology, process, class
 #' @export
 setClass("technology",
   representation(
@@ -274,6 +273,9 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @description
 #' This function initializes and returns an S4 object of class `technology`,
 #' representing a specific technology with given attributes.
+#' The function has the same arguments as slot-names in the `technology` class.
+#' Every argument has a specific format as described below and in the class
+#' documentation.
 #'
 #' @param name `r get_slot_info("technology", "name")`
 #' @param desc `r get_slot_info("technology", "desc")`
@@ -315,7 +317,9 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #'   input = data.frame(
 #'     comm = "COAL", # name of input commodity
 #'     unit = "MMBtu", # unit of the input commodity
-#'     combustion = 1 # combustion factor from 0 to 1 (default 1) to calculate emissions from fuels combustion (commodities intermediate consumption, more broadly)
+#'     # combustion factor from 0 to 1 (default 1) to calculate emissions
+#'     # from fuels combustion (commodities intermediate consumption, more broadly)
+#'     combustion = 1
 #'   ),
 #'   output = data.frame(
 #'     comm = "ELC", # name of output commodity
@@ -325,54 +329,56 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #'     acomm = c("NOx", "SO2", "Hg"), # names of auxilary commodities
 #'     unit = c("kg", "kg", "g") # units
 #'   ),
-#'   cap2act = 8760, # Capacity to activity ration: 8760 MWh output a year per MW of capacity
+#'   # Capacity to activity ration: 8760 MWh output a year per MW of capacity
+#'   cap2act = 8760,
 #'   ceff = data.frame( # efficiency parameters for the main commodities
-#'      comm = "COAL",
-#'      # efficiency, 1/10 MWh per MMBtu, inverse heat rate
-#'      # check: 1 / convert(10, "MMBtu", "MWh") ~= 34% efficiency
-#'      cinp2use = 1/10
-#'    ),
-#'    aeff = data.frame( # paramaters for the auxilary commodities
-#'       acomm = c("NOx", "SO2", "Hg"),
-#'       act2aout = c(0.1, 0.2, 0.3) # (arbitrary) emission factors, linkid to activity
-#'    ),
-#'    af = data.frame( # availability (capacity) factor by time slices
-#'       af.up = 0.95 # maximum 95% per hour
-#'    ),
-#'    afs = data.frame( # availability factor by timeframes
-#'       slice = "ANNUAL", # annual availability factor
-#'       afs.lo = 0.40, # at least 40% per year
-#'       afs.up = 0.85 # maximum 85% per year
-#'    ),
-#'    fixom = data.frame( # fixed operational and maintenance cost
-#'       region = c("R1", "R2", NA), # regions, NA - all other regions
-#'       fixom = c(100, 200, 150) # MW a year
-#'    ),
-#'    varom = data.frame( # variable operational and maintenance cost
-#'       region = c("R1", "R2"), # regions
-#'       varom = c(1, 2) # $1 and $2 per MWh
-#'    ),
-#'    invcost = data.frame( # investment cost
-#'       year = c(2020, 2030, 2040), # to differenciate by years
-#'       invcost = c(1000, 900, 800) # $1000, $900, $800 per MW
-#'    ),
-#'    start = data.frame( # start year
-#'       start = 2020 # can be installed from 2020
-#'    ),
-#'    end = data.frame( # end year
-#'       end = 2040 # can be installed until 2040
-#'    ),
-#'    olife = data.frame( # operational life
-#'       olife = 30 # years
-#'    ),
-#'    capacity = data.frame( # existing capacity
-#'       year = c(2020, 2030, 2040), # to differenciate by years
-#'       region = c("R1"), # exists only in R1
-#'       stock = c(300, 200, 100) # age-based exogenous retirement
-#'    ),
-#'    region = c("R1", "R2", "R5", "R7"), # regions where the technology can be installed
-#'  )
-#'  draw(ECOAL)
+#'     comm = "COAL",
+#'     # efficiency, 1/10 MWh per MMBtu, inverse heat rate
+#'     # check: 1 / convert(10, "MMBtu", "MWh") ~= 34% efficiency
+#'     cinp2use = 1 / 10
+#'   ),
+#'   aeff = data.frame( # paramaters for the auxilary commodities
+#'     acomm = c("NOx", "SO2", "Hg"),
+#'     act2aout = c(0.1, 0.2, 0.3) # emission factors, linked to activity
+#'   ),
+#'   af = data.frame( # availability (capacity) factor by time slices
+#'     af.up = 0.95 # maximum 95% per hour
+#'   ),
+#'   afs = data.frame( # availability factor by timeframes
+#'     slice = "ANNUAL", # annual availability factor
+#'     afs.lo = 0.40, # at least 40% per year
+#'     afs.up = 0.85 # maximum 85% per year
+#'   ),
+#'   fixom = data.frame( # fixed operational and maintenance cost
+#'     region = c("R1", "R2", NA), # regions, NA - all other regions
+#'     fixom = c(100, 200, 150) # MW a year
+#'   ),
+#'   varom = data.frame( # variable operational and maintenance cost
+#'     region = c("R1", "R2"), # regions
+#'     varom = c(1, 2) # $1 and $2 per MWh
+#'   ),
+#'   invcost = data.frame( # investment cost
+#'     year = c(2020, 2030, 2040), # to differentiate by years
+#'     invcost = c(1000, 900, 800) # $1000, $900, $800 per MW
+#'   ),
+#'   start = data.frame( # start year
+#'     start = 2020 # can be installed from 2020
+#'   ),
+#'   end = data.frame( # end year
+#'     end = 2040 # can be installed until 2040
+#'   ),
+#'   olife = data.frame( # operational life
+#'     olife = 30 # years
+#'   ),
+#'   capacity = data.frame( # existing capacity
+#'     year = c(2020, 2030, 2040), # to differentiate by years
+#'     region = c("R1"), # exists only in R1
+#'     stock = c(300, 200, 100) # age-based exogenous retirement
+#'   ),
+#'   # regions where the technology can be installed
+#'   region = c("R1", "R2", "R5", "R7"),
+#' )
+#' draw(ECOAL)
 #'
 newTechnology <- function(
     name = "",

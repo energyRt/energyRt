@@ -18,26 +18,26 @@ make_scenario_dirname(
 \arguments{
 \item{scen}{scenario object}
 
-\item{name}{character, name of the scenario, default is `scen@name`}
+\item{name}{character, name of the scenario, default is \code{scen@name}}
 
-\item{model_name}{character, name of the model, default is `scen@model@name`}
+\item{model_name}{character, name of the model, default is \code{scen@model@name}}
 
-\item{calendar_name}{character, name of the calendar, default is `scen@settings@calendar@name`}
+\item{calendar_name}{character, name of the calendar, default is \code{scen@settings@calendar@name}}
 
-\item{horizon_name}{character, name of the horizon, default is `scen@settings@horizon@name`}
+\item{horizon_name}{character, name of the horizon, default is \code{scen@settings@horizon@name}}
 
 \item{prefix}{character, prefix to add to the name}
 
 \item{suffix}{character, suffix to add to the name}
 
-\item{sep}{character, separator, default is `_`}
+\item{sep}{character, separator, default is \verb{_}}
 }
 \value{
 character, name of the scenario directory
 }
 \description{
 A function to automate the creation of a scenario directory name.
-Used internally in `solve*()` and `interpolate*()` functions.
+Used internally in \verb{solve*()} and \verb{interpolate*()} functions.
 Also can be used to amend the name of the scenario directory and explicitly
 assign the directory name to save the scenario object.
 }

@@ -3,6 +3,7 @@ title: 'Utopia: the testing model'
 subtitle: '(transitional/interim version)'
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+params:
 vignette: >
   %\VignetteIndexEntry{utopia}
   %\VignetteEncoding{UTF-8}
@@ -16,6 +17,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   echo = TRUE,
+  eval = FALSE,
   message = FALSE,
   warning = FALSE,
   results = "hide",
@@ -938,7 +940,10 @@ dimnames(trd_nbr) <- list(reg_names, reg_names)
 
 ```
 
-`r knitr::kable(trd_nbr, caption = "Trade routes matrix.")`  
+```{r, echo=FALSE}
+knitr::kable(trd_nbr, caption = "Trade routes matrix.")
+```
+
 
 We can visualize the open trade routes over the map.  
 ```{r trade_map, fig.cap="Trade routes."}
@@ -988,7 +993,7 @@ trd_flows_map <-
 trd_flows_map
 ```
 
-For every trade-route, direction, and every traded commodity we have to define an object of class `trade` to open the trades in the model. To simplify the process, we can group the trades by source regions. Therefore we will have up to `r nreg` trade objects.  
+For every trade-route, direction, and every traded commodity we have to define an object of class `trade` to open the trades in the model. To simplify the process, we can group the trades by source regions. Therefore we will have up to `nreg` trade objects.  
 
 
 ### Trade
@@ -1202,7 +1207,7 @@ set_progress_bar("progress")
 # Scenarios
 
 ## "BASE" or "Reference"
-```{r BASE, eval=T, echo=T}
+```{r BASE, echo=T}
 set_progress_bar("progress")
 scen_BASE <- solve(mdl, "BASE",
   solver = solver_options$glpk, # default is used if not specified
@@ -1271,7 +1276,7 @@ getData(
 ```
 
 ### Alternative routine: interpolate, write, solve, read
-```{r, include=T, eval=T, echo=T}
+```{r, include=T, echo=T}
 set_progress_bar("bw")
 
 # Step 1: Interpolation of the model/scenario parameters
@@ -1344,7 +1349,7 @@ getData(list(
 
 ## CO2 cap
 Set CO2 cap for the country
-```{r, eval=TRUE}
+```{r}
 emis_co2 <- getData(scen_BASE, "vBalance", comm = "CO2", merge = T) |>
   group_by(scenario, comm, year) |>
   summarize(value = sum(value, na.rm = T), .groups = "drop")

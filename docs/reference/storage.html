@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-info me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
 <dd><p>data.frame. Start year when the storage technology is available for investment.</p><dl><dt>region</dt>
 <dd><p>character. Region where the storage technology available for investment. NA for all regions</p></dd>
 
- <dt>start</dt>
+<dt>start</dt>
 <dd><p>integer. The first year when the storage technology is available for investment.</p></dd>
 
 
@@ -89,7 +89,7 @@
 <dd><p>data.frame. Last year when the storage technology is available for investment.</p><dl><dt>region</dt>
 <dd><p>character. Region where the storage technology available for investment. NA for all regions</p></dd>
 
- <dt>end</dt>
+<dt>end</dt>
 <dd><p>integer. The last year when the storage technology is available for investment.</p></dd>
 
 
@@ -100,7 +100,7 @@
 <dd><p>data.frame. Auxiliary commodities.</p><dl><dt>acomm</dt>
 <dd><p>character. Name of the auxiliary commodity (used in sets).</p></dd>
 
- <dt>unit</dt>
+<dt>unit</dt>
 <dd><p>character. Unit of the auxiliary commodity.</p></dd>
 
 
@@ -111,7 +111,7 @@
 <dd><p>data.frame. Operational life of the storage technology, applicable to the new investment only, the operational life (retirement) of preexiting capacity is described in the @stock slot.</p><dl><dt>region</dt>
 <dd><p>character. Region where the storage technology is available for investment.</p></dd>
 
- <dt>olife</dt>
+<dt>olife</dt>
 <dd><p>integer. Operational life of the storage technology in years.</p></dd>
 
 
@@ -122,10 +122,10 @@
 <dd><p>data.frame. Preexisting capacity of the storage technology</p><dl><dt>region</dt>
 <dd><p>character. Region where the storage technology is preinstalled.</p></dd>
 
- <dt>year</dt>
+<dt>year</dt>
 <dd><p>integer. Year when the storage technology has preinstalled capacity.</p></dd>
 
- <dt>stock</dt>
+<dt>stock</dt>
 <dd><p>numeric. Preexisting capacity of the storage technology for particular year of the model.</p></dd>
 
 
@@ -136,13 +136,13 @@
 <dd><p>data.frame. Pre-charged level at the beginning of the cycle.</p><dl><dt>region</dt>
 <dd><p>character. Region where the storage technology is preinstalled or can be installed.</p></dd>
 
- <dt>year</dt>
+<dt>year</dt>
 <dd><p>integer. Year.</p></dd>
 
- <dt>slice</dt>
+<dt>slice</dt>
 <dd><p>character. Time slice for wich the charged level will be specifies.</p></dd>
 
- <dt>charge</dt>
+<dt>charge</dt>
 <dd><p>numeric. Pre-charged or targeted level at the specified slice.</p></dd>
 
 
@@ -153,19 +153,19 @@
 <dd><p>data.frame. Storage efficiency parameters.</p><dl><dt>region</dt>
 <dd><p>character. Region where the storage technology is preinstalled or can be installed. NA for all regions</p></dd>
 
- <dt>year</dt>
+<dt>year</dt>
 <dd><p>integer. Year for wich the storage efficiency will be specifies. NA for all years</p></dd>
 
- <dt>slice</dt>
+<dt>slice</dt>
 <dd><p>character. Time slice for wich the storage efficiency will be specifies. NA for all slices</p></dd>
 
- <dt>stgeff</dt>
+<dt>stgeff</dt>
 <dd><p>numeric. Storage decay annual rate.</p></dd>
 
- <dt>inpeff</dt>
+<dt>inpeff</dt>
 <dd><p>numeric. Input efficiency rate.</p></dd>
 
- <dt>outeff</dt>
+<dt>outeff</dt>
 <dd><p>numeric. Output efficiency rate.</p></dd>
 
 
@@ -267,10 +267,10 @@
 <dd><p>data.frame. Fixed operation and maintenance cost.</p><dl><dt>region</dt>
 <dd><p>character. Region name for wich the parameter will be specified. NA for all regions.</p></dd>
 
- <dt>year</dt>
+<dt>year</dt>
 <dd><p>integer. Year when the specified parameters will be actual. NA for all years.</p></dd>
 
- <dt>fixom</dt>
+<dt>fixom</dt>
 <dd><p>numeric. Fixed operation and maintenance cost for the speficied sets.</p></dd>
 
 
@@ -281,19 +281,19 @@
 <dd><p>data.frame. Variable operation and maintenance cost.</p><dl><dt>region</dt>
 <dd><p>character. Region name for wich the parameter will be specified. NA for all regions.</p></dd>
 
- <dt>year</dt>
+<dt>year</dt>
 <dd><p>integer. Year when the specified parameter will be actual. NA for all years.</p></dd>
 
- <dt>slice</dt>
+<dt>slice</dt>
 <dd><p>character. Time slice when the specified parameter will be actual. NA for all slices.</p></dd>
 
- <dt>inpcost</dt>
+<dt>inpcost</dt>
 <dd><p>numeric. Costs associated with the input commodity.</p></dd>
 
- <dt>outcost</dt>
+<dt>outcost</dt>
 <dd><p>numeric. Costs associated with the output commodity.</p></dd>
 
- <dt>stgcost</dt>
+<dt>stgcost</dt>
 <dd><p>numeric. Costs associated with the storage level.</p></dd>
 
 
@@ -304,13 +304,13 @@
 <dd><p>data.frame. Investment cost.</p><dl><dt>region</dt>
 <dd><p>character. Region name for wich the parameter will be specified. NA for all regions.</p></dd>
 
-  <dt>year</dt>
+<dt>year</dt>
 <dd><p>integer. Year when the specified parameter will be actual. NA for all years.</p></dd>
 
-  <dt>invcost</dt>
+<dt>invcost</dt>
 <dd><p>numeric. Overnight investment cost for the specified region and year.</p></dd>
 
-  <dt>wacc</dt>
+<dt>wacc</dt>
 <dd><p>numeric. Weighted average cost of capital. If not supplied, the value is taken from the global model or scenario parameters.</p></dd>
 
 
@@ -333,31 +333,31 @@
 <dd><p>data.frame. Weather factors multipliers.</p><dl><dt>weather</dt>
 <dd><p>character. Name of the applied weather factor.</p></dd>
 
- <dt>waf.lo</dt>
+<dt>waf.lo</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the lower bound of the availability factor.</p></dd>
 
- <dt>waf.up</dt>
+<dt>waf.up</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the upper bound of the availability factor.</p></dd>
 
- <dt>waf.fx</dt>
+<dt>waf.fx</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the fixed value of the availability factor.</p></dd>
 
- <dt>wcinp.lo</dt>
+<dt>wcinp.lo</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the lower bound of the input commodity availability factor.</p></dd>
 
- <dt>wcinp.up</dt>
+<dt>wcinp.up</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the upper bound of the input commodity availability factor.</p></dd>
 
- <dt>wcinp.fx</dt>
+<dt>wcinp.fx</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the fixed value of the input commodity availability factor.</p></dd>
 
- <dt>wcout.lo</dt>
+<dt>wcout.lo</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the lower bound of the output commodity availability factor.</p></dd>
 
 <dt>wcout.up</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the upper bound of the output commodity availability factor.</p></dd>
 
- <dt>wcout.fx</dt>
+<dt>wcout.fx</dt>
 <dd><p>numeric. Coefficient that links the weather factor with the fixed value of the output commodity availability factor.</p></dd>
 
 

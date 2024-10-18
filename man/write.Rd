@@ -25,6 +25,6 @@ write.sc(x, tmp.dir = NULL, solver = NULL, ...)
 Write scenario object as a Python, Julia, GAMS, or MathProg script with data files to a directory
 }
 \seealso{
-[solve()] to run the script, solve the scenario. [read_solution] to read model solution.
+\code{\link[=solve]{solve()}} to run the script, solve the scenario. \link{read_solution} to read model solution.
 }
 \concept{write scenario}

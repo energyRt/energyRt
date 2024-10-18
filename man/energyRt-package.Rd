@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Oleg Lugovoy \email{olugovoy@gmail.com}
+\strong{Maintainer}: Oleg Lugovoy \email{olugovoy@optimalsolution.dev} (\href{https://orcid.org/0000-0001-5546-9875}{ORCID})
 
 Authors:
 \itemize{
@@ -27,7 +27,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Tarun Sharma \email{tarunsharma@ms.iitr.ac.in} [contributor]
+  \item Tarun Sharma \email{tarunsharma@ms.iitr.ac.in} (\href{https://orcid.org/0000-0003-3636-2858}{ORCID}) [contributor]
 }
 
 }

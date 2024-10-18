@@ -115,6 +115,10 @@ reference:
   - starts_with("set")
   - matches("make_scenario_dirname")
 
+- title: utils
+  contents:
+  - matches("en_install_julia_pkgs")
+
 # - title: All other
 #   contents: lacks_concepts("none")
 

@@ -1,7 +1,9 @@
 .onAttach <- function(...) {
   packageStartupMessage(
-    glue::glue('energyRt version: {utils::packageVersion("energyRt")}-beta ({utils::packageDate("energyRt")})'),
-    "\n"
+    glue::glue('energyRt version: {utils::packageVersion("energyRt")}-dev ({utils::packageDate("energyRt")})'),
+    "Development version, please report issues:\n",
+    "https://github.com/energyRt/energyRt/issues",
+    "Stable 'beta': pak::pkg_install('energyRt/energyRt@v0.50')"
     )
 
   # options

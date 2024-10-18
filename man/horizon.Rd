@@ -20,7 +20,7 @@ newHorizon(
 \arguments{
 \item{period}{(optional) integer vector with a range or a sequence of period; will be arranged, gaps will be filled. If missing}
 
-\item{intervals}{(optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.}
+\item{intervals}{(optional) data.frame or integer vector. The data.frame must have \code{start}, \code{mid}, and \code{end} columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.}
 
 \item{force_BY_interval_to_1_year}{logical, if TRUE (default), the base-year (first) interval will be forced to one year.}
 
@@ -38,7 +38,7 @@ Create a new object of class 'horizon'
 \describe{
 \item{\code{desc}}{character, a comment or a short description.}
 
-\item{\code{period}}{integer, a planning period defined as a sequence of years (arranged, without gaps) of the model planning (e.g. optimization) window. Data with years before or after the planning `period` can present in the model-objects and will be taken into account during interpolation of the model parameters.
+\item{\code{period}}{integer, a planning period defined as a sequence of years (arranged, without gaps) of the model planning (e.g. optimization) window. Data with years before or after the planning \code{period} can present in the model-objects and will be taken into account during interpolation of the model parameters.
 will be excluded from the the optimization.}
 
 \item{\code{intervals}}{data.frame with three columns, representing start, middle, and the end year of every interval.}

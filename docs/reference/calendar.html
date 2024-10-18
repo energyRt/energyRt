@@ -15,7 +15,7 @@ time-frames and time-slices."><!-- Google tag (gtag.js) --><script async src="ht
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-info me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,11 +76,11 @@ time-frames and time-slices.</p>
 
 
 <dt id="arg-year-fraction">year_fraction<a class="anchor" aria-label="anchor" href="#arg-year-fraction"></a></dt>
-<dd><p>numeric scalar, used for validation or calculation (if missing) of the `share` column in the given `timetable`. The default value is `1L` meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to `NULL` will drop the validation.</p></dd>
+<dd><p>numeric scalar, used for validation or calculation (if missing) of the <code>share</code> column in the given <code>timetable</code>. The default value is <code>1L</code> meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to <code>NULL</code> will drop the validation.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>optional `name`, `desc`, strings, character `default_timeframe`, and list `misc` with any relevant content. All other arguments will be ignored.</p></dd>
+<dd><p>optional <code>name</code>, <code>desc</code>, strings, character <code>default_timeframe</code>, and list <code>misc</code> with any relevant content. All other arguments will be ignored.</p></dd>
 
 
 <dt id="arg-struct">struct<a class="anchor" aria-label="anchor" href="#arg-struct"></a></dt>
@@ -88,12 +88,12 @@ time-frames and time-slices.</p>
 
 
 <dt id="arg-warn">warn<a class="anchor" aria-label="anchor" href="#arg-warn"></a></dt>
-<dd><p>logical, if TRUE, warning will be issued if `ANNUAL` level does not exists in the given structure. The level will be auto-created to complete the time-structure.</p></dd>
+<dd><p>logical, if TRUE, warning will be issued if <code>ANNUAL</code> level does not exists in the given structure. The level will be auto-created to complete the time-structure.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>an object of class `calendar` with the specified structure.</p>
+    <p>an object of class <code>calendar</code> with the specified structure.</p>
 <p>an data.frame with the specified structure.</p>
     </div>
     <div class="section level2">
@@ -118,24 +118,24 @@ of individual elements.</p></dd>
 and number of rows equal to the total number of time-slices on the lowest level. Every timeframe is a set of timeslices ("slices") - a named fragment of time with a year-share. Timeframes have nested structure. Though every slice may have different sub-slices (similar to the real-world calendar).</p><dl><dt>ANNUAL</dt>
 <dd><p>character, annual, the top level of timeframes</p></dd>
 
-  <dt>TIMEFRAME2</dt>
+<dt>TIMEFRAME2</dt>
 <dd><p>character, (optional) first subannual level of timeframes</p></dd>
 
-  <dt>TIMEFRAME3</dt>
+<dt>TIMEFRAME3</dt>
 <dd><p>character, (optional) second subannual level of timeframes</p></dd>
 
-  <dt>...</dt>
+<dt>...</dt>
 <dd><p>character, (optional) further subannual levels of timeframes</p></dd>
 
-  <dt>slice</dt>
-<dd><p>character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `SLICE2_SLICE3...`</p></dd>
+<dt>slice</dt>
+<dd><p>character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: <code>{SLICE2}_{SLICE3}...</code></p></dd>
 
 
 </dl></dd>
 
 
 <dt><code>year_fraction</code></dt>
-<dd><p>numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of `timetable$share` or used default value (1).</p></dd>
+<dd><p>numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of <code>timetable$share</code> or used default value (1).</p></dd>
 
 
 <dt><code>slice_share</code></dt>
@@ -156,15 +156,15 @@ with their individual share in a year.</p></dd>
 
 
 <dt><code>slice_family</code></dt>
-<dd><p>data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.</p></dd>
+<dd><p>data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the <code>@timetable</code>.</p></dd>
 
 
 <dt><code>next_in_timeframe</code></dt>
-<dd><p>data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.</p></dd>
+<dd><p>data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the <code>@timetable</code>.</p></dd>
 
 
 <dt><code>next_in_year</code></dt>
-<dd><p>data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.</p></dd>
+<dd><p>data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the <code>@timetable</code>.</p></dd>
 
 
 <dt><code>misc</code></dt>

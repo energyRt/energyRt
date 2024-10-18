@@ -1,9 +1,7 @@
 # A model with three regions, interregional trade, and a single good
 library(energyRt)
-energyRt::set_gams_path('C:/GAMS/32')
-energyRt::set_gdxlib_path("C:/GAMS/35")
-set_default_solver(solver_options$gams_gdx_cplex)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(data.table)
 
 # Names of the regions

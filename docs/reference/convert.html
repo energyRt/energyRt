@@ -15,7 +15,7 @@ Add units to convert function"><!-- Google tag (gtag.js) --><script async src="h
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-info me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +93,7 @@ Add units to convert function"><!-- Google tag (gtag.js) --><script async src="h
 
 
 <dt id="arg-database">database<a class="anchor" aria-label="anchor" href="#arg-database"></a></dt>
-<dd><p>character name of a database with units (`base` by default, other options are not implemented yet).</p></dd>
+<dd><p>character name of a database with units (<code>base</code> by default, other options are not implemented yet).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -105,11 +105,11 @@ Add units to convert function"><!-- Google tag (gtag.js) --><script async src="h
 
 
 <dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
-<dd><p>character, the name of the new unit to add to the `database`.</p></dd>
+<dd><p>character, the name of the new unit to add to the <code>database</code>.</p></dd>
 
 
 <dt id="arg-coef">coef<a class="anchor" aria-label="anchor" href="#arg-coef"></a></dt>
-<dd><p>numeric, convert factor to the base unit of this type (see the first column of `convert_data[[database]][[type]]`).</p></dd>
+<dd><p>numeric, convert factor to the base unit of this type (see the first column of <code>convert_data[[database]][[type]]</code>).</p></dd>
 
 
 <dt id="arg-alias">alias<a class="anchor" aria-label="anchor" href="#arg-alias"></a></dt>
@@ -117,18 +117,63 @@ Add units to convert function"><!-- Google tag (gtag.js) --><script async src="h
 
 
 <dt id="arg-si-prefixes">SI_prefixes<a class="anchor" aria-label="anchor" href="#arg-si-prefixes"></a></dt>
-<dd><p>logical, can be used with `SI` prefixes, FALSE by default.</p></dd>
+<dd><p>logical, can be used with <code>SI</code> prefixes, FALSE by default.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>numeric vector with converted values</p>
-<p>updated `convert_data` in the `.GlobalEnv`, the values will not update the package data.</p>
+<p>updated <code>convert_data</code> in the <code>.GlobalEnv</code>, the values will not update the package data.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="st">"MWh"</span>, <span class="st">"kWh"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1000</span>
+<span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="st">"kWh"</span>, <span class="st">"MJ"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.6</span>
+<span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="st">"kWh/kg"</span>, <span class="st">"MJ/t"</span>, <span class="fl">1e-3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.6</span>
+<span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="st">"cents/kWh"</span>, <span class="st">"USD/MWh"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
+<span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="fl">1000</span>, <span class="st">"kWh"</span>, <span class="st">"MWh"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="st">"kWh"</span>, <span class="st">"MJ"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.6</span>
+<span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="fl">1</span>, <span class="st">"kWh/kg"</span>, <span class="st">"MJ/t"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3600</span>
+<span class="r-in"><span><span class="fu">convert</span><span class="op">(</span><span class="fl">5</span>, <span class="st">"cents/kWh"</span>, <span class="st">"USD/MWh"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 50</span>
+<span class="r-in"><span><span class="co">## Not run:</span></span></span>
+<span class="r-in"><span><span class="va">convert_data</span><span class="op">$</span><span class="va">base</span><span class="op">$</span><span class="va">Currency</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             USD cents mills       RMB EUR  cr. ₹   cr.₹ crore ₹ crore INR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef          1  0.01 0.001 0.1398601 1.1 121000 121000  121000    121000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes   1  0.00 0.000 1.0000000 1.0      0      0       0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             INR (in cr.)    INR      ₹ crore_INR cr.INR cr. INR   € Euro</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef              121000 0.0121 0.0121    121000 121000  121000 1.1  1.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes            0 1.0000 1.0000         0      0       0 1.0  1.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     JPY Japanese yen         JP¥          円       CNY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef        0.007142857  0.007142857 0.007142857 0.007142857 0.1398601</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes 1.000000000  1.000000000 1.000000000 1.000000000 1.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Chinese yuan       CN¥        元</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef           0.1398601 0.1398601 0.1398601</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes    1.0000000 1.0000000 1.0000000</span>
+<span class="r-in"><span><span class="fu">add_to_convert</span><span class="op">(</span><span class="st">"Currency"</span>, unit <span class="op">=</span> <span class="st">"JPY"</span>, coef <span class="op">=</span> <span class="fl">140</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">convert_data</span><span class="op">$</span><span class="va">base</span><span class="op">$</span><span class="va">Currency</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             USD cents mills       RMB EUR  cr. ₹   cr.₹ crore ₹ crore INR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef          1  0.01 0.001 0.1398601 1.1 121000 121000  121000    121000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes   1  0.00 0.000 1.0000000 1.0      0      0       0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             INR (in cr.)    INR      ₹ crore_INR cr.INR cr. INR   € Euro JPY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef              121000 0.0121 0.0121    121000 121000  121000 1.1  1.1 140</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes            0 1.0000 1.0000         0      0       0 1.0  1.0   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Japanese yen         JP¥          円       CNY Chinese yuan</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef         0.007142857 0.007142857 0.007142857 0.1398601    0.1398601</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes  1.000000000 1.000000000 1.000000000 1.0000000    1.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   CN¥        元</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef        0.1398601 0.1398601</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SI_prefixes 1.0000000 1.0000000</span>
+<span class="r-in"><span><span class="co">## End(Not run)</span></span></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

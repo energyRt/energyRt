@@ -15,7 +15,7 @@ Create class commodity"><!-- Google tag (gtag.js) --><script async src="https://
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-info me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,6 +71,55 @@ Create class commodity"><!-- Google tag (gtag.js) --><script async src="https://
     </div>
 
     <div class="section level2">
+    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
+
+
+<dl><dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
+<dd><p>character, a short name used in sets, no white spaces or special characters</p></dd>
+
+
+<dt id="arg-desc">desc<a class="anchor" aria-label="anchor" href="#arg-desc"></a></dt>
+<dd><p>character, a description of the commodity</p></dd>
+
+
+<dt id="arg-limtype">limtype<a class="anchor" aria-label="anchor" href="#arg-limtype"></a></dt>
+<dd><p>character or factor, the limit type of the commodity
+in balance equation ("LO" by default, meaning that the level of commodity in
+the model is satisfied with the lower bound)</p></dd>
+
+
+<dt id="arg-timeframe">timeframe<a class="anchor" aria-label="anchor" href="#arg-timeframe"></a></dt>
+<dd><p>character, the default time-frame this commodity operates
+in the model (the lowest timeframe used by default)</p></dd>
+
+
+<dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
+<dd><p>character, the physical unit of the commodity used in the model,
+currently for information only.</p></dd>
+
+
+<dt id="arg-agg">agg<a class="anchor" aria-label="anchor" href="#arg-agg"></a></dt>
+<dd><p>data.frame, if the commodity is an aggregation of several commodities,
+this data.frame contains the aggregation parameters of the listed commodities
+into the <code>name</code> commodity.</p></dd>
+
+
+<dt id="arg-emis">emis<a class="anchor" aria-label="anchor" href="#arg-emis"></a></dt>
+<dd><p>data.frame, emission factors of the commodity, if the commodity
+is consumed by a technology with combustion parameter &gt; 0, the listed in the
+slot commodities will be emitted.</p></dd>
+
+
+<dt id="arg-misc">misc<a class="anchor" aria-label="anchor" href="#arg-misc"></a></dt>
+<dd><p>list, a list with miscellaneous information to store.
+#'</p></dd>
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>commodity object</p>
+    </div>
+    <div class="section level2">
     <h2 id="slots">Slots<a class="anchor" aria-label="anchor" href="#slots"></a></h2>
 
 
@@ -95,11 +144,11 @@ Create class commodity"><!-- Google tag (gtag.js) --><script async src="https://
 <dd><p>data.frame with emissions factors, columns:</p><dl><dt>comm</dt>
 <dd><p>character string, name of the commodity</p></dd>
 
- <dt>unit</dt>
+<dt>unit</dt>
 <dd><p>character string, unit of the emission factor</p></dd>
 
- <dt>emis</dt>
-<dd><p>numeric, emission factor, applied to the consumed commodity (`@name`) by a technology with combustion parameter &gt; 0, to calculate emissions of the commodity specified in the slot (`@emis$comm`).</p></dd>
+<dt>emis</dt>
+<dd><p>numeric, emission factor, applied to the consumed commodity (<code>@name</code>) by a technology with combustion parameter &gt; 0, to calculate emissions of the commodity specified in the slot (<code>@emis$comm</code>).</p></dd>
 
 
 </dl></dd>
@@ -107,14 +156,14 @@ Create class commodity"><!-- Google tag (gtag.js) --><script async src="https://
 
 <dt><code>agg</code></dt>
 <dd><p>data.frame with aggregation parameters of several commodities
-into the `@name` commodity, with columns:</p><dl><dt>comm</dt>
+into the <code>@name</code> commodity, with columns:</p><dl><dt>comm</dt>
 <dd><p>character string, name of the commodity being aggregated</p></dd>
 
- <dt>unit</dt>
+<dt>unit</dt>
 <dd><p>numeric, unit of the commodity being aggregated</p></dd>
 
- <dt>agg</dt>
-<dd><p>numeric, aggregation parameter, applied to the commodity specified in the slot (`@agg$comm`) to calculate the `@name` commodity.</p></dd>
+<dt>agg</dt>
+<dd><p>numeric, aggregation parameter, applied to the commodity specified in the slot (<code>@agg$comm</code>) to calculate the <code>@name</code> commodity.</p></dd>
 
 
 </dl></dd>

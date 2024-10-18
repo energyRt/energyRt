@@ -15,7 +15,7 @@ Create a new object of class 'horizon'"><!-- Google tag (gtag.js) --><script asy
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-info me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +79,7 @@ Create a new object of class 'horizon'"><!-- Google tag (gtag.js) --><script asy
 
 
 <dt id="arg-intervals">intervals<a class="anchor" aria-label="anchor" href="#arg-intervals"></a></dt>
-<dd><p>(optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.</p></dd>
+<dd><p>(optional) data.frame or integer vector. The data.frame must have <code>start</code>, <code>mid</code>, and <code>end</code> columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.</p></dd>
 
 
 <dt id="arg-force-by-interval-to-year">force_BY_interval_to_1_year<a class="anchor" aria-label="anchor" href="#arg-force-by-interval-to-year"></a></dt>
@@ -103,7 +103,7 @@ Create a new object of class 'horizon'"><!-- Google tag (gtag.js) --><script asy
 
 
 <dt><code>period</code></dt>
-<dd><p>integer, a planning period defined as a sequence of years (arranged, without gaps) of the model planning (e.g. optimization) window. Data with years before or after the planning `period` can present in the model-objects and will be taken into account during interpolation of the model parameters.
+<dd><p>integer, a planning period defined as a sequence of years (arranged, without gaps) of the model planning (e.g. optimization) window. Data with years before or after the planning <code>period</code> can present in the model-objects and will be taken into account during interpolation of the model parameters.
 will be excluded from the the optimization.</p></dd>
 
 

@@ -13,9 +13,9 @@ show_progress_bar(show = TRUE)
 \item{type}{character, type of the progress bar to display. Existing options:
 "bw", "default", "cli", "progress".}
 
-\item{show}{logical, the progress bar is visible if `TRUE`.}
+\item{show}{logical, the progress bar is visible if \code{TRUE}.}
 
-\item{clear}{logical, sets `progressr.clear` global option. If `TRUE`, all outout from the progress bar will be cleared.}
+\item{clear}{logical, sets \code{progressr.clear} global option. If \code{TRUE}, all outout from the progress bar will be cleared.}
 }
 \description{
 Switch on/off and select/customize progress bar

@@ -12,6 +12,7 @@
 <url><loc>https://energyRt.org/reference/add.html</loc></url>
 <url><loc>https://energyRt.org/reference/calendar.html</loc></url>
 <url><loc>https://energyRt.org/reference/check_name.html</loc></url>
+<url><loc>https://energyRt.org/reference/class-technology.html</loc></url>
 <url><loc>https://energyRt.org/reference/commodity.html</loc></url>
 <url><loc>https://energyRt.org/reference/config-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/constraint-class.html</loc></url>
@@ -22,6 +23,7 @@
 <url><loc>https://energyRt.org/reference/draw.html</loc></url>
 <url><loc>https://energyRt.org/reference/drop_na_cols.html</loc></url>
 <url><loc>https://energyRt.org/reference/energyRt-package.html</loc></url>
+<url><loc>https://energyRt.org/reference/en_install_julia_pkgs.html</loc></url>
 <url><loc>https://energyRt.org/reference/export-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/findData.html</loc></url>
 <url><loc>https://energyRt.org/reference/findDuplicates.html</loc></url>
@@ -46,6 +48,7 @@
 <url><loc>https://energyRt.org/reference/newRegistry.html</loc></url>
 <url><loc>https://energyRt.org/reference/newRepository.html</loc></url>
 <url><loc>https://energyRt.org/reference/newScenario.html</loc></url>
+<url><loc>https://energyRt.org/reference/newTechnology.html</loc></url>
 <url><loc>https://energyRt.org/reference/newWeather.html</loc></url>
 <url><loc>https://energyRt.org/reference/obj2mem.html</loc></url>
 <url><loc>https://energyRt.org/reference/options.html</loc></url>
