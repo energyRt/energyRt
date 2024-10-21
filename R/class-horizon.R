@@ -1,20 +1,17 @@
 # check <- function(...) UseMethod("check")
 
 #' An S4 class to represent model/scenario planning horizon with intervals (year-steps)
-#' @rdname horizon
+#' @name horizon-class
+#' 
+#' @slot name `r get_slot_info("horizon", "name")`
+#' @slot desc `r get_slot_info("horizon", "desc")`
+#' @slot period `r get_slot_info("horizon", "period")`
+#' @slot intervals `r get_slot_info("horizon", "intervals")`
 #'
-#' @slot desc character, a comment or a short description.
-#' @slot period integer, a planning period defined as a sequence of years (arranged, without gaps) of the model planning (e.g. optimization) window. Data with years before or after the planning `period` can present in the model-objects and will be taken into account during interpolation of the model parameters.
-#' will be excluded from the the optimization.
-#' @slot intervals data.frame with three columns, representing start, middle, and the end year of every interval.
-#'
-#' @family horizon
-#'
+#' @rdname class-horizon
+#' @family horizon, config, settings, model, scenario
 #' @include generics.R
-#' @return
 #' @export
-#'
-#' @examples
 setClass(
   "horizon",
   representation(
@@ -32,6 +29,7 @@ setClass(
       mid = integer(),
       end = integer()
     )
+    # !!! Add misc
   )
 )
 
@@ -39,18 +37,25 @@ setClass(
 
 #' Create a new object of class 'horizon'
 #'
-#' @rdname horizon
+#' @description 
+#' The function creates a new object of class 'horizon' that represents the planning horizon of the model/scenario.
+#' 
+#' @rdname newHorizon
 #'
-#' @param period (optional) integer vector with a range or a sequence of period; will be arranged, gaps will be filled. If missing
-#' @param intervals (optional) data.frame or integer vector. The data.frame must have `start`, `mid`, and `end` columns with modeled interval. The vector will be considered as lengths of each modeled interval in period.
-#' @param ... ignored
-#' @param desc character, a comment or description.
+#' @param name `r get_slot_info("horizon", "name")` 
+#' @param period (optional) integer vector with a range or a sequence of years to define
+#' the full period of the model/scenario. If not provided, the range of 'intervals' will be used. 
+#' @param intervals (optional) either data.frame or integer vector. 
+#' The data.frame must have `start`, `mid`, and `end` columns with modeled interval. 
+#' The vector will be considered as lengths of each modeled interval in period.
+#' @param desc `r get_slot_info("horizon", "desc")`
 #' @param force_BY_interval_to_1_year logical, if TRUE (default), the base-year (first) interval will be forced to one year.
+#' @param mid_is_end logical, if TRUE, the mid-year will be set to the end of the interval.
+#' @param mid_is_start logical, if TRUE, the mid-year will be set to the start of the interval.
 #'
-#' @family horizon
+#' @family horizon, config, settings, model, scenario
 #'
-#' @return
-#' @export
+#' @return An object of class 'horizon'
 #'
 #' @examples
 #' newHorizon(2020:2050)
@@ -58,7 +63,7 @@ setClass(
 #' newHorizon(2020:2030, c(1, 2, 5, 10), desc = "Different length intervals")
 #' newHorizon(2020:2035, c(1, 2, 5, 5, 5))
 #' newHorizon(2020:2050, c(1, 2, 5, 7, 1))
-
+#'
 #' newHorizon(intervals = data.frame(
 #'   start = c(2030, 2031, 2034),
 #'   mid =   c(2030, 2032, 2037),
@@ -81,14 +86,16 @@ setClass(
 #'              start = c(2030, 2032, 2035),
 #'              mid =   c(2031, 2033, 2037),
 #'              end =   c(2032, 2034, 2040)))
-newHorizon <- function(period = NULL,
-                       intervals = NULL,
-                       mid_is_end = FALSE,
-                       mid_is_start = FALSE,
-                       force_BY_interval_to_1_year = T,
-                       desc = NULL,
-                       name = NULL,
-                       ...) {
+#' @export
+newHorizon <- function(
+    period = NULL,
+    intervals = NULL,
+    mid_is_end = FALSE,
+    mid_is_start = FALSE,
+    force_BY_interval_to_1_year = T,
+    desc = NULL,
+    name = NULL
+    ) {
   # browser()
   h <- new("horizon") # !!! update .data2slots for this class
   if (!is.null(desc)) {
@@ -212,17 +219,18 @@ newHorizon <- function(period = NULL,
   return(h)
 }
 
-#' @describeIn newHorizon
 #' @family update horizon
 #' @method update horizon
+#' @rdname newHorizon
 #' @export
 setMethod("update", "horizon", function(object, ..., warn_nodata = TRUE) {
   # browser()
   # !!! add no-data check for warning
   # cf <- .data2slots("config", object, ..., warn_nodata = FALSE)
   object <- .data2slots("horizon", object, ...,
-                        # ignore_args = c("name", "desc"),
-                        warn_nodata = warn_nodata)
+    # ignore_args = c("name", "desc"),
+    warn_nodata = warn_nodata
+  )
   object
 })
 

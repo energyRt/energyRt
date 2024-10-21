@@ -2,7 +2,7 @@
 % Please edit documentation in R/class-weather.R
 \name{newWeather}
 \alias{newWeather}
-\title{Title}
+\title{Create new weather object}
 \usage{
 newWeather(
   name = "",
@@ -12,12 +12,40 @@ newWeather(
   timeframe = character(),
   defVal = 0,
   weather = data.frame(),
-  ...
+  misc = list()
 )
 }
 \arguments{
-\item{...}{}
+\item{name}{character. Name of the weather factor, used in sets.}
+
+\item{desc}{character. Description of the weather factor.}
+
+\item{unit}{character. Unit of the weather factor.}
+
+\item{region}{character. Region where the weather factor is applied.}
+
+\item{timeframe}{character. Timeframe of the weather factor.}
+
+\item{defVal}{numeric. Default value of the weather factor, 0 by default.}
+
+\item{weather}{data.frame. Weather factor values.
+\describe{
+\item{region}{character. Region name to apply the parameter, NA for every region.}
+\item{year}{integer. Year to apply the parameter, NA for every year.}
+\item{slice}{character. Time slice to apply the parameter, NA for every slice.}
+\item{wval}{numeric. Weather factor value.}
+}}
+}
+\value{
+weather object with given specifications.
 }
 \description{
-Title
+\code{weather} is a data-carrying class with exogenous shocks
+used to influence operation of processes in the model.
 }
+\details{
+Weather factors are separated from the model parameters
+and can be added or replaced for different scenarios.
+!!!Additional details...
+}
+\concept{weather}

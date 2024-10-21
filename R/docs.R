@@ -50,6 +50,22 @@ roxygen_slots <- function(df, roxy_par = "slot") {
   return(paste0(roxygen_script, collapse = "\n"))
 }
 
+#' Retrieve slot details in rd-format
+#'
+#' @param class_name character, name of class.
+#' @param slot_name character, name of slot to retrieve.
+#' @param col_names logical, if columns information should be
+#' returned for data.frame slots.
+#'
+#' @return character, roxygen2 formatted string with slot details.
+#' @export
+#'
+#' @examples
+#' slotNames("technology")
+#' get_slot_info("technology", "input") |> cat()
+#' get_slot_info("technology", "capacity") |> cat()
+#' get_slot_info("demand", "dem") |> cat()
+#' get_slot_info("commodity", "agg") |> cat()
 get_slot_info <- function(class_name = "technology",
                           slot_name = "ceff",
                           col_names = TRUE
@@ -58,8 +74,9 @@ get_slot_info <- function(class_name = "technology",
   # returns a roxygen2 formatted string
   # slot_doc <- getSlots(class_name) |> filter(slotname == slot_name)
   df <- .classes
-
-  slot_data <- df |> filter(slotname == slot_name)
+  # browser()
+  slot_data <- df |> filter(slotname == slot_name, 
+                            class == class_name)
   if (nrow(slot_data) == 0) {
     stop("No slot found for slot: ", slot_name)
   }

@@ -1,27 +1,30 @@
+# Class trade ####
 #' An S4 class to represent inter-regional trade
 #'
-#' @slot name character. Short name of the trade object, used in sets.
-#' @slot desc character. Description of the trade object.
-#' @slot commodity character. The traded commodity short name.
-#' @slot routes data.frame. Source and destination regions. For bivariate trade define both directions.
-#' @slot trade data.frame. Technical parameters of trade.
-#' @slot aux data.frame. Auxiliary commodity of trade.
-#' @slot aeff data.frame. Auxiliary commodity efficiency parameters.
-#' @slot invcost data.frame. Investment cost, used when capacityVariable is TRUE.
-#' @slot olife numeric. Operational life of the trade object.
-#' @slot start numeric. Start year when the trade-type of process is available for investment.
-#' @slot end numeric. End year when the trade-type of process is available for investment.
-#' @slot stock data.frame. Capacity stock of the trade object.
-#' @slot capacityVariable logical. If TRUE, the capacity variable of the trade object is used. If FALSE, the capacity is defined by availability parameters (`ava.*`) in the trade-flow units.
-#' @slot cap2act numeric. Capacity to activity ratio.
-#' @slot misc list. Additional information.
-#' @slot fixom data.frame. (not implemented!) Fixed operation and maintenance costs.
-#' @slot varom data.frame. (not implemented!) Variable operation and maintenance costs.
-#' @slot capacity data.frame. (not implemented!) Capacity parameters of the trade object.
+#' @inherit newTrade details
+#' 
+#' @md
+#' @slot name `r get_slot_info("trade", "name")`
+#' @slot desc `r get_slot_info("trade", "desc")`
+#' @slot commodity `r get_slot_info("trade", "commodity")`
+#' @slot routes `r get_slot_info("trade", "routes")`
+#' @slot trade `r get_slot_info("trade", "trade")`
+#' @slot aux `r get_slot_info("trade", "aux")`
+#' @slot aeff `r get_slot_info("trade", "aeff")`
+#' @slot invcost `r get_slot_info("trade", "invcost")`
+#' @slot fixom `r get_slot_info("trade", "fixom")`
+#' @slot varom `r get_slot_info("trade", "varom")`
+#' @slot olife `r get_slot_info("trade", "olife")`
+#' @slot start `r get_slot_info("trade", "start")`
+#' @slot end `r get_slot_info("trade", "end")`
+#' @slot capacity `r get_slot_info("trade", "capacity")`
+#' @slot capacityVariable `r get_slot_info("trade", "capacityVariable")`
+#' @slot cap2act `r get_slot_info("trade", "cap2act")`
+#' @slot optimizeRetirement `r get_slot_info("trade", "optimizeRetirement")`
+#' @slot misc `r get_slot_info("trade", "misc")`
 #'
 #' @include class-storage.R
 #'
-#' @return
 #' @export
 #'
 setClass("trade",
@@ -112,11 +115,6 @@ setClass("trade",
       end = Inf,  # temporary, ToDO: similar to other processes
       stringsAsFactors = FALSE
     ),
-    # stock = data.frame(
-    #   year = integer(),
-    #   stock = numeric(),
-    #   stringsAsFactors = FALSE
-    # ),
     capacity = data.frame(
       # region = character(),
       year = integer(),
@@ -162,37 +160,135 @@ setMethod("initialize", "trade", function(.Object, ...) {
   .Object
 })
 
-setGeneric("newTrade", function(name, ...) standardGeneric("newTrade"))
-#' @family trade
-#' @export
-setMethod("newTrade", signature(name = "character"),
-          function(name, ..., source = NULL, destination = NULL, avaUpDef = Inf) {
-  trd <- .data2slots("trade", name, ...)
-  if (avaUpDef != Inf) {
-    trd@trade[nrow(trd@trade) + 1, ] <- NA
-    trd@trade[nrow(trd@trade), "ava.up"] <- avaUpDef
-  }
-  if (is.null(source) != is.null(destination)) {
-    stop('Inconsistency of source/destination data "', trd@name, '"')
-  }
-  if (!is.null(source) && !is.null(list(...)$routes)) {
-    stop('Inconsistency of source/destination with routes data "', trd@name, '"')
-  }
-  if (!is.null(source)) {
-    trd@routes <- merge(
-      data.frame(src = source, stringsAsFactors = FALSE),
-      data.frame(dst = destination, stringsAsFactors = FALSE)
-    )
-    trd@routes <- trd@routes[trd@routes$src != trd@routes$dst, , drop = FALSE]
-  }
-  trd
-})
 
+#' Create new trade object
+#'
+#' @description Constructor for trade object.
+#' 
+#' @details Trade objects are used to represent inter-regional exchange in the model.
+#' Without trade, every region is isolated and can only use its own resources.
+#' The class defines trade routes, efficiency, costs,
+#' and other parameters related to the process. Number of routes per trade object is not
+#' limited. One trade object can have a part or entire trade network of the model.
+#' However, it has a distinct name and all the routs will be optimized together.
+#' Create separate trade objects to optimize different parts of the trade network 
+#' (aka transmission lines).
+#' 
+#' @md 
+#' @param name `r get_slot_info("trade", "name")`
+#' @param desc `r get_slot_info("trade", "desc")`
+#' @param commodity `r get_slot_info("trade", "commodity")`
+#' @param routes `r get_slot_info("trade", "routes")`
+#' @param trade `r get_slot_info("trade", "trade")`
+#' @param fixom `r get_slot_info("trade", "fixom")`
+#' @param varom `r get_slot_info("trade", "varom")`
+#' @param invcost `r get_slot_info("trade", "invcost")`
+#' @param olife `r get_slot_info("trade", "olife")`
+#' @param start `r get_slot_info("trade", "start")`
+#' @param end `r get_slot_info("trade", "end")`
+#' @param capacity `r get_slot_info("trade", "capacity")`
+#' @param capacityVariable `r get_slot_info("trade", "capacityVariable")`
+#' @param aux `r get_slot_info("trade", "aux")`
+#' @param aeff `r get_slot_info("trade", "aeff")`
+#' @param cap2act `r get_slot_info("trade", "cap2act")`
+#' @param optimizeRetirement `r get_slot_info("trade", "optimizeRetirement")`
+#' @param misc `r get_slot_info("trade", "misc")`
+#'
+#' @return trade object with given specifications.
+#' @export
+#' @rdname newTrade
+#' @family trade, process, constructor
+#' @examples
+#' PIPELINE <- newTrade(
+#'   name = "PIPELINE",
+#'   desc = "Some transport pipeline",
+#'   routes = data.frame(
+#'     src = c("R1", "R2"),
+#'     dst = c("R2", "R3")
+#'   ),
+#'   trade = data.frame(
+#'     src = c("R1", "R2"),
+#'     dst = c("R2", "R3"),
+#'     teff = c(0.99, 0.98)
+#'   ),
+#'   olife = list(olife = 60)
+#' )   
+newTrade <- function(
+    name = "",
+    desc = "",
+    commodity = character(),
+    routes = data.frame(),
+    trade = data.frame(),
+    fixom = data.frame(),
+    varom = data.frame(),
+    invcost = data.frame(),
+    olife = data.frame(),
+    start = data.frame(),
+    end = data.frame(),
+    capacity = data.frame(),
+    capacityVariable = TRUE,
+    aux = data.frame(),
+    aeff = data.frame(),
+    cap2act = 1,
+    optimizeRetirement = FALSE,
+    misc = list()
+) {
+  .data2slots(
+    "trade", 
+    name, 
+    desc = desc,
+    commodity = commodity,
+    routes = routes,
+    trade = trade,
+    fixom = fixom,
+    varom = varom,
+    invcost = invcost,
+    olife = olife,
+    start = start,
+    end = end,
+    capacity = capacity,
+    capacityVariable = capacityVariable,
+    aux = aux,
+    aeff = aeff,
+    cap2act = cap2act,
+    optimizeRetirement = optimizeRetirement,
+    misc = misc
+  )
+}
+
+
+
+# setMethod("newTrade", signature(name = "character"),
+#           function(name, ..., source = NULL, destination = NULL, avaUpDef = Inf) {
+#   trd <- .data2slots("trade", name, ...)
+#   if (avaUpDef != Inf) {
+#     trd@trade[nrow(trd@trade) + 1, ] <- NA
+#     trd@trade[nrow(trd@trade), "ava.up"] <- avaUpDef
+#   }
+#   if (is.null(source) != is.null(destination)) {
+#     stop('Inconsistency of source/destination data "', trd@name, '"')
+#   }
+#   if (!is.null(source) && !is.null(list(...)$routes)) {
+#     stop('Inconsistency of source/destination with routes data "', trd@name, '"')
+#   }
+#   if (!is.null(source)) {
+#     trd@routes <- merge(
+#       data.frame(src = source, stringsAsFactors = FALSE),
+#       data.frame(dst = destination, stringsAsFactors = FALSE)
+#     )
+#     trd@routes <- trd@routes[trd@routes$src != trd@routes$dst, , drop = FALSE]
+#   }
+#   trd
+# })
+
+## Methods ####################################################################
+#' Update trade object
 #' @rdname update
 #' @name update
 #'
 #' @family trade update
 #' @keywords trade update
+#' @method trade update
 #' @export
 setMethod("update", signature(object = "trade"), function(object, ...) {
   .data2slots("trade", object, ...)

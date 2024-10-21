@@ -2,41 +2,104 @@
 % Please edit documentation in R/class-constraint.R
 \name{newConstraint}
 \alias{newConstraint}
-\title{Create (equality or inequality) constraint object}
+\alias{isConstraint}
+\alias{addSummand}
+\title{Create constraint object to add custom constraints to the model.}
 \usage{
 newConstraint(
   name,
   desc = "",
   ...,
   eq = "==",
-  rhs = data.frame(),
   for.each = NULL,
+  rhs = data.frame(),
   defVal = NULL,
   interpolation = "inter",
-  replace_zerros = 1e-20,
-  arg = NULL
+  replace_zerros = 1e-20
 )
+
+isConstraint(object)
+
+addSummand(eqt, variable = NULL, mult = data.frame(), for.sum = list(), arg)
 }
 \arguments{
-\item{name}{Name of the constrain object (will be used in GAMS or GLPK as an element in sets)}
+\item{name}{character. Name of the constraint object, used in sets.}
 
-\item{...}{Left-hand side (LHS) terms of the statement - list objects with}
+\item{desc}{character. Description of the constraint.}
+
+\item{...}{named or unnamed list(s) of left-hand side (LHS)
+linear terms (summands) to define the constraint.
+Every summand is defined as a list with the following elements:
+\itemize{
+\item \code{variable} - name of the variable in the summand.
+\item \code{mult} - multiplier for the variable in the summand.
+\item \code{for.sum} - list of sets for which the summand is defined.
+The summands can be passed as named or unnamed lists.
+They will be added to the \code{lhs} slot of the constraint object
+as linear terms of mulipliers and variables.
+}}
 
 \item{eq}{Type of the relation ('==' default, '<=', '>=')}
 
-\item{rhs}{a numeric value, list or data frame with sets and numeric values for each constraint. Warning: zero values will be replaced with \code{1e-20} to avoid ignoring them by the current interpolation algorithms.}
+\item{for.each}{list or data.frame with sets that define the dimension of the constraint.}
 
-\item{for.each}{list with sets for which constraint will be created.}
+\item{rhs}{a numeric value, list or data frame with sets and numeric values for each constraint.
+Note: zero values will be replaced with \code{replace_zerros} to avoid dropping them by the interpolation algorithms.}
 
-\item{defVal}{the default value for the \code{rhs}.}
+\item{defVal}{numeric. The default value for the rhs. It is recommended to set the default value for the rhs of every constraint to avoid unexpected behavior. If not specified, the default value is 0, and the warning is issued.}
 
-\item{interpolation}{interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".}
+\item{interpolation}{character. Interpolation rule for the constraint. Recognized values, any combination  of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation.  The default value is "inter", meaning that the interpolation is done  for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the \code{rhs} values, respectively.}
 
-\item{arg}{tbc}
+\item{replace_zerros}{numeric value to replace zero values in \code{rhs} and \code{defVal}. Default is \code{1e-20}.}
+
+\item{object}{any R object}
 }
 \value{
 Object of class \code{constraint}.
+
+TRUE if the object inherits class \code{constraint}, FALSE otherwise.
 }
 \description{
-Create (equality or inequality) constraint object
+The function creates a new constraint object that can be used
+to add custom constraints to the model.
 }
+\details{
+Custom constraints extend the functionality of the model by adding
+user-defined constraints to the optimization problem.
+If the predefined constraints are not sufficient to describe the problem,
+custom constraints can be used to add linear equlity or inequality
+constraints to define additional relationships between the variables.
+In many cases this can be done without writing constraints in the GAMS,
+Julia/JuMP, Python/Pyomo, or GLPK-MathProg languages by using the
+\code{constrant} class and the \code{newConstraint} function.
+To define a custom constraint with the \code{newConstraint} function,
+the user needs to specify the name of the constraint, the type of the
+relation (equality, less than or equal, greater than or equal), the
+left-hand side (LHS) terms of the statement, and the right-hand side (RHS) value.
+The dimension of the constraint is set by the \code{for.each} parameter.
+The 'lhs' terms are defined as a list of linear terms (summands).
+Each summand consists of a variable, a multiplier, and a set of sets
+for which the summand is defined.
+}
+\section{Functions}{
+\itemize{
+\item \code{isConstraint()}: Check if an object is a constraint.
+
+\item \code{addSummand()}: 
+
+}}
+\examples{
+isConstraint(1)
+isConstraint(newConstraint(""))
+}
+\seealso{
+Other class, constraint: 
+\code{\link{constraint-class}},
+\code{\link{summand-class}}
+
+Other class, constraint: 
+\code{\link{constraint-class}},
+\code{\link{summand-class}}
+}
+\concept{class, constraint}
+\concept{constraint}

@@ -1,27 +1,24 @@
 #' An S4 class to represent a commodity
 #'
-#' @slot name character, a short name used in sets, no white spaces or special characters
-#' @slot limtype, character or factor, the limit type of the commodity in balance equation ("LO" by default, meaning that the level of commodity in the model is satisfied with the lower bound)
-#' @slot timeframe character, the default time-frame this commodity operates in the model
-#'             (the lowest timeframe used by default)
-#' @slot unit the main unit of the commodity used in the model, character string
-#' @slot emis data.frame with emissions factors, columns:
-#' \describe{
-#'  \item{comm}{character string, name of the commodity}
-#'  \item{unit}{character string, unit of the emission factor}
-#'  \item{emis}{numeric, emission factor, applied to the consumed commodity (`@name`) by a technology with combustion parameter > 0, to calculate emissions of the commodity specified in the slot (`@emis$comm`).}
-#' }
-#' @slot agg data.frame with aggregation parameters of several commodities
-#' into the `@name` commodity, with columns:
-#' \describe{
-#'  \item{comm}{character string, name of the commodity being aggregated}
-#'  \item{unit}{numeric, unit of the commodity being aggregated}
-#'  \item{agg}{numeric, aggregation parameter, applied to the commodity specified in the slot (`@agg$comm`) to calculate the `@name` commodity.}
-#' }
-#' @slot misc list with miscellaneous information to store
-#' @slot desc
+#' @description
+#' A commodity is a good or service that is produced and consumed in the model.
+#' The commodity class is used to store information about the commodity. 
+#' All processes in the model operate on commodities, i.e. they either generate,
+#' produce, consume, transform, store, or transport commodities.
+#' The creation of a commodity object is done with the `newCommodity` function.
 #'
-#' @rdname commodity
+#' @md
+#' @slot name `r get_slot_info("commodity", "name")`
+#' @slot desc `r get_slot_info("commodity", "desc")`
+#' @slot limtype `r get_slot_info("commodity", "limtype")`
+#' @slot timeframe `r get_slot_info("commodity", "timeframe")`
+#' @slot unit `r get_slot_info("commodity", "unit")`
+#' @slot emis `r get_slot_info("commodity", "emis")`
+#' @slot agg `r get_slot_info("commodity", "agg")`
+#' @slot misc `r get_slot_info("commodity", "misc")`
+#'
+#' @rdname class-commodity
+#' @family class, commodity
 #' @include class-calendar.R
 #'
 setClass("commodity",
@@ -62,30 +59,24 @@ setMethod("initialize", "commodity", function(.Object, ...) {
   .Object
 })
 
-#' Create class commodity
-#' @param name character, a short name used in sets, no white spaces or special characters
-#' @param desc character, a description of the commodity
-#' @param limtype character or factor, the limit type of the commodity
-#' in balance equation ("LO" by default, meaning that the level of commodity in
-#' the model is satisfied with the lower bound)
-#' @param timeframe character, the default time-frame this commodity operates
-#' in the model (the lowest timeframe used by default)
-#' @param unit character, the physical unit of the commodity used in the model,
-#' currently for information only.
-#' @param agg data.frame, if the commodity is an aggregation of several commodities,
-#' this data.frame contains the aggregation parameters of the listed commodities
-#' into the `name` commodity.
-#' @param emis data.frame, emission factors of the commodity, if the commodity
-#' is consumed by a technology with combustion parameter > 0, the listed in the
-#' slot commodities will be emitted.
-#' @param misc list, a list with miscellaneous information to store.
-#' #'
+#' Create new commodity object
+#' 
+#' @md
+#' @param name `r get_slot_info("commodity", "name")`
+#' @param desc `r get_slot_info("commodity", "desc")`
+#' @param limtype `r get_slot_info("commodity", "limtype")`
+#' @param timeframe `r get_slot_info("commodity", "timeframe")`
+#' @param unit `r get_slot_info("commodity", "unit")`
+#' @param agg `r get_slot_info("commodity", "agg")`
+#' @param emis `r get_slot_info("commodity", "emis")`
+#' @param misc `r get_slot_info("commodity", "misc")`
+#'
 #' @return commodity object
 #' @export
 #'
-#' @rdname commodity
+#' @rdname newCommodity
 #'
-#' @family sets
+#' @family commodity
 #'
 #' @examples
 #' newCommodity(name = "ELC", desc = "Electricity")
@@ -110,7 +101,7 @@ newCommodity <- function(
 }
 
 
-#' @describeIn update update commodity
+#' @method update commodity
 #' @family commodity update
 #' @export
 setMethod("update", signature(object = "commodity"), function(object, ...) {

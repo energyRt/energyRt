@@ -1,15 +1,21 @@
-#' Title
+#' S4 class to represent weather factors
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot unit character.
-#' @slot region character.
-#' @slot timeframe character.
-#' @slot defVal numeric.
-#' @slot weather data.frame.
-#' @slot misc list.
+#' @inherit newWeather description
+#' @inherit newWeather details
+#' 
+#' @md
+#' @slot name `r get_slot_info("weather", "name")`
+#' @slot desc `r get_slot_info("weather", "desc")`
+#' @slot unit `r get_slot_info("weather", "unit")`
+#' @slot region `r get_slot_info("weather", "region")`
+#' @slot timeframe `r get_slot_info("weather", "timeframe")`
+#' @slot defVal `r get_slot_info("weather", "defVal")`
+#' @slot weather `r get_slot_info("weather", "weather")`
+#' @slot misc `r get_slot_info("weather", "misc")`
 #'
 #' @include class-export.R
+#' @family class, weather, data
+#' @rdname class-weather
 #'
 #' @export
 #'
@@ -21,7 +27,7 @@ setClass("weather",
     region = "character",
     timeframe = "character",
     defVal = "numeric",
-    weather = "data.frame", # weather factor (availability multiplier)
+    weather = "data.frame",
     misc = "list"
   ),
   prototype(
@@ -47,21 +53,30 @@ setMethod("initialize", "weather", function(.Object, ...) {
 })
 
 
-
-
-#' Title
+#' Create new weather object
+#' 
+#' @description
+#' `weather` is a data-carrying class with exogenous shocks
+#' used to influence operation of processes in the model.
+#' 
+#' @details
+#' Weather factors are separated from the model parameters
+#' and can be added or replaced for different scenarios.
+#' !!!Additional details...
+#' 
+#' @md
+#' @param name `r get_slot_info("weather", "name")`
+#' @param desc `r get_slot_info("weather", "desc")`
+#' @param unit `r get_slot_info("weather", "unit")`
+#' @param region `r get_slot_info("weather", "region")`
+#' @param timeframe `r get_slot_info("weather", "timeframe")`
+#' @param defVal `r get_slot_info("weather", "defVal")`
+#' @param weather `r get_slot_info("weather", "weather")`
 #'
-#' @param name
-#' @param desc
-#' @param unit
-#' @param region
-#' @param timeframe
-#' @param defVal
-#' @param weather
-#' @param ...
-#'
-#' @return
+#' @return weather object with given specifications.
 #' @export
+#' @rdname newWeather
+#' @family weather
 #'
 #' @examples
 newWeather <- function(
@@ -72,18 +87,19 @@ newWeather <- function(
     timeframe = character(),
     defVal = 0.,
     weather = data.frame(),
-    ...) {
-  .data2slots("weather",
-              name,
-              desc = desc,
-              unit = unit,
-              region = region,
-              timeframe = timeframe,
-              defVal = defVal,
-              weather = weather,
-              ...)
-}
-
+    misc = list()) {
+  .data2slots(
+    "weather",
+      name,
+      desc = desc,
+      unit = unit,
+      region = region,
+      timeframe = timeframe,
+      defVal = defVal,
+      weather = weather,
+      misc = misc
+      )
+  }
 
 #' @param object object of class export
 #'

@@ -2,9 +2,15 @@ pandoc: '3.2'
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
+  energyRt: energyRt.html
+  articles/helloworld: helloworld.html
+  articles/install: install.html
+  articles/logo: logo.html
   articles/model: model.html
+  articles/roadmap: roadmap.html
   utopia: utopia.html
-last_built: 2024-10-18T00:25Z
+  articles/workflow: workflow.html
+last_built: 2024-10-21T01:42Z
 urls:
   reference: https://energyRt.org/reference
   article: https://energyRt.org/articles

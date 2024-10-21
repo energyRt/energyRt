@@ -4,17 +4,27 @@
 \alias{newRepository}
 \title{Create new repository object}
 \usage{
-newRepository(name = "default_repository", ...)
+newRepository(
+  name = "base_repository",
+  ...,
+  desc = NA_character_,
+  misc = list()
+)
 }
 \arguments{
-\item{name}{character,}
+\item{name}{character. Name of the repository.}
+
+\item{...}{list. Model objects ("bricks"), e.g., technologies, constraints, costs, etc.,  stored in with their names as keys, or gropped in named lists.}
+
+\item{desc}{character. Description of the repository.}
+
+\item{misc}{list. Any additional data or information to store in the object.}
 }
 \description{
 Create new repository object
 }
 \seealso{
-Other repository: 
-\code{\link{add,repository-method}},
+Other repository, model, data: 
 \code{\link{repository-class}}
 }
-\concept{repository}
+\concept{repository, model, data}

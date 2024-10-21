@@ -1,3 +1,5 @@
+## costs-class ####
+
 #' Class 'costs'
 #'
 #' @slot name character.
@@ -34,8 +36,16 @@ setMethod("initialize", "costs", function(.Object, ...) {
   .Object
 })
 
+## constructor function ####
+
 #' @export
-newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
+newCosts <- function(
+    name, 
+    variable, 
+    desc = "", 
+    mult = NULL, 
+    subset = NULL
+    ) {
   obj <- new("costs")
   obj@name <- name
   obj@desc <- desc
@@ -71,16 +81,17 @@ newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
     if (!all(colnames(subset) %in% sets)) {
       bug <- colnames(subset)[!(colnames(subset) %in% sets)]
       stop(paste0(
-        "There ", c("is", "are")[1 + length(bug) != 1], " unnecessary column",
+        # "There ", c("is", "are")[1 + length(bug) != 1], 
+        "Unrecognized column",
         "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'),
         '" in subset (cost "', name, '").'
       ))
     }
     if (!is.data.frame(subset)) {
-      stop(paste0('Subset have to be list or data.frame (cost "', name, '").'))
+      stop(paste0('Subset must be a list or data.frame (cost "', name, '").'))
     }
     if (anyDuplicated(subset)) {
-      stop(paste0('There are duplicated row(s) in subset (cost "', name, '").'))
+      stop(paste0('Duplicated row(s) in subset (cost "', name, '").'))
     }
     subset <- subset[, !apply(is.na(subset), 2, all), drop = FALSE]
     obj@subset <- subset
@@ -89,7 +100,7 @@ newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
   # Add mult
   if (!is.null(mult)) {
     if (!is.data.frame(mult) && !is.numeric(mult)) {
-      stop(paste0('Mult have to be numeric or data.frame (cost "', name, '").'))
+      stop(paste0('Mult must be numeric or data.frame (cost "', name, '").'))
     }
     if (is.numeric(mult)) {
       obj@mult <- data.frame(value = mult)
@@ -97,7 +108,8 @@ newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
       if (!all(colnames(mult) %in% c("value", sets))) {
         bug <- colnames(mult)[!(colnames(mult) %in% c("value", sets))]
         stop(paste0(
-          "There ", c("is", "are")[1 + length(bug) != 1], " unnecessary column",
+          # "There ", c("is", "are")[1 + length(bug) != 1], 
+          "Unrecognized column",
           "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'),
           '" in mult (cost "', name, '").'
         ))
@@ -105,10 +117,10 @@ newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
       mult <- mult[, !apply(is.na(mult), 2, all), drop = FALSE]
       # if (anyDuplicated(mult[, colnames(mult) != "value", drop = FALSE])) {
       if (anyDuplicated(select(mult, -value))) {
-        stop(paste0('There are duplicated row(s) in mult (cost "', name, '").'))
+        stop(paste0('Duplicated row(s) in mult (cost "', name, '").'))
       }
-      if (is.null(mult$value)) {
-        stop(paste0('There is not value in mult (cost "', name, '").'))
+      if (is.null(mult$value) || any(is.na(mult$value))) {
+        stop(paste0('NAs in mult (cost "', name, '").'))
       }
       # Remove unused set values from mult (by subset)
       if (any(colnames(mult) %in% colnames(subset))) {
@@ -121,14 +133,15 @@ newCosts <- function(name, variable, desc = "", mult = NULL, subset = NULL) {
     }
   }
   if (nrow(obj@mult) == 0 && obj@defVal == 0) {
-    warning(paste0('The cost of the "', name, '" is strictly equal to zero.'))
+    warning(paste0('The cost constraint of the "', name, '" is strictly equal to zero.'))
   }
 
   obj
 }
 
 
-# Calculate do equation need additional set, and add it
+## internal functions ####
+# Check if the constraint needs additional set(s), add if needed
 .getCostEquation <- function(prec, stm, approxim) {
   stop.constr <- function(x) {
     stop(paste0('Cost "', stm@name, '" error: ', x))
