@@ -3,23 +3,29 @@
 \docType{class}
 \name{summand-class}
 \alias{summand-class}
-\title{Title}
+\title{An S4 class to represent a summand in a constraint.}
 \description{
-Title
+An S4 class to represent a summand in a constraint.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{desc}}{character.}
+\item{\code{desc}}{character. Description of the linear term.}
 
-\item{\code{variable}}{character.}
+\item{\code{variable}}{character. Name of the variable.}
 
-\item{\code{for.sum}}{list.}
+\item{\code{for.sum}}{list. List of sets for which the summand will be created.}
 
-\item{\code{mult}}{data.frame.}
+\item{\code{mult}}{data.frame. Multiplying coefficients to the variable for each set in the \code{for.sum} slot.}
 
-\item{\code{defVal}}{numeric.}
+\item{\code{defVal}}{numeric. Default value for the summand.}
 
-\item{\code{misc}}{list.}
+\item{\code{misc}}{list. Additional information.}
 }}
 
+\seealso{
+Other class, constraint: 
+\code{\link{constraint-class}},
+\code{\link{newConstraint}()}
+}
+\concept{class, constraint}

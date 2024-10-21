@@ -1,19 +1,25 @@
 #' An S4 class to represent commodity import from the rest of the world.
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot commodity character.
-#' @slot unit character.
-#' @slot reserve numeric.
-#' @slot imp data.frame.
-#@slot timeframe character. - depreciated
-#' @slot misc list.
+#' Use `newImport` to create a new `import` object.
+#' 
+#' @inherit newImport description
+#' @inherit newImport details
+#' 
+#' @md
+#' @slot name `r get_slot_info("import", "name")`
+#' @slot desc `r get_slot_info("import", "desc")`
+#' @slot commodity `r get_slot_info("import", "commodity")`
+#' @slot unit `r get_slot_info("import", "unit")`
+#' @slot reserve `r get_slot_info("import", "reserve")`
+#' @slot imp `r get_slot_info("import", "imp")`
+#' @slot misc `r get_slot_info("import", "misc")`
 #'
 #' @include class-trade.R
+#' @family class, import
+#' @rdname class-import
 #'
-#' @return
 #' @export
-#'
+#' 
 setClass("import",
   representation(
     name = "character",
@@ -52,17 +58,36 @@ setMethod("initialize", "import", function(.Object, ...) {
 
 #' Create new export object
 #'
+#' Constructor for import object.
+#' 
 #' @name newImport
+#' 
+#' @description
+#' Import object to represent commodity import from the Rest of the World (RoW).
+#' 
+#' @details 
+#' Import object adds an "external" source of commodity to the model. 
+#' The RoW is not modeled explicitly as a region, `export` and `import` objects
+#' define and control the exchange with the RoW. The operation is similar to
+#' the `demand` object, but the two ideas distinguishes between internal 
+#' and external final consumption.
+#' This exchange can be exogenously defined (`imp.fx`) or optimized by the model
+#' within the given limits (`imp.lo`, `imp.up`). The `price` column is used to
+#' define the price of the imported commodity.
+#' "Reserve" sets the total amount that can be imported over the model horizon.
+#' 
+#' @param name `r get_slot_info("import", "name")`
+#' @param desc `r get_slot_info("import", "desc")`
+#' @param commodity `r get_slot_info("import", "commodity")`
+#' @param unit `r get_slot_info("import", "unit")`
+#' @param reserve `r get_slot_info("import", "reserve")`
+#' @param imp `r get_slot_info("import", "imp")`
+#' @param misc `r get_slot_info("import", "misc")`
 #'
+#' @return import object with given specifications.
+#' @rdname newImport
 #' @export
 #'
-#' @param name character name of the object (used in sets)
-#' @param desc optional character description
-#' @param commodity character name of the import commodity
-#' @param unit character name of unit of the commodity
-#' @param reserve numeric, total accumulated limit through the model horizon
-#' @param imp data frame with import parameters
-#' @param ...
 newImport <- function(
     name,
     desc = "",
@@ -70,7 +95,8 @@ newImport <- function(
     unit = NULL,
     reserve = Inf,
     imp = data.frame(),
-    ...) {
+    misc = list()
+    ) {
   .data2slots(
     "import", name,
     desc = desc,
@@ -78,7 +104,8 @@ newImport <- function(
     unit = unit,
     reserve = reserve,
     imp = imp,
-    ...)
+    misc = misc
+  )
 }
 
 #' @param object an S4 class object to be updated.

@@ -39,6 +39,38 @@ development:
 #   mode: auto
 #   version_label: info
 
+navbar:
+  # bg: light
+  structure:
+    left:  [intro, reference, articles, roadmap, logo, news]
+    right: [search, github, lightswitch]
+  components:
+    news:
+      text: News
+      href: news/index.html
+    articles:
+      text: Tutorials
+      menu:
+      - text: Installation
+        href: articles/install.html
+      # - text: Framework
+        # href: articles/help.html
+      - text: Hello World!
+        href: articles/helloworld.html
+  #     - text: Suggested Workflow
+  #       href: articles/workflow.html
+    roadmap:
+      text: Roadmap
+      href: articles/roadmap.html
+      # menu:
+      # - text: near term
+      #   href: articles/model.html
+      # - text: long term
+        # href: articles/help.html
+    logo:
+      text: Logo
+      href: articles/logo.html
+
 reference:
 - title: Classes
   desc:  Data structures of the key model components.
@@ -118,6 +150,7 @@ reference:
 - title: utils
   contents:
   - matches("en_install_julia_pkgs")
+  - get_slot_info
 
 # - title: All other
 #   contents: lacks_concepts("none")

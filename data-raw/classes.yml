@@ -1,8 +1,218 @@
 ################################################################################
 # Description of slots in classes to use in documentation functions ############
-# Edit this then run `DATASET.R` to update the .classes data.frame for docs ####
-# technology ###################################################################
+# Edit then run `DATASET.R` to update the .classes obj in the package data #####
+################################################################################
 class:
+# model bricks: system components ###############################################
+## commodity ####################################################################
+  commodity:
+    name:
+      type: character
+      description: Name of the commodity.
+    desc:
+      type: character
+      description: Optional description of the commodity for reference.
+    limtype:
+      type: factor or character
+      description: >
+        The limit type of the commodity in balance equation, "LO", "UP", or "FX".
+        "LO" by default, meaning that the level of commodity in the model is restricted 
+        with the lower bound, excess is allowed. "UP" means that the level of commodity
+        cannot exceed the upper bound. "FX" means that total commudity supply and demand
+        are equal, no excess or deficit is allowed.
+    timeframe:
+      type: character
+      description: >
+        The default time-frame this commodity operates in the model.
+        The lowest timeframe in the model is used by default.
+    unit:
+      type: character
+      description: The main unit of the commodity used in the model.
+    emis:
+      type: data.frame
+      description: >
+        Emissions factors related to the commodity consumption 
+        (if "combustion" parameter of a technology which consumes the commodity is > 0).
+      columns:
+        comm:
+          type: character
+          description: Name of the emitted commodity.
+        unit:
+          type: character
+          description: Unit of the emission factor.
+        emis:
+          type: numeric
+          description: >
+            Emission factor, emissions released per unit of the consumed commodity.
+    agg:
+      type: data.frame
+      description: >
+        Used to define an aggregation of several commodities into the `name` commodity.
+      columns:
+        comm:
+          type: character
+          description: Name of a commodity being aggregated.
+        unit:
+          type: character
+          description: Unit of the commodity being aggregated.
+        agg:
+          type: numeric
+          description: >
+            weight of the commodity in the aggregation, must be set for all aggregated commodities.
+    misc:
+      type: list
+      description: >
+        List of additional parameters that are not used in the model but can be used
+        for reference or user-defined functions. For example, links to the source
+        of the commodity data, or other metadata.
+## supply #######################################################################
+  supply:
+    name:
+      type: character
+      description: Name of the supply object, used in sets.
+    desc:
+      type: character
+      description: Description of the supply object.
+    commodity:
+      type: character
+      description: The supplied commodity short name.
+    unit:
+      type: character
+      description: The main unit of the commodity used in the model.
+    weather:
+      type: data.frame
+      description: Weather factors to apply to the supply.
+      columns:
+        weather:
+          type: character
+          description: >
+            Name of the weather factor to apply. Must match the weather factor 
+            names in a `weather` class in the model.
+        wava.lo:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the lower bound of 
+            the availability factor `ava.lo`.
+        wava.up:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the upper bound of 
+            the availability factor `ava.up`.
+        wava.fx:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the fixed value of 
+            the availability factor `ava.fx`. This parameter overrides 
+            `wava.lo` and `wava.up`.
+    reserve:
+      type: data.frame
+      description: >
+        Total available resource. Applicable to exhaustible resources.
+        Set for each region. If not set, the resource is considered infinite.
+      columns:
+        region:
+          type: character
+          description: >
+            Region name to apply the parameter. 
+            Use NA to apply to all regions.
+        res.lo:
+          type: numeric
+          description: Lower bound of the total available resource.
+        res.up:
+          type: numeric
+          description: Upper bound of the total available resource.
+        res.fx:
+          type: numeric
+          description: >
+            Fixed value of the total available resource. 
+            This parameter overrides `res.lo` and `res.up`.
+    availability:
+      type: data.frame
+      description: Availability of the resource in physical units.
+      columns:
+        region:
+          type: character
+          description: >
+            Region name to apply the parameter.
+            Use NA to apply to all regions.
+        year:
+          type: integer
+          description: >
+            Year to apply the parameter.
+            Use NA to apply to all years.
+        slice:
+          type: character
+          description: >
+            Time slice to apply the parameter.
+            Use NA to apply to all slices.
+        ava.lo:
+          type: numeric
+          description: Lower bound of the availability factor.
+        ava.up:
+          type: numeric
+          description: Upper bound of the availability factor.
+        ava.fx:
+          type: numeric
+          description: >
+            Fixed value of the availability factor. 
+            This parameter overrides `ava.lo` and `ava.up`.
+        cost:
+          type: numeric
+          description: >
+            Cost of the resource extraction, 
+            if not set, the resource is considered free.
+    region:
+      type: character
+      description: >
+        Regions where the supply process exists.
+        Must include all regions used in other slots.
+        `availability` and `reserve` slots also limit possible regions.
+    misc:
+      type: list
+      description: >
+        List of additional parameters that are not used in the model but can be used
+        for reference or user-defined functions. For example, links to the source
+        of the supply data, or other metadata.
+## demand #######################################################################
+  demand:
+    name:
+      type: character
+      description: Name of the demand.
+    desc:
+      type: character
+      description: Optional description of the demand for reference.
+    commodity:
+      type: character
+      description: Name of the commodity for which the demand will be specified.
+    unit:
+      type: character
+      description: Optional unit of the commodity.
+    dem:
+      type: data.frame
+      description: Specification of the demand.
+      columns:
+        region:
+          type: character
+          description: Name of region for the demand value. NA for every region.
+        year:
+          type: integer
+          description: Year of the demand. NA for every year.
+        slice:
+          type: character
+          description: Name of the slice for the demand value. NA for every slice.
+        dem:
+          type: numeric
+          description: Value of the demand.
+    region:
+      type: character
+      description: >
+        Optional name of region to narrow the specification of the demand in the case of used NAs. 
+        Error will be returned if specified regions in `@dem` are not mensioned in the `@region` slot 
+        (if the slot is not empty).
+    misc:
+      type: list
+      description: Optional list of additional information.
+## technology ###################################################################
   technology:
     name:
       type: character
@@ -440,5 +650,995 @@ class:
         List of additional parameters that are not used in the model but can be used
         for reference or user-defined functions. For example, links to the source
         of the technology data, or other metadata.
+## storage ######################################################################
+  storage:
+    name:
+      type: character
+      description: Name of the storage (used in sets).
+    desc:
+      type: character
+      description: Description of the storage.
+    commodity:
+      type: character
+      description: Name of the stored commodity.
+    start:
+      type: data.frame
+      description: Start year when the storage is available for installation.
+      columns:
+        region:
+          type: character
+          description: Regions where the storage is available for investment.
+        start:
+          type: integer
+          description: The first year when the storage is available for investment.
+    end:
+      type: data.frame
+      description: Last year when the storage is available for investment.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        end:
+          type: integer
+          description: The last year when the storage is available for investment.
+    aux:
+      type: data.frame
+      description: Auxiliary commodities.
+      columns:
+        acomm:
+          type: character
+          description: Name of the auxiliary commodity (used in sets).
+        unit:
+          type: character
+          description: Unit of the auxiliary commodity.
+    olife:
+      type: data.frame
+      description: >
+        Operational life of the storage technology, applicable to the new investment only, 
+        the operational life (retirement) of preexiting capacity is described in the `stock` slot.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        olife:
+          type: integer
+          description: Operational life of the storage technology in years.
+    charge:
+      type: data.frame
+      description: Pre-charged level at the beginning of the operational cycle.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice for which the charged level will be specified.
+        charge:
+          type: numeric
+          description: Pre-charged or targeted level at the specified slice.
+    seff:
+      type: data.frame
+      description: Storage efficiency parameters.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        stgeff:
+          type: numeric
+          description: Storage decay annual rate.
+        inpeff:
+          type: numeric
+          description: Input efficiency rate.
+        outeff:
+          type: numeric
+          description: Output efficiency rate.
+    af:
+      type: data.frame
+      description: Availability factor parameters.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        af.lo:
+          type: numeric
+          description: Lower bound of the availability factor.
+        af.up:
+          type: numeric
+          description: Upper bound of the availability factor.
+        af.fx:
+          type: numeric
+          description: Fixed value of the availability factor. This parameter overrides `af.lo` and `af.up`.
+        cinp.lo:
+          type: numeric
+          description: Lower bound of the input commodity availability factor.
+        cinp.up:
+          type: numeric
+          description: Upper bound of the input commodity availability factor.
+        cinp.fx:
+          type: numeric
+          description: >
+            Fixed value of the input commodity availability factor.
+            This parameter overrides `cinp.lo` and `cinp.up`.
+        cout.lo:
+          type: numeric
+          description: Lower bound of the output commodity availability factor.
+        cout.up:
+          type: numeric
+          description: Upper bound of the output commodity availability factor.
+        cout.fx:
+          type: numeric
+          description: >
+            Fixed value of the output commodity availability factor. 
+            This parameter overrides `cout.lo` and `cout.up`.
+    aeff:
+      type: data.frame
+      description: Auxiliary commodities efficiency parameters.
+      columns:
+        acomm:
+          type: character
+          description: Name of the auxiliary commodity (used in sets).
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        stg2ainp:
+          type: numeric
+          description: Storaage-level-to-auxiliary-input-commodity coefficient (multiplier).
+        cinp2ainp:
+          type: numeric
+          description: Input-commodity-to-auxiliary-input-commodity coefficient (multiplier).
+        cout2ainp:
+          type: numeric
+          description: Output-commodity-to-auxiliary-input-commodity coefficient (multiplier).
+        stg2aout:
+          type: numeric
+          description: Storage-level-to-auxiliary-output-commodity coefficient (multiplier).
+        cinp2aout:
+          type: numeric
+          description: Input-commodity-to-auxiliary-output-commodity coefficient (multiplier).
+        cout2aout:
+          type: numeric
+          description: Output-commodity-to-auxiliary-output-commodity coefficient (multiplier).
+        cap2ainp:
+          type: numeric
+          description: Capacity-to-auxiliary-input-commodity coefficient (multiplier).
+        cap2aout:
+          type: numeric
+          description: Capacity-to-auxiliary-output-commodity coefficient (multiplier).
+        ncap2ainp:
+          type: numeric
+          description: New-capacity-to-auxiliary-input-commodity coefficient (multiplier).
+        ncap2aout:
+          type: numeric
+          description: New-capacity-to-auxiliary-output-commodity coefficient (multiplier).
+        ncap2stg:
+          type: numeric
+          description: New-capacity-to-storage-level coefficient (multiplier).
+    fixom:
+      type: data.frame
+      description: Fixed operation and maintenance cost.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        fixom:
+          type: numeric
+          description: Fixed operation and maintenance cost for the specified sets.
+    varom:
+      type: data.frame
+      description: Variable operation and maintenance cost.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        inpcost:
+          type: numeric
+          description: Costs associated with the input commodity.
+        outcost:
+          type: numeric
+          description: Costs associated with the output commodity.
+        stgcost:
+          type: numeric
+          description: Costs associated with the storage level.
+    invcost:
+      type: data.frame
+      description: Investment cost.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        invcost:
+          type: numeric
+          description: Overnight investment cost for the specified region and year.
+        wacc:
+          type: numeric
+          description: >
+            Weighted average cost of capital. If not supplied, the discount from the 
+             model or scenario is used. (currently ignored)
+    fullYear:
+      type: logical
+      description: >
+        If TRUE (default), the storage technology operates between parent timeframes through the year.
+        The last time-slice in the timeframe is used as a preciding time-slice for the first
+        time-slice in the the same group of time-slices within the parent timeframe.
+        if FALSE, the storage charge and discchare cycle is limited to the parent timeframe.
+        The last time-slice in the timeframe is used as a preciding time-slice for the first
+        time-slice in the the same group of time-slices within the parent timeframe. 
+    region:
+      type: character
+      description: Region where the storage technology exists or can be installed.
+    cap2stg:
+      type: numeric
+      description: >
+        Charging and discharging capacity to the storing capacity inverse ratio.
+        Can be used to define the storage duration.
+    weather:
+      type: data.frame
+      description: Weather factors multipliers.
+      columns:
+        weather:
+          type: character
+          description: Name of the weather factor to apply.
+        waf.lo:
+          type: numeric
+          description: Coefficient that links the weather factor with the lower bound of the availability factor.
+        waf.up:
+          type: numeric
+          description: Coefficient that links the weather factor with the upper bound of the availability factor.
+        waf.fx:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the fixed value of the availability factor.
+            This parameter overrides `waf.lo` and `waf.up`.
+        wcinp.lo:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the lower bound of the input commodity availability factor.
+        wcinp.up:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the upper bound of the input commodity availability factor.
+        wcinp.fx:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the fixed value of the input commodity availability factor.
+            This parameter overrides `wcinp.lo` and `wcinp.up`.
+        wcout.lo:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the lower bound of the output commodity availability factor.
+        wcout.up:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the upper bound of the output commodity availability factor.
+        wcout.fx:
+          type: numeric
+          description: >
+            Coefficient that links the weather factor with the fixed value of the output commodity availability factor.
+            This parameter overrides `wcout.lo` and `wcout.up`.
+    misc:
+      type: list
+      description: >
+        List of additional parameters that are not used in the model but can be used
+        for reference or user-defined functions. For example, links to the source
+        of the storage data, or other metadata.
+    capacity:
+      type: data.frame
+      description: Capacity parameters of the storage technology.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        cap:
+          type: numeric
+          description: Capacity of the storage technology.
+        cap.lo:
+          type: numeric
+          description: Lower bound of the storage capacity.
+        cap.up:
+          type: numeric
+          description: Upper bound of the storage capacity.
+        cap.fx:
+          type: numeric
+          description: Fixed value of the storage capacity. This parameter overrides `cap.lo` and `cap.up`.
+        ncap.lo:
+          type: numeric
+          description: Lower bound of the new storage capacity.
+        ncap.up:
+          type: numeric
+          description: Upper bound of the new storage capacity.
+        ncap.fx:
+          type: numeric
+          description: >
+            Fixed value of the new storage capacity. This parameter overrides `ncap.lo` and `ncap.up`.
+        ret.lo:
+          type: numeric
+          description: Lower bound of the storage capacity retirement.
+        ret.up:
+          type: numeric
+          description: Upper bound of the storage capacity retirement.
+        ret.fx:
+          type: numeric
+          description: >
+            Fixed value of the storage capacity retirement. This parameter overrides `ret.lo` and `ret.up`.
+    optimizeRetirement:
+      type: logical
+      description: >
+        Incidates if the retirement of the storage should be optimized.
+        Also requires the same parameter in the `model` or `scenario` class to be set to TRUE to be effective.
+## trade ########################################################################
+  trade:
+    name:
+      type: character
+      description: Name of the trade object, used in sets.
+    desc:
+      type: character
+      description: Description of the trade object.
+    commodity:
+      type: character
+      description: The traded commodity short name.
+    routes:
+      type: data.frame
+      description: Source and destination regions. For bivariate trade define both directions in separate rows.
+      columns:
+        from:
+          type: character
+          description: Source region.
+        to:
+          type: character
+          description: Destination region.
+    trade:
+      type: data.frame
+      description: Technical parameters of trade.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        trade:
+          type: numeric
+          description: Trade volume.
+    aux:
+      type: data.frame
+      description: Auxiliary commodity of trade.
+      columns:
+        acomm:
+          type: character
+          description: Name of the auxiliary commodity (used in sets).
+        unit:
+          type: character
+          description: Unit of the auxiliary commodity.
+    aeff:
+      type: data.frame
+      description: Auxiliary commodity efficiency parameters.
+      columns:
+        acomm:
+          type: character
+          description: Name of the auxiliary commodity (used in sets).
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        trade2ainp:
+          type: numeric
+          description: Trade-to-auxiliary-input-commodity coefficient (multiplier).
+        trade2aout:
+          type: numeric
+          description: Trade-to-auxiliary-output-commodity coefficient (multiplier).
+    invcost:
+      type: data.frame
+      description: Investment cost, used when capacityVariable is TRUE.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        invcost:
+          type: numeric
+          description: Investment cost.
+    olife:
+      type: numeric
+      description: Operational life of the trade object.
+    start:
+      type: data.frame
+      description: Start year when the trade-type of process is available for investment.
+      columns:
+        region:
+          type: character
+          description: Regions where the trade-type of process is available for investment.
+        start:
+          type: integer
+          description: The first year when the trade-type of process is available for investment.
+    end:
+      type: data.frame
+      description: End year when the trade-type of process is available for investment.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        end:
+          type: integer
+          description: The last year when the trade-type of process is available for investment.
+    capacityVariable:
+      type: logical
+      description: >
+        If TRUE, the capacity variable of the trade object is optimized. 
+        If FALSE, the capacity is defined by availability parameters (`ava.*`) in the trade-flow units.
+    cap2act:
+      type: numeric
+      description: Capacity to activity ratio.
+    misc:
+      type: list
+      description: Additional information.
+    fixom:
+      type: data.frame
+      description: (not implemented!) Fixed operation and maintenance costs.
+    varom:
+      type: data.frame
+      description: (not implemented!) Variable operation and maintenance costs.
+    capacity:
+      type: data.frame
+      description: (not implemented!) Capacity parameters of the trade object.
+    optimizeRetirement:
+      type: logical
+      description: >
+        Incidates if the retirement of the trade object should be optimized.
+        Also requires the same parameter in the `model` or `scenario` class to be set to TRUE to be effective.
+## import #######################################################################
+  import:
+    name:
+      type: character
+      description: Name of the import object, used in sets.
+    desc:
+      type: character
+      description: Description of the import object.
+    commodity:
+      type: character
+      description: Name of the imported commodity.
+    unit:
+      type: character
+      description: Unit of the imported commodity.
+    reserve:
+      type: numeric
+      description: Total accumulated limit through the model horizon.
+    imp:
+      type: data.frame
+      description: Import parameters.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter; use NA to apply to all regions.
+        year:
+          type: integer
+          description: Year to apply the parameter; use NA to apply to all years.
+        slice:
+          type: character
+          description: Time slice to apply the parameter; use NA to apply to all slices.
+        imp.lo:
+          type: numeric
+          description: Lower bound on the import volume.
+        imp.up:
+          type: numeric
+          description: Upper bound on the import volume.
+        imp.fx:
+          type: numeric
+          description: Fixed import volume, ignored if NA. This parameter overrides `imp.lo` and `imp.up`.
+    misc:
+      type: list
+      description: Additional information.
+## export #######################################################################
+  export:
+    name:
+      type: character
+      description: Name of the export object, used in sets.
+    desc:
+      type: character
+      description: Description of the export object.
+    commodity:
+      type: character
+      description: Name of the exported commodity.
+    unit:
+      type: character
+      description: Unit of the exported commodity.
+    reserve:
+      type: numeric
+      description: Total accumulated limit through the model horizon.
+    exp:
+      type: data.frame
+      description: Export parameters.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter; use NA to apply to all regions.
+        year:
+          type: integer
+          description: Year to apply the parameter; use NA to apply to all years.
+        slice:
+          type: character
+          description: Time slice to apply the parameter; use NA to apply to all slices.
+        exp.lo:
+          type: numeric
+          description: Export lower bound.
+        exp.up:
+          type: numeric
+          description: Export upper bound.
+        exp.fx:
+          type: numeric
+          description: Fixed export volume, ignored if NA. This parameter overrides `exp.lo` and `exp.up`.
+    misc:
+      type: list
+      description: Additional information.
+## weather ######################################################################
+  weather:
+    name:
+      type: character
+      description: Name of the weather factor, used in sets.
+    desc:
+      type: character
+      description: Description of the weather factor.
+    unit:
+      type: character
+      description: Unit of the weather factor.
+    region:
+      type: character
+      description: Region where the weather factor is applied.
+    timeframe:
+      type: character
+      description: Timeframe of the weather factor.
+    defVal:
+      type: numeric
+      description: Default value of the weather factor, 0 by default.
+    weather:
+      type: data.frame
+      description: Weather factor values.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        wval:
+          type: numeric
+          description: Weather factor value.
+    misc:
+      type: list
+      description: Additional information.
+# model bricks: system add-ons and policy instruments ###########################
+## constraint ###################################################################
+  constraint:
+    name:
+      type: character
+      description: Name of the constraint object, used in sets.
+    desc:
+      type: character
+      description: Description of the constraint.
+    eq:
+      type: character
+      description: Type of the relation ('==' default, '<=', '>=').
+    for.each:
+      type: list
+      description: List with sets for combination of which the constraint is created.
+    rhs:
+      type: data.frame
+      description: >
+        Named list or data frame with numeric values for each constraint.
+        The dimensions of the data frame should match the dimensions of the sets 
+        in the `for.each` slot.
+    defVal:
+      type: numeric
+      description: >
+        The default value for the rhs. It is recommended to set the default value
+        for the rhs of every constraint to avoid unexpected behavior.
+        If not specified, the default value is 0, and the warning is issued.
+    interpolation:
+      type: character
+      description: >
+        Interpolation rule for the constraint. Recognized values, any combination 
+        of "back", "inter", "forth", e.g., "back.inter" or "forth.inter",
+        indicating the direction of interpolation. 
+        The default value is "inter", meaning that the interpolation is done 
+        for years between the specified values. The "back" and "forth" values
+        induce backward and forward interpolation of the `rhs` values, respectively.
+    lhs:
+      type: list
+      description: >
+        List of summands for the left-hand-side of the equation. 
+        This slot is created automatically from all named of unnamed lists passed 
+        to the `newConstraint` function, except for the named arguments.
+    misc:
+      type: list
+      description: >
+        Any additional information or parameters to store in the constraint object.
+## summand ######################################################################
+  summand:
+    desc:
+      type: character
+      description: Description of the linear term.
+    variable:
+      type: character
+      description: Name of the variable.
+    for.sum:
+      type: list
+      description: List of sets for which the summand will be created.
+    mult:
+      type: data.frame
+      description: >
+        Multiplying coefficients to the variable for each set in the `for.sum` slot.
+    defVal:
+      type: numeric
+      description: Default value for the summand.
+    misc:
+      type: list
+      description: Additional information.
+## costs ########################################################################
+  costs:
+    name:
+      type: character
+      description: Name of the cost object, used in sets.
+    desc:
+      type: character
+      description: Description of the cost object.
+    variable:
+      type: character
+      description: Name of the variable included in the costs-constraint.
+    subset:
+      type: data.frame
+      description: >
+        Named list or data frame with set-values for each dimension of the variable.
+        This slot subsets the variable to the specified set values.
+    mult:
+      type: data.frame
+      description: >
+        Named list or data frame with numeric values for the variable included 
+        in the costs-constraint. A constant or a data frame with the same dimensions
+        as the subseted variable.
+    misc:
+      type: list
+      description: Additional information.
+## tax ##########################################################################
+  tax:
+    name:
+      type: character
+      description: Name of the tax object, used in sets.
+    desc:
+      type: character
+      description: Description of the tax object.
+    comm:
+      type: character
+      description: Name of the taxed commodity.
+    region:
+      type: character
+      description: Region where the tax is applied.
+    year:
+      type: integer
+      description: Year when the tax is applied.
+    defVal:
+      type: numeric
+      description: Default value of the tax for not specified sets, 0 if not specified.
+    tax:
+      type: data.frame
+      description: Tax values.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        inp:
+          type: numeric
+          description: Input tax, e.g., per unit of commodity consumed by all processes.
+        out:
+          type: numeric
+          description: Output tax, e.g., per unit of commodity produced by all processes.
+        bal:
+          type: numeric
+          description: Balance tax, e.g., per unit of commodity balance (production - consumption).
+    misc:
+      type: list
+      description: Additional information.
+## sub ######################################################################
+  sub:
+    name:
+      type: character
+      description: Name of the subsidy object, used in sets.
+    desc:
+      type: character
+      description: Description of the subsidy object.
+    comm:
+      type: character
+      description: Name of the subsidized commodity.
+    region:
+      type: character
+      description: Region where the subsidy is applied.
+    defVal:
+      type: numeric
+      description: Default value of the subsidy.
+    sub:
+      type: data.frame
+      description: Subsidy values.
+      columns:
+        region:
+          type: character
+          description: Region name to apply the parameter, NA for every region.
+        year:
+          type: integer
+          description: Year to apply the parameter, NA for every year.
+        slice:
+          type: character
+          description: Time slice to apply the parameter, NA for every slice.
+        inp:
+          type: numeric
+          description: Input subsidy, e.g., per unit of commodity consumed by all processes.
+        out:
+          type: numeric
+          description: Output subsidy, e.g., per unit of commodity produced by all processes.
+        bal:
+          type: numeric
+          description: Balance subsidy, e.g., per unit of commodity balance (production - consumption).
+    misc:
+      type: list
+      description: Any additional information or data to store in the subsidy object.
+# data, settings, configuration #################################################
+## repository ###################################################################
+  repository:
+    name:
+      type: character
+      description: Name of the repository.
+    desc:
+      type: character
+      description: Description of the repository.
+    data:
+      type: list
+      description: >
+        Model objects ("bricks"), e.g., technologies, constraints, costs, etc., 
+        stored in with their names as keys, or gropped in named lists.
+    permit:
+      type: character
+      description: >
+        Vector with names of classes permitted to store in the repository.
+        There is a default list of permitted classes which can be extended or 
+        modified. Used in internal functions, it is not common to modify this slot.
+    misc:
+      type: list
+      description: Any additional data or information to store in the object.
+## calendar #####################################################################
+#' @slot name character, (optional) name of the calendar for own references
+#' @slot desc character, (optional) description of the calendar
+#' @slot timeframes a named list of nested sub-annual levels with vectors
+#' of individual elements.
+#' @slot timetable data.frame with levels of timeframes in the named columns,
+#' and number of rows equal to the total number of time-slices on the lowest level. Every timeframe is a set of timeslices ("slices") - a named fragment of time with a year-share. Timeframes have nested structure. Though every slice may have different sub-slices (similar to the real-world calendar).
+#' \describe{
+#'   \item{ANNUAL}{character, annual, the top level of timeframes}
+#'   \item{TIMEFRAME2}{character, (optional) first subannual level of timeframes}
+#'   \item{TIMEFRAME3}{character, (optional) second subannual level of timeframes}
+#'   \item{...}{character, (optional) further subannual levels of timeframes}
+#'   \item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `{SLICE2}_{SLICE3}...`}
+#' }
+#' @slot year_fraction numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of `timetable$share` or used default value (1).
+#' @slot slice_share two column data.frame with slices from all levels
+#' with their individual share in a year.
+#' @slot default_timeframe character, the name of the default level of the time-slices used in the model.
+#' @slot timeframe_rank named character vector with ranks of the timeframes.
+#' @slot slices_in_frame (!!! to depreciate)
+#' @slot slice_family data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.
+#' @slot next_in_timeframe data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.
+#' @slot next_in_year data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.
+#' @slot misc list with additional data and calculated mappings.
 
-
+  # prototype(
+  #   name = character(),
+  #   desc = character(),
+  #   timeframes = list(), # Slices set by level
+  #   year_fraction = as.numeric(1),
+  #   timetable = data.frame(stringsAsFactors = FALSE),
+  #   slice_share = data.frame(
+  #     # year = integer(),
+  #     slice = character(), # == time interval
+  #     share = numeric(), # fraction of a year // rename?
+  #     weight = numeric(),
+  #     stringsAsFactors = FALSE
+  #   ),
+  #   slices_in_frame = integer(),
+  #   slice_family = data.frame(
+  #     # year = integer(),
+  #     parent = character(),
+  #     child = character(),
+  #     stringsAsFactors = FALSE
+  #   ),
+  #   slice_ancestry = data.frame(
+  #     # year = integer(),
+  #     parent = character(),
+  #     child = character(),
+  #     stringsAsFactors = FALSE
+  #   ),
+  #   default_timeframe = character(), # Default slice
+  #   timeframe_rank = c("ANNUAL" = 1L),
+  #   next_in_timeframe = data.frame(
+  #     slice = character(),
+  #     slicep = character()
+  #   ),
+  #   next_in_year = data.frame(
+  #     slice = character(),
+  #     slicep = character()
+  #   ),
+  #   # all_slice = character(), -> slice_share$slice
+  #   misc = list()
+  # ),
+  calendar:
+    name:
+      type: character
+      description: >
+        Name of the calendar object. Use to distingush between different structures
+        and subsets of time-slices. The name is used to propose default folder names
+        for the model/scenario scripts to separate solutions of the same scenario with
+        different calendar objects.
+    desc:
+      type: character
+      description: Description of the calendar object, for own references.
+    timeframes:
+      type: list
+      description: >
+        Named list of nested sub-annual levels with vectors of individual elements.
+        The top level of the list is the highest level of the calendar, e.g., "ANNUAL".
+        The lowest level is the smallest time-slice, e.g., "MONTH".
+        "ANNUAL" is the default (hardwired) top level of the calendar. All other levels
+        are optional, and create nested sub-annual levels of time-slices.
+        The minimum number of time-slices in a timeframe is two (except for the top level).
+    timetable:
+      type: data.frame
+      description: >
+        Data frame with levels of timeframes in the named columns, and number of rows
+        equal to the total number of time-slices on the lowest level. Every timeframe
+        is a set of time-slices ("slices") - a named fragment of time with a year-share.
+        Timeframes have nested structure where every slice serves as a parent for the
+        lower level of time-slices (children). 
+        The first column is the name of the time-slice, the rest of the columns are the
+        names of the timeframes. The values are the share of the year covered by the
+        time-slice. The sum of the shares in every timeframe should be equal to 1.
+        `weight` is an optional column with the weight of the time-slice in the year,
+        used for sumpled/subset selection of the time-slices.
+    year_fraction:
+      type: numeric
+      description: >
+        The fraction of a year covered by the calendar, e.g. 1 for annual calendar
+        (default), 0.5 for semi-annual, 0.25 for quarterly, etc. Currently must be
+        specified manually for subset calendars to validate the sum of the shares.
+    slice_share:
+      type: data.frame
+      description: >
+        Auto-calculated from the `timetable`
+        two column data.frame with slices from all levels with their individual share
+        in a year. The first column is the name of the time-slice, the second column
+        is the share of the year covered by the time-slice.
+    default_timeframe:
+      type: character
+      description: >
+        The name of the default level of the time-slices used in the model. If not
+        specified, the lowest level of the timeframes is used as the default timeframe.
+    timeframe_rank:
+      type: character
+      description: >
+        Auto-calculated from the `timetable` and `timeframes` slots
+        named character vector with ranks of the timeframes. The rank is used to
+        determine the order of the timeframes in the calendar.
+    slice_family:
+      type: data.frame
+      description: >
+        Auto-calculated from the `timetable`
+        data.frame mapping "parent" to "child" slices in two nearest timeframes in the
+        nested hierarchy. The first column is the name of the parent time-slice, the
+        second column is the name of the child time-slice.
+    next_in_timeframe:
+      type: data.frame
+      description: >
+        Auto-calculated from the `timetable`
+        data.frame mapping chronological sequence between time-slices in the same
+        timeframe. The first column is the name of the time-slice, the second column
+        is the name of the next time-slice in the same timeframe.
+    next_in_year:
+      type: data.frame
+      description: >
+        Auto-calculated from the `timetable`
+        data.frame mapping chronological sequence between time-slices in the same
+        timeframe through the whole year. The first column is the name of the time-slice,
+        the second column is the name of the next time-slice in the same timeframe.
+    misc:
+      type: list
+      description: >
+        Any additional data or information to store in the object.
+## horizon ######################################################################
+  horizon:
+    name:
+      type: character
+      description: >
+        Name of the horizon object. Used to distinguish between different horizons
+        in the model or scenario, including the automatic creation of the folder
+        name for the model/scenario scripts.
+    desc:
+      type: character
+      description: Description of the horizon object, for own references.
+    period:
+      type: integer
+      description: >
+        A planning period defined as a sequence of years (arranged, without gaps) of
+        the model planning (e.g. optimization) window. Data with years before or after
+        the planning `period` can present in the model-objects and will be taken into
+        account during interpolation of the model parameters.
+    intervals:
+      type: data.frame
+      description: >
+        Data frame with three columns, representing start, middle, and the end year
+        of every interval. The first column is the start year of the interval, the
+        second column is the middle year of the interval, the third column is the end
+        year of the interval.
+## config #######################################################################
+  config:
+## settings #####################################################################
+  settings:
+## parameter ####################################################################
+  parameter:
+## modInp #######################################################################
+  modInp:
+## modOut #######################################################################
+  modOut:
+# model and scenario ############################################################
+## model ########################################################################
+  model:
+## scenario #####################################################################
+  scenario:

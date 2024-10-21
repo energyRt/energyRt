@@ -1,16 +1,17 @@
 # class repository ####
 #' An S4 class to store the model objects.
-#'
-#' @slot name character. Name of the repository.
-#' @slot desc character, short desc of the purpose or content of the repository.
-#' @slot data list of repositories with objects of permitted classes. All names of objects (`object@name`) must be unique.
-#' @slot permit character vector with names of classes permitted to store in the repository.
-#' @slot misc list, any additional data or information to store in the object.
+#' 
+#' @md
+#' @slot name `r get_slot_info("repository", "name")`
+#' @slot desc `r get_slot_info("repository", "desc")`
+#' @slot data `r get_slot_info("repository", "data")`
+#' @slot permit `r get_slot_info("repository", "permit")`
+#' @slot misc `r get_slot_info("repository", "misc")`
 #'
 #' @export
-#' @family repository
+#' @family repository, model, data
 #' @include generics.R
-#'
+#' @rdname class-repository
 setClass("repository",
   representation(
     name = "character",
@@ -42,16 +43,28 @@ setMethod("initialize", "repository", function(.Object, ...) {
 
 # newRepository ####
 #' Create new repository object
-#' @param name character,
+#'
+#' @md
+#' @param name `r get_slot_info("repository", "name")`
+#' @param ... `r get_slot_info("repository", "data")`
+#' @param desc `r get_slot_info("repository", "desc")`
+#' @param misc `r get_slot_info("repository", "misc")`
 #'
 #' @name newRepository
 #' @export
-#' @family repository
-newRepository <- function(name = "default_repository", ...) {
+#' @family repository, model, data
+newRepository <- function(
+    name = "base_repository", 
+    ...,
+    desc = NA_character_,
+    misc = list()
+    ) {
   # browser()
   obj <- new("repository")
   obj@name <- name
   arg <- list(...)
+  if (!is.na(desc) && !is_empty(desc)) arg <- c(arg, desc = desc)
+  if (!is_empty(misc)) arg <- c(arg, misc = misc)
   if (is_empty(arg)) return(obj)
   slots <- slotNames(obj); slots <- slots[slots != ".S3Class"]
   for (s in slots) {

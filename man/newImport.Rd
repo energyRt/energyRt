@@ -11,22 +11,48 @@ newImport(
   unit = NULL,
   reserve = Inf,
   imp = data.frame(),
-  ...
+  misc = list()
 )
 }
 \arguments{
-\item{name}{character name of the object (used in sets)}
+\item{name}{character. Name of the import object, used in sets.}
 
-\item{desc}{optional character description}
+\item{desc}{character. Description of the import object.}
 
-\item{commodity}{character name of the import commodity}
+\item{commodity}{character. Name of the imported commodity.}
 
-\item{unit}{character name of unit of the commodity}
+\item{unit}{character. Unit of the imported commodity.}
 
-\item{reserve}{numeric, total accumulated limit through the model horizon}
+\item{reserve}{numeric. Total accumulated limit through the model horizon.}
 
-\item{imp}{data frame with import parameters}
+\item{imp}{data.frame. Import parameters.
+\describe{
+\item{region}{character. Region name to apply the parameter; use NA to apply to all regions.}
+\item{year}{integer. Year to apply the parameter; use NA to apply to all years.}
+\item{slice}{character. Time slice to apply the parameter; use NA to apply to all slices.}
+\item{imp.lo}{numeric. Lower bound on the import volume.}
+\item{imp.up}{numeric. Upper bound on the import volume.}
+\item{imp.fx}{numeric. Fixed import volume, ignored if NA. This parameter overrides \code{imp.lo} and \code{imp.up}.}
+}}
+
+\item{misc}{list. Additional information.}
+}
+\value{
+import object with given specifications.
 }
 \description{
-Create new export object
+Import object to represent commodity import from the Rest of the World (RoW).
+}
+\details{
+Constructor for import object.
+
+Import object adds an "external" source of commodity to the model.
+The RoW is not modeled explicitly as a region, \code{export} and \code{import} objects
+define and control the exchange with the RoW. The operation is similar to
+the \code{demand} object, but the two ideas distinguishes between internal
+and external final consumption.
+This exchange can be exogenously defined (\code{imp.fx}) or optimized by the model
+within the given limits (\code{imp.lo}, \code{imp.up}). The \code{price} column is used to
+define the price of the imported commodity.
+"Reserve" sets the total amount that can be imported over the model horizon.
 }

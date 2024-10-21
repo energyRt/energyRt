@@ -1,134 +1,37 @@
 # Class storage ####
 #' An S4 class to represent storage type of technological process.
+#' 
+#' @inherit newStorage description
+#' @inherit newStorage details
 #'
-#' @description
-#' Storage type of technological processes with accumulating capacity of a commodity.
-#'
-#' @slot name character. Name of the storage (used in sets).
-#' @slot desc character. Description of the storage.
-#' @slot commodity character. Name of the stored commodity.
-#' @slot start data.frame. Start year when the storage technology is available for investment.
-#' \describe{
-#'  \item{region}{character. Region where the storage technology available for investment. NA for all regions}
-#'  \item{start}{integer. The first year when the storage technology is available for investment.}
-#' }
-#' @slot end data.frame. Last year when the storage technology is available for investment.
-#' \describe{
-#'  \item{region}{character. Region where the storage technology available for investment. NA for all regions}
-#'  \item{end}{integer. The last year when the storage technology is available for investment.}
-#' }
-#' @slot aux data.frame. Auxiliary commodities.
-#' \describe{
-#'  \item{acomm}{character. Name of the auxiliary commodity (used in sets).}
-#'  \item{unit}{character. Unit of the auxiliary commodity.}
-#'  }
-#' @slot olife data.frame. Operational life of the storage technology, applicable to the new investment only, the operational life (retirement) of preexiting capacity is described in the @stock slot.
-#' \describe{
-#'  \item{region}{character. Region where the storage technology is available for investment.}
-#'  \item{olife}{integer. Operational life of the storage technology in years.}
-#' }
-#' @slot stock data.frame. Preexisting capacity of the storage technology
-#' \describe{
-#'  \item{region}{character. Region where the storage technology is preinstalled.}
-#'  \item{year}{integer. Year when the storage technology has preinstalled capacity.}
-#'  \item{stock}{numeric. Preexisting capacity of the storage technology for particular year of the model.}
-#'  }
-#' @slot charge data.frame. Pre-charged level at the beginning of the cycle.
-#' \describe{
-#'  \item{region}{character. Region where the storage technology is preinstalled or can be installed.}
-#'  \item{year}{integer. Year.}
-#'  \item{slice}{character. Time slice for wich the charged level will be specifies.}
-#'  \item{charge}{numeric. Pre-charged or targeted level at the specified slice.}
-#'  }
-#' @slot seff data.frame. Storage efficiency parameters.
-#' \describe{
-#'  \item{region}{character. Region where the storage technology is preinstalled or can be installed. NA for all regions}
-#'  \item{year}{integer. Year for wich the storage efficiency will be specifies. NA for all years}
-#'  \item{slice}{character. Time slice for wich the storage efficiency will be specifies. NA for all slices}
-#'  \item{stgeff}{numeric. Storage decay annual rate.}
-#'  \item{inpeff}{numeric. Input efficiency rate.}
-#'  \item{outeff}{numeric. Output efficiency rate.}
-#'  }
-#' @slot af data.frame. Availability factor parameters.
-#' \describe{
-#' \item{region}{character. Region where the parameter will be actual. NA for all regions}
-#' \item{year}{integer. Year when the parameter will be actual. NA for all years}
-#' \item{slice}{character. Time slice when the parameter will be actual. NA for all slices}
-#' \item{af.lo}{numeric. Lower bound of the availability factor.}
-#' \item{af.up}{numeric. Upper bound of the availability factor.}
-#' \item{af.fx}{numeric. Fixed value of the availability factor.}
-#' \item{cinp.lo}{numeric. Lower bound of the input commodity availability factor.}
-#' \item{cinp.up}{numeric. Upper bound of the input commodity availability factor.}
-#' \item{cinp.fx}{numeric. Fixed value of the input commodity availability factor.}
-#' \item{cout.lo}{numeric. Lower bound of the output commodity availability factor.}
-#' \item{cout.up}{numeric. Upper bound of the output commodity availability factor.}
-#' \item{cout.fx}{numeric. Fixed value of the output commodity availability factor.}
-#' }
-#' @slot aeff data.frame. Auxiliary commodities efficiency parameters.
-#' \describe{
-#' \item{acomm}{character. Name of the auxiliary commodity (used in sets).}
-#' \item{region}{character. Region where the parameter will be actual. NA for all regions}
-#' \item{year}{integer. Year when the parameter will be actual. NA for all years}
-#' \item{slice}{character. Time slice when the parameter will be actual. NA for all slices}
-#' \item{stg2ainp}{numeric. Storage to auxiliary input commodity coefficient (multiplier).}
-#' \item{cinp2ainp}{numeric. Input commodity to auxiliary input commodity coefficient (multiplier).}
-#' \item{cout2ainp}{numeric. Output commodity to auxiliary input commodity coefficient (multiplier).}
-#' \item{stg2aout}{numeric. Storage level to auxiliary output commodity coefficient (multiplier).}
-#' \item{cinp2aout}{numeric. Input commodity to auxiliary output commodity coefficient (multiplier).}
-#' \item{cout2aout}{numeric. Output commodity to auxiliary output commodity coefficient (multiplier).}
-#' \item{cap2ainp}{numeric. Capacity to auxiliary input commodity coefficient (multiplier).}
-#' \item{cap2aout}{numeric. Capacity to auxiliary output commodity coefficient (multiplier).}
-#' \item{ncap2ainp}{numeric. New capacity to auxiliary input commodity coefficient (multiplier).}
-#' \item{ncap2aout}{numeric. New capacity to auxiliary output commodity coefficient (multiplier).}
-#' \item{ncap2stg}{numeric. New capacity to storage level coefficient (multiplier).}
-#' }
-#' @slot fixom data.frame. Fixed operation and maintenance cost.
-#'  \describe{
-#'  \item{region}{character. Region name for wich the parameter will be specified. NA for all regions.}
-#'  \item{year}{integer. Year when the specified parameters will be actual. NA for all years.}
-#'  \item{fixom}{numeric. Fixed operation and maintenance cost for the speficied sets.}
-#' }
-#' @slot varom data.frame. Variable operation and maintenance cost.
-#' \describe{
-#'  \item{region}{character. Region name for wich the parameter will be specified. NA for all regions.}
-#'  \item{year}{integer. Year when the specified parameter will be actual. NA for all years.}
-#'  \item{slice}{character. Time slice when the specified parameter will be actual. NA for all slices.}
-#'  \item{inpcost}{numeric. Costs associated with the input commodity.}
-#'  \item{outcost}{numeric. Costs associated with the output commodity.}
-#'  \item{stgcost}{numeric. Costs associated with the storage level.}
-#' }
-#' @slot invcost data.frame. Investment cost.
-#' \describe{
-#'   \item{region}{character. Region name for wich the parameter will be specified. NA for all regions.}
-#'   \item{year}{integer. Year when the specified parameter will be actual. NA for all years.}
-#'   \item{invcost}{numeric. Overnight investment cost for the specified region and year.}
-#'   \item{wacc}{numeric. Weighted average cost of capital. If not supplied, the value is taken from the global model or scenario parameters.}
-#' }
-#' @slot fullYear logical. If TRUE, the storage technology operates between timeframes.
-#' @slot region character. Region where the storage technology is pre-installed or available for investment.
-#' @slot cap2stg numeric. Charging and discharging capacity to the storing capacity inverse ratio.
-#' @slot weather data.frame. Weather factors multipliers.
-#' \describe{
-#'  \item{weather}{character. Name of the applied weather factor.}
-#'  \item{waf.lo}{numeric. Coefficient that links the weather factor with the lower bound of the availability factor.}
-#'  \item{waf.up}{numeric. Coefficient that links the weather factor with the upper bound of the availability factor.}
-#'  \item{waf.fx}{numeric. Coefficient that links the weather factor with the fixed value of the availability factor.}
-#'  \item{wcinp.lo}{numeric. Coefficient that links the weather factor with the lower bound of the input commodity availability factor.}
-#'  \item{wcinp.up}{numeric. Coefficient that links the weather factor with the upper bound of the input commodity availability factor.}
-#'  \item{wcinp.fx}{numeric. Coefficient that links the weather factor with the fixed value of the input commodity availability factor.}
-#'  \item{wcout.lo}{numeric. Coefficient that links the weather factor with the lower bound of the output commodity availability factor.}
-#' \item{wcout.up}{numeric. Coefficient that links the weather factor with the upper bound of the output commodity availability factor.}
-#'  \item{wcout.fx}{numeric. Coefficient that links the weather factor with the fixed value of the output commodity availability factor.}
-#' }
-#' @slot misc list. Miscellaneous information or parameters.
-#' @slot capacity data.frame. (not implemented!) Capacity parameters of the storage technology.
+#' @md
+#' @slot name `r get_slot_info("storage", "name")`
+#' @slot desc `r get_slot_info("storage", "desc")`
+#' @slot commodity `r get_slot_info("storage", "commodity")`
+#' @slot aux `r get_slot_info("storage", "aux")`
+#' @slot region `r get_slot_info("storage", "region")`
+#' @slot start `r get_slot_info("storage", "start")`
+#' @slot end `r get_slot_info("storage", "end")`
+#' @slot olife `r get_slot_info("storage", "olife")`
+#' @slot capacity `r get_slot_info("storage", "capacity")`
+#' @slot charge `r get_slot_info("storage", "charge")`
+#' @slot seff `r get_slot_info("storage", "seff")`
+#' @slot af `r get_slot_info("storage", "af")`
+#' @slot aeff `r get_slot_info("storage", "aeff")`
+#' @slot fixom `r get_slot_info("storage", "fixom")`
+#' @slot varom `r get_slot_info("storage", "varom")`
+#' @slot invcost `r get_slot_info("storage", "invcost")`
+#' @slot fullYear `r get_slot_info("storage", "fullYear")`
+#' @slot cap2stg `r get_slot_info("storage", "cap2stg")`
+#' @slot weather `r get_slot_info("storage", "weather")`
+#' @slot optimizeRetirement `r get_slot_info("storage", "optimizeRetirement")`
+#' @slot misc `r get_slot_info("storage", "misc")`
 #'
 #' @include class-technology.R
 #'
-#' @rdname storage
-#' @family process
-#'
-#' @return
+#' @rdname class-storage
+#' @family process, storage
+#' 
 #' @export
 setClass("storage",
   representation(
@@ -300,24 +203,86 @@ setMethod("initialize", "storage", function(.Object, ...) {
 })
 
 #' Create new storage object
+#' 
+#' @description Storage type of technological processes with accumulating capacity of a commodity.
+#' 
+#' @details
+#' Storage can be used in combination with other processes, such as
+#' technologies, supply, or demand to represent complex technological chains,
+#' demand or supply technologies with time-shift.
+#' Operation of storage includes accumulation, storing, and release
+#' of the stored commodity. The storing cycle operates on the ordered
+#' time-slices of the commodity timeframe. The cycle is looped either
+#' on an annual basis (last time-slice of a year follows the first time
+#' slice of the same year) or within the parent time-frame (for example,
+#' when commodity time-frame is "HOUR" and the parent time-frame is "DAY" then
+#' the storage cycle will be a calendar day).
 #'
+#' @param name `r get_slot_info("storage", "name")`
+#' @param desc `r get_slot_info("storage", "desc")`
+#' @param commodity `r get_slot_info("storage", "commodity")`
+#' @param aux `r get_slot_info("storage", "aux")`
+#' @param region `r get_slot_info("storage", "region")`
+#' @param start `r get_slot_info("storage", "start")`
+#' @param end `r get_slot_info("storage", "end")`
+#' @param olife `r get_slot_info("storage", "olife")`
+#' @param charge `r get_slot_info("storage", "charge")`
+#' @param seff `r get_slot_info("storage", "seff")`
+#' @param aeff `r get_slot_info("storage", "aeff")`
+#' @param af `r get_slot_info("storage", "af")`
+#' @param fixom `r get_slot_info("storage", "fixom")`
+#' @param varom `r get_slot_info("storage", "varom")`
+#' @param invcost `r get_slot_info("storage", "invcost")`
+#' @param capacity `r get_slot_info("storage", "capacity")`
+#' @param cap2stg `r get_slot_info("storage", "cap2stg")`
+#' @param fullYear `r get_slot_info("storage", "fullYear")`
+#' @param weather `r get_slot_info("storage", "weather")`
+#' @param optimizeRetirement `r get_slot_info("storage", "optimizeRetirement")`
+#' @param misc `r get_slot_info("storage", "misc")`
+#' @return storage object
+#' 
 #' @name newStorage
-#' @family storage
+#' @family storage, process
 #' @rdname storage
 #' @export
 #'
-newStorage <- function(name, ...) {
+newStorage <- function(
+    name = "",
+    desc = "",
+    commodity = character(),
+    aux = data.frame(),
+    region = character(),
+    start = data.frame(),
+    end = data.frame(),
+    olife = data.frame(),
+    charge = data.frame(),
+    seff = data.frame(),
+    aeff = data.frame(),
+    af = data.frame(),
+    fixom = data.frame(),
+    varom = data.frame(),
+    invcost = data.frame(),
+    capacity = data.frame(),
+    cap2stg = 1,
+    fullYear = TRUE,
+    weather = data.frame(),
+    optimizeRetirement = FALSE,
+    misc = list()
+    ) {
   .data2slots("storage", name, ...)
 }
 
 
+#' @param object storage object.
+#'
 #' @rdname update
 #' @name update
 #'
 #' @family storage update
 #' @keywords storage update
 #' @export
-setMethod("update", signature(object = "storage"), function(object, ...) {
+setMethod("update", signature(object = "storage"), 
+          function(object, ...) {
   # update.storage <- function(obj, ...) {
   .data2slots("storage", object, ...)
 })

@@ -2,22 +2,34 @@
 get_interpolation_rule <- function(x) {
   stopifnot(is.character(x))
   if (!exists(".defInt")) load("R/sysdata.rda")
-  # sapply(x, function(i) energyRt:::.defInt[[i]])
+  sapply(x, function(i) .defInt[[i]])
 }
 
-#' Class 'constraint'
+## constraint-class ####
+#' An S4 class to represent a custom constraint.
 #'
-#' @slot name character. Name of the constrain object (will be used in GAMS, GLPK, etc. as an element in sets).
-#' @slot desc character. Description of the constraint.
-#' @slot eq factor. Type of the relation ('==' default, '<=', '>=').
-#' @slot for.each list. List with sets for which constraint will be created.
-#' @slot rhs data.frame. List or data frame with numeric values for each constraint.
-#' @slot defVal numeric. The default value for the rhs.
-#' @slot interpolation character, interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".
-#' @slot lhs list. List of summands for the left-hand side of the equation. This slot is created automatically from all unnamed arguments passed to the `newConstraint` function.
-#' @slot misc list. List of any additional information or parameters to store in the constraint object.
+#' `r lifecycle::badge("experimental")`
+#' 
+#' @description Class `constraint` is used to define custom constraints in the optimization problem.
+#' @inherit newConstraint details
+#' 
+#' @md
+#' @slot name `r get_slot_info("constraint", "name")`
+#' @slot desc `r get_slot_info("constraint", "desc")`
+#' @slot eq `r get_slot_info("constraint", "eq")`
+#' @slot for.each `r get_slot_info("constraint", "for.each")`
+#' @slot rhs `r get_slot_info("constraint", "rhs")`
+#' @slot defVal `r get_slot_info("constraint", "defVal")`
+#' @slot interpolation `r get_slot_info("constraint", "interpolation")`
+#' @slot lhs `r get_slot_info("constraint", "lhs")`
+#' @slot misc `r get_slot_info("constraint", "misc")`
 #'
+#' 
 #' @include class-subsidy.R
+#' @family class, constraint
+#' @rdname class-constraint
+#' @order 1
+#' @export
 #'
 setClass("constraint",
   representation(
@@ -50,29 +62,39 @@ setMethod("initialize", "constraint", function(.Object, ...) {
   .Object
 })
 
+## summand-class #####
+#' An S4 class to represent a summand in a constraint.
+#' 
+#' 
+#' @md 
+#' @slot desc `r get_slot_info("summand", "desc")`
+#' @slot variable `r get_slot_info("summand", "variable")`
+#' @slot for.sum `r get_slot_info("summand", "for.sum")`
+#' @slot mult `r get_slot_info("summand", "mult")`
+#' @slot defVal `r get_slot_info("summand", "defVal")`
+#' @slot misc `r get_slot_info("summand", "misc")`
+#' 
+#' @family class, constraint
+#' @describeIn class-constraint Summand is a linear term in the `lhs` of a constraint equation. 
+#' It consists of a variable, a multiplier.
+#' Class `summand` is used to store information about linear terms in the constraint class.
+#' It is not intended to be used directly by the user.
 
-# term for equation
-#' Title
-#'
-#' @slot desc character.
-#' @slot variable character.
-#' @slot for.sum list.
-#' @slot mult data.frame.
-#' @slot defVal numeric.
-#' @slot misc list.
+#' @order 2
+#' 
 #' @export
 setClass("summand",
   representation(
-    desc = "character", # desc
+    desc = "character",
     variable = "character",
     for.sum = "list",
     mult = "data.frame",
     defVal = "numeric",
     misc = "list"
-    # parameter= list() # For the future
+    # parameter= list() # !!! consider adding custom parameters
   ),
   prototype(
-    desc = NULL, # desc
+    desc = NULL,
     variable = NULL,
     for.sum = list(),
     mult = data.frame(),
@@ -81,36 +103,75 @@ setClass("summand",
   ),
   S3methods = FALSE
 )
-#' Create (equality or inequality) constraint object
+
+
+#' Create constraint object to add custom constraints to the model.
+#' 
+#' @description 
+#' The function creates a new constraint object that can be used 
+#' to add custom constraints to the model.
+#' 
+#' @details 
+#' Custom constraints extend the functionality of the model by adding
+#' user-defined constraints to the optimization problem.
+#' If the predefined constraints are not sufficient to describe the problem,
+#' custom constraints can be used to add linear equlity or inequality 
+#' constraints to define additional relationships between the variables.
+#' In many cases this can be done without writing constraints in the GAMS, 
+#' Julia/JuMP, Python/Pyomo, or GLPK-MathProg languages by using the 
+#' `constrant` class and the `newConstraint` function.
+#' To define a custom constraint with the `newConstraint` function,
+#' the user needs to specify the name of the constraint, the type of the
+#' relation (equality, less than or equal, greater than or equal), the
+#' left-hand side (LHS) terms of the statement, and the right-hand side (RHS) value.
+#' The dimension of the constraint is set by the `for.each` parameter.
+#' The 'lhs' terms are defined as a list of linear terms (summands).
+#' Each summand consists of a variable, a multiplier, and a set of sets 
+#' for which the summand is defined.
+#' 
 #'
-#' @param name Name of the constrain object (will be used in GAMS or GLPK as an element in sets)
+#' @param name `r get_slot_info("constraint", "name")`
+#' @param desc `r get_slot_info("constraint", "desc")`
+#' @param ... named or unnamed list(s) of left-hand side (LHS) 
+#' linear terms (summands) to define the constraint.
+#' Every summand is defined as a list with the following elements:
+#' - `variable` - name of the variable in the summand.
+#' - `mult` - multiplier for the variable in the summand.
+#' - `for.sum` - list of sets for which the summand is defined.
+#' The summands can be passed as named or unnamed lists.
+#' They will be added to the `lhs` slot of the constraint object
+#' as linear terms of mulipliers and variables.
 #' @param eq Type of the relation ('==' default, '<=', '>=')
-#' @param for.each list with sets for which constraint will be created.
-#' @param ... Left-hand side (LHS) terms of the statement - list objects with
-#' @param rhs a numeric value, list or data frame with sets and numeric values for each constraint. Warning: zero values will be replaced with `1e-20` to avoid ignoring them by the current interpolation algorithms.
-#' @param defVal the default value for the `rhs`.
-#' @param interpolation interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", indicating the direction of interpolation. The default value is "inter".
-#' @param arg tbc
+#' @param for.each list or data.frame with sets that define the dimension of the constraint.
+#' @param rhs a numeric value, list or data frame with sets and numeric values for each constraint. 
+#' Note: zero values will be replaced with `replace_zerros` to avoid dropping them by the interpolation algorithms.
+#' @param defVal `r get_slot_info("constraint", "defVal")`
+#' @param interpolation `r get_slot_info("constraint", "interpolation")`
+#' @param replace_zerros numeric value to replace zero values in `rhs` and `defVal`. Default is `1e-20`.
 #'
 #' @return Object of class `constraint`.
+#' @family class, constraint
+#' @rdname newConstraint
 #'
 #' @export
 newConstraint <- function(
     name,
-    desc = "", # desc
+    desc = "",
     ...,
     eq = "==",
-    rhs = data.frame(),
     for.each = NULL,
-    defVal = NULL, # temporary solution to avoid dropping default zeros during interpolation
+    rhs = data.frame(),
+    defVal = NULL, 
     interpolation = "inter",
-    replace_zerros = 1e-20,
-    arg = NULL) {
+    replace_zerros = 1e-20
+    ) {
   obj <- new("constraint")
   # stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
   if (length(eq) != 1 || !(eq %in% levels(obj@eq))) {
-    stop("Unrecognized 'eq' parameter. Use one of: ",
-         paste0(levels(obj@eq), collapse = ", "))
+    stop(
+      "Unrecognized 'eq' parameter. Use one of: ",
+      paste0(levels(obj@eq), collapse = ", ")
+    )
   }
   obj@eq[] <- eq
   # browser()
@@ -172,7 +233,7 @@ newConstraint <- function(
     rhs[rhs == 0] <- replace_zerros
   }
   if (!is.null(replace_zerros) && !is.na(defVal) && defVal == 0) {
-    warning("Zero value in 'defVal' will be replaced with '", replace_zerros,"' to avoid ignoring it by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
+    warning("Zero value in 'defVal' will be replaced with '", replace_zerros, "' to avoid ignoring it by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
     defVal <- replace_zerros
   }
   # TYPE vs SET
@@ -201,7 +262,7 @@ newConstraint <- function(
     } else if (is.data.frame(for.each)) {
       obj@for.each <- for.each
     } else {
-      stop("Unrecognized 'for.each' parameter. Cannot build a costraint.")
+      stop("Unrecognized 'for.each' parameter. Failed to build the costraint.")
     }
   }
   for (i in seq_along(arg)) {
@@ -216,10 +277,15 @@ newConstraint <- function(
 
 
 
+#' A function to check if an object is of class `constraint`.
+#' 
 #' @param object any R object
 #'
 #' @return TRUE if the object inherits class `constraint`, FALSE otherwise.
 #' @export
+#' 
+#' @family class, constraint
+#' @describeIn newConstraint Check if an object is a constraint. 
 #'
 #' @examples
 #' isConstraint(1)
@@ -228,9 +294,15 @@ isConstraint <- function(object) {
   inherits(object, "constraint")
 }
 
+#' @describeIn newConstraint 
+#' @family constraint
 #' @export
-addSummand <- function(eqt, variable = NULL, mult = data.frame(),
-                       for.sum = list(), arg) {
+addSummand <- function(
+    eqt,
+    variable = NULL,
+    mult = data.frame(),
+    for.sum = list(),
+    arg) {
   if (!is.null(names(arg))) {
     if (any(names(arg) == "variable")) variable <- arg$variable
     if (any(names(arg) == "mult")) mult <- arg$mult
@@ -290,9 +362,9 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
   # if (grepl("CESR_5_2030", stm@name)) browser()
   # !!! add interpolation patch here? or in the calling function? !!!
   # if (nrow(stm@for.each) > 0) {
-    # .interpolation0(stm@rhs, parameter = "rhs", defVal = stm@defVal,
-    #                 arg = list(approxim = approxim)
-    #                 )
+  # .interpolation0(stm@rhs, parameter = "rhs", defVal = stm@defVal,
+  #                 arg = list(approxim = approxim)
+  #                 )
 
   # temporary fix for constraints interpolation: expanding year set
   # works only for year set and if no NA values in the set
@@ -308,9 +380,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     stop(paste0('Constraint "', stm@name, '" error: ', x))
   }
   get.all.child <- function(x) {
-    #!!! Rewrite
+    # !!! Rewrite
     unique(
-      c(x,
+      c(
+        x,
         c(
           # approxim$calendar@slice_ancestry[
           #   approxim$calendar@slice_ancestry$parent %in% x,
@@ -411,9 +484,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
         # check if the same set in lhs exist
         fl <- FALSE
         if (all(!c(all.set[nn[need.set == j], c("lead.year", "lag.year")],
-                   recursive = TRUE))) {
+          recursive = TRUE
+        ))) {
           fl <- nn[(!all.set$for.each[nn] & all.set$set[nn] == j &
-                      !is.na(all.set$new.map[nn]))]
+            !is.na(all.set$new.map[nn]))]
         }
         add.new <- TRUE
         if (any(fl)) {
@@ -448,8 +522,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     new.map.name.full <- paste0(new.map.name, "(", mpp$alias, ")")
     for (i in seq_along(set.map)) {
       prec@parameters[[new.map.name[i]]] <-
-        addMultipleSet(newParameter(new.map.name[i], set.map.name[i], "map"),
-                       c(set.map[[i]]))
+        addMultipleSet(
+          newParameter(new.map.name[i], set.map.name[i], "map"),
+          c(set.map[[i]])
+        )
     }
 
     # copy new.map for lhs set that define in for each
@@ -486,19 +562,22 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
         if (any(all.set$lag.year)) {
           tmg <- tmg[
             !(tmg$year %in% prec@parameters[["mMilestoneFirst"]]@data$year), ,
-            drop = FALSE]
+            drop = FALSE
+          ]
         }
         if (any(all.set$lead.year)) {
           tmg <- tmg[
             tmg$year %in% prec@parameters[["mMilestoneHasNext"]]@data$year, ,
-            drop = FALSE]
+            drop = FALSE
+          ]
         }
       }
       tmp_fe <- rbind(
         merge(
           select(tmp_fe, -any_of(i)),
           # tmp_fe[, colnames(tmp_fe) != i, drop = FALSE],
-          tmg),
+          tmg
+        ),
         tmp_fe[!is.na(tmp_fe[[i]]), , drop = FALSE]
       )
       tmp_fe <- tmp_fe[!duplicated(tmp_fe), , drop = FALSE]
@@ -519,7 +598,8 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     nmn <- paste0("mCnsForEach", stm@name)
     prec@parameters[[nmn]] <- .dat2par(
       newParameter(nmn, colnames(stm@for.each), "map",
-                   interpolation = stm@interpolation),
+        interpolation = stm@interpolation
+      ),
       stm@for.each
     )
     res$equation <- paste0(res$equation, "$", nmn, "(", paste0(colnames(stm@for.each), collapse = ", "), ")")
@@ -532,24 +612,26 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     " ### ",
     c("==" = "=e=", ">=" = "=g=", "<=" = "=l=")[as.character(stm@eq)],
     " "
-    )
+  )
   # Add rhs
   if (nrow(stm@rhs) != 0 &&
-      (any(stm@rhs$rhs != 0) ||
-       (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
+    (any(stm@rhs$rhs != 0) ||
+      (stm@defVal != 0 && nrow(stm@for.each) > nrow(stm@rhs)))) {
     # Complicated rhs
     # Generate approxim
     # browser()
     approxim2 <-
       approxim[unique(
-        c(colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)],
-          "solver", "year", "calendar")
-        )]
+        c(
+          colnames(stm@rhs)[colnames(stm@rhs) %in% names(approxim)],
+          "solver", "year", "calendar"
+        )
+      )]
     if (any(names(approxim2) == "slice")) {
       approxim2$slice <- approxim2$calendar@slice_share$slice
     }
     fl <- (all.set$for.each & !is.na(all.set$new.map) &
-             all.set$set %in% colnames(stm@rhs))
+      all.set$set %in% colnames(stm@rhs))
     need.set <- all.set[fl, , drop = FALSE]
     for (j in seq_len(nrow(need.set))) {
       approxim2[[need.set[j, "set"]]] <- set.map[[need.set[j, "new.map"]]]
@@ -584,8 +666,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
 
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     # Add mult
-    res$equation <- paste0(res$equation, xx@name, "(",
-                           paste0(need.set0, collapse = ", "), ")")
+    res$equation <- paste0(
+      res$equation, xx@name, "(",
+      paste0(need.set0, collapse = ", "), ")"
+    )
   } else {
     res$equation <- paste0(res$equation, stm@defVal)
   }
@@ -667,13 +751,13 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       approxim2$fullsets <- approxim$fullsets
       # browser()
       xx <- newParameter(paste0("pCnsMult", stm@name, "_", i),
-                         need.set,
-                         "numpar",
-                         defVal = stm@lhs[[i]]@defVal, # !!! Check
-                         # interpolation = "back.inter.forth"
-                         # interpolation = .defInt[["rhs"]] # !!! Temporary fix
-                         interpolation = stm@interpolation
-                         )
+        need.set,
+        "numpar",
+        defVal = stm@lhs[[i]]@defVal, # !!! Check
+        # interpolation = "back.inter.forth"
+        # interpolation = .defInt[["rhs"]] # !!! Temporary fix
+        interpolation = stm@interpolation
+      )
       prec@parameters[[xx@name]] <-
         .dat2par(xx, .interp_numpar(stm@lhs[[i]]@mult, "value", xx, approxim2))
       if (any(lhs.set2$lead.year) || any(lhs.set2$lag.year)) {
@@ -684,8 +768,10 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
         prec@parameters[[xx@name]] <- .dat2par(xx, yy)
       }
       # Add mult
-      vrb.lhs <- paste0(xx@name, "(", paste0(need.set, collapse = ", "),
-                        ") * ", vrb.lhs)
+      vrb.lhs <- paste0(
+        xx@name, "(", paste0(need.set, collapse = ", "),
+        ") * ", vrb.lhs
+      )
     } else if (stm@lhs[[i]]@defVal != 1) {
       vrb.lhs <- paste0(stm@lhs[[i]]@defVal, " * ", vrb.lhs)
     }
@@ -693,11 +779,19 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
     for (j in seq_len(nrow(lhs.set2))[lhs.set2$alias != lhs.set2$set]) {
       vrb.lhs <- gsub(paste0(" ", lhs.set2$set[j], " "), lhs.set2$alias[j], vrb.lhs)
     }
-    vrb.lhs <- gsub("[ ]*[$][ ]*", "$",
-                    gsub("[ ]*[)]", ")",
-                         gsub("[ ]*[(][ ]*", "(",
-                              gsub("[ ]*[,][ ]*", ", ",
-                                   vrb.lhs))))
+    vrb.lhs <- gsub(
+      "[ ]*[$][ ]*", "$",
+      gsub(
+        "[ ]*[)]", ")",
+        gsub(
+          "[ ]*[(][ ]*", "(",
+          gsub(
+            "[ ]*[,][ ]*", ", ",
+            vrb.lhs
+          )
+        )
+      )
+    )
     # Generate data to equation
     if (i != 1) lhs_equation <- paste0(lhs_equation, "+")
     if (all(!lhs.set2$def.lhs)) {
@@ -727,12 +821,16 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
       if (sum(lhs.set2$def.lhs) == 1) {
         lhs_equation <- paste0(lhs_equation, " sum(", lhs.set3$alias)
       } else {
-        lhs_equation <- paste0(lhs_equation, " sum((",
-                               paste0(lhs.set3$alias, collapse = ", "), ")")
+        lhs_equation <- paste0(
+          lhs_equation, " sum((",
+          paste0(lhs.set3$alias, collapse = ", "), ")"
+        )
       }
       if (length(cnd) > 1 || any(grep("[ )]and[ (]", cnd))) {
-        lhs_equation <- paste0(lhs_equation, "$(",
-                               paste0(cnd, collapse = " and "), "), ", vrb.lhs, ")")
+        lhs_equation <- paste0(
+          lhs_equation, "$(",
+          paste0(cnd, collapse = " and "), "), ", vrb.lhs, ")"
+        )
       } else if (length(cnd) == 1) {
         lhs_equation <- paste0(lhs_equation, "$", cnd, ", ", vrb.lhs, ")")
       } else {
@@ -753,9 +851,21 @@ addSummand <- function(eqt, variable = NULL, mult = data.frame(),
 #  .getSetEquation(prec, stm, approxim)@gams.equation
 
 #' @export
-newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
-                           for.each = list(), defVal = 0, rule = NULL, comm = NULL,
-                           cout = TRUE, cinp = TRUE, aout = TRUE, ainp = TRUE) { # , emis = TRUE
+newConstraintS <- function(
+    name, 
+    type, 
+    eq = "==", 
+    rhs = 0, 
+    for.sum = list(),
+    for.each = list(), 
+    defVal = 0, 
+    rule = NULL, 
+    comm = NULL,
+    cout = TRUE, 
+    cinp = TRUE, 
+    aout = TRUE, 
+    ainp = TRUE
+  ) { # , emis = TRUE
   stop.newconstr <- function(x) {
     stop(paste0('Constraint "', name, '" error: ', x))
   }
@@ -784,8 +894,10 @@ newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
   #
   set.vec <- c(names(for.each), names(for.sum))
   psb.vec <- c("sup", "stg", "tech", "imp", "expp")
-  psb.vec.tp <- c(sup = "Sup", stg = "Storage", tech = "Tech",
-                  imp = "Import", expp = "Export")
+  psb.vec.tp <- c(
+    sup = "Sup", stg = "Storage", tech = "Tech",
+    imp = "Import", expp = "Export"
+  )
   names(psb.vec) <- psb.vec
   is.set <- psb.vec[psb.vec %in% set.vec]
   if (length(is.set) > 1) {
@@ -830,8 +942,10 @@ newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
     # for (i in seq_along(arg)) {
     #   arg[[i]]$mult <- rhs
     # }
-    term <- list(for.sum = for.sum[!(names(for.sum) %in% psb.vec)],
-                 variable = paste0("v", inpout, "Tot"), mult = rhs)
+    term <- list(
+      for.sum = for.sum[!(names(for.sum) %in% psb.vec)],
+      variable = paste0("v", inpout, "Tot"), mult = rhs
+    )
     rhs <- 0
     defVal <- 0
     arg[[length(arg) + 1]] <- term
@@ -860,6 +974,8 @@ newConstraintS <- function(name, type, eq = "==", rhs = 0, for.sum = list(),
     rhs <- 0
     defVal <- 0
   }
-  newConstraint(name, eq = eq, for.each = for.each, defVal = defVal,
-                rhs = rhs, arg = arg)
+  newConstraint(name,
+    eq = eq, for.each = for.each, defVal = defVal,
+    rhs = rhs, arg = arg
+  )
 }

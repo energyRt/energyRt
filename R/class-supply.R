@@ -1,20 +1,102 @@
 #' An S4 class to represent a supply of a commodity
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot commodity character.
-#' @slot unit character.
-#' @slot weather data.frame.
-#' @slot reserve data.frame.
-#' @slot availability data.frame.
-#' @slot region character.
-# @slot slice character.
-#' @slot misc list.
+#' @slot name `r get_slot_info("supply", "name")`
+#' @slot desc `r get_slot_info("supply", "desc")`
+#' @slot commodity `r get_slot_info("supply", "commodity")`
+#' @slot unit `r get_slot_info("supply", "unit")`
+#' @slot weather `r get_slot_info("supply", "weather")`
+#' @slot reserve `r get_slot_info("supply", "reserve")`
+#' @slot availability `r get_slot_info("supply", "availability")`
+#' @slot region `r get_slot_info("supply", "region")`
+#' @slot misc `r get_slot_info("supply", "misc")`
 #'
 #' @include class-demand.R
 #'
 #' @return supply object with given specifications.
 #' @export
+setClass("supply",
+  representation(
+    name = "character",
+    desc = "character",
+    commodity = "character",
+    unit = "character",
+    weather = "data.frame", 
+    reserve = "data.frame", 
+    availability = "data.frame", 
+    region = "character",
+    misc = "list"
+  ),
+  prototype(
+    name = "",
+    desc = "",
+    commodity = "",
+    unit = "",
+    weather = data.frame(
+      weather = character(), 
+      wava.lo = numeric(),
+      wava.up = numeric(),
+      wava.fx = numeric(),
+      stringsAsFactors = FALSE
+    ),
+    reserve = data.frame(
+      region = character(), 
+      res.lo = numeric(),
+      res.up = numeric(),
+      res.fx = numeric(),
+      stringsAsFactors = FALSE
+    ),
+    availability = data.frame(
+      region = character(),
+      year = integer(),
+      slice = character(),
+      ava.lo = numeric(),
+      ava.up = numeric(),
+      ava.fx = numeric(),
+      cost = numeric(),
+      stringsAsFactors = FALSE
+    ),
+    region = character(),
+    misc = list()
+  ),
+  S3methods = FALSE
+)
+
+setMethod("initialize", "supply", function(.Object, ...) {
+  .Object
+})
+
+
+#' Create new supply object
+#'
+#' Constructor for supply object.
+#' 
+#' @name newSupply
+#' 
+#' @description
+#' The `supply` class is used to add a domestic source of a commodity to the model,
+#' with given reserves, availability, and costs. 
+#' 
+#' @details 
+#' !!!Add more details here
+#' 
+#' @md
+#' @param name `r get_slot_info("supply", "name")`
+#' @param desc `r get_slot_info("supply", "desc")`
+#' @param commodity `r get_slot_info("supply", "commodity")`
+#' @param unit `r get_slot_info("supply", "unit")`
+#' @param weather `r get_slot_info("supply", "weather")`
+#' @param reserve `r get_slot_info("supply", "reserve")`
+#' @param availability `r get_slot_info("supply", "availability")`
+#' @param region `r get_slot_info("supply", "region")`
+#' @param misc `r get_slot_info("supply", "misc")`
+#'
+#' @rdname newSupply
+#' @order 1
+#' @family supply, process
+#' 
+#' @return supply object with given specifications.
+#' @export
+#'
 #' @examples
 #' SUP_COA <- newSupply(
 #'    name = "SUP_COA",
@@ -35,76 +117,32 @@
 #'    region = c("R1", "R2", "R3")
 #'  )
 #' class(SUP_COA)
-setClass("supply",
-  representation(
-    name = "character",
-    desc = "character",
-    # color         = "data.frame",      #
-    commodity = "character",
-    unit = "character",
-    weather = "data.frame", # weather factor (availability multiplier)
-    reserve = "data.frame", # Total available resource
-    availability = "data.frame", # Availability of the resource with prices
-    region = "character",
-    # GIS                = "GIS", # @GIS # setClassUnion("GIS", members=c("SpatialPolygonsDataFrame", "NULL"))
-    # slice = "character",
-    misc = "list"
-  ),
-  prototype(
-    name = "",
-    desc = "",
-    # color         = data.frame(region   = character(),
-    #                            color    = character(),
-    #                            stringsAsFactors = FALSE),
-    commodity = "",
-    unit = "",
-    weather = data.frame(
-      weather = character(), # name of the weather object
-      wava.lo = numeric(), # multipliers for ava.*, 1 by default
-      wava.up = numeric(),
-      wava.fx = numeric(),
-      stringsAsFactors = FALSE
-    ),
-    reserve = data.frame(
-      region = character(), # Total available resource by region
-      res.lo = numeric(),
-      res.up = numeric(),
-      res.fx = numeric(),
-      stringsAsFactors = FALSE
-    ),
-    availability = data.frame(
-      region = character(),
-      year = integer(),
-      slice = character(),
-      ava.lo = numeric(),
-      ava.up = numeric(),
-      ava.fx = numeric(),
-      cost = numeric(),
-      stringsAsFactors = FALSE
-    ),
-    region = character(),
-    # GIS           = NULL,
-    # slice = character(),
-    # ! Misc
-    misc = list()
-  ),
-  S3methods = FALSE
-)
+newSupply <- function(
+  name = NA_character_,
+  desc = NA_character_,
+  commodity = character(),
+  unit = character(),
+  weather = data.frame(),
+  reserve = data.frame(),
+  availability = data.frame(),
+  region = character(),
+  misc = list()
+  ) {
+  .data2slots(
+    "supply", 
+    name = name,
+    desc = desc,
+    commodity = commodity,
+    unit = unit,
+    weather = weather,
+    reserve = reserve,
+    availability = availability,
+    region = region,
+    misc = misc
+    )
+}
 
-setMethod("initialize", "supply", function(.Object, ...) {
-  .Object
-})
-
-setGeneric("newSupply", function(name, ...) standardGeneric("newSupply"))
-#' Create new supply object
-#'
-#' @name newSupply
-#' @rdname sypply
-#' @export
-setMethod("newSupply", signature(name = "character"), function(name, ...) {
-  .data2slots("supply", name, ...)
-})
-
+#' Update supply object
 #' @rdname sypply
 #' @family supply update
 #' @export

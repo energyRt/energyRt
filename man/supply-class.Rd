@@ -13,43 +13,55 @@ An S4 class to represent a supply of a commodity
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character.}
+\item{\code{name}}{character. Name of the supply object, used in sets.}
 
-\item{\code{desc}}{character.}
+\item{\code{desc}}{character. Description of the supply object.}
 
-\item{\code{commodity}}{character.}
+\item{\code{commodity}}{character. The supplied commodity short name.}
 
-\item{\code{unit}}{character.}
+\item{\code{unit}}{character. The main unit of the commodity used in the model.}
 
-\item{\code{weather}}{data.frame.}
-
-\item{\code{reserve}}{data.frame.}
-
-\item{\code{availability}}{data.frame.}
-
-\item{\code{region}}{character.}
-
-\item{\code{misc}}{list.}
+\item{\code{weather}}{data.frame. Weather factors to apply to the supply.
+\describe{
+\item{weather}{character. Name of the weather factor to apply. Must match the weather factor  names in a \code{weather} class in the model.
+}
+\item{wava.lo}{numeric. Coefficient that links the weather factor with the lower bound of  the availability factor \code{ava.lo}.
+}
+\item{wava.up}{numeric. Coefficient that links the weather factor with the upper bound of  the availability factor \code{ava.up}.
+}
+\item{wava.fx}{numeric. Coefficient that links the weather factor with the fixed value of  the availability factor \code{ava.fx}. This parameter overrides  \code{wava.lo} and \code{wava.up}.
+}
 }}
 
-\examples{
-SUP_COA <- newSupply(
-   name = "SUP_COA",
-   desc = "Coal supply",
-   commodity = "COA",
-   unit = "PJ",
-   reserve = data.frame(
-      region = c("R1", "R2", "R3"),
-      res.up = c(2e5, 1e4, 3e6) # total reserves/deposits
-   ),
-   availability = data.frame(
-      region = c("R1", "R2", "R3"),
-      year = NA_integer_,
-      slice = "ANNUAL",
-      ava.up = c(1e3, 1e2, 2e2), # annual availability
-      cost = c(10, 20, 30) # cost of the resource (currency per unit)
-   ),
-   region = c("R1", "R2", "R3")
- )
-class(SUP_COA)
+\item{\code{reserve}}{data.frame. Total available resource. Applicable to exhaustible resources. Set for each region. If not set, the resource is considered infinite.
+
+\describe{
+\item{region}{character. Region name to apply the parameter.  Use NA to apply to all regions.
 }
+\item{res.lo}{numeric. Lower bound of the total available resource.}
+\item{res.up}{numeric. Upper bound of the total available resource.}
+\item{res.fx}{numeric. Fixed value of the total available resource.  This parameter overrides \code{res.lo} and \code{res.up}.
+}
+}}
+
+\item{\code{availability}}{data.frame. Availability of the resource in physical units.
+\describe{
+\item{region}{character. Region name to apply the parameter. Use NA to apply to all regions.
+}
+\item{year}{integer. Year to apply the parameter. Use NA to apply to all years.
+}
+\item{slice}{character. Time slice to apply the parameter. Use NA to apply to all slices.
+}
+\item{ava.lo}{numeric. Lower bound of the availability factor.}
+\item{ava.up}{numeric. Upper bound of the availability factor.}
+\item{ava.fx}{numeric. Fixed value of the availability factor.  This parameter overrides \code{ava.lo} and \code{ava.up}.
+}
+\item{cost}{numeric. Cost of the resource extraction,  if not set, the resource is considered free.
+}
+}}
+
+\item{\code{region}}{character. Regions where the supply process exists. Must include all regions used in other slots. \code{availability} and \code{reserve} slots also limit possible regions.}
+
+\item{\code{misc}}{list. List of additional parameters that are not used in the model but can be used for reference or user-defined functions. For example, links to the source of the supply data, or other metadata.}
+}}
+

@@ -11,9 +11,53 @@ newExport(
   unit = NULL,
   reserve = Inf,
   exp = data.frame(),
-  ...
+  misc = list()
 )
 }
-\description{
-Create new export object
+\arguments{
+\item{name}{character. Name of the export object, used in sets.}
+
+\item{desc}{character. Description of the export object.}
+
+\item{commodity}{character. Name of the exported commodity.}
+
+\item{unit}{character. Unit of the exported commodity.}
+
+\item{reserve}{numeric. Total accumulated limit through the model horizon.}
+
+\item{exp}{data.frame. Export parameters.
+\describe{
+\item{region}{character. Region name to apply the parameter; use NA to apply to all regions.}
+\item{year}{integer. Year to apply the parameter; use NA to apply to all years.}
+\item{slice}{character. Time slice to apply the parameter; use NA to apply to all slices.}
+\item{exp.lo}{numeric. Export lower bound.}
+\item{exp.up}{numeric. Export upper bound.}
+\item{exp.fx}{numeric. Fixed export volume, ignored if NA. This parameter overrides \code{exp.lo} and \code{exp.up}.}
+}}
+
+\item{misc}{list. Additional information.}
 }
+\value{
+export object with given specifications.
+}
+\description{
+Export object represent commodity export to the Rest of the World (RoW).
+}
+\details{
+\code{export} is a type of process that adds an "external" source to a commodity
+to the model. The Rest of the World (RoW) is not modeled explicitly,
+\code{export} and \code{import} objects define and control the exchange with the RoW.
+The operation of the export object is similar to the \code{demand} objects,
+the two different classes are used to distinguish domestic and external
+sources of final consumption.
+The export is controlled by the \code{exp} data frame, which specifies
+bounds and fixed values for the export of the export flow.
+The \code{exp.fx} column is used to specify fixed values of the export flow,
+making the export flow exogenous. The \code{exp.lo} and \code{exp.up} columns are used
+to specify lower and upper bounds of the export flow, making the export flow
+endogenous. The \code{price} column is used to specify the exogenous price
+for the export commodity.
+The \code{reserve} slot is used to set limits on the total export over the
+model horizon.
+}
+\concept{create export}

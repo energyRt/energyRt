@@ -1,32 +1,38 @@
 #' An S4 class to represent a commodity subsidy
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot comm character.
-#' @slot region character.
-#' @slot defVal numeric.
-#' @slot value data.frame.
-#' @slot misc list.
+#' @name subsidy-class
+#' 
+#' @inherit newSub, description
+#' 
+#' @md 
+#' @slot name `r get_slot_info("sub", "name")`
+#' @slot desc `r get_slot_info("sub", "desc")`
+#' @slot comm `r get_slot_info("sub", "comm")`
+#' @slot region `r get_slot_info("sub", "region")`
+#' @slot defVal `r get_slot_info("sub", "defVal")`
+#' @slot sub `r get_slot_info("sub", "sub")`
+#' @slot misc `r get_slot_info("sub", "misc")`
 #'
-#' @return
 #' @export
 #'
 #' @include class-tax.R
+#' @rdname class-subsidy
 #'
-# !!! add slot "sub" = data.frame(comm, year, slice, sub)
-# !!! rename sub -> subsidy
-# !!! add slot @variable = factor("output", "balance")
-setClass("sub",
+setClass("sub", 
   representation(
     # General information
-    name = "character", # Short name
-    desc = "character", # Details
-    comm = "character", #
-    region = "character", #
-    defVal = "numeric", #
-    sub = "data.frame", #
+    name = "character", 
+    desc = "character", 
+    comm = "character", 
+    region = "character", 
+    defVal = "numeric", 
+    sub = "data.frame", 
     misc = "list"
   ),
+  # !!! Rename to "subsidy"
+  # !!! add slot "sub" = data.frame(comm, year, slice, sub)
+  # !!! rename sub -> subsidy
+  # !!! add slot @variable = factor("output", "balance")  
   prototype(
     name = "", # Short name
     comm = "",
@@ -47,9 +53,52 @@ setClass("sub",
   S3methods = FALSE
 )
 
-setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
+# setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
+
+#' @title Create a new subsidy object
+#' 
+#' @description
+#' Subsidies are used to represent the financial support provided to 
+#' production, consumption, or balance of a commodity.
+#'
+#' @param name `r get_slot_info("sub", "name")`
+#' @param desc `r get_slot_info("sub", "desc")`
+#' @param comm `r get_slot_info("sub", "comm")`
+#' @param region `r get_slot_info("sub", "region")`
+#' @param defVal `r get_slot_info("sub", "defVal")`
+#' @param sub `r get_slot_info("sub", "sub")`
+#' @param misc `r get_slot_info("sub", "misc")`
+#'
+#' @return An object of class `sub`
+#' @export
+#' @rdname newSubsidy
+#'
+#' @examples
+newSub <- function(
+  name, 
+  desc = "",
+  comm = "",
+  region = character(),
+  defVal = 0,
+  sub = data.frame(),
+  misc = list()
+  ) {
+  .data2slots(
+    "sub", 
+    name = name,
+    desc = desc,
+    comm = comm,
+    region = region,
+    defVal = defVal,
+    sub = sub,
+    misc = misc
+    )
+}
 
 #' @export
-setMethod("newSub", signature(name = "character"), function(name, ..., value = NULL) {
-  .data2slots("sub", name, ...)
-})
+#' @rdname newSubsidy
+newSubsidy <- newSub
+
+# setMethod("newSub", signature(name = "character"), function(name, ..., value = NULL) {
+#   .data2slots("sub", name, ...)
+# })

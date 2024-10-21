@@ -10,7 +10,7 @@ An S4 class to represent a commodity tax
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character. Name of}
+\item{\code{name}}{character.}
 
 \item{\code{comm}}{character.}
 

@@ -10,6 +10,7 @@
 #' A broad set of parameters provides flexibility to model various technological
 #' processes, including efficiency, availability, costs, and exogenous
 #' shocks (weather factors).
+#' @md
 #'
 #' @slot name `r get_slot_info("technology", "name")`
 #' @slot desc `r get_slot_info("technology", "desc")`

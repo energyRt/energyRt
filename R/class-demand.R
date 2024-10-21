@@ -1,21 +1,16 @@
 #' An S4 class to declare a demand in the model
 #'
-#' @slot name short name (character) used in sets.
-#' @slot desc optional desc, comment (character).
-#' @slot commodity character. Name of the commodity for which the demand will be specified.
-#' @slot unit character. (optional) unit of the commodity.
-#' @slot dem specification of the demand, a data.frame with columns:
-#' \describe{
-#'   \item{region}{character. Name of the region for which the demand will be specified. NA for every regions}'
-#'   \item{year}{integer. Year of the demand. NA for every year.}
-#'   \item{slice}{character. Name of the slice for which the demand will be specified. NA for every slice.}
-#'   \item{dem}{numeric. Value of the demand.}
-#' }
-#' @slot region character. Optional name of region to narrow the specification of the demand in the case of used NAs. Error will be returned if specified regions in `@dem` are not mensioned in the `@region` slot (if the slot is not empty).
-#' @slot misc list. Optional list of additional information.
+#' @md
+#' @slot name `r get_slot_info("demand", "name")`
+#' @slot desc `r get_slot_info("demand", "desc")`
+#' @slot commodity `r get_slot_info("demand", "commodity")`
+#' @slot unit `r get_slot_info("demand", "unit")`
+#' @slot dem `r get_slot_info("demand", "dem")`
+#' @slot region `r get_slot_info("demand", "region")`
+#' @slot misc `r get_slot_info("demand", "misc")`
 #'
 #' @include class-commodity.R
-#' @rdname demand
+#' @rdname class-demand
 #'
 #' @export
 #'
@@ -50,7 +45,17 @@ setMethod("initialize", "demand", function(.Object, ...) {
   .Object
 })
 
-#' @rdname demand
+#' Create new demand object
+#' 
+#' @param name `r get_slot_info("demand", "name")`
+#' @param desc `r get_slot_info("demand", "desc")`
+#' @param commodity `r get_slot_info("demand", "commodity")`
+#' @param unit `r get_slot_info("demand", "unit")`
+#' @param dem `r get_slot_info("demand", "dem")`
+#' @param region `r get_slot_info("demand", "region")`
+#' @param misc `r get_slot_info("demand", "misc")`
+#'
+#' @rdname newDemand
 #' @order 1
 #' @return demand object with given specifications.
 #' @export
@@ -89,10 +94,13 @@ newDemand <- function(
   )
 }
 
+#' Update data in a demand object
+#' 
 #' @name update
 #' @param object demand object
 #'
-#' @rdname update
+#' @rdname newDemand
+#' @order 2
 #' @family demand update
 #' @keywords demand update
 #' @export

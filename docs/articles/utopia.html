@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Utopia: the testing model • energyRt</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
@@ -27,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.3</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.4.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,15 +42,18 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../articles/energyRt.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/model.html">energyRt model framework</a></li>
-    <li><a class="dropdown-item" href="../articles/utopia.html">Utopia: the testing model</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
+<li><a class="dropdown-item" href="../articles/install.html">Installation</a></li>
+    <li><a class="dropdown-item" href="../articles/helloworld.html">Hello World!</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/roadmap.html">Roadmap</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/logo.html">Logo</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -71,12 +80,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Utopia: the testing model</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Utopia: the testing model</h1>
             <h3 data-toc-skip class="subtitle">(transitional/interim
 version)</h3>
             
-            <h4 data-toc-skip class="date">2024-10-17</h4>
+            <h4 data-toc-skip class="date">2024-10-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/energyRt/energyRt/blob/HEAD/vignettes/utopia.Rmd" class="external-link"><code>vignettes/utopia.Rmd</code></a></small>
       <div class="d-none name"><code>utopia.Rmd</code></div>
@@ -350,9 +358,9 @@ declare commodity is its name. Additional parameters can be stored in
 the class <code>commodity</code> for information and processing, most of
 the slots are currently reserved to be used in user-defined functions.
 The preferred way to create the class and fill it with data is the
-<code><a href="../reference/commodity.html">newCommodity()</a></code> function as shown below.</p>
+<code><a href="../reference/newCommodity.html">newCommodity()</a></code> function as shown below.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">COA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">COA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"COA"</span>, <span class="co"># the name as it appears in the solver-software and the model sets</span></span>
 <span>  desc <span class="op">=</span> <span class="st">"Generic coal"</span>, <span class="co"># just a comment</span></span>
 <span>  emis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> <span class="co"># emissions, associated with fuels combustion (see the flags in technologies)</span></span>
@@ -364,7 +372,7 @@ The preferred way to create the class and fill it with data is the
 <span>  <span class="co"># color = "brown" # reserved for output figures, optional</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">OIL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span></span>
+<span><span class="va">OIL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"OIL"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Oil and oil products"</span>,</span>
 <span>  emis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -374,7 +382,7 @@ The preferred way to create the class and fill it with data is the
 <span>  timeframe <span class="op">=</span> <span class="st">"ANNUAL"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">GAS</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span></span>
+<span><span class="va">GAS</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"GAS"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Natural gas"</span>,</span>
 <span>  emis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -385,33 +393,33 @@ The preferred way to create the class and fill it with data is the
 <span>  timeframe <span class="op">=</span> <span class="st">"MONTH"</span> <span class="co"># This commodity will appear in month-level equations</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">CH4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span></span>
+<span><span class="va">CH4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"CH4"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Methan emmisions"</span>,</span>
 <span>  timeframe <span class="op">=</span> <span class="st">"MONTH"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">BIO</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span></span>
+<span><span class="va">BIO</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"BIO"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Generic biomass, all types"</span>,</span>
 <span>  timeframe <span class="op">=</span> <span class="st">"ANNUAL"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># More energy commodities with less details</span></span>
-<span><span class="va">ELC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"ELC"</span>, desc <span class="op">=</span> <span class="st">"Electricity"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">HVE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"HVE"</span>, desc <span class="op">=</span> <span class="st">"High voltage electricity"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">UHV</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"UHV"</span>, desc <span class="op">=</span> <span class="st">"Ultra high voltage electricity"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">NUC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"NUC"</span>, desc <span class="op">=</span> <span class="st">"Nuclear fuel"</span>, timeframe <span class="op">=</span> <span class="st">"ANNUAL"</span><span class="op">)</span></span>
-<span><span class="va">HYD</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"HYD"</span>, desc <span class="op">=</span> <span class="st">"Hydro energy"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">SOL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"SOL"</span>, desc <span class="op">=</span> <span class="st">"Solar energy"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">WIN</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"WIN"</span>, desc <span class="op">=</span> <span class="st">"Wind energy"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">ELC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"ELC"</span>, desc <span class="op">=</span> <span class="st">"Electricity"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">HVE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"HVE"</span>, desc <span class="op">=</span> <span class="st">"High voltage electricity"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">UHV</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"UHV"</span>, desc <span class="op">=</span> <span class="st">"Ultra high voltage electricity"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">NUC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"NUC"</span>, desc <span class="op">=</span> <span class="st">"Nuclear fuel"</span>, timeframe <span class="op">=</span> <span class="st">"ANNUAL"</span><span class="op">)</span></span>
+<span><span class="va">HYD</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"HYD"</span>, desc <span class="op">=</span> <span class="st">"Hydro energy"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">SOL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"SOL"</span>, desc <span class="op">=</span> <span class="st">"Solar energy"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">WIN</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"WIN"</span>, desc <span class="op">=</span> <span class="st">"Wind energy"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Emissions</span></span>
-<span><span class="va">CO2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"CO2"</span>, desc <span class="op">=</span> <span class="st">"Carbon dioxide emissions"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">NOX</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"NOX"</span>, desc <span class="op">=</span> <span class="st">"Nitrogen oxide emissions"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">SO2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"SO2"</span>, desc <span class="op">=</span> <span class="st">"Sulfur dioxide emissions"</span>, timeframe <span class="op">=</span> <span class="st">"MONTH"</span><span class="op">)</span></span>
-<span><span class="va">HG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"HG"</span>, desc <span class="op">=</span> <span class="st">"Mercury emissions"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
-<span><span class="va">PM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/commodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"PM"</span>, desc <span class="op">=</span> <span class="st">"Particulate matter emissions"</span>, timeframe <span class="op">=</span> <span class="st">"ANNUAL"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">CO2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"CO2"</span>, desc <span class="op">=</span> <span class="st">"Carbon dioxide emissions"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">NOX</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"NOX"</span>, desc <span class="op">=</span> <span class="st">"Nitrogen oxide emissions"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">SO2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"SO2"</span>, desc <span class="op">=</span> <span class="st">"Sulfur dioxide emissions"</span>, timeframe <span class="op">=</span> <span class="st">"MONTH"</span><span class="op">)</span></span>
+<span><span class="va">HG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"HG"</span>, desc <span class="op">=</span> <span class="st">"Mercury emissions"</span>, timeframe <span class="op">=</span> <span class="st">"HOUR"</span><span class="op">)</span></span>
+<span><span class="va">PM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"PM"</span>, desc <span class="op">=</span> <span class="st">"Particulate matter emissions"</span>, timeframe <span class="op">=</span> <span class="st">"ANNUAL"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-final-demand">The final demand<a class="anchor" aria-label="anchor" href="#the-final-demand"></a>
@@ -516,7 +524,7 @@ year, the final values will be used for interpolation forward.</p>
 <span><span class="co">#   left_join(select(dat$pDemand, region, year, slice, value)) |&gt;</span></span>
 <span><span class="co">#   mutate(PJ = value) |&gt; select(-value)</span></span>
 <span></span>
-<span><span class="va">DEM_ELC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demand.html">newDemand</a></span><span class="op">(</span></span>
+<span><span class="va">DEM_ELC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newDemand.html">newDemand</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"DEM_ELC"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Final demand for electricity"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"ELC"</span>,</span>
@@ -547,7 +555,7 @@ costs, can be assigned with <code>availability</code> parameters.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If we assume that coal is abundunt resource, available in every region with the same price,</span></span>
 <span><span class="co"># we don't have to declare @region of the supply.</span></span>
-<span><span class="va">SUP_COA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sypply.html">newSupply</a></span><span class="op">(</span></span>
+<span><span class="va">SUP_COA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"SUP_COA"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Supply of coal"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"COA"</span>,</span>
@@ -570,7 +578,7 @@ specified years will be linearly interpolated by default.<br>
 Similarly, for other primary commodities:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
-<span><span class="va">SUP_GAS</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sypply.html">newSupply</a></span><span class="op">(</span></span>
+<span><span class="va">SUP_GAS</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"SUP_GAS"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Supply of natural gas"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"GAS"</span>,</span>
@@ -585,7 +593,7 @@ Similarly, for other primary commodities:</p>
 <span>  <span class="co"># timeframe = "ANNUAL"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">SUP_NUC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sypply.html">newSupply</a></span><span class="op">(</span></span>
+<span><span class="va">SUP_NUC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"SUP_NUC"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"NUC"</span>,</span>
 <span>  availability <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -594,7 +602,7 @@ Similarly, for other primary commodities:</p>
 <span>  <span class="co"># timeframe = "ANNUAL"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">RES_HYD</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sypply.html">newSupply</a></span><span class="op">(</span></span>
+<span><span class="va">RES_HYD</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"RES_HYD"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"HYD"</span>,</span>
 <span>  availability <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -603,13 +611,13 @@ Similarly, for other primary commodities:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">RES_SOL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sypply.html">newSupply</a></span><span class="op">(</span></span>
+<span><span class="va">RES_SOL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"RES_SOL"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"SOL"</span></span>
 <span>  <span class="co"># availability will be defined by weather factors (see below)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">RES_WIN</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sypply.html">newSupply</a></span><span class="op">(</span></span>
+<span><span class="va">RES_WIN</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"RES_WIN"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"WIN"</span></span>
 <span>  <span class="co"># availability will be defined by weather factors (see below)</span></span>
@@ -1219,7 +1227,7 @@ such details as grid simulation models have. …</p>
 <span>  <span class="va">cmd_nm</span> <span class="op">&lt;-</span> <span class="st">"ELC"</span></span>
 <span></span>
 <span>  <span class="co"># Trade class for every route</span></span>
-<span>  <span class="va">trd</span> <span class="op">&lt;-</span> <span class="fu">newTrade</span><span class="op">(</span></span>
+<span>  <span class="va">trd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newTrade.html">newTrade</a></span><span class="op">(</span></span>
 <span>    name <span class="op">=</span> <span class="va">trd_nm</span>,</span>
 <span>    desc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Bidirectional transmission line between"</span>, </span>
 <span>                        <span class="va">src_nm</span>, <span class="st">"and"</span>, <span class="va">dst_nm</span><span class="op">)</span>,</span>

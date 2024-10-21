@@ -1,0 +1,14 @@
+---
+title: "Hello World!"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, eval=FALSE}
+library(energyRt)
+```

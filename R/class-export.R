@@ -1,22 +1,20 @@
 #' An S4 class to represent commodity export to the rest of the world.
+#' 
+#' @inherit newExport description
+#' @inherit newExport details
 #'
-#' @slot name character. Name of the export process (used in sets).
-#' @slot desc character. A short description of the export process.
-#' @slot commodity character. Name of the commodity.
-#' @slot unit character. Unit of the exported commodity.
-#' @slot reserve numeric. Constraints on the total accumulated (over years) export resource (similar to "reserve" in supply).
-#' @slot exp data.frame. Export data.frame with columns:
-#'  \describe{
-#'      \item{region}{character name of region or NA for all regions}
-#'      \item{year}{integer year or NA for all years}
-#'      \item{slice}{name of time-slices, or name timeframe to represent a group of time-slices, or NA for all time-slices}
-#'      \item{exp.lo}{numeric, lower constraint on export}
-#'      \item{exp.up}{numeric, upper constraint on export}
-#'      \item{exp.fx}{numeric, fixed level of export}
-#'      \item{price}{price of the export}.
-#' @slot misc list. Any additional information to store.
+#' @md
+#' @slot name `r get_slot_info("export", "name")`
+#' @slot desc `r get_slot_info("export", "desc")`
+#' @slot commodity `r get_slot_info("export", "commodity")`
+#' @slot unit `r get_slot_info("export", "unit")`
+#' @slot reserve `r get_slot_info("export", "reserve")`
+#' @slot exp `r get_slot_info("export", "exp")`
+#' @slot misc `r get_slot_info("export", "misc")`
 #'
 #' @include class-import.R
+#' @family class, export, process
+#' @rdname class-export
 #'
 #' @export
 #'
@@ -61,18 +59,43 @@ setMethod("initialize", "export", function(.Object, ...) {
 })
 
 #' Create new export object
-#'
-#' @name newExport
-#'
+#' 
+#' @description
+#' Export object represent commodity export to the Rest of the World (RoW).
+#' 
+#' @details
+#' `export` is a type of process that adds an "external" source to a commodity 
+#' to the model. The Rest of the World (RoW) is not modeled explicitly,
+#' `export` and `import` objects define and control the exchange with the RoW.
+#' The operation of the export object is similar to the `demand` objects, 
+#' the two different classes are used to distinguish domestic and external 
+#' sources of final consumption.
+#' The export is controlled by the `exp` data frame, which specifies
+#' bounds and fixed values for the export of the export flow.
+#' The `exp.fx` column is used to specify fixed values of the export flow,
+#' making the export flow exogenous. The `exp.lo` and `exp.up` columns are used
+#' to specify lower and upper bounds of the export flow, making the export flow
+#' endogenous. The `price` column is used to specify the exogenous price 
+#' for the export commodity.
+#' The `reserve` slot is used to set limits on the total export over the 
+#' model horizon.
+#' 
+#' @md
+#' @param name `r get_slot_info("export", "name")`
+#' @param desc  `r get_slot_info("export", "desc")`
+#' @param commodity `r get_slot_info("export", "commodity")`
+#' @param unit `r get_slot_info("export", "unit")`
+#' @param reserve `r get_slot_info("export", "reserve")`
+#' @param exp `r get_slot_info("export", "exp")`
+#' @param misc `r get_slot_info("export", "misc")`
+#' 
+#' @return export object with given specifications.
+#' @rdname newExport
+#' @order 1
 #' @export
+#' @family create export
+#' @examples
 #'
-#' @param name
-#' @param desc
-#' @param commodity
-#' @param unit
-#' @param reserve
-#' @param exp
-#' @param ...
 newExport <- function(
     name,
     desc = "",
@@ -80,7 +103,8 @@ newExport <- function(
     unit = NULL,
     reserve = Inf,
     exp = data.frame(),
-    ...) {
+    misc = list()
+    ) {
   .data2slots("export",
     name,
     desc = desc,
@@ -88,12 +112,18 @@ newExport <- function(
     unit = unit,
     reserve = reserve,
     exp = exp,
-    ...)
+    misc = misc
+    )
 }
 
+#' Update export object
+#' 
+#' @description
+#' The method replaces slots of the export object with new values.
+#' 
 #' @param object object of class export
 #'
-#' @param ... slot-names with data to update (see `newTechnology`)
+#' @param ... arguments-slots (see `newExport`) with updated values to replace.
 #'
 #' @rdname newTechnology
 #' @family update export

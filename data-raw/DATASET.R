@@ -1,5 +1,6 @@
-## Source this script to recreate the package data
-
+## Source this script to recreate the package's /data files
+library(tidyverse)
+library(data.table)
 source("data-raw/maps.R")
 
 .modelCode <- list(
@@ -108,20 +109,18 @@ yaml_to_df <- function(yaml_content) {
   # Initialize an empty list to store results
   all_results <- list()
 
-  # Extracting the 'technology' directly (as 'class')
-  for (tech_name in names(parsed_yaml$class)) {
-    tech_data <- parsed_yaml$class[[tech_name]]
+  for (class_name in names(parsed_yaml$class)) {
+    class_data <- parsed_yaml$class[[class_name]]
 
     # Process each slot within the technology
-    for (slot_name in names(tech_data)) {
-      slot_data <- tech_data[[slot_name]]
+    for (slot_name in names(class_data)) {
+      slot_data <- class_data[[slot_name]]
 
       # Call process_slot for each item
-      all_results[[length(all_results) + 1]] <- process_slot("technology", slot_name, slot_data)
+      all_results[[length(all_results) + 1]] <- process_slot(class_name, slot_name, slot_data)
     }
   }
 
-  # Combine all results into a single DataFrame
   final_df <- bind_rows(all_results)
 
   return(final_df)
@@ -150,5 +149,6 @@ usethis::use_data(
   .equation_description,
   .equation_variable,
   .modelCode,
-  internal = T, overwrite = TRUE
+  internal = T, overwrite = TRUE,
+  compress = "xz"
 )

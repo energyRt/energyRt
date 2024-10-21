@@ -25,9 +25,4 @@
 \description{
 Add an object to the model's repository
 }
-\seealso{
-Other repository: 
-\code{\link{newRepository}()},
-\code{\link{repository-class}}
-}
 \concept{repository}

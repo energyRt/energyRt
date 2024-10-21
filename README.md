@@ -1,4 +1,4 @@
-## energyRt: energy systems modeling tools in R
+## energyRt <a href="https://energyrt.org/articles/logo.html"><img src="man/figures/logo.png" align="right" height="120" alt="Logo-search" /></a>
 
 **energyRt** (*energy* system modeling *R-t*oolbox /ˈɛnərdʒi ɑrt/) is a
 set of classes, methods, and functions that define a macro-language for

@@ -23,3 +23,5 @@ drafts/
 *.lst
 *.~gm
 *.lxi
+inst/doc
+\.DS_Store

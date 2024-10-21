@@ -1,0 +1,20 @@
+---
+title: "Introduction to energyRt"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{energyRt}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, eval=FALSE}
+library(energyRt)
+```
+...

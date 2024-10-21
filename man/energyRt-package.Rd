@@ -6,6 +6,8 @@
 \alias{energyRt-package}
 \title{energyRt: Energy systems modeling toolbox in R, development version}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Energy systems modeling toolbox in R
 }
 \seealso{
