@@ -5,15 +5,16 @@
 \title{Create new supply object}
 \usage{
 newSupply(
-  name = NA_character_,
-  desc = NA_character_,
+  name = "",
+  desc = "",
   commodity = character(),
   unit = character(),
   weather = data.frame(),
   reserve = data.frame(),
   availability = data.frame(),
   region = character(),
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{

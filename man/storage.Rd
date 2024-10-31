@@ -25,7 +25,8 @@ newStorage(
   fullYear = TRUE,
   weather = data.frame(),
   optimizeRetirement = FALSE,
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{

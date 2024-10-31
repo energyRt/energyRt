@@ -10,10 +10,7 @@
 #' @slot misc list.
 #'
 #' @include class-config.R class-repository.R
-#' @return
 #' @export
-#'
-#' @examples
 setClass("model",
   representation(
     name = "character",
@@ -43,147 +40,14 @@ setMethod("initialize", "model", function(.Object, ...) {
 # add <- function(...) UseMethod("add")
 
 
-add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
-  # browser()
-  # cls <- c('technology', 'commodity', 'region', 'commodity',
-  #          'constraint', 'costs',
-  #          'stock', 'reserve',
-  #          'supply', 'weather', 'demand',
-  #          'trade', 'export', 'import', 'storage', 'tax', 'sub')
-  cls <- newRepository()@permit
-  # if (class(obj) != "model") stop('Applying add.model to class ', class(obj))
-  arg <- list(...)
-  while (any(sapply(arg, function(x) class(x)[1] == 'list'))) {
-    # fl <- seq_along(arg)[sapply(arg, class) == 'list']
-    # for (i in fl) {
-    #   for (j in seq_along(arg[[i]])) {
-    #     arg[[length(arg) + 1]] <- arg[[i]][[j]]
-    #   }
-    # }
-    # arg <- arg[-fl]
-    arg <- list_flatten(arg, name_spec = "{inner}")
-  }
-  ## Calendar from solve must be added to interpolate
-  arg_classes <- sapply(arg, class)
-  # if (any(arg_classes == "calendar")) {
-  #   if (length(arg_classes[arg_classes == "calendar"]) > 1) {
-  #     stop("Only one calendar object is allowed")
-  #   }
-  #   obj@data$calendar <- arg[arg_classes == "calendar"]
-  #   arg <- arg[arg_classes != "calendar"]
-  # }
-
-  ## Add to repository
-  if (any(!(sapply(arg, class) %in% c(cls, 'repository')))) {
-    stop(paste('Unknown class "', paste(unique(sapply(arg, class)[
-      !(sapply(arg, class) %in% c(cls, 'repository'))]), collapse = '", "'),
-      '"', sep = ''))
-  }
-  # cc <- sapply(arg, function(x) class(x)[1])
-  ii <- sapply(arg, function(x) inherits(x, cls))
-  if (any(ii)) {
-    # arg <- arg[cc != 'repository']
-    # Generate name
-    if (is.null(repo_name)) {
-      # if (length(obj@data) >= 1) {
-      #   # repo_name <- obj@data[[length(obj@data)]]@name
-      #   repo_name <- names(obj@data)[length(obj@data)]
-      #   warning('"repo_name" is not specified, adding objects to "',
-      #           repo_name, '" repository')
-      # } else {
-        # if (length(obj@data) == 0) {
-      add_repo <- new('repository', repo_name)
-      repo_name <- add_repo@name
-      # repo_name <- "default_repository"
-      if (is.null(obj@data[[repo_name]])) {
-        obj@data[[repo_name]] <- add_repo
-      }
-        # repo_name <- obj@data[[1]]@name # default name
-      # }
-    } else {
-      ff <- c(sapply(obj@data, function(x) x@name), recursive = TRUE)
-      if (all(ff != repo_name)) {
-        obj@data[[repo_name]] <- new('repository', name = repo_name)
-      }
-    }
-    ff <- c(sapply(obj@data, function(x) x@name), recursive = TRUE)
-    fl <- seq(alon = ff)[ff == repo_name]
-    for (i in seq(along = arg[ii])) {
-      obj@data[[fl]] <- add(obj@data[[fl]], arg[ii][[i]], overwrite = overwrite)
-    }
-  }
-  arg <- arg[!ii]
-  if (is_empty(arg)) return(obj)
-  # cc <- sapply(arg, function(x) class(x)[1])
-  ii <- sapply(arg, function(x) inherits(x, "repository"))
-  if (any(ii)) {
-    #    if (any(sapply(arg, class) != 'repository'))
-    #      stop('You can not mix class repository and other for command add')
-    # arg <- arg[sapply(arg, class) == 'repository']
-    ff <- c(sapply(obj@data, function(x) x@name), recursive = TRUE)
-    for (i in seq(along = arg[ii])) {
-      nm <- arg[ii][[i]]@name # new repository name
-      if (nm == "") stop('Empty repository name is not allowed.')
-      if (any(ff == nm)) {
-        # add data to existing repository
-        obj@data[[nm]] <- add(obj@data[[nm]], arg[ii][[i]])
-      } else {
-        # !!! add name-check with other repositories
-        obj@data[[nm]] <- arg[ii][[i]]
-      }
-    }
-    arg <- arg[!ii]
-  }
-  # check duplicated names in class
-  hh <- c(
-    sapply(obj@data, function(x) {
-      sapply(x@data, function(y) paste(class(y), ' - ', y@name, sep = ''))
-      }), recursive = TRUE)
-  if (anyDuplicated(hh)) {
-    hh <- unique(hh[duplicated(hh)])
-    stop('Duplicated objects in "class - name"\n',
-         paste(hh, sep = "\n"))
-  }
-  ## check duplicated names in all objects
-  ff <- c(lapply(obj@data, function(x) sapply(x@data, function(y) y@name)),
-          recursive = TRUE)
-  if (anyDuplicated(ff)) {
-    stop(paste('Duplicated objects "',
-               paste(unique(ff[duplicated(ff)]), collapse = '", "'),
-               '"', sep = ''))
-  }
-  if (length(arg) > 0) {
-    warning("Ignored objects: ", paste(names(arg), ", "))
-  }
-  obj
-}
-
-#' Add an object to the model's repository
-#'
-#' @param obj model objuect
-#' @param ... model elements, allowed classess: ...
-#' @param overwrite logical, if TRUE, objects with the same name will be overwritten, error will be reported if FALSE
-#' @param repo_name character, optional name of a (sub-)repository to add the object.
-#'
-#' @method add model
-#' @rdname add
-#'
-#' @return
-#' @export
-setMethod("add", "model", add.model)
-
-# summary.model <- function(mod) {
-#
-# }
-# setMethod("summary", "model", summary.model)
-
 #' Create new model object
 #'
 #' @param name name of the model
 #' @param ... configuration parameters (see class config) and model elements (classes commodity, technology, etc.)
 #'
+#' @return model object containing model elements (`@data`) and configuration (`@config`)
 #' @rdname newModel
-#' @return
+#' @family model, scenario
 #' @export
 #'
 #' @examples
@@ -329,11 +193,6 @@ newModel <- function(name = "", desc = "", ...) {
 #   mdl
 }
 
-# @export
-# setMethod("setTimeSlices", signature(obj = "model"), function(obj, ...) {
-#   obj@config@slice <- .setTimeSlices(...)
-#   obj
-# })
 
 #' @rdname newModel
 #' @export
@@ -399,3 +258,145 @@ setReplaceMethod("$", c("repository", "ANY"),
 #' @export
 #' @family repository
 setMethod("names", "repository", function(x) names(x@data))
+
+add.model <- function(obj, ..., overwrite = FALSE, repo_name = NULL) {
+  # browser()
+  # cls <- c('technology', 'commodity', 'region', 'commodity',
+  #          'constraint', 'costs',
+  #          'stock', 'reserve',
+  #          'supply', 'weather', 'demand',
+  #          'trade', 'export', 'import', 'storage', 'tax', 'sub')
+  cls <- newRepository()@permit
+  # if (class(obj) != "model") stop('Applying add.model to class ', class(obj))
+  arg <- list(...)
+  while (any(sapply(arg, function(x) class(x)[1] == 'list'))) {
+    # fl <- seq_along(arg)[sapply(arg, class) == 'list']
+    # for (i in fl) {
+    #   for (j in seq_along(arg[[i]])) {
+    #     arg[[length(arg) + 1]] <- arg[[i]][[j]]
+    #   }
+    # }
+    # arg <- arg[-fl]
+    arg <- list_flatten(arg, name_spec = "{inner}")
+  }
+  ## Calendar from solve must be added to interpolate
+  arg_classes <- sapply(arg, class)
+  # if (any(arg_classes == "calendar")) {
+  #   if (length(arg_classes[arg_classes == "calendar"]) > 1) {
+  #     stop("Only one calendar object is allowed")
+  #   }
+  #   obj@data$calendar <- arg[arg_classes == "calendar"]
+  #   arg <- arg[arg_classes != "calendar"]
+  # }
+
+  ## Add to repository
+  if (any(!(sapply(arg, class) %in% c(cls, 'repository')))) {
+    stop(paste('Unknown class "', paste(unique(sapply(arg, class)[
+      !(sapply(arg, class) %in% c(cls, 'repository'))]), collapse = '", "'),
+      '"', sep = ''))
+  }
+  # cc <- sapply(arg, function(x) class(x)[1])
+  ii <- sapply(arg, function(x) inherits(x, cls))
+  if (any(ii)) {
+    # arg <- arg[cc != 'repository']
+    # Generate name
+    if (is.null(repo_name)) {
+      # if (length(obj@data) >= 1) {
+      #   # repo_name <- obj@data[[length(obj@data)]]@name
+      #   repo_name <- names(obj@data)[length(obj@data)]
+      #   warning('"repo_name" is not specified, adding objects to "',
+      #           repo_name, '" repository')
+      # } else {
+      # if (length(obj@data) == 0) {
+      add_repo <- new('repository', repo_name)
+      repo_name <- add_repo@name
+      # repo_name <- "default_repository"
+      if (is.null(obj@data[[repo_name]])) {
+        obj@data[[repo_name]] <- add_repo
+      }
+      # repo_name <- obj@data[[1]]@name # default name
+      # }
+    } else {
+      ff <- c(sapply(obj@data, function(x) x@name), recursive = TRUE)
+      if (all(ff != repo_name)) {
+        obj@data[[repo_name]] <- new('repository', name = repo_name)
+      }
+    }
+    ff <- c(sapply(obj@data, function(x) x@name), recursive = TRUE)
+    fl <- seq(alon = ff)[ff == repo_name]
+    for (i in seq(along = arg[ii])) {
+      obj@data[[fl]] <- add(obj@data[[fl]], arg[ii][[i]], overwrite = overwrite)
+    }
+  }
+  arg <- arg[!ii]
+  if (is_empty(arg)) return(obj)
+  # cc <- sapply(arg, function(x) class(x)[1])
+  ii <- sapply(arg, function(x) inherits(x, "repository"))
+  if (any(ii)) {
+    #    if (any(sapply(arg, class) != 'repository'))
+    #      stop('You can not mix class repository and other for command add')
+    # arg <- arg[sapply(arg, class) == 'repository']
+    ff <- c(sapply(obj@data, function(x) x@name), recursive = TRUE)
+    for (i in seq(along = arg[ii])) {
+      nm <- arg[ii][[i]]@name # new repository name
+      if (nm == "") stop('Empty repository name is not allowed.')
+      if (any(ff == nm)) {
+        # add data to existing repository
+        obj@data[[nm]] <- add(obj@data[[nm]], arg[ii][[i]])
+      } else {
+        # !!! add name-check with other repositories
+        obj@data[[nm]] <- arg[ii][[i]]
+      }
+    }
+    arg <- arg[!ii]
+  }
+  # check duplicated names in class
+  hh <- c(
+    sapply(obj@data, function(x) {
+      sapply(x@data, function(y) paste(class(y), ' - ', y@name, sep = ''))
+    }), recursive = TRUE)
+  if (anyDuplicated(hh)) {
+    hh <- unique(hh[duplicated(hh)])
+    stop('Duplicated objects in "class - name"\n',
+         paste(hh, sep = "\n"))
+  }
+  ## check duplicated names in all objects
+  ff <- c(lapply(obj@data, function(x) sapply(x@data, function(y) y@name)),
+          recursive = TRUE)
+  if (anyDuplicated(ff)) {
+    stop(paste('Duplicated objects "',
+               paste(unique(ff[duplicated(ff)]), collapse = '", "'),
+               '"', sep = ''))
+  }
+  if (length(arg) > 0) {
+    warning("Ignored objects: ", paste(names(arg), ", "))
+  }
+  obj
+}
+
+#' Add an object to the model's repository
+#'
+#' @param obj model object
+#' @param ... model elements, allowed classes: ...
+#' @param overwrite logical, if TRUE, objects with the same name will be overwritten, error will be reported if FALSE
+#' @param repo_name character, optional name of a (sub-)repository to add the object.
+#'
+#' @method add model
+#' @rdname add
+#'
+#' @return model object with added elements to the repository
+#' @export
+setMethod("add", "model", add.model)
+
+summary.model <- function(object, ...) {
+  cat("Model: ", object@name, "\n")
+  cat("Description: ", object@desc, "\n")
+  cat("Repositories: ", names(object@data), "\n")
+  # cat("Horizon: ", getHorizon(object), "\n")
+  # cat("Calendar: ", getCalendar(object), "\n")
+  # invisible(object)
+}
+
+#' @export
+setMethod("summary", "model", summary.model)
+

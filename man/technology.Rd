@@ -31,7 +31,8 @@ newTechnology(
   timeframe = character(),
   fullYear = TRUE,
   optimizeRetirement = FALSE,
-  misc = list()
+  misc = list(),
+  ...
 )
 
 \S4method{update}{technology}(object, ...)
@@ -234,9 +235,9 @@ newTechnology(
 
 \item{misc}{list. List of additional parameters that are not used in the model but can be used for reference or user-defined functions. For example, links to the source of the technology data, or other metadata.}
 
-\item{object}{object of class technology}
-
 \item{...}{slot-names with data to update (see \code{newTechnology})}
+
+\item{object}{object of class technology}
 }
 \value{
 An object of class technology.

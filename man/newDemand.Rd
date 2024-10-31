@@ -12,7 +12,8 @@ newDemand(
   unit = character(),
   dem = data.frame(),
   region = character(),
-  misc = list()
+  misc = list(),
+  ...
 )
 
 \S4method{update}{demand}(object, ...)

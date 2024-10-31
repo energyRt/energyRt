@@ -1,6 +1,6 @@
 #' An internal function to add data to slots of a new S4-class object or update a given one.
 #'
-#' @desc
+#' @description
 #' This function creates and adds data/parameters to `energyRt` classes. It is recommended to to use wrapper functions such as `newTechnology`, `newCommodity`, etc. with guided names of each class slots.
 #'
 #' @param class_name character, name of the class to create.
@@ -12,10 +12,12 @@
 #'
 #' @return created or updated object with the added/updated data in the object slots.
 #' @noRd
-.data2slots <- function(class_name = NULL, x, ...,
-                        ignore_args = NULL,
-                        ignore_classes = NULL,
-                        update = !is.character(x), warn_nodata = TRUE) {
+.data2slots <- function(
+    class_name = NULL, x, ...,
+    ignore_args = NULL,
+    ignore_classes = NULL,
+    update = !is.character(x),
+    warn_nodata = TRUE) {
   # alternative names: data2class, add2slots, fit2slots, ...
   # browser()
   if (update) {
@@ -133,17 +135,14 @@
           slot(obj, s) <- slot(obj, s)[0, , drop = FALSE] # initiate/reset
           # Check: Equal length
           if (any(hh != hh[1])) {
-            stop(
-              "Different length of vectors in given list for slot ", s,
-              ", object: ", x
-            )
+            stop("Different length of vectors in the list ", s, ", object: ", x)
           }
           # Check: All vectors have expected, unique names
           if (is.null(names(dat)) || any(names(dat) == "")) {
-            stop("Unnamed elements in list with data for ", x, "@", s)
+            stop("Unnamed elements in the list object ", x, "@", s)
           }
           if (anyDuplicated(names(dat)) != 0) {
-            stop("Duplicated names/parameters in list with data for ", x, "@", s)
+            stop("Duplicated names/parameters in the list ", x, "@", s)
           }
           # Check for unknown columns
           ii <- names(dat) %in% colnames(slot(obj, s))
@@ -151,7 +150,7 @@
             stop(
               "Unrecognized parameter(s) ",
               paste(names(dat[!ii]), collapse = ", "),
-              " in list with data for ", x, "@", s
+              " in the list ", x, "@", s
             )
           }
           if (hh[1] != 0) {

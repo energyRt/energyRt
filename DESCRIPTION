@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development version
-Version: 0.50.4.9000
-Date: 2024-10-20
+Version: 0.50.5.9000
+Date: 2024-10-30
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -21,7 +21,9 @@ Authors@R:
 URL: https://energyRt.org, https://github.com/energyRt/energyRt
 BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy systems modeling toolbox in R
-Depends: R (>= 4.3)
+Depends: 
+    R (>= 4.3),
+    grid
 Imports: 
     methods,
     generics,

@@ -46,7 +46,7 @@ setMethod("initialize", "demand", function(.Object, ...) {
 })
 
 #' Create new demand object
-#' 
+#'
 #' @param name `r get_slot_info("demand", "name")`
 #' @param desc `r get_slot_info("demand", "desc")`
 #' @param commodity `r get_slot_info("demand", "commodity")`
@@ -82,7 +82,8 @@ newDemand <- function(
     unit = character(),
     dem = data.frame(),
     region = character(),
-    misc = list())
+    misc = list(),
+    ...)
 {
   .data2slots("demand", name,
     desc = desc,
@@ -90,12 +91,13 @@ newDemand <- function(
     unit = unit,
     dem = dem,
     region = region,
-    misc = misc
+    misc = misc,
+    ...
   )
 }
 
 #' Update data in a demand object
-#' 
+#'
 #' @name update
 #' @param object demand object
 #'

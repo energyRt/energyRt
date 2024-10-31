@@ -1,6 +1,6 @@
 # Class storage ####
 #' An S4 class to represent storage type of technological process.
-#' 
+#'
 #' @inherit newStorage description
 #' @inherit newStorage details
 #'
@@ -31,7 +31,7 @@
 #'
 #' @rdname class-storage
 #' @family process, storage
-#' 
+#'
 #' @export
 setClass("storage",
   representation(
@@ -203,9 +203,9 @@ setMethod("initialize", "storage", function(.Object, ...) {
 })
 
 #' Create new storage object
-#' 
+#'
 #' @description Storage type of technological processes with accumulating capacity of a commodity.
-#' 
+#'
 #' @details
 #' Storage can be used in combination with other processes, such as
 #' technologies, supply, or demand to represent complex technological chains,
@@ -240,11 +240,12 @@ setMethod("initialize", "storage", function(.Object, ...) {
 #' @param optimizeRetirement `r get_slot_info("storage", "optimizeRetirement")`
 #' @param misc `r get_slot_info("storage", "misc")`
 #' @return storage object
-#' 
+#'
 #' @name newStorage
 #' @family storage, process
 #' @rdname storage
 #' @export
+#' @examples
 #'
 newStorage <- function(
     name = "",
@@ -267,9 +268,33 @@ newStorage <- function(
     fullYear = TRUE,
     weather = data.frame(),
     optimizeRetirement = FALSE,
-    misc = list()
+    misc = list(),
+    ...
     ) {
-  .data2slots("storage", name, ...)
+  .data2slots(
+    "storage",
+    name,
+    desc = desc,
+    commodity = commodity,
+    aux = aux,
+    region = region,
+    start = start,
+    end = end,
+    olife = olife,
+    charge = charge,
+    seff = seff,
+    aeff = aeff,
+    af = af,
+    fixom = fixom,
+    varom = varom,
+    invcost = invcost,
+    capacity = capacity,
+    cap2stg = cap2stg,
+    fullYear = fullYear,
+    weather = weather,
+    optimizeRetirement = optimizeRetirement,
+    misc = misc,
+    ...)
 }
 
 
@@ -281,7 +306,7 @@ newStorage <- function(
 #' @family storage update
 #' @keywords storage update
 #' @export
-setMethod("update", signature(object = "storage"), 
+setMethod("update", signature(object = "storage"),
           function(object, ...) {
   # update.storage <- function(obj, ...) {
   .data2slots("storage", object, ...)

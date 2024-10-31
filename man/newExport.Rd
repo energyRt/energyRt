@@ -11,7 +11,8 @@ newExport(
   unit = NULL,
   reserve = Inf,
   exp = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{
@@ -59,5 +60,21 @@ endogenous. The \code{price} column is used to specify the exogenous price
 for the export commodity.
 The \code{reserve} slot is used to set limits on the total export over the
 model horizon.
+}
+\examples{
+EXPOIL <- newExport(
+  name = "EXPOIL", # used in sets
+  desc = "Oil export from the model to RoW", # for own reference
+  commodity = "OIL", # must match the commodity name in the model
+  unit = "Mtoe", # for own reference
+  exp = data.frame(
+    region = rep(c("R1", "R2"), each = 2), # export region(s)
+    year = rep(c(2020, 2050)), # export years
+    price = 500, # export price in MUSD/Mtoe (USD/t),
+    exp.up = rep(c(1e3, 1e4), each = 2), # upper bound for export in each year
+    exp.lo = rep(c(5e2, 0), each = 2) # lower bound for export in each year
+  )
+)
+draw(EXPOIL)
 }
 \concept{create export}

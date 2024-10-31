@@ -12,7 +12,8 @@ newWeather(
   timeframe = character(),
   defVal = 0,
   weather = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{

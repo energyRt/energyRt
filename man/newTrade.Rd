@@ -14,15 +14,16 @@ newTrade(
   varom = data.frame(),
   invcost = data.frame(),
   olife = data.frame(),
-  start = data.frame(),
-  end = data.frame(),
+  start = data.frame(start = -Inf, stringsAsFactors = FALSE),
+  end = data.frame(end = Inf, stringsAsFactors = FALSE),
   capacity = data.frame(),
   capacityVariable = TRUE,
   aux = data.frame(),
   aeff = data.frame(),
   cap2act = 1,
   optimizeRetirement = FALSE,
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{
@@ -127,6 +128,6 @@ PIPELINE <- newTrade(
     teff = c(0.99, 0.98)
   ),
   olife = list(olife = 60)
-)   
+)
 }
 \concept{trade, process, constructor}

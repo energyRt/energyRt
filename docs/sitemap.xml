@@ -1,9 +1,5 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://energyRt.org/404.html</loc></url>
-<url><loc>https://energyRt.org/CODE_OF_CONDUCT.html</loc></url>
-<url><loc>https://energyRt.org/CONTRIBUTING.html</loc></url>
-<url><loc>https://energyRt.org/LICENSE-text.html</loc></url>
-<url><loc>https://energyRt.org/LICENSE.html</loc></url>
 <url><loc>https://energyRt.org/articles/energyRt.html</loc></url>
 <url><loc>https://energyRt.org/articles/helloworld.html</loc></url>
 <url><loc>https://energyRt.org/articles/index.html</loc></url>
@@ -14,9 +10,14 @@
 <url><loc>https://energyRt.org/articles/utopia.html</loc></url>
 <url><loc>https://energyRt.org/articles/workflow.html</loc></url>
 <url><loc>https://energyRt.org/authors.html</loc></url>
+<url><loc>https://energyRt.org/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://energyRt.org/CONTRIBUTING.html</loc></url>
 <url><loc>https://energyRt.org/index.html</loc></url>
+<url><loc>https://energyRt.org/LICENSE-text.html</loc></url>
+<url><loc>https://energyRt.org/LICENSE.html</loc></url>
 <url><loc>https://energyRt.org/news/index.html</loc></url>
 <url><loc>https://energyRt.org/reference/add.html</loc></url>
+<url><loc>https://energyRt.org/reference/addSummand.html</loc></url>
 <url><loc>https://energyRt.org/reference/calendar.html</loc></url>
 <url><loc>https://energyRt.org/reference/check_name.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-commodity.html</loc></url>
@@ -39,10 +40,14 @@
 <url><loc>https://energyRt.org/reference/costs-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/demand-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/demand.html</loc></url>
+<url><loc>https://energyRt.org/reference/draw.export.html</loc></url>
 <url><loc>https://energyRt.org/reference/draw.html</loc></url>
+<url><loc>https://energyRt.org/reference/draw.import.html</loc></url>
+<url><loc>https://energyRt.org/reference/draw.technology.html</loc></url>
 <url><loc>https://energyRt.org/reference/drop_na_cols.html</loc></url>
-<url><loc>https://energyRt.org/reference/en_install_julia_pkgs.html</loc></url>
 <url><loc>https://energyRt.org/reference/energyRt-package.html</loc></url>
+<url><loc>https://energyRt.org/reference/en_install_julia_pkgs.html</loc></url>
+<url><loc>https://energyRt.org/reference/en_obj2df.html</loc></url>
 <url><loc>https://energyRt.org/reference/export-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/findData.html</loc></url>
 <url><loc>https://energyRt.org/reference/findDuplicates.html</loc></url>
@@ -57,10 +62,11 @@
 <url><loc>https://energyRt.org/reference/interpolate-model-method.html</loc></url>
 <url><loc>https://energyRt.org/reference/isInMemory.html</loc></url>
 <url><loc>https://energyRt.org/reference/load_scenario.html</loc></url>
+<url><loc>https://energyRt.org/reference/make_label.html</loc></url>
 <url><loc>https://energyRt.org/reference/make_scenario_dirname.html</loc></url>
+<url><loc>https://energyRt.org/reference/model-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/modInp-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/modOut-class.html</loc></url>
-<url><loc>https://energyRt.org/reference/model-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/newCommodity.html</loc></url>
 <url><loc>https://energyRt.org/reference/newConstraint.html</loc></url>
 <url><loc>https://energyRt.org/reference/newDemand.html</loc></url>
@@ -82,6 +88,9 @@
 <url><loc>https://energyRt.org/reference/options.html</loc></url>
 <url><loc>https://energyRt.org/reference/parameter-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/pipe.html</loc></url>
+<url><loc>https://energyRt.org/reference/plot.export.html</loc></url>
+<url><loc>https://energyRt.org/reference/plot.technology.html</loc></url>
+<url><loc>https://energyRt.org/reference/plot_process.html</loc></url>
 <url><loc>https://energyRt.org/reference/progress.html</loc></url>
 <url><loc>https://energyRt.org/reference/read.html</loc></url>
 <url><loc>https://energyRt.org/reference/register.html</loc></url>
@@ -90,10 +99,10 @@
 <url><loc>https://energyRt.org/reference/revalueSets.html</loc></url>
 <url><loc>https://energyRt.org/reference/save_scenario.html</loc></url>
 <url><loc>https://energyRt.org/reference/scenario-class.html</loc></url>
+<url><loc>https://energyRt.org/reference/settings-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/set_glpk_path.html</loc></url>
 <url><loc>https://energyRt.org/reference/set_julia_path.html</loc></url>
 <url><loc>https://energyRt.org/reference/set_python_path.html</loc></url>
-<url><loc>https://energyRt.org/reference/settings-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/size.html</loc></url>
 <url><loc>https://energyRt.org/reference/solve.html</loc></url>
 <url><loc>https://energyRt.org/reference/storage.html</loc></url>

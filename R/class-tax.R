@@ -1,7 +1,7 @@
 #' An S4 class to represent a commodity tax
 #'
 #' @inherit newSub, description
-#' @slot name character. 
+#' @slot name character.
 #' @slot comm character.
 #' @slot desc character.
 #' @slot region character.
@@ -50,11 +50,11 @@ setClass("tax",
 
 # setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
 #' @title Create a new tax object
-#' 
+#'
 #' @description
 #' Taxes are used to represent the financial levy imposed on production,
 #' consumption, or balance of a commodity.
-#' 
+#'
 #' @param name `r get_slot_info("tax", "name")`
 #' @param desc `r get_slot_info("tax", "desc")`
 #' @param comm `r get_slot_info("tax", "comm")`
@@ -69,24 +69,26 @@ setClass("tax",
 #'
 #' @examples
 newTax <- function(
-  name, 
+  name,
   desc = "",
   comm = "",
   region = character(),
   defVal = 0,
   tax = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
   ) {
   .data2slots(
-    "tax", 
+    "tax",
     name = name,
     desc = desc,
     comm = comm,
     region = region,
     defVal = defVal,
     tax = tax,
-    misc = misc
-    )  
+    misc = misc,
+    ...
+    )
 }
 
 # setMethod("newTax", signature(name = "character"), function(name, ...) {

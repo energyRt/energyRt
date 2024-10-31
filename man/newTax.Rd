@@ -11,7 +11,8 @@ newTax(
   region = character(),
   defVal = 0,
   tax = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{

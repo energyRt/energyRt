@@ -15,7 +15,7 @@ to add custom constraints to the model."><meta property="og:image" content="http
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.4.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,9 +73,7 @@ to add custom constraints to the model.</p>
 <span>  replace_zerros <span class="op">=</span> <span class="fl">1e-20</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">isConstraint</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">addSummand</span><span class="op">(</span><span class="va">eqt</span>, variable <span class="op">=</span> <span class="cn">NULL</span>, mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>, for.sum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">arg</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">isConstraint</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -159,7 +157,6 @@ for which the summand is defined.</p>
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
 
 <ul><li><p><code>isConstraint()</code>: Check if an object is a constraint.</p></li>
-<li><p><code>addSummand()</code>:</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -176,9 +173,8 @@ for which the summand is defined.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">isConstraint</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"><span><span class="fu">isConstraint</span><span class="op">(</span><span class="fu">newConstraint</span><span class="op">(</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> It is advisable to define 'defVal' parameter.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Zero value in 'defVal' will be replaced with '1e-20' to avoid ignoring it by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in newConstraint(""):</span> object 'arg' not found</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>It is advisable to define 'defVal' parameter.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

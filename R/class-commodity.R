@@ -2,7 +2,7 @@
 #'
 #' @description
 #' A commodity is a good or service that is produced and consumed in the model.
-#' The commodity class is used to store information about the commodity. 
+#' The commodity class is used to store information about the commodity.
 #' All processes in the model operate on commodities, i.e. they either generate,
 #' produce, consume, transform, store, or transport commodities.
 #' The creation of a commodity object is done with the `newCommodity` function.
@@ -60,7 +60,7 @@ setMethod("initialize", "commodity", function(.Object, ...) {
 })
 
 #' Create new commodity object
-#' 
+#'
 #' @md
 #' @param name `r get_slot_info("commodity", "name")`
 #' @param desc `r get_slot_info("commodity", "desc")`
@@ -89,9 +89,11 @@ newCommodity <- function(
     agg = data.frame(),
     emis = data.frame(),
     misc = list()) {
-  .data2slots("commodity", name,
-    desc = "",
-    limtype = "LO",
+  .data2slots(
+    "commodity",
+    name,
+    desc = desc,
+    limtype = limtype,
     timeframe = timeframe,
     unit = unit,
     agg = agg,

@@ -20,9 +20,9 @@ setClass("supply",
     desc = "character",
     commodity = "character",
     unit = "character",
-    weather = "data.frame", 
-    reserve = "data.frame", 
-    availability = "data.frame", 
+    weather = "data.frame",
+    reserve = "data.frame",
+    availability = "data.frame",
     region = "character",
     misc = "list"
   ),
@@ -32,14 +32,14 @@ setClass("supply",
     commodity = "",
     unit = "",
     weather = data.frame(
-      weather = character(), 
+      weather = character(),
       wava.lo = numeric(),
       wava.up = numeric(),
       wava.fx = numeric(),
       stringsAsFactors = FALSE
     ),
     reserve = data.frame(
-      region = character(), 
+      region = character(),
       res.lo = numeric(),
       res.up = numeric(),
       res.fx = numeric(),
@@ -69,16 +69,16 @@ setMethod("initialize", "supply", function(.Object, ...) {
 #' Create new supply object
 #'
 #' Constructor for supply object.
-#' 
+#'
 #' @name newSupply
-#' 
+#'
 #' @description
 #' The `supply` class is used to add a domestic source of a commodity to the model,
-#' with given reserves, availability, and costs. 
-#' 
-#' @details 
+#' with given reserves, availability, and costs.
+#'
+#' @details
 #' !!!Add more details here
-#' 
+#'
 #' @md
 #' @param name `r get_slot_info("supply", "name")`
 #' @param desc `r get_slot_info("supply", "desc")`
@@ -93,7 +93,7 @@ setMethod("initialize", "supply", function(.Object, ...) {
 #' @rdname newSupply
 #' @order 1
 #' @family supply, process
-#' 
+#'
 #' @return supply object with given specifications.
 #' @export
 #'
@@ -118,19 +118,20 @@ setMethod("initialize", "supply", function(.Object, ...) {
 #'  )
 #' class(SUP_COA)
 newSupply <- function(
-  name = NA_character_,
-  desc = NA_character_,
+  name = "",
+  desc = "",
   commodity = character(),
   unit = character(),
   weather = data.frame(),
   reserve = data.frame(),
   availability = data.frame(),
   region = character(),
-  misc = list()
+  misc = list(),
+  ...
   ) {
   .data2slots(
-    "supply", 
-    name = name,
+    "supply",
+    name,
     desc = desc,
     commodity = commodity,
     unit = unit,
@@ -138,7 +139,8 @@ newSupply <- function(
     reserve = reserve,
     availability = availability,
     region = region,
-    misc = misc
+    misc = misc,
+    ...
     )
 }
 

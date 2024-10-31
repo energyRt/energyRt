@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.4.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -165,6 +165,12 @@
         <dd>Class 'costs'</dd>
       </dl><dl><dt>
 
+          <code><a href="model-class.html">model-class</a></code>
+
+        </dt>
+        <dd>S4 class to represent model</dd>
+      </dl><dl><dt>
+
           <code><a href="modInp-class.html">modInp-class</a></code>
 
         </dt>
@@ -175,12 +181,6 @@
 
         </dt>
         <dd>modOut-class to store the output from the model (solution)</dd>
-      </dl><dl><dt>
-
-          <code><a href="model-class.html">model-class</a></code>
-
-        </dt>
-        <dd>S4 class to represent model</dd>
       </dl><dl><dt>
 
           <code><a href="parameter-class.html">parameter-class</a></code>
@@ -230,7 +230,7 @@
         <dd>Create new commodity object</dd>
       </dl><dl><dt>
 
-          <code><a href="newConstraint.html">newConstraint()</a></code> <code><a href="newConstraint.html">isConstraint()</a></code> <code><a href="newConstraint.html">addSummand()</a></code>
+          <code><a href="newConstraint.html">newConstraint()</a></code> <code><a href="newConstraint.html">isConstraint()</a></code>
 
         </dt>
         <dd>Create constraint object to add custom constraints to the model.</dd>
@@ -562,10 +562,22 @@
 
       <dl><dt>
 
-          <code><a href="draw.html">draw.technology()</a></code>
+          <code><a href="draw.export.html">draw(<i>&lt;export&gt;</i>)</a></code>
 
         </dt>
-        <dd>Schematic representation of technology</dd>
+        <dd>Draw a schematic representation of an export process</dd>
+      </dl><dl><dt>
+
+          <code><a href="draw.import.html">draw.import()</a></code>
+
+        </dt>
+        <dd>Draw a schematic representation of an import process</dd>
+      </dl><dl><dt>
+
+          <code><a href="draw.technology.html">draw.technology()</a></code>
+
+        </dt>
+        <dd>Draw a schematic representation of a technology</dd>
       </dl></div><div class="section level2">
       <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a></h2>
 
@@ -620,6 +632,12 @@
         <dd>Switch on/off and select/customize progress bar</dd>
       </dl><dl><dt>
 
+          <code><a href="settings-class.html">settings-class</a></code>
+
+        </dt>
+        <dd>An S4 class to represent scenario settings</dd>
+      </dl><dl><dt>
+
           <code><a href="set_glpk_path.html">set_glpk_path()</a></code>
 
         </dt>
@@ -636,12 +654,6 @@
 
         </dt>
         <dd>Set or get python installation path to be used to solve models</dd>
-      </dl><dl><dt>
-
-          <code><a href="settings-class.html">settings-class</a></code>
-
-        </dt>
-        <dd>An S4 class to represent scenario settings</dd>
       </dl><dl><dt>
 
           <code><a href="make_scenario_dirname.html">make_scenario_dirname()</a></code>

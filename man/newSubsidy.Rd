@@ -12,7 +12,8 @@ newSub(
   region = character(),
   defVal = 0,
   sub = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
 )
 
 newSubsidy(
@@ -22,7 +23,8 @@ newSubsidy(
   region = character(),
   defVal = 0,
   sub = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{

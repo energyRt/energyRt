@@ -1,3 +1,9 @@
+# energyRt 0.50.5-dev
+
+* draw() is rewritten based on 'grid' package, and is now a generic method. 
+* added draw() methods for 'technology', 'export', and 'import' classes.
+* fixed several interface-level bugs introduced in 0.50.4-dev during clean-up and documentation.
+
 # energyRt 0.50.4-dev
 
 * Documentation of classes is in progress (~70% docs completed).

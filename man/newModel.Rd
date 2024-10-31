@@ -17,6 +17,10 @@ newModel(name = "", desc = "", ...)
 
 \item{...}{configuration parameters (see class config) and model elements (classes commodity, technology, etc.)}
 }
+\value{
+model object containing model elements (\verb{@data}) and configuration (\verb{@config})
+}
 \description{
 Create new model object
 }
+\concept{model, scenario}

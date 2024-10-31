@@ -3,7 +3,6 @@
 \name{newConstraint}
 \alias{newConstraint}
 \alias{isConstraint}
-\alias{addSummand}
 \title{Create constraint object to add custom constraints to the model.}
 \usage{
 newConstraint(
@@ -19,8 +18,6 @@ newConstraint(
 )
 
 isConstraint(object)
-
-addSummand(eqt, variable = NULL, mult = data.frame(), for.sum = list(), arg)
 }
 \arguments{
 \item{name}{character. Name of the constraint object, used in sets.}
@@ -85,8 +82,6 @@ for which the summand is defined.
 \itemize{
 \item \code{isConstraint()}: Check if an object is a constraint.
 
-\item \code{addSummand()}: 
-
 }}
 \examples{
 isConstraint(1)
@@ -102,4 +97,3 @@ Other class, constraint:
 \code{\link{summand-class}}
 }
 \concept{class, constraint}
-\concept{constraint}

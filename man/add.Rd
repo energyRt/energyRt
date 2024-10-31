@@ -14,13 +14,16 @@
 \S4method{add}{scenario}(obj, ..., overwrite = FALSE, repo_name = NULL)
 }
 \arguments{
-\item{obj}{model objuect}
+\item{obj}{model object}
 
-\item{...}{model elements, allowed classess: ...}
+\item{...}{model elements, allowed classes: ...}
 
 \item{overwrite}{logical, if TRUE, objects with the same name will be overwritten, error will be reported if FALSE}
 
 \item{repo_name}{character, optional name of a (sub-)repository to add the object.}
+}
+\value{
+model object with added elements to the repository
 }
 \description{
 Add an object to the model's repository

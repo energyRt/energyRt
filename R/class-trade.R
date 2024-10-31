@@ -2,7 +2,7 @@
 #' An S4 class to represent inter-regional trade
 #'
 #' @inherit newTrade details
-#' 
+#'
 #' @md
 #' @slot name `r get_slot_info("trade", "name")`
 #' @slot desc `r get_slot_info("trade", "desc")`
@@ -164,17 +164,17 @@ setMethod("initialize", "trade", function(.Object, ...) {
 #' Create new trade object
 #'
 #' @description Constructor for trade object.
-#' 
+#'
 #' @details Trade objects are used to represent inter-regional exchange in the model.
 #' Without trade, every region is isolated and can only use its own resources.
 #' The class defines trade routes, efficiency, costs,
 #' and other parameters related to the process. Number of routes per trade object is not
 #' limited. One trade object can have a part or entire trade network of the model.
 #' However, it has a distinct name and all the routs will be optimized together.
-#' Create separate trade objects to optimize different parts of the trade network 
+#' Create separate trade objects to optimize different parts of the trade network
 #' (aka transmission lines).
-#' 
-#' @md 
+#'
+#' @md
 #' @param name `r get_slot_info("trade", "name")`
 #' @param desc `r get_slot_info("trade", "desc")`
 #' @param commodity `r get_slot_info("trade", "commodity")`
@@ -212,7 +212,7 @@ setMethod("initialize", "trade", function(.Object, ...) {
 #'     teff = c(0.99, 0.98)
 #'   ),
 #'   olife = list(olife = 60)
-#' )   
+#' )
 newTrade <- function(
     name = "",
     desc = "",
@@ -223,19 +223,30 @@ newTrade <- function(
     varom = data.frame(),
     invcost = data.frame(),
     olife = data.frame(),
-    start = data.frame(),
-    end = data.frame(),
+    start = data.frame(
+      # start = integer(),
+      start = -Inf, # temporary, ToDO: similar to other processes
+      stringsAsFactors = FALSE
+    ),
+    end = data.frame(
+      # end = integer(),
+      end = Inf,  # temporary, ToDO: similar to other processes
+      stringsAsFactors = FALSE
+    ),
+    # start = data.frame(),
+    # end = data.frame(),
     capacity = data.frame(),
     capacityVariable = TRUE,
     aux = data.frame(),
     aeff = data.frame(),
     cap2act = 1,
     optimizeRetirement = FALSE,
-    misc = list()
+    misc = list(),
+    ...
 ) {
   .data2slots(
-    "trade", 
-    name, 
+    "trade",
+    name,
     desc = desc,
     commodity = commodity,
     routes = routes,
@@ -252,7 +263,8 @@ newTrade <- function(
     aeff = aeff,
     cap2act = cap2act,
     optimizeRetirement = optimizeRetirement,
-    misc = misc
+    misc = misc,
+    ...
   )
 }
 

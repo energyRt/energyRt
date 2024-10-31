@@ -310,7 +310,7 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #'
 #' @return An object of class technology.
 #' @export
-#'
+#' @inherit draw examples
 #' @examples
 #' ECOAL <- newTechnology(
 #'   name = "ECOAL", # name, used in sets, no white spaces or special characters
@@ -409,7 +409,8 @@ newTechnology <- function(
     fullYear = TRUE,
     optimizeRetirement = FALSE,
     # upgrade.technology = character(),
-    misc = list()) {
+    misc = list(),
+    ...) {
   .data2slots("technology", name,
     desc = desc,
     input = input,
@@ -436,7 +437,8 @@ newTechnology <- function(
     fullYear = fullYear,
     optimizeRetirement = optimizeRetirement,
     # upgrade.technology = upgrade.technology,
-    misc = misc
+    misc = misc,
+    ...
   )
 }
 

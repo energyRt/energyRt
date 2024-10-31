@@ -16,7 +16,7 @@ class:
       type: factor or character
       description: >
         The limit type of the commodity in balance equation, "LO", "UP", or "FX".
-        "LO" by default, meaning that the level of commodity in the model is restricted 
+        "LO" by default, meaning that the level of commodity in the model is restricted
         with the lower bound, excess is allowed. "UP" means that the level of commodity
         cannot exceed the upper bound. "FX" means that total commudity supply and demand
         are equal, no excess or deficit is allowed.
@@ -31,7 +31,7 @@ class:
     emis:
       type: data.frame
       description: >
-        Emissions factors related to the commodity consumption 
+        Emissions factors related to the commodity consumption
         (if "combustion" parameter of a technology which consumes the commodity is > 0).
       columns:
         comm:
@@ -86,23 +86,23 @@ class:
         weather:
           type: character
           description: >
-            Name of the weather factor to apply. Must match the weather factor 
+            Name of the weather factor to apply. Must match the weather factor
             names in a `weather` class in the model.
         wava.lo:
           type: numeric
           description: >
-            Coefficient that links the weather factor with the lower bound of 
+            Coefficient that links the weather factor with the lower bound of
             the availability factor `ava.lo`.
         wava.up:
           type: numeric
           description: >
-            Coefficient that links the weather factor with the upper bound of 
+            Coefficient that links the weather factor with the upper bound of
             the availability factor `ava.up`.
         wava.fx:
           type: numeric
           description: >
-            Coefficient that links the weather factor with the fixed value of 
-            the availability factor `ava.fx`. This parameter overrides 
+            Coefficient that links the weather factor with the fixed value of
+            the availability factor `ava.fx`. This parameter overrides
             `wava.lo` and `wava.up`.
     reserve:
       type: data.frame
@@ -113,7 +113,7 @@ class:
         region:
           type: character
           description: >
-            Region name to apply the parameter. 
+            Region name to apply the parameter.
             Use NA to apply to all regions.
         res.lo:
           type: numeric
@@ -124,7 +124,7 @@ class:
         res.fx:
           type: numeric
           description: >
-            Fixed value of the total available resource. 
+            Fixed value of the total available resource.
             This parameter overrides `res.lo` and `res.up`.
     availability:
       type: data.frame
@@ -154,12 +154,12 @@ class:
         ava.fx:
           type: numeric
           description: >
-            Fixed value of the availability factor. 
+            Fixed value of the availability factor.
             This parameter overrides `ava.lo` and `ava.up`.
         cost:
           type: numeric
           description: >
-            Cost of the resource extraction, 
+            Cost of the resource extraction,
             if not set, the resource is considered free.
     region:
       type: character
@@ -206,8 +206,8 @@ class:
     region:
       type: character
       description: >
-        Optional name of region to narrow the specification of the demand in the case of used NAs. 
-        Error will be returned if specified regions in `@dem` are not mensioned in the `@region` slot 
+        Optional name of region to narrow the specification of the demand in the case of used NAs.
+        Error will be returned if specified regions in `@dem` are not mensioned in the `@region` slot
         (if the slot is not empty).
     misc:
       type: list
@@ -694,7 +694,7 @@ class:
     olife:
       type: data.frame
       description: >
-        Operational life of the storage technology, applicable to the new investment only, 
+        Operational life of the storage technology, applicable to the new investment only,
         the operational life (retirement) of preexiting capacity is described in the `stock` slot.
       columns:
         region:
@@ -783,7 +783,7 @@ class:
         cout.fx:
           type: numeric
           description: >
-            Fixed value of the output commodity availability factor. 
+            Fixed value of the output commodity availability factor.
             This parameter overrides `cout.lo` and `cout.up`.
     aeff:
       type: data.frame
@@ -885,7 +885,7 @@ class:
         wacc:
           type: numeric
           description: >
-            Weighted average cost of capital. If not supplied, the discount from the 
+            Weighted average cost of capital. If not supplied, the discount from the
              model or scenario is used. (currently ignored)
     fullYear:
       type: logical
@@ -895,7 +895,7 @@ class:
         time-slice in the the same group of time-slices within the parent timeframe.
         if FALSE, the storage charge and discchare cycle is limited to the parent timeframe.
         The last time-slice in the timeframe is used as a preciding time-slice for the first
-        time-slice in the the same group of time-slices within the parent timeframe. 
+        time-slice in the the same group of time-slices within the parent timeframe.
     region:
       type: character
       description: Region where the storage technology exists or can be installed.
@@ -1109,7 +1109,7 @@ class:
     capacityVariable:
       type: logical
       description: >
-        If TRUE, the capacity variable of the trade object is optimized. 
+        If TRUE, the capacity variable of the trade object is optimized.
         If FALSE, the capacity is defined by availability parameters (`ava.*`) in the trade-flow units.
     cap2act:
       type: numeric
@@ -1273,7 +1273,7 @@ class:
       type: data.frame
       description: >
         Named list or data frame with numeric values for each constraint.
-        The dimensions of the data frame should match the dimensions of the sets 
+        The dimensions of the data frame should match the dimensions of the sets
         in the `for.each` slot.
     defVal:
       type: numeric
@@ -1284,17 +1284,17 @@ class:
     interpolation:
       type: character
       description: >
-        Interpolation rule for the constraint. Recognized values, any combination 
+        Interpolation rule for the constraint. Recognized values, any combination
         of "back", "inter", "forth", e.g., "back.inter" or "forth.inter",
-        indicating the direction of interpolation. 
-        The default value is "inter", meaning that the interpolation is done 
+        indicating the direction of interpolation.
+        The default value is "inter", meaning that the interpolation is done
         for years between the specified values. The "back" and "forth" values
         induce backward and forward interpolation of the `rhs` values, respectively.
     lhs:
       type: list
       description: >
-        List of summands for the left-hand-side of the equation. 
-        This slot is created automatically from all named of unnamed lists passed 
+        List of summands for the left-hand-side of the equation.
+        This slot is created automatically from all named of unnamed lists passed
         to the `newConstraint` function, except for the named arguments.
     misc:
       type: list
@@ -1340,7 +1340,7 @@ class:
     mult:
       type: data.frame
       description: >
-        Named list or data frame with numeric values for the variable included 
+        Named list or data frame with numeric values for the variable included
         in the costs-constraint. A constant or a data frame with the same dimensions
         as the subseted variable.
     misc:
@@ -1445,81 +1445,18 @@ class:
     data:
       type: list
       description: >
-        Model objects ("bricks"), e.g., technologies, constraints, costs, etc., 
+        Model objects ("bricks"), e.g., technologies, constraints, costs, etc.,
         stored in with their names as keys, or gropped in named lists.
     permit:
       type: character
       description: >
         Vector with names of classes permitted to store in the repository.
-        There is a default list of permitted classes which can be extended or 
+        There is a default list of permitted classes which can be extended or
         modified. Used in internal functions, it is not common to modify this slot.
     misc:
       type: list
       description: Any additional data or information to store in the object.
 ## calendar #####################################################################
-#' @slot name character, (optional) name of the calendar for own references
-#' @slot desc character, (optional) description of the calendar
-#' @slot timeframes a named list of nested sub-annual levels with vectors
-#' of individual elements.
-#' @slot timetable data.frame with levels of timeframes in the named columns,
-#' and number of rows equal to the total number of time-slices on the lowest level. Every timeframe is a set of timeslices ("slices") - a named fragment of time with a year-share. Timeframes have nested structure. Though every slice may have different sub-slices (similar to the real-world calendar).
-#' \describe{
-#'   \item{ANNUAL}{character, annual, the top level of timeframes}
-#'   \item{TIMEFRAME2}{character, (optional) first subannual level of timeframes}
-#'   \item{TIMEFRAME3}{character, (optional) second subannual level of timeframes}
-#'   \item{...}{character, (optional) further subannual levels of timeframes}
-#'   \item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `{SLICE2}_{SLICE3}...`}
-#' }
-#' @slot year_fraction numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of `timetable$share` or used default value (1).
-#' @slot slice_share two column data.frame with slices from all levels
-#' with their individual share in a year.
-#' @slot default_timeframe character, the name of the default level of the time-slices used in the model.
-#' @slot timeframe_rank named character vector with ranks of the timeframes.
-#' @slot slices_in_frame (!!! to depreciate)
-#' @slot slice_family data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.
-#' @slot next_in_timeframe data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.
-#' @slot next_in_year data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.
-#' @slot misc list with additional data and calculated mappings.
-
-  # prototype(
-  #   name = character(),
-  #   desc = character(),
-  #   timeframes = list(), # Slices set by level
-  #   year_fraction = as.numeric(1),
-  #   timetable = data.frame(stringsAsFactors = FALSE),
-  #   slice_share = data.frame(
-  #     # year = integer(),
-  #     slice = character(), # == time interval
-  #     share = numeric(), # fraction of a year // rename?
-  #     weight = numeric(),
-  #     stringsAsFactors = FALSE
-  #   ),
-  #   slices_in_frame = integer(),
-  #   slice_family = data.frame(
-  #     # year = integer(),
-  #     parent = character(),
-  #     child = character(),
-  #     stringsAsFactors = FALSE
-  #   ),
-  #   slice_ancestry = data.frame(
-  #     # year = integer(),
-  #     parent = character(),
-  #     child = character(),
-  #     stringsAsFactors = FALSE
-  #   ),
-  #   default_timeframe = character(), # Default slice
-  #   timeframe_rank = c("ANNUAL" = 1L),
-  #   next_in_timeframe = data.frame(
-  #     slice = character(),
-  #     slicep = character()
-  #   ),
-  #   next_in_year = data.frame(
-  #     slice = character(),
-  #     slicep = character()
-  #   ),
-  #   # all_slice = character(), -> slice_share$slice
-  #   misc = list()
-  # ),
   calendar:
     name:
       type: character
@@ -1547,7 +1484,7 @@ class:
         equal to the total number of time-slices on the lowest level. Every timeframe
         is a set of time-slices ("slices") - a named fragment of time with a year-share.
         Timeframes have nested structure where every slice serves as a parent for the
-        lower level of time-slices (children). 
+        lower level of time-slices (children).
         The first column is the name of the time-slice, the rest of the columns are the
         names of the timeframes. The values are the share of the year covered by the
         time-slice. The sum of the shares in every timeframe should be equal to 1.

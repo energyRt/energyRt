@@ -2,7 +2,7 @@
 #'
 #' @inherit newWeather description
 #' @inherit newWeather details
-#' 
+#'
 #' @md
 #' @slot name `r get_slot_info("weather", "name")`
 #' @slot desc `r get_slot_info("weather", "desc")`
@@ -54,16 +54,16 @@ setMethod("initialize", "weather", function(.Object, ...) {
 
 
 #' Create new weather object
-#' 
+#'
 #' @description
 #' `weather` is a data-carrying class with exogenous shocks
 #' used to influence operation of processes in the model.
-#' 
+#'
 #' @details
 #' Weather factors are separated from the model parameters
 #' and can be added or replaced for different scenarios.
 #' !!!Additional details...
-#' 
+#'
 #' @md
 #' @param name `r get_slot_info("weather", "name")`
 #' @param desc `r get_slot_info("weather", "desc")`
@@ -87,18 +87,20 @@ newWeather <- function(
     timeframe = character(),
     defVal = 0.,
     weather = data.frame(),
-    misc = list()) {
+    misc = list(),
+    ...) {
   .data2slots(
     "weather",
-      name,
-      desc = desc,
-      unit = unit,
-      region = region,
-      timeframe = timeframe,
-      defVal = defVal,
-      weather = weather,
-      misc = misc
-      )
+    name,
+    desc = desc,
+    unit = unit,
+    region = region,
+    timeframe = timeframe,
+    defVal = defVal,
+    weather = weather,
+    misc = misc,
+    ...
+    )
   }
 
 #' @param object object of class export

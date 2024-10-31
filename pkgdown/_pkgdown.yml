@@ -137,6 +137,7 @@ reference:
 - title: Visualisation
   contents:
   - matches("draw")
+  - matches("plot")
 
 - title: Validation
   contents:
@@ -150,6 +151,7 @@ reference:
 - title: utils
   contents:
   - matches("en_install_julia_pkgs")
+  - matches("en_obj2df")
   - get_slot_info
 
 # - title: All other
