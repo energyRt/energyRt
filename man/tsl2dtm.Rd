@@ -39,6 +39,14 @@ tsl2month(tsl, format = tsl_guess_format(tsl), return.null = T)
 }
 \value{
 Vector in Date-Time format
+
+Integer vector of years, the same length as the input vector
+
+Integer vector of days of the year, the same length as the input vector
+
+Integer vector of hours, the same length as the input vector
+
+Integer vector of months, the same length as the input vector
 }
 \description{
 Convert time-slices to date-time, extract year, month, day of the year, or hour

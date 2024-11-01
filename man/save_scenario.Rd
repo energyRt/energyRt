@@ -35,3 +35,9 @@ scenario object with most of the slots saved on disk.
 \description{
 Save scenario object on disk in parquet format using \code{arrow} package.
 }
+\examples{
+\dontrun{
+scen_BASE@path # check the scenarion directory
+scen_BASE <- save_scenario(scen_BASE) # saving in the default directory
+}
+}

@@ -41,3 +41,10 @@ Used internally in \verb{solve*()} and \verb{interpolate*()} functions.
 Also can be used to amend the name of the scenario directory and explicitly
 assign the directory name to save the scenario object.
 }
+\examples{
+\dontrun{
+make_scenario_dirname(scen_BASE)
+make_scenario_dirname(scen_BASE, prefix = "prefix", suffix = "suffix")
+}
+
+}

@@ -11,6 +11,15 @@ obj2mem(obj, verbose = TRUE)
 
 \item{verbose}{If TRUE, prints messages}
 }
+\value{
+Object of the same S4 class as input object, with
+all of the slots loaded in memory.
+}
 \description{
 Loads objects from disk to memory
+}
+\examples{
+\dontrun{
+obj2mem(scen_ondisk)
+}
 }

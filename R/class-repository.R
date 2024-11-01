@@ -1,6 +1,6 @@
 # class repository ####
 #' An S4 class to store the model objects.
-#' 
+#'
 #' @md
 #' @slot name `r get_slot_info("repository", "name")`
 #' @slot desc `r get_slot_info("repository", "desc")`
@@ -54,7 +54,7 @@ setMethod("initialize", "repository", function(.Object, ...) {
 #' @export
 #' @family repository, model, data
 newRepository <- function(
-    name = "base_repository", 
+    name = "base_repository",
     ...,
     desc = NA_character_,
     misc = list()
@@ -165,10 +165,10 @@ setMethod("print", "repository", function(x) {
 })
 
 ## show ####
-#' @method show repository
-#' @export
-#' @family repository
-setMethod("show", "repository", function(object) print(object))
+# @method show repository
+# @export
+# @family repository
+#setMethod("show", "repository", function(object) print(object))
 
 ## length ####
 #' @method length repository

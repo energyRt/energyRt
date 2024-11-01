@@ -9,6 +9,17 @@ set_python_path(path = NULL)
 \arguments{
 \item{path}{character path to the python installation. If NULL, the global operation path is used.}
 }
+\value{
+Writes or reads the path to python installation or environment
+to/from \code{energyRt} options.
+}
 \description{
 Set or get python installation path to be used to solve models
+}
+\examples{
+\dontrun{
+set_python_path("C:/Python3")
+set_python_path()
+get_python_path()
+}
 }

@@ -482,10 +482,13 @@ draw.technology <- function(obj, ...) {
 
 #' Draw a schematic representation of an export process
 #'
-#' @param obj
-#' @param ...
+#' @param obj An export object
+#' @param ... Additional arguments to be passed to draw_process
 #'
 #' @method draw export
+#' @family draw export
+#' @return
+#' A figure with a schematic representation of the export process.
 #' @export
 #' @examples
 #'EXPOIL <- newExport(
@@ -619,9 +622,10 @@ setMethod("draw", "export", draw.export)
 #' Draw a schematic representation of an import process
 #'
 #' @param obj An import object
-#' @param ... Additional arguments, currently not used
+#' @param ... Additional arguments to be passed to draw_process
 #'
 #' @return
+#' A figure with a schematic representation of the import process.
 #' @export
 #'
 #' @examples
@@ -842,7 +846,7 @@ make_label <- function(
 #' @param sets A character vector with the names of the sets,
 #' colnames to create in the resulting data frame.
 #' Default is c("region", "year", "slice", "comm", "acomm")
-#' @param verbose
+#' @param verbose A logical value if to print messages
 #' @noRd
 en_obj2df <- function(obj, sets = NULL, verbose = FALSE) {
   # browser()
@@ -1069,6 +1073,7 @@ draw_process <- function(
 
     process_name_fontsize = 14,
     process_desc_fontsize = 10,
+    font_spacing = .06,
 
     arrow_comm_color = "red3",
     arrow_aux_color = "royalblue4",
@@ -1081,19 +1086,19 @@ result <- tryCatch({
 
   # try(dev.off())
 
-  grid.newpage()
+  grid::grid.newpage()
   # Set a viewport
-  vp <- viewport(
+  vp <- grid::viewport(
     width = unit(1, "npc"),
     height = unit(1, "npc"),
     just = "center")
-  pushViewport(vp)
-  on.exit(popViewport(0))
+  grid::pushViewport(vp)
+  on.exit(grid::popViewport(0))
 
   font_in_npc <- function(fontsize) {
     # vp_height_in <- grid::convertUnit(unit(1, "npc"), "in", valueOnly = TRUE)
-    # fontsize / 72 / vp_height_in
-    .08
+    # fontsize / 72 / vp_height_in * 2
+    font_spacing
   }
 
   spacing_bw_titles <- 0.2 * font_in_npc(
@@ -1101,7 +1106,7 @@ result <- tryCatch({
   )
 
   # Process box
-  grid.rect(
+  grid::grid.rect(
     x = 0.5, y = 0.5,
     width = box_width,
     height = box_height,
@@ -1113,7 +1118,7 @@ result <- tryCatch({
     txt_x <- 0.5 + box_height / 2 + spacing_bw_titles +
       font_in_npc(process_desc_fontsize)/2
     # txt_x <- 0.5 + box_height / 2 + .05
-    grid.text(
+    grid::grid.text(
       process_desc,
       x = 0.5,
       y = txt_x,
@@ -1124,7 +1129,7 @@ result <- tryCatch({
   }
 
   # Process label
-  grid.text(
+  grid::grid.text(
     process_name,
     x = 0.5,
     y = txt_x + spacing_bw_titles *
@@ -1135,7 +1140,7 @@ result <- tryCatch({
   )
 
   # # Process label
-  # grid.text(
+  # grid::grid.text(
   #   process_name,
   #   x = 0.5,
   #   y = 0.5 + box_height / 2 +
@@ -1186,7 +1191,7 @@ result <- tryCatch({
 
     if (length(n_inputs) > 0) {
       # Add 'inp' label
-      grid.text(
+      grid::grid.text(
         label = "inp",
         x = 0.5 - box_width / 2 + 0.02,
         # y = y_end + 0.02,
@@ -1204,7 +1209,7 @@ result <- tryCatch({
         inputs$y[i] <- y_pos
 
         # draw arrow i
-        grid.lines(
+        grid::grid.lines(
           x = c(0.5 - 0.5 * box_width - arrow_length, x_pos),
           y = c(y_pos, y_pos),
           arrow = arrow(
@@ -1216,7 +1221,7 @@ result <- tryCatch({
         )
 
         # Add label over the arrow
-        grid.text(
+        grid::grid.text(
           arrow_labels[inputs$ioname[i]],
           x = 0.5 - box_width * 0.5 - .03,
           y = y_pos + font_in_npc(10) / 2,
@@ -1225,14 +1230,14 @@ result <- tryCatch({
         )
 
         # combustion point
-        # grid.points(
+        # grid::grid.points(
         #   x = x_pos,
         #   y = y_pos, pch = 16,
         #   gp = gpar(col = inputs$arrow_color[i], cex = 0.1)
         # )
 
         # Add label near the dot, inside the box
-        grid.text(
+        grid::grid.text(
           inputs$lab_par[i],
           x = 0.5 - box_width * 0.48 + inputs$label_hjust[i],
           y = y_pos + inputs$label_vjust[i] + .00,
@@ -1265,20 +1270,20 @@ result <- tryCatch({
           bracket_x <- 0.5 - box_width * 0.23
 
           # group bracket ####
-          grid.lines(
+          grid::grid.lines(
             x = c(bracket_x,
                   bracket_x),
             y = c(y1, y2),
             gp = gpar(lwd = 1.25, col = "red3")
           )
 
-          grid.lines(
+          grid::grid.lines(
             x = c(bracket_x - box_width * 0.02,
                   bracket_x),
             y = c(y1, y1),
             gp = gpar(lwd = 1.25, col = "red3")
           )
-          grid.lines(
+          grid::grid.lines(
             x = c(bracket_x - box_width * 0.02,
                   bracket_x),
             y = c(y2, y2),
@@ -1288,12 +1293,12 @@ result <- tryCatch({
           # group circle ####
           circle_y <- (y1 + y2) / 2
           circle_x <- bracket_x
-          grid.circle(
+          grid::grid.circle(
             x = circle_x, y = circle_y, r = unit(0.07, "inches"),
             gp = gpar(fill = "white", col = "red3", lwd = 1.0)
           )
           # group number ####
-          grid.text(
+          grid::grid.text(
             label = g,
             x = circle_x,
             y = circle_y,
@@ -1305,7 +1310,7 @@ result <- tryCatch({
           ginp2use <- grouped_com_inputs |>
             filter(group == g, parameter == "ginp2use")
           if (nrow(ginp2use) == 1) {
-            grid.text(
+            grid::grid.text(
               label = ginp2use$lab_par,
               x = circle_x + 0.048,
               y = circle_y,
@@ -1318,7 +1323,7 @@ result <- tryCatch({
 
         } # end for (g in unique(ginp$group))
         # Add 'ginp' label
-        grid.text(
+        grid::grid.text(
           label = "ginp",
           x = bracket_x,
           # y = y_end + 0.02,
@@ -1335,24 +1340,24 @@ result <- tryCatch({
         y_use <- range(cinp$y, na.rm = T) + 0.4 * inp_arrow_spacing * c(-1, 1)
 
         use_x <- 0.5 - box_width * 0.00
-        grid.lines(
+        grid::grid.lines(
           x = c(use_x, use_x),
           y = y_use,
           gp = gpar(lwd = 1.25, col = "red3", lty = "solid")
         )
-        grid.lines(
+        grid::grid.lines(
           x = c(use_x - box_width * 0.02, use_x),
           y = c(y_use[1], y_use[1]),
           gp = gpar(lwd = 1.25, col = "red3", lty = "solid")
         )
-        grid.lines(
+        grid::grid.lines(
           x = c(use_x - box_width * 0.02, use_x),
           y = c(y_use[2], y_use[2]),
           gp = gpar(lwd = 1.25, col = "red3", lty = "solid")
         )
 
         ## "use" label ####
-        grid.text(
+        grid::grid.text(
           label = "use",
           x = use_x,
           y = y_inp_use_act,
@@ -1406,7 +1411,7 @@ result <- tryCatch({
 
       if (show_act_bar) {
         # Add 'out' label
-        grid.text(
+        grid::grid.text(
           label = "out",
           x = 0.5 + box_width / 2 - 0.02,
           y = y_inp_use_act,
@@ -1415,7 +1420,7 @@ result <- tryCatch({
         )
 
         # add 'act' label
-        grid.text(
+        grid::grid.text(
           label = "act",
           x = 0.5 + box_width * 0.22,
           y = y_inp_use_act,
@@ -1436,7 +1441,7 @@ result <- tryCatch({
 
         # draw arrow o
         # browser()
-        grid.lines(
+        grid::grid.lines(
           x = c(x_pos, 0.5 + 0.5 * box_width + arrow_length),
           y = c(y_pos, y_pos),
           arrow = arrow(
@@ -1448,7 +1453,7 @@ result <- tryCatch({
         )
 
         # Add label over the arrow
-        grid.text(
+        grid::grid.text(
           arrow_labels[out_pars$ioname[i]],
           x = 0.5 + box_width * 0.5 + .02,
           y = y_pos + font_in_npc(10) / 2,
@@ -1457,7 +1462,7 @@ result <- tryCatch({
         )
 
         # Add label near the dot, inside the box
-        grid.text(
+        grid::grid.text(
           out_pars$lab_par[i],
           x = 0.5 + box_width * 0.48 + out_pars$label_hjust[i],
           y = y_pos + out_pars$label_vjust[i] + .00,
@@ -1489,20 +1494,20 @@ result <- tryCatch({
           bracket_x <- 0.5 + box_width * 0.25
 
           # group bracket ####
-          grid.lines(
+          grid::grid.lines(
             x = c(bracket_x,
                   bracket_x),
             y = c(y1, y2),
             gp = gpar(lwd = 1.25, col = "red3")
           )
 
-          grid.lines(
+          grid::grid.lines(
             x = c(bracket_x + box_width * 0.02,
                   bracket_x),
             y = c(y1, y1),
             gp = gpar(lwd = 1.25, col = "red3")
           )
-          grid.lines(
+          grid::grid.lines(
             x = c(bracket_x + box_width * 0.02,
                   bracket_x),
             y = c(y2, y2),
@@ -1512,12 +1517,12 @@ result <- tryCatch({
           # group circle ####
           circle_y <- (y1 + y2) / 2
           circle_x <- bracket_x
-          grid.circle(
+          grid::grid.circle(
             x = circle_x, y = circle_y, r = unit(0.07, "inches"),
             gp = gpar(fill = "white", col = "red3", lwd = 1.0)
           )
           # group number ####
-          grid.text(
+          grid::grid.text(
             label = g,
             x = circle_x,
             y = circle_y,
@@ -1533,17 +1538,17 @@ result <- tryCatch({
         y_act <- range(cout$y, na.rm = T) + 0.42 * out_arrow_spacing * c(-1, 1)
         act_x <- 0.5 + box_width * 0.2
 
-        grid.lines(
+        grid::grid.lines(
           x = c(act_x, act_x),
           y = y_act,
           gp = gpar(lwd = 1.25, col = "red3", lty = "solid")
         )
-        grid.lines(
+        grid::grid.lines(
           x = c(act_x + box_width * 0.02, act_x),
           y = c(y_act[1], y_act[1]),
           gp = gpar(lwd = 1.25, col = "red3", lty = "solid")
         )
-        grid.lines(
+        grid::grid.lines(
           x = c(act_x + box_width * 0.02, act_x),
           y = c(y_act[2], y_act[2]),
           gp = gpar(lwd = 1.25, col = "red3", lty = "solid")
@@ -1565,7 +1570,7 @@ result <- tryCatch({
           for (com in unique(use2cact$ioname)) {
             ii <- which(use2cact$ioname == com)
 
-            grid.text(
+            grid::grid.text(
               label = use2cact$lab_par[ii],
               x = use2cact_x,
               y = use2cact$y[ii],
@@ -1580,7 +1585,7 @@ result <- tryCatch({
 
   # cap2act ####
   if (!is.null(cap2act_label)) {
-    grid.text(
+    grid::grid.text(
       label = cap2act_label,
       x = 0.5,
       y = 0.5 - box_height / 2 + 0.05,

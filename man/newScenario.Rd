@@ -19,8 +19,6 @@ newScenario(
 
 \item{path}{character. Path to the scenario directory.}
 
-\item{...}{}
-
 \item{env_name}{name of the environment to assign the scenario in.}
 
 \item{registry}{optional registry object to register the scenario.}

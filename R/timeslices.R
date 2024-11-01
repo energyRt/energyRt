@@ -152,6 +152,8 @@ tsl2dtm <- function(tsl, format = tsl_guess_format(tsl), tmz = "UTC",
 #' @param return.null logical, valid for the cased then all values are NA, then NULL will be returned if return.null = TRUE,
 #'
 #' @return
+#' Integer vector of years, the same length as the input vector
+#'
 #' @export
 #'
 #' @examples
@@ -174,6 +176,7 @@ tsl2year <- function(tsl, return.null = T) {
 #' @param return.null logical, valid for the cased then all values are NA, then NULL will be returned if return.null = TRUE,
 #'
 #' @return
+#' Integer vector of days of the year, the same length as the input vector
 #' @export
 #'
 #' @examples
@@ -194,6 +197,7 @@ tsl2yday <- function(tsl, return.null = T) {
 #' @param return.null logical, valid for the cased then all values are NA, then NULL will be returned if return.null = TRUE,
 #'
 #' @return
+#' Integer vector of hours, the same length as the input vector
 #' @export
 #'
 #' @examples
@@ -216,6 +220,8 @@ tsl2hour <- function(tsl, return.null = T) {
 #' @param format character, the time slices format
 #'
 #' @return
+#' Integer vector of months, the same length as the input vector
+#'
 #' @export
 #'
 #' @examples
@@ -249,6 +255,7 @@ tsl2month <- function(tsl, format = tsl_guess_format(tsl), return.null = T) {
 #' @param tsl
 #'
 #' @return
+#' Character vector with the guessed format of the time-slices
 #' @export
 #'
 #' @examples

@@ -210,4 +210,78 @@ slice of the same year) or within the parent time-frame (for example,
 when commodity time-frame is "HOUR" and the parent time-frame is "DAY" then
 the storage cycle will be a calendar day).
 }
+\examples{
+STG1 <- newStorage(
+  name = "STG1",
+  desc = "Storage description",
+  commodity = "electricity",
+  region = "R1",
+  start = data.frame(region = "R1", start = 0),
+  end = data.frame(region = "R1", end = 1),
+  olife = data.frame(region = "R1", olife = 20),
+  charge = data.frame(
+    # region = "R1",
+    year = 2020,
+    # slice = "HOUR",
+    charge = 0.1
+  ),
+  seff = data.frame(
+    # region = "R1",
+    # year = 2020,
+    # slice = "HOUR",
+    stgeff = 0.999,
+    inpeff = 0.9,
+    outeff = 0.9
+  ),
+  aeff = data.frame(
+    acomm = "electricity",
+    region = "R1",
+    year = 2020,
+    # slice = "HOUR",
+    stg2ainp = 0.9,
+    cinp2ainp = 0.1,
+    cout2ainp = 0.2,
+    stg2aout = 0.9,
+    cinp2aout = 0.9,
+    cout2aout = 0.9,
+    cap2ainp = 0.9,
+    cap2aout = 0.9,
+    ncap2ainp = 0.9,
+    ncap2aout = 0.9,
+    ncap2stg = 0.9
+  ),
+  af = data.frame(
+    region = "R1", year = 2020, slice = "HOUR",
+    af.lo = 0.9, af.up = 0.9, af.fx = 0.9, cinp.up = 0.9,
+    cinp.fx = 0.9, cinp.lo = 0.9, cout.up = 0.9,
+    cout.fx = 0.9, cout.lo = 0.9
+  ),
+  fixom = data.frame(region = "R1", year = 2020, fixom = 0.9),
+  varom = data.frame(
+    region = "R1", year = 2020, slice = "HOUR",
+    inpcost = 0.9, outcost = 0.9, stgcost = 0.9
+  ),
+  invcost = data.frame(
+    region = "R1", year = 2020, invcost = 0.9,
+    wacc = 0.9, retcost = 0.9
+  ),
+  capacity = data.frame(
+    region = "R1", year = 2020, stock = 0.9,
+    cap.lo = 0.9, cap.up = 0.9, cap.fx = 0.9, ncap.lo = 0.9,
+    ncap.up = 0.9, ncap.fx = 0.9, ret.lo = 0.9, ret.up = 0.9,
+    ret.fx = 0.9
+  ),
+  cap2stg = 1,
+  fullYear = TRUE,
+  weather = data.frame(
+    weather = "sunny",
+    waf.lo = 0.9,
+    waf.up = 0.9,
+    waf.fx = 0.9, wcinp.lo = 0.9,
+    wcinp.fx = 0.9, wcinp.up = 0.9, wcout.lo = 0.9, wcout.fx = 0.9,
+    wcout.up = 0.9
+  ), optimizeRetirement = FALSE,
+  misc = list()
+  )
+}
 \concept{storage, process}

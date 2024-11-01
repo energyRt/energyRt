@@ -5,7 +5,8 @@
 #' If GDX path is not set, the GAMS path will be used. If GAMS path is not set, the default system GAMS-path (OS environment variables) instead.
 #'
 #' @param path character, path to installed GAMS distribution to use to solve models and/or with GDX library to use in reading and writing gdx-files.
-#'
+#' @return
+#' Sets path to GAMS library in R-options
 #' @rdname gams
 #' @family GAMS
 #' @export
@@ -28,6 +29,8 @@ set_gams_path <- function(path = NULL) {
 
 #' @rdname gams
 #' @family GAMS
+#' @return
+#' The current path to GAMS library, set in R-options
 #' @export
 #' @examples
 #' # get_gams_path()
@@ -37,6 +40,7 @@ get_gams_path <- function() {
 }
 
 #' @return
+#'  Sets path to GDX library in R-options
 #' @export
 #'
 #' @rdname gams
@@ -58,6 +62,8 @@ set_gdxlib_path <- function(path = NULL) {
 
 #' @rdname gams
 #' @family GAMS
+#' @return
+#' The current path to GDX library, set in R-options
 #' @export
 #' @examples
 #' # get_gdxlib()

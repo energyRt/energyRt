@@ -9,7 +9,10 @@ draw.import(obj, ...)
 \arguments{
 \item{obj}{An import object}
 
-\item{...}{Additional arguments, currently not used}
+\item{...}{Additional arguments to be passed to draw_process}
+}
+\value{
+A figure with a schematic representation of the import process.
 }
 \description{
 Draw a schematic representation of an import process

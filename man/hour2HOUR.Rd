@@ -7,8 +7,22 @@
 hour2HOUR(x, width = 2, prefix = "h", flag = "0")
 }
 \arguments{
-\item{flag}{}
+\item{x}{integer vector, hours (for example, 0-23 for daily data, 0-167 for weekly data,
+etc.)}
+
+\item{width}{integer, width of the output string}
+
+\item{prefix}{character, prefix to add to the name, default is 'h'}
+
+\item{flag}{character, flag to add to the name, default is '0'}
+}
+\value{
+character vector of the same length as \code{x} with formatted hours to
+be used in the HOUR set.
 }
 \description{
 Convert hours (integer) values to HOUR set 'hNN'
+}
+\examples{
+hour2HOUR(0:23)
 }

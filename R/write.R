@@ -173,8 +173,6 @@ write.sc <- write_sc
 #' @param interpolation_count numeric
 #' @param len_name numeric
 #'
-#' @return
-#'
 #' @noRd
 .write_mapping <- function(
     prec,

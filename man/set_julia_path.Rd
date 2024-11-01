@@ -9,6 +9,14 @@ set_julia_path(path = NULL)
 \arguments{
 \item{path}{character. Path to Julia installation. If NULL, the system path is returned.}
 }
+\value{
+Sets the path to Julia installation in the energyRt environment options and
+returns NULL.
+}
 \description{
 Set the path to Julia installation
+}
+\examples{
+set_julia_path("C:/Program Files/Julia-1.10.1/bin/")
+get_julia_path()
 }

@@ -7,7 +7,12 @@
 \method{draw}{export}(obj, ...)
 }
 \arguments{
-\item{...}{}
+\item{obj}{An export object}
+
+\item{...}{Additional arguments to be passed to draw_process}
+}
+\value{
+A figure with a schematic representation of the export process.
 }
 \description{
 Draw a schematic representation of an export process
@@ -28,3 +33,4 @@ EXPOIL <- newExport(
 )
 draw(EXPOIL)
 }
+\concept{draw export}

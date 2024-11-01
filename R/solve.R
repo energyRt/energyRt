@@ -17,6 +17,7 @@
 #'
 #' @rdname solve
 #' @return
+#' When the first argument is a model object, the function
 #' @export
 solve_model <- function(
     obj,

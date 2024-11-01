@@ -14,8 +14,17 @@ read_solution(obj, ...)
 
 \item{...}{optional tmp.dir (if missing in the scenario object or to replace the saved path)}
 }
+\value{
+The function returns the scenario object with populated modOut slot
+from the solved model directory.
+}
 \description{
 The function and method read outputs of solved model/scenario and return the scenario object populated with variables data.
+}
+\examples{
+\dontrun{
+scen <- read(scen)
+}
 }
 \seealso{
 \code{\link[=solve]{solve()}} to run the script, solve the scenario. \code{\link[=write_sc]{write_sc()}} to read

@@ -3,9 +3,13 @@
 #' @param path character. Path to Julia installation. If NULL, the system path is returned.
 #'
 #' @return
+#' Sets the path to Julia installation in the energyRt environment options and
+#' returns NULL.
 #' @export
 #'
 #' @examples
+#' set_julia_path("C:/Program Files/Julia-1.10.1/bin/")
+#' get_julia_path()
 set_julia_path <- function(path = NULL) {
   # browser()
   if (!is.null(path) && path != "") {
@@ -21,6 +25,7 @@ set_julia_path <- function(path = NULL) {
 }
 
 #' @export
+#' @return character. Path to Julia installation.
 get_julia_path <- function() {
   options::opt("julia_path", env = "energyRt")
   # getOption("julia_path")

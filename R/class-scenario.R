@@ -4,17 +4,17 @@
 #' @slot desc character. Description of the scenario.
 #' @slot model model. Model object.
 # @slot subset
-#' @slot settings settings. 
+#' @slot settings settings.
 #'
 #' @slot modInp modInp object.
 #' @slot modOut modOut.
 #' @slot status list.
 #' @slot misc list.
-#' @slot name 
-#' @slot desc 
-#' @slot model 
-#' @slot inMemory 
-#' @slot path 
+#' @slot name
+#' @slot desc
+#' @slot model
+#' @slot inMemory
+#' @slot path
 #'
 #' @include class-modOut.R class-settings.R
 #'
@@ -65,7 +65,7 @@ setMethod("initialize", "scenario", function(.Object, ...) {
 #'
 #' @param name character. Name of the scenario.
 #' @param path character. Path to the scenario directory.
-#' @param ... 
+#' @param ...
 #' @param env_name name of the environment to assign the scenario in.
 #' @param registry optional registry object to register the scenario.
 #' @param replace logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists.
@@ -75,11 +75,11 @@ setMethod("initialize", "scenario", function(.Object, ...) {
 #'
 #' @examples
 newScenario <- function(
-    name, 
+    name,
     model = NULL,
     path = fp(get_scenarios_path(), name),
     ...,
-    env_name = ".scen", 
+    env_name = ".scen",
     registry = get_registry(),
     replace = FALSE
 ) {
@@ -94,13 +94,13 @@ newScenario <- function(
       if (replace) {
         registry$delete_entry(name, ...)
       } else {
-        cat("Scenario ", name, 
+        cat("Scenario ", name,
             " already exists in the registry.\n")
         return(invisible(FALSE))
       }
     }
     register(scen, registry, ..., env = env_name)
-    cat("Scenario ", name, " created in ", env_name, 
+    cat("Scenario ", name, " created in ", env_name,
         " environment and registered.\n")
     return(invisible(TRUE))
   } else {
@@ -146,10 +146,10 @@ setMethod("summary", signature(object = "scenario"),
 # setMethod("summary", "scenario", summary.scenario)
 
 ## show ####
-#' @method show scenario
-#' @export
-#' @family repository
-setMethod("show", "scenario", function(object) summary(object))
+# @method show scenario
+# @export
+# @family repository
+#setMethod("show", "scenario", function(object) summary(object))
 
 # @export
 # setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {
@@ -170,7 +170,7 @@ setMethod("setHorizon", signature(obj = "scenario"),
     if (!is.null(args$period) || !is.null(args$intervals)) {
       if (is.null(args$period) && is.null(args$intervals)) {
           stop("Both 'period' and 'intervals' parameters must be provided.")
-      } 
+      }
       obj@settings <- setHorizon(obj@settings, args$period, args$intervals)
     }
     obj
@@ -179,7 +179,7 @@ setMethod("setHorizon", signature(obj = "scenario"),
 
 # @export
 # setMethod(
-#   "setHorizon", 
+#   "setHorizon",
 #   signature(obj = "scenario", horizon = "horizon"),
 #   function(obj, horizon) {
 #     # obj@model <- setHorizon(obj@model, period, intervals)

@@ -62,35 +62,50 @@
 
 
 <dl><dt><code>name</code></dt>
-<dd><p>character.</p></dd>
-
-
-<dt><code>comm</code></dt>
-<dd><p>character.</p></dd>
+<dd><p>character. Name of the tax object, used in sets.</p></dd>
 
 
 <dt><code>desc</code></dt>
-<dd><p>character.</p></dd>
+<dd><p>character. Description of the tax object.</p></dd>
+
+
+<dt><code>comm</code></dt>
+<dd><p>character. Name of the taxed commodity.</p></dd>
 
 
 <dt><code>region</code></dt>
-<dd><p>character.</p></dd>
-
-
-<dt><code>year</code></dt>
-<dd><p>numeric.</p></dd>
+<dd><p>character. Region where the tax is applied.</p></dd>
 
 
 <dt><code>defVal</code></dt>
-<dd><p>numeric.</p></dd>
+<dd><p>numeric. Default value of the tax for not specified sets, 0 if not specified.</p></dd>
 
 
-<dt><code>value</code></dt>
-<dd><p>data.frame.</p></dd>
+<dt><code>tax</code></dt>
+<dd><p>data.frame. Tax values.</p><dl><dt>region</dt>
+<dd><p>character. Region name to apply the parameter, NA for every region.</p></dd>
+
+<dt>year</dt>
+<dd><p>integer. Year to apply the parameter, NA for every year.</p></dd>
+
+<dt>slice</dt>
+<dd><p>character. Time slice to apply the parameter, NA for every slice.</p></dd>
+
+<dt>inp</dt>
+<dd><p>numeric. Input tax, e.g., per unit of commodity consumed by all processes.</p></dd>
+
+<dt>out</dt>
+<dd><p>numeric. Output tax, e.g., per unit of commodity produced by all processes.</p></dd>
+
+<dt>bal</dt>
+<dd><p>numeric. Balance tax, e.g., per unit of commodity balance (production - consumption).</p></dd>
+
+
+</dl></dd>
 
 
 <dt><code>misc</code></dt>
-<dd><p>list.</p></dd>
+<dd><p>list. Additional information.</p></dd>
 
 
 </dl></div>

@@ -9,6 +9,9 @@ tsl_guess_format(tsl)
 \arguments{
 \item{tsl}{}
 }
+\value{
+Character vector with the guessed format of the time-slices
+}
 \description{
 Guess format of time-slices
 }

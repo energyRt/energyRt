@@ -16,6 +16,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' scen_BASE@path # check the scenarion directory
+#' scen_BASE <- save_scenario(scen_BASE) # saving in the default directory
+#' }
 save_scenario <- function(
     scen,
     path = scen@path,
@@ -428,10 +432,14 @@ if (F) {
 #'
 #' @param obj Object, checks
 #'
-#' @return
+#' @return Logical value, TRUE if object is stored in memory, FALSE if on disk.
+#'
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' isInMemory(scen_BASE)
+#' }
 isInMemory <- function(obj) {
   if (!isS4(obj)) {
     has_path <- try({!is.null(obj$misc$inMemory)}, silent = T)
@@ -706,17 +714,22 @@ if (F) {
 
 #' Load scenario (in progress)
 #'
-#' @param path
-#' @param name
-#' @param env
-#' @param overwrite
-#' @param ignore_errors
-#' @param verbose
+#' @param path character. Path to saved with function `save_scenario` scenario directory.
+#' @param name character. Name to assign to the loaded scenario object.
+#' By default, the name is taken from the loaded scenario object.
+#' @param env environment. Environment to assign the loaded scenario object.
+#' @param overwrite logical. Overwrite existing scenario object in the environment.
+#' @param ignore_errors logical. Ignore load errors and continue execution.
+#' This option is useful when some data is missing or corrupted.
+#' @param verbose logical. Print messages.
 #'
-#' @return
+#' @return TRUE if scenario is loaded, FALSE if not.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' load_scenario("scenarios/base")
+#' }
 load_scenario <- function(
     path,
     name = NULL,
@@ -787,10 +800,14 @@ load_scenario <- function(
 #' @param obj Object of S4 class, saved on disk (scenario, model, etc.)
 #' @param verbose If TRUE, prints messages
 #'
-#' @return
+#' @return Object of the same S4 class as input object, with
+#' all of the slots loaded in memory.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' obj2mem(scen_ondisk)
+#' }
 obj2mem <- function(obj, verbose = TRUE) {
   # browser()
   if (!isS4(obj)) {

@@ -530,7 +530,6 @@
 #' @param remValueUp
 #' @param remValueLo
 #'
-#' @return
 #'
 #' @noRd
 .interp_bounds <- function(

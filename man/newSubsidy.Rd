@@ -15,17 +15,6 @@ newSub(
   misc = list(),
   ...
 )
-
-newSubsidy(
-  name,
-  desc = "",
-  comm = "",
-  region = character(),
-  defVal = 0,
-  sub = data.frame(),
-  misc = list(),
-  ...
-)
 }
 \arguments{
 \item{name}{character. Name of the subsidy object, used in sets.}
@@ -56,4 +45,18 @@ An object of class \code{sub}
 \description{
 Subsidies are used to represent the financial support provided to
 production, consumption, or balance of a commodity.
+}
+\examples{
+SUB_BIO <- newSub(
+ name = "SUB_BIO", # used in sets
+ desc = "Biofuel consumption subsidy", # for own reference
+ comm = "BIO", # must match the commodity name in the model
+ region = "R1", # region where the subsidy is applied
+ defVal = 0, # default value
+ sub = data.frame(
+    # region = "R1",
+    year = 2025:2030,
+    inp = 0.9 # subsidy rate
+   )
+ )
 }

@@ -3,30 +3,35 @@
 
 #' Convert hours (integer) values to HOUR set 'hNN'
 #'
-#' @param x
-#' @param width
-#' @param prefix
-#' @param flag
+#' @param x integer vector, hours (for example, 0-23 for daily data, 0-167 for weekly data,
+#' etc.)
+#' @param width integer, width of the output string
+#' @param prefix character, prefix to add to the name, default is 'h'
+#' @param flag character, flag to add to the name, default is '0'
 #'
-#' @return
+#' @return character vector of the same length as `x` with formatted hours to
+#' be used in the HOUR set.
 #' @export
 #'
 #' @examples
+#' hour2HOUR(0:23)
 hour2HOUR <- function(x, width = 2, prefix = "h", flag = "0") {
   paste0(prefix, formatC(x, width = width, flag = flag))
 }
 
 #' Convert year-days to YDAY set 'dNNN'
 #'
-#' @param x
-#' @param width
-#' @param prefix
-#' @param flag
+#' @param x integer vector, year-days (for example, 1-365 for annual data)
+#' @param width integer, width of the output string, default is 3
+#' @param prefix character, prefix to add to the name, default is 'd'
+#' @param flag character, flag to add to the name, default is '0'
 #'
-#' @return
+#' @return character vector of the same length as `x` with formatted year-days to
+#' be used in the YDAY set.
 #' @export
 #'
 #' @examples
+#' day2YDAY(1:365)
 yday2YDAY <- function(x, width = 3, prefix = "d", flag = "0") {
   paste0(prefix, formatC(x, width = width, flag = flag))
 }
@@ -56,15 +61,18 @@ nonchar_in_sets <- function(x) {
 
 #' Size of an object
 #'
-#' @param x - any R object
-#' @param level1
-#' @param units
-#' @param sort
-#' @param decreasing
-#' @param byteTol
-#' @param asNumeric
+#' @param x any R object
+#' @param level1 logical, if TRUE, the function will return the size of the
+#' object and its slots (if any)
+#' @param units character, units to display the size, default is "auto"
+#' @param sort logical, if TRUE, the function will sort the slots by size
+#' @param decreasing logical, if TRUE, the function will sort the slots in
+#' decreasing order
+#' @param byteTol numeric, threshold in bytes to filter the slots
+#' @param asNumeric logical, if TRUE, the function will return the size of the
+#' object and its slots in bytes
 #'
-#' @return
+#' @return character value or vector, size of the object or its slots
 #' @export
 #'
 #' @examples
@@ -140,7 +148,7 @@ fp <- function(...) {
 }
 
 
-#' Check validity of object names
+#' Check validity of object's names used in sets
 #'
 #' @param x character, name of an object of `energyRt`
 #'
@@ -148,6 +156,11 @@ fp <- function(...) {
 #' @export
 #'
 #' @examples
+#' check_name("name")
+#' check_name("1name")
+#' check_name("name1")
+#' check_name("name_1")
+#' check_name("name_1!")
 check_name <- function(x) {
   (length(x) != 1 || !is.character(x) ||
     sub("^[[:alpha:]][[:alnum:]_]*$", "", x) == "")
@@ -157,10 +170,13 @@ check_name <- function(x) {
 #'
 #' @param x scenario or data.frame with data to check.
 #'
-#' @return
+#' @return data.frame with duplicated values.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' findDuplicates(scen_BASE)
+#' }
 findDuplicates <- function(x) {
   if (class(x) == 'scenario') {
     rs <- NULL
@@ -296,10 +312,17 @@ fact2char <- function(df, asTibble = TRUE) {
 #' @param clear logical, sets `progressr.clear` global option. If `TRUE`, all outout from the progress bar will be cleared.
 #'
 #' @rdname progress
-#' @return
+#' @return sets the progress bar and returns `NULL`
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' set_progress_bar("bw")
+#' set_progress_bar("default")
+#' set_progress_bar("cli")
+#' set_progress_bar("progress")
+#' set_progress_bar("pbcol")
+#' }
 set_progress_bar <- function(type = "bw", show = TRUE, clear = FALSE) {
   if (interactive()) progressr::handlers(global = show)
   options(progressr.clear = clear)
@@ -341,6 +364,10 @@ set_progress_bar <- function(type = "bw", show = TRUE, clear = FALSE) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' show_progress_bar()
+#' show_progress_bar(FALSE)
+#' }
 show_progress_bar <- function(show = TRUE) {
   if (interactive()) set_progress_bar(type = NULL, show = show)
 }
@@ -348,14 +375,19 @@ show_progress_bar <- function(show = TRUE) {
 
 #' Set or get directory for/with scenarios
 #'
-#' @param path
+#' @param path character, path to the directory with scenarios,
+#' default is `NULL`
 #'
 #' @family options
-#' @return
+#' @return sets or gets the path to the directory with scenarios
 #' @export
 #' @rdname options
 #'
 #' @examples
+#' \dontrun{
+#' set_scenarios_path("path/to/scenarios")
+#' get_scenarios_path()
+#' }
 set_scenarios_path <- function(path = NULL) {
   options::opt_set("scenarios_path", path)
   # options(en_scenarios_path = path)
@@ -364,7 +396,6 @@ set_scenarios_path <- function(path = NULL) {
 
 #' @family options
 #' @export
-#' @examples
 #' @rdname options
 get_scenarios_path <- function() {
   options::opt("scenarios_path")
@@ -373,7 +404,7 @@ get_scenarios_path <- function() {
 
 # merge_paths <- function(path1, path2)
 
-#' Drop columns in a data.frame with only NA values
+#' Drop columns in a data.frame with all NA values
 #'
 #' @description
 #' A wrapper with `dplyr` functions to drop columns with no information (all `NA` values)
@@ -381,10 +412,13 @@ get_scenarios_path <- function() {
 #' @param x data.frame
 #' @param unique logical, if TRUE (default), `unique()` function will be applied to the result.
 #'
-#' @return
+#' @return data.frame with dropped columns
 #' @export
 #'
 #' @examples
+#' x <- data.frame(a = c(1, 2, NA), b = c(NA, NA, NA), c = c(NA, 2, 3))
+#' drop_na_cols(x)
+#'
 drop_na_cols <- function(x, unique = TRUE) {
   x <- select(x, where(~ !all(is.na(.))))
   if (unique) x <- unique(x)
@@ -410,6 +444,10 @@ drop_na_cols <- function(x, unique = TRUE) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' make_scenario_dirname(scen_BASE)
+#' make_scenario_dirname(scen_BASE, prefix = "prefix", suffix = "suffix")
+#' }
 #'
 make_scenario_dirname <- function(
     scen,

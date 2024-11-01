@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{drop_na_cols}
 \alias{drop_na_cols}
-\title{Drop columns in a data.frame with only NA values}
+\title{Drop columns in a data.frame with all NA values}
 \usage{
 drop_na_cols(x, unique = TRUE)
 }
@@ -11,6 +11,14 @@ drop_na_cols(x, unique = TRUE)
 
 \item{unique}{logical, if TRUE (default), \code{unique()} function will be applied to the result.}
 }
+\value{
+data.frame with dropped columns
+}
 \description{
 A wrapper with \code{dplyr} functions to drop columns with no information (all \code{NA} values)
+}
+\examples{
+x <- data.frame(a = c(1, 2, NA), b = c(NA, NA, NA), c = c(NA, 2, 3))
+drop_na_cols(x)
+
 }

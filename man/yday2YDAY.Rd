@@ -7,8 +7,21 @@
 yday2YDAY(x, width = 3, prefix = "d", flag = "0")
 }
 \arguments{
-\item{flag}{}
+\item{x}{integer vector, year-days (for example, 1-365 for annual data)}
+
+\item{width}{integer, width of the output string, default is 3}
+
+\item{prefix}{character, prefix to add to the name, default is 'd'}
+
+\item{flag}{character, flag to add to the name, default is '0'}
+}
+\value{
+character vector of the same length as \code{x} with formatted year-days to
+be used in the YDAY set.
 }
 \description{
 Convert year-days to YDAY set 'dNNN'
+}
+\examples{
+day2YDAY(1:365)
 }

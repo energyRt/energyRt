@@ -9,6 +9,9 @@ set_glpk_path(path = NULL)
 \arguments{
 \item{path}{character. Path to the GLPK library with \verb{glpsol.*} executable.}
 }
+\value{
+sets the path to the GLPK library in R options and returns NULL.
+}
 \description{
 Set the path to the GLPK library
 }

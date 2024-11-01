@@ -10,9 +10,19 @@ set_scenarios_path(path = NULL)
 get_scenarios_path()
 }
 \arguments{
-\item{path}{}
+\item{path}{character, path to the directory with scenarios,
+default is \code{NULL}}
+}
+\value{
+sets or gets the path to the directory with scenarios
 }
 \description{
 Set or get directory for/with scenarios
+}
+\examples{
+\dontrun{
+set_scenarios_path("path/to/scenarios")
+get_scenarios_path()
+}
 }
 \concept{options}

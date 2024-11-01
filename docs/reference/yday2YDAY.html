@@ -65,11 +65,34 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-flag">flag<a class="anchor" aria-label="anchor" href="#arg-flag"></a></dt>
-<dd></dd>
+<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>integer vector, year-days (for example, 1-365 for annual data)</p></dd>
+
+
+<dt id="arg-width">width<a class="anchor" aria-label="anchor" href="#arg-width"></a></dt>
+<dd><p>integer, width of the output string, default is 3</p></dd>
+
+
+<dt id="arg-prefix">prefix<a class="anchor" aria-label="anchor" href="#arg-prefix"></a></dt>
+<dd><p>character, prefix to add to the name, default is 'd'</p></dd>
+
+
+<dt id="arg-flag">flag<a class="anchor" aria-label="anchor" href="#arg-flag"></a></dt>
+<dd><p>character, flag to add to the name, default is '0'</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>character vector of the same length as <code>x</code> with formatted year-days to
+be used in the YDAY set.</p>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">day2YDAY</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">365</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in day2YDAY(1:365):</span> could not find function "day2YDAY"</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

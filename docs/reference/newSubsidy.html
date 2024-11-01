@@ -70,17 +70,6 @@ production, consumption, or balance of a commodity.</p>
 <span>  sub <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  misc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">newSubsidy</span><span class="op">(</span></span>
-<span>  <span class="va">name</span>,</span>
-<span>  desc <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  comm <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  defVal <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  sub <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  misc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -140,6 +129,23 @@ production, consumption, or balance of a commodity.</p>
     <p>An object of class <code>sub</code></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">SUB_BIO</span> <span class="op">&lt;-</span> <span class="fu">newSub</span><span class="op">(</span></span></span>
+<span class="r-in"><span> name <span class="op">=</span> <span class="st">"SUB_BIO"</span>, <span class="co"># used in sets</span></span></span>
+<span class="r-in"><span> desc <span class="op">=</span> <span class="st">"Biofuel consumption subsidy"</span>, <span class="co"># for own reference</span></span></span>
+<span class="r-in"><span> comm <span class="op">=</span> <span class="st">"BIO"</span>, <span class="co"># must match the commodity name in the model</span></span></span>
+<span class="r-in"><span> region <span class="op">=</span> <span class="st">"R1"</span>, <span class="co"># region where the subsidy is applied</span></span></span>
+<span class="r-in"><span> defVal <span class="op">=</span> <span class="fl">0</span>, <span class="co"># default value</span></span></span>
+<span class="r-in"><span> sub <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="co"># region = "R1",</span></span></span>
+<span class="r-in"><span>    year <span class="op">=</span> <span class="fl">2025</span><span class="op">:</span><span class="fl">2030</span>,</span></span>
+<span class="r-in"><span>    inp <span class="op">=</span> <span class="fl">0.9</span> <span class="co"># subsidy rate</span></span></span>
+<span class="r-in"><span>   <span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .data2slots("sub", name = name, desc = desc, comm = comm, region = region,     defVal = defVal, sub = sub, misc = misc, ...):</span> argument "x" is missing, with no default</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

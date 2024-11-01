@@ -71,9 +71,22 @@ setClass("sub",
 #'
 #' @return An object of class `sub`
 #' @export
+#' @aliases newSubsidy
 #' @rdname newSubsidy
 #'
 #' @examples
+#' SUB_BIO <- newSub(
+#'  name = "SUB_BIO", # used in sets
+#'  desc = "Biofuel consumption subsidy", # for own reference
+#'  comm = "BIO", # must match the commodity name in the model
+#'  region = "R1", # region where the subsidy is applied
+#'  defVal = 0, # default value
+#'  sub = data.frame(
+#'     # region = "R1",
+#'     year = 2025:2030,
+#'     inp = 0.9 # subsidy rate
+#'    )
+#'  )
 newSub <- function(
   name,
   desc = "",
@@ -98,7 +111,7 @@ newSub <- function(
 }
 
 #' @export
-#' @rdname newSubsidy
+#' @noRd
 newSubsidy <- newSub
 
 # setMethod("newSub", signature(name = "character"), function(name, ..., value = NULL) {

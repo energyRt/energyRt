@@ -14,8 +14,28 @@ load_scenario(
 )
 }
 \arguments{
-\item{verbose}{}
+\item{path}{character. Path to saved with function \code{save_scenario} scenario directory.}
+
+\item{name}{character. Name to assign to the loaded scenario object.
+By default, the name is taken from the loaded scenario object.}
+
+\item{env}{environment. Environment to assign the loaded scenario object.}
+
+\item{overwrite}{logical. Overwrite existing scenario object in the environment.}
+
+\item{ignore_errors}{logical. Ignore load errors and continue execution.
+This option is useful when some data is missing or corrupted.}
+
+\item{verbose}{logical. Print messages.}
+}
+\value{
+TRUE if scenario is loaded, FALSE if not.
 }
 \description{
 Load scenario (in progress)
+}
+\examples{
+\dontrun{
+load_scenario("scenarios/base")
+}
 }
