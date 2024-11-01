@@ -255,7 +255,7 @@ draw.technology <- function(obj, ...) {
 
   # aux combined
   # browser()
-  aux <- bind_rows(ainp, aout) 
+  aux <- bind_rows(ainp, aout)
   if (nrow(aux) > 0) {
     aux <- aux |>
       pivot_longer(
@@ -483,7 +483,7 @@ draw.technology <- function(obj, ...) {
   #   ccom_par |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = comm),
   #   aux |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = acomm),
   #   wea |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = weather)
-  # ), 
+  # ),
   # use.names = TRUE, fill = TRUE
   # )
 
@@ -494,7 +494,7 @@ draw.technology <- function(obj, ...) {
   arrow_labels <- arrow_labels_tb$lab_txt
   names(arrow_labels) <- arrow_labels_tb$ioname
   stopifnot(length(arrow_labels) == nrow(arrow_labels_tb))
-  
+
   try(
     draw_process(
       process_name = obj@name,
@@ -508,16 +508,254 @@ draw.technology <- function(obj, ...) {
       # com_outputs = com_outputs,
       aux_outputs = aux_outputs,
       arrow_labels = arrow_labels,
-      cap2act_label = cap2act_label
+      center_label = cap2act_label,
+      show_iuao_labels = TRUE
     )
   )
-
-
-  # popViewport(0)
 
 } # end of draw.technology
 
 ## draw.storage ####
+
+#' Draw a schematic representation of a storage process
+#'
+#' @param obj A storage object
+#' @param ... Additional arguments to be passed to draw_process
+#' @method draw storage
+#'
+#' @return A figure with a schematic representation of the storage process.
+#' @export
+#'
+#' @examples
+#' STG_ELC <- newStorage(
+#'  name = "STG_ELC", # used in sets
+#'  desc = "Electricity storage (battery)", # for own reference
+#'  commodity = "ELECTRICITY", # must match the commodity name in the model
+#'  aux = data.frame(
+#'    acomm = "LITHIUM", # auxiliary commodity for battery production
+#'    unit = "ton" # unit of the auxiliary commodity
+#'  ),
+#'  start = data.frame(
+#'    start = 2020 # the first year of the process is available for installation
+#'  ),
+#'  end = data.frame(
+#'    end = 2030 # last year of the process is available for installation
+#'  ),
+#'  olife = data.frame(
+#'    olife = 20 # operational life of the storage in years
+#'  ),
+#'  seff = data.frame(
+#'    stgeff = 0.999, # storage efficiency
+#'    inpeff = 0.9, # charging efficiency
+#'    outeff = 0.9 # discharging efficiency
+#'  ),
+#'  aeff = data.frame(
+#'    acomm = "LITHIUM", # track lithium use for battery production
+#'    ncap2ainp = convert(4 * 250, "Wh/kg", "GWh/kt") # lithium per energy capacity
+#'  ),
+#'  af = data.frame(
+#'    # af.lo = 0., # lower bound for the capacity factor
+#'    af.up = 1. # upper bound for the capacity factor
+#'  ),
+#'  fixom = data.frame(
+#'    #region = "R1",
+#'    #year = 2020,
+#'    fixom = 0.9 # fixed operation and maintenance cost
+#'  ),
+#'  cap2stg = 4, # four-hours of storage
+#'  invcost = data.frame(
+#'    region = c("R1", NA), # region R1 and all other regions
+#'    invcost = c(1e3, 1.1e3) # investment cost in MUSD/GWh of 4-hour storage
+#'  ),
+#'  fullYear = TRUE, # full year storage cycle
+#'  weather = data.frame(
+#'    weather = "AMBIENT_TEMP", # weather factor for capacity factor
+#'    waf.up = 1 # affects upper boundary of capacity factor
+#'    # waf.lo = 0.9 # affects lower boundary of capacity factor
+#'  )
+#'  # region = c("R1", "R2", "R3"),
+#' )
+#' draw(STG_ELC)
+#'
+draw.storage <- function(obj, ...) {
+
+  keys <- c("region", "year", "slice", "comm", "acomm",
+            # "value",
+            "lab_par", "lab_txt",
+            "tech", "group", "weather", "unit", "io", "parameter")
+  # browser()
+  comm <- data.frame(
+    comm = obj@commodity
+    # unit = obj@unit
+  ) |>
+    cross_join(obj@seff) |>
+    pivot_longer(
+      cols = matches("eff"),
+      names_to = "parameter",
+      values_to = "value"
+    ) |>
+    group_by(comm, parameter) |>
+    summarize(
+      lab_par = make_label(
+        paste0(parameter, ":"),
+        in_brackets = value,
+        two_lines = F,
+        bracket_type = "square"
+      ),
+      .groups = "drop"
+    ) |>
+      mutate(
+        group = NA_character_,
+        # io = "cinp",
+        # lab_txt = make_label(
+        #   comm,
+        #   in_brackets = obj@unit,
+        #   two_lines = F
+        # )
+        lab_txt = comm
+        # ioname = comm
+      )
+  comm
+  com_txt <- comm |>
+    select(comm, lab_txt) |>
+    unique()
+
+  com_inp <- comm |>
+    filter(grepl("inp", parameter)) |>
+    mutate(iotype = "cinp") |>
+    rename(ioname = comm)
+
+  com_out <- comm |>
+    filter(grepl("out", parameter)) |>
+    mutate(iotype = "cout") |>
+    rename(ioname = comm)
+
+  stg_par <- comm |>
+    filter(grepl("stg", parameter)) |>
+    mutate(cap2stg = obj@cap2stg, iotype = "stg") |>
+    rename(ioname = comm)
+
+  # aux
+  aux <- obj@aux |>
+    full_join(obj@aeff, by = "acomm") |>
+    pivot_longer(
+      cols = matches("2"), # non-grouped-comm-params have "2" in their names
+      names_to = "parameter",
+      values_to = "value"
+    ) |>
+    filter(!is.na(value)) |>
+    group_by(parameter, acomm, unit) |>
+    summarize(
+      lab_par = make_label(
+        paste0(unique(parameter), ":"),
+        in_brackets = value,
+        two_lines = F,
+        bracket_type = "square"
+      ),
+      .groups = "drop"
+    ) |>
+    mutate(
+      iotype = if_else(grepl("ainp$", parameter), "ainp", "aout"),
+      ioname = acomm,
+      lab_txt = make_label(
+        acomm,
+        in_brackets = unit,
+        two_lines = F
+      )
+    )
+    aux
+    aux_inputs <- aux |> filter(iotype == "ainp")
+    aux_outputs <- aux |> filter(iotype == "aout")
+
+  wea <- obj@weather |>
+    rowwise() |>
+    mutate(
+      lab_waf = if_else(
+        !is.na(waf.fx),
+        make_label("waf.fx:", in_brackets = waf.fx, two_lines = F),
+        if_else(!is.na(waf.lo) & !is.na(waf.up),
+                paste0("waf.lo: ", waf.lo, "\n", "waf.up: ", waf.up),
+                if_else(!is.na(waf.lo),
+                        paste0("waf.lo: ", waf.lo),
+                        if_else(!is.na(waf.up),
+                                paste0("waf.up: ", waf.up),
+                                NA_character_)
+                        )
+                )
+        )
+      ) |>
+    select(-waf.lo, -waf.up, -waf.fx) |>
+    mutate(
+      lab_wcinp = if_else(
+        !is.na(wcinp.fx),
+        make_label("wcinp.fx:", in_brackets = wcinp.fx, two_lines = F),
+        if_else(!is.na(wcinp.lo) & !is.na(wcinp.up),
+                paste0("wcinp.lo: ", wcinp.lo, "\n", "wcinp.up: ", wcinp.up),
+                if_else(!is.na(wcinp.lo),
+                        paste0("wcinp.lo: ", wcinp.lo),
+                        if_else(!is.na(wcinp.up),
+                                paste0("wcinp.up: ", wcinp.up),
+                                NA_character_)
+                        )
+                )
+        )
+      ) |>
+    select(-wcinp.lo, -wcinp.up, -wcinp.fx) |>
+    rowwise() |>
+    mutate(
+      lab_txt = if_else(
+        is.na(NA),
+        weather,
+        make_label(weather, in_brackets = obj@commodity, two_lines = F)),
+      lab_par = if_else(
+        all(is.na(c(lab_waf, lab_wcinp))),
+        NA_character_,
+        paste(na.omit(c(lab_waf, lab_wcinp)), collapse = "\n")
+        )
+      ) |>
+    select(-lab_waf, -lab_wcinp) |>
+    rename(
+      ioname = weather
+    ) |>
+    mutate(
+      iotype = "winp"
+    )
+    wea
+
+
+  # center labels
+  center_labels <- c(
+    stg_par$lab_par,
+    paste0("cap2stg: ", obj@cap2stg)
+  ) |>
+    paste(collapse = "\n")
+
+  # arrow_label ####
+  arrow_labels <- c(com_txt$lab_txt, aux$lab_txt, wea$lab_txt)
+  names(arrow_labels) <- c(com_txt$comm, aux$acomm, wea$ioname)
+
+  draw_process(
+    process_name = obj@name,
+    process_desc = obj@desc,
+    single_com_inputs = com_inp,
+    single_com_outputs = com_out,
+    aux_inputs = aux_inputs,
+    aux_outputs = aux_outputs,
+    weather_factors = wea,
+    # storage = stg_par,
+    arrow_labels = arrow_labels,
+    center_label = center_labels,
+    # show_inputs = TRUE,
+    # show_outputs = TRUE,
+    # show_aux = TRUE,
+    show_use_bar = FALSE,
+    show_act_bar = FALSE,
+    show_iuao_labels = FALSE
+  )
+
+
+}
+
 
 
 ## draw.supply ####
@@ -1063,7 +1301,7 @@ if (F) {
 #' @param single_com_outputs A data frame with the single commodity outputs' labels
 #' @param arrow_weather_color A character string with the color of the weather arrows
 #' @param arrow_labels A named character vector with the labels of the arrows
-#' @param cap2act_label A character string with the label of the cap2act arrow
+#' @param center_label A character string with the label of the cap2act arrow
 #' @param box_width A numeric value with the width of the process box
 #' @param box_height A numeric value with the height of the process box
 #' @param box_fill A character string with the fill color of the process box
@@ -1095,7 +1333,7 @@ draw_process <- function(
 
     # labels
     arrow_labels = NULL,
-    cap2act_label = NULL,
+    center_label = NULL,
 
     show_inputs = any(!is.null(c(grouped_com_inputs, single_com_inputs,
                                  aux_inputs, weather_factors)),
@@ -1108,7 +1346,7 @@ draw_process <- function(
     show_act_bar = any(!is.null(c(grouped_com_outputs, single_com_outputs)),
                        na.rm = T),
 
-    show_iuao_labels = NULL,
+    show_iuao_labels = FALSE,
     show_all = NULL,
 
     # draw parameters
@@ -1132,13 +1370,21 @@ draw_process <- function(
 result <- tryCatch({
   # browser()
 
+  if (isTRUE(show_all)) {
+    show_inputs <- TRUE
+    show_outputs <- TRUE
+    show_use_bar <- TRUE
+    show_act_bar <- TRUE
+    show_iuao_labels <- TRUE
+  }
+
   # try(dev.off())
 
   grid::grid.newpage()
   # Set a viewport
   vp <- grid::viewport(
-    width = unit(1, "npc"),
-    height = unit(1, "npc"),
+    width = grid::unit(1, "npc"),
+    height = grid::unit(1, "npc"),
     just = "center")
   grid::pushViewport(vp)
   on.exit(grid::popViewport(0))
@@ -1238,15 +1484,17 @@ result <- tryCatch({
     inp_coords <- list()  # Store coordinates where arrows touch the box
 
     if (length(n_inputs) > 0) {
-      # Add 'inp' label
-      grid::grid.text(
-        label = "inp",
-        x = 0.5 - box_width / 2 + 0.02,
-        # y = y_end + 0.02,
-        y = y_inp_use_act,
-        just = "bottom",
-        gp = gpar(fontsize = 8)
-      )
+      if (show_iuao_labels) {
+        # Add 'inp' label
+        grid::grid.text(
+          label = "inp",
+          x = 0.5 - box_width / 2 + 0.02,
+          # y = y_end + 0.02,
+          y = y_inp_use_act,
+          just = "bottom",
+          gp = gpar(fontsize = 8)
+        )
+      }
 
       for (i in seq_len(n_inputs)) {
 
@@ -1260,9 +1508,9 @@ result <- tryCatch({
         grid::grid.lines(
           x = c(0.5 - 0.5 * box_width - arrow_length, x_pos),
           y = c(y_pos, y_pos),
-          arrow = arrow(
+          arrow = grid::arrow(
             type = "closed", angle = 15,
-            length = unit(0.15, "inches"),
+            length = grid::unit(0.15, "inches"),
             ends = "last"
           ),
           gp = gpar(col = inputs$arrow_color[i], lwd = 2)
@@ -1342,7 +1590,7 @@ result <- tryCatch({
           circle_y <- (y1 + y2) / 2
           circle_x <- bracket_x
           grid::grid.circle(
-            x = circle_x, y = circle_y, r = unit(0.07, "inches"),
+            x = circle_x, y = circle_y, r = grid::unit(0.07, "inches"),
             gp = gpar(fill = "white", col = "red3", lwd = 1.0)
           )
           # group number ####
@@ -1405,13 +1653,15 @@ result <- tryCatch({
         )
 
         ## "use" label ####
-        grid::grid.text(
-          label = "use",
-          x = use_x,
-          y = y_inp_use_act,
-          just = "bottom",
-          gp = gpar(fontsize = 8)
-        )
+        if (show_iuao_labels){
+          grid::grid.text(
+            label = "use",
+            x = use_x,
+            y = y_inp_use_act,
+            just = "bottom",
+            gp = gpar(fontsize = 8)
+          )
+        }
       }
 
     } # end of (length(n_inputs) > 0)
@@ -1457,7 +1707,7 @@ result <- tryCatch({
     if (length(n_outputs) > 0) {
       stopifnot(n_outputs == length(unique(out_pars$ioname)))
 
-      if (show_act_bar) {
+      if (show_iuao_labels) {
         # Add 'out' label
         grid::grid.text(
           label = "out",
@@ -1492,9 +1742,9 @@ result <- tryCatch({
         grid::grid.lines(
           x = c(x_pos, 0.5 + 0.5 * box_width + arrow_length),
           y = c(y_pos, y_pos),
-          arrow = arrow(
+          arrow = grid::arrow(
             type = "closed", angle = 15,
-            length = unit(0.15, "inches"),
+            length = grid::unit(0.15, "inches"),
             ends = "last"
           ),
           gp = gpar(col = out_pars$arrow_color[i], lwd = 2)
@@ -1566,7 +1816,7 @@ result <- tryCatch({
           circle_y <- (y1 + y2) / 2
           circle_x <- bracket_x
           grid::grid.circle(
-            x = circle_x, y = circle_y, r = unit(0.07, "inches"),
+            x = circle_x, y = circle_y, r = grid::unit(0.07, "inches"),
             gp = gpar(fill = "white", col = "red3", lwd = 1.0)
           )
           # group number ####
@@ -1632,9 +1882,9 @@ result <- tryCatch({
   } # end of show_outputs
 
   # cap2act ####
-  if (!is.null(cap2act_label)) {
+  if (!is.null(center_label)) {
     grid::grid.text(
-      label = cap2act_label,
+      label = center_label,
       x = 0.5,
       y = 0.5 - box_height / 2 + 0.05,
       just = "center",

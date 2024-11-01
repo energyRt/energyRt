@@ -37,7 +37,7 @@ setClass("storage",
   representation(
     name = "character",
     desc = "character",
-    commodity = "character",
+    commodity = "character", # !!! ToDo: add units
     aux = "data.frame", #
     region = "character",
     start = "data.frame",
