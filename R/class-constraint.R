@@ -26,7 +26,7 @@ get_interpolation_rule <- function(x) {
 #'
 #'
 #' @include class-subsidy.R
-#' @family class, constraint
+#' @family class, constraint, policy
 #' @rdname class-constraint
 #' @order 1
 #' @export
@@ -64,7 +64,12 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 
 ## summand-class #####
 #' An S4 class to represent a summand in a constraint.
-#'
+#' 
+#' Class `summand` stores information about linear 
+#' terms (a multiplier and a variable) 
+#' in the `lhs` of the constraint class. 
+#' It is auto-created by `newConstraint` function
+#' and is not intended to be used directly by the user.
 #'
 #' @md
 #' @slot desc `r get_slot_info("summand", "desc")`
@@ -75,11 +80,6 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 #' @slot misc `r get_slot_info("summand", "misc")`
 #'
 #' @family class, constraint
-#' @describeIn class-constraint Summand is a linear term in the `lhs` of a constraint equation.
-#' It consists of a variable, a multiplier.
-#' Class `summand` is used to store information about linear terms in the constraint class.
-#' It is not intended to be used directly by the user.
-
 #' @order 2
 #'
 #' @export
@@ -150,7 +150,7 @@ setClass("summand",
 #' @param replace_zerros numeric value to replace zero values in `rhs` and `defVal`. Default is `1e-20`.
 #'
 #' @return Object of class `constraint`.
-#' @family class, constraint
+#' @family class, constraint, policy
 #' @rdname newConstraint
 #'
 #' @export
@@ -276,8 +276,6 @@ newConstraint <- function(
   obj
 }
 
-
-
 #' A function to check if an object is of class `constraint`.
 #'
 #' @param object any R object
@@ -295,9 +293,9 @@ isConstraint <- function(object) {
   inherits(object, "constraint")
 }
 
-#' @describeIn newConstraint
-#' @family constraint
-#' @export
+# @describeIn newConstraint
+# @family constraint
+# @export
 addSummand <- function(
     eqt,
     variable = NULL,

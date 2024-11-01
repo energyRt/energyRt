@@ -1,10 +1,17 @@
 #' An S4 class to represent model input
-#'
-#' @slot set list.
-#' @slot parameters list.
-#' @slot gams.equation list.
-#' @slot costs.equation character
-#' @slot misc list.
+#' @name modInp-class
+#' 
+#' @description
+#' `modInp` class is used to store interpolated date for the model input parameters.
+#' It includes all the model sets, mappings, and parameters, interpolated to the 
+#' scenario's calendar and horizon. The class is automatically created during the
+#' interpolation step and is not intended to be created by users.
+#' 
+#' @slot set `r get_slot_info("modInp", "set")`
+#' @slot parameters `r get_slot_info("modInp", "parameters")`
+#' @slot gams.equation `r get_slot_info("modInp", "gams.equation")`
+#' @slot costs.equation `r get_slot_info("modInp", "costs.equation")`
+#' @slot misc `r get_slot_info("modInp", "misc")`
 #'
 #' @include class-parameter.R
 #'

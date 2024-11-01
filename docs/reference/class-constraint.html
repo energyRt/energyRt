@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@
 
 
 <dt><code>rhs</code></dt>
-<dd><p>data.frame. Named list or data frame with numeric values for each constraint. The dimensions of the data frame should match the dimensions of the sets  in the <code>for.each</code> slot.</p></dd>
+<dd><p>data.frame. Named list or data frame with numeric values for each constraint. The dimensions of the data frame should match the dimensions of the sets in the <code>for.each</code> slot.</p></dd>
 
 
 <dt><code>defVal</code></dt>
@@ -90,11 +90,11 @@
 
 
 <dt><code>interpolation</code></dt>
-<dd><p>character. Interpolation rule for the constraint. Recognized values, any combination  of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation.  The default value is "inter", meaning that the interpolation is done  for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the <code>rhs</code> values, respectively.</p></dd>
+<dd><p>character. Interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation. The default value is "inter", meaning that the interpolation is done for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the <code>rhs</code> values, respectively.</p></dd>
 
 
 <dt><code>lhs</code></dt>
-<dd><p>list. List of summands for the left-hand-side of the equation.  This slot is created automatically from all named of unnamed lists passed  to the <code>newConstraint</code> function, except for the named arguments.</p></dd>
+<dd><p>list. List of summands for the left-hand-side of the equation. This slot is created automatically from all named of unnamed lists passed to the <code>newConstraint</code> function, except for the named arguments.</p></dd>
 
 
 <dt><code>misc</code></dt>
@@ -104,9 +104,14 @@
 </dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other class, constraint:
+    <div class="dont-index"><p>Other class, constraint, policy:
+<code><a href="class-costs.html">costs-class</a></code>,
 <code><a href="newConstraint.html">newConstraint</a>()</code>,
-<code><a href="summand-class.html">summand-class</a></code></p></div>
+<code><a href="newCosts.html">newCosts</a>()</code>,
+<code><a href="newSubsidy.html">newSubsidy</a>()</code>,
+<code><a href="newTax.html">newTax</a>()</code>,
+<code><a href="class-subsidy.html">subsidy-class</a></code>,
+<code><a href="class-tax.html">tax-class</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

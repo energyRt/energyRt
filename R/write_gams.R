@@ -7,8 +7,8 @@
 #' @param path character, path to installed GAMS distribution to use to solve models and/or with GDX library to use in reading and writing gdx-files.
 #' @return
 #' Sets path to GAMS library in R-options
-#' @rdname gams
-#' @family GAMS
+#' @rdname solver
+#' @family GAMS, GDX, solver
 #' @export
 #' @examples
 #' # set_gams_path("C:/GAMS/win64/32.2/")
@@ -27,8 +27,8 @@ set_gams_path <- function(path = NULL) {
   # options(gams_path = path)
 }
 
-#' @rdname gams
-#' @family GAMS
+#' @rdname solver
+#' @family GAMS, GDX, solver
 #' @return
 #' The current path to GAMS library, set in R-options
 #' @export
@@ -43,8 +43,8 @@ get_gams_path <- function() {
 #'  Sets path to GDX library in R-options
 #' @export
 #'
-#' @rdname gams
-#' @family GAMS
+#' @rdname solver
+#' @family GAMS, GDX, solver
 #'
 #' @examples
 #' # set_gdxlib("C:/GAMS/35")
@@ -60,8 +60,8 @@ set_gdxlib_path <- function(path = NULL) {
   options(gdxlib_path = path, env = "energyRt")
 }
 
-#' @rdname gams
-#' @family GAMS
+#' @rdname solver
+#' @family GAMS, GDX, solver
 #' @return
 #' The current path to GDX library, set in R-options
 #' @export

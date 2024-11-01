@@ -74,7 +74,7 @@ newTrade(
 
 \item{capacity}{data.frame. (not implemented!) Capacity parameters of the trade object.}
 
-\item{capacityVariable}{logical. If TRUE, the capacity variable of the trade object is optimized.  If FALSE, the capacity is defined by availability parameters (\verb{ava.*}) in the trade-flow units.}
+\item{capacityVariable}{logical. If TRUE, the capacity variable of the trade object is optimized. If FALSE, the capacity is defined by availability parameters (\verb{ava.*}) in the trade-flow units.}
 
 \item{aux}{data.frame. Auxiliary commodity of trade.
 \describe{

@@ -14,9 +14,9 @@ An S4 class to store the model objects.
 
 \item{\code{desc}}{character. Description of the repository.}
 
-\item{\code{data}}{list. Model objects ("bricks"), e.g., technologies, constraints, costs, etc.,  stored in with their names as keys, or gropped in named lists.}
+\item{\code{data}}{list. Model objects ("bricks"), e.g., technologies, constraints, costs, etc., stored in with their names as keys, or gropped in named lists.}
 
-\item{\code{permit}}{character. Vector with names of classes permitted to store in the repository. There is a default list of permitted classes which can be extended or  modified. Used in internal functions, it is not common to modify this slot.}
+\item{\code{permit}}{character. Vector with names of classes permitted to store in the repository. There is a default list of permitted classes which can be extended or modified. Used in internal functions, it is not common to modify this slot.}
 
 \item{\code{misc}}{list. Any additional data or information to store in the object.}
 }}

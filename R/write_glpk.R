@@ -1,10 +1,13 @@
 
-
 #' @title Set the path to the GLPK library
 #'
 #' @param path character. Path to the GLPK library with `glpsol.*` executable.
 #'
 #' @return sets the path to the GLPK library in R options and returns NULL.
+#' 
+#' @rdname solver
+#' @family solver, glpk
+#' 
 #' @export
 #'
 #' @examples
@@ -27,6 +30,8 @@ set_glpk_path <- function(path = NULL) {
 }
 
 #' @export
+#' @rdname solver
+#' @family solver, glpk
 #' @return returns the path to the GLPK library.
 get_glpk_path <- function() {
   options::opt("glpk_path")

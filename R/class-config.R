@@ -79,8 +79,8 @@ setMethod("initialize", "config", function(.Object, ...) {
     load("R/sysdata.rda")
   }
   # if (!is.null()) # add import from .defInt
-  .Object@defVal <- as.data.frame(energyRt:::.defVal, stringsAsFactors = FALSE)
-  .Object@interpolation <- as.data.frame(energyRt:::.defInt, stringsAsFactors = FALSE)
+  .Object@defVal <- as.data.frame(.defVal, stringsAsFactors = FALSE)
+  .Object@interpolation <- as.data.frame(.defInt, stringsAsFactors = FALSE)
   .Object
 })
 

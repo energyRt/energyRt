@@ -35,7 +35,7 @@ newDemand(
 \item{dem}{numeric. Value of the demand.}
 }}
 
-\item{region}{character. Optional name of region to narrow the specification of the demand in the case of used NAs.  Error will be returned if specified regions in \verb{@dem} are not mensioned in the \verb{@region} slot  (if the slot is not empty).}
+\item{region}{character. Optional name of region to narrow the specification of the demand in the case of used NAs. Error will be returned if specified regions in \verb{@dem} are not mensioned in the \verb{@region} slot (if the slot is not empty).}
 
 \item{misc}{list. Optional list of additional information.}
 

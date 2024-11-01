@@ -15,7 +15,7 @@ to add custom constraints to the model."><meta property="og:image" content="http
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +118,7 @@ Note: zero values will be replaced with <code>replace_zerros</code> to avoid dro
 
 
 <dt id="arg-interpolation">interpolation<a class="anchor" aria-label="anchor" href="#arg-interpolation"></a></dt>
-<dd><p>character. Interpolation rule for the constraint. Recognized values, any combination  of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation.  The default value is "inter", meaning that the interpolation is done  for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the <code>rhs</code> values, respectively.</p></dd>
+<dd><p>character. Interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation. The default value is "inter", meaning that the interpolation is done for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the <code>rhs</code> values, respectively.</p></dd>
 
 
 <dt id="arg-replace-zerros">replace_zerros<a class="anchor" aria-label="anchor" href="#arg-replace-zerros"></a></dt>
@@ -160,11 +160,15 @@ for which the summand is defined.</p>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other class, constraint:
+    <div class="dont-index"><p>Other class, constraint, policy:
 <code><a href="class-constraint.html">constraint-class</a></code>,
-<code><a href="summand-class.html">summand-class</a></code></p>
+<code><a href="class-costs.html">costs-class</a></code>,
+<code><a href="newCosts.html">newCosts</a>()</code>,
+<code><a href="newSubsidy.html">newSubsidy</a>()</code>,
+<code><a href="newTax.html">newTax</a>()</code>,
+<code><a href="class-subsidy.html">subsidy-class</a></code>,
+<code><a href="class-tax.html">tax-class</a></code></p>
 <p>Other class, constraint:
-<code><a href="class-constraint.html">constraint-class</a></code>,
 <code><a href="summand-class.html">summand-class</a></code></p></div>
     </div>
 

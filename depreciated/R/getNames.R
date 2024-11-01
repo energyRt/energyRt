@@ -35,7 +35,7 @@
                            function(xx) unique(sapply(xx@data, class))),
                     recursive = TRUE))
     for (cl in cls) {
-      ll <- energyRt:::.getNames(obj, cl,
+      ll <- .getNames(obj, cl,
         regex = regex, ignore.case = ignore.case, fixed = fixed,
         useBytes = useBytes, invert = invert, ...
       )

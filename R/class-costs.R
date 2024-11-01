@@ -1,15 +1,20 @@
 ## costs-class ####
 
-#' Class 'costs'
+#' @title Costs class
+#' @name costs-class
+#' @inherit newCosts description
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot variable character.
-#' @slot subset data.frame.
-#' @slot mult data.frame.
-#' @slot misc list.
+#' @md
+#' @slot name `r get_slot_info("costs", "name")`
+#' @slot desc `r get_slot_info("costs", "desc")`
+#' @slot variable `r get_slot_info("costs", "variable")`
+#' @slot subset `r get_slot_info("costs", "subset")`
+#' @slot mult `r get_slot_info("costs", "mult")`
+#' @slot misc `r get_slot_info("costs", "misc")`
 #'
 #' @include class-constraint.R
+#' @family class, constraint, policy
+#' @rdname class-costs
 #' @export
 setClass("costs",
   representation(
@@ -37,14 +42,33 @@ setMethod("initialize", "costs", function(.Object, ...) {
 })
 
 ## constructor function ####
-
+#' @title Create new costs object
+#' 
+#' @description Costs object is used to define 
+#' additional costs to add to the model's 
+#' objective function.
+#' 
+#' @md
+#' @param name `get_slot_info("costs", "name")`
+#'
+#' @param variable `get_slot_info("costs", "variable")`
+#' @param desc `get_slot_info("costs", "desc")`
+#' @param mult `get_slot_info("costs", "mult")`
+#' @param subset `get_slot_info("costs", "subset")`
+#' 
+#' @return costs object with given specifications.
+#' @family class, constraint, policy
+#' @rdname newCosts
+#' 
 #' @export
+#' 
 newCosts <- function(
     name, 
     variable, 
     desc = "", 
     mult = NULL, 
-    subset = NULL
+    subset = NULL,
+    misc = NULL
     ) {
   obj <- new("costs")
   obj@name <- name
@@ -135,7 +159,7 @@ newCosts <- function(
   if (nrow(obj@mult) == 0 && obj@defVal == 0) {
     warning(paste0('The cost constraint of the "', name, '" is strictly equal to zero.'))
   }
-
+  obj@misc <- misc
   obj
 }
 

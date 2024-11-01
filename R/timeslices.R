@@ -1,4 +1,7 @@
 #' Common formats of time-slices.
+#' @name tsl_formats
+#' @rdname timeslices
+#' 
 #'
 #' @format A character vector with formats:
 #' \describe{
@@ -22,9 +25,11 @@
 
 #' Sets of the common formats with structure
 #'
-#' @rdname tsl_formats
+#' @name tsl_sets
+#' @rdname timeslices
 #'
-#'"tsl_sets"
+"tsl_sets"
+
 # tsl_sets <- list(
 #   d365 = list(
 #     YDAY = paste0("d", formatC(1:365, width = 3, flag = "0"))),
@@ -43,11 +48,14 @@
 # save(tsl, file = "data/tsl_sets.RData")
 
 
-#' Convert date-time objects to time-slice
+#' @title Convert date-time objects to time-slice
+#' @name dtm2tsl
 #'
 #' @param dtm vector of timepoints in Date format
 #' @param format character, format of the slices
 #' @param d366.as.na logical, if
+#' 
+#' @rdname timeslices
 #'
 #' @return
 #' Character vector with time-slices names
@@ -88,14 +96,23 @@ if (F) {
 
 }
 
-#' Convert time-slices to date-time, extract year, month, day of the year, or hour
+#' Mapping function between time-slices and date-time
+#' 
+#' This set of functions converts date-time objects to model's
+#' time-slices in a given format, and vice versa, maps
+#' time-slices to date-time, and extracts year, month, 
+#' day of the year, hour.
+#' 
+#' @name tsl2dtm
 #'
 #' @param tsl character vector with time-slices
 #' @param format character, format of the slices
 #' @param tmz time-zone
 #' @param year year, used when time-slices don't store year
 #' @param mday day of month, for time slices without the information
-#'
+#' 
+#' @rdname timeslices
+#' 
 #' @return
 #' Vector in Date-Time format
 #' @export
@@ -147,6 +164,8 @@ tsl2dtm <- function(tsl, format = tsl_guess_format(tsl), tmz = "UTC",
 }
 
 
+# @name tsl2year
+# @rdname timeslices
 #' @describeIn tsl2dtm Extract year from time-slices
 #'
 #' @param return.null logical, valid for the cased then all values are NA, then NULL will be returned if return.null = TRUE,
@@ -171,6 +190,8 @@ tsl2year <- function(tsl, return.null = T) {
   return(y)
 }
 
+# @name tsl2yday
+#' Mapping function between time-slices and day of the year
 #' @describeIn tsl2dtm Extract the day of the year from time-slices
 #'
 #' @param return.null logical, valid for the cased then all values are NA, then NULL will be returned if return.null = TRUE,
@@ -192,6 +213,7 @@ tsl2yday <- function(tsl, return.null = T) {
   return(d)
 }
 
+#' Mapping function between time-slices and hour
 #' @describeIn tsl2dtm Extract hour from time-slices
 #'
 #' @param return.null logical, valid for the cased then all values are NA, then NULL will be returned if return.null = TRUE,
@@ -213,6 +235,7 @@ tsl2hour <- function(tsl, return.null = T) {
   return(h)
 }
 
+#' Mapping function between time-slices and month
 #' @describeIn tsl2dtm Extract month from time-slices
 #'
 #' @param return.null logical, valid for the cased then all values are NA, then NULL will be returned if return.null = TRUE,
@@ -251,6 +274,7 @@ tsl2month <- function(tsl, format = tsl_guess_format(tsl), return.null = T) {
 }
 
 #' Guess format of time-slices
+#' @name tsl_guess_format
 #'
 #' @param tsl
 #'

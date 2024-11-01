@@ -56,7 +56,7 @@ newStorage(
 \item{end}{integer. The last year when the storage is available for investment.}
 }}
 
-\item{olife}{data.frame. Operational life of the storage technology, applicable to the new investment only,  the operational life (retirement) of preexiting capacity is described in the \code{stock} slot.
+\item{olife}{data.frame. Operational life of the storage technology, applicable to the new investment only, the operational life (retirement) of preexiting capacity is described in the \code{stock} slot.
 
 \describe{
 \item{region}{character. Region name to apply the parameter, NA for every region.}
@@ -114,7 +114,7 @@ newStorage(
 }
 \item{cout.lo}{numeric. Lower bound of the output commodity availability factor.}
 \item{cout.up}{numeric. Upper bound of the output commodity availability factor.}
-\item{cout.fx}{numeric. Fixed value of the output commodity availability factor.  This parameter overrides \code{cout.lo} and \code{cout.up}.
+\item{cout.fx}{numeric. Fixed value of the output commodity availability factor. This parameter overrides \code{cout.lo} and \code{cout.up}.
 }
 }}
 

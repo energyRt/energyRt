@@ -21,20 +21,25 @@ Class \code{constraint} is used to define custom constraints in the optimization
 
 \item{\code{for.each}}{list. List with sets for combination of which the constraint is created.}
 
-\item{\code{rhs}}{data.frame. Named list or data frame with numeric values for each constraint. The dimensions of the data frame should match the dimensions of the sets  in the \code{for.each} slot.}
+\item{\code{rhs}}{data.frame. Named list or data frame with numeric values for each constraint. The dimensions of the data frame should match the dimensions of the sets in the \code{for.each} slot.}
 
 \item{\code{defVal}}{numeric. The default value for the rhs. It is recommended to set the default value for the rhs of every constraint to avoid unexpected behavior. If not specified, the default value is 0, and the warning is issued.}
 
-\item{\code{interpolation}}{character. Interpolation rule for the constraint. Recognized values, any combination  of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation.  The default value is "inter", meaning that the interpolation is done  for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the \code{rhs} values, respectively.}
+\item{\code{interpolation}}{character. Interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation. The default value is "inter", meaning that the interpolation is done for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the \code{rhs} values, respectively.}
 
-\item{\code{lhs}}{list. List of summands for the left-hand-side of the equation.  This slot is created automatically from all named of unnamed lists passed  to the \code{newConstraint} function, except for the named arguments.}
+\item{\code{lhs}}{list. List of summands for the left-hand-side of the equation. This slot is created automatically from all named of unnamed lists passed to the \code{newConstraint} function, except for the named arguments.}
 
 \item{\code{misc}}{list. Any additional information or parameters to store in the constraint object.}
 }}
 
 \seealso{
-Other class, constraint: 
+Other class, constraint, policy: 
+\code{\link{costs-class}},
 \code{\link{newConstraint}()},
-\code{\link{summand-class}}
+\code{\link{newCosts}()},
+\code{\link{newSubsidy}()},
+\code{\link{newTax}()},
+\code{\link{subsidy-class}},
+\code{\link{tax-class}}
 }
-\concept{class, constraint}
+\concept{class, constraint, policy}

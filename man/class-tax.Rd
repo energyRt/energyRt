@@ -5,7 +5,8 @@
 \alias{tax-class}
 \title{An S4 class to represent a commodity tax}
 \description{
-An S4 class to represent a commodity tax
+Taxes are used to represent the financial levy imposed on production,
+consumption, or balance of a commodity.
 }
 \section{Slots}{
 
@@ -33,3 +34,14 @@ An S4 class to represent a commodity tax
 \item{\code{misc}}{list. Additional information.}
 }}
 
+\seealso{
+Other class, constraint, policy: 
+\code{\link{constraint-class}},
+\code{\link{costs-class}},
+\code{\link{newConstraint}()},
+\code{\link{newCosts}()},
+\code{\link{newSubsidy}()},
+\code{\link{newTax}()},
+\code{\link{subsidy-class}}
+}
+\concept{class, constraint, policy}

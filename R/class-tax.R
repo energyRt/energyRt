@@ -1,6 +1,7 @@
 #' An S4 class to represent a commodity tax
 #'
-#' @inherit newSub, description
+#' @name tax-class
+#' @inherit newTax description
 #'
 #' @slot name `r get_slot_info("tax", "name")`
 #' @slot desc `r get_slot_info("tax", "desc")`
@@ -11,6 +12,7 @@
 #' @slot misc `r get_slot_info("tax", "misc")`
 #'
 #' @include class-weather.R
+#' @family class, constraint, policy
 #' @rdname class-tax
 #' @export
 setClass("tax",
@@ -48,6 +50,7 @@ setClass("tax",
 
 # setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
 #' @title Create a new tax object
+#' @name newTax
 #'
 #' @description
 #' Taxes are used to represent the financial levy imposed on production,
@@ -62,6 +65,7 @@ setClass("tax",
 #' @param misc `r get_slot_info("tax", "misc")`
 #'
 #' @return An object of class `tax`
+#' @family class, constraint, policy
 #' @rdname newTax
 #' @export
 #'

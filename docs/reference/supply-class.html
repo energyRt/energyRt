@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,16 +83,16 @@
 
 <dt><code>weather</code></dt>
 <dd><p>data.frame. Weather factors to apply to the supply.</p><dl><dt>weather</dt>
-<dd><p>character. Name of the weather factor to apply. Must match the weather factor  names in a <code>weather</code> class in the model.</p></dd>
+<dd><p>character. Name of the weather factor to apply. Must match the weather factor names in a <code>weather</code> class in the model.</p></dd>
 
 <dt>wava.lo</dt>
-<dd><p>numeric. Coefficient that links the weather factor with the lower bound of  the availability factor <code>ava.lo</code>.</p></dd>
+<dd><p>numeric. Coefficient that links the weather factor with the lower bound of the availability factor <code>ava.lo</code>.</p></dd>
 
 <dt>wava.up</dt>
-<dd><p>numeric. Coefficient that links the weather factor with the upper bound of  the availability factor <code>ava.up</code>.</p></dd>
+<dd><p>numeric. Coefficient that links the weather factor with the upper bound of the availability factor <code>ava.up</code>.</p></dd>
 
 <dt>wava.fx</dt>
-<dd><p>numeric. Coefficient that links the weather factor with the fixed value of  the availability factor <code>ava.fx</code>. This parameter overrides  <code>wava.lo</code> and <code>wava.up</code>.</p></dd>
+<dd><p>numeric. Coefficient that links the weather factor with the fixed value of the availability factor <code>ava.fx</code>. This parameter overrides <code>wava.lo</code> and <code>wava.up</code>.</p></dd>
 
 
 </dl></dd>
@@ -101,7 +101,7 @@
 <dt><code>reserve</code></dt>
 <dd><p>data.frame. Total available resource. Applicable to exhaustible resources. Set for each region. If not set, the resource is considered infinite.</p>
 <dl><dt>region</dt>
-<dd><p>character. Region name to apply the parameter.  Use NA to apply to all regions.</p></dd>
+<dd><p>character. Region name to apply the parameter. Use NA to apply to all regions.</p></dd>
 
 <dt>res.lo</dt>
 <dd><p>numeric. Lower bound of the total available resource.</p></dd>
@@ -110,7 +110,7 @@
 <dd><p>numeric. Upper bound of the total available resource.</p></dd>
 
 <dt>res.fx</dt>
-<dd><p>numeric. Fixed value of the total available resource.  This parameter overrides <code>res.lo</code> and <code>res.up</code>.</p></dd>
+<dd><p>numeric. Fixed value of the total available resource. This parameter overrides <code>res.lo</code> and <code>res.up</code>.</p></dd>
 
 
 </dl></dd>
@@ -133,10 +133,10 @@
 <dd><p>numeric. Upper bound of the availability factor.</p></dd>
 
 <dt>ava.fx</dt>
-<dd><p>numeric. Fixed value of the availability factor.  This parameter overrides <code>ava.lo</code> and <code>ava.up</code>.</p></dd>
+<dd><p>numeric. Fixed value of the availability factor. This parameter overrides <code>ava.lo</code> and <code>ava.up</code>.</p></dd>
 
 <dt>cost</dt>
-<dd><p>numeric. Cost of the resource extraction,  if not set, the resource is considered free.</p></dd>
+<dd><p>numeric. Cost of the resource extraction, if not set, the resource is considered free.</p></dd>
 
 
 </dl></dd>

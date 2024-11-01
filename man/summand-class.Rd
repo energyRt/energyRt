@@ -5,7 +5,11 @@
 \alias{summand-class}
 \title{An S4 class to represent a summand in a constraint.}
 \description{
-An S4 class to represent a summand in a constraint.
+Class \code{summand} stores information about linear
+terms (a multiplier and a variable)
+in the \code{lhs} of the constraint class.
+It is auto-created by \code{newConstraint} function
+and is not intended to be used directly by the user.
 }
 \section{Slots}{
 
@@ -25,7 +29,6 @@ An S4 class to represent a summand in a constraint.
 
 \seealso{
 Other class, constraint: 
-\code{\link{constraint-class}},
 \code{\link{newConstraint}()}
 }
 \concept{class, constraint}

@@ -2,7 +2,7 @@
 #'
 #' @name subsidy-class
 #'
-#' @inherit newSub, description
+#' @inherit newSubsidy description
 #'
 #' @md
 #' @slot name `r get_slot_info("sub", "name")`
@@ -14,6 +14,7 @@
 #' @slot misc `r get_slot_info("sub", "misc")`
 #'
 #' @export
+#' @family class, constraint, policy
 #'
 #' @include class-tax.R
 #' @rdname class-subsidy
@@ -56,6 +57,7 @@ setClass("sub",
 # setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
 
 #' @title Create a new subsidy object
+#' @name newSubsidy
 #'
 #' @description
 #' Subsidies are used to represent the financial support provided to
@@ -70,6 +72,7 @@ setClass("sub",
 #' @param misc `r get_slot_info("sub", "misc")`
 #'
 #' @return An object of class `sub`
+#' @family class, constraint, policy
 #' @export
 #' @aliases newSubsidy
 #' @rdname newSubsidy

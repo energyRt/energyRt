@@ -123,6 +123,7 @@ reference:
   - matches("tsl2dtm")
   - matches("dtm2tsl")
   - matches("tsl_formats")
+  - matches("^tsl")
   - matches("tsl_guess_format")
   - matches("drop_na_cols")
 

@@ -26,7 +26,7 @@ An S4 class to declare a demand in the model
 \item{dem}{numeric. Value of the demand.}
 }}
 
-\item{\code{region}}{character. Optional name of region to narrow the specification of the demand in the case of used NAs.  Error will be returned if specified regions in \verb{@dem} are not mensioned in the \verb{@region} slot  (if the slot is not empty).}
+\item{\code{region}}{character. Optional name of region to narrow the specification of the demand in the case of used NAs. Error will be returned if specified regions in \verb{@dem} are not mensioned in the \verb{@region} slot (if the slot is not empty).}
 
 \item{\code{misc}}{list. Optional list of additional information.}
 }}

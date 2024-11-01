@@ -1,20 +1,16 @@
 #' An S4 class to represent scenario, an interpolated and/or solved model.
 #'
-#' @slot name character. Name of the scenario.
-#' @slot desc character. Description of the scenario.
-#' @slot model model. Model object.
-# @slot subset
-#' @slot settings settings.
 #'
-#' @slot modInp modInp object.
-#' @slot modOut modOut.
-#' @slot status list.
-#' @slot misc list.
-#' @slot name
-#' @slot desc
-#' @slot model
-#' @slot inMemory
-#' @slot path
+#' @slot name 
+#' @slot desc 
+#' @slot model 
+#' @slot settings 
+#' @slot modInp 
+#' @slot modOut 
+#' @slot status 
+#' @slot inMemory 
+#' @slot path 
+#' @slot misc 
 #'
 #' @include class-modOut.R class-settings.R
 #'

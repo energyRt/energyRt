@@ -83,7 +83,7 @@ Create separate trade objects to optimize different parts of the trade network
 
 \item{\code{capacity}}{data.frame. (not implemented!) Capacity parameters of the trade object.}
 
-\item{\code{capacityVariable}}{logical. If TRUE, the capacity variable of the trade object is optimized.  If FALSE, the capacity is defined by availability parameters (\verb{ava.*}) in the trade-flow units.}
+\item{\code{capacityVariable}}{logical. If TRUE, the capacity variable of the trade object is optimized. If FALSE, the capacity is defined by availability parameters (\verb{ava.*}) in the trade-flow units.}
 
 \item{\code{cap2act}}{numeric. Capacity to activity ratio.}
 

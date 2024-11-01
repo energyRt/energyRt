@@ -20,7 +20,7 @@ newCommodity(
 
 \item{desc}{character. Optional description of the commodity for reference.}
 
-\item{limtype}{factor or character. The limit type of the commodity in balance equation, "LO", "UP", or "FX". "LO" by default, meaning that the level of commodity in the model is restricted  with the lower bound, excess is allowed. "UP" means that the level of commodity cannot exceed the upper bound. "FX" means that total commudity supply and demand are equal, no excess or deficit is allowed.}
+\item{limtype}{factor or character. The limit type of the commodity in balance equation, "LO", "UP", or "FX". "LO" by default, meaning that the level of commodity in the model is restricted with the lower bound, excess is allowed. "UP" means that the level of commodity cannot exceed the upper bound. "FX" means that total commudity supply and demand are equal, no excess or deficit is allowed.}
 
 \item{timeframe}{character. The default time-frame this commodity operates in the model. The lowest timeframe in the model is used by default.}
 
@@ -35,7 +35,7 @@ newCommodity(
 }
 }}
 
-\item{emis}{data.frame. Emissions factors related to the commodity consumption  (if "combustion" parameter of a technology which consumes the commodity is > 0).
+\item{emis}{data.frame. Emissions factors related to the commodity consumption (if "combustion" parameter of a technology which consumes the commodity is > 0).
 
 \describe{
 \item{comm}{character. Name of the emitted commodity.}

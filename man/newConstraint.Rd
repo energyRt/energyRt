@@ -45,7 +45,7 @@ Note: zero values will be replaced with \code{replace_zerros} to avoid dropping 
 
 \item{defVal}{numeric. The default value for the rhs. It is recommended to set the default value for the rhs of every constraint to avoid unexpected behavior. If not specified, the default value is 0, and the warning is issued.}
 
-\item{interpolation}{character. Interpolation rule for the constraint. Recognized values, any combination  of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation.  The default value is "inter", meaning that the interpolation is done  for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the \code{rhs} values, respectively.}
+\item{interpolation}{character. Interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation. The default value is "inter", meaning that the interpolation is done for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the \code{rhs} values, respectively.}
 
 \item{replace_zerros}{numeric value to replace zero values in \code{rhs} and \code{defVal}. Default is \code{1e-20}.}
 
@@ -88,12 +88,17 @@ isConstraint(1)
 isConstraint(newConstraint(""))
 }
 \seealso{
-Other class, constraint: 
+Other class, constraint, policy: 
 \code{\link{constraint-class}},
-\code{\link{summand-class}}
+\code{\link{costs-class}},
+\code{\link{newCosts}()},
+\code{\link{newSubsidy}()},
+\code{\link{newTax}()},
+\code{\link{subsidy-class}},
+\code{\link{tax-class}}
 
 Other class, constraint: 
-\code{\link{constraint-class}},
 \code{\link{summand-class}}
 }
 \concept{class, constraint}
+\concept{class, constraint, policy}

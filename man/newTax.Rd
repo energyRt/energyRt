@@ -64,3 +64,14 @@ CO2TAX <- newTax(
   )
  )
 }
+\seealso{
+Other class, constraint, policy: 
+\code{\link{constraint-class}},
+\code{\link{costs-class}},
+\code{\link{newConstraint}()},
+\code{\link{newCosts}()},
+\code{\link{newSubsidy}()},
+\code{\link{subsidy-class}},
+\code{\link{tax-class}}
+}
+\concept{class, constraint, policy}

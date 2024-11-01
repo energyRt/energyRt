@@ -28,24 +28,24 @@ newSupply(
 
 \item{weather}{data.frame. Weather factors to apply to the supply.
 \describe{
-\item{weather}{character. Name of the weather factor to apply. Must match the weather factor  names in a \code{weather} class in the model.
+\item{weather}{character. Name of the weather factor to apply. Must match the weather factor names in a \code{weather} class in the model.
 }
-\item{wava.lo}{numeric. Coefficient that links the weather factor with the lower bound of  the availability factor \code{ava.lo}.
+\item{wava.lo}{numeric. Coefficient that links the weather factor with the lower bound of the availability factor \code{ava.lo}.
 }
-\item{wava.up}{numeric. Coefficient that links the weather factor with the upper bound of  the availability factor \code{ava.up}.
+\item{wava.up}{numeric. Coefficient that links the weather factor with the upper bound of the availability factor \code{ava.up}.
 }
-\item{wava.fx}{numeric. Coefficient that links the weather factor with the fixed value of  the availability factor \code{ava.fx}. This parameter overrides  \code{wava.lo} and \code{wava.up}.
+\item{wava.fx}{numeric. Coefficient that links the weather factor with the fixed value of the availability factor \code{ava.fx}. This parameter overrides \code{wava.lo} and \code{wava.up}.
 }
 }}
 
 \item{reserve}{data.frame. Total available resource. Applicable to exhaustible resources. Set for each region. If not set, the resource is considered infinite.
 
 \describe{
-\item{region}{character. Region name to apply the parameter.  Use NA to apply to all regions.
+\item{region}{character. Region name to apply the parameter. Use NA to apply to all regions.
 }
 \item{res.lo}{numeric. Lower bound of the total available resource.}
 \item{res.up}{numeric. Upper bound of the total available resource.}
-\item{res.fx}{numeric. Fixed value of the total available resource.  This parameter overrides \code{res.lo} and \code{res.up}.
+\item{res.fx}{numeric. Fixed value of the total available resource. This parameter overrides \code{res.lo} and \code{res.up}.
 }
 }}
 
@@ -59,9 +59,9 @@ newSupply(
 }
 \item{ava.lo}{numeric. Lower bound of the availability factor.}
 \item{ava.up}{numeric. Upper bound of the availability factor.}
-\item{ava.fx}{numeric. Fixed value of the availability factor.  This parameter overrides \code{ava.lo} and \code{ava.up}.
+\item{ava.fx}{numeric. Fixed value of the availability factor. This parameter overrides \code{ava.lo} and \code{ava.up}.
 }
-\item{cost}{numeric. Cost of the resource extraction,  if not set, the resource is considered free.
+\item{cost}{numeric. Cost of the resource extraction, if not set, the resource is considered free.
 }
 }}
 

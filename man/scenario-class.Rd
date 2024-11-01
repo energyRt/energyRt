@@ -10,22 +10,24 @@ An S4 class to represent scenario, an interpolated and/or solved model.
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character. Name of the scenario.}
+\item{\code{name}}{}
 
-\item{\code{desc}}{character. Description of the scenario.}
+\item{\code{desc}}{}
 
-\item{\code{model}}{model. Model object.}
+\item{\code{model}}{}
 
-\item{\code{settings}}{settings.}
+\item{\code{settings}}{}
 
-\item{\code{modInp}}{modInp object.}
+\item{\code{modInp}}{}
 
-\item{\code{modOut}}{modOut.}
+\item{\code{modOut}}{}
 
-\item{\code{status}}{list.}
+\item{\code{status}}{}
 
-\item{\code{misc}}{list.}
+\item{\code{inMemory}}{}
 
 \item{\code{path}}{}
+
+\item{\code{misc}}{}
 }}
 

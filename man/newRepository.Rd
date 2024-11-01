@@ -14,7 +14,7 @@ newRepository(
 \arguments{
 \item{name}{character. Name of the repository.}
 
-\item{...}{list. Model objects ("bricks"), e.g., technologies, constraints, costs, etc.,  stored in with their names as keys, or gropped in named lists.}
+\item{...}{list. Model objects ("bricks"), e.g., technologies, constraints, costs, etc., stored in with their names as keys, or gropped in named lists.}
 
 \item{desc}{character. Description of the repository.}
 

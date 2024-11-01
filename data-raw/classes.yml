@@ -1328,7 +1328,7 @@ class:
       description: Name of the cost object, used in sets.
     desc:
       type: character
-      description: Description of the cost object.
+      description: Description of the cost object for own references.
     variable:
       type: character
       description: Name of the variable included in the costs-constraint.
@@ -1514,6 +1514,11 @@ class:
         Auto-calculated from the `timetable` and `timeframes` slots
         named character vector with ranks of the timeframes. The rank is used to
         determine the order of the timeframes in the calendar.
+    slices_in_frame:
+      type: integer
+      description: >
+        Auto-calculated from the `timetable`
+        Number of time-slices in every timeframe.
     slice_family:
       type: data.frame
       description: >
@@ -1521,6 +1526,14 @@ class:
         data.frame mapping "parent" to "child" slices in two nearest timeframes in the
         nested hierarchy. The first column is the name of the parent time-slice, the
         second column is the name of the child time-slice.
+    slice_ancestry:
+      type: data.frame
+      description: >
+        Auto-calculated from the `timetable`
+        data.frame mapping "child", "grandchild", etc. slices to the "parent" and 
+        "grandparent" time-slices in the full hierarchy. The first column is the name
+        of the (grand-) child time-slice, the second column is the name of the (grand-)
+        parent time-slice.
     next_in_timeframe:
       type: data.frame
       description: >
@@ -1572,6 +1585,36 @@ class:
   parameter:
 ## modInp #######################################################################
   modInp:
+    set:
+      type: list
+      description: named list of character vectors with sets used in the model.
+    parameters:
+      type: list
+      description: >
+        named list of `parameter` objects with three tipes
+        - set: detailed description of the set
+        - parameter: all model parameters, interpolated for every milestone
+          year in the model horizon if applicable. Names of parameters start 
+          with 'p'
+        - mapping sets: auxiliary, automatically created sets used to narrow
+          the dimension of variables and constraints
+    gams.equation:
+      type: list
+      description: >
+        named list of custom constraints added to the model from the
+        `constraint` class. The name of the slot is outdated and will be
+        changed in the future.
+    costs.equation:
+      type: list
+      description: >
+        named list of custom costs added to the model's objective from the
+        `costs` class. The name of the slot is outdated and will be
+        changed in the future.
+    misc:
+      type: list
+      description: >
+        Any additional information or data to store in the object. Also used
+        to store paths to the data files of objects stored on the disk.
 ## modOut #######################################################################
   modOut:
 # model and scenario ############################################################

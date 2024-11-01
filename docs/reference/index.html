@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,10 +63,10 @@
 
       <dl><dt>
 
-          <code><a href="calendar.html">newCalendar()</a></code> <code><a href="calendar.html">make_timetable()</a></code>
+          <code><a href="class-calendar.html">calendar-class</a></code>
 
         </dt>
-        <dd>Generate a new calendar object from</dd>
+        <dd>An S4 class to represent sub-annual time resolution structure.</dd>
       </dl><dl><dt>
 
           <code><a href="class-commodity.html">commodity-class</a></code>
@@ -123,6 +123,12 @@
         <dd>An S4 class to represent a custom constraint.</dd>
       </dl><dl><dt>
 
+          <code><a href="class-costs.html">costs-class</a></code>
+
+        </dt>
+        <dd>Costs class</dd>
+      </dl><dl><dt>
+
           <code><a href="class-horizon.html">horizon-class</a></code>
 
         </dt>
@@ -159,18 +165,6 @@
         <dd>Class (S4) to represent default model configuration.</dd>
       </dl><dl><dt>
 
-          <code><a href="costs-class.html">costs-class</a></code>
-
-        </dt>
-        <dd>Class 'costs'</dd>
-      </dl><dl><dt>
-
-          <code><a href="model-class.html">model-class</a></code>
-
-        </dt>
-        <dd>S4 class to represent model</dd>
-      </dl><dl><dt>
-
           <code><a href="modInp-class.html">modInp-class</a></code>
 
         </dt>
@@ -181,6 +175,12 @@
 
         </dt>
         <dd>modOut-class to store the output from the model (solution)</dd>
+      </dl><dl><dt>
+
+          <code><a href="model-class.html">model-class</a></code>
+
+        </dt>
+        <dd>S4 class to represent model</dd>
       </dl><dl><dt>
 
           <code><a href="parameter-class.html">parameter-class</a></code>
@@ -218,7 +218,7 @@
 
       <dl><dt>
 
-          <code><a href="calendar.html">newCalendar()</a></code> <code><a href="calendar.html">make_timetable()</a></code>
+          <code><a href="newCalendar.html">newCalendar()</a></code>
 
         </dt>
         <dd>Generate a new calendar object from</dd>
@@ -234,6 +234,12 @@
 
         </dt>
         <dd>Create constraint object to add custom constraints to the model.</dd>
+      </dl><dl><dt>
+
+          <code><a href="newCosts.html">newCosts()</a></code>
+
+        </dt>
+        <dd>Create new costs object</dd>
       </dl><dl><dt>
 
           <code><a href="newDemand.html">newDemand()</a></code> <code><a href="newDemand.html">update(<i>&lt;demand&gt;</i>)</a></code>
@@ -326,6 +332,12 @@
         <dd>Create a new "technology" object.</dd>
       </dl><dl><dt>
 
+          <code><a href="calendar.html">make_timetable()</a></code>
+
+        </dt>
+        <dd>Create timetable of time-slices from given structure as a list</dd>
+      </dl><dl><dt>
+
           <code><a href="make_scenario_dirname.html">make_scenario_dirname()</a></code>
 
         </dt>
@@ -373,7 +385,7 @@
 
       <dl><dt>
 
-          <code><a href="calendar.html">newCalendar()</a></code> <code><a href="calendar.html">make_timetable()</a></code>
+          <code><a href="newCalendar.html">newCalendar()</a></code>
 
         </dt>
         <dd>Generate a new calendar object from</dd>
@@ -406,6 +418,12 @@
 
         </dt>
         <dd>Write scenario object as a Python, Julia, GAMS, or MathProg script with data files to a directory</dd>
+      </dl><dl><dt>
+
+          <code><a href="read.html">read_solution()</a></code> <code><a href="read.html">read(<i>&lt;scenario&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Read solution</dd>
       </dl><dl><dt>
 
           <code><a href="solve.html">solve_model()</a></code> <code><a href="solve.html">solve(<i>&lt;model&gt;</i>,<i>&lt;character&gt;</i>)</a></code> <code><a href="solve.html">solve_scenario()</a></code> <code><a href="solve.html">solve(<i>&lt;scenario&gt;</i>,<i>&lt;character&gt;</i>)</a></code>
@@ -485,16 +503,16 @@
         <dd>Convert year-days to YDAY set 'dNNN'</dd>
       </dl><dl><dt>
 
-          <code><a href="tsl2dtm.html">tsl2dtm()</a></code> <code><a href="tsl2dtm.html">tsl2year()</a></code> <code><a href="tsl2dtm.html">tsl2yday()</a></code> <code><a href="tsl2dtm.html">tsl2hour()</a></code> <code><a href="tsl2dtm.html">tsl2month()</a></code>
-
-        </dt>
-        <dd>Convert time-slices to date-time, extract year, month, day of the year, or hour</dd>
-      </dl><dl><dt>
-
-          <code><a href="tsl_formats.html">tsl_formats</a></code>
+          <code><a href="timeslices.html">tsl_formats</a></code> <code><a href="timeslices.html">tsl_sets</a></code> <code><a href="timeslices.html">dtm2tsl()</a></code> <code><a href="timeslices.html">tsl2dtm()</a></code>
 
         </dt>
         <dd>Common formats of time-slices.</dd>
+      </dl><dl><dt>
+
+          <code><a href="tsl2dtm.html">tsl2year()</a></code> <code><a href="tsl2dtm.html">tsl2yday()</a></code> <code><a href="tsl2dtm.html">tsl2hour()</a></code> <code><a href="tsl2dtm.html">tsl2month()</a></code>
+
+        </dt>
+        <dd>Mapping function between time-slices and day of the year</dd>
       </dl><dl><dt>
 
           <code><a href="tsl_guess_format.html">tsl_guess_format()</a></code>
@@ -602,12 +620,6 @@
 
       <dl><dt>
 
-          <code><a href="gams.html">set_gams_path()</a></code> <code><a href="gams.html">get_gams_path()</a></code> <code><a href="gams.html">set_gdxlib_path()</a></code> <code><a href="gams.html">get_gdxlib_path()</a></code>
-
-        </dt>
-        <dd>Set GAMS and GDX library directory</dd>
-      </dl><dl><dt>
-
           <code><a href="newModel.html">newModel()</a></code> <code><a href="newModel.html">setHorizon(<i>&lt;model&gt;</i>)</a></code> <code><a href="newModel.html">getHorizon(<i>&lt;model&gt;</i>)</a></code>
 
         </dt>
@@ -632,22 +644,10 @@
         <dd>An S4 class to represent scenario settings</dd>
       </dl><dl><dt>
 
-          <code><a href="set_glpk_path.html">set_glpk_path()</a></code>
+          <code><a href="solver.html">set_gams_path()</a></code> <code><a href="solver.html">get_gams_path()</a></code> <code><a href="solver.html">set_gdxlib_path()</a></code> <code><a href="solver.html">get_gdxlib_path()</a></code> <code><a href="solver.html">set_glpk_path()</a></code> <code><a href="solver.html">get_glpk_path()</a></code> <code><a href="solver.html">set_julia_path()</a></code> <code><a href="solver.html">get_julia_path()</a></code> <code><a href="solver.html">set_python_path()</a></code> <code><a href="solver.html">get_python_path()</a></code>
 
         </dt>
-        <dd>Set the path to the GLPK library</dd>
-      </dl><dl><dt>
-
-          <code><a href="set_julia_path.html">set_julia_path()</a></code>
-
-        </dt>
-        <dd>Set the path to Julia installation</dd>
-      </dl><dl><dt>
-
-          <code><a href="set_python_path.html">set_python_path()</a></code>
-
-        </dt>
-        <dd>Set or get python installation path to be used to solve models</dd>
+        <dd>Set GAMS and GDX library directory</dd>
       </dl><dl><dt>
 
           <code><a href="make_scenario_dirname.html">make_scenario_dirname()</a></code>
