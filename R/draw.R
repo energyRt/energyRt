@@ -254,36 +254,41 @@ draw.technology <- function(obj, ...) {
   aout
 
   # aux combined
-  aux <- bind_rows(ainp, aout) |>
-    pivot_longer(
-      # cols = -any_of(c("io", "acomm", "comm", "region", "year", "slice", "unit")),
-      cols = -any_of(c(keys)),
-      names_to = "parameter",
-      values_to = "value"
-    ) |>
-    filter(!is.na(value)) |>
-    group_by(io, acomm, comm, unit, parameter) |>
-    summarise(
-      lab_par = make_label(
-        paste0(parameter, ":"),
-        in_brackets = value,
-        two_lines = F,
-        bracket_type = "square"
-      ),
-      .groups = "keep"
-    ) |>
-    mutate(
-      lab_txt = make_label(
-        acomm,
-        in_brackets = unit,
-        two_lines = F
-      ),
-      lab_par = if_else(is.na(comm),
-                        lab_par,
-                        make_label(lab_par, in_brackets = comm, two_lines = T)
-      )
-    ) |>
-    ungroup()
+  # browser()
+  aux <- bind_rows(ainp, aout) 
+  if (nrow(aux) > 0) {
+    aux <- aux |>
+      pivot_longer(
+        # cols = -any_of(c("io", "acomm", "comm", "region", "year", "slice", "unit")),
+        cols = -any_of(c(keys)),
+        names_to = "parameter",
+        values_to = "value"
+      ) |>
+      filter(!is.na(value)) |>
+      group_by(io, acomm, comm, unit, parameter) |>
+      summarise(
+        lab_par = make_label(
+          paste0(parameter, ":"),
+          in_brackets = value,
+          two_lines = F,
+          bracket_type = "square"
+        ),
+        .groups = "keep"
+      ) |>
+      mutate(
+        lab_txt = make_label(
+          acomm,
+          in_brackets = unit,
+          two_lines = F
+        ),
+        lab_par = if_else(is.na(comm),
+                          lab_par,
+                          make_label(lab_par, in_brackets = comm, two_lines = T)
+        )
+      ) |>
+      ungroup()
+  }
+
   aux
 
   # weather factors
@@ -403,7 +408,9 @@ draw.technology <- function(obj, ...) {
 
   aux_inputs <- aux |>
     filter(grepl("inp", io)) |>
-    select(io, acomm, parameter, lab_par) |>
+    select(any_of(c(
+      "io", "acomm", "parameter", "lab_par"
+    ))) |>
     rename(ioname = acomm, iotype = io) |>
     unique()
 
@@ -429,18 +436,56 @@ draw.technology <- function(obj, ...) {
 
   aux_outputs <- aux |>
     filter(grepl("out", io)) |>
-    select(io, acomm, parameter, lab_par) |>
+    select(any_of(c(
+      "io", "acomm", "parameter", "lab_par"
+    ))) |>
     rename(ioname = acomm, iotype = io) |>
     unique()
 
 
   # arrow_labels (all inputs and outputs) ####
-  arrow_labels_tb <- rbindlist(list(
-    gcom_par |> select(comm, lab_txt) |> unique() |> rename(ioname = comm),
-    ccom_par |> select(comm, lab_txt) |> unique() |> rename(ioname = comm),
-    aux |> select(acomm, lab_txt) |> unique() |> rename(ioname = acomm),
-    wea |> select(weather, lab_txt) |> unique() |> rename(ioname = weather)
-  ))
+  arrow_labels_tb <- data.table()
+  if (nrow(gcom_par) > 0) {
+    arrow_labels_tb <- rbindlist(list(
+      arrow_labels_tb,
+      gcom_par |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = comm)
+    ),
+    use.names = TRUE, fill = TRUE
+    )
+  }
+  if (nrow(ccom_par) > 0) {
+    arrow_labels_tb <- rbindlist(list(
+      arrow_labels_tb,
+      ccom_par |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = comm)
+    ),
+    use.names = TRUE, fill = TRUE
+    )
+  }
+  if (nrow(aux) > 0) {
+    arrow_labels_tb <- rbindlist(list(
+      arrow_labels_tb,
+      aux |> select(any_of(c("acomm", "lab_txt"))) |> unique() |> rename(ioname = acomm)
+    ),
+    use.names = TRUE, fill = TRUE
+    )
+  }
+  if (nrow(wea) > 0) {
+    arrow_labels_tb <- rbindlist(list(
+      arrow_labels_tb,
+      wea |> select(any_of(c("weather", "lab_txt"))) |> unique() |> rename(ioname = weather)
+    ),
+    use.names = TRUE, fill = TRUE
+    )
+  }
+
+  # arrow_labels_tb <- rbindlist(list(
+  #   gcom_par |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = comm),
+  #   ccom_par |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = comm),
+  #   aux |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = acomm),
+  #   wea |> select(any_of(c("comm", "lab_txt"))) |> unique() |> rename(ioname = weather)
+  # ), 
+  # use.names = TRUE, fill = TRUE
+  # )
 
   # cap2act ####
   cap2act_label <- paste0("cap2act: ", obj@cap2act)
@@ -449,21 +494,24 @@ draw.technology <- function(obj, ...) {
   arrow_labels <- arrow_labels_tb$lab_txt
   names(arrow_labels) <- arrow_labels_tb$ioname
   stopifnot(length(arrow_labels) == nrow(arrow_labels_tb))
-
-  draw_process(
-    process_name = obj@name,
-    process_desc = obj@desc,
-    grouped_com_inputs = grouped_com_inputs,
-    single_com_inputs = single_com_inputs,
-    aux_inputs = aux_inputs,
-    weather_factors = weather_factors,
-    grouped_com_outputs = grouped_com_outputs,
-    single_com_outputs = single_com_outputs,
-    # com_outputs = com_outputs,
-    aux_outputs = aux_outputs,
-    arrow_labels = arrow_labels,
-    cap2act_label = cap2act_label
+  
+  try(
+    draw_process(
+      process_name = obj@name,
+      process_desc = obj@desc,
+      grouped_com_inputs = grouped_com_inputs,
+      single_com_inputs = single_com_inputs,
+      aux_inputs = aux_inputs,
+      weather_factors = weather_factors,
+      grouped_com_outputs = grouped_com_outputs,
+      single_com_outputs = single_com_outputs,
+      # com_outputs = com_outputs,
+      aux_outputs = aux_outputs,
+      arrow_labels = arrow_labels,
+      cap2act_label = cap2act_label
+    )
   )
+
 
   # popViewport(0)
 

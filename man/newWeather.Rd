@@ -49,4 +49,25 @@ Weather factors are separated from the model parameters
 and can be added or replaced for different scenarios.
 !!!Additional details...
 }
+\examples{
+\dontrun{
+
+# use/make time resolution of the model: timetalbe
+ttbl <- make_timetable(tsl_levels$d365_h24)
+ttbl
+
+WSOL <- newWeather(
+  name = "WSOL",
+  desc = "Horiontal solar PV capacity factor",
+  timeframe = "HOUR",
+  defVal = 0.,
+  weather = data.frame(
+    region = "R1",
+    year = 2015, # 
+    slice = ttbl$slice,
+    wval = runif(length(ttbl$slice), 0., 1) # use your data
+  )
+)
+}
+}
 \concept{weather}
