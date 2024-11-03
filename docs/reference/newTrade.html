@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9004</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -261,7 +261,10 @@ Create separate trade objects to optimize different parts of the trade network
 <span class="r-in"><span>  olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>olife <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">PIPELINE1</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="newTrade-1.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in mutate(rowwise(filter(summarize(group_by(filter(pivot_longer(filter(full_join(obj@aux,     obj@aeff, by = "acomm"), dst == node), cols = matches("2"),     names_to = "parameter", values_to = "value"), !is.na(value)),     parameter, acomm, unit, src), lab_par = make_label(paste0(unique(parameter),     ":"), in_brackets = value, two_lines = FALSE, bracket_type = "square"),     .groups = "drop"), grepl("ainp", parameter))), iotype = "ainp",     ioname = paste0(acomm, ", ", src), lab_txt = make_label(ioname,         in_brackets = unit, two_lines = F)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `lab_txt = make_label(ioname, in_brackets = unit,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   two_lines = F)`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `if_else()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> `true` must have size 1, not size 0.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">PIPELINE2</span> <span class="op">&lt;-</span> <span class="fu">newTrade</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  name <span class="op">=</span> <span class="st">"PIPELINE2"</span>,</span></span>
@@ -291,11 +294,17 @@ Create separate trade objects to optimize different parts of the trade network
 <span class="r-in"><span>  olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>olife <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R1"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="newTrade-2.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in mutate(rowwise(filter(summarize(group_by(filter(pivot_longer(filter(full_join(obj@aux,     obj@aeff, by = "acomm"), dst == node), cols = matches("2"),     names_to = "parameter", values_to = "value"), !is.na(value)),     parameter, acomm, unit, src), lab_par = make_label(paste0(unique(parameter),     ":"), in_brackets = value, two_lines = FALSE, bracket_type = "square"),     .groups = "drop"), grepl("ainp", parameter))), iotype = "ainp",     ioname = paste0(acomm, ", ", src), lab_txt = make_label(ioname,         in_brackets = unit, two_lines = F)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `lab_txt = make_label(ioname, in_brackets = unit,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   two_lines = F)`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `if_else()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> `true` must have size 1, not size 0.</span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R2"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="newTrade-3.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in mutate(rowwise(filter(summarize(group_by(filter(pivot_longer(filter(full_join(obj@aux,     obj@aeff, by = "acomm"), src == node), cols = matches("2"),     names_to = "parameter", values_to = "value"), !is.na(value)),     parameter, acomm, unit, dst), lab_par = make_label(paste0(unique(parameter),     ":"), in_brackets = value, two_lines = FALSE, bracket_type = "square"),     .groups = "drop"), grepl("aout", parameter))), iotype = "aout",     ioname = paste0(acomm, ", ", dst), lab_txt = make_label(ioname,         in_brackets = unit, two_lines = F)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `lab_txt = make_label(ioname, in_brackets = unit,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   two_lines = F)`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `if_else()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> `true` must have size 1, not size 0.</span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R3"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="newTrade-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="newTrade-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
