@@ -613,7 +613,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   #     )
   #   if (length(obj@LECdata$pLECLoACT) == 1) {
   #     scen@modInp@parameters$pLECLoACT <- .dat2par(
-  #       scen@modInp@parameters$pLECLoACT,
+  #       scen@modInp@parameters$pLECLoAC= TRUE,
   #       data.frame(
   #         region = scen@model@LECdata$region,
   #         value = scen@model@LECdata$pLECLoACT

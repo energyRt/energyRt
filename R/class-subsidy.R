@@ -14,7 +14,7 @@
 #' @slot misc `r get_slot_info("sub", "misc")`
 #'
 #' @export
-#' @family class, constraint, policy
+#' @family class constraint policy
 #'
 #' @include class-tax.R
 #' @rdname class-subsidy
@@ -72,7 +72,7 @@ setClass("sub",
 #' @param misc `r get_slot_info("sub", "misc")`
 #'
 #' @return An object of class `sub`
-#' @family class, constraint, policy
+#' @family class constraint policy
 #' @export
 #' @aliases newSubsidy
 #' @rdname newSubsidy
@@ -102,7 +102,7 @@ newSub <- function(
   ) {
   .data2slots(
     "sub",
-    name = name,
+    name,
     desc = desc,
     comm = comm,
     region = region,

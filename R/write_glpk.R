@@ -6,7 +6,7 @@
 #' @return sets the path to the GLPK library in R options and returns NULL.
 #' 
 #' @rdname solver
-#' @family solver, glpk
+#' @family solver glpk
 #' 
 #' @export
 #'
@@ -31,7 +31,7 @@ set_glpk_path <- function(path = NULL) {
 
 #' @export
 #' @rdname solver
-#' @family solver, glpk
+#' @family solver glpk
 #' @return returns the path to the GLPK library.
 get_glpk_path <- function() {
   options::opt("glpk_path")

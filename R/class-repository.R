@@ -1,5 +1,12 @@
 # class repository ####
 #' An S4 class to store the model objects.
+#' 
+#' @name class-repository
+#' 
+#' @description
+#' Use `newRepository` to create a new repository object.
+#' 
+#' @inherit newRepository description
 #'
 #' @md
 #' @slot name `r get_slot_info("repository", "name")`
@@ -9,7 +16,7 @@
 #' @slot misc `r get_slot_info("repository", "misc")`
 #'
 #' @export
-#' @family repository, model, data
+#' @family repository model data
 #' @include generics.R
 #' @rdname class-repository
 setClass("repository",
@@ -42,7 +49,14 @@ setMethod("initialize", "repository", function(.Object, ...) {
 })
 
 # newRepository ####
-#' Create new repository object
+#' A constructor for the repository class
+#' @name newRepository
+#' 
+#' @description
+#' Repository class is used to store the model 'bricks' such as commodity, 
+#' technology, supply, demand, trade, import, export, trade, storage, etc.
+#' Calendars, settings, and configurations cannot be stored in the repository, they
+#' have separate slots in model or scenario objects.
 #'
 #' @md
 #' @param name `r get_slot_info("repository", "name")`
@@ -50,9 +64,8 @@ setMethod("initialize", "repository", function(.Object, ...) {
 #' @param desc `r get_slot_info("repository", "desc")`
 #' @param misc `r get_slot_info("repository", "misc")`
 #'
-#' @name newRepository
 #' @export
-#' @family repository, model, data
+#' @family repository model data
 newRepository <- function(
     name = "base_repository",
     ...,

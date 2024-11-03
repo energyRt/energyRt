@@ -30,7 +30,7 @@
 #' @include class-technology.R
 #'
 #' @rdname class-storage
-#' @family process, storage
+#' @family process storage
 #'
 #' @export
 setClass("storage",
@@ -242,7 +242,7 @@ setMethod("initialize", "storage", function(.Object, ...) {
 #' @return storage object
 #'
 #' @name newStorage
-#' @family storage, process
+#' @family storage process
 #' @rdname storage
 #' @export
 #' @examples
@@ -315,7 +315,8 @@ setMethod("initialize", "storage", function(.Object, ...) {
 #'     waf.fx = 0.9, wcinp.lo = 0.9,
 #'     wcinp.fx = 0.9, wcinp.up = 0.9, wcout.lo = 0.9, wcout.fx = 0.9,
 #'     wcout.up = 0.9
-#'   ), optimizeRetirement = FALSE,
+#'   ), 
+#'   optimizeRetirement = FALSE,
 #'   misc = list()
 #'   )
 newStorage <- function(

@@ -19,3 +19,8 @@ done by the user or by the function \code{en_check_julia()}.
 \description{
 Install Julia packages
 }
+\examples{
+\dontrun{
+en_install_julia_pkgs()
+}
+}

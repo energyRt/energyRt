@@ -7,10 +7,12 @@ get_interpolation_rule <- function(x) {
 
 ## constraint-class ####
 #' An S4 class to represent a custom constraint.
-#'
+#' 
+#' @name class-constraint
+#' 
+#' @description 
+#' Class `constraint` is used to define custom constraints in the optimization problem.
 #' `r lifecycle::badge("experimental")`
-#'
-#' @description Class `constraint` is used to define custom constraints in the optimization problem.
 #' @inherit newConstraint details
 #'
 #' @md
@@ -26,7 +28,7 @@ get_interpolation_rule <- function(x) {
 #'
 #'
 #' @include class-subsidy.R
-#' @family class, constraint, policy
+#' @family class constraint policy
 #' @rdname class-constraint
 #' @order 1
 #' @export
@@ -65,6 +67,9 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 ## summand-class #####
 #' An S4 class to represent a summand in a constraint.
 #' 
+#' @name class-summand
+#' 
+#' @description
 #' Class `summand` stores information about linear 
 #' terms (a multiplier and a variable) 
 #' in the `lhs` of the constraint class. 
@@ -79,9 +84,9 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 #' @slot defVal `r get_slot_info("summand", "defVal")`
 #' @slot misc `r get_slot_info("summand", "misc")`
 #'
-#' @family class, constraint
+#' @family class constraint
 #' @order 2
-#'
+#' @rdname class-constraint
 #' @export
 setClass("summand",
   representation(
@@ -150,7 +155,7 @@ setClass("summand",
 #' @param replace_zerros numeric value to replace zero values in `rhs` and `defVal`. Default is `1e-20`.
 #'
 #' @return Object of class `constraint`.
-#' @family class, constraint, policy
+#' @family class constraint policy
 #' @rdname newConstraint
 #'
 #' @export
@@ -283,7 +288,7 @@ newConstraint <- function(
 #' @return TRUE if the object inherits class `constraint`, FALSE otherwise.
 #' @export
 #'
-#' @family class, constraint
+#' @family class constraint
 #' @describeIn newConstraint Check if an object is a constraint.
 #'
 #' @examples
@@ -850,6 +855,8 @@ addSummand <- function(
 #  .getSetEquation(prec, stm, approxim)@gams.equation
 
 #' @export
+#' @family constraint policy
+#' @rdname newConstraint
 newConstraintS <- function(
     name,
     type,

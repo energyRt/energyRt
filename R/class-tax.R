@@ -12,7 +12,7 @@
 #' @slot misc `r get_slot_info("tax", "misc")`
 #'
 #' @include class-weather.R
-#' @family class, constraint, policy
+#' @family class constraint policy
 #' @rdname class-tax
 #' @export
 setClass("tax",
@@ -65,7 +65,7 @@ setClass("tax",
 #' @param misc `r get_slot_info("tax", "misc")`
 #'
 #' @return An object of class `tax`
-#' @family class, constraint, policy
+#' @family class constraint policy
 #' @rdname newTax
 #' @export
 #'
@@ -82,7 +82,7 @@ setClass("tax",
 #'  bal =  c(10, 50, 200) # $10, $50, $200 per ton, will be interpolated
 #'  # out = ... use to tax output commodity
 #'  # inp = ... use to tax input commodity
-#'    )
+#'    ),
 #'  misc = list(
 #'   source = "https://www.example.com/tax"
 #'   )
@@ -99,7 +99,7 @@ newTax <- function(
   ) {
   .data2slots(
     "tax",
-    name = name,
+    name,
     desc = desc,
     comm = comm,
     region = region,

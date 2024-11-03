@@ -1,4 +1,6 @@
 #' An S4 class to declare a demand in the model
+#' 
+#' @name class-demand
 #'
 #' @md
 #' @slot name `r get_slot_info("demand", "name")`
@@ -13,7 +15,6 @@
 #' @rdname class-demand
 #'
 #' @export
-#'
 setClass("demand",
   representation(
     name = "character",
@@ -74,6 +75,8 @@ setMethod("initialize", "demand", function(.Object, ...) {
 #'  ),
 #'  region = "UTOPIA", # optional, to narrow the specification of the demand
 #'  )
+#'  class(DSTEEL)
+#'  draw(DSTEEL)
 #'
 newDemand <- function(
     name = "",
@@ -105,7 +108,7 @@ newDemand <- function(
 #' @order 2
 #' @family demand update
 #' @keywords demand update
-#' @export
+#' @exportMethod update
 setMethod("update", signature(object = "demand"), function(object, ...) {
   .data2slots("demand", object, ...)
 })

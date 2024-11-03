@@ -2,7 +2,7 @@
 % Please edit documentation in R/class-supply.R
 \name{newSupply}
 \alias{newSupply}
-\title{Create new supply object}
+\title{Constructor for supply object.}
 \usage{
 newSupply(
   name = "",
@@ -73,13 +73,12 @@ newSupply(
 supply object with given specifications.
 }
 \description{
-The \code{supply} class is used to add a domestic source of a commodity to the model,
-with given reserves, availability, and costs.
+Creates an instance of the \code{supply} class and
+initializes it with the given data and parameters.
 }
 \details{
-Constructor for supply object.
-
-!!!Add more details here
+The \code{supply} class is used to add a domestic source of a commodity
+to the model, with given reserves, availability, and costs.
 }
 \examples{
 SUP_COA <- newSupply(
@@ -101,5 +100,6 @@ SUP_COA <- newSupply(
    region = c("R1", "R2", "R3")
  )
 class(SUP_COA)
+# draw(SUP_COA)
 }
-\concept{supply, process}
+\concept{supply process}

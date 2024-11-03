@@ -280,8 +280,9 @@ STG1 <- newStorage(
     waf.fx = 0.9, wcinp.lo = 0.9,
     wcinp.fx = 0.9, wcinp.up = 0.9, wcout.lo = 0.9, wcout.fx = 0.9,
     wcout.up = 0.9
-  ), optimizeRetirement = FALSE,
+  ), 
+  optimizeRetirement = FALSE,
   misc = list()
   )
 }
-\concept{storage, process}
+\concept{storage process}

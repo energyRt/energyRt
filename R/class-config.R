@@ -1,18 +1,29 @@
-# load("R/sysdata.rda")
-#' Class (S4) to represent default model configuration.
-#'
-#' @slot desc character string with the configuration information.
-#' @slot region character coma separated string of all region names in the model
-#' @slot horizon class horizon with the model time parameters
-#' @slot discount data frame with discount rates by region and year
-#' @slot discountFirstYear logical, if TRUE, the discounting starts from the beginning of the year
-#' @slot optimizeRetirement currently ignored
-#' @slot defVal data.frame with default values of parameters (energyRt:::.defVal)
-#' @slot interpolation data.frame with interpolation rules (energyRt:::.defInt)
-#' @slot debug data.frame to define artificial (dummy) variables to debug model infeasibility
-#' @slot misc list with miscelaneous data to store in the object.
+# class-config ###############################################################
+#' An S4 class to represent default model configuration.
+#' 
+#' @description
+#' Config class is used to represent the default model configuration.
+#' It is stored in the model object and is used to initialize the 
+#' scenario settings.
+#' 
+#' @name class-config
+#' 
+#' @slot name `r get_slot_info("config", "name")`
+#' @slot desc `r get_slot_info("config", "desc")`
+#' @slot region `r get_slot_info("config", "region")`
+#' @slot calendar `r get_slot_info("config", "calendar")`
+#' @slot horizon `r get_slot_info("config", "horizon")`
+#' @slot discount `r get_slot_info("config", "discount")`
+#' @slot discountFirstYear `r get_slot_info("config", "discountFirstYear")`
+#' @slot optimizeRetirement `r get_slot_info("config", "optimizeRetirement")`
+#' @slot defVal `r get_slot_info("config", "defVal")`
+#' @slot interpolation `r get_slot_info("config", "interpolation")`
+#' @slot debug `r get_slot_info("config", "debug")`
+#' @slot misc `r get_slot_info("config", "misc")`
 #'
 #' @include class-calendar.R class-horizon.R
+#' @rdname class-config
+#' @family class config settings scenario model
 #'
 #' @export
 setClass("config",
@@ -20,9 +31,9 @@ setClass("config",
     name = "character",
     desc = "character",
     region = "character",
-    horizon = "horizon", # change to class
     # year = "numeric", # move to horizon
     calendar = "calendar",
+    horizon = "horizon", # change to class
     # slice = "slice", #
     # yearFraction = "data.frame",
     discount = "data.frame",
@@ -95,6 +106,7 @@ setMethod("initialize", "config", function(.Object, ...) {
 
 # setGeneric("setCalendar", function(obj, ...) standardGeneric("setCalendar"))
 
+## setCalendar ###############################################################
 #' @export
 setMethod("setCalendar", signature(obj = "config"), function(obj, ...) {
   obj@calendar <- newCalendar(...) ## ToDo: add check for fractional data
@@ -104,9 +116,11 @@ setMethod("setCalendar", signature(obj = "config"), function(obj, ...) {
 # setGeneric("setHorizon",
 #            function(obj, horizon, intervals) standardGeneric("setHorizon"))
 
-#' @param obj .
-#'
-#' @param horizon .
+## setHorizon ###############################################################
+#' @param horizon a new horizon object to be set.
+#' @method setHorizon config
+#' 
+#' @rdname newHorizon
 #'
 #' @export
 setMethod(
@@ -120,10 +134,11 @@ setMethod(
 )
 # setGeneric("getHorizon", function(obj) standardGeneric("getHorizon"))
 
+## getHorizon ###############################################################
 #' @export
 setMethod("getHorizon", signature(obj = "config"), function(obj) obj@horizon)
 
-#' @rdname newConfig
+#' @rdname newHorizon
 #' @family update config
 #' @method update config
 #' @export

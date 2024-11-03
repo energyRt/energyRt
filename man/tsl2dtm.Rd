@@ -7,13 +7,13 @@
 \alias{tsl2month}
 \title{Mapping function between time-slices and day of the year}
 \usage{
-tsl2year(tsl, return.null = T)
+tsl2year(tsl, return.null = TRUE)
 
-tsl2yday(tsl, return.null = T)
+tsl2yday(tsl, return.null = TRUE)
 
-tsl2hour(tsl, return.null = T)
+tsl2hour(tsl, return.null = TRUE)
 
-tsl2month(tsl, format = tsl_guess_format(tsl), return.null = T)
+tsl2month(tsl, format = tsl_guess_format(tsl), return.null = TRUE)
 }
 \arguments{
 \item{tsl}{character vector with time slices}
@@ -50,6 +50,7 @@ Mapping function between time-slices and month
 
 }}
 \examples{
+tsl <- c("y2007_d365_h15", NA, "d151_h22", "d001", "m10_h12")
 tsl2year(tsl)
 tsl
 tsl2yday(tsl)

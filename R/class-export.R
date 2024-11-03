@@ -1,5 +1,7 @@
 #' An S4 class to represent commodity export to the rest of the world.
-#'
+#' 
+#' @name class-export
+#' 
 #' @inherit newExport description
 #' @inherit newExport details
 #'
@@ -13,7 +15,7 @@
 #' @slot misc `r get_slot_info("export", "misc")`
 #'
 #' @include class-import.R
-#' @family class, export, process
+#' @family class export process
 #' @rdname class-export
 #'
 #' @export

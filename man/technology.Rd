@@ -320,5 +320,5 @@ ECOAL <- newTechnology(
 draw(ECOAL)
 
 }
-\concept{technology, process}
+\concept{technology process}
 \concept{update technology process}

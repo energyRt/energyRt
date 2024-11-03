@@ -6,8 +6,10 @@
 # S4 methods from R base (and to avoid conflicts with other libraries)
 setGeneric("add", function(obj, ...) UseMethod("add"))
 setGeneric("convert", function(x, ...) UseMethod("convert"))
-setGeneric("draw", function(...) UseMethod("draw"))
+# setGeneric("draw", function(...) UseMethod("draw"))
+
 # setGeneric("write.sc", function(x, ...) UseMethod("write.sc")) # use function instead
+
 setGeneric("read", function(...) UseMethod("read")) #
 setGeneric("interpolate", function(object, ...) UseMethod("interpolate"))
 
@@ -25,6 +27,7 @@ setGeneric("getCalendar", function(obj) standardGeneric("getCalendar"))
 setGeneric(".add2set", function(obj, app, approxim) standardGeneric(".add2set"))
 setGeneric('.dat2par', function(obj, data) standardGeneric(".dat2par"))
 setGeneric(".obj2modInp", function(obj, app, approxim) standardGeneric(".obj2modInp"))
+
 
 # atable <- data.table
 # as_atable <- as.data.table

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.90023</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,26 +74,39 @@
 
 
 <dl><dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>character. Name of the scenario.</p></dd>
+<dd><p>character. Name of the scenario object, for reference, also used in scenario path-functions.</p></dd>
 
 
 <dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
-<dd><p>character. Path to the scenario directory.</p></dd>
+<dd><p>character. Path to the scenario folder with the model data and scripts.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>any model objects or settings to be assigned to the scenario.</p></dd>
 
 
 <dt id="arg-env-name">env_name<a class="anchor" aria-label="anchor" href="#arg-env-name"></a></dt>
-<dd><p>name of the environment to assign the scenario in.</p></dd>
+<dd><p>character. Name of the environment to register the scenario. Default is ".scen". Used only if registry is provided. (in development)</p></dd>
 
 
 <dt id="arg-registry">registry<a class="anchor" aria-label="anchor" href="#arg-registry"></a></dt>
-<dd><p>optional registry object to register the scenario.</p></dd>
+<dd><p>optional registry object to register the scenario. (in development)</p></dd>
 
 
 <dt id="arg-replace">replace<a class="anchor" aria-label="anchor" href="#arg-replace"></a></dt>
-<dd><p>logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists.</p></dd>
+<dd><p>logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists. (in development)</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A new scenario object.</p>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># It is suggested to use `interpolate(model)` or `solve(model)` to create a new scenario.</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

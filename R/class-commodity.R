@@ -1,4 +1,6 @@
 #' An S4 class to represent a commodity
+#' 
+#' @name class-commodity
 #'
 #' @description
 #' A commodity is a good or service that is produced and consumed in the model.

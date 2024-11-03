@@ -150,8 +150,8 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @examples
 #' \dontrun{
 #' data("utopia_scen_BAU.RData")
-#' getData(scen, name = "pDemand", year = 2015, merge = T)
-#' getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015)
+#' getData(scen, name = "pDemand", year = 2015, merge = TRUE)
+#' getData(scen, name = "vTechOut", comm = "ELC", merge = TRUE, year = 2015)
 #' elc2050 <- getData(scen, parameters = FALSE, comm = "ELC", year = 2050)
 #' names(elc2050)
 #' elc2050$vBalance
@@ -528,10 +528,10 @@ get_data <- getData
 
 if (F) { # test
   load("energyRt_tutorial/data/utopia_scen_BAU.RData")
-  (dem <- getData(scen, name = "pDemand", year = 2015, merge = T))
-  (vTechOut = getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015))
+  (dem <- getData(scen, name = "pDemand", year = 2015, merge = TRUE))
+  (vTechOut = getData(scen, name = "vTechOut", comm = "ELC", merge = TRUE, year = 2015))
   # Storage capacity
-  getData(scen, name = "vStorageCap", merge = T)
+  getData(scen, name = "vStorageCap", merge = TRUE)
 }
 
 .crs2int <- function(x) {

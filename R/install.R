@@ -12,6 +12,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' en_install_julia_pkgs()
+#' }
 en_install_julia_pkgs <- function(pkgs = NULL, update = FALSE) {
 
   if (is.null(pkgs)) {

@@ -1,15 +1,21 @@
-#' modOut-class to store the output from the model (solution)
+#' An S4 class to store results of a solved scenario
 #'
-#' @slot sets list.
-#' @slot variables list.
-#' @slot stage character. # !!! move to scenario-status
-#' @slot solutionLogs data.frame.
-#' @slot misc list.
+#' @name class-modOut
+#'
+#' @description
+#' The class is a part of the scenario object and stores the
+#' results of a solved scenario. It is not intended to be used
+#' as a standalone object.
+#'
+#' @slot sets `r get_slot_info("modOut", "sets")`
+#' @slot variables `r get_slot_info("modOut", "variables")`
+#' @slot stage `r get_slot_info("modOut", "stage")`
+#' @slot solutionLogs `r get_slot_info("modOut", "solutionLogs")`
+#' @slot misc `r get_slot_info("modOut", "misc")`
 #'
 #' @include class-modInp.R
-#'
+#' @rdname class-modOut
 #' @export
-#'
 setClass("modOut",
   representation(
     sets = "list",

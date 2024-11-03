@@ -15,16 +15,24 @@ newScenario(
 )
 }
 \arguments{
-\item{name}{character. Name of the scenario.}
+\item{name}{character. Name of the scenario object, for reference, also used in scenario path-functions.}
 
-\item{path}{character. Path to the scenario directory.}
+\item{path}{character. Path to the scenario folder with the model data and scripts.}
 
-\item{env_name}{name of the environment to assign the scenario in.}
+\item{...}{any model objects or settings to be assigned to the scenario.}
 
-\item{registry}{optional registry object to register the scenario.}
+\item{env_name}{character. Name of the environment to register the scenario. Default is ".scen". Used only if registry is provided. (in development)}
 
-\item{replace}{logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists.}
+\item{registry}{optional registry object to register the scenario. (in development)}
+
+\item{replace}{logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists. (in development)}
+}
+\value{
+A new scenario object.
 }
 \description{
 Generate a new scenario object
+}
+\examples{
+# It is suggested to use `interpolate(model)` or `solve(model)` to create a new scenario.
 }

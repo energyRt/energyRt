@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development version
-Version: 0.50.5.90023
-Date: 2024-11-01
+Version: 0.50.6.9000
+Date: 2024-11-02
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -21,45 +21,15 @@ Authors@R:
 URL: https://energyRt.org, https://github.com/energyRt/energyRt
 BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy systems modeling toolbox in R
-Depends: 
-    R (>= 4.3)
-Imports: 
-    methods,
-    grid,
-    generics,
-    data.table,
-    DBI,
-    RSQLite,
-    tibble,
-    tidyr,
-    dplyr,
-    dtplyr,
-    rlang,
-    stringr,
-    lubridate,
-    purrr,
-    arrow,
-    progressr,
-    tictoc,
-    cli,
-    zoo,
-    registry,
-    options (>= 0.2.0),
-    glue,
-    plyr,
-    grDevices,
-    utils
-Suggests: 
-    pak,
-    gdxtools,
-    knitr,
-    rmarkdown,
-    sf,
-    yaml,
-    ggplot2,
-    testthat (>= 3.0.0),
-    devtools
-SystemRequirements: Julia (>= 1.6) with JuMP or Python (>= 3.7) with Pyomo or GAMS (>= 24.9) or GLPK (>= 4.0)
+Depends: R (>= 4.3)
+Imports: methods, grid, generics, data.table, DBI, RSQLite, tibble,
+        tidyr, dplyr, dtplyr, rlang, stringr, lubridate, purrr, arrow,
+        progressr, tictoc, cli, zoo, registry, options (>= 0.2.0),
+        glue, plyr, grDevices, utils
+Suggests: pak, gdxtools, knitr, rmarkdown, sf, yaml, ggplot2, testthat
+        (>= 3.0.0), devtools
+SystemRequirements: Julia (>= 1.6) with JuMP or Python (>= 3.7) with
+        Pyomo or GAMS (>= 24.9) or GLPK (>= 4.0)
 License: AGPL (>= 3)
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
@@ -121,3 +91,9 @@ Collate:
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Roxygen: list(markdown = TRUE)
+NeedsCompilation: no
+Packaged: 2024-11-02 10:33:16 UTC; olmba
+Author: Oleg Lugovoy [aut, cre] (<https://orcid.org/0000-0001-5546-9875>),
+  Vladimir Potashnikov [aut],
+  Tarun Sharma [ctb] (<https://orcid.org/0000-0003-3636-2858>)
+Maintainer: Oleg Lugovoy <olugovoy@optimalsolution.dev>

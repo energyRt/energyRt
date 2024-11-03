@@ -1,4 +1,6 @@
 #' S4 class to represent weather factors
+#' 
+#' @name class-weather
 #'
 #' @inherit newWeather description
 #' @inherit newWeather details
@@ -14,7 +16,7 @@
 #' @slot misc `r get_slot_info("weather", "misc")`
 #'
 #' @include class-export.R
-#' @family class, weather, data
+#' @family class weather data
 #' @rdname class-weather
 #'
 #' @export

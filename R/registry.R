@@ -181,7 +181,7 @@ if (F) {
   SCEN$n_of_entries()
   SCEN$get_entries()
   SCEN[["TEST"]]
-  register(scen_TEST, SCEN)
+  register(scen_TES= TRUE, SCEN)
   
 }
 

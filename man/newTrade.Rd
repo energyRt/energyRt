@@ -115,9 +115,10 @@ Create separate trade objects to optimize different parts of the trade network
 (aka transmission lines).
 }
 \examples{
-PIPELINE <- newTrade(
-  name = "PIPELINE",
+PIPELINE1 <- newTrade(
+  name = "PIPELINE1",
   desc = "Some transport pipeline",
+  commodity = "OIL",
   routes = data.frame(
     src = c("R1", "R2"),
     dst = c("R2", "R3")
@@ -129,5 +130,37 @@ PIPELINE <- newTrade(
   ),
   olife = list(olife = 60)
 )
+draw(PIPELINE1)
+
+PIPELINE2 <- newTrade(
+  name = "PIPELINE2",
+  desc = "Some transport pipeline",
+  commodity = "OIL",
+  routes = data.frame(
+    src = c("R1", "R1", "R2", "R3"),
+    dst = c("R2", "R3", "R3", "R2")
+  ),
+  trade = data.frame(
+    src = c("R1", "R1", "R2", "R3"),
+    dst = c("R2", "R3", "R3", "R2"),
+    teff = c(0.912, 0.913, 0.923, 0.932)
+  ),
+  aux = data.frame(
+    acomm = c("ELC", "CH4"),
+    unit = c("MWh", "kt")
+  ),
+  aeff = data.frame(
+    acomm = c("ELC", "CH4", "ELC", "CH4"),
+    src = c("R1", "R1", "R2", "R3"),
+    dst = c("R2", "R2", "R3", "R2"),
+    csrc2ainp = c(.5, NA, .3, NA),
+    cdst2ainp = c(.4, NA, .6, NA),
+    csrc2aout = c(NA, .1, NA, .2)
+  ),
+  olife = list(olife = 60)
+)
+draw(PIPELINE2, node = "R1")
+draw(PIPELINE2, node = "R2")
+draw(PIPELINE2, node = "R3")
 }
-\concept{trade, process, constructor}
+\concept{trade process constructor}

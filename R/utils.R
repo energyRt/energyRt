@@ -1,42 +1,6 @@
 # Some commonly used functions
 
 
-#' Convert hours (integer) values to HOUR set 'hNN'
-#'
-#' @param x integer vector, hours (for example, 0-23 for daily data, 0-167 for weekly data,
-#' etc.)
-#' @param width integer, width of the output string
-#' @param prefix character, prefix to add to the name, default is 'h'
-#' @param flag character, flag to add to the name, default is '0'
-#'
-#' @return character vector of the same length as `x` with formatted hours to
-#' be used in the HOUR set.
-#' @export
-#'
-#' @examples
-#' hour2HOUR(0:23)
-hour2HOUR <- function(x, width = 2, prefix = "h", flag = "0") {
-  paste0(prefix, formatC(x, width = width, flag = flag))
-}
-
-#' Convert year-days to YDAY set 'dNNN'
-#'
-#' @param x integer vector, year-days (for example, 1-365 for annual data)
-#' @param width integer, width of the output string, default is 3
-#' @param prefix character, prefix to add to the name, default is 'd'
-#' @param flag character, flag to add to the name, default is '0'
-#'
-#' @return character vector of the same length as `x` with formatted year-days to
-#' be used in the YDAY set.
-#' @export
-#'
-#' @examples
-#' day2YDAY(1:365)
-yday2YDAY <- function(x, width = 3, prefix = "d", flag = "0") {
-  paste0(prefix, formatC(x, width = width, flag = flag))
-}
-
-
 
 factors_in_prams <- function(x) {
   # x - list
@@ -123,7 +87,7 @@ if (F) { # Check
   size(scen@modInp, 1, "Mb", byteTol = 1024)
   size(scen@modInp@parameters, 1, "Mb", byteTol = 1024 * 1000)
   size(scen@modInp@parameters$pTradeIrEff, 1, "Mb", byteTol = 1024 * 1000)
-  size(scen@modInp@parameters$pTradeIrEff@data, 1, "Mb", byteTol = 0, asNumeric = T)
+  size(scen@modInp@parameters$pTradeIrEff@data, 1, "Mb", byteTol = 0, asNumeric = TRUE)
   head(scen@modInp@parameters$pTradeIrEff@data)
 }
 

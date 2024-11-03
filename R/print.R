@@ -1,4 +1,16 @@
+# print methods for the energyRt classes ##############################
+
+
+#' Print methods for the energyRt classes
+#'
+#' @inheritParams print
+#'
+#' @export
+#'
+setGeneric("print", function(x, ...) UseMethod("print"))
+
 # Print modInp ####
+#' @export
 setMethod("print", "modInp", function(x, ...) {
   if (length(x@parameters) == 0) {
     cat("There is no data\n")

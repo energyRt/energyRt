@@ -23,4 +23,17 @@ model object containing model elements (\verb{@data}) and configuration (\verb{@
 \description{
 Create new model object
 }
-\concept{model, scenario}
+\examples{
+\dontrun{
+mod <- newModel(
+  name = "MyModel",
+  desc = "My first model",
+  data = model_repository,
+  discount = 0.05,
+  horizon = newHorizon(period = 2020:2050, 
+                       intervals = rep(5, 10)),
+  calendar = calendars$d365h24
+  )
+}
+}
+\concept{model scenario}

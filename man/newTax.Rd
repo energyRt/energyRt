@@ -58,20 +58,20 @@ CO2TAX <- newTax(
  bal =  c(10, 50, 200) # $10, $50, $200 per ton, will be interpolated
  # out = ... use to tax output commodity
  # inp = ... use to tax input commodity
-   )
+   ),
  misc = list(
   source = "https://www.example.com/tax"
   )
  )
 }
 \seealso{
-Other class, constraint, policy: 
-\code{\link{constraint-class}},
-\code{\link{costs-class}},
+Other class constraint policy: 
+\code{\link{class-constraint}},
+\code{\link{class-costs}},
 \code{\link{newConstraint}()},
 \code{\link{newCosts}()},
 \code{\link{newSubsidy}()},
 \code{\link{subsidy-class}},
 \code{\link{tax-class}}
 }
-\concept{class, constraint, policy}
+\concept{class constraint policy}

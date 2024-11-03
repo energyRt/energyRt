@@ -15,7 +15,7 @@ to add custom constraints to the model."><meta property="og:image" content="http
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.90023</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,23 @@ to add custom constraints to the model.</p>
 <span>  replace_zerros <span class="op">=</span> <span class="fl">1e-20</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">isConstraint</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">isConstraint</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">newConstraintS</span><span class="op">(</span></span>
+<span>  <span class="va">name</span>,</span>
+<span>  <span class="va">type</span>,</span>
+<span>  eq <span class="op">=</span> <span class="st">"=="</span>,</span>
+<span>  rhs <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  for.sum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  for.each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  defVal <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  rule <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  comm <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cout <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cinp <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  aout <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  ainp <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -161,15 +177,15 @@ for which the summand is defined.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other class, constraint, policy:
-<code><a href="class-constraint.html">constraint-class</a></code>,
-<code><a href="class-costs.html">costs-class</a></code>,
+<code><a href="class-constraint.html">class-constraint</a></code>,
+<code><a href="class-costs.html">class-costs</a></code>,
 <code><a href="newCosts.html">newCosts</a>()</code>,
 <code><a href="newSubsidy.html">newSubsidy</a>()</code>,
 <code><a href="newTax.html">newTax</a>()</code>,
 <code><a href="class-subsidy.html">subsidy-class</a></code>,
 <code><a href="class-tax.html">tax-class</a></code></p>
 <p>Other class, constraint:
-<code><a href="summand-class.html">summand-class</a></code></p></div>
+<code><a href="class-constraint.html">class-constraint</a></code></p></div>
     </div>
 
     <div class="section level2">

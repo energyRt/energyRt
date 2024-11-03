@@ -12,7 +12,7 @@ A character vector with formats:
 \describe{
 \item{d365}{daily time-slices, 365 a year (leap year's 366th day is disregarded)}
 \item{d365_h24}{time slices with year-day numbers and hours, 8760 in total}
-...
+\item{...}{etc.}
 }
 
 An object of class \code{list} of length 1.
@@ -61,10 +61,10 @@ day of the year, hour.
 \examples{
 dtm2tsl(lubridate::now())
 dtm2tsl(lubridate::ymd("2020-12-31"))
-dtm2tsl(lubridate::ymd("2020-12-31"), d366.as.na = F)
+dtm2tsl(lubridate::ymd("2020-12-31"), d366.as.na = FALSE)
 dtm2tsl(lubridate::now(tzone = "UTC"), format = "d365")
 dtm2tsl(lubridate::ymd("2020-12-31"), format = "d365")
-dtm2tsl(lubridate::ymd("2020-12-31"), format = "d365", d366.as.na = F)
+dtm2tsl(lubridate::ymd("2020-12-31"), format = "d365", d366.as.na = FALSE)
 dtm2tsl(lubridate::ymd("2020-12-31"), format = "d366")
 tsl <- c("y2007_d365_h15", NA, "d151_h22", "d001", "m10_h12")
 tsl2dtm(tsl[1])

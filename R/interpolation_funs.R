@@ -489,7 +489,7 @@
     # }
     # colnames(d3) <- add_set_name
     d3 <- matrix(add_set_value, nrow = nrow(dd), ncol = length(add_set_value),
-                 byrow = T, dimnames = list(NULL, add_set_name)) |>
+                 byrow = TRUE, dimnames = list(NULL, add_set_name)) |>
       as.data.table()
     stnd <- mtp@dimSets[-(1:length(d3))]
     # It was added for trading routes

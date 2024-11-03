@@ -1,15 +1,18 @@
 # class model ####
 # setTimeSlices <- .setTimeSlices
 
-#' S4 class to represent model
+#' An S4 class to represent model
+#' 
+#' @name class-model
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot data list.
-#' @slot config config.
-#' @slot misc list.
+#' @slot name `r get_slot_info("model", "name")`
+#' @slot desc `r get_slot_info("model", "desc")`
+#' @slot data `r get_slot_info("model", "data")`
+#' @slot config `r get_slot_info("model", "config")`
+#' @slot misc `r get_slot_info("model", "misc")`
 #'
 #' @include class-config.R class-repository.R
+#' 
 #' @export
 setClass("model",
   representation(
@@ -47,10 +50,21 @@ setMethod("initialize", "model", function(.Object, ...) {
 #'
 #' @return model object containing model elements (`@data`) and configuration (`@config`)
 #' @rdname newModel
-#' @family model, scenario
+#' @family model scenario
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' mod <- newModel(
+#'   name = "MyModel",
+#'   desc = "My first model",
+#'   data = model_repository,
+#'   discount = 0.05,
+#'   horizon = newHorizon(period = 2020:2050, 
+#'                        intervals = rep(5, 10)),
+#'   calendar = calendars$d365h24
+#'   )
+#' }
 newModel <- function(name = "", desc = "", ...) {
   # browser()
   # mdl <- .data2slots("model", name,

@@ -1,5 +1,5 @@
 #' An S4 class to represent model input
-#' @name modInp-class
+#' @name class-modInp
 #' 
 #' @description
 #' `modInp` class is used to store interpolated date for the model input parameters.

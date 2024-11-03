@@ -1,7 +1,9 @@
 #' An S4 class to represent commodity import from the rest of the world.
-#'
+#' 
 #' Use `newImport` to create a new `import` object.
 #'
+#' @name class-import 
+#' 
 #' @inherit newImport description
 #' @inherit newImport details
 #'
@@ -15,7 +17,7 @@
 #' @slot misc `r get_slot_info("import", "misc")`
 #'
 #' @include class-trade.R
-#' @family class, import
+#' @family class import
 #' @rdname class-import
 #'
 #' @export

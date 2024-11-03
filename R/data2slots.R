@@ -13,7 +13,9 @@
 #' @return created or updated object with the added/updated data in the object slots.
 #' @noRd
 .data2slots <- function(
-    class_name = NULL, x, ...,
+    class_name = NULL, 
+    x, 
+    ...,
     ignore_args = NULL,
     ignore_classes = NULL,
     update = !is.character(x),

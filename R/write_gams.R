@@ -8,7 +8,7 @@
 #' @return
 #' Sets path to GAMS library in R-options
 #' @rdname solver
-#' @family GAMS, GDX, solver
+#' @family GAMS GDX solver
 #' @export
 #' @examples
 #' # set_gams_path("C:/GAMS/win64/32.2/")
@@ -28,7 +28,7 @@ set_gams_path <- function(path = NULL) {
 }
 
 #' @rdname solver
-#' @family GAMS, GDX, solver
+#' @family GAMS GDX solver
 #' @return
 #' The current path to GAMS library, set in R-options
 #' @export
@@ -44,7 +44,7 @@ get_gams_path <- function() {
 #' @export
 #'
 #' @rdname solver
-#' @family GAMS, GDX, solver
+#' @family GAMS GDX solver
 #'
 #' @examples
 #' # set_gdxlib("C:/GAMS/35")
@@ -61,7 +61,7 @@ set_gdxlib_path <- function(path = NULL) {
 }
 
 #' @rdname solver
-#' @family GAMS, GDX, solver
+#' @family GAMS GDX solver
 #' @return
 #' The current path to GDX library, set in R-options
 #' @export

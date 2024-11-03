@@ -73,15 +73,17 @@ set_glpk_path("/usr/local/bin/glpk") # Linux & Mac
 set_glpk_path("C:/Program Files/glpk/bin") # Windows
 get_glpk_path()
 }
+\dontrun{
 set_julia_path("C:/Program Files/Julia-1.10.1/bin/")
 get_julia_path()
+}
 \dontrun{
 set_python_path("C:/Python3")
 set_python_path()
 get_python_path()
 }
 }
-\concept{GAMS, GDX, solver}
-\concept{solver, glpk}
-\concept{solver, julia}
-\concept{solver, python}
+\concept{GAMS GDX solver}
+\concept{solver glpk}
+\concept{solver julia}
+\concept{solver python}

@@ -1,7 +1,7 @@
 # calendar-class ####
 #' An S4 class to represent sub-annual time resolution structure.
 #' 
-#' @name calendar-class
+#' @name class-calendar
 #'
 #' @description
 #' Sub-annual time resolution is represented by nested, named

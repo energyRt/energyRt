@@ -1,7 +1,8 @@
 ## costs-class ####
 
-#' @title Costs class
-#' @name costs-class
+#' @title An S4 class to add costs to objective function
+#' @name class-costs
+#' 
 #' @inherit newCosts description
 #'
 #' @md
@@ -13,7 +14,7 @@
 #' @slot misc `r get_slot_info("costs", "misc")`
 #'
 #' @include class-constraint.R
-#' @family class, constraint, policy
+#' @family class constraint policy
 #' @rdname class-costs
 #' @export
 setClass("costs",
@@ -57,7 +58,7 @@ setMethod("initialize", "costs", function(.Object, ...) {
 #' @param subset `get_slot_info("costs", "subset")`
 #' 
 #' @return costs object with given specifications.
-#' @family class, constraint, policy
+#' @family class constraint policy
 #' @rdname newCosts
 #' 
 #' @export

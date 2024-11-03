@@ -7,7 +7,7 @@
 #' to/from `energyRt` options.
 #' @export
 #' @rdname solver
-#' @family solver, python
+#' @family solver python
 #'
 #' @examples
 #' \dontrun{
@@ -31,7 +31,7 @@ set_python_path <- function(path = NULL) {
 
 #' @export
 #' @rdname solver
-#' @family solver, python
+#' @family solver python
 get_python_path <- function() {
   options::opt("python_path", env = "energyRt")
 }

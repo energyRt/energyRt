@@ -92,8 +92,8 @@ Extracts information from scenario objects, based on filters.
 \examples{
 \dontrun{
 data("utopia_scen_BAU.RData")
-getData(scen, name = "pDemand", year = 2015, merge = T)
-getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015)
+getData(scen, name = "pDemand", year = 2015, merge = TRUE)
+getData(scen, name = "vTechOut", comm = "ELC", merge = TRUE, year = 2015)
 elc2050 <- getData(scen, parameters = FALSE, comm = "ELC", year = 2050)
 names(elc2050)
 elc2050$vBalance

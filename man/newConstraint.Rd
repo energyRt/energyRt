@@ -3,6 +3,7 @@
 \name{newConstraint}
 \alias{newConstraint}
 \alias{isConstraint}
+\alias{newConstraintS}
 \title{Create constraint object to add custom constraints to the model.}
 \usage{
 newConstraint(
@@ -18,6 +19,22 @@ newConstraint(
 )
 
 isConstraint(object)
+
+newConstraintS(
+  name,
+  type,
+  eq = "==",
+  rhs = 0,
+  for.sum = list(),
+  for.each = list(),
+  defVal = 0,
+  rule = NULL,
+  comm = NULL,
+  cout = TRUE,
+  cinp = TRUE,
+  aout = TRUE,
+  ainp = TRUE
+)
 }
 \arguments{
 \item{name}{character. Name of the constraint object, used in sets.}
@@ -88,17 +105,18 @@ isConstraint(1)
 isConstraint(newConstraint(""))
 }
 \seealso{
-Other class, constraint, policy: 
-\code{\link{constraint-class}},
-\code{\link{costs-class}},
+Other class constraint policy: 
+\code{\link{class-constraint}},
+\code{\link{class-costs}},
 \code{\link{newCosts}()},
 \code{\link{newSubsidy}()},
 \code{\link{newTax}()},
 \code{\link{subsidy-class}},
 \code{\link{tax-class}}
 
-Other class, constraint: 
-\code{\link{summand-class}}
+Other class constraint: 
+\code{\link{class-constraint}}
 }
-\concept{class, constraint}
-\concept{class, constraint, policy}
+\concept{class constraint}
+\concept{class constraint policy}
+\concept{constraint policy}

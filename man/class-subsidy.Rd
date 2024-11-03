@@ -35,13 +35,13 @@ production, consumption, or balance of a commodity.
 }}
 
 \seealso{
-Other class, constraint, policy: 
-\code{\link{constraint-class}},
-\code{\link{costs-class}},
+Other class constraint policy: 
+\code{\link{class-constraint}},
+\code{\link{class-costs}},
 \code{\link{newConstraint}()},
 \code{\link{newCosts}()},
 \code{\link{newSubsidy}()},
 \code{\link{newTax}()},
 \code{\link{tax-class}}
 }
-\concept{class, constraint, policy}
+\concept{class constraint policy}

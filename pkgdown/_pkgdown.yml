@@ -75,16 +75,17 @@ reference:
 - title: Classes
   desc:  Data structures of the key model components.
   contents:
-  - calendar-class
-  - commodity-class
-  - demand-class
-  - supply-class
-  - technology-class
-  - storage-class
-  - trade-class
-  - import-class
-  - export-class
+  # - calendar-class
+  # - commodity-class
+  # - demand-class
+  # - supply-class
+  # - technology-class
+  # - storage-class
+  # - trade-class
+  # - import-class
+  # - export-class
   - ends_with("class")
+  - starts_with("class")
 
 - title: Building a model
   desc:  Functions to create model components.
@@ -143,6 +144,11 @@ reference:
 - title: Validation
   contents:
   - starts_with("check")
+
+- title: Exporting
+  contents:
+  - starts_with("print")
+  - starts_with("summary")
 
 - title: energyRt options and settings
   contents:

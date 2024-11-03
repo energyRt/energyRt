@@ -1,3 +1,10 @@
+# energyRt 0.50.6-dev
+
+* draw() is drafted for all processes: 'technology', 'export', 'import', 'supply', 'demand', 'trade', 'storage
+* docs completed for main classes with examples.
+* code clean-up and documentation in progress.
+
+
 # energyRt 0.50.5-dev
 
 * draw() is rewritten based on 'grid' package, and is now a generic method. 

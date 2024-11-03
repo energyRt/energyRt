@@ -65,19 +65,15 @@ setMethod("initialize", "supply", function(.Object, ...) {
   .Object
 })
 
-
-#' Create new supply object
-#'
-#' Constructor for supply object.
-#'
+#' @title Constructor for supply object.
 #' @name newSupply
-#'
 #' @description
-#' The `supply` class is used to add a domestic source of a commodity to the model,
-#' with given reserves, availability, and costs.
+#' Creates an instance of the `supply` class and 
+#' initializes it with the given data and parameters.
 #'
 #' @details
-#' !!!Add more details here
+#' The `supply` class is used to add a domestic source of a commodity 
+#' to the model, with given reserves, availability, and costs.
 #'
 #' @md
 #' @param name `r get_slot_info("supply", "name")`
@@ -92,7 +88,7 @@ setMethod("initialize", "supply", function(.Object, ...) {
 #'
 #' @rdname newSupply
 #' @order 1
-#' @family supply, process
+#' @family supply process
 #'
 #' @return supply object with given specifications.
 #' @export
@@ -117,6 +113,7 @@ setMethod("initialize", "supply", function(.Object, ...) {
 #'    region = c("R1", "R2", "R3")
 #'  )
 #' class(SUP_COA)
+#' # draw(SUP_COA)
 newSupply <- function(
   name = "",
   desc = "",

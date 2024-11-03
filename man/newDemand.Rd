@@ -63,6 +63,8 @@ DSTEEL <- newDemand(
  ),
  region = "UTOPIA", # optional, to narrow the specification of the demand
  )
+ class(DSTEEL)
+ draw(DSTEEL)
 
 }
 \concept{demand update}
