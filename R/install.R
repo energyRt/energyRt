@@ -22,24 +22,37 @@ en_install_julia_pkgs <- function(pkgs = NULL, update = FALSE) {
               "Gadfly", "DataFrames", "CSV", "SQLite", "Dates")
   }
 
-  # check if Julia is installed
-  if (!file.exists(Sys.which("julia"))) {
-    stop("Julia is not installed. Please install Julia from https://julialang.org/downloads/")
+  # check if Julia is installed and available on the path
+  
+  jp <- get_julia_path() |> paste0("julia")
+  if (!file.exists(jp)) {
+    # try default path
+    jp <- Sys.which("julia")
   }
-
+  if (!file.exists(jp)) {
+    stop("\nCannot locate julia executable on the path.", 
+         "In Julia is not installed, download and install from https://julialang.org/downloads/")
+  }
+  
+  message("Using Julia at ", jp, "\n")
+  
   # create a temporary file to install Julia packages
-  tmp <- tempfile()
+  tmp_file <- tempfile("julia_install_", fileext = ".jl")
+  # tmp <- file("tmp/julia_install.jl", open = "wt")
+  tmp_con <- file(tmp_file, open = "wt")
 
   # write the script to install Julia packages
+  writeLines("using Pkg", tmp_con)
   for (pkg in pkgs) {
-    writeLines(paste0("using Pkg; Pkg.add(\"", pkg, "\")"), tmp)
+    writeLines(paste0("Pkg.add(\"", pkg, "\")"), tmp_con, sep = "\n")
   }
   if (update) {
-    writeLines("using Pkg; Pkg.update()", tmp)
+    writeLines("Pkg.update()", tmp_con)
   }
+  close(tmp_con)
 
   # run Julia with the script
-  system2("julia", c("--color=yes", tmp))
+  system2(jp, c("--color=yes", tmp_file))
 
   # remove the temporary file
   unlink(tmp)

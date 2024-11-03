@@ -1,12 +1,22 @@
 ---
 title: " Installation and Settings"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  eval = TRUE,
   comment = "#>"
 )
 ```
 
-...
+```{r setup, include = FALSE, eval = FALSE}
+library(energyRt)
+get_julia_path()
+set_julia_path("/Users/USER/.juliaup/bin/")
+en_install_julia_pkgs()
+set_default_solver(solver_options$julia_highs)
+```
+

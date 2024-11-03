@@ -23,4 +23,4 @@ library(knitr)
 # include_graphics('images/DALL-E-at-work.png', dpi = NA)
 ```
 
-
+...

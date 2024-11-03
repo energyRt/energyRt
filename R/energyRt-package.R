@@ -2,6 +2,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom data.table :=
 #' @importFrom data.table .BY
 #' @importFrom data.table .EACHI
 #' @importFrom data.table .GRP
@@ -9,7 +10,6 @@
 #' @importFrom data.table .N
 #' @importFrom data.table .NGRP
 #' @importFrom data.table .SD
-#' @importFrom data.table :=
 #' @importFrom data.table as.data.table
 #' @importFrom data.table data.table
 #' @importFrom data.table hour
@@ -48,6 +48,7 @@
 #' @importFrom dplyr row_number
 #' @importFrom dplyr rowwise
 #' @importFrom dplyr select
+#' @importFrom dplyr semi_join
 #' @importFrom dplyr slice_head
 #' @importFrom dplyr summarise
 #' @importFrom dplyr summarize

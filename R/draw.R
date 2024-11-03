@@ -803,7 +803,7 @@ draw.supply <- function(obj, ...) {
   #           # "value",
   #           "lab_par", "lab_txt",
   #           "tech", "group", "weather", "unit", "io", "parameter")
-
+  # browser()
   sup_par <- obj@availability |>
     pivot_longer(
       cols = matches("ava|cost"),
@@ -845,6 +845,7 @@ draw.supply <- function(obj, ...) {
       lab_txt = make_label(
         ioname,
         in_brackets = obj@unit,
+        return_name_if_empty = TRUE,
         two_lines = F
       ),
       parameter = "imp"
@@ -852,13 +853,14 @@ draw.supply <- function(obj, ...) {
 
   arrow_labels <- make_label(
     obj@commodity,
-    in_brackets = obj@unit,
+    in_brackets = obj@unit, 
+    return_name_if_empty = TRUE,
     two_lines = F
   )
   names(arrow_labels) <- obj@commodity
 
   # reserve
-  if (!is.null(obj@reserve)) {
+  if (nrow(obj@reserve) > 0) {
     res_par <- obj@reserve |>
       pivot_longer(
         cols = matches("res"),
@@ -905,6 +907,11 @@ draw.supply <- function(obj, ...) {
         parameter = "sup"
       )
     res_par
+  } else {
+    res_par <- list(
+      lab_par = NULL,
+      lab_txt = NULL
+    )
   }
 
   draw_process(
@@ -951,6 +958,7 @@ setMethod("draw", "supply", draw.supply)
 
 ## draw.demand ####
 draw.demand <- function(obj, ...) {
+  # browser()
   dem_par <- obj@dem |>
     pivot_longer(
       cols = matches("dem"),
@@ -987,6 +995,7 @@ draw.demand <- function(obj, ...) {
       lab_txt = make_label(
         ioname,
         in_brackets = obj@unit,
+        return_name_if_empty = TRUE,
         two_lines = F
       ),
       parameter = "dem"
@@ -996,6 +1005,7 @@ draw.demand <- function(obj, ...) {
   arrow_labels <- make_label(
     obj@commodity,
     in_brackets = obj@unit,
+    return_name_if_empty = TRUE,
     two_lines = F
   )
   names(arrow_labels) <- obj@commodity
@@ -1547,6 +1557,8 @@ setMethod("draw", "trade", draw.trade)
 #' formatted as a range
 #' @param two_lines A logical value to indicate if the label should be in
 #' two lines
+#' @param return_name_if_empty A logical value to return the name if the content
+#' of the brackets is NA or empty.
 #' @param bracket_type A character string with the type of brackets to use,
 #'  one of "round", "square", "curly", "angle", or NULL
 #' @noRd
@@ -1556,6 +1568,7 @@ make_label <- function(
     in_brackets = NULL,
     make_range = TRUE,
     two_lines = FALSE,
+    return_name_if_empty = FALSE,
     bracket_type = "round", # "round", "square", "curly", "angle", or NULL
     comma = ",") {
   # browser()
@@ -1575,7 +1588,8 @@ make_label <- function(
   }
   in_brackets <- in_brackets[!is.na(in_brackets)]
   if (is_empty(in_brackets)) {
-    return("")
+    # browser()
+    return(if_else(return_name_if_empty, name, ""))
   }
   if (is.numeric(in_brackets)) {
     if (length(unique(in_brackets)) > 1) {
@@ -1846,6 +1860,7 @@ draw_process <- function(
     process_name_fontsize = 14,
     process_desc_fontsize = 10,
     font_spacing = .06,
+    fig_background = "white",
     arrow_comm_color = "red3",
     arrow_aux_color = "royalblue4",
     arrow_weather_color = "forestgreen") {
@@ -1862,8 +1877,14 @@ draw_process <- function(
       }
 
       # try(dev.off())
-
       grid::grid.newpage()
+      if (!is.null(fig_background) && !is.na(fig_background)) {
+        grid::grid.rect(
+          x = 0.5, y = 0.5,
+          width = 1, height = 1,
+          gp = grid::gpar(fill = fig_background, col = NA)
+        )
+      }
       # Set a viewport
       vp <- grid::viewport(
         width = grid::unit(1, "npc"),
@@ -1892,7 +1913,8 @@ draw_process <- function(
       )
 
       # Process description subtitle
-      if (!is.null(process_desc) && process_desc != "") {
+      # browser()
+      if (!is_empty(process_desc) && process_desc != "") {
         txt_x <- 0.5 + box_height / 2 + spacing_bw_titles +
           font_in_npc(process_desc_fontsize) / 2
         # txt_x <- 0.5 + box_height / 2 + .05

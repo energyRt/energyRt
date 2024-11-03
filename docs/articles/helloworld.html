@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.5.9004</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,8 +89,256 @@
 
     
     
+<div class="section level2">
+<h2 id="a-minimal-working-example">A minimal working example<a class="anchor" aria-label="anchor" href="#a-minimal-working-example"></a>
+</h2>
+<p>An energy system model optimizes technological chains to meet a given
+(exogenous) demand for a commodity (e.g. electricity, heat, etc.) using
+given resources (e.g. fuels, renewable energy sources, etc.) and
+available technological options (e.g. power plants, heat pumps, etc.).
+The minimal model must have a definition of the final demand and
+available resources.<br>
+Let’s start with the package settings and continue with the minimal
+model definition.<br></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://energyRt.org">energyRt</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://energyRt.org">energyRt</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span> <span class="co"># for data manipulation and visualization</span></span></code></pre></div>
+<p>Check which solver is set</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_solver</span> <span class="op">&lt;-</span> <span class="fu">get_default_solver</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">my_solver</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $name</span></span>
+<span><span class="co">#&gt; [1] "glpk"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $lang</span></span>
+<span><span class="co">#&gt; [1] "glpk"</span></span></code></pre></div>
+<p>(Optional) change default solver.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">set_default_solver</span><span class="op">(</span><span class="va">solver_options</span><span class="op">$</span><span class="va">julia_highs</span><span class="op">)</span></span></code></pre></div>
+<p>Check/set directory to store scenarios using the
+<code>set_scenarios_path</code> and <code>get_scenarios_path</code>
+functions.<br></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/options.html">get_scenarios_path</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "scenarios/"</span></span></code></pre></div>
+<p>The following minimal model consists of a commodity, a supply, and a
+demand object.<br>
+The commodity object is defined using the <code>newCommodity</code>
+constructor-function. The commodity object has a name and a
+description. </p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># define a commodity</span></span>
+<span><span class="va">COM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCommodity.html">newCommodity</a></span><span class="op">(</span><span class="st">"COM"</span><span class="op">)</span></span></code></pre></div>
+<p>The supply object is defined using the <code>newSupply</code>
+constructor-function. The supply object has a name, a description, a
+commodity it supplies, and availability data. The availability data is a
+data frame with a time-series of costs or prices of the commodity.<br></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Declare a domestic supply (market) for the commodity</span></span>
+<span><span class="va">SUP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"SUP"</span>, </span>
+<span>  desc <span class="op">=</span> <span class="st">"Domestic supply of commodity"</span>,</span>
+<span>  commodity <span class="op">=</span> <span class="st">"COM"</span>,</span>
+<span>  availability <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    cost <span class="op">=</span> <span class="fl">10</span> <span class="co"># costs or prices of the commodity</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>This simple supply object sets no physical limits on the availability
+of the commodity. Only the price is set.<br></p>
+<p>Schematic representation of the supply object shows an output arrow
+with the name of the supply object and the commodity it supplies. No
+inputs are required to “produce” the commodity in the model.<br></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">SUP</span><span class="op">)</span></span></code></pre></div>
+<p><img src="helloworld_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p>Demand is an opposite object to supply. It represents the final
+consumption of a commodity in the model.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">DEM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newDemand.html">newDemand</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"DEM"</span>,</span>
+<span>  desc <span class="op">=</span> <span class="st">"Final demand for commodity"</span>,</span>
+<span>  commodity <span class="op">=</span> <span class="st">"COM"</span>,</span>
+<span>  dem <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    slice <span class="op">=</span> <span class="st">"ANNUAL"</span>, <span class="co"># time-slices are defined in the calendar object</span></span>
+<span>    dem <span class="op">=</span> <span class="fl">100</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">DEM</span><span class="op">)</span></span></code></pre></div>
+<p><img src="helloworld_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p>The minimal model can be built now from the created objects. There is
+a commodity that is supplied and demanded. The commodity has a price,
+and the demand is exogenously set. The optimization problem is quite
+simple: minimize the costs of supplying the demand. No technological
+alternatives are available yet in the model to choose from. No
+constraints are set on resources.<br></p>
+<p>Let’s create a model object and solve it. Several settings are
+required to parameterize the model and create a model object:<br>
+- <code>region</code> - a name of a geographical region where the model
+is defined.<br>
+- <code>data</code> - a repository object that stores all data objects
+used in the model.<br>
+- <code>calendar</code> - a calendar object that defines the time
+structure of the model.<br>
+- <code>horizon</code> - a horizon object that defines the time horizon
+of the model.<br>
+- <code>discount</code> - a discount rate used to compute the present
+value of costs in different time periods.<br></p>
+<p>The repository object is created by combining all data objects used
+in the model in all scenarios or a group of scenarios. Additional data
+(model objects and settings) can be added to a particular
+scenario.<br></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># create a repository object to store the core model data</span></span>
+<span><span class="va">world_repo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newRepository.html">newRepository</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"world_repo"</span>, <span class="va">COM</span>, <span class="va">SUP</span>, <span class="va">DEM</span><span class="op">)</span></span>
+<span><span class="co"># check content of the repository by type/class</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">world_repo</span><span class="op">)</span></span>
+<span><span class="co">#&gt; commodity    demand    supply </span></span>
+<span><span class="co">#&gt;         1         1         1</span></span>
+<span><span class="co"># check names of the repository objects</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">world_repo</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "COM" "SUP" "DEM"</span></span></code></pre></div>
+<p>The calendar object defines the time structure of the model:
+time-frames and time-slices. Time-frames are names of time periods that
+include time-slices. Time-slices are minimal time units in a particular
+time-frame. Time-frames have nested structure. The top level is a year,
+with name <code>ANNUAL</code>. This is a default and if no sub-anual
+resolutions are set, the simplest time structure. </p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">hello_calendar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newCalendar.html">newCalendar</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># default calendar with no sub-annual resolutions</span></span></code></pre></div>
+<p>Horizon object defines the time horizon of the model. It is a
+sequence of milestone years and periods for each milestone. The example
+below defines a planning horizon from 2025 to 2050 with 5-year
+intervals.<br>
+One-year horizon:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">planning_2025</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newHorizon.html">newHorizon</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
+<span><span class="va">planning_2025</span></span>
+<span><span class="co">#&gt; An object of class "horizon"</span></span>
+<span><span class="co">#&gt; Slot "name":</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Slot "desc":</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Slot "period":</span></span>
+<span><span class="co">#&gt; [1] 2025</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Slot "intervals":</span></span>
+<span><span class="co">#&gt;    start   mid   end</span></span>
+<span><span class="co">#&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1:  2025  2025  2025</span></span></code></pre></div>
+<p>Multi-year horizon:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">planning_horizon</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newHorizon.html">newHorizon</a></span><span class="op">(</span></span>
+<span>  period <span class="op">=</span> <span class="fl">2025</span><span class="op">:</span><span class="fl">2050</span>, </span>
+<span>  intervals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">planning_horizon</span></span>
+<span><span class="co">#&gt; An object of class "horizon"</span></span>
+<span><span class="co">#&gt; Slot "name":</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Slot "desc":</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Slot "period":</span></span>
+<span><span class="co">#&gt;  [1] 2025 2026 2027 2028 2029 2030 2031 2032 2033 2034 2035 2036 2037 2038 2039</span></span>
+<span><span class="co">#&gt; [16] 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Slot "intervals":</span></span>
+<span><span class="co">#&gt;    start   mid   end</span></span>
+<span><span class="co">#&gt;    &lt;num&gt; &lt;num&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2025  2025  2025</span></span>
+<span><span class="co">#&gt; 2:  2026  2027  2029</span></span>
+<span><span class="co">#&gt; 3:  2030  2032  2034</span></span>
+<span><span class="co">#&gt; 4:  2035  2037  2039</span></span>
+<span><span class="co">#&gt; 5:  2040  2042  2044</span></span>
+<span><span class="co">#&gt; 6:  2045  2047  2049</span></span>
+<span><span class="co">#&gt; 7:  2050  2050  2050</span></span></code></pre></div>
+<p>The <code>newModel</code> constructor-function combines all the
+configuration and data objects to create a model object.<br></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newModel.html">newModel</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"MODEL"</span>, </span>
+<span>  region <span class="op">=</span> <span class="st">"WORLD"</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">world_repo</span>,</span>
+<span>  calendar <span class="op">=</span> <span class="va">hello_calendar</span>,</span>
+<span>  horizon <span class="op">=</span> <span class="va">planning_2025</span>,</span>
+<span>  discount <span class="op">=</span> <span class="fl">0.05</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "model"</span></span>
+<span><span class="co">#&gt; attr(,"package")</span></span>
+<span><span class="co">#&gt; [1] "energyRt"</span></span></code></pre></div>
+<p>Once the model object is created, it can be solved using the
+<code>solve</code> function. The solved (or interpolated) model object
+becomes a scenario object.<br></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># solve for one year</span></span>
+<span><span class="va">scen_2025</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">mod</span>, name <span class="op">=</span> <span class="st">"HELLO_2025"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; model: 'MODEL'</span></span>
+<span><span class="co">#&gt; scenario: 'HELLO_2025'</span></span>
+<span><span class="co">#&gt; path: scenarios/HELLO_2025_MODEL</span></span>
+<span><span class="co">#&gt; inMemory: TRUE</span></span>
+<span><span class="co">#&gt; Interpolating parameters</span></span>
+<span><span class="co">#&gt;  Repository 'world_repo'</span></span>
+<span><span class="co">#&gt; Validating sets</span></span>
+<span><span class="co">#&gt; Validating constraints</span></span>
+<span><span class="co">#&gt;  Repository 'world_repo'</span></span>
+<span><span class="co">#&gt; Validating weather-sets</span></span>
+<span><span class="co">#&gt;                                                                                                                 1.799 sec elapsed</span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241103184929UTC </span></span>
+<span><span class="co">#&gt; Starting time:  2024-11-03 13:49:29 </span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241103184929UTC </span></span>
+<span><span class="co">#&gt; Writing files: 0.21s</span></span>
+<span><span class="co">#&gt; Starting  glpk </span></span>
+<span><span class="co">#&gt; 0.02s</span></span>
+<span><span class="co">#&gt; Reading solution: 0.03s</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_2025</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Scenario: HELLO_2025 </span></span>
+<span><span class="co">#&gt; desc:  </span></span>
+<span><span class="co">#&gt; Model: MODEL </span></span>
+<span><span class="co">#&gt; Interpolated: TRUE </span></span>
+<span><span class="co">#&gt; path: scenarios/HELLO_2025_MODEL </span></span>
+<span><span class="co">#&gt; Solution status: optimal</span></span>
+<span><span class="co">#&gt; vObjective:  1000 </span></span>
+<span><span class="co">#&gt; Size: 3.5 Mb</span></span></code></pre></div>
+<p>Solving for multiple years assumes the perferct foresight of the all
+given data for the future. Since we haven’t defined any years for the
+data, it is extrapolated by default for demand and supply objects.<br></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># solve for multi-year horizon by adding the horizon object</span></span>
+<span><span class="va">scen_2050</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">mod</span>, name <span class="op">=</span> <span class="st">"HELLO_WORLD"</span>, </span>
+<span>                   calendar <span class="op">=</span> <span class="va">planning_horizon</span><span class="op">)</span></span>
+<span><span class="co">#&gt; model: 'MODEL'</span></span>
+<span><span class="co">#&gt; scenario: 'HELLO_WORLD'</span></span>
+<span><span class="co">#&gt; path: scenarios/HELLO_WORLD_MODEL</span></span>
+<span><span class="co">#&gt; inMemory: TRUE</span></span>
+<span><span class="co">#&gt; Interpolating parameters</span></span>
+<span><span class="co">#&gt;  Repository 'world_repo'</span></span>
+<span><span class="co">#&gt; Validating sets</span></span>
+<span><span class="co">#&gt; Validating constraints</span></span>
+<span><span class="co">#&gt;  Repository 'world_repo'</span></span>
+<span><span class="co">#&gt; Validating weather-sets</span></span>
+<span><span class="co">#&gt;                                                                                                                 1.565 sec elapsed</span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241103184931UTC </span></span>
+<span><span class="co">#&gt; Starting time:  2024-11-03 13:49:31 </span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241103184931UTC </span></span>
+<span><span class="co">#&gt; Writing files: 0.21s</span></span>
+<span><span class="co">#&gt; Starting  glpk </span></span>
+<span><span class="co">#&gt; 0.02s</span></span>
+<span><span class="co">#&gt; Reading solution: 0.03s</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_2050</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Scenario: HELLO_WORLD </span></span>
+<span><span class="co">#&gt; desc:  </span></span>
+<span><span class="co">#&gt; Model: MODEL </span></span>
+<span><span class="co">#&gt; Interpolated: TRUE </span></span>
+<span><span class="co">#&gt; path: scenarios/HELLO_WORLD_MODEL </span></span>
+<span><span class="co">#&gt; Solution status: optimal</span></span>
+<span><span class="co">#&gt; vObjective:  15093.94 </span></span>
+<span><span class="co">#&gt; Size: 3.6 Mb</span></span></code></pre></div>
+<p>tbc…</p>
+</div>
   </main>
 </div>
 
