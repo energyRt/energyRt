@@ -1,19 +1,23 @@
 # usethis::use_package("registry")
-# Registry is class for storing and managing records of scenarios, models, and repositories. 
+# Registry is class for storing and managing records of scenarios, models, and repositories.
 # Unless specified, the registry is stored in the global environment. It has entries of objects located either in the global environment (.GlobalEnv), default environment to store scenario or model objects (.scen), or stored in the file system.
 # The 'registry' objects are lightweight and can be saved on the disk and loaded back.
 
-#' Create a new registry object.
+#' @title Create a new registry object.
+#'
+#' @description
+#' Create a new registry object to store records of scenarios, models, and repositories.
+#' `r lifecycle::badge("experimental")`
 #'
 #' @param class character, type of the classes to be stored in the registry.
 #' @param name character, name of the registry object.
 #' @param registry_env character, environment to store the registry object.
 #' @param store_env character, environment to store the objects.
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#' # The `registry` methods are in development.
 newRegistry <- function(
     class = c("scenario", "model", "repository"),
     name = NULL,
@@ -30,7 +34,7 @@ newRegistry <- function(
   book$set_field("path", "character", is_mandatory = FALSE, is_key = FALSE)
   # entry specific:
   book$set_field("memo", "character", is_mandatory = FALSE, is_key = FALSE)
-  book$set_field("datetime", class(Sys.time()), is_mandatory = FALSE, 
+  book$set_field("datetime", class(Sys.time()), is_mandatory = FALSE,
                  is_key = FALSE)
   book$set_field("user", "character")
   book$set_field("system", "character")
@@ -52,6 +56,10 @@ newRegistry <- function(
 
 #' Register an object in the registry.
 #'
+#' @description
+#' Register an repository, model, or scenario object in the registry.
+#' `r lifecycle::badge("experimental")`
+#'
 #' @param obj object to be registered.
 #' @param registry registry object to add the entry.
 #' @param name character, name of the object.
@@ -65,10 +73,10 @@ newRegistry <- function(
 #' @param env character, environment where the object is stored.
 #' @param replace logical, if TRUE, replace the existing entry.
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#' # `registry` methods are in development.
 register <- function(
     obj,
     registry,
@@ -85,18 +93,18 @@ register <- function(
     ...,
     env = obj@misc$env,
     replace = FALSE
-    # update = TRUE, 
+    # update = TRUE,
     # history = FALSE
     ) {
   browser()
-  
+
   reg_exist <- registry$get_entry(
     name = name,
     project = project,
     path = path,
     ...
   )
-  
+
   if (!is.null(reg_exist)) {
     if (replace) {
       registry$remove_entry(name)
@@ -109,7 +117,7 @@ register <- function(
       )
     }
   }
-  
+
   registry$set_entry(
     name = obj@name,
     class = class(obj),
@@ -160,16 +168,16 @@ if (F) {
   set_default_registry("SCEN", ".GlobalEnv")
   which_registry()
   get_registry()
-  
+
   SCEN$get_fields() |> names()
   use_registry("SCEN")
   which_registry()
-  
+
   register(scen_BASE, SCEN)
   SCEN$get_entries("BASE")
   SCEN$n_of_entries()
   SCEN$has_entry("BASE")
-  
+
   SCEN[["BASE"]]
   getScenario("BASE")
 
@@ -182,6 +190,6 @@ if (F) {
   SCEN$get_entries()
   SCEN[["TEST"]]
   register(scen_TES= TRUE, SCEN)
-  
+
 }
 

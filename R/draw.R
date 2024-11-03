@@ -24,17 +24,24 @@ keys <- c(
   "tech", "group", "weather", "unit", "io", "parameter"
 )
 
+# fixing "no visible binding for global variable" warnings
+utils::globalVariables(
+  c("value", "parameter", "comm", "acomm", "unit", "weather",
+    "lab_par", "lab_txt", "lab_waf", "lab_wcinp", "lab_wafs",
+    "lab_wafc", "lab_waf", "lab_wafs", "lab_par", "lab_txt",
+    "ioname", "iotype", "group", "waf.fx", "waf.lo", "waf.up",
+    "wafs.fx", "wafs.lo", "wafs.up", "wafc.fx", "wafc.lo", "wafc.up",
+    "ainp", "aout", "wacinp.fx", "wacinp.lo", "wacinp.up",
+    "wacout.fx", "wacout.lo", "wacout.up", "wacact.fx", "wacact.lo",
+    "wcinp.fx", "wcinp.lo", "wcinp.up", "wcout.fx", "wcout.lo", "wcout.up",
+    "src", "dst", "region", "year", "slice",
+    "cap2act", "cap2stg", "cap2use")
+)
+
 ## draw.technology ####
 draw.technology <- function(obj, ...) {
   # browser()
 
-  # key columns
-  keys <- c(
-    "region", "year", "slice", "comm", "acomm",
-    # "value",
-    "lab_par", "lab_txt",
-    "tech", "group", "weather", "unit", "io", "parameter"
-  )
 
   # com_tbl <- bind_rows(
   #   obj@input |>  mutate(io = "cinp", .before = 1),
@@ -919,7 +926,7 @@ draw.supply <- function(obj, ...) {
 #' @rdname draw
 #'
 #' @export
-#' 
+#'
 #' @examples
 #' SUP_COA <- newSupply(
 #'    name = "SUP_COA",

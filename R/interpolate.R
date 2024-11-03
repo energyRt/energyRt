@@ -850,6 +850,9 @@ interpolate_model <- function(object, ...) { #- returns class scenario
 #' @family interpolate model
 #'
 #' @examples
+#' \dontrun{
+#' scen <- interpolate(mod)
+#' }
 setMethod("interpolate", signature(object = "model"),
   function(object, ...) {
     interpolate_model(object, ...)

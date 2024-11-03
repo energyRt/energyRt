@@ -1,5 +1,5 @@
 #' An S4 class to specify the model set or parameter
-#' 
+#'
 #' @description
 #' Class `parameter` is used to represent the model set or parameter.
 #' All parameters and sets used in the model are populated with data
@@ -7,7 +7,7 @@
 #' and stored as a named list in `model@modInp@data` slot.
 #' The class and related methods and functions are not
 #' intended for direct use by the user.
-#' 
+#'
 #' @slot name `r get_slot_info("parameter", "name")`
 #' @slot desc `r get_slot_info("parameter", "desc")`
 #' @slot type `r get_slot_info("parameter", "type")`
@@ -175,12 +175,10 @@ setMethod("initialize", signature = "parameter",
 )
 
 #' @family parameter
-#' @export
 #' @noRd
 newParameter <- function(...) new("parameter", ...)
 
 #' @family parameter
-#' @export
 #' @noRd
 newSet <- function(dimSets) {
   if (length(dimSets) != 1) stop("Sets must have only one dimension")
