@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,7 +111,7 @@ model definition.<br></p>
 <span><span class="co">#&gt; [1] "glpk"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $lang</span></span>
-<span><span class="co">#&gt; [1] "glpk"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "GLPK"</span></span></code></pre></div>
 <p>(Optional) change default solver.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">set_default_solver</span><span class="op">(</span><span class="va">solver_options</span><span class="op">$</span><span class="va">julia_highs</span><span class="op">)</span></span></code></pre></div>
@@ -286,14 +286,14 @@ becomes a scenario object.<br></p>
 <span><span class="co">#&gt; Validating constraints</span></span>
 <span><span class="co">#&gt;  Repository 'world_repo'</span></span>
 <span><span class="co">#&gt; Validating weather-sets</span></span>
-<span><span class="co">#&gt;                                                                                                                 1.799 sec elapsed</span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241103184929UTC </span></span>
-<span><span class="co">#&gt; Starting time:  2024-11-03 13:49:29 </span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241103184929UTC </span></span>
-<span><span class="co">#&gt; Writing files: 0.21s</span></span>
-<span><span class="co">#&gt; Starting  glpk </span></span>
-<span><span class="co">#&gt; 0.02s</span></span>
-<span><span class="co">#&gt; Reading solution: 0.03s</span></span>
+<span><span class="co">#&gt;                                                                                                                 1.45 sec elapsed</span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241104004405UTC </span></span>
+<span><span class="co">#&gt; Starting time:  2024-11-03 19:44:05 </span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241104004405UTC </span></span>
+<span><span class="co">#&gt; Writing files: 0.17s</span></span>
+<span><span class="co">#&gt; Starting  GLPK </span></span>
+<span><span class="co">#&gt; 0.03s</span></span>
+<span><span class="co">#&gt; Reading solution: 0.04s</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_2025</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scenario: HELLO_2025 </span></span>
 <span><span class="co">#&gt; desc:  </span></span>
@@ -320,13 +320,13 @@ data, it is extrapolated by default for demand and supply objects.<br></p>
 <span><span class="co">#&gt; Validating constraints</span></span>
 <span><span class="co">#&gt;  Repository 'world_repo'</span></span>
 <span><span class="co">#&gt; Validating weather-sets</span></span>
-<span><span class="co">#&gt;                                                                                                                 1.565 sec elapsed</span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241103184931UTC </span></span>
-<span><span class="co">#&gt; Starting time:  2024-11-03 13:49:31 </span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241103184931UTC </span></span>
-<span><span class="co">#&gt; Writing files: 0.21s</span></span>
-<span><span class="co">#&gt; Starting  glpk </span></span>
-<span><span class="co">#&gt; 0.02s</span></span>
+<span><span class="co">#&gt;                                                                                                                 1.31 sec elapsed</span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241104004406UTC </span></span>
+<span><span class="co">#&gt; Starting time:  2024-11-03 19:44:06 </span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241104004406UTC </span></span>
+<span><span class="co">#&gt; Writing files: 0.18s</span></span>
+<span><span class="co">#&gt; Starting  GLPK </span></span>
+<span><span class="co">#&gt; 0.03s</span></span>
 <span><span class="co">#&gt; Reading solution: 0.03s</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_2050</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scenario: HELLO_WORLD </span></span>

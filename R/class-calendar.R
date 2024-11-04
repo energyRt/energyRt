@@ -1,6 +1,6 @@
 # calendar-class ####
 #' An S4 class to represent sub-annual time resolution structure.
-#' 
+#'
 #' @name class-calendar
 #'
 #' @description
@@ -22,7 +22,7 @@
 #' @slot next_in_timeframe `r get_slot_info("calendar", "next_in_timeframe")`
 #' @slot next_in_year `r get_slot_info("calendar", "next_in_year")`
 #' @slot misc `r get_slot_info("calendar", "misc")`
-#' 
+#'
 #' @include generics.R defaults.R
 #' @rdname class-calendar
 #' @export
@@ -205,8 +205,8 @@ if (F) {
 #' Generate a new calendar object from
 #'
 #' @name newCalendar
-#' 
-#' 
+#'
+#'
 #' @param name `r get_slot_info("calendar", "name")`
 #' @param desc `r get_slot_info("calendar", "desc")`
 #' @param timetable `r get_slot_info("calendar", "timetable")`
@@ -219,14 +219,14 @@ if (F) {
 #' @return an object of class `calendar` with the specified structure.
 #'
 #' @description
-#' Calendars are defined by the structure of timeframes and time-slices 
+#' Calendars are defined by the structure of timeframes and time-slices
 #' with shares of time in a year. The structure is represented by a
-#' `timetable` data.frame with levels of timeframes in the named columns, 
+#' `timetable` data.frame with levels of timeframes in the named columns,
 #' and names of individual time-slices in every timeframe.
-#' The number of rows in `timetable` is equal to the total number 
-#' of time-slices on the lowest level. 
-#' Every timeframe is a set of timeslices ("slices") - a named fragment 
-#' of time with a year-share. Timeframes have nested structure. 
+#' The number of rows in `timetable` is equal to the total number
+#' of time-slices on the lowest level.
+#' Every timeframe is a set of timeslices ("slices") - a named fragment
+#' of time with a year-share. Timeframes have nested structure.
 #' Currently, every "parent"-timeframe must have the same number of
 #' elements as the "child"-timeframe. (This may change in the future.)
 #' \describe{
@@ -236,7 +236,7 @@ if (F) {
 #'   \item{...}{character, (optional) further subannual levels of timeframes}
 #'   \item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `{SLICE2}_{SLICE3}...`}
 #' }
-#' 
+#'
 #' @order 1
 #' @export
 #'
@@ -245,8 +245,8 @@ if (F) {
 newCalendar <- function(
     name = "",
     desc = "",
-    timetable = NULL, 
-    year_fraction = 1, 
+    timetable = NULL,
+    year_fraction = 1,
     default_timeframe = NULL,
     misc = list(),
     ...) {
@@ -788,7 +788,7 @@ if (F) {
   # browser()
   slt <- getSlots(class(app))
   slt <- names(slt)[slt %in% c("data.frame", "data.table")]
-  if (class(app) == "technology") slt <- slt[slt != "afs"]
+  if (is(app, "technology")) slt <- slt[slt != "afs"]
   for (ss in slt) {
     if (any(colnames(slot(app, ss)) == "slice")) {
       tmp <- slot(app, ss) |> as.data.frame() # !!! rewrite

@@ -226,7 +226,7 @@ obj2disk <- function(
         nm <- names(obj@misc$onDisk[[s]])
         # dim_list <- vector("list", length(nm)); names(dim_list) <- nm
         # dim_list <- list()
-        if (class(obj)[1] == "model" & s == "data") {
+        if (is(obj, "model") & s == "data") {
           make_progress_bar <- FALSE
         } else {
           if (verbose) {

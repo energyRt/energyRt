@@ -142,7 +142,7 @@ check_name <- function(x) {
 #' findDuplicates(scen_BASE)
 #' }
 findDuplicates <- function(x) {
-  if (class(x) == 'scenario') {
+  if (is(x, 'scenario')) {
     rs <- NULL
     for (pr in names(x@modInp@parameters))
       if (x@modInp@parameters[[pr]]@type %in% c('numpar', 'bounds')) {
@@ -191,7 +191,7 @@ findDuplicates <- function(x) {
     res <- data.frame(repository = character(), object = character(),
                       slot = character(), parameter = character(),
                       stringsAsFactors = FALSE)
-    if (class(x) == 'model') {
+    if (is(x, 'model')) {
       rs <- NULL
       for (i in seq_along(x@data)) {
         tmp <- findDuplicates0(x@data[[i]])
@@ -209,7 +209,7 @@ findDuplicates <- function(x) {
       if (is.null(rs)) return(NULL)
       return(rs[, c(ncol(rs), 1:(ncol(rs) - 1))])
     } else
-      if (class(x) == 'repository') {
+      if (is(x, 'repository')) {
         rs <- NULL
         for (i in seq_along(x@data)) {
           tmp <- findDuplicates0(x@data[[i]])
@@ -221,15 +221,15 @@ findDuplicates <- function(x) {
         if (is.null(rs)) return(NULL)
         return(rs[, c(ncol(rs), 1:(ncol(rs) - 1))])
       } else
-        if (class(x) %in% c('tax', 'sub', 'weather', 'supply',
+        if (inherits(x, c('tax', 'sub', 'weather', 'supply',
                             'import', 'export', 'trade', 'technology',
-                            'demand', 'storage')) {
+                            'demand', 'storage'))) {
           slt_name <- getSlots(class(x))
           slt_name <- names(slt_name)[
             slt_name == 'data.frame' &
               !(names(slt_name) %in% c('input', 'output', 'aux'))]
           return(check_by_slots(x, slt_name))
-        } else if (class(x) %in% c('constraint')) {
+        } else if (is(x, c('constraint'))) {
           tmp <- check_by_slots(x, c('rhs', 'for.each'))
           for (y in seq_along(x@lhs)) {
             nn <- check_by_slots(x@lhs[[y]], 'mult')
@@ -239,11 +239,11 @@ findDuplicates <- function(x) {
             }
           }
           return(tmp)
-        } else if (class(x) %in% c('costs')) {
+        } else if (is(x, "costs")) {
           tmp <- check_by_slots(x, c('for.sum', 'for.each', 'mult'))
           return(tmp)
-        } else if (class(x) %in% c('slice', 'commodity')) {
-        } else if (class(x) %in% c('config')) {
+        } else if (inherits(x, c('slice', 'commodity'))) {
+        } else if (is(x, 'config')) {
           return(check_by_slots(x, c('debug', 'discount')))
         } else warning(paste0('Unknown class "', class(x), '"'))
     NULL

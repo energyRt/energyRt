@@ -330,9 +330,9 @@ setMethod("solve", signature(a = "missing", b = "missing"), function(...) {
   # browser()
   arg <- list(...)
   if (is.null(arg$obj)) do.call(NextMethod, arg)
-  if (class(arg$obj)[1] == "scenario") {
+  if (is(arg$obj, "scenario")) {
     return(do.call(solve_scenario, arg))
-  } else if (class(arg$obj)[1] == "model") {
+  } else if (is(arg$obj, "model")) {
     return(do.call(solve_model, arg))
   } else {
     NextMethod(arg)

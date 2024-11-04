@@ -26,7 +26,8 @@ keys <- c(
 
 # fixing "no visible binding for global variable" warnings
 utils::globalVariables(
-  c("value", "parameter", "comm", "acomm", "unit", "weather",
+  c(
+    "value", "parameter", "comm", "acomm", "unit", "weather",
     "lab_par", "lab_txt", "lab_waf", "lab_wcinp", "lab_wafs",
     "lab_wafc", "lab_waf", "lab_wafs", "lab_par", "lab_txt",
     "ioname", "iotype", "group", "waf.fx", "waf.lo", "waf.up",
@@ -35,7 +36,8 @@ utils::globalVariables(
     "wacout.fx", "wacout.lo", "wacout.up", "wacact.fx", "wacact.lo",
     "wcinp.fx", "wcinp.lo", "wcinp.up", "wcout.fx", "wcout.lo", "wcout.up",
     "src", "dst", "region", "year", "slice",
-    "cap2act", "cap2stg", "cap2use")
+    "cap2act", "cap2stg", "cap2use"
+  )
 )
 
 ## draw.technology ####
@@ -54,7 +56,8 @@ draw.technology <- function(obj, ...) {
       lab_txt = make_label(
         comm,
         in_brackets = unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       )
     ) |>
     # add technology parameters
@@ -76,7 +79,8 @@ draw.technology <- function(obj, ...) {
       lab_txt = make_label(
         comm,
         in_brackets = unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       )
     ) |>
     # add technology parameters
@@ -114,7 +118,11 @@ draw.technology <- function(obj, ...) {
 
   if (nrow(gcom_par) > 0) {
     gcom_par <- gcom_par |>
-      group_by(across(any_of(c("comm", "acomm", "group", "unit", "io", "parameter")))) |>
+      group_by(
+        across(
+          any_of(c("comm", "acomm", "group", "unit", "io", "parameter"))
+        )
+      ) |>
       summarise(
         val_lbl = make_label(
           paste0(parameter, ":"),
@@ -143,7 +151,7 @@ draw.technology <- function(obj, ...) {
         # lab_use2cact = make_label(
         #   val_lbl,
         #   in_brackets = val_lbl,
-        #   two_lines = F
+        #   two_lines = FALSE
         # ),
         .groups = "drop"
       ) |>
@@ -157,7 +165,8 @@ draw.technology <- function(obj, ...) {
         lab_txt = make_label(
           comm,
           in_brackets = unit,
-          two_lines = F
+          return_name_if_empty = TRUE,
+          two_lines = FALSE
         )
       ) |>
       select(-val_lbl, -share_lbl) |>
@@ -178,7 +187,7 @@ draw.technology <- function(obj, ...) {
       lab_par = make_label(
         paste0(parameter, ":"),
         in_brackets = value,
-        two_lines = F
+        two_lines = FALSE
       ),
       .groups = "drop"
     ) |>
@@ -248,7 +257,8 @@ draw.technology <- function(obj, ...) {
         lab_txt = make_label(
           acomm,
           in_brackets = unit,
-          two_lines = F
+          return_name_if_empty = TRUE,
+          two_lines = FALSE
         ),
         lab_par = if_else(is.na(comm),
           lab_par,
@@ -592,7 +602,7 @@ draw.storage <- function(obj, ...) {
       # lab_txt = make_label(
       #   comm,
       #   in_brackets = obj@unit,
-      #   two_lines = F
+      #   two_lines = FALSE
       # )
       lab_txt = comm
       # ioname = comm
@@ -642,7 +652,8 @@ draw.storage <- function(obj, ...) {
       lab_txt = make_label(
         acomm,
         in_brackets = unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       )
     )
   aux
@@ -828,7 +839,8 @@ draw.supply <- function(obj, ...) {
       lab_txt = make_label(
         obj@commodity,
         in_brackets = obj@unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       )
     ) |>
     mutate(
@@ -846,16 +858,16 @@ draw.supply <- function(obj, ...) {
         ioname,
         in_brackets = obj@unit,
         return_name_if_empty = TRUE,
-        two_lines = F
+        two_lines = FALSE
       ),
       parameter = "imp"
     )
 
   arrow_labels <- make_label(
     obj@commodity,
-    in_brackets = obj@unit, 
+    in_brackets = obj@unit,
     return_name_if_empty = TRUE,
-    two_lines = F
+    two_lines = FALSE
   )
   names(arrow_labels) <- obj@commodity
 
@@ -885,7 +897,8 @@ draw.supply <- function(obj, ...) {
         lab_txt = make_label(
           obj@commodity,
           in_brackets = obj@unit,
-          two_lines = F
+          return_name_if_empty = TRUE,
+          two_lines = FALSE
         )
       ) |>
       mutate(
@@ -902,7 +915,8 @@ draw.supply <- function(obj, ...) {
         lab_txt = make_label(
           ioname,
           in_brackets = obj@unit,
-          two_lines = F
+          return_name_if_empty = TRUE,
+          two_lines = FALSE
         ),
         parameter = "sup"
       )
@@ -936,23 +950,23 @@ draw.supply <- function(obj, ...) {
 #'
 #' @examples
 #' SUP_COA <- newSupply(
-#'    name = "SUP_COA",
-#'    desc = "Coal supply",
-#'    commodity = "COA",
-#'    unit = "PJ",
-#'    reserve = data.frame(
-#'       region = c("R1", "R2", "R3"),
-#'       res.up = c(2e5, 1e4, 3e6) # total reserves/deposits
-#'    ),
-#'    availability = data.frame(
-#'       region = c("R1", "R2", "R3"),
-#'       year = NA_integer_,
-#'       slice = "ANNUAL",
-#'       ava.up = c(1e3, 1e2, 2e2), # annual availability
-#'       cost = c(10, 20, 30) # cost of the resource (currency per unit)
-#'    ),
-#'    region = c("R1", "R2", "R3")
-#'  )
+#'   name = "SUP_COA",
+#'   desc = "Coal supply",
+#'   commodity = "COA",
+#'   unit = "PJ",
+#'   reserve = data.frame(
+#'     region = c("R1", "R2", "R3"),
+#'     res.up = c(2e5, 1e4, 3e6) # total reserves/deposits
+#'   ),
+#'   availability = data.frame(
+#'     region = c("R1", "R2", "R3"),
+#'     year = NA_integer_,
+#'     slice = "ANNUAL",
+#'     ava.up = c(1e3, 1e2, 2e2), # annual availability
+#'     cost = c(10, 20, 30) # cost of the resource (currency per unit)
+#'   ),
+#'   region = c("R1", "R2", "R3")
+#' )
 #' draw(SUP_COA)
 setMethod("draw", "supply", draw.supply)
 
@@ -983,7 +997,8 @@ draw.demand <- function(obj, ...) {
       lab_txt = make_label(
         obj@commodity,
         in_brackets = obj@unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       )
     ) |>
     group_by(ioname, iotype, group) |>
@@ -996,7 +1011,7 @@ draw.demand <- function(obj, ...) {
         ioname,
         in_brackets = obj@unit,
         return_name_if_empty = TRUE,
-        two_lines = F
+        two_lines = FALSE
       ),
       parameter = "dem"
     )
@@ -1006,7 +1021,7 @@ draw.demand <- function(obj, ...) {
     obj@commodity,
     in_brackets = obj@unit,
     return_name_if_empty = TRUE,
-    two_lines = F
+    two_lines = FALSE
   )
   names(arrow_labels) <- obj@commodity
 
@@ -1030,19 +1045,19 @@ draw.demand <- function(obj, ...) {
 #'
 #' @examples
 #' DSTEEL <- newDemand(
-#'  name = "DSTEEL",
-#'  desc = "Steel demand",
-#'  commodity = "STEEL",
-#'  unit = "Mt",
-#'  dem = data.frame(
+#'   name = "DSTEEL",
+#'   desc = "Steel demand",
+#'   commodity = "STEEL",
+#'   unit = "Mt",
+#'   dem = data.frame(
 #'     region = "UTOPIA", # NA for every region
 #'     year = c(2020, 2030, 2050),
 #'     slice = "ANNUAL",
 #'     dem = c(100, 200, 300)
-#'  ),
-#'  region = "UTOPIA", # optional, to narrow the specification of the demand
-#'  )
-#'  draw(DSTEEL)
+#'   ),
+#'   region = "UTOPIA", # optional, to narrow the specification of the demand
+#' )
+#' draw(DSTEEL)
 #' @exportMethod draw
 setMethod(
   "draw", signature(obj = "demand"),
@@ -1123,7 +1138,8 @@ draw.export <- function(obj, ...) {
       lab_txt = make_label(
         ioname,
         in_brackets = obj@unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       ),
       parameter = "exp"
     )
@@ -1134,7 +1150,7 @@ draw.export <- function(obj, ...) {
   arrow_labels <- make_label(
     obj@commodity,
     in_brackets = obj@unit,
-    two_lines = F
+    two_lines = FALSE
   )
   names(arrow_labels) <- obj@commodity
 
@@ -1249,7 +1265,8 @@ draw.import <- function(obj, ...) {
       lab_txt = make_label(
         ioname,
         in_brackets = obj@unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       ),
       parameter = "imp"
     )
@@ -1260,7 +1277,7 @@ draw.import <- function(obj, ...) {
   arrow_labels <- make_label(
     obj@commodity,
     in_brackets = obj@unit,
-    two_lines = F
+    two_lines = FALSE
   )
   names(arrow_labels) <- obj@commodity
 
@@ -1306,7 +1323,7 @@ setMethod("draw", "import", draw.import)
 ## draw.trade ####
 draw.trade <- function(obj, ...) {
   arg <- list(...)
-
+  # browser()
   if (!is.null(arg$region)) {
     node <- arg$region
   } else if (!is.null(arg$node)) {
@@ -1374,7 +1391,7 @@ draw.trade <- function(obj, ...) {
       ioname = make_label(
         obj@commodity,
         in_brackets = dst,
-        two_lines = F
+        two_lines = FALSE
       ),
       group = NA_character_,
       lab_txt = ioname # !!! since 'unit' is NA
@@ -1410,7 +1427,8 @@ draw.trade <- function(obj, ...) {
       lab_txt = make_label(
         ioname,
         in_brackets = unit,
-        two_lines = F
+        return_name_if_empty = TRUE,
+        two_lines = FALSE
       )
     )
   aux_inp
@@ -1438,16 +1456,23 @@ draw.trade <- function(obj, ...) {
       .groups = "drop"
     ) |>
     filter(grepl("aout", parameter)) |>
-    rowwise() |>
-    mutate(
-      iotype = "aout",
-      ioname = paste0(acomm, ", ", dst),
-      lab_txt = make_label(
-        ioname,
-        in_brackets = unit,
-        two_lines = F
+  # if (nrow(aux_out) > 0) {
+    # aux_out <- aux_out |>
+      rowwise() |>
+      mutate(
+        iotype = "aout",
+        ioname = paste0(acomm, ", ", dst),
+        lab_txt = make_label(
+          ioname,
+          in_brackets = unit,
+          return_name_if_empty = TRUE,
+          two_lines = FALSE
+        )
       )
-    )
+  # } else {
+  #   aux_out$lab_par <- NULL
+  #   aux_out$lab_txt <- NULL
+  # }
   aux_out
 
   cap2act_label <- make_label(
@@ -1514,7 +1539,7 @@ draw.trade <- function(obj, ...) {
 #' @exportMethod draw
 #' @family draw trade
 #' @rdname draw
-#'@examples
+#' @examples
 #' PIPELINE2 <- newTrade(
 #'   name = "PIPELINE2",
 #'   desc = "Some transport pipeline",
@@ -1589,7 +1614,8 @@ make_label <- function(
   in_brackets <- in_brackets[!is.na(in_brackets)]
   if (is_empty(in_brackets)) {
     # browser()
-    return(if_else(return_name_if_empty, name, ""))
+    if (isTRUE(return_name_if_empty)) return(name)
+    return("")
   }
   if (is.numeric(in_brackets)) {
     if (length(unique(in_brackets)) > 1) {

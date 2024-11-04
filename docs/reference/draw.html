@@ -15,7 +15,7 @@ processes-type classes."><meta property="og:image" content="https://energyRt.org
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -216,39 +216,39 @@ Default is the first node in the trade object.</p></dd>
 <span class="r-plt img"><img src="draw-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">SUP_COA</span> <span class="op">&lt;-</span> <span class="fu"><a href="newSupply.html">newSupply</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   name <span class="op">=</span> <span class="st">"SUP_COA"</span>,</span></span>
-<span class="r-in"><span>   desc <span class="op">=</span> <span class="st">"Coal supply"</span>,</span></span>
-<span class="r-in"><span>   commodity <span class="op">=</span> <span class="st">"COA"</span>,</span></span>
-<span class="r-in"><span>   unit <span class="op">=</span> <span class="st">"PJ"</span>,</span></span>
-<span class="r-in"><span>   reserve <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R1"</span>, <span class="st">"R2"</span>, <span class="st">"R3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      res.up <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2e5</span>, <span class="fl">1e4</span>, <span class="fl">3e6</span><span class="op">)</span> <span class="co"># total reserves/deposits</span></span></span>
-<span class="r-in"><span>   <span class="op">)</span>,</span></span>
-<span class="r-in"><span>   availability <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R1"</span>, <span class="st">"R2"</span>, <span class="st">"R3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      year <span class="op">=</span> <span class="cn">NA_integer_</span>,</span></span>
-<span class="r-in"><span>      slice <span class="op">=</span> <span class="st">"ANNUAL"</span>,</span></span>
-<span class="r-in"><span>      ava.up <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e3</span>, <span class="fl">1e2</span>, <span class="fl">2e2</span><span class="op">)</span>, <span class="co"># annual availability</span></span></span>
-<span class="r-in"><span>      cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span> <span class="co"># cost of the resource (currency per unit)</span></span></span>
-<span class="r-in"><span>   <span class="op">)</span>,</span></span>
-<span class="r-in"><span>   region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R1"</span>, <span class="st">"R2"</span>, <span class="st">"R3"</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="op">)</span></span></span>
+<span class="r-in"><span>  name <span class="op">=</span> <span class="st">"SUP_COA"</span>,</span></span>
+<span class="r-in"><span>  desc <span class="op">=</span> <span class="st">"Coal supply"</span>,</span></span>
+<span class="r-in"><span>  commodity <span class="op">=</span> <span class="st">"COA"</span>,</span></span>
+<span class="r-in"><span>  unit <span class="op">=</span> <span class="st">"PJ"</span>,</span></span>
+<span class="r-in"><span>  reserve <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R1"</span>, <span class="st">"R2"</span>, <span class="st">"R3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    res.up <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2e5</span>, <span class="fl">1e4</span>, <span class="fl">3e6</span><span class="op">)</span> <span class="co"># total reserves/deposits</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  availability <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R1"</span>, <span class="st">"R2"</span>, <span class="st">"R3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    year <span class="op">=</span> <span class="cn">NA_integer_</span>,</span></span>
+<span class="r-in"><span>    slice <span class="op">=</span> <span class="st">"ANNUAL"</span>,</span></span>
+<span class="r-in"><span>    ava.up <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e3</span>, <span class="fl">1e2</span>, <span class="fl">2e2</span><span class="op">)</span>, <span class="co"># annual availability</span></span></span>
+<span class="r-in"><span>    cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span> <span class="co"># cost of the resource (currency per unit)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R1"</span>, <span class="st">"R2"</span>, <span class="st">"R3"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">draw</span><span class="op">(</span><span class="va">SUP_COA</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">DSTEEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="newDemand.html">newDemand</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span> name <span class="op">=</span> <span class="st">"DSTEEL"</span>,</span></span>
-<span class="r-in"><span> desc <span class="op">=</span> <span class="st">"Steel demand"</span>,</span></span>
-<span class="r-in"><span> commodity <span class="op">=</span> <span class="st">"STEEL"</span>,</span></span>
-<span class="r-in"><span> unit <span class="op">=</span> <span class="st">"Mt"</span>,</span></span>
-<span class="r-in"><span> dem <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  name <span class="op">=</span> <span class="st">"DSTEEL"</span>,</span></span>
+<span class="r-in"><span>  desc <span class="op">=</span> <span class="st">"Steel demand"</span>,</span></span>
+<span class="r-in"><span>  commodity <span class="op">=</span> <span class="st">"STEEL"</span>,</span></span>
+<span class="r-in"><span>  unit <span class="op">=</span> <span class="st">"Mt"</span>,</span></span>
+<span class="r-in"><span>  dem <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    region <span class="op">=</span> <span class="st">"UTOPIA"</span>, <span class="co"># NA for every region</span></span></span>
 <span class="r-in"><span>    year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2020</span>, <span class="fl">2030</span>, <span class="fl">2050</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    slice <span class="op">=</span> <span class="st">"ANNUAL"</span>,</span></span>
 <span class="r-in"><span>    dem <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span>, <span class="fl">300</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="op">)</span>,</span></span>
-<span class="r-in"><span> region <span class="op">=</span> <span class="st">"UTOPIA"</span>, <span class="co"># optional, to narrow the specification of the demand</span></span></span>
-<span class="r-in"><span> <span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="fu">draw</span><span class="op">(</span><span class="va">DSTEEL</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  region <span class="op">=</span> <span class="st">"UTOPIA"</span>, <span class="co"># optional, to narrow the specification of the demand</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">draw</span><span class="op">(</span><span class="va">DSTEEL</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">EXPOIL</span> <span class="op">&lt;-</span> <span class="fu"><a href="newExport.html">newExport</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  name <span class="op">=</span> <span class="st">"EXPOIL"</span>, <span class="co"># used in sets</span></span></span>
@@ -308,17 +308,11 @@ Default is the first node in the trade object.</p></dd>
 <span class="r-in"><span>  olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>olife <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">draw</span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R1"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in mutate(rowwise(filter(summarize(group_by(filter(pivot_longer(filter(full_join(obj@aux,     obj@aeff, by = "acomm"), dst == node), cols = matches("2"),     names_to = "parameter", values_to = "value"), !is.na(value)),     parameter, acomm, unit, src), lab_par = make_label(paste0(unique(parameter),     ":"), in_brackets = value, two_lines = FALSE, bracket_type = "square"),     .groups = "drop"), grepl("ainp", parameter))), iotype = "ainp",     ioname = paste0(acomm, ", ", src), lab_txt = make_label(ioname,         in_brackets = unit, two_lines = F)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `lab_txt = make_label(ioname, in_brackets = unit,</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   two_lines = F)`.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `if_else()`:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> `true` must have size 1, not size 0.</span>
-<span class="r-in"><span><span class="fu">draw</span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R2"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in mutate(rowwise(filter(summarize(group_by(filter(pivot_longer(filter(full_join(obj@aux,     obj@aeff, by = "acomm"), src == node), cols = matches("2"),     names_to = "parameter", values_to = "value"), !is.na(value)),     parameter, acomm, unit, dst), lab_par = make_label(paste0(unique(parameter),     ":"), in_brackets = value, two_lines = FALSE, bracket_type = "square"),     .groups = "drop"), grepl("aout", parameter))), iotype = "aout",     ioname = paste0(acomm, ", ", dst), lab_txt = make_label(ioname,         in_brackets = unit, two_lines = F)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `lab_txt = make_label(ioname, in_brackets = unit,</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   two_lines = F)`.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `if_else()`:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> `true` must have size 1, not size 0.</span>
-<span class="r-in"><span><span class="fu">draw</span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R3"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw-7.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">draw</span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R2"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="draw-8.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">draw</span><span class="op">(</span><span class="va">PIPELINE2</span>, node <span class="op">=</span> <span class="st">"R3"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="draw-9.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

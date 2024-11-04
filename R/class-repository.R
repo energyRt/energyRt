@@ -1,11 +1,11 @@
 # class repository ####
 #' An S4 class to store the model objects.
-#' 
+#'
 #' @name class-repository
-#' 
+#'
 #' @description
 #' Use `newRepository` to create a new repository object.
-#' 
+#'
 #' @inherit newRepository description
 #'
 #' @md
@@ -51,9 +51,9 @@ setMethod("initialize", "repository", function(.Object, ...) {
 # newRepository ####
 #' A constructor for the repository class
 #' @name newRepository
-#' 
+#'
 #' @description
-#' Repository class is used to store the model 'bricks' such as commodity, 
+#' Repository class is used to store the model 'bricks' such as commodity,
 #' technology, supply, demand, trade, import, export, trade, storage, etc.
 #' Calendars, settings, and configurations cannot be stored in the repository, they
 #' have separate slots in model or scenario objects.
@@ -209,7 +209,7 @@ setMethod("add", signature("repository"), function(obj, ..., overwrite = FALSE) 
   arg = list(...) |> unlist()
   if (is_empty(arg)) return(obj)
   arg <- sapply(arg, function(x) {
-    if (class(x)[1] == "repository") return(x@data)
+    if (is(x, "repository")) return(x@data)
     x
   }) |> list_flatten()
   ii <- sapply(arg, function(x) class(x)[1] %in% obj@permit)

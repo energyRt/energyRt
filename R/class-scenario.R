@@ -14,7 +14,7 @@
 #'
 #' @include class-modOut.R class-settings.R
 #' @family class scenario
-#' 
+#'
 #' @seealso [interpolate(), solve(), register(), summary(), newScenario()]
 #'
 #' @export
@@ -131,7 +131,7 @@ summary.scenario <- function(object, ...) {
       cat("Solution status: not solved\n")
     } else {
       status <- try(scen@modOut@stage)
-      if (class(status) == "try-error") status <- "unknown"
+      if (is(status, "try-error")) status <- "unknown"
       cat("Solution status:", status,"\n")
     }
   }
@@ -145,10 +145,10 @@ setMethod("summary", signature(object = "scenario"),
 # setMethod("summary", "scenario", summary.scenario)
 
 ## show ####
-# @method show scenario
-# @export
-# @family repository
-#setMethod("show", "scenario", function(object) summary(object))
+#' @method show scenario
+#' @export
+#' @family show print summary
+setMethod("show", "scenario", function(object) summary(object))
 
 # @export
 # setMethod("setTimeSlices", signature(obj = "scenario"), function(obj, ...) {

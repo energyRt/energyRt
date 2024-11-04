@@ -494,7 +494,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       for (i in 1:length(ll)) {
         if (!is.null(ll[[i]]$year)) {
           if (yearsAsFactors) {
-            if (class(ll[[i]]$year) != "factor") {
+            if (!is(ll[[i]]$year, "factor")) {
               ll[[i]]$year <- .crs2fct(ll[[i]]$year)
             }
           } else {
@@ -536,14 +536,14 @@ if (F) { # test
 
 .crs2int <- function(x) {
   # coerce to integer from factor or character
-  if (class(x) == "factor") x <- as.character(x)
-  if (class(x) == "character") x <- as.integer(x)
+  if (is(x, "factor")) x <- as.character(x)
+  if (is(x, "character")) x <- as.integer(x)
   x
 }
 
 .crs2fct <- function(x, levels = NULL, ordered = TRUE) {
   # coerce to integer from factor or character
-  if (class(x) == "character") {
+  if (is(x, "character")) {
     if (!is.null(levels)) {
       x <- factor(x, levels = levels)
     } else {
@@ -738,7 +738,7 @@ if (F) { # Check
             rst <- rst[rst$use, , drop = FALSE]
           } else if (s1[nm] == "logical") {
             # Logical
-            if (class(cnd) != "logical") stop(error_msg)
+            if (!is(cnd, "logical")) stop(error_msg)
             for (i in seq(length.out = nrow(rst))) {
               rst[i, "use"] <- any(
                 cnd == slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
@@ -824,8 +824,8 @@ if (F) { # Check
               cnd2 <- cnd[[nm2]]
               if (all(colnames(slot(s2, nm)) != nm2)) stop(error_msg)
               # Character
-              if (class(cnd2) %in% c("character", "factor")) {
-                if (!(class(cnd2) %in% c("character", "factor"))) {
+              if (inherits(cnd2, c("character", "factor"))) {
+                if (!inherits(cnd2, c("character", "factor"))) {
                   stop(error_msg)
                 }
                 for (i in seq(length.out = nrow(rst))) {
@@ -839,9 +839,9 @@ if (F) { # Check
                   )
                 }
                 rst <- rst[rst$use, , drop = FALSE]
-              } else if (class(cnd2) == "logical") {
+              } else if (is(cnd2, "logical")) {
                 # Logical
-                if (class(cnd2) != "logical") stop(error_msg)
+                if (!is(cnd2, "logical")) stop(error_msg)
                 for (i in seq(length.out = nrow(rst))) {
                   rst[i, "use"] <-
                     any(
@@ -853,7 +853,7 @@ if (F) { # Check
                     )
                 }
                 rst <- rst[rst$use, , drop = FALSE]
-              } else if (class(cnd2) == "numeric") {
+              } else if (is(cnd2, "numeric")) {
                 # Numeric
                 if (!(class(slot(s2, nm)[[nm2]]) %in% c("integer", "numeric"))) {
                   stop(error_msg)

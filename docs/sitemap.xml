@@ -1,9 +1,5 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://energyRt.org/404.html</loc></url>
-<url><loc>https://energyRt.org/CODE_OF_CONDUCT.html</loc></url>
-<url><loc>https://energyRt.org/CONTRIBUTING.html</loc></url>
-<url><loc>https://energyRt.org/LICENSE-text.html</loc></url>
-<url><loc>https://energyRt.org/LICENSE.html</loc></url>
 <url><loc>https://energyRt.org/articles/energyRt.html</loc></url>
 <url><loc>https://energyRt.org/articles/helloworld.html</loc></url>
 <url><loc>https://energyRt.org/articles/index.html</loc></url>
@@ -14,15 +10,12 @@
 <url><loc>https://energyRt.org/articles/utopia.html</loc></url>
 <url><loc>https://energyRt.org/articles/workflow.html</loc></url>
 <url><loc>https://energyRt.org/authors.html</loc></url>
+<url><loc>https://energyRt.org/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://energyRt.org/CONTRIBUTING.html</loc></url>
 <url><loc>https://energyRt.org/index.html</loc></url>
+<url><loc>https://energyRt.org/LICENSE-text.html</loc></url>
+<url><loc>https://energyRt.org/LICENSE.html</loc></url>
 <url><loc>https://energyRt.org/news/index.html</loc></url>
-<url><loc>https://energyRt.org/reference/Config.html</loc></url>
-<url><loc>https://energyRt.org/reference/It.html</loc></url>
-<url><loc>https://energyRt.org/reference/Use.html</loc></url>
-<url><loc>https://energyRt.org/reference/`import`.html</loc></url>
-<url><loc>https://energyRt.org/reference/`newImport`.html</loc></url>
-<url><loc>https://energyRt.org/reference/`newRepository`.html</loc></url>
-<url><loc>https://energyRt.org/reference/`r.html</loc></url>
 <url><loc>https://energyRt.org/reference/a.html</loc></url>
 <url><loc>https://energyRt.org/reference/add,scenario-method.html</loc></url>
 <url><loc>https://energyRt.org/reference/add.html</loc></url>
@@ -40,9 +33,9 @@
 <url><loc>https://energyRt.org/reference/class-export.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-horizon.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-import.html</loc></url>
+<url><loc>https://energyRt.org/reference/class-model.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-modInp.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-modOut.html</loc></url>
-<url><loc>https://energyRt.org/reference/class-model.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-parameter.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-repository.html</loc></url>
 <url><loc>https://energyRt.org/reference/class-scenario.html</loc></url>
@@ -57,6 +50,7 @@
 <url><loc>https://energyRt.org/reference/commodity.html</loc></url>
 <url><loc>https://energyRt.org/reference/config,.html</loc></url>
 <url><loc>https://energyRt.org/reference/config-class.html</loc></url>
+<url><loc>https://energyRt.org/reference/Config.html</loc></url>
 <url><loc>https://energyRt.org/reference/configuration..html</loc></url>
 <url><loc>https://energyRt.org/reference/constraint-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/constraint.html</loc></url>
@@ -80,9 +74,9 @@
 <url><loc>https://energyRt.org/reference/draw.technology.html</loc></url>
 <url><loc>https://energyRt.org/reference/draw.trade.html</loc></url>
 <url><loc>https://energyRt.org/reference/drop_na_cols.html</loc></url>
+<url><loc>https://energyRt.org/reference/energyRt-package.html</loc></url>
 <url><loc>https://energyRt.org/reference/en_install_julia_pkgs.html</loc></url>
 <url><loc>https://energyRt.org/reference/en_obj2df.html</loc></url>
-<url><loc>https://energyRt.org/reference/energyRt-package.html</loc></url>
 <url><loc>https://energyRt.org/reference/export-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/export.html</loc></url>
 <url><loc>https://energyRt.org/reference/findData.html</loc></url>
@@ -102,16 +96,17 @@
 <url><loc>https://energyRt.org/reference/interpolate-model-method.html</loc></url>
 <url><loc>https://energyRt.org/reference/is.html</loc></url>
 <url><loc>https://energyRt.org/reference/isInMemory.html</loc></url>
+<url><loc>https://energyRt.org/reference/It.html</loc></url>
 <url><loc>https://energyRt.org/reference/load_scenario.html</loc></url>
 <url><loc>https://energyRt.org/reference/make_label.html</loc></url>
 <url><loc>https://energyRt.org/reference/make_scenario_dirname.html</loc></url>
 <url><loc>https://energyRt.org/reference/make_timetable.html</loc></url>
+<url><loc>https://energyRt.org/reference/model-class.html</loc></url>
+<url><loc>https://energyRt.org/reference/model.html</loc></url>
 <url><loc>https://energyRt.org/reference/modInp-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/modInp.html</loc></url>
 <url><loc>https://energyRt.org/reference/modOut-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/modOut.html</loc></url>
-<url><loc>https://energyRt.org/reference/model-class.html</loc></url>
-<url><loc>https://energyRt.org/reference/model.html</loc></url>
 <url><loc>https://energyRt.org/reference/new.html</loc></url>
 <url><loc>https://energyRt.org/reference/newCalendar.html</loc></url>
 <url><loc>https://energyRt.org/reference/newCommodity.html</loc></url>
@@ -185,11 +180,16 @@
 <url><loc>https://energyRt.org/reference/tsl_guess_format.html</loc></url>
 <url><loc>https://energyRt.org/reference/update,supply-method.html</loc></url>
 <url><loc>https://energyRt.org/reference/update.html</loc></url>
+<url><loc>https://energyRt.org/reference/Use.html</loc></url>
 <url><loc>https://energyRt.org/reference/used.html</loc></url>
 <url><loc>https://energyRt.org/reference/weather-class,.html</loc></url>
 <url><loc>https://energyRt.org/reference/weather-class.html</loc></url>
 <url><loc>https://energyRt.org/reference/weather.html</loc></url>
 <url><loc>https://energyRt.org/reference/write.html</loc></url>
 <url><loc>https://energyRt.org/reference/yday2YDAY.html</loc></url>
+<url><loc>https://energyRt.org/reference/`import`.html</loc></url>
+<url><loc>https://energyRt.org/reference/`newImport`.html</loc></url>
+<url><loc>https://energyRt.org/reference/`newRepository`.html</loc></url>
+<url><loc>https://energyRt.org/reference/`r.html</loc></url>
 </urlset>
 

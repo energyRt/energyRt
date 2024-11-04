@@ -1,7 +1,7 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development version
-Version: 0.50.7.9000
+Version: 0.50.7.9001
 Date: 2024-11-03
 Authors@R: 
   c(person(given = "Oleg", 
@@ -23,7 +23,7 @@ BugReports: https://github.com/energyRt/energyRt/issues
 Description: Energy systems modeling toolbox in R
 Depends: R (>= 4.3)
 Imports: methods, grid, generics, data.table, DBI, RSQLite, tibble,
-        tidyr, dplyr, dtplyr, rlang, stringr, lubridate, purrr, arrow,
+        tidyr, dplyr, rlang, stringr, lubridate, purrr, arrow,
         progressr, tictoc, cli, zoo, registry, options (>= 0.2.0),
         glue, plyr, grDevices, utils
 Suggests: pak, gdxtools, knitr, rmarkdown, sf, yaml, ggplot2, testthat

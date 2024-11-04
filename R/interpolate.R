@@ -30,14 +30,14 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   interpolation_start_time <- proc.time()[3]
   if (is.null(arg$echo)) arg$echo <- FALSE
 
-  if (class(obj) == "model") {
+  if (is(obj, "model")) {
     scen <- new("scenario")
     # scen <- newScenario()
     scen@model <- obj
     scen@name <- paste("scen", obj@name, sep = "_")
     scen@desc <- ""
     scen@settings <- .config_to_settings(obj@config) # import model settings
-  } else if (class(obj) == "scenario") {
+  } else if (is(obj, "scenario")) {
     scen <- obj
   } else {
     stop('Interpolation is not available for class: "', class(obj), '"')
@@ -432,7 +432,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   approxim$all_comm <-
     c(lapply(scen@model@data, function(x) {
       c(lapply(x@data, function(y) {
-        if (class(y) != "commodity") {
+        if (!is(y, "commodity")) {
           return(NULL)
         }
         return(y@name)
@@ -1112,7 +1112,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
 }
 
 .add_repository <- function(mdl, x) {
-  if (class(x) == "list") {
+  if (is(x, "list")) {
     for (i in seq_along(x)) {
       mdl <- .add.repository(mdl, x[[i]])
     }
@@ -1143,7 +1143,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   for (i in seq(along = obj@data)) {
     for (j in seq(along = obj@data[[i]]@data)) { #
       prec <- .add2set(prec, obj@data[[i]]@data[[j]], approxim = approxim)
-      if (class(obj@data[[i]]@data[[j]]) == "commodity") {
+      if (is(obj@data[[i]]@data[[j]], "commodity")) {
         if (length(obj@data[[i]]@data[[j]]@timeframe) == 0) {
           obj@data[[i]]@data[[j]]@timeframe <- approxim$calendar@default_timeframe
         }
@@ -1274,7 +1274,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
         # tryCatch({
         inRange <- withinHorizon(scen@model@data[[i]]@data[[j]], scen@settings)
         if (!isFALSE(inRange)) { # NULL is allowed
-          if (class(scen@model@data[[i]]@data[[j]]) == "constraint") { #isConstraint
+          if (is(scen@model@data[[i]]@data[[j]], "constraint")) { #isConstraint
             scen@modInp <- .obj2modInp(
               scen@modInp,
               scen@model@data[[i]]@data[[j]],

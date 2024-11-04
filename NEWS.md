@@ -1,9 +1,16 @@
+# energyRt 0.50.7-dev
+
+* Fixed a few stability issues in the `draw()` method.
+* Added "Hello World" example to the tutorial.
+* A new version of the logo design (by DALL-E) is added.
+* The code clean-up and documentation are in progress to comply with CRAN requirements. 
+* The version might be unstable due to ongoing changes.
+
 # energyRt 0.50.6-dev
 
 * draw() is drafted for all processes: 'technology', 'export', 'import', 'supply', 'demand', 'trade', 'storage
 * docs completed for main classes with examples.
 * code clean-up and documentation in progress.
-
 
 # energyRt 0.50.5-dev
 
