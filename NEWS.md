@@ -2,8 +2,9 @@
 
 * Fixed a few stability issues in the `draw()` method.
 * Added "Hello World" example to the tutorial.
-* A new version of the logo design (by DALL-E) is added.
+* A new version of the logo design idea (by DALL-E).
 * The code clean-up and documentation are in progress to comply with CRAN requirements. 
+* The very first draft of the package CRAN-like [manual](<https://github.com/energyRt/energyRt/blob/master/man/figures/energyRt-manual.pdf>) is added.
 * The version might be unstable due to ongoing changes.
 
 # energyRt 0.50.6-dev
