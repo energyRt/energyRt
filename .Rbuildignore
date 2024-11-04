@@ -36,6 +36,7 @@ tmp/
 \.lst$
 \.~gm$
 \.lxi$
+\.pdf$
 
 \.vs$
 depreciated/*
