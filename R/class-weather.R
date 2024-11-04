@@ -1,8 +1,10 @@
 #' S4 class to represent weather factors
+#' 
+#' @name class-weather
 #'
 #' @inherit newWeather description
 #' @inherit newWeather details
-#' 
+#'
 #' @md
 #' @slot name `r get_slot_info("weather", "name")`
 #' @slot desc `r get_slot_info("weather", "desc")`
@@ -14,7 +16,7 @@
 #' @slot misc `r get_slot_info("weather", "misc")`
 #'
 #' @include class-export.R
-#' @family class, weather, data
+#' @family class weather data
 #' @rdname class-weather
 #'
 #' @export
@@ -54,16 +56,16 @@ setMethod("initialize", "weather", function(.Object, ...) {
 
 
 #' Create new weather object
-#' 
+#'
 #' @description
 #' `weather` is a data-carrying class with exogenous shocks
 #' used to influence operation of processes in the model.
-#' 
+#'
 #' @details
 #' Weather factors are separated from the model parameters
 #' and can be added or replaced for different scenarios.
 #' !!!Additional details...
-#' 
+#'
 #' @md
 #' @param name `r get_slot_info("weather", "name")`
 #' @param desc `r get_slot_info("weather", "desc")`
@@ -79,6 +81,25 @@ setMethod("initialize", "weather", function(.Object, ...) {
 #' @family weather
 #'
 #' @examples
+#' \dontrun{
+#' 
+#' # use/make time resolution of the model: timetalbe
+#' ttbl <- make_timetable(tsl_levels$d365_h24)
+#' ttbl
+#' 
+#' WSOL <- newWeather(
+#'   name = "WSOL",
+#'   desc = "Horiontal solar PV capacity factor",
+#'   timeframe = "HOUR",
+#'   defVal = 0.,
+#'   weather = data.frame(
+#'     region = "R1",
+#'     year = 2015, # 
+#'     slice = ttbl$slice,
+#'     wval = runif(length(ttbl$slice), 0., 1) # use your data
+#'   )
+#' )
+#' }
 newWeather <- function(
     name = "",
     desc = "",
@@ -87,18 +108,20 @@ newWeather <- function(
     timeframe = character(),
     defVal = 0.,
     weather = data.frame(),
-    misc = list()) {
+    misc = list(),
+    ...) {
   .data2slots(
     "weather",
-      name,
-      desc = desc,
-      unit = unit,
-      region = region,
-      timeframe = timeframe,
-      defVal = defVal,
-      weather = weather,
-      misc = misc
-      )
+    name,
+    desc = desc,
+    unit = unit,
+    region = region,
+    timeframe = timeframe,
+    defVal = defVal,
+    weather = weather,
+    misc = misc,
+    ...
+    )
   }
 
 #' @param object object of class export

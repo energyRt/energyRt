@@ -11,7 +11,8 @@ newImport(
   unit = NULL,
   reserve = Inf,
   imp = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
 )
 }
 \arguments{
@@ -55,4 +56,21 @@ This exchange can be exogenously defined (\code{imp.fx}) or optimized by the mod
 within the given limits (\code{imp.lo}, \code{imp.up}). The \code{price} column is used to
 define the price of the imported commodity.
 "Reserve" sets the total amount that can be imported over the model horizon.
+}
+\examples{
+IMPOIL <- newImport(
+  name = "IMPOIL", # used in sets
+  desc = "Oil import to the model to the RoW", # for own reference
+  commodity = "OIL", # must match the commodity name in the model
+  unit = "Mtoe", # for own reference
+  imp = data.frame(
+    region = rep(c("R1", "R2"), each = 2), # import region(s)
+    year = rep(c(2020, 2050)), # import years
+    price = 600, # import price in MUSD/Mtoe (USD/t),
+    imp.up = rep(c(1e4, 1e6), each = 2), # upper bound for import in each year
+    imp.lo = rep(c(1e4, 1e5), each = 2) # lower bound for import in each year
+  )
+)
+draw(IMPOIL)
+
 }

@@ -9,6 +9,14 @@ findDuplicates(x)
 \arguments{
 \item{x}{scenario or data.frame with data to check.}
 }
+\value{
+data.frame with duplicated values.
+}
 \description{
 Function to find duplicated values in interpolated scenario.
+}
+\examples{
+\dontrun{
+findDuplicates(scen_BASE)
+}
 }

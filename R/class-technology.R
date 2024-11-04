@@ -1,7 +1,7 @@
 # class ######################################################################
 #' An S4 class to represent technology
 #'
-#' @name technology-class
+#' @name class-technology
 #'
 #' @description
 #' Technology of a technological process in the model is used to convert input
@@ -41,7 +41,7 @@
 #'
 #' @rdname class-technology
 #' @include class-supply.R
-#' @family technology, process, class
+#' @family technology process class
 #' @export
 setClass("technology",
   representation(
@@ -305,12 +305,12 @@ setMethod("initialize", "technology", function(.Object, ...) {
 #' @param optimizeRetirement `r get_slot_info("technology", "optimizeRetirement")`
 #' @param misc `r get_slot_info("technology", "misc")`
 #'
-#' @family technology, process
+#' @family technology process
 #' @rdname technology
 #'
 #' @return An object of class technology.
 #' @export
-#'
+#' @inherit draw examples
 #' @examples
 #' ECOAL <- newTechnology(
 #'   name = "ECOAL", # name, used in sets, no white spaces or special characters
@@ -409,7 +409,8 @@ newTechnology <- function(
     fullYear = TRUE,
     optimizeRetirement = FALSE,
     # upgrade.technology = character(),
-    misc = list()) {
+    misc = list(),
+    ...) {
   .data2slots("technology", name,
     desc = desc,
     input = input,
@@ -436,7 +437,8 @@ newTechnology <- function(
     fullYear = fullYear,
     optimizeRetirement = optimizeRetirement,
     # upgrade.technology = upgrade.technology,
-    misc = misc
+    misc = misc,
+    ...
   )
 }
 

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.4.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +79,8 @@
 <span>  fullYear <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  weather <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  optimizeRetirement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  misc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  misc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -137,7 +138,7 @@
 
 
 <dt id="arg-olife">olife<a class="anchor" aria-label="anchor" href="#arg-olife"></a></dt>
-<dd><p>data.frame. Operational life of the storage technology, applicable to the new investment only,  the operational life (retirement) of preexiting capacity is described in the <code>stock</code> slot.</p>
+<dd><p>data.frame. Operational life of the storage technology, applicable to the new investment only, the operational life (retirement) of preexiting capacity is described in the <code>stock</code> slot.</p>
 <dl><dt>region</dt>
 <dd><p>character. Region name to apply the parameter, NA for every region.</p></dd>
 
@@ -273,7 +274,7 @@
 <dd><p>numeric. Upper bound of the output commodity availability factor.</p></dd>
 
 <dt>cout.fx</dt>
-<dd><p>numeric. Fixed value of the output commodity availability factor.  This parameter overrides <code>cout.lo</code> and <code>cout.up</code>.</p></dd>
+<dd><p>numeric. Fixed value of the output commodity availability factor. This parameter overrides <code>cout.lo</code> and <code>cout.up</code>.</p></dd>
 
 
 </dl></dd>
@@ -444,6 +445,83 @@ when commodity time-frame is "HOUR" and the parent time-frame is "DAY" then
 the storage cycle will be a calendar day).</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">STG1</span> <span class="op">&lt;-</span> <span class="fu">newStorage</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  name <span class="op">=</span> <span class="st">"STG1"</span>,</span></span>
+<span class="r-in"><span>  desc <span class="op">=</span> <span class="st">"Storage description"</span>,</span></span>
+<span class="r-in"><span>  commodity <span class="op">=</span> <span class="st">"electricity"</span>,</span></span>
+<span class="r-in"><span>  region <span class="op">=</span> <span class="st">"R1"</span>,</span></span>
+<span class="r-in"><span>  start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>region <span class="op">=</span> <span class="st">"R1"</span>, start <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>region <span class="op">=</span> <span class="st">"R1"</span>, end <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>region <span class="op">=</span> <span class="st">"R1"</span>, olife <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  charge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="co"># region = "R1",</span></span></span>
+<span class="r-in"><span>    year <span class="op">=</span> <span class="fl">2020</span>,</span></span>
+<span class="r-in"><span>    <span class="co"># slice = "HOUR",</span></span></span>
+<span class="r-in"><span>    charge <span class="op">=</span> <span class="fl">0.1</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  seff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="co"># region = "R1",</span></span></span>
+<span class="r-in"><span>    <span class="co"># year = 2020,</span></span></span>
+<span class="r-in"><span>    <span class="co"># slice = "HOUR",</span></span></span>
+<span class="r-in"><span>    stgeff <span class="op">=</span> <span class="fl">0.999</span>,</span></span>
+<span class="r-in"><span>    inpeff <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    outeff <span class="op">=</span> <span class="fl">0.9</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  aeff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    acomm <span class="op">=</span> <span class="st">"electricity"</span>,</span></span>
+<span class="r-in"><span>    region <span class="op">=</span> <span class="st">"R1"</span>,</span></span>
+<span class="r-in"><span>    year <span class="op">=</span> <span class="fl">2020</span>,</span></span>
+<span class="r-in"><span>    <span class="co"># slice = "HOUR",</span></span></span>
+<span class="r-in"><span>    stg2ainp <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cinp2ainp <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
+<span class="r-in"><span>    cout2ainp <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>    stg2aout <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cinp2aout <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cout2aout <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cap2ainp <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cap2aout <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    ncap2ainp <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    ncap2aout <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    ncap2stg <span class="op">=</span> <span class="fl">0.9</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  af <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    region <span class="op">=</span> <span class="st">"R1"</span>, year <span class="op">=</span> <span class="fl">2020</span>, slice <span class="op">=</span> <span class="st">"HOUR"</span>,</span></span>
+<span class="r-in"><span>    af.lo <span class="op">=</span> <span class="fl">0.9</span>, af.up <span class="op">=</span> <span class="fl">0.9</span>, af.fx <span class="op">=</span> <span class="fl">0.9</span>, cinp.up <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cinp.fx <span class="op">=</span> <span class="fl">0.9</span>, cinp.lo <span class="op">=</span> <span class="fl">0.9</span>, cout.up <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cout.fx <span class="op">=</span> <span class="fl">0.9</span>, cout.lo <span class="op">=</span> <span class="fl">0.9</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  fixom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>region <span class="op">=</span> <span class="st">"R1"</span>, year <span class="op">=</span> <span class="fl">2020</span>, fixom <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  varom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    region <span class="op">=</span> <span class="st">"R1"</span>, year <span class="op">=</span> <span class="fl">2020</span>, slice <span class="op">=</span> <span class="st">"HOUR"</span>,</span></span>
+<span class="r-in"><span>    inpcost <span class="op">=</span> <span class="fl">0.9</span>, outcost <span class="op">=</span> <span class="fl">0.9</span>, stgcost <span class="op">=</span> <span class="fl">0.9</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  invcost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    region <span class="op">=</span> <span class="st">"R1"</span>, year <span class="op">=</span> <span class="fl">2020</span>, invcost <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    wacc <span class="op">=</span> <span class="fl">0.9</span>, retcost <span class="op">=</span> <span class="fl">0.9</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  capacity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    region <span class="op">=</span> <span class="st">"R1"</span>, year <span class="op">=</span> <span class="fl">2020</span>, stock <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    cap.lo <span class="op">=</span> <span class="fl">0.9</span>, cap.up <span class="op">=</span> <span class="fl">0.9</span>, cap.fx <span class="op">=</span> <span class="fl">0.9</span>, ncap.lo <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    ncap.up <span class="op">=</span> <span class="fl">0.9</span>, ncap.fx <span class="op">=</span> <span class="fl">0.9</span>, ret.lo <span class="op">=</span> <span class="fl">0.9</span>, ret.up <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    ret.fx <span class="op">=</span> <span class="fl">0.9</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  cap2stg <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  fullYear <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  weather <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    weather <span class="op">=</span> <span class="st">"sunny"</span>,</span></span>
+<span class="r-in"><span>    waf.lo <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    waf.up <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    waf.fx <span class="op">=</span> <span class="fl">0.9</span>, wcinp.lo <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    wcinp.fx <span class="op">=</span> <span class="fl">0.9</span>, wcinp.up <span class="op">=</span> <span class="fl">0.9</span>, wcout.lo <span class="op">=</span> <span class="fl">0.9</span>, wcout.fx <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    wcout.up <span class="op">=</span> <span class="fl">0.9</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>, </span></span>
+<span class="r-in"><span>  optimizeRetirement <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  misc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

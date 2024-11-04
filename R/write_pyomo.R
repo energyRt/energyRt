@@ -3,9 +3,18 @@
 #' @param path character path to the python installation. If NULL, the global operation path is used.
 #'
 #' @return
+#' Writes or reads the path to python installation or environment
+#' to/from `energyRt` options.
 #' @export
+#' @rdname solver
+#' @family solver python
 #'
 #' @examples
+#' \dontrun{
+#' set_python_path("C:/Python3")
+#' set_python_path()
+#' get_python_path()
+#' }
 set_python_path <- function(path = NULL) {
   # browser()
   if (!is.null(path) && path != "") {
@@ -21,6 +30,8 @@ set_python_path <- function(path = NULL) {
 }
 
 #' @export
+#' @rdname solver
+#' @family solver python
 get_python_path <- function() {
   options::opt("python_path", env = "energyRt")
 }

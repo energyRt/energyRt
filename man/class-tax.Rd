@@ -5,25 +5,43 @@
 \alias{tax-class}
 \title{An S4 class to represent a commodity tax}
 \description{
-An S4 class to represent a commodity tax
+Taxes are used to represent the financial levy imposed on production,
+consumption, or balance of a commodity.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{name}}{character.}
+\item{\code{name}}{character. Name of the tax object, used in sets.}
 
-\item{\code{comm}}{character.}
+\item{\code{desc}}{character. Description of the tax object.}
 
-\item{\code{desc}}{character.}
+\item{\code{comm}}{character. Name of the taxed commodity.}
 
-\item{\code{region}}{character.}
+\item{\code{region}}{character. Region where the tax is applied.}
 
-\item{\code{year}}{numeric.}
+\item{\code{defVal}}{numeric. Default value of the tax for not specified sets, 0 if not specified.}
 
-\item{\code{defVal}}{numeric.}
-
-\item{\code{value}}{data.frame.}
-
-\item{\code{misc}}{list.}
+\item{\code{tax}}{data.frame. Tax values.
+\describe{
+\item{region}{character. Region name to apply the parameter, NA for every region.}
+\item{year}{integer. Year to apply the parameter, NA for every year.}
+\item{slice}{character. Time slice to apply the parameter, NA for every slice.}
+\item{inp}{numeric. Input tax, e.g., per unit of commodity consumed by all processes.}
+\item{out}{numeric. Output tax, e.g., per unit of commodity produced by all processes.}
+\item{bal}{numeric. Balance tax, e.g., per unit of commodity balance (production - consumption).}
 }}
 
+\item{\code{misc}}{list. Additional information.}
+}}
+
+\seealso{
+Other class constraint policy: 
+\code{\link{class-constraint}},
+\code{\link{class-costs}},
+\code{\link{newConstraint}()},
+\code{\link{newCosts}()},
+\code{\link{newSubsidy}()},
+\code{\link{newTax}()},
+\code{\link{subsidy-class}}
+}
+\concept{class constraint policy}

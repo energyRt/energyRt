@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{check_name}
 \alias{check_name}
-\title{Check validity of object names}
+\title{Check validity of object's names used in sets}
 \usage{
 check_name(x)
 }
@@ -13,5 +13,12 @@ check_name(x)
 logical, TRUE if the name is valid.
 }
 \description{
-Check validity of object names
+Check validity of object's names used in sets
+}
+\examples{
+check_name("name")
+check_name("1name")
+check_name("name1")
+check_name("name_1")
+check_name("name_1!")
 }

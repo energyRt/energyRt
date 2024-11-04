@@ -75,16 +75,17 @@ reference:
 - title: Classes
   desc:  Data structures of the key model components.
   contents:
-  - calendar-class
-  - commodity-class
-  - demand-class
-  - supply-class
-  - technology-class
-  - storage-class
-  - trade-class
-  - import-class
-  - export-class
+  # - calendar-class
+  # - commodity-class
+  # - demand-class
+  # - supply-class
+  # - technology-class
+  # - storage-class
+  # - trade-class
+  # - import-class
+  # - export-class
   - ends_with("class")
+  - starts_with("class")
 
 - title: Building a model
   desc:  Functions to create model components.
@@ -123,6 +124,7 @@ reference:
   - matches("tsl2dtm")
   - matches("dtm2tsl")
   - matches("tsl_formats")
+  - matches("^tsl")
   - matches("tsl_guess_format")
   - matches("drop_na_cols")
 
@@ -137,10 +139,16 @@ reference:
 - title: Visualisation
   contents:
   - matches("draw")
+  - matches("plot")
 
 - title: Validation
   contents:
   - starts_with("check")
+
+- title: Exporting
+  contents:
+  - starts_with("print")
+  - starts_with("summary")
 
 - title: energyRt options and settings
   contents:
@@ -150,6 +158,7 @@ reference:
 - title: utils
   contents:
   - matches("en_install_julia_pkgs")
+  - matches("en_obj2df")
   - get_slot_info
 
 # - title: All other

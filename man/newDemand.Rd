@@ -12,7 +12,8 @@ newDemand(
   unit = character(),
   dem = data.frame(),
   region = character(),
-  misc = list()
+  misc = list(),
+  ...
 )
 
 \S4method{update}{demand}(object, ...)
@@ -34,7 +35,7 @@ newDemand(
 \item{dem}{numeric. Value of the demand.}
 }}
 
-\item{region}{character. Optional name of region to narrow the specification of the demand in the case of used NAs.  Error will be returned if specified regions in \verb{@dem} are not mensioned in the \verb{@region} slot  (if the slot is not empty).}
+\item{region}{character. Optional name of region to narrow the specification of the demand in the case of used NAs. Error will be returned if specified regions in \verb{@dem} are not mensioned in the \verb{@region} slot (if the slot is not empty).}
 
 \item{misc}{list. Optional list of additional information.}
 
@@ -62,6 +63,8 @@ DSTEEL <- newDemand(
  ),
  region = "UTOPIA", # optional, to narrow the specification of the demand
  )
+ class(DSTEEL)
+ draw(DSTEEL)
 
 }
 \concept{demand update}

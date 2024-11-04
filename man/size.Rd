@@ -15,11 +15,25 @@ size(
 )
 }
 \arguments{
-\item{x}{\itemize{
-\item any R object
-}}
+\item{x}{any R object}
 
-\item{asNumeric}{}
+\item{level1}{logical, if TRUE, the function will return the size of the
+object and its slots (if any)}
+
+\item{units}{character, units to display the size, default is "auto"}
+
+\item{sort}{logical, if TRUE, the function will sort the slots by size}
+
+\item{decreasing}{logical, if TRUE, the function will sort the slots in
+decreasing order}
+
+\item{byteTol}{numeric, threshold in bytes to filter the slots}
+
+\item{asNumeric}{logical, if TRUE, the function will return the size of the
+object and its slots in bytes}
+}
+\value{
+character value or vector, size of the object or its slots
 }
 \description{
 Size of an object

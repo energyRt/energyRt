@@ -2,7 +2,7 @@
 % Please edit documentation in R/class-repository.R
 \name{newRepository}
 \alias{newRepository}
-\title{Create new repository object}
+\title{A constructor for the repository class}
 \usage{
 newRepository(
   name = "base_repository",
@@ -14,17 +14,20 @@ newRepository(
 \arguments{
 \item{name}{character. Name of the repository.}
 
-\item{...}{list. Model objects ("bricks"), e.g., technologies, constraints, costs, etc.,  stored in with their names as keys, or gropped in named lists.}
+\item{...}{list. Model objects ("bricks"), e.g., technologies, constraints, costs, etc., stored in with their names as keys, or gropped in named lists.}
 
 \item{desc}{character. Description of the repository.}
 
 \item{misc}{list. Any additional data or information to store in the object.}
 }
 \description{
-Create new repository object
+Repository class is used to store the model 'bricks' such as commodity,
+technology, supply, demand, trade, import, export, trade, storage, etc.
+Calendars, settings, and configurations cannot be stored in the repository, they
+have separate slots in model or scenario objects.
 }
 \seealso{
-Other repository, model, data: 
-\code{\link{repository-class}}
+Other repository model data: 
+\code{\link{class-repository}}
 }
-\concept{repository, model, data}
+\concept{repository model data}

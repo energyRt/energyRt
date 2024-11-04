@@ -145,14 +145,13 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' @param scenNameInList logical, should the name of the scenarios be used if not provided in the list with several scenarios?
 #' @param verbose
 #'
-#' @aliases get_data
+#' @aliases getData get_data
 #'
-#' \dontrun{
 #' @examples
 #' \dontrun{
 #' data("utopia_scen_BAU.RData")
-#' getData(scen, name = "pDemand", year = 2015, merge = T)
-#' getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015)
+#' getData(scen, name = "pDemand", year = 2015, merge = TRUE)
+#' getData(scen, name = "vTechOut", comm = "ELC", merge = TRUE, year = 2015)
 #' elc2050 <- getData(scen, parameters = FALSE, comm = "ELC", year = 2050)
 #' names(elc2050)
 #' elc2050$vBalance
@@ -495,7 +494,7 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       for (i in 1:length(ll)) {
         if (!is.null(ll[[i]]$year)) {
           if (yearsAsFactors) {
-            if (class(ll[[i]]$year) != "factor") {
+            if (!is(ll[[i]]$year, "factor")) {
               ll[[i]]$year <- .crs2fct(ll[[i]]$year)
             }
           } else {
@@ -529,22 +528,22 @@ get_data <- getData
 
 if (F) { # test
   load("energyRt_tutorial/data/utopia_scen_BAU.RData")
-  (dem <- getData(scen, name = "pDemand", year = 2015, merge = T))
-  (vTechOut = getData(scen, name = "vTechOut", comm = "ELC", merge = T, year = 2015))
+  (dem <- getData(scen, name = "pDemand", year = 2015, merge = TRUE))
+  (vTechOut = getData(scen, name = "vTechOut", comm = "ELC", merge = TRUE, year = 2015))
   # Storage capacity
-  getData(scen, name = "vStorageCap", merge = T)
+  getData(scen, name = "vStorageCap", merge = TRUE)
 }
 
 .crs2int <- function(x) {
   # coerce to integer from factor or character
-  if (class(x) == "factor") x <- as.character(x)
-  if (class(x) == "character") x <- as.integer(x)
+  if (is(x, "factor")) x <- as.character(x)
+  if (is(x, "character")) x <- as.integer(x)
   x
 }
 
 .crs2fct <- function(x, levels = NULL, ordered = TRUE) {
   # coerce to integer from factor or character
-  if (class(x) == "character") {
+  if (is(x, "character")) {
     if (!is.null(levels)) {
       x <- factor(x, levels = levels)
     } else {
@@ -739,7 +738,7 @@ if (F) { # Check
             rst <- rst[rst$use, , drop = FALSE]
           } else if (s1[nm] == "logical") {
             # Logical
-            if (class(cnd) != "logical") stop(error_msg)
+            if (!is(cnd, "logical")) stop(error_msg)
             for (i in seq(length.out = nrow(rst))) {
               rst[i, "use"] <- any(
                 cnd == slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]], nm),
@@ -825,8 +824,8 @@ if (F) { # Check
               cnd2 <- cnd[[nm2]]
               if (all(colnames(slot(s2, nm)) != nm2)) stop(error_msg)
               # Character
-              if (class(cnd2) %in% c("character", "factor")) {
-                if (!(class(cnd2) %in% c("character", "factor"))) {
+              if (inherits(cnd2, c("character", "factor"))) {
+                if (!inherits(cnd2, c("character", "factor"))) {
                   stop(error_msg)
                 }
                 for (i in seq(length.out = nrow(rst))) {
@@ -840,9 +839,9 @@ if (F) { # Check
                   )
                 }
                 rst <- rst[rst$use, , drop = FALSE]
-              } else if (class(cnd2) == "logical") {
+              } else if (is(cnd2, "logical")) {
                 # Logical
-                if (class(cnd2) != "logical") stop(error_msg)
+                if (!is(cnd2, "logical")) stop(error_msg)
                 for (i in seq(length.out = nrow(rst))) {
                   rst[i, "use"] <-
                     any(
@@ -854,7 +853,7 @@ if (F) { # Check
                     )
                 }
                 rst <- rst[rst$use, , drop = FALSE]
-              } else if (class(cnd2) == "numeric") {
+              } else if (is(cnd2, "numeric")) {
                 # Numeric
                 if (!(class(slot(s2, nm)[[nm2]]) %in% c("integer", "numeric"))) {
                   stop(error_msg)

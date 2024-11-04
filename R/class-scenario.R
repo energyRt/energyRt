@@ -1,24 +1,22 @@
 #' An S4 class to represent scenario, an interpolated and/or solved model.
+#' @name class-scenario
 #'
-#' @slot name character. Name of the scenario.
-#' @slot desc character. Description of the scenario.
-#' @slot model model. Model object.
-# @slot subset
-#' @slot settings settings. 
-#'
-#' @slot modInp modInp object.
-#' @slot modOut modOut.
-#' @slot status list.
-#' @slot misc list.
-#' @slot name 
-#' @slot desc 
-#' @slot model 
-#' @slot inMemory 
-#' @slot path 
+#' @slot name `r get_slot_info("scenario", "name")`
+#' @slot desc `r get_slot_info("scenario", "desc")`
+#' @slot model `r get_slot_info("scenario", "model")`
+#' @slot settings `r get_slot_info("scenario", "settings")`
+#' @slot modInp `r get_slot_info("scenario", "modInp")`
+#' @slot modOut `r get_slot_info("scenario", "modOut")`
+#' @slot status `r get_slot_info("scenario", "status")`
+#' @slot inMemory `r get_slot_info("scenario", "inMemory")`
+#' @slot path `r get_slot_info("scenario", "path")`
+#' @slot misc `r get_slot_info("scenario", "misc")`
 #'
 #' @include class-modOut.R class-settings.R
+#' @family class scenario
 #'
-#' @return
+#' @seealso [interpolate(), solve(), register(), summary(), newScenario()]
+#'
 #' @export
 setClass("scenario",
   representation(
@@ -63,23 +61,24 @@ setMethod("initialize", "scenario", function(.Object, ...) {
 
 #' Generate a new scenario object
 #'
-#' @param name character. Name of the scenario.
-#' @param path character. Path to the scenario directory.
-#' @param ... 
-#' @param env_name name of the environment to assign the scenario in.
-#' @param registry optional registry object to register the scenario.
-#' @param replace logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists.
+#' @param name `r get_slot_info("scenario", "name")`
+#' @param path `r get_slot_info("scenario", "path")`
+#' @param ... any model objects or settings to be assigned to the scenario.
+#' @param env_name character. Name of the environment to register the scenario. Default is ".scen". Used only if registry is provided. (in development)
+#' @param registry optional registry object to register the scenario. (in development)
+#' @param replace logical. If TRUE, replace the entry of the scenario in the registry if the entry already exists. (in development)
 #'
-#' @return
+#' @return A new scenario object.
 #' @export
 #'
 #' @examples
+#' # It is suggested to use `interpolate(model)` or `solve(model)` to create a new scenario.
 newScenario <- function(
-    name, 
+    name,
     model = NULL,
     path = fp(get_scenarios_path(), name),
     ...,
-    env_name = ".scen", 
+    env_name = ".scen",
     registry = get_registry(),
     replace = FALSE
 ) {
@@ -94,13 +93,13 @@ newScenario <- function(
       if (replace) {
         registry$delete_entry(name, ...)
       } else {
-        cat("Scenario ", name, 
+        cat("Scenario ", name,
             " already exists in the registry.\n")
         return(invisible(FALSE))
       }
     }
     register(scen, registry, ..., env = env_name)
-    cat("Scenario ", name, " created in ", env_name, 
+    cat("Scenario ", name, " created in ", env_name,
         " environment and registered.\n")
     return(invisible(TRUE))
   } else {
@@ -122,7 +121,7 @@ summary.scenario <- function(object, ...) {
     if (!is.null(scen@modOut) && scen@modOut@stage == "solved") {
       cat("Solution status: ", ifelse(scen@status$optimal, "", "NOT "), "optimal\n", sep = "")
       # browser()
-      vObj <- getData(scen, "vObjective", merge = T)
+      vObj <- getData(scen, "vObjective", merge = TRUE)
       cat("vObjective: ", vObj$value, "\n")
       dum <- sum(scen@modOut@variables$vDummyCost$value)
       if (abs(dum) > 0) {
@@ -132,7 +131,7 @@ summary.scenario <- function(object, ...) {
       cat("Solution status: not solved\n")
     } else {
       status <- try(scen@modOut@stage)
-      if (class(status) == "try-error") status <- "unknown"
+      if (is(status, "try-error")) status <- "unknown"
       cat("Solution status:", status,"\n")
     }
   }
@@ -148,7 +147,7 @@ setMethod("summary", signature(object = "scenario"),
 ## show ####
 #' @method show scenario
 #' @export
-#' @family repository
+#' @family show print summary
 setMethod("show", "scenario", function(object) summary(object))
 
 # @export
@@ -170,7 +169,7 @@ setMethod("setHorizon", signature(obj = "scenario"),
     if (!is.null(args$period) || !is.null(args$intervals)) {
       if (is.null(args$period) && is.null(args$intervals)) {
           stop("Both 'period' and 'intervals' parameters must be provided.")
-      } 
+      }
       obj@settings <- setHorizon(obj@settings, args$period, args$intervals)
     }
     obj
@@ -179,7 +178,7 @@ setMethod("setHorizon", signature(obj = "scenario"),
 
 # @export
 # setMethod(
-#   "setHorizon", 
+#   "setHorizon",
 #   signature(obj = "scenario", horizon = "horizon"),
 #   function(obj, horizon) {
 #     # obj@model <- setHorizon(obj@model, period, intervals)
@@ -211,16 +210,16 @@ setMethod("getHorizon", signature(obj = "scenario"), function(obj) {
 #   checkGLPK = readLines("glpk/check.mod")
 # )
 
-#' @method add scenario
-#' @rdname add
-#'
-#' @return
-#' @export
-setMethod(
-  "add",
-  "scenario",
-  function(obj, ..., overwrite = FALSE, repo_name = NULL) {
-    stop("'add' method is not implemented yet for scenario.\n",
-         "You can add objects to a new scenario on 'interpolation' stage.")
-  }
-)
+# @method add scenario
+# @rdname add
+#
+# @return scenario object with added objects.
+# @export
+# setMethod(
+#   "add",
+#   "scenario",
+#   function(obj, ..., overwrite = FALSE, repo_name = NULL) {
+#     stop("'add' method is not implemented yet for scenario.\n",
+#          "You can add objects to a new scenario on 'interpolation' stage.")
+#   }
+# )

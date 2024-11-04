@@ -7,12 +7,14 @@ get_interpolation_rule <- function(x) {
 
 ## constraint-class ####
 #' An S4 class to represent a custom constraint.
-#'
+#' 
+#' @name class-constraint
+#' 
+#' @description 
+#' Class `constraint` is used to define custom constraints in the optimization problem.
 #' `r lifecycle::badge("experimental")`
-#' 
-#' @description Class `constraint` is used to define custom constraints in the optimization problem.
 #' @inherit newConstraint details
-#' 
+#'
 #' @md
 #' @slot name `r get_slot_info("constraint", "name")`
 #' @slot desc `r get_slot_info("constraint", "desc")`
@@ -24,9 +26,9 @@ get_interpolation_rule <- function(x) {
 #' @slot lhs `r get_slot_info("constraint", "lhs")`
 #' @slot misc `r get_slot_info("constraint", "misc")`
 #'
-#' 
+#'
 #' @include class-subsidy.R
-#' @family class, constraint
+#' @family class constraint policy
 #' @rdname class-constraint
 #' @order 1
 #' @export
@@ -65,23 +67,26 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 ## summand-class #####
 #' An S4 class to represent a summand in a constraint.
 #' 
+#' @name class-summand
 #' 
-#' @md 
+#' @description
+#' Class `summand` stores information about linear 
+#' terms (a multiplier and a variable) 
+#' in the `lhs` of the constraint class. 
+#' It is auto-created by `newConstraint` function
+#' and is not intended to be used directly by the user.
+#'
+#' @md
 #' @slot desc `r get_slot_info("summand", "desc")`
 #' @slot variable `r get_slot_info("summand", "variable")`
 #' @slot for.sum `r get_slot_info("summand", "for.sum")`
 #' @slot mult `r get_slot_info("summand", "mult")`
 #' @slot defVal `r get_slot_info("summand", "defVal")`
 #' @slot misc `r get_slot_info("summand", "misc")`
-#' 
-#' @family class, constraint
-#' @describeIn class-constraint Summand is a linear term in the `lhs` of a constraint equation. 
-#' It consists of a variable, a multiplier.
-#' Class `summand` is used to store information about linear terms in the constraint class.
-#' It is not intended to be used directly by the user.
-
+#'
+#' @family class constraint
 #' @order 2
-#' 
+#' @rdname class-constraint
 #' @export
 setClass("summand",
   representation(
@@ -106,19 +111,19 @@ setClass("summand",
 
 
 #' Create constraint object to add custom constraints to the model.
-#' 
-#' @description 
-#' The function creates a new constraint object that can be used 
+#'
+#' @description
+#' The function creates a new constraint object that can be used
 #' to add custom constraints to the model.
-#' 
-#' @details 
+#'
+#' @details
 #' Custom constraints extend the functionality of the model by adding
 #' user-defined constraints to the optimization problem.
 #' If the predefined constraints are not sufficient to describe the problem,
-#' custom constraints can be used to add linear equlity or inequality 
+#' custom constraints can be used to add linear equlity or inequality
 #' constraints to define additional relationships between the variables.
-#' In many cases this can be done without writing constraints in the GAMS, 
-#' Julia/JuMP, Python/Pyomo, or GLPK-MathProg languages by using the 
+#' In many cases this can be done without writing constraints in the GAMS,
+#' Julia/JuMP, Python/Pyomo, or GLPK-MathProg languages by using the
 #' `constrant` class and the `newConstraint` function.
 #' To define a custom constraint with the `newConstraint` function,
 #' the user needs to specify the name of the constraint, the type of the
@@ -126,13 +131,13 @@ setClass("summand",
 #' left-hand side (LHS) terms of the statement, and the right-hand side (RHS) value.
 #' The dimension of the constraint is set by the `for.each` parameter.
 #' The 'lhs' terms are defined as a list of linear terms (summands).
-#' Each summand consists of a variable, a multiplier, and a set of sets 
+#' Each summand consists of a variable, a multiplier, and a set of sets
 #' for which the summand is defined.
-#' 
+#'
 #'
 #' @param name `r get_slot_info("constraint", "name")`
 #' @param desc `r get_slot_info("constraint", "desc")`
-#' @param ... named or unnamed list(s) of left-hand side (LHS) 
+#' @param ... named or unnamed list(s) of left-hand side (LHS)
 #' linear terms (summands) to define the constraint.
 #' Every summand is defined as a list with the following elements:
 #' - `variable` - name of the variable in the summand.
@@ -143,14 +148,14 @@ setClass("summand",
 #' as linear terms of mulipliers and variables.
 #' @param eq Type of the relation ('==' default, '<=', '>=')
 #' @param for.each list or data.frame with sets that define the dimension of the constraint.
-#' @param rhs a numeric value, list or data frame with sets and numeric values for each constraint. 
+#' @param rhs a numeric value, list or data frame with sets and numeric values for each constraint.
 #' Note: zero values will be replaced with `replace_zerros` to avoid dropping them by the interpolation algorithms.
 #' @param defVal `r get_slot_info("constraint", "defVal")`
 #' @param interpolation `r get_slot_info("constraint", "interpolation")`
 #' @param replace_zerros numeric value to replace zero values in `rhs` and `defVal`. Default is `1e-20`.
 #'
 #' @return Object of class `constraint`.
-#' @family class, constraint
+#' @family class constraint policy
 #' @rdname newConstraint
 #'
 #' @export
@@ -161,9 +166,10 @@ newConstraint <- function(
     eq = "==",
     for.each = NULL,
     rhs = data.frame(),
-    defVal = NULL, 
+    defVal = NULL,
     interpolation = "inter",
     replace_zerros = 1e-20
+    # arg = NULL
     ) {
   obj <- new("constraint")
   # stopifnot(length(eq) == 1 && eq %in% levels(obj@eq))
@@ -176,7 +182,7 @@ newConstraint <- function(
   obj@eq[] <- eq
   # browser()
   if (is.null(defVal)) {
-    message("It is advisable to define 'defVal' parameter.")
+    warning("It is advisable to define 'defVal' parameter.")
     if (eq == "==") {
       defVal <- 0
     } else if (eq == "<=") {
@@ -229,11 +235,11 @@ newConstraint <- function(
   # }
   # Replace zero values with 1e-20 in rhs and defVal
   if (!is.null(replace_zerros) && any(rhs$rhs == 0)) {
-    warning("Zero values in 'rhs' will be replaced with '", replace_zerros, "' to avoid ignoring them by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
+    # warning("Zero values in 'rhs' will be replaced with '", replace_zerros, "' to avoid ignoring them by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
     rhs[rhs == 0] <- replace_zerros
   }
   if (!is.null(replace_zerros) && !is.na(defVal) && defVal == 0) {
-    warning("Zero value in 'defVal' will be replaced with '", replace_zerros, "' to avoid ignoring it by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
+    # warning("Zero value in 'defVal' will be replaced with '", replace_zerros, "' to avoid ignoring it by the current interpolation algorithms. Use non-zero value to avoid auto-replacement and the warning. Use 'replace_zerros = NULL' to avoid replacement.")
     defVal <- replace_zerros
   }
   # TYPE vs SET
@@ -265,9 +271,9 @@ newConstraint <- function(
       stop("Unrecognized 'for.each' parameter. Failed to build the costraint.")
     }
   }
-  for (i in seq_along(arg)) {
-    obj <- addSummand(obj, arg = arg[[i]])
-  }
+  # for (i in seq_along(arg)) {
+  #   obj <- addSummand(obj, arg = arg[[i]])
+  # }
   arg <- list(...)
   for (i in seq_along(arg)) {
     obj <- addSummand(obj, arg = arg[[i]])
@@ -275,17 +281,15 @@ newConstraint <- function(
   obj
 }
 
-
-
 #' A function to check if an object is of class `constraint`.
-#' 
+#'
 #' @param object any R object
 #'
 #' @return TRUE if the object inherits class `constraint`, FALSE otherwise.
 #' @export
-#' 
-#' @family class, constraint
-#' @describeIn newConstraint Check if an object is a constraint. 
+#'
+#' @family class constraint
+#' @describeIn newConstraint Check if an object is a constraint.
 #'
 #' @examples
 #' isConstraint(1)
@@ -294,9 +298,9 @@ isConstraint <- function(object) {
   inherits(object, "constraint")
 }
 
-#' @describeIn newConstraint 
-#' @family constraint
-#' @export
+# @describeIn newConstraint
+# @family constraint
+# @export
 addSummand <- function(
     eqt,
     variable = NULL,
@@ -851,19 +855,21 @@ addSummand <- function(
 #  .getSetEquation(prec, stm, approxim)@gams.equation
 
 #' @export
+#' @family constraint policy
+#' @rdname newConstraint
 newConstraintS <- function(
-    name, 
-    type, 
-    eq = "==", 
-    rhs = 0, 
+    name,
+    type,
+    eq = "==",
+    rhs = 0,
     for.sum = list(),
-    for.each = list(), 
-    defVal = 0, 
-    rule = NULL, 
+    for.each = list(),
+    defVal = 0,
+    rule = NULL,
     comm = NULL,
-    cout = TRUE, 
-    cinp = TRUE, 
-    aout = TRUE, 
+    cout = TRUE,
+    cinp = TRUE,
+    aout = TRUE,
     ainp = TRUE
   ) { # , emis = TRUE
   stop.newconstr <- function(x) {
@@ -874,7 +880,7 @@ newConstraintS <- function(
     return(newTax(name, tax = rhs, comm = comm, region = for.each$region, year = for.each$year, slice = for.each$slice))
   }
   if (type == "subs") {
-    return(newSub(name, subs = rhs, comm = comm, region = for.each$region, year = for.each$year, slice = for.each$slice))
+    return(newSub(name, sub = rhs, comm = comm, region = for.each$region, year = for.each$year, slice = for.each$slice))
   }
   # if (any(grep('(share|growth)', type))) stop.newconstr(paste(type, 'have to do'))
   # For wich kind of variables (capacity, newcapacity, input or output)

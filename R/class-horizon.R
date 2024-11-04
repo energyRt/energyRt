@@ -1,7 +1,7 @@
 # check <- function(...) UseMethod("check")
 
 #' An S4 class to represent model/scenario planning horizon with intervals (year-steps)
-#' @name horizon-class
+#' @name class-horizon
 #' 
 #' @slot name `r get_slot_info("horizon", "name")`
 #' @slot desc `r get_slot_info("horizon", "desc")`
@@ -9,7 +9,7 @@
 #' @slot intervals `r get_slot_info("horizon", "intervals")`
 #'
 #' @rdname class-horizon
-#' @family horizon, config, settings, model, scenario
+#' @family settings model scenario
 #' @include generics.R
 #' @export
 setClass(
@@ -53,7 +53,7 @@ setClass(
 #' @param mid_is_end logical, if TRUE, the mid-year will be set to the end of the interval.
 #' @param mid_is_start logical, if TRUE, the mid-year will be set to the start of the interval.
 #'
-#' @family horizon, config, settings, model, scenario
+#' @family horizon config settings model scenario
 #'
 #' @return An object of class 'horizon'
 #'
@@ -92,7 +92,7 @@ newHorizon <- function(
     intervals = NULL,
     mid_is_end = FALSE,
     mid_is_start = FALSE,
-    force_BY_interval_to_1_year = T,
+    force_BY_interval_to_1_year = TRUE,
     desc = NULL,
     name = NULL
     ) {

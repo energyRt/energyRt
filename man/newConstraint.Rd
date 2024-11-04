@@ -3,7 +3,7 @@
 \name{newConstraint}
 \alias{newConstraint}
 \alias{isConstraint}
-\alias{addSummand}
+\alias{newConstraintS}
 \title{Create constraint object to add custom constraints to the model.}
 \usage{
 newConstraint(
@@ -20,7 +20,21 @@ newConstraint(
 
 isConstraint(object)
 
-addSummand(eqt, variable = NULL, mult = data.frame(), for.sum = list(), arg)
+newConstraintS(
+  name,
+  type,
+  eq = "==",
+  rhs = 0,
+  for.sum = list(),
+  for.each = list(),
+  defVal = 0,
+  rule = NULL,
+  comm = NULL,
+  cout = TRUE,
+  cinp = TRUE,
+  aout = TRUE,
+  ainp = TRUE
+)
 }
 \arguments{
 \item{name}{character. Name of the constraint object, used in sets.}
@@ -48,7 +62,7 @@ Note: zero values will be replaced with \code{replace_zerros} to avoid dropping 
 
 \item{defVal}{numeric. The default value for the rhs. It is recommended to set the default value for the rhs of every constraint to avoid unexpected behavior. If not specified, the default value is 0, and the warning is issued.}
 
-\item{interpolation}{character. Interpolation rule for the constraint. Recognized values, any combination  of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation.  The default value is "inter", meaning that the interpolation is done  for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the \code{rhs} values, respectively.}
+\item{interpolation}{character. Interpolation rule for the constraint. Recognized values, any combination of "back", "inter", "forth", e.g., "back.inter" or "forth.inter", indicating the direction of interpolation. The default value is "inter", meaning that the interpolation is done for years between the specified values. The "back" and "forth" values induce backward and forward interpolation of the \code{rhs} values, respectively.}
 
 \item{replace_zerros}{numeric value to replace zero values in \code{rhs} and \code{defVal}. Default is \code{1e-20}.}
 
@@ -85,21 +99,24 @@ for which the summand is defined.
 \itemize{
 \item \code{isConstraint()}: Check if an object is a constraint.
 
-\item \code{addSummand()}: 
-
 }}
 \examples{
 isConstraint(1)
 isConstraint(newConstraint(""))
 }
 \seealso{
-Other class, constraint: 
-\code{\link{constraint-class}},
-\code{\link{summand-class}}
+Other class constraint policy: 
+\code{\link{class-constraint}},
+\code{\link{class-costs}},
+\code{\link{newCosts}()},
+\code{\link{newSubsidy}()},
+\code{\link{newTax}()},
+\code{\link{subsidy-class}},
+\code{\link{tax-class}}
 
-Other class, constraint: 
-\code{\link{constraint-class}},
-\code{\link{summand-class}}
+Other class constraint: 
+\code{\link{class-constraint}}
 }
-\concept{class, constraint}
-\concept{constraint}
+\concept{class constraint}
+\concept{class constraint policy}
+\concept{constraint policy}

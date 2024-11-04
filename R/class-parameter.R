@@ -1,14 +1,24 @@
 #' An S4 class to specify the model set or parameter
 #'
-#' @slot name character.
-#' @slot desc character.
-#' @slot dimSets character.
-#' @slot type factor,
-#' @slot defVal numeric.
-#' @slot interpolation character.
-#' @slot data data.frame.
-#' @slot inClass
-#' @slot misc list.
+#' @description
+#' Class `parameter` is used to represent the model set or parameter.
+#' All parameters and sets used in the model are populated with data
+#' from the model repository on the interpolation stage
+#' and stored as a named list in `model@modInp@data` slot.
+#' The class and related methods and functions are not
+#' intended for direct use by the user.
+#'
+#' @slot name `r get_slot_info("parameter", "name")`
+#' @slot desc `r get_slot_info("parameter", "desc")`
+#' @slot type `r get_slot_info("parameter", "type")`
+#' @slot dimSets `r get_slot_info("parameter", "dimSets")`
+#' @slot defVal `r get_slot_info("parameter", "defVal")`
+#' @slot data `r get_slot_info("parameter", "data")`
+#' @slot interpolation `r get_slot_info("parameter", "interpolation")`
+#' @slot inClass `r get_slot_info("parameter", "inClass")`
+#' @slot misc `r get_slot_info("parameter", "misc")`
+#'
+#' @name class-parameter
 #'
 #' @include class-model.R
 #' @family parameter
@@ -165,11 +175,11 @@ setMethod("initialize", signature = "parameter",
 )
 
 #' @family parameter
-#' @export
+#' @noRd
 newParameter <- function(...) new("parameter", ...)
 
 #' @family parameter
-#' @export
+#' @noRd
 newSet <- function(dimSets) {
   if (length(dimSets) != 1) stop("Sets must have only one dimension")
   newParameter(dimSets, dimSets, "set")
@@ -395,6 +405,8 @@ setMethod(
 )
 
 # print parameter ####
+#' @export
+#' @rdname print
 setMethod("print", "parameter", function(x, ...) {
   if (nrow(x@data) == 0) {
     cat('parameter "', x@name, '" is empty\n', sep = "")

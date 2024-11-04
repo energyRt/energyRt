@@ -28,6 +28,9 @@ solve_scenario(obj, name = obj@name, ...)
 
 \item{tmp.del}{logical delete temporary directory after the run}
 }
+\value{
+When the first argument is a model object, the function
+}
 \description{
 The function interpolates model, writes the script in a directory, runs the external software to solve the model, reads the solution results, and returns a scenario object with the solution.
 }

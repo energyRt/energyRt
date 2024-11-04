@@ -1,9 +1,17 @@
+# class-settings ###############################################################
 #' An S4 class to represent scenario settings
 #'
-#' @slot subset list.
-#' @slot solver list.
-#' @slot sourceCode list.
-#' @slot yearFraction
+#' @name class-settings
+#' 
+#' @description
+#' Class 'settings' inherits all slots from class 'config' and adds the following:
+#' 
+#' @slot subset `r get_slot_info("settings", "subset")`
+#' @slot yearFraction `r get_slot_info("settings", "yearFraction")`
+#' @slot solver `r get_slot_info("settings", "solver")`
+#' @slot sourceCode `r get_slot_info("settings", "sourceCode")`
+#'
+#' @family class config settings scenario model
 #'
 #' @include class-config.R
 #' @export

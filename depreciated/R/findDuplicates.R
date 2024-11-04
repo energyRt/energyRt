@@ -24,7 +24,7 @@ findDuplicates <- function(x) {
       rs <- NULL
       for (i in slt_name) {
         slt <- slot(x, i)
-        set_slot <- colnames(slt)[colnames(slt) %in% c('acomm', energyRt:::.set_al[!(energyRt:::.set_al %in% c('dem'))])]
+        set_slot <- colnames(slt)[colnames(slt) %in% c('acomm', .set_al[!(.set_al %in% c('dem'))])]
         value_slot <- colnames(slt)[!(colnames(slt) %in% set_slot)]
         fl <- !is.na(slt[, value_slot, drop = FALSE])
         if (any(fl)) {

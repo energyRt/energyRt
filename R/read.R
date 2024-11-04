@@ -6,11 +6,16 @@
 #' @param ... optional tmp.dir (if missing in the scenario object or to replace the saved path)
 #'
 #' @return
+#' The function returns the scenario object with populated modOut slot
+#' from the solved model directory.
 #' @export
 #' @seealso [solve()] to run the script, solve the scenario. [write_sc()] to read
 #'
-#' @examples
 #' @rdname read
+#' @examples
+#' \dontrun{
+#' scen <- read(scen)
+#' }
 read_solution <- function(obj, ...) {
   scen <- obj
   ## arguments
@@ -86,7 +91,7 @@ read_solution <- function(obj, ...) {
     # .check_load_gdxlib()
     .check_load_gdxtools()
     # Read variables gdx
-    gd <- gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
+    gd <- gdxtools::gdx(paste(arg$tmp.dir, "/output/output.gdx", sep = ""))
     for (i in c(vrb_list, vrb_list2)) {
       # cat(i, "\n")
       # if (i == "vTradeIr") browser() # debug

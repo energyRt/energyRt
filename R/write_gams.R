@@ -5,9 +5,10 @@
 #' If GDX path is not set, the GAMS path will be used. If GAMS path is not set, the default system GAMS-path (OS environment variables) instead.
 #'
 #' @param path character, path to installed GAMS distribution to use to solve models and/or with GDX library to use in reading and writing gdx-files.
-#'
-#' @rdname gams
-#' @family GAMS
+#' @return
+#' Sets path to GAMS library in R-options
+#' @rdname solver
+#' @family GAMS GDX solver
 #' @export
 #' @examples
 #' # set_gams_path("C:/GAMS/win64/32.2/")
@@ -26,8 +27,10 @@ set_gams_path <- function(path = NULL) {
   # options(gams_path = path)
 }
 
-#' @rdname gams
-#' @family GAMS
+#' @rdname solver
+#' @family GAMS GDX solver
+#' @return
+#' The current path to GAMS library, set in R-options
 #' @export
 #' @examples
 #' # get_gams_path()
@@ -37,10 +40,11 @@ get_gams_path <- function() {
 }
 
 #' @return
+#'  Sets path to GDX library in R-options
 #' @export
 #'
-#' @rdname gams
-#' @family GAMS
+#' @rdname solver
+#' @family GAMS GDX solver
 #'
 #' @examples
 #' # set_gdxlib("C:/GAMS/35")
@@ -56,8 +60,10 @@ set_gdxlib_path <- function(path = NULL) {
   options(gdxlib_path = path, env = "energyRt")
 }
 
-#' @rdname gams
-#' @family GAMS
+#' @rdname solver
+#' @family GAMS GDX solver
+#' @return
+#' The current path to GDX library, set in R-options
 #' @export
 #' @examples
 #' # get_gdxlib()
@@ -74,6 +80,7 @@ get_gdxlib_path <- function() {
   #        'Check: "https://github.com/GAMS-dev/gdxrrw"')
   # }
   rw <- requireNamespace("gdxtools", quietly = TRUE)
+  # rw <- require("gdxtools", quietly = TRUE)
   if (!rw) {
     stop('"gdxtools" package has not been found. ',
          'It is required for reading "*.gdx" files.\n',
@@ -86,7 +93,7 @@ get_gdxlib_path <- function() {
     if (is.null(lb)) {
       lb <- options::opt("gams_path")
     }
-    ix <- igdx(lb)
+    ix <- gdxtools::igdx(lb)
     if (!ix) {
       stop('Cannot load "gdx" library. Check "?set_gdxlib_path" to setup.')
     } else {
@@ -103,13 +110,14 @@ get_gdxlib_path <- function() {
          'To install: "https://github.com/lolow/gdxtools".')
   }
   xt <- requireNamespace("gdxtools", quietly = TRUE)
+  # xt <- require("gdxtools", quietly = TRUE)
   en_gdxlib_loaded <- getOption("en_gdxlib_loaded")
   if (is.null(en_gdxlib_loaded) || as.logical(en_gdxlib_loaded) == FALSE) {
     lb <- options::opt("gdxlib_path")
     if (is.null(lb)) {
       lb <- options::opt("gams_path")
     }
-    ix <- igdx(lb)
+    ix <- gdxtools::igdx(lb)
     if (!ix) {
       stop('Cannot load "gdx" library. Check "?set_gdxlib_path" to setup.')
     } else {
@@ -700,11 +708,11 @@ get_gdxlib_path <- function() {
   # gdxrrw::wgdx(gdxName = gdxName, x, squeeze = FALSE)
   # browser()
   # !!!ToDo: add check for NAs
-  wgdx(gdxName = gdxName, x, squeeze = FALSE)
+  gdxtools::wgdx(gdxName = gdxName, x, squeeze = FALSE)
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")
   cat(rep(" ", max_length + 3), sep = "")
-  cat(wipe, wipe, "\b, ", utils::format.object_size(file.size(gdxName), "auto"),
+  cat(wipe, wipe, "\b, ", format(object.size(file.size(gdxName)), "auto"),
       ", ", sep = "")
 }
 
@@ -730,7 +738,7 @@ get_gdxlib_path <- function() {
   cat(wipe, sep = "")
   cat(rep(" ", max_length + 3), sep = "")
   cat(rep(" ", max_length + 3), sep = "")
-  cat(wipe, wipe, "\b, ", utils::format.object_size(file.size(sqlFile), "auto"),
+  cat(wipe, wipe, "\b, ", format(object.size(file.size(sqlFile)), "auto"),
       ", ", sep = "")
   # cat(format(round(Sys.time() - tStart), 1))
 }

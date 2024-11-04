@@ -17,6 +17,22 @@ show_progress_bar(show = TRUE)
 
 \item{clear}{logical, sets \code{progressr.clear} global option. If \code{TRUE}, all outout from the progress bar will be cleared.}
 }
+\value{
+sets the progress bar and returns \code{NULL}
+}
 \description{
 Switch on/off and select/customize progress bar
+}
+\examples{
+\dontrun{
+set_progress_bar("bw")
+set_progress_bar("default")
+set_progress_bar("cli")
+set_progress_bar("progress")
+set_progress_bar("pbcol")
+}
+\dontrun{
+show_progress_bar()
+show_progress_bar(FALSE)
+}
 }

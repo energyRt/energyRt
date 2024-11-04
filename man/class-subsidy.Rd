@@ -5,7 +5,8 @@
 \alias{subsidy-class}
 \title{An S4 class to represent a commodity subsidy}
 \description{
-An S4 class to represent a commodity subsidy
+Subsidies are used to represent the financial support provided to
+production, consumption, or balance of a commodity.
 }
 \section{Slots}{
 
@@ -33,3 +34,14 @@ An S4 class to represent a commodity subsidy
 \item{\code{misc}}{list. Any additional information or data to store in the subsidy object.}
 }}
 
+\seealso{
+Other class constraint policy: 
+\code{\link{class-constraint}},
+\code{\link{class-costs}},
+\code{\link{newConstraint}()},
+\code{\link{newCosts}()},
+\code{\link{newSubsidy}()},
+\code{\link{newTax}()},
+\code{\link{tax-class}}
+}
+\concept{class constraint policy}

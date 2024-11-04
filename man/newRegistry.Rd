@@ -21,5 +21,9 @@ newRegistry(
 \item{store_env}{character, environment to store the objects.}
 }
 \description{
-Create a new registry object.
+Create a new registry object to store records of scenarios, models, and repositories.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+}
+\examples{
+# The `registry` methods are in development.
 }

@@ -15,4 +15,9 @@ scenario object with enclosed model (slot \verb{@model}) and interpolated parame
 \description{
 Interpolate model
 }
+\examples{
+\dontrun{
+scen <- interpolate(mod)
+}
+}
 \concept{interpolate model}

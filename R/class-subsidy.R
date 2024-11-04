@@ -1,10 +1,10 @@
 #' An S4 class to represent a commodity subsidy
 #'
 #' @name subsidy-class
-#' 
-#' @inherit newSub, description
-#' 
-#' @md 
+#'
+#' @inherit newSubsidy description
+#'
+#' @md
 #' @slot name `r get_slot_info("sub", "name")`
 #' @slot desc `r get_slot_info("sub", "desc")`
 #' @slot comm `r get_slot_info("sub", "comm")`
@@ -14,25 +14,26 @@
 #' @slot misc `r get_slot_info("sub", "misc")`
 #'
 #' @export
+#' @family class constraint policy
 #'
 #' @include class-tax.R
 #' @rdname class-subsidy
 #'
-setClass("sub", 
+setClass("sub",
   representation(
     # General information
-    name = "character", 
-    desc = "character", 
-    comm = "character", 
-    region = "character", 
-    defVal = "numeric", 
-    sub = "data.frame", 
+    name = "character",
+    desc = "character",
+    comm = "character",
+    region = "character",
+    defVal = "numeric",
+    sub = "data.frame",
     misc = "list"
   ),
   # !!! Rename to "subsidy"
   # !!! add slot "sub" = data.frame(comm, year, slice, sub)
   # !!! rename sub -> subsidy
-  # !!! add slot @variable = factor("output", "balance")  
+  # !!! add slot @variable = factor("output", "balance")
   prototype(
     name = "", # Short name
     comm = "",
@@ -56,9 +57,10 @@ setClass("sub",
 # setGeneric("newSub", function(name, ...) standardGeneric("newSub"))
 
 #' @title Create a new subsidy object
-#' 
+#' @name newSubsidy
+#'
 #' @description
-#' Subsidies are used to represent the financial support provided to 
+#' Subsidies are used to represent the financial support provided to
 #' production, consumption, or balance of a commodity.
 #'
 #' @param name `r get_slot_info("sub", "name")`
@@ -70,33 +72,49 @@ setClass("sub",
 #' @param misc `r get_slot_info("sub", "misc")`
 #'
 #' @return An object of class `sub`
+#' @family class constraint policy
 #' @export
+#' @aliases newSubsidy
 #' @rdname newSubsidy
 #'
 #' @examples
+#' SUB_BIO <- newSub(
+#'  name = "SUB_BIO", # used in sets
+#'  desc = "Biofuel consumption subsidy", # for own reference
+#'  comm = "BIO", # must match the commodity name in the model
+#'  region = "R1", # region where the subsidy is applied
+#'  defVal = 0, # default value
+#'  sub = data.frame(
+#'     # region = "R1",
+#'     year = 2025:2030,
+#'     inp = 0.9 # subsidy rate
+#'    )
+#'  )
 newSub <- function(
-  name, 
+  name,
   desc = "",
   comm = "",
   region = character(),
   defVal = 0,
   sub = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
   ) {
   .data2slots(
-    "sub", 
-    name = name,
+    "sub",
+    name,
     desc = desc,
     comm = comm,
     region = region,
     defVal = defVal,
     sub = sub,
-    misc = misc
+    misc = misc,
+    ...
     )
 }
 
 #' @export
-#' @rdname newSubsidy
+#' @noRd
 newSubsidy <- newSub
 
 # setMethod("newSub", signature(name = "character"), function(name, ..., value = NULL) {

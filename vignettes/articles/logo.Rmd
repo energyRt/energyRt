@@ -1,7 +1,11 @@
 ---
 title: "In search of the energyRt logo"
+vignette: >
+  %\VignetteIndexEntry{logo}
 resource_files:
   - images/DALL-E-at-work.png
+  - images/logo_v01.png
+  - images/logo_v02.png
 ---
 
 ```{r, include = FALSE, warning=FALSE, message=FALSE}
@@ -18,9 +22,19 @@ In this age of AI, with tools like ChatGPT and DALL-E, why not tap into the coll
 
 If you’d like to share your own logo idea, feel free to submit it via [GitHub Issues](https://github.com/energyRt/energyRt/issues) or send it by [email](<optimal2050@optimalsolution.dev>).
 
-```{r, include=FALSE}
+```{r, include=TRUE, echo=FALSE, fig.cap="Logo v01", fig.align='right', fig.height=3}
 library(knitr)
 # include_graphics('images/DALL-E-at-work.png', dpi = NA)
+knitr::include_graphics('images/logo_v01.png', dpi = NA)
 ```
 
+```{r, include=TRUE, echo=FALSE, fig.cap="Logo v02", fig.align='left', fig.height=3}
+knitr::include_graphics('images/logo_v02.png', dpi = NA)
+```
 
+<!-- #### Logo v02 <img src="images/logo_v02.png" align="left" height="120" alt="" /></a> -->
+<!-- \ -->
+
+<!-- #### Logo v01 <img src="images/logo_v01.png" align="right" height="120" alt="" /></a> -->
+
+...

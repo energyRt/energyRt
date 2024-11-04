@@ -1,20 +1,20 @@
 #' An S4 class to represent a commodity tax
 #'
-#' @inherit newSub, description
-#' @slot name character. 
-#' @slot comm character.
-#' @slot desc character.
-#' @slot region character.
-#' @slot year numeric.
-#' @slot defVal numeric.
-#' @slot value data.frame.
-#' @slot misc list.
+#' @name tax-class
+#' @inherit newTax description
+#'
+#' @slot name `r get_slot_info("tax", "name")`
+#' @slot desc `r get_slot_info("tax", "desc")`
+#' @slot comm `r get_slot_info("tax", "comm")`
+#' @slot region `r get_slot_info("tax", "region")`
+#' @slot defVal `r get_slot_info("tax", "defVal")`
+#' @slot tax `r get_slot_info("tax", "tax")`
+#' @slot misc `r get_slot_info("tax", "misc")`
 #'
 #' @include class-weather.R
+#' @family class constraint policy
 #' @rdname class-tax
-#'
 #' @export
-#'
 setClass("tax",
   representation(
     name = "character", #
@@ -50,11 +50,12 @@ setClass("tax",
 
 # setGeneric("newTax", function(name, ...) standardGeneric("newTax"))
 #' @title Create a new tax object
-#' 
+#' @name newTax
+#'
 #' @description
 #' Taxes are used to represent the financial levy imposed on production,
 #' consumption, or balance of a commodity.
-#' 
+#'
 #' @param name `r get_slot_info("tax", "name")`
 #' @param desc `r get_slot_info("tax", "desc")`
 #' @param comm `r get_slot_info("tax", "comm")`
@@ -64,29 +65,49 @@ setClass("tax",
 #' @param misc `r get_slot_info("tax", "misc")`
 #'
 #' @return An object of class `tax`
+#' @family class constraint policy
 #' @rdname newTax
 #' @export
 #'
 #' @examples
+#' CO2TAX <- newTax(
+#'  name = "CO2TAX",
+#'  desc = "Tax on net CO2 emissions",
+#'  comm = "CO2",
+#'  region = "R1",
+#'  defVal = 0,
+#'  tax = data.frame(
+#'  # region = "R1", # not required when @region is set
+#'  year = c(2030, 2040, 2050),
+#'  bal =  c(10, 50, 200) # $10, $50, $200 per ton, will be interpolated
+#'  # out = ... use to tax output commodity
+#'  # inp = ... use to tax input commodity
+#'    ),
+#'  misc = list(
+#'   source = "https://www.example.com/tax"
+#'   )
+#'  )
 newTax <- function(
-  name, 
+  name,
   desc = "",
   comm = "",
   region = character(),
   defVal = 0,
   tax = data.frame(),
-  misc = list()
+  misc = list(),
+  ...
   ) {
   .data2slots(
-    "tax", 
-    name = name,
+    "tax",
+    name,
     desc = desc,
     comm = comm,
     region = region,
     defVal = defVal,
     tax = tax,
-    misc = misc
-    )  
+    misc = misc,
+    ...
+    )
 }
 
 # setMethod("newTax", signature(name = "character"), function(name, ...) {

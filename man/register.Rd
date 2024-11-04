@@ -45,5 +45,9 @@ register(
 \item{replace}{logical, if TRUE, replace the existing entry.}
 }
 \description{
-Register an object in the registry.
+Register an repository, model, or scenario object in the registry.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+}
+\examples{
+# `registry` methods are in development.
 }

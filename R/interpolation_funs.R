@@ -5,9 +5,6 @@
 #' @param defVal numeric, default value of a parameter.
 #' @param arg list with interpolation settings.
 #'
-#' @return
-#'
-#' @examples
 #' @noRd
 .interpolation0 <- function(dtf, parameter, defVal, arg) {
   # The function is obsolete, to be replaced
@@ -287,8 +284,6 @@
 #' @param defVal numeric, default value of a parameter.
 #' @param ... interpolation parameters.
 #'
-#' @return
-#'
 #' @noRd
 .interpolation <- function(dtf, parameter, defVal, ...) {
   # new pipeline for interpolation routine is in progress
@@ -400,10 +395,9 @@
 #' @param approxim list with interpolation rules
 #' @param add_set_name character, name of set to add element
 #' @param add_set_value character, the element to add to the set
-#' @param remove_duplicate
-#' @param all.val
+#' @param remove_duplicate tbc
+#' @param all.val logical, if `TRUE` all values are interpolated
 #'
-#' @return
 #' @noRd
 .interp_numpar <- function(
     dtf, parameter, mtp, approxim,
@@ -489,7 +483,7 @@
     # }
     # colnames(d3) <- add_set_name
     d3 <- matrix(add_set_value, nrow = nrow(dd), ncol = length(add_set_value),
-                 byrow = T, dimnames = list(NULL, add_set_name)) |>
+                 byrow = TRUE, dimnames = list(NULL, add_set_name)) |>
       as.data.table()
     stnd <- mtp@dimSets[-(1:length(d3))]
     # It was added for trading routes
@@ -520,17 +514,16 @@
 
 #' Internal function to interpolate 'bounds' parameter
 #'
-#' @param dtf
-#' @param parameter
-#' @param mtp
-#' @param approxim
-#' @param add_set_name
-#' @param add_set_value
-#' @param remove_duplicate
-#' @param remValueUp
-#' @param remValueLo
+#' @param dtf data.frame, a slot with the data for interpolation.
+#' @param parameter character, name of the column in the `dtf` to interpolate.
+#' @param mtp class `parameter` to add interpolated data (in `modInp`).
+#' @param approxim list with interpolation rules
+#' @param add_set_name character, name of set to add element
+#' @param add_set_value character, the element to add to the set
+#' @param remove_duplicate tbc
+#' @param remValueUp tbc
+#' @param remValueLo tbc
 #'
-#' @return
 #'
 #' @noRd
 .interp_bounds <- function(

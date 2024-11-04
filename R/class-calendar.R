@@ -1,36 +1,30 @@
 # calendar-class ####
 #' An S4 class to represent sub-annual time resolution structure.
 #'
+#' @name class-calendar
+#'
 #' @description
 #' Sub-annual time resolution is represented by nested, named
 #' time-frames and time-slices.
 #'
-#' @slot name character, (optional) name of the calendar for own references
-#' @slot desc character, (optional) description of the calendar
-#' @slot timeframes a named list of nested sub-annual levels with vectors
-#' of individual elements.
-#' @slot timetable data.frame with levels of timeframes in the named columns,
-#' and number of rows equal to the total number of time-slices on the lowest level. Every timeframe is a set of timeslices ("slices") - a named fragment of time with a year-share. Timeframes have nested structure. Though every slice may have different sub-slices (similar to the real-world calendar).
-#' \describe{
-#'   \item{ANNUAL}{character, annual, the top level of timeframes}
-#'   \item{TIMEFRAME2}{character, (optional) first subannual level of timeframes}
-#'   \item{TIMEFRAME3}{character, (optional) second subannual level of timeframes}
-#'   \item{...}{character, (optional) further subannual levels of timeframes}
-#'   \item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `{SLICE2}_{SLICE3}...`}
-#' }
-#' @slot year_fraction numeric, the fraction of a year covered by the calendar, e.g. 1 for annual calendar (default), 0.5 for semi-annual, 0.25 for quarterly, etc. If not specified, will be calculated as sum of `timetable$share` or used default value (1).
-#' @slot slice_share two column data.frame with slices from all levels
-#' with their individual share in a year.
-#' @slot default_timeframe character, the name of the default level of the time-slices used in the model.
-#' @slot timeframe_rank named character vector with ranks of the timeframes.
-#' @slot slices_in_frame (!!! to depreciate)
-#' @slot slice_family data.frame mapping "parent" to "child" slices in two nearest timeframes in the nested hierarchy. Autocalculated based on the `@timetable`.
-#' @slot next_in_timeframe data.frame mapping chronological sequence between time-slices in the same timeframe. The first timeslice folows the last in the same timeframe. Autocalculated based on the `@timetable`.
-#' @slot next_in_year data.frame mapping chronological sequence between time-slices in the same timeframe through the whole year. Autocalculated based on the `@timetable`.
-#' @slot misc list with additional data and calculated mappings.
+#' @md
+#' @slot name `r get_slot_info("calendar", "name")`
+#' @slot desc `r get_slot_info("calendar", "desc")`
+#' @slot timeframes `r get_slot_info("calendar", "timeframes")`
+#' @slot year_fraction `r get_slot_info("calendar", "year_fraction")`
+#' @slot timetable `r get_slot_info("calendar", "timetable")`
+#' @slot slice_share `r get_slot_info("calendar", "slice_share")`
+#' @slot default_timeframe `r get_slot_info("calendar", "default_timeframe")`
+#' @slot timeframe_rank `r get_slot_info("calendar", "timeframe_rank")`
+#' @slot slices_in_frame `r get_slot_info("calendar", "slices_in_frame")`
+#' @slot slice_family `r get_slot_info("calendar", "slice_family")`
+#' @slot slice_ancestry `r get_slot_info("calendar", "slice_ancestry")`
+#' @slot next_in_timeframe `r get_slot_info("calendar", "next_in_timeframe")`
+#' @slot next_in_year `r get_slot_info("calendar", "next_in_year")`
+#' @slot misc `r get_slot_info("calendar", "misc")`
 #'
 #' @include generics.R defaults.R
-#' @rdname calendar
+#' @rdname class-calendar
 #' @export
 setClass("calendar", # alt: timestructure, timescales, timescheme, timeframe, schedule
   representation(
@@ -210,20 +204,56 @@ if (F) {
 
 #' Generate a new calendar object from
 #'
-#' @param timetable data.frame with the calendar structure.
-#' @param year_fraction numeric scalar, used for validation or calculation (if missing) of the `share` column in the given `timetable`. The default value is `1L` meaning the sum of shares of all slices in the table is equal to one (year). Lower than one value indicates that the calendar represents not a full year. Assigning the parameter to `NULL` will drop the validation.
-#' @param ... optional `name`, `desc`, strings, character `default_timeframe`, and list `misc` with any relevant content. All other arguments will be ignored.
+#' @name newCalendar
 #'
-#' @rdname calendar
+#'
+#' @param name `r get_slot_info("calendar", "name")`
+#' @param desc `r get_slot_info("calendar", "desc")`
+#' @param timetable `r get_slot_info("calendar", "timetable")`
+#' @param year_fraction `r get_slot_info("calendar", "year_fraction")`
+#' @param default_timeframe `r get_slot_info("calendar", "default_timeframe")`
+#' @param misc `r get_slot_info("calendar", "misc")`
+#' @param ... ignored
+#'
+#' @rdname newCalendar
 #' @return an object of class `calendar` with the specified structure.
+#'
+#' @description
+#' Calendars are defined by the structure of timeframes and time-slices
+#' with shares of time in a year. The structure is represented by a
+#' `timetable` data.frame with levels of timeframes in the named columns,
+#' and names of individual time-slices in every timeframe.
+#' The number of rows in `timetable` is equal to the total number
+#' of time-slices on the lowest level.
+#' Every timeframe is a set of timeslices ("slices") - a named fragment
+#' of time with a year-share. Timeframes have nested structure.
+#' Currently, every "parent"-timeframe must have the same number of
+#' elements as the "child"-timeframe. (This may change in the future.)
+#' \describe{
+#'   \item{ANNUAL}{character, annual, the top level of timeframes}
+#'   \item{TIMEFRAME2}{character, (optional) first subannual level of timeframes}
+#'   \item{TIMEFRAME3}{character, (optional) second subannual level of timeframes}
+#'   \item{...}{character, (optional) further subannual levels of timeframes}
+#'   \item{slice}{character, name of the time-slices used in sets to refer to the lowest level of timeframes. If not specified, will be auto-created with the formula: `{SLICE2}_{SLICE3}...`}
+#' }
+#'
 #' @order 1
 #' @export
 #'
 #' @examples
 #' newCalendar()
-newCalendar <- function(timetable = NULL, year_fraction = 1, ...) {
+newCalendar <- function(
+    name = "",
+    desc = "",
+    timetable = NULL,
+    year_fraction = 1,
+    default_timeframe = NULL,
+    misc = list(),
+    ...) {
   obj <- .init_calendar(timetable = timetable, year_fraction = year_fraction)
   arg <- list(...)
+  arg$name <- name
+  arg$desc <- desc
   if (!is.null(arg$name)) obj@name <- arg$name
   if (!is.null(arg$desc)) obj@desc <- arg$desc
   if (!is.null(arg$default_timeframe)) {
@@ -242,8 +272,8 @@ newCalendar <- function(timetable = NULL, year_fraction = 1, ...) {
 if (F) {
   ## tests ####
   newCalendar()
-  newCalendar(make_timetable(timeslices))
-  newCalendar(make_timetable(timeslices2),
+  newCalendar(timetable = make_timetable(timeslices))
+  newCalendar(timetable = make_timetable(timeslices2),
     name = "WRSA_DN",
     desc = "Four Seasons, day-night"
   )
@@ -256,7 +286,7 @@ if (F) {
   cal_subset <- cal[grepl("h0[12]", HOUR)]
   cal$share |> sum()
   cal_subset$share |> sum()
-  newCalendar(cal_subset, year_fraction = sum(cal_subset$share))
+  newCalendar(timetable = cal_subset, year_fraction = sum(cal_subset$share))
 }
 
 .print_if_not_empty <- function(x, pref = NULL, suff = NULL) {
@@ -758,7 +788,7 @@ if (F) {
   # browser()
   slt <- getSlots(class(app))
   slt <- names(slt)[slt %in% c("data.frame", "data.table")]
-  if (class(app) == "technology") slt <- slt[slt != "afs"]
+  if (is(app, "technology")) slt <- slt[slt != "afs"]
   for (ss in slt) {
     if (any(colnames(slot(app, ss)) == "slice")) {
       tmp <- slot(app, ss) |> as.data.frame() # !!! rewrite

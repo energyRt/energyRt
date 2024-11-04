@@ -1,8 +1,10 @@
 # Class trade ####
 #' An S4 class to represent inter-regional trade
+#' 
+#' @name class-trade
 #'
 #' @inherit newTrade details
-#' 
+#'
 #' @md
 #' @slot name `r get_slot_info("trade", "name")`
 #' @slot desc `r get_slot_info("trade", "desc")`
@@ -164,17 +166,17 @@ setMethod("initialize", "trade", function(.Object, ...) {
 #' Create new trade object
 #'
 #' @description Constructor for trade object.
-#' 
+#'
 #' @details Trade objects are used to represent inter-regional exchange in the model.
 #' Without trade, every region is isolated and can only use its own resources.
 #' The class defines trade routes, efficiency, costs,
 #' and other parameters related to the process. Number of routes per trade object is not
 #' limited. One trade object can have a part or entire trade network of the model.
 #' However, it has a distinct name and all the routs will be optimized together.
-#' Create separate trade objects to optimize different parts of the trade network 
+#' Create separate trade objects to optimize different parts of the trade network
 #' (aka transmission lines).
-#' 
-#' @md 
+#'
+#' @md
 #' @param name `r get_slot_info("trade", "name")`
 #' @param desc `r get_slot_info("trade", "desc")`
 #' @param commodity `r get_slot_info("trade", "commodity")`
@@ -197,11 +199,12 @@ setMethod("initialize", "trade", function(.Object, ...) {
 #' @return trade object with given specifications.
 #' @export
 #' @rdname newTrade
-#' @family trade, process, constructor
+#' @family trade process constructor
 #' @examples
-#' PIPELINE <- newTrade(
-#'   name = "PIPELINE",
+#' PIPELINE1 <- newTrade(
+#'   name = "PIPELINE1",
 #'   desc = "Some transport pipeline",
+#'   commodity = "OIL",
 #'   routes = data.frame(
 #'     src = c("R1", "R2"),
 #'     dst = c("R2", "R3")
@@ -212,7 +215,39 @@ setMethod("initialize", "trade", function(.Object, ...) {
 #'     teff = c(0.99, 0.98)
 #'   ),
 #'   olife = list(olife = 60)
-#' )   
+#' )
+#' draw(PIPELINE1)
+#' 
+#' PIPELINE2 <- newTrade(
+#'   name = "PIPELINE2",
+#'   desc = "Some transport pipeline",
+#'   commodity = "OIL",
+#'   routes = data.frame(
+#'     src = c("R1", "R1", "R2", "R3"),
+#'     dst = c("R2", "R3", "R3", "R2")
+#'   ),
+#'   trade = data.frame(
+#'     src = c("R1", "R1", "R2", "R3"),
+#'     dst = c("R2", "R3", "R3", "R2"),
+#'     teff = c(0.912, 0.913, 0.923, 0.932)
+#'   ),
+#'   aux = data.frame(
+#'     acomm = c("ELC", "CH4"),
+#'     unit = c("MWh", "kt")
+#'   ),
+#'   aeff = data.frame(
+#'     acomm = c("ELC", "CH4", "ELC", "CH4"),
+#'     src = c("R1", "R1", "R2", "R3"),
+#'     dst = c("R2", "R2", "R3", "R2"),
+#'     csrc2ainp = c(.5, NA, .3, NA),
+#'     cdst2ainp = c(.4, NA, .6, NA),
+#'     csrc2aout = c(NA, .1, NA, .2)
+#'   ),
+#'   olife = list(olife = 60)
+#' )
+#' draw(PIPELINE2, node = "R1")
+#' draw(PIPELINE2, node = "R2")
+#' draw(PIPELINE2, node = "R3")
 newTrade <- function(
     name = "",
     desc = "",
@@ -223,19 +258,30 @@ newTrade <- function(
     varom = data.frame(),
     invcost = data.frame(),
     olife = data.frame(),
-    start = data.frame(),
-    end = data.frame(),
+    start = data.frame(
+      # start = integer(),
+      start = -Inf, # temporary, ToDO: similar to other processes
+      stringsAsFactors = FALSE
+    ),
+    end = data.frame(
+      # end = integer(),
+      end = Inf,  # temporary, ToDO: similar to other processes
+      stringsAsFactors = FALSE
+    ),
+    # start = data.frame(),
+    # end = data.frame(),
     capacity = data.frame(),
     capacityVariable = TRUE,
     aux = data.frame(),
     aeff = data.frame(),
     cap2act = 1,
     optimizeRetirement = FALSE,
-    misc = list()
+    misc = list(),
+    ...
 ) {
   .data2slots(
-    "trade", 
-    name, 
+    "trade",
+    name,
     desc = desc,
     commodity = commodity,
     routes = routes,
@@ -252,7 +298,8 @@ newTrade <- function(
     aeff = aeff,
     cap2act = cap2act,
     optimizeRetirement = optimizeRetirement,
-    misc = misc
+    misc = misc,
+    ...
   )
 }
 

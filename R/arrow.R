@@ -16,6 +16,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' scen_BASE@path # check the scenarion directory
+#' scen_BASE <- save_scenario(scen_BASE) # saving in the default directory
+#' }
 save_scenario <- function(
     scen,
     path = scen@path,
@@ -137,7 +141,7 @@ data2disk <- function(obj, path = NULL, format = "parquet", verbose = FALSE) {
   # saves certain type of data to disk, returns TRUE if saved, FALSE if not
   if (is.null(path)) path <- getObjPath(obj)
   stopifnot(!is.null(path))
-  # dir.create(path, recursive = T, showWarnings = F)
+  # dir.create(path, recursive = TRUE, showWarnings = FALSE)
   # browser()
   # obj_class <- class(obj)
 
@@ -146,7 +150,7 @@ data2disk <- function(obj, path = NULL, format = "parquet", verbose = FALSE) {
     obj_class <- class(obj)
     # if (verbose) cat(path, format, "\n")
     if (anyDuplicatedSets(obj)) obj <- rename_duplicated_sets(obj)
-    dir.create(path, recursive = T, showWarnings = F)
+    dir.create(path, recursive = TRUE, showWarnings = FALSE)
     arrow::write_dataset(obj, path = path, format = format)
     # write(format, file = fp(path, "format"), append = FALSE)
     # write(obj_class, file = fp(path, "class"), append = FALSE)
@@ -159,7 +163,7 @@ data2disk <- function(obj, path = NULL, format = "parquet", verbose = FALSE) {
     obj <- as.data.table(obj)
     data.table::setnames(obj, old = "obj", new = basename(path))
     # fwrite(obj, file = fp(path, "obj.csv"))
-    dir.create(path, recursive = T, showWarnings = F)
+    dir.create(path, recursive = TRUE, showWarnings = FALSE)
     arrow::write_dataset(obj, path = path, format = "csv")
     # write(obj_class, file = fp(path, "class"), append = FALSE)
     # write("csv", file = fp(path, "format"), append = FALSE)
@@ -181,7 +185,7 @@ obj2disk <- function(
   # proceeds with saving and wiping the saved slots with marks in @misc
   if (is.null(path)) path <- getObjPath(obj)
   stopifnot(!is.null(path))
-  # dir.create(path, recursive = T, showWarnings = F)
+  # dir.create(path, recursive = TRUE, showWarnings = FALSE)
   # browser()
   # obj_class <- class(obj)
   # if (inherits(obj, "list")) browser()
@@ -222,7 +226,7 @@ obj2disk <- function(
         nm <- names(obj@misc$onDisk[[s]])
         # dim_list <- vector("list", length(nm)); names(dim_list) <- nm
         # dim_list <- list()
-        if (class(obj)[1] == "model" & s == "data") {
+        if (is(obj, "model") & s == "data") {
           make_progress_bar <- FALSE
         } else {
           if (verbose) {
@@ -332,18 +336,18 @@ reset_slot <- function(x) {
 if (F) {
   isOnDisk(scen)
   isInMemory(scen)
-  scen_ondisk <- obj2disk(scen, fp("scenarios", scen@name), verbose = F)
+  scen_ondisk <- obj2disk(scen, fp("scenarios", scen@name), verbose = FALSE)
   isOnDisk(scen_ondisk)
   isInMemory(scen_ondisk)
   size(scen)
   size(scen_ondisk)
-  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size |> sum()
+  fs::dir_info(fp("scenarios", scen@name), recurse = TRUE)$size |> sum()
   scen_ondisk2 <- obj2disk(scen_ondisk, fp("scenarios", scen@name),
     verbose = T
   )
   isInMemory(scen_ondisk2)
-  fs::dir_info(fp("scenarios", scen@name), recurse = T)$size |> sum()
-  # obj2disk(scen@modOut, fp("scenarios", scen@name), verbose = T)
+  fs::dir_info(fp("scenarios", scen@name), recurse = TRUE)$size |> sum()
+  # obj2disk(scen@modOut, fp("scenarios", scen@name), verbose = TRUE)
 }
 
 rename_duplicated_sets <- function(x) {
@@ -428,13 +432,17 @@ if (F) {
 #'
 #' @param obj Object, checks
 #'
-#' @return
+#' @return Logical value, TRUE if object is stored in memory, FALSE if on disk.
+#'
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' isInMemory(scen_BASE)
+#' }
 isInMemory <- function(obj) {
   if (!isS4(obj)) {
-    has_path <- try({!is.null(obj$misc$inMemory)}, silent = T)
+    has_path <- try({!is.null(obj$misc$inMemory)}, silent = TRUE)
     if (inherits(has_path, "try-error")) {
       return(TRUE)
     }
@@ -527,7 +535,7 @@ get_lazy_data <- function(obj, slot = NULL, element = NULL,
   }
   path <- paste(c(path, slot, element), collapse = "/")
   if (file.exists(path) || dir.exists(path)) path <- normalizePath(path)
-  qu <- try(en_open_dataset(path), silent = T)
+  qu <- try(en_open_dataset(path), silent = TRUE)
   if (inherits(qu, "try-error")) {
     return(NULL)
   }
@@ -582,7 +590,7 @@ get_lazy_dim_names <- function(obj, slot = NULL, element = NULL,
   }
   # ll$names <- obj@misc$onDisk[[slot]]$dimnames
   # path <- paste(c(path, slot, element), collapse = "/") |> normalizePath()
-  # qu <- try(en_open_dataset(path), silent = T)
+  # qu <- try(en_open_dataset(path), silent = TRUE)
   # if (inherits(qu, "try-error")) {
   #   return(ll)
   # }
@@ -595,17 +603,17 @@ if (F) {
   get_lazy_data(scen@modOut,
     slot = "variables",
     element = "vTechOut",
-    InMemory = F,
+    InMemory = FALSE,
     path = "scenarios/base"
   ) |>
     collect() |>
     as.data.table()
 
-  get_lazy_data(scen@modOut@variables, element = "vObjective", InMemory = T) |>
+  get_lazy_data(scen@modOut@variables, element = "vObjective", InMemory = TRUE) |>
     collect()
   get_lazy_data(scen@modOut@variables,
     element = "vObjective",
-    InMemory = F,
+    InMemory = FALSE,
     path = "scenarios/base/variables"
   ) |>
     collect()
@@ -706,17 +714,22 @@ if (F) {
 
 #' Load scenario (in progress)
 #'
-#' @param path
-#' @param name
-#' @param env
-#' @param overwrite
-#' @param ignore_errors
-#' @param verbose
+#' @param path character. Path to saved with function `save_scenario` scenario directory.
+#' @param name character. Name to assign to the loaded scenario object.
+#' By default, the name is taken from the loaded scenario object.
+#' @param env environment. Environment to assign the loaded scenario object.
+#' @param overwrite logical. Overwrite existing scenario object in the environment.
+#' @param ignore_errors logical. Ignore load errors and continue execution.
+#' This option is useful when some data is missing or corrupted.
+#' @param verbose logical. Print messages.
 #'
-#' @return
+#' @return TRUE if scenario is loaded, FALSE if not.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' load_scenario("scenarios/base")
+#' }
 load_scenario <- function(
     path,
     name = NULL,
@@ -787,10 +800,14 @@ load_scenario <- function(
 #' @param obj Object of S4 class, saved on disk (scenario, model, etc.)
 #' @param verbose If TRUE, prints messages
 #'
-#' @return
+#' @return Object of the same S4 class as input object, with
+#' all of the slots loaded in memory.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' obj2mem(scen_ondisk)
+#' }
 obj2mem <- function(obj, verbose = TRUE) {
   # browser()
   if (!isS4(obj)) {
