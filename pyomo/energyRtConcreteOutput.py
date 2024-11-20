@@ -32,11 +32,11 @@ for t, r, y in mTechEac:
             + "\n"
         )
 f.close()
-flist.write("vTechOMCost\n")
-f = open("output/vTechOMCost.csv", "w")
+flist.write("vTechRetCost\n")
+f = open("output/vTechRetCost.csv", "w")
 f.write("tech,region,year,value\n")
-for t, r, y in mTechOMCost:
-    if model.vTechOMCost[(t, r, y)].value != 0:
+for t, r, y in mTechRetCost:
+    if model.vTechRetCost[(t, r, y)].value != 0:
         f.write(
             str(t)
             + ","
@@ -44,7 +44,39 @@ for t, r, y in mTechOMCost:
             + ","
             + str(y)
             + ","
-            + str(model.vTechOMCost[(t, r, y)].value)
+            + str(model.vTechRetCost[(t, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vTechFixom\n")
+f = open("output/vTechFixom.csv", "w")
+f.write("tech,region,year,value\n")
+for t, r, y in mTechFixom:
+    if model.vTechFixom[(t, r, y)].value != 0:
+        f.write(
+            str(t)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vTechFixom[(t, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vTechVarom\n")
+f = open("output/vTechVarom.csv", "w")
+f.write("tech,region,year,value\n")
+for t, r, y in mTechVarom:
+    if model.vTechVarom[(t, r, y)].value != 0:
+        f.write(
+            str(t)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vTechVarom[(t, r, y)].value)
             + "\n"
         )
 f.close()
@@ -97,6 +129,22 @@ for c, r, y, s in mvBalance:
             + str(s)
             + ","
             + str(model.vBalance[(c, r, y, s)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vBalanceRY\n")
+f = open("output/vBalanceRY.csv", "w")
+f.write("comm,region,year,value\n")
+for c, r, y in mBalanceRY:
+    if model.vBalanceRY[(c, r, y)].value != 0:
+        f.write(
+            str(c)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vBalanceRY[(c, r, y)].value)
             + "\n"
         )
 f.close()
@@ -163,11 +211,43 @@ for c, r, y, s in mAggOut:
             + "\n"
         )
 f.close()
-flist.write("vStorageOMCost\n")
-f = open("output/vStorageOMCost.csv", "w")
+flist.write("vDummyImportCost\n")
+f = open("output/vDummyImportCost.csv", "w")
+f.write("comm,region,year,value\n")
+for c, r, y in mDummyImportCost:
+    if model.vDummyImportCost[(c, r, y)].value != 0:
+        f.write(
+            str(c)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vDummyImportCost[(c, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vDummyExportCost\n")
+f = open("output/vDummyExportCost.csv", "w")
+f.write("comm,region,year,value\n")
+for c, r, y in mDummyExportCost:
+    if model.vDummyExportCost[(c, r, y)].value != 0:
+        f.write(
+            str(c)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vDummyExportCost[(c, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vStorageFixom\n")
+f = open("output/vStorageFixom.csv", "w")
 f.write("stg,region,year,value\n")
-for st1, r, y in mStorageOMCost:
-    if model.vStorageOMCost[(st1, r, y)].value != 0:
+for st1, r, y in mStorageFixom:
+    if model.vStorageFixom[(st1, r, y)].value != 0:
         f.write(
             str(st1)
             + ","
@@ -175,35 +255,120 @@ for st1, r, y in mStorageOMCost:
             + ","
             + str(y)
             + ","
-            + str(model.vStorageOMCost[(st1, r, y)].value)
+            + str(model.vStorageFixom[(st1, r, y)].value)
             + "\n"
         )
 f.close()
-flist.write("vTradeCost\n")
-f = open("output/vTradeCost.csv", "w")
-f.write("region,year,value\n")
-for r, y in mvTradeCost:
-    if model.vTradeCost[(r, y)].value != 0:
+flist.write("vStorageVarom\n")
+f = open("output/vStorageVarom.csv", "w")
+f.write("stg,region,year,value\n")
+for st1, r, y in mStorageVarom:
+    if model.vStorageVarom[(st1, r, y)].value != 0:
         f.write(
-            str(r) + "," + str(y) + "," + str(model.vTradeCost[(r, y)].value) + "\n"
+            str(st1)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vStorageVarom[(st1, r, y)].value)
+            + "\n"
         )
 f.close()
-flist.write("vTradeRowCost\n")
-f = open("output/vTradeRowCost.csv", "w")
-f.write("region,year,value\n")
-for r, y in mvTradeRowCost:
-    if model.vTradeRowCost[(r, y)].value != 0:
+flist.write("vTradeEac\n")
+f = open("output/vTradeEac.csv", "w")
+f.write("trade,region,year,value\n")
+for t1, r, y in mTradeEac:
+    if model.vTradeEac[(t1, r, y)].value != 0:
         f.write(
-            str(r) + "," + str(y) + "," + str(model.vTradeRowCost[(r, y)].value) + "\n"
+            str(t1)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vTradeEac[(t1, r, y)].value)
+            + "\n"
         )
 f.close()
-flist.write("vTradeIrCost\n")
-f = open("output/vTradeIrCost.csv", "w")
-f.write("region,year,value\n")
-for r, y in mvTradeIrCost:
-    if model.vTradeIrCost[(r, y)].value != 0:
+flist.write("vTradeFixom\n")
+f = open("output/vTradeFixom.csv", "w")
+f.write("trade,region,year,value\n")
+for t1, r, y in mTradeFixom:
+    if model.vTradeFixom[(t1, r, y)].value != 0:
         f.write(
-            str(r) + "," + str(y) + "," + str(model.vTradeIrCost[(r, y)].value) + "\n"
+            str(t1)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vTradeFixom[(t1, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vImportIrCost\n")
+f = open("output/vImportIrCost.csv", "w")
+f.write("trade,region,year,value\n")
+for t1, r, y in mImportIrCost:
+    if model.vImportIrCost[(t1, r, y)].value != 0:
+        f.write(
+            str(t1)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vImportIrCost[(t1, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vExportIrCost\n")
+f = open("output/vExportIrCost.csv", "w")
+f.write("trade,region,year,value\n")
+for t1, r, y in mExportIrCost:
+    if model.vExportIrCost[(t1, r, y)].value != 0:
+        f.write(
+            str(t1)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vExportIrCost[(t1, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vImportRowCost\n")
+f = open("output/vImportRowCost.csv", "w")
+f.write("imp,region,year,value\n")
+for i, r, y in mImportRowCost:
+    if model.vImportRowCost[(i, r, y)].value != 0:
+        f.write(
+            str(i)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vImportRowCost[(i, r, y)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vExportRowCost\n")
+f = open("output/vExportRowCost.csv", "w")
+f.write("expp,region,year,value\n")
+for e, r, y in mExportRowCost:
+    if model.vExportRowCost[(e, r, y)].value != 0:
+        f.write(
+            str(e)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vExportRowCost[(e, r, y)].value)
+            + "\n"
         )
 f.close()
 flist.write("vTechNewCap\n")
@@ -458,6 +623,22 @@ for c, r, y, s in mvOutTot:
             + "\n"
         )
 f.close()
+flist.write("vOutTotRY\n")
+f = open("output/vOutTotRY.csv", "w")
+f.write("comm,region,year,value\n")
+for c, r, y in mOutTotRY:
+    if model.vOutTotRY[(c, r, y)].value != 0:
+        f.write(
+            str(c)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vOutTotRY[(c, r, y)].value)
+            + "\n"
+        )
+f.close()
 flist.write("vInpTot\n")
 f = open("output/vInpTot.csv", "w")
 f.write("comm,region,year,slice,value\n")
@@ -473,6 +654,22 @@ for c, r, y, s in mvInpTot:
             + str(s)
             + ","
             + str(model.vInpTot[(c, r, y, s)].value)
+            + "\n"
+        )
+f.close()
+flist.write("vInpTotRY\n")
+f = open("output/vInpTotRY.csv", "w")
+f.write("comm,region,year,value\n")
+for c, r, y in mInpTotRY:
+    if model.vInpTotRY[(c, r, y)].value != 0:
+        f.write(
+            str(c)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vInpTotRY[(c, r, y)].value)
             + "\n"
         )
 f.close()
@@ -1020,22 +1217,6 @@ for t1, r, y in mTradeEac:
             + str(y)
             + ","
             + str(model.vTradeInv[(t1, r, y)].value)
-            + "\n"
-        )
-f.close()
-flist.write("vTradeEac\n")
-f = open("output/vTradeEac.csv", "w")
-f.write("trade,region,year,value\n")
-for t1, r, y in mTradeEac:
-    if model.vTradeEac[(t1, r, y)].value != 0:
-        f.write(
-            str(t1)
-            + ","
-            + str(r)
-            + ","
-            + str(y)
-            + ","
-            + str(model.vTradeEac[(t1, r, y)].value)
             + "\n"
         )
 f.close()

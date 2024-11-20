@@ -22,6 +22,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   # region - define region, not good practice
   # repository - class for add to model (repository or list of repository)
   # echo - print working data
+  # !!! ADD: adjust_weather_sample, adjust_demand_sample
   # browser()
   obj <- object
   arg <- list(...)
@@ -412,7 +413,8 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     solver = arg$solver,
     mileStoneYears = scen@settings@horizon@intervals$mid,
     mileStoneForGrowth = xx,
-    fullsets = fullsets
+    fullsets = fullsets,
+    optimizeRetirement = scen@settings@optimizeRetirement
   )
   approxim$ry <- merge0(
     data.table(region = approxim$region, stringsAsFactors = FALSE),
@@ -534,7 +536,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
   }
 
   scen@modInp <- .obj2modInp(scen@modInp, scen@settings, approxim = approxim)
-
+  # browser()
   # Add discount data to approxim
   approxim <- .add_discount_approxim(scen, approxim)
 
@@ -581,6 +583,7 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     # stopCluster(cl)
     # scen <- .merge_scen(scen_pr, use_par)
   }
+  # browser()
   scen <- .add2_nthreads_1(n.thread = 0, max.thread = 1,
                            scen = scen, arg = arg, approxim = approxim,
                            interpolation_start_time = interpolation_start_time,
@@ -695,8 +698,12 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     filter_comreg(scen@modInp@parameters[["mTechInv"]], y_tech_reg)
   scen@modInp@parameters[["mTechEac"]] <-
     filter_comreg(scen@modInp@parameters[["mTechEac"]], y_tech_reg)
-  scen@modInp@parameters[["mTechOMCost"]] <-
-    filter_comreg(scen@modInp@parameters[["mTechOMCost"]], y_tech_reg)
+  # scen@modInp@parameters[["mTechOMCost"]] <-
+  #   filter_comreg(scen@modInp@parameters[["mTechOMCost"]], y_tech_reg)
+  scen@modInp@parameters[["mTechFixom"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechFixom"]], y_tech_reg)
+  scen@modInp@parameters[["mTechVarom"]] <-
+    filter_comreg(scen@modInp@parameters[["mTechVarom"]], y_tech_reg)
   scen@modInp@parameters[["mTechCapLo"]] <-
     filter_comreg(scen@modInp@parameters[["mTechCapLo"]], y_tech_reg)
   scen@modInp@parameters[["mTechCapUp"]] <-
@@ -705,6 +712,11 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     filter_comreg(scen@modInp@parameters[["mTechNewCapLo"]], y_tech_reg)
   scen@modInp@parameters[["mTechNewCapUp"]] <-
     filter_comreg(scen@modInp@parameters[["mTechNewCapUp"]], y_tech_reg)
+
+  # scen@modInp@parameters[["mStorageFixom"]] <-
+  #   filter_comreg(scen@modInp@parameters[["mStorageFixom"]], y_tech_reg)
+  # scen@modInp@parameters[["mStorageVarom"]] <-
+  #   filter_comreg(scen@modInp@parameters[["mStorageVarom"]], y_tech_reg)
 
   # pTechEac(tech, region, year)
   # scen@modInp@parameters[["pTechEac"]] <-
@@ -806,10 +818,18 @@ interpolate_model <- function(object, ...) { #- returns class scenario
     scen@modInp@parameters[[p]] <- .dat2par(scen@modInp@parameters[[p]], d)
   }
 
-  scen@modInp <- .write_mapping(scen@modInp,
+  # scen@modInp <- .write_mapping(scen@modInp,
+  #   interpolation_count = interpolation_count,
+  #   interpolation_start_time = interpolation_start_time,
+  #   len_name = len_name
+  # )
+
+  scen@modInp <- .make_mapping(
+    scen@modInp,
     interpolation_count = interpolation_count,
     interpolation_start_time = interpolation_start_time,
-    len_name = len_name
+    len_name = len_name,
+    scen_settings = scen@settings
   )
 
   # Clean parameters, need when nValues != -1, and mean that add NA row for speed
@@ -904,7 +924,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
   if (yearFraction == 1) {
     return(repo)
   }
-
+  # browser()
   if (inherits(repo, "list")) {
     # list of repositories
     repo <- lapply(repo, function(o) {
@@ -1238,6 +1258,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
                              len_name) {
   # browser()
   # A couple of string for progress bar
+  # !!! ToDo: rewrite selection of columns to be compatible with data.table
   num_classes_for_progrees_bar <- sum(c(sapply(scen@model@data,
                                                function(x) length(x@data)),
                                         recursive = TRUE))
@@ -1262,6 +1283,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
     for (j in seq(along = scen@model@data[[i]]@data)) {
       p(nm[j])
       k <- k + 1
+      # if (inherits(scen@model@data[[i]]@data[[j]], "costs")) browser()
       if (k %% max.thread == n.thread) {
         tmlg <- tmlg + 1
         if (arg$echo) {
@@ -1274,7 +1296,7 @@ subset_slices_repo <- function(repo, yearFraction = 1, keep_slices = NULL) {
         # tryCatch({
         inRange <- withinHorizon(scen@model@data[[i]]@data[[j]], scen@settings)
         if (!isFALSE(inRange)) { # NULL is allowed
-          if (is(scen@model@data[[i]]@data[[j]], "constraint")) { #isConstraint
+          if (inherits(scen@model@data[[i]]@data[[j]], c("constraint", "costs"))) { #isConstraint
             scen@modInp <- .obj2modInp(
               scen@modInp,
               scen@model@data[[i]]@data[[j]],
@@ -1707,6 +1729,7 @@ withinHorizon <- function(obj, settings) {
 
 # filter data for non-valid sets
 .filter_sets <- function(scen) {
+  # browser()
   dropped <- list() # log removed data
   set_names <- names(scen@modInp@set)
   for (i in seq_along(scen@modInp@parameters)) {

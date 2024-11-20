@@ -20,15 +20,20 @@
   vTechAOut = "vTechAOut( tech , comm , region , year , slice ) $ mvTechAOut( tech , comm , region , year , slice )",
   vTechInv = "vTechInv( tech , region , year ) $ mTechInv( tech , region , year )",
   vTechEac = "vTechEac( tech , region , year ) $ mTechEac( tech , region , year )",
-  vTechOMCost = "vTechOMCost( tech , region , year ) $ mTechOMCost( tech , region , year )",
+  vTechRetCost = "vTechRetCost( tech , region , year ) $ mTechRetCost( tech , region , year )",
+  vTechFixom = "vTechFixom( tech , region , year ) $ mTechFixom( tech , region , year )",
+  vTechVarom = "vTechVarom( tech , region , year ) $ mTechVarom( tech , region , year )",
   vSupOut = "vSupOut( sup , comm , region , year , slice ) $ mSupAva( sup , comm , region , year , slice )",
   vSupReserve = "vSupReserve( sup , comm , region ) $ mvSupReserve( sup , comm , region )",
   vSupCost = "vSupCost( sup , region , year ) $ mvSupCost( sup , region , year )",
   vDemInp = "vDemInp( comm , region , year , slice ) $ mvDemInp( comm , region , year , slice )",
   vEmsFuelTot = "vEmsFuelTot( comm , region , year , slice ) $ mEmsFuelTot( comm , region , year , slice )",
   vBalance = "vBalance( comm , region , year , slice ) $ mvBalance( comm , region , year , slice )",
+  vBalanceRY = "vBalanceRY( comm , region , year ) $ mBalanceRY( comm , region , year )",
   vOutTot = "vOutTot( comm , region , year , slice ) $ mvOutTot( comm , region , year , slice )",
+  vOutTotRY = "vOutTotRY( comm , region , year ) $ mOutTotRY( comm , region , year )",
   vInpTot = "vInpTot( comm , region , year , slice ) $ mvInpTot( comm , region , year , slice )",
+  vInpTotRY = "vInpTotRY( comm , region , year ) $ mInpTotRY( comm , region , year )",
   vInp2Lo = "vInp2Lo( comm , region , year , slice , slice ) $ mvInp2Lo( comm , region , year , slice , slice )",
   vOut2Lo = "vOut2Lo( comm , region , year , slice , slice ) $ mvOut2Lo( comm , region , year , slice , slice )",
   vSupOutTot = "vSupOutTot( comm , region , year , slice ) $ mSupOutTot( comm , region , year , slice )",
@@ -45,6 +50,8 @@
   vTaxCost = "vTaxCost( comm , region , year ) $ mTaxCost( comm , region , year )",
   vSubsCost = "vSubsCost( comm , region , year ) $ mSubCost( comm , region , year )",
   vAggOutTot = "vAggOutTot( comm , region , year , slice ) $ mAggOut( comm , region , year , slice )",
+  vDummyImportCost = "vDummyImportCost( comm , region , year ) $ mDummyImportCost( comm , region , year )",
+  vDummyExportCost = "vDummyExportCost( comm , region , year ) $ mDummyExportCost( comm , region , year )",
   vStorageInp = "vStorageInp( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",
   vStorageOut = "vStorageOut( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",
   vStorageStore = "vStorageStore( stg , comm , region , year , slice ) $ mvStorageStore( stg , comm , region , year , slice )",
@@ -52,7 +59,8 @@
   vStorageEac = "vStorageEac( stg , region , year ) $ mStorageEac( stg , region , year )",
   vStorageCap = "vStorageCap( stg , region , year ) $ mStorageSpan( stg , region , year )",
   vStorageNewCap = "vStorageNewCap( stg , region , year ) $ mStorageNew( stg , region , year )",
-  vStorageOMCost = "vStorageOMCost( stg , region , year ) $ mStorageOMCost( stg , region , year )",
+  vStorageFixom = "vStorageFixom( stg , region , year ) $ mStorageFixom( stg , region , year )",
+  vStorageVarom = "vStorageVarom( stg , region , year ) $ mStorageVarom( stg , region , year )",
   vImportTot = "vImportTot( comm , region , year , slice ) $ mImport( comm , region , year , slice )",
   vExportTot = "vExportTot( comm , region , year , slice ) $ mExport( comm , region , year , slice )",
   vTradeIr = "vTradeIr( trade , comm , region , region , year , slice ) $ mvTradeIr( trade , comm , region , region , year , slice )",
@@ -64,12 +72,14 @@
   vExportRow = "vExportRow( expp , comm , region , year , slice ) $ mExportRow( expp , comm , region , year , slice )",
   vImportRowCum = "vImportRowCum( imp , comm ) $ mImpComm( imp , comm )",
   vImportRow = "vImportRow( imp , comm , region , year , slice ) $ mImportRow( imp , comm , region , year , slice )",
-  vTradeCost = "vTradeCost( region , year ) $ mvTradeCost( region , year )",
-  vTradeRowCost = "vTradeRowCost( region , year ) $ mvTradeRowCost( region , year )",
-  vTradeIrCost = "vTradeIrCost( region , year ) $ mvTradeIrCost( region , year )",
+  vTradeEac = "vTradeEac( trade , region , year ) $ mTradeEac( trade , region , year )",
+  vTradeFixom = "vTradeFixom( trade , region , year ) $ mTradeFixom( trade , region , year )",
+  vImportIrCost = "vImportIrCost( trade , region , year ) $ mImportIrCost( trade , region , year )",
+  vExportIrCost = "vExportIrCost( trade , region , year ) $ mExportIrCost( trade , region , year )",
+  vImportRowCost = "vImportRowCost( imp , region , year ) $ mImportRowCost( imp , region , year )",
+  vExportRowCost = "vExportRowCost( expp , region , year ) $ mExportRowCost( expp , region , year )",
   vTradeCap = "vTradeCap( trade , year ) $ mTradeSpan( trade , year )",
   vTradeInv = "vTradeInv( trade , region , year ) $ mTradeEac( trade , region , year )",
-  vTradeEac = "vTradeEac( trade , region , year ) $ mTradeEac( trade , region , year )",
   vTradeNewCap = "vTradeNewCap( trade , year ) $ mTradeNew( trade , year )",
   vTotalUserCosts = "vTotalUserCosts( region , year ) $ mvTotalUserCosts( region , year )"
 );
@@ -80,19 +90,28 @@
 .variable_description = c(
   vTechInv = "Overnight investment costs",
   vTechEac = "Annualized investment costs",
-  vTechOMCost = "Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)",
+  vTechRetCost = "Early retirement costs",
+  vTechFixom = "Fixed O&M costs",
+  vTechVarom = "Variable O&M costs (AVarom + CVarom + ActVarom)",
   vSupCost = "Supply costs (weighted)",
-  vEmsFuelTot = "Total emissions from fuels combustion (technologies) (weighted)",
-  vBalance = "Net commodity balance (all sources) (weighted)",
+  vEmsFuelTot = "Total emissions from fuels combustion (technologies)",
+  vBalance = "Net commodity balance (all sources)",
+  vBalanceRY = "Net commodity balance by region and year (weighted)",
   vTotalCost = "Regional annual total costs (weighted)",
   vObjective = "Objective costs",
   vTaxCost = "Total tax levies (tax costs)",
   vSubsCost = "Total subsidies (substracted from costs)",
   vAggOutTot = "Aggregated commodity output (weighted)",
-  vStorageOMCost = "Storage O&M costs (weighted)",
-  vTradeCost = "Total trade costs (weighted)",
-  vTradeRowCost = "Trade with ROW costs (weighted)",
-  vTradeIrCost = "Interregional trade costs (weighted)",
+  vDummyImportCost = "Dummy import costs (weighted)",
+  vDummyExportCost = "Dummy export costs (weighted)",
+  vStorageFixom = "Storage fixed O&M costs",
+  vStorageVarom = "Storage variable O&M costs",
+  vTradeEac = "Annualized investments in Interregional trade capacity",
+  vTradeFixom = "Interregional trade fixed O&M costs",
+  vImportIrCost = "Import costs from other regions",
+  vExportIrCost = "Credits (revenue) for export to other regions",
+  vImportRowCost = "Import costs from the ROW",
+  vExportRowCost = "Credits for export to the ROW",
   vTechNewCap = "New capacity",
   vTechRetiredStockCum = "Early retired stock",
   vTechRetiredStock = "Early retired stock",
@@ -107,7 +126,9 @@
   vSupReserve = "Cumulative supply (weighted)",
   vDemInp = "Input to demand",
   vOutTot = "Total commodity output (all processes) (weighted)",
+  vOutTotRY = "Total commodity output (all processes) (weighted)",
   vInpTot = "Total commodity input (all processes) (weighted)",
+  vInpTotRY = "Total commodity input (all processes) (weighted)",
   vInp2Lo = "Desagregation of slices for input parent to (grand)child",
   vOut2Lo = "Desagregation of slices for output parent to (grand)child",
   vSupOutTot = "Total commodity supply (weighted)",
@@ -133,13 +154,12 @@
   vTradeIrAInpTot = "Trade total auxilari input (weighted)",
   vTradeIrAOut = "Trade auxilari output",
   vTradeIrAOutTot = "Trade auxilari output total (weighted)",
-  vExportRowCum = "Cumulative export to ROW",
-  vExportRow = "Export to ROW",
-  vImportRowCum = "Cumulative import from ROW",
-  vImportRow = "Import from ROW",
+  vExportRowCum = "Cumulative export to the ROW",
+  vExportRow = "Export to the ROW",
+  vImportRowCum = "Cumulative import from the ROW",
+  vImportRow = "Import from the ROW",
   vTradeCap = "Trade capacity",
   vTradeInv = "Investment in trade capacity (overnight)",
-  vTradeEac = "Investment in trade capacity (EAC)",
   vTradeNewCap = "New trade capacity",
   vTotalUserCosts = "Total additional costs (set by user)");
 #########################
@@ -180,7 +200,9 @@
   eqTechRetUp = "Upper bound on economic retirement of capacity",
   eqTechEac = "Technology Equivalent Annual Cost (EAC)",
   eqTechInv = "Technology overnight investment costs",
-  eqTechOMCost = "Technology O&M costs (weighted)",
+  eqTechFixom = "Technology fixed costs",
+  eqTechVarom = "Technology variable costs",
+  eqTechRetCost = "Costs of retired capacity of technology",
   eqSupAvaUp = "Supply availability upper bound",
   eqSupAvaLo = "Supply availability lower bound",
   eqSupReserve = "Cumulative supply (use of reserve)",
@@ -207,40 +229,46 @@
   eqStorageNewCapUp = "Storage new capacity upper bound",
   eqStorageInv = "Storage overnight investment costs",
   eqStorageEac = "Storage equivalent annual cost",
-  eqStorageCost = "Storage total costs",
+  eqStorageFixom = "Storage fixed costs",
+  eqStorageVarom = "Storage variable costs",
   eqImportTot = "Import equation (Ir & ROW)",
   eqExportTot = "Export equation (Ir & ROW)",
   eqTradeFlowUp = "Trade upper bound",
   eqTradeFlowLo = "Trade lower bound",
-  eqCostTrade = "Total trade costs",
-  eqCostRowTrade = "Costs of trade with the Rest of the World (ROW)",
-  eqCostIrTrade = "Costs of import",
-  eqExportRowUp = "Export to ROW upper constraint",
-  eqExportRowLo = "Export to ROW lower constraint",
-  eqExportRowCum = "Cumulative export to ROW",
-  eqExportRowResUp = "Cumulative export to ROW upper constraint",
-  eqImportRowUp = "Import from ROW upper constraint",
-  eqImportRowLo = "Import of ROW lower constraint",
-  eqImportRowCum = "Cumulative import from ROW",
-  eqImportRowResUp = "Cumulative import from ROW upper constraint",
+  eqExportRowUp = "Export to the ROW upper constraint",
+  eqExportRowLo = "Export to the ROW lower constraint",
+  eqExportRowCum = "Cumulative export to the ROW",
+  eqExportRowResUp = "Cumulative export to the ROW upper constraint",
+  eqExportRowCost = "Export to the ROW costs equation",
+  eqImportRowUp = "Import from the ROW upper constraint",
+  eqImportRowLo = "Import of the ROW lower constraint",
+  eqImportRowCum = "Cumulative import from the ROW",
+  eqImportRowResUp = "Cumulative import from the ROW upper constraint",
+  eqImportRowCost = "Import from the ROW costs equation",
   eqTradeCap = "Trade capacity",
   eqTradeCapLo = "Trade capacity lower bound",
   eqTradeCapUp = "Trade capacity upper bound",
   eqTradeNewCapLo = "Trade new capacity lower bound",
   eqTradeNewCapUp = "Trade new capacity upper bound",
+  eqTradeCapFlow = "Trade capacity to activity",
   eqTradeInv = "Trade overnight investment costs",
   eqTradeEac = "Trade equivalent annual costs",
-  eqTradeCapFlow = "Trade capacity to activity",
+  eqTradeFixom = "",
+  eqImportIrCost = "Interregional trade import costs",
+  eqExportIrCost = "Interregional trade export costs",
   eqTradeIrAInp = "Trade auxiliary commodity input",
   eqTradeIrAOut = "Trade auxiliary commodity output",
   eqTradeIrAInpTot = "Trade auxiliary commodity input",
   eqTradeIrAOutTot = "Trade auxiliary commodity output",
-  eqBalUp = "commodity balance <= 0 (e.g. upper limit - deficit is allowed)",
-  eqBalLo = "commodity balance >= 0 (e.g. lower limit - excess is allower)",
-  eqBalFx = "commodity balance >= 0 (no excess nor deficit is allowed)",
-  eqBal = "Commodity balance definition",
+  eqBalUp = "Commodity balance <= 0 (e.g. upper limit - deficit is allowed)",
+  eqBalLo = "Commodity balance >= 0 (e.g. lower limit - excess is allower)",
+  eqBalFx = "Commodity balance >= 0 (no excess nor deficit is allowed)",
+  eqBal = "Commodity balance",
+  eqBalanceRY = "",
   eqOutTot = "Total commodity output",
+  eqOutTotRY = "Total commodity output",
   eqInpTot = "Total commodity input",
+  eqInpTotRY = "Total commodity input",
   eqInp2Lo = "From commodity slice to lo level",
   eqOut2Lo = "From commodity slice to lo level",
   eqSupOutTot = "Supply total output",
@@ -248,9 +276,11 @@
   eqTechOutTot = "Technology total output",
   eqStorageInpTot = "Storage total input",
   eqStorageOutTot = "Storage total output",
-  eqCost = "Total costs (weighted)",
+  eqDummyImportCost = "Dummy import costs (weighted)",
+  eqDummyExportCost = "Dummy export costs (weighted)",
   eqTaxCost = "Commodity taxes (weighted)",
   eqSubsCost = "Commodity subsidy (weighted)",
+  eqCost = "Total costs (weighted)",
   eqObjective = "Objective equation NPV of total costs",
   eqLECActivity = "levelized costs (auxiliary equation)");
 #########################
@@ -291,7 +321,9 @@
   eqTechRetUp = c("tech", "region", "year"),
   eqTechEac = c("tech", "region", "year"),
   eqTechInv = c("tech", "region", "year"),
-  eqTechOMCost = c("tech", "region", "year"),
+  eqTechFixom = c("tech", "region", "year"),
+  eqTechVarom = c("tech", "region", "year"),
+  eqTechRetCost = c("tech", "region", "year"),
   eqSupAvaUp = c("sup", "comm", "region", "year", "slice"),
   eqSupAvaLo = c("sup", "comm", "region", "year", "slice"),
   eqSupReserve = c("sup", "comm", "region"),
@@ -318,30 +350,33 @@
   eqStorageNewCapUp = c("stg", "region", "year"),
   eqStorageInv = c("stg", "region", "year"),
   eqStorageEac = c("stg", "region", "year"),
-  eqStorageCost = c("stg", "region", "year"),
+  eqStorageFixom = c("stg", "region", "year"),
+  eqStorageVarom = c("stg", "region", "year"),
   eqImportTot = c("comm", "region", "year", "slice"),
   eqExportTot = c("comm", "region", "year", "slice"),
   eqTradeFlowUp = c("trade", "comm", "region", "region", "year", "slice"),
   eqTradeFlowLo = c("trade", "comm", "region", "region", "year", "slice"),
-  eqCostTrade = c("region", "year"),
-  eqCostRowTrade = c("region", "year"),
-  eqCostIrTrade = c("region", "year"),
   eqExportRowUp = c("expp", "comm", "region", "year", "slice"),
   eqExportRowLo = c("expp", "comm", "region", "year", "slice"),
   eqExportRowCum = c("expp", "comm"),
   eqExportRowResUp = c("expp", "comm"),
+  eqExportRowCost = c("expp", "region", "year"),
   eqImportRowUp = c("imp", "comm", "region", "year", "slice"),
   eqImportRowLo = c("imp", "comm", "region", "year", "slice"),
   eqImportRowCum = c("imp", "comm"),
   eqImportRowResUp = c("imp", "comm"),
+  eqImportRowCost = c("imp", "region", "year"),
   eqTradeCap = c("trade", "year"),
   eqTradeCapLo = c("trade", "year"),
   eqTradeCapUp = c("trade", "year"),
   eqTradeNewCapLo = c("trade", "year"),
   eqTradeNewCapUp = c("trade", "year"),
+  eqTradeCapFlow = c("trade", "comm", "year", "slice"),
   eqTradeInv = c("trade", "region", "year"),
   eqTradeEac = c("trade", "region", "year"),
-  eqTradeCapFlow = c("trade", "comm", "year", "slice"),
+  eqTradeFixom = c("trade", "region", "year"),
+  eqImportIrCost = c("trade", "region", "year"),
+  eqExportIrCost = c("trade", "region", "year"),
   eqTradeIrAInp = c("trade", "comm", "region", "year", "slice"),
   eqTradeIrAOut = c("trade", "comm", "region", "year", "slice"),
   eqTradeIrAInpTot = c("comm", "region", "year", "slice"),
@@ -350,8 +385,11 @@
   eqBalLo = c("comm", "region", "year", "slice"),
   eqBalFx = c("comm", "region", "year", "slice"),
   eqBal = c("comm", "region", "year", "slice"),
+  eqBalanceRY = c("comm", "region", "year"),
   eqOutTot = c("comm", "region", "year", "slice"),
+  eqOutTotRY = c("comm", "region", "year"),
   eqInpTot = c("comm", "region", "year", "slice"),
+  eqInpTotRY = c("comm", "region", "year"),
   eqInp2Lo = c("comm", "region", "year", "slice"),
   eqOut2Lo = c("comm", "region", "year", "slice"),
   eqSupOutTot = c("comm", "region", "year", "slice"),
@@ -359,9 +397,11 @@
   eqTechOutTot = c("comm", "region", "year", "slice"),
   eqStorageInpTot = c("comm", "region", "year", "slice"),
   eqStorageOutTot = c("comm", "region", "year", "slice"),
-  eqCost = c("region", "year"),
+  eqDummyImportCost = c("comm", "region", "year"),
+  eqDummyExportCost = c("comm", "region", "year"),
   eqTaxCost = c("comm", "region", "year"),
   eqSubsCost = c("comm", "region", "year"),
+  eqCost = c("region", "year"),
   eqObjective = NULL,
   eqLECActivity = c("tech", "region", "year"));
 #########################
@@ -388,7 +428,7 @@
   pTechCout2AOut = "Commodity-output to aux-commodity input",
   pTechFixom = "Fixed Operating and maintenance (O&M) costs (per unit of capacity)",
   pTechVarom = "Variable O&M costs (per unit of acticity)",
-  pTechInvcost = "Investment costs (per unit of capacity)",
+  pTechInvcost = "Overnight Investment costs (per unit of capacity)",
   pTechEac = "Equivalent annual (investment) cost",
   pTechRetCost = "Early retirement costs",
   pTechShareLo = "Lower bound of the share of the commodity in total group input or output",
@@ -481,14 +521,14 @@
   pTradeIrCsrc2Aout = "Auxiliary output commodity in source region",
   pTradeIrCdst2Ainp = "Auxiliary input commodity in destination region",
   pTradeIrCdst2Aout = "Auxiliary output commodity in destination region",
-  pExportRowRes = "Upper bound on cumulative export to ROW",
-  pExportRowUp = "Upper bound on export to ROW",
-  pExportRowLo = "Lower bound on export to ROW",
-  pExportRowPrice = "Export prices to ROW",
-  pImportRowRes = "Upper bound on cumulative import to ROW",
-  pImportRowUp = "Upper bount on import from ROW",
-  pImportRowLo = "Lower bound on import from ROW",
-  pImportRowPrice = "Import prices from ROW",
+  pExportRowRes = "Upper bound on cumulative export to the ROW",
+  pExportRowUp = "Upper bound on export to the ROW",
+  pExportRowLo = "Lower bound on export to the ROW",
+  pExportRowPrice = "Export prices to the ROW",
+  pImportRowRes = "Upper bound on cumulative import to the ROW",
+  pImportRowUp = "Upper bount on import from the ROW",
+  pImportRowLo = "Lower bound on import from the ROW",
+  pImportRowPrice = "Import prices from the ROW",
   pTradeStock = "Existing capacity",
   pTradeCapUp = "Upper bound on trade capacity",
   pTradeCapLo = "Lower bound on trade capacity",
@@ -587,7 +627,7 @@
   pAggregateFactor = c("comm", "comm"),
   pPeriodLen = c("year"),
   pSliceShare = c("slice"),
-  pSliceWeight = c("slice"),
+  pSliceWeight = c("year", "slice"),
   ordYear = c("year"),
   cardYear = c("year"),
   pStorageInpEff = c("stg", "comm", "region", "year", "slice"),
@@ -655,7 +695,7 @@
   pTradeInvcost = c("trade", "region", "year"),
   pTradeEac = c("trade", "region", "year"),
   pTradeRetCost = c("trade", "region", "year"),
-  pTradeFixom = c("trade", "year"),
+  pTradeFixom = c("trade", "region", "year"),
   pTradeVarom = c("trade", "region", "region", "year", "slice"),
   pTradeCap2Act = c("trade"),
   pWeather = c("weather", "region", "year", "slice"),
@@ -712,7 +752,9 @@
   eqTechRetUp = "mTechRetUp(tech, region, year)",
   eqTechEac = "mTechEac(tech, region, year)",
   eqTechInv = "mTechInv(tech, region, year)",
-  eqTechOMCost = "mTechOMCost(tech, region, year)",
+  eqTechFixom = "mTechFixom(tech, region, year)",
+  eqTechVarom = "mTechVarom(tech, region, year)",
+  eqTechRetCost = "mTechRetCost(tech, region, year)",
   eqSupAvaUp = "mSupAvaUp(sup, comm, region, year, slice)",
   eqSupAvaLo = "meqSupAvaLo(sup, comm, region, year, slice)",
   eqSupReserve = "mvSupReserve(sup, comm, region)",
@@ -739,30 +781,33 @@
   eqStorageNewCapUp = "mStorageNewCapUp(stg, region, year)",
   eqStorageInv = "mStorageNew(stg, region, year)",
   eqStorageEac = "mStorageEac(stg, region, year)",
-  eqStorageCost = "mStorageOMCost(stg, region, year)",
+  eqStorageFixom = "mStorageFixom(stg, region, year)",
+  eqStorageVarom = "mStorageVarom(stg, region, year)",
   eqImportTot = "mImport(comm, dst, year, slice)",
   eqExportTot = "mExport(comm, src, year, slice)",
   eqTradeFlowUp = "meqTradeFlowUp(trade, comm, src, dst, year, slice)",
   eqTradeFlowLo = "meqTradeFlowLo(trade, comm, src, dst, year, slice)",
-  eqCostTrade = "mvTradeCost(region, year)",
-  eqCostRowTrade = "mvTradeRowCost(region, year)",
-  eqCostIrTrade = "mvTradeIrCost(region, year)",
   eqExportRowUp = "mExportRowUp(expp, comm, region, year, slice)",
   eqExportRowLo = "meqExportRowLo(expp, comm, region, year, slice)",
   eqExportRowCum = "mExpComm(expp, comm)",
   eqExportRowResUp = "mExportRowCumUp(expp, comm)",
+  eqExportRowCost = "mExportRowCost(expp, region, year)",
   eqImportRowUp = "mImportRowUp(imp, comm, region, year, slice)",
   eqImportRowLo = "meqImportRowLo(imp, comm, region, year, slice)",
   eqImportRowCum = "mImpComm(imp, comm)",
   eqImportRowResUp = "mImportRowCumUp(imp, comm)",
+  eqImportRowCost = "mImportRowCost(imp, region, year)",
   eqTradeCap = "mTradeSpan(trade, year)",
   eqTradeCapLo = "mTradeCapLo(trade, year)",
   eqTradeCapUp = "mTradeCapUp(trade, year)",
   eqTradeNewCapLo = "mTradeNewCapLo(trade, year)",
   eqTradeNewCapUp = "mTradeNewCapUp(trade, year)",
+  eqTradeCapFlow = "meqTradeCapFlow(trade, comm, year, slice)",
   eqTradeInv = "mTradeInv(trade, region, year)",
   eqTradeEac = "mTradeEac(trade, region, year)",
-  eqTradeCapFlow = "meqTradeCapFlow(trade, comm, year, slice)",
+  eqTradeFixom = "mTradeFixom(trade, region, year)",
+  eqImportIrCost = "mImportIrCost(trade, region, year)",
+  eqExportIrCost = "mExportIrCost(trade, region, year)",
   eqTradeIrAInp = "mvTradeIrAInp(trade, comm, region, year, slice)",
   eqTradeIrAOut = "mvTradeIrAOut(trade, comm, region, year, slice)",
   eqTradeIrAInpTot = "mvTradeIrAInpTot(comm, region, year, slice)",
@@ -771,8 +816,11 @@
   eqBalLo = "meqBalLo(comm, region, year, slice)",
   eqBalFx = "meqBalFx(comm, region, year, slice)",
   eqBal = "mvBalance(comm, region, year, slice)",
+  eqBalanceRY = "mBalanceRY(comm, region, year)",
   eqOutTot = "mvOutTot(comm, region, year, slice)",
+  eqOutTotRY = "mOutTotRY(comm, region, year)",
   eqInpTot = "mvInpTot(comm, region, year, slice)",
+  eqInpTotRY = "mInpTotRY(comm, region, year)",
   eqInp2Lo = "mInp2Lo(comm, region, year, slice)",
   eqOut2Lo = "mOut2Lo(comm, region, year, slice)",
   eqSupOutTot = "mSupOutTot(comm, region, year, slice)",
@@ -780,9 +828,11 @@
   eqTechOutTot = "mTechOutTot(comm, region, year, slice)",
   eqStorageInpTot = "mStorageInpTot(comm, region, year, slice)",
   eqStorageOutTot = "mStorageOutTot(comm, region, year, slice)",
-  eqCost = "mvTotalCost(region, year)",
+  eqDummyImportCost = "mDummyImportCost(comm, region, year)",
+  eqDummyExportCost = "mDummyExportCost(comm, region, year)",
   eqTaxCost = "mTaxCost(comm, region, year)",
   eqSubsCost = "mSubCost(comm, region, year)",
+  eqCost = "mvTotalCost(region, year)",
   eqObjective = "",
   eqLECActivity = "meqLECActivity(tech, region, year)"
 );
@@ -816,6 +866,7 @@
   mCommSlice = "Commodity to slice",
   mCommSliceOrParent = "",
   mTechRetirement = "Early retirement option",
+  mTechRetCost = "Costs of early retirement",
   mTechUpgrade = "Upgrade technology (not implemented yet)",
   mTechInpComm = "Input commodity",
   mTechOutComm = "Output commodity",
@@ -841,7 +892,8 @@
   mStorageAOut = "Aux-commodity output from storage",
   mStorageNew = "Storage available for investment",
   mStorageSpan = "Storage set showing if the storage may exist in the year and region",
-  mStorageOMCost = "",
+  mStorageFixom = "add",
+  mStorageVarom = "add",
   mStorageEac = "",
   mSliceNext = "Next slice",
   mSliceFYearNext = "Next slice joint",
@@ -863,6 +915,7 @@
   mTradeEac = "",
   mTradeCapacityVariable = "",
   mTradeInv = "",
+  mTradeFixom = "",
   mAggregateFactor = "",
   mWeatherSlice = "",
   mWeatherRegion = "",
@@ -892,8 +945,11 @@
   mvTechAOut = "",
   mvDemInp = "",
   mvBalance = "",
+  mBalanceRY = "",
   mvInpTot = "",
+  mInpTotRY = "",
   mvOutTot = "",
+  mOutTotRY = "",
   mvInp2Lo = "",
   mvOut2Lo = "",
   mInpSub = "",
@@ -931,7 +987,10 @@
   mTradeIrCdst2Aout = "",
   mvTradeCost = "",
   mvTradeRowCost = "",
-  mvTradeIrCost = "",
+  mExportRowCost = "",
+  mImportRowCost = "",
+  mImportIrCost = "",
+  mExportIrCost = "",
   mvTotalCost = "",
   mvTotalUserCosts = "",
   mTradeCapLo = "",
@@ -956,13 +1015,15 @@
   mTechAOutCommAgg = "",
   mTechAOutCommAggSlice = "",
   mTechEac = "",
-  mTechOMCost = "",
+  mTechFixom = "added",
+  mTechVarom = "added",
   mSupOutTot = "",
   mEmsFuelTot = "",
   mTechEmsFuel = "",
   mDummyImport = "",
   mDummyExport = "",
-  mDummyCost = "",
+  mDummyImportCost = "",
+  mDummyExportCost = "",
   mTradeIr = "",
   mvTradeIrAInp = "",
   mvTradeIrAInpTot = "",
@@ -1073,6 +1134,7 @@
   mCommSlice = c("comm", "slice"),
   mCommSliceOrParent = c("comm", "slice", "slice"),
   mTechRetirement = c("tech"),
+  mTechRetCost = c("tech", "region", "year"),
   mTechUpgrade = c("tech", "tech"),
   mTechInpComm = c("tech", "comm"),
   mTechOutComm = c("tech", "comm"),
@@ -1098,7 +1160,8 @@
   mStorageAOut = c("stg", "comm"),
   mStorageNew = c("stg", "region", "year"),
   mStorageSpan = c("stg", "region", "year"),
-  mStorageOMCost = c("stg", "region", "year"),
+  mStorageFixom = c("stg", "region", "year"),
+  mStorageVarom = c("stg", "region", "year"),
   mStorageEac = c("stg", "region", "year"),
   mSliceNext = c("slice", "slice"),
   mSliceFYearNext = c("slice", "slice"),
@@ -1120,6 +1183,7 @@
   mTradeEac = c("trade", "region", "year"),
   mTradeCapacityVariable = c("trade"),
   mTradeInv = c("trade", "region", "year"),
+  mTradeFixom = c("trade", "region", "year"),
   mAggregateFactor = c("comm", "comm"),
   mWeatherSlice = c("weather", "slice"),
   mWeatherRegion = c("weather", "region"),
@@ -1149,8 +1213,11 @@
   mvTechAOut = c("tech", "comm", "region", "year", "slice"),
   mvDemInp = c("comm", "region", "year", "slice"),
   mvBalance = c("comm", "region", "year", "slice"),
+  mBalanceRY = c("comm", "region", "year"),
   mvInpTot = c("comm", "region", "year", "slice"),
+  mInpTotRY = c("comm", "region", "year"),
   mvOutTot = c("comm", "region", "year", "slice"),
+  mOutTotRY = c("comm", "region", "year"),
   mvInp2Lo = c("comm", "region", "year", "slice", "slice"),
   mvOut2Lo = c("comm", "region", "year", "slice", "slice"),
   mInpSub = c("comm", "region", "year", "slice"),
@@ -1188,7 +1255,10 @@
   mTradeIrCdst2Aout = c("trade", "comm", "region", "region", "year", "slice"),
   mvTradeCost = c("region", "year"),
   mvTradeRowCost = c("region", "year"),
-  mvTradeIrCost = c("region", "year"),
+  mExportRowCost = c("expp", "region", "year"),
+  mImportRowCost = c("imp", "region", "year"),
+  mImportIrCost = c("trade", "region", "year"),
+  mExportIrCost = c("trade", "region", "year"),
   mvTotalCost = c("region", "year"),
   mvTotalUserCosts = c("region", "year"),
   mTradeCapLo = c("trade", "year"),
@@ -1213,13 +1283,15 @@
   mTechAOutCommAgg = c("tech", "comm"),
   mTechAOutCommAggSlice = c("tech", "comm", "slice", "slicep"),
   mTechEac = c("tech", "region", "year"),
-  mTechOMCost = c("tech", "region", "year"),
+  mTechFixom = c("tech", "region", "year"),
+  mTechVarom = c("tech", "region", "year"),
   mSupOutTot = c("comm", "region", "year", "slice"),
   mEmsFuelTot = c("comm", "region", "year", "slice"),
   mTechEmsFuel = c("tech", "comm", "comm", "region", "year", "slice"),
   mDummyImport = c("comm", "region", "year", "slice"),
   mDummyExport = c("comm", "region", "year", "slice"),
-  mDummyCost = c("comm", "region", "year"),
+  mDummyImportCost = c("comm", "region", "year"),
+  mDummyExportCost = c("comm", "region", "year"),
   mTradeIr = c("trade", "region", "region", "year", "slice"),
   mvTradeIrAInp = c("trade", "comm", "region", "year", "slice"),
   mvTradeIrAInpTot = c("comm", "region", "year", "slice"),
@@ -1304,7 +1376,7 @@
 # equation_variable 
 #########################
 .equation_variable <- data.frame(equation = character(), variable = character(), stringsAsFactors = FALSE)
-.equation_variable[1:259, ] <- NA;
+.equation_variable[1:280, ] <- NA;
 .equation_variable[1, ] <- c("eqTechSng2Sng", "vTechInp")
 .equation_variable[2, ] <- c("eqTechSng2Sng", "vTechOut")
 .equation_variable[3, ] <- c("eqTechGrp2Sng", "vTechInp")
@@ -1370,200 +1442,221 @@
 .equation_variable[63, ] <- c("eqTechRetLo", "vTechRetiredNewCap")
 .equation_variable[64, ] <- c("eqTechRetUp", "vTechRetiredStock")
 .equation_variable[65, ] <- c("eqTechRetUp", "vTechRetiredNewCap")
-.equation_variable[66, ] <- c("eqTechEac", "vTechEac")
-.equation_variable[67, ] <- c("eqTechEac", "vTechNewCap")
+.equation_variable[66, ] <- c("eqTechEac", "vTechRetCost")
+.equation_variable[67, ] <- c("eqTechEac", "vTechRetiredStock")
 .equation_variable[68, ] <- c("eqTechEac", "vTechRetiredNewCap")
-.equation_variable[69, ] <- c("eqTechInv", "vTechInv")
+.equation_variable[69, ] <- c("eqTechInv", "vTechEac")
 .equation_variable[70, ] <- c("eqTechInv", "vTechNewCap")
-.equation_variable[71, ] <- c("eqTechOMCost", "vTechOMCost")
-.equation_variable[72, ] <- c("eqTechOMCost", "vTechCap")
-.equation_variable[73, ] <- c("eqTechOMCost", "vTechAct")
-.equation_variable[74, ] <- c("eqTechOMCost", "vTechInp")
-.equation_variable[75, ] <- c("eqTechOMCost", "vTechOut")
-.equation_variable[76, ] <- c("eqTechOMCost", "vTechAInp")
-.equation_variable[77, ] <- c("eqTechOMCost", "vTechAOut")
-.equation_variable[78, ] <- c("eqSupAvaUp", "vSupOut")
-.equation_variable[79, ] <- c("eqSupAvaLo", "vSupOut")
-.equation_variable[80, ] <- c("eqSupReserve", "vSupOut")
-.equation_variable[81, ] <- c("eqSupReserve", "vSupReserve")
-.equation_variable[82, ] <- c("eqSupReserveUp", "vSupReserve")
-.equation_variable[83, ] <- c("eqSupReserveLo", "vSupReserve")
-.equation_variable[84, ] <- c("eqSupCost", "vSupCost")
-.equation_variable[85, ] <- c("eqSupCost", "vSupOut")
-.equation_variable[86, ] <- c("eqDemInp", "vDemInp")
-.equation_variable[87, ] <- c("eqAggOutTot", "vAggOutTot")
-.equation_variable[88, ] <- c("eqAggOutTot", "vOutTot")
-.equation_variable[89, ] <- c("eqEmsFuelTot", "vEmsFuelTot")
-.equation_variable[90, ] <- c("eqEmsFuelTot", "vTechInp")
-.equation_variable[91, ] <- c("eqStorageStore", "vStorageAInp")
-.equation_variable[92, ] <- c("eqStorageStore", "vStorageInp")
-.equation_variable[93, ] <- c("eqStorageStore", "vStorageOut")
-.equation_variable[94, ] <- c("eqStorageStore", "vStorageStore")
-.equation_variable[95, ] <- c("eqStorageStore", "vStorageCap")
-.equation_variable[96, ] <- c("eqStorageStore", "vStorageNewCap")
-.equation_variable[97, ] <- c("eqStorageAfLo", "vStorageAOut")
-.equation_variable[98, ] <- c("eqStorageAfLo", "vStorageInp")
-.equation_variable[99, ] <- c("eqStorageAfLo", "vStorageOut")
-.equation_variable[100, ] <- c("eqStorageAfLo", "vStorageStore")
-.equation_variable[101, ] <- c("eqStorageAfLo", "vStorageCap")
-.equation_variable[102, ] <- c("eqStorageAfLo", "vStorageNewCap")
-.equation_variable[103, ] <- c("eqStorageAfUp", "vStorageInp")
-.equation_variable[104, ] <- c("eqStorageAfUp", "vStorageOut")
-.equation_variable[105, ] <- c("eqStorageAfUp", "vStorageStore")
-.equation_variable[106, ] <- c("eqStorageAfUp", "vStorageNewCap")
-.equation_variable[107, ] <- c("eqStorageClear", "vStorageStore")
-.equation_variable[108, ] <- c("eqStorageClear", "vStorageCap")
-.equation_variable[109, ] <- c("eqStorageAInp", "vStorageStore")
-.equation_variable[110, ] <- c("eqStorageAInp", "vStorageCap")
-.equation_variable[111, ] <- c("eqStorageAOut", "vStorageOut")
-.equation_variable[112, ] <- c("eqStorageAOut", "vStorageStore")
-.equation_variable[113, ] <- c("eqStorageInpUp", "vStorageInp")
-.equation_variable[114, ] <- c("eqStorageInpUp", "vStorageCap")
-.equation_variable[115, ] <- c("eqStorageInpLo", "vStorageInp")
-.equation_variable[116, ] <- c("eqStorageInpLo", "vStorageCap")
-.equation_variable[117, ] <- c("eqStorageOutUp", "vStorageOut")
-.equation_variable[118, ] <- c("eqStorageOutUp", "vStorageCap")
-.equation_variable[119, ] <- c("eqStorageOutLo", "vStorageOut")
-.equation_variable[120, ] <- c("eqStorageOutLo", "vStorageCap")
-.equation_variable[121, ] <- c("eqStorageCap", "vStorageCap")
-.equation_variable[122, ] <- c("eqStorageCap", "vStorageNewCap")
-.equation_variable[123, ] <- c("eqStorageCapLo", "vStorageCap")
-.equation_variable[124, ] <- c("eqStorageCapUp", "vStorageCap")
-.equation_variable[125, ] <- c("eqStorageNewCapLo", "vStorageNewCap")
-.equation_variable[126, ] <- c("eqStorageNewCapUp", "vStorageNewCap")
-.equation_variable[127, ] <- c("eqStorageInv", "vStorageInv")
-.equation_variable[128, ] <- c("eqStorageInv", "vStorageNewCap")
-.equation_variable[129, ] <- c("eqStorageEac", "vStorageEac")
-.equation_variable[130, ] <- c("eqStorageEac", "vStorageNewCap")
-.equation_variable[131, ] <- c("eqStorageCost", "vStorageOMCost")
-.equation_variable[132, ] <- c("eqStorageCost", "vStorageInp")
-.equation_variable[133, ] <- c("eqStorageCost", "vStorageOut")
-.equation_variable[134, ] <- c("eqStorageCost", "vStorageStore")
-.equation_variable[135, ] <- c("eqStorageCost", "vStorageCap")
-.equation_variable[136, ] <- c("eqImportTot", "vImportTot")
-.equation_variable[137, ] <- c("eqImportTot", "vTradeIr")
-.equation_variable[138, ] <- c("eqImportTot", "vImportRow")
-.equation_variable[139, ] <- c("eqExportTot", "vExportTot")
-.equation_variable[140, ] <- c("eqExportTot", "vTradeIr")
-.equation_variable[141, ] <- c("eqExportTot", "vExportRow")
-.equation_variable[142, ] <- c("eqTradeFlowUp", "vTradeIr")
-.equation_variable[143, ] <- c("eqTradeFlowLo", "vTradeIr")
-.equation_variable[144, ] <- c("eqCostTrade", "vTradeCost")
-.equation_variable[145, ] <- c("eqCostTrade", "vTradeRowCost")
-.equation_variable[146, ] <- c("eqCostTrade", "vTradeIrCost")
-.equation_variable[147, ] <- c("eqCostRowTrade", "vTradeRowCost")
-.equation_variable[148, ] <- c("eqCostRowTrade", "vExportRow")
-.equation_variable[149, ] <- c("eqCostRowTrade", "vImportRow")
-.equation_variable[150, ] <- c("eqCostIrTrade", "vTradeIrCost")
-.equation_variable[151, ] <- c("eqCostIrTrade", "vTradeIr")
-.equation_variable[152, ] <- c("eqCostIrTrade", "vTradeCap")
-.equation_variable[153, ] <- c("eqCostIrTrade", "vTradeEac")
-.equation_variable[154, ] <- c("eqExportRowUp", "vExportRow")
-.equation_variable[155, ] <- c("eqExportRowLo", "vExportRow")
-.equation_variable[156, ] <- c("eqExportRowCum", "vExportRowCum")
-.equation_variable[157, ] <- c("eqExportRowCum", "vExportRow")
-.equation_variable[158, ] <- c("eqExportRowResUp", "vExportRowCum")
-.equation_variable[159, ] <- c("eqImportRowUp", "vImportRow")
-.equation_variable[160, ] <- c("eqImportRowLo", "vImportRow")
-.equation_variable[161, ] <- c("eqImportRowCum", "vImportRowCum")
-.equation_variable[162, ] <- c("eqImportRowCum", "vImportRow")
-.equation_variable[163, ] <- c("eqImportRowResUp", "vImportRowCum")
-.equation_variable[164, ] <- c("eqTradeCap", "vTradeIr")
-.equation_variable[165, ] <- c("eqTradeCap", "vTradeCap")
-.equation_variable[166, ] <- c("eqTradeCapLo", "vTradeCap")
-.equation_variable[167, ] <- c("eqTradeCapLo", "vTradeNewCap")
+.equation_variable[71, ] <- c("eqTechInv", "vTechRetiredNewCap")
+.equation_variable[72, ] <- c("eqTechFixom", "vTechInv")
+.equation_variable[73, ] <- c("eqTechFixom", "vTechNewCap")
+.equation_variable[74, ] <- c("eqTechVarom", "vTechFixom")
+.equation_variable[75, ] <- c("eqTechVarom", "vTechCap")
+.equation_variable[76, ] <- c("eqTechRetCost", "vTechVarom")
+.equation_variable[77, ] <- c("eqTechRetCost", "vTechAct")
+.equation_variable[78, ] <- c("eqTechRetCost", "vTechInp")
+.equation_variable[79, ] <- c("eqTechRetCost", "vTechOut")
+.equation_variable[80, ] <- c("eqTechRetCost", "vTechAInp")
+.equation_variable[81, ] <- c("eqTechRetCost", "vTechAOut")
+.equation_variable[82, ] <- c("eqSupAvaUp", "vSupOut")
+.equation_variable[83, ] <- c("eqSupAvaLo", "vSupOut")
+.equation_variable[84, ] <- c("eqSupReserve", "vSupOut")
+.equation_variable[85, ] <- c("eqSupReserve", "vSupReserve")
+.equation_variable[86, ] <- c("eqSupReserveUp", "vSupReserve")
+.equation_variable[87, ] <- c("eqSupReserveLo", "vSupReserve")
+.equation_variable[88, ] <- c("eqSupCost", "vSupCost")
+.equation_variable[89, ] <- c("eqSupCost", "vSupOut")
+.equation_variable[90, ] <- c("eqDemInp", "vDemInp")
+.equation_variable[91, ] <- c("eqAggOutTot", "vAggOutTot")
+.equation_variable[92, ] <- c("eqAggOutTot", "vOutTot")
+.equation_variable[93, ] <- c("eqEmsFuelTot", "vEmsFuelTot")
+.equation_variable[94, ] <- c("eqEmsFuelTot", "vTechInp")
+.equation_variable[95, ] <- c("eqStorageStore", "vStorageAInp")
+.equation_variable[96, ] <- c("eqStorageStore", "vStorageInp")
+.equation_variable[97, ] <- c("eqStorageStore", "vStorageOut")
+.equation_variable[98, ] <- c("eqStorageStore", "vStorageStore")
+.equation_variable[99, ] <- c("eqStorageStore", "vStorageCap")
+.equation_variable[100, ] <- c("eqStorageStore", "vStorageNewCap")
+.equation_variable[101, ] <- c("eqStorageAfLo", "vStorageAOut")
+.equation_variable[102, ] <- c("eqStorageAfLo", "vStorageInp")
+.equation_variable[103, ] <- c("eqStorageAfLo", "vStorageOut")
+.equation_variable[104, ] <- c("eqStorageAfLo", "vStorageStore")
+.equation_variable[105, ] <- c("eqStorageAfLo", "vStorageCap")
+.equation_variable[106, ] <- c("eqStorageAfLo", "vStorageNewCap")
+.equation_variable[107, ] <- c("eqStorageAfUp", "vStorageInp")
+.equation_variable[108, ] <- c("eqStorageAfUp", "vStorageOut")
+.equation_variable[109, ] <- c("eqStorageAfUp", "vStorageStore")
+.equation_variable[110, ] <- c("eqStorageAfUp", "vStorageNewCap")
+.equation_variable[111, ] <- c("eqStorageClear", "vStorageStore")
+.equation_variable[112, ] <- c("eqStorageClear", "vStorageCap")
+.equation_variable[113, ] <- c("eqStorageAInp", "vStorageStore")
+.equation_variable[114, ] <- c("eqStorageAInp", "vStorageCap")
+.equation_variable[115, ] <- c("eqStorageAOut", "vStorageOut")
+.equation_variable[116, ] <- c("eqStorageAOut", "vStorageStore")
+.equation_variable[117, ] <- c("eqStorageInpUp", "vStorageInp")
+.equation_variable[118, ] <- c("eqStorageInpUp", "vStorageCap")
+.equation_variable[119, ] <- c("eqStorageInpLo", "vStorageInp")
+.equation_variable[120, ] <- c("eqStorageInpLo", "vStorageCap")
+.equation_variable[121, ] <- c("eqStorageOutUp", "vStorageOut")
+.equation_variable[122, ] <- c("eqStorageOutUp", "vStorageCap")
+.equation_variable[123, ] <- c("eqStorageOutLo", "vStorageOut")
+.equation_variable[124, ] <- c("eqStorageOutLo", "vStorageCap")
+.equation_variable[125, ] <- c("eqStorageCap", "vStorageCap")
+.equation_variable[126, ] <- c("eqStorageCap", "vStorageNewCap")
+.equation_variable[127, ] <- c("eqStorageCapLo", "vStorageCap")
+.equation_variable[128, ] <- c("eqStorageCapUp", "vStorageCap")
+.equation_variable[129, ] <- c("eqStorageNewCapLo", "vStorageNewCap")
+.equation_variable[130, ] <- c("eqStorageNewCapUp", "vStorageNewCap")
+.equation_variable[131, ] <- c("eqStorageInv", "vStorageInv")
+.equation_variable[132, ] <- c("eqStorageInv", "vStorageNewCap")
+.equation_variable[133, ] <- c("eqStorageEac", "vStorageEac")
+.equation_variable[134, ] <- c("eqStorageEac", "vStorageNewCap")
+.equation_variable[135, ] <- c("eqStorageFixom", "vStorageFixom")
+.equation_variable[136, ] <- c("eqStorageFixom", "vStorageCap")
+.equation_variable[137, ] <- c("eqStorageVarom", "vStorageVarom")
+.equation_variable[138, ] <- c("eqStorageVarom", "vStorageInp")
+.equation_variable[139, ] <- c("eqStorageVarom", "vStorageOut")
+.equation_variable[140, ] <- c("eqStorageVarom", "vStorageStore")
+.equation_variable[141, ] <- c("eqImportTot", "vImportTot")
+.equation_variable[142, ] <- c("eqImportTot", "vTradeIr")
+.equation_variable[143, ] <- c("eqImportTot", "vImportRow")
+.equation_variable[144, ] <- c("eqExportTot", "vExportTot")
+.equation_variable[145, ] <- c("eqExportTot", "vTradeIr")
+.equation_variable[146, ] <- c("eqExportTot", "vExportRow")
+.equation_variable[147, ] <- c("eqTradeFlowUp", "vTradeIr")
+.equation_variable[148, ] <- c("eqTradeFlowLo", "vTradeIr")
+.equation_variable[149, ] <- c("eqExportRowUp", "vImportIrCost")
+.equation_variable[150, ] <- c("eqExportRowUp", "vTradeIr")
+.equation_variable[151, ] <- c("eqExportRowLo", "vExportIrCost")
+.equation_variable[152, ] <- c("eqExportRowLo", "vTradeIr")
+.equation_variable[153, ] <- c("eqExportRowCum", "vExportRow")
+.equation_variable[154, ] <- c("eqExportRowResUp", "vExportRow")
+.equation_variable[155, ] <- c("eqExportRowCost", "vExportRowCum")
+.equation_variable[156, ] <- c("eqExportRowCost", "vExportRow")
+.equation_variable[157, ] <- c("eqImportRowUp", "vExportRowCum")
+.equation_variable[158, ] <- c("eqImportRowLo", "vExportRowCost")
+.equation_variable[159, ] <- c("eqImportRowLo", "vExportRow")
+.equation_variable[160, ] <- c("eqImportRowCum", "vImportRow")
+.equation_variable[161, ] <- c("eqImportRowResUp", "vImportRow")
+.equation_variable[162, ] <- c("eqImportRowCost", "vImportRowCum")
+.equation_variable[163, ] <- c("eqImportRowCost", "vImportRow")
+.equation_variable[164, ] <- c("eqTradeCap", "vImportRowCum")
+.equation_variable[165, ] <- c("eqTradeCapLo", "vImportRowCost")
+.equation_variable[166, ] <- c("eqTradeCapLo", "vImportRow")
+.equation_variable[167, ] <- c("eqTradeCapUp", "vTradeIr")
 .equation_variable[168, ] <- c("eqTradeCapUp", "vTradeCap")
 .equation_variable[169, ] <- c("eqTradeNewCapLo", "vTradeCap")
-.equation_variable[170, ] <- c("eqTradeNewCapUp", "vTradeNewCap")
-.equation_variable[171, ] <- c("eqTradeInv", "vTradeNewCap")
-.equation_variable[172, ] <- c("eqTradeEac", "vTradeInv")
-.equation_variable[173, ] <- c("eqTradeEac", "vTradeNewCap")
-.equation_variable[174, ] <- c("eqTradeCapFlow", "vTradeEac")
-.equation_variable[175, ] <- c("eqTradeCapFlow", "vTradeNewCap")
-.equation_variable[176, ] <- c("eqTradeIrAInp", "vTradeIr")
-.equation_variable[177, ] <- c("eqTradeIrAInp", "vTradeIrAInp")
-.equation_variable[178, ] <- c("eqTradeIrAOut", "vTradeIr")
-.equation_variable[179, ] <- c("eqTradeIrAOut", "vTradeIrAOut")
-.equation_variable[180, ] <- c("eqTradeIrAInpTot", "vTradeIrAInp")
-.equation_variable[181, ] <- c("eqTradeIrAInpTot", "vTradeIrAInpTot")
-.equation_variable[182, ] <- c("eqTradeIrAOutTot", "vTradeIrAOut")
-.equation_variable[183, ] <- c("eqTradeIrAOutTot", "vTradeIrAOutTot")
-.equation_variable[184, ] <- c("eqBalUp", "vBalance")
-.equation_variable[185, ] <- c("eqBalLo", "vBalance")
-.equation_variable[186, ] <- c("eqBalFx", "vBalance")
-.equation_variable[187, ] <- c("eqBal", "vBalance")
-.equation_variable[188, ] <- c("eqBal", "vOutTot")
-.equation_variable[189, ] <- c("eqBal", "vInpTot")
-.equation_variable[190, ] <- c("eqOutTot", "vEmsFuelTot")
-.equation_variable[191, ] <- c("eqOutTot", "vAggOutTot")
-.equation_variable[192, ] <- c("eqOutTot", "vOutTot")
-.equation_variable[193, ] <- c("eqOutTot", "vOut2Lo")
-.equation_variable[194, ] <- c("eqOutTot", "vSupOutTot")
-.equation_variable[195, ] <- c("eqOutTot", "vTechOutTot")
-.equation_variable[196, ] <- c("eqOutTot", "vStorageOutTot")
-.equation_variable[197, ] <- c("eqOutTot", "vDummyImport")
-.equation_variable[198, ] <- c("eqOutTot", "vImportTot")
-.equation_variable[199, ] <- c("eqOutTot", "vTradeIrAOutTot")
-.equation_variable[200, ] <- c("eqInpTot", "vEmsFuelTot")
-.equation_variable[201, ] <- c("eqInpTot", "vAggOutTot")
-.equation_variable[202, ] <- c("eqInpTot", "vOut2Lo")
-.equation_variable[203, ] <- c("eqInpTot", "vSupOutTot")
-.equation_variable[204, ] <- c("eqInpTot", "vTechOutTot")
-.equation_variable[205, ] <- c("eqInpTot", "vStorageOutTot")
-.equation_variable[206, ] <- c("eqInpTot", "vImportTot")
-.equation_variable[207, ] <- c("eqInpTot", "vTradeIrAOutTot")
-.equation_variable[208, ] <- c("eqInp2Lo", "vDemInp")
-.equation_variable[209, ] <- c("eqInp2Lo", "vInpTot")
-.equation_variable[210, ] <- c("eqInp2Lo", "vInp2Lo")
-.equation_variable[211, ] <- c("eqInp2Lo", "vTechInpTot")
-.equation_variable[212, ] <- c("eqInp2Lo", "vStorageInpTot")
-.equation_variable[213, ] <- c("eqInp2Lo", "vDummyExport")
-.equation_variable[214, ] <- c("eqInp2Lo", "vExportTot")
-.equation_variable[215, ] <- c("eqInp2Lo", "vTradeIrAInpTot")
-.equation_variable[216, ] <- c("eqOut2Lo", "vInp2Lo")
-.equation_variable[217, ] <- c("eqOut2Lo", "vTechInpTot")
-.equation_variable[218, ] <- c("eqOut2Lo", "vStorageInpTot")
-.equation_variable[219, ] <- c("eqOut2Lo", "vExportTot")
-.equation_variable[220, ] <- c("eqOut2Lo", "vTradeIrAInpTot")
-.equation_variable[221, ] <- c("eqSupOutTot", "vSupOut")
-.equation_variable[222, ] <- c("eqSupOutTot", "vSupOutTot")
-.equation_variable[223, ] <- c("eqTechInpTot", "vTechInp")
-.equation_variable[224, ] <- c("eqTechInpTot", "vTechAInp")
-.equation_variable[225, ] <- c("eqTechInpTot", "vTechInpTot")
-.equation_variable[226, ] <- c("eqTechOutTot", "vTechOut")
-.equation_variable[227, ] <- c("eqTechOutTot", "vTechAOut")
-.equation_variable[228, ] <- c("eqTechOutTot", "vTechOutTot")
-.equation_variable[229, ] <- c("eqStorageInpTot", "vStorageInpTot")
-.equation_variable[230, ] <- c("eqStorageInpTot", "vStorageAInp")
-.equation_variable[231, ] <- c("eqStorageInpTot", "vStorageInp")
-.equation_variable[232, ] <- c("eqStorageOutTot", "vStorageOutTot")
-.equation_variable[233, ] <- c("eqStorageOutTot", "vStorageAOut")
-.equation_variable[234, ] <- c("eqStorageOutTot", "vStorageOut")
-.equation_variable[235, ] <- c("eqCost", "vTechEac")
-.equation_variable[236, ] <- c("eqCost", "vTechOMCost")
-.equation_variable[237, ] <- c("eqCost", "vSupCost")
-.equation_variable[238, ] <- c("eqCost", "vTotalCost")
-.equation_variable[239, ] <- c("eqCost", "vTaxCost")
-.equation_variable[240, ] <- c("eqCost", "vSubsCost")
-.equation_variable[241, ] <- c("eqCost", "vStorageOMCost")
-.equation_variable[242, ] <- c("eqCost", "vTradeCost")
-.equation_variable[243, ] <- c("eqCost", "vTechRetiredStock")
-.equation_variable[244, ] <- c("eqCost", "vTechRetiredNewCap")
-.equation_variable[245, ] <- c("eqCost", "vDummyImport")
-.equation_variable[246, ] <- c("eqCost", "vDummyExport")
-.equation_variable[247, ] <- c("eqCost", "vStorageEac")
-.equation_variable[248, ] <- c("eqCost", "vTotalUserCosts")
-.equation_variable[249, ] <- c("eqTaxCost", "vBalance")
-.equation_variable[250, ] <- c("eqTaxCost", "vTaxCost")
-.equation_variable[251, ] <- c("eqTaxCost", "vOutTot")
-.equation_variable[252, ] <- c("eqTaxCost", "vInpTot")
-.equation_variable[253, ] <- c("eqSubsCost", "vBalance")
-.equation_variable[254, ] <- c("eqSubsCost", "vSubsCost")
-.equation_variable[255, ] <- c("eqSubsCost", "vOutTot")
-.equation_variable[256, ] <- c("eqSubsCost", "vInpTot")
-.equation_variable[257, ] <- c("eqObjective", "vTotalCost")
-.equation_variable[258, ] <- c("eqObjective", "vObjective")
-.equation_variable[259, ] <- c("eqLECActivity", "vTechAct")
+.equation_variable[170, ] <- c("eqTradeNewCapLo", "vTradeNewCap")
+.equation_variable[171, ] <- c("eqTradeNewCapUp", "vTradeCap")
+.equation_variable[172, ] <- c("eqTradeCapFlow", "vTradeCap")
+.equation_variable[173, ] <- c("eqTradeInv", "vTradeNewCap")
+.equation_variable[174, ] <- c("eqTradeEac", "vTradeNewCap")
+.equation_variable[175, ] <- c("eqTradeFixom", "vTradeInv")
+.equation_variable[176, ] <- c("eqTradeFixom", "vTradeNewCap")
+.equation_variable[177, ] <- c("eqImportIrCost", "vTradeEac")
+.equation_variable[178, ] <- c("eqImportIrCost", "vTradeNewCap")
+.equation_variable[179, ] <- c("eqExportIrCost", "vTradeFixom")
+.equation_variable[180, ] <- c("eqExportIrCost", "vTradeCap")
+.equation_variable[181, ] <- c("eqTradeIrAInp", "vTradeIr")
+.equation_variable[182, ] <- c("eqTradeIrAInp", "vTradeIrAInp")
+.equation_variable[183, ] <- c("eqTradeIrAOut", "vTradeIr")
+.equation_variable[184, ] <- c("eqTradeIrAOut", "vTradeIrAOut")
+.equation_variable[185, ] <- c("eqTradeIrAInpTot", "vTradeIrAInp")
+.equation_variable[186, ] <- c("eqTradeIrAInpTot", "vTradeIrAInpTot")
+.equation_variable[187, ] <- c("eqTradeIrAOutTot", "vTradeIrAOut")
+.equation_variable[188, ] <- c("eqTradeIrAOutTot", "vTradeIrAOutTot")
+.equation_variable[189, ] <- c("eqBalUp", "vBalance")
+.equation_variable[190, ] <- c("eqBalLo", "vBalance")
+.equation_variable[191, ] <- c("eqBalFx", "vBalance")
+.equation_variable[192, ] <- c("eqBal", "vBalance")
+.equation_variable[193, ] <- c("eqBal", "vOutTot")
+.equation_variable[194, ] <- c("eqBal", "vInpTot")
+.equation_variable[195, ] <- c("eqBalanceRY", "vBalance")
+.equation_variable[196, ] <- c("eqBalanceRY", "vBalanceRY")
+.equation_variable[197, ] <- c("eqOutTot", "vEmsFuelTot")
+.equation_variable[198, ] <- c("eqOutTot", "vAggOutTot")
+.equation_variable[199, ] <- c("eqOutTot", "vOutTot")
+.equation_variable[200, ] <- c("eqOutTot", "vOut2Lo")
+.equation_variable[201, ] <- c("eqOutTot", "vSupOutTot")
+.equation_variable[202, ] <- c("eqOutTot", "vTechOutTot")
+.equation_variable[203, ] <- c("eqOutTot", "vStorageOutTot")
+.equation_variable[204, ] <- c("eqOutTot", "vDummyImport")
+.equation_variable[205, ] <- c("eqOutTot", "vImportTot")
+.equation_variable[206, ] <- c("eqOutTot", "vTradeIrAOutTot")
+.equation_variable[207, ] <- c("eqOutTotRY", "vOutTot")
+.equation_variable[208, ] <- c("eqOutTotRY", "vOutTotRY")
+.equation_variable[209, ] <- c("eqInpTot", "vEmsFuelTot")
+.equation_variable[210, ] <- c("eqInpTot", "vAggOutTot")
+.equation_variable[211, ] <- c("eqInpTot", "vOut2Lo")
+.equation_variable[212, ] <- c("eqInpTot", "vSupOutTot")
+.equation_variable[213, ] <- c("eqInpTot", "vTechOutTot")
+.equation_variable[214, ] <- c("eqInpTot", "vStorageOutTot")
+.equation_variable[215, ] <- c("eqInpTot", "vImportTot")
+.equation_variable[216, ] <- c("eqInpTot", "vTradeIrAOutTot")
+.equation_variable[217, ] <- c("eqInpTotRY", "vDemInp")
+.equation_variable[218, ] <- c("eqInpTotRY", "vInpTot")
+.equation_variable[219, ] <- c("eqInpTotRY", "vInp2Lo")
+.equation_variable[220, ] <- c("eqInpTotRY", "vTechInpTot")
+.equation_variable[221, ] <- c("eqInpTotRY", "vStorageInpTot")
+.equation_variable[222, ] <- c("eqInpTotRY", "vDummyExport")
+.equation_variable[223, ] <- c("eqInpTotRY", "vExportTot")
+.equation_variable[224, ] <- c("eqInpTotRY", "vTradeIrAInpTot")
+.equation_variable[225, ] <- c("eqInp2Lo", "vInpTot")
+.equation_variable[226, ] <- c("eqInp2Lo", "vInpTotRY")
+.equation_variable[227, ] <- c("eqOut2Lo", "vInp2Lo")
+.equation_variable[228, ] <- c("eqOut2Lo", "vTechInpTot")
+.equation_variable[229, ] <- c("eqOut2Lo", "vStorageInpTot")
+.equation_variable[230, ] <- c("eqOut2Lo", "vExportTot")
+.equation_variable[231, ] <- c("eqOut2Lo", "vTradeIrAInpTot")
+.equation_variable[232, ] <- c("eqSupOutTot", "vSupOut")
+.equation_variable[233, ] <- c("eqSupOutTot", "vSupOutTot")
+.equation_variable[234, ] <- c("eqTechInpTot", "vTechInp")
+.equation_variable[235, ] <- c("eqTechInpTot", "vTechAInp")
+.equation_variable[236, ] <- c("eqTechInpTot", "vTechInpTot")
+.equation_variable[237, ] <- c("eqTechOutTot", "vTechOut")
+.equation_variable[238, ] <- c("eqTechOutTot", "vTechAOut")
+.equation_variable[239, ] <- c("eqTechOutTot", "vTechOutTot")
+.equation_variable[240, ] <- c("eqStorageInpTot", "vStorageInpTot")
+.equation_variable[241, ] <- c("eqStorageInpTot", "vStorageAInp")
+.equation_variable[242, ] <- c("eqStorageInpTot", "vStorageInp")
+.equation_variable[243, ] <- c("eqStorageOutTot", "vStorageOutTot")
+.equation_variable[244, ] <- c("eqStorageOutTot", "vStorageAOut")
+.equation_variable[245, ] <- c("eqStorageOutTot", "vStorageOut")
+.equation_variable[246, ] <- c("eqDummyImportCost", "vDummyImportCost")
+.equation_variable[247, ] <- c("eqDummyImportCost", "vDummyImport")
+.equation_variable[248, ] <- c("eqDummyExportCost", "vDummyExportCost")
+.equation_variable[249, ] <- c("eqDummyExportCost", "vDummyExport")
+.equation_variable[250, ] <- c("eqTaxCost", "vBalance")
+.equation_variable[251, ] <- c("eqTaxCost", "vTaxCost")
+.equation_variable[252, ] <- c("eqTaxCost", "vOutTot")
+.equation_variable[253, ] <- c("eqTaxCost", "vInpTot")
+.equation_variable[254, ] <- c("eqSubsCost", "vBalance")
+.equation_variable[255, ] <- c("eqSubsCost", "vSubsCost")
+.equation_variable[256, ] <- c("eqSubsCost", "vOutTot")
+.equation_variable[257, ] <- c("eqSubsCost", "vInpTot")
+.equation_variable[258, ] <- c("eqCost", "vTechEac")
+.equation_variable[259, ] <- c("eqCost", "vTechRetCost")
+.equation_variable[260, ] <- c("eqCost", "vTechFixom")
+.equation_variable[261, ] <- c("eqCost", "vTechVarom")
+.equation_variable[262, ] <- c("eqCost", "vSupCost")
+.equation_variable[263, ] <- c("eqCost", "vTotalCost")
+.equation_variable[264, ] <- c("eqCost", "vTaxCost")
+.equation_variable[265, ] <- c("eqCost", "vSubsCost")
+.equation_variable[266, ] <- c("eqCost", "vDummyImportCost")
+.equation_variable[267, ] <- c("eqCost", "vDummyExportCost")
+.equation_variable[268, ] <- c("eqCost", "vStorageFixom")
+.equation_variable[269, ] <- c("eqCost", "vStorageVarom")
+.equation_variable[270, ] <- c("eqCost", "vTradeEac")
+.equation_variable[271, ] <- c("eqCost", "vTradeFixom")
+.equation_variable[272, ] <- c("eqCost", "vImportIrCost")
+.equation_variable[273, ] <- c("eqCost", "vExportIrCost")
+.equation_variable[274, ] <- c("eqCost", "vImportRowCost")
+.equation_variable[275, ] <- c("eqCost", "vExportRowCost")
+.equation_variable[276, ] <- c("eqCost", "vStorageEac")
+.equation_variable[277, ] <- c("eqCost", "vTotalUserCosts")
+.equation_variable[278, ] <- c("eqObjective", "vTotalCost")
+.equation_variable[279, ] <- c("eqObjective", "vObjective")
+.equation_variable[280, ] <- c("eqLECActivity", "vTechAct")
 model_structure <- rbind(
 	data.frame(name = names(.set_description), description = .set_description, 
 						 type = 'set', dim = gsub('(["]|[)].*|^[^(]*[(]|NULL)', '', .set_set), map = ''),

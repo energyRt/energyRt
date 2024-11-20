@@ -82,14 +82,17 @@ findData <- function(scen, dataType = c("parameters", "variables"),
       #     names = if (dfNames) names(qu) else NULL
       #   )
       # }
-    # })
+      # })
     }
     ll <- c(ll, lt)
   }
   # browser()
   if (valueColumn) {
-    ii <- sapply(ll, function(x) any(grepl("^value$", x$names,
-                                           ignore.case = ignore.case)))
+    ii <- sapply(ll, function(x) {
+      any(grepl("^value$", x$names,
+        ignore.case = ignore.case
+      ))
+    })
     ll <- ll[ii]
   }
 
@@ -98,16 +101,20 @@ findData <- function(scen, dataType = c("parameters", "variables"),
     ii <- sapply(ll, function(x) {
       if (allSets) {
         all(
-          sapply(setsNames_, function(y) any(grepl(y, x$names,
-                                                   ignore.case = ignore.case))
-                )
-          )
+          sapply(setsNames_, function(y) {
+            any(grepl(y, x$names,
+              ignore.case = ignore.case
+            ))
+          })
+        )
       } else {
         any(
-          sapply(setsNames_, function(y) any(grepl(y, x$names,
-                                                   ignore.case = ignore.case))
-                 )
-          )
+          sapply(setsNames_, function(y) {
+            any(grepl(y, x$names,
+              ignore.case = ignore.case
+            ))
+          })
+        )
       }
     })
     ll <- ll[ii]
@@ -157,16 +164,32 @@ findData <- function(scen, dataType = c("parameters", "variables"),
 #' elc2050$vBalance
 #' }
 #' @export
-getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
-                    parameters = TRUE, variables = TRUE, ignore.case = TRUE,
-                    newNames = NULL, newValues = NULL, na.rm = FALSE,
-                    digits = NULL, drop.zeros = FALSE,
-                    # addGroups = list(), summarizeGroups = list(),
-                    asTibble = TRUE, stringsAsFactors = FALSE,
-                    yearsAsFactors = FALSE,
-                    drop_duplicated_scenarios = TRUE,
-                    scenNameInList = as.logical(length(scen) - 1),
-                    verbose = FALSE) {
+getData <- function(
+    scen,
+    name = NULL,
+    ...,
+    merge = FALSE,
+    process = FALSE,
+    parameters = TRUE,
+    variables = TRUE,
+    ignore.case = TRUE,
+    newNames = NULL,
+    newValues = NULL,
+    na.rm = FALSE,
+    digits = NULL,
+    drop.zeros = FALSE,
+    # addGroups = list(), summarizeGroups = list(),
+    add_weights = "auto",
+    add_period_length = "auto",
+    apply_weights = FALSE,
+    apply_period_length = FALSE,
+    asTibble = TRUE,
+    as_data_table = FALSE,
+    stringsAsFactors = FALSE,
+    yearsAsFactors = FALSE,
+    drop_duplicated_scenarios = TRUE,
+    scenNameInList = as.logical(length(scen) - 1),
+    verbose = FALSE) {
   # if (name == "vObjective") browser()
   # browser()
   arg <- list(...)
@@ -250,8 +273,10 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
       } else {
         sets_names <- NULL
       }
-      lt <- findData(scen[[s]], dataType = datype, setsNames_ = sets_names,
-                     ignore.case = ignore.case)
+      lt <- findData(scen[[s]],
+        dataType = datype, setsNames_ = sets_names,
+        ignore.case = ignore.case
+      )
       pvNames <- names(lt)
       # filter for variable/parameter names
       if (!is.null(name)) {
@@ -269,9 +294,10 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
         # Check if provided sets/filters exist
         ii <- nflt1 %in% clNames
         if (!all(ii)) {
-          warning("Sets '", paste(nflt1, collapse = "', '"),
-                  "' have not been found in scenario '", sc, "',", datype, "'."
-                  )
+          warning(
+            "Sets '", paste(nflt1, collapse = "', '"),
+            "' have not been found in scenario '", sc, "',", datype, "'."
+          )
         }
         # find all matching names of columns
         ii <- sapply(clNames, function(x) {
@@ -305,23 +331,26 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
           if (datype == "parameters") {
             # browser()
             dat <- get_lazy_data(scen[[s]]@modInp@parameters[[pv]],
-                                 slot = "data")
+              slot = "data"
+            )
             if (!is.null(dat)) {
               dat <- collect(dat)
             }
             # temporary. ToDo: rewrite filter-algo for lazy-data
             # if (!is.null(scen[[sc]]@modInp@parameters[[pv]])) {
             # if (!is.null(qu) {
-              # dat <- scen[[sc]]@modInp@parameters[[pv]]@data
-              # if (verbose) cat("   ", pv, "\n")
+            # dat <- scen[[sc]]@modInp@parameters[[pv]]@data
+            # if (verbose) cat("   ", pv, "\n")
             # } else {
-              # warning("Parameter '", pv, "' was not found.")
+            # warning("Parameter '", pv, "' was not found.")
             # }
           } else {
             # dat <- scen[[sc]]@modOut@variables[[pv]]
             # browser()
-            dat <- get_lazy_data(scen[[s]]@modOut, slot = "variables",
-                                 element = pv)
+            dat <- get_lazy_data(scen[[s]]@modOut,
+              slot = "variables",
+              element = pv
+            )
             if (!is.null(dat)) {
               # temporary. ToDo: rewrite filter-algo for lazy-data
               dat <- collect(dat)
@@ -340,7 +369,8 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                 cl_ <- nflt0[grepl(st, nflt_, ignore.case = ignore.case)] # regex match of sets names (find all comm* etc.) for regex match selection
                 for (k in cl_) { # loop over sets for regex filtration
                   kk <- kk & grepl(flt_[[paste0(k, "_")]], dat[[k]],
-                                   ignore.case = ignore.case)
+                    ignore.case = ignore.case
+                  )
                 }
                 cl <- nflt[grepl(st, nflt, ignore.case = ignore.case)] # regex match of sets names (find all comm* etc.) for exact match selection
                 for (k in cl) { # loop over sets/columns for exact filtration
@@ -357,7 +387,9 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
           }
           if (!is.null(dat)) {
             if (anyDuplicatedSets(dat)) dat <- rename_duplicated_sets(dat)
-            dkk <- dat |> collect() |> filter(kk)
+            dkk <- dat |>
+              collect() |>
+              filter(kk)
             if (!is.null(dkk) && nrow(dkk) > 0) {
               nkk <- sum(kk)
               dat <- dplyr::bind_cols(
@@ -365,7 +397,8 @@ getData <- function(scen, name = NULL, ..., merge = FALSE, process = FALSE,
                   scenario = rep(sc, nkk),
                   name = rep(pv, nkk)
                 ),
-                dkk)
+                dkk
+              )
               le <- length(ll) + 1
               nm_ll <- names(ll)
               if (scenNameInList) nm_le <- paste(sc, pv, sep = ".") else nm_le <- pv
@@ -529,7 +562,7 @@ get_data <- getData
 if (F) { # test
   load("energyRt_tutorial/data/utopia_scen_BAU.RData")
   (dem <- getData(scen, name = "pDemand", year = 2015, merge = TRUE))
-  (vTechOut = getData(scen, name = "vTechOut", comm = "ELC", merge = TRUE, year = 2015))
+  (vTechOut <- getData(scen, name = "vTechOut", comm = "ELC", merge = TRUE, year = 2015))
   # Storage capacity
   getData(scen, name = "vStorageCap", merge = TRUE)
 }
@@ -760,8 +793,10 @@ if (F) { # Check
             if (any(names(cnd) == "le")) {
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
-                  cnd["le"] >= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
-                                    nm),
+                  cnd["le"] >= slot(
+                    obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                    nm
+                  ),
                   na.rm = TRUE
                 )
               }
@@ -788,8 +823,10 @@ if (F) { # Check
             if (any(names(cnd) == "ge")) {
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
-                  cnd["ge"] <= slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
-                                    nm),
+                  cnd["ge"] <= slot(
+                    obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                    nm
+                  ),
                   na.rm = TRUE
                 )
               }
@@ -807,8 +844,10 @@ if (F) { # Check
             if (any(names(cnd) == "ne")) {
               for (i in seq(length.out = nrow(rst))) {
                 rst[i, "use"] <- any(
-                  cnd["ne"] != slot(obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
-                                    nm),
+                  cnd["ne"] != slot(
+                    obj@data[[rst[i, 1]]]@data[[rst[i, 2]]],
+                    nm
+                  ),
                   na.rm = TRUE
                 )
               }
@@ -970,4 +1009,3 @@ getObjects <- function(obj, class = c(), regex = NULL, ...) {
 getObjects_ <- function(obj, class = c(), ...) {
   .getNames(obj, cls = class, regex = TRUE, ...)
 }
-

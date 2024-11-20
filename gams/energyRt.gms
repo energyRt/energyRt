@@ -50,6 +50,7 @@ mMidMilestone(year)            Milestone year
 mCommSlice(comm, slice)        Commodity to slice
 mCommSliceOrParent(comm, slice, slice)
 mTechRetirement(tech)          Early retirement option
+mTechRetCost(tech, region, year)  Costs of early retirement
 mTechUpgrade(tech, tech)       Upgrade technology (not implemented yet)
 mTechInpComm(tech, comm)       Input commodity
 mTechOutComm(tech, comm)       Output commodity
@@ -83,11 +84,13 @@ mStorageAInp(stg, comm)            Aux-commodity input to storage
 mStorageAOut(stg, comm)            Aux-commodity output from storage
 mStorageNew(stg, region, year)     Storage available for investment
 mStorageSpan(stg, region, year)    Storage set showing if the storage may exist in the year and region
-mStorageOMCost(stg, region, year)
+*mStorageOMCost(stg, region, year)  drop
+mStorageFixom(stg, region, year)   add
+mStorageVarom(stg, region, year)   add
 mStorageEac(stg, region, year)
 mSliceNext(slice, slice)           Next slice
 mSliceFYearNext(slice, slice)      Next slice joint
-* Trade and ROW
+* Trade and the ROW
 mTradeSlice(trade, slice)          Trade to slice
 mTradeComm(trade, comm)            Trade commodities
 mTradeRoutes(trade, region, region)
@@ -102,7 +105,6 @@ mDiscountZero(region)
 mSliceParentChildE(slice, slice)   Child slice or the same
 mSliceParentChild(slice, slice)    Child slice not the same
 *
-
 mTradeRoutes(trade, region, region)
 mTradeSpan(trade, year)
 mTradeNew(trade, year)
@@ -110,6 +112,7 @@ mTradeOlifeInf(trade)
 mTradeEac(trade, region, year)
 mTradeCapacityVariable(trade)
 mTradeInv(trade, region, year)
+mTradeFixom(trade, region, year)
 mAggregateFactor(comm, comm)
 ;
 
@@ -140,7 +143,7 @@ pTechCout2AOut(tech, comm, comm, region, year, slice)     Commodity-output to au
 *
 pTechFixom(tech, region, year)                      Fixed Operating and maintenance (O&M) costs (per unit of capacity)
 pTechVarom(tech, region, year, slice)               Variable O&M costs (per unit of acticity)
-pTechInvcost(tech, region, year)                    Investment costs (per unit of capacity)
+pTechInvcost(tech, region, year)                    Overnight Investment costs (per unit of capacity)
 pTechEac(tech, region, year)                        Equivalent annual (investment) cost
 pTechRetCost(tech, region, year)                    Early retirement costs
 pTechShareLo(tech, comm, region, year, slice)       Lower bound of the share of the commodity in total group input or output
@@ -192,7 +195,7 @@ pAggregateFactor(comm, comm)                        Aggregation factor of commod
 * System parameters
 pPeriodLen(year)        Length of milestone-year-period
 pSliceShare(slice)      Slice share in year
-pSliceWeight(slice)     Slice weight
+pSliceWeight(year, slice)     Slice weight
 ordYear(year)           ord year (used in GLPK-MathProg)
 cardYear(year)          card year (used in GLPK-MathProg)
 ;
@@ -251,14 +254,14 @@ pTradeIrCsrc2Ainp(trade, comm, region, region, year, slice)   Auxiliary input co
 pTradeIrCsrc2Aout(trade, comm, region, region, year, slice)   Auxiliary output commodity in source region
 pTradeIrCdst2Ainp(trade, comm, region, region, year, slice)   Auxiliary input commodity in destination region
 pTradeIrCdst2Aout(trade, comm, region, region, year, slice)   Auxiliary output commodity in destination region
-pExportRowRes(expp)                                  Upper bound on cumulative export to ROW
-pExportRowUp(expp, region, year, slice)              Upper bound on export to ROW
-pExportRowLo(expp, region, year, slice)              Lower bound on export to ROW
-pExportRowPrice(expp, region, year, slice)           Export prices to ROW
-pImportRowRes(imp)                                   Upper bound on cumulative import to ROW
-pImportRowUp(imp, region, year, slice)               Upper bount on import from ROW
-pImportRowLo(imp, region, year, slice)               Lower bound on import from ROW
-pImportRowPrice(imp, region, year, slice)            Import prices from ROW
+pExportRowRes(expp)                                  Upper bound on cumulative export to the ROW
+pExportRowUp(expp, region, year, slice)              Upper bound on export to the ROW
+pExportRowLo(expp, region, year, slice)              Lower bound on export to the ROW
+pExportRowPrice(expp, region, year, slice)           Export prices to the ROW
+pImportRowRes(imp)                                   Upper bound on cumulative import to the ROW
+pImportRowUp(imp, region, year, slice)               Upper bount on import from the ROW
+pImportRowLo(imp, region, year, slice)               Lower bound on import from the ROW
+pImportRowPrice(imp, region, year, slice)            Import prices from the ROW
 pTradeStock(trade, year)                             Existing capacity
 pTradeCapUp(trade, year)                             Upper bound on trade capacity
 pTradeCapLo(trade, year)                             Lower bound on trade capacity
@@ -270,7 +273,7 @@ pTradeOlife(trade)                                   Operational life
 pTradeInvcost(trade, region, year)                   Overnight investment costs
 pTradeEac(trade, region, year)                       Equivalent annual costs
 pTradeRetCost(trade, region, year)                   Early retirement costs
-pTradeFixom(trade, year)                             Fixed O&M costs
+pTradeFixom(trade, region, year)                             Fixed O&M costs
 pTradeVarom(trade, region, region, year, slice)      Variable O&M costs
 pTradeCap2Act(trade)                                 Capacity to activity factor
 ;
@@ -330,8 +333,11 @@ mvTechAInp(tech, comm, region, year, slice)
 mvTechAOut(tech, comm, region, year, slice)
 mvDemInp(comm, region, year, slice)
 mvBalance(comm, region, year, slice)
+mBalanceRY(comm, region, year)
 mvInpTot(comm, region, year, slice)
+mInpTotRY(comm, region, year)
 mvOutTot(comm, region, year, slice)
+mOutTotRY(comm, region, year)
 mvInp2Lo(comm, region, year, slice, slice)
 mvOut2Lo(comm, region, year, slice, slice)
 mInpSub(comm, region, year, slice)
@@ -373,7 +379,11 @@ mTradeIrCsrc2Aout(trade, comm, region, region, year, slice)
 mTradeIrCdst2Aout(trade, comm, region, region, year, slice)
 mvTradeCost(region, year)
 mvTradeRowCost(region, year)
-mvTradeIrCost(region, year)
+mExportRowCost(expp, region, year)
+mImportRowCost(imp, region, year)
+*mvTradeIrCost(region, year)
+mImportIrCost(trade, region, year)
+mExportIrCost(trade, region, year)
 mvTotalCost(region, year)
 mvTotalUserCosts(region, year)
 
@@ -415,8 +425,14 @@ variables
 vTechInv(tech, region, year)                         Overnight investment costs
 *@ mTechEac(tech, region, year)
 vTechEac(tech, region, year)                         Annualized investment costs
-*@ mTechOMCost(tech, region, year)
-vTechOMCost(tech, region, year)                      Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)
+*@ mTechRetCost(tech, region, year)
+vTechRetCost(tech, region, year)                     Early retirement costs
+* mTechOMCost(tech, region, year)
+* vTechOMCost(tech, region, year)                      Sum of all operational costs is equal vTechFixom + vTechVarom (AVarom + CVarom + ActVarom)
+*@ mTechFixom(tech, region, year)
+vTechFixom(tech, region, year)                       Fixed O&M costs
+*@ mTechVarom(tech, region, year)
+vTechVarom(tech, region, year)                 Variable O&M costs (AVarom + CVarom + ActVarom)
 ;
 positive variables
 * Supply
@@ -437,18 +453,24 @@ vDemInp(comm, region, year, slice)                   Input to demand
 variables
 * Emission
 *@ mEmsFuelTot(comm, region, year, slice)
-vEmsFuelTot(comm, region, year, slice)               Total emissions from fuels combustion (technologies) (weighted)
+vEmsFuelTot(comm, region, year, slice)               Total emissions from fuels combustion (technologies)
 ;
 variables
 * Ballance
 *@ mvBalance(comm, region, year, slice)
-vBalance(comm, region, year, slice)                  Net commodity balance (all sources) (weighted)
+vBalance(comm, region, year, slice)                  Net commodity balance (all sources)
+*@ mBalanceRY(comm, region, year)
+vBalanceRY(comm, region, year)                     Net commodity balance by region and year (weighted)
 ;
 positive variables
 *@ mvOutTot(comm, region, year, slice)
 vOutTot(comm, region, year, slice)                   Total commodity output (all processes) (weighted)
+*@ mOutTotRY(comm, region, year)
+vOutTotRY(comm, region, year)                   Total commodity output (all processes) (weighted)
 *@ mvInpTot(comm, region, year, slice)
 vInpTot(comm, region, year, slice)                   Total commodity input (all processes) (weighted)
+*@ mInpTotRY(comm, region, year)
+vInpTotRY(comm, region, year)                   Total commodity input (all processes) (weighted)
 *@ mvInp2Lo(comm, region, year, slice, slice)
 vInp2Lo(comm, region, year, slice, slice)            Desagregation of slices for input parent to (grand)child
 *@ mvOut2Lo(comm, region, year, slice, slice)
@@ -482,16 +504,19 @@ vDummyImport(comm, region, year, slice)               Dummy import (for debuggin
 vDummyExport(comm, region, year, slice)               Dummy export (for debugging)
 ;
 variable
-* Tax
+* Taxes
 *@ mTaxCost(comm, region, year)
 vTaxCost(comm, region, year)                         Total tax levies (tax costs)
-* Sub
+* Subsidies
 *@ mSubCost(comm, region, year)
 vSubsCost(comm, region, year)                        Total subsidies (substracted from costs)
 *@ mAggOut(comm, region, year, slice)
 vAggOutTot(comm, region, year, slice)                Aggregated commodity output (weighted)
+*@ mDummyImportCost(comm, region, year)
+vDummyImportCost(comm, region, year)   Dummy import costs (weighted)
+*@ mDummyExportCost(comm, region, year)
+vDummyExportCost(comm, region, year)   Dummy export costs (weighted)
 ;
-
 * Reserves
 positive variable
 *@ mvStorageStore(stg, comm, region, year, slice)
@@ -510,8 +535,12 @@ vStorageCap(stg, region, year)                       Storage capacity
 vStorageNewCap(stg, region, year)                    Storage new capacity
 ;
 variable
-*@ mStorageOMCost(stg, region, year)
-vStorageOMCost(stg, region, year)                    Storage O&M costs (weighted)
+* mStorageOMCost(stg, region, year)
+*vStorageOMCost(stg, region, year)                    Storage O&M costs (weighted)
+*@ mStorageFixom(stg, region, year)
+vStorageFixom(stg, region, year)                     Storage fixed O&M costs
+*@ mStorageVarom(stg, region, year)
+vStorageVarom(stg, region, year)                     Storage variable O&M costs
 ;
 
 * Trade and Row variables
@@ -531,29 +560,37 @@ vTradeIrAOut(trade, comm, region, year, slice)       Trade auxilari output
 *@ mvTradeIrAOutTot(comm, region, year, slice)
 vTradeIrAOutTot(comm, region, year, slice)           Trade auxilari output total (weighted)
 *@ mExpComm(expp, comm)
-vExportRowCum(expp, comm)                            Cumulative export to ROW
+vExportRowCum(expp, comm)                            Cumulative export to the ROW
 *@ mExportRow(expp, comm, region, year, slice)
-vExportRow(expp, comm, region, year, slice)          Export to ROW
+vExportRow(expp, comm, region, year, slice)          Export to the ROW
 *@ mImpComm(imp, comm)
-vImportRowCum(imp, comm)                             Cumulative import from ROW
+vImportRowCum(imp, comm)                             Cumulative import from the ROW
 *@ mImportRow(imp, comm, region, year, slice)
-vImportRow(imp, comm, region, year, slice)           Import from ROW
+vImportRow(imp, comm, region, year, slice)           Import from the ROW
 ;
 variable
-*@ mvTradeCost(region, year)
-vTradeCost(region, year)                             Total trade costs (weighted)
-*@ mvTradeRowCost(region, year)
-vTradeRowCost(region, year)                          Trade with ROW costs (weighted)
-*@ mvTradeIrCost(region, year)
-vTradeIrCost(region, year)                           Interregional trade costs (weighted)
+* mvTradeCost(region, year)
+*vTradeCost(region, year)                             Total trade costs (weighted)
+*@ mTradeEac(trade, region, year)
+vTradeEac(trade, region, year)                       Annualized investments in Interregional trade capacity
+*@ mTradeFixom(trade, region, year)
+vTradeFixom(trade, region, year)                     Interregional trade fixed O&M costs
+*mvTradeIrCost(region, year)
+*vTradeIrCost(region, year)                           Interregional trade variable costs and markups
+*@ mImportIrCost(trade, region, year)
+vImportIrCost(trade, region, year)                     Import costs from other regions
+*@ mExportIrCost(trade, region, year)
+vExportIrCost(trade, region, year)                    Credits (revenue) for export to other regions
+*@ mImportRowCost(imp, region, year)
+vImportRowCost(imp, region, year)                    Import costs from the ROW
+*@ mExportRowCost(expp, region, year)
+vExportRowCost(expp, region, year)                   Credits for export to the ROW
 ;
 positive variables
 *@ mTradeSpan(trade, year)
 vTradeCap(trade, year)                               Trade capacity
 *@ mTradeEac(trade, region, year)
 vTradeInv(trade, region, year)                       Investment in trade capacity (overnight)
-*@ mTradeEac(trade, region, year)
-vTradeEac(trade, region, year)                       Investment in trade capacity (EAC)
 *@ mTradeNew(trade, year)
 vTradeNewCap(trade, year)                            New trade capacity
 *@ mvTotalUserCosts(region, year)
@@ -581,13 +618,16 @@ mTechAOutCommSameSlice(tech, comm)
 mTechAOutCommAgg(tech, comm)
 mTechAOutCommAggSlice(tech, comm, slice, slicep)
 mTechEac(tech, region, year)
-mTechOMCost(tech, region, year)
+*mTechOMCost(tech, region, year)  depreciate
+mTechFixom(tech, region, year)   added
+mTechVarom(tech, region, year)   added
 mSupOutTot(comm, region, year, slice)
 mEmsFuelTot(comm, region, year, slice)
 mTechEmsFuel(tech, comm, comm, region, year, slice)
 mDummyImport(comm, region, year, slice)
 mDummyExport(comm, region, year, slice)
-mDummyCost(comm, region, year)
+mDummyImportCost(comm, region, year)
+mDummyExportCost(comm, region, year)
 mTradeIr(trade, region, region, year, slice)
 mvTradeIrAInp(trade, comm, region, year, slice)
 mvTradeIrAInpTot(comm, region, year, slice)
@@ -1019,7 +1059,9 @@ eqTechEac(tech, region, year)             Technology Equivalent Annual Cost (EAC
 * Investment equation
 eqTechInv(tech, region, year)             Technology overnight investment costs
 * Aggregated annual costs
-eqTechOMCost(tech, region, year)          Technology O&M costs (weighted)
+eqTechFixom(tech, region, year)        Technology fixed costs
+eqTechVarom(tech, region, year)   Technology variable costs
+eqTechRetCost(tech, region, year)  Costs of retired capacity of technology
 ;
 
 * Capacity equations
@@ -1054,23 +1096,24 @@ eqTechCapUp(tech, region, year)$mTechCapUp(tech, region, year)..
         vTechCap(tech, region, year) =l= pTechCapUp(tech, region, year);
 
 eqTechNewCapLo(tech, region, year)$mTechNewCapLo(tech, region, year)..
-        vTechNewCap(tech, region, year) =g= pTechNewCapLo(tech, region, year);
+        vTechNewCap(tech, region, year) =g= pTechNewCapLo(tech, region, year) * pPeriodLen(year);
 
 eqTechNewCapUp(tech, region, year)$mTechNewCapUp(tech, region, year)..
-        vTechNewCap(tech, region, year) =l= pTechNewCapUp(tech, region, year);
+        vTechNewCap(tech, region, year) =l= pTechNewCapUp(tech, region, year) * pPeriodLen(year);
 
 
 eqTechRetiredNewCap(tech, region, year)$meqTechRetiredNewCap(tech, region, year)..
     sum(yearp$mvTechRetiredNewCap(tech, region, year, yearp),
-                         vTechRetiredNewCap(tech, region, year, yearp)
-         ) =l= vTechNewCap(tech, region, year);
+         vTechRetiredNewCap(tech, region, year, yearp) * pPeriodLen(yearp))
+         =l=
+         vTechNewCap(tech, region, year) * pPeriodLen(year);
 
-* Stock retired equation
+* Cumulative retirement of existing capacity
 eqTechRetiredStockCum(tech, region, year)$mvTechRetiredStock(tech, region, year)..
          vTechRetiredStockCum(tech, region, year) =l= pTechStock(tech, region, year);
 
 eqTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)..
-         vTechRetiredStock(tech, region, year) =e=
+         vTechRetiredStock(tech, region, year) * pPeriodLen(year)  =e=
          vTechRetiredStockCum(tech, region, year) -
          sum(yearp$mMilestoneNext(yearp, year),
              vTechRetiredStockCum(tech, region, yearp)
@@ -1080,15 +1123,27 @@ eqTechRetUp(tech, region, year)$mTechRetUp(tech, region, year)..
          vTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
          + sum(yearp$mvTechRetiredNewCap(tech, region, year, yearp),
                vTechRetiredNewCap(tech, region, year, yearp))
-         =l= pTechRetUp(tech, region, year);
+         =l= pTechRetUp(tech, region, year) * pPeriodLen(year);
 
 eqTechRetLo(tech, region, year)$mTechRetLo(tech, region, year)..
          vTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
          + sum(yearp$mvTechRetiredNewCap(tech, region, year, yearp),
                vTechRetiredNewCap(tech, region, year, yearp))
-         =g= pTechRetLo(tech, region, year);
+         =g= pTechRetLo(tech, region, year) * pPeriodLen(year);
 
-* EAC equation
+* Costs of early retirement
+eqTechRetCost(tech, region, year)$mTechRetCost(tech, region, year)..
+         vTechRetCost(tech, region, year) =e=
+* retired stock
+        pTechRetCost(tech, region, year) * vTechRetiredStock(tech, region, year)$mvTechRetiredStock(tech, region, year)
+* technology endogenous retirement of new capacity, built in previous periods
+* !!! check year & yearp placement/sum in the vTechRetiredNewCap
+        + sum((yearp)$mvTechRetiredNewCap(tech, region, yearp, year),
+              pTechRetCost(tech, region, year)
+              * vTechRetiredNewCap(tech, region, yearp, year)$mvTechRetiredNewCap(tech, region, yearp, year)
+              );
+
+* Technology Equivalent Annual Cost (EAC)
 eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
          vTechEac(tech, region, year)
          =e=
@@ -1101,9 +1156,7 @@ eqTechEac(tech, region, year)$mTechEac(tech, region, year)..
                      mTechOlifeInf(tech, region)
                      )
                     ),
-*              pYearFraction(year) *
               pTechEac(tech, region, yearp)
-              * pPeriodLen(yearp)
               * (
                 vTechNewCap(tech, region, yearp)
                 - sum(yeare$(mvTechRetiredNewCap(tech, region, yearp, yeare)
@@ -1123,6 +1176,7 @@ eqTechInv(tech, region, year)$mTechInv(tech, region, year)..
         pTechInvcost(tech, region, year) * vTechNewCap(tech, region, year);
 
 
+$ontext
 * Annual O&M costs
 eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)..
         vTechOMCost(tech, region, year)
@@ -1131,33 +1185,72 @@ eqTechOMCost(tech, region, year)$mTechOMCost(tech, region, year)..
         pTechFixom(tech, region, year) * vTechCap(tech, region, year) +
         sum(slice$mTechSlice(tech, slice),
             pTechVarom(tech, region, year, slice)
-            * pSliceWeight(slice)
+            * pSliceWeight(year, slice)
             * vTechAct(tech, region, year, slice) +
             sum(comm$mTechInpComm(tech, comm),
                 pTechCvarom(tech, comm, region, year, slice)
-                * pSliceWeight(slice)
+                * pSliceWeight(year, slice)
                 * vTechInp(tech, comm, region, year, slice)
             )
             +
             sum(comm$mTechOutComm(tech, comm),
                 pTechCvarom(tech, comm, region, year, slice)
-                * pSliceWeight(slice)
+                * pSliceWeight(year, slice)
                 * vTechOut(tech, comm, region, year, slice)
             )
             +
             sum(comm$mvTechAOut(tech, comm, region, year, slice),
                 pTechAvarom(tech, comm, region, year, slice)
-                * pSliceWeight(slice)
+                * pSliceWeight(year, slice)
                 * vTechAOut(tech, comm, region, year, slice)
             )
             +
             sum(comm$mvTechAInp(tech, comm, region, year, slice),
                 pTechAvarom(tech, comm, region, year, slice)
-                * pSliceWeight(slice)
+                * pSliceWeight(year, slice)
                 * vTechAInp(tech, comm, region, year, slice)
             )
          );
 *         / pYearFraction(year) ;
+$offtext
+* Fixed O&M costs
+*mTechFixom(tech, region, year) = mTechSpan(tech, region, year);
+eqTechFixom(tech, region, year)$mTechFixom(tech, region, year)..
+        vTechFixom(tech, region, year)
+        =e=
+        pTechFixom(tech, region, year) * vTechCap(tech, region, year);
+
+* Variable O&M costs
+*mTechVarom(tech, region, year) = mTechSpan(tech, region, year);
+eqTechVarom(tech, region, year)$mTechVarom(tech, region, year)..
+        vTechVarom(tech, region, year)
+        =e=
+        sum(slice$mTechSlice(tech, slice),
+            pTechVarom(tech, region, year, slice)
+            * pSliceWeight(year, slice)
+            * vTechAct(tech, region, year, slice)
+            +
+            sum(comm$mTechInpComm(tech, comm),
+                pTechCvarom(tech, comm, region, year, slice)
+                * pSliceWeight(year, slice)
+                * vTechInp(tech, comm, region, year, slice))
+            +
+            sum(comm$mTechOutComm(tech, comm),
+                pTechCvarom(tech, comm, region, year, slice)
+                * pSliceWeight(year, slice)
+                * vTechOut(tech, comm, region, year, slice))
+            +
+            sum(comm$mvTechAOut(tech, comm, region, year, slice),
+                pTechAvarom(tech, comm, region, year, slice)
+                * pSliceWeight(year, slice)
+                * vTechAOut(tech, comm, region, year, slice))
+            +
+            sum(comm$mvTechAInp(tech, comm, region, year, slice),
+                pTechAvarom(tech, comm, region, year, slice)
+                * pSliceWeight(year, slice)
+                * vTechAInp(tech, comm, region, year, slice))
+        );
+
 
 **************************************
 ** Supply
@@ -1191,7 +1284,7 @@ eqSupReserve(sup, comm, region)$mvSupReserve(sup, comm, region)..
          vSupReserve(sup, comm, region)
          =e=
          sum((year, slice)$mSupAva(sup, comm, region, year, slice),
-             pPeriodLen(year) * pSliceWeight(slice)
+             pPeriodLen(year) * pSliceWeight(year, slice)
              * vSupOut(sup, comm, region, year, slice)
 *              / pYearFraction(year)
          );
@@ -1207,7 +1300,7 @@ eqSupCost(sup, region, year)$mvSupCost(sup, region, year)..
          =e=
          sum((comm, slice)$mSupAva(sup, comm, region, year, slice),
              pSupCost(sup, comm, region, year, slice)
-             * pSliceWeight(slice)
+             * pSliceWeight(year, slice)
              * vSupOut(sup, comm, region, year, slice));
 
 **************************************
@@ -1251,13 +1344,15 @@ eqEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)..
              pEmissionFactor(comm, commp)
              * sum(tech$mTechInpComm(tech, commp),
                    pTechEmisComm(tech, commp)
-*                   * pSliceWeight(slice)
+*                   * pSliceWeight(year, slice)
                    * sum(slicep$mCommSliceOrParent(comm, slice, slicep),
+*                         pSliceWeight(year, slicep) *
                          vTechInp(tech, commp, region, year, slicep)$mTechEmsFuel(
                                   tech, comm, commp, region, year, slicep)
                          )
                   )
-          ) * pSliceWeight(slice);
+           );
+*          ) * pSliceWeight(year, slice);
 
 ********************************************************************************
 ** Storage
@@ -1422,7 +1517,9 @@ eqStorageNewCapUp(stg, region, year)  Storage new capacity upper bound
 eqStorageInv(stg, region, year)       Storage overnight investment costs
 eqStorageEac(stg, region, year)       Storage equivalent annual cost
 * Aggregated annual costs
-eqStorageCost(stg, region, year)      Storage total costs
+* eqStorageCost(stg, region, year)      Storage total costs
+eqStorageFixom(stg, region, year)     Storage fixed costs
+eqStorageVarom(stg, region, year)    Storage variable costs
 * Constrain capacity
 ;
 
@@ -1451,10 +1548,10 @@ eqStorageCapUp(stg, region, year)$mStorageCapUp(stg, region, year)..
           vStorageCap(stg, region, year) =l= pStorageCapUp(stg, region, year);
 
 eqStorageNewCapLo(stg, region, year)$mStorageNewCapLo(stg, region, year)..
-          vStorageNewCap(stg, region, year) =g= pStorageNewCapLo(stg, region, year);
+          vStorageNewCap(stg, region, year) =g= pStorageNewCapLo(stg, region, year) * pPeriodLen(year);
 
 eqStorageNewCapUp(stg, region, year)$mStorageNewCapUp(stg, region, year)..
-          vStorageNewCap(stg, region, year) =l= pStorageNewCapUp(stg, region, year);
+          vStorageNewCap(stg, region, year) =l= pStorageNewCapUp(stg, region, year) * pPeriodLen(year);
 
 * Investment equation
 eqStorageInv(stg, region, year)$mStorageNew(stg, region, year)..
@@ -1476,11 +1573,11 @@ eqStorageEac(stg, region, year)$mStorageEac(stg, region, year)..
                     ),
 *                  pYearFraction(year) *
             pStorageEac(stg, region, yearp)
-            * pPeriodLen(yearp)
+*            * pPeriodLen(yearp)
             * vStorageNewCap(stg, region, yearp)
          );
 
-
+$ontext
 * Fixed and Variable O&M costs
 eqStorageCost(stg, region, year)$mStorageOMCost(stg, region, year)..
          vStorageOMCost(stg, region, year)
@@ -1491,13 +1588,38 @@ eqStorageCost(stg, region, year)$mStorageOMCost(stg, region, year)..
          sum(comm$mStorageComm(stg, comm),
              sum(slice$mCommSlice(comm, slice),
                  pStorageCostInp(stg, region, year, slice)
-                    * pSliceWeight(slice)
+                    * pSliceWeight(year, slice)
                     * vStorageInp(stg, comm, region, year, slice)
                  + pStorageCostOut(stg, region, year, slice)
-                    * pSliceWeight(slice)
+                    * pSliceWeight(year, slice)
                     * vStorageOut(stg, comm, region, year, slice)
                  + pStorageCostStore(stg, region, year, slice)
-                    * pSliceWeight(slice)
+                    * pSliceWeight(year, slice)
+                    * vStorageStore(stg, comm, region, year, slice)
+             )
+         );
+$offtext
+* Storage fixed costs
+*!!!eqStorageFixom(stg, region, year)$mStorageFixom(stg, region, year)..
+eqStorageFixom(stg, region, year)$mStorageFixom(stg, region, year)..
+         vStorageFixom(stg, region, year)
+         =e=
+         pStorageFixom(stg, region, year) * vStorageCap(stg, region, year);
+
+* Storage variable costs
+eqStorageVarom(stg, region, year)$mStorageVarom(stg, region, year)..
+          vStorageVarom(stg, region, year)
+          =e=
+          sum(comm$mStorageComm(stg, comm),
+             sum(slice$mCommSlice(comm, slice),
+                 pStorageCostInp(stg, region, year, slice)
+                    * pSliceWeight(year, slice)
+                    * vStorageInp(stg, comm, region, year, slice)
+                 + pStorageCostOut(stg, region, year, slice)
+                    * pSliceWeight(year, slice)
+                    * vStorageOut(stg, comm, region, year, slice)
+                 + pStorageCostStore(stg, region, year, slice)
+                    * pSliceWeight(year, slice)
                     * vStorageStore(stg, comm, region, year, slice)
              )
          );
@@ -1513,25 +1635,30 @@ eqImportTot(comm, region, year, slice)             Import equation (Ir & ROW)
 eqExportTot(comm, region, year, slice)             Export equation (Ir & ROW)
 eqTradeFlowUp(trade, comm, region, region, year, slice)   Trade upper bound
 eqTradeFlowLo(trade, comm, region, region, year, slice)   Trade lower bound
-eqCostTrade(region, year)                         Total trade costs
-eqCostRowTrade(region, year)                      Costs of trade with the Rest of the World (ROW)
-eqCostIrTrade(region, year)                       Costs of import
-eqExportRowUp(expp, comm, region, year, slice)    Export to ROW upper constraint
-eqExportRowLo(expp, comm, region, year, slice)    Export to ROW lower constraint
-eqExportRowCum(expp, comm)                 Cumulative export to ROW
-eqExportRowResUp(expp, comm)                      Cumulative export to ROW upper constraint
-eqImportRowUp(imp, comm, region, year, slice)     Import from ROW upper constraint
-eqImportRowLo(imp, comm, region, year, slice)     Import of ROW lower constraint
-eqImportRowCum(imp, comm)                 Cumulative import from ROW
-eqImportRowResUp(imp, comm)                       Cumulative import from ROW upper constraint
+*eqCostTrade(region, year)                         Total trade costs
+*eqCostRowTrade(region, year)                      Costs of trade with the Rest of the World (ROW)
+* eqCostIrTrade(region, year)                       Costs of import
+eqExportRowUp(expp, comm, region, year, slice)    Export to the ROW upper constraint
+eqExportRowLo(expp, comm, region, year, slice)    Export to the ROW lower constraint
+eqExportRowCum(expp, comm)                 Cumulative export to the ROW
+eqExportRowResUp(expp, comm)                      Cumulative export to the ROW upper constraint
+eqExportRowCost(expp, region, year)               Export to the ROW costs equation
+eqImportRowUp(imp, comm, region, year, slice)     Import from the ROW upper constraint
+eqImportRowLo(imp, comm, region, year, slice)     Import of the ROW lower constraint
+eqImportRowCum(imp, comm)                 Cumulative import from the ROW
+eqImportRowResUp(imp, comm)                       Cumulative import from the ROW upper constraint
+eqImportRowCost(imp, region, year)                Import from the ROW costs equation
 eqTradeCap(trade, year)                           Trade capacity
 eqTradeCapLo(trade, year)                         Trade capacity lower bound
 eqTradeCapUp(trade, year)                         Trade capacity upper bound
 eqTradeNewCapLo(trade, year)                      Trade new capacity lower bound
 eqTradeNewCapUp(trade, year)                      Trade new capacity upper bound
+eqTradeCapFlow(trade, comm, year, slice)          Trade capacity to activity
 eqTradeInv(trade, region, year)                   Trade overnight investment costs
 eqTradeEac(trade, region, year)                   Trade equivalent annual costs
-eqTradeCapFlow(trade, comm, year, slice)          Trade capacity to activity
+eqTradeFixom(trade, region, year)
+eqImportIrCost(trade, region, year)               Interregional trade import costs
+eqExportIrCost(trade, region, year)               Interregional trade export costs
 ;
 
 $ontext
@@ -1565,11 +1692,13 @@ eqImportTot(comm, dst, year, slice)$mImport(comm, dst, year, slice)..
            * vTradeIr(trade, comm, src, dst, year, slice)
           )$mvTradeIr(trade, comm, src, dst, year, slice)
       )
-    ) * pSliceWeight(slice)
+    )
+*    ) * pSliceWeight(year, slice)
     +
     sum(imp$mImpComm(imp, comm),
           vImportRow(imp, comm, dst, year, slice)$mImportRow(imp, comm, dst, year, slice)
-    ) * pSliceWeight(slice);
+    );
+*    ) * pSliceWeight(year, slice);
 
 $ontext
 * rewritten (dropped sum(slicep$mCommSliceOrParent...)
@@ -1594,17 +1723,20 @@ eqExportTot(comm, src, year, slice)$mExport(comm, src, year, slice)..
 $offtext
 
 eqExportTot(comm, src, year, slice)$mExport(comm, src, year, slice)..
+
   vExportTot(comm, src, year, slice)
   =e=
   sum(trade$mTradeComm(trade, comm),
       sum(dst$mTradeRoutes(trade, src, dst),
           vTradeIr(trade, comm, src, dst, year, slice)$mvTradeIr(trade, comm, src, dst, year, slice)
       )
-  ) * pSliceWeight(slice)
+  )
+*  ) * pSliceWeight(year, slice)
   +
   sum(expp$mExpComm(expp, comm),
       vExportRow(expp, comm, src, year, slice)$mExportRow(expp, comm, src, year, slice)
-  ) * pSliceWeight(slice);
+  );
+*  ) * pSliceWeight(year, slice);
 
 eqTradeFlowUp(trade, comm, src, dst, year, slice)$meqTradeFlowUp(trade, comm, src, dst, year, slice)..
       vTradeIr(trade, comm, src, dst, year, slice) =l= pTradeIrUp(trade, src, dst, year, slice);
@@ -1612,41 +1744,48 @@ eqTradeFlowUp(trade, comm, src, dst, year, slice)$meqTradeFlowUp(trade, comm, sr
 eqTradeFlowLo(trade, comm, src, dst, year, slice)$meqTradeFlowLo(trade, comm, src, dst, year, slice)..
       vTradeIr(trade, comm, src, dst, year, slice) =g= pTradeIrLo(trade, src, dst, year, slice);
 
+$ontext
 eqCostTrade(region, year)$mvTradeCost(region, year)..
   vTradeCost(region, year)
   =e=
   vTradeRowCost(region, year)$mvTradeRowCost(region, year)
   + vTradeIrCost(region, year)$mvTradeIrCost(region, year);
+*$offtext
 
 eqCostRowTrade(region, year)$mvTradeRowCost(region, year)..
   vTradeRowCost(region, year)
   =e=
 * Row
   sum((imp, comm, slice)$mImportRow(imp, comm, region, year, slice),
-      pImportRowPrice(imp, region, year, slice) * pSliceWeight(slice)
+      pImportRowPrice(imp, region, year, slice) * pSliceWeight(year, slice)
       * vImportRow(imp, comm, region, year, slice)
   ) -
   sum((expp, comm, slice)$mExportRow(expp, comm, region, year, slice),
-      pExportRowPrice(expp, region, year, slice) * pSliceWeight(slice)
+      pExportRowPrice(expp, region, year, slice) * pSliceWeight(year, slice)
       * vExportRow(expp, comm, region, year, slice)
   );
+*$offtext
 
 eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
   vTradeIrCost(region, year)
   =e=
-* Fixed O&M of stock (!!! check mTradeSpan when not mTradeCapacityVariable)
+* * Fixed O&M of stock (!!! check mTradeSpan when not mTradeCapacityVariable)
+*   sum(trade$mTradeSpan(trade, year),
+*       pTradeFixom(trade, year) * pTradeStock(trade, year) * pPeriodLen(year)
+*   )
+*   +
+* * Fixed O&M of new installations
+*   sum(trade$(mTradeSpan(trade, year) and mTradeCapacityVariable(trade)),
+*       pTradeFixom(trade, year) * (vTradeCap(trade, year) - pTradeStock(trade, year)) * pPeriodLen(year)
+*   )
+* Fixed O&M of trade
   sum(trade$mTradeSpan(trade, year),
-      pTradeFixom(trade, year) * pTradeStock(trade, year)
-  )
-  +
-* Fixed O&M of new installations
-  sum(trade$(mTradeSpan(trade, year) and mTradeCapacityVariable(trade)),
-      pTradeFixom(trade, year) * (vTradeCap(trade, year) - pTradeStock(trade, year))
+      pTradeFixom(trade, region, year) * vTradeCap(trade, year) * pPeriodLen(year)
   )
   +
 * Eac
   sum(trade$mTradeEac(trade, region, year),
-      vTradeEac(trade, region, year)
+      vTradeEac(trade, region, year) * pPeriodLen(year)
   )
 * Import (IR)
   + sum((trade, src)$mTradeRoutes(trade, src, region),
@@ -1654,7 +1793,7 @@ eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
             sum(slice$mTradeSlice(trade, slice),
                 ((pTradeIrCost(trade, src, region, year, slice)
                    + pTradeIrMarkup(trade, src, region, year, slice)
-                  ) * vTradeIr(trade, comm, src, region, year, slice) * pSliceWeight(slice)
+                  ) * vTradeIr(trade, comm, src, region, year, slice) * pSliceWeight(year, slice) * pPeriodLen(year)
                 )$mvTradeIr(trade, comm, src, region, year, slice)
             )
         )
@@ -1665,7 +1804,66 @@ eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
             sum(slice$mTradeSlice(trade, slice),
                 ((pTradeIrCost(trade, region, dst, year, slice)
                   + pTradeIrMarkup(trade, region, dst, year, slice)
-                  )* vTradeIr(trade, comm, region, dst, year, slice) * pSliceWeight(slice)
+                  )* vTradeIr(trade, comm, region, dst, year, slice) * pSliceWeight(year, slice) * pPeriodLen(year)
+                 )$mvTradeIr(trade, comm, region, dst, year, slice)
+            )
+        )
+    );
+*$offtext
+
+* Rewritten IR-trade costs equation activity (non-capital) costs
+eqCostIrTrade(region, year)$mvTradeIrCost(region, year)..
+  vTradeIrCost(region, year)
+  =e=
+* Import (IR)
+  + sum((trade, src)$mTradeRoutes(trade, src, region),
+        sum(comm$mTradeComm(trade, comm),
+            sum(slice$mTradeSlice(trade, slice),
+                ((pTradeIrCost(trade, src, region, year, slice)
+                   + pTradeIrMarkup(trade, src, region, year, slice)
+                  ) * vTradeIr(trade, comm, src, region, year, slice) * pSliceWeight(year, slice)
+                )$mvTradeIr(trade, comm, src, region, year, slice)
+            )
+        )
+    )
+* Export (IR)
+  - sum((trade, dst)$mTradeRoutes(trade, region, dst),
+        sum(comm$mTradeComm(trade, comm),
+            sum(slice$mTradeSlice(trade, slice),
+                ((pTradeIrCost(trade, region, dst, year, slice)
+                  + pTradeIrMarkup(trade, region, dst, year, slice)
+                  ) * vTradeIr(trade, comm, region, dst, year, slice) * pSliceWeight(year, slice)
+                 )$mvTradeIr(trade, comm, region, dst, year, slice)
+            )
+        )
+    );
+$offtext
+
+* Import (IR)
+eqImportIrCost(trade, region, year)$mImportIrCost(trade, region, year)..
+  vImportIrCost(trade, region, year)
+  =e=
+    sum((src)$mTradeRoutes(trade, src, region),
+        sum(comm$mTradeComm(trade, comm),
+            sum(slice$mTradeSlice(trade, slice),
+                ((pTradeIrCost(trade, src, region, year, slice)
+                   + pTradeIrMarkup(trade, src, region, year, slice)
+                  ) * vTradeIr(trade, comm, src, region, year, slice) * pSliceWeight(year, slice)
+                )$mvTradeIr(trade, comm, src, region, year, slice)
+            )
+        )
+    );
+
+* Export (IR)
+eqExportIrCost(trade, region, year)$mExportIrCost(trade, region, year)..
+  vExportIrCost(trade, region, year)
+  =e=
+    - sum((dst)$mTradeRoutes(trade, region, dst),
+        sum(comm$mTradeComm(trade, comm),
+            sum(slice$mTradeSlice(trade, slice),
+                ((pTradeIrCost(trade, region, dst, year, slice)
+                  + pTradeIrMarkup(trade, region, dst, year, slice)
+                  ) * vTradeIr(trade, comm, region, dst, year, slice) * pSliceWeight(year, slice)
                  )$mvTradeIr(trade, comm, region, dst, year, slice)
             )
         )
@@ -1685,12 +1883,21 @@ eqExportRowCum(expp, comm)$mExpComm(expp, comm)..
   vExportRowCum(expp, comm)
   =e=
   sum((region, year, slice)$mExportRow(expp, comm, region, year, slice),
-      pPeriodLen(year) * pSliceWeight(slice)
+      pPeriodLen(year) * pSliceWeight(year, slice)
       * vExportRow(expp, comm, region, year, slice)
   );
 
 eqExportRowResUp(expp, comm)$mExportRowCumUp(expp, comm)..
   vExportRowCum(expp, comm) =l= pExportRowRes(expp);
+
+* mapping? $mExpRegYear(expp, region, year)
+eqExportRowCost(expp, region, year)$mExportRowCost(expp, region, year)..
+  vExportRowCost(expp, region, year)
+  =e=
+  - sum((comm, slice)$mExportRow(expp, comm, region, year, slice),
+      pExportRowPrice(expp, region, year, slice) * pSliceWeight(year, slice)
+      * vExportRow(expp, comm, region, year, slice)
+  );
 
 eqImportRowUp(imp, comm, region, year, slice)$mImportRowUp(imp, comm, region, year, slice)..
   vImportRow(imp, comm, region, year, slice)  =l= pImportRowUp(imp, region, year, slice);
@@ -1702,19 +1909,27 @@ eqImportRowCum(imp, comm)$mImpComm(imp, comm)..
   vImportRowCum(imp, comm)
   =e=
   sum((region, year, slice)$mImportRow(imp, comm, region, year, slice),
-      pPeriodLen(year) * pSliceWeight(slice)
+      pPeriodLen(year) * pSliceWeight(year, slice)
       * vImportRow(imp, comm, region, year, slice)
   );
 
 eqImportRowResUp(imp, comm)$mImportRowCumUp(imp, comm)..
   vImportRowCum(imp, comm) =l= pImportRowRes(imp);
 
+* mapping? $mImpComm(imp, region)
+eqImportRowCost(imp, region, year)$mImportRowCost(imp, region, year)..
+  vImportRowCost(imp, region, year)
+  =e=
+  sum((comm, slice)$mImportRow(imp, comm, region, year, slice),
+      pImportRowPrice(imp, region, year, slice) * pSliceWeight(year, slice)
+      * vImportRow(imp, comm, region, year, slice)
+  );
 
 ********************************************************************************
 *** Trade IR capacity equations
 ********************************************************************************
 
-* Activity equation
+* Capacity to activity constraint
 eqTradeCapFlow(trade, comm, year, slice)$meqTradeCapFlow(trade, comm, year, slice)..
          pSliceShare(slice) * pTradeCap2Act(trade) * vTradeCap(trade, year) =g=
                  sum((src, dst)$mvTradeIr(trade, comm, src, dst, year, slice),
@@ -1739,10 +1954,10 @@ eqTradeCapUp(trade, year)$mTradeCapUp(trade, year)..
         vTradeCap(trade, year) =l= pTradeCapUp(trade, year);
 
 eqTradeNewCapLo(trade, year)$mTradeNewCapLo(trade, year)..
-        vTradeNewCap(trade, year) =g= pTradeNewCapLo(trade, year);
+        vTradeNewCap(trade, year) * pPeriodLen(year) =g= pTradeNewCapLo(trade, year);
 
 eqTradeNewCapUp(trade, year)$mTradeNewCapUp(trade, year)..
-        vTradeNewCap(trade, year) =l= pTradeNewCapUp(trade, year);
+        vTradeNewCap(trade, year) * pPeriodLen(year) =l= pTradeNewCapUp(trade, year);
 
 * Investment equation
 eqTradeInv(trade, region, year)$mTradeInv(trade, region, year)..
@@ -1755,10 +1970,13 @@ eqTradeEac(trade, region, year)$mTradeEac(trade, region, year)..
          =e=
          sum(yearp$(mTradeNew(trade, yearp) and  ordYear(year) >= ordYear(yearp) and
             (ordYear(year) < pTradeOlife(trade) + ordYear(yearp) or mTradeOlifeInf(trade))),
-*                pYearFraction(year) *
-                pTradeEac(trade, region, yearp) *
-                pPeriodLen(yearp) *
-                vTradeNewCap(trade, yearp));
+                pTradeEac(trade, region, yearp) * vTradeNewCap(trade, yearp));
+
+* Fixed O&M costs
+eqTradeFixom(trade, region, year)$mTradeFixom(trade, region, year)..
+         vTradeFixom(trade, region, year)
+         =e=
+         pTradeFixom(trade, region, year) * vTradeCap(trade, year);
 
 ********************************************************************************
 *** Auxiliary input & output equations
@@ -1805,7 +2023,7 @@ eqTradeIrAOut(trade, comm, region, year, slice)$mvTradeIrAOut(trade, comm, regio
 eqTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)..
   vTradeIrAInpTot(comm, region, year, slice)
   =e=
-  pSliceWeight(slice) *
+*  pSliceWeight(year, slice) *
   sum((trade, slicep)$(mCommSliceOrParent(comm, slice, slicep)
                        and mvTradeIrAInp(trade, comm, region, year, slicep)
                        ),
@@ -1815,25 +2033,26 @@ eqTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year,
 eqTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice)..
   vTradeIrAOutTot(comm, region, year, slice)
   =e=
-  pSliceWeight(slice) *
+*  pSliceWeight(year, slice) *
   sum((trade, slicep)$(mCommSliceOrParent(comm, slice, slicep)
                        and mvTradeIrAOut(trade, comm, region, year, slicep)
                        ),
       vTradeIrAOut(trade, comm, region, year, slicep)
   );
 
-
-
 ********************************************************************************
 *** Balance equations & dummy import & export
 ********************************************************************************
 Equation
-eqBalUp(comm, region, year, slice)   commodity balance <= 0 (e.g. upper limit - deficit is allowed)
-eqBalLo(comm, region, year, slice)   commodity balance >= 0 (e.g. lower limit - excess is allower)
-eqBalFx(comm, region, year, slice)   commodity balance >= 0 (no excess nor deficit is allowed)
-eqBal(comm, region, year, slice)     Commodity balance definition
+eqBalUp(comm, region, year, slice)   Commodity balance <= 0 (e.g. upper limit - deficit is allowed)
+eqBalLo(comm, region, year, slice)   Commodity balance >= 0 (e.g. lower limit - excess is allower)
+eqBalFx(comm, region, year, slice)   Commodity balance >= 0 (no excess nor deficit is allowed)
+eqBal(comm, region, year, slice)     Commodity balance
+eqBalanceRY(comm, region, year)
 eqOutTot(comm, region, year, slice)     Total commodity output
+eqOutTotRY(comm, region, year)     Total commodity output
 eqInpTot(comm, region, year, slice)     Total commodity input
+eqInpTotRY(comm, region, year)     Total commodity input
 eqInp2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqOut2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqSupOutTot(comm, region, year, slice)      Supply total output
@@ -1854,33 +2073,45 @@ eqBalFx(comm, region, year, slice)$meqBalFx(comm, region, year, slice)..
 
 eqBal(comm, region, year, slice)$mvBalance(comm, region, year, slice)..
   vBalance(comm, region, year, slice)
-* pSliceWeight(slice)
+* pSliceWeight(year, slice)
   =e=
   vOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
   -
   vInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice);
 
+eqBalanceRY(comm, region, year)$mBalanceRY(comm, region, year)..
+  vBalanceRY(comm, region, year)
+  =e=
+  sum(slice$mvBalance(comm, region, year, slice),
+        pSliceWeight(year, slice)
+        * vBalance(comm, region, year, slice)$mvBalance(comm, region, year, slice)
+    );
+
 eqOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)..
          vOutTot(comm, region, year, slice)
-*         * pYearFraction(year)
          =e=
-         pSliceWeight(slice) *
            vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice)
          + vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
          + vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
-*         + pSliceWeight(slice) *
          + vAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
          + vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
          + vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)
          + vImportTot(comm, region, year, slice)$mImport(comm, region, year, slice)
          + vTradeIrAOutTot(comm, region, year, slice)$mvTradeIrAOutTot(comm, region, year, slice)
-         + pSliceWeight(slice) *
-           sum(slicep$(mSliceParentChild(slicep, slice)
+         + sum(slicep$(mSliceParentChild(slicep, slice)
                and
                mvOut2Lo(comm, region, year, slicep, slice)
               ),
               vOut2Lo(comm, region, year, slicep, slice)
            )$mOutSub(comm, region, year, slice);
+
+eqOutTotRY(comm, region, year)$mOutTotRY(comm, region, year)..
+  vOutTotRY(comm, region, year)
+  =e=
+  sum(slice$mvOutTot(comm, region, year, slice),
+      pSliceWeight(year, slice) *
+      vOutTot(comm, region, year, slice)$mvOutTot(comm, region, year, slice)
+      );
 
 eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
          sum(slicep$mvOut2Lo(comm, region, year, slice, slicep),
@@ -1888,7 +2119,6 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
          =e=
          vSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)
          + vEmsFuelTot(comm, region, year, slice)$mEmsFuelTot(comm, region, year, slice)
-*         + pSliceWeight(slice) *
          + vAggOutTot(comm, region, year, slice)$mAggOut(comm, region, year, slice)
          + vTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)
          + vStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)
@@ -1897,23 +2127,27 @@ eqOut2Lo(comm, region, year, slice)$mOut2Lo(comm, region, year, slice)..
 
 eqInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)..
         vInpTot(comm, region, year, slice)
-*        * pYearFraction(year)
         =e=
-        pSliceWeight(slice) *
-          vDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)
-        + pSliceWeight(slice) *
-          vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice)
+         vDemInp(comm, region, year, slice)$mvDemInp(comm, region, year, slice)
+        + vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice)
         + vTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)
         + vStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)
         + vExportTot(comm, region, year, slice)$mExport(comm, region, year, slice)
         + vTradeIrAInpTot(comm, region, year, slice)$mvTradeIrAInpTot(comm, region, year, slice)
-        + pSliceWeight(slice) *
-        sum(slicep$(mSliceParentChild(slicep, slice)
+        + sum(slicep$(mSliceParentChild(slicep, slice)
                     and
                     mvInp2Lo(comm, region, year, slicep, slice)
             ),
             vInp2Lo(comm, region, year, slicep, slice)
         )$mInpSub(comm, region, year, slice);
+
+eqInpTotRY(comm, region, year)$mInpTotRY(comm, region, year)..
+        vInpTotRY(comm, region, year)
+        =e=
+        sum(slice$mvInpTot(comm, region, year, slice),
+            pSliceWeight(year, slice) *
+            vInpTot(comm, region, year, slice)$mvInpTot(comm, region, year, slice)
+        );
 
 eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
         sum(slicep$mvInp2Lo(comm, region, year, slice, slicep),
@@ -1928,10 +2162,10 @@ eqInp2Lo(comm, region, year, slice)$mInp2Lo(comm, region, year, slice)..
 eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)..
           vSupOutTot(comm, region, year, slice)
           =e=
-          pSliceWeight(slice) *
           sum(sup$mSupComm(sup, comm),
               vSupOut(sup, comm, region, year, slice)
           );
+
 * the sum removed since supply-timeframe is fixed to the commodity's timeframe
 *              sum(slicep$(mCommSliceOrParent(comm, slice, slicep)
 *                          and mSupAva(sup, comm, region, year, slicep)
@@ -1944,24 +2178,24 @@ eqSupOutTot(comm, region, year, slice)$mSupOutTot(comm, region, year, slice)..
 eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
         vTechInpTot(comm, region, year, slice)
         =e=
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechInpCommSameSlice(tech, comm),
             vTechInp(tech, comm, region, year, slice)$mvTechInp(tech, comm, region, year, slice)
         )
         +
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechInpCommAgg(tech, comm),
             sum(slicep$mTechInpCommAggSlice(tech, comm, slicep, slice),
                 vTechInp(tech, comm, region, year, slicep)$mvTechInp(tech, comm, region, year, slicep)
             )
         )
         +
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechAInpCommSameSlice(tech, comm),
             vTechAInp(tech, comm, region, year, slice)$mvTechAInp(tech, comm, region, year, slice)
         )
         +
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechAInpCommAgg(tech, comm),
             sum(slicep$mTechAInpCommAggSlice(tech, comm, slicep, slice),
             vTechAInp(tech, comm, region, year, slicep)$mvTechAInp(tech, comm, region, year, slicep)
@@ -1971,24 +2205,24 @@ eqTechInpTot(comm, region, year, slice)$mTechInpTot(comm, region, year, slice)..
 eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)..
         vTechOutTot(comm, region, year, slice)
         =e=
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechOutCommSameSlice(tech, comm),
             vTechOut(tech, comm, region, year, slice)$mvTechOut(tech, comm, region, year, slice)
         )
         +
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechOutCommAgg(tech, comm),
             sum(slicep$mTechOutCommAggSlice(tech, comm, slicep, slice),
                 vTechOut(tech, comm, region, year, slicep)$mvTechOut(tech, comm, region, year, slicep)
             )
         )
         +
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechAOutCommSameSlice(tech, comm),
             vTechAOut(tech, comm, region, year, slice)$mvTechAOut(tech, comm, region, year, slice)
         )
         +
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(tech$mTechAOutCommAgg(tech, comm),
             sum(slicep$mTechAOutCommAggSlice(tech, comm, slicep, slice),
                 vTechAOut(tech, comm, region, year, slicep)$mvTechAOut(tech, comm, region, year, slicep)
@@ -1998,24 +2232,24 @@ eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)..
 eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)..
         vStorageInpTot(comm, region, year, slice)
         =e=
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(stg$mvStorageStore(stg, comm, region, year, slice),
             vStorageInp(stg, comm, region, year, slice)
         )
-        + pSliceWeight(slice) *
-        sum(stg$mvStorageAInp(stg, comm, region, year, slice),
+*        + pSliceWeight(year, slice) *
+        + sum(stg$mvStorageAInp(stg, comm, region, year, slice),
             vStorageAInp(stg, comm, region, year, slice)
         );
 
 eqStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, slice)..
         vStorageOutTot(comm, region, year, slice)
         =e=
-        pSliceWeight(slice) *
+*        pSliceWeight(year, slice) *
         sum(stg$mvStorageStore(stg, comm, region, year, slice),
             vStorageOut(stg, comm, region, year, slice)
         )
-        + pSliceWeight(slice) *
-        sum(stg$mvStorageAOut(stg, comm, region, year, slice),
+*        + pSliceWeight(year, slice) *
+        + sum(stg$mvStorageAOut(stg, comm, region, year, slice),
             vStorageAOut(stg, comm, region, year, slice)
         );
 
@@ -2023,84 +2257,123 @@ eqStorageOutTot(comm, region, year, slice)$mStorageOutTot(comm, region, year, sl
 ** Objective and aggregated costs equations
 **********************************************
 Equation
-eqCost(region, year)                Total costs (weighted)
+eqDummyImportCost(comm, region, year)   Dummy import costs (weighted)
+eqDummyExportCost(comm, region, year)   Dummy export costs (weighted)
 eqTaxCost(comm, region, year)       Commodity taxes (weighted)
 eqSubsCost(comm, region, year)      Commodity subsidy (weighted)
+eqCost(region, year)                Total costs (weighted)
 eqObjective                         Objective equation NPV of total costs
 ;
 
-eqCost(region, year)$mvTotalCost(region, year)..
-        vTotalCost(region, year)
+
+
+* dummy import (to debug infesibility)
+eqDummyImportCost(comm, region, year)$mDummyImportCost(comm, region, year)..
+        vDummyImportCost(comm, region, year)
         =e=
-        sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year))
-* endogenous (forced/early) retirement costs
-        + sum(tech$mvTechRetiredStock(tech, region, year),
-              pTechRetCost(tech, region, year) * (
-                vTechRetiredStock(tech, region, year)
-              ))
-*                + sum(yearp$mvTechRetiredNewCap(tech, region, yearp, year),
-*                      vTechRetiredNewCap(tech, region, yearp, year))
-*              ))
-* !!! check year & yearp placement/sum in the vTechRetiredNewCap
-        + sum((tech, yearp)$mvTechRetiredNewCap(tech, region, yearp, year),
-              pTechRetCost(tech, region, year) * vTechRetiredNewCap(tech, region, yearp, year))
-        + sum(tech$mTechOMCost(tech, region, year), vTechOMCost(tech, region, year))
-        + sum(sup$mvSupCost(sup, region, year), vSupCost(sup, region, year))
-        + sum((comm, slice)$mDummyImport(comm, region, year, slice),
-              pDummyImportCost(comm, region, year, slice)
-              * pSliceWeight(slice)
-              * vDummyImport(comm, region, year, slice)
-          )
-        + sum((comm, slice)$mDummyExport(comm, region, year, slice),
-              pDummyExportCost(comm, region, year, slice)
-              * pSliceWeight(slice)
-              * vDummyExport(comm, region, year, slice)
-          )
-        + sum(comm$mTaxCost(comm, region, year), vTaxCost(comm, region, year))
-        - sum(comm$mSubCost(comm, region, year), vSubsCost(comm, region, year))
-        + sum(stg$mStorageOMCost(stg, region, year), vStorageOMCost(stg, region, year))
-        + sum(stg$mStorageEac(stg, region, year), vStorageEac(stg, region, year))
-        + vTradeCost(region, year)$mvTradeCost(region, year)
-        + vTotalUserCosts(region, year)$mvTotalUserCosts(region, year);
+        sum(slice$mDummyImport(comm, region, year, slice),
+            pSliceWeight(year, slice)
+            * pDummyImportCost(comm, region, year, slice)
+            * vDummyImport(comm, region, year, slice)$mDummyImport(comm, region, year, slice)
+            );
 
+* dummy export (to debug infesibility)
+eqDummyExportCost(comm, region, year)$mDummyExportCost(comm, region, year)..
+        vDummyExportCost(comm, region, year)
+        =e=
+        sum(slice$mDummyExport(comm, region, year, slice),
+            pSliceWeight(year, slice)
+            * pDummyExportCost(comm, region, year, slice)
+            * vDummyExport(comm, region, year, slice)$mDummyExport(comm, region, year, slice)
+            );
 
+* tax levies
 eqTaxCost(comm, region, year)$mTaxCost(comm, region, year)..
          vTaxCost(comm, region, year)
          =e=
          sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)),
              pTaxCostOut(comm, region, year, slice)
+             * pSliceWeight(year, slice)
              * vOutTot(comm, region, year, slice)
              )
        + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)),
              pTaxCostInp(comm, region, year, slice)
+             * pSliceWeight(year, slice)
              * vInpTot(comm, region, year, slice)
              )
        + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)),
              pTaxCostBal(comm, region, year, slice)
-*             * pSliceWeight(slice)
+             * pSliceWeight(year, slice)
              * vBalance(comm, region, year, slice)
-             )
-         ;
+             );
 
+* subsidies
 eqSubsCost(comm, region, year)$mSubCost(comm, region, year)..
         vSubsCost(comm, region, year)
         =e=
-        sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)),
-            pSubCostOut(comm, region, year, slice) * vOutTot(comm, region, year, slice)
+      - sum(slice$(mvOutTot(comm, region, year, slice) and mCommSlice(comm, slice)),
+            pSubCostOut(comm, region, year, slice)
+            * pSliceWeight(year, slice)
+            * vOutTot(comm, region, year, slice)
         )
-      + sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)),
-            pSubCostInp(comm, region, year, slice) * vInpTot(comm, region, year, slice)
+      - sum(slice$(mvInpTot(comm, region, year, slice) and mCommSlice(comm, slice)),
+            pSubCostInp(comm, region, year, slice)
+            * pSliceWeight(year, slice)
+            * vInpTot(comm, region, year, slice)
         )
-      + sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)),
+      - sum(slice$(mvBalance(comm, region, year, slice) and mCommSlice(comm, slice)),
             pSubCostBal(comm, region, year, slice)
-*            * pSliceWeight(slice)
-            * vBalance(comm, region, year, slice))
-         ;
+            * pSliceWeight(year, slice)
+            * vBalance(comm, region, year, slice));
+*==============================================================================*
+eqCost(region, year)$mvTotalCost(region, year)..
+        vTotalCost(region, year)
+        =e=
+* supply costs
+        + sum(sup$mvSupCost(sup, region, year), vSupCost(sup, region, year)$mvSupCost(sup, region, year))
+* technology capital costs
+        + sum(tech$mTechEac(tech, region, year), vTechEac(tech, region, year)$mTechEac(tech, region, year))
+* technology endogenous retirement
+        + sum(tech$mTechRetCost(tech, region, year), vTechRetCost(tech, region, year)$mTechRetCost(tech, region, year))
+* technology fixed O&M costs
+        + sum(tech$mTechFixom(tech, region, year), vTechFixom(tech, region, year)$mTechFixom(tech, region, year))
+* technology variable O&M costs
+        + sum(tech$mTechVarom(tech, region, year), vTechVarom(tech, region, year)$mTechVarom(tech, region, year))
+* storage capital costs
+        + sum(stg$mStorageEac(stg, region, year), vStorageEac(stg, region, year)$mStorageEac(stg, region, year))
+* storage fixed O&M costs
+        + sum(stg$mStorageFixom(stg, region, year), vStorageFixom(stg, region, year)$mStorageFixom(stg, region, year))
+* storage variable O&M costs
+        + sum(stg$mStorageVarom(stg, region, year), vStorageVarom(stg, region, year)$mStorageVarom(stg, region, year))
+* RoW import costs/credits
+        + sum(imp$mImportRowCost(imp, region, year), vImportRowCost(imp, region, year)$mImportRowCost(imp, region, year))
+* RoW export credit/costs
+        + sum(expp$mExportRowCost(expp, region, year), vExportRowCost(expp, region, year)$mExportRowCost(expp, region, year))
+* IR trade capital costs
+        + sum(trade$mTradeEac(trade, region, year), vTradeEac(trade, region, year)$mTradeEac(trade, region, year))
+* IR trade fixed O&M costs
+        + sum(trade$mTradeFixom(trade, region, year), vTradeFixom(trade, region, year)$mTradeFixom(trade, region, year))
+* IR trade import costs
+        + sum(trade$mImportIrCost(trade, region, year), vImportIrCost(trade, region, year)$mImportIrCost(trade, region, year))
+* IR trade export costs
+        + sum(trade$mExportIrCost(trade, region, year), vExportIrCost(trade, region, year)$mExportIrCost(trade, region, year))
+* commodity taxes
+        + sum(comm$mTaxCost(comm, region, year), vTaxCost(comm, region, year)$mTaxCost(comm, region, year))
+* commodity subsidies
+        + sum(comm$mSubCost(comm, region, year), vSubsCost(comm, region, year)$mSubCost(comm, region, year))
+* custom user costs
+        + vTotalUserCosts(region, year)$mvTotalUserCosts(region, year)
+* "dummy" import costs for debugging
+        + sum((comm)$mDummyImportCost(comm, region, year), vDummyImportCost(comm, region, year)$mDummyImportCost(comm, region, year))
+* "dummy" export costs for debugging
+        + sum((comm)$mDummyExportCost(comm, region, year), vDummyExportCost(comm, region, year)$mDummyExportCost(comm, region, year))
+;
 
 eqObjective..
    vObjective =e=
          sum((region, year)$mvTotalCost(region, year),
-           pDiscountFactorMileStone(region, year) * vTotalCost(region, year));
+*           pDiscountFactorMileStone(region, year) *
+            vTotalCost(region, year) * pPeriodLen(year) * pDiscountFactor(region, year));
 
 set
 mLECRegion(region)
@@ -2132,7 +2405,6 @@ put '"load data",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " "
 
 $include data.gms
 
-
 $include inc3.gms
 
 put log_stat;
@@ -2141,6 +2413,7 @@ put '"solver",,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GH
 $include inc_solver.gms
 
 Solve energyRt minimizing vObjective using LP;
+*$ontext
 
 put log_stat;
 put '"solution status",' energyRt.Modelstat:0:0 ',"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0'"'/;
@@ -2156,3 +2429,4 @@ $include inc5.gms
 put log_stat;
 put 'done,,"' GYear(JNow):0:0 "-" GMonth(JNow):0:0 "-" GDay(JNow):0:0 " " GHour(JNow):0:0 ":" GMinute(JNow):0:0 ":" GSecond(JNow):0:0 '"'/;
 putclose;
+*$offtext

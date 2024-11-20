@@ -36,14 +36,15 @@ utils::globalVariables(
     "wacout.fx", "wacout.lo", "wacout.up", "wacact.fx", "wacact.lo",
     "wcinp.fx", "wcinp.lo", "wcinp.up", "wcout.fx", "wcout.lo", "wcout.up",
     "src", "dst", "region", "year", "slice",
-    "cap2act", "cap2stg", "cap2use"
+    "cap2act", "cap2stg", "cap2use",
+    "io", "na.omit", "share.lo", "share.up", "share.fx",
+    "val_lbl", "where", "ginp2use", "desc", "x", "y"
   )
 )
 
 ## draw.technology ####
 draw.technology <- function(obj, ...) {
   # browser()
-
 
   # com_tbl <- bind_rows(
   #   obj@input |>  mutate(io = "cinp", .before = 1),
@@ -660,62 +661,70 @@ draw.storage <- function(obj, ...) {
   aux_inputs <- aux |> filter(iotype == "ainp")
   aux_outputs <- aux |> filter(iotype == "aout")
 
-  wea <- obj@weather |>
-    rowwise() |>
-    mutate(
-      lab_waf = if_else(
-        !is.na(waf.fx),
-        make_label("waf.fx:", in_brackets = waf.fx, two_lines = FALSE),
-        if_else(!is.na(waf.lo) & !is.na(waf.up),
-          paste0("waf.lo: ", waf.lo, "\n", "waf.up: ", waf.up),
-          if_else(!is.na(waf.lo),
-            paste0("waf.lo: ", waf.lo),
-            if_else(!is.na(waf.up),
-              paste0("waf.up: ", waf.up),
-              NA_character_
+
+  if (nrow(obj@weather) > 0) {
+    wea <- obj@weather |>
+      rowwise() |>
+      mutate(
+        lab_waf = if_else(
+          !is.na(waf.fx),
+          make_label("waf.fx:", in_brackets = waf.fx, two_lines = FALSE),
+          if_else(!is.na(waf.lo) & !is.na(waf.up),
+            paste0("waf.lo: ", waf.lo, "\n", "waf.up: ", waf.up),
+            if_else(!is.na(waf.lo),
+              paste0("waf.lo: ", waf.lo),
+              if_else(!is.na(waf.up),
+                paste0("waf.up: ", waf.up),
+                NA_character_
+              )
             )
           )
         )
-      )
-    ) |>
-    select(-waf.lo, -waf.up, -waf.fx) |>
-    mutate(
-      lab_wcinp = if_else(
-        !is.na(wcinp.fx),
-        make_label("wcinp.fx:", in_brackets = wcinp.fx, two_lines = FALSE),
-        if_else(!is.na(wcinp.lo) & !is.na(wcinp.up),
-          paste0("wcinp.lo: ", wcinp.lo, "\n", "wcinp.up: ", wcinp.up),
-          if_else(!is.na(wcinp.lo),
-            paste0("wcinp.lo: ", wcinp.lo),
-            if_else(!is.na(wcinp.up),
-              paste0("wcinp.up: ", wcinp.up),
-              NA_character_
+      ) |>
+      select(-waf.lo, -waf.up, -waf.fx) |>
+      mutate(
+        lab_wcinp = if_else(
+          !is.na(wcinp.fx),
+          make_label("wcinp.fx:", in_brackets = wcinp.fx, two_lines = FALSE),
+          if_else(!is.na(wcinp.lo) & !is.na(wcinp.up),
+            paste0("wcinp.lo: ", wcinp.lo, "\n", "wcinp.up: ", wcinp.up),
+            if_else(!is.na(wcinp.lo),
+              paste0("wcinp.lo: ", wcinp.lo),
+              if_else(!is.na(wcinp.up),
+                paste0("wcinp.up: ", wcinp.up),
+                NA_character_
+              )
             )
           )
         )
+      ) |>
+      select(-wcinp.lo, -wcinp.up, -wcinp.fx) |>
+      rowwise() |>
+      mutate(
+        lab_txt = if_else(
+          is.na(NA),
+          weather,
+          make_label(weather, in_brackets = obj@commodity, two_lines = FALSE)
+        ),
+        lab_par = if_else(
+          all(is.na(c(lab_waf, lab_wcinp))),
+          NA_character_,
+          paste(na.omit(c(lab_waf, lab_wcinp)), collapse = "\n")
+        )
+      ) |>
+      select(-lab_waf, -lab_wcinp) |>
+      rename(
+        ioname = weather
+      ) |>
+      mutate(
+        iotype = "winp"
       )
-    ) |>
-    select(-wcinp.lo, -wcinp.up, -wcinp.fx) |>
-    rowwise() |>
-    mutate(
-      lab_txt = if_else(
-        is.na(NA),
-        weather,
-        make_label(weather, in_brackets = obj@commodity, two_lines = FALSE)
-      ),
-      lab_par = if_else(
-        all(is.na(c(lab_waf, lab_wcinp))),
-        NA_character_,
-        paste(na.omit(c(lab_waf, lab_wcinp)), collapse = "\n")
-      )
-    ) |>
-    select(-lab_waf, -lab_wcinp) |>
-    rename(
-      ioname = weather
-    ) |>
-    mutate(
-      iotype = "winp"
+  } else {
+    wea <- list(
+      lab_par = NULL,
+      lab_txt = NULL
     )
+  }
   wea
 
   # center labels
@@ -815,53 +824,64 @@ draw.supply <- function(obj, ...) {
   #           "lab_par", "lab_txt",
   #           "tech", "group", "weather", "unit", "io", "parameter")
   # browser()
-  sup_par <- obj@availability |>
-    pivot_longer(
-      cols = matches("ava|cost"),
-      names_to = "parameter",
-      values_to = "value"
-    ) |>
-    filter(!is.na(value)) |>
-    group_by(parameter) |>
-    summarize(
-      lab_par = make_label(
-        paste0(unique(parameter), ":"),
-        in_brackets = value,
-        two_lines = FALSE,
-        bracket_type = "square"
-      ),
-      .groups = "drop"
-    ) |>
-    mutate(
-      iotype = "cinp",
-      ioname = obj@commodity,
-      group = NA_character_,
-      lab_txt = make_label(
-        obj@commodity,
-        in_brackets = obj@unit,
-        return_name_if_empty = TRUE,
-        two_lines = FALSE
-      )
-    ) |>
-    mutate(
+  if (nrow(obj@availability) == 0) {
+    sup_par <- data.frame(
+      lab_par = "",
+      lab_txt = "",
       iotype = "cout",
       ioname = obj@commodity,
-      group = NA_character_
-    ) |>
-    group_by(ioname, iotype, group) |>
-    summarize(
-      lab_par = paste0(lab_par, collapse = "\n"),
-      .groups = "drop"
-    ) |>
-    mutate(
-      lab_txt = make_label(
-        ioname,
-        in_brackets = obj@unit,
-        return_name_if_empty = TRUE,
-        two_lines = FALSE
-      ),
-      parameter = "imp"
+      group = NA_character_,
+      parameter = "sup"
     )
+  } else {
+    sup_par <- obj@availability |>
+      pivot_longer(
+        cols = matches("ava|cost"),
+        names_to = "parameter",
+        values_to = "value"
+      ) |>
+      filter(!is.na(value)) |>
+      group_by(parameter) |>
+      summarize(
+        lab_par = make_label(
+          paste0(unique(parameter), ":"),
+          in_brackets = value,
+          two_lines = FALSE,
+          bracket_type = "square"
+        ),
+        .groups = "drop"
+      ) |>
+      # mutate(
+      #   iotype = "cout",
+      #   ioname = obj@commodity,
+      #   group = NA_character_,
+      #   lab_txt = make_label(
+      #     obj@commodity,
+      #     in_brackets = obj@unit,
+      #     return_name_if_empty = TRUE,
+      #     two_lines = FALSE
+      #   )
+      # ) |>
+      mutate(
+        iotype = "cout",
+        ioname = obj@commodity,
+        group = NA_character_
+      ) |>
+      group_by(ioname, iotype, group) |>
+      summarize(
+        lab_par = paste0(lab_par, collapse = "\n"),
+        .groups = "drop"
+      ) |>
+      mutate(
+        lab_txt = make_label(
+          ioname,
+          in_brackets = obj@unit,
+          return_name_if_empty = TRUE,
+          two_lines = FALSE
+        ),
+        parameter = "sup"
+      )
+  }
 
   arrow_labels <- make_label(
     obj@commodity,
@@ -934,7 +954,7 @@ draw.supply <- function(obj, ...) {
     single_com_outputs = sup_par,
     center_label = res_par$lab_par,
     arrow_labels = arrow_labels,
-    show_inputs = FALSE,
+    show_inputs = FALSE, # !!! add weather factors
     show_outputs = TRUE,
     show_use_bar = FALSE,
     show_act_bar = FALSE,
@@ -1196,7 +1216,7 @@ setMethod("draw", "export", draw.export)
 ## draw.import ####
 draw.import <- function(obj, ...) {
   # key columns
-
+  # browser()
   # import parameters
   imp_par <-
     obj@imp |>
@@ -1277,6 +1297,7 @@ draw.import <- function(obj, ...) {
   arrow_labels <- make_label(
     obj@commodity,
     in_brackets = obj@unit,
+    return_name_if_empty = TRUE,
     two_lines = FALSE
   )
   names(arrow_labels) <- obj@commodity
@@ -1351,6 +1372,12 @@ draw.trade <- function(obj, ...) {
       ),
       .groups = "drop"
     ) |>
+    group_by(src) |>
+    summarize(
+      lab_par = paste0(lab_par, collapse = "\n"),
+      parameter = "trade_inp",
+      .groups = "drop"
+    ) |>
     rowwise() |>
     mutate(
       comm = obj@commodity,
@@ -1382,6 +1409,12 @@ draw.trade <- function(obj, ...) {
         two_lines = FALSE,
         bracket_type = "square"
       ),
+      .groups = "drop"
+    ) |>
+    group_by(dst) |>
+    summarize(
+      lab_par = paste0(lab_par, collapse = "\n"),
+      parameter = "trade_out",
       .groups = "drop"
     ) |>
     rowwise() |>
@@ -1612,6 +1645,7 @@ make_label <- function(
     )
   }
   in_brackets <- in_brackets[!is.na(in_brackets)]
+  in_brackets <- in_brackets[in_brackets != ""]
   if (is_empty(in_brackets)) {
     # browser()
     if (isTRUE(return_name_if_empty)) return(name)
@@ -1620,14 +1654,16 @@ make_label <- function(
   if (is.numeric(in_brackets)) {
     if (length(unique(in_brackets)) > 1) {
       in_brackets <- paste0(
-        bracket[1], min(in_brackets),
+        bracket[1],
+        format_number(min(in_brackets)),
         comma,
-        max(in_brackets), bracket[2]
+        format_number(max(in_brackets)),
+        bracket[2]
       ) |>
         # format_number()
         prettyNum(digits = 2, big.mark = "")
     } else {
-      in_brackets <- unique(in_brackets)
+      in_brackets <- unique(in_brackets) |> format_number()
     }
   } else {
     in_brackets <- unique(in_brackets)
@@ -2232,7 +2268,7 @@ draw_process <- function(
         out_coms <- outputs$ioname |> unique()
         out_pars <- outputs |>
           filter(grepl("out|teff", parameter) |
-            (is.na(group) & grepl("cinp2use|use2cact|imp", parameter)))
+            (is.na(group) & grepl("cinp2use|use2cact|imp|sup|trade", parameter)))
         n_outputs <- length(out_coms)
 
         # browser()
@@ -2426,13 +2462,11 @@ draw_process <- function(
         )
       } # end of cap2act
 
-      # popViewport()
-
       return(invisible(TRUE))
     },
     error = function(e) {
       message("Error in draw_process: ", e)
-      try(popViewport(0), silent = TRUE)
+      try(grid::popViewport(0), silent = TRUE)
       return(invisible(FALSE))
     }
   )
@@ -2482,18 +2516,58 @@ shorten_string <- function(string, n, add_number = NULL) {
   }
 }
 
-format_number <- function(x) {
-  # browser()
-  # if (length(x) > 1) {
-  #   return(sapply(x, format_number))
-  # }
-  # Use scientific notation if the number is larger than 100 or smaller than 0.01 (positive or negative)
-  if (any(abs(x) > 100) || any(abs(x) < 0.01)) {
-    return(prettyNum(format(x, scientific = TRUE), big.mark = ","))
-  } else {
-    return(prettyNum(format(x, nsmall = 2), big.mark = ","))
-  }
+# format_number <- function(x) {
+#   # browser()
+#   # if (length(x) > 1) {
+#   #   return(sapply(x, format_number))
+#   # }
+#   # Use scientific notation if the number is larger than 100 or smaller than 0.01 (positive or negative)
+#   if (any(abs(x) > 100) || any(abs(x) < 0.01)) {
+#     return(prettyNum(format(x, scientific = TRUE), big.mark = ","))
+#   } else {
+#     return(prettyNum(format(x, nsmall = 2), big.mark = ","))
+#   }
+# }
+
+# x <- c(0.01224201, 1002360.1)
+
+# Define a function for conditional formatting
+# format_number <- function(x, threshold = 1e5, small_threshold = 1e-3) {
+#   sapply(x, function(n) {
+#     if (abs(n) >= threshold || (abs(n) < small_threshold && n != 0)) {
+#       # Use scientific notation for very large or very small numbers
+#       formatC(n, format = "e", digits = 3)
+#     } else {
+#       # Use fixed decimal format
+#       formatC(n, format = "f", digits = 3)
+#     }
+#   })
+# }
+
+# format_number <- function(x, accuracy = 3) {
+#   scales::label_number(accuracy = accuracy)(x)
+# }
+
+
+format_number <- function(x, accuracy = .01) {
+  sapply(x, function(value) {
+    if (value == 0) {
+      "0."
+    } else if (value >= 1e4) {
+      # For large numbers, show fewer digits with scale suffix
+      scales::label_scientific(accuracy = 0)(value)
+    } else if (value <= accuracy) {
+      # For smaller numbers, allow more precision
+      scales::label_scientific(accuracy = accuracy)(value)
+    } else {
+      scales::label_number(accuracy = accuracy, big.mark = "")(value)
+    }
+  })
 }
+# # Apply the function
+# formatted_x <- format_numbers(x)
+# print(formatted_x)
+
 
 # Example usage
 # numbers <- c(45.678, 12345.678, -12345.678, 0.1234, 0.009, -0.008, 1e8)

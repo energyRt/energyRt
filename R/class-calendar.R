@@ -248,7 +248,9 @@ newCalendar <- function(
     timetable = NULL,
     year_fraction = 1,
     default_timeframe = NULL,
-    misc = list(),
+    misc = list(
+      pSliceWeight = NULL
+    ),
     ...) {
   obj <- .init_calendar(timetable = timetable, year_fraction = year_fraction)
   arg <- list(...)

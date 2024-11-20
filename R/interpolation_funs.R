@@ -405,6 +405,7 @@
     # removeDefault = TRUE, # not used
     # remValue = NULL, # not used
     all.val = FALSE) {
+  # if (!is.null(dtf[["wval"]])) browser()
   # cat(parameter, "\n")
   # if (parameter == "rhs") browser() # DEBUG
   has_year_col <- any(colnames(dtf) == "year")

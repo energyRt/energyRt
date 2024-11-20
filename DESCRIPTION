@@ -1,8 +1,8 @@
 Package: energyRt
 Type: Package
 Title: Energy systems modeling toolbox in R, development version
-Version: 0.50.7.9001
-Date: 2024-11-03
+Version: 0.50.09.9001
+Date: 2024-11-19
 Authors@R: 
   c(person(given = "Oleg", 
           family = "Lugovoy", 
@@ -76,11 +76,12 @@ Collate:
     'interpolate2.R'
     'interpolate_new.R'
     'interpolation_funs.R'
+    'solve.R'
+    'levcost.R'
     'obj2modInp.R'
     'print.R'
     'read.R'
     'registry.R'
-    'solve.R'
     'start_msg.R'
     'timeslices.R'
     'write.R'

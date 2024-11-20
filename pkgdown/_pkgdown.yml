@@ -140,10 +140,12 @@ reference:
   contents:
   - matches("draw")
   - matches("plot")
+  - matches("show")
 
 - title: Validation
   contents:
   - starts_with("check")
+  - matches("levcost")
 
 - title: Exporting
   contents:

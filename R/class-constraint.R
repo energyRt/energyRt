@@ -7,10 +7,10 @@ get_interpolation_rule <- function(x) {
 
 ## constraint-class ####
 #' An S4 class to represent a custom constraint.
-#' 
+#'
 #' @name class-constraint
-#' 
-#' @description 
+#'
+#' @description
 #' Class `constraint` is used to define custom constraints in the optimization problem.
 #' `r lifecycle::badge("experimental")`
 #' @inherit newConstraint details
@@ -66,13 +66,13 @@ setMethod("initialize", "constraint", function(.Object, ...) {
 
 ## summand-class #####
 #' An S4 class to represent a summand in a constraint.
-#' 
+#'
 #' @name class-summand
-#' 
+#'
 #' @description
-#' Class `summand` stores information about linear 
-#' terms (a multiplier and a variable) 
-#' in the `lhs` of the constraint class. 
+#' Class `summand` stores information about linear
+#' terms (a multiplier and a variable)
+#' in the `lhs` of the constraint class.
 #' It is auto-created by `newConstraint` function
 #' and is not intended to be used directly by the user.
 #'
@@ -334,6 +334,7 @@ addSummand <- function(
     st@defVal <- mult
   }
   st@for.sum <- for.sum
+  # browser()
   if (all(names(.variable_set) != variable)) {
     stop(paste0('Unknown variables "', variable, '"in summands "', eqt@name, '"'))
   }

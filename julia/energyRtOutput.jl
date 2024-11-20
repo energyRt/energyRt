@@ -22,17 +22,41 @@ end;
 
 close(fvTechEac);
 
-fvTechOMCost = open("output/vTechOMCost.csv", "w");
+fvTechRetCost = open("output/vTechRetCost.csv", "w");
 
-println(fvTechOMCost, "tech,region,year,value");
+println(fvTechRetCost, "tech,region,year,value");
 
-for (t, r, y) in mTechOMCost
-    if JuMP.value(vTechOMCost[(t, r, y)]) != 0
-        println(fvTechOMCost, t, ",", r, ",", y, ",", JuMP.value(vTechOMCost[(t, r, y)]))
+for (t, r, y) in mTechRetCost
+    if JuMP.value(vTechRetCost[(t, r, y)]) != 0
+        println(fvTechRetCost, t, ",", r, ",", y, ",", JuMP.value(vTechRetCost[(t, r, y)]))
     end
 end;
 
-close(fvTechOMCost);
+close(fvTechRetCost);
+
+fvTechFixom = open("output/vTechFixom.csv", "w");
+
+println(fvTechFixom, "tech,region,year,value");
+
+for (t, r, y) in mTechFixom
+    if JuMP.value(vTechFixom[(t, r, y)]) != 0
+        println(fvTechFixom, t, ",", r, ",", y, ",", JuMP.value(vTechFixom[(t, r, y)]))
+    end
+end;
+
+close(fvTechFixom);
+
+fvTechVarom = open("output/vTechVarom.csv", "w");
+
+println(fvTechVarom, "tech,region,year,value");
+
+for (t, r, y) in mTechVarom
+    if JuMP.value(vTechVarom[(t, r, y)]) != 0
+        println(fvTechVarom, t, ",", r, ",", y, ",", JuMP.value(vTechVarom[(t, r, y)]))
+    end
+end;
+
+close(fvTechVarom);
 
 fvSupCost = open("output/vSupCost.csv", "w");
 
@@ -91,6 +115,18 @@ for (c, r, y, s) in mvBalance
 end;
 
 close(fvBalance);
+
+fvBalanceRY = open("output/vBalanceRY.csv", "w");
+
+println(fvBalanceRY, "comm,region,year,value");
+
+for (c, r, y) in mBalanceRY
+    if JuMP.value(vBalanceRY[(c, r, y)]) != 0
+        println(fvBalanceRY, c, ",", r, ",", y, ",", JuMP.value(vBalanceRY[(c, r, y)]))
+    end
+end;
+
+close(fvBalanceRY);
 
 fvTotalCost = open("output/vTotalCost.csv", "w");
 
@@ -156,62 +192,197 @@ end;
 
 close(fvAggOutTot);
 
-fvStorageOMCost = open("output/vStorageOMCost.csv", "w");
+fvDummyImportCost = open("output/vDummyImportCost.csv", "w");
 
-println(fvStorageOMCost, "stg,region,year,value");
+println(fvDummyImportCost, "comm,region,year,value");
 
-for (st1, r, y) in mStorageOMCost
-    if JuMP.value(vStorageOMCost[(st1, r, y)]) != 0
+for (c, r, y) in mDummyImportCost
+    if JuMP.value(vDummyImportCost[(c, r, y)]) != 0
         println(
-            fvStorageOMCost,
+            fvDummyImportCost,
+            c,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vDummyImportCost[(c, r, y)]),
+        )
+    end
+end;
+
+close(fvDummyImportCost);
+
+fvDummyExportCost = open("output/vDummyExportCost.csv", "w");
+
+println(fvDummyExportCost, "comm,region,year,value");
+
+for (c, r, y) in mDummyExportCost
+    if JuMP.value(vDummyExportCost[(c, r, y)]) != 0
+        println(
+            fvDummyExportCost,
+            c,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vDummyExportCost[(c, r, y)]),
+        )
+    end
+end;
+
+close(fvDummyExportCost);
+
+fvStorageFixom = open("output/vStorageFixom.csv", "w");
+
+println(fvStorageFixom, "stg,region,year,value");
+
+for (st1, r, y) in mStorageFixom
+    if JuMP.value(vStorageFixom[(st1, r, y)]) != 0
+        println(
+            fvStorageFixom,
             st1,
             ",",
             r,
             ",",
             y,
             ",",
-            JuMP.value(vStorageOMCost[(st1, r, y)]),
+            JuMP.value(vStorageFixom[(st1, r, y)]),
         )
     end
 end;
 
-close(fvStorageOMCost);
+close(fvStorageFixom);
 
-fvTradeCost = open("output/vTradeCost.csv", "w");
+fvStorageVarom = open("output/vStorageVarom.csv", "w");
 
-println(fvTradeCost, "region,year,value");
+println(fvStorageVarom, "stg,region,year,value");
 
-for (r, y) in mvTradeCost
-    if JuMP.value(vTradeCost[(r, y)]) != 0
-        println(fvTradeCost, r, ",", y, ",", JuMP.value(vTradeCost[(r, y)]))
+for (st1, r, y) in mStorageVarom
+    if JuMP.value(vStorageVarom[(st1, r, y)]) != 0
+        println(
+            fvStorageVarom,
+            st1,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vStorageVarom[(st1, r, y)]),
+        )
     end
 end;
 
-close(fvTradeCost);
+close(fvStorageVarom);
 
-fvTradeRowCost = open("output/vTradeRowCost.csv", "w");
+fvTradeEac = open("output/vTradeEac.csv", "w");
 
-println(fvTradeRowCost, "region,year,value");
+println(fvTradeEac, "trade,region,year,value");
 
-for (r, y) in mvTradeRowCost
-    if JuMP.value(vTradeRowCost[(r, y)]) != 0
-        println(fvTradeRowCost, r, ",", y, ",", JuMP.value(vTradeRowCost[(r, y)]))
+for (t1, r, y) in mTradeEac
+    if JuMP.value(vTradeEac[(t1, r, y)]) != 0
+        println(fvTradeEac, t1, ",", r, ",", y, ",", JuMP.value(vTradeEac[(t1, r, y)]))
     end
 end;
 
-close(fvTradeRowCost);
+close(fvTradeEac);
 
-fvTradeIrCost = open("output/vTradeIrCost.csv", "w");
+fvTradeFixom = open("output/vTradeFixom.csv", "w");
 
-println(fvTradeIrCost, "region,year,value");
+println(fvTradeFixom, "trade,region,year,value");
 
-for (r, y) in mvTradeIrCost
-    if JuMP.value(vTradeIrCost[(r, y)]) != 0
-        println(fvTradeIrCost, r, ",", y, ",", JuMP.value(vTradeIrCost[(r, y)]))
+for (t1, r, y) in mTradeFixom
+    if JuMP.value(vTradeFixom[(t1, r, y)]) != 0
+        println(fvTradeFixom, t1, ",", r, ",", y, ",", JuMP.value(vTradeFixom[(t1, r, y)]))
     end
 end;
 
-close(fvTradeIrCost);
+close(fvTradeFixom);
+
+fvImportIrCost = open("output/vImportIrCost.csv", "w");
+
+println(fvImportIrCost, "trade,region,year,value");
+
+for (t1, r, y) in mImportIrCost
+    if JuMP.value(vImportIrCost[(t1, r, y)]) != 0
+        println(
+            fvImportIrCost,
+            t1,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vImportIrCost[(t1, r, y)]),
+        )
+    end
+end;
+
+close(fvImportIrCost);
+
+fvExportIrCost = open("output/vExportIrCost.csv", "w");
+
+println(fvExportIrCost, "trade,region,year,value");
+
+for (t1, r, y) in mExportIrCost
+    if JuMP.value(vExportIrCost[(t1, r, y)]) != 0
+        println(
+            fvExportIrCost,
+            t1,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vExportIrCost[(t1, r, y)]),
+        )
+    end
+end;
+
+close(fvExportIrCost);
+
+fvImportRowCost = open("output/vImportRowCost.csv", "w");
+
+println(fvImportRowCost, "imp,region,year,value");
+
+for (i, r, y) in mImportRowCost
+    if JuMP.value(vImportRowCost[(i, r, y)]) != 0
+        println(
+            fvImportRowCost,
+            i,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vImportRowCost[(i, r, y)]),
+        )
+    end
+end;
+
+close(fvImportRowCost);
+
+fvExportRowCost = open("output/vExportRowCost.csv", "w");
+
+println(fvExportRowCost, "expp,region,year,value");
+
+for (e, r, y) in mExportRowCost
+    if JuMP.value(vExportRowCost[(e, r, y)]) != 0
+        println(
+            fvExportRowCost,
+            e,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vExportRowCost[(e, r, y)]),
+        )
+    end
+end;
+
+close(fvExportRowCost);
 
 fvTechNewCap = open("output/vTechNewCap.csv", "w");
 println(fvTechNewCap, "tech,region,year,value");
@@ -444,6 +615,15 @@ for (c, r, y, s) in mvOutTot
 end;
 close(fvOutTot);
 
+fvOutTotRY = open("output/vOutTotRY.csv", "w");
+println(fvOutTotRY, "comm,region,year,value");
+for (c, r, y) in mOutTotRY
+    if JuMP.value(vOutTotRY[(c, r, y)]) != 0
+        println(fvOutTotRY, c, ",", r, ",", y, ",", JuMP.value(vOutTotRY[(c, r, y)]))
+    end
+end;
+close(fvOutTotRY);
+
 fvInpTot = open("output/vInpTot.csv", "w");
 println(fvInpTot, "comm,region,year,slice,value");
 for (c, r, y, s) in mvInpTot
@@ -452,6 +632,15 @@ for (c, r, y, s) in mvInpTot
     end
 end;
 close(fvInpTot);
+
+fvInpTotRY = open("output/vInpTotRY.csv", "w");
+println(fvInpTotRY, "comm,region,year,value");
+for (c, r, y) in mInpTotRY
+    if JuMP.value(vInpTotRY[(c, r, y)]) != 0
+        println(fvInpTotRY, c, ",", r, ",", y, ",", JuMP.value(vInpTotRY[(c, r, y)]))
+    end
+end;
+close(fvInpTotRY);
 
 fvInp2Lo = open("output/vInp2Lo.csv", "w");
 println(fvInp2Lo, "comm,region,year,slice,slicep,value");
@@ -1047,15 +1236,6 @@ for (t1, r, y) in mTradeEac
 end;
 close(fvTradeInv);
 
-fvTradeEac = open("output/vTradeEac.csv", "w");
-println(fvTradeEac, "trade,region,year,value");
-for (t1, r, y) in mTradeEac
-    if JuMP.value(vTradeEac[(t1, r, y)]) != 0
-        println(fvTradeEac, t1, ",", r, ",", y, ",", JuMP.value(vTradeEac[(t1, r, y)]))
-    end
-end;
-close(fvTradeEac);
-
 fvTradeNewCap = open("output/vTradeNewCap.csv", "w");
 println(fvTradeNewCap, "trade,year,value");
 for (t1, y) in mTradeNew
@@ -1078,19 +1258,28 @@ vrb_list = open("output/variable_list.csv", "w");
 println(vrb_list, "value");
 println(vrb_list, "vTechInv");
 println(vrb_list, "vTechEac");
-println(vrb_list, "vTechOMCost");
+println(vrb_list, "vTechRetCost");
+println(vrb_list, "vTechFixom");
+println(vrb_list, "vTechVarom");
 println(vrb_list, "vSupCost");
 println(vrb_list, "vEmsFuelTot");
 println(vrb_list, "vBalance");
+println(vrb_list, "vBalanceRY");
 println(vrb_list, "vTotalCost");
 println(vrb_list, "vObjective");
 println(vrb_list, "vTaxCost");
 println(vrb_list, "vSubsCost");
 println(vrb_list, "vAggOutTot");
-println(vrb_list, "vStorageOMCost");
-println(vrb_list, "vTradeCost");
-println(vrb_list, "vTradeRowCost");
-println(vrb_list, "vTradeIrCost");
+println(vrb_list, "vDummyImportCost");
+println(vrb_list, "vDummyExportCost");
+println(vrb_list, "vStorageFixom");
+println(vrb_list, "vStorageVarom");
+println(vrb_list, "vTradeEac");
+println(vrb_list, "vTradeFixom");
+println(vrb_list, "vImportIrCost");
+println(vrb_list, "vExportIrCost");
+println(vrb_list, "vImportRowCost");
+println(vrb_list, "vExportRowCost");
 println(vrb_list, "vTechNewCap");
 println(vrb_list, "vTechRetiredStockCum");
 println(vrb_list, "vTechRetiredStock");
@@ -1105,7 +1294,9 @@ println(vrb_list, "vSupOut");
 println(vrb_list, "vSupReserve");
 println(vrb_list, "vDemInp");
 println(vrb_list, "vOutTot");
+println(vrb_list, "vOutTotRY");
 println(vrb_list, "vInpTot");
+println(vrb_list, "vInpTotRY");
 println(vrb_list, "vInp2Lo");
 println(vrb_list, "vOut2Lo");
 println(vrb_list, "vSupOutTot");
@@ -1137,7 +1328,6 @@ println(vrb_list, "vImportRowCum");
 println(vrb_list, "vImportRow");
 println(vrb_list, "vTradeCap");
 println(vrb_list, "vTradeInv");
-println(vrb_list, "vTradeEac");
 println(vrb_list, "vTradeNewCap");
 println(vrb_list, "vTotalUserCosts");
 

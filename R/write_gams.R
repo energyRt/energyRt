@@ -164,6 +164,7 @@ get_gdxlib_path <- function() {
           }
         }
       } else if (any(grep("^pCosts", nn))) {
+        # browser()
         mmm <- grep(templ, scen@modInp@costs.equation)
         if (any(mmm)) {
           scen@modInp@costs.equation[mmm] <- sapply(
@@ -188,7 +189,8 @@ get_gdxlib_path <- function() {
     scen@settings@solver$import_format <- "gms"
   } else {
     scen@settings@solver$import_format <- "gdx"
-    scen@settings@sourceCode[["GAMS_output"]] <- c(scen@settings@sourceCode[["GAMS_output"]][grep(
+    scen@settings@sourceCode[["GAMS_output"]] <- c(
+      scen@settings@sourceCode[["GAMS_output"]][grep(
       "^file variable_list_csv",
       scen@settings@sourceCode[["GAMS_output"]]
     ):length(scen@settings@sourceCode[["GAMS_output"]])],
