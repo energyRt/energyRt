@@ -610,10 +610,10 @@ pSliceShare:
 pSliceWeight:
   name: pSliceWeight
   dimSets:
-  # - year
+  - year
   - slice
   type: numpar
-  defVal: 0.0
+  defVal: 1.0
   interpolation: back.inter.forth
   colName: ''
 pEmissionFactor:
@@ -1059,10 +1059,13 @@ mTechRetirement:
   name: mTechRetirement
   dimSets: tech
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
-  class: technology
+mTechRetCost:
+  name: mTechRetCost
+  dimSets:
+  - tech
+  - region
+  - year
+  type: map
 mTechNew:
   name: mTechNew
   dimSets:
@@ -1107,8 +1110,30 @@ meqTechRetiredNewCap:
   interpolation: back.inter.forth
   colName: ''
   class: technology
-mTechOMCost:
-  name: mTechOMCost
+# mTechOMCost:
+#   name: mTechOMCost
+#   dimSets:
+#   - tech
+#   - region
+#   - year
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+#   class: technology
+mTechFixom:
+  name: mTechFixom
+  dimSets:
+  - tech
+  - region
+  - year
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+  class: technology
+mTechVarom:
+  name: mTechVarom
   dimSets:
   - tech
   - region
@@ -1908,8 +1933,28 @@ mStorageEac:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
-mStorageOMCost:
-  name: mStorageOMCost
+# mStorageOMCost:
+#   name: mStorageOMCost
+#   dimSets:
+#   - stg
+#   - region
+#   - year
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+mStorageFixom:
+  name: mStorageFixom
+  dimSets:
+  - stg
+  - region
+  - year
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''
+mStorageVarom:
+  name: mStorageVarom
   dimSets:
   - stg
   - region
@@ -2430,6 +2475,16 @@ pExportRow:
   - exp.lo
   - exp.up
   class: export
+mExportRowCost:
+  name: mExportRowCost
+  dimSets:
+  - expp
+  - region
+  - year
+  type: map
+  defVal: 0.0
+  interpolation: ''
+  colName: ''
 pImportRow:
   name: pImportRow
   dimSets:
@@ -2448,6 +2503,16 @@ pImportRow:
   - imp.lo
   - imp.up
   class: import
+mImportRowCost:
+  name: mImportRowCost
+  dimSets:
+  - imp
+  - region
+  - year
+  type: map
+  defVal: 0.0
+  interpolation: ''
+  colName: ''
 pExportRowRes:
   name: pExportRowRes
   dimSets: expp
@@ -2503,22 +2568,22 @@ pDiscountFactor:
   defVal: 1.0
   interpolation: back.inter.forth
   colName: ''
-pDiscountFactorMileStone:
-  name: pDiscountFactorMileStone
-  dimSets:
-  - region
-  - year
-  type: numpar
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
-mDiscountZero:
-  name: mDiscountZero
-  dimSets: region
-  type: map
-  defVal: 1.0
-  interpolation: back.inter.forth
-  colName: ''
+# pDiscountFactorMileStone:
+#   name: pDiscountFactorMileStone
+#   dimSets:
+#   - region
+#   - year
+#   type: numpar
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+# mDiscountZero:
+#   name: mDiscountZero
+#   dimSets: region
+#   type: map
+#   defVal: 1.0
+#   interpolation: back.inter.forth
+#   colName: ''
 mMidMilestone:
   name: mMidMilestone
   dimSets: year
@@ -2653,16 +2718,20 @@ mDummyExport:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
-mDummyCost:
-  name: mDummyCost
+mDummyImportCost:
+  name: mDummyImportCost
   dimSets:
   - comm
   - region
   - year
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+mDummyExportCost:
+  name: mDummyExportCost
+  dimSets:
+  - comm
+  - region
+  - year
+  type: map
 mTradeIr:
   name: mTradeIr
   dimSets:
@@ -2674,6 +2743,26 @@ mTradeIr:
   type: map
   defVal: 0.0
   interpolation: back.inter.forth
+  colName: ''
+mImportIrCost:
+  name: mImportIrCost
+  dimSets:
+  - trade
+  - region
+  - year
+  type: map
+  defVal: 0.0
+  interpolation: ''
+  colName: ''
+mExportIrCost:
+  name: mExportIrCost
+  dimSets:
+  - trade
+  - region
+  - year
+  type: map
+  defVal: 0.0
+  interpolation: ''
   colName: ''
 mvTradeIrAInp:
   name: mvTradeIrAInp
@@ -3327,9 +3416,13 @@ mvBalance:
   - year
   - slice
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+mBalanceRY:
+  name: mBalanceRY
+  dimSets:
+  - comm
+  - region
+  - year
+  type: map
 mvInpTot:
   name: mvInpTot
   dimSets:
@@ -3341,6 +3434,13 @@ mvInpTot:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
+mInpTotRY:
+  name: mInpTotRY
+  dimSets:
+  - comm
+  - region
+  - year
+  type: map
 mvOutTot:
   name: mvOutTot
   dimSets:
@@ -3349,9 +3449,13 @@ mvOutTot:
   - year
   - slice
   type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+mOutTotRY:
+  name: mOutTotRY
+  dimSets:
+  - comm
+  - region
+  - year
+  type: map
 mvInp2Lo:
   name: mvInp2Lo
   dimSets:
@@ -3502,15 +3606,35 @@ mvTradeRowCost:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
-mvTradeIrCost:
-  name: mvTradeIrCost
-  dimSets:
-  - region
-  - year
-  type: map
-  defVal: 0.0
-  interpolation: back.inter.forth
-  colName: ''
+# mvTradeIrCost:
+#   name: mvTradeIrCost
+#   dimSets:
+#   - region
+#   - year
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+# mImportIrCost:
+#   name: mImportIrCost
+#   dimSets:
+#   - imp
+#   - region
+#   - year
+#   type: map
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
+# mExportIrCost:
+#   name: vExportIrCost
+#   dimSets:
+#   - expp
+#   - region
+#   - year
+#   type: var
+#   defVal: 0.0
+#   interpolation: back.inter.forth
+#   colName: ''
 mvTotalCost:
   name: mvTotalCost
   dimSets:
@@ -4216,12 +4340,20 @@ pTradeFixom:
   name: pTradeFixom
   dimSets:
   - trade
+  - region
   - year
   type: numpar
   defVal: 0.0
   interpolation: back.inter.forth
   colName: fixom
   class: trade
+mTradeFixom:
+  name: mTradeFixom
+  dimSets:
+  - trade
+  - region
+  - year
+  type: map
 pTradeRet:
   name: pTradeRet
   dimSets:

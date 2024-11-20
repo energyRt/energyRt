@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Hello World!">
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-CYBYJ238Q5"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9001</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.09.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,6 +102,7 @@ Let’s start with the package settings and continue with the minimal
 model definition.<br></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://energyRt.org">energyRt</a></span><span class="op">)</span></span>
+<span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span> <span class="co"># for data manipulation and visualization</span></span></code></pre></div>
 <p>Check which solver is set</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -286,13 +287,13 @@ becomes a scenario object.<br></p>
 <span><span class="co">#&gt; Validating constraints</span></span>
 <span><span class="co">#&gt;  Repository 'world_repo'</span></span>
 <span><span class="co">#&gt; Validating weather-sets</span></span>
-<span><span class="co">#&gt;                                                                                                                 1.36 sec elapsed</span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241104020148UTC </span></span>
-<span><span class="co">#&gt; Starting time:  2024-11-03 21:01:48 </span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241104020148UTC </span></span>
-<span><span class="co">#&gt; Writing files: 0.17s</span></span>
+<span><span class="co">#&gt;                                                                                                                 1.67 sec elapsed</span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241120003801UTC </span></span>
+<span><span class="co">#&gt; Starting time:  2024-11-19 19:38:01 </span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_2025_MODEL/script/20241120003801UTC </span></span>
+<span><span class="co">#&gt; Writing files: 0.16s</span></span>
 <span><span class="co">#&gt; Starting  GLPK </span></span>
-<span><span class="co">#&gt; 0.02s</span></span>
+<span><span class="co">#&gt; 0.03s</span></span>
 <span><span class="co">#&gt; Reading solution: 0.03s</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_2025</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scenario: HELLO_2025 </span></span>
@@ -302,7 +303,7 @@ becomes a scenario object.<br></p>
 <span><span class="co">#&gt; path: scenarios/HELLO_2025_MODEL </span></span>
 <span><span class="co">#&gt; Solution status: optimal</span></span>
 <span><span class="co">#&gt; vObjective:  1000 </span></span>
-<span><span class="co">#&gt; Size: 3.5 Mb</span></span></code></pre></div>
+<span><span class="co">#&gt; Size: 3.7 Mb</span></span></code></pre></div>
 <p>Solving for multiple years assumes the perferct foresight of the all
 given data for the future. Since we haven’t defined any years for the
 data, it is extrapolated by default for demand and supply objects.<br></p>
@@ -320,14 +321,14 @@ data, it is extrapolated by default for demand and supply objects.<br></p>
 <span><span class="co">#&gt; Validating constraints</span></span>
 <span><span class="co">#&gt;  Repository 'world_repo'</span></span>
 <span><span class="co">#&gt; Validating weather-sets</span></span>
-<span><span class="co">#&gt;                                                                                                                 1.25 sec elapsed</span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241104020149UTC </span></span>
-<span><span class="co">#&gt; Starting time:  2024-11-03 21:01:49 </span></span>
-<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241104020149UTC </span></span>
-<span><span class="co">#&gt; Writing files: 0.17s</span></span>
+<span><span class="co">#&gt;                                                                                                                 1.55 sec elapsed</span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241120003803UTC </span></span>
+<span><span class="co">#&gt; Starting time:  2024-11-19 19:38:03 </span></span>
+<span><span class="co">#&gt; Solver directory:  scenarios/HELLO_WORLD_MODEL/script/20241120003803UTC </span></span>
+<span><span class="co">#&gt; Writing files: 0.14s</span></span>
 <span><span class="co">#&gt; Starting  GLPK </span></span>
 <span><span class="co">#&gt; 0.03s</span></span>
-<span><span class="co">#&gt; Reading solution: 0.04s</span></span>
+<span><span class="co">#&gt; Reading solution: 0.03s</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_2050</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scenario: HELLO_WORLD </span></span>
 <span><span class="co">#&gt; desc:  </span></span>
@@ -335,8 +336,8 @@ data, it is extrapolated by default for demand and supply objects.<br></p>
 <span><span class="co">#&gt; Interpolated: TRUE </span></span>
 <span><span class="co">#&gt; path: scenarios/HELLO_WORLD_MODEL </span></span>
 <span><span class="co">#&gt; Solution status: optimal</span></span>
-<span><span class="co">#&gt; vObjective:  15093.94 </span></span>
-<span><span class="co">#&gt; Size: 3.6 Mb</span></span></code></pre></div>
+<span><span class="co">#&gt; vObjective:  15151.75 </span></span>
+<span><span class="co">#&gt; Size: 3.7 Mb</span></span></code></pre></div>
 <p>tbc…</p>
 </div>
   </main>

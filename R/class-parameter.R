@@ -202,7 +202,7 @@ setMethod(
     if (nrow(data) > 0) {
       if (ncol(data) != ncol(obj@data) ||
         any(sort(colnames(data)) != sort(colnames(obj@data)))) {
-        stop("Internal error: Wrong new data 1")
+        stop("Parameter dimensions mismatch: ", obj@name)
       }
       # data <- data[, colnames(obj@data), drop = FALSE]
       data <- select(data, all_of(colnames(obj@data)))
@@ -219,6 +219,7 @@ setMethod(
       class2 <- function(x) if (inherits(x, "integer")) "numeric" else class(x)
       if (nrow(obj@data) > 0 && # !!! rewrite with exact match
           any(sapply(data, class2) != sapply(obj@data, class))) {
+        # browser()
         stop("Internal error: Wrong new data 3")
       }
       # data <- data[apply(data, 1, function(x) all(!is.na(x))), , drop = FALSE]

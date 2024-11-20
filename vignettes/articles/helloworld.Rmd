@@ -18,6 +18,7 @@ Let's start with the package settings and continue with the minimal model defini
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(energyRt)
+
 library(tidyverse) # for data manipulation and visualization
 ```
 Check which solver is set

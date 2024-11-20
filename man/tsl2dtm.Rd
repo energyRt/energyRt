@@ -11,7 +11,7 @@ tsl2year(tsl, return.null = TRUE)
 
 tsl2yday(tsl, return.null = TRUE)
 
-tsl2hour(tsl, return.null = TRUE)
+tsl2hour(tsl, return.null = TRUE, pattern = "h[0-9]++")
 
 tsl2month(tsl, format = tsl_guess_format(tsl), return.null = TRUE)
 }

@@ -247,14 +247,15 @@ tsl2yday <- function(tsl, return.null = TRUE) {
 #' @examples
 #' tsl
 #' tsl2hour(tsl)
-tsl2hour <- function(tsl, return.null = TRUE) {
-  h <- str_extract(tsl, "h[0-9]++")
+tsl2hour <- function(tsl, return.null = TRUE, pattern = "h[0-9]++") {
+  h <- str_extract(tsl, pattern)
   if (return.null) {
     if (all(is.na(h))) {
       return(NULL)
     }
   }
-  h <- str_sub(h, 2, 3)
+  # replace non-numeric characters
+  h <- str_replace_all(h, "[^0-9.]", "")
   h <- as.integer(h)
   return(h)
 }

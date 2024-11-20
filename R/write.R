@@ -174,11 +174,13 @@ write.sc <- write_sc
 #' @param len_name numeric
 #'
 #' @noRd
-.write_mapping <- function(
+.make_mapping <- function(
     prec,
     interpolation_start_time,
     interpolation_count,
-    len_name) {
+    len_name,
+    scen_settings) {
+  # prec <- scen@modInp
   reduce.duplicate <- function(x) x[!duplicated(x), , drop = FALSE]
   bacs <- paste0(rep("\b", len_name), collapse = "")
   rest <- interpolation_count - 45
@@ -634,7 +636,9 @@ write.sc <- write_sc
     rm(mTechNewCapUp)
   }
 
-  if (nrow(prec@parameters[["pTechRet"]]@data) > 0) {
+  # browser()
+  if (nrow(prec@parameters[["pTechRet"]]@data) > 0 &&
+      scen_settings@optimizeRetirement == TRUE) {
     suppressMessages({
       mTechRet <- prec@parameters[["pTechRet"]]@data |>
         inner_join(prec@parameters[["mTechSpan"]]@data) |>
@@ -820,17 +824,27 @@ write.sc <- write_sc
   rest <- rest + 1
   prec@parameters[["mDummyExport"]] <-
     .dat2par(prec@parameters[["mDummyExport"]], no_inf("pDummyExportCost"))
+
+
   .interpolation_message("mDummyCost", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
 
-  prec@parameters[["mDummyCost"]] <- .dat2par(
-    prec@parameters[["mDummyCost"]],
+  prec@parameters[["mDummyImportCost"]] <- .dat2par(
+    prec@parameters[["mDummyImportCost"]],
     reduce.sect(rbind(
-      .get_data_slot(prec@parameters[["mDummyImport"]]),
+      .get_data_slot(prec@parameters[["mDummyImport"]])
+      # .get_data_slot(prec@parameters[["mDummyExport"]])
+    ), c("comm", "region", "year"))
+  )
+  prec@parameters[["mDummyExportCost"]] <- .dat2par(
+    prec@parameters[["mDummyExportCost"]],
+    reduce.sect(rbind(
       .get_data_slot(prec@parameters[["mDummyExport"]])
     ), c("comm", "region", "year"))
   )
+
+
   .interpolation_message("mvTradeIrAInpTot", rest, interpolation_count,
                          interpolation_start_time, len_name)
   rest <- rest + 1
@@ -1072,17 +1086,64 @@ write.sc <- write_sc
   .interpolation_message("mvTradeCost", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
 
+  # browser()
   ##
   dregionyear <- merge0(region, year)
-  .interpolation_message("mvTradeCost", rest, interpolation_count, interpolation_start_time, len_name)
-  rest <- rest + 1
-  prec@parameters[["mvTradeCost"]] <- .dat2par(prec@parameters[["mvTradeCost"]], dregionyear)
-  .interpolation_message("mvTradeRowCost", rest, interpolation_count, interpolation_start_time, len_name)
-  rest <- rest + 1
-  prec@parameters[["mvTradeRowCost"]] <- .dat2par(prec@parameters[["mvTradeRowCost"]], dregionyear)
-  .interpolation_message("mvTradeIrCost", rest, interpolation_count, interpolation_start_time, len_name)
-  rest <- rest + 1
-  prec@parameters[["mvTradeIrCost"]] <- .dat2par(prec@parameters[["mvTradeIrCost"]], dregionyear)
+  # .interpolation_message("mvTradeCost", rest, interpolation_count, interpolation_start_time, len_name)
+  # rest <- rest + 1
+  # prec@parameters[["mvTradeCost"]] <- .dat2par(prec@parameters[["mvTradeCost"]], dregionyear)
+  # .interpolation_message("mvTradeRowCost", rest, interpolation_count, interpolation_start_time, len_name)
+  # rest <- rest + 1
+  # prec@parameters[["mvTradeRowCost"]] <- .dat2par(prec@parameters[["mvTradeRowCost"]], dregionyear)
+  # .interpolation_message("mvTradeIrCost", rest, interpolation_count, interpolation_start_time, len_name)
+  # rest <- rest + 1
+  # prec@parameters[["mvTradeIrCost"]] <- .dat2par(prec@parameters[["mvTradeIrCost"]], dregionyear)
+  prec@parameters[["mExportRowCost"]] <- .dat2par(
+    prec@parameters[["mExportRowCost"]],
+    merge(
+      unique(
+        select(
+          .get_data_slot(prec@parameters[["mExportRow"]]),
+          all_of(prec@parameters[["mExportRowCost"]]@dimSets)
+        )
+      ),
+      dregionyear
+    )
+  )
+
+  prec@parameters[["mImportRowCost"]] <- .dat2par(
+    prec@parameters[["mImportRowCost"]],
+    merge(
+      unique(
+        select(
+          .get_data_slot(prec@parameters[["mImportRow"]]),
+          all_of(prec@parameters[["mImportRowCost"]]@dimSets)
+        )
+      ),
+      dregionyear
+    )
+  )
+  # mImportIrCost(trade, region, year)
+  x <- .get_data_slot(prec@parameters[["mTradeIr"]]) |>
+    rename(region = dst) |>
+    select(any_of(prec@parameters[["mImportIrCost"]]@dimSets)) |>
+    unique()
+  prec@parameters[["mImportIrCost"]] <- .dat2par(
+    prec@parameters[["mImportIrCost"]],
+    merge0(x, dregionyear)
+    )
+
+  # mExportIrCost(trade, region, year)
+  x <- .get_data_slot(prec@parameters[["mTradeIr"]]) |>
+    rename(region = src) |>
+    select(any_of(prec@parameters[["mExportIrCost"]]@dimSets)) |>
+    unique()
+
+  prec@parameters[["mExportIrCost"]] <- .dat2par(
+    prec@parameters[["mExportIrCost"]],
+    merge(x, dregionyear)
+  )
+  rm(x)
 
   .interpolation_message("mvTotalCost", rest, interpolation_count, interpolation_start_time, len_name)
   rest <- rest + 1
@@ -1182,13 +1243,14 @@ write.sc <- write_sc
       )
     }
   }
+  # browser()
   if (length(prec@costs.equation) == 0) {
     prec@costs.equation <-
       "eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. vTotalUserCosts(region, year) =e= 0;"
   } else {
     prec@costs.equation <- paste0(
-      "eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year).. ",
-      "vTotalUserCosts(region, year) =e= ",
+      "eqTotalUserCosts(region, year)$mvTotalUserCosts(region, year)..",
+      "   vTotalUserCosts(region, year) =e= ",
       gsub("[+][ ]*[-]", "-", paste0(prec@costs.equation, collapse = " + ")), ";"
     )
   }
@@ -1203,7 +1265,8 @@ write.sc <- write_sc
   }
   # browser()
   # mvInpTot ####
-  .interpolation_message("mvInpTot", rest, interpolation_count, interpolation_start_time, len_name)
+  .interpolation_message("mvInpTot", rest, interpolation_count,
+                         interpolation_start_time, len_name)
   rest <- rest + 1
   mvInpTot <- rbind(
     .get_data_slot(prec@parameters$mvDemInp),
@@ -1238,6 +1301,11 @@ write.sc <- write_sc
   prec@parameters[["mvInpTot"]] <-
     .dat2par(prec@parameters[["mvInpTot"]], mvInpTot)
   # rm(mvInpTot)
+
+  # mInpTotRY
+  mInpTotRY <- mvInpTot |> select(-slice) |> unique()
+  prec@parameters[["mInpTotRY"]] <-
+    .dat2par(prec@parameters[["mInpTotRY"]], mInpTotRY)
 
   # mvOutTot ####
   .interpolation_message("mvOutTot", rest, interpolation_count,
@@ -1290,6 +1358,11 @@ write.sc <- write_sc
   }
   prec@parameters[["mvBalance"]] <-
     .dat2par(prec@parameters[["mvBalance"]], mvBalance)
+
+  mBalanceRY <- mvBalance |> select(-slice) |> unique()
+  prec@parameters[["mBalanceRY"]] <-
+    .dat2par(prec@parameters[["mBalanceRY"]], mBalanceRY)
+
   # prec@parameters[["mvInpTot"]] <-
   #   .dat2par(prec@parameters[["mvInpTot"]], mvBalance)
   # prec@parameters[["mvOutTot"]] <-
@@ -1364,6 +1437,9 @@ write.sc <- write_sc
   #     filter(mvOutTot, !(comm %in% prec@parameters$mAggregateFactor@data$comm))
   #     ))) browser() # Debug
   # }
+  mOutTotRY <- mvOutTot |> select(-slice) |> unique()
+  prec@parameters[["mOutTotRY"]] <-
+    .dat2par(prec@parameters[["mOutTotRY"]], mOutTotRY)
   rm(mvOutTot)
   prec
 }

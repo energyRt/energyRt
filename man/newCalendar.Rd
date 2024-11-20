@@ -10,7 +10,7 @@ newCalendar(
   timetable = NULL,
   year_fraction = 1,
   default_timeframe = NULL,
-  misc = list(),
+  misc = list(pSliceWeight = NULL),
   ...
 )
 }

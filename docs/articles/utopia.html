@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Utopia: the testing model">
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-CYBYJ238Q5"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">energyRt</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.7.9001</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.50.09.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@
             <h3 data-toc-skip class="subtitle">(transitional/interim
 version)</h3>
             
-            <h4 data-toc-skip class="date">2024-11-03</h4>
+            <h4 data-toc-skip class="date">2024-11-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/energyRt/energyRt/blob/HEAD/vignettes/utopia.Rmd" class="external-link"><code>vignettes/utopia.Rmd</code></a></small>
       <div class="d-none name"><code>utopia.Rmd</code></div>
@@ -136,8 +136,10 @@ is to have installed <code>energyRt</code>, the solver software
 detailed installation steps are available on the package website (<a href="https://github.com/energyRt/energyRt/" class="external-link uri">https://github.com/energyRt/energyRt/</a>).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"energyRt"</span><span class="op">)</span> <span class="op">&lt;</span> <span class="st">"0.49.1"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"\nPlease install the latest version of energyRt package.\n"</span>,</span>
-<span>       <span class="st">'devtools::install_github("energyRt/energyRt", ref = "dev")'</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span></span>
+<span>    <span class="st">"\nPlease install the latest version of energyRt package.\n"</span>,</span>
+<span>    <span class="st">'devtools::install_github("energyRt/energyRt", ref = "dev")'</span></span>
+<span>  <span class="op">)</span></span>
 <span>  <span class="co"># devtools::install_github("energyRt/energyRt", ref = "v0.50")</span></span>
 <span><span class="op">}</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://energyRt.org">energyRt</a></span><span class="op">)</span></span>
@@ -169,12 +171,13 @@ compared on the figure below.</p>
 <span><span class="va">par_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">utopia</span><span class="op">$</span><span class="va">map</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="st">"region"</span><span class="op">]</span><span class="op">)</span>, </span>
-<span>       main <span class="op">=</span> <span class="va">maps</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, </span>
-<span>       bg <span class="op">=</span> <span class="st">"aliceblue"</span>, </span>
-<span>       col <span class="op">=</span> <span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">11</span>, <span class="st">"Set3"</span><span class="op">)</span>,</span>
-<span>       key.pos <span class="op">=</span> <span class="cn">NULL</span>, </span>
-<span>       reset <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">utopia</span><span class="op">$</span><span class="va">map</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="st">"region"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    main <span class="op">=</span> <span class="va">maps</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,</span>
+<span>    bg <span class="op">=</span> <span class="st">"aliceblue"</span>,</span>
+<span>    col <span class="op">=</span> <span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">11</span>, <span class="st">"Set3"</span><span class="op">)</span>,</span>
+<span>    key.pos <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>    reset <span class="op">=</span> <span class="cn">F</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">par_default</span><span class="op">)</span></span></code></pre></div>
 <p>Certainly, any other map in <code>SpatialPolygonsDataFrame</code>
@@ -185,11 +188,13 @@ and keep the <code>7</code> first regions for the simulation.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># data("utopia_honeycomb") # , package = "energyRt")</span></span>
 <span><span class="va">gis</span> <span class="op">&lt;-</span> <span class="va">utopia</span><span class="op">$</span><span class="va">map</span><span class="op">$</span><span class="va">honeycomb</span></span>
-<span><span class="va">gis</span> <span class="op">&lt;-</span> <span class="va">gis</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="op">]</span></span>
+<span><span class="va">gis</span> <span class="op">&lt;-</span> <span class="va">gis</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="co"># Often used parameters</span></span>
-<span><span class="va">reg_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">gis</span><span class="op">$</span><span class="va">region</span><span class="op">)</span>; <span class="va">reg_names</span> <span class="co"># Region names</span></span>
-<span><span class="va">nreg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">reg_names</span><span class="op">)</span>; <span class="va">nreg</span> <span class="co"># Number of regions</span></span></code></pre></div>
+<span><span class="va">reg_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">gis</span><span class="op">$</span><span class="va">region</span><span class="op">)</span></span>
+<span><span class="va">reg_names</span> <span class="co"># Region names</span></span>
+<span><span class="va">nreg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">reg_names</span><span class="op">)</span></span>
+<span><span class="va">nreg</span> <span class="co"># Number of regions</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="mapping-with-ggplot">Mapping with ggplot<a class="anchor" aria-label="anchor" href="#mapping-with-ggplot"></a>
@@ -517,10 +522,10 @@ year, the final values will be used for interpolation forward.</p>
 <span><span class="co"># dat$pDemand |&gt; as.data.table()</span></span>
 <span><span class="co"># scen_BASE_int@modInp@parameters$pDemand@data</span></span>
 <span><span class="co"># scen_BASE_int@modInp@parameters$pDemand@data &lt;- dat$pDemand |&gt;</span></span>
-<span>  <span class="co"># as.data.table()</span></span>
+<span><span class="co"># as.data.table()</span></span>
 <span></span>
 <span><span class="co"># replace data for banchmarking</span></span>
-<span><span class="co"># elc_dem &lt;- elc_dem |&gt; </span></span>
+<span><span class="co"># elc_dem &lt;- elc_dem |&gt;</span></span>
 <span><span class="co">#   left_join(select(dat$pDemand, region, year, slice, value)) |&gt;</span></span>
 <span><span class="co">#   mutate(PJ = value) |&gt; select(-value)</span></span>
 <span></span>
@@ -536,6 +541,8 @@ year, the final values will be used for interpolation forward.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">DEM_ELC</span><span class="op">@</span><span class="va">dem</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">DEM_ELC</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">DEM_ELC</span><span class="op">@</span><span class="va">dem</span><span class="op">$</span><span class="va">year</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">DEM_ELC</span><span class="op">@</span><span class="va">dem</span><span class="op">$</span><span class="va">region</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">DEM_ELC</span><span class="op">@</span><span class="va">dem</span><span class="op">$</span><span class="va">slice</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -568,7 +575,8 @@ costs, can be assigned with <code>availability</code> parameters.</p>
 <span>    cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">convert</span><span class="op">(</span><span class="st">"USD/tce"</span>, <span class="st">"MUSD/PJ"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">60</span>, <span class="fl">70</span><span class="op">)</span> <span class="op">*</span> <span class="fl">.7</span><span class="op">)</span><span class="op">)</span> <span class="co"># assumed price per 1PJ</span></span>
 <span>  <span class="op">)</span></span>
 <span>  <span class="co"># timeframe = "ANNUAL"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">SUP_COA</span><span class="op">)</span></span></code></pre></div>
 <p>The saved parameter can be checked in
 <code>SUP_COA@availability</code> slot:</p>
 <p>The <code>NA</code> values mean “for all” by default in columns with
@@ -592,6 +600,7 @@ Similarly, for other primary commodities:</p>
 <span>  <span class="op">)</span></span>
 <span>  <span class="co"># timeframe = "ANNUAL"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">SUP_GAS</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">SUP_NUC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"SUP_NUC"</span>,</span>
@@ -601,6 +610,7 @@ Similarly, for other primary commodities:</p>
 <span>  <span class="op">)</span></span>
 <span>  <span class="co"># timeframe = "ANNUAL"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">SUP_NUC</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">RES_HYD</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"RES_HYD"</span>,</span>
@@ -610,18 +620,21 @@ Similarly, for other primary commodities:</p>
 <span>    cost <span class="op">=</span> <span class="fl">0</span> <span class="co"># no price to the resource, can be dropped</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">RES_HYD</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">RES_SOL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"RES_SOL"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"SOL"</span></span>
 <span>  <span class="co"># availability will be defined by weather factors (see below)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">RES_SOL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">RES_WIN</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newSupply.html">newSupply</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"RES_WIN"</span>,</span>
 <span>  commodity <span class="op">=</span> <span class="st">"WIN"</span></span>
 <span>  <span class="co"># availability will be defined by weather factors (see below)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">RES_WIN</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="technologies">Technologies<a class="anchor" aria-label="anchor" href="#technologies"></a>
@@ -652,7 +665,7 @@ various weights into one level, then all the comm…</p>
 <span>  output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    comm <span class="op">=</span> <span class="st">"ELC"</span>,</span>
 <span>    unit <span class="op">=</span> <span class="st">"PJ"</span></span>
-<span>  <span class="op">)</span>, </span>
+<span>  <span class="op">)</span>,</span>
 <span>  aux <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    acomm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HG"</span>, <span class="st">"NOX"</span>, <span class="st">"PM"</span>, <span class="st">"SO2"</span><span class="op">)</span>,</span>
 <span>    unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"t"</span>, <span class="st">"kt"</span>, <span class="st">"kt"</span>, <span class="st">"kt"</span><span class="op">)</span></span>
@@ -676,7 +689,8 @@ various weights into one level, then all the comm…</p>
 <span>    fixom <span class="op">=</span> <span class="fl">100</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  invcost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    invcost <span class="op">=</span> <span class="fl">1500</span></span>
+<span>    invcost <span class="op">=</span> <span class="fl">1500</span>,</span>
+<span>    retcost <span class="op">=</span> <span class="op">-</span><span class="fl">500</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  capacity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">reg_names</span>, <span class="va">reg_names</span><span class="op">)</span>,</span>
@@ -689,7 +703,8 @@ various weights into one level, then all the comm…</p>
 <span>  olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    olife <span class="op">=</span> <span class="fl">30</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  timeframe <span class="op">=</span> <span class="st">"HOUR"</span></span>
+<span>  timeframe <span class="op">=</span> <span class="st">"HOUR"</span>,</span>
+<span>  optimizeRetirement <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">ECOA</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -734,7 +749,8 @@ various weights into one level, then all the comm…</p>
 <span>    fixom <span class="op">=</span> <span class="fl">100</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  invcost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    invcost <span class="op">=</span> <span class="fl">1200</span></span>
+<span>    invcost <span class="op">=</span> <span class="fl">1200</span>,</span>
+<span>    retcost <span class="op">=</span> <span class="fl">150</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  capacity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">reg_names</span>, <span class="va">reg_names</span><span class="op">)</span>,</span>
@@ -747,7 +763,8 @@ various weights into one level, then all the comm…</p>
 <span>  olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    olife <span class="op">=</span> <span class="fl">30</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  timeframe <span class="op">=</span> <span class="st">"HOUR"</span></span>
+<span>  timeframe <span class="op">=</span> <span class="st">"HOUR"</span>,</span>
+<span>  optimizeRetirement <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">EGAS</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -841,12 +858,14 @@ various weights into one level, then all the comm…</p>
 <span>    fixom <span class="op">=</span> <span class="fl">30</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  invcost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    invcost <span class="op">=</span> <span class="fu">convert</span><span class="op">(</span><span class="st">"USD/kW"</span>, <span class="st">"MUSD/GW"</span>, <span class="fl">3500</span><span class="op">)</span></span>
+<span>    invcost <span class="op">=</span> <span class="fu">convert</span><span class="op">(</span><span class="st">"USD/kW"</span>, <span class="st">"MUSD/GW"</span>, <span class="fl">3500</span><span class="op">)</span>,</span>
+<span>    retcost <span class="op">=</span> <span class="fl">500</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  capacity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    region <span class="op">=</span> <span class="va">reg_names</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>    year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2015</span>, <span class="fl">2060</span><span class="op">)</span>,</span>
-<span>    stock <span class="op">=</span> <span class="fl">2</span></span>
+<span>    year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2015</span>, <span class="fl">2040</span>, <span class="fl">2041</span>, <span class="fl">2060</span><span class="op">)</span>,</span>
+<span>    stock <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>    ret.up <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    start <span class="op">=</span> <span class="fl">2010</span></span>
@@ -857,7 +876,8 @@ various weights into one level, then all the comm…</p>
 <span>  olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    olife <span class="op">=</span> <span class="fl">60</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  timeframe <span class="op">=</span> <span class="st">"HOUR"</span></span>
+<span>  timeframe <span class="op">=</span> <span class="st">"HOUR"</span>,</span>
+<span>  optimizeRetirement <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">ENUC</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -1102,12 +1122,21 @@ various weights into one level, then all the comm…</p>
 <span>  invcost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    invcost <span class="op">=</span> <span class="fu">convert</span><span class="op">(</span><span class="st">"USD/kWh"</span>, <span class="st">"MUSD/PJ"</span>, <span class="fl">200</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
+<span>  fixom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2015</span>, <span class="fl">2030</span>, <span class="fl">2050</span><span class="op">)</span>,</span>
+<span>    fixom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  varom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    region <span class="op">=</span> <span class="va">reg_names</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>    stgcost <span class="op">=</span> <span class="fu">convert</span><span class="op">(</span><span class="st">"USD/kWh"</span>, <span class="st">"MUSD/PJ"</span>, <span class="fl">0.01</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  seff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    stgeff <span class="op">=</span> <span class="fl">.99</span>,</span>
 <span>    inpeff <span class="op">=</span> <span class="fl">.9</span>,</span>
 <span>    outeff <span class="op">=</span> <span class="fl">.95</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">STGELC</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -1128,8 +1157,8 @@ GIS info.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data frame of trade routes</span></span>
 <span><span class="va">trd_dt</span> <span class="op">&lt;-</span> <span class="va">trd_nbr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.data.frame.table</a></span><span class="op">(</span>stringsAsFactors <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Freq</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.data.frame.table</a></span><span class="op">(</span>stringsAsFactors <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Freq</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>src <span class="op">=</span> <span class="fl">1</span>, dst <span class="op">=</span> <span class="fl">2</span>, trd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
@@ -1146,8 +1175,7 @@ GIS info.</p>
 <span><span class="co"># a &lt;- value</span></span>
 <span><span class="va">trd_flows_map</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gis</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"wheat"</span>, colour <span class="op">=</span> <span class="st">"white"</span>, alpha <span class="op">=</span> <span class="fl">1</span>, linewidth <span class="op">=</span> <span class="fl">.5</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span> <span class="co"># aes fill = id,</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"wheat"</span>, colour <span class="op">=</span> <span class="st">"white"</span>, alpha <span class="op">=</span> <span class="fl">1</span>, linewidth <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> <span class="op">+</span> <span class="co"># aes fill = id,</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># do this to leave off the color legend</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Interregional electricity trade routes"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -1163,7 +1191,7 @@ GIS info.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html" class="external-link">geom_segment</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xsrc</span>, y <span class="op">=</span> <span class="va">ysrc</span>, xend <span class="op">=</span> <span class="va">xdst</span>, yend <span class="op">=</span> <span class="va">ydst</span><span class="op">)</span>,</span>
 <span>    data <span class="op">=</span> <span class="va">trd_rou</span>, inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>, linewidth <span class="op">=</span> <span class="fl">.1</span>,</span>
 <span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span></span>
-<span>      type <span class="op">=</span> <span class="st">"closed"</span>, angle <span class="op">=</span> <span class="fl">15</span>, ends <span class="op">=</span> <span class="st">"both"</span>, </span>
+<span>      type <span class="op">=</span> <span class="st">"closed"</span>, angle <span class="op">=</span> <span class="fl">15</span>, ends <span class="op">=</span> <span class="st">"both"</span>,</span>
 <span>      length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.15</span>, <span class="st">"inches"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"white"</span>, alpha <span class="op">=</span> <span class="fl">0.75</span>,</span>
@@ -1213,7 +1241,7 @@ such details as grid simulation models have. …</p>
 <span></span>
 <span><span class="co"># A repository for trades, related technologies and commodities</span></span>
 <span><span class="va">TRBD_ELC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newRepository.html">newRepository</a></span><span class="op">(</span></span>
-<span>  name <span class="op">=</span> <span class="st">"TRBD_ELC"</span>, </span>
+<span>  name <span class="op">=</span> <span class="st">"TRBD_ELC"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"Bidirectional tranmission lines"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co"># Define trade object for each route</span></span>
@@ -1222,18 +1250,24 @@ such details as grid simulation models have. …</p>
 <span>  <span class="co"># The loop creates trade-objects for every region with neighbors,</span></span>
 <span>  <span class="co"># ii &lt;- trd_dt$src %in% src_nm # select routes for the source region</span></span>
 <span>  <span class="va">src_nm</span> <span class="op">&lt;-</span> <span class="va">trd_dt</span><span class="op">$</span><span class="va">src</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
-<span>  <span class="va">dst_nm</span> <span class="op">&lt;-</span> <span class="va">trd_dt</span><span class="op">$</span><span class="va">dst</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> </span>
+<span>  <span class="va">dst_nm</span> <span class="op">&lt;-</span> <span class="va">trd_dt</span><span class="op">$</span><span class="va">dst</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
 <span>  <span class="va">trd_nm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"TRBD_ELC"</span>, <span class="va">src_nm</span>, <span class="va">dst_nm</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="co"># Trade object name</span></span>
 <span>  <span class="va">cmd_nm</span> <span class="op">&lt;-</span> <span class="st">"ELC"</span></span>
 <span></span>
 <span>  <span class="co"># Trade class for every route</span></span>
 <span>  <span class="va">trd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newTrade.html">newTrade</a></span><span class="op">(</span></span>
 <span>    name <span class="op">=</span> <span class="va">trd_nm</span>,</span>
-<span>    desc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Bidirectional transmission line between"</span>, </span>
-<span>                        <span class="va">src_nm</span>, <span class="st">"and"</span>, <span class="va">dst_nm</span><span class="op">)</span>,</span>
+<span>    desc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Bidirectional transmission line between"</span>,</span>
+<span>      <span class="va">src_nm</span>, <span class="st">"and"</span>, <span class="va">dst_nm</span></span>
+<span>    <span class="op">)</span>,</span>
 <span>    commodity <span class="op">=</span> <span class="va">cmd_nm</span>,</span>
-<span>    source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">src_nm</span>, <span class="va">dst_nm</span><span class="op">)</span>,</span>
-<span>    destination <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dst_nm</span>, <span class="va">src_nm</span><span class="op">)</span>,</span>
+<span>    <span class="co"># source = c(src_nm, dst_nm),</span></span>
+<span>    <span class="co"># destination = c(dst_nm, src_nm),</span></span>
+<span>    routes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      src <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">src_nm</span>, <span class="va">dst_nm</span><span class="op">)</span>,</span>
+<span>      dst <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dst_nm</span>, <span class="va">src_nm</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
 <span>    trade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>      src <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">src_nm</span>, <span class="va">dst_nm</span><span class="op">)</span>,</span>
 <span>      dst <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dst_nm</span>, <span class="va">src_nm</span><span class="op">)</span>,</span>
@@ -1248,7 +1282,7 @@ such details as grid simulation models have. …</p>
 <span>      varom <span class="op">=</span> <span class="va">trd_dt</span><span class="op">$</span><span class="va">cost</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="co"># variable trade costs</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    fixom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>      <span class="co"># src = c(src_nm, dst_nm),</span></span>
+<span>      region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">src_nm</span>, <span class="va">dst_nm</span><span class="op">)</span>,</span>
 <span>      <span class="co"># dst = c(dst_nm, src_nm),</span></span>
 <span>      fixom <span class="op">=</span> <span class="fl">0.5</span> <span class="co"># fixed trade costs</span></span>
 <span>    <span class="op">)</span>,</span>
@@ -1261,11 +1295,25 @@ such details as grid simulation models have. …</p>
 <span>    invcost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>      region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">src_nm</span>, <span class="va">dst_nm</span><span class="op">)</span>,</span>
 <span>      invcost <span class="op">=</span> <span class="va">trd_dt</span><span class="op">$</span><span class="va">distance_km</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">/</span> <span class="fl">1e3</span> <span class="op">*</span> <span class="fl">250</span> <span class="op">/</span> <span class="fl">2</span> <span class="co"># $250 MUSD/1000km</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    olife <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      olife <span class="op">=</span> <span class="fl">50</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span>  <span class="va">TRBD_ELC</span> <span class="op">&lt;-</span> <span class="fu">add</span><span class="op">(</span><span class="va">TRBD_ELC</span>, <span class="va">trd</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">TRBD_ELC</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">TRBD_ELC</span><span class="op">)</span></span>
+<span><span class="va">td</span> <span class="op">&lt;-</span> <span class="va">TRBD_ELC</span><span class="op">$</span><span class="va">TRBD_ELC_R1_R2</span></span>
+<span><span class="va">TRBD_ELC</span><span class="op">$</span><span class="va">TRBD_ELC_R1_R2</span><span class="op">@</span><span class="va">invcost</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">TRBD_ELC</span><span class="op">$</span><span class="va">TRBD_ELC_R1_R2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">TRBD_ELC</span><span class="op">$</span><span class="va">TRBD_ELC_R1_R2</span>, region <span class="op">=</span> <span class="st">"R2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">TRBD_ELC</span><span class="op">$</span><span class="va">TRBD_ELC_R3_R4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">td</span><span class="op">@</span><span class="va">invcost</span></span>
+<span><span class="co"># fEAC(td@invcost$invcost[1], discount = 0.05, td@olife$olife[1])</span></span>
+<span><span class="co"># fEAC(td@invcost$invcost[1], discount = 0.0, 1)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -1282,6 +1330,7 @@ such details as grid simulation models have. …</p>
 <span>    price <span class="op">=</span> <span class="va">SUP_COA</span><span class="op">@</span><span class="va">availability</span><span class="op">$</span><span class="va">cost</span> <span class="op">*</span> <span class="fl">1.2</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">COAIMP</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">GASIMP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newImport.html">newImport</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"GASIMP"</span>,</span>
@@ -1293,6 +1342,7 @@ such details as grid simulation models have. …</p>
 <span>    price <span class="op">=</span> <span class="va">SUP_GAS</span><span class="op">@</span><span class="va">availability</span><span class="op">$</span><span class="va">cost</span> <span class="op">*</span> <span class="fl">1.2</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">GASIMP</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OILIMP &lt;- newImport(</span></span>
 <span><span class="co">#   name = "OILIMP",</span></span>
@@ -1309,7 +1359,7 @@ such details as grid simulation models have. …</p>
 <h3 id="the-model">The model<a class="anchor" aria-label="anchor" href="#the-model"></a>
 </h3>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newRepository.html">newRepository</a></span><span class="op">(</span><span class="st">"utopia_repository"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newRepository.html">newRepository</a></span><span class="op">(</span><span class="st">"utopia_repository"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">add</span><span class="op">(</span></span>
 <span>    <span class="co"># Commodities</span></span>
 <span>    <span class="va">ELC</span>, <span class="co"># electricity</span></span>
@@ -1323,7 +1373,9 @@ such details as grid simulation models have. …</p>
 <span>    <span class="va">COAIMP</span>, <span class="va">GASIMP</span>,</span>
 <span>    <span class="co"># Technologies</span></span>
 <span>    <span class="va">ECOA</span>, <span class="va">EGAS</span>, <span class="va">ENUC</span>, <span class="va">EHYD</span>,</span>
-<span>    <span class="co"># EWIN, ESOL,</span></span>
+<span>    <span class="va">EWIN</span>, <span class="va">WWIN</span>,</span>
+<span>    <span class="va">ESOL</span>, <span class="va">WSOL</span>,</span>
+<span>    <span class="va">STGELC</span>,</span>
 <span>    <span class="co"># Electricity trade</span></span>
 <span>    <span class="va">TRBD_ELC</span>, <span class="co"># repository with electricity trade routes</span></span>
 <span>    <span class="va">DEM_ELC</span> <span class="co"># ELC demand with load curve (24 hours x 12 months)</span></span>
@@ -1334,17 +1386,20 @@ such details as grid simulation models have. …</p>
 <span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">repo</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mdl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newModel.html">newModel</a></span><span class="op">(</span><span class="st">"UTOPIA"</span>,</span>
-<span>  debug <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span> <span class="co"># comm = "ELC",</span></span>
-<span>    dummyImport <span class="op">=</span> <span class="fl">1e6</span>,</span>
-<span>    dummyExport <span class="op">=</span> <span class="fl">1e6</span></span>
+<span>  debug <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    comm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ELC"</span>, <span class="st">"CO2"</span><span class="op">)</span>,</span>
+<span>    dummyImport <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e5</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>    dummyExport <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">1e5</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  region <span class="op">=</span> <span class="va">reg_names</span>,</span>
 <span>  discount <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  calendar <span class="op">=</span> <span class="fu"><a href="../reference/newCalendar.html">newCalendar</a></span><span class="op">(</span><span class="fu"><a href="../reference/calendar.html">make_timetable</a></span><span class="op">(</span><span class="va">timeslices</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  repository <span class="op">=</span> <span class="va">repo</span></span>
+<span>  calendar <span class="op">=</span> <span class="fu"><a href="../reference/newCalendar.html">newCalendar</a></span><span class="op">(</span>timetable <span class="op">=</span> <span class="fu"><a href="../reference/calendar.html">make_timetable</a></span><span class="op">(</span><span class="va">timeslices</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  repository <span class="op">=</span> <span class="va">repo</span>,</span>
+<span>  optimizeRetirement <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">mdl</span><span class="op">@</span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">mdl</span><span class="op">@</span><span class="va">data</span></span></code></pre></div>
+<span><span class="va">mdl</span><span class="op">@</span><span class="va">data</span></span>
+<span><span class="va">mdl</span><span class="op">@</span><span class="va">config</span><span class="op">@</span><span class="va">optimizeRetirement</span></span></code></pre></div>
 <p>We can check the shares of the time-slices which are auto-calculated
 assuming that all slices have the same weights. This works for 24 hours,
 but the weights for every month can be specified to take the difference
@@ -1435,7 +1490,8 @@ must be specified as shown below.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_BASE_gams</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">scen_BASE_py</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="fu">add</span><span class="op">(</span><span class="va">mdl</span><span class="op">)</span>,</span>
+<span><span class="va">scen_BASE_py</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span></span>
+<span>  <span class="va">mdl</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"BASE_py"</span>,</span>
 <span>  solver <span class="op">=</span> <span class="va">solver_options</span><span class="op">$</span><span class="va">pyomo_cbc</span>,</span>
 <span>  tmp.del <span class="op">=</span> <span class="cn">F</span></span>
@@ -1456,9 +1512,10 @@ must be specified as shown below.</p>
 <span>    <span class="va">scen_BASE_jl</span>,</span>
 <span>    <span class="va">scen_BASE_py</span>,</span>
 <span>    <span class="va">scen_BASE_gams</span></span>
-<span>    <span class="op">)</span>, </span>
-<span>  name <span class="op">=</span> <span class="st">"vObjective"</span>, </span>
-<span>  merge <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="op">)</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"vObjective"</span>,</span>
+<span>  merge <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="alternative-routine-interpolate-write-solve-read">Alternative routine: interpolate, write, solve, read<a class="anchor" aria-label="anchor" href="#alternative-routine-interpolate-write-solve-read"></a>
@@ -1466,10 +1523,26 @@ must be specified as shown below.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/progress.html">set_progress_bar</a></span><span class="op">(</span><span class="st">"bw"</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># COST_vTechRetiredStock &lt;-</span></span>
+<span><span class="co">#   newCosts(</span></span>
+<span><span class="co">#   "COST_ret_stock",</span></span>
+<span><span class="co">#   variable = "vTechRetiredStock",</span></span>
+<span><span class="co">#          mult = data.frame(</span></span>
+<span><span class="co">#            year = 2015:2060,</span></span>
+<span><span class="co">#            region = "R1",</span></span>
+<span><span class="co">#            value = 100</span></span>
+<span><span class="co">#          ),</span></span>
+<span><span class="co">#          desc = "Cost of retiring technology stock",</span></span>
+<span><span class="co">#          misc = list()</span></span>
+<span><span class="co">#         )</span></span>
+<span></span>
 <span><span class="co"># Step 1: Interpolation of the model/scenario parameters</span></span>
 <span><span class="va">scen_BASE_int</span> <span class="op">&lt;-</span> <span class="fu">interpolate</span><span class="op">(</span></span>
 <span>  <span class="va">mdl</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"BASE"</span></span>
+<span>  <span class="co"># COST_vTechRetiredStock,</span></span>
+<span>  name <span class="op">=</span> <span class="st">"BASE"</span>,</span>
+<span>  optimizeRetirement <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>  discountFirstYear <span class="op">=</span> <span class="cn">F</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 2: Write the model/scenario script on disk in the selected language</span></span>
@@ -1480,7 +1553,7 @@ must be specified as shown below.</p>
 <span><span class="va">scen_BASE_gams</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">tmp.dir</span> <span class="co"># directory</span></span>
 <span></span>
 <span><span class="va">scen_BASE_py</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/write.html">write_sc</a></span><span class="op">(</span><span class="va">scen_BASE_int</span>,</span>
-<span>  solver <span class="op">=</span> <span class="va">solver_options</span><span class="op">$</span><span class="va">pyomo_</span></span>
+<span>  solver <span class="op">=</span> <span class="va">solver_options</span><span class="op">$</span><span class="va">pyomo_cbc</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">scen_BASE_py</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">tmp.dir</span></span>
 <span></span>
@@ -1496,7 +1569,7 @@ must be specified as shown below.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">scen_BASE_gams</span>, wait <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">scen_BASE_py</span>, wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">scen_BASE_glpk</span>, wait <span class="op">=</span> <span class="cn">FALSE</span>, intern <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">scen_BASE_jl</span>, wait <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">scen_BASE_jl</span>, wait <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Step 4: Read solution (wait until solved)</span></span>
 <span><span class="va">scen_BASE_gams</span> <span class="op">&lt;-</span> <span class="fu">read</span><span class="op">(</span><span class="va">scen_BASE_gams</span><span class="op">)</span></span>
@@ -1511,13 +1584,15 @@ must be specified as shown below.</p>
 <span><span class="va">scen_BASE_jl</span> <span class="op">&lt;-</span> <span class="fu">read</span><span class="op">(</span><span class="va">scen_BASE_jl</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scen_BASE_jl</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  GLPK <span class="op">=</span> <span class="va">scen_BASE_glpk</span>,</span>
-<span>  Julia <span class="op">=</span> <span class="va">scen_BASE_jl</span>,</span>
-<span>  Python <span class="op">=</span> <span class="va">scen_BASE_py</span>,</span>
-<span>  GAMS <span class="op">=</span> <span class="va">scen_BASE_gams</span></span>
-<span>  <span class="op">)</span>, </span>
-<span>  name <span class="op">=</span> <span class="st">"vObjective"</span>, merge <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    GLPK <span class="op">=</span> <span class="va">scen_BASE_glpk</span>,</span>
+<span>    Julia <span class="op">=</span> <span class="va">scen_BASE_jl</span>,</span>
+<span>    Python <span class="op">=</span> <span class="va">scen_BASE_py</span>,</span>
+<span>    GAMS <span class="op">=</span> <span class="va">scen_BASE_gams</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"vObjective"</span>, merge <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -1553,19 +1628,19 @@ must be specified as shown below.</p>
 <span><span class="va">CO2CAP</span><span class="op">@</span><span class="va">interpolation</span></span>
 <span></span>
 <span><span class="va">CO2EXP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newExport.html">newExport</a></span><span class="op">(</span></span>
-<span>  name <span class="op">=</span> <span class="st">"CO2EXP"</span>, </span>
+<span>  name <span class="op">=</span> <span class="st">"CO2EXP"</span>,</span>
 <span>  desc <span class="op">=</span> <span class="st">"CO2 price, 'export' if the reduction is not feasible below the price"</span>,</span>
-<span>  commodity <span class="op">=</span> <span class="st">"CO2"</span>, </span>
+<span>  commodity <span class="op">=</span> <span class="st">"CO2"</span>,</span>
 <span>  exp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>price <span class="op">=</span> <span class="op">-</span><span class="fl">10000</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/progress.html">set_progress_bar</a></span><span class="op">(</span>show <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span><span class="va">scen_CO2CAP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/solve.html">solve_model</a></span><span class="op">(</span></span>
-<span>  <span class="va">mdl</span>, </span>
+<span>  <span class="va">mdl</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"CO2CAP"</span>,</span>
 <span>  <span class="va">CO2CAP</span>,</span>
 <span>  <span class="va">CO2EXP</span>,</span>
-<span>  tmp.del <span class="op">=</span> <span class="cn">F</span>, </span>
+<span>  tmp.del <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  wait <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu">getHorizon</span><span class="op">(</span><span class="va">scen_CO2CAP</span><span class="op">)</span></span>
@@ -1574,17 +1649,50 @@ must be specified as shown below.</p>
 <span><span class="va">scen_CO2CAP</span><span class="op">@</span><span class="va">model</span><span class="op">@</span><span class="va">data</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">CO2CAP</span></span>
 <span><span class="va">scen_CO2CAP</span><span class="op">@</span><span class="va">modInp</span><span class="op">@</span><span class="va">parameters</span><span class="op">$</span><span class="va">pCnsRhsCO2CAP</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">scen_BASE</span>, <span class="va">scen_CO2CAP</span><span class="op">)</span>, </span>
-<span>        <span class="st">"vBalance"</span>, comm <span class="op">=</span> <span class="st">"CO2"</span>, merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">scen_BASE</span>, <span class="va">scen_CO2CAP</span><span class="op">)</span>,</span>
+<span>  <span class="st">"vBalance"</span>,</span>
+<span>  comm <span class="op">=</span> <span class="st">"CO2"</span>, merge <span class="op">=</span> <span class="cn">T</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">scenario</span>, <span class="va">comm</span>, <span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span><span class="va">scen_CO2CAP</span>, <span class="st">"vEmsFuelTot"</span>, comm <span class="op">=</span> <span class="st">"CO2"</span>, merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">scenario</span>, <span class="va">comm</span>, <span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span><span class="va">scen_CO2CAP</span>, <span class="st">"vExportRow"</span>, comm <span class="op">=</span> <span class="st">"CO2"</span>, merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  </span></code></pre></div>
-<p>tbc…</p>
+<span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span><span class="va">scen_CO2CAP</span>, <span class="st">"vExportRow"</span>, comm <span class="op">=</span> <span class="st">"CO2"</span>, merge <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="adding-custom-costs-to-the-objective-function">Adding custom costs to the objective function<a class="anchor" aria-label="anchor" href="#adding-custom-costs-to-the-objective-function"></a>
+</h3>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">COST_vTechRetiredStock</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/newCosts.html">newCosts</a></span><span class="op">(</span></span>
+<span>    <span class="st">"COST_ret_stock"</span>,</span>
+<span>    variable <span class="op">=</span> <span class="st">"vTechRetiredStockCum"</span>,</span>
+<span>    mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      year <span class="op">=</span> <span class="fl">2015</span><span class="op">:</span><span class="fl">2060</span>,</span>
+<span>      region <span class="op">=</span> <span class="st">"R1"</span>,</span>
+<span>      value <span class="op">=</span> <span class="fl">100</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    desc <span class="op">=</span> <span class="st">"Cost of retiring technology stock"</span>,</span>
+<span>    misc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">scen_BASE_cost</span> <span class="op">&lt;-</span> <span class="fu">interpolate</span><span class="op">(</span></span>
+<span>  <span class="va">mdl</span>,</span>
+<span>  <span class="va">COST_vTechRetiredStock</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"RET_COST"</span>,</span>
+<span>  optimizeRetirement <span class="op">=</span> <span class="cn">T</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">set_default_solver</span><span class="op">(</span><span class="va">solver_options</span><span class="op">$</span><span class="va">pyomo_glpk</span><span class="op">)</span></span>
+<span><span class="fu">set_default_solver</span><span class="op">(</span><span class="va">solver_options</span><span class="op">$</span><span class="va">glpk</span><span class="op">)</span></span>
+<span><span class="va">scen_BASE_cost</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/write.html">write_sc</a></span><span class="op">(</span><span class="va">scen_BASE_cost</span><span class="op">)</span></span>
+<span><span class="va">scen_BASE_cost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">scen_BASE_cost</span><span class="op">)</span></span>
+<span><span class="va">scen_BASE_cost</span> <span class="op">&lt;-</span> <span class="fu">read</span><span class="op">(</span><span class="va">scen_BASE_cost</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">scen_BASE_cost</span><span class="op">@</span><span class="va">modOut</span><span class="op">@</span><span class="va">variables</span><span class="op">$</span><span class="va">vUserCosts</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -1,6 +1,9 @@
 #' @include docs.R
 # @eval options::as_roxygen_docs()
 
+# set default rounding in data.table for 'unique' and 'duplicated' functions
+data.table::setNumericRounding(2)
+
 # solver ####
 #' @export
 options::define_option(

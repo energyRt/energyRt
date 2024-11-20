@@ -4,10 +4,10 @@
 #' @param path character. Path to the GLPK library with `glpsol.*` executable.
 #'
 #' @return sets the path to the GLPK library in R options and returns NULL.
-#' 
+#'
 #' @rdname solver
 #' @family solver glpk
-#' 
+#'
 #' @export
 #'
 #' @examples
@@ -102,6 +102,7 @@ get_glpk_path <- function() {
 
   ### Costs
   {
+    # browser()
     add_eq_costs <- .equation.from.gams.to.glpk(scen@modInp@costs.equation)
     # Add additional maps
     mps_name_costs <- grep("^[m]Costs", names(scen@modInp@parameters),
@@ -173,7 +174,11 @@ get_glpk_path <- function() {
 
 .sm_to_glpk <- function(obj) {
   if (obj@misc$nValues != -1) {
-    obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
+    if (nrow(obj@data) > obj@misc$nValues) {
+      warning("Ignoring rows in ", obj@name, "\n",
+      "Check the number of rows in @data and @misc$nValues")
+      obj@data <- obj@data[seq(length.out = obj@misc$nValues), , drop = FALSE]
+    }
   }
   if (obj@type == "set") {
     if (nrow(obj@data) == 0) {

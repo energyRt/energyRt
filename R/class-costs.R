@@ -2,8 +2,10 @@
 
 #' @title An S4 class to add costs to objective function
 #' @name class-costs
-#' 
+#'
 #' @inherit newCosts description
+#'
+#' `r lifecycle::badge("experimental")`
 #'
 #' @md
 #' @slot name `r get_slot_info("costs", "name")`
@@ -44,11 +46,11 @@ setMethod("initialize", "costs", function(.Object, ...) {
 
 ## constructor function ####
 #' @title Create new costs object
-#' 
-#' @description Costs object is used to define 
-#' additional costs to add to the model's 
+#'
+#' @description Costs object is used to define
+#' additional costs to add to the model's
 #' objective function.
-#' 
+#'
 #' @md
 #' @param name `get_slot_info("costs", "name")`
 #'
@@ -56,21 +58,22 @@ setMethod("initialize", "costs", function(.Object, ...) {
 #' @param desc `get_slot_info("costs", "desc")`
 #' @param mult `get_slot_info("costs", "mult")`
 #' @param subset `get_slot_info("costs", "subset")`
-#' 
+#'
 #' @return costs object with given specifications.
 #' @family class constraint policy
 #' @rdname newCosts
-#' 
+#'
 #' @export
-#' 
+#'
 newCosts <- function(
-    name, 
-    variable, 
-    desc = "", 
-    mult = NULL, 
+    name,
+    variable,
+    desc = "",
+    mult = NULL,
     subset = NULL,
     misc = NULL
     ) {
+  # browser()
   obj <- new("costs")
   obj@name <- name
   obj@desc <- desc
@@ -87,8 +90,10 @@ newCosts <- function(
     sets[duplicated(sets)] <- paste0(sets[duplicated(sets)], 2)
   }
   if (sum(sets %in% c("region", "year")) != 2) {
-    stop(paste0('Add cost to variable without sets region & year is not ',
-                'allowed (cost "', name, '").'))
+    stop(paste0(
+      "The cost-object accepts variables with 'region' and 'year' dimensions.\n",
+      "  the variable '", variable, "' has the following sets: ",
+      paste0(sets, collapse = ", ")))
   }
   obj@variable <- variable
 
@@ -106,7 +111,7 @@ newCosts <- function(
     if (!all(colnames(subset) %in% sets)) {
       bug <- colnames(subset)[!(colnames(subset) %in% sets)]
       stop(paste0(
-        # "There ", c("is", "are")[1 + length(bug) != 1], 
+        # "There ", c("is", "are")[1 + length(bug) != 1],
         "Unrecognized column",
         "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'),
         '" in subset (cost "', name, '").'
@@ -133,7 +138,7 @@ newCosts <- function(
       if (!all(colnames(mult) %in% c("value", sets))) {
         bug <- colnames(mult)[!(colnames(mult) %in% c("value", sets))]
         stop(paste0(
-          # "There ", c("is", "are")[1 + length(bug) != 1], 
+          # "There ", c("is", "are")[1 + length(bug) != 1],
           "Unrecognized column",
           "s"[length(bug) != 1], ' "', paste0(bug, collapse = '", "'),
           '" in mult (cost "', name, '").'
@@ -168,6 +173,7 @@ newCosts <- function(
 ## internal functions ####
 # Check if the constraint needs additional set(s), add if needed
 .getCostEquation <- function(prec, stm, approxim) {
+  # browser()
   stop.constr <- function(x) {
     stop(paste0('Cost "', stm@name, '" error: ', x))
   }
@@ -217,7 +223,7 @@ newCosts <- function(
     prec@parameters[[xx@name]] <- .dat2par(xx, yy)
     sss <- ""
     if (length(mult_sets) != 0) sss <- paste0("(", paste0(mult_sets,
-                                                          collapse = '", "'),
+                                                          collapse = ", "),
                                               ")")
     mult_txt <- paste0(xx@name, sss, " * ")
   } else {

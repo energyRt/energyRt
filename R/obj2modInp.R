@@ -141,6 +141,7 @@ setMethod(".obj2modInp", signature(
   approxim = "list"
 ), function(obj, app, approxim) {
   # wth <- .upper_case(app)
+  # browser()
   wth <- app
   if (length(wth@timeframe) == 0 && length(approxim$calendar@slices_in_frame) > 1) {
     stop("Slot weather@timeframe is empty, it should have information about slice level")
@@ -383,7 +384,7 @@ setMethod(
       "mMilestoneLast", "mMilestoneFirst", "mMilestoneNext",
       "mMilestoneHasNext", "mSameSlice", "mSameRegion", "ordYear",
       "pYearFraction",
-      "cardYear", "pPeriodLen", "pDiscountFactor", "mDiscountZero"
+      "cardYear", "pPeriodLen", "pDiscountFactor" #, "mDiscountZero"
     )
     for (i in clean_list) {
       obj@parameters[[i]] <- .resetParameter(obj@parameters[[i]])
@@ -441,13 +442,76 @@ setMethod(
     )
     approxim_comm$slice <- approxim$calendar@slice_share$slice
 
-    obj@parameters[["pSliceWeight"]] <- .dat2par(
-      obj@parameters[["pSliceWeight"]],
-      data.table(
-        slice = approxim$calendar@slice_share$slice,
-        value = approxim$calendar@slice_share$weight
+    # browser()
+    data.table::setNumericRounding(2) # ignore small differences in 'unique' function
+    # add pSliceWeight from calendar@misc$pSliceWeight o @slice_share$weight
+    if (!is_null(approxim$calendar@misc$pSliceWeight)) {
+
+      pSliceWeight_tmp <- data.table(
+        year = approxim$calendar@misc$pSliceWeight$year,
+        slice = approxim$calendar@misc$pSliceWeight$slice,
+        value = approxim$calendar@misc$pSliceWeight$weight
       )
+      if (is_null(pSliceWeight_tmp[["value"]])) {
+        if (is_null(pSliceWeight_tmp[["weight"]])) {
+          stop("No slice weight in calendar@misc$pSliceWeight$value or @slice_share$weight")
+        }
+        pSliceWeight_tmp <- rename(pSliceWeight_tmp, value = weight)
+      }
+    } else {
+      pSliceWeight_tmp <- lapply(approxim$year, function(x) {
+        data.table(
+          year = x,
+          slice = approxim$calendar@slice_share$slice,
+          value = approxim$calendar@slice_share$weight
+        )
+      }) |> rbindlist()
+    }
+
+    # calculate slice weights for "parent" timeframes
+    # requirements: weights are given for the lowest level time-slices
+    # approxim$calendar@slice_share |>
+    #   select(-weight) |>
+    #   left_join(, by = "slice")
+
+      a <- pSliceWeight_tmp |>
+      left_join(approxim$calendar@slice_ancestry, by = c("slice" = "child")) |>
+      left_join(select(approxim$calendar@slice_share, -weight),
+                by = c("parent" = "slice")) |>
+        rename(weight = value) |>
+        filter(!is.na(parent))
+
+      b <-
+        approxim$calendar@timetable |>
+        select(1:slice) |>
+        pivot_longer(cols = -slice, names_to = "timeframe",
+                     values_to = "parent") |>
+        as.data.table() |>
+        select(timeframe, parent, slice) |>
+        arrange(timeframe, parent, slice)
+
+      ab <- left_join(a, b, by = c("slice", "parent")) |>
+        group_by(year, parent) |>
+        summarise(value = weighted.mean(weight, w = share)) |>
+        rename(slice = parent) |>
+        as.data.table()
+
+      pSliceWeight_tmp <- rbind(pSliceWeight_tmp, ab) |>
+        filter(year %in% approxim$mileStoneYears) |>
+        unique()
+      # pSliceWeight_tmp$value <- pSliceWeight_tmp$value /
+      #   (24 * 7 * 52 / 24 / 365)
+
+      obj@parameters[["pSliceWeight"]] <- .dat2par(
+      obj@parameters[["pSliceWeight"]],
+      # data.table(
+      #   slice = approxim$calendar@slice_share$slice,
+      #   value = approxim$calendar@slice_share$weight
+      # )
+      pSliceWeight_tmp
     )
+      # browser()
+    rm(a, b, ab, pSliceWeight_tmp)
 
     if (nrow(app@horizon@intervals) == 0) { # ???
       browser()
@@ -521,6 +585,7 @@ setMethod(
     pDiscountFactor <- pDiscount[0, , drop = FALSE]
     for (l in unique(pDiscount$region)) {
       dd <- pDiscount[pDiscount$region == l, , drop = FALSE]
+      if (!app@discountFirstYear) dd$value[which.min(dd$year)] <- 0
       dd$value <- cumprod(1 / (1 + dd$value))
       pDiscountFactor <- rbind(pDiscountFactor, dd)
     }
@@ -530,42 +595,43 @@ setMethod(
                # pDiscountFactor
                )
     # pDiscountFactorMileStone
-    yrr <- app@horizon@intervals$start[1]:app@horizon@intervals$end[nrow(app@horizon@intervals)]
-    tyr <- rep(NA, length(yrr))
-    names(tyr) <- yrr
-    for (yr in seq_len(nrow(app@horizon@intervals))) {
-      tyr[app@horizon@intervals$start[yr] <= yrr & yrr <= app@horizon@intervals$end[yr]] <- app@horizon@intervals$mid[yr]
-    }
+    # yrr <- app@horizon@intervals$start[1]:app@horizon@intervals$end[nrow(app@horizon@intervals)]
+    # tyr <- rep(NA, length(yrr))
+    # names(tyr) <- yrr
+    # for (yr in seq_len(nrow(app@horizon@intervals))) {
+    #   tyr[app@horizon@intervals$start[yr] <= yrr & yrr <= app@horizon@intervals$end[yr]] <- app@horizon@intervals$mid[yr]
+    # }
     # browser()
-    pDiscountFactorMileStone <- pDiscountFactor
-    pDiscountFactorMileStone$year <-
-      tyr[as.character(pDiscountFactorMileStone$year)]
-    pDiscountFactorMileStone <- aggregate(
-      pDiscountFactorMileStone[, "value", drop = FALSE],
-      pDiscountFactorMileStone[, c("region", "year"), drop = FALSE], sum
-    )
-    if (!app@discountFirstYear) {
-      dsc <- pDiscount[pDiscount$year == min(pDiscount$year), ]
-      dsc$mlt <- dsc$value + 1
-      pDiscountFactorMileStone <-
-        merge0(pDiscountFactorMileStone, dsc[, c("region", "mlt")])
-      pDiscountFactorMileStone$value <-
-        pDiscountFactorMileStone$value * pDiscountFactorMileStone$mlt
-      pDiscountFactorMileStone$mlt <- NULL
-    }
-    obj@parameters[["pDiscountFactorMileStone"]] <-
-      .dat2par(obj@parameters[["pDiscountFactorMileStone"]],
-                pDiscountFactorMileStone)
+    # pDiscountFactorMileStone <- pDiscountFactor
+    # pDiscountFactorMileStone$year <-
+    #   tyr[as.character(pDiscountFactorMileStone$year)]
+    # pDiscountFactorMileStone <- aggregate(
+    #   pDiscountFactorMileStone[, "value", drop = FALSE],
+    #   pDiscountFactorMileStone[, c("region", "year"), drop = FALSE], sum
+    # )
+    # if (!app@discountFirstYear) {
+      # warning("discountFirstYear is temporary set to TRUE")
+      # dsc <- pDiscount[pDiscount$year == min(pDiscount$year), ]
+      # dsc$mlt <- dsc$value + 1
+      # pDiscountFactorMileStone <-
+      #   merge0(pDiscountFactorMileStone, dsc[, c("region", "mlt")])
+      # pDiscountFactorMileStone$value <-
+      #   pDiscountFactorMileStone$value * pDiscountFactorMileStone$mlt
+      # pDiscountFactorMileStone$mlt <- NULL
+    # }
+    # obj@parameters[["pDiscountFactorMileStone"]] <-
+    #   .dat2par(obj@parameters[["pDiscountFactorMileStone"]],
+    #             pDiscountFactorMileStone)
     # browser()
     # pDiscountFactorMileStone
-    mDiscountZero <-
-      pDiscount[pDiscount$year == as.character(max(app@horizon@period)), -2]
-    mDiscountZero <- mDiscountZero[mDiscountZero$value == 0, "region", drop = FALSE]
-    # Add mDiscountZero - zero discount rate in final int(?)
-    if (nrow(mDiscountZero) != 0) {
-      obj@parameters[["mDiscountZero"]] <-
-        .dat2par(obj@parameters[["mDiscountZero"]], mDiscountZero)
-    }
+    # mDiscountZero <-
+    #   pDiscount[pDiscount$year == as.character(max(app@horizon@period)), -2]
+    # mDiscountZero <- mDiscountZero[mDiscountZero$value == 0, "region", drop = FALSE]
+    # # Add mDiscountZero - zero discount rate in final int(?)
+    # if (nrow(mDiscountZero) != 0) {
+    #   obj@parameters[["mDiscountZero"]] <-
+    #     .dat2par(obj@parameters[["mDiscountZero"]], mDiscountZero)
+    # }
     # browser()
     # pYearFraction <- data.table(year = .get_data_slot(obj@parameters$year))
     pYearFraction <- .get_data_slot(obj@parameters$year)
@@ -992,13 +1058,16 @@ setMethod(
       obj@parameters[["mStorageOlifeInf"]] <-
         .dat2par(obj@parameters[["mStorageOlifeInf"]], mStorageOlifeInf)
     }
-    mStorageOMCost <- NULL
-    add_omcost <- function(mStorageOMCost, pStorageFixom) {
+    # mStorageOMCost <- NULL
+    # browser()
+    mStorageVarom <- NULL
+    mStorageFixom <- NULL
+    add_omcost <- function(mStorageFixom, pStorageFixom) {
       if (is.null(pStorageFixom) || all(pStorageFixom$value == 0)) {
-        return(mStorageOMCost)
+        return(mStorageFixom)
       }
-      return(rbind(
-        mStorageOMCost,
+      x <- rbind(
+        mStorageFixom,
         merge0(mStorageSpan,
                select(filter(pStorageFixom, value != 0),
                       any_of(colnames(mStorageSpan))
@@ -1008,17 +1077,29 @@ setMethod(
         #   colnames(pStorageFixom) %in% colnames(mStorageSpan),
         #   drop = FALSE
         # ])
-      ))
+      )
+      return(unique(x))
     }
-    mStorageOMCost <- add_omcost(mStorageOMCost, pStorageFixom)
-    mStorageOMCost <- add_omcost(mStorageOMCost, pStorageCostInp)
-    mStorageOMCost <- add_omcost(mStorageOMCost, pStorageCostOut)
-    mStorageOMCost <- add_omcost(mStorageOMCost, pStorageCostStore)
+    mStorageFixom <- add_omcost(mStorageFixom, pStorageFixom)
 
-    if (!is.null(mStorageOMCost)) {
-      mStorageOMCost <- merge0(mStorageOMCost[!duplicated(mStorageOMCost), ], mStorageSpan)
-      obj@parameters[["mStorageOMCost"]] <- .dat2par(obj@parameters[["mStorageOMCost"]], mStorageOMCost)
+    if (!is.null(mStorageFixom)) {
+      mStorageFixom <- merge0(mStorageFixom, mStorageSpan)
+      obj@parameters[["mStorageFixom"]] <-
+        .dat2par(obj@parameters[["mStorageFixom"]], mStorageFixom)
     }
+
+    mStorageVarom <- add_omcost(mStorageVarom, pStorageCostInp)
+    mStorageVarom <- add_omcost(mStorageVarom, pStorageCostOut)
+    mStorageVarom <- add_omcost(mStorageVarom, pStorageCostStore)
+
+    if (!is.null(mStorageVarom)) {
+      # browser()
+      mStorageVarom <- merge0(mStorageVarom, mStorageSpan)
+      obj@parameters[["mStorageVarom"]] <-
+        .dat2par(obj@parameters[["mStorageVarom"]], mStorageVarom)
+    }
+
+
     # dsm <- obj@parameters[['mStorageOMCost']]@dimSets
     # mStorageOMCost <- NULL
     # browser()
@@ -1733,9 +1814,16 @@ setMethod(
     retcost <- .interp_numpar(tech@invcost, "retcost",
                               obj@parameters[["pTechRetCost"]], approxim,
                               "tech", tech@name)
-    if (!is.null(retcost)) {
+    if (!is.null(retcost) ) {
       obj@parameters[["pTechRetCost"]] <-
         .dat2par(obj@parameters[["pTechRetCost"]], retcost)
+
+      mretcost <- retcost |> select(-value) |> unique()
+      if (!is_null(mretcost) && approxim$optimizeRetirement) {
+       # && scen@settings@optimizeRetirement
+        obj@parameters[["mTechRetCost"]] <-
+          .dat2par(obj@parameters[["mTechRetCost"]], mretcost)
+      }
     }
 
     # browser()
@@ -1851,6 +1939,7 @@ setMethod(
       pTechCinp2ginp <- NULL
     }
     if (tech@optimizeRetirement) {
+      # browser()
       obj@parameters[["mTechRetirement"]] <-
         .dat2par(obj@parameters[["mTechRetirement"]], data.table(tech = tech@name))
     }
@@ -2002,7 +2091,8 @@ setMethod(
     }
     # browser()
     if (nrow(dd0$new) > 0 && tech@optimizeRetirement) {
-      obj@parameters[["meqTechRetiredNewCap"]] <- .dat2par(obj@parameters[["meqTechRetiredNewCap"]], mTechNew)
+      obj@parameters[["meqTechRetiredNewCap"]] <-
+        .dat2par(obj@parameters[["meqTechRetiredNewCap"]], mTechNew)
 
 
       mvTechRetiredCap0 <- merge0(merge0(mTechNew, mTechSpan, by = c("tech", "region")),
@@ -2013,6 +2103,7 @@ setMethod(
         mvTechRetiredCap0$year.x + mvTechRetiredCap0$olife > mvTechRetiredCap0$year.y &
           mvTechRetiredCap0$year.x <= mvTechRetiredCap0$year.y), -5]
       colnames(mvTechRetiredCap0)[3:4] <- c("year", "year.1")
+      mvTechRetiredCap0 <- filter(mvTechRetiredCap0, year != year.1)
       obj@parameters[["mvTechRetiredNewCap"]] <- .dat2par(
         obj@parameters[["mvTechRetiredNewCap"]],
         mvTechRetiredCap0
@@ -2464,35 +2555,43 @@ setMethod(
       stop('Techology "', tech@name, '", there is not activity commodity')
     }
     # mTechOMCost(tech, region, year)
-    mTechOMCost <- NULL
-    add_omcost <- function(mTechOMCost, pTechFixom) {
-      if (is.null(pTechFixom) || all(pTechFixom$value == 0)) {
-        return(mTechOMCost)
+    # mTechOMCost <- NULL
+    mTechFixom <- NULL
+    add_omcost <- function(x, y) {
+      if (is.null(y) || all(y$value == 0)) {
+        return(x)
       }
       x <- rbind(
-        mTechOMCost,
+        x,
         merge0(
           mTechSpan,
           # pTechFixom[pTechFixom$value != 0,
           #            colnames(pTechFixom) %in% colnames(mTechSpan),
           #            drop = FALSE]
           select(
-            filter(pTechFixom, value != 0),
+            filter(y, value != 0),
             any_of(colnames(mTechSpan))
             )
           )
         )
-      return(x)
+      return(unique(x))
     }
-    mTechOMCost <- add_omcost(mTechOMCost, pTechFixom)
-    mTechOMCost <- add_omcost(mTechOMCost, pTechVarom)
-    mTechOMCost <- add_omcost(mTechOMCost, pTechCvarom)
-    mTechOMCost <- add_omcost(mTechOMCost, pTechAvarom)
 
-    if (!is.null(mTechOMCost)) {
-      mTechOMCost <- merge0(mTechOMCost[!duplicated(mTechOMCost), ], mTechSpan)
-      obj@parameters[["mTechOMCost"]] <-
-        .dat2par(obj@parameters[["mTechOMCost"]], mTechOMCost)
+    # browser()
+    mTechFixom <- add_omcost(mTechFixom, pTechFixom)
+    if (!is.null(mTechFixom)) {
+      mTechFixom <- merge0(mTechFixom[!duplicated(mTechFixom), ], mTechSpan)
+      obj@parameters[["mTechFixom"]] <-
+        .dat2par(obj@parameters[["mTechFixom"]], mTechFixom)
+    }
+    mTechVarom <- NULL
+    mTechVarom <- add_omcost(mTechVarom, pTechVarom)
+    mTechVarom <- add_omcost(mTechVarom, pTechCvarom)
+    mTechVarom <- add_omcost(mTechVarom, pTechAvarom)
+    if (!is.null(mTechVarom)) {
+      mTechVarom <- merge0(mTechVarom, mTechSpan)
+      obj@parameters[["mTechVarom"]] <-
+        .dat2par(obj@parameters[["mTechVarom"]], mTechVarom)
     }
 
     ### Ramp
@@ -3062,7 +3161,16 @@ setMethod(
       # !!! duplicated values after the interpolation - check !!!
       obj@parameters[["pTradeFixom"]] <-
         .dat2par(obj@parameters[["pTradeFixom"]], unique(pTradeFixom))
+
+      # mTradeFixom
+      # browser()
+      mTradeFixom <- pTradeFixom |>
+        select(all_of(obj@parameters[["mTradeFixom"]]@dimSets)) |>
+        unique()
+      obj@parameters[["mTradeFixom"]] <- .dat2par(
+        obj@parameters[["mTradeFixom"]], mTradeFixom)
     }
+
     ####
     mTradeIr <- merge0(mTradeRoutes, mTradeSlice)
     if (trd@capacityVariable) {

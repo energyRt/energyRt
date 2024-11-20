@@ -451,3 +451,13 @@ make_scenario_dirname <- function(
 
   return(name)
 }
+
+
+fEAC <- function(invcost, discount, olife) {
+  stopifnot(olife > 0)
+  stopifnot(invcost > 0)
+  if (round(discount, 7) == 0) {
+    return(invcost/olife)
+  }
+  (invcost * discount) / (1 - (1 + discount) ^ (-olife))
+}
