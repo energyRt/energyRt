@@ -511,6 +511,24 @@ for t, c, r, y, s in mvTechOut:
             + "\n"
         )
 f.close()
+flist.write("vTechOutRY\n")
+f = open("output/vTechOutRY.csv", "w")
+f.write("tech,comm,region,year,value\n")
+for t, c, r, y in mTechOutRY:
+    if model.vTechOutRY[(t, c, r, y)].value != 0:
+        f.write(
+            str(t)
+            + ","
+            + str(c)
+            + ","
+            + str(r)
+            + ","
+            + str(y)
+            + ","
+            + str(model.vTechOutRY[(t, c, r, y)].value)
+            + "\n"
+        )
+f.close()
 flist.write("vTechAInp\n")
 f = open("output/vTechAInp.csv", "w")
 f.write("tech,comm,region,year,slice,value\n")

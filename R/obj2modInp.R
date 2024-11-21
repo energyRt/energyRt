@@ -2157,6 +2157,10 @@ setMethod(
       # mvTechOutS <- mvTechOut |>
       #   left_join()
 
+      mTechOutRY <- mvTechOut |> select(-slice) |> unique()
+      obj@parameters[["mTechOutRY"]] <-
+        .dat2par(obj@parameters[["mTechOutRY"]], mTechOutRY)
+
     } else {
       mvTechOut <- NULL
     }

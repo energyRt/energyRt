@@ -52,6 +52,7 @@ model = Model();
 @variable(model, vTechAct[mvTechAct] >= 0);
 @variable(model, vTechInp[mvTechInp] >= 0);
 @variable(model, vTechOut[mvTechOut] >= 0);
+@variable(model, vTechOutRY[mTechOutRY] >= 0);
 @variable(model, vTechAInp[mvTechAInp] >= 0);
 @variable(model, vTechAOut[mvTechAOut] >= 0);
 @variable(model, vSupOut[mSupAva] >= 0);
@@ -3805,6 +3806,31 @@ print("eqTechOutTot(comm, region, year, slice)...")
                 0
             end) for sp in slice if (t, c, sp, s) in mTechAOutCommAggSlice
         ) for t in tech if (t, c) in mTechAOutCommAgg
+    )
+);
+print(
+    " ",
+    Dates.format(now(), "HH:MM:SS"),
+    "
+",
+)
+# eqTechOutRY(tech, comm, region, year)$mTechOutRY(tech, comm, region, year)
+print("eqTechOutRY(tech, comm, region, year)...")
+@constraint(
+    model,
+    [(t, c, r, y) in mTechOutRY],
+    vTechOutRY[(t, c, r, y)] == sum(
+        (
+            if haskey(pSliceWeight, (y, s))
+                pSliceWeight[(y, s)]
+            else
+                pSliceWeightDef
+            end
+        ) * (if (t, c, r, y, s) in mvTechOut
+            vTechOut[(t, c, r, y, s)]
+        else
+            0
+        end) for s in slice if (c, r, y, s) in mTechOutTot
     )
 );
 print(

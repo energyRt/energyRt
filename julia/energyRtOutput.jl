@@ -522,6 +522,26 @@ for (t, c, r, y, s) in mvTechOut
 end;
 close(fvTechOut);
 
+fvTechOutRY = open("output/vTechOutRY.csv", "w");
+println(fvTechOutRY, "tech,comm,region,year,value");
+for (t, c, r, y) in mTechOutRY
+    if JuMP.value(vTechOutRY[(t, c, r, y)]) != 0
+        println(
+            fvTechOutRY,
+            t,
+            ",",
+            c,
+            ",",
+            r,
+            ",",
+            y,
+            ",",
+            JuMP.value(vTechOutRY[(t, c, r, y)]),
+        )
+    end
+end;
+close(fvTechOutRY);
+
 fvTechAInp = open("output/vTechAInp.csv", "w");
 println(fvTechAInp, "tech,comm,region,year,slice,value");
 for (t, c, r, y, s) in mvTechAInp
@@ -1288,6 +1308,7 @@ println(vrb_list, "vTechCap");
 println(vrb_list, "vTechAct");
 println(vrb_list, "vTechInp");
 println(vrb_list, "vTechOut");
+println(vrb_list, "vTechOutRY");
 println(vrb_list, "vTechAInp");
 println(vrb_list, "vTechAOut");
 println(vrb_list, "vSupOut");

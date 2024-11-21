@@ -106,6 +106,7 @@ set mvTechRetiredStock dimen 3;
 set mvTechAct dimen 4;
 set mvTechInpCommSameSlice dimen 5;
 set mvTechOut dimen 5;
+set mTechOutRY dimen 4;
 set mvTechAInp dimen 5;
 set mvTechAOut dimen 5;
 set mvDemInp dimen 4;
@@ -464,6 +465,7 @@ var vTechCap{tech, region, year} >= 0;
 var vTechAct{tech, region, year, slice} >= 0;
 var vTechInp{tech, comm, region, year, slice} >= 0;
 var vTechOut{tech, comm, region, year, slice} >= 0;
+var vTechOutRY{tech, comm, region, year} >= 0;
 var vTechAInp{tech, comm, region, year, slice} >= 0;
 var vTechAOut{tech, comm, region, year, slice} >= 0;
 var vSupOut{sup, comm, region, year, slice} >= 0;
@@ -728,6 +730,8 @@ s.t.  eqTechInpTot{(c, r, y, s) in mTechInpTot}: vTechInpTot[c,r,y,s]  =  sum{t 
 
 s.t.  eqTechOutTot{(c, r, y, s) in mTechOutTot}: vTechOutTot[c,r,y,s]  =  sum{t in tech:((t,c) in mTechOutCommSameSlice)}(sum{FORIF: (t,c,r,y,s) in mvTechOut} (vTechOut[t,c,r,y,s]))+sum{t in tech:((t,c) in mTechOutCommAgg)}(sum{sp in slice:((t,c,sp,s) in mTechOutCommAggSlice)}(sum{FORIF: (t,c,r,y,sp) in mvTechOut} (vTechOut[t,c,r,y,sp])))+sum{t in tech:((t,c) in mTechAOutCommSameSlice)}(sum{FORIF: (t,c,r,y,s) in mvTechAOut} (vTechAOut[t,c,r,y,s]))+sum{t in tech:((t,c) in mTechAOutCommAgg)}(sum{sp in slice:((t,c,sp,s) in mTechAOutCommAggSlice)}(sum{FORIF: (t,c,r,y,sp) in mvTechAOut} (vTechAOut[t,c,r,y,sp])));
 
+s.t.  eqTechOutRY{(t, c, r, y) in mTechOutRY}: vTechOutRY[t,c,r,y]  =  sum{s in slice:((c,r,y,s) in mTechOutTot)}(pSliceWeight[y,s]*sum{FORIF: (t,c,r,y,s) in mvTechOut} (vTechOut[t,c,r,y,s]));
+
 s.t.  eqStorageInpTot{(c, r, y, s) in mStorageInpTot}: vStorageInpTot[c,r,y,s]  =  sum{st1 in stg:((st1,c,r,y,s) in mvStorageStore)}(vStorageInp[st1,c,r,y,s])+sum{st1 in stg:((st1,c,r,y,s) in mvStorageAInp)}(vStorageAInp[st1,c,r,y,s]);
 
 s.t.  eqStorageOutTot{(c, r, y, s) in mStorageOutTot}: vStorageOutTot[c,r,y,s]  =  sum{st1 in stg:((st1,c,r,y,s) in mvStorageStore)}(vStorageOut[st1,c,r,y,s])+sum{st1 in stg:((st1,c,r,y,s) in mvStorageAOut)}(vStorageAOut[st1,c,r,y,s]);
@@ -785,6 +789,10 @@ for{(t, c, r, y, s) in mvTechInp : vTechInp[t,c,r,y,s] <> 0} {
 printf "tech,comm,region,year,slice,value\n" > "output/vTechOut.csv";
 for{(t, c, r, y, s) in mvTechOut : vTechOut[t,c,r,y,s] <> 0} {
   printf "%s,%s,%s,%s,%s,%f\n", t,c,r,y,s,vTechOut[t,c,r,y,s] >> "output/vTechOut.csv";
+}
+printf "tech,comm,region,year,value\n" > "output/vTechOutRY.csv";
+for{(t, c, r, y) in mTechOutRY : vTechOutRY[t,c,r,y] <> 0} {
+  printf "%s,%s,%s,%s,%f\n", t,c,r,y,vTechOutRY[t,c,r,y] >> "output/vTechOutRY.csv";
 }
 printf "tech,comm,region,year,slice,value\n" > "output/vTechAInp.csv";
 for{(t, c, r, y, s) in mvTechAInp : vTechAInp[t,c,r,y,s] <> 0} {
@@ -1082,6 +1090,7 @@ printf "value\n" > "output/variable_list.csv";
     printf "vTechAct\n" >> "output/variable_list.csv";
     printf "vTechInp\n" >> "output/variable_list.csv";
     printf "vTechOut\n" >> "output/variable_list.csv";
+    printf "vTechOutRY\n" >> "output/variable_list.csv";
     printf "vTechAInp\n" >> "output/variable_list.csv";
     printf "vTechAOut\n" >> "output/variable_list.csv";
     printf "vSupOut\n" >> "output/variable_list.csv";

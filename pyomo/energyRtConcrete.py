@@ -127,6 +127,11 @@ model.vTechOut = Var(
     domain=pyo.NonNegativeReals,
     doc="Commodity output from technology - tech timeframe",
 )
+model.vTechOutRY = Var(
+    mTechOutRY,
+    domain=pyo.NonNegativeReals,
+    doc="Commodity output from technology - tech timeframe",
+)
 model.vTechAInp = Var(
     mvTechAInp, domain=pyo.NonNegativeReals, doc="Auxiliary commodity input"
 )
@@ -2949,6 +2954,28 @@ model.eqTechOutTot = Constraint(
         )
         for t in tech
         if (t, c) in mTechAOutCommAgg
+    ),
+)
+if verbose:
+    print(
+        datetime.datetime.now().strftime("%H:%M:%S"),
+        " (",
+        round(time.time() - seconds, 2),
+        " s)",
+        sep="",
+    )
+# eqTechOutRY(tech, comm, region, year)$mTechOutRY(tech, comm, region, year)
+if verbose:
+    print("eqTechOutRY ", end="")
+sys.stdout.flush()
+model.eqTechOutRY = Constraint(
+    mTechOutRY,
+    rule=lambda model, t, c, r, y: model.vTechOutRY[t, c, r, y]
+    == sum(
+        pSliceWeight.get((y, s))
+        * (model.vTechOut[t, c, r, y, s] if (t, c, r, y, s) in mvTechOut else 0)
+        for s in slice
+        if (c, r, y, s) in mTechOutTot
     ),
 )
 if verbose:

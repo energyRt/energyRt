@@ -1351,9 +1351,43 @@ scen_BASE_int <- interpolate(
   mdl,
   # COST_vTechRetiredStock,
   name = "BASE",
-  optimizeRetirement = T,
+  optimizeRetirement = F,
   discountFirstYear = F
+  # solver = solver_options$gams_gdx_cplex_parallel
 )
+
+# scen_BASE_int_no_ret <- write_sc(
+#   scen_BASE_int_no_ret,
+#   solver = solver_options$glpk
+# )
+# scen_BASE_int_no_ret <- solve(scen_BASE_int_no_ret, wait = T)
+# scen_BASE_int_no_ret <- read(scen_BASE_int_no_ret)
+# 
+# scen_BASE_int_ret <- interpolate(
+#   mdl,
+#   # COST_vTechRetiredStock,
+#   name = "BASE",
+#   optimizeRetirement = T,
+#   discountFirstYear = F
+# )
+
+# scen_BASE_int_ret <- write_sc(
+#   scen_BASE_int_ret,
+#   solver = solver_options$glpk
+# )
+# 
+# scen_BASE_int_ret <- solve(scen_BASE_int_ret, wait = T)
+# 
+# scen_BASE_int_ret <- read(scen_BASE_int_ret)
+
+# getData(
+#   list(
+#     no_ret = scen_BASE_int_no_ret,
+#     ret = scen_BASE_int_ret
+#   ),
+#   name = "vObjective",
+#   merge = TRUE
+# )
 
 # Step 2: Write the model/scenario script on disk in the selected language
 scen_BASE_gams <- write_sc(
@@ -1526,4 +1560,8 @@ scen_BASE_cost <- solve(scen_BASE_cost)
 scen_BASE_cost <- read(scen_BASE_cost)
 
 scen_BASE_cost@modOut@variables$vUserCosts
+scen_BASE_cost@modOut@variables$vTechRetiredStockCum
+
+getData(scen_BASE_cost, "vTechRetiredStockCum", region = "R1")
+
 ```

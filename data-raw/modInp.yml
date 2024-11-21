@@ -2663,6 +2663,17 @@ mTechOutTot:
   defVal: 0.0
   interpolation: back.inter.forth
   colName: ''
+mTechOutRY:
+  name: mTechOutRY
+  dimSets:
+  - tech
+  - comm
+  - region
+  - year
+  type: map
+  defVal: 0.0
+  interpolation: back.inter.forth
+  colName: ''  
 mEmsFuelTot:
   name: mEmsFuelTot
   dimSets:

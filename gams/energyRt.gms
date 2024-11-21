@@ -329,6 +329,7 @@ mvTechAct(tech, region, year, slice)
 mvTechInp(tech, comm, region, year, slice)
 mvTechInpCommSameSlice(tech, comm, region, year, slice)
 mvTechOut(tech, comm, region, year, slice)
+mTechOutRY(tech, comm, region, year)
 mvTechAInp(tech, comm, region, year, slice)
 mvTechAOut(tech, comm, region, year, slice)
 mvDemInp(comm, region, year, slice)
@@ -414,6 +415,8 @@ vTechAct(tech, region, year, slice)                  Activity level of technolog
 vTechInp(tech, comm, region, year, slice)            Input level
 *@ mvTechOut(tech, comm, region, year, slice)
 vTechOut(tech, comm, region, year, slice)            Commodity output from technology - tech timeframe
+*@ mTechOutRY(tech, comm, region, year)
+vTechOutRY(tech, comm, region, year)            Commodity output from technology - tech timeframe
 * Auxiliary input & output
 *@ mvTechAInp(tech, comm, region, year, slice)
 vTechAInp(tech, comm, region, year, slice)           Auxiliary commodity input
@@ -1890,7 +1893,7 @@ eqExportRowCum(expp, comm)$mExpComm(expp, comm)..
 eqExportRowResUp(expp, comm)$mExportRowCumUp(expp, comm)..
   vExportRowCum(expp, comm) =l= pExportRowRes(expp);
 
-* mapping? $mExpRegYear(expp, region, year)
+*
 eqExportRowCost(expp, region, year)$mExportRowCost(expp, region, year)..
   vExportRowCost(expp, region, year)
   =e=
@@ -2058,6 +2061,7 @@ eqOut2Lo(comm, region, year, slice)         From commodity slice to lo level
 eqSupOutTot(comm, region, year, slice)      Supply total output
 eqTechInpTot(comm, region, year, slice)     Technology total input
 eqTechOutTot(comm, region, year, slice)     Technology total output
+eqTechOutRY(tech, comm, region, year)     Technology total output (year)
 eqStorageInpTot(comm, region, year, slice)  Storage total input
 eqStorageOutTot(comm, region, year, slice)  Storage total output
 ;
@@ -2227,6 +2231,14 @@ eqTechOutTot(comm, region, year, slice)$mTechOutTot(comm, region, year, slice)..
             sum(slicep$mTechAOutCommAggSlice(tech, comm, slicep, slice),
                 vTechAOut(tech, comm, region, year, slicep)$mvTechAOut(tech, comm, region, year, slicep)
             )
+        );
+
+eqTechOutRY(tech, comm, region, year)$mTechOutRY(tech, comm, region, year)..
+        vTechOutRY(tech, comm, region, year)
+        =e=
+        sum(slice$mTechOutTot(comm, region, year, slice),
+            pSliceWeight(year, slice) *
+            vTechOut(tech, comm, region, year, slice)$mvTechOut(tech, comm, region, year, slice)
         );
 
 eqStorageInpTot(comm, region, year, slice)$mStorageInpTot(comm, region, year, slice)..
